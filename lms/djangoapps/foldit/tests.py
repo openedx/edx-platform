@@ -25,19 +25,22 @@ class FolditTestCase(TestCase):
 
         pwd = 'abc'
         self.user = User.objects.create_user('testuser', 'test@test.com', pwd)
+        self.user2 = User.objects.create_user('testuser2', 'test2@test.com', pwd)
         self.unique_user_id = unique_id_for_user(self.user)
+        self.unique_user_id2 = unique_id_for_user(self.user2)
         now = datetime.now()
         self.tomorrow = now + timedelta(days=1)
         self.yesterday = now - timedelta(days=1)
 
         UserProfile.objects.create(user=self.user)
+        UserProfile.objects.create(user=self.user2)
 
-    def make_request(self, post_data):
+    def make_request(self, post_data, user=self.user):
         request = self.factory.post(self.url, post_data)
-        request.user = self.user
+        request.user = user
         return request
 
-    def make_puzzle_score_request(self, puzzle_ids, best_scores):
+    def make_puzzle_score_request(self, puzzle_ids, best_scores, user=self.user):
         """
         Given lists of puzzle_ids and best_scores (must have same length), make a
         SetPlayerPuzzleScores request and return the response.
@@ -52,8 +55,8 @@ class FolditTestCase(TestCase):
         scores = [score_dict(pid, bs) for pid, bs in zip(puzzle_ids, best_scores)]
         scores_str = json.dumps(scores)
 
-        verify = {"Verify": verify_code(self.user.email, scores_str),
-                  "VerifyMethod":"FoldItVerify"}
+        verify = {"Verify": verify_code(user.email, scores_str),
+                  "VerifyMethod": "FoldItVerify"}
         data = {'SetPlayerPuzzleScoresVerify': json.dumps(verify),
                 'SetPlayerPuzzleScores': scores_str}
 
@@ -65,7 +68,7 @@ class FolditTestCase(TestCase):
 
     def test_SetPlayerPuzzleScores(self):
 
-        puzzle_id = 994391
+        puzzle_id = [994391]
         best_score = 0.078034
         response = self.make_puzzle_score_request([puzzle_id], [best_score])
 
@@ -76,13 +79,11 @@ class FolditTestCase(TestCase):
                   "Status": "Success"}]}]))
 
         # There should now be a score in the db.
-        top_10 = Score.get_top_n(puzzle_id, 10)
+        top_10 = Score.get_tops_n(puzzle_id, 10)
         self.assertEqual(len(top_10), 1)
         self.assertEqual(top_10[0]['score'], Score.display_score(best_score))
 
-
     def test_SetPlayerPuzzleScores_many(self):
-
 
         response = self.make_puzzle_score_request([1, 2], [0.078034, 0.080000])
 
@@ -96,19 +97,17 @@ class FolditTestCase(TestCase):
                   "Status": "Success"}]}]))
 
 
-
-
     def test_SetPlayerPuzzleScores_multiple(self):
         """
         Check that multiple posts with the same id are handled properly
         (keep latest for each user, have multiple users work properly)
         """
         orig_score = 0.07
-        puzzle_id = 1
+        puzzle_id = ['1']
         response = self.make_puzzle_score_request([puzzle_id], [orig_score])
 
         # There should now be a score in the db.
-        top_10 = Score.get_top_n(puzzle_id, 10)
+        top_10 = Score.get_tops_n(puzzle_id, 10)
         self.assertEqual(len(top_10), 1)
         self.assertEqual(top_10[0]['score'], Score.display_score(best_score))
 
@@ -116,7 +115,7 @@ class FolditTestCase(TestCase):
         better_score = 0.06
         response = self.make_puzzle_score_request([1], [better_score])
 
-        top_10 = Score.get_top_n(puzzle_id, 10)
+        top_10 = Score.get_tops_n(puzzle_id, 10)
         self.assertEqual(len(top_10), 1)
         self.assertEqual(top_10[0]['score'], Score.display_score(better_score))
 
@@ -124,24 +123,51 @@ class FolditTestCase(TestCase):
         worse_score = 0.065
         response = self.make_puzzle_score_request([1], [worse_score])
 
-        top_10 = Score.get_top_n(puzzle_id, 10)
+        top_10 = Score.get_tops_n(puzzle_id, 10)
         self.assertEqual(len(top_10), 1)
         # should still be the better score
         self.assertEqual(top_10[0]['score'], Score.display_score(better_score))
 
+    def test_SetPlayerPyzzleScores_manyplayers(self):
+        """
+        Check that when we send scores from multiple users, the correct order
+        of scores is displayed.
+        """
+        puzzle_id = ['1']
+        player1_score = 0.07
+        player2_score = 0.08
+        response1 = self.make_puzzle_score_request([puzzle_id], [player1_score],
+                self.user)
 
+        # There should now be a score in the db.
+        top_10 = Score.get_tops_n(puzzle_id, 10)
+        self.assertEqual(len(top_10), 1)
+        self.assertEqual(top_10[0]['score'], Score.display_score(player1_score))
+
+        response2 = self.make_puzzle_score_request([puzzle_id], [player2_score],
+                self.user2)
+
+        # There should now be two scores in the db
+        self.assertEqual(len(top_10), 2)
+
+        # Top score should be player2_score. Second should be player1_score
+        self.assertEqual(top_10[0]['score'], Score.display_score(player2_score))
+        self.assertEqual(top_10[1]['score'], Score.display_score(player1_score))
+
+        # Top score user should be self.user2.username
+        self.assertEqual(top_10[0]['username'], self.user2.username)
 
     def test_SetPlayerPuzzleScores_error(self):
 
-        scores = [ {"PuzzleID": 994391,
+        scores = [{"PuzzleID": 994391,
                     "ScoreType": "score",
                     "BestScore": 0.078034,
-                    "CurrentScore":0.080035,
-                    "ScoreVersion":23}]
+                    "CurrentScore": 0.080035,
+                    "ScoreVersion": 23}]
         validation_str = json.dumps(scores)
 
         verify = {"Verify": verify_code(self.user.email, validation_str),
-                  "VerifyMethod":"FoldItVerify"}
+                  "VerifyMethod": "FoldItVerify"}
 
         # change the real string -- should get an error
         scores[0]['ScoreVersion'] = 22

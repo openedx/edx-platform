@@ -111,16 +111,26 @@ def save_scores(user, puzzle_scores):
         current_score = score['CurrentScore']
         score_version = score['ScoreVersion']
 
-        # TODO: save the score
-
         # SetPlayerPuzzleScoreResponse object
-        Score.objects.get_or_create(
-            user=user,
-            unique_user_id=unique_id_for_user(user),
-            puzzle_id=puzzle_id,
-            best_score=best_score,
-            current_score=current_score,
-            score_version=score_version)
+        # Score entries are unique on user/unique_user_id/puzzle_id/score_version
+        try:
+            obj = Score.objects.get(
+                user=user,
+                unique_user_id=unique_id_for_user(user),
+                puzzle_id=puzzle_id,
+                score_version=score_version)
+            obj.current_score = current_score
+            obj.best_score = best_score
+
+        except Score.DoesNotExist:
+            obj = Score(
+                user=user,
+                unique_user_id=unique_id_for_user(user),
+                puzzle_id=puzzle_id,
+                current_score=current_score,
+                best_score=best_score,
+                score_version=score_version)
+            obj.save()
 
         # TODO: get info from db instead?
         score_responses.append({'PuzzleID': puzzle_id,

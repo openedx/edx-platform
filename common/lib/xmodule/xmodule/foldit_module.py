@@ -73,7 +73,7 @@ class FolditModule(XModule):
         """
         from foldit.models import Score
 
-        return [(e['username'], e['total_score']) for e in Score.get_tops_n(10)]
+        return [(e['username'], e['score']) for e in Score.get_tops_n(10)]
 
     def get_html(self):
         """
