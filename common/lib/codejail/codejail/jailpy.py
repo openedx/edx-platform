@@ -3,6 +3,7 @@
 # Instructions:
 #   - AppArmor.md from xserver
 
+import logging
 import os, os.path
 import resource
 import shutil
@@ -12,6 +13,8 @@ import threading
 import time
 
 from .util import temp_directory
+
+log = logging.getLogger(__name__)
 
 # TODO: limit too much stdout data?
 
@@ -60,6 +63,8 @@ def jailpy(code, files=None, argv=None, stdin=None):
         raise Exception("jailpy needs to be configured")
 
     with temp_directory(delete_when_done=True) as tmpdir:
+
+        log.debug("Executing jailed code: %r", code)
 
         # All the supporting files are copied into our directory.
         for filename in files or ():
