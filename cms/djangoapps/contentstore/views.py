@@ -106,6 +106,9 @@ def howitworks(request):
     else: 
         return render_to_response('howitworks.html', {})
 
+def alerts(request):
+    return render_to_response('alerts.html', {})
+
 # ==== Views for any logged-in user ==================================
 
 @login_required

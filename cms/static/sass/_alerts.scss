@@ -292,7 +292,7 @@
   @include box-sizing(border-box);
   @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1);
   position: relative;
-  top: -($baseline*20);
+  top: -($baseline*1.5);
   z-index: 100;
   overflow: hidden;
   width: 100%;
@@ -533,6 +533,22 @@
         color: $pink-s1;
       }
     }
+  }
+}
+
+// temporary
+body.uxdesign.alerts {
+
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    @extend .window;
+    width: flex-grid(12, 12);
+    margin-right: flex-gutter();
+    padding: $baseline ($baseline*1.5);
   }
 }
 
