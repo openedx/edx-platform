@@ -4,7 +4,7 @@
 
 <%block name="content">
 <!-- alert: you're editing a draft -->
-<div class="wrapper wrapper-alert wrapper-alert-warning is-shown">
+<div class="wrapper wrapper-alert wrapper-alert-warning" id="alert-draft">
   <div class="alert warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
@@ -28,7 +28,7 @@
 </div>
 
 <!-- alert: newer version -->
-<div class="wrapper wrapper-alert wrapper-alert-warning is-shown">
+<div class="wrapper wrapper-alert wrapper-alert-warning" id="alert-version">
   <div class="alert warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
@@ -52,7 +52,7 @@
 </div>
 
 <!-- alert: save confirmed -->
-<div class="wrapper wrapper-alert wrapper-alert-confirmation is-shown">
+<div class="wrapper wrapper-alert wrapper-alert-confirmation" id="alert-saved">
   <div class="alert confirmation">
     <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
 
@@ -64,7 +64,7 @@
 </div>
 
 <!-- alert: delete confirmed -->
-<div class="wrapper wrapper-alert wrapper-alert-confirmation is-shown">
+<div class="wrapper wrapper-alert wrapper-alert-confirmation" id="alert-removed">
   <div class="alert confirmation">
     <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
 
@@ -76,7 +76,7 @@
 </div>
 
 <!-- alert: system error -->
-<div class="wrapper wrapper-alert wrapper-alert-error is-shown">
+<div class="wrapper wrapper-alert wrapper-alert-error" id="alert-system-error">
   <div class="alert error">
     <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
 
@@ -88,7 +88,7 @@
 </div>
 
 <!-- alert: user error -->
-<div class="wrapper wrapper-alert wrapper-alert-error is-shown">
+<div class="wrapper wrapper-alert wrapper-alert-error" id="alert-user-error">
   <div class="alert error has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
 
@@ -109,7 +109,7 @@
 </div>
 
 <!-- alert: announcement w/ actions -->
-<div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
+<div class="wrapper wrapper-alert wrapper-alert-announcement" id="alert-announcement1">
   <div class="alert announcement has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-announcement">&#x1F4E2;</i>
 
@@ -133,7 +133,7 @@
 </div>
 
 <!-- alert: announcement -->
-<div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
+<div class="wrapper wrapper-alert wrapper-alert-announcement" id="alert-announcement2">
   <div class="alert announcement">
     <i class="ss-icon ss-symbolicons-block icon icon-announcement">&#x1F4E2;</i>
 
@@ -145,7 +145,7 @@
 </div>
 
 <!-- alert: step required -->
-<div class="wrapper wrapper-alert wrapper-alert-step-required is-shown">
+<div class="wrapper wrapper-alert wrapper-alert-step-required" id="alert-activation">
   <div class="alert step-required has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-step-required">&#xE0D1;</i>
 
@@ -182,14 +182,6 @@
   </div>
 </div>
 
-<div class="wrapper wrapper-testing">
-  <div class="testing">
-    <ul>
-      <li><a href="#" class="test-notification">Toggle Notification</a></li>
-    </ul>
-  </div>
-</div>
-
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
     <div class="title">
@@ -209,6 +201,17 @@
         </header>
 
         <p>In Studio, alerts are 1) general warnings/notes (e.g. drafts, published content, next steps) about the current view a user is interacting with or 2) notes about the status (e.g. saved confirmations, errors, next system steps) of any previous state that need to communicated to the user when arriving at the current view.</p>
+
+        <h3 class="title-3">Different Static Examples of Alerts</h3>
+        <p>Note: alerts will probably never been shown based on click or page action and will primarily be loaded along with a pageload and initial display</p>
+
+        <ul>
+          <li><a href="#" class="test-notification">Toggle Change Warning Notification</a></li>
+          <li><a href="#" class="test-notification">Toggle New Version Warning Notification</a></li>
+          <li><a href="#" class="test-notification">Toggle Editing Warning Notification</a></li>
+          <li><a href="#" class="test-notification">Toggle Saving Notification</a></li>
+          <li><a href="#" class="test-notification">Toggle Help Notification</a></li>
+        </ul>
       </section>
 
       <section>
@@ -218,13 +221,23 @@
         </header>
 
         <p>In Studio, notifications are meant to inform the user of 1) any system status (e.g. saving, processing/validating) occurring based on any action they have taken or 2) any decisions (e.g. saving/discarding) a user must make to confirm.</p>
+
+        <h3 class="title-3">Different Static Examples of Notifications</h3>
+
+        <ul>
+          <li><a href="#" class="test-notification">Toggle Change Warning Notification</a></li>
+          <li><a href="#" class="test-notification">Toggle New Version Warning Notification</a></li>
+          <li><a href="#" class="test-notification">Toggle Editing Warning Notification</a></li>
+          <li><a href="#" class="test-notification">Toggle Saving Notification</a></li>
+          <li><a href="#" class="test-notification">Toggle Help Notification</a></li>
+        </ul>
       </section>
     </article>
   </section>
 </div>
 
 <!-- notification: change has been made and a save is needed -->
-<div class="wrapper wrapper-notification wrapper-notification-change">
+<div class="wrapper wrapper-notification wrapper-notification-change" id="notification-change">
   <div class="notification change has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-change">&#x1F4DD;</i>
     
@@ -248,7 +261,7 @@
 </div>
 
 <!-- notification: newer version exists -->
-<div class="wrapper wrapper-notification wrapper-notification-warning">
+<div class="wrapper wrapper-notification wrapper-notification-warning" id="notification-version">
   <div class="notification warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
     
@@ -277,7 +290,7 @@
 </div>
 
 <!-- notification: warning about editing something dangerous -->
-<div class="wrapper wrapper-notification wrapper-notification-warning">
+<div class="wrapper wrapper-notification wrapper-notification-warning" id="notification-dangerous">
   <div class="notification warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
     
@@ -301,7 +314,7 @@
 </div>
 
 <!-- notification: status - saving -->
-<div class="wrapper wrapper-notification wrapper-notification-status">
+<div class="wrapper wrapper-notification wrapper-notification-status is-shown" id="notification-saving">
   <div class="notification saving">
     <i class="ss-icon ss-symbolicons-block icon icon-saving">&#x2699;</i>
     
@@ -313,7 +326,7 @@
 </div>
 
 <!-- notification: status - helper -->
-<div class="wrapper wrapper-notification wrapper-notification-status">
+<div class="wrapper wrapper-notification wrapper-notification-helping" id="notification-helping">
   <div class="notification helping">
     <i class="ss-icon ss-symbolicons-block icon icon-helping">&#x2753;</i>
     

@@ -10,19 +10,11 @@
   -webkit-transition: bottom 1.5s ease-in-out 0.25s;
   @include box-shadow(0 -1px 3px $shadow);
   position: fixed;
-  bottom: -1000px;
   z-index: 1000;
   width: 100%;
-  overflow: hidden;
-  opacity: 0;
   border-top: 4px solid $gray-l1;
   padding: ($baseline*0.75) ($baseline*2);
   background: $gray-d3;
-
-  &.is-shown {
-    bottom: 0;
-    opacity: 1.0;
-  }
 
   &.wrapper-notification-warning {
     border-top-color: $orange;
@@ -74,12 +66,11 @@
 
   // shorter/status notifications
   &.wrapper-notification-status {
-    width: ($baseline*10);
+    width: ($baseline*12.5);
     right: ($baseline);
     padding: ($baseline/2) $baseline;
 
     .notification {
-      background: red;
       @include box-sizing(border-box);
       @include clearfix();
       width: 100%;
@@ -87,11 +78,19 @@
       min-width: none;
 
       .icon {
-        width: auto;
+        width: $baseline;
+        margin-right: ($baseline*0.75);
       }
 
       .copy {
-        width: auto;
+        width: ($baseline*9);
+
+        p {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          width: 100%;
+        }
       }
     }    
   }
@@ -115,7 +114,7 @@
 
   .icon {
     @include transition (color 0.5s ease-in-out);
-    @include font-size(28);
+    @include font-size(22);
     width: flex-grid(1, 12);
     margin-right: flex-gutter();
     text-align: right;
@@ -283,6 +282,16 @@
       border-color: $blue-d2;
     }
   }
+
+  &.saving {
+
+    .icon-saving {
+      @include animation(rotateClockwise 3.0s forwards linear infinite);
+      width: 22px;
+      height: 25px;
+      line-height: 3rem !important;
+    }
+  }
 }
 
 // ====================
@@ -296,15 +305,10 @@
   z-index: 100;
   overflow: hidden;
   width: 100%;
-  opacity: 0;
   border-bottom: 4px solid $gray-l1;
   border-top: 1px solid $black;
   padding: $baseline ($baseline*2);
   background: $gray-d3;
-
-  &.is-shown {
-    opacity: 1.0;
-  }
 
   &.wrapper-alert-warning {
     border-bottom-color: $orange;
@@ -532,6 +536,28 @@
       &:hover {
         color: $pink-s1;
       }
+    }
+  }
+}
+
+// js enabled
+.js {
+
+  .wrapper-alert {
+    display: none;
+
+    &.is-shown {
+      display: block;
+    }
+  }
+
+  .wrapper-notification {
+    bottom: -1000px;
+    opacity: 0;
+
+    &.is-shown {
+      bottom: 0;
+      opacity: 1.0;
     }
   }
 }
