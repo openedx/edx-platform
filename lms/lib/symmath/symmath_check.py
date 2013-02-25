@@ -215,7 +215,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         fans = None
 
     # do a numerical comparison if both expected and answer are numbers
-    if (hasattr(fexpect, 'is_number') and fexpect.is_number and fans
+    if (hasattr(fexpect, 'is_number') and fexpect.is_number 
         and hasattr(fans, 'is_number') and fans.is_number):
         if abs(abs(fans - fexpect) / fexpect) < threshold:
             return {'ok': True, 'msg': msg}
