@@ -14,7 +14,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from timeinfo import TimeInfo
 
-from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +53,10 @@ class PeerGradingModule(XModule):
         #We need to set the location here so the child modules can use it
         system.set('location', location)
         self.system = system
-        self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system)
+        if(self.system.open_ended_grading_interface):
+            self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system)
+        else:
+            self.peer_gs = MockPeerGradingService()
 
 
         self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
@@ -563,7 +566,7 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
     """
     Module for adding combined open ended questions
     """
-    mako_template = "widgets/html-edit.html"
+    mako_template = "widgets/raw-edit.html"
     module_class = PeerGradingModule
     filename_extension = "xml"
 

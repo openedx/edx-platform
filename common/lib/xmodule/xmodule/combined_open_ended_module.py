@@ -6,7 +6,6 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from .xml_module import XmlDescriptor
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 
 log = logging.getLogger("mitx.courseware")
@@ -169,14 +168,11 @@ class CombinedOpenEndedDescriptor(RawDescriptor):
     """
     Module for adding combined open ended questions
     """
-    mako_template = "widgets/html-edit.html"
+    mako_template = "widgets/raw-edit.html"
     module_class = CombinedOpenEndedModule
     filename_extension = "xml"
 
     stores_state = True
     has_score = True
     template_dir_name = "combinedopenended"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
 
