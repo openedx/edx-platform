@@ -5,9 +5,8 @@
 .wrapper-notification {
   @include clearfix();
   @include box-sizing(border-box);
-  // @include transition (bottom 1.5s ease-in-out 0.25s);
-  transition: bottom 1.5s ease-in-out 0.25s;
-  -webkit-transition: bottom 1.5s ease-in-out 0.25s;
+  transition: bottom 1.0s ease-in-out 0.125s;
+  -webkit-transition: bottom 1.0s ease-in-out 0.125s;
   @include box-shadow(0 -1px 3px $shadow);
   position: fixed;
   z-index: 1000;
@@ -66,8 +65,9 @@
 
   // shorter/status notifications
   &.wrapper-notification-status {
-    width: ($baseline*12.5);
+    width: ($baseline*6);
     right: ($baseline);
+    border-top-color: $pink;
     padding: ($baseline/2) $baseline;
 
     .notification {
@@ -91,6 +91,30 @@
           text-overflow: ellipsis;
           width: 100%;
         }
+      }
+    }    
+  }
+
+  // shorter/status notifications
+  &.wrapper-notification-help {
+    width: ($baseline*14);
+    right: ($baseline);
+    padding: ($baseline/2) $baseline;
+
+    .notification {
+      @include box-sizing(border-box);
+      @include clearfix();
+      width: 100%;
+      max-width: none;
+      min-width: none;
+
+      .icon-help {
+        width: $baseline;
+        margin-right: ($baseline*0.75);
+      }
+
+      .copy {
+        width: ($baseline*11);
       }
     }    
   }
@@ -135,27 +159,24 @@
 
   // with cancel
   .action-notification-close {
-    @include transition(top .25s ease-in-out);
-    @include border-bottom-radius(3px);
+    @include border-top-radius(3px);
     position: absolute;
-    top: -($baseline/4);
-    left: ($baseline/2);
+    top: -31px;
+    right: $baseline;
     padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
-    background: $gray-d2;
+    background: $gray-l1;
     text-align: center;
 
     .label {
       @include text-sr();
     }
 
-    .ss-icon {
+    .icon {
       @include font-size(14);
       color: $white;
-    }
-
-    &:hover {
-      background: $blue;
-      top: 0;
+      width: auto;
+      margin: 0;
+      padding: 2px;
     }
   }
 
@@ -185,16 +206,18 @@
         &:last-child {
           margin-right: 0;
         }
-
-        .action-primary {
-          @include font-size(13);
-          font-weight: 600;
-        }
-
-        .action-secondary {
-          @include font-size(13);
-        }
       }
+    }
+
+    .action-primary {
+      @include blue-button();
+      @include font-size(13);
+      border-color: $blue-d2;
+      font-weight: 600;
+    }
+
+    .action-secondary {
+      @include font-size(13);
     }
   }
 
@@ -202,14 +225,16 @@
   &.warning {
 
     .action-notification-close {
+      background: $orange;
 
       &:hover {
-        background: $orange;
+        background: $orange-s2;
       }
     }
 
     .action-primary {
-      @include orange-button;
+      @include orange-button();
+      @include font-size(13);
       border-color: $orange-d2;
     }
 
@@ -225,14 +250,16 @@
   &.error {
 
     .action-notification-close {
+      background: $red-l1;
 
       &:hover {
-        background: $red-l1;
+        background: $red;
       }
     }
 
     .action-primary {
-      @include red-button;
+      @include red-button();
+      @include font-size(13);
       border-color: $red-d2;
     }
 
@@ -248,14 +275,16 @@
   &.confirmation {
 
     .action-notification-close {
+      background: $green;
 
       &:hover {
-        background: $green;
+        background: $green-s2;
       }
     }
 
     .action-primary {
-      @include green-button;
+      @include green-button();
+      @include font-size(13);
       border-color: $green-d2;
     }
 
@@ -271,14 +300,16 @@
   &.announcement {
 
     .action-notification-close {
+      background: $blue;
 
       &:hover {
-        background: $blue;
+        background: $blue-s1;
       }
     }
 
     .action-primary {
-      @include blue-button;
+      @include blue-button();
+      @include font-size(13);
       border-color: $blue-d2;
     }
   }
@@ -290,6 +321,10 @@
       width: 22px;
       height: 25px;
       line-height: 3rem !important;
+    }
+
+    .copy p {
+      @include text-sr();
     }
   }
 }
@@ -428,6 +463,7 @@
     }
   }
 
+  // with actions
   &.has-actions {
   	
     .icon {
@@ -466,11 +502,38 @@
   	}
   }
 
+  // with cancel
+  .action-alert-close {
+    @include border-bottom-radius(3px);
+    position: absolute;
+    top: -($baseline/10);
+    right: $baseline;
+    padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
+    background: $gray-d1;
+    text-align: center;
+
+    .label {
+      @include text-sr();
+    }
+
+    .icon {
+      @include font-size(14);
+      color: $white;
+      width: auto;
+      margin: 0;
+      padding: 2px;
+    }
+
+    &:hover {
+      background: $gray-l1;
+    }
+  }
+
   // alert types
   &.warning {
   	
     .action-primary {
-      @include orange-button;
+      @include orange-button();
       border-color: $orange-d2;
     }
 
@@ -486,7 +549,7 @@
   &.error {
 
     .action-primary {
-      @include red-button;
+      @include red-button();
       border-color: $red-d2;
     }
 
@@ -502,7 +565,7 @@
   &.confirmation {
 
     .action-primary {
-      @include green-button;
+      @include green-button();
       border-color: $green-d2;
     }
 
@@ -518,7 +581,7 @@
   &.announcement {
 
     .action-primary {
-      @include blue-button;
+      @include blue-button();
       border-color: $blue-d2;
     }
   }
@@ -527,7 +590,7 @@
 
     .action-primary {
       border-color: $pink-d2;
-      @include pink-button;
+      @include pink-button();
     }
 
     a {

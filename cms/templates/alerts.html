@@ -2,6 +2,26 @@
 <%block name="title">Studio Alerts</%block>
 <%block name="bodyclass">is-signedin course uxdesign alerts</%block>
 
+<%block name="jsextra">
+<script type="text/javascript">
+  // notifications - demo
+  $(document).ready(function() {
+    
+    $('.test-notification').click(function(e) {
+        (e).preventDefault();          
+        $('.wrapper-notification').removeClass('is-shown');
+        $(this.hash).toggleClass('is-shown');
+    });
+
+    $('.test-alert').click(function(e) {
+        (e).preventDefault();          
+        $('.wrapper-alert').removeClass('is-shown');
+        $(this.hash).toggleClass('is-shown');
+    });
+  });
+</script>
+</%block>
+
 <%block name="content">
 <!-- alert: you're editing a draft -->
 <div class="wrapper wrapper-alert wrapper-alert-warning" id="alert-draft">
@@ -60,6 +80,23 @@
       <h2 class="title title-3">Your changes have been saved</h2>
       <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
     </div>
+  </div>
+</div>
+
+<!-- alert: save confirmed with close -->
+<div class="wrapper wrapper-alert wrapper-alert-confirmation" id="alert-close">
+  <div class="alert confirmation">
+    <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">Your changes have been saved</h2>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
+    </div>
+
+    <a href="#" rel="view" class="action action-alert-close">
+      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
+      <span class="label">close alert</span>
+    </a>
   </div>
 </div>
 
@@ -206,11 +243,16 @@
         <p>Note: alerts will probably never been shown based on click or page action and will primarily be loaded along with a pageload and initial display</p>
 
         <ul>
-          <li><a href="#" class="test-notification">Toggle Change Warning Notification</a></li>
-          <li><a href="#" class="test-notification">Toggle New Version Warning Notification</a></li>
-          <li><a href="#" class="test-notification">Toggle Editing Warning Notification</a></li>
-          <li><a href="#" class="test-notification">Toggle Saving Notification</a></li>
-          <li><a href="#" class="test-notification">Toggle Help Notification</a></li>
+          <li><a href="#alert-draft" class="test-alert">Toggle Draft Alert</a></li>
+          <li><a href="#alert-version" class="test-alert">Toggle Version Alert</a></li>
+          <li><a href="#alert-saved" class="test-alert">Toggle Previous View/Action Alert</a></li>
+          <li><a href="#alert-close" class="test-alert">Toggle Alert with Close Option</a></li>
+          <li><a href="#alert-removed" class="test-alert">Toggle Previous View/Action Removed Alert</a></li>
+          <li><a href="#alert-system-error" class="test-alert">Toggle System Error Alert</a></li>
+          <li><a href="#alert-user-error" class="test-alert">Toggle User Error Alert</a></li>
+          <li><a href="#alert-announcement1" class="test-alert">Toggle Announcement Alert</a></li>
+          <li><a href="#alert-announcement2" class="test-alert">Toggle Announcement with Actions Alert</a></li>
+          <li><a href="#alert-activation" class="test-alert">Toggle Activiation Alert</a></li>
         </ul>
       </section>
 
@@ -225,11 +267,11 @@
         <h3 class="title-3">Different Static Examples of Notifications</h3>
 
         <ul>
-          <li><a href="#" class="test-notification">Toggle Change Warning Notification</a></li>
-          <li><a href="#" class="test-notification">Toggle New Version Warning Notification</a></li>
-          <li><a href="#" class="test-notification">Toggle Editing Warning Notification</a></li>
-          <li><a href="#" class="test-notification">Toggle Saving Notification</a></li>
-          <li><a href="#" class="test-notification">Toggle Help Notification</a></li>
+          <li><a href="#notification-change" class="test-notification">Toggle Change Warning Notification</a></li>
+          <li><a href="#notification-version" class="test-notification">Toggle New Version Warning Notification</a></li>
+          <li><a href="#notification-dangerous" class="test-notification">Toggle Editing Warning Notification</a></li>
+          <li><a href="#notification-saving" class="test-notification">Toggle Saving Notification</a></li>
+          <li><a href="#notification-help" class="test-notification">Toggle Help Notification</a></li>
         </ul>
       </section>
     </article>
@@ -243,7 +285,7 @@
     
     <div class="copy">
       <h2 class="title title-3">You've Made Some Changes</h2>
-      <p><strong>Note:</strong> Your changes will not take effect until you <strong>save your progress</strong>.</p>
+      <p>Your changes will not take effect until you <strong>save your progress</strong>.</p>
     </div>
 
     <nav class="nav-actions">
@@ -314,7 +356,7 @@
 </div>
 
 <!-- notification: status - saving -->
-<div class="wrapper wrapper-notification wrapper-notification-status is-shown" id="notification-saving">
+<div class="wrapper wrapper-notification wrapper-notification-status" id="notification-saving">
   <div class="notification saving">
     <i class="ss-icon ss-symbolicons-block icon icon-saving">&#x2699;</i>
     
@@ -325,15 +367,20 @@
   </div>
 </div>
 
-<!-- notification: status - helper -->
-<div class="wrapper wrapper-notification wrapper-notification-helping" id="notification-helping">
-  <div class="notification helping">
-    <i class="ss-icon ss-symbolicons-block icon icon-helping">&#x2753;</i>
+<!-- notification: help - DYK -->
+<div class="wrapper wrapper-notification wrapper-notification-help" id="notification-help">
+  <div class="notification help">
+    <i class="ss-icon ss-symbolicons-block icon icon-help">&#x2753;</i>
     
     <div class="copy">
       <h2 class="title title-3">Fun Fact:</h2>
       <p>Using the checkmark will allow you make a subsection gradable as an assignment, which counts towards a student's total grade</p>
     </div>
+
+    <a href="#" rel="view" class="action action-notification-close">
+      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
+      <span class="label">close notification</span>
+    </a>
   </div>
 </div>
 </%block>

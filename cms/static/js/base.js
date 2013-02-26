@@ -43,30 +43,27 @@ $(document).ready(function () {
 
     $('body').addClass('js');
 
-    // notifications
-    $('.testing .test-notification').click(function(e) {
-        (e).preventDefault();
-        manageNotification(e);
-    });
-
-    function manageNotification(e) {
-        var $notificationRibbon = $('.wrapper-notification');
-
-        // showing
-        $notificationRibbon.toggleClass('is-shown');
-
-        // controls for closing notification
-        $notificationRibbon.find('.action-notification-close').click(function(e) {
-            (e).preventDefault();
-            $notificationRibbon.toggleClass('is-shown');
-        });
-    }
-
     // lean/simple modal
     $('a[rel*=modal]').leanModal({overlay : 0.80, closeButton: '.action-modal-close' });
     $('a.action-modal-close').click(function(e){
         (e).preventDefault();
     });
+
+    // alert and notifications - manual close
+    $('.action-alert-close').click(function(e) {
+        (e).preventDefault();
+        console.log('closing alert');
+        $(this).closest('.wrapper-alert').removeClass('is-shown');
+    });
+
+    // alert and notifications - manual close
+    $('.action-notification-close').click(function(e) {
+        (e).preventDefault();
+        $(this).closest('.wrapper-notification').removeClass('is-shown');
+    });
+
+
+
 
     // nav - dropdown related
     $body.click(function (e) {
