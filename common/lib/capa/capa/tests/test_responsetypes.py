@@ -386,32 +386,48 @@ class CodeResponseTest(unittest.TestCase):
                 self.assertEquals(answers_converted['1_4_1'], [fp.name, fp.name])
 
 
+from response_xml_factory import ChoiceResponseXMLFactory
 class ChoiceResponseTest(unittest.TestCase):
 
-    def test_cr_rb_grade(self):
-        problem_file = os.path.dirname(__file__) + "/test_files/choiceresponse_radio.xml"
-        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': 'choice_2',
-                           '1_3_1': ['choice_2', 'choice_3']}
-        test_answers = {'1_2_1': 'choice_2',
-                        '1_3_1': 'choice_2',
-                        }
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'incorrect')
+    def setUp(self):
+        self.xml_factory = ChoiceResponseXMLFactory()
 
-    def test_cr_cb_grade(self):
-        problem_file = os.path.dirname(__file__) + "/test_files/choiceresponse_checkbox.xml"
-        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': 'choice_2',
-                           '1_3_1': ['choice_2', 'choice_3'],
-                           '1_4_1': ['choice_2', 'choice_3']}
-        test_answers = {'1_2_1': 'choice_2',
-                        '1_3_1': 'choice_2',
-                        '1_4_1': ['choice_2', 'choice_3'],
-                        }
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'incorrect')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_4_1'), 'correct')
+    def test_radio_group_grade(self):
+        xml = self.xml_factory.build_xml(allow_multiple=False, 
+                                        choices=[False, True, False])
+
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        # Check that we get the expected results
+        self._assert_grade(problem, 'choice_0', 'incorrect')
+        self._assert_grade(problem, 'choice_1', 'correct')
+        self._assert_grade(problem, 'choice_2', 'incorrect')
+
+        # No choice 3 exists --> mark incorrect
+        self._assert_grade(problem, 'choice_3', 'incorrect')
+
+
+    def test_checkbox_group_grade(self):
+        xml = self.xml_factory.build_xml(allow_multiple=True,
+                                        choices=[False, True, True])
+
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        # Check that we get the expected results
+        # (correct if and only if BOTH correct choices chosen)
+        self._assert_grade(problem, ['choice_1', 'choice_2'], 'correct')
+        self._assert_grade(problem, 'choice_1', 'incorrect')
+        self._assert_grade(problem, 'choice_2', 'incorrect')
+        self._assert_grade(problem, ['choice_0', 'choice_1'], 'incorrect')
+        self._assert_grade(problem, ['choice_0', 'choice_2'], 'incorrect')
+
+        # No choice 3 exists --> mark incorrect
+        self._assert_grade(problem, 'choice_3', 'incorrect')
+
+    def _assert_grade(self, problem, submission, expected_correctness):
+        input_dict = {'1_2_1': submission}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness)
 
 
 class JavascriptResponseTest(unittest.TestCase):

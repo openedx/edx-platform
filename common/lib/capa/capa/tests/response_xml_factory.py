@@ -188,16 +188,6 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
 
 
-class CodeResponseXMLFactory(ResponseXMLFactory):
-    """ Factory for creating <coderesponse> XML trees """
-
-    def create_response_element(self, **kwargs):
-        """ Create a <coderesponse> XML element """
-        raise NotImplemented
-
-    def create_input_element(self, **kwargs):
-        raise NotImplemented
-
 class SchematicResponseXMLFactory(ResponseXMLFactory):
     """ Factory for creating <schematicresponse> XML trees """
 
@@ -225,8 +215,114 @@ class SchematicResponseXMLFactory(ResponseXMLFactory):
         """ Create the <schematic> XML element.
 
         Although <schematic> can have several attributes,
-        (*height*, *width*, *parts*, *analyses*, *submit_analysis*,
-        and *initial_value*),
+        (*height*, *width*, *parts*, *analyses*, *submit_analysis*, and *initial_value*),
         none of them are used in the capa module.
         For testing, we create a bare-bones version of <schematic>."""
         return etree.Element("schematic")
+
+class CodeResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for creating <coderesponse> XML trees """
+
+    def create_response_element(self, **kwargs):
+        """ Create a <coderesponse> XML element """
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
+
+
+class ChoiceResponseXMLFactory(ResponseXMLFactory):
+    def create_response_element(self, **kwargs):
+        """ Create a <choiceresponse> element """
+        return etree.Element("choiceresponse")
+
+    def create_input_element(self, **kwargs):
+        """ Create a <checkboxgroup> element.
+        
+        Uses *kwargs*:
+
+        *allow_multiple*: If True, use checkboxes; 
+                         otherwise, use radio buttons 
+                         DEFAULT: True
+
+        *choices*: List of True/False values indicating whether
+                            a particular choice is correct or not.
+                            Users must choose *all* correct options in order
+                            to be marked correct.
+                            DEFAULT: [True]
+        """
+
+        # Retrieve **kwargs
+        allow_multiple = kwargs.get('allow_multiple', True)
+        choices = kwargs.get('choices', [True])
+
+        # Create the <checkboxgroup> or <radiogroup> element
+        group_element = etree.Element("checkboxgroup" if allow_multiple else "radiogroup")
+
+        # Create the <choice> elements
+        for correct_val in choices:
+            choice_element = etree.SubElement(group_element, "choice")
+            choice_element.set("correct", "true" if correct_val else "false")
+
+            # Add some text describing the choice
+            etree.SubElement(choice_element, "startouttext")
+            etree.text = "Choice description"
+            etree.SubElement(choice_element, "endouttext")
+
+        return group_element
+
+class FormulaResponseXMLFactory(ResponseXMLFactory):
+    def create_response_element(self, **kwargs):
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
+
+class ImageResponseXMLFactory(ResponseXMLFactory):
+    def create_response_element(self, **kwargs):
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
+
+class JavascriptResponseXMLFactory(ResponseXMLFactory):
+    def create_response_element(self, **kwargs):
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
+
+class MultipleChoiceResponseXMLFactory(ResponseXMLFactory):
+    def create_response_element(self, **kwargs):
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
+
+class OptionResponseXMLFactory(ResponseXMLFactory):
+    def create_response_element(self, **kwargs):
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
+
+class StringResponseXMLFactory(ResponseXMLFactory):
+    def create_response_element(self, **kwargs):
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
+
+class SymbolicResponseXMLFactory(ResponseXMLFactory):
+    def create_response_element(self, **kwargs):
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
+
+class TrueFalseResponseXMLFactory(ResponseXMLFactory):
+    def create_response_element(self, **kwargs):
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
