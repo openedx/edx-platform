@@ -16,38 +16,95 @@ from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat
 
+class ResponseTest(unittest.TestCase):
+    """ Base class for tests of capa responses."""
+    
+    xml_factory_class = None
 
-class MultiChoiceTest(unittest.TestCase):
-    def test_MC_grade(self):
-        multichoice_file = os.path.dirname(__file__) + "/test_files/multichoice.xml"
-        test_lcp = lcp.LoncapaProblem(open(multichoice_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': 'choice_foil3'}
-        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
-        false_answers = {'1_2_1': 'choice_foil2'}
-        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
+    def setUp(self):
+        if self.xml_factory_class:
+            self.xml_factory = self.xml_factory_class()
 
-    def test_MC_bare_grades(self):
-        multichoice_file = os.path.dirname(__file__) + "/test_files/multi_bare.xml"
-        test_lcp = lcp.LoncapaProblem(open(multichoice_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': 'choice_2'}
-        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
-        false_answers = {'1_2_1': 'choice_1'}
-        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
+    def assert_grade(self, problem, submission, expected_correctness):
+        input_dict = {'1_2_1': submission}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness)
 
-    def test_TF_grade(self):
-        truefalse_file = os.path.dirname(__file__) + "/test_files/truefalse.xml"
-        test_lcp = lcp.LoncapaProblem(open(truefalse_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': ['choice_foil2', 'choice_foil1']}
-        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
-        false_answers = {'1_2_1': ['choice_foil1']}
-        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
-        false_answers = {'1_2_1': ['choice_foil1', 'choice_foil3']}
-        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
-        false_answers = {'1_2_1': ['choice_foil3']}
-        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
-        false_answers = {'1_2_1': ['choice_foil1', 'choice_foil2', 'choice_foil3']}
-        self.assertEquals(test_lcp.grade_answers(false_answers).get_correctness('1_2_1'), 'incorrect')
+    def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):
+        for input_str in correct_answers:
+            result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
+            self.assertEqual(result, 'correct')
 
+        for input_str in incorrect_answers:
+            result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
+            self.assertEqual(result, 'incorrect')
+
+class MultiChoiceResponseTest(ResponseTest):
+    from response_xml_factory import MultipleChoiceResponseXMLFactory
+    xml_factory_class = MultipleChoiceResponseXMLFactory
+
+    def test_multiple_choice_grade(self):
+        xml = self.xml_factory.build_xml(choices=[False, True, False])
+
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+        
+        # Ensure that we get the expected grades
+        self.assert_grade(problem, 'choice_0', 'incorrect')
+        self.assert_grade(problem, 'choice_1', 'correct')
+        self.assert_grade(problem, 'choice_2', 'incorrect')
+
+    def test_named_multiple_choice_grade(self):
+        xml = self.xml_factory.build_xml(choices=[False, True, False],
+                                        choice_names=["foil_1", "foil_2", "foil_3"])
+
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+        
+        # Ensure that we get the expected grades
+        self.assert_grade(problem, 'choice_foil_1', 'incorrect')
+        self.assert_grade(problem, 'choice_foil_2', 'correct')
+        self.assert_grade(problem, 'choice_foil_3', 'incorrect')
+
+
+class TrueFalseResponseTest(ResponseTest):
+    from response_xml_factory import TrueFalseResponseXMLFactory
+    xml_factory_class = TrueFalseResponseXMLFactory
+
+    def test_true_false_grade(self):
+        xml = self.xml_factory.build_xml(choices=[False, True, True])
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        # Check the results
+        # Mark correct if and only if ALL (and only) correct choices selected
+        self.assert_grade(problem, 'choice_0', 'incorrect')
+        self.assert_grade(problem, 'choice_1', 'incorrect')
+        self.assert_grade(problem, 'choice_2', 'incorrect')
+        self.assert_grade(problem, ['choice_0', 'choice_1', 'choice_2'], 'incorrect')
+        self.assert_grade(problem, ['choice_0', 'choice_2'], 'incorrect')
+        self.assert_grade(problem, ['choice_0', 'choice_1'], 'incorrect')
+        self.assert_grade(problem, ['choice_1', 'choice_2'], 'correct')
+
+        # Invalid choices should be marked incorrect (we have no choice 3)
+        self.assert_grade(problem, 'choice_3', 'incorrect')
+        self.assert_grade(problem, 'not_a_choice', 'incorrect')
+
+    def test_named_true_false_grade(self):
+        xml = self.xml_factory.build_xml(choices=[False, True, True],
+                                        choice_names=['foil_1','foil_2','foil_3'])
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        # Check the results
+        # Mark correct if and only if ALL (and only) correct chocies selected
+        self.assert_grade(problem, 'choice_foil_1', 'incorrect')
+        self.assert_grade(problem, 'choice_foil_2', 'incorrect')
+        self.assert_grade(problem, 'choice_foil_3', 'incorrect')
+        self.assert_grade(problem, ['choice_foil_1', 'choice_foil_2', 'choice_foil_3'], 'incorrect')
+        self.assert_grade(problem, ['choice_foil_1', 'choice_foil_3'], 'incorrect')
+        self.assert_grade(problem, ['choice_foil_1', 'choice_foil_2'], 'incorrect')
+        self.assert_grade(problem, ['choice_foil_2', 'choice_foil_3'], 'correct')
+
+        # Invalid choices should be marked incorrect
+        self.assert_grade(problem, 'choice_foil_4', 'incorrect')
+        self.assert_grade(problem, 'not_a_choice', 'incorrect')
 
 class ImageResponseTest(unittest.TestCase):
     def test_ir_grade(self):
@@ -386,48 +443,41 @@ class CodeResponseTest(unittest.TestCase):
                 self.assertEquals(answers_converted['1_4_1'], [fp.name, fp.name])
 
 
-from response_xml_factory import ChoiceResponseXMLFactory
-class ChoiceResponseTest(unittest.TestCase):
-
-    def setUp(self):
-        self.xml_factory = ChoiceResponseXMLFactory()
+class ChoiceResponseTest(ResponseTest):
+    from response_xml_factory import ChoiceResponseXMLFactory
+    xml_factory_class = ChoiceResponseXMLFactory
 
     def test_radio_group_grade(self):
-        xml = self.xml_factory.build_xml(allow_multiple=False, 
+        xml = self.xml_factory.build_xml(choice_type='radio', 
                                         choices=[False, True, False])
 
         problem = lcp.LoncapaProblem(xml, '1', system=test_system)
 
         # Check that we get the expected results
-        self._assert_grade(problem, 'choice_0', 'incorrect')
-        self._assert_grade(problem, 'choice_1', 'correct')
-        self._assert_grade(problem, 'choice_2', 'incorrect')
+        self.assert_grade(problem, 'choice_0', 'incorrect')
+        self.assert_grade(problem, 'choice_1', 'correct')
+        self.assert_grade(problem, 'choice_2', 'incorrect')
 
         # No choice 3 exists --> mark incorrect
-        self._assert_grade(problem, 'choice_3', 'incorrect')
+        self.assert_grade(problem, 'choice_3', 'incorrect')
 
 
     def test_checkbox_group_grade(self):
-        xml = self.xml_factory.build_xml(allow_multiple=True,
+        xml = self.xml_factory.build_xml(choice_type='checkbox',
                                         choices=[False, True, True])
 
         problem = lcp.LoncapaProblem(xml, '1', system=test_system)
 
         # Check that we get the expected results
         # (correct if and only if BOTH correct choices chosen)
-        self._assert_grade(problem, ['choice_1', 'choice_2'], 'correct')
-        self._assert_grade(problem, 'choice_1', 'incorrect')
-        self._assert_grade(problem, 'choice_2', 'incorrect')
-        self._assert_grade(problem, ['choice_0', 'choice_1'], 'incorrect')
-        self._assert_grade(problem, ['choice_0', 'choice_2'], 'incorrect')
+        self.assert_grade(problem, ['choice_1', 'choice_2'], 'correct')
+        self.assert_grade(problem, 'choice_1', 'incorrect')
+        self.assert_grade(problem, 'choice_2', 'incorrect')
+        self.assert_grade(problem, ['choice_0', 'choice_1'], 'incorrect')
+        self.assert_grade(problem, ['choice_0', 'choice_2'], 'incorrect')
 
         # No choice 3 exists --> mark incorrect
-        self._assert_grade(problem, 'choice_3', 'incorrect')
-
-    def _assert_grade(self, problem, submission, expected_correctness):
-        input_dict = {'1_2_1': submission}
-        correct_map = problem.grade_answers(input_dict)
-        self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness)
+        self.assert_grade(problem, 'choice_3', 'incorrect')
 
 
 class JavascriptResponseTest(unittest.TestCase):
@@ -443,19 +493,18 @@ class JavascriptResponseTest(unittest.TestCase):
         self.assertEquals(test_lcp.grade_answers(incorrect_answers).get_correctness('1_2_1'), 'incorrect')
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
 
-from response_xml_factory import NumericalResponseXMLFactory
-class NumericalResponseTest(unittest.TestCase):
+class NumericalResponseTest(ResponseTest):
+    from response_xml_factory import NumericalResponseXMLFactory
+    xml_factory_class = NumericalResponseXMLFactory
 
-    def setUp(self):
-        self.xml_factory = NumericalResponseXMLFactory()
-    
     def test_grade_exact(self):
         xml = self.xml_factory.build_xml(question_text="What is 2 + 2?",
                                         explanation="The answer is 4",
                                         answer=4)
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
         correct_responses = ["4", "4.0", "4.00"]
         incorrect_responses = ["", "3.9", "4.1", "0"]
-        self._test_grading(xml, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
         
 
     def test_grade_decimal_tolerance(self):
@@ -463,18 +512,20 @@ class NumericalResponseTest(unittest.TestCase):
                                         explanation="The answer is 4",
                                         answer=4,
                                         tolerance=0.1)
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
         correct_responses = ["4.0", "4.00", "4.09", "3.91"] 
         incorrect_responses = ["", "4.11", "3.89", "0"]
-        self._test_grading(xml, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
                         
     def test_grade_percent_tolerance(self):
         xml = self.xml_factory.build_xml(question_text="What is 2 + 2 approximately?",
                                         explanation="The answer is 4",
                                         answer=4,
                                         tolerance="10%")
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
         correct_responses = ["4.0", "4.3", "3.7", "4.30", "3.70"]
         incorrect_responses = ["", "4.5", "3.5", "0"]
-        self._test_grading(xml, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_with_script(self):
         script_text = "computed_response = math.sqrt(4)"
@@ -482,9 +533,10 @@ class NumericalResponseTest(unittest.TestCase):
                                         explanation="The answer is 2",
                                         answer="$computed_response",
                                         script=script_text)
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
         correct_responses = ["2", "2.0"]
         incorrect_responses = ["", "2.01", "1.99", "0"]
-        self._test_grading(xml, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_with_script_and_tolerance(self):
         script_text = "computed_response = math.sqrt(4)"
@@ -493,28 +545,15 @@ class NumericalResponseTest(unittest.TestCase):
                                         answer="$computed_response",
                                         tolerance="0.1",
                                         script=script_text)
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
         correct_responses = ["2", "2.0", "2.05", "1.95"]
         incorrect_responses = ["", "2.11", "1.89", "0"]
-        self._test_grading(xml, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
 
-    def _test_grading(self, xml, correct_answers, incorrect_answers):
-
-        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
-
-        for input_str in correct_answers:
-            result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'correct')
-
-        for input_str in incorrect_answers:
-            result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'incorrect')
-
-from response_xml_factory import CustomResponseXMLFactory
-class CustomResponseTest(unittest.TestCase):
-
-    def setUp(self):
-        self.xml_factory = CustomResponseXMLFactory()
+class CustomResponseTest(ResponseTest):
+    from response_xml_factory import CustomResponseXMLFactory
+    xml_factory_class = CustomResponseXMLFactory
 
     def test_inline_code(self):
 
@@ -525,18 +564,11 @@ class CustomResponseTest(unittest.TestCase):
         inline_script = """correct[0] = 'correct' if (answers['1_2_1'] == expect) else 'incorrect'"""
 
         xml = self.xml_factory.build_xml(answer=inline_script, expect="42")
-
         problem = lcp.LoncapaProblem(xml, '1', system=test_system)
 
-        # Correct answer
-        input_dict = {'1_2_1': '42'}
-        result = problem.grade_answers(input_dict).get_correctness('1_2_1')
-        self.assertEqual(result, 'correct')
-
-        # Incorrect answer
-        input_dict = {'1_2_1': '0'}
-        result = problem.grade_answers(input_dict).get_correctness('1_2_1')
-        self.assertEqual(result, 'incorrect')
+        # Check results
+        self.assert_grade(problem, '42', 'correct')
+        self.assert_grade(problem, '0', 'incorrect')
 
     def test_inline_message(self):
 
@@ -627,11 +659,9 @@ class CustomResponseTest(unittest.TestCase):
         self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
 
 
-from response_xml_factory import SchematicResponseXMLFactory
-class SchematicResponseTest(unittest.TestCase):
-
-    def setUp(self):
-        self.xml_factory = SchematicResponseXMLFactory()
+class SchematicResponseTest(ResponseTest):
+    from response_xml_factory import SchematicResponseXMLFactory
+    xml_factory_class = SchematicResponseXMLFactory
 
     def test_grade(self):
 

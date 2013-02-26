@@ -108,6 +108,54 @@ class ResponseXMLFactory(object):
 
         return input_element
 
+    @staticmethod
+    def choicegroup_input_xml(**kwargs):
+        """ Create a <choicegroup> XML element
+
+        Uses **kwargs:
+
+        *choice_type*: Can be "checkbox", "radio", or "multiple"
+
+        *choices*: List of True/False values indicating whether
+                            a particular choice is correct or not.
+                            Users must choose *all* correct options in order
+                            to be marked correct.
+                            DEFAULT: [True]
+
+        *choice_names": List of strings identifying the choices.
+                        If specified, you must ensure that
+                        len(choice_names) == len(choices)
+        """
+        # Names of group elements
+        group_element_names = {'checkbox': 'checkboxgroup',
+                                'radio': 'radiogroup',
+                                'multiple': 'choicegroup' }
+
+        # Retrieve **kwargs
+        choices = kwargs.get('choices', [True])
+        choice_type = kwargs.get('choice_type', 'multiple')
+        choice_names = kwargs.get('choice_names', [None] * len(choices))
+
+        # Create the <choicegroup>, <checkboxgroup>, or <radiogroup> element
+        assert(choice_type in group_element_names)
+        group_element = etree.Element(group_element_names[choice_type])
+
+        # Create the <choice> elements
+        for (correct_val, name) in zip(choices, choice_names):
+            choice_element = etree.SubElement(group_element, "choice")
+            choice_element.set("correct", "true" if correct_val else "false")
+
+            # Add some text describing the choice
+            etree.SubElement(choice_element, "startouttext")
+            etree.text = "Choice description"
+            etree.SubElement(choice_element, "endouttext")
+
+            # Add a name identifying the choice, if one exists
+            if name:
+                choice_element.set("name", str(name))
+
+        return group_element
+
 
 class NumericalResponseXMLFactory(ResponseXMLFactory):
     """ Factory for producing <numericalresponse> XML trees """
@@ -237,39 +285,9 @@ class ChoiceResponseXMLFactory(ResponseXMLFactory):
         return etree.Element("choiceresponse")
 
     def create_input_element(self, **kwargs):
-        """ Create a <checkboxgroup> element.
-        
-        Uses *kwargs*:
+        """ Create a <checkboxgroup> element."""
+        return ResponseXMLFactory.choicegroup_input_xml(**kwargs)
 
-        *allow_multiple*: If True, use checkboxes; 
-                         otherwise, use radio buttons 
-                         DEFAULT: True
-
-        *choices*: List of True/False values indicating whether
-                            a particular choice is correct or not.
-                            Users must choose *all* correct options in order
-                            to be marked correct.
-                            DEFAULT: [True]
-        """
-
-        # Retrieve **kwargs
-        allow_multiple = kwargs.get('allow_multiple', True)
-        choices = kwargs.get('choices', [True])
-
-        # Create the <checkboxgroup> or <radiogroup> element
-        group_element = etree.Element("checkboxgroup" if allow_multiple else "radiogroup")
-
-        # Create the <choice> elements
-        for correct_val in choices:
-            choice_element = etree.SubElement(group_element, "choice")
-            choice_element.set("correct", "true" if correct_val else "false")
-
-            # Add some text describing the choice
-            etree.SubElement(choice_element, "startouttext")
-            etree.text = "Choice description"
-            etree.SubElement(choice_element, "endouttext")
-
-        return group_element
 
 class FormulaResponseXMLFactory(ResponseXMLFactory):
     def create_response_element(self, **kwargs):
@@ -293,11 +311,28 @@ class JavascriptResponseXMLFactory(ResponseXMLFactory):
         raise NotImplemented
 
 class MultipleChoiceResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for producing <multiplechoiceresponse> XML """
+
     def create_response_element(self, **kwargs):
-        raise NotImplemented
+        """ Create the <multiplechoiceresponse> element"""
+        return etree.Element('multiplechoiceresponse')
 
     def create_input_element(self, **kwargs):
-        raise NotImplemented
+        """ Create the <choicegroup> element"""
+        kwargs['choice_type'] = 'multiple'
+        return ResponseXMLFactory.choicegroup_input_xml(**kwargs)
+
+class TrueFalseResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for producing <truefalseresponse> XML """
+
+    def create_response_element(self, **kwargs):
+        """ Create the <truefalseresponse> element"""
+        return etree.Element('truefalseresponse')
+
+    def create_input_element(self, **kwargs):
+        """ Create the <choicegroup> element"""
+        kwargs['choice_type'] = 'multiple'
+        return ResponseXMLFactory.choicegroup_input_xml(**kwargs)
 
 class OptionResponseXMLFactory(ResponseXMLFactory):
     def create_response_element(self, **kwargs):
@@ -314,13 +349,6 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         raise NotImplemented
 
 class SymbolicResponseXMLFactory(ResponseXMLFactory):
-    def create_response_element(self, **kwargs):
-        raise NotImplemented
-
-    def create_input_element(self, **kwargs):
-        raise NotImplemented
-
-class TrueFalseResponseXMLFactory(ResponseXMLFactory):
     def create_response_element(self, **kwargs):
         raise NotImplemented
 
