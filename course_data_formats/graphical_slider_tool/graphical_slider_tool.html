@@ -1,0 +1,924 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>XML format of graphical slider tool [xmodule] &mdash; edX Data 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="edX Data 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Student Info and Progress Data" href="../../internal_data_formats/sql_schema.html" />
+    <link rel="prev" title="XML format of drag and drop input [inputtypes]" href="../drag_and_drop/drag_and_drop_input.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../internal_data_formats/sql_schema.html" title="Student Info and Progress Data"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../drag_and_drop/drag_and_drop_input.html" title="XML format of drag and drop input [inputtypes]"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">edX Data 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">XML format of graphical slider tool [xmodule]</a><ul>
+<li><a class="reference internal" href="#format-description">Format description</a><ul>
+<li><a class="reference internal" href="#render-tag">Render tag</a><ul>
+<li><a class="reference internal" href="#slider-tag">Slider tag</a></li>
+<li><a class="reference internal" href="#textbox-tag">Textbox tag</a></li>
+<li><a class="reference internal" href="#plot-tag">Plot tag</a></li>
+<li><a class="reference internal" href="#html-tags-with-id-dynamic-elements">HTML tags with ID (dynamic elements)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-tag">Configuration tag</a><ul>
+<li><a class="reference internal" href="#parameters-tag">Parameters tag</a></li>
+<li><a class="reference internal" href="#functions-tag">Functions tag</a></li>
+<li><a class="reference internal" href="#note-on-mathjax-and-labels">[Note on MathJax and labels]</a></li>
+<li><a class="reference internal" href="#id9">Plot tag</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example">Example</a><ul>
+<li><a class="reference internal" href="#plotting-sliders-and-inputs">Plotting, sliders and inputs</a></li>
+<li><a class="reference internal" href="#update-of-html-elements-no-plotting">Update of html elements, no plotting</a></li>
+<li><a class="reference internal" href="#circle-with-dynamic-radius">Circle with dynamic radius</a></li>
+<li><a class="reference internal" href="#example-of-a-bar-graph">Example of a bar graph</a></li>
+<li><a class="reference internal" href="#example-of-moving-labels-of-graph">Example of moving labels of graph</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../drag_and_drop/drag_and_drop_input.html"
+                        title="previous chapter">XML format of drag and drop input [inputtypes]</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../internal_data_formats/sql_schema.html"
+                        title="next chapter">Student Info and Progress Data</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/course_data_formats/graphical_slider_tool/graphical_slider_tool.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-xml_format_gst">
+<span id="xml-format-of-graphical-slider-tool-xmodule"></span><h1>XML format of graphical slider tool [xmodule]<a class="headerlink" href="#module-xml_format_gst" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="format-description">
+<h2>Format description<a class="headerlink" href="#format-description" title="Permalink to this headline">¶</a></h2>
+<p>Graphical slider tool (GST) main tag is:</p>
+<div class="highlight-python"><pre>&lt;graphical_slider_tool&gt; BODY &lt;/graphical_slider_tool&gt;</pre>
+</div>
+<p><tt class="docutils literal"><span class="pre">graphical_slider_tool</span></tt> tag must have two children tags: <tt class="docutils literal"><span class="pre">render</span></tt>
+and <tt class="docutils literal"><span class="pre">configuration</span></tt>.</p>
+<div class="section" id="render-tag">
+<h3>Render tag<a class="headerlink" href="#render-tag" title="Permalink to this headline">¶</a></h3>
+<p>Render tag can contain usual html tags mixed with some GST specific tags:</p>
+<div class="highlight-python"><pre>&lt;slider/&gt; - represents jQuery slider for changing a parameter's value
+&lt;textbox/&gt; - represents a text input field for changing a parameter's value
+&lt;plot/&gt; - represents Flot JS plot element</pre>
+</div>
+<p>Also GST will track all elements inside <tt class="docutils literal"><span class="pre">&lt;render&gt;&lt;/render&gt;</span></tt> where <tt class="docutils literal"><span class="pre">id</span></tt>
+attribute is set, and a corresponding parameter referencing that <tt class="docutils literal"><span class="pre">id</span></tt> is present
+in the configuration section below. These will be referred to as dynamic elements.</p>
+<p>The contents of the &lt;render&gt; section will be shown to the user after
+all occurrences of:</p>
+<div class="highlight-python"><pre>&lt;slider var="{parameter name}" [style="{CSS statements}"] /&gt;
+&lt;textbox var="{parameter name}" [style="{CSS statements}"] /&gt;
+&lt;plot [style="{CSS statements}"] /&gt;</pre>
+</div>
+<p>have been converted to actual sliders, text inputs, and a plot graph.
+Everything in square brackets is optional. After initialization, all
+text input fields, sliders, and dynamic elements will be set to the initial
+values of the parameters that they are assigned to.</p>
+<p><tt class="docutils literal"><span class="pre">{parameter</span> <span class="pre">name}</span></tt> specifies the parameter to which the slider or text
+input will be attached to.</p>
+<p>[style=&#8221;{CSS statements}&#8221;] specifies valid CSS styling. It will be passed
+directly to the browser without any parsing.</p>
+<p>There is a one-to-one relationship between a slider and a parameter.
+I.e. for one parameter you can put only one <tt class="docutils literal"><span class="pre">&lt;slider&gt;</span></tt> in the
+<tt class="docutils literal"><span class="pre">&lt;render&gt;</span></tt> section. However, you don&#8217;t have to specify a slider - they
+are optional.</p>
+<p>There is a many-to-one relationship between text inputs and a
+parameter. I.e. for one parameter you can put many &#8216;&lt;textbox&gt;&#8217; elements in
+the <tt class="docutils literal"><span class="pre">&lt;render&gt;</span></tt> section. However, you don&#8217;t have to specify a text
+input - they are optional.</p>
+<p>You can put only one <tt class="docutils literal"><span class="pre">&lt;plot&gt;</span></tt> in the <tt class="docutils literal"><span class="pre">&lt;render&gt;</span></tt> section. It is not
+required.</p>
+<div class="section" id="slider-tag">
+<h4>Slider tag<a class="headerlink" href="#slider-tag" title="Permalink to this headline">¶</a></h4>
+<p>Slider tag must have <tt class="docutils literal"><span class="pre">var</span></tt> attribute and optional <tt class="docutils literal"><span class="pre">style</span></tt> attribute:</p>
+<div class="highlight-python"><pre>&lt;slider var='a' style="width:400px;float:left;" /&gt;</pre>
+</div>
+<p>After processing, slider tags will be replaced by jQuery UI sliders with applied
+<tt class="docutils literal"><span class="pre">style</span></tt> attribute.</p>
+<p><tt class="docutils literal"><span class="pre">var</span></tt> attribute must correspond to a parameter. Parameters can be used in any
+of the <tt class="docutils literal"><span class="pre">function</span></tt> tags in <tt class="docutils literal"><span class="pre">functions</span></tt> tag. By moving slider, value of
+parameter <tt class="docutils literal"><span class="pre">a</span></tt> will change, and so result of function, that depends on parameter
+<tt class="docutils literal"><span class="pre">a</span></tt>, will also change.</p>
+</div>
+<div class="section" id="textbox-tag">
+<h4>Textbox tag<a class="headerlink" href="#textbox-tag" title="Permalink to this headline">¶</a></h4>
+<p>Texbox tag must have <tt class="docutils literal"><span class="pre">var</span></tt> attribute and optional <tt class="docutils literal"><span class="pre">style</span></tt> attribute:</p>
+<div class="highlight-python"><pre>&lt;textbox var="b" style="width:50px; float:left; margin-left:10px;" /&gt;</pre>
+</div>
+<p>After processing, textbox tags will be replaced by html text inputs with applied
+<tt class="docutils literal"><span class="pre">style</span></tt> attribute. If you want a readonly text input, then you should use a
+dynamic element instead (see section below &#8220;HTML tagsd with ID&#8221;).</p>
+<p><tt class="docutils literal"><span class="pre">var</span></tt> attribute must correspond to a parameter. Parameters can be used in any
+of the <tt class="docutils literal"><span class="pre">function</span></tt> tags in <tt class="docutils literal"><span class="pre">functions</span></tt> tag. By changing the value on the text input,
+value of parameter <tt class="docutils literal"><span class="pre">a</span></tt> will change, and so result of function, that depends on
+parameter <tt class="docutils literal"><span class="pre">a</span></tt>, will also change.</p>
+</div>
+<div class="section" id="plot-tag">
+<h4>Plot tag<a class="headerlink" href="#plot-tag" title="Permalink to this headline">¶</a></h4>
+<p>Plot tag may have optional <tt class="docutils literal"><span class="pre">style</span></tt> attribute:</p>
+<div class="highlight-python"><pre>&lt;plot style="width:50px; float:left; margin-left:10px;" /&gt;</pre>
+</div>
+<p>After processing plot tags will be replaced by Flot JS plot with applied
+<tt class="docutils literal"><span class="pre">style</span></tt> attribute.</p>
+</div>
+<div class="section" id="html-tags-with-id-dynamic-elements">
+<h4>HTML tags with ID (dynamic elements)<a class="headerlink" href="#html-tags-with-id-dynamic-elements" title="Permalink to this headline">¶</a></h4>
+<p>Any HTML tag with ID, e.g. <tt class="docutils literal"><span class="pre">&lt;span</span> <span class="pre">id=&quot;answer_span_1&quot;&gt;</span></tt> can be used as a
+place where result of function can be inserted. To insert function result to
+an element, element ID must be included in <tt class="docutils literal"><span class="pre">function</span></tt> tag as <tt class="docutils literal"><span class="pre">el_id</span></tt> attribute
+and <tt class="docutils literal"><span class="pre">output</span></tt> value must be <tt class="docutils literal"><span class="pre">&quot;element&quot;</span></tt>:</p>
+<div class="highlight-python"><pre>&lt;function output="element" el_id="answer_span_1"&gt;
+                function add(a, b, precision) {
+                    var x = Math.pow(10, precision || 2);
+                    return (Math.round(a * x) + Math.round(b * x)) / x;
+                }
+
+                return add(a, b, 5);
+&lt;/function&gt;</pre>
+</div>
+</div>
+</div>
+<div class="section" id="configuration-tag">
+<h3>Configuration tag<a class="headerlink" href="#configuration-tag" title="Permalink to this headline">¶</a></h3>
+<p>The configuration tag contains parameter settings, graph
+settings, and function definitions which are to be plotted on the
+graph and that use specified parameters.</p>
+<p>Configuration tag contains two mandatory tag <tt class="docutils literal"><span class="pre">functions</span></tt> and <tt class="docutils literal"><span class="pre">parameters</span></tt> and
+may contain another <tt class="docutils literal"><span class="pre">plot</span></tt> tag.</p>
+<div class="section" id="parameters-tag">
+<h4>Parameters tag<a class="headerlink" href="#parameters-tag" title="Permalink to this headline">¶</a></h4>
+<p><tt class="docutils literal"><span class="pre">Parameters</span></tt> tag contains <tt class="docutils literal"><span class="pre">parameter</span></tt> tags. Each <tt class="docutils literal"><span class="pre">parameter</span></tt> tag must have
+<tt class="docutils literal"><span class="pre">var</span></tt>, <tt class="docutils literal"><span class="pre">max</span></tt>, <tt class="docutils literal"><span class="pre">min</span></tt>, <tt class="docutils literal"><span class="pre">step</span></tt> and <tt class="docutils literal"><span class="pre">initial</span></tt> attributes:</p>
+<div class="highlight-python"><pre>&lt;parameters&gt;
+        &lt;param var="a" min="-10.0" max="10.0" step="0.1" initial="0" /&gt;
+        &lt;param var="b" min="-10.0" max="10.0" step="0.1" initial="0" /&gt;
+&lt;/parameters&gt;</pre>
+</div>
+<p><tt class="docutils literal"><span class="pre">var</span></tt> attribute links min, max, step and initial values to parameter name.</p>
+<p><tt class="docutils literal"><span class="pre">min</span></tt> attribute is the minimal value that a parameter can take. Slider and input
+values can not go below it.</p>
+<p><tt class="docutils literal"><span class="pre">max</span></tt> attribute is the maximal value that a parameter can take. Slider and input
+values can not go over it.</p>
+<p><tt class="docutils literal"><span class="pre">step</span></tt> attribute is value of slider step. When a slider increase or decreases
+the specified parameter, it will do so by the amount specified with &#8216;step&#8217;</p>
+<p><tt class="docutils literal"><span class="pre">initial</span></tt> attribute is the initial value that the specified parameter should be
+set to. Sliders and inputs will initially show this value.</p>
+<p>The parameter&#8217;s name is specified by the <tt class="docutils literal"><span class="pre">var</span></tt> property. All occurrences
+of sliders and/or text inputs that specify a <tt class="docutils literal"><span class="pre">var</span></tt> property, will be
+connected to this parameter - i.e. they will reflect the current
+value of the parameter, and will be updated when the parameter
+changes.</p>
+<p>If at lest one of these attributes is not set, then the parameter
+will not be used, slider&#8217;s and/or text input elements that specify
+this parameter will not be activated, and the specified functions
+which use this parameter will not return a numeric value. This means
+that neglecting to specify at least one of the attributes for some
+parameter will have the result of the whole GST instance not working
+properly.</p>
+</div>
+<div class="section" id="functions-tag">
+<h4>Functions tag<a class="headerlink" href="#functions-tag" title="Permalink to this headline">¶</a></h4>
+<p>For the GST to do something, you must defined at least one
+function, which can use any of the specified parameter values. The
+function expects to take the <tt class="docutils literal"><span class="pre">x</span></tt> value, do some calculations, and
+return the <tt class="docutils literal"><span class="pre">y</span></tt> value. I.e. this is a 2D plot in Cartesian
+coordinates. This is how the default function is meant to be used for
+the graph.</p>
+<p>There are other special cases of functions. They are used mainly for
+outputting to elements, plot labels, or for custom output. Because
+the return a single value, and that value is meant for a single element,
+these function are invoked only with the set of all of the parameters.
+I.e. no <tt class="docutils literal"><span class="pre">x</span></tt> value is available inside them. They are useful for
+showing the current value of a parameter, showing complex static
+formulas where some parameter&#8217;s value must change, and other useful
+things.</p>
+<p>The different style of function is specified by the <tt class="docutils literal"><span class="pre">output</span></tt> attribute.</p>
+<p>Each function must be defined inside <tt class="docutils literal"><span class="pre">function</span></tt> tag in  <tt class="docutils literal"><span class="pre">functions</span></tt> tag:</p>
+<div class="highlight-python"><pre>&lt;functions&gt;
+    &lt;function output="element" el_id="answer_span_1"&gt;
+        function add(a, b, precision) {
+            var x = Math.pow(10, precision || 2);
+            return (Math.round(a * x) + Math.round(b * x)) / x;
+        }
+
+        return add(a, b, 5);
+    &lt;/function&gt;
+&lt;/functions&gt;</pre>
+</div>
+<p>The parameter names (along with their values, as provided from text
+inputs and/or sliders), will be available inside all defined
+functions. A defined function body string will be parsed internally
+by the browser&#8217;s JavaScript engine and converted to a true JS
+function.</p>
+<p>The function&#8217;s parameter list will automatically be created and
+populated, and will include the <tt class="docutils literal"><span class="pre">x</span></tt> (when <tt class="docutils literal"><span class="pre">output</span></tt> is not specified or
+is set to <tt class="docutils literal"><span class="pre">&quot;graph&quot;</span></tt>), and all of the specified parameter values (from sliders
+and text inputs). This means that each of the defined functions will have
+access to all of the parameter values. You don&#8217;t have to use them, but
+they will be there.</p>
+<p>Examples:</p>
+<div class="highlight-python"><pre>&lt;function&gt;
+    return x;
+&lt;/function&gt;
+
+&lt;function dot="true" label="\(y_2\)"&gt;
+    return (x + a) * Math.sin(x * b);
+&lt;/function&gt;
+
+&lt;function color="green"&gt;
+    function helperFunc(c1) {
+        return c1 * c1 - a;
+    }
+    return helperFunc(x + 10 * a * b) + Math.sin(a - x);
+&lt;/function&gt;</pre>
+</div>
+<p>Required parameters:</p>
+<div class="highlight-python"><pre>function body:
+
+A string composing a normal JavaScript function
+except that there is no function declaration
+(along with parameters), and no closing bracket.
+
+So if you normally would have written your
+JavaScript function like this:
+
+    function myFunc(x, a, b) {
+        return x * a + b;
+    }
+
+here you must specify just the function body
+(everything that goes between '{' and '}'). So,
+you would specify the above function like so (the
+bare-bone minimum):
+
+    &lt;function&gt;return x * a + b;&lt;/function&gt;
+
+VERY IMPORTANT: Because the function will be passed
+to the browser as a single string, depending on implementation
+specifics, the end-of-line characters can be stripped. This
+means that single line JavaScript comments (starting with "//")
+can lead to the effect that everything after the first such comment
+will be treated as a comment. Therefore, it is absolutely
+necessary that such single line comments are not used when
+defining functions for GST. You can safely use the alternative
+multiple line JavaScript comments (such comments start with "/*"
+and end with "*/).
+
+VERY IMPORTANT: If you have a large function body, and decide to
+split it into several lines, than you must wrap it in "CDATA" like
+so:
+
+    &lt;function&gt;
+    &lt;![CDATA[
+        var dNew;
+
+        dNew = 0.3;
+
+        return x * a + b - dNew;
+    ]]&gt;
+    &lt;/function&gt;</pre>
+</div>
+<p>Optional parameters:</p>
+<div class="highlight-python"><pre>color:  Color name ('red', 'green', etc.) or in the form of
+        '#FFFF00'. If not specified, a default color (different
+        one for each graphed function) will be given by Flot JS.
+line:   A string - 'true' or 'false'. Should the data points be
+        connected by a line on the graph? Default is 'true'.
+dot:    A string - 'true' or 'false'. Should points be shown for
+        each data point on the graph? Default is 'false'.
+bar:    A string - 'true' or 'false'. When set to 'true', points
+        will be plotted as bars.
+label:  A string. If provided, will be shown in the legend, along
+        with the color that was used to plot the function.
+output: 'element', 'none', 'plot_label', or 'graph'. If not defined,
+        function will be plotted (same as setting 'output' to 'graph').
+        If defined, and other than 'graph', function will not be
+        plotted, but it's output will be inserted into the element
+        with ID specified by 'el_id' attribute.
+el_id:  Id of HTML element, defined in '&lt;render&gt;' section. Value of
+        function will be inserted as content of this element.
+disable_auto_return: By default, if JavaScript function string is written
+                     without a "return" statement, the "return" will be
+                     prepended to it. Set to "true" to disable this
+                     functionality. This is done so that simple functions
+                     can be defined in an easy fashion (for example, "a",
+                     which will be translated into "return a").
+update_on: A string - 'change', or 'slide'. Default (if not set) is
+           'slide'. This defines the event on which a given function is
+           called, and its result is inserted into an element. This
+           setting is relevant only when "output" is other than "graph".</pre>
+</div>
+<dl class="docutils">
+<dt>When specifying <tt class="docutils literal"><span class="pre">el_id</span></tt>, it is essential to set &#8220;output&#8221; to one of</dt>
+<dd><dl class="first last docutils">
+<dt>element - GST will invoke the function, and the return of it will be</dt>
+<dd>inserted into a HTML element with id specified by <tt class="docutils literal"><span class="pre">el_id</span></tt>.</dd>
+<dt>none    - GST will simply inoke the function. It is left to the instructor</dt>
+<dd>who writes the JavaScript function body to update all necesary
+HTML elements inside the function, before it exits. This is done
+so that extra steps can be preformed after an HTML element has
+been updated with a value. Note, that because the return value
+from this function is not actually used, it will be tempting to
+omit the &#8220;return&#8221; statement. However, in this case, the attribute
+&#8220;disable_auto_return&#8221; must be set to &#8220;true&#8221; in order to prevent
+GST from inserting a &#8220;return&#8221; statement automatically.</dd>
+<dt>plot_label - GST will process all plot labels (which are strings), and</dt>
+<dd>will replace the all instances of substrings specified by
+<tt class="docutils literal"><span class="pre">el_id</span></tt> with the returned value of the function. This is
+necessary if you want a label in the graph to have some changing
+number. Because of the nature of Flot JS, it is impossible to
+achieve the same effect by setting the &#8220;output&#8221; attribute
+to &#8220;element&#8221;, and including a HTML element in the label.</dd>
+</dl>
+</dd>
+</dl>
+<p>The above values for &#8220;output&#8221; will tell GST that the function is meant for an
+HTML element (not for graph), and that it should not get an &#8216;x&#8217; parameter (along
+with some value).</p>
+</div>
+<div class="section" id="note-on-mathjax-and-labels">
+<h4>[Note on MathJax and labels]<a class="headerlink" href="#note-on-mathjax-and-labels" title="Permalink to this headline">¶</a></h4>
+<p>Independently of this module, will render all TeX code
+within the <tt class="docutils literal"><span class="pre">&lt;render&gt;</span></tt> section into nice mathematical formulas. Just
+remember to wrap it in one of:</p>
+<div class="highlight-python"><pre>\(  and  \)  -  for inline formulas (formulas surrounded by
+              standard text)
+\[  and  \]  -  if you want the formula to be a separate line</pre>
+</div>
+<p>It is possible to define a label in standard TeX notation. The JS
+library MathJax will work on these labels also because they are
+inserted on top of the plot as standard HTML (text within a DIV).</p>
+<p>If the label is dynamic, i.e. it will contain some text (numeric, or other)
+that has to be updated on a parameter&#8217;s change, then one can define
+a special function to handle this. The &#8220;output&#8221; of such a function must be
+set to &#8220;none&#8221;, and the JavaScript code inside this function must update the
+MathJax element by itself. Before exiting, MathJax typeset function should
+be called so that the new text will be re-rendered by MathJax. For example,</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&lt;render&gt;</dt>
+<dd>...
+&lt;span id=&#8221;dynamic_mathjax&#8221;&gt;&lt;/span&gt;</dd>
+</dl>
+<p>&lt;/render&gt;
+...
+&lt;function output=&#8221;none&#8221; el_id=&#8221;dynamic_mathjax&#8221;&gt;
+&lt;![CDATA[</p>
+<blockquote>
+<div><p>var out_text;</p>
+<dl class="docutils">
+<dt>out_text = &#8220;\[\mathrm{Percent \space of \space treated \space with \space YSS=\frac{&#8220;</dt>
+<dd>+(treated_men*10)+&#8221;\space men <a href="#id1"><span class="problematic" id="id2">*</span></a>&#8221;
++(your_m_tx_yss/100)+&#8221;\space prev. +\space &#8221;
++((100-treated_men)*10)+&#8221;\space women <a href="#id3"><span class="problematic" id="id4">*</span></a>&#8221;
++(your_f_tx_yss/100)+&#8221;\space prev.}&#8221;
++&#8221;{1000\space total\space treated\space patients}&#8221;
++&#8221;=&#8221;+drummond_combined[0][1]+&#8221;\%}\]&#8221;;
+mathjax_for_prevalence_calcs+=&#8221;\[\mathrm{Percent \space of \space untreated \space with \space YSS=\frac{&#8221;
++(untreated_men*10)+&#8221;\space men <a href="#id5"><span class="problematic" id="id6">*</span></a>&#8221;
++(your_m_utx_yss/100)+&#8221;\space prev. +\space &#8221;
++((100-untreated_men)*10)+&#8221;\space women <a href="#id7"><span class="problematic" id="id8">*</span></a>&#8221;
++(your_f_utx_yss/100)+&#8221;\space prev.}&#8221;
++&#8221;{1000\space total\space untreated\space patients}&#8221;
++&#8221;=&#8221;+drummond_combined[1][1]+&#8221;\%}\]&#8221;;</dd>
+</dl>
+<p>$(&#8220;#dynamic_mathjax&#8221;).html(out_text);</p>
+<p>MathJax.Hub.Queue([&#8220;Typeset&#8221;,MathJax.Hub,&#8221;dynamic_mathjax&#8221;]);</p>
+</div></blockquote>
+<p>]]&gt;
+&lt;/function&gt;
+...</p>
+</div></blockquote>
+</div>
+<div class="section" id="id9">
+<h4>Plot tag<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<p><tt class="docutils literal"><span class="pre">Plot</span></tt> tag inside <tt class="docutils literal"><span class="pre">configuration</span></tt> tag defines settings for plot output.</p>
+<p>Required parameters:</p>
+<div class="highlight-python"><pre>xrange: 2 functions that must return value. Value is constant (3.1415)
+        or depend on parameter from parameters section:
+            &lt;xrange&gt;
+                &lt;min&gt;return 0;&lt;/min&gt;
+                &lt;max&gt;return 30;&lt;/max&gt;
+            &lt;/xrange&gt;
+                                    or
+            &lt;xrange&gt;
+                &lt;min&gt;return -a;&lt;/min&gt;
+                &lt;max&gt;return a;&lt;/max&gt;
+            &lt;/xrange&gt;
+
+        All functions will be calculated over domain between xrange:min
+        and xrange:max. Xrange depending on parameter is extremely
+        useful when domain(s) of your function(s) depends on parameter
+        (like circle, when parameter is radius and you want to allow
+        to change it).</pre>
+</div>
+<p>Optional parameters:</p>
+<div class="highlight-python"><pre>num_points: Number of data points to generated for the plot. If
+            this is not set, the number of points will be
+            calculated as width / 5.
+
+bar_width: If functions are present which are to be plotted as bars,
+           then this parameter specifies the width of the bars. A
+           numeric value for this parameter is expected.
+
+bar_align: If functions are present which are to be plotted as bars,
+           then this parameter specifies how to align the bars relative
+           to the tick. Available values are "left" and "center".
+
+xticks,
+yticks:    3 floating point numbers separated by commas. This
+           specifies how many ticks are created, what number they
+           start at, and what number they end at. This is different
+           from the 'xrange' setting in that it has nothing to do
+           with the data points - it control what area of the
+           Cartesian space you will see. The first number is the
+           first tick's value, the second number is the step
+           between each tick, the third number is the value of the
+           last tick. If these configurations are not specified,
+           Flot will chose them for you based on the data points
+           set that he is currently plotting. Usually, this results
+           in a nice graph, however, sometimes you need to fine
+           grain the controls. For example, when you want to show
+           a fixed area of the Cartesian space, even when the data
+           set changes. On it's own, Flot will recalculate the
+           ticks, which will result in a different graph each time.
+           By specifying the xticks, yticks configurations, only
+           the plotted data will change - the axes (ticks) will
+           remain as you have defined them.
+
+xticks_names, yticks_names:
+          A JSON string which represents a mapping of xticks, yticks
+          values to some defined strings. If specified, the graph will
+          not have any xticks, yticks except those for which a string
+          value has been defined in the JSON string. Note that the
+          matching will be string-based and not numeric. I.e. if a tick
+          value was "3.70" before, then inside the JSON there should be
+          a mapping like {..., "3.70": "Some string", ...}. Example:
+
+              &lt;xticks_names&gt;
+              &lt;![CDATA[
+              {
+                  "1": "Treated", "2": "Not Treated",
+                  "4": "Treated", "5": "Not Treated",
+                  "7": "Treated", "8": "Not Treated"
+              }
+              ]]&gt;
+              &lt;/xticks_names&gt;
+
+              &lt;yticks_names&gt;
+              &lt;![CDATA[
+                  {"0": "0%", "10": "10%", "20": "20%", "30": "30%", "40": "40%", "50": "50%"}
+              ]]&gt;
+              &lt;/yticks_names&gt;
+
+xunits,
+yunits:   Units values to be set on axes. Use MathJax. Example:
+            &lt;xunits&gt;\(cm\)&lt;/xunits&gt;
+            &lt;yunits&gt;\(m\)&lt;/yunits&gt;
+
+moving_label:
+          A way to specify a label that should be positioned dynamically,
+          based on the values of some parameters, or some other factors.
+          It is similar to a &lt;function&gt;, but it is only valid for a plot
+          because it is drawn relative to the plot coordinate system.
+
+          Multiple "moving_label" configurations can be provided, each one
+          with a unique text and a unique set of functions that determine
+          it's dynamic positioning.
+
+          Each "moving_label" can have a "color" attribute (CSS color notation),
+          and a "weight" attribute. "weight" can be one of "normal" or "bold",
+          and determines the styling of moving label's text.
+
+          Each "moving_label" function should return an object with a 'x'
+          and 'y properties. Within those functions, all of the parameter
+          names along with their value are available.
+
+          Example (note that "return" statement is missing; it will be automatically
+          inserted by GST):
+
+              &lt;moving_label text="Co" weight="bold" color="red&gt;
+              &lt;![CDATA[  {'x': -50, 'y': c0};]]&gt;
+              &lt;/moving_label&gt;
+
+asymptote:
+          Add a vertical or horizontal asymptote to the graph which will
+          be dynamically repositioned based on the specified function.
+
+          It is similar to the function in that it provides a JavaScript body function
+          string. This function will be used to calculate the position of the asymptote
+          relative to the axis specified by the "type" parameter.
+
+          Required parameters:
+              type:
+                    Which axis should the asymptote be plotted against. Available values
+                    are "x" and "y".
+
+          Optional parameters:
+              color:
+                    The color of the line. A valid CSS color string is expected.</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="plotting-sliders-and-inputs">
+<h3>Plotting, sliders and inputs<a class="headerlink" href="#plotting-sliders-and-inputs" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>&lt;vertical&gt;
+    &lt;graphical_slider_tool&gt;
+      &lt;render&gt;
+
+          &lt;h2&gt;Graphic slider tool: full example.&lt;/h2&gt;
+            &lt;p&gt;
+                A simple equation
+                    \(
+                        y_1 = 10 \times b \times \frac{sin(a \times x) \times sin(b \times x)}{cos(b \times x) + 10}
+                    \)
+                can be plotted.
+            &lt;/p&gt;
+
+            &lt;!-- make text and input or slider at the same line --&gt;
+            &lt;div&gt;
+              &lt;p style="float:left;"&gt; Currently \(a\) is&lt;/p&gt;
+              &lt;!-- readonly input for a --&gt;
+              &lt;span id="a_readonly" style="width:50px; float:left; margin-left:10px;"/&gt;
+            &lt;/div&gt;
+            &lt;!-- clear:left will make next text to begin from new line --&gt;
+            &lt;p style="clear:left"&gt;   This one
+                  \(
+                      y_2 = sin(a \times x)
+                  \)
+              will be overlayed on top.
+            &lt;/p&gt;
+            &lt;div&gt;
+              &lt;p style="float:left;"&gt;Currently \(b\) is &lt;/p&gt;
+              &lt;textbox var="b" style="width:50px; float:left; margin-left:10px;"/&gt;
+            &lt;/div&gt;
+            &lt;div style="clear:left;"&gt;
+              &lt;p style="float:left;"&gt;To change \(a\) use:&lt;/p&gt;
+              &lt;slider var="a" style="width:400px;float:left;margin-left:10px;"/&gt;
+            &lt;/div&gt;
+            &lt;div style="clear:left;"&gt;
+              &lt;p style="float:left;"&gt;To change \(b\) use:&lt;/p&gt;
+              &lt;slider var="b" style="width:400px;float:left;margin-left:10px;"/&gt;
+            &lt;/div&gt;
+            &lt;plot style='clear:left;width:600px;padding-top:15px;padding-bottom:20px;'/&gt;
+            &lt;div style="clear:left;height:50px;"&gt;
+             &lt;p style="float:left;"&gt;Second input for b:&lt;/p&gt;
+             &lt;!-- editable input for b --&gt;
+              &lt;textbox var="b" style="color:red;width:60px;float:left;margin-left:10px;"/&gt;
+            &lt;/div &gt;
+      &lt;/render&gt;
+
+      &lt;configuration&gt;
+
+        &lt;parameters&gt;
+            &lt;param var="a" min="90" max="120" step="10" initial="100" /&gt;
+            &lt;param var="b" min="120" max="200" step="2.3" initial="120" /&gt;
+        &lt;/parameters&gt;
+
+        &lt;functions&gt;
+
+          &lt;function color="#0000FF" line="false" dot="true" label="\(y_1\)"&gt;
+            return 10.0 * b * Math.sin(a * x) * Math.sin(b * x) / (Math.cos(b * x) + 10);
+          &lt;/function&gt;
+          &lt;function color="red" line="true" dot="false" label="\(y_2\)"&gt;
+            &lt;!-- works w/o return, if function is single line --&gt;
+            Math.sin(a * x);
+          &lt;/function&gt;
+          &lt;function color="#FFFF00" line="false" dot="false" label="unknown"&gt;
+            function helperFunc(c1) {
+              return c1 * c1 - a;
+            }
+
+            return helperFunc(x + 10 * a * b) + Math.sin(a - x);
+          &lt;/function&gt;
+          &lt;function output="element" el_id="a_readonly"&gt;a&lt;/function&gt;
+        &lt;/functions&gt;
+
+        &lt;plot&gt;
+
+          &lt;xrange&gt;
+              &lt;min&gt;return 0;&lt;/min&gt;
+              &lt;!-- works w/o return --&gt;
+              &lt;max&gt;30&lt;/max&gt;
+          &lt;/xrange&gt;
+
+          &lt;num_points&gt;120&lt;/num_points&gt;
+
+          &lt;xticks&gt;0, 3, 30&lt;/xticks&gt;
+          &lt;yticks&gt;-1.5, 1.5, 13.5&lt;/yticks&gt;
+
+          &lt;xunits&gt;\(cm\)&lt;/xunits&gt;
+          &lt;yunits&gt;\(m\)&lt;/yunits&gt;
+        &lt;/plot&gt;
+      &lt;/configuration&gt;
+    &lt;/graphical_slider_tool&gt;
+&lt;/vertical&gt;
+</pre>
+</div>
+</div>
+<div class="section" id="update-of-html-elements-no-plotting">
+<h3>Update of html elements, no plotting<a class="headerlink" href="#update-of-html-elements-no-plotting" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>&lt;vertical&gt;
+    &lt;graphical_slider_tool&gt;
+        &lt;render&gt;
+            &lt;h2&gt;Graphic slider tool: Output to DOM element.&lt;/h2&gt;
+
+            &lt;p&gt;a + b = &lt;span id="answer_span_1"&gt;&lt;/span&gt;&lt;/p&gt;
+
+            &lt;div style="clear:both"&gt;
+                &lt;p style="float:left;margin-right:10px;"&gt;a&lt;/p&gt;
+                &lt;slider var='a' style="width:400px;float:left;"/&gt;
+                &lt;textbox var='a' style="width:50px;float:left;margin-left:15px;"/&gt;
+            &lt;/div&gt;
+
+            &lt;div style="clear:both"&gt;
+                &lt;p style="float:left;margin-right:10px;"&gt;b&lt;/p&gt;
+                &lt;slider var='b' style="width:400px;float:left;"/&gt;
+                &lt;textbox var='b' style="width:50px;float:left;margin-left:15px;"/&gt;
+            &lt;/div&gt;
+            &lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+            &lt;plot/&gt;
+        &lt;/render&gt;
+        &lt;configuration&gt;
+            &lt;parameters&gt;
+                &lt;param var="a" min="-10.0" max="10.0" step="0.1" initial="0" /&gt;
+                &lt;param var="b" min="-10.0" max="10.0" step="0.1" initial="0" /&gt;
+            &lt;/parameters&gt;
+
+            &lt;functions&gt;
+                &lt;function output="element" el_id="answer_span_1"&gt;
+                    function add(a, b, precision) {
+                        var x = Math.pow(10, precision || 2);
+                        return (Math.round(a * x) + Math.round(b * x)) / x;
+                    }
+
+                    return add(a, b, 5);
+                &lt;/function&gt;
+            &lt;/functions&gt;
+        &lt;/configuration&gt;
+    &lt;/graphical_slider_tool&gt;
+&lt;/vertical&gt;
+</pre>
+</div>
+</div>
+<div class="section" id="circle-with-dynamic-radius">
+<h3>Circle with dynamic radius<a class="headerlink" href="#circle-with-dynamic-radius" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>&lt;vertical&gt;
+    &lt;graphical_slider_tool&gt;
+      &lt;render&gt;
+        &lt;h2&gt;Graphic slider tool: Dynamic range and implicit functions.&lt;/h2&gt;
+
+        &lt;p&gt;You can make x range (not ticks of x axis) of functions to depend on
+          parameter value. This can be useful when function domain depends
+          on parameter.&lt;/p&gt;
+        &lt;p&gt;Also implicit functons like circle can be plotted as 2 separate
+            functions of same color.&lt;/p&gt;
+         &lt;div style="height:50px;"&gt;
+         &lt;slider var='a' style="width:400px;float:left;"/&gt;
+         &lt;textbox var='a' style="float:left;width:60px;margin-left:15px;"/&gt;
+       &lt;/div&gt;
+        &lt;plot style="margin-top:15px;margin-bottom:15px;"/&gt;
+      &lt;/render&gt;
+      &lt;configuration&gt;
+        &lt;parameters&gt;
+            &lt;param var="a" min="5" max="25" step="0.5" initial="12.5" /&gt;
+        &lt;/parameters&gt;
+        &lt;functions&gt;
+          &lt;function color="red"&gt;Math.sqrt(a * a - x * x)&lt;/function&gt;
+          &lt;function color="red"&gt;-Math.sqrt(a * a - x * x)&lt;/function&gt;
+        &lt;/functions&gt;
+        &lt;plot&gt;
+          &lt;xrange&gt;
+            &lt;!-- dynamic range --&gt;
+              &lt;min&gt;-a&lt;/min&gt;
+              &lt;max&gt;a&lt;/max&gt;
+          &lt;/xrange&gt;
+          &lt;num_points&gt;1000&lt;/num_points&gt;
+          &lt;xticks&gt;-30, 6, 30&lt;/xticks&gt;
+          &lt;yticks&gt;-30, 6, 30&lt;/yticks&gt;
+        &lt;/plot&gt;
+      &lt;/configuration&gt;
+    &lt;/graphical_slider_tool&gt;
+&lt;/vertical&gt;
+</pre>
+</div>
+</div>
+<div class="section" id="example-of-a-bar-graph">
+<h3>Example of a bar graph<a class="headerlink" href="#example-of-a-bar-graph" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>&lt;vertical&gt;
+    &lt;graphical_slider_tool&gt;
+      &lt;render&gt;
+        &lt;h2&gt;Graphic slider tool: Bar graph example.&lt;/h2&gt;
+
+        &lt;p&gt;We can request the API to plot us a bar graph.&lt;/p&gt;
+        &lt;div style="clear:both"&gt;
+          &lt;p style="width:60px;float:left;"&gt;a&lt;/p&gt;
+          &lt;slider var='a' style="width:400px;float:left;"/&gt;
+          &lt;textbox var='a' style="width:50px;float:left;margin-left:15px;"/&gt;
+          &lt;br /&gt;&lt;br /&gt;&lt;br /&gt;
+          &lt;p style="width:60px;float:left;"&gt;b&lt;/p&gt;
+          &lt;slider var='b' style="width:400px;float:left;"/&gt;
+          &lt;textbox var='b' style="width:50px;float:left;margin-left:15px;"/&gt;
+        &lt;/div&gt;
+          &lt;plot style="clear:left;"/&gt;
+      &lt;/render&gt;
+      &lt;configuration&gt;
+        &lt;parameters&gt;
+            &lt;param var="a" min="-100" max="100" step="5" initial="25" /&gt;
+            &lt;param var="b" min="-100" max="100" step="5" initial="50" /&gt;
+        &lt;/parameters&gt;
+        &lt;functions&gt;
+          &lt;function bar="true" color="blue" label="Men"&gt;
+            &lt;![CDATA[if (((x&gt;0.9) &amp;&amp; (x&lt;1.1)) || ((x&gt;4.9) &amp;&amp; (x&lt;5.1))) { return Math.sin(a * 0.01 * Math.PI + 2.952 * x); }
+            else {return undefined;}]]&gt;
+          &lt;/function&gt;
+          &lt;function bar="true" color="red" label="Women"&gt;
+            &lt;![CDATA[if (((x&gt;1.9) &amp;&amp; (x&lt;2.1)) || ((x&gt;3.9) &amp;&amp; (x&lt;4.1))) { return Math.cos(b * 0.01 * Math.PI + 3.432 * x); }
+            else {return undefined;}]]&gt;
+          &lt;/function&gt;
+          &lt;function bar="true" color="green" label="Other 1"&gt;
+            &lt;![CDATA[if (((x&gt;1.9) &amp;&amp; (x&lt;2.1)) || ((x&gt;3.9) &amp;&amp; (x&lt;4.1))) { return Math.cos((b - 10 * a) * 0.01 * Math.PI + 3.432 * x); }
+            else {return undefined;}]]&gt;
+          &lt;/function&gt;
+          &lt;function bar="true" color="yellow" label="Other 2"&gt;
+            &lt;![CDATA[if (((x&gt;1.9) &amp;&amp; (x&lt;2.1)) || ((x&gt;3.9) &amp;&amp; (x&lt;4.1))) { return Math.cos((b + 7 * a) * 0.01 * Math.PI + 3.432 * x); }
+            else {return undefined;}]]&gt;
+          &lt;/function&gt;
+        &lt;/functions&gt;
+        &lt;plot&gt;
+          &lt;xrange&gt;&lt;min&gt;1&lt;/min&gt;&lt;max&gt;5&lt;/max&gt;&lt;/xrange&gt;
+          &lt;num_points&gt;5&lt;/num_points&gt;
+          &lt;xticks&gt;0, 0.5, 6&lt;/xticks&gt;
+          &lt;yticks&gt;-1.5, 0.1, 1.5&lt;/yticks&gt;
+          &lt;xticks_names&gt;
+          &lt;![CDATA[
+              {
+                  "1.5": "Single", "4.5": "Married"
+              }
+          ]]&gt;
+          &lt;/xticks_names&gt;
+          &lt;yticks_names&gt;
+          &lt;![CDATA[
+              {
+                  "-1.0": "-100%", "-0.5": "-50%", "0.0": "0%", "0.5": "50%", "1.0": "100%"
+              }
+          ]]&gt;
+          &lt;/yticks_names&gt;
+          &lt;bar_width&gt;0.4&lt;/bar_width&gt;
+        &lt;/plot&gt;
+      &lt;/configuration&gt;
+    &lt;/graphical_slider_tool&gt;
+&lt;/vertical&gt;
+</pre>
+</div>
+</div>
+<div class="section" id="example-of-moving-labels-of-graph">
+<h3>Example of moving labels of graph<a class="headerlink" href="#example-of-moving-labels-of-graph" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>&lt;vertical&gt;
+ &lt;graphical_slider_tool&gt;
+      &lt;render&gt;
+        &lt;h1&gt;Graphic slider tool: Dynamic labels.&lt;/h1&gt;
+        &lt;p&gt;There are two kinds of dynamic lables.
+        1) Dynamic changing values in graph legends.
+        2) Dynamic labels, which coordinates depend on parameters &lt;/p&gt;
+         &lt;p&gt;a: &lt;slider var="a"/&gt;&lt;/p&gt;
+          &lt;br/&gt;
+          &lt;p&gt;b: &lt;slider var="b"/&gt;&lt;/p&gt;
+          &lt;br/&gt;&lt;br/&gt;
+          &lt;plot style="width:400px; height:400px;"/&gt;
+      &lt;/render&gt;
+
+      &lt;configuration&gt;
+        &lt;parameters&gt;
+            &lt;param var="a" min="-10" max="10" step="1" initial="0" /&gt;
+            &lt;param var="b" min="0" max="10" step="0.5" initial="5" /&gt;
+        &lt;/parameters&gt;
+        &lt;functions&gt;
+          &lt;function label="Value of a is: dyn_val_1"&gt;a * x + b&lt;/function&gt;
+         &lt;!-- dynamic values in legend --&gt;
+         &lt;function output="plot_label" el_id="dyn_val_1"&gt;a&lt;/function&gt;
+        &lt;/functions&gt;
+        &lt;plot&gt;
+          &lt;xrange&gt;&lt;min&gt;0&lt;/min&gt;&lt;max&gt;30&lt;/max&gt;&lt;/xrange&gt;
+          &lt;num_points&gt;10&lt;/num_points&gt;
+          &lt;xticks&gt;0, 6, 30&lt;/xticks&gt;
+          &lt;yticks&gt;-9, 1, 9&lt;/yticks&gt;
+          &lt;!-- custom labels with coordinates as any function of parameter --&gt;
+          &lt;moving_label text="Dynam_lbl 1" weight="bold"&gt;
+          &lt;![CDATA[  {'x': 10, 'y': a};]]&gt;
+          &lt;/moving_label&gt;
+          &lt;moving_label text="Dynam lbl 2" weight="bold"&gt;
+          &lt;![CDATA[  {'x': -6, 'y': b};]]&gt;
+          &lt;/moving_label&gt;
+        &lt;/plot&gt;
+      &lt;/configuration&gt;
+    &lt;/graphical_slider_tool&gt;
+&lt;/vertical&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../internal_data_formats/sql_schema.html" title="Student Info and Progress Data"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../drag_and_drop/drag_and_drop_input.html" title="XML format of drag and drop input [inputtypes]"
+             >previous</a> |</li>
+        <li><a href="../../index.html">edX Data 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, edX Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
