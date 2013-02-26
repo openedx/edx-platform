@@ -45,6 +45,10 @@ class FolditTestCase(TestCase):
         Given lists of puzzle_ids and best_scores (must have same length), make a
         SetPlayerPuzzleScores request and return the response.
         """
+        if not(type(best_scores) == list):
+            best_scores = [best_scores]
+        if not(type(puzzle_ids) == list):
+            puzzle_ids = [puzzle_ids]
         user = self.user if not user else user
 
         def score_dict(puzzle_id, best_score):
@@ -62,7 +66,7 @@ class FolditTestCase(TestCase):
         data = {'SetPlayerPuzzleScoresVerify': json.dumps(verify),
                 'SetPlayerPuzzleScores': scores_str}
 
-        request = self.make_request(data)
+        request = self.make_request(data, user)
 
         response = foldit_ops(request)
         self.assertEqual(response.status_code, 200)
@@ -70,9 +74,9 @@ class FolditTestCase(TestCase):
 
     def test_SetPlayerPuzzleScores(self):
 
-        puzzle_id = [994391]
+        puzzle_id = 994391
         best_score = 0.078034
-        response = self.make_puzzle_score_request([puzzle_id], [best_score])
+        response = self.make_puzzle_score_request(puzzle_id, [best_score])
 
         self.assertEqual(response.content, json.dumps(
             [{"OperationID": "SetPlayerPuzzleScores",
@@ -81,7 +85,7 @@ class FolditTestCase(TestCase):
                   "Status": "Success"}]}]))
 
         # There should now be a score in the db.
-        top_10 = Score.get_tops_n(puzzle_id, 10)
+        top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 1)
         self.assertEqual(top_10[0]['score'], Score.display_score(best_score))
 
@@ -105,11 +109,11 @@ class FolditTestCase(TestCase):
         (keep latest for each user, have multiple users work properly)
         """
         orig_score = 0.07
-        puzzle_id = ['1']
+        puzzle_id = '1'
         response = self.make_puzzle_score_request([puzzle_id], [orig_score])
 
         # There should now be a score in the db.
-        top_10 = Score.get_tops_n(puzzle_id, 10)
+        top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 1)
         self.assertEqual(top_10[0]['score'], Score.display_score(orig_score))
 
@@ -117,20 +121,26 @@ class FolditTestCase(TestCase):
         better_score = 0.06
         response = self.make_puzzle_score_request([1], [better_score])
 
-        top_10 = Score.get_tops_n(puzzle_id, 10)
+        top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 1)
-        self.assertEqual(top_10[0]['score'], Score.display_score(better_score))
+
+        # Floats always get in the way, so do almostequal
+        self.assertAlmostEqual(top_10[0]['score'],
+               Score.display_score(better_score),
+               delta=0.5)
 
         # reporting a worse score shouldn't
         worse_score = 0.065
         response = self.make_puzzle_score_request([1], [worse_score])
 
-        top_10 = Score.get_tops_n(puzzle_id, 10)
+        top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 1)
         # should still be the better score
-        self.assertEqual(top_10[0]['score'], Score.display_score(better_score))
+        self.assertAlmostEqual(top_10[0]['score'],
+                Score.display_score(better_score),
+                delta=0.5)
 
-    def test_SetPlayerPyzzleScores_manyplayers(self):
+    def test_SetPlayerPuzzleScores_manyplayers(self):
         """
         Check that when we send scores from multiple users, the correct order
         of scores is displayed.
@@ -138,18 +148,19 @@ class FolditTestCase(TestCase):
         puzzle_id = ['1']
         player1_score = 0.07
         player2_score = 0.08
-        response1 = self.make_puzzle_score_request([puzzle_id], [player1_score],
+        response1 = self.make_puzzle_score_request(puzzle_id, player1_score,
                 self.user)
 
         # There should now be a score in the db.
-        top_10 = Score.get_tops_n(puzzle_id, 10)
+        top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 1)
         self.assertEqual(top_10[0]['score'], Score.display_score(player1_score))
 
-        response2 = self.make_puzzle_score_request([puzzle_id], [player2_score],
+        response2 = self.make_puzzle_score_request(puzzle_id, player2_score,
                 self.user2)
 
         # There should now be two scores in the db
+        top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 2)
 
         # Top score should be player2_score. Second should be player1_score

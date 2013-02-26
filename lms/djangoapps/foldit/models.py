@@ -72,6 +72,8 @@ class Score(models.Model):
                 [ {username: 'a_user',
                    score: 12000} ...]
         """
+        if not(type(puzzles) == list):
+            puzzles = [puzzles]
         scores = Score.objects \
             .filter(puzzle_id__in=puzzles) \
             .annotate(total_score=models.Sum('best_score')) \
