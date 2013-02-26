@@ -38,24 +38,6 @@ class Score(models.Model):
         """
         return (-score) * 10 + 8000 * sum_of
 
-    # TODO: delete this, incorporate it in get_tops_n
-    #@staticmethod
-    #def get_top_n(puzzle_id, n):
-        #"""
-        #Arguments:
-            #puzzle_id (int): id of the puzzle for which to look
-            #n (int): number of top scores to return.
-
-        #Returns:
-           #The top (lowest energy, highest display score) n scores for the puzzle.  If
-           #there are fewer than n, returns all.  Output is a list of dictionaries, sorted
-           #by display_score:
-                #[ {username: 'a_user',
-                   #score: 8500}, ...]
-        #"""
-        #scores = Score.objects.filter(puzzle_id=puzzle_id).order_by('-best_score')[:n]
-        #return [{'username': s.user.username, 'score': Score.display_score(s.best_score)}
-                #for s in scores]
 
     @staticmethod
     def get_tops_n(n, puzzles=['994559']):
