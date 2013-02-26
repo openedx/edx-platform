@@ -33,15 +33,18 @@ class AnnotatableModuleTestCase(unittest.TestCase):
     instance_state = None
     shared_state = None
 
-    annotation_el = {
-        'tag': 'annotation',
-        'attrib': [
-            'title',
-            'body', # required
-            'problem',
-            'highlight'
-        ]
-    }
-
     def setUp(self):
         self.annotatable = AnnotatableModule(test_system, self.location, self.definition, self.descriptor, self.instance_state, self.shared_state)
+
+    def test_annotation_data_attr(self):
+        el = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')
+
+        expected_attr = {
+            'data-comment-body': {'value': 'foo', '_delete': 'body' },
+            'data-comment-title': {'value': 'bar', '_delete': 'title'},
+            'data-problem-id': {'value': '0', '_delete': 'problem'}
+        }
+
+        data_attr = self.annotatable._get_annotation_data_attr(0, el)
+        self.assertTrue(type(data_attr) is dict)
+        self.assertDictEqual(expected_attr, data_attr)
