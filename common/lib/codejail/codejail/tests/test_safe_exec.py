@@ -54,6 +54,11 @@ class SafeExecTests(object):
             """), g)
         self.assertEqual(g['x'], 1723)
 
+    def test_printing_stuff_when_you_shouldnt(self):
+        g = {}
+        self.safe_exec("a = 17; print 'hi!'", g)
+        self.assertEqual(g['a'], 17)
+
 
 class TestSafeExec(SafeExecTests, unittest.TestCase):
     """Run SafeExecTests, with the real safe_exec."""

@@ -46,9 +46,24 @@ def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=
     the_code = []
     files = list(files or ())
 
-    the_code.append(textwrap.dedent("""\
+    the_code.append(textwrap.dedent(
+        """
         import json
         import sys
+        """
+        # We need to prevent the sandboxed code from printing to stdout,
+        # or it will pollute the json we print there.  This isn't a
+        # security concern (they can put any values in the json output
+        # anyway, either by writing to sys.__stdout__, or just by defining
+        # global values), but keeps accidents from happening.
+        """
+        class DevNull(object):
+            def write(self, *args, **kwargs):
+                pass
+        sys.stdout = DevNull()
+        """
+        # Read the code and the globals from the stdin.
+        """
         code, g_dict = json.load(sys.stdin)
         """))
 
@@ -62,12 +77,20 @@ def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=
         for name, modname in names_and_modules(assumed_imports):
             the_code.append("g_dict['{}'] = LazyModule('{}')\n".format(name, modname))
 
-    the_code.append(textwrap.dedent("""\
+    the_code.append(textwrap.dedent(
+        # Execute the sandboxed code.
+        """
         exec code in g_dict
+        """
+        # Clean the globals for sending back as JSON over stdout.
+        """
         ok_types = (type(None), int, long, float, str, unicode, list, tuple, dict)
         bad_keys = ("__builtins__",)
         g_dict = {k:v for k,v in g_dict.iteritems() if isinstance(v, ok_types) and k not in bad_keys}
-        json.dump(g_dict, sys.stdout)
+        """
+        # Write the globals back to the calling process.
+        """
+        json.dump(g_dict, sys.__stdout__)
         """))
 
     stdin = json.dumps([code, globals_dict])
@@ -82,7 +105,7 @@ def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=
 
     res = jailpy.jailpy(jailed_code, stdin=stdin, files=files)
     if res.status != 0:
-        raise Exception("Couldn't excecute jailed code: %s" % res.stderr)
+        raise Exception("Couldn't execute jailed code: %s" % res.stderr)
     globals_dict.update(json.loads(res.stdout))
 
 
