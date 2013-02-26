@@ -936,9 +936,8 @@ class CustomResponse(LoncapaResponse):
                             'expect': expect,
                             'ans': ans,
                         }
-                        locals_dict = {}
-                        safe_exec.safe_exec(code, globals_dict, locals_dict)
-                        return locals_dict['cfn_return']
+                        safe_exec.safe_exec(code, globals_dict)
+                        return globals_dict['cfn_return']
                     return check_function
 
                 self.code = make_check_function(self.context['script_code'], cfn)
@@ -1055,9 +1054,7 @@ class CustomResponse(LoncapaResponse):
         # exec the check function
         if isinstance(self.code, basestring):
             try:
-                locals_dict = {}
-                safe_exec.safe_exec(self.code, self.context, locals_dict)
-                self.context.update(locals_dict)
+                safe_exec.safe_exec(self.code, self.context)
             except Exception as err:
                 self._handle_exec_exception(err)
 
@@ -1762,10 +1759,9 @@ class SchematicResponse(LoncapaResponse):
             json.loads(student_answers[k]) for k in sorted(self.answer_ids)
         ]
         self.context.update({'submission': submission})
-        locals_dict = {}
-        safe_exec.safe_exec(self.code, self.context, locals_dict)
+        safe_exec.safe_exec(self.code, self.context)
         cmap = CorrectMap()
-        cmap.set_dict(dict(zip(sorted(self.answer_ids), locals_dict['correct'])))
+        cmap.set_dict(dict(zip(sorted(self.answer_ids), self.context['correct'])))
         return cmap
 
     def get_answers(self):

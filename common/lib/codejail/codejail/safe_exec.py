@@ -28,19 +28,19 @@ def names_and_modules(assumed_imports):
             yield modname, modname
 
 
-def safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=None, python_path=None):
+def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=None):
     """Execute code as "exec" does, but safely.
 
-    `code` is a string of Python code.  `globals_dict` and `locals_dict` are
-    dictionaries to use as the globals and locals.  Modifications the code
-    makes to `locals_dict` are reflected in the dictionary on return.
+    `code` is a string of Python code.  `globals_dict` is used as the globals
+    during execution.  Modifications the code makes to `globals_dict` are
+    reflected in the dictionary on return.
 
     `assumed_imports` is a list of modules to make available as implicit
     imports for the code.  Entries are either a name, "mod", which makes
     "import mod" part of the code, or a pair, ("f", "fooey"), which makes
     "import fooey as f" part of the code.  The module name can be dotted.
 
-    Returns None.  Changes made by `code` are visible in `locals_dict`.
+    Returns None.  Changes made by `code` are visible in `globals_dict`.
 
     """
     the_code = []
@@ -49,7 +49,7 @@ def safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=None,
     the_code.append(textwrap.dedent("""\
         import json
         import sys
-        code, g_dict, l_dict = json.load(sys.stdin)
+        code, g_dict = json.load(sys.stdin)
         """))
 
     for pydir in python_path or ():
@@ -63,13 +63,14 @@ def safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=None,
             the_code.append("g_dict['{}'] = LazyModule('{}')\n".format(name, modname))
 
     the_code.append(textwrap.dedent("""\
-        exec code in g_dict, l_dict
+        exec code in g_dict
         ok_types = (type(None), int, long, float, str, unicode, list, tuple, dict)
-        l_dict = {k:v for k,v in l_dict.iteritems() if isinstance(v, ok_types)}
-        json.dump(l_dict, sys.stdout)
+        bad_keys = ("__builtins__",)
+        g_dict = {k:v for k,v in g_dict.iteritems() if isinstance(v, ok_types) and k not in bad_keys}
+        json.dump(g_dict, sys.stdout)
         """))
 
-    stdin = json.dumps([code, globals_dict, locals_dict])
+    stdin = json.dumps([code, globals_dict])
     jailed_code = "".join(the_code)
 
     # Turn this on to see what's being executed.
@@ -82,10 +83,10 @@ def safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=None,
     res = jailpy.jailpy(jailed_code, stdin=stdin, files=files)
     if res.status != 0:
         raise Exception("Couldn't excecute jailed code: %s" % res.stderr)
-    locals_dict.update(json.loads(res.stdout))
+    globals_dict.update(json.loads(res.stdout))
 
 
-def not_safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=None, python_path=None):
+def not_safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=None):
     """Another implementation of `safe_exec`, but not safe.
 
     This can be swapped in for debugging problems in sandboxed Python code.
@@ -111,7 +112,6 @@ def not_safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=N
         return json.loads(json.dumps(jd))
 
     g_dict = straw(globals_dict)
-    l_dict = straw(locals_dict)
 
     for name, modname in names_and_modules(assumed_imports or ()):
         g_dict[name] = lazymod.LazyModule(modname)
@@ -127,11 +127,11 @@ def not_safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=N
             if python_path:
                 sys.path.extend(python_path)
             try:
-                exec code in g_dict, l_dict
+                exec code in g_dict
             finally:
                 sys.path = original_path
 
-    locals_dict.update(straw(l_dict))
+    globals_dict.update(straw(g_dict))
 
 # Running Python code in the sandbox makes it difficult to debug.
 # Change 0 to 1 to run the code directly.

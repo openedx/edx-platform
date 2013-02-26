@@ -462,9 +462,7 @@ class LoncapaProblem(object):
 
         if all_code:
             try:
-                locals_dict = {}
-                safe_exec.safe_exec(all_code, context, locals_dict, random_seed=self.seed, python_path=python_path)
-                context.update(locals_dict)
+                safe_exec.safe_exec(all_code, context, random_seed=self.seed, python_path=python_path)
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
                 msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')

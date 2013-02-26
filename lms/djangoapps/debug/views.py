@@ -19,11 +19,11 @@ def run_python(request):
     c['results'] = None
     if request.method == 'POST':
         py_code = c['code'] = request.POST.get('code')
-        g, l = {}, {}
+        g = {}
         try:
-            safe_exec(py_code, g, l)
+            safe_exec(py_code, g)
         except Exception as e:
             c['results'] = str(e)
         else:
-            c['results'] = pprint.pformat(l)
+            c['results'] = pprint.pformat(g)
     return render_to_response("debug/run_python_form.html", c)
