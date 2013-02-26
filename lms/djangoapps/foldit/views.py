@@ -132,7 +132,6 @@ def save_scores(user, puzzle_scores):
                 score_version=score_version)
             obj.save()
 
-        # TODO: get info from db instead?
         score_responses.append({'PuzzleID': puzzle_id,
                                 'Status': 'Success'})
 

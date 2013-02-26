@@ -96,8 +96,8 @@ class FolditModule(XModule):
             self.required_level,
             self.required_sublevel)
 
-        showbasic = (self.metadata.get("show_basic_score") == "true")
-        showleader = (self.metadata.get("show_leaderboard") == "true")
+        showbasic = (self.metadata.get("show_basic_score").lower() == "true")
+        showleader = (self.metadata.get("show_leaderboard").lower() == "true")
         context = {
             'due': self.due_str,
             'success': self.is_complete(),
