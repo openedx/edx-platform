@@ -27,24 +27,27 @@ PDFJS.disableWorker = true;
         var pdfViewer = this;
 
         var pdfDocument = null;
-        var url = null;
+        var urlToLoad = null;
         if (options.url) {
-            url = options.url;
+            urlToLoad = options.url;
         }
-        var chapter_urls = null;
+        var chapterUrls = null;
         if (options.chapters) {
-            chapter_urls = options.chapters;
+            chapterUrls = options.chapters;
         }
-        var chapterNum = 1;
+        var chapterToLoad = 1;
         if (options.chapterNum) {
-            chapterNum = options.chapterNum;
             // TODO: this should only be specified if there are 
             // chapters, and it should be in-bounds.
+            chapterToLoad = options.chapterNum;
         }
-        var pageNum = 1;
+        var pageToLoad = 1;
         if (options.pageNum) {
-            pageNum = options.pageNum;
+            pageToLoad = options.pageNum;
         }
+
+        var chapterNum = 1;
+        var pageNum = 1;
 
         var viewerElement = document.getElementById('viewer');
         var ANNOT_MIN_SIZE = 10;
@@ -280,13 +283,21 @@ PDFJS.disableWorker = true;
         //
         // Asynchronously download PDF as an ArrayBuffer
         //
-        loadUrl = function pdfViewLoadUrl(url_to_load) {
-            PDFJS.getDocument(url_to_load).then(
+        loadUrl = function pdfViewLoadUrl(url, page) {
+            PDFJS.getDocument(url).then(
                 function getDocument(_pdfDocument) {
                     pdfDocument = _pdfDocument;
-                    // display the current page with a default scale value:
-		    currentScale = UNKNOWN_SCALE;
-                    parseScale(DEFAULT_SCALE_VALUE);
+                    pageNum = page;
+                    // if the scale has not been set before, set it now.
+                    // Otherwise, don't change the current scale,
+                    // but make sure it gets refreshed.
+                    if (currentScale == UNKNOWN_SCALE) {
+                        parseScale(DEFAULT_SCALE_VALUE);
+                    } else {
+                        var preservedScale = currentScale;
+                        currentScale = UNKNOWN_SCALE;
+                        parseScale(preservedScale);
+                    }
                 }, 
                 function getDocumentError(message, exception) {
                     // placeholder: don't expect errors :)
@@ -296,9 +307,12 @@ PDFJS.disableWorker = true;
                 });
             }; 
 
-        loadChapterUrl = function pdfViewLoadChapterUrl(chapter_index) {
-            var chapter_url = chapter_urls[chapter_index];
-            loadUrl(chapter_url);
+        loadChapterUrl = function pdfViewLoadChapterUrl(chapterNum, pageVal) {
+            if (chapterNum < 1 || chapterNum > chapterUrls.length) {
+                return;
+            }
+            var chapterUrl = chapterUrls[chapterNum-1];
+            loadUrl(chapterUrl, pageVal);
         }
 
         $("#previous").click(function(event) {
@@ -329,22 +343,23 @@ PDFJS.disableWorker = true;
         });
 
         // define navigation links for chapters:  
-        if (chapter_urls != null) {
+        if (chapterUrls != null) {
             var loadChapterUrlHelper = function(i) {
                 return function(event) {
-                    loadChapterUrl(i);
+                    // when opening a new chapter, always open the first page:
+                    loadChapterUrl(i, 1);
                 };
             };
-            for (var index = 1; index <= chapter_urls.length; index += 1) {
+            for (var index = 1; index <= chapterUrls.length; index += 1) {
                 $("#pdfchapter-" + index).click(loadChapterUrlHelper(index));
             }   
         }
 
-        // finally, load the appropriate page
-        if (url != null) {
-            loadUrl(url);
+        // finally, load the appropriate url/page
+        if (urlToLoad != null) {
+            loadUrl(urlToLoad, pageToLoad);
         } else {
-            loadChapterUrl(chapterNum);
+            loadChapterUrl(chapterToLoad, pageToLoad);
         }       
             
         return pdfViewer;
