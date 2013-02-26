@@ -1,6 +1,7 @@
 """Test safe_exec.py"""
 
 import os.path
+import textwrap
 import unittest
 from nose.plugins.skip import SkipTest
 
@@ -41,6 +42,17 @@ class SafeExecTests(object):
             python_path=[os.path.dirname(__file__) + "/pylib"]
         )
         self.assertEqual(l['a'], 42)
+
+    def test_functions_calling_each_other(self):
+        g, l = {}, {}
+        self.safe_exec(textwrap.dedent("""\
+            def f():
+                return 1723
+            def g():
+                return f()
+            x = g()
+            """), g, l)
+        self.assertEqual(l['x'], 1723)
 
 
 class TestSafeExec(SafeExecTests, unittest.TestCase):
