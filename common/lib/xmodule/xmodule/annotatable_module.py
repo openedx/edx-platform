@@ -63,26 +63,29 @@ class AnnotatableModule(XModule):
 
         return data_attrs
 
+    def _render_annotation(self, index, el):
+        """ Renders an annotation element for HTML output.  """
+        attr = {}
+        attr.update(self._get_annotation_class_attr(index, el))
+        attr.update(self._get_annotation_data_attr(index, el))
+
+        el.tag = 'span'
+
+        for key in attr.keys():
+            el.set(key, attr[key]['value'])
+            if '_delete' in attr[key] and attr[key]['_delete'] is not None:
+                delete_key = attr[key]['_delete']
+                del el.attrib[delete_key]
+
+
     def _render_content(self):
         """ Renders annotatable content with annotation spans and returns HTML. """
-
         xmltree = etree.fromstring(self.content)
         xmltree.tag = 'div'
 
         index = 0
         for el in xmltree.findall('.//annotation'):
-            el.tag = 'span'
-
-            attr = {}
-            attr.update(self._get_annotation_class_attr(index, el))
-            attr.update(self._get_annotation_data_attr(index, el))
-
-            for key in attr.keys():
-                el.set(key, attr[key]['value'])
-                if '_delete' in attr[key] and attr[key]['_delete'] is not None:
-                    delete_key = attr[key]['_delete']
-                    del el.attrib[delete_key]
-
+            self._render_annotation(index, el)
             index += 1
 
         return etree.tostring(xmltree, encoding='unicode')

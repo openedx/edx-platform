@@ -14,7 +14,10 @@
   border-radius: .5em;
   margin-bottom: .5em;
 
-  .annotatable-section-title {}
+  .annotatable-section-title {
+    font-weight: bold;
+    a { font-weight: normal; }
+  }
   .annotatable-section-body {
     border-top: 1px solid $border-color;
     margin-top: .5em;
