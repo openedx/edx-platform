@@ -283,19 +283,31 @@ class FormulaResponseWithHintTest(unittest.TestCase):
         self.assertTrue('You have inverted' in cmap.get_hint('1_2_1'))
 
 
-class StringResponseWithHintTest(unittest.TestCase):
-    '''
-    Test String response problem with a hint
-    '''
-    def test_or_grade(self):
-        problem_file = os.path.dirname(__file__) + "/test_files/stringresponse_with_hint.xml"
-        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': 'Michigan'}
-        test_answers = {'1_2_1': 'Minnesota'}
-        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
-        cmap = test_lcp.grade_answers(test_answers)
-        self.assertEquals(cmap.get_correctness('1_2_1'), 'incorrect')
-        self.assertTrue('St. Paul' in cmap.get_hint('1_2_1'))
+class StringResponseWithHintTest(ResponseTest):
+    from response_xml_factory import StringResponseXMLFactory
+    xml_factory_class = StringResponseXMLFactory
+
+
+    def test_case_sensitive(self):
+        problem = self.build_problem(answer="Second", case_sensitive=True)
+
+        # Exact string should be correct
+        self.assert_grade(problem, "Second", "correct")
+
+        # Other strings and the lowercase version of the string are incorrect
+        self.assert_grade(problem, "Other String", "incorrect")
+        self.assert_grade(problem, "second", "incorrect")
+
+    def test_case_insensitive(self):
+        problem = self.build_problem(answer="Second", case_sensitive=False)
+
+        # Both versions of the string should be allowed, regardless
+        # of capitalization
+        self.assert_grade(problem, "Second", "correct")
+        self.assert_grade(problem, "second", "correct")
+
+        # Other strings are not allowed
+        self.assert_grade(problem, "Other String", "incorrect")
 
 
 class CodeResponseTest(unittest.TestCase):

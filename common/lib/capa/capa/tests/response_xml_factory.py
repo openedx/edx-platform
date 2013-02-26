@@ -374,11 +374,36 @@ class OptionResponseXMLFactory(ResponseXMLFactory):
 
 
 class StringResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for producing <stringresponse> XML """
+
     def create_response_element(self, **kwargs):
-        raise NotImplemented
+        """ Create a <stringresponse> XML element.
+        
+            Uses **kwargs:
+
+            *answer*: The correct answer (a string) [REQUIRED]
+            *case_sensitive*: Whether the response is case-sensitive (True/False)
+                            [DEFAULT: True]
+        """
+        # Retrieve the **kwargs
+        answer = kwargs.get("answer", None)
+        case_sensitive = kwargs.get("case_sensitive", True)
+        assert(answer)
+
+        # Create the <stringresponse> element
+        response_element = etree.Element("stringresponse")
+
+        # Set the answer attribute 
+        response_element.set("answer", str(answer))
+
+        # Set the case sensitivity
+        response_element.set("type", "cs" if case_sensitive else "ci")
+
+        return response_element
 
     def create_input_element(self, **kwargs):
-        raise NotImplemented
+        return ResponseXMLFactory.textline_input_xml(**kwargs)
+
 
 class SymbolicResponseXMLFactory(ResponseXMLFactory):
     def create_response_element(self, **kwargs):
