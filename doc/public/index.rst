@@ -1,17 +1,18 @@
-.. edX documentation master file, created by
-   sphinx-quickstart on Fri Nov  2 15:43:00 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-   common-lib.rst
-   djangoapps.rst
-   xml_formats.rst
+edX Docs
+========
+
+Course Data Formats
+-------------------
+These are data formats written by people to specify course structure and content. Some of this is abstracted away if you are using the Studio authoring user interface.
+
+.. toctree::
+   :maxdepth: 2
+
+   course_xml.rst
 
 
-edX Data Formats
-================
-
-Internal Formats
-----------------
+Internal Data Formats
+---------------------
 These document describe how we store course structure, student state/progress, and events internally. Useful for developers or researchers who interact with our raw data exports.
 
 .. toctree::
@@ -25,6 +26,5 @@ Indices and tables
 ==================
 
 .. * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 
