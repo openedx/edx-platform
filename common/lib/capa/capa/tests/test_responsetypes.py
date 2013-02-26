@@ -609,3 +609,36 @@ class CustomResponseTest(unittest.TestCase):
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
         self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
         self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
+
+
+from response_xml_factory import SchematicResponseXMLFactory
+class SchematicResponseTest(unittest.TestCase):
+
+    def setUp(self):
+        self.xml_factory = SchematicResponseXMLFactory()
+
+    def test_grade(self):
+
+        # Most of the schematic-specific work is handled elsewhere
+        # (in client-side JavaScript)
+        # The <schematicresponse> is responsible only for executing the
+        # Python code in <answer> with *submission* (list)
+        # in the global context.
+
+        # To test that the context is set up correctly,
+        # we create a script that sets *correct* to true
+        # if and only if we find the *submission* (list)
+        script="correct = ['correct' if 'test' in submission[0] else 'incorrect']"
+        xml = self.xml_factory.build_xml(answer=script)
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        # The actual dictionary would contain schematic information
+        # sent from the JavaScript simulation
+        submission_dict = {'test': 'test'}
+        input_dict = { '1_2_1': json.dumps(submission_dict) }
+        correct_map = problem.grade_answers(input_dict)
+
+        # Expect that the problem is graded as true
+        # (That is, our script verifies that the context
+        # is what we expect)
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')

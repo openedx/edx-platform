@@ -35,15 +35,15 @@ class ResponseXMLFactory(object):
 
         For all response types, **kwargs can contain:
 
-        'question_text': The text of the question to display,
+        *question_text*: The text of the question to display,
             wrapped in <p> tags.
         
-        'explanation_text': The detailed explanation that will
+        *explanation_text*: The detailed explanation that will
             be shown if the user answers incorrectly.
 
-        'script': The embedded Python script (a string)
+        *script*: The embedded Python script (a string)
 
-        'num_inputs': The number of input elements
+        *num_inputs*: The number of input elements
             to create [DEFAULT: 1]
 
         Returns a string representation of the XML tree.
@@ -51,7 +51,7 @@ class ResponseXMLFactory(object):
 
         # Retrieve keyward arguments
         question_text = kwargs.get('question_text', '')
-        explanation_text = kwargs.get('explanation_text')
+        explanation_text = kwargs.get('explanation_text', '')
         script = kwargs.get('script', None)
         num_inputs = kwargs.get('num_inputs', 1)
 
@@ -91,9 +91,9 @@ class ResponseXMLFactory(object):
 
         Uses **kwargs:
 
-        'math_display': If True, then includes a MathJax display of user input
+        *math_display*: If True, then includes a MathJax display of user input
 
-        'size': An integer representing the width of the text line
+        *size*: An integer representing the width of the text line
         """
         math_display = kwargs.get('math_display', False)
         size = kwargs.get('size', None)
@@ -108,6 +108,7 @@ class ResponseXMLFactory(object):
 
         return input_element
 
+
 class NumericalResponseXMLFactory(ResponseXMLFactory):
     """ Factory for producing <numericalresponse> XML trees """
 
@@ -115,9 +116,9 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
         """ Create a <numericalresponse> XML element.
         Uses **kwarg keys:
 
-        'answer': The correct answer (e.g. "5")
+        *answer*: The correct answer (e.g. "5")
 
-        'tolerance': The tolerance within which a response
+        *tolerance*: The tolerance within which a response
         is considered correct.  Can be a decimal (e.g. "0.01")
         or percentage (e.g. "2%")
         """
@@ -140,24 +141,27 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
 
+
 class CustomResponseXMLFactory(ResponseXMLFactory):
     """ Factory for producing <customresponse> XML trees """
 
     def create_response_element(self, **kwargs):
         """ Create a <customresponse> XML element.
 
-        Use **kwargs:
+        Uses **kwargs:
 
-        'cfn': the Python code to run.  Can be inline code,
+        *cfn*: the Python code to run.  Can be inline code,
         or the name of a function defined in earlier <script> tags.
 
-        Should have the form: cfn(expect, ans)
-        where expect is a value (see below) 
-        and ans is a list of values.
+        Should have the form: cfn(expect, answer_given, student_answers)
+        where expect is a value (see below),
+        answer_given is a single value (for 1 input)
+        or a list of values (for multiple inputs),
+        and student_answers is a dict of answers by input ID.
 
-        'expect': The value passed as the first argument to the function cfn
+        *expect*: The value passed to the function cfn
 
-        'answer': Inline script that calculates the answer
+        *answer*: Inline script that calculates the answer
         """
         
         # Retrieve **kwargs
@@ -182,3 +186,47 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
 
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
+
+
+class CodeResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for creating <coderesponse> XML trees """
+
+    def create_response_element(self, **kwargs):
+        """ Create a <coderesponse> XML element """
+        raise NotImplemented
+
+    def create_input_element(self, **kwargs):
+        raise NotImplemented
+
+class SchematicResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for creating <schematicresponse> XML trees """
+
+    def create_response_element(self, **kwargs):
+        """ Create the <schematicresponse> XML element.
+        
+        Uses *kwargs*:
+
+        *answer*: The Python script used to evaluate the answer.
+        """
+        answer_script = kwargs.get('answer', None)
+
+        # Create the <schematicresponse> element
+        response_element = etree.Element("schematicresponse")
+
+        # Insert the <answer> script if one is provided
+        if answer_script:
+            answer_element = etree.SubElement(response_element, "answer")
+            answer_element.set("type", "loncapa/python")
+            answer_element.text = str(answer_script)
+
+        return response_element
+
+    def create_input_element(self, **kwargs):
+        """ Create the <schematic> XML element.
+
+        Although <schematic> can have several attributes,
+        (*height*, *width*, *parts*, *analyses*, *submit_analysis*,
+        and *initial_value*),
+        none of them are used in the capa module.
+        For testing, we create a bare-bones version of <schematic>."""
+        return etree.Element("schematic")
