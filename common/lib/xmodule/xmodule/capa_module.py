@@ -429,6 +429,11 @@ class CapaModule(XModule):
         # used by conditional module
         return self.attempts > 0
 
+    def is_correct(self):
+        """True if full points"""
+        d = self.get_score()
+        return d['score'] == d['total']
+
     def answer_available(self):
         '''
         Is the user allowed to see an answer?
@@ -449,6 +454,9 @@ class CapaModule(XModule):
             return self.lcp.done
         elif self.show_answer == 'closed':
             return self.closed()
+        elif self.show_answer == 'finished':
+            return self.closed() or self.is_correct()
+
         elif self.show_answer == 'past_due':
             return self.is_past_due()
         elif self.show_answer == 'always':
