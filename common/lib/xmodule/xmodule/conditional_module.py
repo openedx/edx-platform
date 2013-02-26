@@ -172,7 +172,9 @@ class ConditionalDescriptor(SequenceDescriptor):
                         else:
                             result.append(location)
                     except ItemNotFoundError:
-                        log.exception("Invalid module by location.")
+                        msg = "Invalid module by location."
+                        log.exception(msg)
+                        system.error_tracker(msg)
         return result
 
     def get_required_module_descriptors(self):
@@ -198,7 +200,9 @@ class ConditionalDescriptor(SequenceDescriptor):
                     module_url = descriptor.location.url()
                     children.append(module_url)
                 except:
-                    log.exception("Unable to load child when parsing Conditional.")
+                    msg = "Unable to load child when parsing Conditional."
+                    log.exception(msg)
+                    system.error_tracker(msg)
         return {'show_tag_list': show_tag_list}, children
 
     def definition_to_xml(self, resource_fs):
