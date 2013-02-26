@@ -382,12 +382,19 @@ class StringResponseXMLFactory(ResponseXMLFactory):
             Uses **kwargs:
 
             *answer*: The correct answer (a string) [REQUIRED]
+
             *case_sensitive*: Whether the response is case-sensitive (True/False)
                             [DEFAULT: True]
+
+            *hints*: List of (hint_prompt, hint_name, hint_text) tuples
+                Where *hint_prompt* is the string for which we show the hint,
+                *hint_name* is an internal identifier for the hint,
+                and *hint_text* is the text we show for the hint.
         """
         # Retrieve the **kwargs
         answer = kwargs.get("answer", None)
         case_sensitive = kwargs.get("case_sensitive", True)
+        hint_list = kwargs.get('hints', None)
         assert(answer)
 
         # Create the <stringresponse> element
@@ -398,6 +405,20 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
         # Set the case sensitivity
         response_element.set("type", "cs" if case_sensitive else "ci")
+
+        # Add the hints if specified
+        if hint_list:
+            hintgroup_element = etree.SubElement(response_element, "hintgroup")
+            for (hint_prompt, hint_name, hint_text) in hint_list:
+                stringhint_element = etree.SubElement(hintgroup_element, "stringhint")
+                stringhint_element.set("answer", str(hint_prompt))
+                stringhint_element.set("name", str(hint_name))
+
+                hintpart_element = etree.SubElement(hintgroup_element, "hintpart")
+                hintpart_element.set("on", str(hint_name))
+
+                hint_text_element = etree.SubElement(hintpart_element, "text")
+                hint_text_element.text = str(hint_text)
 
         return response_element
 

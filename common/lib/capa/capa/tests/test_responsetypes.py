@@ -309,6 +309,35 @@ class StringResponseWithHintTest(ResponseTest):
         # Other strings are not allowed
         self.assert_grade(problem, "Other String", "incorrect")
 
+    def test_hints(self):
+        hints = [("wisconsin", "wisc", "The state capital of Wisconsin is Madison"),
+                ("minnesota", "minn", "The state capital of Minnesota is St. Paul")]
+
+        problem = self.build_problem(answer="Michigan", 
+                                    case_sensitive=False, 
+                                    hints=hints)
+
+        # We should get a hint for Wisconsin
+        input_dict = {'1_2_1': 'Wisconsin'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'),
+                        "The state capital of Wisconsin is Madison")
+
+        # We should get a hint for Minnesota
+        input_dict = {'1_2_1': 'Minnesota'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'),
+                        "The state capital of Minnesota is St. Paul")
+
+        # We should NOT get a hint for Michigan (the correct answer)
+        input_dict = {'1_2_1': 'Michigan'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'), "")
+
+        # We should NOT get a hint for any other string
+        input_dict = {'1_2_1': 'California'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'), "")
 
 class CodeResponseTest(unittest.TestCase):
     '''
