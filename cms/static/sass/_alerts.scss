@@ -113,8 +113,12 @@
         margin-right: ($baseline*0.75);
       }
 
+      .action-notification-close {
+        right: 0;
+      }
+
       .copy {
-        width: ($baseline*11);
+        width: ($baseline*10);
       }
     }    
   }
