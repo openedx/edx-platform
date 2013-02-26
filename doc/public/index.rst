@@ -1,5 +1,11 @@
-edX Docs
-========
+..
+    Public facing docs for non-developers go here. Please do not add any Python
+    dependencies for code introspection here (we may temporarily host it some
+    place where those dependencies are cumbersome to build).
+
+edX Data Documentation
+======================
+The following documents are targetted at those who are working with various data formats consumed and produced by the edX platform -- primarily course authors and those who are conducting research on data in our system. Developer oriented discussion of architecture and strictly internal APIs should be documented elsewhere.
 
 Course Data Formats
 -------------------

@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'edX Docs'
+project = u'edX Data'
 copyright = u'2013, edX Team'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -183,7 +183,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'edXDocs.tex', u'edX Docs Documentation',
+  ('index', 'edXDocs.tex', u'edX Data Documentation',
    u'edX Team', 'manual'),
 ]
 
@@ -213,7 +213,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'edxdocs', u'edX Docs Documentation',
+    ('index', 'edxdocs', u'edX Data Documentation',
      [u'edX Team'], 1)
 ]
 
@@ -227,7 +227,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'edXDocs', u'edX Docs Documentation',
+  ('index', 'edXDocs', u'edX Data Documentation',
    u'edX Team', 'edXDocs', 'One line description of project.',
    'Miscellaneous'),
 ]
