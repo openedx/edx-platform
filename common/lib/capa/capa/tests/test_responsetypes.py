@@ -493,3 +493,119 @@ class NumericalResponseTest(unittest.TestCase):
         for input_str in incorrect_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
             self.assertEqual(result, 'incorrect')
+
+from response_xml_factory import CustomResponseXMLFactory
+class CustomResponseTest(unittest.TestCase):
+
+    def setUp(self):
+        self.xml_factory = CustomResponseXMLFactory()
+
+    def test_inline_code(self):
+
+        # For inline code, we directly modify global context variables
+        # 'answers' is a list of answers provided to us
+        # 'correct' is a list we fill in with True/False
+        # 'expect' is given to us (if provided in the XML)
+        inline_script = """correct[0] = 'correct' if (answers['1_2_1'] == expect) else 'incorrect'"""
+
+        xml = self.xml_factory.build_xml(answer=inline_script, expect="42")
+
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        # Correct answer
+        input_dict = {'1_2_1': '42'}
+        result = problem.grade_answers(input_dict).get_correctness('1_2_1')
+        self.assertEqual(result, 'correct')
+
+        # Incorrect answer
+        input_dict = {'1_2_1': '0'}
+        result = problem.grade_answers(input_dict).get_correctness('1_2_1')
+        self.assertEqual(result, 'incorrect')
+
+    def test_inline_message(self):
+
+        # Inline code can update the global messages list
+        # to pass messages to the CorrectMap for a particular input
+        inline_script = """messages[0] = "Test Message" """
+
+        xml = self.xml_factory.build_xml(answer=inline_script)
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        input_dict = {'1_2_1': '0'}
+        msg = problem.grade_answers(input_dict).get_msg('1_2_1')
+        self.assertEqual(msg, "Test Message")
+
+    def test_function_code(self):
+
+        # For function code, we pass in three arguments:
+        # 
+        #   'expect' is the expect attribute of the <customresponse>
+        #
+        #   'answer_given' is the answer the student gave (if there is just one input)
+        #       or an ordered list of answers (if there are multiple inputs)
+        #   
+        #   'student_answers' is a dictionary of answers by input ID
+        #
+        #
+        # The function should return a dict of the form 
+        # { 'ok': BOOL, 'msg': STRING }
+        #
+        script = """def check_func(expect, answer_given, student_answers):
+    return {'ok': answer_given == expect, 'msg': 'Message text'}"""
+
+        xml = self.xml_factory.build_xml(script=script, cfn="check_func", expect="42")
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        # Correct answer
+        input_dict = {'1_2_1': '42'}
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        msg = correct_map.get_msg('1_2_1')
+
+        self.assertEqual(correctness, 'correct')
+        self.assertEqual(msg, "Message text\n")
+
+        # Incorrect answer
+        input_dict = {'1_2_1': '0'}
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        msg = correct_map.get_msg('1_2_1')
+
+        self.assertEqual(correctness, 'incorrect')
+        self.assertEqual(msg, "Message text\n")
+
+    def test_multiple_inputs(self):
+        # When given multiple inputs, the 'answer_given' argument
+        # to the check_func() is a list of inputs
+        # The sample script below marks the problem as correct
+        # if and only if it receives answer_given=[1,2,3]
+        # (or string values ['1','2','3'])
+        script = """def check_func(expect, answer_given, student_answers):
+    check1 = (int(answer_given[0]) == 1)
+    check2 = (int(answer_given[1]) == 2)
+    check3 = (int(answer_given[2]) == 3)
+    return {'ok': (check1 and check2 and check3),  'msg': 'Message text'}"""
+
+        xml = self.xml_factory.build_xml(script=script, 
+                                        cfn="check_func", num_inputs=3)
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        # Grade the inputs (one input incorrect)
+        input_dict = {'1_2_1': '-999', '1_2_2': '2', '1_2_3': '3' }
+        correct_map = problem.grade_answers(input_dict)
+
+        # Everything marked incorrect
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
+        self.assertEqual(correct_map.get_correctness('1_2_2'), 'incorrect')
+        self.assertEqual(correct_map.get_correctness('1_2_3'), 'incorrect')
+
+        # Grade the inputs (everything correct)
+        input_dict = {'1_2_1': '1', '1_2_2': '2', '1_2_3': '3' }
+        correct_map = problem.grade_answers(input_dict)
+
+        # Everything marked incorrect
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
