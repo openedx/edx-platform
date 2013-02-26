@@ -45,6 +45,70 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             'data-problem-id': {'value': '0', '_delete': 'problem'}
         }
 
-        data_attr = self.annotatable._get_annotation_data_attr(0, el)
-        self.assertTrue(type(data_attr) is dict)
-        self.assertDictEqual(expected_attr, data_attr)
+        actual_attr = self.annotatable._get_annotation_data_attr(0, el)
+
+        self.assertTrue(type(actual_attr) is dict)
+        self.assertDictEqual(expected_attr, actual_attr)
+
+    def test_annotation_class_attr_default(self):
+        xml = '<annotation title="x" body="y" problem="0">test</annotation>'
+        el = etree.fromstring(xml)
+
+        expected_attr = { 'class': { 'value': 'annotatable-span highlight' } }
+        actual_attr = self.annotatable._get_annotation_class_attr(0, el)
+
+        self.assertTrue(type(actual_attr) is dict)
+        self.assertDictEqual(expected_attr, actual_attr)
+
+    def test_annotation_class_attr_with_valid_highlight(self):
+        xml = '<annotation title="x" body="y" problem="0" highlight="{highlight}">test</annotation>'
+
+        for color in self.annotatable.highlight_colors:
+            el = etree.fromstring(xml.format(highlight=color))
+            value = 'annotatable-span highlight highlight-{highlight}'.format(highlight=color)
+
+            expected_attr = { 'class': {
+                'value': value,
+                '_delete': 'highlight' }
+            }
+            actual_attr = self.annotatable._get_annotation_class_attr(0, el)
+
+            self.assertTrue(type(actual_attr) is dict)
+            self.assertDictEqual(expected_attr, actual_attr)
+
+    def test_annotation_class_attr_with_invalid_highlight(self):
+        xml = '<annotation title="x" body="y" problem="0" highlight="{highlight}">test</annotation>'
+
+        for invalid_color in ['rainbow', 'blink', 'invisible', '', None]:
+            el = etree.fromstring(xml.format(highlight=invalid_color))
+            expected_attr = { 'class': {
+                'value': 'annotatable-span highlight',
+                '_delete': 'highlight' }
+            }
+            actual_attr = self.annotatable._get_annotation_class_attr(0, el)
+
+            self.assertTrue(type(actual_attr) is dict)
+            self.assertDictEqual(expected_attr, actual_attr)
+
+    def test_render_annotation(self):
+        expected_html = '<span class="annotatable-span highlight highlight-yellow" data-comment-title="x" data-comment-body="y" data-problem-id="0">z</span>'
+        expected_el = etree.fromstring(expected_html)
+
+        actual_el = etree.fromstring('<annotation title="x" body="y" problem="0" highlight="yellow">z</annotation>')
+        self.annotatable._render_annotation(0, actual_el)
+
+        self.assertEqual(expected_el.tag, actual_el.tag)
+        self.assertEqual(expected_el.text, actual_el.text)
+        self.assertDictEqual(dict(expected_el.attrib), dict(actual_el.attrib))
+
+    def test_extract_instructions(self):
+        xmltree = etree.fromstring(self.sample_text)
+
+        expected_xml = u"<div>Read the text.</div>"
+        actual_xml = self.annotatable._extract_instructions(xmltree)
+        self.assertIsNotNone(actual_xml)
+        self.assertEqual(expected_xml.strip(), actual_xml.strip())
+
+        xmltree = etree.fromstring('<annotatable>foo</annotatable>')
+        actual = self.annotatable._extract_instructions(xmltree)
+        self.assertIsNone(actual)

@@ -29,14 +29,13 @@ class AnnotatableModule(XModule):
 
         attr = {}
         cls = ['annotatable-span', 'highlight']
-        valid_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
         highlight_key = 'highlight'
-
         color = el.get(highlight_key)
-        if color is not None and color in valid_colors:
-            cls.append('highlight-'+color)
-            attr['_delete'] = highlight_key
 
+        if color is not None:
+            if color in self.highlight_colors:
+                cls.append('highlight-'+color)
+            attr['_delete'] = highlight_key
         attr['value'] = ' '.join(cls)
 
         return { 'class' : attr }
@@ -120,6 +119,7 @@ class AnnotatableModule(XModule):
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
         self.element_id = self.location.html_id()
+        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
 
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule
