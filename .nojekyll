@@ -1,4 +1,0 @@
-The existence of this file means GitHub will skip running Jekyll
-on our Pages, which is necessary because Sphinx uses _static,
-and underscored dirs are considered special by Jekyll.
-
