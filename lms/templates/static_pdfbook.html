@@ -41,10 +41,7 @@
   </script>  
 </%block>
 
-<% use_nav_images = False %>
-
 <%include file="/courseware/course_navigation.html" args="active_page='pdftextbook/{0}'.format(book_index)" />
-
 
     <div id="outerContainer">
       <div id="mainContainer" class="book-wrapper">
@@ -53,17 +50,6 @@
           <div id="toolbarContainer">
             <div id="toolbarViewer">
               <div id="toolbarViewerLeft">
-                <div class="splitToolbarButton">
-%if use_nav_images != True:
-                  <button class="toolbarButton pageUp" title="Previous Page" id="previous" tabindex="5">
-                    <span>Previous</span>
-                  </button>
-                  <div class="splitToolbarButtonSeparator"></div>
-                  <button class="toolbarButton pageDown" title="Next Page" id="next" tabindex="6">
-                    <span>Next</span>
-                  </button>
-%endif
-                </div>
                 <label id="pageNumberLabel" class="toolbarLabel" for="pageNumber">Page: </label>
                 <input type="number" id="pageNumber" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="7">
                 </input>
@@ -116,17 +102,15 @@
               </li>
           </%def>
 
-          <% index = 0 %>
-          % for entry in textbook['chapters']:
-            <% index += 1 %>
-            ${print_entry(entry, index)}
+          % for (index, entry) in enumerate(textbook['chapters']):
+            ${print_entry(entry, index+1)}
           % endfor
       </ul>
     </section>
 %endif
 
         <section id="viewerContainer" class="book">
-%if use_nav_images:
+	  <!-- use same page-turning as used in image-based textbooks -->
           <nav>
             <ul>
               <li class="last">
@@ -137,7 +121,7 @@
               </li>
             </ul>
           </nav>
-%endif
+
           <div id="viewer" contextmenu="viewerContextMenu"></div>
         </div>
 
