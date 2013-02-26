@@ -85,13 +85,16 @@ select {
 }
 
 #viewerContainer {
-  overflow: auto;
+/*  overflow: auto; */
   box-shadow: inset 1px 0 0 hsla(0,0%,100%,.05);
 /*  position: absolute;
   top: 32px;
   right: 0;
   bottom: 0;
   left: 0; */
+/* switch to using these instead: */
+  position: relative;
+  overflow: hidden;
 }
 
 .toolbar {
