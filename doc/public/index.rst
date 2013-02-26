@@ -1,6 +1,10 @@
 edX Docs
 ========
 
+Course Mechanics
+----------------
+
+
 Course Data Formats
 -------------------
 These are data formats written by people to specify course structure and content. Some of this is abstracted away if you are using the Studio authoring user interface.

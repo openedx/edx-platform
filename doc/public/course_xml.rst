@@ -365,31 +365,55 @@ Available metadata
 
 Not Inherited
 --------------
-* `display_name` - name that will appear when this content is displayed in the courseware.  Useful for all tag types.
-*	`format` - subheading under display name -- currently only displayed for chapter sub-sections.  Also used by the the grader to know how to process students assessments that the
-    section contains. New formats can be defined as a 'type' in the GRADER variable in course_settings.json. Optional.  (TODO: double check this--what's the current behavior?)
-* `hide_from_toc` -- If set to true for a chapter or chapter subsection, will hide that element from the courseware navigation accordion.  This is useful if you'd like to link to the content directly instead (e.g. for tutorials)
-* `ispublic` -- specify whether the course is public.  You should be able to use start dates instead (?)
+`display_name`
+  Name that will appear when this content is displayed in the courseware.  Useful for all tag types.
+
+`format`
+  Subheading under display name -- currently only displayed for chapter sub-sections.  Also used by the the grader to know how to process students assessments that the section contains. New formats can be defined as a 'type' in the GRADER variable in course_settings.json. Optional.  (TODO: double check this--what's the current behavior?)
+
+`hide_from_toc`
+  If set to true for a chapter or chapter subsection, will hide that element from the courseware navigation accordion.  This is useful if you'd like to link to the content directly instead (e.g. for tutorials)
+
+`ispublic`
+  Specify whether the course is public.  You should be able to use start dates instead (?)
 
 Inherited
 ---------
 
-* `start` -- when this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
-*	`showanswer` - When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
-*	`graded` - Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
-*	`rerandomize` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
-                                                            'onreset' (randomize question when reset button is pressed by the student)
-                                                            'never' (all students see the same version of the problem)
-                                                            'per_student' (individual students see the same version of the problem each time the look at it, but that version is different from what other students see)
-                                                            Default: 'always'. Optional.
-*	`due` - Due date for assignment. Assignment will be closed after that.  Values: valid date. Default: none. Optional.
-* attempts: Number of allowed attempts. Values: integer. Default: infinite. Optional.
-* `graceperiod` - A default length of time that the problem is still accessible after the due date in the format "2 days 3 hours" or "1 day 15 minutes".  Note, graceperiods are currently the easiest way to handle time zones. Due dates are all expressed in UCT.
-* `xqa_key` -- for integration with Ike's content QA server. -- should typically be specified at the course level.
+`start`
+  When this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
+
+`showanswer`
+  When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
+
+`graded`
+  Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
+
+`rerandomize`
+  Randomize question on each attempt. Optional. Possible values:
+  
+  `always` (default)
+    Students see a different version of the problem after each attempt to solve it.
+  `onreset`
+    Randomize question when reset button is pressed by the student.
+  `never`
+    All students see the same version of the problem.
+  `per_student`
+    Individual students see the same version of the problem each time the look at it, but that version is different from what other students see.
+  `due`
+    Due date for assignment. Assignment will be closed after that.  Values: valid date. Default: none. Optional.
+  `attempts`
+    Number of allowed attempts. Values: integer. Default: infinite. Optional.
+  `graceperiod`
+    A default length of time that the problem is still accessible after the due date in the format `"2 days 3 hours"` or `"1 day 15 minutes"`.  Note, graceperiods are currently the easiest way to handle time zones. Due dates are all expressed in UTC.
+  `xqa_key`
+    For integration with Ike's content QA server. -- should typically be specified at the course level.
 
 Inheritance example
 -------------------
 This is a sketch ("tue" is not a valid start date), that should help illustrate how metadata inheritance works.
+
+  .. code-block:: xml
 
     <course start="tue">
       <chap1> -- start tue
@@ -404,10 +428,12 @@ This is a sketch ("tue" is not a valid start date), that should help illustrate 
 
 Specifying metadata in the XML file
 -----------------------------------
-Metadata can also live in the xml files, but anything defined in the policy file overrides anything in the xml.  This is primarily for backwards compatibility, and you should probably  not use both.  If you do leave some metadata tags in the xml, you should be consistent (e.g. if `display_name`s stay in xml, they should all stay in xml. Note `display_name` should be specified in the problem xml definition itself, ie, <problem display_name="Title"> Problem Text </problem>, in file ProblemFoo.xml).
-   - note, some xml attributes are not metadata.  e.g. in `<video youtube="xyz987293487293847"/>`, the `youtube` attribute specifies what video this is, and is logically part of the content, not the policy, so it should stay in the xml.
+Metadata can also live in the xml files, but anything defined in the policy file overrides anything in the XML.  This is primarily for backwards compatibility, and you should probably  not use both.  If you do leave some metadata tags in the xml, you should be consistent (e.g. if `display_name` stays in XML, they should all stay in XML. Note `display_name` should be specified in the problem xml definition itself, ie, `<problem display_name="Title">Problem Text</problem>`, in file `ProblemFoo.xml`).
 
-Another example policy file:
+.. note::
+   Some xml attributes are not metadata.  e.g. in `<video youtube="xyz987293487293847"/>`, the `youtube` attribute specifies what video this is, and is logically part of the content, not the policy, so it should stay in the xml.
+
+Another example policy file::
 
     {
         "course/2012": {
@@ -433,14 +459,19 @@ If you look at some older xml, you may see some tags or metadata attributes that
 
 Obsolete Tags
 ^^^^^^^^^^^^^
-* `section` : this used to be necessary within chapters.  Now, you can just use any standard tag inside a chapter, so use the container tag that makes the most sense for grouping content--e.g. `problemset`, `videosequence`, and just include content directly if it belongs inside a chapter (e.g. `html`, `video`, `problem`)
+`section`
+  This used to be necessary within chapters.  Now, you can just use any standard tag inside a chapter, so use the container tag that makes the most sense for grouping content--e.g. `problemset`, `videosequence`, and just include content directly if it belongs inside a chapter (e.g. `html`, `video`, `problem`)
 
-* There used to be special purpose tags that all basically did the same thing, and have been subsumed by `customtag`.  The list is `videodev, book, slides, image, discuss`.  Use `customtag` in new content.  (e.g. instead of `<book page="12"/>`, use `<customtag impl="book" page="12"/>`)
+`videodev, book, slides, image, discuss`
+  There used to be special purpose tags that all basically did the same thing, and have been subsumed by `customtag`.  The list is `videodev, book, slides, image, discuss`.  Use `customtag` in new content.  (e.g. instead of `<book page="12"/>`, use `<customtag impl="book" page="12"/>`)
 
 Obsolete Attributes
 ^^^^^^^^^^^^^^^^^^^
-* `slug` -- old term for `url_name`.  Use `url_name`
-* `name` -- we didn't originally have a distinction between `url_name` and `display_name` -- this made content element ids fragile, so please use `url_name` as a stable unique identifier for the content, and `display_name` as the particular string you'd like to display for it.
+`slug`
+  Old term for `url_name`.  Use `url_name`
+
+`name`
+  We didn't originally have a distinction between `url_name` and `display_name` -- this made content element ids fragile, so please use `url_name` as a stable unique identifier for the content, and `display_name` as the particular string you'd like to display for it.
 
 ************
 Static links
@@ -456,55 +487,64 @@ Links that include `/course` will be rewritten to the root of your course in the
 Tabs
 ****
 
-If you want to customize the courseware tabs displayed for your course, specify a "tabs" list in the course-level policy:
+If you want to customize the courseware tabs displayed for your course, specify a "tabs" list in the course-level policy, like the following example:
 
-    "tabs" : [
-        {"type": "courseware"},       # no name--always "Courseware" for consistency between courses
-        {"type": "course_info", "name": "Course Info"},
-        {"type": "external_link", "name": "My Discussion", "link": "http://www.mydiscussion.org/blah"},
-        {"type": "progress", "name": "Progress"},
-        {"type": "wiki", "name": "Wonderwiki"},
-        {"type": "static_tab", "url_slug": "news", "name": "Exciting news"},
-        {"type": "textbooks"}        # generates one tab per textbook, taking names from the textbook titles
-    ]
+.. code-block:: json
 
+  "tabs" : [
+    {"type": "courseware"},
+    {
+      "type": "course_info",
+      "name": "Course Info"
+    },
+    {
+      "type": "external_link",
+      "name": "My Discussion",
+      "link": "http://www.mydiscussion.org/blah"
+    },
+    {"type": "progress", "name": "Progress"},
+    {"type": "wiki", "name": "Wonderwiki"},
+    {
+      "type": "static_tab",
+      "url_slug": "news",
+      "name": "Exciting news"
+    },
+    {"type": "textbooks"}
+  ]
 
 * If you specify any tabs, you must specify all tabs.  They will appear in the order given.
-* The first two tabs must have types `"courseware"` and `"course_info"`, in that order.  Otherwise, we'll refuse to load the course.
-* for static tabs, the url_slug will be the url that points to the tab.  It can not be one of the existing courseware url types (even if those aren't used in your course).  The static content will come from `tabs/{course_url_name}/{url_slug}.html`, or `tabs/{url_slug}.html` if that doesn't exist.
-
+* The first two tabs must have types `"courseware"` and `"course_info"`, in that order, or the course will not load.
+* The `courseware` tab never has a name attribute -- it's always rendered as "Courseware" for consistency between courses.
+* The `textbooks` tab will actually generate one tab per textbook, using the textbook titles as names.
+* For static tabs, the `url_slug` will be the url that points to the tab.  It can not be one of the existing courseware url types (even if those aren't used in your course).  The static content will come from `tabs/{course_url_name}/{url_slug}.html`, or `tabs/{url_slug}.html` if that doesn't exist.
 * An Instructor tab will be automatically added at the end for course staff users.
 
-Supported Tabs
-==============
-* "courseware".  No other parameters.
-* "course_info".  Parameter "name".
-* "wiki". Parameter "name".
-* "discussion".  Parameter "name".
-* "external_link".  Parameters "name", "link".
-* "textbooks".  No parameters--generates tab names from book titles.
-* "progress".  Parameter "name".
-* "static_tab".  Parameters "name", 'url_slug'--will look for tab contents in
-                       'tabs/{course_url_name}/{tab url_slug}.html'
-* "staff_grading". No parameters.  If specified, displays the staff grading tab for instructors.
+.. list-table:: Supported Tabs and Parameters
+   :widths: 10 80
+   :header-rows: 0
 
+   * - `courseware`
+     - No other parameters.
+   * - `course_info`
+     - Parameter `name`.
+   * - `wiki`
+     - arameter `name`.
+   * - `discussion`
+     - Parameter `name`.
+   * - `external_link`
+     - Parameters `name`, `link`.
+   * - `textbooks`
+     - No parameters--generates tab names from book titles.
+   * - `progress`
+     - Parameter `name`.
+   * - `static_tab`
+     - Parameters `name`, `url_slug`--will look for tab contents in 'tabs/{course_url_name}/{tab url_slug}.html'
+   * - `staff_grading`
+     - No parameters.  If specified, displays the staff grading tab for instructors.
 
-***************************
-Tips for content developers
-***************************
-
-* We will be making better tools for managing policy files soon.  In the meantime, you can add dummy definitions to make it easier to search and separate the file visually.  For example, you could add:
-
-    "WEEK 1" : "##################################################",
-
-before the week 1 material to make it easy to find in the file.
-
-* Come up with a consistent pattern for url_names, so that it's easy to know where to look for any piece of content.  It will also help to come up with a standard way of splitting your content files.  As a point of departure, we suggest splitting chapters, sequences, html, and problems into separate files.
-
-* Prefer the most "semantic" name for containers: e.g., use problemset rather than sequential for a problem set.  That way, if we decide to display problem sets differently, we don't have to change the xml.
-
+*************************************
 Other file locations (info and about)
-=====================================
+*************************************
 With different course runs, we may want different course info and about materials.  This is now supported by putting files in as follows::
 
     / 
@@ -518,3 +558,15 @@ With different course runs, we may want different course info and about material
                            -- url_name2 will use default foo.html
 
 and the same works for the `info` directory.
+
+
+***************************
+Tips for content developers
+***************************
+
+#. We will be making better tools for managing policy files soon.  In the meantime, you can add dummy definitions to make it easier to search and separate the file visually.  For example, you could add `"WEEK 1" : "###################"`, before the week 1 material to make it easy to find in the file.
+
+#. Come up with a consistent pattern for url_names, so that it's easy to know where to look for any piece of content.  It will also help to come up with a standard way of splitting your content files.  As a point of departure, we suggest splitting chapters, sequences, html, and problems into separate files.
+
+#. Prefer the most "semantic" name for containers: e.g., use problemset rather than sequential for a problem set. That way, if we decide to display problem sets differently, we don't have to change the XML.
+
