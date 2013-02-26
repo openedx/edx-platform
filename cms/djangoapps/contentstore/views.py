@@ -1263,11 +1263,11 @@ def course_advanced_updates(request, org, course, name):
     else:
         real_method = request.method
         
-    if request.method == 'GET':
+    if real_method == 'GET':
         return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
     elif real_method == 'DELETE':
         return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))), mimetype="application/json")
-    elif request.method == 'POST':
+    elif real_method == 'POST' or real_method == 'PUT':
         # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
         return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
 

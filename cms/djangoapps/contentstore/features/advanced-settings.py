@@ -141,7 +141,8 @@ def create_entry(key, value):
 
 
 def delete_entry(index):
-    """ index is 0-based
+    """ 
+    Delete the nth entry where index is 0-based
     """
     css = '.delete-button'
     assert_true(world.browser.is_element_present_by_css(css, 5))
