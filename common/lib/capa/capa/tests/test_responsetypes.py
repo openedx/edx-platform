@@ -250,22 +250,21 @@ class SymbolicResponseTest(unittest.TestCase):
         self.assertEquals(test_lcp.grade_answers(wrong_answers).get_correctness('1_2_1'), 'incorrect')
 
 
-class OptionResponseTest(unittest.TestCase):
-    '''
-    Run this with
+class OptionResponseTest(ResponseTest):
+    from response_xml_factory import OptionResponseXMLFactory
+    xml_factory_class = OptionResponseXMLFactory
 
-    python manage.py test courseware.OptionResponseTest
-    '''
-    def test_or_grade(self):
-        optionresponse_file = os.path.dirname(__file__) + "/test_files/optionresponse.xml"
-        test_lcp = lcp.LoncapaProblem(open(optionresponse_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': 'True',
-                           '1_2_2': 'False'}
-        test_answers = {'1_2_1': 'True',
-                        '1_2_2': 'True',
-                        }
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_2'), 'incorrect')
+    def test_grade(self):
+        problem = self.build_problem(options=["first", "second", "third"], 
+                                    correct_option="second")
+
+        # Assert that we get the expected grades
+        self.assert_grade(problem, "first", "incorrect")
+        self.assert_grade(problem, "second", "correct")
+        self.assert_grade(problem, "third", "incorrect")
+
+        # Options not in the list should be marked incorrect
+        self.assert_grade(problem, "invalid_option", "incorrect")
 
 
 class FormulaResponseWithHintTest(unittest.TestCase):

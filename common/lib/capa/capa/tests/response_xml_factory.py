@@ -335,11 +335,43 @@ class TrueFalseResponseXMLFactory(ResponseXMLFactory):
         return ResponseXMLFactory.choicegroup_input_xml(**kwargs)
 
 class OptionResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for producing <optionresponse> XML"""
+
     def create_response_element(self, **kwargs):
-        raise NotImplemented
+        """ Create the <optionresponse> element"""
+        return etree.Element("optionresponse")
 
     def create_input_element(self, **kwargs):
-        raise NotImplemented
+        """ Create the <optioninput> element.
+
+        Uses **kwargs:
+
+        *options*: a list of possible options the user can choose from [REQUIRED]
+                    You must specify at least 2 options.
+        *correct_option*: the correct choice from the list of options [REQUIRED]
+        """
+
+        options_list = kwargs.get('options', None)
+        correct_option = kwargs.get('correct_option', None)
+
+        assert(options_list and correct_option)
+        assert(len(options_list) > 1)
+        assert(correct_option in options_list)
+
+        # Create the <optioninput> element
+        optioninput_element = etree.Element("optioninput")
+
+        # Set the "options" attribute
+        # Format: "('first', 'second', 'third')"
+        options_attr_string = ",".join(["'%s'" % str(o) for o in options_list])
+        options_attr_string = "(%s)" % options_attr_string
+        optioninput_element.set('options', options_attr_string)
+
+        # Set the "correct" attribute
+        optioninput_element.set('correct', str(correct_option))
+
+        return optioninput_element
+
 
 class StringResponseXMLFactory(ResponseXMLFactory):
     def create_response_element(self, **kwargs):
