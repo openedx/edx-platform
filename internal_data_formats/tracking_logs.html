@@ -1,0 +1,563 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tracking Logs &mdash; edX Data 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="edX Data 0.1 documentation" href="../index.html" />
+    <link rel="prev" title="Discussion Forums Data" href="discussion_data.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="discussion_data.html" title="Discussion Forums Data"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">edX Data 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tracking Logs</a><ul>
+<li><a class="reference internal" href="#common-fields">Common Fields</a></li>
+<li><a class="reference internal" href="#event-sources">Event Sources</a><ul>
+<li><a class="reference internal" href="#server-events">Server Events</a><ul>
+<li><a class="reference internal" href="#correct-map-details"><cite>correct_map</cite> details</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#browser-events">Browser Events</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="discussion_data.html"
+                        title="previous chapter">Discussion Forums Data</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/internal_data_formats/tracking_logs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tracking-logs">
+<h1>Tracking Logs<a class="headerlink" href="#tracking-logs" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Tracking logs are made available as separate tar files on S3 in the course-data bucket.</li>
+<li>They are represented as JSON files that catalog all user interactions with the site.</li>
+<li>To avoid filename collisions the tracking logs are organized by server name, where each directory corresponds to a server where they were stored.</li>
+</ul>
+<div class="section" id="common-fields">
+<h2>Common Fields<a class="headerlink" href="#common-fields" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="47%" />
+<col width="12%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">field</th>
+<th class="head">details</th>
+<th class="head">type</th>
+<th class="head">values/format</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><cite>username</cite></td>
+<td>username of the user who triggered the event, empty string for anonymous events (not logged in)</td>
+<td>string</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><cite>session</cite></td>
+<td>key identifying the user&#8217;s session, may be undefined</td>
+<td>string</td>
+<td>32 digits key</td>
+</tr>
+<tr class="row-even"><td><cite>time</cite></td>
+<td>GMT time the event was triggered</td>
+<td>string</td>
+<td><cite>YYYY-MM-DDThh:mm:ss.xxxxxx</cite></td>
+</tr>
+<tr class="row-odd"><td><cite>ip</cite></td>
+<td>user ip address</td>
+<td>string</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><cite>agent</cite></td>
+<td>users browser agent string</td>
+<td>string</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><cite>page</cite></td>
+<td>page the user was visiting when the event was generated</td>
+<td>string</td>
+<td><cite>$URL</cite></td>
+</tr>
+<tr class="row-even"><td>event_source</td>
+<td>event source</td>
+<td>string</td>
+<td><cite>browser</cite>, <cite>server</cite></td>
+</tr>
+<tr class="row-odd"><td><cite>event_type</cite></td>
+<td>type of event triggered, values depends on <cite>event_source</cite></td>
+<td>string</td>
+<td><em>more details listed below</em></td>
+</tr>
+<tr class="row-even"><td><cite>event</cite></td>
+<td>specifics of the event (dependenty of the event_type)</td>
+<td>string/json</td>
+<td><em>the event string may encode a JSON record</em></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="event-sources">
+<h2>Event Sources<a class="headerlink" href="#event-sources" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>event_source</cite> field identifies whether the event originated in the browser (via javascript) or on the server (during the processing of a request).</p>
+<div class="section" id="server-events">
+<h3>Server Events<a class="headerlink" href="#server-events" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">event_type</th>
+<th class="head">event fields</th>
+<th class="head">type</th>
+<th class="head">values/format</th>
+<th class="head">details</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><cite>show_answer</cite></td>
+<td><cite>problem_id</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>id of the problem being shown. Ex: <cite>i4x://MITx/6.00x/problem/L15:L15_Problem_2</cite></td>
+</tr>
+<tr class="row-odd"><td><cite>save_problem_check</cite></td>
+<td><cite>problem_id</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>id of the problem being shown</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><cite>success</cite></td>
+<td>string</td>
+<td>correct, incorrect</td>
+<td>whether the problem was correct</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>attempts</cite></td>
+<td>integer</td>
+<td>number of attempts</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><cite>correct_map</cite></td>
+<td>string/json</td>
+<td>&nbsp;</td>
+<td>see details below</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>state</cite></td>
+<td>string/json</td>
+<td>&nbsp;</td>
+<td>current problem state</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><cite>answers</cite></td>
+<td>string/json</td>
+<td>&nbsp;</td>
+<td>students answers</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>reset_problem</cite></td>
+<td>problem_id</td>
+<td>string</td>
+<td>id of the problem being shown</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="section" id="correct-map-details">
+<h4><cite>correct_map</cite> details<a class="headerlink" href="#correct-map-details" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="20%" />
+<col width="30%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">correct_map fields</th>
+<th class="head">type</th>
+<th class="head">values/format</th>
+<th class="head">null allowed?</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>hint</td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>hintmode</td>
+<td>boolean</td>
+<td>&nbsp;</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>correctness</td>
+<td>string</td>
+<td>correct, incorrect</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>npoints</td>
+<td>integer</td>
+<td>&nbsp;</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>msg</td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>queuestate</td>
+<td>string/json</td>
+<td>keys: key, time</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="browser-events">
+<h3>Browser Events<a class="headerlink" href="#browser-events" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="14%" />
+<col width="11%" />
+<col width="17%" />
+<col width="29%" />
+<col width="14%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">event_type</th>
+<th class="head">fields</th>
+<th class="head">type</th>
+<th class="head">values/format</th>
+<th class="head">details</th>
+<th class="head">example</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><cite>book</cite></td>
+<td><cite>type</cite></td>
+<td>string</td>
+<td><cite>gotopage</cite></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>old</cite></td>
+<td>integer</td>
+<td><cite>$PAGE</cite></td>
+<td>from page number</td>
+<td><cite>2</cite></td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><cite>new</cite></td>
+<td>integer</td>
+<td><cite>$PAGE</cite></td>
+<td>to page number</td>
+<td><cite>25</cite></td>
+</tr>
+<tr class="row-odd"><td><cite>book</cite></td>
+<td><cite>type</cite></td>
+<td>string</td>
+<td><cite>nextpage</cite></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td>new</td>
+<td>integer</td>
+<td><cite>$PAGE</cite></td>
+<td>next page number</td>
+<td><cite>10</cite></td>
+</tr>
+<tr class="row-odd"><td><cite>page_close</cite></td>
+<td><em>empty</em></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>&#8216;page&#8217; field indicates which page was being closed</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>play_video</td>
+<td><cite>id</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>edX id of the video being watched</td>
+<td><cite>i4x-HarvardX-PH207x-video-Simple_Random_Sample</cite></td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td>code</td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>youtube id of the video being watched</td>
+<td><cite>FU3fCJNs94Y</cite></td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><cite>currentTime</cite></td>
+<td>float</td>
+<td>&nbsp;</td>
+<td>time the video was paused at, in seconds</td>
+<td><cite>1.264</cite></td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>speed</cite></td>
+<td>string</td>
+<td><cite>0.75, 1.0, 1.25, 1.50</cite></td>
+<td>video speed being played</td>
+<td><cite>&#8220;1.0&#8221;</cite></td>
+</tr>
+<tr class="row-even"><td><cite>pause_video</cite></td>
+<td><cite>id</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>edX id of the video being watched</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>code</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>youtube id of the video being watched</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><cite>currentTime</cite></td>
+<td>float</td>
+<td>&nbsp;</td>
+<td>time the video was paused at</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>speed</cite></td>
+<td>string</td>
+<td><cite>0.75, 1.0, 1.25, 1.50</cite></td>
+<td>video speed being played</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><cite>problem_check</cite></td>
+<td><em>none</em></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>event field contains the values of all input fields from the problem being checked (in the style of GET parameters (<cite>key=value&amp;key=value</cite>))</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><cite>problem_show</cite></td>
+<td><cite>problem</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>id of the problem being checked</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><cite>seq_goto</cite></td>
+<td><cite>id</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>edX id of the sequence</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>old</cite></td>
+<td>integer</td>
+<td>&nbsp;</td>
+<td>sequence element being jumped from</td>
+<td><cite>3</cite></td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><cite>new</cite></td>
+<td>integer</td>
+<td>&nbsp;</td>
+<td>sequence element being jumped to</td>
+<td><cite>5</cite></td>
+</tr>
+<tr class="row-odd"><td><cite>seq_next</cite></td>
+<td><cite>id</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>edX id of the sequence</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><cite>old</cite></td>
+<td>integer</td>
+<td>&nbsp;</td>
+<td>sequence element being jumped from</td>
+<td><cite>4</cite></td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>new</cite></td>
+<td>integer</td>
+<td>&nbsp;</td>
+<td>sequence element being jumped to</td>
+<td><cite>6</cite></td>
+</tr>
+<tr class="row-even"><td><cite>rubric_select</cite></td>
+<td><cite>location</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>location of the rubric&#8217;s problem</td>
+<td><cite>i4x://MITx/6.00x/problem/L15:L15_Problem_2</cite></td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><cite>category</cite></td>
+<td>integer</td>
+<td>&nbsp;</td>
+<td>category number of the rubric selection</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><cite>value</cite></td>
+<td>integer</td>
+<td>&nbsp;</td>
+<td>value selected within the category</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><cite>(oe / peer_grading / staff_grading)</cite>
+<cite>_show_problem</cite></td>
+<td><cite>location</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>the location of the problem whose prompt we&#8217;re showing</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><cite>(oe / peer_grading / staff_grading)</cite>
+<cite>_hide_problem</cite></td>
+<td><cite>location</cite></td>
+<td>string</td>
+<td>&nbsp;</td>
+<td>the location of the problem whose prompt we&#8217;re hiding</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><cite>oe_show_full_feedback</cite></td>
+<td><em>empty</em></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>the page where they&#8217;re showing full feedback is already recorded</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><cite>oe_show_respond_to_feedback</cite></td>
+<td><em>empty</em></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>the page where they&#8217;re showing the feedback response form is already recorded</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><cite>oe_feedback_response_selected</cite></td>
+<td><cite>value</cite></td>
+<td>integer</td>
+<td>&nbsp;</td>
+<td>the value selected in the feedback response form</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="discussion_data.html" title="Discussion Forums Data"
+             >previous</a> |</li>
+        <li><a href="../index.html">edX Data 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, edX Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
