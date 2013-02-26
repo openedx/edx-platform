@@ -81,6 +81,8 @@ class AnnotatableModule(XModule):
         """ Renders annotatable content with annotation spans and returns HTML. """
         xmltree = etree.fromstring(self.content)
         xmltree.tag = 'div'
+        if 'display_name' in xmltree.attrib:
+            del xmltree.attrib['display_name']
 
         index = 0
         for el in xmltree.findall('.//annotation'):

@@ -12,7 +12,7 @@ from . import test_system
 
 class AnnotatableModuleTestCase(unittest.TestCase):
     location = Location(["i4x", "edX", "toy", "annotatable", "guided_discussion"])
-    sample_text = '''
+    sample_xml = '''
         <annotatable display_name="Iliad">
             <instructions>Read the text.</instructions>
             <p>
@@ -28,7 +28,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             <annotation title="footnote" body="the end">The Iliad of Homer by Samuel Butler</annotation>
         </annotatable>
     '''
-    definition = { 'data': sample_text }
+    definition = { 'data': sample_xml }
     descriptor = Mock()
     instance_state = None
     shared_state = None
@@ -101,8 +101,23 @@ class AnnotatableModuleTestCase(unittest.TestCase):
         self.assertEqual(expected_el.text, actual_el.text)
         self.assertDictEqual(dict(expected_el.attrib), dict(actual_el.attrib))
 
+    def test_render_content(self):
+        content = self.annotatable._render_content()
+        el = etree.fromstring(content)
+
+        self.assertEqual('div', el.tag, 'root tag is a div')
+
+        expected_num_annotations = 5
+        actual_num_annotations = el.xpath('count(//span[contains(@class,"annotatable-span")])')
+        self.assertEqual(expected_num_annotations, actual_num_annotations, 'check number of annotations')
+
+    def test_get_html(self):
+        context = self.annotatable.get_html()
+        for key in ['display_name', 'element_id', 'content_html', 'instructions_html']:
+            self.assertIn(key, context)
+
     def test_extract_instructions(self):
-        xmltree = etree.fromstring(self.sample_text)
+        xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div>Read the text.</div>"
         actual_xml = self.annotatable._extract_instructions(xmltree)
