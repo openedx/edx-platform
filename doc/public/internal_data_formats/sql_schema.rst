@@ -528,7 +528,7 @@ The `courseware_studentmodule` table holds all courseware state for a given user
   Datetime when this row was created (i.e. when the student first accessed this piece of content).
 
 `modified`
----------
+----------
   Datetime when we last updated this row. Set to be equal to `created` at first. A change in `modified` implies that there was a state change, usually in response to a user action like saving or submitting a problem, or clicking on a navigational element that records its state. However it can also be triggered if the module writes multiple times on its first load, like problems do (see note in `grade`).
 
 `max_grade`

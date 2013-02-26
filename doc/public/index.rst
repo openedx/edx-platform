@@ -1,10 +1,6 @@
 edX Docs
 ========
 
-Course Mechanics
-----------------
-
-
 Course Data Formats
 -------------------
 These are data formats written by people to specify course structure and content. Some of this is abstracted away if you are using the Studio authoring user interface.
@@ -12,8 +8,8 @@ These are data formats written by people to specify course structure and content
 .. toctree::
    :maxdepth: 2
 
-   course_xml.rst
-
+   course_data_formats/course_xml.rst
+   course_data_formats/grading.rst
 
 Internal Data Formats
 ---------------------
@@ -22,13 +18,12 @@ These document describe how we store course structure, student state/progress, a
 .. toctree::
    :maxdepth: 2
 
-   sql_schema.rst
-   discussion_data.rst
-   tracking_logs.rst
+   internal_data_formats/sql_schema.rst
+   internal_data_formats/discussion_data.rst
+   internal_data_formats/tracking_logs.rst
 
 Indices and tables
 ==================
 
-.. * :ref:`genindex`
 * :ref:`search`
 

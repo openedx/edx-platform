@@ -242,7 +242,7 @@ Since `customtag` is already a pointer, there is generally no need to put it int
     <customtag url_name="my_custom_tag" impl="blah" attr1="..."/>
 
 `discussion`
-===========
+============
 The discussion tag embeds an inline discussion module. The XML format is:
 
   .. code-block:: xml
@@ -320,8 +320,7 @@ Contents
 ========
 * The file format is JSON, and is best shown by example, as in the tutorial above.
 * The expected contents are a dictionary mapping from keys to values (syntax `{ key : value, key2 : value2, etc}`)
-* Keys are in the form `{category}/{url_name}`, which should uniquely identify a content element.
-Values are dictionaries of the form `{"metadata-key" : "metadata-value"}`.
+* Keys are in the form `{category}/{url_name}`, which should uniquely identify a content element. Values are dictionaries of the form `{"metadata-key" : "metadata-value"}`.
 * The order in which things appear does not matter, though it may be helpful to organize the file in the same order as things appear in the content.
 * NOTE: JSON is picky about commas.  If you have trailing commas before closing braces, it will complain and refuse to parse the file.  This can be irritating at first.
 
