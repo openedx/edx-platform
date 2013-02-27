@@ -19,11 +19,23 @@
     <div class="block">${tag_prompt}</div>
     <ul class="tags">
     % for option in options:
-        <li><span class="tag
-        % if option['id'] in options_value:
-            selected
-        % endif
-        " data-id="${option['id']}">${option['description']}</span></li>
+        <li>
+            % if all([c == 'correct' for c in option['choice'], status]):
+            <span class="status correct" id="status_${id}"></span>
+            % elif all([c == 'partial' for c in option['choice'], status]):
+            <span class="status partially_correct" id="status_${id}">P</span>
+            % elif all([c == 'incorrect' for c in option['choice'], status]):
+            <span class="status incorrect" id="status_${id}"></span>
+            % endif
+
+            <span class="tag
+            % if option['id'] in options_value:
+                selected
+            % endif
+            " data-id="${option['id']}">
+                ${option['description']}
+            </span>
+        </li>
     % endfor
     </ul>
 
@@ -42,12 +54,6 @@
 
     % if status == 'unsubmitted':
     <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-    % elif status == 'correct':
-    <span class="correct" id="status_${id}"></span>
-    % elif status == 'partial':
-    <span class="partially_correct" id="status_${id}">Partially Correct</span>
-    % elif status == 'incorrect':
-    <span class="incorrect" id="status_${id}"></span>
     % elif status == 'incomplete':
     <span class="incorrect" id="status_${id}"></span>
     % endif

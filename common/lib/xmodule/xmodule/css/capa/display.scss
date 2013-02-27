@@ -842,16 +842,22 @@ section.problem {
       margin-left: 1em;
       li {
         display: block;
-        margin: 1em 0 0 1.5em;
-        span {
-          cursor: pointer;
+        margin: 1em 0 0 0;
+        position: relative;
+        .tag {
           display: inline-block;
-          padding: .25em .5em;
+          cursor: pointer;
           border: 1px solid rgb(102,102,102);
+          margin-left: 40px;
           &.selected {
             background-color: $yellow;
           }
         }
+        .status {
+          position: absolute;
+          left: 0;
+        }
+        .tag, .status { padding: .25em .5em; }
       }
     }
     textarea.comment { width: 100%; }

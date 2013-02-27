@@ -980,7 +980,7 @@ class AnnotationInput(InputTypeBase):
         self.comment_prompt = xml.findtext('./comment_prompt', 'Type a commentary below:')
         self.tag_prompt = xml.findtext('./tag_prompt', 'Select one or more tags:')
         self.options = self._find_options()
-        self.return_to_annotation = True
+        self.return_to_annotation = True # return only works in conjunction with annotatable xmodule
 
         # Need to provide a value that JSON can parse if there is no
         # student-supplied value yet.
