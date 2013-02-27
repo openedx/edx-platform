@@ -59,6 +59,14 @@ class SafeExecTests(object):
         self.safe_exec("a = 17; print 'hi!'", g)
         self.assertEqual(g['a'], 17)
 
+    def test_importing_lots_of_crap(self):
+        g = {}
+        self.safe_exec(textwrap.dedent("""\
+            from numpy import *
+            a = 1723
+            """), g)
+        self.assertEqual(g['a'], 1723)
+
 
 class TestSafeExec(SafeExecTests, unittest.TestCase):
     """Run SafeExecTests, with the real safe_exec."""

@@ -43,6 +43,10 @@ def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=
     Returns None.  Changes made by `code` are visible in `globals_dict`.
 
     """
+    print "--- Executing: -------"
+    print code
+    print
+
     the_code = []
     files = list(files or ())
 
@@ -86,7 +90,15 @@ def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=
         """
         ok_types = (type(None), int, long, float, str, unicode, list, tuple, dict)
         bad_keys = ("__builtins__",)
-        g_dict = {k:v for k,v in g_dict.iteritems() if isinstance(v, ok_types) and k not in bad_keys}
+        def jsonable(v):
+            if not isinstance(v, ok_types):
+                return False
+            try:
+                json.dumps(v)
+            except Exception:
+                return False
+            return True
+        g_dict = {k:v for k,v in g_dict.iteritems() if jsonable(v) and k not in bad_keys}
         """
         # Write the globals back to the calling process.
         """
@@ -124,8 +136,14 @@ def not_safe_exec(code, globals_dict, assumed_imports=None, files=None, python_p
         Used to emulate reading data through a serialization straw.
 
         """
+        ok_types = (type(None), int, long, float, str, unicode, list, tuple, dict)
+        bad_keys = ("__builtins__",)
         jd = {}
         for k,v in d.iteritems():
+            if not isinstance(v, ok_types):
+                continue
+            if k in bad_keys:
+                continue
             try:
                 json.dumps(v)
             except TypeError:
