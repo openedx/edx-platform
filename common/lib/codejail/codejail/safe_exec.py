@@ -43,10 +43,6 @@ def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=
     Returns None.  Changes made by `code` are visible in `globals_dict`.
 
     """
-    print "--- Executing: -------"
-    print code
-    print
-
     the_code = []
     files = list(files or ())
 
