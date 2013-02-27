@@ -1858,6 +1858,26 @@ class AnnotationResponse(LoncapaResponse):
         xml = self.xml
         self.scoring_map = self._get_scoring_map()
         self.answer_map = self._get_answer_map()
+        self.maxpoints = self._get_max_points()
+
+    def get_score(self, student_answers):
+        ''' Returns a CorrectMap for the student answer, which may include
+            partially correct answers.'''
+        student_answer = student_answers[self.answer_id]
+        student_option = self._get_submitted_option_id(student_answer)
+
+        scoring = self.scoring_map[self.answer_id]
+        is_valid = student_option is not None and student_option in scoring.keys()
+
+        (correctness, points) = ('incorrect', None)
+        if is_valid:
+            correctness = scoring[student_option]['correctness']
+            points = scoring[student_option]['points']
+
+        return CorrectMap(self.answer_id, correctness=correctness, npoints=points)
+
+    def get_answers(self):
+        return self.answer_map
 
     def _get_scoring_map(self):
         ''' Returns a dict of option->scoring for each input. '''
@@ -1883,6 +1903,12 @@ class AnnotationResponse(LoncapaResponse):
             if correct_option is not None:
                 answer_map[inputfield.get('id')] = correct_option.get('description')
         return answer_map
+
+    def _get_max_points(self):
+        ''' Returns a dict of the max points for each input: input id -> maxpoints. '''
+        scoring = self.default_scoring
+        correct_points = scoring.get('correct')
+        return dict([(inputfield.get('id'), correct_points) for inputfield in self.inputfields])
 
     def _find_options(self, inputfield):
         ''' Returns an array of dicts where each dict represents an option. '''
@@ -1925,25 +1951,6 @@ class AnnotationResponse(LoncapaResponse):
         if len(option_ids) == 1:
             return option_ids[0]
         return None
-
-    def get_score(self, student_answers):
-        ''' Returns a CorrectMap for the student answer, which may include
-            partially correct answers.'''
-        student_answer = student_answers[self.answer_id]
-        student_option = self._get_submitted_option_id(student_answer)
-
-        scoring = self.scoring_map[self.answer_id]
-        is_valid = student_option is not None and student_option in scoring.keys()
-
-        (correctness, points) = ('incorrect', None)
-        if is_valid:
-            correctness = scoring[student_option]['correctness']
-            points = scoring[student_option]['points']
-
-        return CorrectMap(self.answer_id, correctness=correctness, npoints=points)
-
-    def get_answers(self):
-        return self.answer_map
 
 #-----------------------------------------------------------------------------
 
