@@ -943,25 +943,24 @@ registry.register(EditAGeneInput)
 
 class AnnotationInput(InputTypeBase):
     """
-    Input type for annotations / tags: students can enter some notes or other text
-    (currently ungraded), and then choose from a set of tags, which are graded.
+    Input type for annotations: students can enter some notes or other text
+    (currently ungraded), and then choose from a set of tags/optoins, which are graded.
 
     Example:
 
-    <annotationinput>
-    <title>Annotation Exercise</title>
-    <text>Dr Seuss uses colors!  How?</text>
-    <comment>Why does Dr Seuss use colors!?</comment>
-    <comment_prompt>Write down some notes:</comment_prompt>
-    <tag_prompt>Now pick the right color</tag_prompt>
-    <options>
-      <option score="0">blue -- color of grass</option>
-      <option score="1">ham -- color of grass</option>
-      <option score="2">green -- color of grass</option>
-    </options>
-    </annotationinput>
-
-    <text>The location of the sky</text>
+        <annotationinput>
+            <title>Annotation Exercise</title>
+            <text>They are the ones who, at the public assembly, had put savage derangement [atē] into my thinking [phre
+nes] |89 on that day when I myself deprived Achilles of his honorific portion [geras]</text>
+            <comment>Agamemnon says that atē or ‘derangement’ was the cause of his actions: why could Zeus say the same thing?</comment>
+            <comment_prompt>Type a commentary below:</comment_prompt>
+            <tag_prompt>Select one or more tags:</tag_prompt>
+            <options>
+                <option choice="correct">atē - both a cause and an effect</option>
+                <option choice="incorrect">atē - a cause</option>
+                <option choice="partial">atē - an effect</option>
+            </options>
+        </annotationinput>
 
     # TODO: allow ordering to be randomized
     """
