@@ -341,6 +341,7 @@ def _dispatch(table, action, user, obj):
 def _does_course_group_name_exist(name):
     return len(Group.objects.filter(name=name)) > 0
 
+
 def _course_org_staff_group_name(location, course_context=None):
     """
     Get the name of the staff group for an organization which corresponds
