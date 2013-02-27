@@ -120,8 +120,8 @@ class ConditionalModule(XModule):
             return json.dumps({'html': [html], 'message': bool(message)})
 
         if self.contents is None:
-            self.contents = [self.system.get_module(child_descriptor).get_html()
-                    for child_descriptor in self.descriptor.get_children()]
+            self.contents = [child.get_html() for child in
+                self.get_display_items()]
 
         html = self.contents
 
