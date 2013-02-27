@@ -37,6 +37,18 @@ class TestSafeExec(unittest.TestCase):
         safe_exec("rnums = [random.randint(0, 999) for _ in xrange(100)]", g, random_seed=17)
         self.assertEqual(g['rnums'], rnums)
 
+    def test_random_is_still_importable(self):
+        g = {}
+        r = random.Random(17)
+        rnums = [r.randint(0, 999) for _ in xrange(100)]
+
+        # With a seed, the results are predictable even from the random module
+        safe_exec(
+            "import random\n"
+            "rnums = [random.randint(0, 999) for _ in xrange(100)]\n",
+            g, random_seed=17)
+        self.assertEqual(g['rnums'], rnums)
+
     def test_python_lib(self):
         pylib = os.path.dirname(__file__) + "/test_files/pylib"
         g = {}
