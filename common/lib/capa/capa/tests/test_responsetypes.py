@@ -426,3 +426,6 @@ class JavascriptResponseTest(unittest.TestCase):
 
         self.assertEquals(test_lcp.grade_answers(incorrect_answers).get_correctness('1_2_1'), 'incorrect')
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+
+class AnnotationResponseTest(unittest.TestCase):
+    pass

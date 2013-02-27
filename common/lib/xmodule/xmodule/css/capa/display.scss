@@ -231,6 +231,15 @@ section.problem {
         width: 25px;
       }
 
+      &.partially-correct {
+        @include inline-block();
+        background: url('../images/partially-correct-icon.png') center center no-repeat;
+        height: 20px;
+        position: relative;
+        top: 6px;
+        width: 25px;
+      }
+
       &.incorrect, &.ui-icon-close {
         @include inline-block();
         background: url('../images/incorrect-icon.png') center center no-repeat;
@@ -853,11 +862,11 @@ section.problem {
             background-color: $yellow;
           }
         }
-        .status {
+        .tag-status {
           position: absolute;
           left: 0;
         }
-        .tag, .status { padding: .25em .5em; }
+        .tag-status, .tag { padding: .25em .5em; }
       }
     }
     textarea.comment { width: 100%; }

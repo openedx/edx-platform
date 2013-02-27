@@ -950,15 +950,17 @@ class AnnotationInput(InputTypeBase):
 
         <annotationinput>
             <title>Annotation Exercise</title>
-            <text>They are the ones who, at the public assembly, had put savage derangement [atē] into my thinking [phre
-nes] |89 on that day when I myself deprived Achilles of his honorific portion [geras]</text>
-            <comment>Agamemnon says that atē or ‘derangement’ was the cause of his actions: why could Zeus say the same thing?</comment>
+            <text>
+                They are the ones who, at the public assembly, had put savage derangement [ate] into my thinking
+                [phrenes] |89 on that day when I myself deprived Achilles of his honorific portion [geras]
+            </text>
+            <comment>Agamemnon says that ate or 'derangement' was the cause of his actions: why could Zeus say the same thing?</comment>
             <comment_prompt>Type a commentary below:</comment_prompt>
             <tag_prompt>Select one or more tags:</tag_prompt>
             <options>
-                <option choice="correct">atē - both a cause and an effect</option>
-                <option choice="incorrect">atē - a cause</option>
-                <option choice="partial">atē - an effect</option>
+                <option choice="correct">ate - both a cause and an effect</option>
+                <option choice="incorrect">ate - a cause</option>
+                <option choice="partial">ate - an effect</option>
             </options>
         </annotationinput>
 

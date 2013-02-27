@@ -21,11 +21,11 @@
     % for option in options:
         <li>
             % if all([c == 'correct' for c in option['choice'], status]):
-            <span class="status correct" id="status_${id}"></span>
-            % elif all([c == 'partial' for c in option['choice'], status]):
-            <span class="status partially_correct" id="status_${id}">P</span>
+            <span class="tag-status correct" id="status_${id}"></span>
+            % elif all([c == 'partially-correct' for c in option['choice'], status]):
+            <span class="tag-status partially-correct" id="status_${id}"></span>
             % elif all([c == 'incorrect' for c in option['choice'], status]):
-            <span class="status incorrect" id="status_${id}"></span>
+            <span class="tag-status incorrect" id="status_${id}"></span>
             % endif
 
             <span class="tag

@@ -1854,7 +1854,7 @@ class AnnotationResponse(LoncapaResponse):
     response_tag = 'annotationresponse'
     allowed_inputfields = ['annotationinput']
     max_inputfields = 1
-    default_scoring = {'incorrect': 0, 'partial': 1, 'correct': 2 }
+    default_scoring = {'incorrect': 0, 'partially-correct': 1, 'correct': 2 }
     def setup_response(self):
         xml = self.xml
         self.scoring_map = self._get_scoring_map()
