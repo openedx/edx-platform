@@ -411,7 +411,6 @@ class ResourceTemplates(object):
 
         return templates
 
-
 class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     """
     An XModuleDescriptor is a specification for an element of a course. This
@@ -585,11 +584,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     def inherit_metadata(self, metadata):
         """
         Updates this module with metadata inherited from a containing module.
-        Only metadata specified in self.inheritable_metadata will
+        Only metadata specified in inheritable_metadata will
         be inherited
         """
         # Set all inheritable metadata from kwargs that are
-        # in self.inheritable_metadata and aren't already set in metadata
+        # in inheritable_metadata and aren't already set in metadata
         for attr in self.inheritable_metadata:
             if attr not in self.metadata and attr in metadata:
                 self._inherited_metadata.add(attr)

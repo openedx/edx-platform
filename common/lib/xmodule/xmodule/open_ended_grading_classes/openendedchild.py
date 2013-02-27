@@ -22,6 +22,8 @@ from xmodule.stringify import stringify_children
 from xmodule.xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
+from peer_grading_service import PeerGradingService
+import controller_query_service
 
 from datetime import datetime
 
@@ -99,10 +101,21 @@ class OpenEndedChild(object):
         self.accept_file_upload = static_data['accept_file_upload']
         self.close_date = static_data['close_date']
         self.s3_interface = static_data['s3_interface']
+        self.skip_basic_checks = static_data['skip_basic_checks']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = static_data['max_score']
+        self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+        self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,system)
+
+        self.system = system
+        
+        self.location_string = location
+        try:
+            self.location_string = self.location_string.url()
+        except:
+            pass
 
         self.setup_response(system, location, definition, descriptor)
 
@@ -126,12 +139,14 @@ class OpenEndedChild(object):
         if self.closed():
             return True, {
                 'success': False,
-                'error': 'This problem is now closed.'
+                #This is a student_facing_error
+                'error': 'The problem close date has passed, and this problem is now closed.'
             }
         elif self.attempts > self.max_attempts:
             return True, {
                 'success': False,
-                'error': 'Too many attempts.'
+                #This is a student_facing_error
+                'error': 'You have attempted this problem {0} times.  You are allowed {1} attempts.'.format(self.attempts, self.max_attempts)
             }
         else:
             return False, {}
@@ -250,7 +265,8 @@ class OpenEndedChild(object):
             try:
                 return Progress(self.get_score()['score'], self._max_score)
             except Exception as err:
-                log.exception("Got bad progress")
+                #This is a dev_facing_error
+                log.exception("Got bad progress from open ended child module. Max Score: {1}".format(self._max_score))
                 return None
         return None
 
@@ -258,10 +274,12 @@ class OpenEndedChild(object):
         """
         return dict out-of-sync error message, and also log.
         """
-        log.warning("Assessment module state out sync. state: %r, get: %r. %s",
+        #This is a dev_facing_error
+        log.warning("Open ended child state out sync. state: %r, get: %r. %s",
             self.state, get, msg)
+        #This is a student_facing_error
         return {'success': False,
-                'error': 'The problem state got out-of-sync'}
+                'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
 
     def get_html(self):
         """
@@ -339,6 +357,10 @@ class OpenEndedChild(object):
             if get_data['can_upload_files'] in ['true', '1']:
                 has_file_to_upload = True
                 file = get_data['student_file'][0]
+                if self.system.track_fuction:
+                    self.system.track_function('open_ended_image_upload', {'filename': file.name})
+                else:
+                    log.info("No tracking function found when uploading image.")
                 uploaded_to_s3, image_ok, s3_public_url = self.upload_image_to_s3(file)
                 if uploaded_to_s3:
                     image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
@@ -407,3 +429,55 @@ class OpenEndedChild(object):
                     success = True
 
         return success, string
+
+    def check_if_student_can_submit(self):
+        location = self.location_string
+
+        student_id = self.system.anonymous_student_id
+        success = False
+        allowed_to_submit = True
+        response = {}
+        #This is a student_facing_error
+        error_string = ("You need to peer grade {0} more in order to make another submission.  "
+        "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
+        try:
+            response = self.peer_gs.get_data_for_location(self.location_string, student_id)
+            count_graded = response['count_graded']
+            count_required = response['count_required']
+            student_sub_count = response['student_sub_count']
+            success = True
+        except:
+            #This is a dev_facing_error
+            log.error("Could not contact external open ended graders for location {0} and student {1}".format(self.location_string,student_id))
+            #This is a student_facing_error
+            error_message = "Could not contact the graders.  Please notify course staff."
+            return success, allowed_to_submit, error_message
+        if count_graded>=count_required:
+            return success, allowed_to_submit, ""
+        else:
+            allowed_to_submit = False
+            #This is a student_facing_error
+            error_message = error_string.format(count_required-count_graded, count_graded, count_required, student_sub_count)
+            return success, allowed_to_submit, error_message
+
+    def get_eta(self):
+        response = self.controller_qs.check_for_eta(self.location_string)
+        try:
+            response = json.loads(response)
+        except:
+            pass
+
+        success = response['success']
+        if isinstance(success, basestring):
+            success = (success.lower()=="true")
+
+        if success:
+            eta = controller_query_service.convert_seconds_to_human_readable(response['eta'])
+            eta_string = "Please check back for your response in at most {0}.".format(eta)
+        else:
+            eta_string = ""
+
+        return eta_string
+
+
+

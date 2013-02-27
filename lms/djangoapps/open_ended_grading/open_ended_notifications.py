@@ -1,7 +1,7 @@
 from django.conf import settings
 from xmodule.open_ended_grading_classes import peer_grading_service
 from staff_grading_service import StaffGradingService
-from open_ended_grading.controller_query_service import ControllerQueryService
+from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 import json
 from student.models import unique_id_for_user
 from courseware.models import StudentModule
@@ -45,7 +45,8 @@ def staff_grading_notifications(course, user):
     except:
         #Non catastrophic error, so no real action
         notifications = {}
-        log.info("Problem with getting notifications from staff grading service.")
+        #This is a dev_facing_error
+        log.info("Problem with getting notifications from staff grading service for course {0} user {1}.".format(course_id, student_id))
 
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
@@ -78,7 +79,8 @@ def peer_grading_notifications(course, user):
     except:
         #Non catastrophic error, so no real action
         notifications = {}
-        log.info("Problem with getting notifications from peer grading service.")
+        #This is a dev_facing_error
+        log.info("Problem with getting notifications from peer grading service for course {0} user {1}.".format(course_id, student_id))
 
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
@@ -91,7 +93,8 @@ def peer_grading_notifications(course, user):
 
 
 def combined_notifications(course, user):
-    controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE)
+    system = ModuleSystem(None, None, None, render_to_string, None)
+    controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, course, 'staff')
     course_id = course.id
@@ -123,7 +126,8 @@ def combined_notifications(course, user):
     except:
         #Non catastrophic error, so no real action
         notifications = {}
-        log.exception("Problem with getting notifications from controller query service.")
+        #This is a dev_facing_error
+        log.exception("Problem with getting notifications from controller query service for course {0} user {1}.".format(course_id, student_id))
 
     if pending_grading:
         img_path = "/static/images/grading_notification.png"

@@ -30,8 +30,8 @@ class PeerGradingService(GradingService):
         self.system = system
 
     def get_data_for_location(self, problem_location, student_id):
-        response = self.get(self.get_data_for_location_url,
-            {'location': problem_location, 'student_id': student_id})
+        params = {'location': problem_location, 'student_id': student_id}
+        response = self.get(self.get_data_for_location_url, params)
         return self.try_to_decode(response)
 
     def get_next_submission(self, problem_location, grader_id):
@@ -106,7 +106,7 @@ class MockPeerGradingService(object):
                            'max_score': 4})
 
     def save_grade(self, location, grader_id, submission_id,
-                   score, feedback, submission_key):
+                   score, feedback, submission_key, rubric_scores, submission_flagged):
         return json.dumps({'success': True})
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -122,7 +122,8 @@ class MockPeerGradingService(object):
                            'max_score': 4})
 
     def save_calibration_essay(self, problem_location, grader_id,
-                               calibration_essay_id, submission_key, score, feedback):
+                               calibration_essay_id, submission_key, score, 
+                               feedback, rubric_scores):
         return {'success': True, 'actual_score': 2}
 
     def get_problem_list(self, course_id, grader_id):

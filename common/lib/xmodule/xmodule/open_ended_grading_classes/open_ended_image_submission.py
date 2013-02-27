@@ -251,8 +251,9 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
 
         return True, public_url
     except:
-        error_message = "Could not connect to S3."
-        log.exception(error_message)
+        #This is a dev_facing_error
+        error_message = "Could not connect to S3 to upload peer grading image.  Trying to utilize bucket: {0}".format(bucketname.lower())
+        log.error(error_message)
         return False, error_message
 
 

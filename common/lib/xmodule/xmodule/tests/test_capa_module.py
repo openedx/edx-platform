@@ -42,6 +42,7 @@ class CapaFactory(object):
                force_save_button=None,
                attempts=None,
                problem_state=None,
+               correct=False
                ):
         """
         All parameters are optional, and are added to the created problem if specified.
@@ -58,6 +59,7 @@ class CapaFactory(object):
                 module.
 
             attempts: also added to instance state.  Will be converted to an int.
+            correct: if True, the problem will be initialized to be answered correctly.
         """
         definition = {'data': CapaFactory.sample_problem_xml, }
         location = Location(["i4x", "edX", "capa_test", "problem",
@@ -81,10 +83,19 @@ class CapaFactory(object):
         instance_state_dict = {}
         if problem_state is not None:
             instance_state_dict = problem_state
+
         if attempts is not None:
             # converting to int here because I keep putting "0" and "1" in the tests
             # since everything else is a string.
             instance_state_dict['attempts'] = int(attempts)
+
+        if correct:
+            # TODO: make this actually set an answer of 3.14, and mark it correct
+            #instance_state_dict['student_answers'] = {}
+            #instance_state_dict['correct_map'] = {}
+            pass
+
+
         if len(instance_state_dict) > 0:
             instance_state = json.dumps(instance_state_dict)
         else:
@@ -94,12 +105,15 @@ class CapaFactory(object):
                             definition, descriptor,
                                       instance_state, None, metadata=metadata)
 
+        if correct:
+            # TODO: probably better to actually set the internal state properly, but...
+            module.get_score = lambda: {'score': 1, 'total': 1}
+
         return module
 
 
 
 class CapaModuleTest(unittest.TestCase):
-
 
     def setUp(self):
         now = datetime.datetime.now()
@@ -119,6 +133,18 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(module.get_score()['score'], 0)
         self.assertNotEqual(module.url_name, other_module.url_name,
                             "Factory should be creating unique names for each problem")
+
+
+    def test_correct(self):
+        """
+        Check that the factory creates correct and incorrect problems properly.
+        """
+        module = CapaFactory.create()
+        self.assertEqual(module.get_score()['score'], 0)
+
+        other_module = CapaFactory.create(correct=True)
+        self.assertEqual(other_module.get_score()['score'], 1)
+
 
     def test_showanswer_default(self):
         """
@@ -178,7 +204,7 @@ class CapaModuleTest(unittest.TestCase):
         for everyone--e.g. after due date + grace period.
         """
 
-        # can see after attempts used up, even with due date in the future
+        # can't see after attempts used up, even with due date in the future
         used_all_attempts = CapaFactory.create(showanswer='past_due',
                                                max_attempts="1",
                                                attempts="1",
@@ -209,3 +235,50 @@ class CapaModuleTest(unittest.TestCase):
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
         self.assertFalse(still_in_grace.answer_available())
+
+    def test_showanswer_finished(self):
+        """
+        With showanswer="finished" should show answer after the problem is closed,
+        or after the answer is correct.
+        """
+
+        # can see after attempts used up, even with due date in the future
+        used_all_attempts = CapaFactory.create(showanswer='finished',
+                                               max_attempts="1",
+                                               attempts="1",
+                                               due=self.tomorrow_str)
+        self.assertTrue(used_all_attempts.answer_available())
+
+
+        # can see after due date
+        past_due_date = CapaFactory.create(showanswer='finished',
+                                               max_attempts="1",
+                                               attempts="0",
+                                               due=self.yesterday_str)
+        self.assertTrue(past_due_date.answer_available())
+
+
+        # can't see because attempts left and wrong
+        attempts_left_open = CapaFactory.create(showanswer='finished',
+                                               max_attempts="1",
+                                               attempts="0",
+                                               due=self.tomorrow_str)
+        self.assertFalse(attempts_left_open.answer_available())
+
+        # _can_ see because attempts left and right
+        correct_ans = CapaFactory.create(showanswer='finished',
+                                               max_attempts="1",
+                                               attempts="0",
+                                               due=self.tomorrow_str,
+                                               correct=True)
+        self.assertTrue(correct_ans.answer_available())
+
+
+        # Can see even though grace period hasn't expired, because have no more
+        # attempts.
+        still_in_grace = CapaFactory.create(showanswer='finished',
+                                            max_attempts="1",
+                                            attempts="1",
+                                            due=self.yesterday_str,
+                                            graceperiod=self.two_day_delta_str)
+        self.assertTrue(still_in_grace.answer_available())

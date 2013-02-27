@@ -2,8 +2,7 @@ import json
 import logging
 from lxml import etree
 from lxml.html import rewrite_links
-
-
+from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import only_one, ComplexEncoder
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
@@ -14,16 +13,13 @@ from xmodule.xml_module import XmlDescriptor
 import self_assessment_module
 import open_ended_module
 from combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-import dateutil
-import dateutil.parser
-from xmodule.timeparse import parse_timedelta
 
 log = logging.getLogger("mitx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing
 # attempts specified in xml definition overrides this.
-MAX_ATTEMPTS = 10000
+MAX_ATTEMPTS = 1
 
 # Set maximum available number of points.
 # Overriden by max_score specified in xml.
@@ -47,6 +43,10 @@ HUMAN_TASK_TYPE = {
     'selfassessment' : "Self Assessment",
     'openended' : "edX Assessment",
     }
+
+#Default value that controls whether or not to skip basic spelling checks in the controller
+#Metadata overrides this
+SKIP_BASIC_CHECKS = False
 
 class CombinedOpenEndedV1Module():
     """
@@ -146,28 +146,17 @@ class CombinedOpenEndedV1Module():
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
         self.is_scored = self.metadata.get('is_graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
+        self.skip_basic_checks = self.metadata.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
 
         display_due_date_string = self.metadata.get('due', None)
-        if display_due_date_string is not None:
-            try:
-                self.display_due_date = dateutil.parser.parse(display_due_date_string)
-            except ValueError:
-                log.error("Could not parse due date {0} for location {1}".format(display_due_date_string, location))
-                raise
-        else:
-            self.display_due_date = None
-
+    
         grace_period_string = self.metadata.get('graceperiod', None)
-        if grace_period_string is not None and self.display_due_date:
-            try:
-                self.grace_period = parse_timedelta(grace_period_string)
-                self.close_date = self.display_due_date + self.grace_period
-            except:
-                log.error("Error parsing the grace period {0} for location {1}".format(grace_period_string, location))
-                raise
-        else:
-            self.grace_period = None
-            self.close_date = self.display_due_date
+        try:
+            self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)  
+        except:
+            log.error("Error parsing due date information in location {0}".format(location))
+            raise
+        self.display_due_date = self.timeinfo.display_due_date
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -185,8 +174,9 @@ class CombinedOpenEndedV1Module():
             'rubric': definition['rubric'],
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
-            'close_date' : self.close_date,
+            'close_date' : self.timeinfo.close_date,
             's3_interface' : self.system.s3_interface,
+            'skip_basic_checks' : self.skip_basic_checks,
             }
 
         self.task_xml = definition['task_xml']
@@ -340,6 +330,7 @@ class CombinedOpenEndedV1Module():
             'status': self.get_status(False),
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
+            'location': self.location,
             'legend_list' : LEGEND_LIST,
             }
 
@@ -656,7 +647,10 @@ class CombinedOpenEndedV1Module():
         if self.attempts > self.max_attempts:
             return {
                 'success': False,
-                'error': 'Too many attempts.'
+                #This is a student_facing_error
+                'error': ('You have attempted this question {0} times.  '
+                          'You are only allowed to attempt it {1} times.').format(
+                    self.attempts, self.max_attempts)
             }
         self.state = self.INITIAL
         self.allow_reset = False
@@ -795,7 +789,8 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
         expected_children = ['task', 'rubric', 'prompt']
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0:
-                raise ValueError("Combined Open Ended definition must include at least one '{0}' tag".format(child))
+                #This is a staff_facing_error
+                raise ValueError("Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
 
         def parse_task(k):
             """Assumes that xml_object has child k"""

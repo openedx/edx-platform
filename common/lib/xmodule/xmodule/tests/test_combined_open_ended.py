@@ -48,6 +48,7 @@ class OpenEndedChildTest(unittest.TestCase):
             'close_date': None,
             's3_interface' : "",
             'open_ended_grading_interface' : {},
+            'skip_basic_checks' : False,
             }
     definition = Mock()
     descriptor = Mock()
@@ -167,6 +168,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'close_date': None,
             's3_interface' : test_util_open_ended.S3_INTERFACE,
             'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            'skip_basic_checks' : False,
             }
 
     oeparam = etree.XML('''
@@ -301,6 +303,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             'close_date' : "",
             's3_interface' : test_util_open_ended.S3_INTERFACE,
             'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            'skip_basic_checks' : False,
             }
 
     oeparam = etree.XML('''

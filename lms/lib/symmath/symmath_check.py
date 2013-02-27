@@ -149,6 +149,12 @@ def make_error_message(msg):
     msg = '<div class="capa_alert">%s</div>' % msg
     return msg
 
+def is_within_tolerance(expected, actual, tolerance):
+    if expected == 0:
+        return (abs(actual) < tolerance)
+    else:
+        return (abs(abs(actual - expected) / expected) < tolerance)
+
 #-----------------------------------------------------------------------------
 # Check function interface, which takes pmathml input
 #
@@ -215,16 +221,16 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         fans = None
 
     # do a numerical comparison if both expected and answer are numbers
-    if (hasattr(fexpect, 'is_number') and fexpect.is_number and fans
+    if (hasattr(fexpect, 'is_number') and fexpect.is_number 
         and hasattr(fans, 'is_number') and fans.is_number):
-        if abs(abs(fans - fexpect) / fexpect) < threshold:
+        if is_within_tolerance(fexpect, fans, threshold):
             return {'ok': True, 'msg': msg}
         else:
             msg += '<p>You entered: %s</p>' % to_latex(fans)
             return {'ok': False, 'msg': msg}
 
     if do_numerical:		# numerical answer expected - force numerical comparison
-        if abs(abs(fans - fexpect) / fexpect) < threshold:
+        if is_within_tolerance(fexpect, fans, threshold):
             return {'ok': True, 'msg': msg}
         else:
             msg += '<p>You entered: %s (note that a numerical answer is expected)</p>' % to_latex(fans)

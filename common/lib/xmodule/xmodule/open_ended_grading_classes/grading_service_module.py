@@ -51,6 +51,8 @@ class GradingService(object):
             r = self._try_with_login(op)
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
+            #This is a dev_facing_error
+            log.error("Problem posting data to the grading controller.  URL: {0}, data: {1}".format(url, data))
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
         return r.text
@@ -67,6 +69,8 @@ class GradingService(object):
             r = self._try_with_login(op)
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
+            #This is a dev_facing_error
+            log.error("Problem getting data from the grading controller.  URL: {0}, params: {1}".format(url, params))
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
         return r.text
@@ -119,11 +123,13 @@ class GradingService(object):
             return response_json
         # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError, RubricParsingError:
+            #This is a dev_facing_error
             log.exception("Cannot parse rubric string. Raw string: {0}"
             .format(rubric))
             return {'success': False,
                     'error': 'Error displaying submission'}
         except ValueError:
+            #This is a dev_facing_error
             log.exception("Error parsing response: {0}".format(response))
             return {'success': False,
                     'error': "Error displaying submission"}
