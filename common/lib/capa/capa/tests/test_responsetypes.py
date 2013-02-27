@@ -428,4 +428,16 @@ class JavascriptResponseTest(unittest.TestCase):
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
 
 class AnnotationResponseTest(unittest.TestCase):
-    pass
+
+    def test_grade(self):
+        annotationresponse_file = os.path.dirname(__file__) + "/test_files/annotationresponse.xml"
+        test_lcp = lcp.LoncapaProblem(open(annotationresponse_file).read(), '1', system=test_system)
+        answers_for = {
+            'correct': {'1_2_1': json.dumps({'options':[0]})},
+            'incorrect': {'1_2_1': json.dumps({'options':[1]})},
+            'partially-correct': {'1_2_1': json.dumps({'options':[2]})}
+        }
+
+        for expected_correctness in answers_for.keys():
+            actual_correctness = test_lcp.grade_answers(answers_for[expected_correctness]).get_correctness('1_2_1')
+            self.assertEquals(expected_correctness, actual_correctness)

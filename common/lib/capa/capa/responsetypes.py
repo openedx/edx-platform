@@ -1848,8 +1848,7 @@ class AnnotationResponse(LoncapaResponse):
     Checking of annotation responses.
 
     The response contains both a comment (student commentary) and an option (student tag).
-    Only the tag is currently graded. Answers may be incorrect, partially correct, or correct
-    and are scored accordingly.
+    Only the tag is currently graded. Answers may be incorrect, partially correct, or correct.
     '''
     response_tag = 'annotationresponse'
     allowed_inputfields = ['annotationinput']
