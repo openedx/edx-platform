@@ -574,18 +574,24 @@ class ChoiceResponseTest(ResponseTest):
         self.assert_grade(problem, 'choice_3', 'incorrect')
 
 
-class JavascriptResponseTest(unittest.TestCase):
+class JavascriptResponseTest(ResponseTest):
+    from response_xml_factory import JavascriptResponseXMLFactory
+    xml_factory_class = JavascriptResponseXMLFactory
 
-    def test_jr_grade(self):
-        problem_file = os.path.dirname(__file__) + "/test_files/javascriptresponse.xml"
+    def test_grade(self):
+        problem = self.build_problem(generator_src="test_problem_generator.js",
+                                    grader_src="test_problem_grader.js",
+                                    display_class="TestProblemDisplay",
+                                    display_src="test_problem_display.js",
+                                    param_dict={'value': '4'})
+
+        # Compile coffee files into javascript used by the response
         coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
         os.system("coffee -c %s" % (coffee_file_path))
-        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': json.dumps({0: 4})}
-        incorrect_answers = {'1_2_1': json.dumps({0: 5})}
 
-        self.assertEquals(test_lcp.grade_answers(incorrect_answers).get_correctness('1_2_1'), 'incorrect')
-        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+        # Test that we get graded correctly
+        self.assert_grade(problem, json.dumps({0:4}), "correct")
+        self.assert_grade(problem, json.dumps({0:5}), "incorrect")
 
 class NumericalResponseTest(ResponseTest):
     from response_xml_factory import NumericalResponseXMLFactory
