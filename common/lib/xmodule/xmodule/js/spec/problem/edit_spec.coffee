@@ -383,4 +383,4 @@ describe 'MarkdownEditingDescriptor', ->
         <p>bad tests require drivel</p>
         </div>
         </problem>""")
-    # failure tests here
+    # failure tests
