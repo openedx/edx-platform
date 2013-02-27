@@ -37,11 +37,13 @@ class ResponseTest(unittest.TestCase):
     def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):
         for input_str in correct_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'correct')
+            self.assertEqual(result, 'correct',
+                        msg="%s should be marked correct" % str(input_str))
 
         for input_str in incorrect_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'incorrect')
+            self.assertEqual(result, 'incorrect', 
+                            msg="%s should be marked incorrect" % str(input_str))
 
 class MultiChoiceResponseTest(ResponseTest):
     from response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -104,60 +106,61 @@ class TrueFalseResponseTest(ResponseTest):
         self.assert_grade(problem, 'choice_foil_4', 'incorrect')
         self.assert_grade(problem, 'not_a_choice', 'incorrect')
 
-class ImageResponseTest(unittest.TestCase):
-    def test_ir_grade(self):
-        imageresponse_file = os.path.dirname(__file__) + "/test_files/imageresponse.xml"
-        test_lcp = lcp.LoncapaProblem(open(imageresponse_file).read(), '1', system=test_system)
-        # testing regions only
-        correct_answers = {
-           #regions
-           '1_2_1': '(490,11)-(556,98)',
-           '1_2_2': '(242,202)-(296,276)',
-           '1_2_3': '(490,11)-(556,98);(242,202)-(296,276)',
-           '1_2_4': '(490,11)-(556,98);(242,202)-(296,276)',
-           '1_2_5': '(490,11)-(556,98);(242,202)-(296,276)',
-           #testing regions and rectanges
-           '1_3_1': 'rectangle="(490,11)-(556,98)" \
-           regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"',
-           '1_3_2': 'rectangle="(490,11)-(556,98)" \
-           regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"',
-           '1_3_3': 'regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"',
-           '1_3_4': 'regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"',
-           '1_3_5': 'regions="[[[10,10], [20,10], [20, 30]]]"',
-           '1_3_6': 'regions="[[10,10], [30,30], [15, 15]]"',
-           '1_3_7': 'regions="[[10,10], [30,30], [10, 30], [30, 10]]"',
-                          }
-        test_answers = {
-            '1_2_1': '[500,20]',
-            '1_2_2': '[250,300]',
-            '1_2_3': '[500,20]',
-            '1_2_4': '[250,250]',
-            '1_2_5': '[10,10]',
+class ImageResponseTest(ResponseTest):
+    from response_xml_factory import ImageResponseXMLFactory
+    xml_factory_class = ImageResponseXMLFactory
 
-            '1_3_1': '[500,20]',
-            '1_3_2': '[15,15]',
-            '1_3_3': '[500,20]',
-            '1_3_4': '[115,115]',
-            '1_3_5': '[15,15]',
-            '1_3_6': '[20,20]',
-            '1_3_7': '[20,15]',
-                        }
+    def test_rectangle_grade(self):
+        # Define a rectangle with corners (10,10) and (20,20)
+        problem = self.build_problem(rectangle="(10,10)-(20,20)")
 
-        # regions
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_2'), 'incorrect')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_3'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_4'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_5'), 'incorrect')
+        # Anything inside the rectangle (and along the borders) is correct
+        # Everything else is incorrect
+        correct_inputs = ["[12,19]", "[10,10]", "[20,20]", 
+                            "[10,15]", "[20,15]", "[15,10]", "[15,20]"]
+        incorrect_inputs = ["[4,6]", "[25,15]", "[15,40]", "[15,4]"]
+        self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
 
-        # regions and rectangles
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_2'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_3'), 'incorrect')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_4'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_5'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_6'), 'incorrect')
-        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_7'), 'correct')
+    def test_multiple_rectangles_grade(self):
+        # Define two rectangles
+        rectangle_str = "(10,10)-(20,20);(100,100)-(200,200)"
+
+        # Expect that only points inside the rectangles are marked correct
+        problem = self.build_problem(rectangle=rectangle_str)
+        correct_inputs = ["[12,19]", "[120, 130]"]
+        incorrect_inputs = ["[4,6]", "[25,15]", "[15,40]", "[15,4]",
+                            "[50,55]", "[300, 14]", "[120, 400]"]
+        self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
+
+    def test_region_grade(self):
+        # Define a triangular region with corners (0,0), (5,10), and (0, 10)
+        region_str = "[ [1,1], [5,10], [0,10] ]"
+
+        # Expect that only points inside the triangle are marked correct
+        problem = self.build_problem(regions=region_str)
+        correct_inputs = ["[2,4]", "[1,3]"]
+        incorrect_inputs = ["[0,0]", "[3,5]", "[5,15]", "[30, 12]"]
+        self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
+
+    def test_multiple_regions_grade(self):
+        # Define multiple regions that the user can select
+        region_str="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"
+
+        # Expect that only points inside the regions are marked correct
+        problem = self.build_problem(regions=region_str)
+        correct_inputs = ["[15,12]", "[110,112]"]
+        incorrect_inputs = ["[0,0]", "[600,300]"]
+        self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
+
+    def test_region_and_rectangle_grade(self):
+        rectangle_str = "(100,100)-(200,200)"
+        region_str="[[10,10], [20,10], [20, 30]]"
+
+        # Expect that only points inside the rectangle or region are marked correct
+        problem = self.build_problem(regions=region_str, rectangle=rectangle_str)
+        correct_inputs = ["[13,12]", "[110,112]"]
+        incorrect_inputs = ["[0,0]", "[600,300]"]
+        self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
 
 
 class SymbolicResponseTest(unittest.TestCase):

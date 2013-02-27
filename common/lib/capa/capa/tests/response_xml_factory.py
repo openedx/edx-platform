@@ -362,15 +362,15 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
                 # that we used previously.  
                 formulahint_element.set("samples", sample_str)
 
-                formulahint_element.set("answer", hint_prompt)
-                formulahint_element.set("name", hint_name)
+                formulahint_element.set("answer", str(hint_prompt))
+                formulahint_element.set("name", str(hint_name))
 
                 # For each hint, create a <hintpart> element
                 # corresponding to the <formulahint>
                 hintpart_element = etree.SubElement(hintgroup_element, "hintpart")
-                hintpart_element.set("on", hint_name)
+                hintpart_element.set("on", str(hint_name))
                 text_element = etree.SubElement(hintpart_element, "text")
-                text_element.text = hint_text
+                text_element.text = str(hint_text)
 
         return response_element
 
@@ -392,11 +392,63 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         return sample_str
 
 class ImageResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for producing <imageresponse> XML """
+
     def create_response_element(self, **kwargs):
-        raise NotImplemented
+        """ Create the <imageresponse> element."""
+        return etree.Element("imageresponse")
+
 
     def create_input_element(self, **kwargs):
-        raise NotImplemented
+        """ Create the <imageinput> element.
+        
+        Uses **kwargs:
+            
+        *src*: URL for the image file [DEFAULT: "/static/image.jpg"]
+
+        *width*: Width of the image [DEFAULT: 100]
+
+        *height*: Height of the image [DEFAULT: 100]
+
+        *rectangle*: String representing the rectangles the user should select.
+
+                    Take the form "(x1,y1)-(x2,y2)", where the two (x,y)
+                    tuples define the corners of the rectangle.
+
+                    Can include multiple rectangles separated by a semicolon, e.g.
+                    "(490,11)-(556,98);(242,202)-(296,276)"
+
+        *regions*: String representing the regions a user can select
+
+                    Take the form "[ [[x1,y1], [x2,y2], [x3,y3]],
+                                    [[x1,y1], [x2,y2], [x3,y3]] ]"
+                    (Defines two regions, each with 3 points)
+
+        REQUIRED: Either *rectangle* or *region* (or both)
+        """
+
+        # Get the **kwargs
+        src = kwargs.get("src", "/static/image.jpg")
+        width = kwargs.get("width", 100)
+        height = kwargs.get("height", 100)
+        rectangle = kwargs.get('rectangle', None)
+        regions = kwargs.get('regions', None)
+
+        assert(rectangle or regions)
+
+        # Create the <imageinput> element
+        input_element = etree.Element("imageinput")
+        input_element.set("src", str(src))
+        input_element.set("width", str(width))
+        input_element.set("height", str(height))
+        
+        if rectangle:
+            input_element.set("rectangle", rectangle)
+
+        if regions:
+            input_element.set("regions", regions)
+
+        return input_element
 
 class JavascriptResponseXMLFactory(ResponseXMLFactory):
     def create_response_element(self, **kwargs):
