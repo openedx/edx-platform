@@ -1881,7 +1881,8 @@ class AnnotationResponse(LoncapaResponse):
         answer_map = {}
         for inputfield in self.inputfields:
             correct_option = self._find_option_with_choice(inputfield, 'correct')
-            answer_map[inputfield.get('id')] = correct_option['description']
+            if correct_option is not None:
+                answer_map[inputfield.get('id')] = correct_option.get('description')
         return answer_map
 
     def _find_options(self, inputfield):

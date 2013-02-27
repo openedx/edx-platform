@@ -974,6 +974,7 @@ class AnnotationInput(InputTypeBase):
         xml = self.xml
 
         self.debug = False # set to True to display extra debug info with input
+        self.return_to_annotation = True # return only works in conjunction with annotatable xmodule
 
         self.title = xml.findtext('./title', 'Annotation Exercise')
         self.text = xml.findtext('./text')
@@ -981,12 +982,13 @@ class AnnotationInput(InputTypeBase):
         self.comment_prompt = xml.findtext('./comment_prompt', 'Type a commentary below:')
         self.tag_prompt = xml.findtext('./tag_prompt', 'Select one or more tags:')
         self.options = self._find_options()
-        self.return_to_annotation = True # return only works in conjunction with annotatable xmodule
 
         # Need to provide a value that JSON can parse if there is no
         # student-supplied value yet.
         if self.value == '':
             self.value = 'null'
+
+        self._validate_options()
 
     def _find_options(self):
         ''' Returns an array of dicts where each dict represents an option. '''
@@ -996,6 +998,16 @@ class AnnotationInput(InputTypeBase):
                 'description': option.text,
                 'choice': option.get('choice')
             } for (index, option) in enumerate(elements) ]
+
+    def _validate_options(self):
+        ''' Raises a ValueError if the choice attribute is missing or invalid. '''
+        valid_choices = ('correct', 'partially-correct', 'incorrect')
+        for option in self.options:
+            choice = option['choice']
+            if choice is None:
+                raise ValueError('Missing required choice attribute.')
+            elif choice not in valid_choices:
+                raise ValueError('Invalid choice attribute: {0}. Must be one of: {1}'.format(choice, ', '.join(valid_choices)))
 
     def _unpack(self, json_value):
         ''' Unpacks the json input state into a dict. '''
