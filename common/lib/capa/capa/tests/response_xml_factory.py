@@ -280,6 +280,8 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
 
 
 class ChoiceResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for creating <choiceresponse> XML trees """
+
     def create_response_element(self, **kwargs):
         """ Create a <choiceresponse> element """
         return etree.Element("choiceresponse")
@@ -290,11 +292,104 @@ class ChoiceResponseXMLFactory(ResponseXMLFactory):
 
 
 class FormulaResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for creating <formularesponse> XML trees """
+
     def create_response_element(self, **kwargs):
-        raise NotImplemented
+        """ Create a <formularesponse> element.
+
+        *sample_dict*: A dictionary of the form:
+                        { VARIABLE_NAME: (MIN, MAX), ....}
+
+                        This specifies the range within which
+                        to numerically sample each variable to check
+                        student answers.
+                        [REQUIRED]
+
+        *num_samples*: The number of times to sample the student's answer
+                        to numerically compare it to the correct answer.
+        
+        *tolerance*: The tolerance within which answers will be accepted
+                        [DEFAULT: 0.01] 
+
+        *answer*: The answer to the problem.  Can be a formula string
+                    or a Python variable defined in a script 
+                    (e.g. "$calculated_answer" for a Python variable 
+                    called calculated_answer)
+                    [REQUIRED]
+
+        *hints*: List of (hint_prompt, hint_name, hint_text) tuples
+                Where *hint_prompt* is the formula for which we show the hint,
+                *hint_name* is an internal identifier for the hint,
+                and *hint_text* is the text we show for the hint.
+        """
+        # Retrieve kwargs
+        sample_dict = kwargs.get("sample_dict", None)
+        num_samples = kwargs.get("num_samples", None)
+        tolerance = kwargs.get("tolerance", 0.01)
+        answer = kwargs.get("answer", None)
+        hint_list = kwargs.get("hints", None)
+
+        assert(answer)
+        assert(sample_dict and num_samples)
+
+        # Create the <formularesponse> element
+        response_element = etree.Element("formularesponse")
+
+        # Set the sample information
+        sample_str = self._sample_str(sample_dict, num_samples, tolerance)
+        response_element.set("samples", sample_str)
+                
+
+        # Set the tolerance
+        responseparam_element = etree.SubElement(response_element, "responseparam")
+        responseparam_element.set("type", "tolerance")
+        responseparam_element.set("default", str(tolerance))
+
+        # Set the answer
+        response_element.set("answer", str(answer))
+
+        # Include hints, if specified
+        if hint_list:
+            hintgroup_element = etree.SubElement(response_element, "hintgroup")
+
+            for (hint_prompt, hint_name, hint_text) in hint_list:
+
+                # For each hint, create a <formulahint> element
+                formulahint_element = etree.SubElement(hintgroup_element, "formulahint")
+
+                # We could sample a different range, but for simplicity,
+                # we use the same sample string for the hints
+                # that we used previously.  
+                formulahint_element.set("samples", sample_str)
+
+                formulahint_element.set("answer", hint_prompt)
+                formulahint_element.set("name", hint_name)
+
+                # For each hint, create a <hintpart> element
+                # corresponding to the <formulahint>
+                hintpart_element = etree.SubElement(hintgroup_element, "hintpart")
+                hintpart_element.set("on", hint_name)
+                text_element = etree.SubElement(hintpart_element, "text")
+                text_element.text = hint_text
+
+        return response_element
 
     def create_input_element(self, **kwargs):
-        raise NotImplemented
+        return ResponseXMLFactory.textline_input_xml(**kwargs)
+
+    def _sample_str(self, sample_dict, num_samples, tolerance):
+        # Loncapa uses a special format for sample strings:
+        # "x,y,z@4,5,3:10,12,8#4" means plug in values for (x,y,z)
+        # from within the box defined by points (4,5,3) and (10,12,8)
+        # The "#4" means to repeat 4 times.
+        variables = [str(v) for v in sample_dict.keys()]
+        low_range_vals = [str(f[0]) for f in sample_dict.values()]
+        high_range_vals = [str(f[1]) for f in sample_dict.values()]
+        sample_str = (",".join(sample_dict.keys()) + "@" +
+                        ",".join(low_range_vals) + ":" +
+                        ",".join(high_range_vals) + 
+                        "#" + str(num_samples))
+        return sample_str
 
 class ImageResponseXMLFactory(ResponseXMLFactory):
     def create_response_element(self, **kwargs):

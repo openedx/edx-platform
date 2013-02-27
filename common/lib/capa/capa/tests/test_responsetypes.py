@@ -267,23 +267,80 @@ class OptionResponseTest(ResponseTest):
         self.assert_grade(problem, "invalid_option", "incorrect")
 
 
-class FormulaResponseWithHintTest(unittest.TestCase):
-    '''
-    Test Formula response problem with a hint
-    This problem also uses calc.
-    '''
-    def test_or_grade(self):
-        problem_file = os.path.dirname(__file__) + "/test_files/formularesponse_with_hint.xml"
-        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': '2.5*x-5.0'}
-        test_answers = {'1_2_1': '0.4*x-5.0'}
-        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
-        cmap = test_lcp.grade_answers(test_answers)
-        self.assertEquals(cmap.get_correctness('1_2_1'), 'incorrect')
-        self.assertTrue('You have inverted' in cmap.get_hint('1_2_1'))
+class FormulaResponseTest(ResponseTest):
+    from response_xml_factory import FormulaResponseXMLFactory
+    xml_factory_class = FormulaResponseXMLFactory
+
+    def test_grade(self):
+        # Sample variables x and y in the range [-10, 10]
+        sample_dict = {'x': (-10, 10), 'y': (-10, 10)}
+
+        # The expected solution is numerically equivalent to x+2y
+        problem = self.build_problem(sample_dict=sample_dict,
+                                    num_samples=10,
+                                    tolerance=0.01,
+                                    answer="x+2*y")
+
+        # Expect an equivalent formula to be marked correct
+        # 2x - x + y + y = x + 2y
+        input_formula = "2*x - x + y + y"
+        self.assert_grade(problem, input_formula, "correct")
+
+        # Expect an incorrect formula to be marked incorrect
+        # x + y != x + 2y
+        input_formula = "x + y"
+        self.assert_grade(problem, input_formula, "incorrect")
+
+    def test_hint(self):
+        # Sample variables x and y in the range [-10, 10]
+        sample_dict = {'x': (-10, 10), 'y': (-10,10) }
+
+        # Give a hint if the user leaves off the coefficient
+        # or leaves out x
+        hints = [('x + 3*y', 'y_coefficient', 'Check the coefficient of y'),
+                ('2*y', 'missing_x', 'Try including the variable x')]
 
 
-class StringResponseWithHintTest(ResponseTest):
+        # The expected solution is numerically equivalent to x+2y
+        problem = self.build_problem(sample_dict=sample_dict,
+                                    num_samples=10,
+                                    tolerance=0.01,
+                                    answer="x+2*y",
+                                    hints=hints)
+
+        # Expect to receive a hint  if we add an extra y
+        input_dict = {'1_2_1': "x + 2*y + y"}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'),
+                'Check the coefficient of y')
+
+        # Expect to receive a hint if we leave out x
+        input_dict = {'1_2_1': "2*y"}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'),
+                'Try including the variable x')
+
+
+    def test_script(self):
+        # Calculate the answer using a script
+        script = "calculated_ans = 'x+x'"
+
+        # Sample x in the range [-10,10]
+        sample_dict = {'x': (-10, 10)}
+
+        # The expected solution is numerically equivalent to 2*x
+        problem = self.build_problem(sample_dict=sample_dict,
+                                    num_samples=10,
+                                    tolerance=0.01,
+                                    answer="$calculated_ans",
+                                    script=script)
+
+        # Expect that the inputs are graded correctly
+        self.assert_grade(problem, '2*x', 'correct')
+        self.assert_grade(problem, '3*x', 'incorrect')
+
+
+class StringResponseTest(ResponseTest):
     from response_xml_factory import StringResponseXMLFactory
     xml_factory_class = StringResponseXMLFactory
 
