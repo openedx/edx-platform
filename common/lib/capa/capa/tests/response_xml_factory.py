@@ -43,6 +43,8 @@ class ResponseXMLFactory(object):
 
         *script*: The embedded Python script (a string)
 
+        *num_responses*: The number of responses to create [DEFAULT: 1]
+
         *num_inputs*: The number of input elements
             to create [DEFAULT: 1]
 
@@ -53,6 +55,7 @@ class ResponseXMLFactory(object):
         question_text = kwargs.get('question_text', '')
         explanation_text = kwargs.get('explanation_text', '')
         script = kwargs.get('script', None)
+        num_responses = kwargs.get('num_responses', 1)
         num_inputs = kwargs.get('num_inputs', 1)
 
         # The root is <problem>
@@ -68,20 +71,23 @@ class ResponseXMLFactory(object):
         question = etree.SubElement(root, "p")
         question.text = question_text
 
-        # Add the response
-        response_element = self.create_response_element(**kwargs)
-        root.append(response_element)
-        
-        # Add input elements
-        for i in range(0, int(num_inputs)):
-            input_element = self.create_input_element(**kwargs)
-            response_element.append(input_element)
+        # Add the response(s)
+        for i in range(0, int(num_responses)):
+            response_element = self.create_response_element(**kwargs)
+            root.append(response_element)
+            
+            # Add input elements
+            for j in range(0, int(num_inputs)):
+                input_element = self.create_input_element(**kwargs)
+                if not (None == input_element):
+                    response_element.append(input_element)
 
-        # The problem has an explanation of the solution
-        explanation = etree.SubElement(root, "solution")
-        explanation_div = etree.SubElement(explanation, "div")
-        explanation_div.set("class", "detailed-solution")
-        explanation_div.text = explanation_text
+            # The problem has an explanation of the solution
+            if explanation_text:
+                explanation = etree.SubElement(root, "solution")
+                explanation_div = etree.SubElement(explanation, "div")
+                explanation_div.set("class", "detailed-solution")
+                explanation_div.text = explanation_text
 
         return etree.tostring(root)
 
@@ -271,13 +277,56 @@ class SchematicResponseXMLFactory(ResponseXMLFactory):
 class CodeResponseXMLFactory(ResponseXMLFactory):
     """ Factory for creating <coderesponse> XML trees """
 
+    def build_xml(self, **kwargs):
+        # Since we are providing an <answer> tag,
+        # we should override the default behavior
+        # of including a <solution> tag as well
+        kwargs['explanation_text'] = None
+        return super(CodeResponseXMLFactory, self).build_xml(**kwargs)
+
     def create_response_element(self, **kwargs):
-        """ Create a <coderesponse> XML element """
-        raise NotImplemented
+        """ Create a <coderesponse> XML element:
+            
+            Uses **kwargs:
+                
+            *initial_display*: The code that initially appears in the textbox
+                                [DEFAULT: "Enter code here"]
+            *answer_display*: The answer to display to the student
+                                [DEFAULT: "This is the correct answer!"]
+            *grader_payload*: A JSON-encoded string sent to the grader
+                                [DEFAULT: empty dict string]
+        """
+        # Get **kwargs
+        initial_display = kwargs.get("initial_display", "Enter code here")
+        answer_display = kwargs.get("answer_display", "This is the correct answer!")
+        grader_payload = kwargs.get("grader_payload", '{}')
+
+        # Create the <coderesponse> element
+        response_element = etree.Element("coderesponse")
+        codeparam_element = etree.SubElement(response_element, "codeparam")
+
+        # Set the initial display text
+        initial_element = etree.SubElement(codeparam_element, "initial_display")
+        initial_element.text = str(initial_display)
+
+        # Set the answer display text
+        answer_element = etree.SubElement(codeparam_element, "answer_display")
+        answer_element.text = str(answer_display)
+
+        # Set the grader payload string
+        grader_element = etree.SubElement(codeparam_element, "grader_payload")
+        grader_element.text = str(grader_payload)
+
+        # Create the input within the response
+        input_element = etree.SubElement(response_element, "textbox")
+        input_element.set("mode", "python")
+
+        return response_element
 
     def create_input_element(self, **kwargs):
-        raise NotImplemented
-
+        # Since we create this in create_response_element(),
+        # return None here
+        return None
 
 class ChoiceResponseXMLFactory(ResponseXMLFactory):
     """ Factory for creating <choiceresponse> XML trees """

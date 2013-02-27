@@ -399,11 +399,19 @@ class StringResponseTest(ResponseTest):
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_hint('1_2_1'), "")
 
-class CodeResponseTest(unittest.TestCase):
-    '''
-    Test CodeResponse
-    TODO: Add tests for external grader messages
-    '''
+class CodeResponseTest(ResponseTest):
+    from response_xml_factory import CodeResponseXMLFactory
+    xml_factory_class = CodeResponseXMLFactory
+
+    def setUp(self):
+        super(CodeResponseTest, self).setUp()
+
+        grader_payload = json.dumps({"grader": "ps04/grade_square.py"})
+        self.problem = self.build_problem(initial_display="def square(x):",
+                                        answer_display="answer",
+                                        grader_payload=grader_payload,
+                                        num_responses=2)
+
     @staticmethod
     def make_queuestate(key, time):
         timestr = datetime.strftime(time, dateformat)
@@ -413,133 +421,121 @@ class CodeResponseTest(unittest.TestCase):
         """
         Simple test of whether LoncapaProblem knows when it's been queued
         """
-        problem_file = os.path.join(os.path.dirname(__file__), "test_files/coderesponse.xml")
-        with open(problem_file) as input_file:
-            test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=test_system)
 
-            answer_ids = sorted(test_lcp.get_question_answers())
+        answer_ids = sorted(self.problem.get_question_answers())
 
-            # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
-            cmap = CorrectMap()
-            for answer_id in answer_ids:
-                cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
-            test_lcp.correct_map.update(cmap)
+        # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
+        cmap = CorrectMap()
+        for answer_id in answer_ids:
+            cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
+        self.problem.correct_map.update(cmap)
 
-            self.assertEquals(test_lcp.is_queued(), False)
+        self.assertEquals(self.problem.is_queued(), False)
 
-            # Now we queue the LCP
-            cmap = CorrectMap()
-            for i, answer_id in enumerate(answer_ids):
-                queuestate = CodeResponseTest.make_queuestate(i, datetime.now())
-                cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
-            test_lcp.correct_map.update(cmap)
+        # Now we queue the LCP
+        cmap = CorrectMap()
+        for i, answer_id in enumerate(answer_ids):
+            queuestate = CodeResponseTest.make_queuestate(i, datetime.now())
+            cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+        self.problem.correct_map.update(cmap)
 
-            self.assertEquals(test_lcp.is_queued(), True)
+        self.assertEquals(self.problem.is_queued(), True)
 
 
     def test_update_score(self):
         '''
         Test whether LoncapaProblem.update_score can deliver queued result to the right subproblem
         '''
-        problem_file = os.path.join(os.path.dirname(__file__), "test_files/coderesponse.xml")
-        with open(problem_file) as input_file:
-            test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=test_system)
+        answer_ids = sorted(self.problem.get_question_answers())
 
-            answer_ids = sorted(test_lcp.get_question_answers())
+        # CodeResponse requires internal CorrectMap state. Build it now in the queued state
+        old_cmap = CorrectMap()
+        for i, answer_id in enumerate(answer_ids):
+            queuekey = 1000 + i
+            queuestate = CodeResponseTest.make_queuestate(1000 + i, datetime.now())
+            old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
 
-            # CodeResponse requires internal CorrectMap state. Build it now in the queued state
-            old_cmap = CorrectMap()
+        # Message format common to external graders
+        grader_msg = '<span>MESSAGE</span>'   # Must be valid XML
+        correct_score_msg = json.dumps({'correct': True, 'score': 1, 'msg': grader_msg})
+        incorrect_score_msg = json.dumps({'correct': False, 'score': 0, 'msg': grader_msg})
+
+        xserver_msgs = {'correct': correct_score_msg,
+                        'incorrect': incorrect_score_msg, }
+
+        # Incorrect queuekey, state should not be updated
+        for correctness in ['correct', 'incorrect']:
+            self.problem.correct_map = CorrectMap()
+            self.problem.correct_map.update(old_cmap)  # Deep copy
+
+            self.problem.update_score(xserver_msgs[correctness], queuekey=0)
+            self.assertEquals(self.problem.correct_map.get_dict(), old_cmap.get_dict())  # Deep comparison
+
+            for answer_id in answer_ids:
+                self.assertTrue(self.problem.correct_map.is_queued(answer_id))  # Should be still queued, since message undelivered
+
+        # Correct queuekey, state should be updated
+        for correctness in ['correct', 'incorrect']:
             for i, answer_id in enumerate(answer_ids):
-                queuekey = 1000 + i
-                queuestate = CodeResponseTest.make_queuestate(1000 + i, datetime.now())
-                old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+                self.problem.correct_map = CorrectMap()
+                self.problem.correct_map.update(old_cmap)
 
-            # Message format common to external graders
-            grader_msg = '<span>MESSAGE</span>'   # Must be valid XML
-            correct_score_msg = json.dumps({'correct': True, 'score': 1, 'msg': grader_msg})
-            incorrect_score_msg = json.dumps({'correct': False, 'score': 0, 'msg': grader_msg})
+                new_cmap = CorrectMap()
+                new_cmap.update(old_cmap)
+                npoints = 1 if correctness == 'correct' else 0
+                new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None)
 
-            xserver_msgs = {'correct': correct_score_msg,
-                            'incorrect': incorrect_score_msg, }
+                self.problem.update_score(xserver_msgs[correctness], queuekey=1000 + i)
+                self.assertEquals(self.problem.correct_map.get_dict(), new_cmap.get_dict())
 
-            # Incorrect queuekey, state should not be updated
-            for correctness in ['correct', 'incorrect']:
-                test_lcp.correct_map = CorrectMap()
-                test_lcp.correct_map.update(old_cmap)  # Deep copy
-
-                test_lcp.update_score(xserver_msgs[correctness], queuekey=0)
-                self.assertEquals(test_lcp.correct_map.get_dict(), old_cmap.get_dict())  # Deep comparison
-
-                for answer_id in answer_ids:
-                    self.assertTrue(test_lcp.correct_map.is_queued(answer_id))  # Should be still queued, since message undelivered
-
-            # Correct queuekey, state should be updated
-            for correctness in ['correct', 'incorrect']:
-                for i, answer_id in enumerate(answer_ids):
-                    test_lcp.correct_map = CorrectMap()
-                    test_lcp.correct_map.update(old_cmap)
-
-                    new_cmap = CorrectMap()
-                    new_cmap.update(old_cmap)
-                    npoints = 1 if correctness == 'correct' else 0
-                    new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None)
-
-                    test_lcp.update_score(xserver_msgs[correctness], queuekey=1000 + i)
-                    self.assertEquals(test_lcp.correct_map.get_dict(), new_cmap.get_dict())
-
-                    for j, test_id in enumerate(answer_ids):
-                        if j == i:
-                            self.assertFalse(test_lcp.correct_map.is_queued(test_id))  # Should be dequeued, message delivered
-                        else:
-                            self.assertTrue(test_lcp.correct_map.is_queued(test_id))  # Should be queued, message undelivered
+                for j, test_id in enumerate(answer_ids):
+                    if j == i:
+                        self.assertFalse(self.problem.correct_map.is_queued(test_id))  # Should be dequeued, message delivered
+                    else:
+                        self.assertTrue(self.problem.correct_map.is_queued(test_id))  # Should be queued, message undelivered
 
 
     def test_recentmost_queuetime(self):
         '''
         Test whether the LoncapaProblem knows about the time of queue requests
         '''
-        problem_file = os.path.join(os.path.dirname(__file__), "test_files/coderesponse.xml")
-        with open(problem_file) as input_file:
-            test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=test_system)
+        answer_ids = sorted(self.problem.get_question_answers())
 
-            answer_ids = sorted(test_lcp.get_question_answers())
+        # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
+        cmap = CorrectMap()
+        for answer_id in answer_ids:
+            cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
+        self.problem.correct_map.update(cmap)
 
-            # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
-            cmap = CorrectMap()
-            for answer_id in answer_ids:
-                cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
-            test_lcp.correct_map.update(cmap)
+        self.assertEquals(self.problem.get_recentmost_queuetime(), None)
 
-            self.assertEquals(test_lcp.get_recentmost_queuetime(), None)
+        # CodeResponse requires internal CorrectMap state. Build it now in the queued state
+        cmap = CorrectMap()
+        for i, answer_id in enumerate(answer_ids):
+            queuekey = 1000 + i
+            latest_timestamp = datetime.now()
+            queuestate = CodeResponseTest.make_queuestate(1000 + i, latest_timestamp)
+            cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
+        self.problem.correct_map.update(cmap)
 
-            # CodeResponse requires internal CorrectMap state. Build it now in the queued state
-            cmap = CorrectMap()
-            for i, answer_id in enumerate(answer_ids):
-                queuekey = 1000 + i
-                latest_timestamp = datetime.now()
-                queuestate = CodeResponseTest.make_queuestate(1000 + i, latest_timestamp)
-                cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
-            test_lcp.correct_map.update(cmap)
+        # Queue state only tracks up to second
+        latest_timestamp = datetime.strptime(datetime.strftime(latest_timestamp, dateformat), dateformat)
 
-            # Queue state only tracks up to second
-            latest_timestamp = datetime.strptime(datetime.strftime(latest_timestamp, dateformat), dateformat)
+        self.assertEquals(self.problem.get_recentmost_queuetime(), latest_timestamp)
 
-            self.assertEquals(test_lcp.get_recentmost_queuetime(), latest_timestamp)
-
-        def test_convert_files_to_filenames(self):
-            '''
-            Test whether file objects are converted to filenames without altering other structures
-            '''
-            problem_file = os.path.join(os.path.dirname(__file__), "test_files/coderesponse.xml")
-            with open(problem_file) as fp:
-                answers_with_file = {'1_2_1': 'String-based answer',
-                                     '1_3_1': ['answer1', 'answer2', 'answer3'],
-                                     '1_4_1': [fp, fp]}
-                answers_converted = convert_files_to_filenames(answers_with_file)
-                self.assertEquals(answers_converted['1_2_1'], 'String-based answer')
-                self.assertEquals(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
-                self.assertEquals(answers_converted['1_4_1'], [fp.name, fp.name])
-
+    def test_convert_files_to_filenames(self):
+        '''
+        Test whether file objects are converted to filenames without altering other structures
+        '''
+        problem_file = os.path.join(os.path.dirname(__file__), "test_files/filename_convert_test.txt")
+        with open(problem_file) as fp:
+            answers_with_file = {'1_2_1': 'String-based answer',
+                                 '1_3_1': ['answer1', 'answer2', 'answer3'],
+                                 '1_4_1': [fp, fp]}
+            answers_converted = convert_files_to_filenames(answers_with_file)
+            self.assertEquals(answers_converted['1_2_1'], 'String-based answer')
+            self.assertEquals(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
+            self.assertEquals(answers_converted['1_4_1'], [fp.name, fp.name])
 
 class ChoiceResponseTest(ResponseTest):
     from response_xml_factory import ChoiceResponseXMLFactory
