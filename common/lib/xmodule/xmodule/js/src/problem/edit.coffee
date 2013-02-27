@@ -231,13 +231,14 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // replace string and numerical
       xml = xml.replace(/^\=\s*(.*?$)/gm, function(match, p) {
         var string;
-        var params = /(.*?)\+\-\s*(.*?$)/.exec(p);
-        if(parseFloat(p)) {
+        var floatValue = parseFloat(p);
+        if(!isNaN(floatValue)) {
+          var params = /(.*?)\+\-\s*(.*?$)/.exec(p);
           if(params) {
-            string = '<numericalresponse answer="' + params[1] + '">\n';
+            string = '<numericalresponse answer="' + floatValue + '">\n';
             string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
           } else {
-            string = '<numericalresponse answer="' + p + '">\n';
+            string = '<numericalresponse answer="' + floatValue + '">\n';
           }
           string += '  <textline />\n';
           string += '</numericalresponse>\n\n';
