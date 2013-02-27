@@ -19,6 +19,50 @@
 
 // ====================
 
+// notifications slide up
+@mixin notificationsSlideUp {
+  0% {
+    @include transform(translateY(0));
+  }
+
+  90% {
+    @include transform(translateY(-($notification-height)));
+  }
+
+  100% {
+    @include transform(translateY(-($notification-height*0.99)));
+  }
+}
+
+@-moz-keyframes notificationsSlideUp { @include notificationsSlideUp(); }
+@-webkit-keyframes notificationsSlideUp { @include notificationsSlideUp(); }
+@-o-keyframes notificationsSlideUp { @include notificationsSlideUp(); }
+@keyframes notificationsSlideUp { @include notificationsSlideUp();}
+
+// ====================
+
+// notifications slide up
+@mixin notificationsSlideUpDown {
+  0%, 100% { 
+    @include transform(translateY(0));
+  }
+
+  15%, 85% {
+    @include transform(translateY(-($notification-height)));
+  }
+
+  20%, 80% {
+    @include transform(translateY(-($notification-height*0.99)));
+  }
+}
+
+@-moz-keyframes notificationsSlideUpDown { @include notificationsSlideUpDown(); }
+@-webkit-keyframes notificationsSlideUpDown { @include notificationsSlideUpDown(); }
+@-o-keyframes notificationsSlideUpDown { @include notificationsSlideUpDown(); }
+@keyframes notificationsSlideUpDown { @include notificationsSlideUpDown();}
+
+// ====================
+
 // bounce in
 @mixin bounce-in {
   0% {

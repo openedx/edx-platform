@@ -250,8 +250,8 @@
           <li><a href="#alert-removed" class="test-alert">Toggle Previous View/Action Removed Alert</a></li>
           <li><a href="#alert-system-error" class="test-alert">Toggle System Error Alert</a></li>
           <li><a href="#alert-user-error" class="test-alert">Toggle User Error Alert</a></li>
-          <li><a href="#alert-announcement1" class="test-alert">Toggle Announcement Alert</a></li>
-          <li><a href="#alert-announcement2" class="test-alert">Toggle Announcement with Actions Alert</a></li>
+          <li><a href="#alert-announcement2" class="test-alert">Toggle Announcement Alert</a></li>
+          <li><a href="#alert-announcement1" class="test-alert">Toggle Announcement with Actions Alert</a></li>
           <li><a href="#alert-activation" class="test-alert">Toggle Activiation Alert</a></li>
         </ul>
       </section>
@@ -270,6 +270,7 @@
           <li><a href="#notification-change" class="test-notification">Toggle Change Warning Notification</a></li>
           <li><a href="#notification-version" class="test-notification">Toggle New Version Warning Notification</a></li>
           <li><a href="#notification-dangerous" class="test-notification">Toggle Editing Warning Notification</a></li>
+          <li><a href="#notification-confirmation" class="test-notification">Toggle Confirmation Notification</a></li>
           <li><a href="#notification-saving" class="test-notification">Toggle Saving Notification</a></li>
           <li><a href="#notification-help" class="test-notification">Toggle Help Notification</a></li>
         </ul>
@@ -356,13 +357,23 @@
 </div>
 
 <!-- notification: status - saving -->
-<div class="wrapper wrapper-notification wrapper-notification-status" id="notification-saving">
+<div class="wrapper wrapper-notification wrapper-notification-status wrapper-notification-saving" id="notification-saving">
   <div class="notification saving">
     <i class="ss-icon ss-symbolicons-block icon icon-saving">&#x2699;</i>
     
     <div class="copy">
-      <h2 class="title title-3">Saving</h2>
-      <p>Hamster wheels are turning pretty fast right now. Hang on! Saving will be done soon.</p>
+      <h2 class="title title-3">Saving &hellip;</h2>
+    </div>
+  </div>
+</div>
+
+<!-- notification: status- confirmed -->
+<div class="wrapper wrapper-notification wrapper-notification-confirmation is-fleeting" id="notification-confirmation">
+  <div class="notification confirmation">
+    <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+    
+    <div class="copy">
+      <h2 class="title title-3"><a href="#">Your Section</a> Has Been Created</h2>
     </div>
   </div>
 </div>

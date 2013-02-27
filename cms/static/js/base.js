@@ -50,20 +50,17 @@ $(document).ready(function () {
     });
 
     // alert and notifications - manual close
-    $('.action-alert-close').click(function(e) {
+    $('.action-alert-close, .alert.has-actions .nav-actions a').click(function(e) {
         (e).preventDefault();
         console.log('closing alert');
         $(this).closest('.wrapper-alert').removeClass('is-shown');
     });
 
-    // alert and notifications - manual close
-    $('.action-notification-close').click(function(e) {
+    // alert and notifications - manual & action-based close
+    $('.action-notification-close, .notification.has-actions .nav-actions a').click(function(e) {
         (e).preventDefault();
         $(this).closest('.wrapper-notification').removeClass('is-shown');
     });
-
-
-
 
     // nav - dropdown related
     $body.click(function (e) {

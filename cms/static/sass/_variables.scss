@@ -136,6 +136,10 @@ $shadow-l1: rgba(0,0,0,0.1);
 $shadow-l2: rgba(0,0,0,0.05);
 $shadow-d1: rgba(0,0,0,0.4);
 
+
+// specific UI
+$notification-height: ($baseline*10);
+
 // colors - inherited 
 $baseFontColor: #3c3c3c;
 $offBlack: #3c3c3c;

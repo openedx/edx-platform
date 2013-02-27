@@ -5,10 +5,9 @@
 .wrapper-notification {
   @include clearfix();
   @include box-sizing(border-box);
-  transition: bottom 1.0s ease-in-out 0.125s;
-  -webkit-transition: bottom 1.0s ease-in-out 0.125s;
   @include box-shadow(0 -1px 3px $shadow);
   position: fixed;
+  bottom: 0;
   z-index: 1000;
   width: 100%;
   border-top: 4px solid $gray-l1;
@@ -31,7 +30,7 @@
     }
   }
 
-  &.wrapper-notification-error {
+  &.wrapper-cation-error {
     border-top-color: $red-l1;
 
     .icon-error {
@@ -50,24 +49,31 @@
   &.wrapper-notification-confirmation {
     border-top-color: $green;
 
-    .icon-error {
+    .icon-confirmation {
       color: $green;
     }
 
     &:hover {
       border-top-color: $green-s1;
 
-      .icon-error {
+      .icon-confirmation {
         color: $green-s1;
       }
     }
   }
 
+  &.wrapper-notification-saving {
+    border-top-color: $pink;
+
+    &:hover {
+      border-top-color: $pink-s1;
+    }
+  } 
+
   // shorter/status notifications
   &.wrapper-notification-status {
-    width: ($baseline*6);
+    width: ($baseline*8);
     right: ($baseline);
-    border-top-color: $pink;
     padding: ($baseline/2) $baseline;
 
     .notification {
@@ -77,25 +83,26 @@
       max-width: none;
       min-width: none;
 
+      .icon, .copy {
+        float: none;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
       .icon {
         width: $baseline;
+        height: ($baseline*1.25);
         margin-right: ($baseline*0.75);
+        line-height: 3rem;
       }
 
       .copy {
-        width: ($baseline*9);
 
-        p {
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          width: 100%;
-        }
       }
-    }    
+    } 
   }
 
-  // shorter/status notifications
+  // help notifications
   &.wrapper-notification-help {
     width: ($baseline*14);
     right: ($baseline);
@@ -138,12 +145,15 @@
 
   .icon, .copy {
     float: left;
+    display: inline-block;
+    vertical-align: middle;
   }
 
   .icon {
     @include transition (color 0.5s ease-in-out);
     @include font-size(22);
     width: flex-grid(1, 12);
+    height: ($baseline*1.25);
     margin-right: flex-gutter();
     text-align: right;
     color: $white;
@@ -165,9 +175,9 @@
   .action-notification-close {
     @include border-top-radius(3px);
     position: absolute;
-    top: -31px;
+    top: -34px;
     right: $baseline;
-    padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
+    padding: ($baseline/5) ($baseline/2.5) 0 ($baseline/2.5);
     background: $gray-l1;
     text-align: center;
 
@@ -278,6 +288,10 @@
 
   &.confirmation {
 
+    .copy {
+      margin-top: ($baseline/5);
+    }
+
     .action-notification-close {
       background: $green;
 
@@ -323,8 +337,6 @@
     .icon-saving {
       @include animation(rotateClockwise 3.0s forwards linear infinite);
       width: 22px;
-      height: 25px;
-      line-height: 3rem !important;
     }
 
     .copy p {
@@ -619,12 +631,14 @@
   }
 
   .wrapper-notification {
-    bottom: -1000px;
-    opacity: 0;
+    bottom: -($notification-height);
 
     &.is-shown {
-      bottom: 0;
-      opacity: 1.0;
+      @include animation(notificationsSlideUp 2s forwards ease-in-out 1);
+    }
+
+    &.is-fleeting.is-shown {
+      @include animation(notificationsSlideUpDown 6s forwards ease-in-out 1);
     }
   }
 }
