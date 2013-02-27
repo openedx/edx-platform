@@ -1,7 +1,13 @@
 <form class="annotation-input">
 <div class="script_placeholder" data-src="/static/js/capa/annotationinput.js"/>
 
-<div class="annotation-header">${title}</div>
+<div class="annotation-header">
+    ${title}
+
+    % if return_to_annotation:
+        <a class="annotation-return" href="javascript:void(0)">Return to Annotation</a><br/>
+    % endif
+</div>
 <div class="annotation-body">
 
     <div class="block block-highlight">${text}</div>
@@ -32,7 +38,7 @@
         <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
     % endif
 
-    <span id="answer_${id}"></span>
+    <p id="answer_${id}" class="answer answer-annotation"></p>
 
     % if status == 'unsubmitted':
     <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
@@ -46,9 +52,6 @@
     <span class="incorrect" id="status_${id}"></span>
     % endif
 
-    % if return_to_annotation:
-        <a class="annotation-return" href="javascript:void(0)">Return to Annotation</a><br/>
-    % endif
 </div>
 </form>
 

@@ -816,8 +816,12 @@ section.problem {
       padding: .5em 1em;
     }
     .annotation-body { padding: .5em 1em; }
-    .annotation-return { float: right; }
-    .annotation-return:after { content: " \2191" }
+    a.annotation-return {
+      float: right;
+      font: inherit;
+      font-weight: normal;
+    }
+    a.annotation-return:after { content: " \2191" }
 
     .block, ul.tags {
       margin: .5em 0;
@@ -851,6 +855,9 @@ section.problem {
       }
     }
     textarea.comment { width: 100%; }
+    .answer-annotation { display: block; margin: 0; }
+
+    /* for debugging the input value field. enable the debug flag on the inputtype */
     .debug-value {
         color: #fff;
         padding: 1em;
