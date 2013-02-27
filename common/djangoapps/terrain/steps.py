@@ -1,8 +1,6 @@
 from lettuce import world, step
 from factories import *
-from django.core.management import call_command
 from lettuce.django import django_url
-from django.conf import settings
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from urllib import quote_plus
@@ -19,6 +17,11 @@ logger = getLogger(__name__)
 @step(u'I wait (?:for )?"(\d+)" seconds?$')
 def wait(step, seconds):
     time.sleep(float(seconds))
+
+
+@step('I reload the page$')
+def reload_the_page(step):
+    world.browser.reload()
 
 
 @step('I (?:visit|access|open) the homepage$')
@@ -104,6 +107,11 @@ def i_am_an_edx_user(step):
     create_user('robot')
 
 #### helper functions
+
+@world.absorb
+def scroll_to_bottom():
+    # Maximize the browser
+    world.browser.execute_script("window.scrollTo(0, screen.height);")
 
 
 @world.absorb
