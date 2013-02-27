@@ -4,7 +4,47 @@ class @Rubric
   @initialize: (location) ->
     $('.rubric').data("location", location) 
     $('input[class="score-selection"]').change @tracking_callback
+    # set up the hotkeys
+    $(window).unbind('keydown', @keypress_callback)
+    $(window).keydown @keypress_callback
+    # display the 'current' carat
+    @categories = $('.rubric-category')
+    @category = $(@categories.first())
+    @category.prepend('> ')
+    @category_index = 0
+    
+    
+  @keypress_callback: (event) =>
+    # don't try to do this when user is typing in a text input
+    if $(event.target).is('input, textarea')
+      return
+    # for when we select via top row
+    if event.which >= 48 and event.which <= 57
+      selected = event.which - 48
+    # for when we select via numpad
+    else if event.which >= 96 and event.which <= 105
+      selected = event.which - 96
+    # we don't want to do anything since we haven't pressed a number
+    else
+      return
 
+    # if we actually have a current category (not past the end)
+    if(@category_index <= @categories.length)
+      # find the valid selections for this category
+      inputs = $("input[name='score-selection-#{@category_index}']")
+      max_score = inputs.length - 1
+
+      if selected > max_score or selected < 0
+        return
+      inputs.filter("input[value=#{selected}]").click()
+
+      # move to the next category
+      old_category_text = @category.html().substring(5)
+      @category.html(old_category_text)
+      @category_index++
+      @category = $(@categories[@category_index])
+      @category.prepend('> ')
+    
   @tracking_callback: (event) ->
     target_selection = $(event.target).val()
     # chop off the beginning of the name so that we can get the number of the category
@@ -49,6 +89,7 @@ class @CombinedOpenEnded
   constructor: (element) ->
     @element=element
     @reinitialize(element)
+    $(window).keydown @keydown_handler
 
   reinitialize: (element) ->
     @wrapper=$(element).find('section.xmodule_CombinedOpenEndedModule')
@@ -306,6 +347,7 @@ class @CombinedOpenEnded
           if response.success
             @rubric_wrapper.html(response.rubric_html)
             @rubric_wrapper.show()
+            Rubric.initialize(@location)
             @answer_area.html(response.student_response)
             @child_state = 'assessing'
             @find_assessment_elements()
@@ -317,6 +359,11 @@ class @CombinedOpenEnded
 
     else
       @errors_area.html(@out_of_sync_message)
+
+  keydown_handler: (e) =>
+    # only do anything when the key pressed is the 'enter' key
+    if e.which == 13 && @child_state == 'assessing' && Rubric.check_complete()
+      @save_assessment(e)
 
   save_assessment: (event) =>
     event.preventDefault()

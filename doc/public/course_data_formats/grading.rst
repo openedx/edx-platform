@@ -1,5 +1,6 @@
-# Course Grading
-
+##############
+Course Grading
+##############
 This document is written to help professors understand how a final grade for a
 course is computed.
 
@@ -8,42 +9,46 @@ in a course and generating a final score (and corresponding letter grade). This
 grading process can be split into two phases - totaling sections and section 
 weighting.
 
-## Totaling sections
-
+*****************
+Totaling sections
+*****************
 The process of totaling sections is to get a percentage score (between 0.0 and
 1.0) for every section in the course. A section is any module that is a direct
 child of a chapter. For example, psets, labs, and sequences are all common
 sections. Only the *percentage* on the section will be available to compute the
 final grade, *not* the final number of points earned / possible.
 
-
-**For a section to be included in the final grade, the policies file must set
-graded = True for the section.**
+.. important::
+  For a section to be included in the final grade, the policies file must set
+  `graded = True` for the section.
 
 For each section, the grading function retrieves all problems within the
 section. The section percentage is computed as (total points earned) / (total
 points possible).
 
-
-### Weighting Problems
+******************
+Weighting Problems
+******************
 In some cases, one might want to give weights to problems within a section. For
-example, a final exam might contain 4 questions each worth 1 point by default.
+example, a final exam might contain four questions each worth 1 point by default.
 This means each question would by default have the same weight. If one wanted
 the first problem to be worth 50% of the final exam, the policy file could specify
-weights of 30, 10, 10, and 10 to the 4 problems, respectively.
+weights of 30, 10, 10, and 10 to the four problems, respectively.
 
-Note that the default weight of a problem **is not 1.** The default weight of a
-problem is the module's max_grade.
+Note that the default weight of a problem **is not 1**. The default weight of a
+problem is the module's `max_grade`.
 
 If weighting is set, each problem is worth the number of points assigned, regardless of the number of responses it contains.
 
 Consider a Homework section that contains two problems.
 
+.. code-block:: xml
+
     <problem display_name=”Problem 1”>
       <numericalresponse> ... </numericalreponse>
     </problem>
 
-and
+.. code-block:: xml
 
     <problem display_name=”Problem 2”>
       <numericalresponse> ... </numericalreponse>
@@ -51,41 +56,40 @@ and
       <numericalresponse> ... </numericalreponse>
     </problem>
 
-
-
-
-
 Without weighting, Problem 1 is worth 25% of the assignment, and Problem 2 is worth 75% of the assignment.
 
 Weighting for the problems can be set in the policy.json file.
 
+.. code-block:: json
+
     "problem/problem1": {
-       "weight": 2
-       },
+      "weight": 2
+    },
     "problem/problem2": {
-       "weight": 2
-        },
+      "weight": 2
+    },
 
 With the above weighting, Problems 1 and 2 are each worth 50% of the assignment.
 
-Please note: When problems have weight, the point value is automatically included in the display name *except* when “weight”: 1.When “weight”: 1, no visual change occurs in the display name, leaving the point value open to interpretation to the student.
+Please note: When problems have weight, the point value is automatically included in the display name *except* when `"weight": 1`. When the weight is 1, no visual change occurs in the display name, leaving the point value open to interpretation to the student.
 
 
-
-## Section Weighting
-
+******************
+Weighting Sections
+******************
 Once each section has a percentage score, we must total those sections into a
 final grade. Of course, not every section has equal weight in the final grade.
 The policies for weighting sections into a final grade are specified in the
 grading_policy.json file.
 
-The grading_policy.json file specifies several sub-graders that are each given
+The `grading_policy.json` file specifies several sub-graders that are each given
 a weight and factored into the final grade. There are currently two types of
 sub-graders, section format graders and single section graders.
 
 We will use this simple example of a grader with one section format grader and
 one single section grader.
 
+.. code-block:: json
 
     "GRADER" : [
         {
@@ -103,13 +107,14 @@ one single section grader.
         }
     ]
 
-### Section Format Graders
-
+Section Format Graders
+======================
 A section format grader grades a set of sections with the same format, as
 defined in the course policy file. To make a vertical named Homework1 be graded
 by the Homework section format grader, the following definition would be in the
 course policy file.
 
+.. code-block:: json
 
     "vertical/Homework1": {
         "display_name": "Homework 1", 
@@ -132,25 +137,26 @@ A section format grader will also show the average of that section in the grade
 breakdown (shown on the Progress page, gradebook, etc.).
 
 
-### Single Section Graders
-
+Single Section Graders
+======================
 A single section grader grades exactly that - a single section. If a section
 is found with a matching format and display name then the score of that section
 is used. If not, a score of 0% is assumed.
 
 
-### Combining sub-graders
-
+Combining sub-graders
+=====================
 The final grade is computed by taking the score and weight of each sub grader.
 In the above example, homework will be 40% of the final grade. The final exam
 will be 60% of the final grade.
 
-## Displaying the final grade
-
+**************************
+Displaying the final grade
+**************************
 The final grade is then rounded up to the nearest percentage point. This is so
 the system can consistently display a percentage without worrying whether the
 displayed percentage has been rounded up or down (potentially misleading the
-student). The formula for the rounding is
+student). The formula for the rounding is::
 
     rounded_percent = round(computed_percent * 100 + 0.05) / 100
 

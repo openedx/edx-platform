@@ -4,13 +4,6 @@ from common import *
 ############### ACTIONS ####################
 
 
-@step('I have opened a new course in Studio$')
-def i_have_opened_a_new_course(step):
-    clear_courses()
-    log_into_studio()
-    create_a_course()
-
-
 @step('I click the new section link$')
 def i_click_new_section_link(step):
     link_css = 'a.new-courseware-section-button'
@@ -45,6 +38,7 @@ def i_save_a_new_section_release_date(step):
     css_click(time_css)
     css_fill(time_css, '12:00am')
     css_click('a.save-button')
+
 
 ############ ASSERTIONS ###################
 

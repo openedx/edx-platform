@@ -102,6 +102,7 @@ div.book-wrapper {
           position: absolute;
           height: 100%;
           width: flex-grid(2, 8);
+          z-index: 1;
 
           a {
             background-color: rgba(#000, .7);

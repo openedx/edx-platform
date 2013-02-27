@@ -195,7 +195,7 @@ def instructor_dashboard(request, course_id):
         track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
 
-    elif "Reset student's attempts" in action:
+    elif "Reset student's attempts" in action or "Delete student state for problem" in action:
         # get the form data
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
         problem_to_reset = request.POST.get('problem_to_reset', '')
@@ -226,28 +226,36 @@ def instructor_dashboard(request, course_id):
             except Exception as e:
                 msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
 
-        # modify the problem's state
-        try:
-            # load the state json
-            problem_state = json.loads(module_to_reset.state)
-            old_number_of_attempts = problem_state["attempts"]
-            problem_state["attempts"] = 0
+        if "Delete student state for problem" in action:
+            # delete the state
+            try:
+                module_to_reset.delete()
+                msg += "<font color='red'>Deleted student module state for %s!</font>" % module_state_key
+            except:
+                msg += "Failed to delete module state for %s/%s" % (unique_student_identifier, problem_to_reset)
+        else:
+            # modify the problem's state
+            try:
+                # load the state json
+                problem_state = json.loads(module_to_reset.state)
+                old_number_of_attempts = problem_state["attempts"]
+                problem_state["attempts"] = 0
 
-            # save
-            module_to_reset.state = json.dumps(problem_state)
-            module_to_reset.save()
-            track.views.server_track(request,
-                                    '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
-                                        old_attempts=old_number_of_attempts,
-                                        student=student_to_reset,
-                                        problem=module_to_reset.module_state_key,
-                                        instructor=request.user,
-                                        course=course_id),
-                                    {},
-                                    page='idashboard')
-            msg += "<font color='green'>Module state successfully reset!</font>"
-        except:
-            msg += "<font color='red'>Couldn't reset module state.  </font>"
+                # save
+                module_to_reset.state = json.dumps(problem_state)
+                module_to_reset.save()
+                track.views.server_track(request,
+                                        '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
+                                            old_attempts=old_number_of_attempts,
+                                            student=student_to_reset,
+                                            problem=module_to_reset.module_state_key,
+                                            instructor=request.user,
+                                            course=course_id),
+                                        {},
+                                        page='idashboard')
+                msg += "<font color='green'>Module state successfully reset!</font>"
+            except:
+                msg += "<font color='red'>Couldn't reset module state.  </font>"
 
 
     elif "Get link to student's progress page" in action:
