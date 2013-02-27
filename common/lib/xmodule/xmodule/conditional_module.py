@@ -49,8 +49,6 @@ class ConditionalModule(XModule):
     js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    contents = String(scope=Scope.content)
-
     # Map
     # key: <tag attribute in xml>
     # value: <name of module attribute>
@@ -60,6 +58,10 @@ class ConditionalModule(XModule):
         'attempted': 'is_attempted',  # capa_problem attr
         'voted': 'voted'  # poll_question attr
     }
+
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
+        self.contents = None
 
     def _get_condition(self):
         # Get first valid condition.
