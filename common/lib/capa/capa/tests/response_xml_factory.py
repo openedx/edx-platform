@@ -666,11 +666,3 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
-
-
-class SymbolicResponseXMLFactory(ResponseXMLFactory):
-    def create_response_element(self, **kwargs):
-        raise NotImplemented
-
-    def create_input_element(self, **kwargs):
-        raise NotImplemented
