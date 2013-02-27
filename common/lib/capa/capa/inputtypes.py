@@ -988,27 +988,25 @@ class AnnotationInput(InputTypeBase):
             self.value = 'null'
 
     def _find_options(self):
-        options = []
-        index = 0
-        for option in self.xml.findall('./options/option'):
-            options.append({
+        ''' Returns an array of dicts where each dict represents an option. '''
+        elements = self.xml.findall('./options/option')
+        return [{
                 'id': index,
                 'description': option.text,
-                'score': option.get('score', 0)
-            })
-            index += 1
-        return options
+                'choice': option.get('choice')
+            } for (index, option) in enumerate(elements) ]
 
-    def _unpack_value(self):
-        unpacked_value = json.loads(self.value)
-        if type(unpacked_value) != dict:
-            unpacked_value = {}
+    def _unpack(self, json_value):
+        ''' Unpacks the json input state into a dict. '''
+        d = json.loads(json_value)
+        if type(d) != dict:
+            d = {}
 
-        comment_value = unpacked_value.get('comment', '')
+        comment_value = d.get('comment', '')
         if not isinstance(comment_value, basestring):
             comment_value = ''
 
-        options_value = unpacked_value.get('options', [])
+        options_value = d.get('options', [])
         if not isinstance(options_value, list):
             options_value = []
 
@@ -1027,9 +1025,9 @@ class AnnotationInput(InputTypeBase):
                 'options': self.options,
                 'return_to_annotation': self.return_to_annotation,
                 'debug': self.debug
-         }
-        unpacked_value = self._unpack_value()
-        extra_context.update(unpacked_value)
+        }
+
+        extra_context.update(self._unpack(self.value))
 
         return extra_context
 

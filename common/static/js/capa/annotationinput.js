@@ -1,12 +1,15 @@
 (function () {
-    var debug = true;
+    var debug = false;
 
     var module = {
         debug: debug,
         inputSelector: '.annotation-input',
         tagSelector: '.tag',
+        tagsSelector: '.tags',
         commentSelector: 'textarea.comment',
         valueSelector: 'input.value', // stash tag selections and comment here as a JSON string...
+
+        singleSelect: true,
 
         init: function() {
             var that = this;
@@ -38,15 +41,30 @@
             target_value = $(e.target).data('id');
 
             if(!$(target_el).hasClass('selected')) {
-                current_value.options.push(target_value);
+                if(this.singleSelect) {
+                    current_value.options = [target_value]
+                } else {
+                    current_value.options.push(target_value);
+                }
             } else {
-                target_index = current_value.options.indexOf(target_value);
-                if(target_index !== -1) {
-                    current_value.options.splice(target_index, 1);
+                if(this.singleSelect) {
+                    current_value.options = []
+                } else {
+                    target_index = current_value.options.indexOf(target_value);
+                    if(target_index !== -1) {
+                        current_value.options.splice(target_index, 1);
+                    }
                 }
             }
 
             this.storeValue(value_el, current_value);
+
+            if(this.singleSelect) {
+                $(target_el).closest(this.tagsSelector)
+                    .find(this.tagSelector)
+                    .not(target_el)
+                    .removeClass('selected')
+            } 
             $(target_el).toggleClass('selected');
         },
         findValueEl: function(target_el) {

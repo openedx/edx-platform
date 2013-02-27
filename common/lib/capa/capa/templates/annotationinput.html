@@ -24,7 +24,7 @@
     % if debug:
     <div class="debug-value">
         Rendered with value:<br/>
-        <pre>${value}</pre>
+        <pre>${value|h}</pre>
         Current input value:<br/>
         <input type="text" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
     </div>
@@ -38,6 +38,8 @@
     <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
     % elif status == 'correct':
     <span class="correct" id="status_${id}"></span>
+    % elif status == 'partial':
+    <span class="partially_correct" id="status_${id}">Partially Correct</span>
     % elif status == 'incorrect':
     <span class="incorrect" id="status_${id}"></span>
     % elif status == 'incomplete':
