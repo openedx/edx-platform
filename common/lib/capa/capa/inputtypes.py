@@ -960,7 +960,7 @@ class AnnotationInput(InputTypeBase):
             <options>
                 <option choice="correct">ate - both a cause and an effect</option>
                 <option choice="incorrect">ate - a cause</option>
-                <option choice="partial">ate - an effect</option>
+                <option choice="partially-correct">ate - an effect</option>
             </options>
         </annotationinput>
 
