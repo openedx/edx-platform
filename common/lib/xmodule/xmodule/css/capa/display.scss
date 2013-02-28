@@ -40,7 +40,7 @@ section.problem {
     @include clearfix;
 
     label.choicegroup_correct{
-      text:after{
+      &:after{
         content: url('../images/correct-icon.png');
       }
     }
