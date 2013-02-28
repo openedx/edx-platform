@@ -20,12 +20,14 @@
     <ul class="tags">
     % for option in options:
         <li>
-            % if all([c == 'correct' for c in option['choice'], status]):
-            <span class="tag-status correct" id="status_${id}"></span>
-            % elif all([c == 'partially-correct' for c in option['choice'], status]):
-            <span class="tag-status partially-correct" id="status_${id}"></span>
-            % elif all([c == 'incorrect' for c in option['choice'], status]):
-            <span class="tag-status incorrect" id="status_${id}"></span>
+            % if has_options_value:
+                % if all([c == 'correct' for c in option['choice'], status]):
+                <span class="tag-status correct" id="status_${id}"></span>
+                % elif all([c == 'partially-correct' for c in option['choice'], status]):
+                <span class="tag-status partially-correct" id="status_${id}"></span>
+                % elif all([c == 'incorrect' for c in option['choice'], status]):
+                <span class="tag-status incorrect" id="status_${id}"></span>
+                % endif
             % endif
 
             <span class="tag
@@ -50,14 +52,15 @@
         <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
     % endif
 
-    <p id="answer_${id}" class="answer answer-annotation"></p>
-
     % if status == 'unsubmitted':
     <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
     % elif status == 'incomplete':
     <span class="incorrect" id="status_${id}"></span>
+    % elif status == 'incorrect' and not has_options_value:
+    <span class="incorrect" id="status_${id}"></span>
     % endif
 
+    <p id="answer_${id}" class="answer answer-annotation"></p>
 </div>
 </form>
 

@@ -1025,7 +1025,8 @@ class AnnotationInput(InputTypeBase):
 
         return {
             'options_value': options_value,
-            'comment_value': comment_value
+            'has_options_value': len(options_value) > 0, # for convenience
+            'comment_value': comment_value,
         }
 
     def _extra_context(self):
