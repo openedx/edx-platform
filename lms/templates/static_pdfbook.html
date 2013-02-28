@@ -90,41 +90,40 @@
           </div>
         </div>
 
-%if 'chapters' in textbook:
-    <section aria-label="Textbook Navigation" class="book-sidebar">
+        %if 'chapters' in textbook:
+	<section aria-label="Textbook Navigation" class="book-sidebar">
+	  <ul id="booknav" class="treeview-booknav">
+	      <%def name="print_entry(entry, index_value)">
+		  <li id="pdfchapter-${index_value}">
+		    <a class="chapter">
+		      ${entry.get('title')}
+		    </a>
+		  </li>
+	      </%def>
 
-      <ul id="booknav" class="treeview-booknav">
-          <%def name="print_entry(entry, index_value)">
-              <li id="pdfchapter-${index_value}">
-                <a class="chapter">
-                  ${entry.get('title')}
-                </a>
-              </li>
-          </%def>
-
-          % for (index, entry) in enumerate(textbook['chapters']):
-            ${print_entry(entry, index+1)}
-          % endfor
-      </ul>
-    </section>
-%endif
+	      % for (index, entry) in enumerate(textbook['chapters']):
+		${print_entry(entry, index+1)}
+	      % endfor
+	  </ul>
+	</section>
+        %endif
 
         <section id="viewerContainer" class="book">
-	  <!-- use same page-turning as used in image-based textbooks -->
-          <nav>
-            <ul>
-              <li class="last">
-                <a id="previous">Previous page</a>
-              </li>
-              <li class="next">
-                <a id="next">Next page</a>
-              </li>
-            </ul>
-          </nav>
-
-          <div id="viewer" contextmenu="viewerContextMenu"></div>
-        </div>
-
+	  <section class="page">
+	    <!-- use same page-turning as used in image-based textbooks -->
+            <nav>
+              <ul>
+                <li class="last">
+                  <a id="previous">Previous page</a>
+                </li>
+                <li class="next">
+                  <a id="next">Next page</a>
+                </li>
+              </ul>
+            </nav>
+            <div id="viewer" contextmenu="viewerContextMenu"></div>
+          </section>
+        </section>
 
       </div> <!-- mainContainer -->
 

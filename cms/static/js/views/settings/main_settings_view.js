@@ -1,10 +1,10 @@
-if (!CMS.Views['Settings']) CMS.Views.Settings = {}; // ensure the pseudo pkg exists
+if (!CMS.Views['Settings']) CMS.Views.Settings = {};
 
 CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
     events : {
-        "blur input" : "updateModel",
-        "blur textarea" : "updateModel",
+        "change input" : "updateModel",
+        "change textarea" : "updateModel",
         'click .remove-course-syllabus' : "removeSyllabus",
         'click .new-course-syllabus' : 'assetSyllabus',
         'click .remove-course-introduction-video' : "removeVideo",

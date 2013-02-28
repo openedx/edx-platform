@@ -10,8 +10,8 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     errorTemplate : _.template('<span class="message-error"><%= message %></span>'),
 
     events : {
-        "blur input" : "clearValidationErrors",
-        "blur textarea" : "clearValidationErrors"
+        "change input" : "clearValidationErrors",
+        "change textarea" : "clearValidationErrors"
     },
     fieldToSelectorMap : {
         // Your subclass must populate this w/ all of the model keys and dom selectors 
