@@ -75,12 +75,15 @@ def get_course_for_item(location):
     return courses[0]
 
 
-def get_lms_link_for_item(location, preview=False):
+def get_lms_link_for_item(location, course_id=None, preview=False):
+    if course_id is None:
+        course_id = get_course_id(location)
+
     if settings.LMS_BASE is not None:
         lms_link = "//{preview}{lms_base}/courses/{course_id}/jump_to/{location}".format(
             preview='preview.' if preview else '',
             lms_base=settings.LMS_BASE,
-            course_id=get_course_id(location),
+            course_id= course_id,
             location=Location(location)
         )
     else:
