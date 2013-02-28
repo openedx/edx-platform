@@ -965,6 +965,7 @@ def sympy_check2():
         # not expecting 'unknown's
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
+        overall_message = ""
 
         # put these in the context of the check function evaluator
         # note that this doesn't help the "cfn" version - only the exec version
@@ -996,6 +997,10 @@ def sympy_check2():
             # the list of messages to be filled in by the check function
             'messages': messages,
 
+            # a message that applies to the entire response
+            # instead of a particular input
+            'overall_message': overall_message,
+
             # any options to be passed to the cfn
             'options': self.xml.get('options'),
             'testdat': 'hello world',
@@ -1010,6 +1015,7 @@ def sympy_check2():
                 exec self.code in self.context['global_context'], self.context
                 correct = self.context['correct']
                 messages = self.context['messages']
+                overall_message = self.context['overall_message']
             except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
@@ -1044,28 +1050,66 @@ def sympy_check2():
                 log.error(traceback.format_exc())
                 raise Exception("oops in customresponse (cfn) error %s" % err)
             log.debug("[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
+
             if type(ret) == dict:
-                correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
-                msg = ret['msg']
 
-                if 1:
-                    # try to clean up message html
-                    msg = '<html>' + msg + '</html>'
-                    msg = msg.replace('&#60;', '&lt;')
-                    #msg = msg.replace('&lt;','<')
-                    msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
-                                         pretty_print=True)
-                    #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
-                    msg = msg.replace('&#13;', '')
-                    #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
-                    msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
+                # One kind of dictionary the check function can return has the
+                # form {'ok': BOOLEAN, 'msg': STRING}
+                # If there are multiple inputs, they all get marked
+                # to the same correct/incorrect value
+                # and the first input stores the message
+                if 'ok' in ret:
+                    correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
+                    msg = ret['msg']
 
-                messages[0] = msg
+                    if 1:
+                        # try to clean up message html
+                        msg = '<html>' + msg + '</html>'
+                        msg = msg.replace('&#60;', '&lt;')
+                        #msg = msg.replace('&lt;','<')
+                        msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
+                                             pretty_print=True)
+                        #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
+                        msg = msg.replace('&#13;', '')
+                        #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
+                        msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
+
+                    messages[0] = msg
+
+
+                # Another kind of dictionary the check function can return has
+                # the form:
+                # {'overall_message': STRING,
+                #  'input_list': [{ 'ok': BOOLEAN, 'msg': STRING }, ...] }
+                # 
+                # This allows the function to return an 'overall message'
+                # that applies to the entire problem, as well as correct/incorrect
+                # status and messages for individual inputs
+                elif 'input_list' in ret:
+                    overall_message = ret.get('overall_message', '')
+                    input_list = ret['input_list']
+
+                    correct = []
+                    messages = []
+                    for input_dict in input_list:
+                        correct.append('correct' if input_dict['ok'] else 'incorrect')
+                        messages.append(input_dict['msg'] if 'msg' in input_dict else None)
+
+                # Otherwise, we do not recognize the dictionary
+                # Raise an exception
+                else:
+                    log.error(traceback.format_exc())
+                    raise Exception("CustomResponse: check function returned an invalid dict")
+
+            # The check function can return a boolean value,
+            # indicating whether all inputs should be marked
+            # correct or incorrect
             else:
                 correct = ['correct'] * len(idset) if ret else ['incorrect'] * len(idset)
 
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
+        correct_map.set_overall_message(overall_message)
         for k in range(len(idset)):
             npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
             correct_map.set(idset[k], correct[k], msg=messages[k],

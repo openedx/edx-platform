@@ -159,6 +159,7 @@ class CorrectMap(object):
         if not isinstance(other_cmap, CorrectMap):
             raise Exception('CorrectMap.update called with invalid argument %s' % other_cmap)
         self.cmap.update(other_cmap.get_dict())
+        self.set_overall_message(other_cmap.get_overall_message())
 
 
     def set_overall_message(self, message_str):

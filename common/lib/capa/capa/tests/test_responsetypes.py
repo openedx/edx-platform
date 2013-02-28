@@ -8,6 +8,7 @@ import json
 from nose.plugins.skip import SkipTest
 import os
 import unittest
+import textwrap
 
 from . import test_system
 
@@ -663,30 +664,43 @@ class CustomResponseTest(ResponseTest):
 
         # Inline code can update the global messages list
         # to pass messages to the CorrectMap for a particular input
-        inline_script = """messages[0] = "Test Message" """
+        # The code can also set the global overall_message (str)
+        # to pass a message that applies to the whole response
+        inline_script = textwrap.dedent("""
+        messages[0] = "Test Message" 
+        overall_message = "Overall message"
+        """)
         problem = self.build_problem(answer=inline_script)
 
         input_dict = {'1_2_1': '0'}
-        msg = problem.grade_answers(input_dict).get_msg('1_2_1')
-        self.assertEqual(msg, "Test Message")
+        correctmap = problem.grade_answers(input_dict)
 
-    def test_function_code(self):
+        # Check that the message for the particular input was received
+        input_msg = correctmap.get_msg('1_2_1')
+        self.assertEqual(input_msg, "Test Message")
 
-        # For function code, we pass in three arguments:
+        # Check that the overall message (for the whole response) was received
+        overall_msg = correctmap.get_overall_message()
+        self.assertEqual(overall_msg, "Overall message")
+
+
+    def test_function_code_single_input(self):
+
+        # For function code, we pass in these arguments:
         # 
         #   'expect' is the expect attribute of the <customresponse>
         #
         #   'answer_given' is the answer the student gave (if there is just one input)
         #       or an ordered list of answers (if there are multiple inputs)
         #   
-        #   'student_answers' is a dictionary of answers by input ID
-        #
         #
         # The function should return a dict of the form 
         # { 'ok': BOOL, 'msg': STRING }
         #
-        script = """def check_func(expect, answer_given, student_answers):
-    return {'ok': answer_given == expect, 'msg': 'Message text'}"""
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                return {'ok': answer_given == expect, 'msg': 'Message text'}
+        """)
 
         problem = self.build_problem(script=script, cfn="check_func", expect="42")
 
@@ -710,17 +724,134 @@ class CustomResponseTest(ResponseTest):
         self.assertEqual(correctness, 'incorrect')
         self.assertEqual(msg, "Message text\n")
 
-    def test_multiple_inputs(self):
+    def test_function_code_multiple_input_no_msg(self):
+
+        # Check functions also have the option of returning
+        # a single boolean value 
+        # If true, mark all the inputs correct
+        # If false, mark all the inputs incorrect
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                return (answer_given[0] == expect and
+                        answer_given[1] == expect)
+        """)
+
+        problem = self.build_problem(script=script, cfn="check_func", 
+                                    expect="42", num_inputs=2)
+
+        # Correct answer -- expect both inputs marked correct
+        input_dict = {'1_2_1': '42', '1_2_2': '42'}
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        self.assertEqual(correctness, 'correct')
+
+        correctness = correct_map.get_correctness('1_2_2')
+        self.assertEqual(correctness, 'correct')
+
+        # One answer incorrect -- expect both inputs marked incorrect
+        input_dict = {'1_2_1': '0', '1_2_2': '42'}
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        self.assertEqual(correctness, 'incorrect')
+
+        correctness = correct_map.get_correctness('1_2_2')
+        self.assertEqual(correctness, 'incorrect')
+
+    def test_script_exception(self):
+
+        # Construct a script that will raise an exception
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                raise Exception("Test")
+            """)
+
+        problem = self.build_problem(script=script, cfn="check_func")
+
+        # Expect that an exception gets raised when we check the answer
+        with self.assertRaises(Exception):
+            problem.grade_answers({'1_2_1': '42'})
+    
+    def test_invalid_dict_exception(self):
+
+        # Construct a script that passes back an invalid dict format
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                return {'invalid': 'test'}
+            """)
+
+        problem = self.build_problem(script=script, cfn="check_func")
+
+        # Expect that an exception gets raised when we check the answer
+        with self.assertRaises(Exception):
+            problem.grade_answers({'1_2_1': '42'})
+
+
+    def test_function_code_multiple_inputs(self):
+
+        # If the <customresponse> has multiple inputs associated with it,
+        # the check function can return a dict of the form:
+        # 
+        # {'overall_message': STRING,
+        #  'input_list': [{'ok': BOOL, 'msg': STRING}, ...] }
+        # 
+        # 'overall_message' is displayed at the end of the response
+        #
+        # 'input_list' contains dictionaries representing the correctness
+        #           and message for each input.
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                check1 = (int(answer_given[0]) == 1)
+                check2 = (int(answer_given[1]) == 2)
+                check3 = (int(answer_given[2]) == 3)
+                return {'overall_message': 'Overall message',
+                        'input_list': [
+                            {'ok': check1,  'msg': 'Feedback 1'},
+                            {'ok': check2,  'msg': 'Feedback 2'},
+                            {'ok': check3,  'msg': 'Feedback 3'} ] }
+            """)
+
+        problem = self.build_problem(script=script, 
+                                    cfn="check_func", num_inputs=3)
+
+        # Grade the inputs (one input incorrect)
+        input_dict = {'1_2_1': '-999', '1_2_2': '2', '1_2_3': '3' }
+        correct_map = problem.grade_answers(input_dict)
+
+        # Expect that we receive the overall message (for the whole response)
+        self.assertEqual(correct_map.get_overall_message(), "Overall message")
+
+        # Expect that the inputs were graded individually
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
+        self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
+
+        # Expect that we received messages for each individual input
+        self.assertEqual(correct_map.get_msg('1_2_1'), 'Feedback 1')
+        self.assertEqual(correct_map.get_msg('1_2_2'), 'Feedback 2')
+        self.assertEqual(correct_map.get_msg('1_2_3'), 'Feedback 3')
+
+
+    def test_multiple_inputs_return_one_status(self):
         # When given multiple inputs, the 'answer_given' argument
         # to the check_func() is a list of inputs
+        #
         # The sample script below marks the problem as correct
         # if and only if it receives answer_given=[1,2,3]
         # (or string values ['1','2','3'])
-        script = """def check_func(expect, answer_given, student_answers):
-    check1 = (int(answer_given[0]) == 1)
-    check2 = (int(answer_given[1]) == 2)
-    check3 = (int(answer_given[2]) == 3)
-    return {'ok': (check1 and check2 and check3),  'msg': 'Message text'}"""
+        #
+        # Since we return a dict describing the status of one input,
+        # we expect that the same 'ok' value is applied to each
+        # of the inputs.
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                check1 = (int(answer_given[0]) == 1)
+                check2 = (int(answer_given[1]) == 2)
+                check3 = (int(answer_given[2]) == 3)
+                return {'ok': (check1 and check2 and check3),  
+                        'msg': 'Message text'}
+            """)
 
         problem = self.build_problem(script=script, 
                                     cfn="check_func", num_inputs=3)
