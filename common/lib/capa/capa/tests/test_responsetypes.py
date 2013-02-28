@@ -575,15 +575,15 @@ class JavascriptResponseTest(ResponseTest):
     xml_factory_class = JavascriptResponseXMLFactory
 
     def test_grade(self):
+        # Compile coffee files into javascript used by the response
+        coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
+        os.system("coffee -c %s" % (coffee_file_path))
+
         problem = self.build_problem(generator_src="test_problem_generator.js",
                                     grader_src="test_problem_grader.js",
                                     display_class="TestProblemDisplay",
                                     display_src="test_problem_display.js",
                                     param_dict={'value': '4'})
-
-        # Compile coffee files into javascript used by the response
-        coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
-        os.system("coffee -c %s" % (coffee_file_path))
 
         # Test that we get graded correctly
         self.assert_grade(problem, json.dumps({0:4}), "correct")
