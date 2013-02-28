@@ -510,7 +510,9 @@ class LoncapaProblem(object):
 
         # let each Response render itself
         if problemtree in self.responders:
-            return self.responders[problemtree].render_html(self._extract_html)
+            overall_msg = self.correct_map.get_overall_message()
+            return self.responders[problemtree].render_html(self._extract_html,
+                                                response_msg=overall_msg)
 
         # let each custom renderer render itself:
         if problemtree.tag in customrender.registry.registered_tags():

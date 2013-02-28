@@ -174,13 +174,14 @@ class LoncapaResponse(object):
         '''
         return sum(self.maxpoints.values())
 
-    def render_html(self, renderer):
+    def render_html(self, renderer, response_msg=None):
         '''
         Return XHTML Element tree representation of this Response.
 
         Arguments:
 
           - renderer : procedure which produces HTML given an ElementTree
+          - response_msg: a message displayed at the end of the Response
         '''
         # render ourself as a <span> + our content
         tree = etree.Element('span')
@@ -195,6 +196,13 @@ class LoncapaResponse(object):
             if item_xhtml is not None:
                 tree.append(item_xhtml)
         tree.tail = self.xml.tail
+
+        # Add a <div> for the message at the end of the response
+        if response_msg:
+            response_msg_div = etree.SubElement(tree, 'div')
+            response_msg_div.set("class", "response_message")
+            response_msg_div.text = response_msg
+
         return tree
 
     def evaluate_answers(self, student_answers, old_cmap):
@@ -1060,7 +1068,7 @@ def sympy_check2():
                 # and the first input stores the message
                 if 'ok' in ret:
                     correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
-                    msg = ret['msg']
+                    msg = ret.get('msg', None)
 
                     if 1:
                         # try to clean up message html
