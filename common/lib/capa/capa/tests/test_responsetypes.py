@@ -772,3 +772,40 @@ class SchematicResponseTest(ResponseTest):
         # (That is, our script verifies that the context
         # is what we expect)
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+
+class AnnotationResponseTest(ResponseTest):
+    from response_xml_factory import AnnotationResponseXMLFactory
+    xml_factory_class = AnnotationResponseXMLFactory
+
+    def test_grade(self):
+        (correct, partially, incorrect) = ('correct', 'partially-correct', 'incorrect')
+
+        answer_id = '1_2_1'
+        options = (('x', correct),('y', partially),('z', incorrect))
+        make_answer = lambda option_ids: {answer_id: json.dumps({'options': option_ids })}
+
+        tests = [
+            {'correctness': correct, 'points': 2,'answers': make_answer([0]) },
+            {'correctness': partially, 'points': 1, 'answers': make_answer([1]) },
+            {'correctness': incorrect, 'points': 0, 'answers': make_answer([2]) },
+            {'correctness': incorrect, 'points': 0, 'answers': make_answer([0,1,2]) },
+            {'correctness': incorrect, 'points': 0, 'answers': make_answer([]) },
+            {'correctness': incorrect, 'points': 0, 'answers': make_answer('') },
+            {'correctness': incorrect, 'points': 0, 'answers': make_answer(None) },
+            {'correctness': incorrect, 'points': 0, 'answers': {answer_id: 'null' } },
+        ]
+
+        for (index, test) in enumerate(tests):
+            expected_correctness = test['correctness']
+            expected_points = test['points']
+            answers = test['answers']
+
+            problem = self.build_problem(options=options)
+            correct_map = problem.grade_answers(answers)
+            actual_correctness = correct_map.get_correctness(answer_id)
+            actual_points = correct_map.get_npoints(answer_id)
+
+            self.assertEqual(expected_correctness, actual_correctness,
+                             msg="%s should be marked %s" % (answer_id, expected_correctness))
+            self.assertEqual(expected_points, actual_points,
+                             msg="%s should have %d points" % (answer_id, expected_points))
