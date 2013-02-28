@@ -59,10 +59,6 @@ class ConditionalModule(XModule):
         'voted': 'voted'  # poll_question attr
     }
 
-    def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
-        self.contents = None
-
     def _get_condition(self):
         # Get first valid condition.
         for xml_attr, attr_name in self.conditions_map.iteritems():
@@ -119,11 +115,7 @@ class ConditionalModule(XModule):
                 context)
             return json.dumps({'html': [html], 'message': bool(message)})
 
-        if self.contents is None:
-            self.contents = [child.get_html() for child in
-                self.get_display_items()]
-
-        html = self.contents
+        html = [child.get_html() for child in self.get_display_items()]
 
         return json.dumps({'html': html})
 
