@@ -24,7 +24,6 @@ def SQL_query_to_list(cursor, query_string):
     print raw_result
     return raw_result
 
-
 def dashboard(request):
     """
     Slightly less hackish hack to show staff enrollment numbers and other
@@ -58,8 +57,20 @@ def dashboard(request):
     # table queries need not take the form of raw SQL, but do in this case since
     # the MySQL backend for django isn't very friendly with group by or distinct
     table_queries = {}
-    table_queries["course enrollments"]="select count(user_id) as students, course_id from student_courseenrollment group by course_id order by students desc;"
-    table_queries["number of students in each number of classes"]="select registrations, count(registrations) from (select count(user_id) as registrations from student_courseenrollment group by user_id) as registrations_per_user group by registrations;"
+    table_queries["course enrollments"]= \
+        "select "+ \
+        "course_id as Course, "+ \
+        "count(user_id) as Students " + \
+        "from student_courseenrollment "+ \
+        "group by course_id "+ \
+        "order by students desc;"
+    table_queries["number of students in each number of classes"]= \
+        "select registrations as 'Registered for __ Classes' , "+ \
+        "count(registrations) as Users "+ \
+        "from (select count(user_id) as registrations "+ \
+               "from student_courseenrollment "+ \
+               "group by user_id) as registrations_per_user "+ \
+        "group by registrations;"
 
     # add the result for each of the table_queries to the results object
     for query in table_queries.keys():
