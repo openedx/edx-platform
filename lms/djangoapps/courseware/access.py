@@ -342,6 +342,27 @@ def _does_course_group_name_exist(name):
     return len(Group.objects.filter(name=name)) > 0
 
 
+def _course_org_staff_group_name(location, course_context=None):
+    """
+    Get the name of the staff group for an organization which corresponds
+    to the organization in the course id.
+
+    location: something that can passed to Location
+    course_context: A course_id that specifies the course run in which
+                    the location occurs.
+                    Required if location doesn't have category 'course'
+
+    """
+    loc = Location(location)
+    if loc.category == 'course':
+        course_id = loc.course_id
+    else:
+        if course_context is None:
+            raise CourseContextRequired()
+        course_id = course_context
+    return 'staff_%s' % course_id.split('/')[0]
+
+
 def _course_staff_group_name(location, course_context=None):
     """
     Get the name of the staff group for a location in the context of a course run.
@@ -380,6 +401,27 @@ def course_beta_test_group_name(location):
 # nosetests thinks that anything with _test_ in the name is a test.
 # Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
 course_beta_test_group_name.__test__ = False
+
+
+def _course_org_instructor_group_name(location, course_context=None):
+    """
+    Get the name of the instructor group for an organization which corresponds
+    to the organization in the course id.
+
+    location: something that can passed to Location
+    course_context: A course_id that specifies the course run in which
+                    the location occurs.
+                    Required if location doesn't have category 'course'
+
+    """
+    loc = Location(location)
+    if loc.category == 'course':
+        course_id = loc.course_id
+    else:
+        if course_context is None:
+            raise CourseContextRequired()
+        course_id = course_context
+    return 'instructor_%s' % course_id.split('/')[0]
 
 
 def _course_instructor_group_name(location, course_context=None):
@@ -499,14 +541,18 @@ def _has_access_to_location(user, location, access_level, course_context):
 
     if access_level == 'staff':
         staff_group = _course_staff_group_name(location, course_context)
-        if staff_group in user_groups:
+        # org_staff_group is a group for an entire organization
+        org_staff_group = _course_org_staff_group_name(location, course_context)
+        if staff_group in user_groups or org_staff_group in user_groups:
             debug("Allow: user in group %s", staff_group)
             return True
         debug("Deny: user not in group %s", staff_group)
 
     if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
         instructor_group = _course_instructor_group_name(location, course_context)
-        if instructor_group in user_groups:
+        instructor_staff_group = _course_org_instructor_group_name(
+            location, course_context)
+        if instructor_group in user_groups or instructor_staff_group in user_groups:
             debug("Allow: user in group %s", instructor_group)
             return True
         debug("Deny: user not in group %s", instructor_group)
