@@ -624,6 +624,7 @@ class AnnotationInputTest(unittest.TestCase):
             ],
             'value': json_value,
             'options_value': value['options'],
+            'has_options_value': len(value['options']) > 0,
             'comment_value': value['comment'],
             'debug': False,
             'return_to_annotation': True
