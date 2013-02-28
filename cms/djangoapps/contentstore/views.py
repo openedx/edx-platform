@@ -114,7 +114,7 @@ def index(request):
     """
     List all courses available to the logged in user
     """
-    courses = modulestore().get_items(['i4x', None, None, 'course', None])
+    courses = modulestore('direct').get_items(['i4x', None, None, 'course', None])
 
     # filter out courses that we don't have access too
     def course_filter(course):
@@ -132,7 +132,7 @@ def index(request):
                         course.location.org,
                         course.location.course,
                         course.location.name]),
-                    get_lms_link_for_item(course.location))
+                    get_lms_link_for_item(course.location, course_id=course.location.course_id))
                     for course in courses],
         'user': request.user,
         'disable_course_creation': settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff
