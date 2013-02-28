@@ -2,8 +2,6 @@ import pymongo
 import sys
 import logging
 import copy
-import time
-import traceback
 
 from bson.son import SON
 from fs.osfs import OSFS

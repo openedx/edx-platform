@@ -75,7 +75,7 @@ def get_course_for_item(location):
     return courses[0]
 
 
-def get_lms_link_for_item(location, course_id=None, preview=False):
+def get_lms_link_for_item(location, preview=False, course_id=None):
     if course_id is None:
         course_id = get_course_id(location)
 
