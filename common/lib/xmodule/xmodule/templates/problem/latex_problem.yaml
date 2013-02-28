@@ -1,7 +1,7 @@
 ---
 metadata:
     display_name: Problem Written in LaTeX 
-    source_processor_url: https://qisx.mit.edu:5443/latex2edx
+    source_processor_url: https://studio-input-filter.mitx.mit.edu/latex2edx
     source_code: |
         % Nearly any kind of edX problem can be authored using Latex as
         % the source language.  Write latex as usual, including equations.  The
