@@ -956,7 +956,7 @@ class AnnotationInput(InputTypeBase):
             </text>
             <comment>Agamemnon says that ate or 'derangement' was the cause of his actions: why could Zeus say the same thing?</comment>
             <comment_prompt>Type a commentary below:</comment_prompt>
-            <tag_prompt>Select one or more tags:</tag_prompt>
+            <tag_prompt>Select one tag:</tag_prompt>
             <options>
                 <option choice="correct">ate - both a cause and an effect</option>
                 <option choice="incorrect">ate - a cause</option>
@@ -980,7 +980,7 @@ class AnnotationInput(InputTypeBase):
         self.text = xml.findtext('./text')
         self.comment = xml.findtext('./comment')
         self.comment_prompt = xml.findtext('./comment_prompt', 'Type a commentary below:')
-        self.tag_prompt = xml.findtext('./tag_prompt', 'Select one or more tags:')
+        self.tag_prompt = xml.findtext('./tag_prompt', 'Select one tag:')
         self.options = self._find_options()
 
         # Need to provide a value that JSON can parse if there is no
