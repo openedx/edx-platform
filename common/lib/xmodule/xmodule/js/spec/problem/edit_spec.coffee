@@ -119,13 +119,13 @@ describe 'MarkdownEditingDescriptor', ->
         <p>The answer is correct if it is within a specified numerical tolerance of the expected answer.</p>
         
         <p>Enter the numerical value of Pi:</p>
-        <numericalresponse answer="3.14159 ">
+        <numericalresponse answer="3.14159">
           <responseparam type="tolerance" default=".02" />
           <textline />
         </numericalresponse>
         
         <p>Enter the approximate value of 502*9:</p>
-        <numericalresponse answer="4518 ">
+        <numericalresponse answer="4518">
           <responseparam type="tolerance" default="15%" />
           <textline />
         </numericalresponse>
@@ -147,6 +147,20 @@ describe 'MarkdownEditingDescriptor', ->
 
         </div>
         </solution>
+        </problem>""")
+    it 'will convert 0 as a numerical response (instead of string response)', ->
+      data =  MarkdownEditingDescriptor.markdownToXml("""
+        Enter 0 with a tolerance:
+        = 0 +- .02
+        """)
+      expect(data).toEqual("""<problem>
+        <p>Enter 0 with a tolerance:</p>
+        <numericalresponse answer="0">
+          <responseparam type="tolerance" default=".02" />
+          <textline />
+        </numericalresponse>
+
+
         </problem>""")
     it 'converts multiple choice to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
