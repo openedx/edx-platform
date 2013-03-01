@@ -73,8 +73,7 @@ ADVANCED_COMPONENT_TYPES = {
     'advanced' : ['annotation']
 }
 
-ADVANCED_COMPONENT_CATEGORY = 'advanced'
-ADVANCED_COMPONENT_POLICY_KEY = 'enable_advanced_modules'
+ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -293,16 +292,23 @@ def edit_unit(request, location):
     advanced_component_types = ADVANCED_COMPONENT_TYPES
     course_metadata = CourseMetadata.fetch(course.location)
     course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, {})
+    try:
+        course_advanced_keys = json.loads(course_advanced_keys)
+    except:
+        log.error("Cannot json decode course advanced policy: {0}".format(course_advanced_keys))
+
     if isinstance(course_advanced_keys,dict):
         advanced_component_types.update(course_advanced_keys)
     else:
         log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
 
+
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
         category = template.location.category
+        log.debug(category)
         for key in ADVANCED_COMPONENT_TYPES:
-            if template.location.category in ADVANCED_COMPONENT_TYPES[key]:
+            if category in ADVANCED_COMPONENT_TYPES[key]:
                 category = key
                 break
 
