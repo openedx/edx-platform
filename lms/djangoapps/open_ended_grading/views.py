@@ -2,7 +2,6 @@
 
 import logging
 import urllib
-import re
 
 from django.conf import settings
 from django.views.decorators.cache import cache_control
@@ -12,26 +11,26 @@ from django.core.urlresolvers import reverse
 from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
-from controller_query_service import ControllerQueryService
-from xmodule.grading_service_module import GradingServiceError
+from xmodule.x_module import ModuleSystem
+from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService, convert_seconds_to_human_readable
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
-from .staff_grading import StaffGrading
 from student.models import unique_id_for_user
 
-import open_ended_util
 import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
+from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
-controller_url = open_ended_util.get_controller_url()
-controller_qs = ControllerQueryService(controller_url)
+system = ModuleSystem(None, None, None, render_to_string, None)
+controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
 
 """
 Reverses the URL from the name and the course id, and then adds a trailing slash if
@@ -64,6 +63,8 @@ ALERT_DICT = {
             'Flagged Submissions': "Submissions have been flagged for review"
     }
 
+STUDENT_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify course staff."
+STAFF_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
@@ -100,7 +101,9 @@ def peer_grading(request, course_id):
 
         return HttpResponseRedirect(problem_url)
     except:
+        #This is a student_facing_error
         error_message = "Error with initializing peer grading.  Centralized module does not exist.  Please contact course staff."
+        #This is a dev_facing_error
         log.exception(error_message + "Current course is: {0}".format(course_id))
         return HttpResponse(error_message)
 
@@ -136,30 +139,46 @@ def student_problem_list(request, course_id):
     problem_list = []
     base_course_url  = reverse('courses')
 
-    #try:
-    problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
-    problem_list_dict = json.loads(problem_list_json)
-    success = problem_list_dict['success']
-    if 'error' in problem_list_dict:
-        error_text = problem_list_dict['error']
-        problem_list = []
-    else:
-        problem_list = problem_list_dict['problem_list']
+    try:
+        problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
+        problem_list_dict = json.loads(problem_list_json)
+        success = problem_list_dict['success']
+        if 'error' in problem_list_dict:
+            error_text = problem_list_dict['error']
+            problem_list = []
+        else:
+            problem_list = problem_list_dict['problem_list']
 
-    for i in xrange(0, len(problem_list)):
-        problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
-        problem_url = generate_problem_url(problem_url_parts, base_course_url)
-        problem_list[i].update({'actual_url': problem_url})
+        for i in xrange(0, len(problem_list)):
+            problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
+            problem_url = generate_problem_url(problem_url_parts, base_course_url)
+            problem_list[i].update({'actual_url': problem_url})
+            eta_available = problem_list[i]['eta_available']
+            if isinstance(eta_available, basestring):
+                eta_available = (eta_available.lower() == "true")
 
-    """
+            eta_string = "N/A"
+            if eta_available:
+                try:
+                    eta_string = convert_seconds_to_human_readable(int(problem_list[i]['eta']))
+                except:
+                    #This is a student_facing_error
+                    eta_string = "Error getting ETA."
+            problem_list[i].update({'eta_string' : eta_string})
+
     except GradingServiceError:
-        error_text = "Error occured while contacting the grading service"
+        #This is a student_facing_error
+        error_text = STUDENT_ERROR_MESSAGE
+        #This is a dev facing error
+        log.error("Problem contacting open ended grading service.")
         success = False
     # catch error if if the json loads fails
     except ValueError:
-        error_text = "Could not get problem list"
+        #This is a student facing error
+        error_text = STUDENT_ERROR_MESSAGE
+        #This is a dev_facing_error
+        log.error("Problem with results from external grading service for open ended.")
         success = False
-    """
 
     ajax_url = _reverse_with_slash('open_ended_problems', course_id)
 
@@ -199,11 +218,17 @@ def flagged_problem_list(request, course_id):
             problem_list = problem_list_dict['flagged_submissions']
 
     except GradingServiceError:
-        error_text = "Error occured while contacting the grading service"
+        #This is a staff_facing_error
+        error_text = STAFF_ERROR_MESSAGE
+        #This is a dev_facing_error
+        log.error("Could not get flagged problem list from external grading service for open ended.")
         success = False
     # catch error if if the json loads fails
     except ValueError:
-        error_text = "Could not get problem list"
+        #This is a staff_facing_error
+        error_text = STAFF_ERROR_MESSAGE
+        #This is a dev_facing_error
+        log.error("Could not parse problem list from external grading service response.")
         success = False
 
     ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_id)
@@ -287,7 +312,8 @@ def take_action_on_flags(request, course_id):
     required = ['submission_id', 'action_type', 'student_id']
     for key in required:
         if key not in request.POST:
-            return HttpResponse(json.dumps({'success': False, 'error': 'Missing key {0}'.format(key)}),
+            #This is a staff_facing_error
+            return HttpResponse(json.dumps({'success': False, 'error': STAFF_ERROR_MESSAGE + 'Missing key {0} from submission.  Please reload and try again.'.format(key)}),
                 mimetype="application/json")
 
     p = request.POST
@@ -301,5 +327,6 @@ def take_action_on_flags(request, course_id):
         response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
-        log.exception("Error saving calibration grade, submission_id: {0}, submission_key: {1}, grader_id: {2}".format(submission_id, submission_key, grader_id))
-        return _err_response('Could not connect to grading service')
+        #This is a dev_facing_error
+        log.exception("Error taking action on flagged peer grading submissions, submission_id: {0}, action_type: {1}, grader_id: {2}".format(submission_id, action_type, grader_id))
+        return _err_response(STAFF_ERROR_MESSAGE)

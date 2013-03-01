@@ -352,6 +352,13 @@ class CourseDescriptor(SequenceDescriptor):
         """
         return self.metadata.get('tabs')
 
+    @property
+    def pdf_textbooks(self):
+        """
+        Return the pdf_textbooks config, as a python object, or None if not specified.
+        """
+        return self.metadata.get('pdf_textbooks')
+
     @tabs.setter
     def tabs(self, value):
         self.metadata['tabs'] = value
@@ -371,6 +378,28 @@ class CourseDescriptor(SequenceDescriptor):
 
         return bool(config.get("cohorted"))
 
+    @property
+    def auto_cohort(self):
+        """
+        Return whether the course is auto-cohorted.
+        """
+        if not self.is_cohorted:
+            return False
+
+        return bool(self.metadata.get("cohort_config", {}).get(
+            "auto_cohort", False))
+
+    @property
+    def auto_cohort_groups(self):
+        """
+        Return the list of groups to put students into.  Returns [] if not
+        specified. Returns specified list even if is_cohorted and/or auto_cohort are
+        false.
+        """
+        return self.metadata.get("cohort_config", {}).get(
+            "auto_cohort_groups", [])
+
+    
     @property
     def top_level_discussion_topic_ids(self):
         """
@@ -446,7 +475,7 @@ class CourseDescriptor(SequenceDescriptor):
         # utility function to get datetime objects for dates used to
         # compute the is_new flag and the sorting_score
         def to_datetime(timestamp):
-            return datetime.fromtimestamp(time.mktime(timestamp))
+            return datetime(*timestamp[:6])
 
         def get_date(field):
             timetuple = self._try_parse_time(field)
@@ -707,7 +736,7 @@ class CourseDescriptor(SequenceDescriptor):
     def get_test_center_exam(self, exam_series_code):
         exams = [exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
         return exams[0] if len(exams) == 1 else None
-        
+
     @property
     def title(self):
         return self.display_name

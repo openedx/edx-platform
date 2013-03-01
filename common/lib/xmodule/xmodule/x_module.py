@@ -411,7 +411,6 @@ class ResourceTemplates(object):
 
         return templates
 
-
 class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     """
     An XModuleDescriptor is a specification for an element of a course. This
@@ -515,6 +514,16 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         self._child_instances = None
         self._inherited_metadata = set()
 
+
+    # Class level variable
+    always_recalculate_grades = False
+    """
+    Return whether this descriptor always requires recalculation of grades, for
+    example if the score can change via an extrnal service, not just when the
+    student interacts with the module on the page.  A specific example is
+    FoldIt, which posts grade-changing updates through a separate API.
+    """
+
     @property
     def display_name(self):
         '''
@@ -575,11 +584,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     def inherit_metadata(self, metadata):
         """
         Updates this module with metadata inherited from a containing module.
-        Only metadata specified in self.inheritable_metadata will
+        Only metadata specified in inheritable_metadata will
         be inherited
         """
         # Set all inheritable metadata from kwargs that are
-        # in self.inheritable_metadata and aren't already set in metadata
+        # in inheritable_metadata and aren't already set in metadata
         for attr in self.inheritable_metadata:
             if attr not in self.metadata and attr in metadata:
                 self._inherited_metadata.add(attr)
@@ -869,7 +878,9 @@ class ModuleSystem(object):
                  xqueue=None,
                  node_path="",
                  anonymous_student_id='',
-                 course_id=None):
+                 course_id=None,
+                 open_ended_grading_interface=None,
+                 s3_interface=None):
         '''
         Create a closure around the system environment.
 
@@ -920,6 +931,8 @@ class ModuleSystem(object):
         self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
+        self.open_ended_grading_interface = open_ended_grading_interface
+        self.s3_interface = s3_interface
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

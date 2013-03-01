@@ -341,6 +341,28 @@ def _dispatch(table, action, user, obj):
 def _does_course_group_name_exist(name):
     return len(Group.objects.filter(name=name)) > 0
 
+
+def _course_org_staff_group_name(location, course_context=None):
+    """
+    Get the name of the staff group for an organization which corresponds
+    to the organization in the course id.
+
+    location: something that can passed to Location
+    course_context: A course_id that specifies the course run in which
+                    the location occurs.
+                    Required if location doesn't have category 'course'
+
+    """
+    loc = Location(location)
+    if loc.category == 'course':
+        course_id = loc.course_id
+    else:
+        if course_context is None:
+            raise CourseContextRequired()
+        course_id = course_context
+    return 'staff_%s' % course_id.split('/')[0]
+
+
 def group_names_for(role, location, course_context=None):
     """Returns the group names for a given role with this location. Plural 
     because it will return both the name we expect now as well as the legacy
@@ -383,6 +405,27 @@ def _course_staff_group_name(location, course_context=None):
         return legacy_group_name
 
     return group_name
+
+def _course_org_instructor_group_name(location, course_context=None):
+    """
+    Get the name of the instructor group for an organization which corresponds
+    to the organization in the course id.
+
+    location: something that can passed to Location
+    course_context: A course_id that specifies the course run in which
+                    the location occurs.
+                    Required if location doesn't have category 'course'
+
+    """
+    loc = Location(location)
+    if loc.category == 'course':
+        course_id = loc.course_id
+    else:
+        if course_context is None:
+            raise CourseContextRequired()
+        course_id = course_context
+    return 'instructor_%s' % course_id.split('/')[0]
+
 
 def _course_instructor_group_name(location, course_context=None):
     """
@@ -508,7 +551,8 @@ def _has_access_to_location(user, location, access_level, course_context):
     user_groups = [g.name for g in user.groups.all()]
 
     if access_level == 'staff':
-        staff_groups = group_names_for_staff(location, course_context)
+        staff_groups = group_names_for_staff(location, course_context) + \
+                       _course_org_staff_group_name(location, course_context)
         for staff_group in staff_groups:
             if staff_group in user_groups:
                 debug("Allow: user in group %s", staff_group)
@@ -516,13 +560,13 @@ def _has_access_to_location(user, location, access_level, course_context):
         debug("Deny: user not in groups %s", staff_groups)
 
     if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
-        instructor_groups = group_names_for_instructor(location, course_context)
+        instructor_groups = group_names_for_instructor(location, course_context) + \
+                            _course_org_instructor_group_name(location, course_context)
         for instructor_group in instructor_groups:
             if instructor_group in user_groups:
                 debug("Allow: user in group %s", instructor_group)
                 return True
         debug("Deny: user not in groups %s", instructor_groups)
-
     else:
         log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
 

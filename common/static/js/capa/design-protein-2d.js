@@ -22,6 +22,15 @@
     // It calls protexIsReady with a deferred command when it has finished 
     // initialization and has drawn itself
     
+    function updateProtexField() {
+            var problem = $('#protex_container').parents('.problem');
+            var input_field = problem.find('input[type=hidden]');
+            var protex_answer = protexCheckAnswer();
+            var value = {protex_answer: protex_answer};
+            //console.log(JSON.stringify(value));
+            input_field.val(JSON.stringify(value));
+        }
+        
     protexIsReady = function() {
         //Load target shape
         var target_shape = $('#target_shape').val();
@@ -29,15 +38,18 @@
             
         //Get answer from protex and store it into the hidden input field
         //when Check button is clicked
-        var problem = $('#protex_container').parents('.problem');
-        var check_button = problem.find('input.check');
-        var input_field = problem.find('input[type=hidden]');
-        check_button.on('click', function() {
+        var fold_button = $("#fold-button");
+        fold_button.on('click', function(){
+            var problem = $('#protex_container').parents('.problem');
+            var input_field = problem.find('input[type=hidden]');
             var protex_answer = protexCheckAnswer();
             var value = {protex_answer: protex_answer};
+            //console.log(JSON.stringify(value));
             input_field.val(JSON.stringify(value));
-        });              
+        });
+        updateProtexField();              
     };
+
     
     /*function initializeProtex() {
         //Check to see if the two exported GWT functions protexSetTargetShape 

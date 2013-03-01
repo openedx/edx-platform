@@ -1,15 +1,16 @@
 import json
 import shutil
 from django.test.client import Client
-from override_settings import override_settings
+from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
-from tempfile import mkdtemp
+from tempdir import mkdtemp_clean
 import json
 from fs.osfs import OSFS
 import copy
 from mock import Mock
+from json import dumps, loads
 
 from student.models import Registration
 from django.contrib.auth.models import User
@@ -26,10 +27,12 @@ from xmodule.contentstore.django import contentstore
 from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.templates import update_templates
 
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
@@ -191,7 +194,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(ms, 'common/test/data/', ['full'])
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
-        root_dir = path(mkdtemp())
+        root_dir = path(mkdtemp_clean())
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
@@ -207,6 +210,24 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check for custom_tags
         self.verify_content_existence(ms, root_dir, location, 'custom_tags', 'custom_tag_template')
 
+        # check for graiding_policy.json
+        fs = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
+        self.assertTrue(fs.exists('grading_policy.json'))
+
+        course = ms.get_item(location)
+        # compare what's on disk compared to what we have in our course
+        with fs.open('grading_policy.json','r') as grading_policy:
+            on_disk = loads(grading_policy.read())    
+            self.assertEqual(on_disk, course.definition['data']['grading_policy'])
+
+        #check for policy.json
+        self.assertTrue(fs.exists('policy.json'))
+
+        # compare what's on disk to what we have in the course module
+        with fs.open('policy.json','r') as course_policy:
+            on_disk = loads(course_policy.read())
+            self.assertIn('course/6.002_Spring_2012', on_disk)
+            self.assertEqual(on_disk['course/6.002_Spring_2012'], course.metadata)
 
         # remove old course
         delete_course(ms, cs, location)
@@ -241,6 +262,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check that /static/ has been converted to the full path
         # note, we know the link it should be because that's what in the 'full' course in the test data
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
+
 
 
 class ContentStoreTest(ModuleStoreTestCase):
@@ -321,7 +343,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # Create a course so there is something to view
         resp = self.client.get(reverse('index'))
         self.assertContains(resp,
-            '<h1>My Courses</h1>',
+            '<h1 class="title-1">My Courses</h1>',
             status_code=200,
             html=True)
 
@@ -357,7 +379,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         resp = self.client.get(reverse('course_index', kwargs=data))
         self.assertContains(resp,
-            '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
+            '<article class="courseware-overview" data-course-id="i4x://MITx/999/course/Robot_Super_Course">',
             status_code=200,
             html=True)
 
@@ -380,11 +402,11 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
-        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         problem_data = {
             'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
-            'template': 'i4x://edx/templates/problem/Empty'
+            'template': 'i4x://edx/templates/problem/Blank_Common_Problem'
             }
 
         resp = self.client.post(reverse('clone_item'), problem_data)
@@ -399,3 +421,90 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertIn('markdown', context, "markdown is missing from context")
         self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
+
+    def test_import_metadata_with_attempts_empty_string(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+        ms = modulestore('direct')
+        did_load_item = False
+        try:       
+            ms.get_item(Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None]))
+            did_load_item = True
+        except ItemNotFoundError:
+            pass
+
+        # make sure we found the item (e.g. it didn't error while loading)
+        self.assertTrue(did_load_item)   
+
+    def test_metadata_inheritance(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        ms = modulestore('direct')
+        course = ms.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        verticals = ms.get_items(['i4x', 'edX', 'full', 'vertical', None, None])
+
+        # let's assert on the metadata_inheritance on an existing vertical
+        for vertical in verticals:
+            self.assertIn('xqa_key', vertical.metadata)
+            self.assertEqual(course.metadata['xqa_key'], vertical.metadata['xqa_key'])
+
+        self.assertGreater(len(verticals), 0)
+
+        new_component_location = Location('i4x', 'edX', 'full', 'html', 'new_component')
+        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Blank_HTML_Page')
+        
+        # crate a new module and add it as a child to a vertical
+        ms.clone_item(source_template_location, new_component_location)
+        parent = verticals[0]
+        ms.update_children(parent.location, parent.definition.get('children', []) + [new_component_location.url()])
+
+        # flush the cache
+        ms.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        new_module = ms.get_item(new_component_location)
+
+        # check for grace period definition which should be defined at the course level
+        self.assertIn('graceperiod', new_module.metadata)
+
+        self.assertEqual(course.metadata['graceperiod'], new_module.metadata['graceperiod'])
+
+        #
+        # now let's define an override at the leaf node level
+        #
+        new_module.metadata['graceperiod'] = '1 day'
+        ms.update_metadata(new_module.location, new_module.metadata)
+
+        # flush the cache and refetch
+        ms.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        new_module = ms.get_item(new_component_location)
+
+        self.assertIn('graceperiod', new_module.metadata)
+        self.assertEqual('1 day', new_module.metadata['graceperiod'])
+
+
+class TemplateTestCase(ModuleStoreTestCase):
+
+    def test_template_cleanup(self):        
+        ms = modulestore('direct')
+
+        # insert a bogus template in the store
+        bogus_template_location = Location('i4x', 'edx', 'templates', 'html', 'bogus')
+        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Blank_HTML_Page')
+        
+        ms.clone_item(source_template_location, bogus_template_location)
+
+        verify_create = ms.get_item(bogus_template_location)
+        self.assertIsNotNone(verify_create)
+
+        # now run cleanup
+        update_templates()
+
+        # now try to find dangling template, it should not be in DB any longer
+        asserted = False
+        try:
+            verify_create = ms.get_item(bogus_template_location)
+        except ItemNotFoundError:
+            asserted = True
+
+        self.assertTrue(asserted)     
+
+

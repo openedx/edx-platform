@@ -632,8 +632,14 @@ class MultipleChoiceResponse(LoncapaResponse):
 
         # define correct choices (after calling secondary setup)
         xml = self.xml
-        cxml = xml.xpath('//*[@id=$id]//choice[@correct="true"]', id=xml.get('id'))
-        self.correct_choices = [contextualize_text(choice.get('name'), self.context) for choice in cxml]
+        cxml = xml.xpath('//*[@id=$id]//choice', id=xml.get('id'))
+
+        # contextualize correct attribute and then select ones for which
+        # correct = "true"
+        self.correct_choices = [
+            contextualize_text(choice.get('name'), self.context)
+            for choice in cxml
+            if contextualize_text(choice.get('correct'), self.context) == "true"]
 
     def mc_setup_response(self):
         '''

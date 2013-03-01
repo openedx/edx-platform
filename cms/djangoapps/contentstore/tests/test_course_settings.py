@@ -1,7 +1,5 @@
 import datetime
-import time
 import json
-import calendar
 import copy
 from util import converters
 from util.converters import jsdate_to_time
@@ -11,7 +9,6 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 
-import xmodule
 from xmodule.modulestore import Location
 from cms.djangoapps.models.settings.course_details import (CourseDetails,
                                                     CourseSettingsEncoder)
@@ -21,6 +18,10 @@ from cms.djangoapps.contentstore.utils import get_modulestore
 from django.test import TestCase
 from utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.django import modulestore
 
 
 # YYYY-MM-DDThh:mm:ss.s+/-HH:MM
@@ -143,10 +144,6 @@ class CourseDetailsViewTest(CourseTestCase):
     def test_update_and_fetch(self):
         details = CourseDetails.fetch(self.course_location)
 
-        resp = self.client.get(reverse('course_settings', kwargs={'org': self.course_location.org, 'course': self.course_location.course,
-                                                                  'name': self.course_location.name}))
-        self.assertContains(resp, '<li><a href="#" class="is-shown" data-section="details">Course Details</a></li>', status_code=200, html=True)
-
         # resp s/b json from here on
         url = reverse('course_settings', kwargs={'org': self.course_location.org, 'course': self.course_location.course,
                                                  'name': self.course_location.name, 'section': 'details'})
@@ -249,7 +246,7 @@ class CourseGradingTest(CourseTestCase):
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "cutoff add D")
 
-        test_grader.grace_period = {'hours' :  '4'}
+        test_grader.grace_period = {'hours' :  4, 'minutes' : 5, 'seconds': 0}
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "4 hour grace period")
 
@@ -265,3 +262,64 @@ class CourseGradingTest(CourseTestCase):
         test_grader.graders[1]['drop_count'] = test_grader.graders[1].get('drop_count') + 1
         altered_grader = CourseGradingModel.update_grader_from_json(test_grader.course_location, test_grader.graders[1])
         self.assertDictEqual(test_grader.graders[1], altered_grader, "drop_count[1] + 2")
+
+class CourseMetadataEditingTest(CourseTestCase):
+    def setUp(self):
+        CourseTestCase.setUp(self)
+        # add in the full class too
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        self.fullcourse_location = Location(['i4x','edX','full','course','6.002_Spring_2012', None])
+
+
+    def test_fetch_initial_fields(self):
+        test_model = CourseMetadata.fetch(self.course_location)
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+
+        test_model = CourseMetadata.fetch(self.fullcourse_location)
+        self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
+        self.assertIn('display_name', test_model, 'full missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Testing', "not expected value")
+        self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
+        self.assertIn('showanswer', test_model, 'showanswer field ')
+        self.assertIn('xqa_key', test_model, 'xqa_key field ')
+
+    def test_update_from_json(self):
+        test_model = CourseMetadata.update_from_json(self.course_location,
+            { "a" : 1,
+              "b_a_c_h" : { "c" : "test" },
+              "test_text" : "a text string"})
+        self.update_check(test_model)
+        # try fresh fetch to ensure persistence
+        test_model = CourseMetadata.fetch(self.course_location)
+        self.update_check(test_model)
+        # now change some of the existing metadata
+        test_model = CourseMetadata.update_from_json(self.course_location,
+            { "a" : 2,
+              "display_name" : "jolly roger"})
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'jolly roger', "not expected value")
+        self.assertIn('a', test_model, 'Missing revised a metadata field')
+        self.assertEqual(test_model['a'], 2, "a not expected value")
+
+    def update_check(self, test_model):
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertIn('a', test_model, 'Missing new a metadata field')
+        self.assertEqual(test_model['a'], 1, "a not expected value")
+        self.assertIn('b_a_c_h', test_model, 'Missing b_a_c_h metadata field')
+        self.assertDictEqual(test_model['b_a_c_h'], { "c" : "test" }, "b_a_c_h not expected value")
+        self.assertIn('test_text', test_model, 'Missing test_text metadata field')
+        self.assertEqual(test_model['test_text'], "a text string", "test_text not expected value")
+
+
+    def test_delete_key(self):
+        test_model = CourseMetadata.delete_key(self.fullcourse_location, { 'deleteKeys' : ['doesnt_exist', 'showanswer', 'xqa_key']})
+        # ensure no harm
+        self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
+        self.assertIn('display_name', test_model, 'full missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Testing', "not expected value")
+        self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
+        # check for deletion effectiveness
+        self.assertNotIn('showanswer', test_model, 'showanswer field still in')
+        self.assertNotIn('xqa_key', test_model, 'xqa_key field still in')

@@ -1,25 +1,13 @@
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
 from lxml import etree
-from lxml.html import rewrite_links
-from path import path
-import os
-import sys
 
 from pkg_resources import resource_string
 
-from .capa_module import only_one, ComplexEncoder
 from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
-from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
-from combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 
 log = logging.getLogger("mitx.courseware")
 
@@ -120,11 +108,13 @@ class CombinedOpenEndedModule(XModule):
             instance_state = {}
 
         self.version = self.metadata.get('version', DEFAULT_VERSION)
+        version_error_string = "Version of combined open ended module {0} is not correct.  Going with version {1}"
         if not isinstance(self.version, basestring):
             try:
                 self.version = str(self.version)
             except:
-                log.error("Version {0} is not correct.  Going with version {1}".format(self.version, DEFAULT_VERSION))
+                #This is a dev_facing_error
+                log.info(version_error_string.format(self.version, DEFAULT_VERSION))
                 self.version = DEFAULT_VERSION
 
         versions = [i[0] for i in VERSION_TUPLES]
@@ -134,7 +124,8 @@ class CombinedOpenEndedModule(XModule):
         try:
             version_index = versions.index(self.version)
         except:
-            log.error("Version {0} is not correct.  Going with version {1}".format(self.version, DEFAULT_VERSION))
+            #This is a dev_facing_error
+            log.error(version_error_string.format(self.version, DEFAULT_VERSION))
             self.version = DEFAULT_VERSION
             version_index = versions.index(self.version)
 

@@ -429,6 +429,11 @@ class CapaModule(XModule):
         # used by conditional module
         return self.attempts > 0
 
+    def is_correct(self):
+        """True if full points"""
+        d = self.get_score()
+        return d['score'] == d['total']
+
     def answer_available(self):
         '''
         Is the user allowed to see an answer?
@@ -449,6 +454,9 @@ class CapaModule(XModule):
             return self.lcp.done
         elif self.show_answer == 'closed':
             return self.closed()
+        elif self.show_answer == 'finished':
+            return self.closed() or self.is_correct()
+
         elif self.show_answer == 'past_due':
             return self.is_past_due()
         elif self.show_answer == 'always':
@@ -703,15 +711,15 @@ class CapaDescriptor(RawDescriptor):
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.metadata.get('markdown', '')})
+        _context.update({'markdown': self.metadata.get('markdown', ''),
+                         'enable_markdown' : 'markdown' in self.metadata})
         return _context
 
     @property
     def editable_metadata_fields(self):
-        """Remove metadata from the editable fields since it has its own editor"""
-        subset = super(CapaDescriptor, self).editable_metadata_fields
-        if 'markdown' in subset:
-            subset.remove('markdown')
+        """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
+        subset = [field for field in super(CapaDescriptor,self).editable_metadata_fields
+                  if field not in ['markdown', 'empty']]
         return subset
 
 

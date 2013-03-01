@@ -33,7 +33,7 @@ from xmodule_modifiers import replace_course_urls, replace_static_urls, add_hist
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from statsd import statsd
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger(__name__)
 
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
@@ -226,6 +226,30 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
               'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
              }
 
+    def get_or_default(key, default):
+        getattr(settings, key, default)
+
+    #This is a hacky way to pass settings to the combined open ended xmodule
+    #It needs an S3 interface to upload images to S3
+    #It needs the open ended grading interface in order to get peer grading to be done
+    #TODO: refactor these settings into module-specific settings when possible.
+    #this first checks to see if the descriptor is the correct one, and only sends settings if it is
+    is_descriptor_combined_open_ended = (descriptor.__class__.__name__ == 'CombinedOpenEndedDescriptor')
+    is_descriptor_peer_grading =  (descriptor.__class__.__name__ == 'PeerGradingDescriptor')
+    open_ended_grading_interface = None
+    s3_interface = None
+    if is_descriptor_combined_open_ended or is_descriptor_peer_grading:
+        open_ended_grading_interface = settings.OPEN_ENDED_GRADING_INTERFACE
+        open_ended_grading_interface['mock_peer_grading'] = settings.MOCK_PEER_GRADING
+        open_ended_grading_interface['mock_staff_grading'] = settings.MOCK_STAFF_GRADING
+        if is_descriptor_combined_open_ended:
+            s3_interface = {
+                'access_key' : get_or_default('AWS_ACCESS_KEY_ID',''),
+                'secret_access_key' : get_or_default('AWS_SECRET_ACCESS_KEY',''),
+                'storage_bucket_name' : get_or_default('AWS_STORAGE_BUCKET_NAME','')
+            }
+
+
     def inner_get_module(descriptor):
         """
         Delegate to get_module.  It does an access check, so may return None
@@ -255,6 +279,8 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
                           node_path=settings.NODE_PATH,
                           anonymous_student_id=unique_id_for_user(user),
                           course_id=course_id,
+                          open_ended_grading_interface=open_ended_grading_interface,
+                          s3_interface=s3_interface,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
@@ -280,6 +306,7 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
         # Make an error module
         return err_descriptor.xmodule_constructor(system)(None, None)
 
+    system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
     _get_html = module.get_html
 
     if wrap_xmodule_display == True:

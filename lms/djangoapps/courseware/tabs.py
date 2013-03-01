@@ -119,6 +119,16 @@ def _textbooks(tab, user, course, active_page):
                 for index, textbook in enumerate(course.textbooks)]
     return []
 
+def _pdf_textbooks(tab, user, course, active_page):
+    """
+    Generates one tab per textbook.  Only displays if user is authenticated.
+    """
+    if user.is_authenticated():
+        # since there can be more than one textbook, active_page is e.g. "book/0".
+        return [CourseTab(textbook['tab_title'], reverse('pdf_book', args=[course.id, index]),
+                          active_page == "pdftextbook/{0}".format(index))
+                for index, textbook in enumerate(course.pdf_textbooks)]
+    return []
 
 def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
@@ -198,6 +208,7 @@ VALID_TAB_TYPES = {
     'discussion': TabImpl(need_name, _discussion),
     'external_link': TabImpl(key_checker(['name', 'link']), _external_link),
     'textbooks': TabImpl(null_validator, _textbooks),
+    'pdf_textbooks': TabImpl(null_validator, _pdf_textbooks),
     'progress': TabImpl(need_name, _progress),
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
     'peer_grading': TabImpl(null_validator, _peer_grading),

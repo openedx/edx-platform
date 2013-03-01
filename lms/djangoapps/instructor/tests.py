@@ -15,7 +15,7 @@ import json
 from nose import SkipTest
 from mock import patch, Mock
 
-from override_settings import override_settings
+from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
 from django.contrib.auth.models import Group

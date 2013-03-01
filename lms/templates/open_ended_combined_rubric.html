@@ -1,0 +1,28 @@
+<div class="rubric">
+    % for i in range(len(categories)):
+        <% category = categories[i] %>
+        <span class="rubric-category">${category['description']}</span> <br/>
+        <ul class="rubric-list">
+        % for j in range(len(category['options'])):
+            <% option = category['options'][j] %>
+            <li class="rubric-list-item">
+                <div class="rubric-label">
+                    %for grader_type in category['options'][j]['grader_types']:
+                        % if grader_type in grader_type_image_dict:
+                            <% grader_image = grader_type_image_dict[grader_type] %>
+                            % if grader_type in human_grader_types:
+                                <% human_title = human_grader_types[grader_type] %>
+                            % else:
+                                <% human_title = grader_type %>
+                            % endif
+                            <img src="${grader_image}" title="${human_title}"/>
+                        % endif
+                    %endfor
+                    ${option['points']} points : ${option['text']}
+                </div>
+            </li>
+        % endfor
+        </ul>
+    % endfor
+</div>
+

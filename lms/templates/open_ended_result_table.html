@@ -1,0 +1,58 @@
+% for co in context_list:
+    % if co['grader_type'] in grader_type_image_dict:
+        <%grader_type=co['grader_type']%>
+        <% grader_image = grader_type_image_dict[grader_type] %>
+        % if grader_type in human_grader_types:
+            <% human_title = human_grader_types[grader_type] %>
+        % else:
+            <% human_title = grader_type %>
+        % endif
+        <section class="rubric-result-container">
+            <div class="rubric-result">
+                <img src="${grader_image}" title="${human_title}"/>
+            </div>
+            <div class="rubric-result">
+                ${co['rubric_html']}
+            </div>
+            <div class="rubric-result">
+                %if len(co['feedback'])>2:
+                    <div class="collapsible evaluation-response">
+                        <header>
+                            <a href="#">See full feedback</a>
+                        </header>
+                        <section class="feedback-full">
+                            ${co['feedback']}
+                        </section>
+                    </div>
+                %endif
+            </div>
+            %if grader_type!="SA":
+                <div class="rubric-result">
+                    <input type="hidden" value="${co['grader_id']}" class="grader_id" />
+                    <input type="hidden" value="${co['submission_id']}" class="submission_id" />
+                    <div class="collapsible evaluation-response">
+                        <header>
+                            <a href="#">Respond to Feedback</a>
+                        </header>
+                        <section id="evaluation" class="evaluation">
+                            <p>How accurate do you find this feedback?</p>
+                            <div class="evaluation-scoring">
+                                <ul class="scoring-list">
+                                    <li><input type="radio" name="evaluation-score" id="evaluation-score-5" value="5" /> <label for="evaluation-score-5"> Correct</label></li>
+                                    <li><input type="radio" name="evaluation-score" id="evaluation-score-4" value="4" /> <label for="evaluation-score-4"> Partially Correct</label></li>
+                                    <li><input type="radio" name="evaluation-score" id="evaluation-score-3" value="3" /> <label for="evaluation-score-3"> No Opinion</label></li>
+                                    <li><input type="radio" name="evaluation-score" id="evaluation-score-2" value="2" /> <label for="evaluation-score-2"> Partially Incorrect</label></li>
+                                    <li><input type="radio" name="evaluation-score" id="evaluation-score-1" value="1" /> <label for="evaluation-score-1"> Incorrect</label></li>
+                                </ul>
+                            </div>
+                            <p>Additional comments:</p>
+                            <textarea rows="${rows}" cols="${cols}" name="feedback" class="feedback-on-feedback" id="feedback"></textarea>
+                            <input type="button" value="Submit Feedback" class="submit-evaluation-button" name="reset"/>
+                        </section>
+                    </div>
+                </div>
+            %endif
+        </section>
+        <br/>
+    %endif
+%endfor

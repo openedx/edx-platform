@@ -1,12 +1,13 @@
 from lettuce import world, step
-from factories import *
-from django.core.management import call_command
 from lettuce.django import django_url
-from django.conf import settings
-from django.core.management import call_command
 from nose.tools import assert_true
 from nose.tools import assert_equal
+from selenium.webdriver.support.ui import WebDriverWait
+
+from terrain.factories import UserFactory, RegistrationFactory, UserProfileFactory
+from terrain.factories import CourseFactory, GroupFactory
 import xmodule.modulestore.django
+from auth.authz import get_user_by_email
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -20,7 +21,8 @@ def i_visit_the_studio_homepage(step):
     # LETTUCE_SERVER_PORT = 8001
     # in your settings.py file.
     world.browser.visit(django_url('/'))
-    assert world.browser.is_element_present_by_css('body.no-header', 10)
+    signin_css = 'a.action-signin'
+    assert world.browser.is_element_present_by_css(signin_css, 10)
 
 
 @step('I am logged into Studio$')
@@ -42,6 +44,13 @@ def i_press_the_category_delete_icon(step, category):
     else:
         assert False, 'Invalid category: %s' % category
     css_click(css)
+
+
+@step('I have opened a new course in Studio$')
+def i_have_opened_a_new_course(step):
+    clear_courses()
+    log_into_studio()
+    create_a_course()
 
 ####### HELPER FUNCTIONS ##############
 
@@ -85,11 +94,36 @@ def assert_css_with_text(css, text):
 
 
 def css_click(css):
+    assert_true(world.browser.is_element_present_by_css(css, 5))
     world.browser.find_by_css(css).first.click()
+
+
+def css_click_at(css, x=10, y=10):
+    '''
+    A method to click at x,y coordinates of the element
+    rather than in the center of the element
+    '''
+    assert_true(world.browser.is_element_present_by_css(css, 5))
+    e = world.browser.find_by_css(css).first
+    e.action_chains.move_to_element_with_offset(e._element, x, y)
+    e.action_chains.click()
+    e.action_chains.perform()
 
 
 def css_fill(css, value):
     world.browser.find_by_css(css).first.fill(value)
+
+
+def css_find(css):
+    return world.browser.find_by_css(css)
+
+
+def wait_for(func):
+    WebDriverWait(world.browser.driver, 10).until(func)
+
+
+def id_find(id):
+    return world.browser.find_by_id(id)
 
 
 def clear_courses():
@@ -113,7 +147,11 @@ def log_into_studio(
     create_studio_user(uname=uname, email=email, is_staff=is_staff)
     world.browser.cookies.delete()
     world.browser.visit(django_url('/'))
-    world.browser.is_element_present_by_css('body.no-header', 10)
+    signin_css = 'a.action-signin'
+    world.browser.is_element_present_by_css(signin_css, 10)
+
+    # click the signin button
+    css_click(signin_css)
 
     login_form = world.browser.find_by_css('form#login_form')
     login_form.find_by_name('email').fill(email)
@@ -124,19 +162,31 @@ def log_into_studio(
 
 
 def create_a_course():
-    css_click('a.new-course-button')
-    fill_in_course_info()
-    css_click('input.new-course-save')
-    assert_true(world.browser.is_element_present_by_css('a#courseware-tab', 5))
+    c = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+    # Add the user to the instructor group of the course
+    # so they will have the permissions to see it in studio
+    g = GroupFactory.create(name='instructor_MITx/999/Robot_Super_Course')
+    u = get_user_by_email('robot+studio@edx.org')
+    u.groups.add(g)
+    u.save()
+    world.browser.reload()
+
+    course_link_css = 'span.class-name'
+    css_click(course_link_css)
+    course_title_css = 'span.course-title'
+    assert_true(world.browser.is_element_present_by_css(course_title_css, 5))
 
 
 def add_section(name='My Section'):
     link_css = 'a.new-courseware-section-button'
     css_click(link_css)
-    name_css = '.new-section-name'
-    save_css = '.new-section-name-save'
+    name_css = 'input.new-section-name'
+    save_css = 'input.new-section-name-save'
     css_fill(name_css, name)
     css_click(save_css)
+    span_css = 'span.section-name-span'
+    assert_true(world.browser.is_element_present_by_css(span_css, 5))
 
 
 def add_subsection(name='Subsection One'):

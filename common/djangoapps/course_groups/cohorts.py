@@ -6,6 +6,7 @@ forums, and to the cohort admin views.
 from django.contrib.auth.models import User
 from django.http import Http404
 import logging
+import random
 
 from courseware import courses
 from student.models import get_user_by_username_or_email
@@ -64,7 +65,23 @@ def is_commentable_cohorted(course_id, commentable_id):
                                                                ans))
     return ans
 
+    
+def get_cohorted_commentables(course_id):
+    """
+    Given a course_id return a list of strings representing cohorted commentables
+    """
 
+    course = courses.get_course_by_id(course_id)
+    
+    if not course.is_cohorted:
+        # this is the easy case :)
+        ans = []
+    else: 
+        ans = course.cohorted_discussions
+
+    return ans
+    
+    
 def get_cohort(user, course_id):
     """
     Given a django User and a course_id, return the user's cohort in that
@@ -96,8 +113,29 @@ def get_cohort(user, course_id):
                                             group_type=CourseUserGroup.COHORT,
                                             users__id=user.id)
     except CourseUserGroup.DoesNotExist:
-        # TODO: add auto-cohorting logic here once we know what that will be.
+        # Didn't find the group.  We'll go on to create one if needed.
+        pass
+
+    if not course.auto_cohort:
         return None
+
+    choices = course.auto_cohort_groups
+    if len(choices) == 0:
+        # Nowhere to put user
+        log.warning("Course %s is auto-cohorted, but there are no"
+                    " auto_cohort_groups specified",
+                    course_id)
+        return None
+
+    # Put user in a random group, creating it if needed
+    group_name = random.choice(choices)
+    group, created = CourseUserGroup.objects.get_or_create(
+        course_id=course_id,
+        group_type=CourseUserGroup.COHORT,
+        name=group_name)
+    
+    user.course_groups.add(group)
+    return group
 
 
 def get_course_cohorts(course_id):
