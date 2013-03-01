@@ -385,7 +385,7 @@ def login_user(request, error=""):
         try:
             login(request, user)
             if request.POST.get('remember') == 'true':
-                request.session.set_expiry(None)  # or change to 604800 for 7 days
+                request.session.set_expiry(604800)
                 log.debug("Setting user session to never expire")
             else:
                 request.session.set_expiry(0)

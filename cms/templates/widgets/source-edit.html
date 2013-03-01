@@ -10,7 +10,7 @@
       <h2>High Level Source Editing</h2>
     </header>
 
-    <form id="hls-form">
+    <form id="hls-form" enctype="multipart/form-data">
       <section class="source-edit">
           <textarea name="" data-metadata-name="source_code" class="source-edit-box hls-data" rows="8" cols="40">${metadata['source_code']|h}</textarea>
       </section>
@@ -18,6 +18,9 @@
         <button type="reset" class="hls-compile">Save &amp; Compile to edX XML</button>
         <button type="reset" class="hls-save">Save</button>
         <button type="reset" class="hls-refresh">Refresh</button>
+	<div style="display:none" id="hls-finput"></div>
+        <span id="message"></span>
+        <button type="reset" class="hls-upload" style="float:right">Upload</button>
       </div>
     </form>
 
@@ -25,88 +28,148 @@
   </section>
     
   <script type="text/javascript" src="/static/js/vendor/CodeMirror/stex.js"></script>
-  <script type="text/javascript">
-     $('#hls-trig-${hlskey}').leanModal({ top:40, overlay:0.8, closeButton: ".close-button"});
+  <script type = "text/javascript">
+  hlstrig = $('#hls-trig-${hlskey}');
+  hlsmodal = $('#hls-modal-${hlskey}');
 
-     $('#hls-modal-${hlskey}').data('editor',CodeMirror.fromTextArea($('#hls-modal-${hlskey}').find('.hls-data')[0], {lineNumbers: true, mode: 'stex'}));
+  hlstrig.leanModal({
+      top: 40,
+      overlay: 0.8,
+      closeButton: ".close-button"
+  });
 
-     $('#hls-trig-${hlskey}').click(function(){slow_refresh_hls($('#hls-modal-${hlskey}'))})
+  hlsmodal.data('editor', CodeMirror.fromTextArea(hlsmodal.find('.hls-data')[0], {
+      lineNumbers: true,
+      mode: 'stex'
+  }));
 
-     // refresh button
+  $('#hls-trig-${hlskey}').click(function() {
 
-     $('#hls-modal-${hlskey}').find('.hls-refresh').click(function(){refresh_hls($('#hls-modal-${hlskey}'))});
+      ## this ought to be done using css instead
+      hlsmodal.attr('style', function(i,s) { return s + ' margin-left:0px !important; left:5%' });
 
-     function refresh_hls(el){
-	 el.data('editor').refresh();
-      }
+      ## setup file input
+      ## need to insert this only after hls triggered, because otherwise it
+      ## causes other <form> elements to become multipart/form-data, 
+      ## thus breaking multiple-choice input forms, for example.
+      $('#hls-finput').append('<input type="file" name="hlsfile" id="hlsfile" />');
 
-     function slow_refresh_hls(el){
-         el.delay(200).queue(function(){ 
-	       refresh_hls(el);
-	       $(this).dequeue(); 
-	   });
-	 // resize the codemirror box
-	 h = el.height();
-	 el.find('.CodeMirror-scroll').height(h-100);
-     }
+      var el = $('#hls-modal-${hlskey}');
+      setup_autoupload(el);
+      slow_refresh_hls(el);
+  });
 
-     // compile & save button
+  // file upload button
+  hlsmodal.find('.hls-upload').click(function() {
+      $('#hls-modal-${hlskey}').find('#hlsfile').trigger('click');
+  });
 
-     $('#hls-modal-${hlskey}').find('.hls-compile').click(compile_hls_${hlskey});
-     
-     function compile_hls_${hlskey}(){
+  // auto-upload after file is chosen
+  function setup_autoupload(el){
+      el.find('#hlsfile').change(function() {
+          var file = el.find('#hlsfile')[0].files[0];
+    
+          var reader = new FileReader();
+          reader.onload = function(event) {
+              var contents = event.target.result;
+	      el.data('editor').setValue(contents);
+	      // trigger compile & save
+	      el.find('.hls-compile').trigger('click');
+          };
+          reader.readAsText(file);
+      });
+  }
 
-          editor = $('#hls-modal-${hlskey}').data('editor')
-          var myquery = { latexin: editor.getValue() };
+  // refresh button
+  hlsmodal.find('.hls-refresh').click(function() {
+      refresh_hls(hlsmodal);
+  });
 
-          $.ajax({
-              url: '${metadata.get('source_processor_url','https://qisx.mit.edu:5443/latex2edx')}',
-              type: 'GET',
-              contentType: 'application/json',
-              data: escape(JSON.stringify(myquery)),
-              crossDomain: true,
-              dataType: 'jsonp',
-              jsonpCallback: 'process_return_${hlskey}',
-              beforeSend: function (xhr) { xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
-              timeout : 7000,
-              success: function(result) {
-		  console.log(result);
-              },
-              error: function() {
-                  alert('Error: cannot connect to latex2edx server');
-                  console.log('error!');
+  function refresh_hls(el) {
+      el.data('editor').refresh();
+      $('#lean_overlay').hide();	      // hide gray overlay
+  }
+
+  function slow_refresh_hls(el) {
+      el.delay(200).queue(function() {
+          refresh_hls(el);
+          $(this).dequeue();
+      });
+      // resize the codemirror box
+      var h = el.height();
+      el.find('.CodeMirror-scroll').height(h - 100);
+  }
+
+  // compile & save button
+  hlsmodal.find('.hls-compile').click(function() {
+      var el = $('#hls-modal-${hlskey}');
+      compile_hls(el);
+  });
+
+  // connect to server using POST (requires cross-domain-access)
+
+  function compile_hls(el) {
+      var editor = el.data('editor')
+      var hlsdata = editor.getValue();
+
+      $.ajax({
+          url: "https://studio-input-filter.mitx.mit.edu/latex2edx?raw=1",
+          type: "POST",
+          data: "" + hlsdata,
+          crossDomain: true,
+          processData: false,
+          success: function(data) {
+              xml = data.xml;
+              if (xml.length == 0) {
+                  alert('Conversion failed!  error:' + data.message);
+              } else {
+                  el.closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(xml);
+                  save_hls(el);
               }
-          });
-	  // $('#hls-modal-${hlskey}').hide();
-     }
-
-     function process_return_${hlskey}(datadict){
-          // datadict is json of array with "xml" and "message"
-          // if "xml" value is '' then the conversion failed
-          xml = datadict.xml;
-          console.log('xml:');
-          console.log(xml);
-          if (xml.length==0){
-              alert('Conversion failed!  error:'+ datadict.message);
-          }else{
-              set_raw_edit_box(xml,'${hlskey}');
-              save_hls($('#hls-modal-${hlskey}'));
+          },
+          error: function() {
+              alert('Error: cannot connect to latex2edx server');
           }
-     }
+      });
+  }
+  
+  function process_return_${hlskey}(datadict) {
+      // datadict is json of array with "xml" and "message"
+      // if "xml" value is '' then the conversion failed
+      var xml = datadict.xml;
+      if (xml.length == 0) {
+          alert('Conversion failed!  error:' + datadict.message);
+      } else {
+          set_raw_edit_box(xml, '${hlskey}');
+          save_hls($('#hls-modal-${hlskey}'));
+      }
+  }
 
-     function set_raw_edit_box(data,key){
-         // get the codemirror editor for the raw-edit-box
-         // it's a CodeMirror-wrap class element
-          $('#hls-modal-'+key).closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(data);
-     }
 
-     // save button
+  function set_raw_edit_box(data, key) {
+      // get the codemirror editor for the raw-edit-box
+      // it's a CodeMirror-wrap class element
+      $('#hls-modal-' + key).closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(data);
+  }
 
-     $('#hls-modal-${hlskey}').find('.hls-save').click(function(){save_hls($('#hls-modal-${hlskey}'))});
-     
-     function save_hls(el){
-          el.find('.hls-data').val(el.data('editor').getValue());
-          el.closest('.component').find('.save-button').click();
-     }
+  // save button
+
+  hlsmodal.find('.hls-save').click(function() {
+      save_hls(hlsmodal);
+  });
+
+  function save_hls(el) {
+      el.find('.hls-data').val(el.data('editor').getValue());
+      el.closest('.component').find('.save-button').click();
+  }
+
+  ## add upload and download links / buttons to component edit box
+  hlsmodal.closest('.component').find('.component-actions').append('<div id="link-${hlskey}" style="float:right;"></div>');
+  $('#link-${hlskey}').html('<a class="upload-button standard" id="upload-${hlskey}">upload</a>');
+  $('#upload-${hlskey}').click(function() {
+      hlsmodal.closest('.component').find('.edit-button').trigger('click'); // open up editor window
+      $('#hls-trig-${hlskey}').trigger('click'); // open up HLS editor window
+      hlsmodal.find('#hlsfile').trigger('click');
+  });
 
   </script>

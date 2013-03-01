@@ -20,7 +20,7 @@ http://sympy.googlecode.com/files/sympy-0.7.1.tar.gz
 newrelic==1.8.0.13
 glob2==0.3
 pymongo==2.4.1
-django_nose
+django_nose==1.1
 nosexcover==1.0.7
 rednose==0.3.3
 GitPython==0.3.2.RC1

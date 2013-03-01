@@ -23,7 +23,7 @@
         // to find the URL path in which the script lives. If the name
         // of the file is changed, GWT won't load correctly
         var jsmolcalc_src = '/sta' + 'tic/js/capa/jsmolcalc/jsmolcalc.nocache.js';
-        var jsme_src = '/sta' + 'tic/js/capa/jsme/jsme_export.nocache.js';
+        var jsme_src = '/sta' + 'tic/js/capa/jsme/jsme.nocache.js';
 
         // Make sure we don't request the scripts twice
 
@@ -48,11 +48,11 @@
             jsmolcalc.onInjectionDone('jsmolcalc');
         }
 
-        if (typeof(jsme_export) != 'undefined' && jsme_export)
+        if (typeof(jsme) != 'undefined' && jsme)
         {
-            // dummy function called by jsme_export
+            // dummy function called by jsme
             window.jsmeOnLoad  = function() {};
-            jsme_export.onInjectionDone('jsme_export');
+            jsme.onInjectionDone('jsme');
         }
 
         // jsmol is defined my jsmolcalc and JavaScriptApplet is defined by jsme

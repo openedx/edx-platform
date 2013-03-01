@@ -86,7 +86,8 @@ def render_accordion(request, course, chapter, section):
         Returns the html string'''
 
     # grab the table of contents
-    toc = toc_for_course(request.user, request, course, chapter, section)
+    user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    toc = toc_for_course(user, request, course, chapter, section)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
@@ -250,23 +251,24 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
-    course = get_course_with_access(request.user, course_id, 'load', depth=2)
-    staff_access = has_access(request.user, course, 'staff')
-    registered = registered_for_course(course, request.user)
+    user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    course = get_course_with_access(user, course_id, 'load', depth=2)
+    staff_access = has_access(user, course, 'staff')
+    registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug('User %s tried to view course %s but is not enrolled' % (request.user, course.location.url()))
+        log.debug('User %s tried to view course %s but is not enrolled' % (user, course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
 
     try:
         student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2)
+            course.id, user, course, depth=2)
 
         # Has this student been in this course before?
         first_time = student_module_cache.lookup(course_id, 'course', course.location.url()) is None
 
         # Load the module for the course
-        course_module = get_module_for_descriptor(request.user, request, course, student_module_cache, course.id)
+        course_module = get_module_for_descriptor(user, request, course, student_module_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
                         ' far, should have gotten a course module for this user')
@@ -288,7 +290,7 @@ def index(request, course_id, chapter=None, section=None,
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
-            instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
+            instance_module = get_instance_module(course_id, user, course_module, student_module_cache)
             save_child_position(course_module, chapter, instance_module)
         else:
             raise Http404('No chapter descriptor found with name {}'.format(chapter))
@@ -307,9 +309,9 @@ def index(request, course_id, chapter=None, section=None,
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
             section_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-                course.id, request.user, section_descriptor, depth=None)
+                course.id, user, section_descriptor, depth=None)
 
-            section_module = get_module(request.user, request, section_descriptor.location,
+            section_module = get_module(user, request, section_descriptor.location,
                 section_module_cache, course.id, position=position, depth=None)
             if section_module is None:
                 # User may be trying to be clever and access something
@@ -317,12 +319,12 @@ def index(request, course_id, chapter=None, section=None,
                 raise Http404
 
             # Save where we are in the chapter
-            instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
+            instance_module = get_instance_module(course_id, user, chapter_module, student_module_cache)
             save_child_position(chapter_module, section, instance_module)
 
             # check here if this section *is* a timed module.  
             if section_module.category == 'timelimit':
-                timer_context = update_timelimit_module(request.user, course_id, student_module_cache, 
+                timer_context = update_timelimit_module(user, course_id, student_module_cache, 
                                                         section_descriptor, section_module)
                 if 'timer_expiration_duration' in timer_context:
                     context.update(timer_context)
@@ -363,7 +365,7 @@ def index(request, course_id, chapter=None, section=None,
             log.exception("Error in index view: user={user}, course={course},"
                           " chapter={chapter} section={section}"
                           "position={position}".format(
-                              user=request.user,
+                              user=user,
                               course=course,
                               chapter=chapter,
                               section=section,
