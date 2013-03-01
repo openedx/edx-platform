@@ -174,7 +174,7 @@ a:active {
     background-image: url(images/button/split-button-arrow.png);
 }
 .mosaic-ToolButton .mosaic-Split-Button-focus {
-    background-image: url(split-button-arrow-focus.png);
+    background-image: url(images/button/split-button-arrow-focus.png);
 }
 .mosaic-ToolButton .mosaic-Split-Button-hover {
     background-image: url(images/button/split-button-arrow-hover.png);
