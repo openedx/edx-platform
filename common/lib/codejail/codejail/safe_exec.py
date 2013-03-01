@@ -101,7 +101,7 @@ def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=
         json.dump(g_dict, sys.__stdout__)
         """))
 
-    stdin = json.dumps([code, globals_dict])
+    stdin = json.dumps([code, json_safe(globals_dict)])
     jailed_code = "".join(the_code)
 
     # Turn this on to see what's being executed.
@@ -117,6 +117,29 @@ def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=
     globals_dict.update(json.loads(res.stdout))
 
 
+def json_safe(d):
+    """Return only the JSON-safe part of d.
+
+    Used to emulate reading data through a serialization straw.
+
+    """
+    ok_types = (type(None), int, long, float, str, unicode, list, tuple, dict)
+    bad_keys = ("__builtins__",)
+    jd = {}
+    for k,v in d.iteritems():
+        if not isinstance(v, ok_types):
+            continue
+        if k in bad_keys:
+            continue
+        try:
+            json.dumps(v)
+        except TypeError:
+            continue
+        else:
+            jd[k] = v
+    return json.loads(json.dumps(jd))
+
+
 def not_safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=None):
     """Another implementation of `safe_exec`, but not safe.
 
@@ -126,29 +149,7 @@ def not_safe_exec(code, globals_dict, assumed_imports=None, files=None, python_p
     and modifying sys.path.
 
     """
-    def straw(d):
-        """Return only the JSON-safe part of d.
-
-        Used to emulate reading data through a serialization straw.
-
-        """
-        ok_types = (type(None), int, long, float, str, unicode, list, tuple, dict)
-        bad_keys = ("__builtins__",)
-        jd = {}
-        for k,v in d.iteritems():
-            if not isinstance(v, ok_types):
-                continue
-            if k in bad_keys:
-                continue
-            try:
-                json.dumps(v)
-            except TypeError:
-                continue
-            else:
-                jd[k] = v
-        return json.loads(json.dumps(jd))
-
-    g_dict = straw(globals_dict)
+    g_dict = json_safe(globals_dict)
 
     for name, modname in names_and_modules(assumed_imports or ()):
         g_dict[name] = lazymod.LazyModule(modname)
@@ -168,7 +169,7 @@ def not_safe_exec(code, globals_dict, assumed_imports=None, files=None, python_p
             finally:
                 sys.path = original_path
 
-    globals_dict.update(straw(g_dict))
+    globals_dict.update(json_safe(g_dict))
 
 # Running Python code in the sandbox makes it difficult to debug.
 # Change 0 to 1 to run the code directly.
