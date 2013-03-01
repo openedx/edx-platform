@@ -66,7 +66,11 @@ from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 log = logging.getLogger(__name__)
 
 
-COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video', 'peergrading', 'combinedopenended']
+COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video', 'combinedopenended', 'peergrading']
+
+ADVANCED_COMPONENT_TYPES = {
+    'openended' : ['combinedopenended', 'peergrading']
+}
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -285,7 +289,14 @@ def edit_unit(request, location):
     log.debug(templates)
     for template in templates:
         if template.location.category in COMPONENT_TYPES:
-            component_templates[template.location.category].append((
+            #This is a hack to create categories for different xmodules
+            category = template.location.category
+            for key in ADVANCED_COMPONENT_TYPES:
+                if template.location.category in ADVANCED_COMPONENT_TYPES[key]:
+                    category = key
+                    break
+
+            component_templates[category].append((
                 template.display_name,
                 template.location.url(),
                 'markdown' in template.metadata,

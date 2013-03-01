@@ -456,6 +456,7 @@ class PeerGradingModule(XModule):
         try:
             problem_list_json = self.peer_gs.get_problem_list(self.system.course_id, self.system.anonymous_student_id)
             problem_list_dict = problem_list_json
+            log.debug(problem_list_dict)
             success = problem_list_dict['success']
             if 'error' in problem_list_dict:
                 error_text = problem_list_dict['error']
@@ -470,6 +471,9 @@ class PeerGradingModule(XModule):
         except ValueError:
             #This is a student_facing_error
             error_text = "Could not get list of problems to peer grade.  Please notify course staff."
+            success = False
+        except:
+            log.exception("Could not contact peer grading service.")
             success = False
 
 

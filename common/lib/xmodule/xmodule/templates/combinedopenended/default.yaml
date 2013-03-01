@@ -5,12 +5,12 @@ metadata:
     showanswer: never
     weight: ""
     attempts: 10
-    max_score: 2
+    max_score: 1
     is_graded: False
     version: 1
     display_name: Test Question
 data: |
-  <combinedopenended attempts="10" max_score="2" display_name = "Test Question" is_graded="True" version="1">
+  <combinedopenended attempts="10" max_score="1" display_name = "Open Ended Response" is_graded="True" version="1">
   	<rubric>
   		<rubric>
   		    <category>
@@ -21,15 +21,6 @@ data: |
               <option>
                   The response is correct for category 1.
               </option>
-  		    </category>
-  		    <category>
-  		       <description> Hydrophobia </description>
-  		       <option>
-  		        The response does not incorporate what is needed for a one response.
-  		       </option>
-  		       <option>
-  				The response is correct for category 2.
-  		      </option>
   		    </category>
   		</rubric>
   	</rubric>
