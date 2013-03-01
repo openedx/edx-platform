@@ -66,11 +66,11 @@ from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 log = logging.getLogger(__name__)
 
 
-COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video', 'advanced', 'openended']
+COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 ADVANCED_COMPONENT_TYPES = {
     'openended' : ['combinedopenended', 'peergrading'],
-    'advanced' : ['advanced']
+    'advanced' : ['annotation']
 }
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
@@ -301,14 +301,14 @@ def edit_unit(request, location):
 
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
-        if template.location.category in COMPONENT_TYPES:
-			#This is a hack to create categories for different xmodules
-            category = template.location.category
-            for key in ADVANCED_COMPONENT_TYPES:
-                if template.location.category in ADVANCED_COMPONENT_TYPES[key]:
-                    category = key
-                    break
+        category = template.location.category
+        for key in ADVANCED_COMPONENT_TYPES:
+            if template.location.category in ADVANCED_COMPONENT_TYPES[key]:
+                category = key
+                break
 
+        if category in COMPONENT_TYPES:
+			#This is a hack to create categories for different xmodules
             component_templates[template.location.category].append((
                 template.display_name,
                 template.location.url(),
