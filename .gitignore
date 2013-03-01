@@ -27,4 +27,5 @@ lms/lib/comment_client/python
 nosetests.xml
 cover_html/
 .idea/
+.redcar/
 chromedriver.log

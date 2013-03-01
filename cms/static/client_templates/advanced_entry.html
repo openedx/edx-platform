@@ -1,0 +1,16 @@
+<li class="field-group course-advanced-policy-list-item">
+	<div class="field text key" id="<%= (_.isEmpty(key) ? '__new_advanced_key__' : key) %>">
+		<label for="<%= keyUniqueId %>">Policy Key:</label>
+		<input type="text" class="short policy-key" id="<%= keyUniqueId %>" value="<%= key %>" />
+		<span class="tip tip-stacked">Keys are case	sensitive and cannot contain spaces or start with a number</span>
+  </div>
+  
+  <div class="field text value">
+    <label for="<%= valueUniqueId %>">Policy Value:</label>
+    <textarea class="json text" id="<%= valueUniqueId %>"><%= value %></textarea>
+  </div>
+	
+	<div class="actions">
+		<a href="#" class="button delete-button standard remove-item remove-grading-data"><span class="delete-icon"></span>Delete</a>
+	</div>
+</li>

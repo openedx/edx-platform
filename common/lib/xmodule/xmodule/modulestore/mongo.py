@@ -157,10 +157,15 @@ class MongoModuleStore(ModuleStoreBase):
         '''
         
         # get all collections in the course, this query should not return any leaf nodes
-        query = { '_id.org' : location.org,
-                '_id.course' : location.course,
-                '_id.revision' : None,
-                'definition.children':{'$ne': []}
+        query = { 
+                    '_id.org': location.org,
+                    '_id.course': location.course,
+                    '$or': [ 
+                    {"_id.category":"course"}, 
+                    {"_id.category":"chapter"},    
+                    {"_id.category":"sequential"},    
+                    {"_id.category":"vertical"}   
+                ]
                 }
         # we just want the Location, children, and metadata
         record_filter = {'_id':1,'definition.children':1,'metadata':1}
@@ -279,6 +284,13 @@ class MongoModuleStore(ModuleStoreBase):
 
         resource_fs = OSFS(root)
 
+        metadata_inheritance_tree = None
+
+        # if we are loading a course object, there is no parent to inherit the metadata from
+        # so don't bother getting it
+        if item['location']['category'] != 'course':
+            metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']), 300)
+
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
         system = CachingDescriptorSystem(
@@ -288,7 +300,7 @@ class MongoModuleStore(ModuleStoreBase):
             resource_fs,
             self.error_tracker,
             self.render_template,
-            metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']), 60)
+            metadata_inheritance_tree = metadata_inheritance_tree
         )
         return system.load_item(item['location'])
 

@@ -172,6 +172,9 @@ LANGUAGE_CODE = 'en'            # http://www.i18nguy.com/unicode/language-identi
 USE_I18N = True
 USE_L10N = True
 
+# Tracking
+TRACK_MAX_EVENT = 10000
+
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -275,6 +278,10 @@ INSTALLED_APPS = (
     'auth',
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run
+
+    # tracking
+    'track',
+
     # For asset pipelining
     'pipeline',
     'staticfiles',

@@ -23,7 +23,8 @@ from contentstore import utils
   
   <script type="text/javascript">
     $(document).ready(function(){
-    
+      
+      // hilighting labels when fields are focused in
       $("form :input").focus(function() {
         $("label[for='" + this.id + "']").addClass("is-focused");
       }).blur(function() {
@@ -205,7 +206,7 @@ from contentstore import utils
 
     <aside class="content-supplementary" role="complimentary">
      <div class="bit">
-        <h3 class="title-3">How will these settings be used</h3>
+        <h3 class="title-3">How will these settings be used?</h3>
         <p>Your course's schedule settings determine when students can enroll in and begin a course as well as when the course.</p>
 
         <p>Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.</p>
@@ -220,6 +221,7 @@ from contentstore import utils
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
             <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
           </ul>
         </nav>
       % endif

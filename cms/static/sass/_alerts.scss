@@ -1,3 +1,100 @@
+// notifications
+.wrapper-notification {
+	@include clearfix();
+	@include box-sizing(border-box);
+	@include transition (bottom 2.0s ease-in-out 5s);
+	@include box-shadow(0 -1px 2px rgba(0,0,0,0.1));
+	position: fixed;
+	bottom: -100px;
+	z-index: 1000;
+	width: 100%;
+	overflow: hidden;
+	opacity: 0;
+	border-top: 1px solid $darkGrey;
+	padding: 20px 40px;
+
+	&.is-shown {
+		bottom: 0;
+		opacity: 1.0;
+	}
+
+	&.wrapper-notification-warning {
+		border-color: shade($yellow, 25%);
+		background: tint($yellow, 25%);
+	}
+
+	&.wrapper-notification-error {
+		border-color: shade($red, 50%);
+		background: tint($red, 20%);
+		color: $white;
+	}
+
+	&.wrapper-notification-confirm {
+		border-color: shade($green, 30%);
+		background: tint($green, 40%);
+		color: shade($green, 30%);
+	}
+}
+
+.notification {
+	@include box-sizing(border-box);
+	margin: 0 auto;
+	width: flex-grid(12);
+	max-width: $fg-max-width;
+	min-width: $fg-min-width;
+
+	.copy {
+		float: left;
+		width: flex-grid(9, 12);
+		margin-right: flex-gutter();
+		margin-top: 5px;
+		font-size: 14px;
+
+		.icon {
+			display: inline-block;
+			vertical-align: top;
+			margin-right: 5px;
+			font-size: 20px;
+		}
+
+		p {
+			width: flex-grid(8, 9);
+			display: inline-block;
+			vertical-align: top;
+		}
+	}
+
+	.actions {
+		float: right;
+		width: flex-grid(3, 12);
+		margin-top: ($baseline/2);
+		text-align: right;
+
+		li {
+			display: inline-block;
+			vertical-align: middle;
+			margin-right: 10px;
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+
+		.save-button {
+			@include blue-button;
+		}
+
+		.cancel-button {
+		  @include white-button;
+		}
+	}
+
+	strong {
+		font-weight: 700;
+	}
+}
+
+// adopted alerts
 .alert {
 	padding: 15px 20px;
 	margin-bottom: 30px;

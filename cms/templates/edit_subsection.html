@@ -22,7 +22,7 @@
       <article class="subsection-body window" data-id="${subsection.location}">
         <div class="subsection-name-input">
           <label>Display Name:</label>
-          <input type="text" value="${subsection.display_name}" class="subsection-display-name-input" data-metadata-name="display_name"/>
+          <input type="text" value="${subsection.display_name | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
         <div class="sortable-unit-list">
           <label>Units:</label>

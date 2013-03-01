@@ -210,6 +210,9 @@ class @PeerGradingProblem
     @calibration_interstitial_page_button = $('.calibration-interstitial-page-button')
     @flag_student_checkbox = $('.flag-checkbox')
     @answer_unknown_checkbox = $('.answer-unknown-checkbox')
+
+    $(window).keydown @keydown_handler
+
     @collapse_question()
 
     Collapsible.setCollapsibles(@content_panel)
@@ -251,9 +254,6 @@ class @PeerGradingProblem
   fetch_submission_essay: () =>
     @backend.post('get_next_submission', {location: @location}, @render_submission)
 
-  gentle_alert: (msg) =>
-    @grading_message.fadeIn()
-    @grading_message.html("<p>" + msg + "</p>")
 
   construct_data: () ->
     data =
@@ -336,6 +336,14 @@ class @PeerGradingProblem
       @grading_message.hide()
       @show_submit_button()
       @grade = Rubric.get_total_score()
+
+  keydown_handler: (event) =>
+    if event.which == 13 && @submit_button.is(':visible')
+      if @calibration
+        @submit_calibration_essay()
+      else
+        @submit_grade()
+
 
 
 
@@ -472,6 +480,10 @@ class @PeerGradingProblem
   setup_score_selection: (max_score) =>
     # And now hook up an event handler again
     $("input[class='score-selection']").change @graded_callback
+
+  gentle_alert: (msg) =>
+    @grading_message.fadeIn()
+    @grading_message.html("<p>" + msg + "</p>")
 
   collapse_question: () =>
     @prompt_container.slideToggle()

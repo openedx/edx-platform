@@ -17,37 +17,39 @@
 <%block name="js_extra">
   <script type="text/javascript">
 
-    var url = "${textbook['url']}";
-
     $(document).ready(function() {
-        $('#outerContainer').PDFViewer( { 
-            % if page is not None:
-            'pageNum' : ${page},
-            % endif
-            'url' : url
-        });
+        var options = {};
+        %if 'url' in textbook:
+            options.url = "${textbook['url']}";
+        %endif
+        %if 'chapters' in textbook:
+            var chptrs = [];
+            %for chap in textbook['chapters']:
+                chptrs.push("${chap['url']}");
+            %endfor
+            options.chapters = chptrs;
+        %endif
+        %if chapter is not None:
+            options.chapterNum = ${chapter};
+        %endif
+        %if page is not None:
+            options.pageNum = ${page};
+        %endif
+    
+        $('#outerContainer').PDFViewer(options);
     });
   </script>  
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='pdftextbook/{0}'.format(book_index)" />
 
-
     <div id="outerContainer">
-      <div id="mainContainer">
+      <div id="mainContainer" class="book-wrapper">
+
         <div class="toolbar">
           <div id="toolbarContainer">
             <div id="toolbarViewer">
               <div id="toolbarViewerLeft">
-                <div class="splitToolbarButton">
-                  <button class="toolbarButton pageUp" title="Previous Page" id="previous" tabindex="5">
-                    <span>Previous</span>
-                  </button>
-                  <div class="splitToolbarButtonSeparator"></div>
-                  <button class="toolbarButton pageDown" title="Next Page" id="next" tabindex="6">
-                    <span>Next</span>
-                  </button>
-                </div>
                 <label id="pageNumberLabel" class="toolbarLabel" for="pageNumber">Page: </label>
                 <input type="number" id="pageNumber" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="7">
                 </input>
@@ -88,10 +90,40 @@
           </div>
         </div>
 
-        <div id="viewerContainer">
-          <div id="viewer" contextmenu="viewerContextMenu"></div>
-        </div>
+        %if 'chapters' in textbook:
+	<section aria-label="Textbook Navigation" class="book-sidebar">
+	  <ul id="booknav" class="treeview-booknav">
+	      <%def name="print_entry(entry, index_value)">
+		  <li id="pdfchapter-${index_value}">
+		    <a class="chapter">
+		      ${entry.get('title')}
+		    </a>
+		  </li>
+	      </%def>
 
+	      % for (index, entry) in enumerate(textbook['chapters']):
+		${print_entry(entry, index+1)}
+	      % endfor
+	  </ul>
+	</section>
+        %endif
+
+        <section id="viewerContainer" class="book">
+	  <section class="page">
+	    <!-- use same page-turning as used in image-based textbooks -->
+            <nav>
+              <ul>
+                <li class="last">
+                  <a id="previous">Previous page</a>
+                </li>
+                <li class="next">
+                  <a id="next">Next page</a>
+                </li>
+              </ul>
+            </nav>
+            <div id="viewer" contextmenu="viewerContextMenu"></div>
+          </section>
+        </section>
 
       </div> <!-- mainContainer -->
 
