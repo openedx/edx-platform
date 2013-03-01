@@ -43,7 +43,6 @@
         // script loader. To fix this, wait for the scripts to load,
         // initialize them manually and wait until they are ready
 
-        console.log("Waiting for gwt...");
         if (typeof(jsmolcalc) != 'undefined' && jsmolcalc)
         {
             jsmolcalc.onInjectionDone('jsmolcalc');
@@ -68,7 +67,6 @@
 
     function initializeApplets() {
         var applets = $('.editamoleculeinput div.applet');
-        console.log(applets);
         applets.each(function(i, element) {
             if (!$(element).hasClass('loaded')) {
                 var applet = new JavaScriptApplet.JSME(
