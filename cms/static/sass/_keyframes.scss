@@ -41,7 +41,29 @@
 
 // ====================
 
-// notifications slide up
+// notifications slide down
+@mixin notificationsSlideDown {
+  0% {
+    @include transform(translateY(-($notification-height*0.99)));
+  }
+
+  10% {
+    @include transform(translateY(-($notification-height)));
+  }
+
+  100% {
+    @include transform(translateY(0));
+  }
+}
+
+@-moz-keyframes notificationsSlideDown { @include notificationsSlideDown(); }
+@-webkit-keyframes notificationsSlideDown { @include notificationsSlideDown(); }
+@-o-keyframes notificationsSlideDown { @include notificationsSlideDown(); }
+@keyframes notificationsSlideDown { @include notificationsSlideDown();}
+
+// ====================
+
+// notifications slide up then down
 @mixin notificationsSlideUpDown {
   0%, 100% { 
     @include transform(translateY(0));

@@ -1,6 +1,43 @@
 // studio alerts and notifications
 // ====================
 
+// prompts
+.wrapper-prompt {
+  position: fixed;
+  top: 0;
+  background: $black-t1;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 100;
+
+  &:before {
+    content: '';
+    display: inline-block;
+    height: 100%; 
+    vertical-align: middle;
+    margin-right: -0.25em; /* Adjusts for spacing */
+  }
+
+  .prompt {
+    @include border-radius(3px);
+    @include box-sizing(border-box);
+    @include box-shadow(0 0 4px $shadow-d1);
+    display: inline-block;
+    vertical-align: middle;
+    width: $baseline*15;
+    padding: $baseline;
+    background: $white;
+
+    .nav-actions {
+
+      .nav-item {
+
+      }
+    }
+  }
+}
+
 // notifications
 .wrapper-notification {
   @include clearfix();
@@ -622,6 +659,17 @@
 // js enabled
 .js {
 
+  .wrapper-prompt {
+    @include transition (opacity 0.25s ease-in-out);
+    display: none;
+    opacity: 0;
+
+    &.is-shown {
+      display: block;
+      opacity: 1.0;
+    }
+  }
+
   .wrapper-alert {
     display: none;
 
@@ -633,12 +681,17 @@
   .wrapper-notification {
     bottom: -($notification-height);
 
+    // varying animations
     &.is-shown {
-      @include animation(notificationsSlideUp 2s forwards ease-in-out 1);
+      @include animation(notificationsSlideUp 1s forwards ease-in-out 1);
     }
 
-    &.is-fleeting.is-shown {
-      @include animation(notificationsSlideUpDown 6s forwards ease-in-out 1);
+    &.is-hiding {
+      @include animation(notificationsSlideDown 1s forwards ease-in-out 1);
+    }
+
+    &.is-fleeting {
+      @include animation(notificationsSlideUpDown 2s forwards ease-in-out 1);
     }
   }
 }
@@ -656,6 +709,29 @@ body.uxdesign.alerts {
     width: flex-grid(12, 12);
     margin-right: flex-gutter();
     padding: $baseline ($baseline*1.5);
+
+    ul {
+
+      li {
+        @include clearfix();
+        width: flex-grid(12, 12);
+        margin-bottom: ($baseline/4);
+        border-bottom: 1px solid $gray-l4;
+        padding-bottom: ($baseline/4);
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        a {
+          float: left;
+          width: flex-grid(5, 12);
+          margin-right: flex-gutter();
+        }
+      }
+    }
   }
 }
 

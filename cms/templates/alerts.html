@@ -7,16 +7,46 @@
   // notifications - demo
   $(document).ready(function() {
     
-    $('.test-notification').click(function(e) {
+    $('.hide-notification').click(function(e) {
         (e).preventDefault();          
-        $('.wrapper-notification').removeClass('is-shown');
-        $(this.hash).toggleClass('is-shown');
+        $('.wrapper-notification').removeClass('is-hiding is-shown');
+        $(this.hash).addClass('is-hiding');
     });
 
-    $('.test-alert').click(function(e) {
+    $('.show-notification').click(function(e) {
+        (e).preventDefault();          
+        $('.wrapper-notification').removeClass('is-shown is-hiding');
+        $(this.hash).addClass('is-shown');
+    });
+
+    $('.show-notification-fleeting').click(function(e) {
+        (e).preventDefault();          
+        $('.wrapper-notification').removeClass('is-fleeting');
+        $(this.hash).addClass('is-fleeting');
+    });
+
+    $('.hide-alert').click(function(e) {
+        (e).preventDefault();          
+        $('.wrapper-alert').removeClass('is-hiding');
+        $(this.hash).addClass('is-hiding');
+    });
+
+    $('.show-alert').click(function(e) {
         (e).preventDefault();          
         $('.wrapper-alert').removeClass('is-shown');
-        $(this.hash).toggleClass('is-shown');
+        $(this.hash).addClass('is-shown');
+    });
+
+    $('.hide-prompt').click(function(e) {
+        (e).preventDefault();          
+        $('.wrapper-prompt').removeClass('is-hiding is-shown');
+        $(this.hash).addClass('is-hiding');
+    });
+
+    $('.show-prompt').click(function(e) {
+        (e).preventDefault();          
+        $('.wrapper-prompt').removeClass('is-shown is-hiding');
+        $(this.hash).addClass('is-shown');
     });
   });
 </script>
@@ -243,16 +273,16 @@
         <p>Note: alerts will probably never been shown based on click or page action and will primarily be loaded along with a pageload and initial display</p>
 
         <ul>
-          <li><a href="#alert-draft" class="test-alert">Toggle Draft Alert</a></li>
-          <li><a href="#alert-version" class="test-alert">Toggle Version Alert</a></li>
-          <li><a href="#alert-saved" class="test-alert">Toggle Previous View/Action Alert</a></li>
-          <li><a href="#alert-close" class="test-alert">Toggle Alert with Close Option</a></li>
-          <li><a href="#alert-removed" class="test-alert">Toggle Previous View/Action Removed Alert</a></li>
-          <li><a href="#alert-system-error" class="test-alert">Toggle System Error Alert</a></li>
-          <li><a href="#alert-user-error" class="test-alert">Toggle User Error Alert</a></li>
-          <li><a href="#alert-announcement2" class="test-alert">Toggle Announcement Alert</a></li>
-          <li><a href="#alert-announcement1" class="test-alert">Toggle Announcement with Actions Alert</a></li>
-          <li><a href="#alert-activation" class="test-alert">Toggle Activiation Alert</a></li>
+          <li><a href="#alert-draft" class="show-alert">Show Draft</a></li>
+          <li><a href="#alert-version" class="show-alert">Show Version</a></li>
+          <li><a href="#alert-saved" class="show-alert">Show Previous View/Action</a></li>
+          <li><a href="#alert-close" class="show-alert">Show Alert with Close Option</a></li>
+          <li><a href="#alert-removed" class="show-alert">Show Previous View/Action Removed</a></li>
+          <li><a href="#alert-system-error" class="show-alert">Show System Error</a></li>
+          <li><a href="#alert-user-error" class="show-alert">Show User Error</a></li>
+          <li><a href="#alert-announcement2" class="show-alert">Show Announcement</a></li>
+          <li><a href="#alert-announcement1" class="show-alert">Show Announcement with Actions</a></li>
+          <li><a href="#alert-activation" class="show-alert">Show Activiation</a></li>
         </ul>
       </section>
 
@@ -267,12 +297,46 @@
         <h3 class="title-3">Different Static Examples of Notifications</h3>
 
         <ul>
-          <li><a href="#notification-change" class="test-notification">Toggle Change Warning Notification</a></li>
-          <li><a href="#notification-version" class="test-notification">Toggle New Version Warning Notification</a></li>
-          <li><a href="#notification-dangerous" class="test-notification">Toggle Editing Warning Notification</a></li>
-          <li><a href="#notification-confirmation" class="test-notification">Toggle Confirmation Notification</a></li>
-          <li><a href="#notification-saving" class="test-notification">Toggle Saving Notification</a></li>
-          <li><a href="#notification-help" class="test-notification">Toggle Help Notification</a></li>
+          <li>
+            <a href="#notification-change" class="show-notification">Show Change Warning</a>
+            <a href="#notification-change" class="hide-notification">Hide Change Warning</a>
+          </li>
+          <li>
+            <a href="#notification-version" class="show-notification">Show New Version Warning</a>
+            <a href="#notification-version" class="hide-notification">Hide New Version Warning</a>
+          </li>
+          <li>
+            <a href="#notification-dangerous" class="show-notification">Show Editing Warning</a>
+            <a href="#notification-dangerous" class="hide-notification">Hide Editing Warning</a>
+          </li>
+          <li>
+            <a href="#notification-confirmation" class="show-notification-fleeting">Show Confirmation (Fleeting Notification)</a>
+          </li>
+          <li>
+            <a href="#notification-saving" class="show-notification">Show Saving</a>
+            <a href="#notification-saving" class="hide-notification">Hide Saving</a>
+          </li>
+          <li>
+            <a href="#notification-help" class="show-notification">Show Help</a>
+            <a href="#notification-help" class="hide-notification">Hide Help</a>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <header>
+          <h2 class="title-2">Prompts</h2>
+          <span class="tip">presents a user with a choice, based on their previous interaction, that must be decided before they can proceed</span>
+        </header>
+
+        <p>In Studio, prompts are dialogs that are presented above all other page components and present a user with a choice, based on their previous interaction, that must be decided before they can proceed (or return to the previous interaction step).</p>
+
+        <h3 class="title-3">Different Static Examples of Notifications</h3>
+
+        <ul>
+          <li>
+            <a href="#prompt-confirm" class="show-prompt">Show Confirm Prompt</a>
+          </li>
         </ul>
       </section>
     </article>
@@ -368,7 +432,7 @@
 </div>
 
 <!-- notification: status- confirmed -->
-<div class="wrapper wrapper-notification wrapper-notification-confirmation is-fleeting" id="notification-confirmation">
+<div class="wrapper wrapper-notification wrapper-notification-confirmation" id="notification-confirmation">
   <div class="notification confirmation">
     <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
     
@@ -392,6 +456,27 @@
       <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
       <span class="label">close notification</span>
     </a>
+  </div>
+</div>
+
+<!-- prompt: confirm -->
+<div class="wrapper wrapper-prompt wrapper-prompt-confirm" id="prompt-confirm">
+  <div class="prompt confirm">
+    <div class="copy">
+      <h2 class="title title-3">Are You Sure You Want to Do That?</h2>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Prompt Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="action-primary action-proceed">Yes</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="action-secondary action-cancel">No</a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>
 </%block>

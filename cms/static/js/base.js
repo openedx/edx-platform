@@ -59,7 +59,13 @@ $(document).ready(function () {
     // alert and notifications - manual & action-based close
     $('.action-notification-close, .notification.has-actions .nav-actions a').click(function(e) {
         (e).preventDefault();
-        $(this).closest('.wrapper-notification').removeClass('is-shown');
+        $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
+    });
+
+    // prompt close
+    $('.prompt .action-cancel').click(function(e) {
+        (e).preventDefault();
+        $(this).closest('.wrapper-prompt').removeClass('is-shown').addClass('is-hiding');
     });
 
     // nav - dropdown related
