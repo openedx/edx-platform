@@ -147,17 +147,18 @@ def inline_discussion(request, course_id, discussion_id):
               
       else:
       #otherwise, just make a dictionary of two 
-          user_cohort = get_cohort(cc_user, course_id)
-          if user_cohort:
-              user_cohort_name = user_cohort.name
-              user_cohort_id = user_cohort.id
-          else:
-              user_cohort_name = user_cohort_id = None
+          #user_cohort = get_cohort(cc_user, course_id)
+          #if user_cohort:
+          #    user_cohort_name = user_cohort.name
+          #    user_cohort_id = user_cohort.id
+          #else:
+          #    user_cohort_name = user_cohort_id = None
+          cohorts_list = None
           
-          if user_cohort:
-              cohorts_list.append({'name':user_cohort_name, 'id':user_cohort_id})
-          else:
-              cohorts_list = None
+          #if user_cohort:
+          #    cohorts_list.append({'name':user_cohort_name, 'id':user_cohort_id})
+          #else:
+          #    cohorts_list = None
           
           
     return utils.JsonResponse({
