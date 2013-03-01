@@ -96,6 +96,7 @@ def create_thread(request, course_id, commentable_id):
 
     #kevinchugh because the new requirement is that all groups will be determined
     #by the group id in the request this all goes away
+    #not anymore, only for admins
     
     # Cohort the thread if the commentable is cohorted.
     if is_commentable_cohorted(course_id, commentable_id):
@@ -110,12 +111,10 @@ def create_thread(request, course_id, commentable_id):
         else:
             # regular users always post with their own id.
             group_id = user_group_id
-#    group_id = post.get('group_id')
 
     if group_id:
       thread.update_attributes(group_id=group_id)
     
-    #log.debug("Saving thread %r", thread.attributes)
     thread.save()
 
     if post.get('auto_subscribe', 'false').lower() == 'true':
