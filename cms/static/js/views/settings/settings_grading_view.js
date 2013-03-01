@@ -90,8 +90,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     setGracePeriod : function(event) {
         event.data.clearValidationErrors();
         var newVal = event.data.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
-        if (event.data.model.get('grace_period') != newVal) event.data.model.save('grace_period', newVal,
-                { error : CMS.ServerError});
+        if (event.data.model.get('grace_period') != newVal) event.data.model.save('grace_period', newVal);
     },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
@@ -227,8 +226,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
                     object[cutoff['designation']] = cutoff['cutoff'] / 100.0;
                     return object;
                 }, 
-                {}),
-                { error : CMS.ServerError});
+                {}));
     },
 
     addNewGrade: function(e) {
