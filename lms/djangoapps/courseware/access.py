@@ -382,7 +382,7 @@ def group_names_for(role, location, course_context=None):
 
     group_name = '{0}_{1}'.format(role, course_id)
 
-    return group_name, legacy_group_name
+    return [group_name, legacy_group_name]
 
 group_names_for_staff = partial(group_names_for, 'staff')
 group_names_for_instructor = partial(group_names_for, 'instructor')
@@ -552,7 +552,7 @@ def _has_access_to_location(user, location, access_level, course_context):
 
     if access_level == 'staff':
         staff_groups = group_names_for_staff(location, course_context) + \
-                       _course_org_staff_group_name(location, course_context)
+                       [_course_org_staff_group_name(location, course_context)]
         for staff_group in staff_groups:
             if staff_group in user_groups:
                 debug("Allow: user in group %s", staff_group)
@@ -561,7 +561,7 @@ def _has_access_to_location(user, location, access_level, course_context):
 
     if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
         instructor_groups = group_names_for_instructor(location, course_context) + \
-                            _course_org_instructor_group_name(location, course_context)
+                            [_course_org_instructor_group_name(location, course_context)]
         for instructor_group in instructor_groups:
             if instructor_group in user_groups:
                 debug("Allow: user in group %s", instructor_group)
