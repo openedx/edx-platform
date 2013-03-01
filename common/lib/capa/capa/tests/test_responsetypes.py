@@ -759,34 +759,6 @@ class CustomResponseTest(ResponseTest):
         correctness = correct_map.get_correctness('1_2_2')
         self.assertEqual(correctness, 'incorrect')
 
-    def test_script_exception(self):
-
-        # Construct a script that will raise an exception
-        script = textwrap.dedent("""
-            def check_func(expect, answer_given):
-                raise Exception("Test")
-            """)
-
-        problem = self.build_problem(script=script, cfn="check_func")
-
-        # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(Exception):
-            problem.grade_answers({'1_2_1': '42'})
-    
-    def test_invalid_dict_exception(self):
-
-        # Construct a script that passes back an invalid dict format
-        script = textwrap.dedent("""
-            def check_func(expect, answer_given):
-                return {'invalid': 'test'}
-            """)
-
-        problem = self.build_problem(script=script, cfn="check_func")
-
-        # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(Exception):
-            problem.grade_answers({'1_2_1': '42'})
-
 
     def test_function_code_multiple_inputs(self):
 
@@ -873,6 +845,37 @@ class CustomResponseTest(ResponseTest):
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
         self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
         self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
+
+        # Message is interpreted as an "overall message"
+        self.assertEqual(correct_map.get_overall_message(), 'Message text')
+
+    def test_script_exception(self):
+
+        # Construct a script that will raise an exception
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                raise Exception("Test")
+            """)
+
+        problem = self.build_problem(script=script, cfn="check_func")
+
+        # Expect that an exception gets raised when we check the answer
+        with self.assertRaises(Exception):
+            problem.grade_answers({'1_2_1': '42'})
+    
+    def test_invalid_dict_exception(self):
+
+        # Construct a script that passes back an invalid dict format
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                return {'invalid': 'test'}
+            """)
+
+        problem = self.build_problem(script=script, cfn="check_func")
+
+        # Expect that an exception gets raised when we check the answer
+        with self.assertRaises(Exception):
+            problem.grade_answers({'1_2_1': '42'})
 
 
 class SchematicResponseTest(ResponseTest):

@@ -1086,11 +1086,17 @@ def sympy_check2():
                 # form {'ok': BOOLEAN, 'msg': STRING}
                 # If there are multiple inputs, they all get marked
                 # to the same correct/incorrect value
-                # and the first input stores the message
                 if 'ok' in ret:
                     correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
                     msg = ret.get('msg', None)
-                    messages[0] = self.clean_message_html(msg)
+                    msg = self.clean_message_html(msg)
+
+                    # If there is only one input, apply the message to that input
+                    # Otherwise, apply the message to the whole problem
+                    if len(idset) > 1:
+                        overall_message = msg
+                    else:
+                        messages[0] = msg
 
 
                 # Another kind of dictionary the check function can return has
@@ -1137,18 +1143,21 @@ def sympy_check2():
         return correct_map
 
     def clean_message_html(self, msg):
-        # try to clean up message html
-        msg = '<html>' + msg + '</html>'
-        msg = msg.replace('&#60;', '&lt;')
-        #msg = msg.replace('&lt;','<')
-        msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
-                             pretty_print=True)
-        #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
-        msg = msg.replace('&#13;', '')
-        #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
-        msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
+        if msg:
+            # try to clean up message html
+            msg = '<html>' + msg + '</html>'
+            msg = msg.replace('&#60;', '&lt;')
+            #msg = msg.replace('&lt;','<')
+            msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
+                                 pretty_print=True)
+            #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
+            msg = msg.replace('&#13;', '')
+            #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
+            msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
 
-        return msg.strip()
+            return msg.strip()
+        else:
+            return ""
 
     def get_answers(self):
         '''
