@@ -401,59 +401,6 @@ a:active {
 	filter: alpha(opacity = 33) !important; /* IE */
 	opacity: 0.3 !important; /* non-IE */
 }
-.mosaic-GlassPanel-countertop {
-	background-image: url("images/glasspanel/countertop.png");
-	background-repeat: repeat;
-
-	filter: alpha(opacity = 40) !important; /* IE */
-	opacity: 0.4 !important; /* non-IE */
-}
-.mosaic-GlassPanel-fish {
-	background-image: url("images/glasspanel/fish.png");
-	background-repeat: repeat;
-}
-.mosaic-GlassPanel-fleur_de_lis {
-	background-image: url("images/glasspanel/fleur_de_lis.png");
-	background-repeat: repeat;
-
-	filter: alpha(opacity = 100) !important; /* IE */
-	opacity: 1.0 !important; /* non-IE */
-}
-.mosaic-GlassPanel-floral {
-	background-image: url("images/glasspanel/floral.png");
-	background-repeat: repeat;
-
-	filter: alpha(opacity = 100) !important; /* IE */
-	opacity: 1.0 !important; /* non-IE */
-}
-.mosaic-GlassPanel-moss_ridge {
-	background-image: url("images/glasspanel/moss_ridge.png");
-	background-repeat: repeat;
-
-	filter: alpha(opacity = 100) !important; /* IE */
-	opacity: 1.0 !important; /* non-IE */
-}
-.mosaic-GlassPanel-numbers {
-	background-image: url("images/glasspanel/numbers.png");
-	background-repeat: repeat;
-
-	filter: alpha(opacity = 100) !important; /* IE */
-	opacity: 1.0 !important; /* non-IE */
-}
-.mosaic-GlassPanel-sky_ridge {
-	background-image: url("images/glasspanel/sky_ridge.png");
-	background-repeat: repeat;
-
-	filter: alpha(opacity = 100) !important; /* IE */
-	opacity: 1.0 !important; /* non-IE */
-}
-.mosaic-GlassPanel-snow_ridge {
-	background-image: url("images/glasspanel/snow_ridge.png");
-	background-repeat: repeat;
-
-	filter: alpha(opacity = 100) !important; /* IE */
-	opacity: 1.0 !important; /* non-IE */
-}
 
 /*** ImageButton ***/
 
@@ -851,27 +798,6 @@ html>body .mosaic-LayoutPanel-BorderLayout .SouthCollapsedImageButton img {
 	width: 6px;
 	height: 6px;
 }
-html>body .mosaic-DecoratedBottomTabBar .tabBottomLeft {
-	background: url(images/corner2.png) no-repeat 0px -6px;
-}
-html>body .mosaic-DecoratedBottomTabBar .tabBottomRight {
-	background: url(images/corner2.png) no-repeat -6px -6px;
-}
-* html .mosaic-DecoratedBottomTabBar .tabBottomLeftInner {
-	width: 5px;
-	height: 61px;
-	margin-top: -55px;
-	overflow: hidden;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='gwt/standard/images/corner2.png',sizingMethod='crop');
-}
-* html .mosaic-DecoratedBottomTabBar .tabBottomRightInner {
-	width: 12px;
-	height: 61px;
-	margin-top: -55px;
-	margin-left: -6px;
-	overflow: hidden;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='gwt/standard/images/corner2.png',sizingMethod='crop');
-}
 .mosaic-DecoratedBottomTabBar .tabMiddleLeft,
 .mosaic-DecoratedBottomTabBar .tabMiddleRight {
 	width: 6px;
@@ -900,21 +826,6 @@ html>body .mosaic-DecoratedBottomTabBar .gwt-TabBarItem-selected .tabBottomLeft 
 }
 html>body .mosaic-DecoratedBottomTabBar .gwt-TabBarItem-selected .tabBottomRight {
 	background-position: -6px 0px;
-}
-* html .mosaic-DecoratedBottomTabBar .gwt-TabBarItem-selected .tabBottomLeftInner {
-	width: 5px;
-	height: 67px;
-	margin-top: -61px;
-	overflow: hidden;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='gwt/standard/images/corner2.png',sizingMethod='crop');
-}
-* html .mosaic-DecoratedBottomTabBar .gwt-TabBarItem-selected .tabBottomRightInner {
-	width: 12px;
-	height: 67px;
-	margin-top: -61px;
-	margin-left: -6px;
-	overflow: hidden;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='gwt/standard/images/corner2.png',sizingMethod='crop');
 }
 .mosaic-DecoratedBottomTabBar .gwt-TabBarItem-selected .tabMiddleLeft,
 .mosaic-DecoratedBottomTabBar .gwt-TabBarItem-selected .tabMiddleRight {
