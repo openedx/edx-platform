@@ -66,7 +66,7 @@ from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 log = logging.getLogger(__name__)
 
 
-COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
+COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video', 'peergrading', 'combinedopenended']
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -282,6 +282,7 @@ def edit_unit(request, location):
     component_templates = defaultdict(list)
 
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
+    log.debug(templates)
     for template in templates:
         if template.location.category in COMPONENT_TYPES:
             component_templates[template.location.category].append((
