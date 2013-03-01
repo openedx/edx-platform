@@ -32,6 +32,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
     </selfassessment>
     """
 
+    TEMPLATE_DIR = "combinedopenended/selfassessment"
+
     def setup_response(self, system, location, definition, descriptor):
         """
         Sets up the module
@@ -68,7 +70,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'accept_file_upload': self.accept_file_upload,
         }
 
-        html = system.render_template('self_assessment_prompt.html', context)
+        html = system.render_template('{0}/self_assessment_prompt.html'.format(self.TEMPLATE_DIR), context)
         return html
 
 
@@ -129,7 +131,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             #This is a dev_facing_error
             raise ValueError("Self assessment module is in an illegal state '{0}'".format(self.state))
 
-        return system.render_template('self_assessment_rubric.html', context)
+        return system.render_template('{0}/self_assessment_rubric.html'.format(self.TEMPLATE_DIR), context)
 
     def get_hint_html(self, system):
         """
@@ -155,7 +157,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             #This is a dev_facing_error
             raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.state))
 
-        return system.render_template('self_assessment_hint.html', context)
+        return system.render_template('{0}/self_assessment_hint.html'.format(self.TEMPLATE_DIR), context)
 
 
     def save_answer(self, get, system):

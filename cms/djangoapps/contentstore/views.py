@@ -66,10 +66,13 @@ from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 log = logging.getLogger(__name__)
 
 
-COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video', 'advanced']
+COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video', 'advanced', 'openended']
 
-# advanced/beta components that can be enabled for all courses or per-course in the policy file 
-ADVANCED_COMPONENT_TYPES = []
+ADVANCED_COMPONENT_TYPES = {
+    'openended' : ['combinedopenended', 'peergrading'],
+    'advanced' : ['advanced']
+}
+
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'enable_advanced_modules'
 
@@ -287,25 +290,31 @@ def edit_unit(request, location):
     component_templates = defaultdict(list)
 
     # check if there are any advanced modules specified in the course policy
-    advanced_component_types = list(ADVANCED_COMPONENT_TYPES)
+    advanced_component_types = ADVANCED_COMPONENT_TYPES
     course_metadata = CourseMetadata.fetch(course.location)
-    advanced_component_types.extend(course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, []))
+	course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, {})
+	if isinstance(course_advanced_keys,dict):
+    	advanced_component_types.update(course_advanced_keys)
+	else:
+		log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
+
 
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
-        component_template = ( 
-            template.display_name,
-            template.location.url(),
-            'markdown' in template.metadata,
-            'empty' in template.metadata
-        )
-        if template.location.category in COMPONENT_TYPES: 
-            component_templates[template.location.category].append(component_template)
-        elif template.location.category in advanced_component_types:
-            component_templates[ADVANCED_COMPONENT_CATEGORY].append(component_template)
+        if template.location.category in COMPONENT_TYPES:
+			#This is a hack to create categories for different xmodules
+            category = template.location.category
+            for key in ADVANCED_COMPONENT_TYPES:
+                if template.location.category in ADVANCED_COMPONENT_TYPES[key]:
+                    category = key
+                    break
 
-    # order of component types for display purposes
-    component_template_types = [type for type in COMPONENT_TYPES if type in component_templates.keys()]
+            component_templates[template.location.category].append((
+                template.display_name,
+                template.location.url(),
+                'markdown' in template.metadata,
+                'empty' in template.metadata
+            ))
 
     components = [
         component.location.url()

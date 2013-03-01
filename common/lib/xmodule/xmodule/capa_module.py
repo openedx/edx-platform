@@ -333,6 +333,12 @@ class CapaModule(XModule):
             reset_button = False
             save_button = False
 
+        # If attempts=0 then show just check and reset buttons; this is for survey questions using capa
+        if self.max_attempts==0:
+            check_button = False
+            reset_button = True
+            save_button = True
+
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions.
         if self.lcp.done and self.rerandomize == "always":
@@ -630,11 +636,11 @@ class CapaModule(XModule):
         event_info['answers'] = answers
 
         # Too late. Cannot submit
-        if self.closed():
+        if self.closed() and not self.max_attempts==0:
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'error': "Problem is closed"}
+                    'msg': "Problem is closed"}
 
         # Problem submitted. Student should reset before saving
         # again.
@@ -642,13 +648,16 @@ class CapaModule(XModule):
             event_info['failure'] = 'done'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'error': "Problem needs to be reset prior to save."}
+                    'msg': "Problem needs to be reset prior to save"}
 
         self.lcp.student_answers = answers
 
-        # TODO: should this be save_problem_fail?  Looks like success to me...
-        self.system.track_function('save_problem_fail', event_info)
-        return {'success': True}
+        self.system.track_function('save_problem_success', event_info)
+        msg = "Your answers have been saved"
+        if not self.max_attempts==0:
+            msg += " but not graded. Hit 'Check' to grade them."
+        return {'success': True,
+                'msg': msg}
 
     def reset_problem(self, get):
         ''' Changes problem state to unfinished -- removes student answers,
