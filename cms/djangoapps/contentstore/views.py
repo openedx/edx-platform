@@ -71,7 +71,7 @@ COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 ADVANCED_COMPONENT_TYPES = {
     'openended' : ['combinedopenended', 'peergrading'],
-    'advanced' : ['annotation'],
+    'advanced' : ['annotatable'],
 }
 
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
