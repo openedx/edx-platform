@@ -201,7 +201,17 @@ class LoncapaResponse(object):
         if response_msg:
             response_msg_div = etree.SubElement(tree, 'div')
             response_msg_div.set("class", "response_message")
-            response_msg_div.text = response_msg
+
+            # If the response message can be represented as an XHTML tree,
+            # create the tree and append it to the message <div>
+            try:
+                response_tree = etree.XML(response_msg)
+                response_msg_div.append(response_tree)
+
+            # Otherwise, assume that the message is text (not XHTML)
+            # and insert it as the text of the message <div>
+            except:
+                response_msg_div.text = response_msg
 
         return tree
 
@@ -1069,20 +1079,7 @@ def sympy_check2():
                 if 'ok' in ret:
                     correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
                     msg = ret.get('msg', None)
-
-                    if 1:
-                        # try to clean up message html
-                        msg = '<html>' + msg + '</html>'
-                        msg = msg.replace('&#60;', '&lt;')
-                        #msg = msg.replace('&lt;','<')
-                        msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
-                                             pretty_print=True)
-                        #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
-                        msg = msg.replace('&#13;', '')
-                        #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
-                        msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
-
-                    messages[0] = msg
+                    messages[0] = self.clean_message_html(msg)
 
 
                 # Another kind of dictionary the check function can return has
@@ -1101,7 +1098,8 @@ def sympy_check2():
                     messages = []
                     for input_dict in input_list:
                         correct.append('correct' if input_dict['ok'] else 'incorrect')
-                        messages.append(input_dict['msg'] if 'msg' in input_dict else None)
+                        msg = self.clean_message_html(input_dict['msg']) if 'msg' in input_dict else None
+                        messages.append(msg)
 
                 # Otherwise, we do not recognize the dictionary
                 # Raise an exception
@@ -1117,12 +1115,29 @@ def sympy_check2():
 
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
+
+        overall_message = self.clean_message_html(overall_message)
         correct_map.set_overall_message(overall_message)
+
         for k in range(len(idset)):
             npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
+
+    def clean_message_html(self, msg):
+        # try to clean up message html
+        msg = '<html>' + msg + '</html>'
+        msg = msg.replace('&#60;', '&lt;')
+        #msg = msg.replace('&lt;','<')
+        msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
+                             pretty_print=True)
+        #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
+        msg = msg.replace('&#13;', '')
+        #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
+        msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
+
+        return msg.strip()
 
     def get_answers(self):
         '''

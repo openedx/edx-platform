@@ -712,7 +712,7 @@ class CustomResponseTest(ResponseTest):
         msg = correct_map.get_msg('1_2_1')
 
         self.assertEqual(correctness, 'correct')
-        self.assertEqual(msg, "Message text\n")
+        self.assertEqual(msg, "Message text")
 
         # Incorrect answer
         input_dict = {'1_2_1': '0'}
@@ -722,7 +722,7 @@ class CustomResponseTest(ResponseTest):
         msg = correct_map.get_msg('1_2_1')
 
         self.assertEqual(correctness, 'incorrect')
-        self.assertEqual(msg, "Message text\n")
+        self.assertEqual(msg, "Message text")
 
     def test_function_code_multiple_input_no_msg(self):
 
