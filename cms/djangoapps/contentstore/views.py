@@ -66,7 +66,12 @@ from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 log = logging.getLogger(__name__)
 
 
-COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
+COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video', 'advanced']
+
+# advanced/beta components that can be enabled for all courses or per-course in the policy file 
+ADVANCED_COMPONENT_TYPES = []
+ADVANCED_COMPONENT_CATEGORY = 'advanced'
+ADVANCED_COMPONENT_POLICY_KEY = 'enable_advanced_modules'
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -281,15 +286,26 @@ def edit_unit(request, location):
 
     component_templates = defaultdict(list)
 
+    # check if there are any advanced modules specified in the course policy
+    advanced_component_types = list(ADVANCED_COMPONENT_TYPES)
+    course_metadata = CourseMetadata.fetch(course.location)
+    advanced_component_types.extend(course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, []))
+
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
-        if template.location.category in COMPONENT_TYPES:
-            component_templates[template.location.category].append((
-                template.display_name,
-                template.location.url(),
-                'markdown' in template.metadata,
-                'empty' in template.metadata
-            ))
+        component_template = ( 
+            template.display_name,
+            template.location.url(),
+            'markdown' in template.metadata,
+            'empty' in template.metadata
+        )
+        if template.location.category in COMPONENT_TYPES: 
+            component_templates[template.location.category].append(component_template)
+        elif template.location.category in advanced_component_types:
+            component_templates[ADVANCED_COMPONENT_CATEGORY].append(component_template)
+
+    # order of component types for display purposes
+    component_template_types = [type for type in COMPONENT_TYPES if type in component_templates.keys()]
 
     components = [
         component.location.url()
@@ -341,6 +357,7 @@ def edit_unit(request, location):
         'unit_location': location,
         'components': components,
         'component_templates': component_templates,
+        'component_template_types': component_template_types,
         'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,

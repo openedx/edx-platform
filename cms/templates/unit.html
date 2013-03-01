@@ -53,7 +53,7 @@
               <div class="new-component">
                 <h5>Add New Component</h5>
                 <ul class="new-component-type">
-                  % for type in sorted(component_templates.keys()):
+                  % for type in component_template_types:
                   <li>
                     <a href="#" data-type="${type}">
                       <span class="large-template-icon large-${type}-icon"></span>
