@@ -174,7 +174,7 @@ class LoncapaResponse(object):
         '''
         return sum(self.maxpoints.values())
 
-    def render_html(self, renderer, response_msg=None):
+    def render_html(self, renderer, response_msg=''):
         '''
         Return XHTML Element tree representation of this Response.
 
