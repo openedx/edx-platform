@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1 and len(args) != 2:
-            raise CommandError("delete_course requires one argument: <location> |commit|")
+            raise CommandError("delete_course requires one or more arguments: <location> |commit|")
 
         loc_str = args[0]
 
