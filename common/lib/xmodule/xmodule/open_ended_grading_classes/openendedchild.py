@@ -22,7 +22,7 @@ from xmodule.stringify import stringify_children
 from xmodule.xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
-from peer_grading_service import PeerGradingService
+from peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
 
 from datetime import datetime
@@ -106,8 +106,14 @@ class OpenEndedChild(object):
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = static_data['max_score']
-        self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
-        self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,system)
+        if system.open_ended_grading_interface:
+            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+            self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,system)
+        else:
+            self.peer_gs = MockPeerGradingService()
+            self.controller_qs = None 
+
+
 
         self.system = system
         
@@ -461,11 +467,14 @@ class OpenEndedChild(object):
             return success, allowed_to_submit, error_message
 
     def get_eta(self):
-        response = self.controller_qs.check_for_eta(self.location_string)
-        try:
-            response = json.loads(response)
-        except:
-            pass
+        if self.controller_qs:
+            response = self.controller_qs.check_for_eta(self.location_string)
+            try:
+                response = json.loads(response)
+            except:
+                pass
+        else:
+            return ""
 
         success = response['success']
         if isinstance(success, basestring):
