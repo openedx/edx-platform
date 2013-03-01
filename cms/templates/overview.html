@@ -13,144 +13,145 @@
 <%namespace name="units" file="widgets/units.html" />
 
 <%block name="jsextra">
-<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-<script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-<script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
-<script src="${static.url('js/vendor/date.js')}"></script>
-<script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-<script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
-<script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
-<script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+  <script src="${static.url('js/vendor/date.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
 
-<script type="text/javascript">
-$(document).ready(function(){
-  // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
-  // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
-  // but we really should change that behavior.
-  if (!window.graderTypes) {
-    window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
-    window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
-    window.graderTypes.reset(${course_graders|n});
-  }
-  
-  $(".gradable-status").each(function(index, ele) {
-      var gradeView = new CMS.Views.OverviewAssignmentGrader({
-          el : ele,
-          graders : window.graderTypes
-      });
+  <script type="text/javascript">
+  $(document).ready(function(){
+    // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
+    // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
+    // but we really should change that behavior.
+    if (!window.graderTypes) {
+      window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
+      window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
+      window.graderTypes.reset(${course_graders|n});
+    }
+    
+    $(".gradable-status").each(function(index, ele) {
+        var gradeView = new CMS.Views.OverviewAssignmentGrader({
+            el : ele,
+            graders : window.graderTypes
+        });
+    });
   });
-});
-
-</script>
+  
+  </script>
 </%block>
 
 <%block name="header_extras">
-<script type="text/template" id="new-section-template">
-  <section class="courseware-section branch new-section">
-    <header>
-      <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
-      <div class="item-details">
-        <h3 class="section-name">
-        <form class="section-name-form">
-          <input type="text" value="New Section Name" class="new-section-name" />
-          <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
-          <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
+  <script type="text/template" id="new-section-template">
+    <section class="courseware-section branch new-section">
+      <header>
+        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+        <div class="item-details">
+          <h3 class="section-name">
+          <form class="section-name-form">
+            <input type="text" value="New Section Name" class="new-section-name" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
+            <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
+          </form>
+        </div>
+      </header>
+    </section>
+  </script>
+
+  <script type="text/template" id="blank-slate-template">
+    <section class="courseware-section branch new-section">
+      <header>
+        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+        <div class="item-details">
+          <h3 class="section-name">
+          <span class="section-name-span">Click here to set the section name</span>
+          <form class="section-name-form">
+            <input type="text" value="New Section Name" class="new-section-name" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
+            <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
+          </form>
+        </div>
+        <div class="item-actions">
+          <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+          <a href="#" data-tooltip="Drag to re-order" class="drag-handle"></a>
+        </div>
+      </header>
+    </section>
+  </script>
+
+  <script type="text/template" id="new-subsection-template">
+    <li class="branch collapsed">
+      <div class="section-item editing">
+        <form class="new-subsection-form">
+          <span class="folder-icon"></span>
+          <span class="subsection-name">
+            <input type="text" value="New Subsection" class="new-subsection-name-input" />
+          </span>
+          <input type="submit" value="Save" class="new-subsection-name-save" />
+          <input type="button" value="Cancel" class="new-subsection-name-cancel" />
         </form>
       </div>
-    </header>
-  </section>
-</script>
-
-<script type="text/template" id="blank-slate-template">
-  <section class="courseware-section branch new-section">
-    <header>
-      <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
-      <div class="item-details">
-        <h3 class="section-name">
-        <span class="section-name-span">Click here to set the section name</span>
-        <form class="section-name-form">
-          <input type="text" value="New Section Name" class="new-section-name" />
-          <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
-          <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
-        </form>
-      </div>
-      <div class="item-actions">
-        <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-        <a href="#" data-tooltip="Drag to re-order" class="drag-handle"></a>
-      </div>
-    </header>
-  </section>
-</script>
-
-<script type="text/template" id="new-subsection-template">
-  <li class="branch collapsed">
-    <div class="section-item editing">
-      <form class="new-subsection-form">
-        <span class="folder-icon"></span>
-        <span class="subsection-name">
-          <input type="text" value="New Subsection" class="new-subsection-name-input" />
-        </span>
-        <input type="submit" value="Save" class="new-subsection-name-save" />
-        <input type="button" value="Cancel" class="new-subsection-name-cancel" />
-      </form>
-    </div>
-    <ol>
-      <li>
-        <a href="unit.html" class="new-unit-item">
-          <span class="new-unit-icon"></span>New Unit
-        </a>
-      </li>
-    </ol>
-  </li>
-</script>
+      <ol>
+        <li>
+          <a href="unit.html" class="new-unit-item">
+            <span class="new-unit-icon"></span>New Unit
+          </a>
+        </li>
+      </ol>
+    </li>
+  </script>
 </%block>
 
 <%block name="content">
-<div class="edit-subsection-publish-settings">
-  <div class="settings">
-    <h3>Section Release Date</h3>
-    <div class="picker datepair">
-      <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-      <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-      <div class="description">
-        <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
+  <div class="edit-subsection-publish-settings">
+    <div class="settings">
+      <h3>Section Release Date</h3>
+      <div class="picker datepair">
+        <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+        <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+        <div class="description">
+          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
+        </div>
       </div>
+      <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
     </div>
-    <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
   </div>
-</div>
 
-<div class="wrapper-mast wrapper">
-  <header class="mast has-actions has-subtitle">
-    <div class="title">
-      <span class="title-sub">Course Content</span>
-      <h1 class="title-1">Course Outline</h1>
-    </div>
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <div class="title">
+        <span class="title-sub">Course Content</span>
+        <h1 class="title-1">Course Outline</h1>
+      </div>
 
-    <nav class="nav-actions">
-      <h3 class="sr">Page Actions</h3>
-      <ul>
-        <li class="nav-item">
-          <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block icon">up</i> <span class="label">Collapse All Sections</span></a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="button new-button new-courseware-section-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Section</a>
-        </li>
-        <li class="nav-item">
-          <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
-        </li>
-      </ul>
-    </nav>
-  </header>
-</div>
+      <nav class="nav-actions">
+        <h3 class="sr">Page Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block icon">up</i> <span class="label">Collapse All Sections</span></a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="button new-button new-courseware-section-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Section</a>
+          </li>
+          <li class="nav-item">
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
 
-<div class="main-wrapper">
-  <div class="inner-wrapper">
-    <article class="courseware-overview" data-course-id="${context_course.location.url()}">        
-      % for section in sections:
-      <section class="courseware-section branch" data-id="${section.location}">
-        <header>
-          <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
+  <div class="main-wrapper">
+    <div class="inner-wrapper">
+      <article class="courseware-overview" data-course-id="${context_course.location.url()}">        
+        % for section in sections:
+        <section class="courseware-section branch" data-id="${section.location}">
+          <header>
+            <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
+
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name">
                 <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
@@ -211,44 +212,11 @@ $(document).ready(function(){
               </li>
               % endfor
             </ol>
-          </div>          
-        </header>
-        <div class="subsection-list">
-          <div class="list-header">
-            <a href="#" class="new-subsection-item" data-template="${new_subsection_template}">
-              <span class="new-folder-icon"></span>New Subsection
-            </a>
           </div>
-          <ol data-section-id="${section.location.url()}">
-            % for subsection in section.get_children():
-            <li class="branch collapsed id-holder" data-id="${subsection.location}">
-              <div class="section-item">
-                <div class="details">
-                  <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
-                  <a href="${reverse('edit_subsection', args=[subsection.location])}">
-                    <span class="folder-icon"></span>
-                    <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
-                  </a>
-                </div>
-                
-                <div class="gradable-status" data-initial-status="${subsection.metadata.get('format', 'Not Graded')}">
-                </div>
-                
-                <div class="item-actions">
-                  <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
-                  <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
-                </div>
-              </div>
-              ${units.enum_units(subsection)}
-            </li>
-            % endfor
-          </ol>
-        </div>
-      </section>
-      % endfor
-    </article>
+        </section>
+        % endfor
+      </article>
+    </div>
   </div>
-</div>
-<footer></footer>
-
+  <footer></footer>
 </%block>
