@@ -44,6 +44,8 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         		self.render();           
             }
         );
+        // when the client refetches the updates as a whole, re-render them
+        this.listenTo(this.collection, 'reset', this.render);
     },
         
     render: function () {
@@ -150,7 +152,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
 
     closeEditor: function(self, removePost) {
-        var targetModel = self.collection.getByCid(self.$currentPost.attr('name'));
+        var targetModel = self.collection.get(self.$currentPost.attr('name'));
 
         if(removePost) {
             self.$currentPost.remove();
@@ -172,7 +174,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     // Dereferencing from events to screen elements    
     eventModel: function(event) {
         // not sure if it should be currentTarget or delegateTarget
-        return this.collection.getByCid($(event.currentTarget).attr("name"));
+        return this.collection.get($(event.currentTarget).attr("name"));
     },
         
     modelDom: function(event) {
