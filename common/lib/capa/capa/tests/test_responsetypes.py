@@ -186,7 +186,10 @@ class ImageResponseTest(ResponseTest):
 
 
 class SymbolicResponseTest(unittest.TestCase):
-    def test_sr_grade(self):
+    from response_xml_factory import SymbolicResponseXMLFactory
+    xml_factory_class = SymbolicResponseXMLFactory
+
+    def test_symbolic_response_grade(self):
         symbolicresponse_file = os.path.dirname(__file__) + "/test_files/symbolicresponse.xml"
         test_lcp = lcp.LoncapaProblem(open(symbolicresponse_file).read(), '1', system=test_system)
         correct_answers = {'1_2_1': 'cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]',
