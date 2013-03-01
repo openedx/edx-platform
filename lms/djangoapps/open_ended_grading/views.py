@@ -95,6 +95,8 @@ def peer_grading(request, course_id):
 
     base_course_url  = reverse('courses')
     try:
+        #TODO:  This will not work with multiple runs of a course.  Make it work.  The last key in the Location passed
+        #to get_items is called revision.  Is this the same as run?
         items = modulestore().get_items(['i4x', None, course_id_parts[1], 'peergrading', None])
         items = [i for i in items if i.metadata.get("use_for_single_location", True) in false_dict]
         item_location = items[0].location
