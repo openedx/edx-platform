@@ -91,12 +91,15 @@ def peer_grading(request, course_id):
 
     course = get_course_with_access(request.user, course_id, 'load')
     course_id_parts = course.id.split("/")
-    course_id_norun = "/".join(course_id_parts[0:2])
-    pg_location = "i4x://" + course_id_norun + "/peergrading/init"
+    false_dict = [False,"False", "false", "FALSE"]
 
     base_course_url  = reverse('courses')
     try:
-        problem_url_parts = search.path_to_location(modulestore(), course.id, pg_location)
+        items = modulestore().get_items(['i4x', None, course_id_parts[1], 'peergrading', None])
+        items = [i for i in items if i.metadata.get("use_for_single_location", True) in false_dict]
+        item_location = items[0].location
+        item_location_url = item_location.url()
+        problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
 
         return HttpResponseRedirect(problem_url)
