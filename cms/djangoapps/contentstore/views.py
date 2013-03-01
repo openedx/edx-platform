@@ -292,12 +292,11 @@ def edit_unit(request, location):
     # check if there are any advanced modules specified in the course policy
     advanced_component_types = ADVANCED_COMPONENT_TYPES
     course_metadata = CourseMetadata.fetch(course.location)
-	course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, {})
-	if isinstance(course_advanced_keys,dict):
-    	advanced_component_types.update(course_advanced_keys)
-	else:
-		log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
-
+    course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, {})
+    if isinstance(course_advanced_keys,dict):
+        advanced_component_types.update(course_advanced_keys)
+    else:
+        log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
 
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
