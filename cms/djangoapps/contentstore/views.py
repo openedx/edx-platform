@@ -366,7 +366,6 @@ def edit_unit(request, location):
         'unit_location': location,
         'components': components,
         'component_templates': component_templates,
-        'component_template_types': component_template_types,
         'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
