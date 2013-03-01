@@ -1143,19 +1143,33 @@ def sympy_check2():
         return correct_map
 
     def clean_message_html(self, msg):
+
+        # If *msg* is an empty string, then the code below
+        # will return "</html>".  To avoid this, we first check
+        # that *msg* is a non-empty string.
         if msg:
-            # try to clean up message html
+
+            # When we parse *msg* using etree, there needs to be a root
+            # element, so we wrap the *msg* text in <html> tags
             msg = '<html>' + msg + '</html>'
+
+            # Replace < characters
             msg = msg.replace('&#60;', '&lt;')
-            #msg = msg.replace('&lt;','<')
+
+            # Use etree to prettify the HTML
             msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
                                  pretty_print=True)
-            #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
+
             msg = msg.replace('&#13;', '')
-            #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
+
+            # Remove the <html> tags we introduced earlier, so we're
+            # left with just the prettified message markup
             msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
 
+            # Strip leading and trailing whitespace
             return msg.strip()
+
+        # If we start with an empty string, then return an empty string
         else:
             return ""
 
