@@ -140,7 +140,7 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
     grading_context = course.grading_context
     raw_scores = []
 
-    if student_module_cache == None:
+    if student_module_cache is None:
         student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
 
     totaled_scores = {}
