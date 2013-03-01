@@ -105,7 +105,7 @@ succeeded.  The check function can return any of the following:
     * A dictionary of the form: ``{ 'ok': True, 'msg': 'Message' }``
       If the dictionary's value for ``ok`` is set to ``True``, all inputs are
       marked correct; if it is set to ``False``, all inputs are marked incorrect.
-      The ``msg`` is displayed beneath the first input, and it may contain
+      The ``msg`` is displayed beneath all inputs, and it may contain
       XHTML markup.
     * A dictionary of the form 
 
