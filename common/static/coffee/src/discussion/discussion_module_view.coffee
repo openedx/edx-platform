@@ -79,7 +79,7 @@ if Backbone?
       #determined in the coffeescript based on whether or not there's a
       #group id
       
-      if response.is_cohorted
+      if response.is_cohorted and response.is_moderator
         source = "script#_inline_discussion_cohorted"
       else
         source = "script#_inline_discussion"

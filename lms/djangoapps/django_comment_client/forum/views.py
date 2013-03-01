@@ -133,14 +133,18 @@ def inline_discussion(request, course_id, discussion_id):
     #if the commentable is cohorted, otherwise everything is not cohorted
     #and no one has the option of choosing a cohort
     is_cohorted = is_course_cohorted(course_id) and is_commentable_cohorted(course_id, discussion_id)
-
+    is_moderator = cached_has_permission(request.user, "see_all_cohorts", course_id)
+    
     cohorts_list = list()
     
     if is_cohorted:
       cohorts_list.append({'name':'All Groups','id':None})
       
       #if you're a mod, send all cohorts and let you pick
-      if cached_has_permission(request.user, "see_all_cohorts", course_id):
+      
+      
+      
+      if is_moderator:
           cohorts = get_course_cohorts(course_id)
           for c in cohorts:
               cohorts_list.append({'name':c.name, 'id':c.id})
@@ -171,6 +175,7 @@ def inline_discussion(request, course_id, discussion_id):
         'allow_anonymous_to_peers': allow_anonymous_to_peers,
         'allow_anonymous': allow_anonymous,
         'cohorts': cohorts_list,
+        'is_moderator': is_moderator,
         'is_cohorted': is_cohorted
     })
 

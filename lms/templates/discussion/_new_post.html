@@ -53,7 +53,7 @@
                             <option value="">All Groups</option>
                             %for c in cohorts:
                                 <option value="${c.id}" 
-                                %if user_cohort and user_cohort == c.id
+                                %if user_cohort and str(user_cohort) == str(c.id):
                                     selected
                                 %endif
                                 >${c.name}</option>
