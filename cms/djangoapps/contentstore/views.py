@@ -1,5 +1,6 @@
 from util.json_request import expect_json
 import json
+import ast
 import logging
 import os
 import sys
@@ -70,7 +71,7 @@ COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 ADVANCED_COMPONENT_TYPES = {
     'openended' : ['combinedopenended', 'peergrading'],
-    'advanced' : ['annotation']
+    'advanced' : ['annotation'],
 }
 
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
@@ -289,32 +290,45 @@ def edit_unit(request, location):
     component_templates = defaultdict(list)
 
     # check if there are any advanced modules specified in the course policy
-    advanced_component_types = ADVANCED_COMPONENT_TYPES
     course_metadata = CourseMetadata.fetch(course.location)
-    course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, {})
+    course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, [])
+
+    #First try to parse with json
     try:
         course_advanced_keys = json.loads(course_advanced_keys)
     except:
         log.error("Cannot json decode course advanced policy: {0}".format(course_advanced_keys))
+    #It may be that it is not a json object, but can be evaluated as a python literal
+    try:
+        #This is a safe evaluation.  See docs for ast
+        course_advanced_keys = ast.literal_eval(course_advanced_keys)
+    except:
+        log.error("Cannot parse course advanced policy at all: {0}".format(course_advanced_keys))
+        course_advanced_keys=[]
 
-    if isinstance(course_advanced_keys,dict):
-        advanced_component_types.update(course_advanced_keys)
+    #Set component types according to course policy file
+    component_types = COMPONENT_TYPES
+    if isinstance(course_advanced_keys, list):
+        #Generate a subset of the dictionary for just needed keys
+        course_advanced_keys = [c for c in course_advanced_keys if c in ADVANCED_COMPONENT_TYPES]
+        advanced_component_type_mappings = {k: ADVANCED_COMPONENT_TYPES.get(k,[]) for k in course_advanced_keys}
+        #Let course staff defined keys be valid
+        component_types+=course_advanced_keys
     else:
         log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
-
 
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
         category = template.location.category
-        log.debug(category)
-        for key in ADVANCED_COMPONENT_TYPES:
-            if category in ADVANCED_COMPONENT_TYPES[key]:
+        #Map subcategory to upper level category
+        for key in course_advanced_keys:
+            if category in advanced_component_type_mappings[key]:
                 category = key
                 break
 
-        if category in COMPONENT_TYPES:
+        if category in component_types:
 			#This is a hack to create categories for different xmodules
-            component_templates[template.location.category].append((
+            component_templates[category].append((
                 template.display_name,
                 template.location.url(),
                 'markdown' in template.metadata,
