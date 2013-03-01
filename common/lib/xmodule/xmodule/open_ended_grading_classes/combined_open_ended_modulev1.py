@@ -79,6 +79,9 @@ class CombinedOpenEndedV1Module():
     INTERMEDIATE_DONE = 'intermediate_done'
     DONE = 'done'
 
+    #Where the templates live for this problem
+    TEMPLATE_DIR = "combinedopenended"
+
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, metadata = None, static_data = None, **kwargs):
 
@@ -343,7 +346,7 @@ class CombinedOpenEndedV1Module():
         Output: rendered html
         """
         context = self.get_context()
-        html = self.system.render_template('combined_open_ended.html', context)
+        html = self.system.render_template('{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
 
     def get_html_nonsystem(self):
@@ -354,7 +357,7 @@ class CombinedOpenEndedV1Module():
         Output: HTML rendered directly via Mako
         """
         context = self.get_context()
-        html = self.system.render_template('combined_open_ended.html', context)
+        html = self.system.render_template('{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
 
     def get_html_base(self):
