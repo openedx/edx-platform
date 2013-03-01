@@ -1,12 +1,12 @@
 ---
 metadata:
     display_name: Peer Grading Interface
-    rerandomize: never
-    showanswer: never
-    weight: ""
-    attempts: ""
+    attempts: 1
+    use_for_single_location: False
+    link_to_location: None
+    is_graded: False
 data: |
-  <peergrading use_for_single_location="False" is_graded="False" display_name = "Peer Grading Panel">
+  <peergrading>
   </peergrading>
 
 children: []
