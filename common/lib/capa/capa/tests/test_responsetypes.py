@@ -2,7 +2,6 @@
 Tests of responsetypes
 """
 
-
 from datetime import datetime
 import json
 from nose.plugins.skip import SkipTest
@@ -806,9 +805,8 @@ class CustomResponseTest(ResponseTest):
         #
         #   'answer_given' is the answer the student gave (if there is just one input)
         #       or an ordered list of answers (if there are multiple inputs)
-        #
-        #
-        # The function should return a dict of the form
+        #   
+        # The function should return a dict of the form 
         # { 'ok': BOOL, 'msg': STRING }
         #
         script = textwrap.dedent("""
@@ -916,6 +914,35 @@ class CustomResponseTest(ResponseTest):
         self.assertEqual(correct_map.get_msg('1_2_1'), 'Feedback 1')
         self.assertEqual(correct_map.get_msg('1_2_2'), 'Feedback 2')
         self.assertEqual(correct_map.get_msg('1_2_3'), 'Feedback 3')
+
+    def test_function_code_with_extra_args(self):
+        script = textwrap.dedent("""\
+                    def check_func(expect, answer_given, options, dynamath):
+                        assert options == "xyzzy", "Options was %r" % options
+                        return {'ok': answer_given == expect, 'msg': 'Message text'}
+                    """)
+
+        problem = self.build_problem(script=script, cfn="check_func", expect="42", options="xyzzy", cfn_extra_args="options dynamath")
+
+        # Correct answer
+        input_dict = {'1_2_1': '42'}
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        msg = correct_map.get_msg('1_2_1')
+
+        self.assertEqual(correctness, 'correct')
+        self.assertEqual(msg, "Message text\n")
+
+        # Incorrect answer
+        input_dict = {'1_2_1': '0'}
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        msg = correct_map.get_msg('1_2_1')
+
+        self.assertEqual(correctness, 'incorrect')
+        self.assertEqual(msg, "Message text\n")
 
     def test_multiple_inputs_return_one_status(self):
         # When given multiple inputs, the 'answer_given' argument

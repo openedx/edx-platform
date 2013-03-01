@@ -221,6 +221,8 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         cfn = kwargs.get('cfn', None)
         expect = kwargs.get('expect', None)
         answer = kwargs.get('answer', None)
+        options = kwargs.get('options', None)
+        cfn_extra_args = kwargs.get('cfn_extra_args', None)
 
         # Create the response element
         response_element = etree.Element("customresponse")
@@ -234,6 +236,12 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         if answer:
             answer_element = etree.SubElement(response_element, "answer")
             answer_element.text = str(answer)
+
+        if options:
+            response_element.set('options', str(options))
+
+        if cfn_extra_args:
+            response_element.set('cfn_extra_args', str(cfn_extra_args))
 
         return response_element
 

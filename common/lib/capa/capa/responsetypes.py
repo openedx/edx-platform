@@ -927,15 +927,17 @@ class CustomResponse(LoncapaResponse):
                 # actual function that will re-execute the original script,
                 # and invoke the function with the data needed.
                 def make_check_function(script_code, cfn):
-                    def check_function(expect, ans):
+                    def check_function(expect, ans, **kwargs):
+                        extra_args = "".join(", {0}={0}".format(k) for k in kwargs)
                         code = (
                             script_code + "\n" +
-                            "cfn_return = %s(expect, ans)\n" % cfn
+                            "cfn_return = %s(expect, ans%s)\n" % (cfn, extra_args)
                         )
                         globals_dict = {
                             'expect': expect,
                             'ans': ans,
                         }
+                        globals_dict.update(kwargs)
                         safe_exec.safe_exec(code, globals_dict)
                         return globals_dict['cfn_return']
                     return check_function
@@ -1063,10 +1065,12 @@ class CustomResponse(LoncapaResponse):
 
             # this is an interface to the Tutor2 check functions
             fn = self.code
+            answer_given = submission[0] if (len(idset) == 1) else submission
+            kwnames = self.xml.get("cfn_extra_args", "").split()
+            kwargs = {n:self.context.get(n) for n in kwnames}
             log.debug(" submission = %s" % submission)
             try:
-                answer_given = submission[0] if (len(idset) == 1) else submission
-                ret = fn(self.expect, answer_given)
+                ret = fn(self.expect, answer_given, **kwargs)
             except Exception as err:
                 log.error("oops in customresponse (cfn) error %s" % err)
                 # print "context = ",self.context
