@@ -262,9 +262,8 @@ class @Problem
   save: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
-      if response.success
-        saveMessage = "Your answers have been saved but not graded. Hit 'Check' to grade them."
-        @gentle_alert saveMessage
+      saveMessage = response.msg
+      @gentle_alert saveMessage
       @updateProgress response
 
   refreshMath: (event, element) =>
