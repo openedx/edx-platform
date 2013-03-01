@@ -156,7 +156,7 @@
               <h3 class="section-name">
                 <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
                 <form class="section-name-edit" style="display:none">
-                  <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
+                  <input type="text" value="${section.display_name | h}" class="edit-section-name" autocomplete="off"/>
                   <input type="submit" class="save-button edit-section-name-save" value="Save" />
                   <input type="button" class="cancel-button edit-section-name-cancel" value="Cancel" />
                 </form>
