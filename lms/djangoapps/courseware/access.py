@@ -1,10 +1,10 @@
 """This file contains (or should), all access control logic for the courseware.
 Ideally, it will be the only place that needs to know about any special settings
 like DISABLE_START_DATES"""
-
 import logging
 import time
 from datetime import datetime, timedelta
+from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -363,6 +363,30 @@ def _course_org_staff_group_name(location, course_context=None):
     return 'staff_%s' % course_id.split('/')[0]
 
 
+def group_names_for(role, location, course_context=None):
+    """Returns the group names for a given role with this location. Plural 
+    because it will return both the name we expect now as well as the legacy
+    group name we support for backwards compatibility. This should not check
+    the DB for existence of a group (like some of its callers do) because that's
+    a DB roundtrip, and we expect this might be invoked many times as we crawl
+    an XModule tree."""
+    loc = Location(location)
+    legacy_group_name = '{0}_{1}'.format(role, loc.course)
+
+    if loc.category == 'course':
+        course_id = loc.course_id
+    else:
+        if course_context is None:
+            raise CourseContextRequired()
+        course_id = course_context
+
+    group_name = '{0}_{1}'.format(role, course_id)
+
+    return [group_name, legacy_group_name]
+
+group_names_for_staff = partial(group_names_for, 'staff')
+group_names_for_instructor = partial(group_names_for, 'instructor')
+
 def _course_staff_group_name(location, course_context=None):
     """
     Get the name of the staff group for a location in the context of a course run.
@@ -375,33 +399,12 @@ def _course_staff_group_name(location, course_context=None):
     using course_id rather than just the course number. So first check to see if the group name exists
     """
     loc = Location(location)
-    legacy_name = 'staff_%s' % loc.course
-    if _does_course_group_name_exist(legacy_name):
-        return legacy_name
+    group_name, legacy_group_name = group_names_for_staff(location, course_context)
 
-    if loc.category == 'course':
-        course_id = loc.course_id
-    else:
-        if course_context is None:
-            raise CourseContextRequired()
-        course_id = course_context
+    if _does_course_group_name_exist(legacy_group_name):
+        return legacy_group_name
 
-    return 'staff_%s' % course_id
-
-
-def course_beta_test_group_name(location):
-    """
-    Get the name of the beta tester group for a location.  Right now, that's
-    beta_testers_COURSE.
-
-    location: something that can passed to Location.
-    """
-    return 'beta_testers_{0}'.format(Location(location).course)
-
-# nosetests thinks that anything with _test_ in the name is a test.
-# Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
-course_beta_test_group_name.__test__ = False
-
+    return group_name
 
 def _course_org_instructor_group_name(location, course_context=None):
     """
@@ -437,18 +440,26 @@ def _course_instructor_group_name(location, course_context=None):
     using course_id rather than just the course number. So first check to see if the group name exists
     """
     loc = Location(location)
-    legacy_name = 'instructor_%s' % loc.course
-    if _does_course_group_name_exist(legacy_name):
-        return legacy_name
+    group_name, legacy_group_name = group_names_for_instructor(location, course_context)
 
-    if loc.category == 'course':
-        course_id = loc.course_id
-    else:
-        if course_context is None:
-            raise CourseContextRequired()
-        course_id = course_context
+    if _does_course_group_name_exist(legacy_group_name):
+        return legacy_group_name
 
-    return 'instructor_%s' % course_id
+    return group_name
+
+def course_beta_test_group_name(location):
+    """
+    Get the name of the beta tester group for a location.  Right now, that's
+    beta_testers_COURSE.
+
+    location: something that can passed to Location.
+    """
+    return 'beta_testers_{0}'.format(Location(location).course)
+
+# nosetests thinks that anything with _test_ in the name is a test.
+# Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
+course_beta_test_group_name.__test__ = False
+
 
 
 def _has_global_staff_access(user):
@@ -540,23 +551,22 @@ def _has_access_to_location(user, location, access_level, course_context):
     user_groups = [g.name for g in user.groups.all()]
 
     if access_level == 'staff':
-        staff_group = _course_staff_group_name(location, course_context)
-        # org_staff_group is a group for an entire organization
-        org_staff_group = _course_org_staff_group_name(location, course_context)
-        if staff_group in user_groups or org_staff_group in user_groups:
-            debug("Allow: user in group %s", staff_group)
-            return True
-        debug("Deny: user not in group %s", staff_group)
+        staff_groups = group_names_for_staff(location, course_context) + \
+                       [_course_org_staff_group_name(location, course_context)]
+        for staff_group in staff_groups:
+            if staff_group in user_groups:
+                debug("Allow: user in group %s", staff_group)
+                return True
+        debug("Deny: user not in groups %s", staff_groups)
 
     if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
-        instructor_group = _course_instructor_group_name(location, course_context)
-        instructor_staff_group = _course_org_instructor_group_name(
-            location, course_context)
-        if instructor_group in user_groups or instructor_staff_group in user_groups:
-            debug("Allow: user in group %s", instructor_group)
-            return True
-        debug("Deny: user not in group %s", instructor_group)
-
+        instructor_groups = group_names_for_instructor(location, course_context) + \
+                            [_course_org_instructor_group_name(location, course_context)]
+        for instructor_group in instructor_groups:
+            if instructor_group in user_groups:
+                debug("Allow: user in group %s", instructor_group)
+                return True
+        debug("Deny: user not in groups %s", instructor_groups)
     else:
         log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
 
