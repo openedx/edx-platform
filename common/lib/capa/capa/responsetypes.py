@@ -199,19 +199,7 @@ class LoncapaResponse(object):
 
         # Add a <div> for the message at the end of the response
         if response_msg:
-            response_msg_div = etree.SubElement(tree, 'div')
-            response_msg_div.set("class", "response_message")
-
-            # If the response message can be represented as an XHTML tree,
-            # create the tree and append it to the message <div>
-            try:
-                response_tree = etree.XML(response_msg)
-                response_msg_div.append(response_tree)
-
-            # Otherwise, assume that the message is text (not XHTML)
-            # and insert it as the text of the message <div>
-            except:
-                response_msg_div.text = response_msg
+            tree.append(self._render_response_msg_html(response_msg))
 
         return tree
 
@@ -336,6 +324,29 @@ class LoncapaResponse(object):
 
     def __unicode__(self):
         return u'LoncapaProblem Response %s' % self.xml.tag
+
+    def _render_response_msg_html(self, response_msg):
+        """ Render a <div> for a message that applies to the entire response.
+
+        *response_msg* is a string, which may contain XHTML markup
+        
+        Returns an etree element representing the response message <div> """
+        # First try wrapping the text in a <div> and parsing
+        # it as an XHTML tree
+        try:
+            response_msg_div = etree.XML('<div>%s</div>' % str(response_msg))
+
+        # If we can't do that, create the <div> and set the message
+        # as the text of the <div>
+        except:
+            response_msg_div = etree.Element('div')
+            response_msg_div.text = str(response_msg)
+
+
+        # Set the css class of the message <div>
+        response_msg_div.set("class", "response_message")
+
+        return response_msg_div
 
 
 #-----------------------------------------------------------------------------

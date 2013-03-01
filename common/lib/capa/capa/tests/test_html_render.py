@@ -135,7 +135,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # CustomResponse script that sets an overall_message
         script=textwrap.dedent("""
             def check_func(*args):
-                return {'overall_message': '<p>Test message</p>',
+                msg = '<p>Test message 1<br /></p><p>Test message 2</p>'
+                return {'overall_message': msg,
                         'input_list': [ {'ok': True, 'msg': '' } ] }
         """)
 
@@ -160,9 +161,12 @@ class CapaHtmlRenderTest(unittest.TestCase):
         self.assertEqual(msg_div_element.get('class'), "response_message")
 
         # Expect that the <div> contains our message (as part of the XML tree)
-        msg_p_element = msg_div_element.find('p')
-        self.assertEqual(msg_p_element.tag, "p")
-        self.assertEqual(msg_p_element.text, "Test message")
+        msg_p_elements = msg_div_element.findall('p')
+        self.assertEqual(msg_p_elements[0].tag, "p")
+        self.assertEqual(msg_p_elements[0].text, "Test message 1")
+
+        self.assertEqual(msg_p_elements[1].tag, "p")
+        self.assertEqual(msg_p_elements[1].text, "Test message 2")
 
 
     def test_substitute_python_vars(self):
