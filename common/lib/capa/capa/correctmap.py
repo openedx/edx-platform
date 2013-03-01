@@ -117,7 +117,7 @@ class CorrectMap(object):
             Otherwise, return 0 points """
         if self.is_correct(answer_id):
             npoints = self.get_property(answer_id, 'npoints')
-            return npoints if npoints else 1
+            return npoints if npoints is not None else 1
         else:
             return 0
 
