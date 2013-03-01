@@ -127,4 +127,5 @@ class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule
     stores_state = True
     template_dir_name = "annotatable"
+    mako_template = "widgets/raw-edit.html"
 
