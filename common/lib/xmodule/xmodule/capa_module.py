@@ -116,7 +116,7 @@ class CapaModule(XModule):
             #log.debug("Then parsed " + grace_period_string +
             #          " to closing date" + str(self.close_date))
         else:
-            self.close_date = self.due
+            self.close_date = due_date
 
         if self.seed is None:
             if self.rerandomize == 'never':
@@ -373,8 +373,11 @@ class CapaModule(XModule):
                 datetime.datetime.utcnow() > self.close_date)
 
     def closed(self):
-        ''' Is the student still allowed to submit answers? '''
-        if self.attempts == self.max_attempts:
+        ''' Is the student prevented from submitting answers? '''
+        if self.max_attempts is None:
+            return False
+
+        if self.attempts >= self.max_attempts:
             return True
         if self.is_past_due():
             return True
@@ -668,6 +671,7 @@ class CapaDescriptor(RawDescriptor):
     module_class = CapaModule
 
     weight = Float(help="How much to weight this problem by", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", scope=Scope.settings, default='')
 
     stores_state = True
     has_score = True
@@ -689,7 +693,7 @@ class CapaDescriptor(RawDescriptor):
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.metadata.get('markdown', '')})
+        _context.update({'markdown': self.markdown})
         return _context
 
     @property

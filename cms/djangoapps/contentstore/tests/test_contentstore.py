@@ -109,11 +109,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
         ms = modulestore('direct')
         effort = ms.get_item(Location(['i4x', 'edX', 'full', 'about', 'effort', None]))
-        self.assertEqual(effort.definition['data'], '6 hours')
+        self.assertEqual(effort.data, '6 hours')
 
         # this one should be in a non-override folder
         effort = ms.get_item(Location(['i4x', 'edX', 'full', 'about', 'end_date', None]))
-        self.assertEqual(effort.definition['data'], 'TBD')
+        self.assertEqual(effort.data, 'TBD')
 
     def test_remove_hide_progress_tab(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -123,7 +123,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
         course = ms.get_item(source_location)
-        self.assertNotIn('hide_progress_tab', course.metadata)
+        self.assertFalse(course.hide_progress_tab)
 
     def test_clone_course(self):
 
@@ -216,7 +216,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         with fs.open('grading_policy.json','r') as grading_policy:
             on_disk = loads(grading_policy.read())
             course = ms.get_item(location)
-            self.assertEqual(on_disk, course.definition['data']['grading_policy'])
+            self.assertEqual(on_disk, course.grading_policy)
 
         # remove old course
         delete_course(ms, cs, location)
@@ -407,5 +407,4 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")
         context = problem.get_context()
         self.assertIn('markdown', context, "markdown is missing from context")
-        self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")

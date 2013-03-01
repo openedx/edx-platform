@@ -367,7 +367,7 @@ class ImportTestCase(BaseCourseTestCase):
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
-        self.assertEqual(gst_sample.definition['render'], render_string_from_sample_gst_xml)
+        self.assertEqual(gst_sample.render, render_string_from_sample_gst_xml)
 
     def test_cohort_config(self):
         """
@@ -383,13 +383,13 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertFalse(course.is_cohorted)
 
         # empty config -> False
-        course.metadata['cohort_config'] = {}
+        course.cohort_config = {}
         self.assertFalse(course.is_cohorted)
 
         # false config -> False
-        course.metadata['cohort_config'] = {'cohorted': False}
+        course.cohort_config = {'cohorted': False}
         self.assertFalse(course.is_cohorted)
 
         # and finally...
-        course.metadata['cohort_config'] = {'cohorted': True}
+        course.cohort_config = {'cohorted': True}
         self.assertTrue(course.is_cohorted)

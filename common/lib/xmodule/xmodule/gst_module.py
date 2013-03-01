@@ -14,6 +14,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from pkg_resources import resource_string
+from xblock.core import String, Scope
 
 
 log = logging.getLogger(__name__)
@@ -43,6 +44,8 @@ class GraphicalSliderToolModule(XModule):
     }
     js_module_name = "GraphicalSliderTool"
 
+    render = String(scope=Scope.content)
+
     def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
         """
@@ -60,7 +63,7 @@ class GraphicalSliderToolModule(XModule):
         self.html_class = self.location.category
         self.configuration_json = self.build_configuration_json()
         params = {
-                  'gst_html': self.substitute_controls(self.definition['render']),
+                  'gst_html': self.substitute_controls(self.render),
                   'element_id': self.html_id,
                   'element_class': self.html_class,
                   'configuration_json': self.configuration_json
@@ -146,6 +149,9 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
     module_class = GraphicalSliderToolModule
     template_dir_name = 'graphical_slider_tool'
 
+    render = String(scope=Scope.content)
+    configuration = String(scope=Scope.content)
+
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
@@ -184,7 +190,7 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
         xml_object = etree.Element('graphical_slider_tool')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
             child_node = etree.fromstring(child_str)
             xml_object.append(child_node)
 

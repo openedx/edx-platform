@@ -101,7 +101,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         assert(descriptor.is_newish is True)
 
         descriptor = self.get_dummy_course(start='2013-02-02T12:00', is_new=False)
-        assert(descriptor.is_new is False)
+        assert(descriptor.is_newish is False)
 
         descriptor = self.get_dummy_course(start='2013-02-02T12:00', is_new=True)
         assert(descriptor.is_newish is True)

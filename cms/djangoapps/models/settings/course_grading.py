@@ -157,10 +157,10 @@ class CourseGradingModel(object):
                 graceperiodjson = graceperiodjson['grace_period']
 
             # lms requires these to be in a fixed order
-            grace_rep = "{0[hours]:d} hours {0[minutes]:d} minutes {0[seconds]:d} seconds".format(graceperiodjson)
+            grace_timedelta = timedelta(**graceperiodjson)
 
             descriptor = get_modulestore(course_location).get_item(course_location)
-            descriptor.lms.graceperiod = grace_rep
+            descriptor.lms.graceperiod = grace_timedelta
             get_modulestore(course_location).update_metadata(course_location, descriptor._model_data._kvs._metadata)
 
     @staticmethod
@@ -236,7 +236,6 @@ class CourseGradingModel(object):
 
     @staticmethod
     def convert_set_grace_period(descriptor):
-<<<<<<< HEAD
         # 5 hours 59 minutes 59 seconds => converted to iso format
         rawgrace = descriptor.lms.graceperiod
         if rawgrace:
@@ -248,27 +247,19 @@ class CourseGradingModel(object):
             minutes = int(seconds / 60)
             seconds -= minutes * 60
 
-            graceperiod = {}
+            graceperiod = {'hours': 0, 'minutes': 0, 'seconds': 0}
             if hours > 0:
-                graceperiod['hours'] = str(hours)
+                graceperiod['hours'] = hours
 
             if minutes > 0:
-                graceperiod['minutes'] = str(minutes)
+                graceperiod['minutes'] = minutes
 
             if seconds > 0:
-                graceperiod['seconds'] = str(seconds)
+                graceperiod['seconds'] = seconds
 
             return graceperiod
         else:
             return None
-=======
-        # 5 hours 59 minutes 59 seconds => { hours: 5, minutes : 59, seconds : 59}
-        rawgrace = descriptor.metadata.get('graceperiod', None)
-        if rawgrace:
-            parsedgrace = {str(key): int(val) for (val, key) in re.findall('\s*(\d+)\s*(\w+)', rawgrace)}
-            return parsedgrace
-        else: return None
->>>>>>> origin/master
 
     @staticmethod
     def parse_grader(json_grader):

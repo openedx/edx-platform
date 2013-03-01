@@ -409,6 +409,11 @@ class CourseDescriptor(SequenceDescriptor):
     def grade_cutoffs(self, value):
         self._grading_policy['GRADE_CUTOFFS'] = value
 
+        # XBlock fields don't update after mutation
+        policy = self.grading_policy
+        policy['GRADE_CUTOFFS'] = value
+        self.grading_policy = policy
+
 
     @property
     def lowest_passing_grade(self):

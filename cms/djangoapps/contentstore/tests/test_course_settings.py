@@ -251,8 +251,7 @@ class CourseGradingTest(CourseTestCase):
 
         test_grader.grace_period = {'hours': 4, 'minutes': 5, 'seconds': 0}
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
-        print test_grader.__dict__
-        print altered_grader.__dict__
+        print test_grader.grace_period, altered_grader.grace_period
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "4 hour grace period")
 
     def test_update_grader_from_json(self):

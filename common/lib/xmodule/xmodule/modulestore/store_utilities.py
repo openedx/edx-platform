@@ -55,7 +55,7 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
             )
             new_children.append(child_loc.url())
 
-      modulestore.update_children(module.location, new_children)
+        modulestore.update_children(module.location, new_children)
 
     # save metadata
     modulestore.update_metadata(module.location, module._model_data._kvs._metadata)
