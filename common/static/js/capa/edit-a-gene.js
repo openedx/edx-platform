@@ -36,7 +36,9 @@
         genexSetProblemNumber(genex_problem_number);    
     };
     genexStoreAnswer = function(ans) {
-        alert(ans);
+        var problem = $('#genex_container').parents('.problem');
+        var input_field = problem.find('input[type="hidden"][name!="dna_sequence"][name!="genex_problem_number"]');
+        input_field.val(ans);
     };
 }).call(this);
 
