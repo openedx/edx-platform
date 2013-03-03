@@ -171,7 +171,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
-        delete_course(ms, cs, location)
+        delete_course(ms, cs, location, commit=True)
 
         items = ms.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
         self.assertEqual(len(items), 0)
@@ -465,7 +465,9 @@ class ContentStoreTest(ModuleStoreTestCase):
         # check for grace period definition which should be defined at the course level
         self.assertIn('graceperiod', new_module.metadata)
 
-        self.assertEqual(course.metadata['graceperiod'], new_module.metadata['graceperiod'])
+        self.assertEqual(parent.metadata['graceperiod'], new_module.metadata['graceperiod'])
+
+        self.assertEqual(course.metadata['xqa_key'], new_module.metadata['xqa_key'])
 
         #
         # now let's define an override at the leaf node level
