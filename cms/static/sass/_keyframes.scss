@@ -17,6 +17,14 @@
 @-o-keyframes rotateClockwise { @include rotateClockwise(); }
 @keyframes rotateClockwise { @include rotateClockwise();}
 
+@mixin anim-rotateClockwise($duration, $timing: ease-in-out, $count: 1) {
+  @include animation-name(rotateClockwise);
+  @include animation-duration($duration);
+  @include animation-timing-function($timing);
+  @include animation-fill-mode(both);
+  @include animation-iteration-count($count);
+}
+
 // ====================
 
 // notifications slide up
@@ -38,6 +46,14 @@
 @-webkit-keyframes notificationsSlideUp { @include notificationsSlideUp(); }
 @-o-keyframes notificationsSlideUp { @include notificationsSlideUp(); }
 @keyframes notificationsSlideUp { @include notificationsSlideUp();}
+
+@mixin anim-notificationsSlideUp($duration, $timing: ease-in-out, $count: 1) {
+  @include animation-name(notificationsSlideUp);
+  @include animation-duration($duration);
+  @include animation-timing-function($timing);
+  @include animation-fill-mode(both);
+  @include animation-iteration-count($count);
+}
 
 // ====================
 
@@ -61,6 +77,14 @@
 @-o-keyframes notificationsSlideDown { @include notificationsSlideDown(); }
 @keyframes notificationsSlideDown { @include notificationsSlideDown();}
 
+@mixin anim-notificationsSlideDown($duration, $timing: ease-in-out, $count: 1) {
+  @include animation-name(notificationsSlideDown);
+  @include animation-duration($duration);
+  @include animation-timing-function($timing);
+  @include animation-fill-mode(both);
+  @include animation-iteration-count($count);
+}
+
 // ====================
 
 // notifications slide up then down
@@ -83,13 +107,21 @@
 @-o-keyframes notificationsSlideUpDown { @include notificationsSlideUpDown(); }
 @keyframes notificationsSlideUpDown { @include notificationsSlideUpDown();}
 
+@mixin anim-notificationsSlideUpDown($duration, $timing: ease-in-out, $count: 1) {
+  @include animation-name(notificationsSlideUpDown);
+  @include animation-duration($duration);
+  @include animation-timing-function($timing);
+  @include animation-fill-mode(both);
+  @include animation-iteration-count($count);
+}
+
 // ====================
 
 // bounce in
-@mixin bounce-in {
+@mixin bounceIn {
   0% {
     opacity: 0;
-    @include transform(scale(.3));
+    @include transform(scale(0.3));
   }
 
   50% {
@@ -102,14 +134,61 @@
   }
 }
 
-@-moz-keyframes bounce-in { @include bounce-in(); }
-@-webkit-keyframes bounce-in { @include bounce-in(); }
-@-o-keyframes bounce-in { @include bounce-in(); }
-@keyframes bounce-in { @include bounce-in();}
+@-moz-keyframes bounceIn { @include bounceIn(); }
+@-webkit-keyframes bounceIn { @include bounceIn(); }
+@-o-keyframes bounceIn { @include bounceIn(); }
+@keyframes bounceIn { @include bounceIn();}
 
-@mixin bounce-in-animation($duration, $timing: ease-in-out) {
-  @include animation-name(bounce-in);
+@mixin anim-bounceIn($duration, $timing: ease-in-out, $count: 1) {
+  @include animation-name(bounceIn);
   @include animation-duration($duration);
   @include animation-timing-function($timing);
   @include animation-fill-mode(both);
+  @include animation-iteration-count($count);
+}
+
+// ====================
+
+// bounce in
+@mixin bounceOut {
+  0% {
+    opacity: 0;
+    @include transform(scale(0.3));
+  }
+
+  50% {
+    opacity: 1;
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    @include transform(scale(1));
+  }
+
+  0% {
+    @include transform(scale(1));
+  }
+
+  50% {
+    opacity: 1;
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    opacity: 0;
+    @include transform(scale(0.3));
+  }
+}
+
+@-moz-keyframes bounceOut { @include bounceOut(); }
+@-webkit-keyframes bounceOut { @include bounceOut(); }
+@-o-keyframes bounceOut { @include bounceOut(); }
+@keyframes bounceOut { @include bounceOut();}
+
+@mixin anim-bounceOut($duration, $timing: ease-in-out, $count: 1) {
+  @include animation-name(bounceOut);
+  @include animation-duration($duration);
+  @include animation-timing-function($timing);
+  @include animation-fill-mode(both);
+  @include animation-iteration-count($count);
 }

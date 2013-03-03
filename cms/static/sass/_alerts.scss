@@ -9,7 +9,7 @@
   width: 100%;
   height: 100%;
   text-align: center;
-  z-index: 100;
+  z-index: 10000;
 
   &:before {
     content: '';
@@ -372,7 +372,8 @@
   &.saving {
 
     .icon-saving {
-      @include animation(rotateClockwise 3.0s forwards linear infinite);
+      @include anim-rotateClockwise(3s, linear, infinite);
+
       width: 22px;
     }
 
@@ -661,13 +662,26 @@
 .js {
 
   .wrapper-prompt {
-    @include transition (opacity 0.25s ease-in-out);
     display: none;
-    opacity: 0;
+
+    .prompt {
+      @include anim-bounceIn(0.5s);
+      opacity: 0.1;
+    }
 
     &.is-shown {
       display: block;
-      opacity: 1.0;
+
+      .prompt {
+        opacity: 1.0;
+      }
+    }
+
+    &.is-hiding {
+
+      .prompt {
+        @include anim-bounceOut(0.5s);
+      }
     }
   }
 
@@ -684,15 +698,15 @@
 
     // varying animations
     &.is-shown {
-      @include animation(notificationsSlideUp 1s forwards ease-in-out 1);
+      @include anim-notificationsSlideUp(1s);
     }
 
     &.is-hiding {
-      @include animation(notificationsSlideDown 1s forwards ease-in-out 1);
+      @include anim-notificationsSlideDown(1s);
     }
 
     &.is-fleeting {
-      @include animation(notificationsSlideUpDown 2s forwards ease-in-out 1);
+      @include anim-notificationsSlideUpDown(2s);
     }
   }
 }
