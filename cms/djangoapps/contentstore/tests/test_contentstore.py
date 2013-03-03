@@ -171,7 +171,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
-        delete_course(ms, cs, location)
+        delete_course(ms, cs, location, commit=True)
 
         items = ms.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
         self.assertEqual(len(items), 0)
