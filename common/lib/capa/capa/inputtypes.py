@@ -921,11 +921,12 @@ class EditAGeneInput(InputTypeBase):
     @classmethod
     def get_attributes(cls):
         """
-            Note: width, hight, and dna_sequencee are required.
-            """
+        Note: width, height, and dna_sequencee are required.
+        """
         return [Attribute('width'),
                 Attribute('height'),
-                Attribute('dna_sequence')
+                Attribute('dna_sequence'),
+                Attribute('genex_problem_number')
                 ]
     
     def _extra_context(self):
