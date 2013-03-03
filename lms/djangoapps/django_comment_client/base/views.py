@@ -91,8 +91,6 @@ def create_thread(request, course_id, commentable_id):
         'user_id': request.user.id,
     })
 
-    group_id = False
- 
     user = cc.User.from_django_user(request.user)
 
     #kevinchugh because the new requirement is that all groups will be determined
@@ -113,8 +111,8 @@ def create_thread(request, course_id, commentable_id):
             # regular users always post with their own id.
             group_id = user_group_id
 
-    if group_id:
-      thread.update_attributes(group_id=group_id)
+        if group_id:
+          thread.update_attributes(group_id=group_id)
     
     thread.save()
 
