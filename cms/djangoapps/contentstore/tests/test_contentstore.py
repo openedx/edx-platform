@@ -465,7 +465,9 @@ class ContentStoreTest(ModuleStoreTestCase):
         # check for grace period definition which should be defined at the course level
         self.assertIn('graceperiod', new_module.metadata)
 
-        self.assertEqual(course.metadata['graceperiod'], new_module.metadata['graceperiod'])
+        self.assertEqual(parent.metadata['graceperiod'], new_module.metadata['graceperiod'])
+
+        self.assertEqual(course.metadata['xqa_key'], new_module.metadata['xqa_key'])
 
         #
         # now let's define an override at the leaf node level
