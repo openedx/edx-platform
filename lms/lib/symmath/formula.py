@@ -247,6 +247,65 @@ class formula(object):
                 fix_hat(k)
         fix_hat(xml)
 
+        def flatten_pmathml(xml):
+            '''
+            Give the text version of PMathML elements
+            '''
+            tag = gettag(xml)
+            if tag == 'mn': return xml.text
+            elif tag == 'mi': return xml.text
+            # elif tag == 'msub': return '_'.join([flatten_pmathml(y) for y in xml])
+            # elif tag == 'msup': return '^'.join([flatten_pmathml(y) for y in xml])
+            elif tag == 'mrow': return ''.join([flatten_pmathml(y) for y in xml])
+            raise Exception, '[flatten_pmathml] unknown tag %s' % tag
+
+        # find "tagged" superscripts
+        # they have the character \u200b in the superscript
+        # replace them with a__b so snuggle doesn't get confused
+        def fix_superscripts(xml):
+            for k in xml:
+                tag = gettag(k)
+
+                # match node to a superscript
+                if (tag == 'msup' and
+                    len(k) == 2 and gettag(k[1]) == 'mrow' and
+                    gettag(k[1][0]) == 'mo' and k[1][0].text == u'\u200b'): # whew
+
+                    k[1].remove(k[1][0])
+                    newk = etree.Element('mi')
+                    newk.text = '%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]))
+                    xml.replace(k, newk)
+
+                if (tag == 'msubsup' and
+                    len(k) == 3 and gettag(k[2]) == 'mrow' and
+                    gettag(k[2][0]) == 'mo' and k[2][0].text == u'\u200b'): # whew
+
+                    k[2].remove(k[2][0])
+                    newk = etree.Element('mi')
+                    newk.text = '%s_%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]), flatten_pmathml(k[2]))
+                    xml.replace(k, newk)
+
+                fix_superscripts(k)
+        fix_superscripts(xml)
+
+        # Snuggle returns an error when it sees an <msubsup>
+        # replace such elements with an <msup>, except the first element is of
+        # the form a_b. I.e. map a_b^c => (a_b)^c
+        def fix_msubsup(parent):
+            for child in parent:
+                # fix msubsup
+                if (gettag(child) == 'msubsup' and len(child) == 3):
+                    newchild = etree.Element('msup')
+                    newbase = etree.Element('mi')
+                    newbase.text = '%s_%s' % (flatten_pmathml(child[0]), flatten_pmathml(child[1]))
+                    newexp = child[2]
+                    newchild.append(newbase)
+                    newchild.append(newexp)
+                    parent.replace(child, newchild)
+
+                fix_msubsup(child)
+        fix_msubsup(xml)
+
         self.xml = xml
         return self.xml
 
@@ -257,6 +316,7 @@ class formula(object):
         try:
             xml = self.preprocess_pmathml(self.expr)
         except Exception, err:
+            # print 'Err %s while preprocessing; expr=%s' % (err, self.expr)
             return "<html>Error! Cannot process pmathml</html>"
         pmathml = etree.tostring(xml, pretty_print=True)
         self.the_pmathml = pmathml
