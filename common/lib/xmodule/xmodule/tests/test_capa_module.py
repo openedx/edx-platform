@@ -282,3 +282,53 @@ class CapaModuleTest(unittest.TestCase):
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
         self.assertTrue(still_in_grace.answer_available())
+
+
+    def test_parse_get_params(self):
+
+        # Valid GET param dict
+        valid_get_dict = {'input_1': 'test',
+                        'input_1_2': 'test',
+                        'input_1_2_3': 'test',
+                        'input_[]_3': 'test',
+                        'input_4': None,
+                        'input_5': [],
+                        'input_6': 5}
+        
+        result = CapaModule.make_dict_of_responses(valid_get_dict)
+
+        # Expect that we get a dict with "input" stripped from key names
+        # and that we get the same values back
+        for key in result.keys():
+            original_key = "input_" + key
+            self.assertTrue(original_key in valid_get_dict,
+                            "Output dict should have key %s" % original_key)
+            self.assertEqual(valid_get_dict[original_key], result[key])
+
+
+        # Valid GET param dict with list keys
+        valid_get_dict = {'input_2[]': ['test1', 'test2']}
+        result = CapaModule.make_dict_of_responses(valid_get_dict)
+        self.assertTrue('2' in result)
+        self.assertEqual(valid_get_dict['input_2[]'], result['2'])
+
+        # If we use [] at the end of a key name, we should always
+        # get a list, even if there's just one value
+        valid_get_dict = {'input_1[]': 'test'}
+        result = CapaModule.make_dict_of_responses(valid_get_dict)
+        self.assertEqual(result['1'], ['test'])
+
+
+        # If we have no underscores in the name, then the key is invalid
+        invalid_get_dict = {'input': 'test'}
+        with self.assertRaises(ValueError):
+            result = CapaModule.make_dict_of_responses(invalid_get_dict)
+
+
+        # Two equivalent names (one list, one non-list)
+        # One of the values would overwrite the other, so detect this
+        # and raise an exception
+        invalid_get_dict = {'input_1[]': 'test 1',
+                            'input_1': 'test 2' }
+        with self.assertRaises(ValueError):
+            result = CapaModule.make_dict_of_responses(invalid_get_dict)

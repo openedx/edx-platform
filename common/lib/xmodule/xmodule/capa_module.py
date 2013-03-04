@@ -534,15 +534,34 @@ class CapaModule(XModule):
             # e.g. input_resistor_1 ==> resistor_1
             _, _, name = key.partition('_')
 
-            # This allows for answers which require more than one value for
-            # the same form input (e.g. checkbox inputs). The convention is that
-            # if the name ends with '[]' (which looks like an array), then the
-            # answer will be an array.
-            if not name.endswith('[]'):
-                answers[name] = get[key]
+            # If key has no underscores, then partition
+            # will return (key, '', '')
+            # We detect this and raise an error
+            if name is '':
+                raise ValueError("%s must contain at least one underscore" % str(key))
+
             else:
-                name = name[:-2]
-                answers[name] = get.getlist(key)
+                # This allows for answers which require more than one value for
+                # the same form input (e.g. checkbox inputs). The convention is that
+                # if the name ends with '[]' (which looks like an array), then the
+                # answer will be an array.
+                is_list_key = name.endswith('[]')
+                name = name[:-2] if is_list_key else name
+
+                if is_list_key:
+                    if type(get[key]) is list:
+                        val = get[key]
+                    else:
+                        val = [get[key]]
+                else:
+                    val = get[key]
+
+                # If the name already exists, then we don't want
+                # to override it.  Raise an error instead
+                if name in answers:
+                    raise ValueError("Key %s already exists in answers dict" % str(name))
+                else:
+                    answers[name] = val
 
         return answers
 
