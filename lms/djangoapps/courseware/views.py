@@ -5,10 +5,11 @@ from functools import partial
 
 from django.conf import settings
 from django.core.context_processors import csrf
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -20,7 +21,7 @@ from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
-from courseware.models import StudentModule, StudentModuleCache
+from courseware.models import StudentModule, StudentModuleCache, StudentModuleHistory
 from module_render import toc_for_course, get_module, get_instance_module, get_module_for_descriptor
 
 from django_comment_client.utils import get_discussion_title
@@ -608,3 +609,48 @@ def progress(request, course_id, student_id=None):
     context.update()
 
     return render_to_response('courseware/progress.html', context)
+
+
+@login_required
+def submission_history(request, course_id, student_username, location):
+    """Render an HTML fragment (meant for inclusion elsewhere) that renders a 
+    history of all state changes made by this user for this problem location.
+    Right now this only works for problems because that's all 
+    StudentModuleHistory records.
+    """
+    course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
+
+    # Permission Denied if they don't have staff access and are trying to see
+    # somebody else's submission history.
+    if (student_username != request.user.username) and (not staff_access):
+        raise PermissionDenied
+
+    try:
+        student = User.objects.get(username=student_username)
+        student_module = StudentModule.objects.get(course_id=course_id,
+                                                   module_state_key=location,
+                                                   student_id=student.id)
+    except User.DoesNotExist:
+        return HttpResponse("User {0} does not exist.".format(student_username))
+    except StudentModule.DoesNotExist:
+        return HttpResponse("{0} has never accessed problem {1}"
+                            .format(student_username, location))
+
+    history_entries = StudentModuleHistory.objects \
+                      .filter(student_module=student_module).order_by('-created')
+
+    # If no history records exist, let's force a save to get history started.
+    if not history_entries:
+        student_module.save()
+        history_entries = StudentModuleHistory.objects \
+                          .filter(student_module=student_module).order_by('-created')
+
+    context = {
+        'history_entries': history_entries,
+        'username': student.username,
+        'location': location,
+        'course_id': course_id
+    }
+
+    return render_to_response('courseware/submission_history.html', context)
