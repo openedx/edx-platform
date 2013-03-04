@@ -96,6 +96,7 @@ def assert_css_with_text(css, text):
 
 def css_click(css):
     '''
+<<<<<<< HEAD
     First try to use the regular click method, 
     but if clicking in the middle of an element
     doesn't work it might be that it thinks some other
@@ -106,6 +107,12 @@ def css_click(css):
         world.browser.find_by_css(css).first.click()
     except WebDriverException, e:
         css_click_at(css)
+=======
+    Rather than click in the middle of an element, 
+    click in the upper left
+    '''
+    css_click_at(css)
+>>>>>>> Click in the upper left of an element instead of the middle.
 
 
 def css_click_at(css, x=10, y=10):
