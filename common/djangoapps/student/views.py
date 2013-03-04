@@ -554,7 +554,7 @@ def create_account(request, post_override=None):
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
-        js['value'] = "Username should only consist of A-Z and 0-9.".format(field=a)
+        js['value'] = "Username should only consist of A-Z and 0-9, with no spaces.".format(field=a)
         js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
