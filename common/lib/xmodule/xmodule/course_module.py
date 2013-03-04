@@ -317,6 +317,10 @@ class CourseDescriptor(SequenceDescriptor):
             self.metadata['enrollment_end'] = stringify_time(value)
 
     @property
+    def grader(self):
+        return grader_from_conf(self.raw_grader)
+
+    @property
     def raw_grader(self):
         return self._grading_policy['RAW_GRADER']
 
