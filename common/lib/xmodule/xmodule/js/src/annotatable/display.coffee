@@ -73,8 +73,13 @@ class @Annotatable
             classes: 'ui-tooltip-annotatable'
         events:
             show: @onShowTip
+            visible: @onVisibleTip
 
-    onShowTip: (event, api) => event.preventDefault() if @annotationsHidden
+    onShowTip: (event, api) =>
+        event.preventDefault() if @annotationsHidden
+
+    onVisibleTip: (event, api) =>
+        @constrainTipHorizontally(api.elements.tooltip, event.originalEvent.pageX)
 
     onClickToggleAnnotations: (e) => @toggleAnnotations()
 
@@ -199,7 +204,19 @@ class @Annotatable
             $(el).qtip('show')
             api = $(el).qtip('api')
             $(api?.elements.tooltip).offset(offset)
- 
+
+    constrainTipHorizontally: (tip, mouseX) ->
+        win_width = $(window).width()
+        tip_center = $(tip).width() / 2 # see position setting of tip
+        tip_offset = $(tip).offset()
+
+        if (tip_center + mouseX) > win_width
+          adjust_left = '-=' + (tip_center + mouseX - win_width)
+        else if (mouseX - tip_center) < 0
+          adjust_left = '+=' + (tip_center - mouseX)
+
+        $(tip).animate({ left: adjust_left }) if adjust_left?
+
     _once: (fn) ->
         done = false
         return =>
