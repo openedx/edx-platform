@@ -616,10 +616,11 @@ def submission_history(request, course_id, student_username, location):
     Right now this only works for problems because that's all 
     StudentModuleHistory records.
     """
-    # Make sure our has_access check uses the course_id, eh? or is ourself
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
+    # Permission Denied if they don't have staff access and are trying to see
+    # somebody else's submission history.
     if (student_username != request.user.username) and (not staff_access):
         raise PermissionDenied
 

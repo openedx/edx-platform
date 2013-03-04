@@ -67,6 +67,8 @@ class StudentModuleHistory(models.Model):
     Student. Right now, we restrict this to problems so that the table doesn't
     explode in size."""
 
+    HISTORY_SAVING_TYPES = {'problem'}
+
     class Meta:
         get_latest_by = "created"
 
@@ -81,7 +83,7 @@ class StudentModuleHistory(models.Model):
 
     @receiver(post_save, sender=StudentModule)
     def save_history(sender, instance, **kwargs):
-        if instance.module_type == 'problem':
+        if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
             history_entry = StudentModuleHistory(student_module=instance,
                                                  version=None,
                                                  created=instance.modified,
