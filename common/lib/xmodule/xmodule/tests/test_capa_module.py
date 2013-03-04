@@ -341,8 +341,11 @@ class CapaModuleTest(unittest.TestCase):
 
         # Simulate that all answers are marked correct, no matter
         # what the input is, by patching CorrectMap.is_correct()
-        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+        # Also simulate rendering the HTML
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct,\
+                patch('xmodule.capa_module.CapaModule.get_problem_html') as mock_html:
             mock_is_correct.return_value = True
+            mock_html.return_value = "Test HTML"
 
             # Check the problem
             get_request_dict = { CapaFactory.input_key(): '3.14' }
@@ -350,6 +353,9 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the problem is marked correct
         self.assertEqual(result['success'], 'correct')
+
+        # Expect that we get the (mocked) HTML
+        self.assertEqual(result['contents'], 'Test HTML')
 
         # Expect that the number of attempts is incremented by 1
         self.assertEqual(module.attempts, 2)
