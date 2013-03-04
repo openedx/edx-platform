@@ -65,10 +65,12 @@ class @Annotatable
                 mouse: false # dont follow the mouse
                 y: -10
         show:
-            event: 'mouseenter'
+            event: 'click mouseenter'
             solo: true
         hide:
-            event: 'unfocus'
+            event: 'click mouseleave'
+            delay: 250,
+            fixed: true
         style:
             classes: 'ui-tooltip-annotatable'
         events:
