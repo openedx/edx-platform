@@ -326,6 +326,15 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
     # Name of resource directory to load templates from
     template_dir_name = "default"
 
+    # Class level variable
+    always_recalculate_grades = False
+    """
+    Return whether this descriptor always requires recalculation of grades, for
+    example if the score can change via an extrnal service, not just when the
+    student interacts with the module on the page.  A specific example is
+    FoldIt, which posts grade-changing updates through a separate API.
+    """
+
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
                  system,
@@ -636,7 +645,9 @@ class ModuleSystem(object):
                  publish=None,
                  node_path="",
                  anonymous_student_id='',
-                 course_id=None):
+                 course_id=None,
+                 open_ended_grading_interface=None,
+                 s3_interface=None):
         '''
         Create a closure around the system environment.
 
@@ -673,6 +684,11 @@ class ModuleSystem(object):
         anonymous_student_id - Used for tracking modules with student id
 
         course_id - the course_id containing this module
+
+        publish(event) - A function that allows XModules to publish events (such as grade changes)
+
+        xblock_model_data - A dict-like object containing the all data available to this
+            xblock
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -694,6 +710,8 @@ class ModuleSystem(object):
 
         self.publish = publish
 
+        self.open_ended_grading_interface = open_ended_grading_interface
+        self.s3_interface = s3_interface
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

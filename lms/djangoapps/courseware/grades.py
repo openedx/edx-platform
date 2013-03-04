@@ -143,7 +143,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
     grading_context = course.grading_context
     raw_scores = []
 
-    if model_data_cache == None:
+    if model_data_cache is None:
         model_data_cache = ModelDataCache(grading_context['all_descriptors'], course.id, student)
 
     totaled_scores = {}
@@ -279,7 +279,7 @@ def progress_summary(student, request, course, model_data_cache):
     # would be simpler
     course_module = get_module(student, request,
                                 course.location, model_data_cache,
-                                course.id)
+                                course.id, depth=None)
     if not course_module:
         # This student must not have access to the course.
         return None
@@ -352,6 +352,14 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
     """
     if not user.is_authenticated():
         return (None, None)
+
+    if problem_descriptor.always_recalculate_grades:
+        problem = module_creator(problem_descriptor)
+        d = problem.get_score()
+        if d is not None:
+            return (d['score'], d['total'])
+        else:
+            return (None, None)
 
     if not (problem_descriptor.stores_state and problem_descriptor.has_score):
         # These are not problems, and do not have a score

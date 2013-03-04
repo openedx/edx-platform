@@ -34,8 +34,8 @@ def i_click_the_course_link_in_my_courses(step):
 
 @step('the Courseware page has loaded in Studio$')
 def courseware_page_has_loaded_in_studio(step):
-    courseware_css = 'a#courseware-tab'
-    assert world.browser.is_element_present_by_css(courseware_css)
+    course_title_css = 'span.course-title'
+    assert world.browser.is_element_present_by_css(course_title_css)
 
 
 @step('I see the course listed in My Courses$')
@@ -59,4 +59,4 @@ def i_am_on_tab(step, tab_name):
 @step('I see a link for adding a new section$')
 def i_see_new_section_link(step):
     link_css = 'a.new-courseware-section-button'
-    assert_css_with_text(link_css, 'New Section')
+    assert_css_with_text(link_css, '+ New Section')

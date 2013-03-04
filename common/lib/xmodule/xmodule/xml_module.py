@@ -134,8 +134,7 @@ class XmlDescriptor(XModuleDescriptor):
         'graded': bool_map,
         'hide_progress_tab': bool_map,
         'allow_anonymous': bool_map,
-        'allow_anonymous_to_peers': bool_map,
-        'weight': int_map
+        'allow_anonymous_to_peers': bool_map
     }
 
     # VS[compat].  Backwards compatibility code that can go away after

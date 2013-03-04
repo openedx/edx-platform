@@ -174,6 +174,7 @@ class CourseDescriptor(SequenceDescriptor):
     is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
     no_grade = Boolean(help="True if this course isn't graded", default=False, scope=Scope.settings)
     disable_progress_graph = Boolean(help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
+    pdf_textbooks = List(help="List of dictionaries containing pdf_textbook configuration", default=None, scope=Scope.settings)
     has_children = True
 
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
@@ -429,6 +430,28 @@ class CourseDescriptor(SequenceDescriptor):
             return False
 
         return bool(config.get("cohorted"))
+
+    @property
+    def auto_cohort(self):
+        """
+        Return whether the course is auto-cohorted.
+        """
+        if not self.is_cohorted:
+            return False
+
+        return bool(self.cohort_config.get(
+            "auto_cohort", False))
+
+    @property
+    def auto_cohort_groups(self):
+        """
+        Return the list of groups to put students into.  Returns [] if not
+        specified. Returns specified list even if is_cohorted and/or auto_cohort are
+        false.
+        """
+        return self.metadata.get("cohort_config", {}).get(
+            "auto_cohort_groups", [])
+
 
     @property
     def top_level_discussion_topic_ids(self):

@@ -57,7 +57,7 @@ def own_metadata(module):
             field.name in module._model_data):
 
             try:
-                metadata[field.name] = module._model_data[field.name]
+                metadata[field.name] = field.read_from(module)
             except KeyError:
                 # Ignore any missing keys in _model_data
                 pass

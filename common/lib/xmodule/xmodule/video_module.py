@@ -4,15 +4,14 @@ import logging
 from lxml import etree
 from pkg_resources import resource_string, resource_listdir
 
+from django.http import Http404
+
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xblock.core import Integer, Scope, String
-
-import datetime
-import time
 
 import datetime
 import time

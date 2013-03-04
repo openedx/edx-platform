@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Formula Response
+    display_name: Math Expression Input
     rerandomize: never
     showanswer: always
     weight: ""
@@ -8,7 +8,7 @@ metadata:
 data: |
   <problem>
   <p>
-  A formula response problem accepts a line of text representing a mathematical expression from the
+  A math expression input problem accepts a line of text representing a mathematical expression from the
   student, and evaluates the input for equivalence to a mathematical expression provided by the 
   grader. Correctness is based on numerical sampling of the symbolic expressions.
   </p>

@@ -1,6 +1,5 @@
 from .x_module import XModuleDescriptor, DescriptorSystem
-from xblock.core import Scope
-import logging
+from .modulestore.inheritance import own_metadata
 
 
 class MakoDescriptorSystem(DescriptorSystem):
@@ -46,22 +45,9 @@ class MakoModuleDescriptor(XModuleDescriptor):
     @property
     def editable_metadata_fields(self):
         fields = {}
-        for field in self.fields:
-            if field.scope != Scope.settings:
-                continue
-
+        for field, value in own_metadata(self):
             if field.name in self.system_metadata_fields:
                 continue
 
-            fields[field.name] = field.read_from(self)
-
-        for field in self.lms.fields:
-            if field.scope != Scope.settings:
-                continue
-
-            if field.name in self.system_metadata_fields:
-                continue
-
-            fields[field.name] = field.read_from(self)
-
+            fields[field.name] = value
         return fields

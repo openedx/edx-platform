@@ -9,6 +9,7 @@ from django.template.loaders.app_directories import Loader as AppDirectoriesLoad
 from mitxmako.template import Template
 import mitxmako.middleware
 
+import tempdir
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ class MakoLoader(object):
 
         if module_directory is None:
             log.warning("For more caching of mako templates, set the MAKO_MODULE_DIR in settings!")
-            module_directory = tempfile.mkdtemp()
+            module_directory = tempdir.mkdtemp_clean()
 
         self.module_directory = module_directory
 

@@ -28,7 +28,7 @@ setup(
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "error = xmodule.error_module:ErrorDescriptor",
             "peergrading = xmodule.peer_grading_module:PeerGradingDescriptor",
-			"poll_question = xmodule.poll_module:PollDescriptor",
+            "poll_question = xmodule.poll_module:PollDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
             "randomize = xmodule.randomize_module:RandomizeDescriptor",
@@ -38,6 +38,7 @@ setup(
             "timelimit = xmodule.timelimit_module:TimeLimitDescriptor",
             "vertical = xmodule.vertical_module:VerticalDescriptor",
             "video = xmodule.video_module:VideoDescriptor",
+            "videoalpha = xmodule.videoalpha_module:VideoAlphaDescriptor",
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
             "discussion = xmodule.discussion_module:DiscussionDescriptor",
@@ -45,8 +46,9 @@ setup(
             "static_tab = xmodule.html_module:StaticTabDescriptor",
             "custom_tag_template = xmodule.raw_module:RawDescriptor",
             "about = xmodule.html_module:AboutDescriptor",
-			"graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
             "wrapper = xmodule.wrapper_module:WrapperDescriptor",
-        ],
+            "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
+            "foldit = xmodule.foldit_module:FolditDescriptor",
+         ]
     }
 )

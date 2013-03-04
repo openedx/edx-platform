@@ -423,7 +423,10 @@ end
 namespace :cms do
   desc "Delete existing MongoDB based course"
   task :delete_course do
-    if ENV['LOC']
+    
+    if ENV['LOC'] and ENV['COMMIT']
+        sh(django_admin(:cms, :dev, :delete_course, ENV['LOC'], ENV['COMMIT']))
+    elsif ENV['LOC']
       sh(django_admin(:cms, :dev, :delete_course, ENV['LOC']))
     else
       raise "You must pass in a LOC parameter"

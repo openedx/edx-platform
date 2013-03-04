@@ -1,17 +1,10 @@
 <section>
-    <header>Feedback</header>
-    <div class="shortform-custom" data-open-text='Show detailed results' data-close-text='Hide detailed results'>
-        <div class="result-output">
-            <p>Score: ${score}</p>
-            % if grader_type == "ML":
-                <p>Check below for full feedback:</p>
-            % endif
-        </div>
-    </div>
-    <div class="longform">
-        <div class="result-output">
-            ${ feedback | n}
-        </div>
+    <div class="grader-feedback">
         ${rubric_feedback | n}
+        % if grader_type=="PE":
+            <div class="result-output">
+                ${ feedback | n}
+            </div>
+        % endif
     </div>
 </section>

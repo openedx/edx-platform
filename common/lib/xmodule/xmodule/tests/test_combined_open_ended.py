@@ -2,9 +2,9 @@ import json
 from mock import Mock, MagicMock, ANY
 import unittest
 
-from xmodule.openendedchild import OpenEndedChild
-from xmodule.open_ended_module import OpenEndedModule
-from xmodule.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
+from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 
 from xmodule.modulestore import Location
 from lxml import etree
@@ -12,6 +12,8 @@ import capa.xqueue_interface as xqueue_interface
 from datetime import datetime
 
 from . import test_system
+
+import test_util_open_ended
 """
 Tests for the various pieces of the CombinedOpenEndedGrading system
 
@@ -43,7 +45,10 @@ class OpenEndedChildTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
-            'close_date': None
+            'close_date': None,
+            's3_interface' : "",
+            'open_ended_grading_interface' : {},
+            'skip_basic_checks' : False,
             }
     definition = Mock()
     descriptor = Mock()
@@ -161,6 +166,9 @@ class OpenEndedModuleTest(unittest.TestCase):
             'accept_file_upload': False,
             'rewrite_content_links' : "",
             'close_date': None,
+            's3_interface' : test_util_open_ended.S3_INTERFACE,
+            'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            'skip_basic_checks' : False,
             }
 
     oeparam = etree.XML('''
@@ -293,6 +301,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             'accept_file_upload' : False,
             'rewrite_content_links' : "",
             'close_date' : "",
+            's3_interface' : test_util_open_ended.S3_INTERFACE,
+            'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            'skip_basic_checks' : False,
             }
 
     oeparam = etree.XML('''

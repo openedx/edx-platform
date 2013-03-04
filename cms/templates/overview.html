@@ -6,7 +6,8 @@
    from datetime import datetime
 %>
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">CMS Courseware Overview</%block>
+<%block name="title">Course Outline</%block>
+<%block name="bodyclass">is-signedin course outline</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
@@ -31,7 +32,7 @@
 	    window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
 	    window.graderTypes.reset(${course_graders|n});
     }
-    
+
     $(".gradable-status").each(function(index, ele) {
         var gradeView = new CMS.Views.OverviewAssignmentGrader({
             el : ele,
@@ -39,7 +40,7 @@
         });
     });
   });
-  
+
   </script>
 </%block>
 
@@ -119,13 +120,33 @@
     </div>
   </div>
 
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <div class="title">
+        <span class="title-sub">Course Content</span>
+        <h1 class="title-1">Course Outline</h1>
+      </div>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Page Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block icon">up</i> <span class="label">Collapse All Sections</span></a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="button new-button new-courseware-section-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Section</a>
+          </li>
+          <li class="nav-item">
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <div class="page-actions">
-        <a href="#" class="new-button new-courseware-section-button"><span class="plus-icon white"></span> New Section</a>
-        <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block">up</i> <span class="label">Collapse All Sections</span></a>
-      </div>
-      <article class="courseware-overview" data-course-id="${context_course.location.url()}">        
+      <article class="courseware-overview" data-course-id="${context_course.location.url()}">
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>
@@ -135,7 +156,7 @@
               <h3 class="section-name">
                 <span data-tooltip="Edit this section's name" class="section-name-span">${section.lms.display_name}</span>
                 <form class="section-name-edit" style="display:none">
-                  <input type="text" value="${section.lms.display_name}" class="edit-section-name" autocomplete="off"/>
+                  <input type="text" value="${section.lms.display_name | h}" class="edit-section-name" autocomplete="off"/>
                   <input type="submit" class="save-button edit-section-name-save" value="Save" />
                   <input type="button" class="cancel-button edit-section-name-cancel" value="Cancel" />
                 </form>
@@ -153,9 +174,9 @@
                   <span class="published-status"><strong>Will Release:</strong> ${start_date_str} at ${start_time_str}</span>
                   <a href="#" class="edit-button" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}">Edit</a>
                 %endif
-              </div>              
+              </div>
             </div>
-            
+
             <div class="item-actions">
               <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
               <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
@@ -178,12 +199,12 @@
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.lms.display_name}</span></span>
                     </a>
                   </div>
-                  
+
                   <div class="gradable-status" data-initial-status="${subsection.lms.format if section.lms.format is not None else 'Not Graded'}">
                   </div>
-                  
+
                   <div class="item-actions">
-                    <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
+                    <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>
                     <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
                   </div>
                 </div>

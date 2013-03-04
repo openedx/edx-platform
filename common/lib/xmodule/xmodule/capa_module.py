@@ -294,6 +294,12 @@ class CapaModule(XModule):
             reset_button = False
             save_button = False
 
+        # If attempts=0 then show just check and reset buttons; this is for survey questions using capa
+        if self.max_attempts==0:
+            check_button = False
+            reset_button = True
+            save_button = True
+
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions.
         if self.done and self.rerandomize == "always":
@@ -393,6 +399,11 @@ class CapaModule(XModule):
         # used by conditional module
         return self.attempts > 0
 
+    def is_correct(self):
+        """True if full points"""
+        d = self.get_score()
+        return d['score'] == d['total']
+
     def answer_available(self):
         '''
         Is the user allowed to see an answer?
@@ -413,6 +424,9 @@ class CapaModule(XModule):
             return self.lcp.done
         elif self.showanswer == 'closed':
             return self.closed()
+        elif self.showanswer == 'finished':
+            return self.closed() or self.is_correct()
+
         elif self.showanswer == 'past_due':
             return self.is_past_due()
         elif self.showanswer == 'always':
@@ -601,11 +615,11 @@ class CapaModule(XModule):
         event_info['answers'] = answers
 
         # Too late. Cannot submit
-        if self.closed():
+        if self.closed() and not self.max_attempts==0:
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'error': "Problem is closed"}
+                    'msg': "Problem is closed"}
 
         # Problem submitted. Student should reset before saving
         # again.
@@ -613,13 +627,16 @@ class CapaModule(XModule):
             event_info['failure'] = 'done'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'error': "Problem needs to be reset prior to save."}
+                    'msg': "Problem needs to be reset prior to save"}
 
         self.lcp.student_answers = answers
 
-        # TODO: should this be save_problem_fail?  Looks like success to me...
-        self.system.track_function('save_problem_fail', event_info)
-        return {'success': True}
+        self.system.track_function('save_problem_success', event_info)
+        msg = "Your answers have been saved"
+        if not self.max_attempts==0:
+            msg += " but not graded. Hit 'Check' to grade them."
+        return {'success': True,
+                'msg': msg}
 
     def reset_problem(self, get):
         ''' Changes problem state to unfinished -- removes student answers,
@@ -693,7 +710,8 @@ class CapaDescriptor(RawDescriptor):
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.markdown})
+        _context.update({'markdown': self.markdown,
+                         'enable_markdown' : self.markdown != ''})
         return _context
 
     @property
@@ -702,6 +720,8 @@ class CapaDescriptor(RawDescriptor):
         subset = super(CapaDescriptor, self).editable_metadata_fields
         if 'markdown' in subset:
             del subset['markdown']
+        if 'empty' in subset:
+            del subset['empty']
         return subset
 
     # VS[compat]
