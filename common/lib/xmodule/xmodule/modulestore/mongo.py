@@ -64,7 +64,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         location = Location(location)
         json_data = self.module_data.get(location)
         if json_data is None:
-            return self.modulestore.get_item(location)
+            module = self.modulestore.get_item(location)
+            if module is not None:
+                self.module_data.update(module.system.module_data)
+            return module
         else:
             # load the module and apply the inherited metadata
             try:
