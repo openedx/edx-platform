@@ -17,8 +17,7 @@ from auth.authz import _delete_course_group
 
 
 class Command(BaseCommand):
-    help = \
-'''Delete a MongoDB backed course'''
+    help = '''Delete a MongoDB backed course'''
 
     def handle(self, *args, **options):
         if len(args) != 1 and len(args) != 2:
@@ -28,19 +27,19 @@ class Command(BaseCommand):
 
         commit = False
         if len(args) == 2:
-          commit = args[1] == 'commit'
+            commit = args[1] == 'commit'
 
         if commit:
-          print 'Actually going to delete the course from DB....'
+            print 'Actually going to delete the course from DB....'
 
         ms = modulestore('direct')
         cs = contentstore()
 
         if query_yes_no("Deleting course {0}. Confirm?".format(loc_str), default="no"):
-          if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
-            loc = CourseDescriptor.id_to_location(loc_str)
-            if delete_course(ms, cs, loc, commit) == True:
-              print 'removing User permissions from course....'
-              # in the django layer, we need to remove all the user permissions groups associated with this course
-              if commit:
-                _delete_course_group(loc)            
+            if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
+                loc = CourseDescriptor.id_to_location(loc_str)
+                if delete_course(ms, cs, loc, commit) == True:
+                    print 'removing User permissions from course....'
+                    # in the django layer, we need to remove all the user permissions groups associated with this course
+                    if commit:
+                        _delete_course_group(loc)

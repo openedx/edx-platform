@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import is_course_cohorted, get_cohort_id, is_commentable_cohorted, get_cohorted_commentables, get_cohort, get_course_cohorts, get_cohort_by_id 
+from course_groups.cohorts import is_course_cohorted, get_cohort_id, is_commentable_cohorted, get_cohorted_commentables, get_cohort, get_course_cohorts, get_cohort_by_id
 from courseware.access import has_access
 
 from urllib import urlencode
@@ -64,24 +64,23 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     #there are 2 dimensions to consider when executing a search with respect to group id
     #is user a moderator
     #did the user request a group
-    
+
     #if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
-    
+
     group_id = request.GET.get('group_id')
-    
+
     if group_id == "all":
         group_id = None
-    
+
     if not group_id:
         if not cached_has_permission(request.user, "see_all_cohorts", course_id):
             group_id = get_cohort_id(request.user, course_id)
-        
+
     if group_id:
         default_query_params["group_id"] = group_id
 
-        
     #so by default, a moderator sees all items, and a student sees his cohort
-        
+
     query_params = merge_dict(default_query_params,
                               strip_none(extract(request.GET,
                                                  ['page', 'sort_key',
@@ -89,7 +88,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                                                   'tags', 'commentable_ids'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
-    
+
     #now add the group name if the thread has a group id
     for thread in threads:
         if thread.get('group_id'):
@@ -106,7 +105,6 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
 
 def inline_discussion(request, course_id, discussion_id):
-  
     """
     Renders JSON for DiscussionModules
     """
@@ -128,7 +126,7 @@ def inline_discussion(request, course_id, discussion_id):
 
     allow_anonymous = course.metadata.get("allow_anonymous", True)
     allow_anonymous_to_peers = course.metadata.get("allow_anonymous_to_peers", False)
-        
+
     #since inline is all one commentable, only show or allow the choice of cohorts
     #if the commentable is cohorted, otherwise everything is not cohorted
     #and no one has the option of choosing a cohort
@@ -138,18 +136,18 @@ def inline_discussion(request, course_id, discussion_id):
     cohorts_list = list()
     
     if is_cohorted:
-      cohorts_list.append({'name':'All Groups','id':None})
-      
-      #if you're a mod, send all cohorts and let you pick
-      
-      if is_moderator:
-          cohorts = get_course_cohorts(course_id)
-          for c in cohorts:
-              cohorts_list.append({'name':c.name, 'id':c.id})
-              
-      else:
-          #students don't get to choose
-          cohorts_list = None
+        cohorts_list.append({'name':'All Groups','id':None})
+        
+        #if you're a mod, send all cohorts and let you pick
+        
+        if is_moderator:
+            cohorts = get_course_cohorts(course_id)
+            for c in cohorts:
+                cohorts_list.append({'name':c.name, 'id':c.id})
+                
+        else:
+            #students don't get to choose
+            cohorts_list = None
           
     return utils.JsonResponse({
         'discussion_data': map(utils.safe_content, threads),
@@ -168,7 +166,6 @@ def inline_discussion(request, course_id, discussion_id):
 
 @login_required
 def forum_form_discussion(request, course_id):
-    
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
@@ -210,7 +207,7 @@ def forum_form_discussion(request, course_id):
         #)
         cohorts = get_course_cohorts(course_id)
         cohorted_commentables = get_cohorted_commentables(course_id)
-        
+
         user_cohort_id = get_cohort_id(request.user, course_id)
 
         context = {
@@ -233,7 +230,7 @@ def forum_form_discussion(request, course_id):
             'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
-        
+
         return render_to_response('discussion/index.html', context)
 
 @login_required
@@ -251,7 +248,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     if request.is_ajax():
 
         courseware_context = get_courseware_context(thread, course)
-        
+
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
@@ -282,7 +279,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             if courseware_context:
                 thread.update(courseware_context)
             if thread.get('group_id') and not thread.get('group_name'):
-                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name     
+                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
 
         threads = [utils.safe_content(thread) for thread in threads]
 
@@ -297,7 +294,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #)
 
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
-    
+
         cohorts = get_course_cohorts(course_id)
         cohorted_commentables = get_cohorted_commentables(course_id)
         user_cohort = get_cohort_id(request.user, course_id)

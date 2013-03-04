@@ -70,7 +70,7 @@ StrPrinter._print_hat = _print_hat
 
 
 def to_latex(x):
-    if x == None: return ''
+    if x is None: return ''
     # LatexPrinter._print_dot = _print_dot
     xs = latex(x)
     xs = xs.replace(r'\XI', 'XI')	 # workaround for strange greek
@@ -278,7 +278,7 @@ class formula(object):
 
         if self.the_sympy: return self.the_sympy
 
-        if xml == None:	 # root
+        if xml is None:	 # root
             if not self.is_mathml():
                 return my_sympify(self.expr)
             if self.is_presentation_mathml():

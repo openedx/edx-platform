@@ -524,7 +524,7 @@ class PeerGradingModule(XModule):
         '''
         Show individual problem interface
         '''
-        if get == None or get.get('location') == None:
+        if get is None or get.get('location') is None:
             if not self.use_for_single_location:
                 #This is an error case, because it must be set to use a single location to be called without get parameters
                 #This is a dev_facing_error
