@@ -1,9 +1,11 @@
 import datetime
 import json
-from mock import Mock
+from mock import Mock, patch
 from pprint import pprint
 import unittest
 
+import xmodule
+import capa
 from xmodule.capa_module import CapaModule
 from xmodule.modulestore import Location
 from lxml import etree
@@ -34,6 +36,14 @@ class CapaFactory(object):
         return CapaFactory.num
 
     @staticmethod
+    def input_key():
+        """ Return the input key to use when passing GET parameters """
+        return ("input_" + 
+                "-".join(['i4x', 'edX', 'capa_test', 'problem', 
+                        'SampleProblem%d' % CapaFactory.num]) +
+                "_2_1")
+
+    @staticmethod
     def create(graceperiod=None,
                due=None,
                max_attempts=None,
@@ -59,11 +69,10 @@ class CapaFactory(object):
                 module.
 
             attempts: also added to instance state.  Will be converted to an int.
-            correct: if True, the problem will be initialized to be answered correctly.
         """
         definition = {'data': CapaFactory.sample_problem_xml, }
         location = Location(["i4x", "edX", "capa_test", "problem",
-                             "SampleProblem{0}".format(CapaFactory.next_num())])
+                             "SampleProblem%d" % CapaFactory.next_num()])
         metadata = {}
         if graceperiod is not None:
             metadata['graceperiod'] = graceperiod
@@ -88,13 +97,6 @@ class CapaFactory(object):
             # converting to int here because I keep putting "0" and "1" in the tests
             # since everything else is a string.
             instance_state_dict['attempts'] = int(attempts)
-
-        if correct:
-            # TODO: make this actually set an answer of 3.14, and mark it correct
-            #instance_state_dict['student_answers'] = {}
-            #instance_state_dict['correct_map'] = {}
-            pass
-
 
         if len(instance_state_dict) > 0:
             instance_state = json.dumps(instance_state_dict)
@@ -332,3 +334,128 @@ class CapaModuleTest(unittest.TestCase):
                             'input_1': 'test 2' }
         with self.assertRaises(ValueError):
             result = CapaModule.make_dict_of_responses(invalid_get_dict)
+
+    def test_check_problem_correct(self):
+
+        module = CapaFactory.create(attempts=1)
+
+        # Simulate that all answers are marked correct, no matter
+        # what the input is, by patching CorrectMap.is_correct()
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            mock_is_correct.return_value = True
+
+            # Check the problem
+            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            result = module.check_problem(get_request_dict)
+
+        # Expect that the problem is marked correct
+        self.assertEqual(result['success'], 'correct')
+
+        # Expect that the number of attempts is incremented by 1
+        self.assertEqual(module.attempts, 2)
+
+
+    def test_check_problem_incorrect(self):
+
+        module = CapaFactory.create(attempts=0)
+
+        # Simulate marking the input incorrect
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            mock_is_correct.return_value = False
+
+            # Check the problem
+            get_request_dict = { CapaFactory.input_key(): '0' }
+            result = module.check_problem(get_request_dict)
+
+        # Expect that the problem is marked correct
+        self.assertEqual(result['success'], 'incorrect')
+
+        # Expect that the number of attempts is incremented by 1
+        self.assertEqual(module.attempts, 1)
+
+
+    def test_check_problem_closed(self):
+        module = CapaFactory.create(attempts=3)
+
+        # Problem closed -- cannot submit
+        # Simulate that CapaModule.closed() always returns True
+        with patch('xmodule.capa_module.CapaModule.closed') as mock_closed:
+            mock_closed.return_value = True
+            with self.assertRaises(xmodule.exceptions.NotFoundError):
+                get_request_dict = { CapaFactory.input_key(): '3.14' }
+                module.check_problem(get_request_dict)
+
+        # Expect that number of attempts NOT incremented
+        self.assertEqual(module.attempts, 3)
+
+
+    def test_check_problem_resubmitted_with_randomize(self):
+        # Randomize turned on
+        module = CapaFactory.create(rerandomize='always', attempts=0)
+
+        # Simulate that the problem is completed
+        module.lcp.done = True
+
+        # Expect that we cannot submit
+        with self.assertRaises(xmodule.exceptions.NotFoundError):
+            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            module.check_problem(get_request_dict)
+
+        # Expect that number of attempts NOT incremented
+        self.assertEqual(module.attempts, 0)
+
+
+    def test_check_problem_resubmitted_no_randomize(self):
+        # Randomize turned off
+        module = CapaFactory.create(rerandomize='never', attempts=0)
+
+        # Simulate that the problem is completed
+        module.lcp.done = True
+
+        # Expect that we can submit successfully
+        get_request_dict = { CapaFactory.input_key(): '3.14' }
+        result = module.check_problem(get_request_dict)
+
+        self.assertEqual(result['success'], 'correct')
+
+        # Expect that number of attempts IS incremented
+        self.assertEqual(module.attempts, 1)
+
+
+    def test_check_problem_queued(self):
+        module = CapaFactory.create(attempts=1)
+
+        # Simulate that the problem is queued
+        with patch('capa.capa_problem.LoncapaProblem.is_queued') \
+                as mock_is_queued,\
+            patch('capa.capa_problem.LoncapaProblem.get_recentmost_queuetime') \
+                as mock_get_queuetime:
+
+            mock_is_queued.return_value = True
+            mock_get_queuetime.return_value = datetime.datetime.now()
+        
+            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            result = module.check_problem(get_request_dict)
+
+            # Expect an AJAX alert message in 'success'
+            self.assertTrue('You must wait' in result['success'])
+
+        # Expect that the number of attempts is NOT incremented
+        self.assertEqual(module.attempts, 1)
+
+
+    def test_check_problem_student_input_error(self):
+        module = CapaFactory.create(attempts=1)
+
+        # Simulate a student input exception
+        with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+            mock_grade.side_effect = capa.responsetypes.StudentInputError('test error')
+
+            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            result = module.check_problem(get_request_dict)
+
+            # Expect an AJAX alert message in 'success'
+            self.assertTrue('test error' in result['success'])
+
+        # Expect that the number of attempts is NOT incremented
+        self.assertEqual(module.attempts, 1)
