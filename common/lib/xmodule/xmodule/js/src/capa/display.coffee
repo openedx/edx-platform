@@ -76,6 +76,14 @@ class @Problem
         # TODO: Some logic to dynamically adjust polling rate based on queuelen
         window.queuePollerID = window.setTimeout(@poll, 1000)
 
+
+  # Use this if you want to make an ajax call on the input type object 
+  # static method so you don't have to instantiate a Problem in order to use it
+  @inputAjax: (url, dispatch, data, callback) ->
+    data['dispatch'] = dispatch
+    $.postWithPrefix "#{url}/input_ajax", data, callback
+    
+
   render: (content) ->
     if content
       @el.html(content)

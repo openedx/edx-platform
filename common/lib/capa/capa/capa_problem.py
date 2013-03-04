@@ -146,6 +146,9 @@ class LoncapaProblem(object):
         if not self.student_answers:  # True when student_answers is an empty dict
             self.set_initial_display()
 
+        self.extracted_tree = self._extract_html(self.tree)
+
+
     def do_reset(self):
         '''
         Reset internal state to unfinished, with no answers
@@ -324,7 +327,21 @@ class LoncapaProblem(object):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        return contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        html = contextualize_text(etree.tostring(self.extracted_tree), self.context)
+        return html
+
+
+    def handle_input_ajax(self, get):
+        '''
+        This passes any specialized input ajax onto the input class
+
+        It also parses out the dispatch from the get so that it can be passed onto the input type nicely
+        '''
+        if self.input:
+            dispatch = get['dispatch']
+            return self.input.handle_ajax(dispatch, get)
+        return {}
+
 
     # ======= Private Methods Below ========
 
@@ -458,6 +475,8 @@ class LoncapaProblem(object):
             finally:
                 sys.path = original_path
 
+
+
     def _extract_html(self, problemtree):  # private
         '''
         Main (private) function which converts Problem XML tree to HTML.
@@ -468,6 +487,7 @@ class LoncapaProblem(object):
 
         Used by get_html.
         '''
+
         if (problemtree.tag == 'script' and problemtree.get('type')
             and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
@@ -505,8 +525,9 @@ class LoncapaProblem(object):
                                 'hintmode': hintmode, }}
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
-            the_input = input_type_cls(self.system, problemtree, state)
-            return the_input.get_html()
+            # save the input type so that we can make ajax calls on it if we need to
+            self.input = input_type_cls(self.system, problemtree, state)
+            return self.input.get_html()
 
         # let each Response render itself
         if problemtree in self.responders:

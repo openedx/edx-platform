@@ -215,6 +215,18 @@ class InputTypeBase(object):
         """
         pass
 
+    def handle_ajax(self, dispatch, get):
+        """
+        InputTypes that need to handle specialized AJAX should override this.
+
+        Input:
+            dispatch: a string that can be used to determine how to handle the data passed in
+            get: a dictionary containing the data that was sent with the ajax call
+
+        Output:
+            a dictionary object that will then get sent back to the Javascript
+        """
+        pass
 
     def _get_render_context(self):
         """

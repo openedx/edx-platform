@@ -412,6 +412,7 @@ class CapaModule(XModule):
                    'weight': self.descriptor.weight,
                    }
 
+
         context = {'problem': content,
                    'id': self.id,
                    'check_button': check_button,
@@ -449,6 +450,7 @@ class CapaModule(XModule):
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
             'score_update': self.update_score,
+            'input_ajax': self.lcp.handle_input_ajax
             }
 
         if dispatch not in handlers:
