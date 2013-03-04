@@ -6,10 +6,9 @@ from lxml import etree
 from datetime import datetime
 from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
-from .editing_module import EditingDescriptor
 from .stringify import stringify_children
 from .x_module import XModule
-from .xml_module import XmlDescriptor
+from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from timeinfo import TimeInfo
@@ -83,7 +82,7 @@ class PeerGradingModule(XModule):
             raise
 
         self.display_due_date = self.timeinfo.display_due_date
-        
+
         try:
             self.student_data_for_location = json.loads(self.student_data_for_location)
         except:
@@ -558,9 +557,9 @@ class PeerGradingModule(XModule):
         return json.dumps(state)
 
 
-class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
+class PeerGradingDescriptor(RawDescriptor):
     """
-    Module for adding combined open ended questions
+    Module for adding peer grading questions
     """
     mako_template = "widgets/raw-edit.html"
     module_class = PeerGradingModule
@@ -569,41 +568,3 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "peer_grading"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
-
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        """
-        Pull out the individual tasks, the rubric, and the prompt, and parse
-
-        Returns:
-        {
-        'rubric': 'some-html',
-        'prompt': 'some-html',
-        'task_xml': dictionary of xml strings,
-        }
-        """
-        log.debug("In definition")
-        expected_children = []
-        for child in expected_children:
-            if len(xml_object.xpath(child)) == 0:
-                #This is a staff_facing_error
-                raise ValueError("Peer grading definition must include at least one '{0}' tag.  Contact the learning sciences group for assistance.".format(child))
-
-        def parse_task(k):
-            """Assumes that xml_object has child k"""
-            return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(0, len(xml_object.xpath(k)))]
-
-        def parse(k):
-            """Assumes that xml_object has child k"""
-            return xml_object.xpath(k)[0]
-
-        return {}, []
-
-
-    def definition_to_xml(self, resource_fs):
-        '''Return an xml element representing this definition.'''
-        elt = etree.Element('peergrading')
-        return elt
