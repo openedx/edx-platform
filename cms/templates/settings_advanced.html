@@ -105,20 +105,25 @@ editor.render();
 
 <!-- notification: change has been made and a save is needed -->
 <div class="wrapper wrapper-notification wrapper-notification-warning">
-  <div class="notification warning">
+  <div class="notification warning has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+    
     <div class="copy">
-      <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
-
-      <p><strong>Note: </strong>Your changes will not take effect until you <strong>save your
-      progress</strong>. Take care with key and value formatting, as validation is <strong>not implemented</strong>.</p>
+      <h2 class="title title-3">You've Made Some Changes</h2>
+      <p>Your changes will not take effect until you <strong>save your progress</strong>. Take care with key and value formatting, as validation is <strong>not implemented</strong>.</p>
     </div>
 
-    <div class="actions">
+    <nav class="nav-actions">
+      <h3 class="sr">Notification Actions</h3>
       <ul>
-        <li><a href="#" class="save-button">Save</a></li>
-        <li><a href="#" class="cancel-button">Cancel</a></li>
+        <li class="nav-item">
+          <a href="#" class="action-primary save-button">Save Changes</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="action-secondary cancel-button">Cancel</a>
+        </li>
       </ul>
-    </div>
+    </nav>
   </div>
 </div>
 </%block>

@@ -57,7 +57,7 @@ $(document).ready(function () {
     });
 
     // alert and notifications - manual & action-based close
-    $('.action-notification-close, .notification.has-actions .nav-actions a').click(function(e) {
+    $('.action-notification-close').click(function(e) {
         (e).preventDefault();
         $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
     });

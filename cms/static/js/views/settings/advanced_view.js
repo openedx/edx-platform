@@ -141,13 +141,13 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                         event.keyCode === 8 || event.keyCode === 46)) return;
             }
             this.$el.find(".message-status").removeClass("is-shown");
-            $('.wrapper-notification').addClass('is-shown');
+            $('.wrapper-notification').removeClass('is-hiding').addClass('is-shown');
             this.buttonsVisible = true;
         }
     },
 
     hideSaveCancelButtons: function() {
-        $('.wrapper-notification').removeClass('is-shown');
+        $('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
         this.buttonsVisible = false;
     },
 
