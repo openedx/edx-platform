@@ -24,6 +24,112 @@
   }
 }
 
+.alert, .notification, .prompt {
+
+  // types - confirm
+  &.confirm {
+
+    .nav-actions .action-primary {
+      @include blue-button();
+      border-color: $blue-d2;
+    }
+
+    a {
+      color: $blue;
+
+      &:hover {
+        color: $blue-s2;
+      }
+    }
+  }
+
+  // types - warning
+  &.warning {
+
+    .nav-actions .action-primary {
+      @include orange-button();
+      border-color: $orange-d2;
+      color: $gray-d4;
+    }
+
+    a {
+      color: $orange;
+
+      &:hover {
+        color: $orange-s2;
+      }
+    }
+  }
+
+  // types - error
+  &.error {
+
+    .nav-actions .action-primary {
+      @include red-button();
+      border-color: $red-d2;
+    }
+
+    a {
+      color: $red-l1;
+
+      &:hover {
+        color: $red;
+      }
+    }
+  }
+
+  // types - announcement
+  &.announcement {
+
+    .nav-actions .action-primary {
+      @include blue-button();
+      border-color: $blue-d2;
+    }
+
+    a {
+      color: $blue;
+
+      &:hover {
+        color: $blue-s2;
+      }
+    }
+  }
+
+  // types - confirmation
+  &.confirmation {
+
+    .nav-actions .action-primary {
+      @include green-button();
+      border-color: $green-d2;
+    }
+
+    a {
+      color: $green;
+
+      &:hover {
+        color: $green-s2;
+      }
+    }
+  }
+
+  // types - step required
+  &.step-required {
+
+    .nav-actions .action-primary {
+      border-color: $pink-d2;
+      @include pink-button();
+    }
+
+    a {
+      color: $pink;
+
+      &:hover {
+        color: $pink-s1;
+      }
+    }
+  }
+}
+
 // prompts
 .wrapper-prompt {
   @include transition(all 0.05s ease-in-out);
@@ -73,9 +179,7 @@
       }
 
       .action-primary {
-        @include blue-button();
         @include font-size(13);
-        border-color: $blue-d2;
         font-weight: 600;
       }
 
@@ -125,73 +229,48 @@
 // notifications
 .wrapper-notification {
   @include clearfix();
-  @include box-shadow(0 -1px 3px $shadow);
+  @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $blue);
   position: fixed;
   bottom: 0;
   z-index: 1000;
   width: 100%;
-  padding: ($baseline*0.75) ($baseline*2);
+  border-top: 4px solid $black;
+  padding: $baseline ($baseline*2);
 
   &.wrapper-notification-warning {
-    border-top-color: $orange;
+    @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $orange);
 
     .icon-warning {
       color: $orange;
     }
-
-    &:hover {
-      border-top-color: $orange-s2;
-
-      .icon-warning {
-        color: $orange-s2;
-      }
-    }
   }
 
   &.wrapper-notification-error {
-    border-top-color: $red-l1;
+    @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $red-l1);
 
     .icon-error {
       color: $red-l1;
     }
-
-    &:hover {
-      border-top-color: $red;
-
-      .icon-error {
-        color: $red;
-      }
-    }
   }
 
   &.wrapper-notification-confirmation {
-    border-top-color: $green;
+    @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $green);
 
     .icon-confirmation {
       color: $green;
     }
-
-    &:hover {
-      border-top-color: $green-s1;
-
-      .icon-confirmation {
-        color: $green-s1;
-      }
-    }
   }
 
   &.wrapper-notification-saving {
-    border-top-color: $pink;
-
-    &:hover {
-      border-top-color: $pink-s1;
-    }
+    @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $pink);
   } 
 
   // shorter/status notifications
   &.wrapper-notification-status {
+    @include border-top-radius(3px);
     width: ($baseline*8);
     right: ($baseline);
+    border: 4px solid $black;
     padding: ($baseline/2) $baseline;
 
     .notification {
@@ -222,8 +301,10 @@
 
   // help notifications
   &.wrapper-notification-help {
+    @include border-top-radius(3px);
     width: ($baseline*14);
     right: ($baseline);
+    border: 4px solid $black;
     padding: ($baseline/2) $baseline;
 
     .notification {
@@ -304,7 +385,7 @@
     .nav-actions {
       width: flex-grid(4, 12);
       float: right;
-      margin-top: ($baseline/2);
+      margin-top: ($baseline/4);
       text-align: right;
 
       .nav-item {
@@ -355,94 +436,54 @@
 // alerts
 .wrapper-alert {
   @include box-sizing(border-box);
-  @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1);
+  @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue);
   position: relative;
   top: -($baseline*1.5);
   z-index: 100;
   overflow: hidden;
   width: 100%;
-  border-bottom: 4px solid $gray-l1;
+  border-bottom: 2px solid $black;
   border-top: 1px solid $black;
-  padding: $baseline ($baseline*2);
+  padding: $baseline ($baseline*2) ($baseline*1.5) ($baseline*2);
   background: $gray-d3;
 
   &.wrapper-alert-warning {
-    border-bottom-color: $orange;
+    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $orange);
 
     .icon-warning {
       color: $orange;
     }
-
-    &:hover {
-      border-bottom-color: $orange-s2;
-
-      .icon-warning {
-        color: $orange-s2;
-      }
-    }
   }
 
   &.wrapper-alert-error {
-    border-bottom-color: $red-l1;
+    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $red-l1);
 
     .icon-error {
       color: $red-l1;
     }
-
-    &:hover {
-      border-bottom-color: $red;
-
-      .icon-error {
-        color: $red;
-      }
-    }
   }
 
   &.wrapper-alert-confirmation {
-    border-bottom-color: $green;
+    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $green);
 
     .icon-confirmation {
       color: $green;
     }
-
-    &:hover {
-      border-bottom-color: $green-s2;
-
-      .icon-confirmation {
-        color: $green-s2;
-      }
-    }
   }
 
   &.wrapper-alert-announcement {
-    border-bottom-color: $blue;
+    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue);
 
     .icon-announcement {
       color: $blue;
     }
-
-    &:hover {
-      border-bottom-color: $blue-s2;
-
-      .icon-announcement {
-        color: $blue-s2;
-      }
-    }
   }
 
   &.wrapper-alert-step-required {
-    border-bottom-color: $pink;
+    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $pink);
 
     .icon-step-required {
       color: $pink;
-    }
-
-    &:hover {
-      border-bottom-color: $pink-s2;
-
-      .icon-announcement {
-        color: $pink-s2;
-      }
     }
   }
 }
@@ -548,95 +589,6 @@
 
     &:hover {
       background: $gray-d1;
-    }
-  }
-}
-
-.alert, .notification, .prompt {
-
-  // types - warning
-  &.warning {
-
-    .nav-actions .action-primary {
-      @include orange-button();
-      border-color: $orange-d2;
-      color: $gray-d4;
-    }
-
-    a {
-      color: $orange;
-
-      &:hover {
-        color: $orange-s2;
-      }
-    }
-  }
-
-  // types - error
-  &.error {
-
-    .nav-actions .action-primary {
-      @include red-button();
-      border-color: $red-d2;
-    }
-
-    a {
-      color: $red-l1;
-
-      &:hover {
-        color: $red;
-      }
-    }
-  }
-
-  // types - announcement
-  &.announcement {
-
-    .nav-actions .action-primary {
-      @include blue-button();
-      border-color: $blue-d2;
-    }
-
-    a {
-      color: $blue;
-
-      &:hover {
-        color: $blue-s2;
-      }
-    }
-  }
-
-  // types - confirmation
-  &.confirmation {
-
-    .nav-actions .action-primary {
-      @include green-button();
-      border-color: $green-d2;
-    }
-
-    a {
-      color: $green;
-
-      &:hover {
-        color: $green-s2;
-      }
-    }
-  }
-
-  // types - step required
-  &.step-required {
-
-    .nav-actions .action-primary {
-      border-color: $pink-d2;
-      @include pink-button();
-    }
-
-    a {
-      color: $pink;
-
-      &:hover {
-        color: $pink-s1;
-      }
     }
   }
 }
