@@ -570,7 +570,7 @@ def progress(request, course_id, student_id=None):
 
     Course staff are allowed to see the progress of students in their class.
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, course_id, 'load', depth=None)
     staff_access = has_access(request.user, course, 'staff')
 
     if student_id is None or student_id == request.user.id:
@@ -590,7 +590,7 @@ def progress(request, course_id, student_id=None):
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-        course_id, student, course)
+        course_id, student, course, depth=None)
 
     courseware_summary = grades.progress_summary(student, request, course,
                                                  student_module_cache)
