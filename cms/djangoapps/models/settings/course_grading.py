@@ -118,8 +118,6 @@ class CourseGradingModel(object):
             descriptor.raw_grader[index] = grader
         else:
             descriptor.raw_grader.append(grader)
-        # make definition notice the update
-        descriptor.raw_grader = descriptor.raw_grader
 
         get_modulestore(course_location).update_item(course_location, descriptor.definition['data'])
 
