@@ -528,6 +528,27 @@ class CapaModule(XModule):
     def make_dict_of_responses(get):
         '''Make dictionary of student responses (aka "answers")
         get is POST dictionary.
+
+        The *get* dict has keys of the form 'x_y', which are mapped
+        to key 'y' in the returned dict.  For example,
+        'input_1_2_3' would be mapped to '1_2_3' in the returned dict.
+
+        Some inputs always expect a list in the returned dict
+        (e.g. checkbox inputs).  The convention is that
+        keys in the *get* dict that end with '[]' will always
+        have list values in the returned dict.
+        For example, if the *get* dict contains {'input_1[]': 'test' }
+        then the output dict would contain {'1': ['test'] }
+        (the value is a list).
+
+        Raises an exception if:
+
+            A key in the *get* dictionary does not contain >= 1 underscores
+            (e.g. "input" is invalid; "input_1" is valid)
+
+            Two keys end up with the same name in the returned dict.
+            (e.g. 'input_1' and 'input_1[]', which both get mapped
+            to 'input_1' in the returned dict)
         '''
         answers = dict()
         for key in get:
