@@ -97,10 +97,14 @@ def assert_css_with_text(css, text):
 def css_click(css):
     '''
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Catch WebDriverException
     First try to use the regular click method, 
     but if clicking in the middle of an element
     doesn't work it might be that it thinks some other
     element is on top of it there so click in the upper left
+<<<<<<< HEAD
     '''
     try:
         assert_true(world.browser.is_element_present_by_css(css, 5))
@@ -113,6 +117,14 @@ def css_click(css):
     '''
     css_click_at(css)
 >>>>>>> Click in the upper left of an element instead of the middle.
+=======
+    '''
+    try:
+        assert_true(world.browser.is_element_present_by_css(css, 5))
+        world.browser.find_by_css(css).first.click()
+    except WebDriverException, e:
+        css_click_at(css)
+>>>>>>> Catch WebDriverException
 
 
 def css_click_at(css, x=10, y=10):
