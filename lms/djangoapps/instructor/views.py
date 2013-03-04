@@ -59,7 +59,7 @@ def split_by_comma_and_whitespace(s):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
-    course = get_course_with_access(request.user, course_id, 'staff')
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
 
@@ -893,7 +893,7 @@ def gradebook(request, course_id):
     - only displayed to course staff
     - shows students who are enrolled.
     """
-    course = get_course_with_access(request.user, course_id, 'staff')
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username').select_related("profile")
 
