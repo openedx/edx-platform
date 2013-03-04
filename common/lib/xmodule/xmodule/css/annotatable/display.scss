@@ -25,6 +25,7 @@ $body-font-size: em(14);
     border-top: 1px solid $border-color;
     margin-top: .5em;
     padding-top: .5em;
+    @include clearfix;
   }
 }
 
