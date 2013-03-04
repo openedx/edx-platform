@@ -69,6 +69,7 @@ class CombinedOpenEndedModule(XModule):
     due = String(help="Date that this problem is due by", default= None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None, scope=Scope.settings)
     max_score = Integer(help="Maximum score for the problem.", default=1, scope=Scope.settings)
+    version = Integer(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
 
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
@@ -120,22 +121,6 @@ class CombinedOpenEndedModule(XModule):
         self.system = system
         self.system.set('location', location)
 
-        # Load instance state
-        if instance_state is not None:
-            instance_state = json.loads(instance_state)
-        else:
-            instance_state = {}
-
-        self.version = self.metadata.get('version', DEFAULT_VERSION)
-        version_error_string = "Version of combined open ended module {0} is not correct.  Going with version {1}"
-        if not isinstance(self.version, basestring):
-            try:
-                self.version = str(self.version)
-            except:
-                #This is a dev_facing_error
-                log.info(version_error_string.format(self.version, DEFAULT_VERSION))
-                self.version = DEFAULT_VERSION
-
         versions = [i[0] for i in VERSION_TUPLES]
         descriptors = [i[1] for i in VERSION_TUPLES]
         modules = [i[2] for i in VERSION_TUPLES]
@@ -154,11 +139,10 @@ class CombinedOpenEndedModule(XModule):
         }
 
         instance_state = { k: self.__dict__[k] for k in self.__dict__ if k in attributes[version_index]}
-        log.debug(instance_state)
         self.child_descriptor = descriptors[version_index](self.system)
         self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(self.data), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = json.dumps(instance_state), metadata = self.metadata, static_data= static_data)
+            instance_state = instance_state, static_data= static_data)
 
     def get_html(self):
         return self.child_module.get_html()

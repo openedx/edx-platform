@@ -58,9 +58,6 @@ class PeerGradingModule(XModule):
         else:
             self.peer_gs = MockPeerGradingService()
 
-        if isinstance(self.use_for_single_location, basestring):
-            self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
-
         if self.use_for_single_location == True:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
@@ -71,9 +68,6 @@ class PeerGradingModule(XModule):
             due_date = self.linked_problem.metadata.get('peer_grading_due', None)
             if due_date:
                 self.metadata['due'] = due_date
-
-        if isinstance(self.is_graded, basestring):
-            self.is_graded = (self.is_graded in TRUE_DICT)
 
         try:
             self.timeinfo = TimeInfo(self.display_due_date_string, self.grace_period_string)

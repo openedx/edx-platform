@@ -115,16 +115,9 @@ class CombinedOpenEndedV1Module():
 
         """
 
-        self.metadata = metadata
-        self.display_name = metadata.get('display_name', "Open Ended")
+        self.instance_state = instance_state
+        self.display_name = instance_state.get('display_name', "Open Ended")
         self.rewrite_content_links = static_data.get('rewrite_content_links',"")
-
-
-        # Load instance state
-        if instance_state is not None:
-            instance_state = json.loads(instance_state)
-        else:
-            instance_state = {}
 
         #We need to set the location here so the child modules can use it
         system.set('location', location)
@@ -141,14 +134,14 @@ class CombinedOpenEndedV1Module():
 
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.allow_reset = instance_state.get('ready_to_reset', False)
-        self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
-        self.is_scored = self.metadata.get('is_graded', IS_SCORED) in TRUE_DICT
-        self.accept_file_upload = self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
-        self.skip_basic_checks = self.metadata.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
+        self.max_attempts = int(self.instance_state.get('attempts', MAX_ATTEMPTS))
+        self.is_scored = self.instance_state.get('is_graded', IS_SCORED) in TRUE_DICT
+        self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
+        self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
 
-        display_due_date_string = self.metadata.get('due', None)
+        display_due_date_string = self.instance_state.get('due', None)
 
-        grace_period_string = self.metadata.get('graceperiod', None)
+        grace_period_string = self.instance_state.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)
         except:
@@ -158,7 +151,7 @@ class CombinedOpenEndedV1Module():
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
-        self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
+        self._max_score = int(self.instance_state.get('max_score', MAX_SCORE))
 
         self.rubric_renderer = CombinedOpenEndedRubric(system, True)
         rubric_string = stringify_children(definition['rubric'])
@@ -760,7 +753,7 @@ class CombinedOpenEndedV1Module():
         return progress_object
 
 
-class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
+class CombinedOpenEndedV1Descriptor():
     """
     Module for adding combined open ended questions
     """
@@ -771,6 +764,9 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "combinedopenended"
+
+    def __init__(self, system):
+        self.system =system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -798,7 +794,7 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return xml_object.xpath(k)[0]
 
-        return {'task_xml': parse_task('task'), 'prompt': parse('prompt'), 'rubric': parse('rubric')}, []
+        return {'task_xml': parse_task('task'), 'prompt': parse('prompt'), 'rubric': parse('rubric')}
 
 
     def definition_to_xml(self, resource_fs):

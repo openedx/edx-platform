@@ -29,7 +29,14 @@ log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
-system = ModuleSystem(None, None, None, render_to_string, None, None)
+system = ModuleSystem(
+    ajax_url=None,
+    track_function=None,
+    get_module = None,
+    render_template=render_to_string,
+    replace_urls = None,
+    xblock_model_data= {}
+)
 controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
 
 """
