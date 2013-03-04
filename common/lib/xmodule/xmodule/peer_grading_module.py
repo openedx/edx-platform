@@ -40,14 +40,16 @@ class PeerGradingModule(XModule):
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
-    student_data_for_location = Object(scope=Scope.student_state)
-    max_grade = Integer(default=MAX_SCORE, scope=Scope.student_state)
-    use_for_single_location = Boolean(default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
-    is_graded = Boolean(default=IS_GRADED, scope=Scope.settings)
-    link_to_location = String(default=LINK_TO_LOCATION, scope=Scope.settings)
+    use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.", default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
+    link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION, scope=Scope.settings)
+    is_graded = Boolean(help="Whether or not this module is scored.",default=IS_GRADED, scope=Scope.settings)
+    display_due_date_string = String(help="Due date that should be displayed.", default=None, scope=Scope.settings)
+    grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
+    max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE, scope=Scope.settings)
+    student_data_for_location = Object(help="Student data for a given peer grading problem.", default=json.dumps({}),scope=Scope.student_state)
 
-    def __init__(self, *args, **kwargs):
-        super(PeerGradingModule, self).__init__(*args, **kwargs)
+    def __init__(self, system, location, descriptor, model_data):
+        XModule.__init__(self, system, location, descriptor, model_data)
 
         #We need to set the location here so the child modules can use it
         system.set('location', location)
@@ -57,11 +59,9 @@ class PeerGradingModule(XModule):
         else:
             self.peer_gs = MockPeerGradingService()
 
-
         if isinstance(self.use_for_single_location, basestring):
             self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
 
-        self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
         if self.use_for_single_location == True:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
@@ -73,21 +73,21 @@ class PeerGradingModule(XModule):
             if due_date:
                 self.metadata['due'] = due_date
 
-        self.is_graded = self.metadata.get('is_graded', IS_GRADED)
         if isinstance(self.is_graded, basestring):
             self.is_graded = (self.is_graded in TRUE_DICT)
 
-        display_due_date_string = self.metadata.get('due', None)
-        grace_period_string = self.metadata.get('graceperiod', None)
-
         try:
-            self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)
+            self.timeinfo = TimeInfo(self.display_due_date_string, self.grace_period_string)
         except:
             log.error("Error parsing due date information in location {0}".format(location))
             raise
 
         self.display_due_date = self.timeinfo.display_due_date
-
+        
+        try:
+            self.student_data_for_location = json.loads(self.student_data_for_location)
+        except:
+            pass
 
         self.ajax_url = self.system.ajax_url
         if not self.ajax_url.endswith("/"):
