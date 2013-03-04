@@ -3,6 +3,7 @@ from lettuce.django import django_url
 from nose.tools import assert_true
 from nose.tools import assert_equal
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import WebDriverException
 
 from terrain.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from terrain.factories import CourseFactory, GroupFactory
@@ -95,10 +96,16 @@ def assert_css_with_text(css, text):
 
 def css_click(css):
     '''
-    Rather than click in the middle of an element, 
-    click in the upper left
+    First try to use the regular click method, 
+    but if clicking in the middle of an element
+    doesn't work it might be that it thinks some other
+    element is on top of it there so click in the upper left
     '''
-    css_click_at(css)
+    try:
+        assert_true(world.browser.is_element_present_by_css(css, 5))
+        world.browser.find_by_css(css).first.click()
+    except WebDriverException, e:
+        css_click_at(css)
 
 
 def css_click_at(css, x=10, y=10):

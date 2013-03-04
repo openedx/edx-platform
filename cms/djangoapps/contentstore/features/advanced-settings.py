@@ -1,6 +1,7 @@
 from lettuce import world, step
 from common import *
 import time
+from selenium.common.exceptions import WebDriverException
 
 from nose.tools import assert_equal
 from nose.tools import assert_true
@@ -42,7 +43,11 @@ def edit_the_name_of_a_policy_key(step):
 
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(step, name):
-    world.browser.click_link_by_text(name)
+    try:
+        world.browser.click_link_by_text(name)
+    except WebDriverException, e:
+        css = 'a.%s-button' % name.lower()
+        css_click_at(css)
 
 
 @step(u'I edit the value of a policy key$')
