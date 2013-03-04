@@ -112,7 +112,7 @@ def create_thread(request, course_id, commentable_id):
             group_id = user_group_id
 
         if group_id:
-          thread.update_attributes(group_id=group_id)
+            thread.update_attributes(group_id=group_id)
     
     thread.save()
 
