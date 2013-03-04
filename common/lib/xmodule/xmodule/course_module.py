@@ -127,6 +127,7 @@ class CourseDescriptor(SequenceDescriptor):
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+        self._grading_policy = {}
         self.set_grading_policy(self.definition['data'].get('grading_policy', None))
 
         self.test_center_exams = []
@@ -196,11 +197,9 @@ class CourseDescriptor(SequenceDescriptor):
         grading_policy.update(course_policy)
 
         # Here is where we should parse any configurations, so that we can fail early
-        grading_policy['RAW_GRADER'] = grading_policy['GRADER']  # used for cms access
-        grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
-        self._grading_policy = grading_policy
-
-
+        # Use setters so that side effecting to .definitions works
+        self.raw_grader = grading_policy['GRADER']  # used for cms access
+        self.grade_cutoffs = grading_policy['GRADE_CUTOFFS']
 
     @classmethod
     def read_grading_policy(cls, paths, system):
@@ -316,10 +315,6 @@ class CourseDescriptor(SequenceDescriptor):
     def enrollment_end(self, value):
         if isinstance(value, time.struct_time):
             self.metadata['enrollment_end'] = stringify_time(value)
-
-    @property
-    def grader(self):
-        return self._grading_policy['GRADER']
 
     @property
     def raw_grader(self):
