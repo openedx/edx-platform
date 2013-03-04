@@ -1,11 +1,35 @@
 // studio alerts and notifications
 // ====================
 
+// shared
+.wrapper-notification, .wrapper-alert, .prompt {
+  @include box-sizing(border-box);
+  background: $gray-d3;
+  border-top: 4px solid $gray-d4;
+
+  .copy {
+    @include font-size(13);
+    color: $gray-l2;
+
+    .title {
+      color: $white;
+    }
+
+    .nav-actions {
+
+      .action-primary {
+        color: $gray-d4;
+      }
+    }
+  }
+}
+
 // prompts
 .wrapper-prompt {
+  @include transition(all 0.05s ease-in-out);
   position: fixed;
   top: 0;
-  background: $black-t1;
+  background: $black-t0;
   width: 100%;
   height: 100%;
   text-align: center;
@@ -20,20 +44,80 @@
   }
 
   .prompt {
-    @include border-radius(3px);
-    @include box-sizing(border-box);
-    @include box-shadow(0 0 4px $shadow-d1);
+    @include border-radius(($baseline/5));
+    @include box-shadow(0 0 3px $shadow-d1);
     display: inline-block;
     vertical-align: middle;
-    width: $baseline*15;
-    padding: $baseline;
-    background: $white;
+    width: $baseline*17.5;
+    border: 4px solid $black;
+    text-align: left;
+
+    .copy {
+      border-top: 4px solid $blue;
+      padding: $baseline;
+    }
 
     .nav-actions {
+      @include box-shadow(inset 0 1px 2px $shadow-d1);
+      border-top: 1px solid $black-t1;
+      padding: ($baseline*0.75) $baseline;
+      background: $gray-d4;
 
       .nav-item {
+        display: inline-block;
+        margin-right: ($baseline*0.75);
 
+        &:last-child {
+          margin-right: 0;
+        }
       }
+
+      .action-primary {
+        @include blue-button();
+        @include font-size(13);
+        border-color: $blue-d2;
+        font-weight: 600;
+      }
+
+      .action-secondary {
+        @include font-size(13);
+      }
+    }
+  }
+
+  // types of prompts - error
+  .prompt.error {
+
+    .icon-error {
+      color: $red-l1;
+    }
+
+    .copy {
+      border-top-color: $red-l1;
+    }
+  }
+
+  // types of prompts - confirmation
+  .prompt.confirmation {
+
+    .icon-error {
+      color: $green;
+    }
+
+    .copy {
+      border-top-color: $green;
+    }
+  }
+
+  // types of prompts - error
+  .prompt.warning {
+
+    .icon-warning {
+      color: $orange;
+    }
+
+    .copy {
+      border-top-color: $orange;
     }
   }
 }
@@ -41,15 +125,12 @@
 // notifications
 .wrapper-notification {
   @include clearfix();
-  @include box-sizing(border-box);
   @include box-shadow(0 -1px 3px $shadow);
   position: fixed;
   bottom: 0;
   z-index: 1000;
   width: 100%;
-  border-top: 4px solid $gray-l1;
   padding: ($baseline*0.75) ($baseline*2);
-  background: $gray-d3;
 
   &.wrapper-notification-warning {
     border-top-color: $orange;
@@ -67,7 +148,7 @@
     }
   }
 
-  &.wrapper-cation-error {
+  &.wrapper-notification-error {
     border-top-color: $red-l1;
 
     .icon-error {
@@ -208,29 +289,6 @@
     }
   }
 
-  // with cancel
-  .action-notification-close {
-    @include border-top-radius(3px);
-    position: absolute;
-    top: -34px;
-    right: $baseline;
-    padding: ($baseline/5) ($baseline/2.5) 0 ($baseline/2.5);
-    background: $gray-l1;
-    text-align: center;
-
-    .label {
-      @include text-sr();
-    }
-
-    .icon {
-      @include font-size(14);
-      color: $white;
-      width: auto;
-      margin: 0;
-      padding: 2px;
-    }
-  }
-
   // with actions
   &.has-actions {
     
@@ -272,100 +330,10 @@
     }
   }
 
-  // notification types
-  &.warning {
-
-    .action-notification-close {
-      background: $orange;
-
-      &:hover {
-        background: $orange-s2;
-      }
-    }
-
-    .action-primary {
-      @include orange-button();
-      @include font-size(13);
-      border-color: $orange-d2;
-    }
-
-    a {
-      color: $orange;
-
-      &:hover {
-        color: $orange-s2;
-      }
-    }
-  }
-
-  &.error {
-
-    .action-notification-close {
-      background: $red-l1;
-
-      &:hover {
-        background: $red;
-      }
-    }
-
-    .action-primary {
-      @include red-button();
-      @include font-size(13);
-      border-color: $red-d2;
-    }
-
-    a {
-      color: $red-l1;
-
-      &:hover {
-        color: $red;
-      }
-    }
-  }
-
   &.confirmation {
 
     .copy {
       margin-top: ($baseline/5);
-    }
-
-    .action-notification-close {
-      background: $green;
-
-      &:hover {
-        background: $green-s2;
-      }
-    }
-
-    .action-primary {
-      @include green-button();
-      @include font-size(13);
-      border-color: $green-d2;
-    }
-
-    a {
-      color: $green;
-
-      &:hover {
-        color: $green-s2;
-      }
-    }
-  }
-
-  &.announcement {
-
-    .action-notification-close {
-      background: $blue;
-
-      &:hover {
-        background: $blue-s1;
-      }
-    }
-
-    .action-primary {
-      @include blue-button();
-      @include font-size(13);
-      border-color: $blue-d2;
     }
   }
 
@@ -373,7 +341,6 @@
 
     .icon-saving {
       @include anim-rotateClockwise(3s, linear, infinite);
-
       width: 22px;
     }
 
@@ -559,12 +526,12 @@
 
   // with cancel
   .action-alert-close {
-    @include border-bottom-radius(3px);
+    @include border-bottom-radius(($baseline/5));
     position: absolute;
     top: -($baseline/10);
     right: $baseline;
     padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
-    background: $gray-d1;
+    background: $gray-d4;
     text-align: center;
 
     .label {
@@ -580,16 +547,20 @@
     }
 
     &:hover {
-      background: $gray-l1;
+      background: $gray-d1;
     }
   }
+}
 
-  // alert types
+.alert, .notification, .prompt {
+
+  // types - warning
   &.warning {
-  	
-    .action-primary {
+
+    .nav-actions .action-primary {
       @include orange-button();
       border-color: $orange-d2;
+      color: $gray-d4;
     }
 
     a {
@@ -601,9 +572,10 @@
     }
   }
 
+  // types - error
   &.error {
 
-    .action-primary {
+    .nav-actions .action-primary {
       @include red-button();
       border-color: $red-d2;
     }
@@ -617,9 +589,27 @@
     }
   }
 
+  // types - announcement
+  &.announcement {
+
+    .nav-actions .action-primary {
+      @include blue-button();
+      border-color: $blue-d2;
+    }
+
+    a {
+      color: $blue;
+
+      &:hover {
+        color: $blue-s2;
+      }
+    }
+  }
+
+  // types - confirmation
   &.confirmation {
 
-    .action-primary {
+    .nav-actions .action-primary {
       @include green-button();
       border-color: $green-d2;
     }
@@ -633,17 +623,10 @@
     }
   }
 
-  &.announcement {
-
-    .action-primary {
-      @include blue-button();
-      border-color: $blue-d2;
-    }
-  }
-
+  // types - step required
   &.step-required {
 
-    .action-primary {
+    .nav-actions .action-primary {
       border-color: $pink-d2;
       @include pink-button();
     }
@@ -661,26 +644,31 @@
 // js enabled
 .js {
 
+  // prompt set-up
   .wrapper-prompt {
-    display: none;
+    visibility: hidden;
+    pointer-events: none;
 
     .prompt {
-      @include anim-bounceIn(0.5s);
-      opacity: 0.1;
+      opacity: 0;
+    }
+  }
+
+  // prompt showing
+  &.prompt-is-shown {
+
+    .wrapper-view {
+      -webkit-filter: blur(2px) grayscale(25%);
+      filter: blur(2px) grayscale(25%);
     }
 
-    &.is-shown {
-      display: block;
+    .wrapper-prompt.is-shown {
+      visibility: visible;
+      pointer-events: auto;
 
       .prompt {
+        @include anim-bounceIn(0.5s);
         opacity: 1.0;
-      }
-    }
-
-    &.is-hiding {
-
-      .prompt {
-        @include anim-bounceOut(0.5s);
       }
     }
   }

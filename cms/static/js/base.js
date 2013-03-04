@@ -62,10 +62,16 @@ $(document).ready(function () {
         $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
     });
 
-    // prompt close
-    $('.prompt .action-cancel').click(function(e) {
+    // prompt pop
+    $('.action-prompt').click(function(e){
         (e).preventDefault();
-        $(this).closest('.wrapper-prompt').removeClass('is-shown').addClass('is-hiding');
+        $body.toggleClass('prompt-is-shown');
+    });
+
+    // prompt close
+    $('.prompt .action-cancel, .prompt .action-proceed').click(function(e) {
+        (e).preventDefault();
+        $body.removeClass('prompt-is-shown');
     });
 
     // nav - dropdown related
