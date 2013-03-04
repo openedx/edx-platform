@@ -18,14 +18,16 @@ from models import StudentModule
 
 log = logging.getLogger("mitx.courseware")
 
+
 def yield_module_descendents(module):
     stack = module.get_display_items()
     stack.reverse()
 
     while len(stack) > 0:
         next_module = stack.pop()
-        stack.extend( next_module.get_display_items() )
+        stack.extend(next_module.get_display_items())
         yield next_module
+
 
 def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     """
@@ -39,15 +41,15 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
             return module.get_child_descriptors()
         else:
             return descriptor.get_children()
-    
-    
+
+
     stack = [descriptor]
 
     while len(stack) > 0:
         next_descriptor = stack.pop()
-        stack.extend( get_dynamic_descriptor_children(next_descriptor) )
+        stack.extend(get_dynamic_descriptor_children(next_descriptor))
         yield next_descriptor
-    
+
 
 def yield_problems(request, course, student):
     """
@@ -87,6 +89,7 @@ def yield_problems(request, course, student):
             for problem in yield_module_descendents(section_module):
                 if isinstance(problem, CapaModule):
                     yield problem
+
 
 def answer_distributions(request, course):
     """
@@ -150,7 +153,7 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
             section_name = section_descriptor.metadata.get('display_name')
 
             should_grade_section = False
-            # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%  
+            # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             for moduledescriptor in section['xmoduledescriptors']:
                 if student_module_cache.lookup(
                         course.id, moduledescriptor.category, moduledescriptor.location.url()):
@@ -159,20 +162,20 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
 
             if should_grade_section:
                 scores = []
-                
+
                 def create_module(descriptor):
                     # TODO: We need the request to pass into here. If we could forgo that, our arguments
                     # would be simpler
-                    return get_module(student, request, descriptor.location, 
+                    return get_module(student, request, descriptor.location,
                                         student_module_cache, course.id)
-                                
+
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
-                                                     
+
                     (correct, total) = get_score(course.id, student, module_descriptor, create_module, student_module_cache)
                     if correct is None and total is None:
                         continue
 
-                    if settings.GENERATE_PROFILE_SCORES:	# for debugging!
+                    if settings.GENERATE_PROFILE_SCORES:  	# for debugging!
                         if total > 1:
                             correct = random.randrange(max(total - 2, 1), total + 1)
                         else:
@@ -208,11 +211,12 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
 
     letter_grade = grade_for_percentage(course.grade_cutoffs, grade_summary['percent'])
     grade_summary['grade'] = letter_grade
-    grade_summary['totaled_scores'] = totaled_scores	# make this available, eg for instructor download & debugging
+    grade_summary['totaled_scores'] = totaled_scores  	# make this available, eg for instructor download & debugging
     if keep_raw_scores:
         grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
                                                         # so grader can be double-checked
     return grade_summary
+
 
 def grade_for_percentage(grade_cutoffs, percentage):
     """
@@ -225,7 +229,7 @@ def grade_for_percentage(grade_cutoffs, percentage):
     """
 
     letter_grade = None
-    
+
     # Possible grades, sorted in descending order of score
     descending_grades = sorted(grade_cutoffs, key=lambda x: grade_cutoffs[x], reverse=True)
     for possible_grade in descending_grades:
@@ -255,13 +259,13 @@ def progress_summary(student, request, course, student_module_cache):
         course: A Descriptor containing the course to grade
         student_module_cache: A StudentModuleCache initialized with all
              instance_modules for the student
-    
+
     If the student does not have access to load the course module, this function
     will return None.
-    
+
     """
-    
-    
+
+
     # TODO: We need the request to pass into here. If we could forgo that, our arguments
     # would be simpler
     course_module = get_module(student, request,
@@ -270,30 +274,30 @@ def progress_summary(student, request, course, student_module_cache):
     if not course_module:
         # This student must not have access to the course.
         return None
-    
+
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
     for chapter_module in course_module.get_display_items():
         # Skip if the chapter is hidden
-        hidden = chapter_module.metadata.get('hide_from_toc','false')
+        hidden = chapter_module.metadata.get('hide_from_toc', 'false')
         if hidden.lower() == 'true':
             continue
-        
+
         sections = []
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
-            hidden = section_module.metadata.get('hide_from_toc','false')
+            hidden = section_module.metadata.get('hide_from_toc', 'false')
             if hidden.lower() == 'true':
                 continue
-            
+
             # Same for sections
             graded = section_module.metadata.get('graded', False)
             scores = []
-            
+
             module_creator = section_module.system.get_module
-            
+
             for module_descriptor in yield_dynamic_descriptor_descendents(section_module.descriptor, module_creator):
-                
+
                 course_id = course.id
                 (correct, total) = get_score(course_id, student, module_descriptor, module_creator, student_module_cache)
                 if correct is None and total is None:
@@ -339,6 +343,14 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
            Can return None if user doesn't have access, or if something else went wrong.
     cache: A StudentModuleCache
     """
+    if problem_descriptor.always_recalculate_grades:
+        problem = module_creator(problem_descriptor)
+        d = problem.get_score()
+        if d is not None:
+            return (d['score'], d['total'])
+        else:
+            return (None, None)
+
     if not (problem_descriptor.stores_state and problem_descriptor.has_score):
         # These are not problems, and do not have a score
         return (None, None)

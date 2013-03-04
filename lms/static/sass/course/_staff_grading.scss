@@ -2,19 +2,48 @@ div.staff-grading,
 div.peer-grading{
     textarea.feedback-area {
         height: 75px;
-        margin: 20px;
+        margin: 0px;
+    }
+
+    ul.rubric-list{
+        list-style-type: none;
+        padding:0;
+        margin:0;
+        li {
+             &.rubric-list-item{
+                 margin-bottom: 0px;
+                 padding: 0px;
+             }
+        }
+    }
+
+    h1 {
+        margin : 0 0 0 10px;
+    }
+
+    h2{
+        a
+        {
+            text-size: .5em;
+        }
     }
 
     div {
-        margin: 10px;
+        margin: 0px;
+        &.submission-container{
+              overflow-y: auto;
+              height: 150px;
+              background: #F6F6F6;
+              border: 1px solid #ddd;
+              @include clearfix;
+        }
     }
 
     label {
-        margin: 10px;
-        padding: 5px;
-        display: inline-block;
+        margin: 0px;
+        padding: 2px;
         min-width: 50px;
-        background-color: #CCC;
+        background-color: white;
         text-size: 1.5em;
     }
     
@@ -36,11 +65,11 @@ div.peer-grading{
         width:100%;
         th
         {
-            padding: 10px;
+            padding: 2px;
         }
         td
         {
-            padding:10px;
+            padding:2px;
         }
         td.problem-name
         {
@@ -59,71 +88,61 @@ div.peer-grading{
     .calibration-feedback-wrapper,
     .grading-container
     {
-        border: 1px solid gray;
-        padding: 15px;
+        padding: 2px;
     }
     .error-container
     {
         background-color: #FFCCCC;
-        padding: 15px;
+        padding: 2px;
         margin-left: 0px;
     }
     .submission-wrapper
     {
         h3
         {
-            margin-bottom: 15px;
+            margin-bottom: 2px;
         }
         p
         {
-            margin-left:10px;
+            margin-left:2px;
         }
-        padding: 15px;
+        padding: 2px;
+        padding-bottom: 15px;
     }
     .meta-info-wrapper
     {
         background-color: #eee;
-        padding:15px;
-        h3
+        padding:2px;
+        div
         {
-            font-size:1em;
-        }
-        ul
-        {
-            list-style-type: none;
-            font-size: .85em;
-            li
-            {
-                margin: 5px 0px;
-            }
+            display : inline;
         }
     }
     .message-container,
     .grading-message
     {
         background-color: $yellow;
-        padding: 10px;
+        padding: 2px;
         margin-left:0px;
     }
     
     .breadcrumbs
     {
-        margin-top:20px;
+        margin-top:2px;
         margin-left:0px;
-        margin-bottom:5px;
+        margin-bottom:2px;
         font-size: .8em;
     }
 
     .instructions-panel
     {
 
-        margin-right:20px;
+        margin-right:2px;
         > div
         {
-            padding: 10px;
-            margin: 0px;
+            padding: 2px;
+            margin-bottom: 5px;
             background: #eee;
-            height: 10em;
             width:47.6%;
             h3
             {
@@ -161,8 +180,8 @@ div.peer-grading{
         margin-left: 0px;
         header
         {
-            margin-top:20px;
-            margin-bottom:20px;
+            margin-top:2px;
+            margin-bottom:2px;
             font-size: 1.2em;
         }
     }
@@ -175,50 +194,7 @@ div.peer-grading{
             margin-top: 20px;
         }
     }
-    padding: 40px;
-  .rubric {
-      tr {
-          margin:10px 0px;
-          height: 100%;
-      }
-      td {
-          padding: 20px 0px 25px 0px;
-          height: 100%;
-      }
-      th {
-          padding: 5px;
-          margin: 5px;
-      }
-      label,
-      .view-only {
-          margin:2px;
-          position: relative;
-          padding: 15px 15px 25px 15px;
-          width: 150px;
-          height:100%;
-          display: inline-block;
-          min-height: 50px;
-          min-width: 50px;
-          background-color: #CCC;
-          font-size: .9em;
-      }
-      .grade {
-        position: absolute;
-        bottom:0px;
-        right:0px;
-        margin:10px;
-      }
-      .selected-grade {
-        background: #666;
-        color: white; 
-      }
-      input[type=radio]:checked + label {
-        background: #666;
-        color: white; }
-      input[class='score-selection'] {
-        display: none; 
-      }
-  }
-    
+    padding: 15px;
+    border: none;
 }
 

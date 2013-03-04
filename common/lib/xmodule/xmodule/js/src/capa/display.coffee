@@ -11,8 +11,9 @@ class @Problem
     $(selector, @el)
 
   bind: =>
-    @el.find('.problem > div').each (index, element) =>
-      MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+    if MathJax?
+      @el.find('.problem > div').each (index, element) =>
+        MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
     window.update_schematics()
 
@@ -31,8 +32,9 @@ class @Problem
 
     # Dynamath
     @$('input.math').keyup(@refreshMath)
-    @$('input.math').each (index, element) =>
-      MathJax.Hub.Queue [@refreshMath, null, element]
+    if MathJax?
+      @$('input.math').each (index, element) =>
+        MathJax.Hub.Queue [@refreshMath, null, element]
 
   updateProgress: (response) =>
     if response.progress_changed
@@ -140,15 +142,15 @@ class @Problem
         allowed_files  = $(element).data("allowed_files")
         for file in element.files
           if allowed_files.length != 0 and file.name not in allowed_files
-              unallowed_file_submitted = true
-              errors.push "You submitted #{file.name}; only #{allowed_files} are allowed."
+            unallowed_file_submitted = true
+            errors.push "You submitted #{file.name}; only #{allowed_files} are allowed."
           if file.name in required_files
-              required_files.splice(required_files.indexOf(file.name), 1)
+            required_files.splice(required_files.indexOf(file.name), 1)
           if file.size > max_filesize
             file_too_large = true
             errors.push 'Your file "' + file.name '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
           fd.append(element.id, file)
-        if element.files.length == 0 
+        if element.files.length == 0
           file_not_selected = true
           fd.append(element.id, '') # In case we want to allow submissions with no file
         if required_files.length != 0
@@ -157,7 +159,7 @@ class @Problem
       else
         fd.append(element.id, element.value)
 
-    
+
     if file_not_selected
       errors.push 'You did not select any files to submit'
 
@@ -230,8 +232,9 @@ class @Problem
               showMethod = @inputtypeShowAnswerMethods[cls]
               showMethod(inputtype, display, answers) if showMethod?
 
-        @el.find('.problem > div').each (index, element) =>
-          MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+        if MathJax?
+          @el.find('.problem > div').each (index, element) =>
+            MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
         @$('.show').val 'Hide Answer'
         @el.addClass 'showed'
@@ -259,9 +262,8 @@ class @Problem
   save: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
-      if response.success
-        saveMessage = "Your answers have been saved but not graded. Hit 'Check' to grade them."
-        @gentle_alert saveMessage
+      saveMessage = response.msg
+      @gentle_alert saveMessage
       @updateProgress response
 
   refreshMath: (event, element) =>
@@ -273,7 +275,7 @@ class @Problem
     preprocessor_tag = "inputtype_" + elid
     mathjax_preprocessor = @inputtypeDisplays[preprocessor_tag]
 
-    if jax = MathJax.Hub.getAllJax(target)[0]
+    if MathJax? and jax = MathJax.Hub.getAllJax(target)[0]
       eqn = $(element).val()
       if mathjax_preprocessor
         eqn = mathjax_preprocessor(eqn)
@@ -286,7 +288,8 @@ class @Problem
       $("##{element.id}_dynamath").val(jax.root.toMathML '')
     catch exception
       throw exception unless exception.restart
-      MathJax.Callback.After [@refreshMath, jax], exception.restart
+      if MathJax?
+        MathJax.Callback.After [@refreshMath, jax], exception.restart
 
   refreshAnswers: =>
     @$('input.schematic').each (index, element) ->

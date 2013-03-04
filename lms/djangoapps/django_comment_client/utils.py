@@ -11,6 +11,8 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from django_comment_client.models import Role
 from django_comment_client.permissions import check_permissions_by_view
+from xmodule.modulestore.exceptions import NoPathToItem
+
 from mitxmako import middleware
 import pystache_custom as pystache
 
@@ -24,19 +26,26 @@ log = logging.getLogger(__name__)
 _FULLMODULES = None
 _DISCUSSIONINFO = defaultdict(dict)
 
+
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
 
+
 def strip_none(dic):
     return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+
 
 def strip_blank(dic):
     def _is_blank(v):
         return isinstance(v, str) and len(v.strip()) == 0
     return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
 
+# TODO should we be checking if d1 and d2 have the same keys with different values?
+
+
 def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
+
 
 def get_role_ids(course_id):
     roles = Role.objects.filter(course_id=course_id)
@@ -46,6 +55,7 @@ def get_role_ids(course_id):
         roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
     return roles_with_ids
 
+
 def has_forum_access(uname, course_id, rolename):
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
@@ -53,11 +63,13 @@ def has_forum_access(uname, course_id, rolename):
         return False
     return role.users.filter(username=uname).exists()
 
+
 def get_full_modules():
     global _FULLMODULES
     if not _FULLMODULES:
         _FULLMODULES = modulestore().modules
     return _FULLMODULES
+
 
 def get_discussion_id_map(course):
     """
@@ -67,17 +79,20 @@ def get_discussion_id_map(course):
     initialize_discussion_info(course)
     return _DISCUSSIONINFO[course.id]['id_map']
 
+
 def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
     initialize_discussion_info(course)
     title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
     return title
 
+
 def get_discussion_category_map(course):
 
     global _DISCUSSIONINFO
     initialize_discussion_info(course)
     return filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
+
 
 def filter_unstarted_categories(category_map):
 
@@ -116,6 +131,7 @@ def filter_unstarted_categories(category_map):
 
     return result_map
 
+
 def sort_map_entries(category_map):
     things = []
     for title, entry in category_map["entries"].items():
@@ -150,12 +166,21 @@ def initialize_discussion_info(course):
     # get all discussion models within this course_id
     all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course, 'discussion', None], course_id=course_id)
 
+    path_to_locations = {}
     for module in all_modules:
         skip_module = False
         for key in ('id', 'discussion_category', 'for'):
             if key not in module.metadata:
                 log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
                 skip_module = True
+
+        # cdodge: pre-compute the path_to_location. Note this can throw an exception for any
+        # dangling discussion modules
+        try:
+            path_to_locations[module.location] = path_to_location(modulestore(), course.id, module.location)
+        except NoPathToItem:
+            log.warning("Could not compute path_to_location for {0}. Perhaps this is an orphaned discussion module?!? Skipping...".format(module.location))
+            skip_module = True
 
         if skip_module:
             continue
@@ -210,7 +235,7 @@ def initialize_discussion_info(course):
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
     # in the backend.
-    default_topics = {'General': {'id' :course.location.html_id()}}
+    default_topics = {'General': {'id': course.location.html_id()}}
     discussion_topics = course.metadata.get('discussion_topics', default_topics)
     for topic, entry in discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
@@ -221,12 +246,15 @@ def initialize_discussion_info(course):
     _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
     _DISCUSSIONINFO[course.id]['category_map'] = category_map
     _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now()
+    _DISCUSSIONINFO[course.id]['path_to_location'] = path_to_locations
+
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
         content = simplejson.dumps(data)
         super(JsonResponse, self).__init__(content,
                                            mimetype='application/json; charset=utf-8')
+
 
 class JsonError(HttpResponse):
     def __init__(self, error_messages=[], status=400):
@@ -238,13 +266,16 @@ class JsonError(HttpResponse):
         super(JsonError, self).__init__(content,
                                         mimetype='application/json; charset=utf-8', status=status)
 
+
 class HtmlResponse(HttpResponse):
     def __init__(self, html=''):
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
+
 class ViewNameMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):
         request.view_name = view_func.__name__
+
 
 class QueryCountDebugMiddleware(object):
     """
@@ -271,6 +302,7 @@ class QueryCountDebugMiddleware(object):
             log.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
         return response
 
+
 def get_ability(course_id, content, user):
     return {
             'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
@@ -282,6 +314,8 @@ def get_ability(course_id, content, user):
     }
 
 #TODO: RENAME
+
+
 def get_annotated_content_info(course_id, content, user, user_info):
     """
     Get metadata for an individual content (thread or comment)
@@ -298,6 +332,8 @@ def get_annotated_content_info(course_id, content, user, user_info):
     }
 
 #TODO: RENAME
+
+
 def get_annotated_content_infos(course_id, thread, user, user_info):
     """
     Get metadata for a thread and its children
@@ -310,6 +346,7 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
     annotate(thread)
     return infos
 
+
 def get_metadata_for_threads(course_id, threads, user, user_info):
     def infogetter(thread):
         return get_annotated_content_infos(course_id, thread, user, user_info)
@@ -318,12 +355,16 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
     return metadata
 
 # put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
+
+
 def url_for_tags(course_id, tags):
     return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': tags})
+
 
 def render_mustache(template_name, dictionary, *args, **kwargs):
     template = middleware.lookup['main'].get_template(template_name).source
     return pystache.render(template, dictionary)
+
 
 def permalink(content):
     if content['type'] == 'thread':
@@ -332,6 +373,7 @@ def permalink(content):
     else:
         return reverse('django_comment_client.forum.views.single_thread',
                        args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
+
 
 def extend_content(content):
     roles = {}
@@ -348,9 +390,10 @@ def extend_content(content):
         'raw_tags': ','.join(content.get('tags', [])),
         'permalink': permalink(content),
         'roles': roles,
-        'updated': content['created_at']!=content['updated_at'],
+        'updated': content['created_at'] != content['updated_at'],
     }
     return merge_dict(content, content_info)
+
 
 def get_courseware_context(content, course):
     id_map = get_discussion_id_map(course)
@@ -359,13 +402,26 @@ def get_courseware_context(content, course):
     if id in id_map:
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
-        (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
+
+        # cdodge: did we pre-compute, if so, then let's use that rather than recomputing
+        if 'path_to_location' in _DISCUSSIONINFO[course.id] and location in _DISCUSSIONINFO[course.id]['path_to_location']:
+            (course_id, chapter, section, position) = _DISCUSSIONINFO[course.id]['path_to_location'][location]
+        else:
+            try:
+                (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
+            except NoPathToItem:
+                # Object is not in the graph any longer, let's just get path to the base of the course
+                # so that we can at least return something to the caller
+                (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, course.location)
+
         url = reverse('courseware_position', kwargs={"course_id":course_id,
                                                      "chapter":chapter,
                                                      "section":section,
                                                      "position":position})
+
         content_info = {"courseware_url": url, "courseware_title": title}
     return content_info
+
 
 def safe_content(content):
     fields = [
@@ -374,7 +430,7 @@ def safe_content(content):
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
-        'read',
+        'read', 'group_id', 'group_name', 'group_string'
     ]
 
     if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):

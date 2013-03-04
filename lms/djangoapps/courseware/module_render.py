@@ -2,6 +2,9 @@ import json
 import logging
 import pyparsing
 import sys
+import static_replace
+
+from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -18,7 +21,6 @@ from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from static_replace import replace_urls
 from student.models import unique_id_for_user
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError
@@ -31,7 +33,7 @@ from xmodule_modifiers import replace_course_urls, replace_static_urls, add_hist
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from statsd import statsd
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger(__name__)
 
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
@@ -89,7 +91,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
     chapters = list()
     for chapter in course_module.get_display_items():
-        hide_from_toc = chapter.metadata.get('hide_from_toc','false').lower() == 'true'
+        hide_from_toc = chapter.metadata.get('hide_from_toc', 'false').lower() == 'true'
         if hide_from_toc:
             continue
 
@@ -164,6 +166,7 @@ def get_module_for_descriptor(user, request, descriptor, student_module_cache, c
     return _get_module(user, request, descriptor, student_module_cache, course_id,
                        position=position, wrap_xmodule_display=wrap_xmodule_display)
 
+
 def _get_module(user, request, descriptor, student_module_cache, course_id,
                 position=None, wrap_xmodule_display=True):
     """
@@ -223,6 +226,30 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
               'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
              }
 
+    def get_or_default(key, default):
+        getattr(settings, key, default)
+
+    #This is a hacky way to pass settings to the combined open ended xmodule
+    #It needs an S3 interface to upload images to S3
+    #It needs the open ended grading interface in order to get peer grading to be done
+    #TODO: refactor these settings into module-specific settings when possible.
+    #this first checks to see if the descriptor is the correct one, and only sends settings if it is
+    is_descriptor_combined_open_ended = (descriptor.__class__.__name__ == 'CombinedOpenEndedDescriptor')
+    is_descriptor_peer_grading =  (descriptor.__class__.__name__ == 'PeerGradingDescriptor')
+    open_ended_grading_interface = None
+    s3_interface = None
+    if is_descriptor_combined_open_ended or is_descriptor_peer_grading:
+        open_ended_grading_interface = settings.OPEN_ENDED_GRADING_INTERFACE
+        open_ended_grading_interface['mock_peer_grading'] = settings.MOCK_PEER_GRADING
+        open_ended_grading_interface['mock_staff_grading'] = settings.MOCK_STAFF_GRADING
+        if is_descriptor_combined_open_ended:
+            s3_interface = {
+                'access_key' : get_or_default('AWS_ACCESS_KEY_ID',''),
+                'secret_access_key' : get_or_default('AWS_SECRET_ACCESS_KEY',''),
+                'storage_bucket_name' : get_or_default('AWS_STORAGE_BUCKET_NAME','')
+            }
+
+
     def inner_get_module(descriptor):
         """
         Delegate to get_module.  It does an access check, so may return None
@@ -244,10 +271,16 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
                           # TODO (cpennington): This should be removed when all html from
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
-                          replace_urls=replace_urls,
+                          replace_urls=partial(
+                              static_replace.replace_static_urls,
+                              data_directory=descriptor.metadata.get('data_dir', ''),
+                              course_namespace=descriptor.location._replace(category=None, name=None),
+                          ),
                           node_path=settings.NODE_PATH,
                           anonymous_student_id=unique_id_for_user(user),
                           course_id=course_id,
+                          open_ended_grading_interface=open_ended_grading_interface,
+                          s3_interface=s3_interface,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
@@ -273,6 +306,7 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
         # Make an error module
         return err_descriptor.xmodule_constructor(system)(None, None)
 
+    system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
     _get_html = module.get_html
 
     if wrap_xmodule_display == True:
@@ -280,8 +314,8 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
 
     module.get_html = replace_static_urls(
         _get_html,
-        module.metadata['data_dir'] if 'data_dir' in module.metadata else '', 
-        course_namespace = module.location._replace(category=None, name=None))
+        module.metadata.get('data_dir', ''),
+        course_namespace=module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
     #   hierarchy of this course
@@ -294,6 +328,8 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
     return module
 
 # TODO (vshnayder): Rename this?  It's very confusing.
+
+
 def get_instance_module(course_id, user, module, student_module_cache):
     """
     Returns the StudentModule specific to this module for this student,
@@ -322,6 +358,7 @@ def get_instance_module(course_id, user, module, student_module_cache):
         return instance_module
     else:
         return None
+
 
 def get_shared_instance_module(course_id, user, module, student_module_cache):
     """
@@ -352,6 +389,7 @@ def get_shared_instance_module(course_id, user, module, student_module_cache):
         return shared_module
     else:
         return None
+
 
 @csrf_exempt
 def xqueue_callback(request, course_id, userid, id, dispatch):
@@ -409,8 +447,8 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
         instance_module.save()
 
         #Bin score into range and increment stats
-        score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
-        org, course_num, run=course_id.split("/")
+        score_bucket = get_score_bucket(instance_module.grade, instance_module.max_grade)
+        org, course_num, run = course_id.split("/")
         statsd.increment("lms.courseware.question_answered",
                         tags=["org:{0}".format(org),
                               "course:{0}".format(course_num),
@@ -450,9 +488,9 @@ def modx_dispatch(request, dispatch, location, course_id):
                 return HttpResponse(json.dumps({'success': too_many_files_msg}))
 
             for inputfile in inputfiles:
-                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE: # Bytes
+                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:   # Bytes
                     file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
-                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE/(1000**2))
+                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
 
@@ -493,7 +531,7 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:
         instance_module.state = instance.get_instance_state()
-        instance_module.max_grade=instance.max_score()
+        instance_module.max_grade = instance.max_score()
         if instance.get_score():
             instance_module.grade = instance.get_score()['score']
         if (instance_module.grade != oldgrade or
@@ -502,8 +540,8 @@ def modx_dispatch(request, dispatch, location, course_id):
             instance_module.save()
 
             #Bin score into range and increment stats
-            score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
-            org, course_num, run=course_id.split("/")
+            score_bucket = get_score_bucket(instance_module.grade, instance_module.max_grade)
+            org, course_num, run = course_id.split("/")
             statsd.increment("lms.courseware.question_answered",
                             tags=["org:{0}".format(org),
                                   "course:{0}".format(course_num),
@@ -519,6 +557,7 @@ def modx_dispatch(request, dispatch, location, course_id):
 
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
+
 
 def preview_chemcalc(request):
     """
@@ -538,7 +577,7 @@ def preview_chemcalc(request):
         raise Http404
 
     result = {'preview': '',
-              'error': '' }
+              'error': ''}
     formula = request.GET.get('formula')
     if formula is None:
         result['error'] = "No formula specified."
@@ -557,17 +596,15 @@ def preview_chemcalc(request):
     return HttpResponse(json.dumps(result))
 
 
-def get_score_bucket(grade,max_grade):
+def get_score_bucket(grade, max_grade):
     """
     Function to split arbitrary score ranges into 3 buckets.
     Used with statsd tracking.
     """
-    score_bucket="incorrect"
-    if(grade>0 and grade<max_grade):
-        score_bucket="partial"
-    elif(grade==max_grade):
-        score_bucket="correct"
+    score_bucket = "incorrect"
+    if(grade > 0 and grade < max_grade):
+        score_bucket = "partial"
+    elif(grade == max_grade):
+        score_bucket = "correct"
 
     return score_bucket
-
-

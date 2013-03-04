@@ -37,6 +37,11 @@
 		padding: 34px 0 42px;
 		border-top: 1px solid #cbd1db;
 
+		&:first-child {
+			padding-top: 0;
+			border: none;
+		}
+
 		&.editing {
 			position: relative;
 			z-index: 1001;

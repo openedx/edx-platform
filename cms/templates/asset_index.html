@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%block name="bodyclass">assets</%block>
-<%block name="title">Courseware Assets</%block>
+<%block name="bodyclass">is-signedin course uploads</%block>
+<%block name="title">Uploads &amp; Files</%block>
 
 <%namespace name='static' file='static_content.html'/>
 
@@ -33,12 +33,27 @@
     </tr>
   </script>
 
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <div class="title">
+        <span class="title-sub">Course Content</span>
+        <h1 class="title-1">Files &amp; Uploads</h1>        
+      </div>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Page Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="button upload-button new-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#xEB40;</i> Upload New File</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
   <div class="main-wrapper">
     <div class="inner-wrapper">
       <div class="page-actions">
-        <a href="#" class="upload-button new-button">
-          <span class="upload-icon"></span>Upload New Asset
-        </a>
         <input type="text" class="asset-search-input search wip-box" placeholder="search assets" style="display:none"/>
       </div>
       <article class="asset-library">

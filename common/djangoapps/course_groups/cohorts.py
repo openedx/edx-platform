@@ -6,12 +6,14 @@ forums, and to the cohort admin views.
 from django.contrib.auth.models import User
 from django.http import Http404
 import logging
+import random
 
 from courseware import courses
 from student.models import get_user_by_username_or_email
 from .models import CourseUserGroup
 
 log = logging.getLogger(__name__)
+
 
 def is_course_cohorted(course_id):
     """
@@ -63,7 +65,23 @@ def is_commentable_cohorted(course_id, commentable_id):
                                                                ans))
     return ans
 
+    
+def get_cohorted_commentables(course_id):
+    """
+    Given a course_id return a list of strings representing cohorted commentables
+    """
 
+    course = courses.get_course_by_id(course_id)
+    
+    if not course.is_cohorted:
+        # this is the easy case :)
+        ans = []
+    else: 
+        ans = course.cohorted_discussions
+
+    return ans
+    
+    
 def get_cohort(user, course_id):
     """
     Given a django User and a course_id, return the user's cohort in that
@@ -95,8 +113,29 @@ def get_cohort(user, course_id):
                                             group_type=CourseUserGroup.COHORT,
                                             users__id=user.id)
     except CourseUserGroup.DoesNotExist:
-        # TODO: add auto-cohorting logic here once we know what that will be.
+        # Didn't find the group.  We'll go on to create one if needed.
+        pass
+
+    if not course.auto_cohort:
         return None
+
+    choices = course.auto_cohort_groups
+    if len(choices) == 0:
+        # Nowhere to put user
+        log.warning("Course %s is auto-cohorted, but there are no"
+                    " auto_cohort_groups specified",
+                    course_id)
+        return None
+
+    # Put user in a random group, creating it if needed
+    group_name = random.choice(choices)
+    group, created = CourseUserGroup.objects.get_or_create(
+        course_id=course_id,
+        group_type=CourseUserGroup.COHORT,
+        name=group_name)
+    
+    user.course_groups.add(group)
+    return group
 
 
 def get_course_cohorts(course_id):
@@ -115,6 +154,7 @@ def get_course_cohorts(course_id):
 
 ### Helpers for cohort management views
 
+
 def get_cohort_by_name(course_id, name):
     """
     Return the CourseUserGroup object for the given cohort.  Raises DoesNotExist
@@ -124,6 +164,7 @@ def get_cohort_by_name(course_id, name):
                                        group_type=CourseUserGroup.COHORT,
                                        name=name)
 
+
 def get_cohort_by_id(course_id, cohort_id):
     """
     Return the CourseUserGroup object for the given cohort.  Raises DoesNotExist
@@ -132,6 +173,7 @@ def get_cohort_by_id(course_id, cohort_id):
     return CourseUserGroup.objects.get(course_id=course_id,
                                        group_type=CourseUserGroup.COHORT,
                                        id=cohort_id)
+
 
 def add_cohort(course_id, name):
     """
@@ -148,11 +190,13 @@ def add_cohort(course_id, name):
                                           group_type=CourseUserGroup.COHORT,
                                           name=name)
 
+
 class CohortConflict(Exception):
     """
     Raised when user to be added is already in another cohort in same course.
     """
     pass
+
 
 def add_user_to_cohort(cohort, username_or_email):
     """
@@ -211,4 +255,3 @@ def delete_empty_cohort(course_id, name):
                 name, course_id))
 
     cohort.delete()
-

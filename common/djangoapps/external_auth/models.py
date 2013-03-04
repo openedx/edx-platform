@@ -12,20 +12,20 @@ file and check it in at the same time as your model changes. To do that,
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class ExternalAuthMap(models.Model):
     class Meta:
         unique_together = (('external_id', 'external_domain'), )
     external_id = models.CharField(max_length=255, db_index=True)
     external_domain = models.CharField(max_length=255, db_index=True)
-    external_credentials = models.TextField(blank=True)  # JSON dictionary 
+    external_credentials = models.TextField(blank=True)  # JSON dictionary
     external_email = models.CharField(max_length=255, db_index=True)
-    external_name = models.CharField(blank=True,max_length=255, db_index=True)
+    external_name = models.CharField(blank=True, max_length=255, db_index=True)
     user = models.OneToOneField(User, unique=True, db_index=True, null=True)
-    internal_password = models.CharField(blank=True, max_length=31)	# randomly generated
-    dtcreated = models.DateTimeField('creation date',auto_now_add=True)
-    dtsignup = models.DateTimeField('signup date',null=True)		# set after signup
-    
+    internal_password = models.CharField(blank=True, max_length=31)  	# randomly generated
+    dtcreated = models.DateTimeField('creation date', auto_now_add=True)
+    dtsignup = models.DateTimeField('signup date', null=True)		# set after signup
+
     def __unicode__(self):
         s = "[%s] = (%s / %s)" % (self.external_id, self.external_name, self.external_email)
         return s
-    

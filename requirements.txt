@@ -20,11 +20,10 @@ http://sympy.googlecode.com/files/sympy-0.7.1.tar.gz
 newrelic==1.8.0.13
 glob2==0.3
 pymongo==2.4.1
-django_nose
+django_nose==1.1
 nosexcover==1.0.7
 rednose==0.3.3
 GitPython==0.3.2.RC1
-django-override-settings==1.2
 mock==0.8.0
 PyYAML==3.10
 South==0.7.6
@@ -48,7 +47,6 @@ sorl-thumbnail==11.12
 networkx==1.7
 pygraphviz==1.1
 -r repo-requirements.txt
-pil==1.1.7
 nltk==2.0.4
 django-debug-toolbar-mongo
 dogstatsd-python==0.2.1
@@ -59,3 +57,4 @@ Shapely==1.2.16
 ipython==0.13.1
 xmltodict==0.4.1
 paramiko==1.9.0
+Pillow==1.7.8

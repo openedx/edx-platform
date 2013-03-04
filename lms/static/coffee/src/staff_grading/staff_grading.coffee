@@ -143,11 +143,12 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     else
       # TODO: replace with postWithPrefix when that's loaded
       $.post(@ajax_url + cmd, data, callback)
-        .error => callback({success: false, error: "Error occured while performing this operation"})
+        .error => callback({success: false, error: "Error occured while performing javascript AJAX post."})
 
 
 class @StaffGrading
   constructor: (backend) ->
+    AjaxPrefix.addAjaxPrefix(jQuery, -> "")
     @backend = backend
 
     # all the jquery selectors
@@ -170,6 +171,7 @@ class @StaffGrading
     @feedback_area = $('.feedback-area')
     @score_selection_container = $('.score-selection-container')
     @grade_selection_container = $('.grade-selection-container')
+    @flag_submission_checkbox = $('.flag-checkbox')
 
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
@@ -180,6 +182,12 @@ class @StaffGrading
     @ml_error_info_container = $('.ml-error-info-container')
 
     @breadcrumbs = $('.breadcrumbs')
+
+
+    $(window).keydown @keydown_handler
+    @question_header = $('.question-header')
+    @question_header.click @collapse_question
+    @collapse_question()
     
     # model state
     @state = state_no_data
@@ -212,54 +220,23 @@ class @StaffGrading
 
 
   setup_score_selection: =>
-    # first, get rid of all the old inputs, if any.
-    @grade_selection_container.html("""
-    <h3>Overall Score</h3>
-    <p>Choose an overall score for this submission.</p>
-    """)
-    # Now create new labels and inputs for each possible score.
-    for score in [0..@max_score]
-      id = 'score-' + score
-      label = """<label for="#{id}">#{score}</label>"""
-      input = """
-              <input type="radio" class="grade-selection" name="grade-selection" id="#{id}" value="#{score}"/>
-              """  # "  fix broken parsing in emacs
-      @grade_selection_container.append(input + label)
-    $('.grade-selection').click => @graded_callback()
-
     @score_selection_container.html(@rubric)
-    $('.score-selection').click => @graded_callback()
+    $('input[class="score-selection"]').change => @graded_callback()
+    Rubric.initialize(@location)
 
 
   graded_callback: () =>
-    @grade = $("input[name='grade-selection']:checked").val()
-    if @grade == undefined
-      return
-    # check to see whether or not any categories have not been scored
-    num_categories = $('table.rubric tr').length
-    for i in [0..(num_categories-1)]
-      score = $("input[name='score-selection-#{i}']:checked").val()
-      if score == undefined
-        return
-    # show button if we have scores for all categories
-    @state = state_graded
-    @submit_button.show()
+   # show button if we have scores for all categories
+    if Rubric.check_complete()
+      @state = state_graded
+      @submit_button.show()
+
+  keydown_handler: (e) =>
+    if e.which == 13 && !@list_view && Rubric.check_complete()
+      @submit_and_get_next()
 
   set_button_text: (text) =>
     @action_button.attr('value', text)
-
-  # finds the scores for each rubric category
-  get_score_list: () =>
-    # find the number of categories:
-    num_categories = $('table.rubric tr').length
-
-    score_lst = []
-    # get the score for each one
-    for i in [0..(num_categories-1)]
-      score = $("input[name='score-selection-#{i}']:checked").val()
-      score_lst.push(score)
-
-    return score_lst
 
   ajax_callback: (response) =>
     # always clear out errors and messages on transition.
@@ -285,12 +262,13 @@ class @StaffGrading
 
   skip_and_get_next: () =>
     data =
-      score: @grade
-      rubric_scores: @get_score_list()
+      score: Rubric.get_total_score()
+      rubric_scores: Rubric.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
       skipped: true
+      submission_flagged: false
     @backend.post('save_grade', data, @ajax_callback)
 
   get_problem_list: () ->
@@ -299,11 +277,12 @@ class @StaffGrading
 
   submit_and_get_next: () ->
     data =
-      score: @grade
-      rubric_scores: @get_score_list()
+      score: Rubric.get_total_score()
+      rubric_scores: Rubric.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
+      submission_flagged: @flag_submission_checkbox.is(':checked')
     
     @backend.post('save_grade', data, @ajax_callback)
 
@@ -361,6 +340,7 @@ class @StaffGrading
     @error_container.html(@error_msg)
     @message_container.toggle(@message != "")
     @error_container.toggle(@error_msg != "")
+    @flag_submission_checkbox.prop('checked', false)
 
 
     # only show the grading elements when we are not in list view or the state
@@ -424,10 +404,10 @@ class @StaffGrading
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
-      meta_list = $("<ul>")
-      meta_list.append("<li><span class='meta-info'>Available - </span> #{@num_pending}</li>")
-      meta_list.append("<li><span class='meta-info'>Graded - </span> #{@num_graded}</li>")
-      meta_list.append("<li><span class='meta-info'>Needed for ML - </span> #{Math.max(@min_for_ml - @num_graded, 0)}</li>")
+      meta_list = $("<div>")
+      meta_list.append("<div class='meta-info'>#{@num_pending} available | </div>")
+      meta_list.append("<div class='meta-info'>#{@num_graded} graded | </div>")
+      meta_list.append("<div class='meta-info'>#{Math.max(@min_for_ml - @num_graded, 0)} more needed to start ML </div><br/>")
       @problem_meta_info.html(meta_list)
 
       @prompt_container.html(@prompt)
@@ -464,7 +444,19 @@ class @StaffGrading
       @get_next_submission(@location)
     else
       @error('System got into invalid state for submission: ' + @state)
-  
+
+  collapse_question: () =>
+    @prompt_container.slideToggle()
+    @prompt_container.toggleClass('open')
+    if @question_header.text() == "(Hide)"
+      Logger.log 'staff_grading_hide_question', {location: @location}
+      new_text = "(Show)"
+    else
+      Logger.log 'staff_grading_show_question', {location: @location}
+      new_text = "(Hide)"
+    @question_header.text(new_text)
+
+
 
 # for now, just create an instance and load it...
 mock_backend = false

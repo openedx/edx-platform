@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Tabs</%block>
-<%block name="bodyclass">static-pages</%block>
+<%block name="title">Static Pages</%block>
+<%block name="bodyclass">is-signedin course pages static-pages</%block>
 
 <%block name="jsextra">
   <script type='text/javascript'>
@@ -9,25 +9,49 @@
       el: $('.main-wrapper'),
       model: new CMS.Models.Module({
         id: '${context_course.location}'
-      })
+      }),
+      mast: $('.wrapper-mast')
     });
   </script>
 </%block>
 
 <%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions has-subtitle">
+    <div class="title">
+      <span class="title-sub">Course Content</span>
+      <h1 class="title-1">Static Pages</h1>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Page Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="button new-button new-tab"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Page</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <div class="introduction has-links">
+      <p class="copy">Static Pages are additional pages that supplement your Courseware. Other course authors have used them to share a syllabus, calendar, handouts, and more.</p>
+      <nav class="nav-introduction-supplementary">
+        <ul>
+          <li class="nav-item">
+            <a rel="modal" href="#preview-lms-staticpages"><i class="ss-icon ss-symbolicons-block icon icon-information">&#x2753;</i>How do Static Pages look to students in my course?</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+</div>
+
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <article class="unit-body">
-      <div class="details">
-        <h2>Here you can add and manage additional pages for your course</h2> 
-        <p>These pages will be added to the primary navigation menu alongside Courseware, Course Info, Discussion, etc.</p>
-      </div>
-
-      <div class="page-actions">
-        <a href="#" class="new-button new-tab">
-          <span class="plus-icon white"></span>New Page
-        </a>
-      </div>
       
       <div class="tab-list">
         <ol class='components'>
@@ -42,5 +66,18 @@
       </div>
     </article>
   </div>
+</div>
+
+<div class="content-modal" id="preview-lms-staticpages">
+  <h3 class="title">How Static Pages are Used in Your Course</h3>
+  <figure>
+    <img src="/static/img/preview-lms-staticpages.png" alt="Preview of how Static Pages are used in your course" />
+    <figcaption class="description">These pages will be presented in your course's main navigation alongside Courseware, Course Info, Discussion, etc.</figcaption>
+  </figure>
+
+  <a href="#" rel="view" class="action action-modal-close">
+    <i class="ss-icon ss-symbolicons-block icon-close icon">&#x2421;</i>
+    <span class="label">close modal</span>
+  </a>
 </div>
 </%block>

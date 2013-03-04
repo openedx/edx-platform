@@ -111,7 +111,7 @@ class DragAndDrop(object):
         Returns: bool.
         '''
         for draggable in self.excess_draggables:
-            if not self.excess_draggables[draggable]:
+            if self.excess_draggables[draggable]:
                 return False  # user answer has more draggables than correct answer
 
         # Number of draggables in user_groups may be differ that in
@@ -304,8 +304,13 @@ class DragAndDrop(object):
 
         user_answer = json.loads(user_answer)
 
-        # check if we have draggables that are not in correct answer:
-        self.excess_draggables = {}
+        # This dictionary will hold a key for each draggable the user placed on
+        # the image.  The value is True if that draggable is not mentioned in any
+        # correct_answer entries.  If the draggable is mentioned in at least one
+        # correct_answer entry, the value is False.
+        # default to consider every user answer excess until proven otherwise.
+        self.excess_draggables = dict((users_draggable.keys()[0],True) 
+            for users_draggable in user_answer['draggables'])
 
         # create identical data structures from user answer and correct answer
         for i in xrange(0, len(correct_answer)):
@@ -322,11 +327,8 @@ class DragAndDrop(object):
                     self.user_groups[groupname].append(draggable_name)
                     self.user_positions[groupname]['user'].append(
                                             draggable_dict[draggable_name])
-                    self.excess_draggables[draggable_name] = True
-                else:
-                    self.excess_draggables[draggable_name] = \
-                    self.excess_draggables.get(draggable_name, False)
-
+                    # proved that this is not excess
+                    self.excess_draggables[draggable_name] = False
 
 def grade(user_input, correct_answer):
     """ Creates DragAndDrop instance from user_input and correct_answer and

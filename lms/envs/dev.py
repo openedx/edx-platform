@@ -106,25 +106,42 @@ VIRTUAL_UNIVERSITIES = []
 
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
+############################## Course static files ##########################
+if os.path.isdir(DATA_DIR):
+    # Add the full course repo if there is no static directory
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir)
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir) and
+            not os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
+    # Otherwise, add only the static directory from the course dir
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir / 'static')
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
+
+
 ################################# mitx revision string  #####################
 
 MITX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
 
-################################# Staff grading config  #####################
+################################# Open ended grading config  #####################
 
-STAFF_GRADING_INTERFACE = {
-    'url': 'http://127.0.0.1:3033/staff_grading',
-    'username': 'lms',
-    'password': 'abcd',
-    }
+OPEN_ENDED_GRADING_INTERFACE = {
+    'url' : 'http://127.0.0.1:3033/',
+    'username' : 'lms',
+    'password' : 'abcd',
+    'staff_grading' : 'staff_grading',
+    'peer_grading' : 'peer_grading',
+    'grading_controller' : 'grading_controller'
+}
 
-################################# Peer grading config  #####################
-
-PEER_GRADING_INTERFACE = {
-    'url': 'http://127.0.0.1:3033/peer_grading',
-    'username': 'lms',
-    'password': 'abcd',
-    }
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
@@ -144,7 +161,7 @@ INSTALLED_APPS += ('django_openid_auth',)
 
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
-OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'	# TODO: accept more endpoints
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'  	# TODO: accept more endpoints
 OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']

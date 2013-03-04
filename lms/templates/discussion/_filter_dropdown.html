@@ -11,7 +11,7 @@
 </%def>
 
 <%def name="render_entry(entries, entry)">
-    <li><a href="#"><span class="board-name" data-discussion_id='${json.dumps(entries[entry])}'>${entry}</span></a></li>
+    <li><a href="#"><span class="board-name" data-discussion_id='${json.dumps(entries[entry])}' cohorted = "${entries[entry]['id'] in cohorted_commentables}">${entry}</span></a></li>
 </%def>
 
 <%def name="render_category(categories, category)">
@@ -30,7 +30,7 @@
     <ul class="browse-topic-drop-menu">
         <li>
             <a href="#">
-                <span class="board-name" data-discussion_id='#all'>All</span>
+                <span class="board-name" data-discussion_id='#all'>Show All Discussions</span>
             </a>
         </li>
         <li>

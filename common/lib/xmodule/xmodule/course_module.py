@@ -147,37 +147,37 @@ class CourseDescriptor(SequenceDescriptor):
         """
         Return a dict which is a copy of the default grading policy
         """
-        default = {"GRADER" : [
+        default = {"GRADER": [
                 {
-                    "type" : "Homework",
-                    "min_count" : 12,
-                    "drop_count" : 2,
-                    "short_label" : "HW",
-                    "weight" : 0.15
+                    "type": "Homework",
+                    "min_count": 12,
+                    "drop_count": 2,
+                    "short_label": "HW",
+                    "weight": 0.15
                 },
                 {
-                    "type" : "Lab",
-                    "min_count" : 12,
-                    "drop_count" : 2,
-                    "weight" : 0.15
+                    "type": "Lab",
+                    "min_count": 12,
+                    "drop_count": 2,
+                    "weight": 0.15
                 },
                 {
-                    "type" : "Midterm Exam",
-                    "short_label" : "Midterm",
-                    "min_count" : 1,
-                    "drop_count" : 0,
-                    "weight" : 0.3
+                    "type": "Midterm Exam",
+                    "short_label": "Midterm",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "weight": 0.3
                 },
                 {
-                    "type" : "Final Exam",
-                    "short_label" : "Final",
-                    "min_count" : 1,
-                    "drop_count" : 0,
-                    "weight" : 0.4
+                    "type": "Final Exam",
+                    "short_label": "Final",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "weight": 0.4
                 }
             ],
-            "GRADE_CUTOFFS" : {
-                "Pass" : 0.5
+            "GRADE_CUTOFFS": {
+                "Pass": 0.5
             }}
         return copy.deepcopy(default)
 
@@ -230,8 +230,8 @@ class CourseDescriptor(SequenceDescriptor):
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
-        course_file = StringIO(xml_data.encode('ascii','ignore'))
-        xml_obj = etree.parse(course_file,parser=edx_xml_parser).getroot()
+        course_file = StringIO(xml_data.encode('ascii', 'ignore'))
+        xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None
         url_name = xml_obj.get('url_name', xml_obj.get('slug'))
@@ -329,7 +329,7 @@ class CourseDescriptor(SequenceDescriptor):
     def raw_grader(self, value):
         # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
         self._grading_policy['RAW_GRADER'] = value
-        self.definition['data'].setdefault('grading_policy',{})['GRADER'] = value
+        self.definition['data'].setdefault('grading_policy', {})['GRADER'] = value
 
     @property
     def grade_cutoffs(self):
@@ -338,7 +338,7 @@ class CourseDescriptor(SequenceDescriptor):
     @grade_cutoffs.setter
     def grade_cutoffs(self, value):
         self._grading_policy['GRADE_CUTOFFS'] = value
-        self.definition['data'].setdefault('grading_policy',{})['GRADE_CUTOFFS'] = value
+        self.definition['data'].setdefault('grading_policy', {})['GRADE_CUTOFFS'] = value
 
 
     @property
@@ -351,6 +351,13 @@ class CourseDescriptor(SequenceDescriptor):
         Return the tabs config, as a python object, or None if not specified.
         """
         return self.metadata.get('tabs')
+
+    @property
+    def pdf_textbooks(self):
+        """
+        Return the pdf_textbooks config, as a python object, or None if not specified.
+        """
+        return self.metadata.get('pdf_textbooks')
 
     @tabs.setter
     def tabs(self, value):
@@ -372,12 +379,34 @@ class CourseDescriptor(SequenceDescriptor):
         return bool(config.get("cohorted"))
 
     @property
+    def auto_cohort(self):
+        """
+        Return whether the course is auto-cohorted.
+        """
+        if not self.is_cohorted:
+            return False
+
+        return bool(self.metadata.get("cohort_config", {}).get(
+            "auto_cohort", False))
+
+    @property
+    def auto_cohort_groups(self):
+        """
+        Return the list of groups to put students into.  Returns [] if not
+        specified. Returns specified list even if is_cohorted and/or auto_cohort are
+        false.
+        """
+        return self.metadata.get("cohort_config", {}).get(
+            "auto_cohort_groups", [])
+
+    
+    @property
     def top_level_discussion_topic_ids(self):
         """
         Return list of topic ids defined in course policy.
         """
         topics = self.metadata.get("discussion_topics", {})
-        return [d["id"] for d in topics.values()] 
+        return [d["id"] for d in topics.values()]
 
 
     @property
@@ -436,17 +465,17 @@ class CourseDescriptor(SequenceDescriptor):
         scale = 300.0  # about a year
         if announcement:
             days = (now - announcement).days
-            score = -exp(-days/scale)
+            score = -exp(-days / scale)
         else:
             days = (now - start).days
-            score = exp(days/scale)
+            score = exp(days / scale)
         return score
 
     def _sorting_dates(self):
         # utility function to get datetime objects for dates used to
         # compute the is_new flag and the sorting_score
         def to_datetime(timestamp):
-            return datetime.fromtimestamp(time.mktime(timestamp))
+            return datetime(*timestamp[:6])
 
         def get_date(field):
             timetuple = self._try_parse_time(field)
@@ -501,16 +530,16 @@ class CourseDescriptor(SequenceDescriptor):
                     xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
-                    section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : filter(lambda child: child.has_score, xmoduledescriptors) }
+                    section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)}
 
                     section_format = s.metadata.get('format', "")
-                    graded_sections[ section_format ] = graded_sections.get( section_format, [] ) + [section_description]
+                    graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
 
                     all_descriptors.extend(xmoduledescriptors)
                     all_descriptors.append(s)
 
-        return { 'graded_sections' : graded_sections,
-                 'all_descriptors' : all_descriptors,}
+        return {'graded_sections': graded_sections,
+                 'all_descriptors': all_descriptors, }
 
 
     @staticmethod
@@ -636,7 +665,7 @@ class CourseDescriptor(SequenceDescriptor):
             # *end* of the same day, not the same time.  It's going to be used as the
             # end of the exam overall, so we don't want the exam to disappear too soon.
             # It's also used optionally as the registration end date, so time matters there too.
-            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date') # or self.first_eligible_appointment_date
+            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')   # or self.first_eligible_appointment_date
             if self.last_eligible_appointment_date is None:
                 raise ValueError("Last appointment date must be specified")
             self.registration_start_date = self._try_parse_time('Registration_Start_Date') or time.gmtime(0)
@@ -648,7 +677,7 @@ class CourseDescriptor(SequenceDescriptor):
                 raise ValueError("First appointment date must be before last appointment date")
             if self.registration_end_date > self.last_eligible_appointment_date:
                 raise ValueError("Registration end date must be before last appointment date")
-
+            self.exam_url = exam_info.get('Exam_URL')
 
         def _try_parse_time(self, key):
             """
@@ -704,6 +733,10 @@ class CourseDescriptor(SequenceDescriptor):
         else:
             return None
 
+    def get_test_center_exam(self, exam_series_code):
+        exams = [exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
+        return exams[0] if len(exams) == 1 else None
+
     @property
     def title(self):
         return self.display_name
@@ -715,4 +748,3 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
-

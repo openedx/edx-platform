@@ -20,7 +20,6 @@ Longer TODO:
 """
 
 import sys
-import tempfile
 import os.path
 import os
 import lms.envs.common
@@ -33,8 +32,8 @@ MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
     'GITHUB_PUSH': False,
     'ENABLE_DISCUSSION_SERVICE': False,
-    'AUTH_USE_MIT_CERTIFICATES' : False,
-    'STUB_VIDEO_FOR_TESTING': False, # do not display video when running automated acceptance tests
+    'AUTH_USE_MIT_CERTIFICATES': False,
+    'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
 }
 ENABLE_JASMINE = False
 
@@ -59,7 +58,8 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
-MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
+from tempdir import mkdtemp_clean
+MAKO_MODULE_DIR = mkdtemp_clean('mako')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
@@ -74,8 +74,8 @@ TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
 MITX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/login'
-LOGIN_URL = MITX_ROOT_URL + '/login'
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/signin'
+LOGIN_URL = MITX_ROOT_URL + '/signin'
 
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -165,19 +165,15 @@ STATICFILES_DIRS = [
 # This is how you would use the textbook images locally
 #    ("book", ENV_ROOT / "book_images")
 ]
-if os.path.isdir(GITHUB_REPO_ROOT):
-    STATICFILES_DIRS += [
-        # TODO (cpennington): When courses aren't loaded from github, remove this
-        (course_dir, GITHUB_REPO_ROOT / course_dir)
-        for course_dir in os.listdir(GITHUB_REPO_ROOT)
-        if os.path.isdir(GITHUB_REPO_ROOT / course_dir)
-    ]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'            # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
 USE_L10N = True
+
+# Tracking
+TRACK_MAX_EVENT = 10000
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -229,7 +225,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.coffee') +
             rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.coffee')
-        ) + [ 'js/hesitate.js', 'js/base.js'],
+        ) + ['js/hesitate.js', 'js/base.js'],
         'output_filename': 'js/cms-application.js',
     },
     'module-js': {
@@ -282,7 +278,12 @@ INSTALLED_APPS = (
     'auth',
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run
+
+    # tracking
+    'track',
+
     # For asset pipelining
     'pipeline',
     'staticfiles',
+    'static_replace',
 )

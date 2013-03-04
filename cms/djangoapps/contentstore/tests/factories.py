@@ -1,8 +1,9 @@
 from factory import Factory
 from datetime import datetime
-import uuid
-from time import gmtime
 from uuid import uuid4
+from student.models import (User, UserProfile, Registration,
+                            CourseEnrollmentAllowed)
+from django.contrib.auth.models import Group
 
 from django.contrib.auth.models import Group
 
@@ -13,54 +14,44 @@ from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed)
 from django.contrib.auth.models import Group
 
-def XMODULE_COURSE_CREATION(class_to_create, **kwargs): 
-    return XModuleCourseFactory._create(class_to_create, **kwargs)
+class UserProfileFactory(Factory):
+    FACTORY_FOR = UserProfile
 
-def XMODULE_ITEM_CREATION(class_to_create, **kwargs):
-    return XModuleItemFactory._create(class_to_create, **kwargs)
+    user = None
+    name = 'Robot Studio'
+    courseware = 'course.xml'
 
-class XModuleCourseFactory(Factory):
-    """
-    Factory for XModule courses.
-    """
 
-    ABSTRACT_FACTORY = True
-    _creation_function = (XMODULE_COURSE_CREATION,)
+class RegistrationFactory(Factory):
+    FACTORY_FOR = Registration
 
-    @classmethod
-    def _create(cls, target_class, *args, **kwargs):
+    user = None
+    activation_key = uuid4().hex
 
-        template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
-        org = kwargs.get('org')
-        number = kwargs.get('number')
-        display_name = kwargs.get('display_name')
-        location = Location('i4x', org, number, 
-                            'course', Location.clean(display_name))
 
-        store = modulestore('direct')
+class UserFactory(Factory):
+    FACTORY_FOR = User
 
-        # Write the data to the mongo datastore
-        new_course = store.clone_item(template, location)
+    username = 'robot'
+    email = 'robot@edx.org'
+    password = 'test'
+    first_name = 'Robot'
+    last_name = 'Tester'
+    is_staff = False
+    is_active = True
+    is_superuser = False
+    last_login = datetime.now()
+    date_joined = datetime.now()
 
-        # This metadata code was copied from cms/djangoapps/contentstore/views.py
-        if display_name is not None:
-            new_course.metadata['display_name'] = display_name
 
-        new_course.metadata['data_dir'] = uuid4().hex
-        new_course.metadata['start'] = stringify_time(gmtime())
-        new_course.tabs = [{"type": "courseware"}, 
-            {"type": "course_info", "name": "Course Info"}, 
-            {"type": "discussion", "name": "Discussion"},
-            {"type": "wiki", "name": "Wiki"},
-            {"type": "progress", "name": "Progress"}]
+class GroupFactory(Factory):
+    FACTORY_FOR = Group
 
-        # Update the data in the mongo datastore
-        store.update_metadata(new_course.location.url(), new_course.own_metadata)   
+    name = 'test_group'
 
-        return new_course
 
-class Course:
-    pass
+class CourseEnrollmentAllowedFactory(Factory):
+    FACTORY_FOR = CourseEnrollmentAllowed
 
 class CourseFactory(XModuleCourseFactory):
     FACTORY_FOR = Course
@@ -157,6 +148,3 @@ class GroupFactory(Factory):
 
 class CourseEnrollmentAllowedFactory(Factory):
     FACTORY_FOR = CourseEnrollmentAllowed
-
-    email = 'test@edx.org'
-    course_id = 'edX/test/2012_Fall'

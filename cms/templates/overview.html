@@ -6,7 +6,8 @@
    from datetime import datetime
 %>
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">CMS Courseware Overview</%block>
+<%block name="title">Course Outline</%block>
+<%block name="bodyclass">is-signedin course outline</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
@@ -18,6 +19,7 @@
   <script src="${static.url('js/vendor/date.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
 
   <script type="text/javascript">
@@ -118,12 +120,32 @@
     </div>
   </div>
 
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <div class="title">
+        <span class="title-sub">Course Content</span>
+        <h1 class="title-1">Course Outline</h1>
+      </div>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Page Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block icon">up</i> <span class="label">Collapse All Sections</span></a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="button new-button new-courseware-section-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Section</a>
+          </li>
+          <li class="nav-item">
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <div class="page-actions">
-        <a href="#" class="new-button new-courseware-section-button"><span class="plus-icon white"></span> New Section</a>
-        <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block">up</i> <span class="label">Collapse All Sections</span></a>
-      </div>
       <article class="courseware-overview" data-course-id="${context_course.location.url()}">        
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
@@ -134,7 +156,7 @@
               <h3 class="section-name">
                 <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
                 <form class="section-name-edit" style="display:none">
-                  <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
+                  <input type="text" value="${section.display_name | h}" class="edit-section-name" autocomplete="off"/>
                   <input type="submit" class="save-button edit-section-name-save" value="Save" />
                   <input type="button" class="cancel-button edit-section-name-cancel" value="Cancel" />
                 </form>

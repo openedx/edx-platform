@@ -13,13 +13,7 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
 from django.db import models
-#from django.core.cache import cache
 from django.contrib.auth.models import User
-
-#from cache_toolbox import cache_model, cache_relation
-
-#CACHE_TIMEOUT = 60 * 60 * 4 # Set the cache timeout to be four hours
-
 
 class StudentModule(models.Model):
     """
@@ -30,6 +24,7 @@ class StudentModule(models.Model):
     MODULE_TYPES = (('problem', 'problem'),
                     ('video', 'video'),
                     ('html', 'html'),
+                    ('timelimit', 'timelimit'),
                     )
     ## These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
@@ -113,6 +108,9 @@ class StudentModuleCache(object):
                                          descriptor_filter=lambda descriptor: True,
                                          select_for_update=False):
         """
+        obtain and return cache for descriptor descendents (ie children) AND modules required by the descriptor,
+        but which are not children of the module
+
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
         descriptor: An XModuleDescriptor
@@ -132,7 +130,7 @@ class StudentModuleCache(object):
             if depth is None or depth > 0:
                 new_depth = depth - 1 if depth is not None else depth
 
-                for child in descriptor.get_children():
+                for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
                     descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
 
             return descriptors
@@ -209,7 +207,7 @@ class OfflineComputedGradeLog(models.Model):
 
     course_id = models.CharField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
-    seconds = models.IntegerField(default=0)	# seconds elapsed for computation
+    seconds = models.IntegerField(default=0)  	# seconds elapsed for computation
     nstudents = models.IntegerField(default=0)
 
     def __unicode__(self):

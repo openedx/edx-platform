@@ -1,90 +1,90 @@
 
 input.courseware-unit-search-input {
-	float: left;
-	width: 260px;
-	background-color: #fff;
+    float: left;
+    width: 260px;
+    background-color: #fff;
 }
 
 .branch {
 
-	.section-item {
-	  @include clearfix();
+    .section-item {
+      @include clearfix();
 
-	  .details {
-	  	display: block;
-	    float: left;
-	    margin-bottom: 0;
-	    width: 650px;
-	  }
+      .details {
+        display: block;
+        float: left;
+        margin-bottom: 0;
+        width: 650px;
+      }
 
-	  .gradable-status {
-	    float: right;
-	    position: relative;
-	    top: -4px;
-	    right: 50px;
-	    width: 145px;
+      .gradable-status {
+        float: right;
+        position: relative;
+        top: -4px;
+        right: 50px;
+        width: 145px;
 
-	    .status-label {
-	      position: absolute;
-	      top: 2px;
-	      right: -5px;
-	      display: none;
-	      width: 110px;
-	      padding: 5px 40px 5px 10px;
-	      @include border-radius(3px);
-	      color: $lightGrey;
-	      text-align: right;
-	      font-size: 12px;
-	      font-weight: bold;
-	      line-height: 16px;
-	    }
+        .status-label {
+          position: absolute;
+          top: 2px;
+          right: -5px;
+          display: none;
+          width: 110px;
+          padding: 5px 40px 5px 10px;
+          @include border-radius(3px);
+          color: $lightGrey;
+          text-align: right;
+          font-size: 12px;
+          font-weight: bold;
+          line-height: 16px;
+        }
 
-	    .menu-toggle {
-	    	  z-index: 10;
-	    	  position: absolute;
-	    	  top: 0;
-	    	  right: 5px;
-	    	  padding: 5px;
-	    	  color: $mediumGrey;
+        .menu-toggle {
+              z-index: 10;
+              position: absolute;
+              top: 0;
+              right: 5px;
+              padding: 5px;
+              color: $mediumGrey;
 
-	    	  &:hover, &.is-active {
-	    	    color: $blue;
-	    	  }
-	    	}
+              &:hover, &.is-active {
+                color: $blue;
+              }
+            }
 
-	    	.menu {
-	    	  z-index: 1;
-	    	  display: none;
-	    	  opacity: 0.0;
-	    	  position: absolute;
-	    	  top: -1px;
-	    	  left: 5px;
-	    	  margin: 0;
-	    	  padding: 8px 12px;
-	    	  background: $white;
-	    	  border: 1px solid $mediumGrey;
-	    	  font-size: 12px;
-	    	  @include border-radius(4px);
-	    	  @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
-	    	  @include transition(opacity .15s);
+            .menu {
+              z-index: 1;
+              display: none;
+              opacity: 0.0;
+              position: absolute;
+              top: -1px;
+              left: 5px;
+              margin: 0;
+              padding: 8px 12px;
+              background: $white;
+              border: 1px solid $mediumGrey;
+              font-size: 12px;
+              @include border-radius(4px);
+              @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
+              @include transition(opacity .15s);
 
 
-	    	  li {
-	    	    width: 115px;
-	    	    margin-bottom: 3px;
-	    	    padding-bottom: 3px;
-	    	    border-bottom: 1px solid $lightGrey;
+              li {
+                width: 115px;
+                margin-bottom: 3px;
+                padding-bottom: 3px;
+                border-bottom: 1px solid $lightGrey;
 
-	    	    &:last-child {
-	    	      margin-bottom: 0;
-	    	      padding-bottom: 0;
-	    	      border: none;
+                &:last-child {
+                  margin-bottom: 0;
+                  padding-bottom: 0;
+                  border: none;
 
-	    	      a {
-	    	        color: $darkGrey;
-	    	      }
-	    	    }
-	    	  }
+                  a {
+                    color: $darkGrey;
+                  }
+                }
+              }
 
           a {
             color: $blue;
@@ -127,262 +127,262 @@ input.courseware-unit-search-input {
 
 
 .courseware-section {
-	position: relative;
-	background: #fff;
-	border-radius: 3px;
-	border: 1px solid $mediumGrey;
-	margin-top: 15px;
-	padding-bottom: 12px;
-	@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+    position: relative;
+    background: #fff;
+    border-radius: 3px;
+    border: 1px solid $mediumGrey;
+    margin-top: 15px;
+    padding-bottom: 12px;
+    @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
 
-	&:first-child {
-		margin-top: 0;
-	}
+    &:first-child {
+        margin-top: 0;
+    }
 
-	&.collapsed {
-		padding-bottom: 0;
-	}
+    &.collapsed {
+        padding-bottom: 0;
+    }
 
-	label {
-		float: left;
-		line-height: 29px;
-	}
+    label {
+        float: left;
+        line-height: 29px;
+    }
 
-	.datepair {
-		float: left;
-		margin-left: 10px;
-	}
+    .datepair {
+        float: left;
+        margin-left: 10px;
+    }
 
-	.section-published-date {
-		position: absolute;
-		top: 19px;
-		right: 90px;
-		padding: 4px 10px;
-		border-radius: 3px;
-		background: $lightGrey;
-		text-align: right;
+    .section-published-date {
+        position: absolute;
+        top: 19px;
+        right: 90px;
+        padding: 4px 10px;
+        border-radius: 3px;
+        background: $lightGrey;
+        text-align: right;
 
-		.published-status {
-			font-size: 12px;
-			margin-right: 15px;
+        .published-status {
+            font-size: 12px;
+            margin-right: 15px;
 
-			strong {
-				font-weight: bold;
-			}
-		}
+            strong {
+                font-weight: bold;
+            }
+        }
 
-		.schedule-button {
-			@include blue-button;
-		}
+        .schedule-button {
+            @include blue-button;
+        }
 
-		.edit-button {
-			@include blue-button;
-		}
+        .edit-button {
+            @include blue-button;
+        }
 
-		.schedule-button,
-		.edit-button {
-			font-size: 11px;
-			padding: 3px 15px 5px;
-		}
-	}
+        .schedule-button,
+        .edit-button {
+            font-size: 11px;
+            padding: 3px 15px 5px;
+        }
+    }
 
-	.datepair .date,
-	.datepair .time {
-		padding-left: 0;
-		padding-right: 0;
-		border: none;
-		background: none;
-		@include box-shadow(none);
-		font-size: 13px;
-		font-weight: bold;
-		color: $blue;
-		cursor: pointer;
-	}
+    .datepair .date,
+    .datepair .time {
+        padding-left: 0;
+        padding-right: 0;
+        border: none;
+        background: none;
+        @include box-shadow(none);
+        font-size: 13px;
+        font-weight: bold;
+        color: $blue;
+        cursor: pointer;
+    }
 
-	.datepair .date {
-		width: 80px;
-	}
+    .datepair .date {
+        width: 80px;
+    }
 
-	.datepair .time {
-		width: 65px;
-	}
+    .datepair .time {
+        width: 65px;
+    }
 
-	&.collapsed .subsection-list,
-	.collapsed .subsection-list,
-	.collapsed > ol {
-		display: none !important;
-	}
+    &.collapsed .subsection-list,
+    .collapsed .subsection-list,
+    .collapsed > ol {
+        display: none !important;
+    }
 
-	header {
-		min-height: 75px;
-		@include clearfix();
+    header {
+        min-height: 75px;
+        @include clearfix();
 
-		.item-details, .section-published-date {
+        .item-details, .section-published-date {
 
-		}
+        }
 
-		.item-details {
-			display: inline-block;
-			padding: 20px 0 10px 0;
-			@include clearfix();
+        .item-details {
+            display: inline-block;
+            padding: 20px 0 10px 0;
+            @include clearfix();
 
-			.section-name {
-			  float: left;
-			  margin-right: 10px;
-			  width: 350px;
-			  font-size: 19px;
-			  font-weight: bold;
-			  color: $blue;
-			}
+            .section-name {
+              float: left;
+              margin-right: 10px;
+              width: 350px;
+              font-size: 19px;
+              font-weight: bold;
+              color: $blue;
+            }
 
-			.section-name-span {
-			  cursor: pointer;
-			  @include transition(color .15s);
+            .section-name-span {
+              cursor: pointer;
+              @include transition(color .15s);
 
-			  &:hover {
-			    color: $orange;
-			  }
-			}
+              &:hover {
+                color: $orange;
+              }
+            }
 
-			.section-name-edit {
-			  position: relative;
-			  width: 400px;
-			  background: $white;
+            .section-name-edit {
+              position: relative;
+              width: 400px;
+              background: $white;
 
-			  input {
-	  	    font-size: 16px;        
-	  	  }
-	  	                    
-	  	  .save-button {
-	  	    @include blue-button;
-	  	    padding: 7px 20px 7px;
-	  	    margin-right: 5px;
-	  	  }
+              input {
+            font-size: 16px;        
+          }
+                            
+          .save-button {
+            @include blue-button;
+            padding: 7px 20px 7px;
+            margin-right: 5px;
+          }
 
-	  	  .cancel-button {
-	  	    @include white-button;
-	  	    padding: 7px 20px 7px;
-	  	  }
-	  	}
+          .cancel-button {
+            @include white-button;
+            padding: 7px 20px 7px;
+          }
+        }
 
-	  	.section-published-date {
-	  	  float: right;
-	  	  width: 265px;
-	  	  margin-right: 220px;                              
-	  	  @include border-radius(3px);
-	  	  background: $lightGrey;
+        .section-published-date {
+          float: right;
+          width: 265px;
+          margin-right: 220px;                              
+          @include border-radius(3px);
+          background: $lightGrey;
 
-	  	  .published-status {
-	  	    font-size: 12px;
-	  	    margin-right: 15px;
+          .published-status {
+            font-size: 12px;
+            margin-right: 15px;
 
-	  	    strong {
-	  	      font-weight: bold;
-	  	    }
-	  	  }
+            strong {
+              font-weight: bold;
+            }
+          }
 
-	  	  .schedule-button {
-	  	    @include blue-button;
-	  	  }
+          .schedule-button {
+            @include blue-button;
+          }
 
-	  	  .edit-button {
-	  	    @include blue-button;
-	  	  }
+          .edit-button {
+            @include blue-button;
+          }
 
-	  	  .schedule-button,
-	  	  .edit-button {
-	  	    font-size: 11px;
-	  	    padding: 3px 15px 5px;
-	  	   
-	  	    }
-	  	  }
+          .schedule-button,
+          .edit-button {
+            font-size: 11px;
+            padding: 3px 15px 5px;
+           
+            }
+          }
 
-	  	  .gradable-status {
-	  	    position: absolute;
-	  	    top: 20px;
-	  	    right: 70px;
-	  	    width: 145px;
+          .gradable-status {
+            position: absolute;
+            top: 20px;
+            right: 70px;
+            width: 145px;
 
-	  	    .status-label {
-	  	      position: absolute;
-	  	      top: 0;
-	  	      right: 2px;
-	  	      display: none;
-	  	      width: 100px;
-	  	      padding: 10px 35px 10px 10px;
-	  	      @include border-radius(3px);
-	  	      background: $lightGrey;
-	  	      color: $lightGrey;
-	  	      text-align: right;
-	  	      font-size: 12px;
-	  	      font-weight: bold;
-	  	      line-height: 16px;
-	  	    }
+            .status-label {
+              position: absolute;
+              top: 0;
+              right: 2px;
+              display: none;
+              width: 100px;
+              padding: 10px 35px 10px 10px;
+              @include border-radius(3px);
+              background: $lightGrey;
+              color: $lightGrey;
+              text-align: right;
+              font-size: 12px;
+              font-weight: bold;
+              line-height: 16px;
+            }
 
-	  	    .menu-toggle {
-	  	      z-index: 10;
-	  	      position: absolute;
-	  	      top: 2px;
-	  	      right: 5px;
-	  	      padding: 5px;
-	  	      color: $lightGrey;
+            .menu-toggle {
+              z-index: 10;
+              position: absolute;
+              top: 2px;
+              right: 5px;
+              padding: 5px;
+              color: $lightGrey;
 
-	  	      &:hover, &.is-active {
-	  	        color: $blue;
-	  	      }
-	  	    }
+              &:hover, &.is-active {
+                color: $blue;
+              }
+            }
 
-	  	    .menu {
-	  	      z-index: 1;
-	  	      display: none;
-	  	      opacity: 0.0;
-	  	      position: absolute;
-	  	      top: -1px;
-	  	      left: 2px;
-	          margin: 0;
-	          padding: 8px 12px;
-	          background: $white;
-	          border: 1px solid $mediumGrey;
-	          font-size: 12px;
-	          @include border-radius(4px);
-	          @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
-	          @include transition(opacity .15s);
-	          @include transition(display .15s);
+            .menu {
+              z-index: 1;
+              display: none;
+              opacity: 0.0;
+              position: absolute;
+              top: -1px;
+              left: 2px;
+              margin: 0;
+              padding: 8px 12px;
+              background: $white;
+              border: 1px solid $mediumGrey;
+              font-size: 12px;
+              @include border-radius(4px);
+              @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
+              @include transition(opacity .15s);
+              @include transition(display .15s);
 
 
-	          li {
-	            width: 115px;
-	            margin-bottom: 3px;
-	            padding-bottom: 3px;
-	            border-bottom: 1px solid $lightGrey;
+              li {
+                width: 115px;
+                margin-bottom: 3px;
+                padding-bottom: 3px;
+                border-bottom: 1px solid $lightGrey;
 
-	            &:last-child {
-	              margin-bottom: 0;
-	              padding-bottom: 0;
-	              border: none;
+                &:last-child {
+                  margin-bottom: 0;
+                  padding-bottom: 0;
+                  border: none;
 
-	              a {
-	                color: $darkGrey;
-	              }
-	            }
-	          }
+                  a {
+                    color: $darkGrey;
+                  }
+                }
+              }
 
-	          a {
+              a {
 
-	            &.is-selected {
-	              font-weight: bold;
-	            }
-	          }
-	      }
+                &.is-selected {
+                  font-weight: bold;
+                }
+              }
+          }
 
-	      // dropdown state
-	      &.is-active {
+          // dropdown state
+          &.is-active {
 
-	        .menu {
-	          z-index: 1000;
-	          display: block;
-	          opacity: 1.0;
-	        }
+            .menu {
+              z-index: 1000;
+              display: block;
+              opacity: 1.0;
+            }
 
 
           .menu-toggle {
@@ -408,256 +408,282 @@ input.courseware-unit-search-input {
       }
     }
 
-		.item-actions {			
-			margin-top: 21px;
-			margin-right: 12px;
+        .item-actions {         
+            margin-top: 21px;
+            margin-right: 12px;
 
-			.edit-button,
-			.delete-button {
-				margin-top: -3px;
-			}
-		}
+            .edit-button,
+            .delete-button {
+                margin-top: -3px;
+            }
+        }
 
-		.expand-collapse-icon {
-			float: left;
-			margin: 29px 6px 16px 16px;
-			@include transition(none);
+        .expand-collapse-icon {
+            float: left;
+            margin: 29px 6px 16px 16px;
+            @include transition(none);
 
-			&.expand {
-				background-position: 0 0;
-			}
+            &.expand {
+                background-position: 0 0;
+            }
 
-			&.collapsed {
-				
-			}
-		}
+            &.collapsed {
+                
+            }
+        }
 
-		.drag-handle {
-			margin-left: 11px;
-		}
-	}
+        .drag-handle {
+            margin-left: 11px;
+        }
+    }
 
-	h3 {
-		font-size: 19px;
-		font-weight: 700;
-		color: $blue;
-	}
+    h3 {
+        font-size: 19px;
+        font-weight: 700;
+        color: $blue;
+    }
 
-	.section-name-span {
-		cursor: pointer;
-		@include transition(color .15s);
+    .section-name-span {
+        cursor: pointer;
+        @include transition(color .15s);
 
-		&:hover {
-			color: $orange;
-		}
-	}
+        &:hover {
+            color: $orange;
+        }
+    }
 
-	.section-name-form {
-		margin-bottom: 15px;
-	}
+    .section-name-form {
+        margin-bottom: 15px;
+    }
 
-	.section-name-edit {
-		input {
-			font-size: 16px;
-		}
-		
-		.save-button {
-			@include blue-button;
-			padding: 7px 20px 7px;
-			margin-right: 5px;
-		}
+    .section-name-edit {
+        input {
+            font-size: 16px;
+        }
+        
+        .save-button {
+            @include blue-button;
+            padding: 7px 20px 7px;
+            margin-right: 5px;
+        }
 
-		.cancel-button {
-			@include white-button;
-			padding: 7px 20px 7px;
-		}
-	}
+        .cancel-button {
+            @include white-button;
+            padding: 7px 20px 7px;
+        }
+    }
 
-	h4 {
-		font-size: 12px;
-		color: #878e9d;
+    h4 {
+        font-size: 12px;
+        color: #878e9d;
 
-		strong {
-			font-weight: bold;
-		}
-	}
+        strong {
+            font-weight: bold;
+        }
+    }
 
-	.list-header {
-		@include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
-		background-color: #ced2db;
-		border-radius: 3px 3px 0 0;
-	}
+    .list-header {
+        @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
+        background-color: #ced2db;
+        border-radius: 3px 3px 0 0;
+    }
 
-	.subsection-list {
-		margin: 0 12px;
+    .subsection-list {
+        margin: 0 12px;
 
-		> ol {
-			@include tree-view;
-			border-top-width: 0;
-		}
-	}
+        > ol {
+            @include tree-view;
+            border-top-width: 0;
+        }
+    }
 
-	&.new-section {
-		header {
-			height: auto;
-			@include clearfix();
-		}
+    &.new-section {
 
-		.expand-collapse-icon {
-			visibility: hidden;
-		}
-	}
+        header {
+            height: auto;
+            @include clearfix();
+        }
+
+        .expand-collapse-icon {
+            visibility: hidden;
+        }
+
+        .item-details {
+          padding: 25px 0 0 0;
+
+          .section-name {
+            float: none;
+            width: 100%;
+          }
+        }
+    }
 }
 
 .toggle-button-sections {
-	display: none;
-	position: relative;
-	float: right;
-	margin-top: 10px;
+    display: none;
+    position: relative;
+    float: right;
+    margin-top: 10px;
 
-	font-size: 13px;
-	color: $darkGrey;
+    font-size: 13px;
+    color: $darkGrey;
 
-	&.is-shown {
-		display: block;
-	}
+    &.is-shown {
+        display: block;
+    }
 
-	.ss-icon {
-		@include border-radius(20px);
-		position: relative;
-		top: -1px;
-		display: inline-block;
-		margin-right: 2px;
-		line-height: 5px;
-		font-size: 11px;
-	}
+    .ss-icon {
+        @include border-radius(20px);
+        position: relative;
+        top: -1px;
+        display: inline-block;
+        margin-right: 2px;
+        line-height: 5px;
+        font-size: 11px;
+    }
 
-	.label {
-		display: inline-block;
-	}
+    .label {
+        display: inline-block;
+    }
 }
 
 .new-section-name,
 .new-subsection-name-input {
-	width: 515px;
+    width: 515px;
 }
 
 .new-section-name-save,
 .new-subsection-name-save {
-	@include blue-button;
-	padding: 4px 20px 7px;
-	margin: 0 5px;
-	color: #fff !important;
+    @include blue-button;
+    padding: 4px 20px 7px;
+    margin: 0 5px;
+    color: #fff !important;
 }
 
 .new-section-name-cancel,
 .new-subsection-name-cancel {
-	@include white-button;
-	padding: 4px 20px 7px;
-	color: #8891a1 !important;
+    @include white-button;
+    padding: 4px 20px 7px;
+    color: #8891a1 !important;
 }
 
 .dummy-calendar {
-	display: none;
-	position: absolute;
-	top: 55px;
-	left: 110px;
-	z-index: 9999;
-	border: 1px solid #3C3C3C;
-	@include box-shadow(0 1px 15px rgba(0, 0, 0, .2));
+    display: none;
+    position: absolute;
+    top: 55px;
+    left: 110px;
+    z-index: 9999;
+    border: 1px solid #3C3C3C;
+    @include box-shadow(0 1px 15px rgba(0, 0, 0, .2));
 }
 
 .unit-name-input {
-	padding: 20px 40px;
+    padding: 20px 40px;
 
-	label {
-		display: block;
-	}
+    label {
+        display: block;
+    }
 
-	input {
-		width: 100%;
-		font-size: 20px;
-	}
+    input {
+        width: 100%;
+        font-size: 20px;
+    }
 }
 
 .preview {
-	background: url(../img/preview.jpg) center top no-repeat;
+    background: url(../img/preview.jpg) center top no-repeat;
 }
 
 .edit-subsection-publish-settings {
-	display: none;
-	position: fixed;
-	top: 100px;
-	left: 50%;
-	z-index: 99999;
-	width: 600px;
-	margin-left: -300px;
-	background: #fff;
-	text-align: center;
+    display: none;
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    z-index: 99999;
+    width: 600px;
+    margin-left: -300px;
+    background: #fff;
+    text-align: center;
 
-	.settings {
-		padding: 40px;
-	}
+    .settings {
+        padding: 40px;
+    }
 
-	h3 {
-		font-size: 34px;
-		font-weight: 300;
-	}
+    h3 {
+        font-size: 34px;
+        font-weight: 300;
+    }
 
-	.picker {
-		margin: 30px 0 65px;
-	}
+    .picker {
+        margin: 30px 0 65px;
+    }
 
-	.description {
-		margin-top: 30px;
-		font-size: 14px;
-		line-height: 20px;
-	}
+    .description {
+        margin-top: 30px;
+        font-size: 14px;
+        line-height: 20px;
+    }
 
-	strong {
-		font-weight: 700;
-	}
+    strong {
+        font-weight: 700;
+    }
 
-	.start-date,
-	.start-time {
-		font-size: 19px;
-	}
+    .start-date,
+    .start-time {
+        font-size: 19px;
+    }
 
-	.save-button {
-		@include blue-button;
-		margin-right: 10px;
-	}
+    .save-button {
+        @include blue-button;
+        margin-right: 10px;
+    }
 
-	.cancel-button {
-		@include white-button;
-	}
+    .cancel-button {
+        @include white-button;
+    }
 
-	.save-button,
-	.cancel-button {
-		font-size: 16px;
-	}
+    .save-button,
+    .cancel-button {
+        font-size: 16px;
+    }
 }
 
 .collapse-all-button {
-	float: right;
-	margin-top: 10px;
-	font-size: 13px;
-	color: $darkGrey;
+    float: right;
+    margin-top: 10px;
+    font-size: 13px;
+    color: $darkGrey;
 }
 
 // sort/drag and drop
 .ui-droppable {
-  min-height: 20px;
+    @include transition (padding 0.5s ease-in-out 0s);
+    min-height: 20px;
+    padding: 0;
 
-  &.dropover {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
+    &.dropover {
+        padding: 15px 0;
+    }
+}
+
+.ui-draggable-dragging {
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, .3));
+    border: 1px solid $darkGrey;
+    opacity : 0.2;
+    &:hover {
+        opacity : 1.0;    
+        .section-item {
+            background: $yellow !important;
+        }
+    }
+
+    // hiding unit button - temporary fix until this semantically corrected
+    .new-unit-item {
+      display: none;
+    }
 }
 
 ol.ui-droppable .branch:first-child .section-item {
-	border-top: none;
+    border-top: none;
 }
-
-
 

@@ -2,9 +2,9 @@ import json
 from mock import Mock, MagicMock, ANY
 import unittest
 
-from xmodule.openendedchild import OpenEndedChild
-from xmodule.open_ended_module import OpenEndedModule
-from xmodule.combined_open_ended_module import CombinedOpenEndedModule
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
+from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 
 from xmodule.modulestore import Location
 from lxml import etree
@@ -12,6 +12,8 @@ import capa.xqueue_interface as xqueue_interface
 from datetime import datetime
 
 from . import test_system
+
+import test_util_open_ended
 """
 Tests for the various pieces of the CombinedOpenEndedGrading system
 
@@ -19,6 +21,7 @@ OpenEndedChild
 OpenEndedModule
 
 """
+
 
 class OpenEndedChildTest(unittest.TestCase):
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
@@ -30,24 +33,30 @@ class OpenEndedChildTest(unittest.TestCase):
         <category>
         <description>Response Quality</description>
         <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>Second option</option>
         </category>
          </rubric></rubric>'''
-    max_score = 4
+    max_score = 1
 
     static_data = {
             'max_attempts': 20,
             'prompt': prompt,
             'rubric': rubric,
-            'max_score': max_score, 
-            'display_name': 'Name'
+            'max_score': max_score,
+            'display_name': 'Name',
+            'accept_file_upload': False,
+            'close_date': None,
+            's3_interface' : "",
+            'open_ended_grading_interface' : {},
+            'skip_basic_checks' : False,
             }
     definition = Mock()
     descriptor = Mock()
 
     def setUp(self):
-        self.openendedchild = OpenEndedChild(test_system, self.location, 
+        self.openendedchild = OpenEndedChild(test_system, self.location,
                 self.definition, self.descriptor, self.static_data, self.metadata) 
- 
+
 
     def test_latest_answer_empty(self):
         answer = self.openendedchild.latest_answer()
@@ -114,12 +123,12 @@ class OpenEndedChildTest(unittest.TestCase):
         self.assertEqual(score['score'], new_score)
         self.assertEqual(score['total'], self.static_data['max_score'])
 
-        
+
     def test_reset(self):
         self.openendedchild.reset(test_system)
         state = json.loads(self.openendedchild.get_instance_state())
         self.assertEqual(state['state'], OpenEndedChild.INITIAL)
-        
+
 
     def test_is_last_response_correct(self):
         new_answer = "New Answer"
@@ -132,6 +141,7 @@ class OpenEndedChildTest(unittest.TestCase):
         self.openendedchild.record_latest_score(0)
         self.assertEqual(self.openendedchild.is_last_response_correct(),
                 'incorrect')
+
 
 class OpenEndedModuleTest(unittest.TestCase):
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
@@ -151,8 +161,14 @@ class OpenEndedModuleTest(unittest.TestCase):
             'max_attempts': 20,
             'prompt': prompt,
             'rubric': rubric,
-            'max_score': max_score, 
-            'display_name': 'Name'
+            'max_score': max_score,
+            'display_name': 'Name',
+            'accept_file_upload': False,
+            'rewrite_content_links' : "",
+            'close_date': None,
+            's3_interface' : test_util_open_ended.S3_INTERFACE,
+            'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            'skip_basic_checks' : False,
             }
 
     oeparam = etree.XML('''
@@ -168,9 +184,9 @@ class OpenEndedModuleTest(unittest.TestCase):
     def setUp(self):
         test_system.location = self.location
         self.mock_xqueue = MagicMock()
-        self.mock_xqueue.send_to_queue.return_value=(None, "Message")
-        test_system.xqueue = {'interface':self.mock_xqueue, 'callback_url':'/', 'default_queuename': 'testqueue', 'waittime': 1}
-        self.openendedmodule = OpenEndedModule(test_system, self.location, 
+        self.mock_xqueue.send_to_queue.return_value = (None, "Message")
+        test_system.xqueue = {'interface': self.mock_xqueue, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 1}
+        self.openendedmodule = OpenEndedModule(test_system, self.location,
                 self.definition, self.descriptor, self.static_data, self.metadata) 
 
     def test_message_post(self):
@@ -192,8 +208,8 @@ class OpenEndedModuleTest(unittest.TestCase):
         result = self.openendedmodule.message_post(get, test_system)
         self.assertTrue(result['success'])
         # make sure it's actually sending something we want to the queue
-        self.mock_xqueue.send_to_queue.assert_called_with(body = json.dumps(contents), header=ANY)
-        
+        self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
+
         state = json.loads(self.openendedmodule.get_instance_state())
         self.assertIsNotNone(state['state'], OpenEndedModule.DONE)
 
@@ -203,21 +219,21 @@ class OpenEndedModuleTest(unittest.TestCase):
         student_info = {'anonymous_student_id': test_system.anonymous_student_id,
                 'submission_time': qtime}
         contents = self.openendedmodule.payload.copy()
-        contents.update({ 
+        contents.update({
             'student_info': json.dumps(student_info),
-            'student_response': submission, 
+            'student_response': submission,
             'max_score': self.max_score
             })
         result = self.openendedmodule.send_to_grader(submission, test_system)
         self.assertTrue(result)
-        self.mock_xqueue.send_to_queue.assert_called_with(body = json.dumps(contents), header=ANY)
+        self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
 
     def update_score_single(self):
         self.openendedmodule.new_history_entry("New Entry")
-        score_msg = { 
+        score_msg = {
                 'correct': True,
                 'score': 4,
-                'msg' : 'Grader Message',
+                'msg': 'Grader Message',
                 'feedback': "Grader Feedback"
                 }
         get = {'queuekey': "abcd",
@@ -230,10 +246,10 @@ class OpenEndedModuleTest(unittest.TestCase):
                 "success": True,
                 "feedback": "Grader Feedback"
                 }
-        score_msg = { 
+        score_msg = {
                 'correct': True,
                 'score': 4,
-                'msg' : 'Grader Message',
+                'msg': 'Grader Message',
                 'feedback': json.dumps(feedback),
                 'grader_type': 'IN',
                 'grader_id': '1',
@@ -259,6 +275,7 @@ class OpenEndedModuleTest(unittest.TestCase):
         score = self.openendedmodule.latest_score()
         self.assertEqual(score, 4)
 
+
 class CombinedOpenEndedModuleTest(unittest.TestCase):
     location = Location(["i4x", "edX", "open_ended", "combinedopenended",
                          "SampleQuestion"])
@@ -268,19 +285,26 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         <category>
         <description>Response Quality</description>
         <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>Second option</option>
         </category>
          </rubric></rubric>'''
-    max_score = 4
+    max_score = 1
 
     metadata = {'attempts': '10', 'max_score': max_score}
 
-    static_data = json.dumps({
+    static_data = {
             'max_attempts': 20,
             'prompt': prompt,
             'rubric': rubric,
-            'max_score': max_score, 
-            'display_name': 'Name'
-            })
+            'max_score': max_score,
+            'display_name': 'Name',
+            'accept_file_upload' : False,
+            'rewrite_content_links' : "",
+            'close_date' : "",
+            's3_interface' : test_util_open_ended.S3_INTERFACE,
+            'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            'skip_basic_checks' : False,
+            }
 
     oeparam = etree.XML('''
       <openendedparam>
@@ -312,7 +336,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.combinedoe = CombinedOpenEndedModule(test_system, self.location, self.definition, self.descriptor, self.static_data, metadata=self.metadata)
+        self.combinedoe = CombinedOpenEndedV1Module(test_system, self.location, self.definition, self.descriptor, static_data = self.static_data, metadata=self.metadata)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
@@ -322,16 +346,14 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         response_dict = self.combinedoe.get_last_response(0)
         self.assertEqual(response_dict['type'], "selfassessment")
         self.assertEqual(response_dict['max_score'], self.max_score)
-        self.assertEqual(response_dict['state'], CombinedOpenEndedModule.INITIAL)
+        self.assertEqual(response_dict['state'], CombinedOpenEndedV1Module.INITIAL)
 
     def test_update_task_states(self):
         changed = self.combinedoe.update_task_states()
         self.assertFalse(changed)
 
         current_task = self.combinedoe.current_task
-        current_task.change_state(CombinedOpenEndedModule.DONE)
+        current_task.change_state(CombinedOpenEndedV1Module.DONE)
         changed = self.combinedoe.update_task_states()
 
         self.assertTrue(changed)
-
-

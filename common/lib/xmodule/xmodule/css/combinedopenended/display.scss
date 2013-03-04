@@ -24,14 +24,11 @@ section.combined-open-ended {
   @include clearfix;
   .status-container
   {
-      float:right;
-      width:40%;
+      padding-bottom: 5px;
   }
   .item-container
   {
-      float:left;
-      width: 53%;
-      padding-bottom: 50px;
+      padding-bottom: 10px;
   }
 
   .result-container
@@ -46,14 +43,26 @@ section.combined-open-ended {
   }
 }
 
+section.legend-container {
+  .legenditem {
+    background-color : #d4d4d4;
+    font-size: .9em;
+    padding: 2px;
+    display: inline;
+    width: 20%;
+  }
+  margin-bottom: 5px;
+}
+
 section.combined-open-ended-status {
 
     .statusitem {
-      background-color: #FAFAFA;
       color: #2C2C2C;
-      font-family: monospace;
-      font-size: 1em;
-      padding: 10px;
+      background-color : #d4d4d4;
+      font-size: .9em;
+      padding: 2px;
+      display: inline;
+      width: 20%;
       .show-results {
           margin-top: .3em;
           text-align:right;
@@ -61,12 +70,12 @@ section.combined-open-ended-status {
       .show-results-button {
           font: 1em monospace;
       }
-   }
+    }
 
    .statusitem-current {
-     background-color: #d4d4d4;
+     background-color: #B2B2B2;
      color: #222;
-  }
+   }
 
     span {
         &.unanswered {
@@ -98,8 +107,29 @@ section.combined-open-ended-status {
     }
 }
 
-div.result-container {
+div.combined-rubric-container {
+  ul.rubric-list{
+    list-style-type: none;
+    padding:0;
+    margin:0;
+    li {
+      &.rubric-list-item{
+        margin-bottom: 2px;
+        padding: 0px;
+      }
+    }
+  }
 
+  span.rubric-category {
+    font-size: .9em;
+  }
+  padding-bottom: 5px;
+  padding-top: 10px;
+}
+
+div.result-container {
+  padding-top: 10px;
+  padding-bottom: 5px;
  .evaluation {
 
         p {
@@ -113,9 +143,8 @@ div.result-container {
     }
 
     .evaluation-response {
-        margin-bottom: 10px;
+        margin-bottom: 2px;
         header {
-            text-align: right;
             a {
                 font-size: .85em;
             }
@@ -198,20 +227,6 @@ div.result-container {
               }
             }
 
-            .result-correct {
-              background: url('../images/correct-icon.png') left 20px no-repeat;
-              .result-actual-output {
-                color: #090;
-              }
-            }
-
-            .result-incorrect {
-              background: url('../images/incorrect-icon.png') left 20px no-repeat;
-              .result-actual-output {
-                color: #B00;
-              }
-            }
-
             .markup-text{
               margin: 5px;
               padding: 20px 0px 15px 50px;
@@ -229,49 +244,18 @@ div.result-container {
           }
         }
       }
+  .rubric-result-container {
+    .rubric-result {
+      font-size: .9em;
+      padding: 2px;
+      display: inline-table;
+    }
+    padding: 2px;
+    margin: 0px;
+    display : inline;
+  }
 }
 
-div.result-container, section.open-ended-child {
-    .rubric {
-            margin-bottom:25px;
-            tr {
-                margin:10px 0px;
-                height: 100%;
-            }
-            td {
-                padding: 20px 0px 25px 0px;
-                margin: 10px 0px;
-                height: 100%;
-            }
-            th {
-                padding: 5px;
-                margin: 5px;
-            }
-            label,
-            .view-only {
-                margin:2px;
-                position: relative;
-                padding: 10px 15px 25px 15px;
-                width: 145px;
-                height:100%;
-                display: inline-block;
-                min-height: 50px;
-                min-width: 50px;
-                background-color: #CCC;
-                font-size: .85em;
-            }
-            .grade {
-              position: absolute;
-              bottom:0px;
-              right:0px;
-              margin:10px;
-            }
-            .selected-grade {
-              background: #666;
-              color: white;
-            }
-        }
-}
 
 section.open-ended-child {
   @media print {
@@ -442,6 +426,14 @@ section.open-ended-child {
       margin: 10px;
     }
 
+    div.short-form-response {
+          background: #F6F6F6;
+          border: 1px solid #ddd;
+          margin-bottom: 0px;
+          overflow-y: auto;
+          height: 200px;
+          @include clearfix;
+     }
 
     .grader-status {
       padding: 9px;
@@ -511,6 +503,18 @@ section.open-ended-child {
     margin-left: .75rem;
   }
 
+    ul.rubric-list{
+        list-style-type: none;
+        padding:0;
+        margin:0;
+        li {
+             &.rubric-list-item{
+                 margin-bottom: 0px;
+                 padding: 0px;
+             }
+        }
+    }
+
   ol {
     list-style: decimal outside none;
     margin-bottom: lh();
@@ -536,9 +540,8 @@ section.open-ended-child {
   }
 
   li {
-    line-height: 1.4em;
-    margin-bottom: lh(.5);
-
+    margin-bottom: 0px;
+    padding: 0px;
     &:last-child {
       margin-bottom: 0;
     }
@@ -577,11 +580,6 @@ section.open-ended-child {
     }
 
     .submission_feedback {
-      // background: #F3F3F3;
-      // border: 1px solid #ddd;
-      // @include border-radius(3px);
-      // padding: 8px 12px;
-      // margin-top: 10px;
       @include inline-block;
       font-style: italic;
       margin: 8px 0 0 10px;

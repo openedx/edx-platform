@@ -3,6 +3,7 @@
    <div class="prompt">
     ${prompt|n}
    </div>
+  <h4>Response</h4>
   <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
 
   <div class="message-wrapper"></div>
@@ -14,13 +15,20 @@
     % elif state in ['done', 'post_assessment'] and correct == 'incorrect':
     <span class="incorrect" id="status_${id}"></span> <p>Incorrect. </p>
     % elif state == 'assessing':
-      <span class="grading" id="status_${id}">Submitted for grading.</span>
+      <span class="grading" id="status_${id}">Submitted for grading.
+      % if eta_message is not None:
+         ${eta_message}
+      % endif
+      </span>
+
     % endif
 
     % if hidden:
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
   </div>
+
+  <div class="file-upload"></div>
 
   <input type="button" value="Submit" class="submit-button" name="show"/>
   <input name="skip" class="skip-button" type="button" value="Skip Post-Assessment"/>
