@@ -49,6 +49,22 @@ class CombinedOpenEndedModule(XModule):
     INTERMEDIATE_DONE = 'intermediate_done'
     DONE = 'done'
 
+    icon_class = 'problem'
+
+    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
+    max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    due = String(help="Date that this problem is due by", scope=Scope.settings)
+    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
+    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
+    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
+    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    data = String(help="XML data for the problem", scope=Scope.content)
+    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
+    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
+    done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+    seed = Integer(help="Random seed for this student", scope=Scope.student_state)
+
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
@@ -57,10 +73,8 @@ class CombinedOpenEndedModule(XModule):
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-            instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, descriptor, model_data):
+        XModule.__init__(self, system, location, descriptor, model_data)
 
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
