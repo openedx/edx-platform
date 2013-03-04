@@ -30,13 +30,18 @@ from contentstore import utils
       }).blur(function() {
         $("label").removeClass("is-focused");
         });
-        
-      var editor = new CMS.Views.Settings.Details({
-          el: $('.settings-details'),
-          model: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true})
-        });
-        
-        editor.render();
+      var model = new CMS.Models.Settings.CourseDetails();
+      model.urlRoot = '${details_url}';
+      model.fetch({success : 
+          function(model) {
+              var editor = new CMS.Views.Settings.Details({
+                  el: $('.settings-details'),
+                  model: model
+                });
+                
+              editor.render();
+          }
+      });
     });
       
   </script>

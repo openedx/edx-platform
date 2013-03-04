@@ -55,8 +55,12 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
           $(updateEle).empty();
           var self = this;
           this.collection.each(function (update) {
-        	  var newEle = self.template({ updateModel : update });
-              $(updateEle).append(newEle);
+              try {
+                  var newEle = self.template({ updateModel : update });
+                  $(updateEle).append(newEle);
+            } catch (e) {
+                // ignore
+            }
           });
           this.$el.find(".new-update-form").hide();
           this.$el.find('.date').datepicker({ 'dateFormat': 'MM d, yy' });
@@ -162,8 +166,13 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         self.$currentPost.removeClass('editing');
         self.$currentPost.find('.date-display').html(targetModel.get('date'));
         self.$currentPost.find('.date').val(targetModel.get('date'));
-        self.$currentPost.find('.update-contents').html(targetModel.get('content'));
-        self.$currentPost.find('.new-update-content').val(targetModel.get('content'));
+        try {
+            // just in case the content causes an error (embedded js errors)
+            self.$currentPost.find('.update-contents').html(targetModel.get('content'));
+            self.$currentPost.find('.new-update-content').val(targetModel.get('content'));
+        } catch (e) {
+            // ignore but handle rest of page
+        }
         self.$currentPost.find('form').hide();
         window.$modalCover.unbind('click');
         window.$modalCover.hide();
