@@ -94,8 +94,11 @@ def assert_css_with_text(css, text):
 
 
 def css_click(css):
-    assert_true(world.browser.is_element_present_by_css(css, 5))
-    world.browser.find_by_css(css).first.click()
+    '''
+    Rather than click in the middle of an element, 
+    click in the upper left
+    '''
+    css_click_at(css)
 
 
 def css_click_at(css, x=10, y=10):
