@@ -39,7 +39,7 @@ class DummySystem(ImportSystem):
 class IsNewCourseTestCase(unittest.TestCase):
     """Make sure the property is_new works on courses"""
     @staticmethod
-    def get_dummy_course(start, announcement=None, is_new=None):
+    def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None):
         """Get a dummy course"""
 
         system = DummySystem(load_error_modules=True)
@@ -49,48 +49,64 @@ class IsNewCourseTestCase(unittest.TestCase):
 
         is_new = to_attrb('is_new', is_new)
         announcement = to_attrb('announcement', announcement)
+        advertised_start = to_attrb('advertised_start', advertised_start)
 
         start_xml = '''
          <course org="{org}" course="{course}"
                 graceperiod="1 day" url_name="test"
                 start="{start}"
                 {announcement}
-                {is_new}>
+                {is_new}
+                {advertised_start}>
             <chapter url="hi" url_name="ch" display_name="CH">
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
          </course>
          '''.format(org=ORG, course=COURSE, start=start, is_new=is_new,
-                    announcement=announcement)
+                    announcement=announcement, advertised_start=advertised_start)
 
         return system.process_xml(start_xml)
 
     @patch('xmodule.course_module.time.gmtime')
     def test_sorting_score(self, gmtime_mock):
         gmtime_mock.return_value = NOW
-        dates = [('2012-10-01T12:00', '2012-09-01T12:00'),  # 0
-                 ('2012-12-01T12:00', '2012-11-01T12:00'),  # 1
-                 ('2013-02-01T12:00', '2012-12-01T12:00'),  # 2
-                 ('2013-02-01T12:00', '2012-11-10T12:00'),  # 3
-                 ('2013-02-01T12:00', None),                # 4
-                 ('2013-03-01T12:00', None),                # 5
-                 ('2013-04-01T12:00', None),                # 6
-                 ('2012-11-01T12:00', None),                # 7
-                 ('2012-09-01T12:00', None),                # 8
-                 ('1990-01-01T12:00', None),                # 9
-                 ('2013-01-02T12:00', None),                # 10
-                 ('2013-01-10T12:00', '2012-12-31T12:00'),  # 11
-                 ('2013-01-10T12:00', '2013-01-01T12:00'),  # 12
+
+        day1 = '2012-01-01T12:00'
+        day2 = '2012-01-02T12:00'
+
+        dates = [
+            # Announce date takes priority over actual start
+            # and courses announced on a later date are newer
+            # than courses announced for an earlier date
+            ((day1, day2, None), (day1, day1, None), self.assertLess),
+            ((day1, day1, None), (day2, day1, None), self.assertEqual),
+
+            # Announce dates take priority over advertised starts
+            ((day1, day2, day1), (day1, day1, day1), self.assertLess),
+            ((day1, day1, day2), (day2, day1, day2), self.assertEqual),
+
+            # Later start == newer course
+            ((day2, None, None), (day1, None, None), self.assertLess),
+            ((day1, None, None), (day1, None, None), self.assertEqual),
+
+            # Non-parseable advertised starts are ignored in preference
+            # to actual starts
+            ((day2, None, "Spring 2013"), (day1, None, "Fall 2012"), self.assertLess),
+            ((day1, None, "Spring 2013"), (day1, None, "Fall 2012"), self.assertEqual),
+
+            # Parseable advertised starts take priority over start dates
+            ((day1, None, day2), (day1, None, day1), self.assertLess),
+            ((day2, None, day2), (day1, None, day2), self.assertEqual),
+
         ]
 
         data = []
-        for i, d in enumerate(dates):
-            descriptor = self.get_dummy_course(start=d[0], announcement=d[1])
-            score = descriptor.sorting_score
-            data.append((score, i))
+        for a, b, assertion in dates:
+            a_score = self.get_dummy_course(start=a[0], announcement=a[1], advertised_start=a[2]).sorting_score
+            b_score = self.get_dummy_course(start=b[0], announcement=b[1], advertised_start=b[2]).sorting_score
+            print "Comparing %s to %s" % (a, b)
+            assertion(a_score, b_score)
 
-        result = [d[1] for d in sorted(data)]
-        assert(result == [12, 11, 2, 3, 1, 0, 6, 5, 4, 10, 7, 8, 9])
 
 
     @patch('xmodule.course_module.time.gmtime')

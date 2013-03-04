@@ -481,8 +481,8 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def sorting_score(self):
         """
-        Returns a number that can be used to sort the courses according
-        the how "new"" they are. The "newness"" score is computed using a
+        Returns a tuple that can be used to sort the courses according
+        the how "new" they are. The "newness" score is computed using a
         heuristic that takes into account the announcement and
         (advertized) start dates of the course if available.
 
@@ -510,7 +510,10 @@ class CourseDescriptor(SequenceDescriptor):
         announcement = self.announcement
         if announcement is not None:
             announcement = to_datetime(announcement)
-        start = self.advertised_start or to_datetime(self.start)
+        if self.advertised_start is None or isinstance(self.advertised_start, basestring):
+            start = to_datetime(self.start)
+        else:
+            start = to_datetime(self.advertised_start)
         now = to_datetime(time.gmtime())
 
         return announcement, start, now
