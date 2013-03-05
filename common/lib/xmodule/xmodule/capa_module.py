@@ -590,7 +590,7 @@ class CapaModule(XModule):
         ''' Checks whether answers to a problem are correct, and
             returns a map of correct/incorrect answers:
 
-            {'success' : bool,
+            {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
              'contents' : html}
             '''
         event_info = dict()
