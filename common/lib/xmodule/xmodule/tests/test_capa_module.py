@@ -286,6 +286,34 @@ class CapaModuleTest(unittest.TestCase):
         self.assertTrue(still_in_grace.answer_available())
 
 
+    def test_closed(self):
+
+        # Attempts < Max attempts --> NOT closed
+        module = CapaFactory.create(max_attempts="1", attempts="0")
+        self.assertFalse(module.closed())
+
+        # Attempts < Max attempts --> NOT closed
+        module = CapaFactory.create(max_attempts="2", attempts="1")
+        self.assertFalse(module.closed())
+
+        # Attempts = Max attempts --> closed
+        module = CapaFactory.create(max_attempts="1", attempts="1")
+        self.assertTrue(module.closed())
+
+        # Attempts > Max attempts --> closed
+        module = CapaFactory.create(max_attempts="1", attempts="2")
+        self.assertTrue(module.closed())
+
+        # Max attempts = 0 --> closed
+        module = CapaFactory.create(max_attempts="0", attempts="2")
+        self.assertTrue(module.closed())
+
+        # Past due --> closed
+        module = CapaFactory.create(max_attempts="1", attempts="0",
+                                    due=self.yesterday_str)
+        self.assertTrue(module.closed())
+
+
     def test_parse_get_params(self):
 
         # Valid GET param dict
@@ -522,3 +550,21 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the problem was NOT reset
         self.assertTrue('success' in result and not result['success'])
+
+
+    def test_save_problem(self):
+        module = CapaFactory.create()
+
+        # Simulate 
+
+
+    def test_save_problem_closed(self):
+        self.fail()
+
+
+    def test_save_problem_submitted_with_randomize(self):
+        self.fail()
+
+
+    def test_save_problem_submitted_no_randomize(self):
+        self.fail()

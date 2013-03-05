@@ -419,7 +419,7 @@ class CapaModule(XModule):
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
-        if self.attempts == self.max_attempts:
+        if self.max_attempts is not None and self.attempts >= self.max_attempts:
             return True
         if self.is_past_due():
             return True
