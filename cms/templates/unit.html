@@ -33,7 +33,7 @@
 <%block name="content">
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
     <div class="inner-wrapper">
-      <div class="alert editing-draft-alert wip-box">
+      <div class="alert editing-draft-alert">
         <p class="alert-message"><strong>You are editing a draft.</strong>
         % if published_date:
         This unit was originally published on ${published_date}.
@@ -143,7 +143,7 @@
                 <option value="private">Private</option>
               </select>
             </div>
-            <div class="row published-alert wip-box">
+            <div class="row published-alert">
               <p class="edit-draft-message">This unit has been published. To make changes, you must <a href="#" class="create-draft">edit a draft</a>.</p>
               <p class="publish-draft-message">This is a draft of the published unit. To update the live version, you must <a href="#" class="publish-draft">replace it with this draft</a>.</p>
             </div>            

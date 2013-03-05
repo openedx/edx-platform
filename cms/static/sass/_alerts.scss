@@ -271,6 +271,7 @@
     width: ($baseline*8);
     right: ($baseline);
     border: 4px solid $black;
+    border-bottom: none;
     padding: ($baseline/2) $baseline;
 
     .notification {
@@ -305,6 +306,7 @@
     width: ($baseline*14);
     right: ($baseline);
     border: 4px solid $black;
+    border-bottom: none;
     padding: ($baseline/2) $baseline;
 
     .notification {
@@ -690,69 +692,74 @@ body.uxdesign.alerts {
   }
 }
 
+// ====================
+
 // artifact styles
-// .alert {
-// 	padding: 15px 20px;
-// 	margin-bottom: 30px;
-// 	border-radius: 3px;
-// 	border: 1px solid #edbd3c;
-// 	border-radius: 3px;
-// 	background: #fbf6e1;
-// 	// background: #edbd3c;
-// 	font-size: 14px;
-// 	@include clearfix;
+.main-wrapper {
+  .alert {
+    padding: 15px 20px;
+    margin-bottom: 30px;
+    border-radius: 3px;
+    border: 1px solid #edbd3c;
+    border-radius: 3px;
+    background: #fbf6e1;
+    // background: #edbd3c;
+    font-size: 14px;
+    @include clearfix;
 
-// 	.alert-message {
-// 		float: left;
-// 		margin-top: 4px;
-// 	}
+    .alert-message {
+      float: left;
+      margin: 4px 0 0 0;
+      color: $gray-d3;
+    }
 
-// 	strong {
-// 		font-weight: 700;
-// 	}
+    strong {
+      font-weight: 700;
+    }
 
-// 	.alert-action {
-// 		float: right;
+    .alert-action {
+      float: right;
 
-// 		&.secondary {
-// 			@include orange-button;
-// 		}
-// 	}
-// }
+      &.secondary {
+        @include orange-button;
+      }
+    }
+  }
+}
 
-// body.error {
-// 	background: $darkGrey;
-// 	color: #3c3c3c;
+body.error {
+	background: $gray-d4;
+	color: $gray-d3;
 
-// 	.primary-header {
-// 		display: none;
-// 	}
+	.primary-header {
+		display: none;
+	}
 
-// 	.error-prompt {
-// 		width: 700px;
-// 		margin: 150px auto;
-// 		padding: 60px 50px 90px;
-// 		border-radius: 3px;
-// 		background: #fff;
-// 		text-align: center;
-// 	}
+	.error-prompt {
+		width: 700px;
+		margin: 150px auto;
+		padding: 60px 50px 90px;
+		border-radius: 3px;
+		background: $white;
+		text-align: center;
+	}
 
-// 	h1 {
-// 		float: none;
-// 		margin: 0;
-// 		font-size: 60px;
-// 		font-weight: 300;		
-// 		color: #3c3c3c;
-// 	}
+	h1 {
+		float: none;
+		margin: 0;
+		font-size: 60px;
+		font-weight: 300;		
+		color: $gray-d3;
+	}
 
-// 	.description {
-// 		margin-bottom: 50px;
-// 		font-size: 21px;
-// 	}
+	.description {
+		margin-bottom: 50px;
+		font-size: 21px;
+	}
 
-// 	.back-button {
-// 		@include blue-button;
-// 		padding: 14px 40px 18px;
-// 		font-size: 18px;
-// 	}
-// }
+	.back-button {
+		@include blue-button;
+		padding: 14px 40px 18px;
+		font-size: 18px;
+	}
+}
