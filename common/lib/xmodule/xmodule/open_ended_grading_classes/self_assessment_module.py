@@ -39,22 +39,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
     REQUEST_HINT = 'request_hint'
     DONE = 'done'
 
-    student_answers = List(scope=Scope.student_state, default=[])
-    scores = List(scope=Scope.student_state, default=[])
-    hints = List(scope=Scope.student_state, default=[])
-    state = String(scope=Scope.student_state, default=INITIAL)
-
-    # Used for progress / grading.  Currently get credit just for
-    # completion (doesn't matter if you self-assessed correct/incorrect).
-    max_score = Integer(scope=Scope.settings, default=openendedchild.MAX_SCORE)
-    max_attempts = Integer(scope=Scope.settings, default=openendedchild.MAX_ATTEMPTS)
-
-    attempts = Integer(scope=Scope.student_state, default=0)
-    rubric = String(scope=Scope.content)
-    prompt = String(scope=Scope.content)
-    submitmessage = String(scope=Scope.content)
-    hintprompt = String(scope=Scope.content)
-
     def setup_response(self, system, location, definition, descriptor):
         """
         Sets up the module
@@ -64,8 +48,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         @param descriptor: SelfAssessmentDescriptor
         @return: None
         """
-        self.prompt = stringify_children(self.prompt)
-        self.rubric = stringify_children(self.rubric)
+        self.child_prompt = stringify_children(self.child_prompt)
+        self.child_rubric = stringify_children(self.child_rubric)
 
     def get_html(self, system):
         """
@@ -74,18 +58,18 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         @return: Rendered HTML
         """
         #set context variables and render template
-        if self.state != self.INITIAL:
+        if self.child_state != self.INITIAL:
             latest = self.latest_answer()
             previous_answer = latest if latest is not None else ''
         else:
             previous_answer = ''
 
         context = {
-            'prompt': self.prompt,
+            'prompt': self.child_prompt,
             'previous_answer': previous_answer,
             'ajax_url': system.ajax_url,
             'initial_rubric': self.get_rubric_html(system),
-            'state': self.state,
+            'state': self.child_state,
             'allow_reset': self._allow_reset(),
             'child_type': 'selfassessment',
             'accept_file_upload': self.accept_file_upload,
@@ -131,11 +115,11 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         """
         Return the appropriate version of the rubric, based on the state.
         """
-        if self.state == self.INITIAL:
+        if self.child_state == self.INITIAL:
             return ''
 
         rubric_renderer = CombinedOpenEndedRubric(system, False)
-        rubric_dict = rubric_renderer.render_rubric(self.rubric)
+        rubric_dict = rubric_renderer.render_rubric(self.child_rubric)
         success = rubric_dict['success']
         rubric_html = rubric_dict['html']
 
@@ -144,13 +128,13 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
                    'max_score': self._max_score,
         }
 
-        if self.state == self.ASSESSING:
+        if self.child_state == self.ASSESSING:
             context['read_only'] = False
-        elif self.state in (self.POST_ASSESSMENT, self.DONE):
+        elif self.child_state in (self.POST_ASSESSMENT, self.DONE):
             context['read_only'] = True
         else:
             #This is a dev_facing_error
-            raise ValueError("Self assessment module is in an illegal state '{0}'".format(self.state))
+            raise ValueError("Self assessment module is in an illegal state '{0}'".format(self.child_state))
 
         return system.render_template('self_assessment_rubric.html', context)
 
@@ -158,10 +142,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         """
         Return the appropriate version of the hint view, based on state.
         """
-        if self.state in (self.INITIAL, self.ASSESSING):
+        if self.child_state in (self.INITIAL, self.ASSESSING):
             return ''
 
-        if self.state == self.DONE:
+        if self.child_state == self.DONE:
             # display the previous hint
             latest = self.latest_post_assessment(system)
             hint = latest if latest is not None else ''
@@ -170,13 +154,13 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         context = {'hint': hint}
 
-        if self.state == self.POST_ASSESSMENT:
+        if self.child_state == self.POST_ASSESSMENT:
             context['read_only'] = False
-        elif self.state == self.DONE:
+        elif self.child_state == self.DONE:
             context['read_only'] = True
         else:
             #This is a dev_facing_error
-            raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.state))
+            raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.child_state))
 
         return system.render_template('self_assessment_hint.html', context)
 
@@ -198,7 +182,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if closed:
             return msg
 
-        if self.state != self.INITIAL:
+        if self.child_state != self.INITIAL:
             return self.out_of_sync_error(get)
 
         error_message = ""
@@ -239,7 +223,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         'message_html' only if success is true
         """
 
-        if self.state != self.ASSESSING:
+        if self.child_state != self.ASSESSING:
             return self.out_of_sync_error(get)
 
         try:
@@ -262,7 +246,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         self.change_state(self.DONE)
         d['allow_reset'] = self._allow_reset()
 
-        d['state'] = self.state
+        d['state'] = self.child_state
         return d
 
     def save_hint(self, get, system):
@@ -276,7 +260,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         with the error key only present if success is False and message_html
         only if True.
         '''
-        if self.state != self.POST_ASSESSMENT:
+        if self.child_state != self.POST_ASSESSMENT:
             # Note: because we only ask for hints on wrong answers, may not have
             # the same number of hints and answers.
             return self.out_of_sync_error(get)

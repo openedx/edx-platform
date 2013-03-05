@@ -195,10 +195,10 @@ class CombinedOpenEndedV1Module():
         last_response = last_response_data['response']
 
         loaded_task_state = json.loads(current_task_state)
-        if loaded_task_state['state'] == self.INITIAL:
-            loaded_task_state['state'] = self.ASSESSING
-            loaded_task_state['created'] = True
-            loaded_task_state['history'].append({'answer': last_response})
+        if loaded_task_state['child_state'] == self.INITIAL:
+            loaded_task_state['child_state'] = self.ASSESSING
+            loaded_task_state['child_created'] = True
+            loaded_task_state['child_history'].append({'answer': last_response})
             current_task_state = json.dumps(loaded_task_state)
         return current_task_state
 
@@ -233,9 +233,7 @@ class CombinedOpenEndedV1Module():
         current_task_state = None
         if len(self.task_states) > self.current_task_number:
             current_task_state = self.task_states[self.current_task_number]
-            model_data = self._model_data['task_states'][self.current_task_number]
 
-        log.debug(model_data)
         self.current_task_xml = self.task_xml[self.current_task_number]
 
         if self.current_task_number > 0:
@@ -255,6 +253,7 @@ class CombinedOpenEndedV1Module():
 
         #This sends the etree_xml object through the descriptor module of the current task, and
         #returns the xml parsed by the descriptor
+        log.debug(current_task_state)
         self.current_task_parsed_xml = self.current_task_descriptor.definition_from_xml(etree_xml, self.system)
         if current_task_state is None and self.current_task_number == 0:
             self.current_task = child_task_module(self.system, self.location,
@@ -268,9 +267,9 @@ class CombinedOpenEndedV1Module():
                 'state': self.ASSESSING,
                 'version': self.STATE_VERSION,
                 'max_score': self._max_score,
-                'attempts': 0,
-                'created': True,
-                'history': [{'answer': last_response}],
+                'child_attempts': 0,
+                'child_created': True,
+                'child_history': [{'answer': last_response}],
                 })
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
@@ -395,7 +394,7 @@ class CombinedOpenEndedV1Module():
 
         task_parsed_xml = task_descriptor.definition_from_xml(etree_xml, self.system)
         task = children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor,
-            self.static_data, instance_state=task_state, model_data = self._model_data)
+            self.static_data, instance_state=self.instance_state, model_data = self._model_data)
         last_response = task.latest_answer()
         last_score = task.latest_score()
         last_post_assessment = task.latest_post_assessment(self.system)
@@ -413,7 +412,7 @@ class CombinedOpenEndedV1Module():
             else:
                 last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
             last_post_assessment = last_post_evaluation
-            rubric_data = task._parse_score_msg(task.history[-1].get('post_assessment', ""), self.system)
+            rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
             rubric_scores = rubric_data['rubric_scores']
             grader_types = rubric_data['grader_types']
             feedback_items = rubric_data['feedback_items']
@@ -427,7 +426,7 @@ class CombinedOpenEndedV1Module():
             last_post_assessment = ""
         last_correctness = task.is_last_response_correct()
         max_score = task.max_score()
-        state = task.state
+        state = task.child_state
         if task_type in HUMAN_TASK_TYPE:
             human_task_name = HUMAN_TASK_TYPE[task_type]
         else:

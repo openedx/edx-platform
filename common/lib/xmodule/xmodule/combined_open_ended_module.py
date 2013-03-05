@@ -58,7 +58,7 @@ class CombinedOpenEndedModule(XModule):
 
     display_name = String(help="Display name for this module", scope=Scope.settings)
     current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.student_state)
-    task_states = String(help="State dictionaries of each task within this module.", default=json.dumps("[]"), scope=Scope.student_state)
+    task_states = Object(help="State dictionaries of each task within this module.", default=[], scope=Scope.student_state)
     state = String(help="Which step within the current task that the student is on.", default="initial", scope=Scope.student_state)
     attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
     ready_to_reset = Boolean(help="If the problem is ready to be reset or not.",  default=False, scope=Scope.student_state)
