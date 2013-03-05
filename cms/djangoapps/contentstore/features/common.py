@@ -7,7 +7,8 @@ from selenium.common.exceptions import WebDriverException
 
 from terrain.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from terrain.factories import CourseFactory, GroupFactory
-import xmodule.modulestore.django
+from xmodule.modulestore.django import _MODULESTORES, modulestore
+from xmodule.templates import update_templates
 from auth.authz import get_user_by_email
 
 from logging import getLogger
@@ -84,9 +85,9 @@ def flush_xmodule_store():
     # (though it shouldn't), do this manually
     # from the bash shell to drop it:
     # $ mongo test_xmodule --eval "db.dropDatabase()"
-    xmodule.modulestore.django._MODULESTORES = {}
-    xmodule.modulestore.django.modulestore().collection.drop()
-    xmodule.templates.update_templates()
+    _MODULESTORES = {}
+    modulestore().collection.drop()
+    update_templates()
 
 
 def assert_css_with_text(css, text):
