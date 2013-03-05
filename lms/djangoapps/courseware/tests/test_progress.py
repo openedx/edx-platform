@@ -30,8 +30,6 @@ class ProgessTests(TestCase):
 		     'questions_incorrect': 1,
 		     'questions_total': 0})
 
-		
-
 		self.oth = dict({'duration_total': 0,
 		     'duration_watched': 0,
 		     'done': True,
@@ -48,6 +46,7 @@ class ProgessTests(TestCase):
 	     'questions_correct': 4,
 	     'questions_incorrect': 0,
 	     'questions_total': 7}
+
 	def test_getitem(self):
 		self.assertEqual(self.c.__getitem__('duration_watched'), 0)
 

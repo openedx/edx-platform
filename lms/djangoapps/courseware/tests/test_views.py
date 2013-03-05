@@ -84,22 +84,12 @@ class ViewsTestCase(TestCase):
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
 
-
     def test_user_groups(self):
         # depreciated function
         mock_user = MagicMock()
         mock_user.is_authenticated.return_value = False
         self.assertEquals(views.user_groups(mock_user),[])
         
-
-    @override_settings(DEBUG = True)
-    def test_user_groups_debug(self):
-        mock_user = MagicMock()
-        mock_user.is_authenticated.return_value = True
-        pass
-        #views.user_groups(mock_user)
-        #Keep going later
-
     def test_get_current_child(self):
         self.assertIsNone(views.get_current_child(Stub()))
         mock_xmodule = MagicMock()
@@ -118,7 +108,6 @@ class ViewsTestCase(TestCase):
         mock_module.get_display_items.return_value = []
         self.assertRaises(Http404, views.redirect_to_course_position,
                           mock_module, True)
-
 
     def test_registered_for_course(self):
         self.assertFalse(views.registered_for_course('Basketweaving', None))
