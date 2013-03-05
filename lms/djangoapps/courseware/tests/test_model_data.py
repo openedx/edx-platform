@@ -56,24 +56,24 @@ class StudentModuleFactory(factory.Factory):
 class ContentFactory(factory.Factory):
     FACTORY_FOR = XModuleContentField
 
-    field_name = 'content_field'
-    value = json.dumps('content_value')
+    field_name = 'existing_field'
+    value = json.dumps('old_value')
     definition_id = location('def_id').url()
 
 
 class SettingsFactory(factory.Factory):
     FACTORY_FOR = XModuleSettingsField
 
-    field_name = 'settings_field'
-    value = json.dumps('settings_value')
+    field_name = 'existing_field'
+    value = json.dumps('old_value')
     usage_id = '%s-%s' % (course_id, location('def_id').url())
 
 
 class StudentPrefsFactory(factory.Factory):
     FACTORY_FOR = XModuleStudentPrefsField
 
-    field_name = 'student_pref_field'
-    value = json.dumps('student_pref_value')
+    field_name = 'existing_field'
+    value = json.dumps('old_value')
     student = factory.SubFactory(UserFactory)
     module_type = 'problem'
 
@@ -81,8 +81,8 @@ class StudentPrefsFactory(factory.Factory):
 class StudentInfoFactory(factory.Factory):
     FACTORY_FOR = XModuleStudentInfoField
 
-    field_name = 'student_info_field'
-    value = json.dumps('student_info_value')
+    field_name = 'existing_field'
+    value = json.dumps('old_value')
     student = factory.SubFactory(UserFactory)
 
 
@@ -125,6 +125,7 @@ class TestInvalidScopes(TestCase):
             self.assertRaises(InvalidScopeError, self.kvs.get, LmsKeyValueStore.Key(scope, None, None, 'field'))
             self.assertRaises(InvalidScopeError, self.kvs.set, LmsKeyValueStore.Key(scope, None, None, 'field'), 'value')
             self.assertRaises(InvalidScopeError, self.kvs.delete, LmsKeyValueStore.Key(scope, None, None, 'field'))
+            self.assertRaises(InvalidScopeError, self.kvs.has, LmsKeyValueStore.Key(scope, None, None, 'field'))
 
 
 class TestStudentModuleStorage(TestCase):
@@ -168,6 +169,14 @@ class TestStudentModuleStorage(TestCase):
         self.assertEquals(1, StudentModule.objects.all().count())
         self.assertEquals({'a_field': 'a_value'}, json.loads(StudentModule.objects.all()[0].state))
 
+    def test_has_existing_field(self):
+        "Test that `has` returns True for existing fields in StudentModules"
+        self.assertTrue(self.kvs.has(student_state_key('a_field')))
+
+    def test_has_missing_field(self):
+        "Test that `has` returns False for missing fields in StudentModule"
+        self.assertFalse(self.kvs.has(student_state_key('not_a_field')))
+
 
 class TestMissingStudentModule(TestCase):
     def setUp(self):
@@ -200,172 +209,90 @@ class TestMissingStudentModule(TestCase):
         "Test that deleting a field from a missing StudentModule raises a KeyError"
         self.assertRaises(KeyError, self.kvs.delete, student_state_key('a_field'))
 
+    def test_has_field_for_missing_student_module(self):
+        "Test that `has` returns False for missing StudentModules"
+        self.assertFalse(self.kvs.has(student_state_key('a_field')))
 
-class TestSettingsStorage(TestCase):
+
+class StorageTestBase(object):
+    factory = None
+    scope = None
+    key_factory = None
+    storage_class = None
 
     def setUp(self):
-        settings = SettingsFactory.create()
-        self.user = UserFactory.create()
+        field_storage = self.factory.create()
+        if hasattr(field_storage, 'student'):
+            self.user = field_storage.student
+        else:
+            self.user = UserFactory.create()
         self.desc_md = {}
-        self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.settings, 'settings_field')])], course_id, self.user)
+        self.mdc = ModelDataCache([mock_descriptor([mock_field(self.scope, 'existing_field')])], course_id, self.user)
         self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_existing_field(self):
-        "Test that getting an existing field in an existing SettingsField works"
-        self.assertEquals('settings_value', self.kvs.get(settings_key('settings_field')))
+        "Test that getting an existing field in an existing Storage Field works"
+        self.assertEquals('old_value', self.kvs.get(self.key_factory('existing_field')))
 
     def test_get_missing_field(self):
-        "Test that getting a missing field from an existing SettingsField raises a KeyError"
-        self.assertRaises(KeyError, self.kvs.get, settings_key('not_settings_field'))
+        "Test that getting a missing field from an existing Storage Field raises a KeyError"
+        self.assertRaises(KeyError, self.kvs.get, self.key_factory('missing_field'))
 
     def test_set_existing_field(self):
         "Test that setting an existing field changes the value"
-        self.kvs.set(settings_key('settings_field'), 'new_value')
-        self.assertEquals(1, XModuleSettingsField.objects.all().count())
-        self.assertEquals('new_value', json.loads(XModuleSettingsField.objects.all()[0].value))
+        self.kvs.set(self.key_factory('existing_field'), 'new_value')
+        self.assertEquals(1, self.storage_class.objects.all().count())
+        self.assertEquals('new_value', json.loads(self.storage_class.objects.all()[0].value))
 
     def test_set_missing_field(self):
         "Test that setting a new field changes the value"
-        self.kvs.set(settings_key('not_settings_field'), 'new_value')
-        self.assertEquals(2, XModuleSettingsField.objects.all().count())
-        self.assertEquals('settings_value', json.loads(XModuleSettingsField.objects.get(field_name='settings_field').value))
-        self.assertEquals('new_value', json.loads(XModuleSettingsField.objects.get(field_name='not_settings_field').value))
+        self.kvs.set(self.key_factory('missing_field'), 'new_value')
+        self.assertEquals(2, self.storage_class.objects.all().count())
+        self.assertEquals('old_value', json.loads(self.storage_class.objects.get(field_name='existing_field').value))
+        self.assertEquals('new_value', json.loads(self.storage_class.objects.get(field_name='missing_field').value))
 
     def test_delete_existing_field(self):
         "Test that deleting an existing field removes it"
-        self.kvs.delete(settings_key('settings_field'))
-        self.assertEquals(0, XModuleSettingsField.objects.all().count())
+        self.kvs.delete(self.key_factory('existing_field'))
+        self.assertEquals(0, self.storage_class.objects.all().count())
 
     def test_delete_missing_field(self):
-        "Test that deleting a missing field from an existing SettingsField raises a KeyError"
-        self.assertRaises(KeyError, self.kvs.delete, settings_key('not_settings_field'))
-        self.assertEquals(1, XModuleSettingsField.objects.all().count())
+        "Test that deleting a missing field from an existing Storage Field raises a KeyError"
+        self.assertRaises(KeyError, self.kvs.delete, self.key_factory('missing_field'))
+        self.assertEquals(1, self.storage_class.objects.all().count())
+
+    def test_has_existing_field(self):
+        "Test that `has` returns True for an existing Storage Field"
+        self.assertTrue(self.kvs.has(self.key_factory('existing_field')))
+
+    def test_has_missing_field(self):
+        "Test that `has` return False for an existing Storage Field"
+        self.assertFalse(self.kvs.has(self.key_factory('missing_field')))
 
 
-class TestContentStorage(TestCase):
-
-    def setUp(self):
-        content = ContentFactory.create()
-        self.user = UserFactory.create()
-        self.desc_md = {}
-        self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.content, 'content_field')])], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
-
-    def test_get_existing_field(self):
-        "Test that getting an existing field in an existing ContentField works"
-        self.assertEquals('content_value', self.kvs.get(content_key('content_field')))
-
-    def test_get_missing_field(self):
-        "Test that getting a missing field from an existing ContentField raises a KeyError"
-        self.assertRaises(KeyError, self.kvs.get, content_key('not_content_field'))
-
-    def test_set_existing_field(self):
-        "Test that setting an existing field changes the value"
-        self.kvs.set(content_key('content_field'), 'new_value')
-        self.assertEquals(1, XModuleContentField.objects.all().count())
-        self.assertEquals('new_value', json.loads(XModuleContentField.objects.all()[0].value))
-
-    def test_set_missing_field(self):
-        "Test that setting a new field changes the value"
-        self.kvs.set(content_key('not_content_field'), 'new_value')
-        self.assertEquals(2, XModuleContentField.objects.all().count())
-        self.assertEquals('content_value', json.loads(XModuleContentField.objects.get(field_name='content_field').value))
-        self.assertEquals('new_value', json.loads(XModuleContentField.objects.get(field_name='not_content_field').value))
-
-    def test_delete_existing_field(self):
-        "Test that deleting an existing field removes it"
-        self.kvs.delete(content_key('content_field'))
-        self.assertEquals(0, XModuleContentField.objects.all().count())
-
-    def test_delete_missing_field(self):
-        "Test that deleting a missing field from an existing ContentField raises a KeyError"
-        self.assertRaises(KeyError, self.kvs.delete, content_key('not_content_field'))
-        self.assertEquals(1, XModuleContentField.objects.all().count())
+class TestSettingsStorage(StorageTestBase, TestCase):
+    factory = SettingsFactory
+    scope = Scope.settings
+    key_factory = settings_key
+    storage_class = XModuleSettingsField
 
 
-class TestStudentPrefsStorage(TestCase):
-
-    def setUp(self):
-        student_pref = StudentPrefsFactory.create()
-        self.user = student_pref.student
-        self.desc_md = {}
-        self.mdc = ModelDataCache([mock_descriptor([
-            mock_field(Scope.student_preferences, 'student_pref_field'),
-            mock_field(Scope.student_preferences, 'not_student_pref_field'),
-        ])], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
-
-    def test_get_existing_field(self):
-        "Test that getting an existing field in an existing StudentPrefsField works"
-        self.assertEquals('student_pref_value', self.kvs.get(student_prefs_key('student_pref_field')))
-
-    def test_get_missing_field(self):
-        "Test that getting a missing field from an existing StudentPrefsField raises a KeyError"
-        self.assertRaises(KeyError, self.kvs.get, student_prefs_key('not_student_pref_field'))
-
-    def test_set_existing_field(self):
-        "Test that setting an existing field changes the value"
-        self.kvs.set(student_prefs_key('student_pref_field'), 'new_value')
-        self.assertEquals(1, XModuleStudentPrefsField.objects.all().count())
-        self.assertEquals('new_value', json.loads(XModuleStudentPrefsField.objects.all()[0].value))
-
-    def test_set_missing_field(self):
-        "Test that setting a new field changes the value"
-        self.kvs.set(student_prefs_key('not_student_pref_field'), 'new_value')
-        self.assertEquals(2, XModuleStudentPrefsField.objects.all().count())
-        self.assertEquals('student_pref_value', json.loads(XModuleStudentPrefsField.objects.get(field_name='student_pref_field').value))
-        self.assertEquals('new_value', json.loads(XModuleStudentPrefsField.objects.get(field_name='not_student_pref_field').value))
-
-    def test_delete_existing_field(self):
-        "Test that deleting an existing field removes it"
-        self.kvs.delete(student_prefs_key('student_pref_field'))
-        self.assertEquals(0, XModuleStudentPrefsField.objects.all().count())
-
-    def test_delete_missing_field(self):
-        "Test that deleting a missing field from an existing StudentPrefsField raises a KeyError"
-        self.assertRaises(KeyError, self.kvs.delete, student_prefs_key('not_student_pref_field'))
-        self.assertEquals(1, XModuleStudentPrefsField.objects.all().count())
+class TestContentStorage(StorageTestBase, TestCase):
+    factory = ContentFactory
+    scope = Scope.content
+    key_factory = content_key
+    storage_class = XModuleContentField
 
 
-class TestStudentInfoStorage(TestCase):
+class TestStudentPrefsStorage(StorageTestBase, TestCase):
+    factory = StudentPrefsFactory
+    scope = Scope.student_preferences
+    key_factory = student_prefs_key
+    storage_class = XModuleStudentPrefsField
 
-    def setUp(self):
-        student_info = StudentInfoFactory.create()
-        self.user = student_info.student
-        self.desc_md = {}
-        self.mdc = ModelDataCache([mock_descriptor([
-            mock_field(Scope.student_info, 'student_info_field'),
-            mock_field(Scope.student_info, 'not_student_info_field'),
-        ])], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
-    def test_get_existing_field(self):
-        "Test that getting an existing field in an existing StudentInfoField works"
-        self.assertEquals('student_info_value', self.kvs.get(student_info_key('student_info_field')))
-
-    def test_get_missing_field(self):
-        "Test that getting a missing field from an existing StudentInfoField raises a KeyError"
-        self.assertRaises(KeyError, self.kvs.get, student_info_key('not_student_info_field'))
-
-    def test_set_existing_field(self):
-        "Test that setting an existing field changes the value"
-        self.kvs.set(student_info_key('student_info_field'), 'new_value')
-        self.assertEquals(1, XModuleStudentInfoField.objects.all().count())
-        self.assertEquals('new_value', json.loads(XModuleStudentInfoField.objects.all()[0].value))
-
-    def test_set_missing_field(self):
-        "Test that setting a new field changes the value"
-        self.kvs.set(student_info_key('not_student_info_field'), 'new_value')
-        self.assertEquals(2, XModuleStudentInfoField.objects.all().count())
-        self.assertEquals('student_info_value', json.loads(XModuleStudentInfoField.objects.get(field_name='student_info_field').value))
-        self.assertEquals('new_value', json.loads(XModuleStudentInfoField.objects.get(field_name='not_student_info_field').value))
-
-    def test_delete_existing_field(self):
-        "Test that deleting an existing field removes it"
-        self.kvs.delete(student_info_key('student_info_field'))
-        self.assertEquals(0, XModuleStudentInfoField.objects.all().count())
-
-    def test_delete_missing_field(self):
-        "Test that deleting a missing field from an existing StudentInfoField raises a KeyError"
-        self.assertRaises(KeyError, self.kvs.delete, student_info_key('not_student_info_field'))
-        self.assertEquals(1, XModuleStudentInfoField.objects.all().count())
+class TestStudentInfoStorage(StorageTestBase, TestCase):
+    factory = StudentInfoFactory
+    scope = Scope.student_info
+    key_factory = student_info_key
+    storage_class = XModuleStudentInfoField

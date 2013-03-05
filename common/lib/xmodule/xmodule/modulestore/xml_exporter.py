@@ -1,6 +1,7 @@
 import logging
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
 from json import dumps
 
@@ -31,14 +32,12 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     # export the grading policy
     policies_dir = export_fs.makeopendir('policies')
     course_run_policy_dir = policies_dir.makeopendir(course.location.name)
-    if 'grading_policy' in course.definition['data']:
-        with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
-            grading_policy.write(dumps(course.grading_policy))
+    with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
+        grading_policy.write(dumps(course.grading_policy))
 
     # export all of the course metadata in policy.json
     with course_run_policy_dir.open('policy.json', 'w') as course_policy:
-        policy = {}
-        policy = {'course/' + course.location.name: course.metadata}
+        policy = {'course/' + course.location.name: own_metadata(course)}
         course_policy.write(dumps(policy))
 
 

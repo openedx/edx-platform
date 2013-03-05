@@ -22,7 +22,7 @@ from . import ModuleStoreBase, Location
 from .draft import DraftModuleStore
 from .exceptions import (ItemNotFoundError,
                          DuplicateItemError)
-from .inheritance import own_metadata, INHERITABLE_METADATA
+from .inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
 
 
 log = logging.getLogger(__name__)
@@ -84,6 +84,18 @@ class MongoKeyValueStore(KeyValueStore):
         else:
             raise InvalidScopeError(key.scope)
 
+    def has(self, key):
+        if key.scope in (Scope.children, Scope.parent):
+            return True
+        elif key.scope == Scope.settings:
+            return key.field_name in self._metadata
+        elif key.scope == Scope.content:
+            if key.field_name == 'data' and not isinstance(self._data, dict):
+                return True
+            else:
+                return key.field_name in self._data
+        else:
+            raise InvalidScopeError(key.scope)
 
 MongoUsage = namedtuple('MongoUsage', 'id, def_id')
 
@@ -146,7 +158,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 module = class_(self, location, model_data)
                 if self.metadata_inheritance_tree is not None:
                     metadata_to_inherit = self.metadata_inheritance_tree.get('parent_metadata', {}).get(location.url(), {})
-                    module.inherit_metadata(metadata_to_inherit)
+                    inherit_metadata(module, metadata_to_inherit)
                 return module
             except:
                 log.debug("Failed to load descriptor", exc_info=True)

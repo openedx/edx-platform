@@ -464,6 +464,9 @@ class SessionKeyValueStore(KeyValueStore):
         except (KeyError, InvalidScopeError):
             del self._session[tuple(key)]
 
+    def has(self, key):
+        return key in self._model_data or key in self._session
+
 
 def preview_module_system(request, preview_id, descriptor):
     """
@@ -662,7 +665,7 @@ def save_item(request):
 
         # commit to datastore
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
-        store.update_metadata(item_location, existing_item._model_data._kvs._metadata)
+        store.update_metadata(item_location, own_metadat(existing_item))
 
     return HttpResponse()
 

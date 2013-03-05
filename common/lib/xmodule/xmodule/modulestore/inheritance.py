@@ -5,9 +5,6 @@ INHERITABLE_METADATA = (
     'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
     # TODO (ichuang): used for Fall 2012 xqa server access
     'xqa_key',
-    # TODO: This is used by the XMLModuleStore to provide for locations for
-    # static files, and will need to be removed when that code is removed
-    'data_dir'
     # How many days early to show a course element to beta testers (float)
     # intended to be set per-course, but can be overridden in for specific
     # elements.  Can be a float.
@@ -33,13 +30,13 @@ def inherit_metadata(descriptor, model_data):
     be inherited
     """
     if not hasattr(descriptor, '_inherited_metadata'):
-        setattr(descriptor, '_inherited_metadata', set())
+        setattr(descriptor, '_inherited_metadata', {})
 
     # Set all inheritable metadata from kwargs that are
     # in self.inheritable_metadata and aren't already set in metadata
     for attr in INHERITABLE_METADATA:
         if attr not in descriptor._model_data and attr in model_data:
-            descriptor._inherited_metadata.add(attr)
+            descriptor._inherited_metadata[attr] = model_data[attr]
             descriptor._model_data[attr] = model_data[attr]
 
 
@@ -52,15 +49,19 @@ def own_metadata(module):
     metadata = {}
     for field in module.fields + module.lms.fields:
         # Only save metadata that wasn't inherited
-        if (field.scope == Scope.settings and
-            field.name not in inherited_metadata and
-            field.name in module._model_data):
+        if field.scope != Scope.settings:
+            continue
 
-            try:
-                metadata[field.name] = field.read_from(module)
-            except KeyError:
-                # Ignore any missing keys in _model_data
-                pass
+        if field.name in inherited_metadata and module._model_data[field.name] == inherited_metadata[field.name]:
+            continue
 
+        if field.name not in module._model_data:
+            continue
+
+        try:
+            metadata[field.name] = module._model_data[field.name]
+        except KeyError:
+            # Ignore any missing keys in _model_data
+            pass
 
     return metadata

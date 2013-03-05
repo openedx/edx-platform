@@ -98,6 +98,8 @@ class CapaFactory(object):
         if correct:
             # TODO: probably better to actually set the internal state properly, but...
             module.get_score = lambda: {'score': 1, 'total': 1}
+        else:
+            module.get_score = lambda: {'score': 0, 'total': 1}
 
         return module
 

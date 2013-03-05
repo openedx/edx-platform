@@ -50,7 +50,7 @@ class StringOrDate(Date):
 
         try:
             return time.strftime(self.time_format, value)
-        except ValueError:
+        except (ValueError, TypeError):
             return value
 
 
@@ -449,8 +449,10 @@ class CourseDescriptor(SequenceDescriptor):
         specified. Returns specified list even if is_cohorted and/or auto_cohort are
         false.
         """
-        return self.metadata.get("cohort_config", {}).get(
-            "auto_cohort_groups", [])
+        if self.cohort_config is None:
+            return []
+        else:
+            return self.cohort_config.get("auto_cohort_groups", [])
 
 
     @property

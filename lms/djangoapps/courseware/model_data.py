@@ -336,6 +336,25 @@ class LmsKeyValueStore(KeyValueStore):
         else:
             field_object.delete()
 
+    def has(self, key):
+        if key.field_name in self._descriptor_model_data:
+            return key.field_name in self._descriptor_model_data
+
+        if key.scope == Scope.parent:
+            return True
+
+        if key.scope not in self._allowed_scopes:
+            raise InvalidScopeError(key.scope)
+
+        field_object = self._model_data_cache.find(key)
+        if field_object is None:
+            return False
+
+        if key.scope == Scope.student_state:
+            return key.field_name in json.loads(field_object.state)
+        else:
+            return True
+
 
 LmsUsage = namedtuple('LmsUsage', 'id, def_id')
 

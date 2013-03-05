@@ -45,9 +45,9 @@ class MakoModuleDescriptor(XModuleDescriptor):
     @property
     def editable_metadata_fields(self):
         fields = {}
-        for field, value in own_metadata(self):
-            if field.name in self.system_metadata_fields:
+        for field, value in own_metadata(self).items():
+            if field in self.system_metadata_fields:
                 continue
 
-            fields[field.name] = value
+            fields[field] = value
         return fields
