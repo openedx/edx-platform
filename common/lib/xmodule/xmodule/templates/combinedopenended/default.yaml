@@ -1,7 +1,7 @@
 ---
 metadata:
     display_name: Open Ended Response
-    attempts: 1
+    max_attempts: 1
     max_score: 1
     is_graded: False
     version: 1
