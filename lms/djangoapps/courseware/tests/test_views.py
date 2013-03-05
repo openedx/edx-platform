@@ -19,14 +19,11 @@ from xmodule.modulestore.exceptions import InvalidLocationError,\
 import courseware.views as views
 from xmodule.modulestore import Location
 
+from factories import UserFactory
+
 class Stub():
     pass
 
-class UserFactory(factory.Factory):
-    first_name = 'Test'
-    last_name = 'Robot'
-    is_staff = True
-    is_active = True
 
 # This part is required for modulestore() to work properly
 def xml_store_config(data_dir):

@@ -25,6 +25,8 @@ from xmodule.seq_module import SequenceModule
 from courseware.tests.tests import PageLoader
 from student.models import Registration 
 
+from factories import UserFactory
+
 class Stub:
     def __init__(self):
         pass
@@ -39,12 +41,6 @@ def xml_store_config(data_dir):
         }
     }
 }
-
-class UserFactory(factory.Factory):
-    first_name = 'Test'
-    last_name = 'Robot'
-    is_staff = True
-    is_active = True
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
