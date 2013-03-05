@@ -135,7 +135,7 @@ class CombinedOpenEndedV1Module():
 
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.allow_reset = instance_state.get('ready_to_reset', False)
-        self.max_attempts = int(self.instance_state.get('attempts', MAX_ATTEMPTS))
+        self.max_attempts = self.instance_state.get('attempts', MAX_ATTEMPTS)
         self.is_scored = self.instance_state.get('is_graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
         self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
@@ -152,7 +152,7 @@ class CombinedOpenEndedV1Module():
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
-        self._max_score = int(self.instance_state.get('max_score', MAX_SCORE))
+        self._max_score = self.instance_state.get('max_score', MAX_SCORE)
 
         self.rubric_renderer = CombinedOpenEndedRubric(system, True)
         rubric_string = stringify_children(definition['rubric'])

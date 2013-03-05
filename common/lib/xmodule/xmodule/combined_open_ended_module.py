@@ -138,7 +138,6 @@ class CombinedOpenEndedModule(XModule):
             'rewrite_content_links' : self.rewrite_content_links,
         }
         instance_state = { k: getattr(self,k) for k in attributes[version_index]}
-        log.debug(instance_state)
         instance_state.update({'data' : self.data})
         self.child_descriptor = descriptors[version_index](self.system)
         self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(self.data), self.system)
