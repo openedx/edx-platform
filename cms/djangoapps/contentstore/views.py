@@ -1112,6 +1112,7 @@ def module_info(request, module_location):
     else:
         return HttpResponseBadRequest()
 
+
 @login_required
 @ensure_csrf_cookie
 def get_course_settings(request, org, course, name):
@@ -1127,12 +1128,15 @@ def get_course_settings(request, org, course, name):
         raise PermissionDenied()
 
     course_module = modulestore().get_item(location)
-    course_details = CourseDetails.fetch(location)
 
     return render_to_response('settings.html', {
         'context_course': course_module,
-        'course_location' : location,
-        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
+        'course_location': location,
+        'details_url': reverse(course_settings_updates,
+                               kwargs={"org": org,
+                                       "course": course,
+                                       "name": name,
+                                       "section": "details"})
     })
 
 @login_required

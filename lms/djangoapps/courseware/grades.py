@@ -270,7 +270,7 @@ def progress_summary(student, request, course, student_module_cache):
     # would be simpler
     course_module = get_module(student, request,
                                 course.location, student_module_cache,
-                                course.id)
+                                course.id, depth=None)
     if not course_module:
         # This student must not have access to the course.
         return None
