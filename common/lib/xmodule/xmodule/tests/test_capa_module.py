@@ -1,6 +1,6 @@
 import datetime
 import json
-from mock import Mock, patch
+from mock import Mock, MagicMock, patch
 from pprint import pprint
 import unittest
 
@@ -465,3 +465,60 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)
+
+
+    def test_reset_problem(self):
+        module = CapaFactory.create()
+
+        # Mock the module's capa problem 
+        # to simulate that the problem is done
+        mock_problem = MagicMock(capa.capa_problem.LoncapaProblem)
+        mock_problem.done = True
+        module.lcp = mock_problem
+
+        # Stub out HTML rendering
+        with patch('xmodule.capa_module.CapaModule.get_problem_html') as mock_html:
+            mock_html.return_value = "<div>Test HTML</div>"
+
+            # Reset the problem
+            get_request_dict = {}
+            result = module.reset_problem(get_request_dict)
+
+        # Expect that the request was successful
+        self.assertTrue('success' in result and result['success'])
+
+        # Expect that the problem HTML is retrieved
+        self.assertTrue('html' in result)
+        self.assertEqual(result['html'], "<div>Test HTML</div>")
+
+        # Expect that the problem was reset
+        mock_problem.do_reset.assert_called_once_with()
+
+
+    def test_reset_problem_closed(self):
+        module = CapaFactory.create()
+
+        # Simulate that the problem is closed
+        with patch('xmodule.capa_module.CapaModule.closed') as mock_closed:
+            mock_closed.return_value = True
+
+            # Try to reset the problem
+            get_request_dict = {}
+            result = module.reset_problem(get_request_dict)
+
+        # Expect that the problem was NOT reset
+        self.assertTrue('success' in result and not result['success'])
+
+
+    def test_reset_problem_not_done(self):
+        module = CapaFactory.create()
+
+        # Simulate that the problem is NOT done
+        module.lcp.done = False
+
+        # Try to reset the problem
+        get_request_dict = {}
+        result = module.reset_problem(get_request_dict)
+
+        # Expect that the problem was NOT reset
+        self.assertTrue('success' in result and not result['success'])

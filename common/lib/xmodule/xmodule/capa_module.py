@@ -703,7 +703,12 @@ class CapaModule(XModule):
         ''' Changes problem state to unfinished -- removes student answers,
             and causes problem to rerender itself.
 
-            Returns problem html as { 'html' : html-string }.
+            Returns a dictionary of the form:
+            {'success': True/False,
+            'html': Problem HTML string }
+
+            If an error occurs, the dictionary will also have an
+            'error' key containing an error message.
         '''
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
@@ -734,7 +739,8 @@ class CapaModule(XModule):
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)
 
-        return {'html': self.get_problem_html(encapsulate=False)}
+        return { 'success': True,
+                'html': self.get_problem_html(encapsulate=False)}
 
 
 class CapaDescriptor(RawDescriptor):
