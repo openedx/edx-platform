@@ -3,6 +3,7 @@ import json
 from mock import Mock, MagicMock, patch
 from pprint import pprint
 import unittest
+import random
 
 import xmodule
 import capa
@@ -618,3 +619,164 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that we succeed
         self.assertTrue('success' in result and result['success'])
+
+    def test_check_button_name(self):
+
+        # If last attempt, button name changes to "Final Check"
+        # Just in case, we also check what happens if we have
+        # more attempts than allowed.
+        attempts = random.randint(1, 10)
+        module = CapaFactory.create(attempts=attempts-1, max_attempts=attempts)
+        self.assertEqual(module.check_button_name(), "Final Check")
+
+        module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
+        self.assertEqual(module.check_button_name(), "Final Check")
+
+        module = CapaFactory.create(attempts=attempts + 1, max_attempts=attempts)
+        self.assertEqual(module.check_button_name(), "Final Check")
+
+        # Otherwise, button name is "Check"
+        module = CapaFactory.create(attempts=attempts-2, max_attempts=attempts)
+        self.assertEqual(module.check_button_name(), "Check")
+
+        module = CapaFactory.create(attempts=attempts-3, max_attempts=attempts)
+        self.assertEqual(module.check_button_name(), "Check")
+
+        # If no limit on attempts, then always show "Check"
+        module = CapaFactory.create(attempts=attempts-3)
+        self.assertEqual(module.check_button_name(), "Check")
+
+        module = CapaFactory.create(attempts=0)
+        self.assertEqual(module.check_button_name(), "Check")
+
+    def test_should_show_check_button(self):
+
+        attempts = random.randint(1,10)
+
+        # If we're after the deadline, do NOT show check button
+        module = CapaFactory.create(due=self.yesterday_str)
+        self.assertFalse(module.should_show_check_button())
+
+        # If user is out of attempts, do NOT show the check button
+        module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
+        self.assertFalse(module.should_show_check_button())
+
+        # If survey question (max_attempts = 0), do NOT show the check button
+        module = CapaFactory.create(max_attempts=0)
+        self.assertFalse(module.should_show_check_button())
+
+        # If user submitted a problem but hasn't reset, 
+        # do NOT show the check button
+        # Note:  we can only reset when rerandomize="always"
+        module = CapaFactory.create(rerandomize="always")
+        module.lcp.done = True
+        self.assertFalse(module.should_show_check_button())
+
+        # Otherwise, DO show the check button
+        module = CapaFactory.create()
+        self.assertTrue(module.should_show_check_button())
+
+        # If the user has submitted the problem
+        # and we do NOT have a reset button, then we can show the check button
+        # Setting rerandomize to "never" ensures that the reset button
+        # is not shown
+        module = CapaFactory.create(rerandomize="never")
+        module.lcp.done = True
+        self.assertTrue(module.should_show_check_button())
+
+
+    def test_should_show_reset_button(self):
+
+        attempts = random.randint(1,10)
+
+        # If we're after the deadline, do NOT show the reset button
+        module = CapaFactory.create(due=self.yesterday_str)
+        module.lcp.done = True
+        self.assertFalse(module.should_show_reset_button())
+
+        # If the user is out of attempts, do NOT show the reset button
+        module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
+        module.lcp.done = True
+        self.assertFalse(module.should_show_reset_button())
+
+        # If we're NOT randomizing, then do NOT show the reset button
+        module = CapaFactory.create(rerandomize="never")
+        module.lcp.done = True
+        self.assertFalse(module.should_show_reset_button())
+
+        # If the user hasn't submitted an answer yet, 
+        # then do NOT show the reset button
+        module = CapaFactory.create()
+        module.lcp.done = False
+        self.assertFalse(module.should_show_reset_button())
+
+        # Otherwise, DO show the reset button
+        module = CapaFactory.create()
+        module.lcp.done = True
+        self.assertTrue(module.should_show_reset_button())
+
+        # If survey question for capa (max_attempts = 0),
+        # DO show the reset button
+        module = CapaFactory.create(max_attempts=0)
+        module.lcp.done = True
+        self.assertTrue(module.should_show_reset_button())
+
+
+    def test_should_show_save_button(self):
+
+        attempts = random.randint(1,10)
+
+        # If we're after the deadline, do NOT show the save button
+        module = CapaFactory.create(due=self.yesterday_str)
+        module.lcp.done = True
+        self.assertFalse(module.should_show_save_button())
+
+        # If the user is out of attempts, do NOT show the save button
+        module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
+        module.lcp.done = True
+        self.assertFalse(module.should_show_save_button())
+
+        # If user submitted a problem but hasn't reset, do NOT show the save button
+        module = CapaFactory.create(rerandomize="always")
+        module.lcp.done = True
+        self.assertFalse(module.should_show_save_button())
+
+        # Otherwise, DO show the save button
+        module = CapaFactory.create()
+        module.lcp.done = False
+        self.assertTrue(module.should_show_save_button())
+
+        # If we're not randomizing, then we can re-save
+        module = CapaFactory.create(rerandomize="never")
+        module.lcp.done = True
+        self.assertTrue(module.should_show_save_button())
+
+        # If survey question for capa (max_attempts = 0),
+        # DO show the save button
+        module = CapaFactory.create(max_attempts=0)
+        module.lcp.done = False
+        self.assertTrue(module.should_show_save_button())
+
+    def test_should_show_save_button_force_save_button(self):
+        # If we're after the deadline, do NOT show the save button
+        # even though we're forcing a save
+        module = CapaFactory.create(due=self.yesterday_str,
+                                    force_save_button="true")
+        module.lcp.done = True
+        self.assertFalse(module.should_show_save_button())
+
+        # If the user is out of attempts, do NOT show the save button
+        attempts = random.randint(1,10)
+        module = CapaFactory.create(attempts=attempts, 
+                                    max_attempts=attempts,
+                                    force_save_button="true")
+        module.lcp.done = True
+        self.assertFalse(module.should_show_save_button())
+
+        # Otherwise, if we force the save button,
+        # then show it even if we would ordinarily
+        # require a reset first
+        module = CapaFactory.create(force_save_button="true",
+                                    rerandomize="always")
+        module.lcp.done = True
+        self.assertTrue(module.should_show_save_button())

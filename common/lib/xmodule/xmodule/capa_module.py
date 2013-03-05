@@ -136,7 +136,7 @@ class CapaModule(XModule):
             self.close_date = self.display_due_date
 
         max_attempts = self.metadata.get('attempts', None)
-        if max_attempts:
+        if max_attempts is not None:
             self.max_attempts = int(max_attempts)
         else:
             self.max_attempts = None
@@ -247,6 +247,78 @@ class CapaModule(XModule):
             'progress': Progress.to_js_status_str(self.get_progress())
         })
 
+    def check_button_name(self):
+        """
+        Determine the name for the "check" button.
+        Usually it is just "Check", but if this is the student's
+        final attempt, change the name to "Final Check"
+        """
+        if self.max_attempts is not None:
+            final_check = (self.attempts >= self.max_attempts - 1)
+        else:
+            final_check = False
+
+        return "Final Check" if final_check else "Check"
+
+    def should_show_check_button(self):
+        """
+        Return True/False to indicate whether to show the "Check" button.
+        """
+        submitted_without_reset = (self.is_completed() and self.rerandomize == "always")
+
+        # If the problem is closed (past due / too many attempts)
+        # then we do NOT show the "check" button
+        # Also, do not show the "check" button if we're waiting
+        # for the user to reset a randomized problem
+        if self.closed() or submitted_without_reset:
+            return False
+        else:
+            return True
+
+    def should_show_reset_button(self):
+        """
+        Return True/False to indicate whether to show the "Reset" button.
+        """
+        survey_question = (self.max_attempts == 0)
+
+        if self.rerandomize in ["always", "onreset"]:
+
+            # If the problem is closed (and not a survey question with max_attempts==0),
+            # then do NOT show the reset button.
+            # If the problem hasn't been submitted yet, then do NOT show
+            # the reset button.
+            if (self.closed() and not survey_question) or not self.is_completed():
+                return False
+            else:
+                return True
+
+        # Only randomized problems need a "reset" button
+        else:
+            return False
+
+    def should_show_save_button(self):
+        """
+        Return True/False to indicate whether to show the "Save" button.
+        """
+
+        # If the user has forced the save button to display,
+        # then show it as long as the problem is not closed
+        # (past due / too many attempts)
+        if self.force_save_button == "true":
+            return not self.closed()
+        else:
+            survey_question = (self.max_attempts == 0)
+            needs_reset = self.is_completed() and self.rerandomize == "always"
+
+            # If the problem is closed (and not a survey question with max_attempts==0),
+            # then do NOT show the reset button
+            # If we're waiting for the user to reset a randomized problem
+            # then do NOT show the reset button
+            if (self.closed() and not survey_question) or needs_reset:
+                return False
+            else:
+                return True
+
     def get_problem_html(self, encapsulate=True):
         '''Return html for the problem.  Adds check, reset, save buttons
         as necessary based on the problem config and state.'''
@@ -313,57 +385,14 @@ class CapaModule(XModule):
                    'weight': self.descriptor.weight,
                    }
 
-        # We using strings as truthy values, because the terminology of the
-        # check button is context-specific.
-
-        # Put a "Check" button if unlimited attempts or still some left
-        if self.max_attempts is None or self.attempts < self.max_attempts - 1:
-            check_button = "Check"
-        else:
-            # Will be final check so let user know that
-            check_button = "Final Check"
-
-        reset_button = True
-        save_button = True
-
-        # If we're after deadline, or user has exhausted attempts,
-        # question is read-only.
-        if self.closed():
-            check_button = False
-            reset_button = False
-            save_button = False
-
-        # If attempts=0 then show just check and reset buttons; this is for survey questions using capa
-        if self.max_attempts==0:
-            check_button = False
-            reset_button = True
-            save_button = True
-
-        # User submitted a problem, and hasn't reset. We don't want
-        # more submissions.
-        if self.lcp.done and self.rerandomize == "always":
-            check_button = False
-            save_button = False
-
-        # Only show the reset button if pressing it will show different values
-        if self.rerandomize not in ["always", "onreset"]:
-            reset_button = False
-
-        # User hasn't submitted an answer yet -- we don't want resets
-        if not self.lcp.done:
-            reset_button = False
-
-        # We may not need a "save" button if infinite number of attempts and
-        # non-randomized. The problem author can force it. It's a bit weird for
-        # randomization to control this; should perhaps be cleaned up.
-        if (self.force_save_button == "false") and (self.max_attempts is None and self.rerandomize != "always"):
-            save_button = False
-
         context = {'problem': content,
                    'id': self.id,
-                   'check_button': check_button,
-                   'reset_button': reset_button,
-                   'save_button': save_button,
+
+                    # Pass in the name of the check button or False
+                    # if we do not need a check button
+                   'check_button': self.check_button_name() if self.should_show_check_button() else False,
+                   'reset_button': self.should_show_reset_button(),
+                   'save_button': self.should_show_save_button(),
                    'answer_available': self.answer_available(),
                    'ajax_url': self.system.ajax_url,
                    'attempts_used': self.attempts,
@@ -731,6 +760,7 @@ class CapaModule(XModule):
             # reset random number generator seed (note the self.lcp.get_state()
             # in next line)
             self.lcp.seed = None
+    
 
         self.lcp = LoncapaProblem(self.definition['data'],
                                   self.location.html_id(), self.lcp.get_state(),
