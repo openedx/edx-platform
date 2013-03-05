@@ -146,6 +146,8 @@ class LoncapaProblem(object):
         if not self.student_answers:  # True when student_answers is an empty dict
             self.set_initial_display()
 
+        # dictionary of InputType objects associated with this problem
+        #   input_id string -> InputType object
         self.inputs = {}
 
         self.extracted_tree = self._extract_html(self.tree)
