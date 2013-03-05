@@ -55,13 +55,5 @@ class ProgessTests(TestCase):
 		self.c.__setitem__('questions_correct', 4)
 		self.assertEqual(str(self.c),str(self.d))
 
-	# def test_add(self):
-	# 	self.assertEqual(self.c.__add__(self.c2), self.cplusc2)
-
-	def test_contains(self):
-
-		return self.c.__contains__('meow')
-		#self.assertEqual(self.c.__contains__('done'), True)
-
 	def test_repr(self):
 		self.assertEqual(self.c.__repr__(), str(progress.completion()))

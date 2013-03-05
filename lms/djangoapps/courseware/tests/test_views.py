@@ -4,7 +4,6 @@ import datetime
 import factory
 import unittest
 import os
-from nose.plugins.skip import SkipTest
 
 from django.test import TestCase
 from django.http import Http404, HttpResponse
@@ -20,13 +19,6 @@ from xmodule.modulestore.exceptions import InvalidLocationError,\
 import courseware.views as views
 from xmodule.modulestore import Location
 
-def skipped(func):
-    from nose.plugins.skip import SkipTest
-    def _():
-        raise SkipTest("Test %s is skipped" % func.__name__)
-    _.__name__ = func.__name__
-    return _
-
 #from override_settings import override_settings
 
 class Stub():
@@ -37,13 +29,6 @@ class UserFactory(factory.Factory):
     last_name = 'Robot'
     is_staff = True
     is_active = True
-
-def skipped(func):
-    from nose.plugins.skip import SkipTest
-    def _():
-        raise SkipTest("Test %s is skipped" % func.__name__)
-    _.__name__ = func.__name__
-    return _
 
 # This part is required for modulestore() to work properly
 def xml_store_config(data_dir):
@@ -139,20 +124,6 @@ class ViewsTestCase(TestCase):
         self.assertRaises(Http404, views.redirect_to_course_position,
                           mock_module, True)
 
-    def test_index(self):
-        assert SkipTest
-        request = self.request_factory.get(self.chapter_url)
-        request.user = UserFactory()
-        response = views.index(request, self.course_id)
-        self.assertIsInstance(response, HttpResponse)
-        self.assertEqual(response.status_code, 302)
-        # views.index does not throw 404 if chapter, section, or position are
-        # not valid, which doesn't match index's comments
-        views.index(request, self.course_id, chapter='foo', section='bar',
-                    position='baz')
-        request_2 = self.request_factory.get(self.chapter_url)
-        request_2.user = self.user
-        response = views.index(request_2, self.course_id)
 
     def test_registered_for_course(self):
         self.assertFalse(views.registered_for_course('Basketweaving', None))
@@ -187,47 +158,3 @@ class ViewsTestCase(TestCase):
 ##        request_2 = self.request_factory.get('foo')
 ##        request_2.user = UserFactory()
         
-    def test_static_university_profile(self):
-        # TODO
-        # Can't test unless havehttp://toastdriven.com/blog/2011/apr/10/guide-to-testing-in-django/ a valid template file
-        raise SkipTest
-        request = self.client.get('university_profile/edX')
-        self.assertIsInstance(views.static_university_profile(request, 'edX'), HttpResponse)
-        
-    def test_university_profile(self):
-        raise SkipTest
-        request = self.request_factory.get(self.chapter_url)
-        request.user = UserFactory()
-        self.assertRaisesRegexp(Http404, 'University Profile*',
-                                views.university_profile, request, 'Harvard')
-        # TODO
-        #request_2 = self.client.get('/university_profile/edx')
-        self.assertIsInstance(views.university_profile(request, 'edX'), HttpResponse)
-        # Can't continue testing unless have valid template file
-
-    
-    def test_syllabus(self):
-        raise SkipTest
-        request = self.request_factory.get(self.chapter_url)
-        request.user = UserFactory()
-        # Can't find valid template
-        # TODO
-        views.syllabus(request, 'edX/toy/2012_Fall')
-
-    def test_render_notifications(self):
-        raise SkipTest
-        request = self.request_factory.get('foo')
-        #views.render_notifications(request, self.course_id, 'dummy')
-        # TODO
-        # Needs valid template
-
-    def test_news(self):
-        raise SkipTest
-        # Bug? get_notifications is actually in lms/lib/comment_client/legacy.py
-        request = self.client.get('/news')
-        self.user.id = 'foo'
-        request.user = self.user
-        course_id = 'edX/toy/2012_Fall'
-        self.assertIsInstance(views.news(request, course_id), HttpResponse)
-        
-        # TODO

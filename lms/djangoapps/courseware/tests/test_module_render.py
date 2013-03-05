@@ -14,13 +14,13 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse 
+from django.test.utils import override_settings
 
 from courseware.models import StudentModule, StudentModuleCache 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError 
 from xmodule.modulestore import Location
 import courseware.module_render as render
-from override_settings import override_settings
 from xmodule.modulestore.django import modulestore, _MODULESTORES
 from xmodule.seq_module import SequenceModule
 from courseware.tests.tests import PageLoader
@@ -58,35 +58,11 @@ class ModuleRenderTestCase(PageLoader):
         self.course_id = 'edX/toy/2012_Fall'
         self.toy_course = modulestore().get_course(self.course_id)
 
-    def test_toc_for_course(self):
-        mock_course = MagicMock()
-        mock_course.id = 'dummy'
-        mock_course.location = Location(self.location)
-        mock_course.get_children.return_value = []
-        mock_user = MagicMock()
-        mock_user.is_authenticated.return_value = False
-        self.assertIsNone(render.toc_for_course(mock_user,'dummy',
-                                                mock_course, 'dummy', 'dummy'))
-        # rest of tests are in class TestTOC
-
     def test_get_module(self):
         self.assertIsNone(render.get_module('dummyuser',None,\
                                             'invalid location',None,None))
-        #done
-
-    def test__get_module(self):
-        mock_user = MagicMock()
-        mock_user.is_authenticated.return_value = False
-        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        mock_request = MagicMock()
-        s = render._get_module(mock_user, mock_request, location,
-                                'dummy', 'edX/toy/2012_Fall')
-        self.assertIsInstance(s, SequenceModule)
-        # Don't know how to generate error in line 260 to test
-        # Can't tell if sequence module is an error?
 
     def test_get_instance_module(self):
-        # done
         mock_user = MagicMock()
         mock_user.is_authenticated.return_value = False
         self.assertIsNone(render.get_instance_module('dummy', mock_user, 'dummy',
