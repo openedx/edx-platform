@@ -798,6 +798,10 @@ class DragAndDropInput(InputTypeBase):
             if tag_type == 'draggable' and not self.no_labels:
                 dic['label'] = dic['label'] or dic['id']
 
+            if tag_type == 'draggable':
+                dic['target_fields'] = [parse(target, 'target') for target in
+                                                tag.iterchildren('target')]
+
             return dic
 
         # add labels to images?:
@@ -909,15 +913,15 @@ registry.register(DesignProtein2dInput)
 class EditAGeneInput(InputTypeBase):
     """
         An input type for editing a gene. Integrates with the genex java applet.
-        
+
         Example:
-        
+
         <editagene width="800" hight="500" dna_sequence="ETAAGGCTATAACCGA" />
         """
-    
+
     template = "editageneinput.html"
     tags = ['editageneinput']
-    
+
     @classmethod
     def get_attributes(cls):
         """
@@ -927,14 +931,14 @@ class EditAGeneInput(InputTypeBase):
                 Attribute('height'),
                 Attribute('dna_sequence')
                 ]
-    
+
     def _extra_context(self):
         """
             """
         context = {
             'applet_loader': '/static/js/capa/edit-a-gene.js',
         }
-        
+
         return context
 
 registry.register(EditAGeneInput)
