@@ -224,7 +224,7 @@ class InputTypeBase(object):
             get: a dictionary containing the data that was sent with the ajax call
 
         Output:
-            a dictionary object that will then get sent back to the Javascript
+            a dictionary object that can be serialized into JSON. This will be sent back to the Javascript. 
         """
         pass
 

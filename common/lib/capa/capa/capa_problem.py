@@ -335,16 +335,16 @@ class LoncapaProblem(object):
 
     def handle_input_ajax(self, get):
         '''
-        This passes any specialized input ajax onto the input class
+        InputTypes can support specialized AJAX calls. Find the correct input and pass along the correct data
 
-        It also parses out the dispatch from the get so that it can be passed onto the input type nicely
+        Also, parse out the dispatch from the get so that it can be passed onto the input type nicely
         '''
 
         # pull out the id
-        problem_id = get['problem_id']
-        if self.inputs[problem_id]:
+        input_id = get['input_id']
+        if self.inputs[input_id]:
             dispatch = get['dispatch']
-            return self.inputs[problem_id].handle_ajax(dispatch, get)
+            return self.inputs[input_id].handle_ajax(dispatch, get)
         else:
             log.warning("Could not find matching input for id: %s" % problem_id)
             return {}
@@ -512,8 +512,9 @@ class LoncapaProblem(object):
             msg = ''
             hint = ''
             hintmode = None
+            input_id = problemtree.get('id')
             if problemid in self.correct_map:
-                pid = problemtree.get('id')
+                pid = input_id
                 status = self.correct_map.get_correctness(pid)
                 msg = self.correct_map.get_msg(pid)
                 hint = self.correct_map.get_hint(pid)
@@ -524,18 +525,17 @@ class LoncapaProblem(object):
                 value = self.student_answers[problemid]
 
             # do the rendering
-
             state = {'value': value,
                    'status': status,
-                   'id': problemtree.get('id'),
+                   'id': input_id,
                    'feedback': {'message': msg,
                                 'hint': hint,
                                 'hintmode': hintmode, }}
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             # save the input type so that we can make ajax calls on it if we need to
-            self.inputs[problemid] = input_type_cls(self.system, problemtree, state)
-            return self.inputs[problemid].get_html()
+            self.inputs[input_id] = input_type_cls(self.system, problemtree, state)
+            return self.inputs[input_id].get_html()
 
         # let each Response render itself
         if problemtree in self.responders:
