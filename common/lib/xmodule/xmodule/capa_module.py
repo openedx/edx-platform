@@ -319,66 +319,82 @@ class CapaModule(XModule):
             else:
                 return True
 
+    def handle_problem_html_error(self, err):
+        """
+        Change our problem to a dummy problem containing
+        a warning message to display to users.
+
+        Returns the HTML to show to users
+
+        *err* is the Exception encountered while rendering the problem HTML.
+        """
+        log.exception(err)
+
+        # TODO (vshnayder): another switch on DEBUG.
+        if self.system.DEBUG:
+            msg = (
+                '[courseware.capa.capa_module] <font size="+1" color="red">'
+                'Failed to generate HTML for problem %s</font>' %
+                (self.location.url()))
+            msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<', '&lt;')
+            msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
+            html = msg
+
+        # We're in non-debug mode, and possibly even in production. We want
+        #   to avoid bricking of problem as much as possible
+        else:
+
+            # Presumably, student submission has corrupted LoncapaProblem HTML.
+            #   First, pull down all student answers
+            student_answers = self.lcp.student_answers
+            answer_ids = student_answers.keys()
+
+            # Some inputtypes, such as dynamath, have additional "hidden" state that
+            #   is not exposed to the student. Keep those hidden
+            # TODO: Use regex, e.g. 'dynamath' is suffix at end of answer_id
+            hidden_state_keywords = ['dynamath']
+            for answer_id in answer_ids:
+                for hidden_state_keyword in hidden_state_keywords:
+                    if answer_id.find(hidden_state_keyword) >= 0:
+                        student_answers.pop(answer_id)
+
+            #   Next, generate a fresh LoncapaProblem
+            self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
+                           state=None,   # Tabula rasa
+                           seed=self.seed, system=self.system)
+
+            # Prepend a scary warning to the student
+            warning  = '<div class="capa_reset">'\
+                       '<h2>Warning: The problem has been reset to its initial state!</h2>'\
+                       'The problem\'s state was corrupted by an invalid submission. ' \
+                       'The submission consisted of:'\
+                       '<ul>'
+            for student_answer in student_answers.values():
+                if student_answer != '':
+                    warning += '<li>' + cgi.escape(student_answer) + '</li>'
+            warning += '</ul>'\
+                       'If this error persists, please contact the course staff.'\
+                       '</div>'
+
+            html = warning
+            try:
+                html += self.lcp.get_html()
+            except Exception, err:   # Couldn't do it. Give up
+                log.exception(err)
+                raise
+
+        return html
+
+
     def get_problem_html(self, encapsulate=True):
         '''Return html for the problem.  Adds check, reset, save buttons
         as necessary based on the problem config and state.'''
 
         try:
             html = self.lcp.get_html()
+
         except Exception, err:
-            log.exception(err)
-
-            # TODO (vshnayder): another switch on DEBUG.
-            if self.system.DEBUG:
-                msg = (
-                    '[courseware.capa.capa_module] <font size="+1" color="red">'
-                    'Failed to generate HTML for problem %s</font>' %
-                    (self.location.url()))
-                msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<', '&lt;')
-                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
-                html = msg
-            else:
-                # We're in non-debug mode, and possibly even in production. We want
-                #   to avoid bricking of problem as much as possible
-
-                # Presumably, student submission has corrupted LoncapaProblem HTML.
-                #   First, pull down all student answers
-                student_answers = self.lcp.student_answers
-                answer_ids = student_answers.keys()
-
-                # Some inputtypes, such as dynamath, have additional "hidden" state that
-                #   is not exposed to the student. Keep those hidden
-                # TODO: Use regex, e.g. 'dynamath' is suffix at end of answer_id
-                hidden_state_keywords = ['dynamath']
-                for answer_id in answer_ids:
-                    for hidden_state_keyword in hidden_state_keywords:
-                        if answer_id.find(hidden_state_keyword) >= 0:
-                            student_answers.pop(answer_id)
-
-                #   Next, generate a fresh LoncapaProblem
-                self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                               state=None,   # Tabula rasa
-                               seed=self.seed, system=self.system)
-
-                # Prepend a scary warning to the student
-                warning  = '<div class="capa_reset">'\
-                           '<h2>Warning: The problem has been reset to its initial state!</h2>'\
-                           'The problem\'s state was corrupted by an invalid submission. ' \
-                           'The submission consisted of:'\
-                           '<ul>'
-                for student_answer in student_answers.values():
-                    if student_answer != '':
-                        warning += '<li>' + cgi.escape(student_answer) + '</li>'
-                warning += '</ul>'\
-                           'If this error persists, please contact the course staff.'\
-                           '</div>'
-
-                html = warning
-                try:
-                    html += self.lcp.get_html()
-                except Exception, err:   # Couldn't do it. Give up
-                    log.exception(err)
-                    raise
+            return self.handle_problem_html_error(err)
 
         content = {'name': self.display_name,
                    'html': html,
