@@ -1,6 +1,5 @@
 from util.json_request import expect_json
 import json
-import ast
 import logging
 import os
 import sys
@@ -291,21 +290,6 @@ def edit_unit(request, location):
     # in ADVANCED_COMPONENT_TYPES that should be enabled for the course.
     course_metadata = CourseMetadata.fetch(course.location)
     course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, [])
-
-    # We expect the advanced keys to be a *list* of strings, but if it is a JSON-encoded string, attempt to parse it.
-    if isinstance(course_advanced_keys, basestring):
-        # Are you JSON?
-        try:
-            course_advanced_keys = json.loads(course_advanced_keys)
-        except:
-            log.error("Cannot JSON decode course advanced policy: {0}".format(course_advanced_keys))
-            # Not JSON? How about Python?
-        try:
-            #This is a safe evaluation.  See docs for ast
-            course_advanced_keys = ast.literal_eval(course_advanced_keys)
-        except:
-            log.error("Cannot parse course advanced policy at all: {0}".format(course_advanced_keys))
-            course_advanced_keys=[]
 
     # Set component types according to course policy file
     component_types = list(COMPONENT_TYPES)
