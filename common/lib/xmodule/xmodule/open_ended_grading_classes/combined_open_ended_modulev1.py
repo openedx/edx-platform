@@ -116,6 +116,7 @@ class CombinedOpenEndedV1Module():
         """
 
         self.instance_state = instance_state
+        log.debug(instance_state)
         self.display_name = instance_state.get('display_name', "Open Ended")
         self.rewrite_content_links = static_data.get('rewrite_content_links',"")
 

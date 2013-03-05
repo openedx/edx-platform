@@ -14,7 +14,7 @@ log = logging.getLogger("mitx.courseware")
 
 V1_ATTRIBUTES = ["display_name", "current_task_number", "task_states", "state",
                  "attempts", "ready_to_reset", "max_attempts", "is_graded", "accept_file_upload",
-                 "skip_spelling_checks", "due", "graceperiod", "max_score", "data"]
+                 "skip_spelling_checks", "due", "graceperiod", "max_score"]
 
 VERSION_TUPLES = (
     ('1', CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_ATTRIBUTES),
@@ -137,8 +137,9 @@ class CombinedOpenEndedModule(XModule):
         static_data = {
             'rewrite_content_links' : self.rewrite_content_links,
         }
-
-        instance_state = { k: self.__dict__[k] for k in self.__dict__ if k in attributes[version_index]}
+        instance_state = { k: getattr(self,k) for k in attributes[version_index]}
+        log.debug(instance_state)
+        instance_state.update({'data' : self.data})
         self.child_descriptor = descriptors[version_index](self.system)
         self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(self.data), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
@@ -165,10 +166,6 @@ class CombinedOpenEndedModule(XModule):
     @property
     def due_date(self):
         return self.child_module.due_date
-
-    @property
-    def display_name(self):
-        return self.child_module.display_name
 
 
 class CombinedOpenEndedDescriptor(RawDescriptor):
