@@ -307,6 +307,10 @@ def index(request, course_id, chapter=None, section=None,
                 # Specifically asked-for section doesn't exist
                 raise Http404
 
+            # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
+            # which will prefetch the children more efficiently than doing a recursive load
+            section_descriptor = modulestore().get_instance(course.id, section_descriptor.location, depth=None)
+
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
             section_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
