@@ -146,6 +146,8 @@ class LoncapaProblem(object):
         if not self.student_answers:  # True when student_answers is an empty dict
             self.set_initial_display()
 
+        self.inputs = {}
+
         self.extracted_tree = self._extract_html(self.tree)
 
 
@@ -337,10 +339,16 @@ class LoncapaProblem(object):
 
         It also parses out the dispatch from the get so that it can be passed onto the input type nicely
         '''
-        if self.input:
+
+        # pull out the id
+        problem_id = get['problem_id']
+        if self.inputs[problem_id]:
             dispatch = get['dispatch']
-            return self.input.handle_ajax(dispatch, get)
-        return {}
+            return self.inputs[problem_id].handle_ajax(dispatch, get)
+        else:
+            log.warning("Could not find matching input for id: %s" % problem_id)
+            return {}
+
 
 
     # ======= Private Methods Below ========
@@ -526,8 +534,8 @@ class LoncapaProblem(object):
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             # save the input type so that we can make ajax calls on it if we need to
-            self.input = input_type_cls(self.system, problemtree, state)
-            return self.input.get_html()
+            self.inputs[problemid] = input_type_cls(self.system, problemtree, state)
+            return self.inputs[problemid].get_html()
 
         # let each Response render itself
         if problemtree in self.responders:

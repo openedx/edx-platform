@@ -79,8 +79,9 @@ class @Problem
 
   # Use this if you want to make an ajax call on the input type object 
   # static method so you don't have to instantiate a Problem in order to use it
-  @inputAjax: (url, dispatch, data, callback) ->
+  @inputAjax: (url, problem_id, dispatch, data, callback) ->
     data['dispatch'] = dispatch
+    data['problem_id'] = problem_id
     $.postWithPrefix "#{url}/input_ajax", data, callback
     
 
