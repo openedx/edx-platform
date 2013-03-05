@@ -279,7 +279,7 @@ class CapaModule(XModule):
         """
         Return True/False to indicate whether to show the "Reset" button.
         """
-        survey_question = (self.max_attempts == 0)
+        is_survey_question = (self.max_attempts == 0)
 
         if self.rerandomize in ["always", "onreset"]:
 
@@ -287,7 +287,7 @@ class CapaModule(XModule):
             # then do NOT show the reset button.
             # If the problem hasn't been submitted yet, then do NOT show
             # the reset button.
-            if (self.closed() and not survey_question) or not self.is_completed():
+            if (self.closed() and not is_survey_question) or not self.is_completed():
                 return False
             else:
                 return True
@@ -307,14 +307,14 @@ class CapaModule(XModule):
         if self.force_save_button == "true":
             return not self.closed()
         else:
-            survey_question = (self.max_attempts == 0)
+            is_survey_question = (self.max_attempts == 0)
             needs_reset = self.is_completed() and self.rerandomize == "always"
 
             # If the problem is closed (and not a survey question with max_attempts==0),
             # then do NOT show the reset button
             # If we're waiting for the user to reset a randomized problem
             # then do NOT show the reset button
-            if (self.closed() and not survey_question) or needs_reset:
+            if (self.closed() and not is_survey_question) or needs_reset:
                 return False
             else:
                 return True
