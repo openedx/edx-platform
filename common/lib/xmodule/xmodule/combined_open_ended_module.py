@@ -6,13 +6,18 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
+from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 
 log = logging.getLogger("mitx.courseware")
 
 
+V1_ATTRIBUTES = ["display_name", "current_task_number", "task_states", "state",
+                 "attempts", "ready_to_reset", "max_attempts", "is_graded", "accept_file_upload",
+                 "skip_spelling_checks", "due", "graceperiod", "max_score", "data"]
+
 VERSION_TUPLES = (
-    ('1', CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module),
+    ('1', CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_ATTRIBUTES),
 )
 
 DEFAULT_VERSION = 1
@@ -49,6 +54,24 @@ class CombinedOpenEndedModule(XModule):
     INTERMEDIATE_DONE = 'intermediate_done'
     DONE = 'done'
 
+    icon_class = 'problem'
+
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+    current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.student_state)
+    task_states = String(help="State dictionaries of each task within this module.", default=json.dumps("[]"), scope=Scope.student_state)
+    state = String(help="Which step within the current task that the student is on.", default="initial", scope=Scope.student_state)
+    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
+    ready_to_reset = Boolean(help="If the problem is ready to be reset or not.",  default=False, scope=Scope.student_state)
+    max_attempts = Integer(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
+    is_graded = Boolean(help="Whether or not the problem is graded.",  default=False, scope=Scope.settings)
+    accept_file_upload = Boolean(help="Whether or not the problem accepts file uploads.",  default=False, scope=Scope.settings)
+    skip_spelling_checks = Boolean(help="Whether or not to skip initial spelling checks.",  default=True, scope=Scope.settings)
+    due = String(help="Date that this problem is due by", default= None, scope=Scope.settings)
+    graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None, scope=Scope.settings)
+    max_score = Integer(help="Maximum score for the problem.", default=1, scope=Scope.settings)
+    version = Integer(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
+    data = String(help="XML data for the problem", scope=Scope.content)
+
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
@@ -57,10 +80,8 @@ class CombinedOpenEndedModule(XModule):
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-            instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, descriptor, model_data):
+        XModule.__init__(self, system, location, descriptor, model_data)
 
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
@@ -100,25 +121,10 @@ class CombinedOpenEndedModule(XModule):
         self.system = system
         self.system.set('location', location)
 
-        # Load instance state
-        if instance_state is not None:
-            instance_state = json.loads(instance_state)
-        else:
-            instance_state = {}
-
-        self.version = self.metadata.get('version', DEFAULT_VERSION)
-        version_error_string = "Version of combined open ended module {0} is not correct.  Going with version {1}"
-        if not isinstance(self.version, basestring):
-            try:
-                self.version = str(self.version)
-            except:
-                #This is a dev_facing_error
-                log.info(version_error_string.format(self.version, DEFAULT_VERSION))
-                self.version = DEFAULT_VERSION
-
         versions = [i[0] for i in VERSION_TUPLES]
         descriptors = [i[1] for i in VERSION_TUPLES]
         modules = [i[2] for i in VERSION_TUPLES]
+        attributes = [i[3] for i in VERSION_TUPLES]
 
         try:
             version_index = versions.index(self.version)
@@ -132,10 +138,11 @@ class CombinedOpenEndedModule(XModule):
             'rewrite_content_links' : self.rewrite_content_links,
         }
 
+        instance_state = { k: self.__dict__[k] for k in self.__dict__ if k in attributes[version_index]}
         self.child_descriptor = descriptors[version_index](self.system)
-        self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(definition['data']), self.system)
+        self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(self.data), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = json.dumps(instance_state), metadata = self.metadata, static_data= static_data)
+            instance_state = instance_state, static_data= static_data)
 
     def get_html(self):
         return self.child_module.get_html()

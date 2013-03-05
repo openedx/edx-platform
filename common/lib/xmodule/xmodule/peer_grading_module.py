@@ -6,10 +6,9 @@ from lxml import etree
 from datetime import datetime
 from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
-from .editing_module import EditingDescriptor
 from .stringify import stringify_children
 from .x_module import XModule
-from .xml_module import XmlDescriptor
+from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from timeinfo import TimeInfo
@@ -40,14 +39,16 @@ class PeerGradingModule(XModule):
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
-    student_data_for_location = Object(scope=Scope.student_state)
-    max_grade = Integer(default=MAX_SCORE, scope=Scope.student_state)
-    use_for_single_location = Boolean(default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
-    is_graded = Boolean(default=IS_GRADED, scope=Scope.settings)
-    link_to_location = String(default=LINK_TO_LOCATION, scope=Scope.settings)
+    use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.", default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
+    link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION, scope=Scope.settings)
+    is_graded = Boolean(help="Whether or not this module is scored.",default=IS_GRADED, scope=Scope.settings)
+    display_due_date_string = String(help="Due date that should be displayed.", default=None, scope=Scope.settings)
+    grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
+    max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE, scope=Scope.settings)
+    student_data_for_location = Object(help="Student data for a given peer grading problem.", default=json.dumps({}),scope=Scope.student_state)
 
-    def __init__(self, *args, **kwargs):
-        super(PeerGradingModule, self).__init__(*args, **kwargs)
+    def __init__(self, system, location, descriptor, model_data):
+        XModule.__init__(self, system, location, descriptor, model_data)
 
         #We need to set the location here so the child modules can use it
         system.set('location', location)
@@ -57,11 +58,6 @@ class PeerGradingModule(XModule):
         else:
             self.peer_gs = MockPeerGradingService()
 
-
-        if isinstance(self.use_for_single_location, basestring):
-            self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
-
-        self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
         if self.use_for_single_location == True:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
@@ -73,21 +69,18 @@ class PeerGradingModule(XModule):
             if due_date:
                 self.metadata['due'] = due_date
 
-        self.is_graded = self.metadata.get('is_graded', IS_GRADED)
-        if isinstance(self.is_graded, basestring):
-            self.is_graded = (self.is_graded in TRUE_DICT)
-
-        display_due_date_string = self.metadata.get('due', None)
-        grace_period_string = self.metadata.get('graceperiod', None)
-
         try:
-            self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)
+            self.timeinfo = TimeInfo(self.display_due_date_string, self.grace_period_string)
         except:
             log.error("Error parsing due date information in location {0}".format(location))
             raise
 
         self.display_due_date = self.timeinfo.display_due_date
 
+        try:
+            self.student_data_for_location = json.loads(self.student_data_for_location)
+        except:
+            pass
 
         self.ajax_url = self.system.ajax_url
         if not self.ajax_url.endswith("/"):
@@ -558,9 +551,9 @@ class PeerGradingModule(XModule):
         return json.dumps(state)
 
 
-class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
+class PeerGradingDescriptor(RawDescriptor):
     """
-    Module for adding combined open ended questions
+    Module for adding peer grading questions
     """
     mako_template = "widgets/raw-edit.html"
     module_class = PeerGradingModule
@@ -569,41 +562,3 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "peer_grading"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
-
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        """
-        Pull out the individual tasks, the rubric, and the prompt, and parse
-
-        Returns:
-        {
-        'rubric': 'some-html',
-        'prompt': 'some-html',
-        'task_xml': dictionary of xml strings,
-        }
-        """
-        log.debug("In definition")
-        expected_children = []
-        for child in expected_children:
-            if len(xml_object.xpath(child)) == 0:
-                #This is a staff_facing_error
-                raise ValueError("Peer grading definition must include at least one '{0}' tag.  Contact the learning sciences group for assistance.".format(child))
-
-        def parse_task(k):
-            """Assumes that xml_object has child k"""
-            return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(0, len(xml_object.xpath(k)))]
-
-        def parse(k):
-            """Assumes that xml_object has child k"""
-            return xml_object.xpath(k)[0]
-
-        return {}, []
-
-
-    def definition_to_xml(self, resource_fs):
-        '''Return an xml element representing this definition.'''
-        elt = etree.Element('peergrading')
-        return elt

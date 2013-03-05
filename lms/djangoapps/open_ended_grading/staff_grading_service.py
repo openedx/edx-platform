@@ -60,7 +60,14 @@ class StaffGradingService(GradingService):
     Interface to staff grading backend.
     """
     def __init__(self, config):
-        config['system'] = ModuleSystem(None, None, None, render_to_string, None)
+        config['system'] = ModuleSystem(
+            ajax_url=None,
+            track_function=None,
+            get_module = None,
+            render_template=render_to_string,
+            replace_urls=None,
+            xblock_model_data= {}
+        )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']
         self.login_url = self.url + '/login/'

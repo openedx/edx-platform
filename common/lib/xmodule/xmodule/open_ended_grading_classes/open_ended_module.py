@@ -696,7 +696,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return html
 
 
-class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
+class OpenEndedDescriptor():
     """
     Module for adding open ended response questions to courses
     """
@@ -707,6 +707,9 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "openended"
+
+    def __init__(self, system):
+        self.system =system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -727,7 +730,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return xml_object.xpath(k)[0]
 
-        return {'oeparam': parse('openendedparam')}, []
+        return {'oeparam': parse('openendedparam')}
 
 
     def definition_to_xml(self, resource_fs):

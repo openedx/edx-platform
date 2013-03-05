@@ -145,14 +145,21 @@ class TestPeerGradingService(ct.PageLoader):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-
+        model_data = {'data' : "<peergrading/>"}
         self.mock_service = peer_grading_service.MockPeerGradingService()
-        self.system = ModuleSystem(location, None, None, render_to_string, None,
+        self.system = ModuleSystem(
+            ajax_url=location,
+            track_function=None,
+            get_module = None,
+            render_template=render_to_string,
+            replace_urls=None,
+            xblock_model_data= {},
             s3_interface = test_util_open_ended.S3_INTERFACE,
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
         )
-        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system)
-        self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, "<peergrading/>", self.descriptor)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, location, model_data)
+        model_data = {}
+        self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, self.descriptor, model_data)
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 

@@ -299,7 +299,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         return [rubric_scores]
 
 
-class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
+class SelfAssessmentDescriptor():
     """
     Module for adding self assessment questions to courses
     """
@@ -310,6 +310,9 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "selfassessment"
+
+    def __init__(self, system):
+        self.system =system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
