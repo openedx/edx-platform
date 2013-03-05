@@ -38,8 +38,12 @@ class CapaFactory(object):
     @staticmethod
     def input_key():
         """ Return the input key to use when passing GET parameters """
-        return ("input_" + 
-                "-".join(['i4x', 'edX', 'capa_test', 'problem', 
+        return ("input_" + CapaFactory.answer_key())
+
+    @staticmethod
+    def answer_key():
+        """ Return the key stored in the capa problem answer dict """
+        return ("-".join(['i4x', 'edX', 'capa_test', 'problem', 
                         'SampleProblem%d' % CapaFactory.num]) +
                 "_2_1")
 
@@ -555,16 +559,62 @@ class CapaModuleTest(unittest.TestCase):
     def test_save_problem(self):
         module = CapaFactory.create()
 
-        # Simulate 
+        # Simulate that the problem is not done (not attempted or reset)
+        module.lcp.done = False
+
+        # Save the problem
+        get_request_dict = { CapaFactory.input_key(): '3.14' }
+        result = module.save_problem(get_request_dict)
+
+        # Expect that answers are saved to the problem
+        expected_answers = { CapaFactory.answer_key(): '3.14' }
+        self.assertEqual(module.lcp.student_answers, expected_answers)
+
+        # Expect that the result is success
+        self.assertTrue('success' in result and result['success'])
 
 
     def test_save_problem_closed(self):
-        self.fail()
+        module = CapaFactory.create()
+
+        # Simulate that the problem is NOT done (not attempted or reset)
+        module.lcp.done = False
+
+        # Simulate that the problem is closed
+        with patch('xmodule.capa_module.CapaModule.closed') as mock_closed:
+            mock_closed.return_value = True
+
+            # Try to save the problem
+            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            result = module.save_problem(get_request_dict)
+
+        # Expect that the result is failure
+        self.assertTrue('success' in result and not result['success'])
 
 
     def test_save_problem_submitted_with_randomize(self):
-        self.fail()
+        module = CapaFactory.create(rerandomize='always')
+
+        # Simulate that the problem is completed
+        module.lcp.done = True
+
+        # Try to save
+        get_request_dict = { CapaFactory.input_key(): '3.14' }
+        result = module.save_problem(get_request_dict)
+
+        # Expect that we cannot save
+        self.assertTrue('success' in result and not result['success'])
 
 
     def test_save_problem_submitted_no_randomize(self):
-        self.fail()
+        module = CapaFactory.create(rerandomize='never')
+
+        # Simulate that the problem is completed
+        module.lcp.done = True
+
+        # Try to save
+        get_request_dict = { CapaFactory.input_key(): '3.14' }
+        result = module.save_problem(get_request_dict)
+
+        # Expect that we succeed
+        self.assertTrue('success' in result and result['success'])
