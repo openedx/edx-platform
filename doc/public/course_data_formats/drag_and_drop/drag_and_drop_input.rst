@@ -123,6 +123,13 @@ material to make sure that there is no overlapping of targets. It is also prefer
 that targets on draggables are smaller than the actual parent draggable. Technically
 this is not necessary, but from the usability perspective it is desirable.
 
+3.) You can have targets on draggables only in the case when there are base targets
+defined (base targets are attached to the base image).
+
+If you do not have base targets, then you can only have a single level of nesting
+(draggables on the base image). In this case the client side will be reporting (x,y)
+positions of each draggables on the base image.
+
 Correct answer format
 ---------------------
 
