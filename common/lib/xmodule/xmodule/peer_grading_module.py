@@ -456,7 +456,6 @@ class PeerGradingModule(XModule):
         try:
             problem_list_json = self.peer_gs.get_problem_list(self.system.course_id, self.system.anonymous_student_id)
             problem_list_dict = problem_list_json
-            log.debug(problem_list_dict)
             success = problem_list_dict['success']
             if 'error' in problem_list_dict:
                 error_text = problem_list_dict['error']
@@ -593,7 +592,6 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
         'task_xml': dictionary of xml strings,
         }
         """
-        log.debug("In definition")
         expected_children = []
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0:

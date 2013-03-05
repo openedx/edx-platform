@@ -89,18 +89,23 @@ def peer_grading(request, course_id):
     Show a peer grading interface
     '''
 
+    #Get the current course
     course = get_course_with_access(request.user, course_id, 'load')
     course_id_parts = course.id.split("/")
     false_dict = [False,"False", "false", "FALSE"]
 
+    #Reverse the base course url
     base_course_url  = reverse('courses')
     try:
         #TODO:  This will not work with multiple runs of a course.  Make it work.  The last key in the Location passed
         #to get_items is called revision.  Is this the same as run?
+        #Get the peer grading modules currently in the course
         items = modulestore().get_items(['i4x', None, course_id_parts[1], 'peergrading', None])
+        #See if any of the modules are centralized modules (ie display info from multiple problems)
         items = [i for i in items if i.metadata.get("use_for_single_location", True) in false_dict]
+        #Get the first one
         item_location = items[0].location
-        item_location_url = item_location.url()
+        #Generate a url for the first module and redirect the user to it
         problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
 
