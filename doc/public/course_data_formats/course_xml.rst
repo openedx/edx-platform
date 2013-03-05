@@ -357,6 +357,8 @@ Supported fields at the course level
           * `cohorted_discussions`: list of discussions that should be cohorted.  Any not specified in this list are not cohorted.
           * `auto_cohort`: Truthy.
           * `auto_cohort_groups`: `["group name 1", "group name 2", ...]` If `cohorted` and `auto_cohort` is true, automatically put each student into a random group from the `auto_cohort_groups` list, creating the group if needed.  
+     * - `pdf_textbooks`
+       - have pdf-based textbooks on tabs in the courseware.  See below for details on config.
 
 
 Available metadata
@@ -508,13 +510,15 @@ If you want to customize the courseware tabs displayed for your course, specify 
       "url_slug": "news",
       "name": "Exciting news"
     },
-    {"type": "textbooks"}
+    {"type": "textbooks"},
+    {"type": "pdf_textbooks"}
   ]
 
 * If you specify any tabs, you must specify all tabs.  They will appear in the order given.
 * The first two tabs must have types `"courseware"` and `"course_info"`, in that order, or the course will not load.
 * The `courseware` tab never has a name attribute -- it's always rendered as "Courseware" for consistency between courses.
 * The `textbooks` tab will actually generate one tab per textbook, using the textbook titles as names.
+* The `pdf_textbooks` tab will actually generate one tab per pdf_textbook.  The tab name is found in the pdf textbook definition.
 * For static tabs, the `url_slug` will be the url that points to the tab.  It can not be one of the existing courseware url types (even if those aren't used in your course).  The static content will come from `tabs/{course_url_name}/{url_slug}.html`, or `tabs/{url_slug}.html` if that doesn't exist.
 * An Instructor tab will be automatically added at the end for course staff users.
 
@@ -527,19 +531,54 @@ If you want to customize the courseware tabs displayed for your course, specify 
    * - `course_info`
      - Parameter `name`.
    * - `wiki`
-     - arameter `name`.
+     - Parameter `name`.
    * - `discussion`
      - Parameter `name`.
    * - `external_link`
      - Parameters `name`, `link`.
    * - `textbooks`
      - No parameters--generates tab names from book titles.
+   * - `pdf_textbooks`
+     - No parameters--generates tab names from pdf book definition.  (See discussion below for configuration.)
    * - `progress`
      - Parameter `name`.
    * - `static_tab`
      - Parameters `name`, `url_slug`--will look for tab contents in 'tabs/{course_url_name}/{tab url_slug}.html'
    * - `staff_grading`
      - No parameters.  If specified, displays the staff grading tab for instructors.
+
+*********
+Textbooks
+*********
+Support is currently provided for image-based and PDF-based textbooks.  
+
+Image-based Textbooks
+^^^^^^^^^^^^^^^^^^^^^
+
+TBD.
+
+PDF-based Textbooks
+^^^^^^^^^^^^^^^^^^^
+
+PDF-based textbooks are configured at the course level in the policy file.  The JSON markup consists of an array of maps, with each map corresponding to a separate textbook.  There are two styles to presenting PDF-based material.  The first way is as a single PDF on a tab, which requires only a tab title and a URL for configuration.  A second way permits the display of multiple PDFs that should be displayed together on a single view. For this view, a side panel of links is available on the left, allowing selection of a particular PDF to view.  
+
+.. code-block:: json
+
+        "pdf_textbooks": [ 
+          {"tab_title": "Textbook 1", 
+	   "url": "https://www.example.com/book1.pdf" },
+          {"tab_title": "Textbook 2", 
+	   "chapters": [
+               { "title": "Chapter 1", "url": "https://www.example.com/Chapter1.pdf" },
+               { "title": "Chapter 2", "url": "https://www.example.com/Chapter2.pdf" },
+               { "title": "Chapter 3", "url": "https://www.example.com/Chapter3.pdf" },
+               { "title": "Chapter 4", "url": "https://www.example.com/Chapter4.pdf" },
+               { "title": "Chapter 5", "url": "https://www.example.com/Chapter5.pdf" },
+               { "title": "Chapter 6", "url": "https://www.example.com/Chapter6.pdf" },
+               { "title": "Chapter 7", "url": "https://www.example.com/Chapter7.pdf" }
+	       ]
+	  }
+        ]
 
 *************************************
 Other file locations (info and about)
