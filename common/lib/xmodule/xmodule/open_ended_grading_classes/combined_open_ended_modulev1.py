@@ -273,7 +273,7 @@ class CombinedOpenEndedV1Module():
                 })
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
-                instance_state=self.instance_state, model_data = self._model_data, task_number = self.current_task_number)
+                instance_state=current_task_state)
             self.task_states.append(self.current_task.get_instance_state())
             self.state = self.ASSESSING
         else:
@@ -281,7 +281,7 @@ class CombinedOpenEndedV1Module():
                 current_task_state = self.overwrite_state(current_task_state)
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
-                instance_state=self.instance_state, model_data = self._model_data, task_number = self.current_task_number)
+                instance_state=current_task_state)
 
         return True
 

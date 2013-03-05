@@ -102,6 +102,7 @@ class OpenEndedChild(object):
         except:
             self.child_attempts = 0
 
+        self.max_attempts = static_data['max_attempts']
         self.child_prompt = static_data['prompt']
         self.child_rubric = static_data['rubric']
         self.display_name = static_data['display_name']
@@ -277,7 +278,7 @@ class OpenEndedChild(object):
                 return Progress(self.get_score()['score'], self._max_score)
             except Exception as err:
                 #This is a dev_facing_error
-                log.exception("Got bad progress from open ended child module. Max Score: {1}".format(self._max_score))
+                log.exception("Got bad progress from open ended child module. Max Score: {0}".format(self._max_score))
                 return None
         return None
 
