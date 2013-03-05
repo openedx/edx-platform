@@ -96,7 +96,7 @@ class CombinedOpenEndedRubric(object):
                 log.error(error_message)
                 raise RubricParsingError(error_message)
 
-        if total != max_score:
+        if int(total) != int(max_score):
             #This is a staff_facing_error
             error_msg = "The max score {0} for problem {1} does not match the total number of points in the rubric {2}. Contact the learning sciences group for assistance.".format(
                     max_score, location, total)

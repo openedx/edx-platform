@@ -65,7 +65,7 @@ class OpenEndedChild(object):
     }
 
     def __init__(self, system, location, definition, descriptor, static_data,
-                 instance_state=None, shared_state=None, **kwargs):
+                 instance_state=None, shared_state=None, model_data=None, task_number = None, **kwargs):
         # Load instance state
         if instance_state is not None:
             instance_state = json.loads(instance_state)
@@ -76,13 +76,19 @@ class OpenEndedChild(object):
         # None for any element, and score and hint can be None for the last (current)
         # element.
         # Scores are on scale from 0 to max_score
-        self.history = instance_state.get('history', [])
+        self._model_data = model_data
+        task_state = {}
+        if task_number is not None:
+            self.task_number = task_number
+            if instance_state is not None:
+                task_state =
 
-        self.state = instance_state.get('state', self.INITIAL)
+       instance_state['task_states'][task_number]['history']
+     instance_state['task_states'][task_number]['state']', self.INITIAL)
 
-        self.created = instance_state.get('created', False)
+        self.created = task_state.get('created', False)
 
-        self.attempts = instance_state.get('attempts', 0)
+        self.attempts = task_state.get('attempts', 0)
         self.max_attempts = static_data['max_attempts']
 
         self.prompt = static_data['prompt']

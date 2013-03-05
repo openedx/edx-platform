@@ -78,7 +78,7 @@ class CombinedOpenEndedV1Module():
     DONE = 'done'
 
     def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, metadata = None, static_data = None, **kwargs):
+                 instance_state=None, shared_state=None, metadata = None, static_data = None, model_data=None,**kwargs):
 
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
@@ -115,8 +115,8 @@ class CombinedOpenEndedV1Module():
 
         """
 
+        self._model_data = model_data
         self.instance_state = instance_state
-        log.debug(instance_state)
         self.display_name = instance_state.get('display_name', "Open Ended")
         self.rewrite_content_links = static_data.get('rewrite_content_links',"")
 
@@ -233,7 +233,9 @@ class CombinedOpenEndedV1Module():
         current_task_state = None
         if len(self.task_states) > self.current_task_number:
             current_task_state = self.task_states[self.current_task_number]
+            model_data = self._model_data['task_states'][self.current_task_number]
 
+        log.debug(model_data)
         self.current_task_xml = self.task_xml[self.current_task_number]
 
         if self.current_task_number > 0:
@@ -272,7 +274,7 @@ class CombinedOpenEndedV1Module():
                 })
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
-                instance_state=current_task_state)
+                instance_state=self.instance_state, model_data = self._model_data, task_number = self.current_task_number)
             self.task_states.append(self.current_task.get_instance_state())
             self.state = self.ASSESSING
         else:
@@ -280,7 +282,7 @@ class CombinedOpenEndedV1Module():
                 current_task_state = self.overwrite_state(current_task_state)
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
-                instance_state=current_task_state)
+                instance_state=self.instance_state, model_data = self._model_data, task_number = self.current_task_number)
 
         return True
 
@@ -393,7 +395,7 @@ class CombinedOpenEndedV1Module():
 
         task_parsed_xml = task_descriptor.definition_from_xml(etree_xml, self.system)
         task = children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor,
-            self.static_data, instance_state=task_state)
+            self.static_data, instance_state=task_state, model_data = self._model_data)
         last_response = task.latest_answer()
         last_score = task.latest_score()
         last_post_assessment = task.latest_post_assessment(self.system)

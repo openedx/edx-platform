@@ -142,7 +142,7 @@ class CombinedOpenEndedModule(XModule):
         self.child_descriptor = descriptors[version_index](self.system)
         self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(self.data), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = instance_state, static_data= static_data)
+            instance_state = instance_state, static_data= static_data, model_data=model_data)
 
     def get_html(self):
         return self.child_module.get_html()
@@ -156,8 +156,8 @@ class CombinedOpenEndedModule(XModule):
     def get_score(self):
         return self.child_module.get_score()
 
-    def max_score(self):
-        return self.child_module.max_score()
+    #def max_score(self):
+    #    return self.child_module.max_score()
 
     def get_progress(self):
         return self.child_module.get_progress()
