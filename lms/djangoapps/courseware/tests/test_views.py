@@ -15,11 +15,12 @@ from django.test.client import RequestFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore, _MODULESTORES
 from xmodule.modulestore.exceptions import InvalidLocationError,\
-     ItemNotFoundError, NoPathToItem
+                                ItemNotFoundError, NoPathToItem
 import courseware.views as views
 from xmodule.modulestore import Location
 
 from factories import UserFactory
+
 
 class Stub():
     pass
@@ -28,17 +29,18 @@ class Stub():
 # This part is required for modulestore() to work properly
 def xml_store_config(data_dir):
     return {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': data_dir,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        'default': {
+            'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+            'OPTIONS': {
+                'data_dir': data_dir,
+                'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+            }
         }
     }
-}
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
+
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestJumpTo(TestCase):
@@ -64,15 +66,16 @@ class TestJumpTo(TestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
+
 class ViewsTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
-        self.date = datetime.datetime(2013,1,22)
+        self.date = datetime.datetime(2013, 1, 22)
         self.course_id = 'edX/toy/2012_Fall'
-        self.enrollment = CourseEnrollment.objects.get_or_create(user = self.user,
-                                                  course_id = self.course_id,
-                                                  created = self.date)[0]
+        self.enrollment = CourseEnrollment.objects.get_or_create(user=self.user,
+                                                  course_id=self.course_id,
+                                                  created=self.date)[0]
         self.location = ['tag', 'org', 'course', 'category', 'name']
         self._MODULESTORES = {}
         # This is a CourseDescriptor object
@@ -85,13 +88,13 @@ class ViewsTestCase(TestCase):
         # depreciated function
         mock_user = MagicMock()
         mock_user.is_authenticated.return_value = False
-        self.assertEquals(views.user_groups(mock_user),[])
-        
+        self.assertEquals(views.user_groups(mock_user), [])
+
     def test_get_current_child(self):
         self.assertIsNone(views.get_current_child(Stub()))
         mock_xmodule = MagicMock()
         mock_xmodule.position = -1
-        mock_xmodule.get_display_items.return_value = ['one','two']
+        mock_xmodule.get_display_items.return_value = ['one', 'two']
         self.assertEquals(views.get_current_child(mock_xmodule), 'one')
         mock_xmodule_2 = MagicMock()
         mock_xmodule_2.position = 3
