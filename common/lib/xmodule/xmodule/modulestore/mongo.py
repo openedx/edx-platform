@@ -66,6 +66,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         if json_data is None:
             module = self.modulestore.get_item(location)
             if module is not None:
+                # update our own cache after going to the DB to get cache miss
                 self.module_data.update(module.system.module_data)
             return module
         else:
