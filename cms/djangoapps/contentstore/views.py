@@ -70,8 +70,7 @@ log = logging.getLogger(__name__)
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 ADVANCED_COMPONENT_TYPES = {
-    'openended' : ['combinedopenended', 'peergrading'],
-    'advanced' : ['annotatable'],
+    'advanced' : ['annotatable','combinedopenended', 'peergrading']
 }
 
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
@@ -293,18 +292,20 @@ def edit_unit(request, location):
     course_metadata = CourseMetadata.fetch(course.location)
     course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, [])
 
-    #First try to parse with json
-    try:
-        course_advanced_keys = json.loads(course_advanced_keys)
-    except:
-        log.error("Cannot json decode course advanced policy: {0}".format(course_advanced_keys))
-    #It may be that it is not a json object, but can be evaluated as a python literal
-    try:
-        #This is a safe evaluation.  See docs for ast
-        course_advanced_keys = ast.literal_eval(course_advanced_keys)
-    except:
-        log.error("Cannot parse course advanced policy at all: {0}".format(course_advanced_keys))
-        course_advanced_keys=[]
+    # check if the keys are in JSON format, or perhaps a literal python expression
+    if isinstance(course_advanced_keys, basestring):
+        # Are you JSON?
+        try:
+            course_advanced_keys = json.loads(course_advanced_keys)
+        except:
+            log.error("Cannot JSON decode course advanced policy: {0}".format(course_advanced_keys))
+            # Not JSON? How about Python?
+        try:
+            #This is a safe evaluation.  See docs for ast
+            course_advanced_keys = ast.literal_eval(course_advanced_keys)
+        except:
+            log.error("Cannot parse course advanced policy at all: {0}".format(course_advanced_keys))
+            course_advanced_keys=[]
 
     #Set component types according to course policy file
     component_types = COMPONENT_TYPES
