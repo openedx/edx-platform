@@ -53,46 +53,46 @@ def registration(email):
 
 def mongo_store_config(data_dir):
     return {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': {
-            'default_class': 'xmodule.raw_module.RawDescriptor',
-            'host': 'localhost',
-            'db': 'test_xmodule',
-            'collection': 'modulestore',
-            'fs_root': data_dir,
-            'render_template': 'mitxmako.shortcuts.render_to_string',
+        'default': {
+            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+            'OPTIONS': {
+                'default_class': 'xmodule.raw_module.RawDescriptor',
+                'host': 'localhost',
+                'db': 'test_xmodule',
+                'collection': 'modulestore',
+                'fs_root': data_dir,
+                'render_template': 'mitxmako.shortcuts.render_to_string',
+            }
         }
     }
-}
 
 
 def draft_mongo_store_config(data_dir):
     return {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
-        'OPTIONS': {
-            'default_class': 'xmodule.raw_module.RawDescriptor',
-            'host': 'localhost',
-            'db': 'test_xmodule',
-            'collection': 'modulestore',
-            'fs_root': data_dir,
-            'render_template': 'mitxmako.shortcuts.render_to_string',
+        'default': {
+            'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+            'OPTIONS': {
+                'default_class': 'xmodule.raw_module.RawDescriptor',
+                'host': 'localhost',
+                'db': 'test_xmodule',
+                'collection': 'modulestore',
+                'fs_root': data_dir,
+                'render_template': 'mitxmako.shortcuts.render_to_string',
+            }
         }
     }
-}
 
 
 def xml_store_config(data_dir):
     return {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': data_dir,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        'default': {
+            'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+            'OPTIONS': {
+                'data_dir': data_dir,
+                'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+            }
         }
     }
-}
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
@@ -115,8 +115,7 @@ class ActivateLoginTestCase(TestCase):
                          'Response status code was {0} instead of 302'.format(response.status_code))
         url = response['Location']
 
-        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(
-                                                              expected_url)
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
         if not (e_scheme or e_netloc):
             expected_url = urlunsplit(('http', 'testserver', e_path,
                 e_query, e_fragment))
@@ -211,7 +210,7 @@ class PageLoader(ActivateLoginTestCase):
         resp = self.client.post('/change_enrollment', {
             'enrollment_action': 'enroll',
             'course_id': course.id,
-            })
+        })
         return parse_json(resp)
 
     def try_enroll(self, course):
@@ -230,10 +229,9 @@ class PageLoader(ActivateLoginTestCase):
         resp = self.client.post('/change_enrollment', {
             'enrollment_action': 'unenroll',
             'course_id': course.id,
-            })
+        })
         data = parse_json(resp)
         self.assertTrue(data['success'])
-
 
     def check_for_get_code(self, code, url):
         """
@@ -246,7 +244,6 @@ class PageLoader(ActivateLoginTestCase):
                          .format(resp.status_code, url, code))
         return resp
 
-
     def check_for_post_code(self, code, url, data={}):
         """
         Check that we got the expected code when accessing url via POST.
@@ -258,12 +255,8 @@ class PageLoader(ActivateLoginTestCase):
                          .format(resp.status_code, url, code))
         return resp
 
-
-
     def check_pages_load(self, module_store):
         """Make all locations in course load"""
-
-
        # enroll in the course before trying to access pages
         courses = module_store.get_courses()
         self.assertEqual(len(courses), 1)
@@ -316,7 +309,7 @@ class PageLoader(ActivateLoginTestCase):
                 msg = str(resp.status_code)
 
                 if resp.status_code != 200:
-                    msg = "ERROR " + msg  + ": " + descriptor.location.url()
+                    msg = "ERROR " + msg + ": " + descriptor.location.url()
                     all_ok = False
                     num_bad += 1
                 elif resp.redirect_chain[0][1] != 302:
@@ -344,7 +337,6 @@ class PageLoader(ActivateLoginTestCase):
         self.assertTrue(all_ok)
 
 
-
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCoursesLoadTestCase_XmlModulestore(PageLoader):
     '''Check that all pages in test courses load properly'''
@@ -355,21 +347,21 @@ class TestCoursesLoadTestCase_XmlModulestore(PageLoader):
 
     def test_toy_course_loads(self):
         module_store = XMLModuleStore(
-                                      TEST_DATA_DIR,
-                                      default_class='xmodule.hidden_module.HiddenDescriptor',
-                                      course_dirs=['toy'],
-                                      load_error_modules=True,
-                                      )
+                                        TEST_DATA_DIR,
+                                        default_class='xmodule.hidden_module.HiddenDescriptor',
+                                        course_dirs=['toy'],
+                                        load_error_modules=True,
+        )
 
         self.check_pages_load(module_store)
 
     def test_full_course_loads(self):
         module_store = XMLModuleStore(
-                                      TEST_DATA_DIR,
-                                      default_class='xmodule.hidden_module.HiddenDescriptor',
-                                      course_dirs=['full'],
-                                      load_error_modules=True,
-                                      )
+                                        TEST_DATA_DIR,
+                                        default_class='xmodule.hidden_module.HiddenDescriptor',
+                                        course_dirs=['full'],
+                                        load_error_modules=True,
+        )
         self.check_pages_load(module_store)
 
 
@@ -525,7 +517,6 @@ class TestViewAuth(PageLoader):
             print 'checking for 404 on {0}'.format(url)
             self.check_for_get_code(404, url)
 
-
         # now also make the instructor staff
         u = user(self.instructor)
         u.is_staff = True
@@ -535,7 +526,6 @@ class TestViewAuth(PageLoader):
         for url in instructor_urls(self.toy) + instructor_urls(self.full):
             print 'checking for 200 on {0}'.format(url)
             self.check_for_get_code(200, url)
-
 
     def run_wrapped(self, test):
         """
@@ -551,7 +541,6 @@ class TestViewAuth(PageLoader):
             test()
         finally:
             settings.MITX_FEATURES['DISABLE_START_DATES'] = oldDSD
-
 
     def test_dark_launch(self):
         """Make sure that before course start, students can't access course
@@ -645,7 +634,6 @@ class TestViewAuth(PageLoader):
             # The courseware url should redirect, not 200
             url = reverse_urls(['courseware'], course)[0]
             self.check_for_get_code(302, url)
-
 
         # First, try with an enrolled student
         print '=== Testing student access....'
@@ -761,7 +749,6 @@ class TestViewAuth(PageLoader):
         self.assertTrue(has_access(student_user, self.toy, 'load'))
 
 
-
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCourseGrader(PageLoader):
     """Check that a course gets graded properly"""
@@ -832,13 +819,12 @@ class TestCourseGrader(PageLoader):
                             kwargs={
                                 'course_id': self.graded_course.id,
                                 'location': problem_location,
-                                'dispatch': 'problem_check', }
-                          )
+                                'dispatch': 'problem_check', })
 
         resp = self.client.post(modx_url, {
             'input_i4x-edX-graded-problem-{0}_2_1'.format(problem_url_name): responses[0],
             'input_i4x-edX-graded-problem-{0}_2_2'.format(problem_url_name): responses[1],
-            })
+        })
         print "modx_url", modx_url, "responses", responses
         print "resp", resp
 
@@ -854,8 +840,7 @@ class TestCourseGrader(PageLoader):
                             kwargs={
                                 'course_id': self.graded_course.id,
                                 'location': problem_location,
-                                'dispatch': 'problem_reset', }
-                          )
+                                'dispatch': 'problem_reset', })
 
         resp = self.client.post(modx_url)
         return resp

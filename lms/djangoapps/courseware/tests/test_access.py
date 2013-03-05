@@ -1,11 +1,18 @@
 import unittest
+import logging
 import time
-from mock import Mock
+from mock import Mock, MagicMock, patch
+
+from django.conf import settings
 from django.test import TestCase
 
+from xmodule.course_module import CourseDescriptor
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import Location
-from factories import CourseEnrollmentAllowedFactory
+from xmodule.timeparse import parse_time
+from xmodule.x_module import XModule, XModuleDescriptor
 import courseware.access as access
+from factories import CourseEnrollmentAllowedFactory
 
 
 class AccessTestCase(TestCase):
