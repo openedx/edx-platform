@@ -19,8 +19,6 @@ from xmodule.modulestore.exceptions import InvalidLocationError,\
 import courseware.views as views
 from xmodule.modulestore import Location
 
-#from override_settings import override_settings
-
 class Stub():
     pass
 
@@ -44,9 +42,6 @@ def xml_store_config(data_dir):
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
-
-
-#class ModulestoreTest(TestCase):
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestJumpTo(TestCase):
@@ -134,27 +129,9 @@ class ViewsTestCase(TestCase):
         mock_course.id = self.course_id
         self.assertTrue(views.registered_for_course(mock_course, self.user))
 
-    def test_jump_to(self):
+    def test_jump_to_invalid(self):
         request = self.request_factory.get(self.chapter_url)
         self.assertRaisesRegexp(Http404, 'Invalid location', views.jump_to,
                                 request, 'bar', ())
         self.assertRaisesRegexp(Http404, 'No data*', views.jump_to, request,
                                 'dummy', self.location)
-##        print type(self.toy_course)
-##        print dir(self.toy_course)
-##        print self.toy_course.location
-##        print self.toy_course.__dict__
-##        valid = ['i4x', 'edX', 'toy', 'chapter', 'overview']
-##        L = Location('i4x', 'edX', 'toy', 'chapter', 'Overview', None)
-##        
-##        views.jump_to(request, 'dummy', L)
-        
-    def test_static_tab(self):
-        request = self.request_factory.get('foo')
-        request.user = self.user
-        self.assertRaises(Http404, views.static_tab, request, 'edX/toy/2012_Fall',
-                          'dummy')
-        # What are valid tab_slugs?
-##        request_2 = self.request_factory.get('foo')
-##        request_2.user = UserFactory()
-        

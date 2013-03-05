@@ -4,7 +4,6 @@ import json
 import factory
 import unittest
 from nose.tools import set_trace
-from nose.plugins.skip import SkipTest
 
 from django.http import Http404, HttpResponse, HttpRequest
 from django.conf import settings
@@ -74,62 +73,6 @@ class ModuleRenderTestCase(PageLoader):
         self.assertIsNone(render.get_instance_module('dummy', mock_user_2,
                                                      mock_module,'dummy'))
 
-    def test_get_shared_instance_module(self):
-        raise SkipTest
-        mock_user = MagicMock(User)
-        mock_user.is_authenticated.return_value = False
-        self.assertIsNone(render.get_shared_instance_module('dummy', mock_user, 'dummy',
-                     'dummy'))
-        mock_user_2 = MagicMock(User)
-        mock_user_2.is_authenticated.return_value = True
-        
-        mock_module = MagicMock(shared_state_key = 'key')
-        mock_module.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        mock_module.get_shared_state.return_value = '{}'
-        mock_cache = MagicMock()
-        mock_cache.lookup.return_value = False
-        #mock_cache._state = 'dummy'
-        #set_trace()
-        print mock_module.get_shared_state()
-        s = render.get_shared_instance_module(self.course_id, mock_user_2,
-                                              mock_module, mock_cache)
-        self.assertIsInstance(s, StudentModule)
-        # Problem: can't get code to take branch that creates StudentModule?
-        # Can't finish testing modx_dispatch
-
-    def test_xqueue_callback(self):
-        mock_request = MagicMock()
-        mock_request.POST.copy.return_value = {}
-        # 339
-        self.assertRaises(Http404, render.xqueue_callback,mock_request,
-                          'dummy', 'dummy', 'dummy', 'dummy')
-        mock_request_2 = MagicMock()
-        xpackage = {'xqueue_header': json.dumps({}), 
-        'xqueue_body'  : 'Message from grader'}
-        mock_request_2.POST.copy.return_value = xpackage
-        # 342
-        self.assertRaises(Http404, render.xqueue_callback,mock_request_2,
-                          'dummy', 'dummy', 'dummy', 'dummy')
-        mock_request_3 = MagicMock()
-        xpackage_2 = {'xqueue_header': json.dumps({'lms_key':'secretkey'}), 
-        'xqueue_body'  : 'Message from grader'}
-        mock_request_3.POST.copy.return_value = xpackage_2
-        # Roadblock: how to get user registered in class?
-        raise SkipTest
-        #
-        # trying alternate way of creating account in hopes of getting valid id
-        # Problem: Can't activate user
-        
-        self.student_name = '12'
-        self.password = 'foo'
-        self.email = 'test@mit.edu'
-        self.create_account(self.student_name, self.email, self.password)
-        self.activate_user(self.email)
-        request = RequestFactory().get('stuff')
-        # This doesn't work to install user
-        render.xqueue_callback(mock_request_3, self.course_id,
-                               self.student_name, self.password, 'dummy')
-
     def test_modx_dispatch(self):
         self.assertRaises(Http404, render.modx_dispatch, 'dummy', 'dummy',
                           'invalid Location', 'dummy')
@@ -162,40 +105,10 @@ class ModuleRenderTestCase(PageLoader):
                           mock_request_3, 'dummy', self.location, 'toy')
         self.assertRaises(Http404,render.modx_dispatch, mock_request_3, 'dummy',
                             self.location, self.course_id)
-##        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(self.course_id, 
-##                mock_request_3.user, modulestore().get_instance(self.course_id, self.location))
-##        get_shared_instance_module(course_id, request.user, instance, student_module_cache)
-        # 'goto_position' is the only dispatch that will work
         mock_request_3.POST.copy.return_value = {'position':1}
         self.assertIsInstance(render.modx_dispatch(mock_request_3, 'goto_position',
                             self.location, self.course_id), HttpResponse)
-        # keep going
         
-    def test_preview_chemcalc(self):
-        mock_request = MagicMock(method = 'notGET')
-        self.assertRaises(Http404, render.preview_chemcalc, mock_request)
-        mock_request_2 = MagicMock(method = 'GET')
-        mock_request_2.GET.get.return_value = None
-        self.assertEquals(render.preview_chemcalc(mock_request_2).content,
-                          json.dumps({'preview':'',
-                                      'error':'No formula specified.'}))
-
-        mock_request_3 = MagicMock()
-        mock_request_3.method = 'GET'
-        # Test fails because chemcalc.render_to_html always parses strings?
-        mock_request_3.GET.get.return_value = unicode('\x12400', errors="strict")
-##        self.assertEquals(render.preview_chemcalc(mock_request_3).content,
-##                          json.dumps({'preview':'',
-##                                      'error':"Couldn't parse formula: formula"}))
-##        
-        mock_request_3 = MagicMock()
-        mock_request_3.method = 'GET'
-        mock_request_3.GET.get.return_value = Stub()
-        self.assertEquals(render.preview_chemcalc(mock_request_3).content,
-                          json.dumps({'preview':'',
-                                      'error':"Error while rendering preview"}))
-        
-
     def test_get_score_bucket(self):
         self.assertEquals(render.get_score_bucket(0, 10), 'incorrect')
         self.assertEquals(render.get_score_bucket(1, 10), 'partial')
