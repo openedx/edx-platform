@@ -108,7 +108,7 @@ class CapaFactory(object):
         else:
             instance_state = None
 
-        module = CapaModule(test_system, location,
+        module = CapaModule(test_system(), location,
                             definition, descriptor,
                                       instance_state, None, metadata=metadata)
 
@@ -794,14 +794,8 @@ class CapaModuleTest(unittest.TestCase):
         module.should_show_reset_button = Mock(return_value=show_reset_button)
         module.should_show_save_button = Mock(return_value=show_save_button)
 
-        # Mock the system rendering function (reset when we're done)
-        old_render_func = test_system.render_template
-        test_system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-
-        def cleanup_func():
-            test_system.render_template = old_render_func
-
-        self.addCleanup(cleanup_func)
+        # Mock the system rendering function 
+        module.system.render_template = Mock(return_value="<div>Test Template HTML</div>")
 
         # Patch the capa problem's HTML rendering
         with patch('capa.capa_problem.LoncapaProblem.get_html') as mock_html:
@@ -817,7 +811,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(html, "<div>Test Template HTML</div>")
 
         # Check the rendering context
-        render_args,_ = test_system.render_template.call_args
+        render_args,_ = module.system.render_template.call_args
         self.assertEqual(len(render_args), 2)
 
         template_name = render_args[0]
@@ -848,25 +842,17 @@ class CapaModuleTest(unittest.TestCase):
         # is asked to render itself as HTML
         module.lcp.get_html = Mock(side_effect=Exception("Test"))
 
-        # Stub out the test_system rendering function temporarily
-        old_render_func = test_system.render_template
-        test_system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+        # Stub out the test_system rendering function 
+        module.system.render_template = Mock(return_value="<div>Test Template HTML</div>")
 
-        # Turn off DEBUG temporarily
-        old_debug = test_system.DEBUG
-        test_system.DEBUG = False
-
-        def cleanup_func():
-            test_system.render_template = old_render_func
-            test_system.DEBUG = old_debug
-
-        self.addCleanup(cleanup_func)
+        # Turn off DEBUG 
+        module.system.DEBUG = False
 
         # Try to render the module with DEBUG turned off
         html = module.get_problem_html()
 
         # Check the rendering context
-        render_args,_ = test_system.render_template.call_args
+        render_args,_ = module.system.render_template.call_args
         context = render_args[1]
         self.assertTrue("error" in context['problem']['html'])
 
