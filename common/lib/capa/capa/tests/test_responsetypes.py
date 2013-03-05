@@ -10,6 +10,7 @@ import random
 import unittest
 import textwrap
 import mock
+import textwrap
 
 from . import test_system
 
@@ -184,107 +185,151 @@ class ImageResponseTest(ResponseTest):
         self.assert_answer_format(problem)
 
 
-class SymbolicResponseTest(unittest.TestCase):
+class SymbolicResponseTest(ResponseTest):
     from response_xml_factory import SymbolicResponseXMLFactory
     xml_factory_class = SymbolicResponseXMLFactory
 
-    def test_symbolic_response_grade(self):
-        symbolicresponse_file = os.path.dirname(__file__) + "/test_files/symbolicresponse.xml"
-        test_lcp = lcp.LoncapaProblem(open(symbolicresponse_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': 'cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]',
-                           '1_2_1_dynamath': '''
-                            <math xmlns="http://www.w3.org/1998/Math/MathML">
-                              <mstyle displaystyle="true">
-                                <mrow>
-                                  <mi>cos</mi>
-                                  <mrow>
-                                    <mo>(</mo>
-                                    <mi>&#x3B8;</mi>
-                                    <mo>)</mo>
-                                  </mrow>
-                                </mrow>
-                                <mo>&#x22C5;</mo>
-                                <mrow>
-                                  <mo>[</mo>
-                                  <mtable>
-                                    <mtr>
-                                      <mtd>
-                                        <mn>1</mn>
-                                      </mtd>
-                                      <mtd>
-                                        <mn>0</mn>
-                                      </mtd>
-                                    </mtr>
-                                    <mtr>
-                                      <mtd>
-                                        <mn>0</mn>
-                                      </mtd>
-                                      <mtd>
-                                        <mn>1</mn>
-                                      </mtd>
-                                    </mtr>
-                                  </mtable>
-                                  <mo>]</mo>
-                                </mrow>
-                                <mo>+</mo>
-                                <mi>i</mi>
-                                <mo>&#x22C5;</mo>
-                                <mrow>
-                                  <mi>sin</mi>
-                                  <mrow>
-                                    <mo>(</mo>
-                                    <mi>&#x3B8;</mi>
-                                    <mo>)</mo>
-                                  </mrow>
-                                </mrow>
-                                <mo>&#x22C5;</mo>
-                                <mrow>
-                                  <mo>[</mo>
-                                  <mtable>
-                                    <mtr>
-                                      <mtd>
-                                        <mn>0</mn>
-                                      </mtd>
-                                      <mtd>
-                                        <mn>1</mn>
-                                      </mtd>
-                                    </mtr>
-                                    <mtr>
-                                      <mtd>
-                                        <mn>1</mn>
-                                      </mtd>
-                                      <mtd>
-                                        <mn>0</mn>
-                                      </mtd>
-                                    </mtr>
-                                  </mtable>
-                                  <mo>]</mo>
-                                </mrow>
-                              </mstyle>
-                            </math>
-                            ''',
-                           }
-        wrong_answers = {'1_2_1': '2',
-                         '1_2_1_dynamath': '''
-                            <math xmlns="http://www.w3.org/1998/Math/MathML">
-                            <mstyle displaystyle="true">
-                                <mn>2</mn>
-                            </mstyle>
-                            </math>''',
-                        }
+    def test_grade_single_input(self):
+        problem = self.build_problem(math_display=True,
+                                    expect="2*x+3*y")
 
+        # Correct answers
+        correct_inputs = [
+            ('2x+3y', textwrap.dedent("""
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                    <mn>2</mn><mo>*</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
+                    </mstyle></math>""")),
+
+            ('x+x+3y', textwrap.dedent("""
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                    <mi>x</mi><mo>+</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
+                    </mstyle></math>""")),
+        ]
+
+        for (input_str, input_mathml) in correct_inputs:
+            self._assert_symbolic_grade(problem, input_str, input_mathml, 'correct')
+
+        # Incorrect answers
+        incorrect_inputs = [
+            ('0', ''),
+            ('4x+3y', textwrap.dedent("""
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                    <mn>4</mn><mo>*</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
+                    </mstyle></math>""")),
+        ]
+
+        for (input_str, input_mathml) in incorrect_inputs:
+            self._assert_symbolic_grade(problem, input_str, input_mathml, 'incorrect')
+
+
+    def test_complex_number_grade(self):
+        problem = self.build_problem(math_display=True,
+            expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
+            options=["matrix", "imaginary"])
+
+        # For LaTeX-style inputs, symmath_check() will try to contact
+        # a server to convert the input to MathML.
+        # We mock out the server, simulating the response that it would give
+        # for this input.
         import requests
-        d = os.path.dirname(__file__)
-        correct_snuggletex_response = open(os.path.join(d, "test_files/snuggletex_correct.html")).read().decode('utf8')
-        wrong_snuggletex_response = open(os.path.join(d, "test_files/snuggletex_wrong.html")).read().decode('utf8')
+        dirpath = os.path.dirname(__file__)
+        correct_snuggletex_response = open(os.path.join(dirpath, "test_files/snuggletex_correct.html")).read().decode('utf8')
+        wrong_snuggletex_response = open(os.path.join(dirpath, "test_files/snuggletex_wrong.html")).read().decode('utf8')
 
+        # Correct answer
         with mock.patch.object(requests, 'post') as mock_post:
+
+            # Simulate what the LaTeX-to-MathML server would 
+            # send for the correct response input
             mock_post.return_value.text = correct_snuggletex_response
-            self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
 
+            self._assert_symbolic_grade(problem,
+                "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]",
+                textwrap.dedent("""
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                  <mstyle displaystyle="true">
+                    <mrow>
+                      <mi>cos</mi>
+                      <mrow><mo>(</mo><mi>&#x3B8;</mi><mo>)</mo></mrow>
+                    </mrow>
+                    <mo>&#x22C5;</mo>
+                    <mrow>
+                      <mo>[</mo>
+                      <mtable>
+                        <mtr>
+                          <mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd>
+                        </mtr>
+                      </mtable>
+                      <mo>]</mo>
+                    </mrow>
+                    <mo>+</mo>
+                    <mi>i</mi>
+                    <mo>&#x22C5;</mo>
+                    <mrow>
+                      <mi>sin</mi>
+                      <mrow>
+                        <mo>(</mo><mi>&#x3B8;</mi><mo>)</mo>
+                      </mrow>
+                    </mrow>
+                    <mo>&#x22C5;</mo>
+                    <mrow>
+                      <mo>[</mo>
+                      <mtable>
+                        <mtr>
+                          <mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd>
+                        </mtr>
+                      </mtable>
+                      <mo>]</mo>
+                    </mrow>
+                  </mstyle>
+                </math>
+                """),
+                'correct')
+
+        # Incorrect answer
         with mock.patch.object(requests, 'post') as mock_post:
+
+            # Simulate what the LaTeX-to-MathML server would
+            # send for the incorrect response input
             mock_post.return_value.text = wrong_snuggletex_response
-            self.assertEquals(test_lcp.grade_answers(wrong_answers).get_correctness('1_2_1'), 'incorrect')
+
+            self._assert_symbolic_grade(problem, "2",
+                    textwrap.dedent("""
+                    <math xmlns="http://www.w3.org/1998/Math/MathML">
+                      <mstyle displaystyle="true"><mn>2</mn></mstyle>
+                    </math>
+                    """),
+                'incorrect')
+
+    def test_multiple_inputs_exception(self):
+
+        # Should not allow multiple inputs, since we specify
+        # only one "expect" value
+        with self.assertRaises(Exception):
+            problem = self.build_problem(math_display=True,
+                                        expect="2*x+3*y",
+                                        num_inputs=3)
+
+    def _assert_symbolic_grade(self, problem,
+                                student_input,
+                                dynamath_input,
+                                expected_correctness):
+        input_dict = {'1_2_1': str(student_input),
+                        '1_2_1_dynamath': str(dynamath_input) }
+
+        correct_map = problem.grade_answers(input_dict)
+
+        self.assertEqual(correct_map.get_correctness('1_2_1'),
+                        expected_correctness)
 
 
 class OptionResponseTest(ResponseTest):

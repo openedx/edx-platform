@@ -29,7 +29,7 @@ from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
 # specific library imports
-from .calc import evaluator, UndefinedVariable
+from calc import evaluator, UndefinedVariable
 from .correctmap import CorrectMap
 from datetime import datetime
 from .util import *
@@ -1043,7 +1043,7 @@ class CustomResponse(LoncapaResponse):
         messages = self.context['messages']
         correct_map = CorrectMap()
 
-        overall_message = self.clean_message_html(self.context['overall_message']))
+        overall_message = self.clean_message_html(self.context['overall_message'])
         correct_map.set_overall_message(overall_message)
 
         for k in range(len(idset)):
@@ -1195,12 +1195,24 @@ class SymbolicResponse(CustomResponse):
     """
 
     response_tag = 'symbolicresponse'
+    max_inputfields = 1
+
+    def setup_response(self):
+        # Symbolic response always uses symmath_check()
+        # If the XML did not specify this, then set it now
+        # Otherwise, we get an error from the superclass
+        self.xml.set('cfn', 'symmath_check')
+
+        # Let CustomResponse do its setup
+        super(SymbolicResponse, self).setup_response()
 
     def execute_check_function(self, idset, submission):
         from symmath import symmath_check
-        fn = self.code
         try:
-            answer_given = submission[0] if (len(idset) == 1) else submission
+            # Since we have limited max_inputfields to 1,
+            # we can assume that there is only one submission
+            answer_given = submission[0]
+
             ret = symmath_check(
                 self.expect, answer_given,
                 dynamath=self.context.get('dynamath'),

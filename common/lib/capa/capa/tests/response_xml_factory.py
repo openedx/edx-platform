@@ -734,3 +734,38 @@ class AnnotationResponseXMLFactory(ResponseXMLFactory):
             option_element.text = description
 
         return input_element
+
+
+class SymbolicResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for producing <symbolicresponse> xml """
+
+    def create_response_element(self, **kwargs):
+        """ Build the <symbolicresponse> XML element.
+
+        Uses **kwargs:
+
+        *expect*: The correct answer (a sympy string)
+
+        *options*: list of option strings to pass to symmath_check
+            (e.g. 'matrix', 'qbit', 'imaginary', 'numerical')"""
+
+        # Retrieve **kwargs
+        expect = kwargs.get('expect', '')
+        options = kwargs.get('options', [])
+
+        # Symmath check expects a string of options
+        options_str = ",".join(options)
+
+        # Construct the <symbolicresponse> element
+        response_element = etree.Element('symbolicresponse')
+
+        if expect:
+            response_element.set('expect', str(expect))
+
+        if options_str:
+            response_element.set('options', str(options_str))
+
+        return response_element
+
+    def create_input_element(self, **kwargs):
+        return ResponseXMLFactory.textline_input_xml(**kwargs)
