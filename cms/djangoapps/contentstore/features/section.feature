@@ -11,6 +11,14 @@ Feature: Create Section
     And I see a release date for my section
     And I see a link to create a new subsection
 
+  Scenario: Add a new section (with a quote in the name) to a course (bug #216)
+    Given I have opened a new course in Studio
+    When I click the New Section link
+    And I enter a section name with a quote and click save
+    Then I see my section name with a quote on the Courseware page
+    And I click to edit the section name
+    Then I see the complete section name with a quote in the editor
+
   Scenario: Edit section release date
     Given I have opened a new course in Studio
     And I have added a new section
