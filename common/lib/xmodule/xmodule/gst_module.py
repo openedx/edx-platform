@@ -45,15 +45,7 @@ class GraphicalSliderToolModule(XModule):
     js_module_name = "GraphicalSliderTool"
 
     render = String(scope=Scope.content)
-
-    def __init__(self, system, location, definition, descriptor, instance_state=None,
-                 shared_state=None, **kwargs):
-        """
-        For XML file format please look at documentation. TODO - receive
-        information where to store XML documentation.
-        """
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
+    configuration = String(scope=Scope.content)
 
     def get_html(self):
         """ Renders parameters to template. """
@@ -68,9 +60,9 @@ class GraphicalSliderToolModule(XModule):
                   'element_class': self.html_class,
                   'configuration_json': self.configuration_json
                   }
-        self.content = self.system.render_template(
+        content = self.system.render_template(
                         'graphical_slider_tool.html', params)
-        return self.content
+        return content
 
     def substitute_controls(self, html_string):
         """ Substitutes control elements (slider, textbox and plot) in
@@ -142,7 +134,7 @@ class GraphicalSliderToolModule(XModule):
         # <root> added for interface compatibility with xmltodict.parse
         # class added for javascript's part purposes
         return json.dumps(xmltodict.parse('<root class="' + self.html_class +
-                '">' + self.definition['configuration'] + '</root>'))
+                '">' + self.configuration + '</root>'))
 
 
 class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
