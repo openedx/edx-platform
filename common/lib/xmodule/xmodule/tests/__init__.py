@@ -34,7 +34,7 @@ test_system = ModuleSystem(
     get_module=Mock(),
     # "render" to just the context...
     render_template=lambda template, context: str(context),
-    replace_urls=Mock(),
+    replace_urls=lambda html: str(html),
     user=Mock(is_staff=False),
     filestore=Mock(),
     debug=True,

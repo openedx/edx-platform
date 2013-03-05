@@ -780,3 +780,95 @@ class CapaModuleTest(unittest.TestCase):
                                     rerandomize="always")
         module.lcp.done = True
         self.assertTrue(module.should_show_save_button())
+
+    def test_get_problem_html(self):
+        module = CapaFactory.create()
+
+        # We've tested the show/hide button logic in other tests,
+        # so here we hard-wire the values
+        show_check_button = bool(random.randint(0,1) % 2)
+        show_reset_button = bool(random.randint(0,1) % 2)
+        show_save_button = bool(random.randint(0,1) % 2)
+
+        module.should_show_check_button = Mock(return_value=show_check_button)
+        module.should_show_reset_button = Mock(return_value=show_reset_button)
+        module.should_show_save_button = Mock(return_value=show_save_button)
+
+        # Mock the system rendering function (reset when we're done)
+        old_render_func = test_system.render_template
+        test_system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+
+        def cleanup_func():
+            test_system.render_template = old_render_func
+
+        self.addCleanup(cleanup_func)
+
+        # Patch the capa problem's HTML rendering
+        with patch('capa.capa_problem.LoncapaProblem.get_html') as mock_html:
+            mock_html.return_value = "<div>Test Problem HTML</div>"
+
+            # Render the problem HTML
+            html = module.get_problem_html(encapsulate=False)
+
+            # Also render the problem encapsulated in a <div>
+            html_encapsulated = module.get_problem_html(encapsulate=True)
+            
+        # Expect that we get the rendered template back
+        self.assertEqual(html, "<div>Test Template HTML</div>")
+
+        # Check the rendering context
+        render_args,_ = test_system.render_template.call_args
+        self.assertEqual(len(render_args), 2)
+
+        template_name = render_args[0]
+        self.assertEqual(template_name, "problem.html")
+
+        context = render_args[1]
+        self.assertEqual(context['problem']['html'], "<div>Test Problem HTML</div>")
+        self.assertEqual(bool(context['check_button']), show_check_button)
+        self.assertEqual(bool(context['reset_button']), show_reset_button)
+        self.assertEqual(bool(context['save_button']), show_save_button)
+
+        # Assert that the encapsulated html contains the original html
+        self.assertTrue(html in html_encapsulated)
+
+
+    def test_get_problem_html_error(self):
+        """ 
+        In production, when an error occurs with the problem HTML
+        rendering, a "dummy" problem is created with an error
+        message to display to the user.
+        """
+        module = CapaFactory.create()
+
+        # Save the original problem so we can compare it later
+        original_problem = module.lcp
+
+        # Simulate throwing an exception when the capa problem
+        # is asked to render itself as HTML
+        module.lcp.get_html = Mock(side_effect=Exception("Test"))
+
+        # Stub out the test_system rendering function temporarily
+        old_render_func = test_system.render_template
+        test_system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+
+        # Turn off DEBUG temporarily
+        old_debug = test_system.DEBUG
+        test_system.DEBUG = False
+
+        def cleanup_func():
+            test_system.render_template = old_render_func
+            test_system.DEBUG = old_debug
+
+        self.addCleanup(cleanup_func)
+
+        # Try to render the module with DEBUG turned off
+        html = module.get_problem_html()
+
+        # Check the rendering context
+        render_args,_ = test_system.render_template.call_args
+        context = render_args[1]
+        self.assertTrue("error" in context['problem']['html'])
+
+        # Expect that the module has created a new dummy problem with the error
+        self.assertNotEqual(original_problem, module.lcp) 

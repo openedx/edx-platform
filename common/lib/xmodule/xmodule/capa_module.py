@@ -393,8 +393,19 @@ class CapaModule(XModule):
         try:
             html = self.lcp.get_html()
 
+        # If we cannot construct the problem HTML,
+        # then generate an error message instead.
         except Exception, err:
-            return self.handle_problem_html_error(err)
+            html = self.handle_problem_html_error(err)
+
+
+        # The convention is to pass the name of the check button
+        # if we want to show a check button, and False otherwise
+        # This works because non-empty strings evaluate to True
+        if self.should_show_check_button():
+            check_button = self.check_button_name() 
+        else:
+            check_button = False
 
         content = {'name': self.display_name,
                    'html': html,
@@ -403,10 +414,7 @@ class CapaModule(XModule):
 
         context = {'problem': content,
                    'id': self.id,
-
-                    # Pass in the name of the check button or False
-                    # if we do not need a check button
-                   'check_button': self.check_button_name() if self.should_show_check_button() else False,
+                   'check_button': check_button,
                    'reset_button': self.should_show_reset_button(),
                    'save_button': self.should_show_save_button(),
                    'answer_available': self.answer_available(),
