@@ -869,7 +869,14 @@ section.problem {
         .tag-status, .tag { padding: .25em .5em; }
       }
     }
-    textarea.comment { width: 100%; }
+    textarea.comment { 
+      $num-lines-to-show: 5;
+      $line-height: 1.4em;
+      width: 100%; 
+      padding: .375em .75em;
+      line-height: $line-height;
+      height: ($line-height * $num-lines-to-show) + .375em;
+    }
     .answer-annotation { display: block; margin: 0; }
 
     /* for debugging the input value field. enable the debug flag on the inputtype */
