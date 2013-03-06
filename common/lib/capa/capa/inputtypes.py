@@ -45,8 +45,10 @@ import re
 import shlex  # for splitting quoted strings
 import sys
 import os
+import pyparsing
 
 from registry import TagRegistry
+from capa.chem import chemcalc
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -751,6 +753,45 @@ class ChemicalEquationInput(InputTypeBase):
         TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
         """
         return {'previewer': '/static/js/capa/chemical_equation_preview.js', }
+
+    def handle_ajax(self, dispatch, get):
+        '''
+        Since we only have chemcalc preview this input, check to see if it
+        matches the corresponding dispatch and send it through if it does
+        '''
+        if dispatch == 'preview_chemcalc':
+            return self.preview_chemcalc(get)
+        return {}
+
+    def preview_chemcalc(self, get):
+        """
+        Render an html preview of a chemical formula or equation.  get should
+        contain a key 'formula' and value 'some formula string'.
+
+        Returns a json dictionary:
+        {
+           'preview' : 'the-preview-html' or ''
+           'error' : 'the-error' or ''
+        }
+        """
+
+        result = {'preview': '',
+                  'error': ''}
+        formula = get['formula']
+        if formula is None:
+            result['error'] = "No formula specified."
+            return result
+
+        try:
+            result['preview'] = chemcalc.render_to_html(formula)
+        except pyparsing.ParseException as p:
+            result['error'] = "Couldn't parse formula: {0}".format(p)
+        except Exception:
+            # this is unexpected, so log
+            log.warning("Error while previewing chemical formula", exc_info=True)
+            result['error'] = "Error while rendering preview"
+
+        return result
 
 registry.register(ChemicalEquationInput)
 

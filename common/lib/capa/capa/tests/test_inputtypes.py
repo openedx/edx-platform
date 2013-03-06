@@ -482,26 +482,42 @@ class ChemicalEquationTest(unittest.TestCase):
     '''
     Check that chemical equation inputs work.
     '''
-
-    def test_rendering(self):
-        size = "42"
-        xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=size)
+    def setUp(self):
+        self.size = "42"
+        xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
 
         element = etree.fromstring(xml_str)
 
         state = {'value': 'H2OYeah', }
-        the_input = lookup_tag('chemicalequationinput')(test_system, element, state)
+        self.the_input = lookup_tag('chemicalequationinput')(test_system, element, state)
 
-        context = the_input._get_render_context()
+
+    def test_rendering(self):
+        ''' Verify that the render context matches the expected render context'''
+        context = self.the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
                     'value': 'H2OYeah',
                     'status': 'unanswered',
                     'msg': '',
-                    'size': size,
+                    'size': self.size,
                     'previewer': '/static/js/capa/chemical_equation_preview.js',
                     }
         self.assertEqual(context, expected)
+
+    
+    def test_chemcalc_ajax_sucess(self):
+        ''' Verify that using the correct dispatch and valid data produces a valid response'''
+        
+        data = {'formula': "H"}
+        response = self.the_input.handle_ajax("preview_chemcalc", data)
+
+        self.assertTrue('preview' in response)
+        self.assertNotEqual(response['preview'], '')
+        self.assertEqual(response['error'], "")
+
+
+    
 
 
 class DragAndDropTest(unittest.TestCase):
