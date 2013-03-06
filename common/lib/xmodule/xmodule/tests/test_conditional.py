@@ -106,7 +106,7 @@ class ConditionalModuleTest(unittest.TestCase):
         html = module.get_html()
         print "html type: ", type(html)
         print "html: ", html
-        html_expect = "<div>{'ajax_url': 'courses/course_id/modx/a_location', 'element_id': 'i4x-edX-cond_test-conditional-condone', 'id': 'i4x://edX/cond_test/conditional/condone'}</div>"
+        html_expect = "{'ajax_url': 'courses/course_id/modx/a_location', 'element_id': 'i4x-edX-cond_test-conditional-condone', 'id': 'i4x://edX/cond_test/conditional/condone'}"
         self.assertEqual(html, html_expect)
 
         gdi =  module.get_display_items()

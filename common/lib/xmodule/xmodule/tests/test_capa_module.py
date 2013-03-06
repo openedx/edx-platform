@@ -108,7 +108,9 @@ class CapaFactory(object):
         else:
             instance_state = None
 
-        module = CapaModule(test_system(), location,
+        system = test_system()
+        system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+        module = CapaModule(system, location,
                             definition, descriptor,
                                       instance_state, None, metadata=metadata)
 
@@ -185,6 +187,7 @@ class CapaModuleTest(unittest.TestCase):
                                                max_attempts="1",
                                                attempts="0",
                                                due=self.yesterday_str)
+
         self.assertTrue(after_due_date.answer_available())
 
 
