@@ -124,31 +124,31 @@ def inline_discussion(request, course_id, discussion_id):
 
     annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
-    allow_anonymous = course.metadata.get("allow_anonymous", True)
-    allow_anonymous_to_peers = course.metadata.get("allow_anonymous_to_peers", False)
+    allow_anonymous = course.allow_anonymous
+    allow_anonymous_to_peers = course.allow_anonymous_to_peers
 
     #since inline is all one commentable, only show or allow the choice of cohorts
     #if the commentable is cohorted, otherwise everything is not cohorted
     #and no one has the option of choosing a cohort
     is_cohorted = is_course_cohorted(course_id) and is_commentable_cohorted(course_id, discussion_id)
     is_moderator = cached_has_permission(request.user, "see_all_cohorts", course_id)
-    
+
     cohorts_list = list()
-    
+
     if is_cohorted:
         cohorts_list.append({'name':'All Groups','id':None})
-        
+
         #if you're a mod, send all cohorts and let you pick
-        
+
         if is_moderator:
             cohorts = get_course_cohorts(course_id)
             for c in cohorts:
                 cohorts_list.append({'name':c.name, 'id':c.id})
-                
+
         else:
             #students don't get to choose
             cohorts_list = None
-          
+
     return utils.JsonResponse({
         'discussion_data': map(utils.safe_content, threads),
         'user_info': user_info,

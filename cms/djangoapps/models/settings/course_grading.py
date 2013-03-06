@@ -135,7 +135,7 @@ class CourseGradingModel(object):
 
         descriptor = get_modulestore(course_location).get_item(course_location)
         descriptor.grade_cutoffs = cutoffs
-        get_modulestore(course_location).update_item(course_location, descriptor.definition['data'])
+        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
 
         return cutoffs
 
@@ -203,8 +203,8 @@ class CourseGradingModel(object):
             course_location = Location(course_location)
 
         descriptor = get_modulestore(course_location).get_item(course_location)
-        if 'graceperiod' in descriptor.metadata: del descriptor.metadata['graceperiod']
-        get_modulestore(course_location).update_metadata(course_location, descriptor._model_data._kvs._data)
+        del descriptor.lms.graceperiod
+        get_modulestore(course_location).update_metadata(course_location, descriptor._model_data._kvs._metadata)
 
     @staticmethod
     def get_section_grader_type(location):
@@ -213,7 +213,7 @@ class CourseGradingModel(object):
 
         descriptor = get_modulestore(location).get_item(location)
         return {
-                "graderType": descriptor.metadata.get('format', u"Not Graded"),
+                "graderType": descriptor.lms.format or 'Not Graded',
                 "location": location,
                 "id": 99   # just an arbitrary value to
                 }

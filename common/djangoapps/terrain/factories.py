@@ -7,13 +7,14 @@ from xmodule.modulestore.django import modulestore
 from time import gmtime
 from uuid import uuid4
 from xmodule.timeparse import stringify_time
+from xmodule.modulestore.inheritance import own_metadata
 
 
 class GroupFactory(Factory):
     FACTORY_FOR = Group
 
     name = 'staff_MITx/999/Robot_Super_Course'
-    
+
 
 class UserProfileFactory(Factory):
     FACTORY_FOR = UserProfile
@@ -81,18 +82,18 @@ class XModuleCourseFactory(Factory):
 
         # This metadata code was copied from cms/djangoapps/contentstore/views.py
         if display_name is not None:
-            new_course.metadata['display_name'] = display_name
+            new_course.lms.display_name = display_name
 
-        new_course.metadata['data_dir'] = uuid4().hex
-        new_course.metadata['start'] = stringify_time(gmtime())
+        new_course.data_dir = uuid4().hex
+        new_course.lms.start = gmtime()
         new_course.tabs = [{"type": "courseware"},
-            {"type": "course_info", "name": "Course Info"}, 
+            {"type": "course_info", "name": "Course Info"},
             {"type": "discussion", "name": "Discussion"},
             {"type": "wiki", "name": "Wiki"},
             {"type": "progress", "name": "Progress"}]
 
         # Update the data in the mongo datastore
-        store.update_metadata(new_course.location.url(), new_course.own_metadata)
+        store.update_metadata(new_course.location.url(), own_metadata(new_course))
 
         return new_course
 
@@ -140,16 +141,16 @@ class XModuleItemFactory(Factory):
         new_item = store.clone_item(template, dest_location)
 
         # TODO: This needs to be deleted when we have proper storage for static content
-        new_item.metadata['data_dir'] = parent.metadata['data_dir']
+        new_item.data_dir = parent.data_dir
 
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
-            new_item.metadata['display_name'] = display_name
+            new_item.lms.display_name = display_name
 
         store.update_metadata(new_item.location.url(), new_item.own_metadata)
 
         if new_item.location.category not in DETACHED_CATEGORIES:
-            store.update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+            store.update_children(parent_location, parent.children + [new_item.location.url()])
 
         return new_item
 

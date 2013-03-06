@@ -72,17 +72,17 @@ def create_thread(request, course_id, commentable_id):
     course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
 
-    if course.metadata.get("allow_anonymous", True):
+    if course.allow_anonymous:
         anonymous = post.get('anonymous', 'false').lower() == 'true'
     else:
         anonymous = False
 
-    if course.metadata.get("allow_anonymous_to_peers", False):
+    if course.allow_anonymous_to_peers:
         anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
     else:
         anonymous_to_peers = False
 
-    thread = cc.Thread(**extract(post, ['body', 'title', 'tags']))
+    thread = cc.Thread(**extract(post,/ ['body', 'title', 'tags']))
     thread.update_attributes(**{
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
@@ -96,7 +96,7 @@ def create_thread(request, course_id, commentable_id):
     #kevinchugh because the new requirement is that all groups will be determined
     #by the group id in the request this all goes away
     #not anymore, only for admins
-    
+
     # Cohort the thread if the commentable is cohorted.
     if is_commentable_cohorted(course_id, commentable_id):
         user_group_id = get_cohort_id(user, course_id)
@@ -113,7 +113,7 @@ def create_thread(request, course_id, commentable_id):
 
         if group_id:
             thread.update_attributes(group_id=group_id)
-    
+
     thread.save()
 
     if post.get('auto_subscribe', 'false').lower() == 'true':
@@ -147,12 +147,12 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
     comment = cc.Comment(**extract(post, ['body']))
 
     course = get_course_with_access(request.user, course_id, 'load')
-    if course.metadata.get("allow_anonymous", True):
+    if course.allow_anonymous:
         anonymous = post.get('anonymous', 'false').lower() == 'true'
     else:
         anonymous = False
 
-    if course.metadata.get("allow_anonymous_to_peers", False):
+    if course.allow_anonymous_to_peers:
         anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
     else:
         anonymous_to_peers = False

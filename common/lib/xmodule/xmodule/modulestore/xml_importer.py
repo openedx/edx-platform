@@ -109,8 +109,8 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
                 course=target_location_namespace.course, name=target_location_namespace.name)
 
         # then remap children pointers since they too will be re-namespaced
-        children_locs = module.definition.get('children')
-        if children_locs is not None:
+        if module.has_children:
+            children_locs = module.children
             new_locs = []
             for child in children_locs:
                 child_loc = Location(child)
@@ -119,7 +119,7 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
 
                 new_locs.append(new_child_loc.url())
 
-            module.definition['children'] = new_locs
+            module.children = new_locs
 
     if hasattr(module, 'data'):
         # cdodge: now go through any link references to '/static/' and make sure we've imported
@@ -237,7 +237,7 @@ def validate_category_hierarchy(module_store, course_id, parent_category, expect
             parents.append(module)
 
     for parent in parents:
-        for child_loc in [Location(child) for child in parent.definition.get('children', [])]:
+        for child_loc in [Location(child) for child in parent.children]:
             if child_loc.category != expected_child_category:
                 err_cnt += 1
                 print 'ERROR: child {0} of parent {1} was expected to be category of {2} but was {3}'.format(

@@ -173,8 +173,8 @@ def initialize_discussion_info(course):
     path_to_locations = {}
     for module in all_modules:
         skip_module = False
-        for key in ('id', 'discussion_category', 'for'):
-            if key not in module.metadata:
+        for key in ('discussion_id', 'discussion_category', 'discussion_target'):
+            if getattr(module, key) is None:
                 log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
                 skip_module = True
 

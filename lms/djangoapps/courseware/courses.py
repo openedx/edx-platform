@@ -250,7 +250,7 @@ def get_course_syllabus_section(course, section_key):
             with fs.open(filepath) as htmlFile:
                 return replace_static_urls(
                     htmlFile.read().decode('utf-8'),
-                    course.metadata['data_dir'],
+                    getattr(course, 'data_dir', None),
                     course_namespace=course.location
                 )
         except ResourceNotFoundError:

@@ -7,6 +7,7 @@ from pkg_resources import resource_string
 from xmodule.editing_module import EditingDescriptor
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
+from xblock.core import Scope, Integer, String
 
 log = logging.getLogger(__name__)
 
@@ -14,10 +15,16 @@ class FolditModule(XModule):
 
     css = {'scss': [resource_string(__name__, 'css/foldit/leaderboard.scss')]}
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
+    # default to what Spring_7012x uses
+    required_level = Integer(default=4, scope=Scope.settings)
+    required_sublevel = Integer(default=5, scope=Scope.settings)
+    due = String(help="Date that this problem is due by", scope=Scope.settings, default='')
+
+    show_basic_score = String(scope=Scope.settings, default='false')
+    show_leaderboard = String(scope=Scope.settings, default='false')
+
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
         """
 
         Example:
@@ -26,25 +33,17 @@ class FolditModule(XModule):
             required_sublevel="3"
             show_leaderboard="false"/>
         """
-        req_level = self.metadata.get("required_level")
-        req_sublevel = self.metadata.get("required_sublevel")
-
-        # default to what Spring_7012x uses
-        self.required_level = req_level if req_level else 4
-        self.required_sublevel = req_sublevel if req_sublevel else 5
-
         def parse_due_date():
             """
             Pull out the date, or None
             """
-            s = self.metadata.get("due")
+            s = self.due
             if s:
                 return parser.parse(s)
             else:
                 return None
 
-        self.due_str = self.metadata.get("due", "None")
-        self.due = parse_due_date()
+        self.due_time = parse_due_date()
 
     def is_complete(self):
         """
@@ -59,7 +58,7 @@ class FolditModule(XModule):
             self.system.anonymous_student_id,
             self.required_level,
             self.required_sublevel,
-            self.due)
+            self.due_time)
         return complete
 
     def completed_puzzles(self):
@@ -96,10 +95,10 @@ class FolditModule(XModule):
             self.required_level,
             self.required_sublevel)
 
-        showbasic = (self.metadata.get("show_basic_score").lower() == "true")
-        showleader = (self.metadata.get("show_leaderboard").lower() == "true")
+        showbasic = (self.show_basic_score.lower() == "true")
+        showleader = (self.show_leaderboard.lower() == "true")
         context = {
-            'due': self.due_str,
+            'due': self.due,
             'success': self.is_complete(),
             'goal_level': goal_level,
             'completed': self.completed_puzzles(),
@@ -121,7 +120,7 @@ class FolditModule(XModule):
             self.required_sublevel)
 
         context = {
-            'due': self.due_str,
+            'due': self.due,
             'success': self.is_complete(),
             'goal_level': goal_level,
             'completed': self.completed_puzzles(),
@@ -170,9 +169,4 @@ class FolditDescriptor(XmlDescriptor, EditingDescriptor):
     # so always need to actually check.
     always_recalculate_grades = True
 
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        """
-        Get the xml_object's attributes.
-        """
-        return {'metadata': xml_object.attrib}
+    metadata_attributes = XmlDescriptor.metadata_attributes + ('required_level', 'required_sublevel')

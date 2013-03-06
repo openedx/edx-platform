@@ -11,6 +11,7 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
+from xblock.core import Integer, Scope, String
 
 import datetime
 import time
@@ -46,11 +47,13 @@ class VideoAlphaModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/videoalpha/display.scss')]}
     js_module_name = "VideoAlpha"
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-        xmltree = etree.fromstring(self.definition['data'])
+    data = String(help="XML data for the problem", scope=Scope.content)
+    position = Integer(help="Current position in the video", scope=Scope.student_state, default=0)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
+        xmltree = etree.fromstring(self.data)
         self.youtube_streams = xmltree.get('youtube')
         self.sub = xmltree.get('sub')
         self.position = 0
@@ -63,11 +66,6 @@ class VideoAlphaModule(XModule):
         }
         self.track = self._get_track(xmltree)
         self.start_time, self.end_time = self._get_timeframe(xmltree)
-
-        if instance_state is not None:
-            state = json.loads(instance_state)
-            if 'position' in state:
-                self.position = int(float(state['position']))
 
     def _get_source(self, xmltree, exts=None):
         """Find the first valid source, which ends with one of `exts`."""
@@ -131,7 +129,7 @@ class VideoAlphaModule(XModule):
         else:
             # VS[compat]
             # cdodge: filesystem static content support.
-            caption_asset_path = "/static/{0}/subs/".format(self.metadata['data_dir'])
+            caption_asset_path = "/static/{0}/subs/".format(getattr(self, 'data_dir', None))
 
         return self.system.render_template('videoalpha.html', {
             'youtube_streams': self.youtube_streams,
@@ -141,7 +139,7 @@ class VideoAlphaModule(XModule):
             'track': self.track,
             'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
-            'data_dir': self.metadata['data_dir'],
+            'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': caption_asset_path,
             'show_captions': self.show_captions,
             'start': self.start_time,

@@ -325,7 +325,7 @@ class PageLoader(ActivateLoginTestCase):
                     num_bad += 1
                 elif isinstance(descriptor, ErrorDescriptor):
                     msg = "ERROR error descriptor loaded: "
-                    msg = msg + descriptor.definition['data']['error_msg']
+                    msg = msg + descriptor.error_msg
                     all_ok = False
                     num_bad += 1
 

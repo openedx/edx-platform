@@ -194,7 +194,7 @@ def check_for_active_timelimit_module(request, course_id, course):
                 # This value should be in milliseconds.
                 remaining_time = timelimit_module.get_remaining_time_in_ms()
                 context['timer_expiration_duration'] = remaining_time
-                context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata.suppress_toplevel_navigation
+                context['suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
                 return_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
                 context['timer_navigation_return_url'] = return_url
     return context
