@@ -34,7 +34,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
     shared_state = None
 
     def setUp(self):
-        self.annotatable = AnnotatableModule(test_system, self.location, self.definition, self.descriptor, self.instance_state, self.shared_state)
+        self.annotatable = AnnotatableModule(test_system(), self.location, self.definition, self.descriptor, self.instance_state, self.shared_state)
 
     def test_annotation_data_attr(self):
         el = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')
