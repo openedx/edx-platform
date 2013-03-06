@@ -96,17 +96,8 @@ class FolditModule(XModule):
             self.required_level,
             self.required_sublevel)
 
-        # Wrap these gets around try-except since calling lower() on NoneType
-        # (e.g. there is no attribute "show_basic_score" to the tag) will raise
-        # an exception
-        try:
-            showbasic = (self.metadata.get("show_basic_score").lower() == "true")
-        except Exception:
-            showbasic = False
-        try:
-            showleader = (self.metadata.get("show_leaderboard").lower() == "true")
-        except Exception:
-            showleader = False
+        showbasic = (self.metadata.get("show_basic_score", "").lower() == "true")
+        showleader = (self.metadata.get("show_leaderboard", "").lower() == "true")
 
         context = {
             'due': self.due_str,
