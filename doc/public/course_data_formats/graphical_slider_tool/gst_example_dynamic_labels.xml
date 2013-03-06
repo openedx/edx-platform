@@ -1,0 +1,40 @@
+<vertical>
+ <graphical_slider_tool>
+      <render>
+        <h1>Graphic slider tool: Dynamic labels.</h1>
+        <p>There are two kinds of dynamic lables.
+        1) Dynamic changing values in graph legends.
+        2) Dynamic labels, which coordinates depend on parameters </p>
+         <p>a: <slider var="a"/></p>
+          <br/>
+          <p>b: <slider var="b"/></p>
+          <br/><br/>
+          <plot style="width:400px; height:400px;"/>
+      </render>
+
+      <configuration>
+        <parameters>
+            <param var="a" min="-10" max="10" step="1" initial="0" />
+            <param var="b" min="0" max="10" step="0.5" initial="5" />
+        </parameters>
+        <functions>
+          <function label="Value of a is: dyn_val_1">a * x + b</function>
+         <!-- dynamic values in legend -->
+         <function output="plot_label" el_id="dyn_val_1">a</function>
+        </functions>
+        <plot>
+          <xrange><min>0</min><max>30</max></xrange>
+          <num_points>10</num_points>
+          <xticks>0, 6, 30</xticks>
+          <yticks>-9, 1, 9</yticks>
+          <!-- custom labels with coordinates as any function of parameter -->
+          <moving_label text="Dynam_lbl 1" weight="bold">
+          <![CDATA[  {'x': 10, 'y': a};]]>
+          </moving_label>
+          <moving_label text="Dynam lbl 2" weight="bold">
+          <![CDATA[  {'x': -6, 'y': b};]]>
+          </moving_label>
+        </plot>
+      </configuration>
+    </graphical_slider_tool>
+</vertical>

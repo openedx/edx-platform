@@ -4,9 +4,8 @@ from lxml import etree
 
 from pkg_resources import resource_string
 
-from .editing_module import EditingDescriptor
+from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from .xml_module import XmlDescriptor
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 
 log = logging.getLogger("mitx.courseware")
@@ -134,7 +133,7 @@ class CombinedOpenEndedModule(XModule):
         }
 
         self.child_descriptor = descriptors[version_index](self.system)
-        self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(definition['xml_string']), self.system)
+        self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(definition['data']), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
             instance_state = json.dumps(instance_state), metadata = self.metadata, static_data= static_data)
 
@@ -165,11 +164,11 @@ class CombinedOpenEndedModule(XModule):
         return self.child_module.display_name
 
 
-class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
+class CombinedOpenEndedDescriptor(RawDescriptor):
     """
     Module for adding combined open ended questions
     """
-    mako_template = "widgets/html-edit.html"
+    mako_template = "widgets/raw-edit.html"
     module_class = CombinedOpenEndedModule
     filename_extension = "xml"
 
@@ -177,35 +176,3 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     has_score = True
     template_dir_name = "combinedopenended"
 
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
-
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        """
-        Pull out the individual tasks, the rubric, and the prompt, and parse
-
-        Returns:
-        {
-        'rubric': 'some-html',
-        'prompt': 'some-html',
-        'task_xml': dictionary of xml strings,
-        }
-        """
-
-        return {'xml_string' : etree.tostring(xml_object), 'metadata' : xml_object.attrib}
-
-
-    def definition_to_xml(self, resource_fs):
-        '''Return an xml element representing this definition.'''
-        elt = etree.Element('combinedopenended')
-
-        def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
-            child_node = etree.fromstring(child_str)
-            elt.append(child_node)
-
-        for child in ['task']:
-            add_child(child)
-
-        return elt

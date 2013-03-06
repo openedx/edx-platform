@@ -127,6 +127,7 @@ class CourseDescriptor(SequenceDescriptor):
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+        self._grading_policy = {}
         self.set_grading_policy(self.definition['data'].get('grading_policy', None))
 
         self.test_center_exams = []
@@ -196,11 +197,9 @@ class CourseDescriptor(SequenceDescriptor):
         grading_policy.update(course_policy)
 
         # Here is where we should parse any configurations, so that we can fail early
-        grading_policy['RAW_GRADER'] = grading_policy['GRADER']  # used for cms access
-        grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
-        self._grading_policy = grading_policy
-
-
+        # Use setters so that side effecting to .definitions works
+        self.raw_grader = grading_policy['GRADER']  # used for cms access
+        self.grade_cutoffs = grading_policy['GRADE_CUTOFFS']
 
     @classmethod
     def read_grading_policy(cls, paths, system):
@@ -319,7 +318,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def grader(self):
-        return self._grading_policy['GRADER']
+        return grader_from_conf(self.raw_grader)
 
     @property
     def raw_grader(self):
@@ -378,6 +377,28 @@ class CourseDescriptor(SequenceDescriptor):
 
         return bool(config.get("cohorted"))
 
+    @property
+    def auto_cohort(self):
+        """
+        Return whether the course is auto-cohorted.
+        """
+        if not self.is_cohorted:
+            return False
+
+        return bool(self.metadata.get("cohort_config", {}).get(
+            "auto_cohort", False))
+
+    @property
+    def auto_cohort_groups(self):
+        """
+        Return the list of groups to put students into.  Returns [] if not
+        specified. Returns specified list even if is_cohorted and/or auto_cohort are
+        false.
+        """
+        return self.metadata.get("cohort_config", {}).get(
+            "auto_cohort_groups", [])
+
+    
     @property
     def top_level_discussion_topic_ids(self):
         """
@@ -714,7 +735,7 @@ class CourseDescriptor(SequenceDescriptor):
     def get_test_center_exam(self, exam_series_code):
         exams = [exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
         return exams[0] if len(exams) == 1 else None
-        
+
     @property
     def title(self):
         return self.display_name

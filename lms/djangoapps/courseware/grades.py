@@ -140,7 +140,7 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
     grading_context = course.grading_context
     raw_scores = []
 
-    if student_module_cache == None:
+    if student_module_cache is None:
         student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
 
     totaled_scores = {}
@@ -270,7 +270,7 @@ def progress_summary(student, request, course, student_module_cache):
     # would be simpler
     course_module = get_module(student, request,
                                 course.location, student_module_cache,
-                                course.id)
+                                course.id, depth=None)
     if not course_module:
         # This student must not have access to the course.
         return None

@@ -14,6 +14,44 @@ body.course.settings {
     padding: $baseline ($baseline*1.5);
   }
 
+  // messages - should be synced up with global messages in the future
+  .message {
+    display: block;
+    font-size: 14px;
+  }
+
+  .message-status {
+    display: none;
+    @include border-top-radius(2px);
+    @include box-sizing(border-box);
+    border-bottom: 2px solid $yellow;
+    margin: 0 0 20px 0;
+    padding: 10px 20px;
+    font-weight: 500;
+    background: $paleYellow;
+
+    .text {
+      display: inline-block;
+    }
+
+    &.error {
+      border-color: shade($red, 50%);
+      background: tint($red, 20%);
+      color: $white;
+    }
+
+    &.confirm {
+      border-color: shade($green, 50%);
+      background: tint($green, 20%);
+      color: $white;
+    }
+
+    &.is-shown {
+      display: block;
+    }
+  }
+
+  // in form - elements
   .group-settings {
     margin: 0 0 ($baseline*2) 0;
 
@@ -45,7 +83,12 @@ body.course.settings {
 
     }
 
-    // UI hints/tips/messages
+    // in form  -UI hints/tips/messages
+    .instructions {
+      @include font-size(14);
+      margin: 0 0 $baseline 0;
+    }
+
     .tip {
       @include transition(color, 0.15s, ease-in-out);
       @include font-size(13);
@@ -573,6 +616,119 @@ body.course.settings {
 
         .delete-button {
           margin: 0;
+        }
+      }
+    }
+
+    // specific fields - advanced settings
+    &.advanced-policies {
+
+      .field-group {
+        margin-bottom: ($baseline*1.5);
+
+        &:last-child {
+          border: none;
+          padding-bottom: 0;
+        }
+      }
+
+      .course-advanced-policy-list-item {
+        @include clearfix();
+        position: relative;
+
+        .field {
+
+          input {
+            width: 100%;
+          }
+
+          .tip {
+            @include transition (opacity 0.5s ease-in-out 0s);
+            opacity: 0;
+            position: absolute;
+            bottom: ($baseline*1.25);
+          }
+
+          input:focus {
+
+            & + .tip {
+              opacity: 1.0;
+            }
+          }
+
+          input.error {
+
+            & + .tip {
+              opacity: 0;
+            }
+          }
+        }
+
+        .key, .value {
+          float: left;
+          margin: 0 0 ($baseline/2) 0;
+        }
+
+       .key {
+         width: flex-grid(3, 9);
+         margin-right: flex-gutter();
+        }
+
+        .value {
+          width: flex-grid(6, 9);
+        }
+
+        .actions {
+          float: left;
+          width: flex-grid(9, 9);
+
+          .delete-button {
+            margin: 0;
+          }
+        }
+      }
+
+      .message-error {
+        position: absolute;
+        bottom: ($baseline*0.75);
+      }
+
+      // specific to code mirror instance in JSON policy editing, need to sync up with other similar code mirror UIs
+      .CodeMirror {
+        @include font-size(16);
+        @include box-sizing(border-box);
+        @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+        @include linear-gradient($lightGrey, tint($lightGrey, 90%));
+        padding: 5px 8px;
+        border: 1px solid $mediumGrey;
+        border-radius: 2px;
+        background-color: $lightGrey;
+        font-family: 'Open Sans', sans-serif;
+        color: $baseFontColor;
+        outline: 0;
+
+        &.CodeMirror-focused {
+          @include linear-gradient($paleYellow, tint($paleYellow, 90%));
+          outline: 0;
+        }
+
+        .CodeMirror-scroll {
+          overflow: hidden;
+          height: auto;
+          min-height: ($baseline*1.5);
+          max-height: ($baseline*10);
+        }
+
+        // editor color changes just for JSON
+        .CodeMirror-lines {
+
+          .cm-string {
+            color: #cb9c40;
+          }
+
+          pre {
+            line-height: 2.0rem;
+          }
         }
       }
     }

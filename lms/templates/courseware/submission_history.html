@@ -1,0 +1,13 @@
+<% import json  %>
+<h3>${username} > ${course_id} > ${location}</h3>
+
+% for i, entry in enumerate(history_entries):
+<hr/>
+<div>
+<b>#${len(history_entries) - i}</b>: ${entry.created} (${TIME_ZONE} time)</br>
+Score: ${entry.grade} / ${entry.max_grade}
+<pre>
+${json.dumps(json.loads(entry.state), indent=2, sort_keys=True) | h}
+</pre>
+</div>
+% endfor

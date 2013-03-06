@@ -58,8 +58,8 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
     CourseSettingsEncoder
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
-from lxml import etree
 from django.shortcuts import redirect
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -67,6 +67,10 @@ log = logging.getLogger(__name__)
 
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
+
+ADVANCED_COMPONENT_TYPES = ['annotatable','combinedopenended', 'peergrading']
+ADVANCED_COMPONENT_CATEGORY = 'advanced'
+ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -114,7 +118,7 @@ def index(request):
     """
     List all courses available to the logged in user
     """
-    courses = modulestore().get_items(['i4x', None, None, 'course', None])
+    courses = modulestore('direct').get_items(['i4x', None, None, 'course', None])
 
     # filter out courses that we don't have access too
     def course_filter(course):
@@ -132,7 +136,7 @@ def index(request):
                         course.location.org,
                         course.location.course,
                         course.location.name]),
-                    get_lms_link_for_item(course.location))
+                    get_lms_link_for_item(course.location, course_id=course.location.course_id))
                     for course in courses],
         'user': request.user,
         'disable_course_creation': settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff
@@ -281,10 +285,31 @@ def edit_unit(request, location):
 
     component_templates = defaultdict(list)
 
+    # Check if there are any advanced modules specified in the course policy. These modules
+    # should be specified as a list of strings, where the strings are the names of the modules
+    # in ADVANCED_COMPONENT_TYPES that should be enabled for the course.
+    course_metadata = CourseMetadata.fetch(course.location)
+    course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, [])
+
+    # Set component types according to course policy file
+    component_types = list(COMPONENT_TYPES)
+    if isinstance(course_advanced_keys, list):
+        course_advanced_keys = [c for c in course_advanced_keys if c in ADVANCED_COMPONENT_TYPES]
+        if len(course_advanced_keys) > 0:
+            component_types.append(ADVANCED_COMPONENT_CATEGORY)
+    else:
+        log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
+
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
-        if template.location.category in COMPONENT_TYPES:
-            component_templates[template.location.category].append((
+        category = template.location.category
+
+        if category in course_advanced_keys:
+            category = ADVANCED_COMPONENT_CATEGORY
+
+        if category in component_types:
+            #This is a hack to create categories for different xmodules
+            component_templates[category].append((
                 template.display_name,
                 template.location.url(),
                 'markdown' in template.metadata,
@@ -317,8 +342,11 @@ def edit_unit(request, location):
             break
         index = index + 1
 
-    preview_lms_link = '//{preview}{lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
-            preview='preview.',
+    preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE',
+        'preview.' + settings.LMS_BASE)
+
+    preview_lms_link = '//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
+            preview_lms_base=preview_lms_base,
             lms_base=settings.LMS_BASE,
             org=course.location.org,
             course=course.location.course,
@@ -364,7 +392,6 @@ def preview_component(request, location):
         'preview': get_module_previews(request, component)[0],
         'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
-
 
 @expect_json
 @login_required
@@ -682,7 +709,6 @@ def create_draft(request):
 
     return HttpResponse()
 
-
 @login_required
 @expect_json
 def publish_draft(request):
@@ -711,7 +737,6 @@ def unpublish_unit(request):
     _xmodule_recurse(item, lambda i: modulestore().unpublish(i.location))
 
     return HttpResponse()
-
 
 @login_required
 @expect_json
@@ -901,7 +926,6 @@ def remove_user(request, location):
 def landing(request, org, course, coursename):
     return render_to_response('temp-course-landing.html', {})
 
-
 @login_required
 @ensure_csrf_cookie
 def static_pages(request, org, course, coursename):
@@ -1005,7 +1029,6 @@ def edit_tabs(request, org, course, coursename):
         'components': components
         })
 
-
 def not_found(request):
     return render_to_response('error.html', {'error': '404'})
 
@@ -1040,7 +1063,6 @@ def course_info(request, org, course, name, provided_id=None):
         'course_updates': json.dumps(get_course_updates(location)),
         'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url()
     })
-
 
 @expect_json
 @login_required
@@ -1128,12 +1150,15 @@ def get_course_settings(request, org, course, name):
         raise PermissionDenied()
 
     course_module = modulestore().get_item(location)
-    course_details = CourseDetails.fetch(location)
 
     return render_to_response('settings.html', {
         'context_course': course_module,
-        'course_location' : location,
-        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
+        'course_location': location,
+        'details_url': reverse(course_settings_updates,
+                               kwargs={"org": org,
+                                       "course": course,
+                                       "name": name,
+                                       "section": "details"})
     })
 
 @login_required
@@ -1159,6 +1184,28 @@ def course_config_graders_page(request, org, course, name):
         'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 
+@login_required
+@ensure_csrf_cookie
+def course_config_advanced_page(request, org, course, name):
+    """
+    Send models and views as well as html for editing the advanced course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    course_module = modulestore().get_item(location)
+
+    return render_to_response('settings_advanced.html', {
+        'context_course': course_module,
+        'course_location' : location,
+        'advanced_blacklist' : json.dumps(CourseMetadata.FILTERED_LIST),
+        'advanced_dict' : json.dumps(CourseMetadata.fetch(location)),
+    })
 
 @expect_json
 @login_required
@@ -1190,7 +1237,6 @@ def course_settings_updates(request, org, course, name, section):
     elif request.method == 'POST':   # post or put, doesn't matter.
         return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseSettingsEncoder),
                             mimetype="application/json")
-
 
 @expect_json
 @login_required
@@ -1225,6 +1271,37 @@ def course_grader_updates(request, org, course, name, grader_index=None):
     elif request.method == 'POST':   # post or put, doesn't matter.
         return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course', name]), request.POST)),
                             mimetype="application/json")
+
+        
+## NB: expect_json failed on ["key", "key2"] and json payload
+@login_required
+@ensure_csrf_cookie
+def course_advanced_updates(request, org, course, name):
+    """
+    restful CRUD operations on metadata. The payload is a json rep of the metadata dicts. For delete, otoh,
+    the payload is either a key or a list of keys to delete.
+
+    org, course: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+        
+    if real_method == 'GET':
+        return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
+    elif real_method == 'DELETE':
+        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))), mimetype="application/json")
+    elif real_method == 'POST' or real_method == 'PUT':
+        # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
+        return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
 
 
 @login_required
@@ -1286,7 +1363,6 @@ def asset_index(request, org, course, name):
 def edge(request):
     return render_to_response('university_profiles/edge.html', {})
 
-
 @login_required
 @expect_json
 def create_new_course(request):
@@ -1342,7 +1418,6 @@ def create_new_course(request):
 
     return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
-
 def initialize_course_tabs(course):
     # set up the default tabs
     # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
@@ -1359,7 +1434,6 @@ def initialize_course_tabs(course):
         {"type": "progress", "name": "Progress"}]
 
     modulestore('direct').update_metadata(course.location.url(), course.own_metadata)
-
 
 @ensure_csrf_cookie
 @login_required
@@ -1438,7 +1512,6 @@ def import_course(request, org, course, name):
                         course_module.location.name])
         })
 
-
 @ensure_csrf_cookie
 @login_required
 def generate_export_course(request, org, course, name):
@@ -1489,7 +1562,6 @@ def export_course(request, org, course, name):
         'active_tab': 'export',
         'successful_import_redirect_url': ''
     })
-
 
 def event(request):
     '''

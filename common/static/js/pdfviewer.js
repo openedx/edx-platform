@@ -27,11 +27,27 @@ PDFJS.disableWorker = true;
         var pdfViewer = this;
 
         var pdfDocument = null;
-        var url = options['url'];
-        var pageNum = 1;
-        if (options.pageNum) {
-            pageNum = options.pageNum;
+        var urlToLoad = null;
+        if (options.url) {
+            urlToLoad = options.url;
         }
+        var chapterUrls = null;
+        if (options.chapters) {
+            chapterUrls = options.chapters;
+        }
+        var chapterToLoad = 1;
+        if (options.chapterNum) {
+            // TODO: this should only be specified if there are 
+            // chapters, and it should be in-bounds.
+            chapterToLoad = options.chapterNum;
+        }
+        var pageToLoad = 1;
+        if (options.pageNum) {
+            pageToLoad = options.pageNum;
+        }
+
+        var chapterNum = 1;
+        var pageNum = 1;
 
         var viewerElement = document.getElementById('viewer');
         var ANNOT_MIN_SIZE = 10;
@@ -44,31 +60,28 @@ PDFJS.disableWorker = true;
         var currentScaleValue = "0";
         var DEFAULT_SCALE_VALUE = "1";
 
-	// TESTING:
-	var destinations = null;
-
         var setupText = function setupText(textdiv, content, viewport) {
 
             function getPageNumberFromDest(dest) {
-		var destPage = 1;
-		if (dest instanceof Array) {
-		    var destRef = dest[0]; 
-		    if (destRef instanceof Object) {
-			// we would need to look this up in the 
-			// list of all pages that have been loaded,
-			// but we're trying to not have to load all the pages
-			// right now.  
-			// destPage = this.pagesRefMap[destRef.num + ' ' + destRef.gen + ' R'];
-		    } else {
-			destPage = (destRef + 1);
-		    }
-		}
-		return destPage;
-	    }
+                var destPage = 1;
+                if (dest instanceof Array) {
+                    var destRef = dest[0]; 
+                    if (destRef instanceof Object) {
+                        // we would need to look this up in the 
+                        // list of all pages that have been loaded,
+                        // but we're trying to not have to load all the pages
+                        // right now.  
+                        // destPage = this.pagesRefMap[destRef.num + ' ' + destRef.gen + ' R'];
+                    } else {
+                        destPage = (destRef + 1);
+                    }
+                }
+                return destPage;
+            }
 
             function bindLink(link, dest) {
-		// get page number from dest:
-		destPage = getPageNumberFromDest(dest);
+                // get page number from dest:
+                destPage = getPageNumberFromDest(dest);
                 link.href = '#page=' + destPage;
                 link.onclick = function pageViewSetupLinksOnclick() {
                     if (dest && dest instanceof Array )
@@ -138,10 +151,10 @@ PDFJS.disableWorker = true;
         // Get page info from document, resize canvas accordingly, and render page
         //
         renderPage = function(num) {
-	    // don't try to render a page that cannot be rendered
-	    if (num < 1 || num > pdfDocument.numPages) {
-		return;
-	    }
+            // don't try to render a page that cannot be rendered
+            if (num < 1 || num > pdfDocument.numPages) {
+                return;
+            }
 
             // Update logging:
             log_event("book", { "type" : "gotopage", "old" : pageNum, "new" : num });
@@ -270,18 +283,37 @@ PDFJS.disableWorker = true;
         //
         // Asynchronously download PDF as an ArrayBuffer
         //
-        PDFJS.getDocument(url).then(
-            function getDocument(_pdfDocument) {
-                pdfDocument = _pdfDocument;
-		// display the current page with a default scale value:
-		parseScale(DEFAULT_SCALE_VALUE);
-            }, 
-            function getDocumentError(message, exception) {
-                // placeholder: don't expect errors :)
-            }, 
-            function getDocumentProgress(progressData) {
-                // placeholder: not yet ready to display loading progress
-            });
+        loadUrl = function pdfViewLoadUrl(url, page) {
+            PDFJS.getDocument(url).then(
+                function getDocument(_pdfDocument) {
+                    pdfDocument = _pdfDocument;
+                    pageNum = page;
+                    // if the scale has not been set before, set it now.
+                    // Otherwise, don't change the current scale,
+                    // but make sure it gets refreshed.
+                    if (currentScale == UNKNOWN_SCALE) {
+                        parseScale(DEFAULT_SCALE_VALUE);
+                    } else {
+                        var preservedScale = currentScale;
+                        currentScale = UNKNOWN_SCALE;
+                        parseScale(preservedScale);
+                    }
+                }, 
+                function getDocumentError(message, exception) {
+                    // placeholder: don't expect errors :)
+                }, 
+                function getDocumentProgress(progressData) {
+                    // placeholder: not yet ready to display loading progress
+                });
+            }; 
+
+        loadChapterUrl = function pdfViewLoadChapterUrl(chapterNum, pageVal) {
+            if (chapterNum < 1 || chapterNum > chapterUrls.length) {
+                return;
+            }
+            var chapterUrl = chapterUrls[chapterNum-1];
+            loadUrl(chapterUrl, pageVal);
+        }
 
         $("#previous").click(function(event) {
             prevPage();
@@ -302,11 +334,34 @@ PDFJS.disableWorker = true;
             parseScale(this.value);
         });
 
+
         $('#pageNumber').change(function(event) {
-	    var newPageVal = parseInt(this.value);
-	    if (newPageVal) {
-		renderPage(newPageVal);
-	    }
+            var newPageVal = parseInt(this.value);
+            if (newPageVal) {
+                renderPage(newPageVal);
+            }
         });
+
+        // define navigation links for chapters:  
+        if (chapterUrls != null) {
+            var loadChapterUrlHelper = function(i) {
+                return function(event) {
+                    // when opening a new chapter, always open the first page:
+                    loadChapterUrl(i, 1);
+                };
+            };
+            for (var index = 1; index <= chapterUrls.length; index += 1) {
+                $("#pdfchapter-" + index).click(loadChapterUrlHelper(index));
+            }   
+        }
+
+        // finally, load the appropriate url/page
+        if (urlToLoad != null) {
+            loadUrl(urlToLoad, pageToLoad);
+        } else {
+            loadChapterUrl(chapterToLoad, pageToLoad);
+        }       
+            
+        return pdfViewer;
     }
 })(jQuery);

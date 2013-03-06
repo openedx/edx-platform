@@ -149,6 +149,12 @@ function goto( mode)
     <p><input type="text" name="unique_student_identifier">  <input type="submit" name="action" value="Get link to student's progress page"></p>
     <p>and, if you want to reset the number of attempts for a problem, the urlname of that problem</p>
     <p> <input type="text" name="problem_to_reset"> <input type="submit" name="action" value="Reset student's attempts">  </p>
+
+    %if instructor_access:
+    <p> You may also delete the entire state of a student for a problem:
+    <input type="submit" name="action" value="Delete student state for problem">  </p>
+    %endif
+
  %endif
 
 ##----------------------------------------------------------------------------- 
@@ -240,7 +246,6 @@ function goto( mode)
     <p>
     Student Email: <input type="text" name="enstudent"> <input type="submit" name="action" value="Un-enroll student">
     <input type="submit" name="action" value="Enroll student">
-    <input type="submit" name="action" value="Un-enroll ALL students">
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:

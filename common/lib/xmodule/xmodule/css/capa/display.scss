@@ -40,7 +40,7 @@ section.problem {
     @include clearfix;
 
     label.choicegroup_correct{
-      text:after{
+      &:after{
         content: url('../images/correct-icon.png');
       }
     }
@@ -227,7 +227,7 @@ section.problem {
         background: url('../images/correct-icon.png') center center no-repeat;
         height: 20px;
         position: relative;
-        top: 6px;
+        top: 3px;
         width: 25px;
       }
 
@@ -237,7 +237,7 @@ section.problem {
         height: 20px;
         width: 20px;
         position: relative;
-        top: 6px;
+        top: 3px;
       }
     }
 
