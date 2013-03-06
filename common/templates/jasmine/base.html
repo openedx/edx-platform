@@ -15,6 +15,10 @@
 
     {% load compressed %}
     {# static files #}
+    {% for url in suite.static_files %}
+    <script src="{{ STATIC_URL }}{{ url }}"></script>
+    {% endfor %}
+
     {% compressed_js 'js-test-source' %}
 
     {# source files #}
