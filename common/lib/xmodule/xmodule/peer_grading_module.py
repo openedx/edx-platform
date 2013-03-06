@@ -471,6 +471,9 @@ class PeerGradingModule(XModule):
             #This is a student_facing_error
             error_text = "Could not get list of problems to peer grade.  Please notify course staff."
             success = False
+        except:
+            log.exception("Could not contact peer grading service.")
+            success = False
 
 
         def _find_corresponding_module_for_location(location):
@@ -589,7 +592,6 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
         'task_xml': dictionary of xml strings,
         }
         """
-        log.debug("In definition")
         expected_children = []
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0:

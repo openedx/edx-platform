@@ -71,6 +71,17 @@ class Location(_LocationBase):
         """
         return Location._clean(value, INVALID_CHARS)
 
+
+    @staticmethod
+    def clean_keeping_underscores(value):
+        """
+        Return value, replacing INVALID_CHARS, but not collapsing multiple '_' chars.
+        This for cleaning asset names, as the YouTube ID's may have underscores in them, and we need the
+        transcript asset name to match. In the future we may want to change the behavior of _clean.
+        """
+        return INVALID_CHARS.sub('_', value)
+
+
     @staticmethod
     def clean_for_url_name(value):
         """
