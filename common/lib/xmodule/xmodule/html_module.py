@@ -168,8 +168,11 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     @property
     def editable_metadata_fields(self):
         """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
-        subset = [field for field in super(HtmlDescriptor,self).editable_metadata_fields
-                  if field not in ['empty']]
+        subset = super(HtmlDescriptor, self).editable_metadata_fields
+
+        if 'empty' in subset:
+            del subset['empty']
+
         return subset
 
 
