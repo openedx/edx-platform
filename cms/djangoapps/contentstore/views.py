@@ -135,7 +135,7 @@ def index(request):
 
     return render_to_response('index.html', {
         'new_course_template': Location('i4x', 'edx', 'templates', 'course', 'Empty'),
-        'courses': [(course.title,
+        'courses': [(course.lms.display_name,
                     reverse('course_index', args=[
                         course.location.org,
                         course.location.course,

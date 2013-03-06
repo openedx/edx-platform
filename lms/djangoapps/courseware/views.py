@@ -282,7 +282,7 @@ def index(request, course_id, chapter=None, section=None,
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(request, course, chapter, section, model_data_cache),
-            'COURSE_TITLE': course.title,
+            'COURSE_TITLE': course.lms.display_name,
             'course': course,
             'init': '',
             'content': '',

@@ -742,10 +742,6 @@ class CourseDescriptor(SequenceDescriptor):
         return exams[0] if len(exams) == 1 else None
 
     @property
-    def title(self):
-        return self.display_name
-
-    @property
     def number(self):
         return self.location.course
 
