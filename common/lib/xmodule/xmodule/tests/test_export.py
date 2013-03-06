@@ -4,7 +4,7 @@ from fs.osfs import OSFS
 from nose.tools import assert_equals, assert_true
 from path import path
 from tempfile import mkdtemp
-from shutil import copytree
+import shutil
 
 from xmodule.modulestore.xml import XMLModuleStore
 
@@ -27,6 +27,7 @@ def strip_metadata(descriptor, key):
     for d in descriptor.get_children():
         strip_metadata(d, key)
 
+
 def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
@@ -45,11 +46,11 @@ class RoundTripTestCase(unittest.TestCase):
         Thus we make sure that export and import work properly.
     '''
     def check_export_roundtrip(self, data_dir, course_dir):
-        root_dir = path(mkdtemp())
+        root_dir = path(self.temp_dir)
         print "Copying test course to temp dir {0}".format(root_dir)
 
         data_dir = path(data_dir)
-        copytree(data_dir / course_dir, root_dir / course_dir)
+        shutil.copytree(data_dir / course_dir, root_dir / course_dir)
 
         print "Starting import"
         initial_import = XMLModuleStore(root_dir, course_dirs=[course_dir])
@@ -107,6 +108,8 @@ class RoundTripTestCase(unittest.TestCase):
 
     def setUp(self):
         self.maxDiff = None
+        self.temp_dir = mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
 
     def test_toy_roundtrip(self):
         self.check_export_roundtrip(DATA_DIR, "toy")
@@ -119,12 +122,12 @@ class RoundTripTestCase(unittest.TestCase):
 
     def test_selfassessment_roundtrip(self):
         #Test selfassessment xmodule to see if it exports correctly
-        self.check_export_roundtrip(DATA_DIR,"self_assessment")
+        self.check_export_roundtrip(DATA_DIR, "self_assessment")
 
     def test_graphicslidertool_roundtrip(self):
         #Test graphicslidertool xmodule to see if it exports correctly
-        self.check_export_roundtrip(DATA_DIR,"graphic_slider_tool")
+        self.check_export_roundtrip(DATA_DIR, "graphic_slider_tool")
 
     def test_exam_registration_roundtrip(self):
         # Test exam_registration xmodule to see if it exports correctly
-        self.check_export_roundtrip(DATA_DIR,"test_exam_registration")
+        self.check_export_roundtrip(DATA_DIR, "test_exam_registration")

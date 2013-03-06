@@ -5,17 +5,19 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
+
 def get_modulestore(location):
     """
     Returns the correct modulestore to use for modifying the specified location
     """
     if not isinstance(location, Location):
         location = Location(location)
-        
+
     if location.category in DIRECT_ONLY_CATEGORIES:
         return modulestore('direct')
     else:
         return modulestore()
+
 
 def get_course_location_for_item(location):
     '''
@@ -46,6 +48,7 @@ def get_course_location_for_item(location):
 
     return location
 
+
 def get_course_for_item(location):
     '''
     cdodge: for a given Xmodule, return the course that it belongs to
@@ -72,18 +75,27 @@ def get_course_for_item(location):
     return courses[0]
 
 
-def get_lms_link_for_item(location, preview=False):
+def get_lms_link_for_item(location, preview=False, course_id=None):
+    if course_id is None:
+        course_id = get_course_id(location)
+
     if settings.LMS_BASE is not None:
-        lms_link = "//{preview}{lms_base}/courses/{course_id}/jump_to/{location}".format(
-            preview='preview.' if preview else '',
-            lms_base=settings.LMS_BASE,
-            course_id=get_course_id(location),
+        if preview:
+            lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE',
+                'preview.' + settings.LMS_BASE)
+        else:
+            lms_base = settings.LMS_BASE
+     
+        lms_link = "//{lms_base}/courses/{course_id}/jump_to/{location}".format(
+            lms_base=lms_base,
+            course_id=course_id,
             location=Location(location)
         )
     else:
         lms_link = None
 
     return lms_link
+
 
 def get_lms_link_for_about_page(location):
     """
@@ -99,12 +111,14 @@ def get_lms_link_for_about_page(location):
 
     return lms_link
 
+
 def get_course_id(location):
     """
     Returns the course_id from a given the location tuple.
     """
     # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
     return modulestore().get_containing_courses(Location(location))[0].id
+
 
 class UnitState(object):
     draft = 'draft'
@@ -134,6 +148,7 @@ def compute_unit_state(unit):
 
 def get_date_display(date):
     return date.strftime("%d %B, %Y at %I:%M %p")
+
 
 def update_item(location, value):
     """

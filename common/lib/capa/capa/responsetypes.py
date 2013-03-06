@@ -174,27 +174,33 @@ class LoncapaResponse(object):
         '''
         return sum(self.maxpoints.values())
 
-    def render_html(self, renderer):
+    def render_html(self, renderer, response_msg=''):
         '''
         Return XHTML Element tree representation of this Response.
 
         Arguments:
 
           - renderer : procedure which produces HTML given an ElementTree
+          - response_msg: a message displayed at the end of the Response
         '''
         # render ourself as a <span> + our content
         tree = etree.Element('span')
 
         # problem author can make this span display:inline
-        if self.xml.get('inline',''):
-            tree.set('class','inline')
-            
+        if self.xml.get('inline', ''):
+            tree.set('class', 'inline')
+
         for item in self.xml:
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
             if item_xhtml is not None:
                 tree.append(item_xhtml)
         tree.tail = self.xml.tail
+
+        # Add a <div> for the message at the end of the response
+        if response_msg:
+            tree.append(self._render_response_msg_html(response_msg))
+
         return tree
 
     def evaluate_answers(self, student_answers, old_cmap):
@@ -318,6 +324,29 @@ class LoncapaResponse(object):
 
     def __unicode__(self):
         return u'LoncapaProblem Response %s' % self.xml.tag
+
+    def _render_response_msg_html(self, response_msg):
+        """ Render a <div> for a message that applies to the entire response.
+
+        *response_msg* is a string, which may contain XHTML markup
+        
+        Returns an etree element representing the response message <div> """
+        # First try wrapping the text in a <div> and parsing
+        # it as an XHTML tree
+        try:
+            response_msg_div = etree.XML('<div>%s</div>' % str(response_msg))
+
+        # If we can't do that, create the <div> and set the message
+        # as the text of the <div>
+        except:
+            response_msg_div = etree.Element('div')
+            response_msg_div.text = str(response_msg)
+
+
+        # Set the css class of the message <div>
+        response_msg_div.set("class", "response_message")
+
+        return response_msg_div
 
 
 #-----------------------------------------------------------------------------
@@ -632,8 +661,14 @@ class MultipleChoiceResponse(LoncapaResponse):
 
         # define correct choices (after calling secondary setup)
         xml = self.xml
-        cxml = xml.xpath('//*[@id=$id]//choice[@correct="true"]', id=xml.get('id'))
-        self.correct_choices = [contextualize_text(choice.get('name'), self.context) for choice in cxml]
+        cxml = xml.xpath('//*[@id=$id]//choice', id=xml.get('id'))
+
+        # contextualize correct attribute and then select ones for which
+        # correct = "true"
+        self.correct_choices = [
+            contextualize_text(choice.get('name'), self.context)
+            for choice in cxml
+            if contextualize_text(choice.get('correct'), self.context) == "true"]
 
     def mc_setup_response(self):
         '''
@@ -875,7 +910,8 @@ def sympy_check2():
 
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
                             'chemicalequationinput', 'vsepr_input',
-                            'drag_and_drop_input']
+                            'drag_and_drop_input', 'editamoleculeinput',
+                            'designprotein2dinput', 'editageneinput']
 
     def setup_response(self):
         xml = self.xml
@@ -958,6 +994,7 @@ def sympy_check2():
         # not expecting 'unknown's
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
+        overall_message = ""
 
         # put these in the context of the check function evaluator
         # note that this doesn't help the "cfn" version - only the exec version
@@ -989,6 +1026,10 @@ def sympy_check2():
             # the list of messages to be filled in by the check function
             'messages': messages,
 
+            # a message that applies to the entire response
+            # instead of a particular input
+            'overall_message': overall_message,
+
             # any options to be passed to the cfn
             'options': self.xml.get('options'),
             'testdat': 'hello world',
@@ -998,11 +1039,12 @@ def sympy_check2():
         self.context['debug'] = self.system.DEBUG
 
         # exec the check function
-        if type(self.code) == str:
+        if isinstance(self.code, basestring):
             try:
                 exec self.code in self.context['global_context'], self.context
                 correct = self.context['correct']
                 messages = self.context['messages']
+                overall_message = self.context['overall_message']
             except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
@@ -1037,33 +1079,99 @@ def sympy_check2():
                 log.error(traceback.format_exc())
                 raise Exception("oops in customresponse (cfn) error %s" % err)
             log.debug("[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
+
             if type(ret) == dict:
-                correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
-                msg = ret['msg']
 
-                if 1:
-                    # try to clean up message html
-                    msg = '<html>' + msg + '</html>'
-                    msg = msg.replace('&#60;', '&lt;')
-                    #msg = msg.replace('&lt;','<')
-                    msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
-                                         pretty_print=True)
-                    #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
-                    msg = msg.replace('&#13;', '')
-                    #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
-                    msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
+                # One kind of dictionary the check function can return has the
+                # form {'ok': BOOLEAN, 'msg': STRING}
+                # If there are multiple inputs, they all get marked
+                # to the same correct/incorrect value
+                if 'ok' in ret:
+                    correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
+                    msg = ret.get('msg', None)
+                    msg = self.clean_message_html(msg)
 
-                messages[0] = msg
+                    # If there is only one input, apply the message to that input
+                    # Otherwise, apply the message to the whole problem
+                    if len(idset) > 1:
+                        overall_message = msg
+                    else:
+                        messages[0] = msg
+
+
+                # Another kind of dictionary the check function can return has
+                # the form:
+                # {'overall_message': STRING,
+                #  'input_list': [{ 'ok': BOOLEAN, 'msg': STRING }, ...] }
+                # 
+                # This allows the function to return an 'overall message'
+                # that applies to the entire problem, as well as correct/incorrect
+                # status and messages for individual inputs
+                elif 'input_list' in ret:
+                    overall_message = ret.get('overall_message', '')
+                    input_list = ret['input_list']
+
+                    correct = []
+                    messages = []
+                    for input_dict in input_list:
+                        correct.append('correct' if input_dict['ok'] else 'incorrect')
+                        msg = self.clean_message_html(input_dict['msg']) if 'msg' in input_dict else None
+                        messages.append(msg)
+
+                # Otherwise, we do not recognize the dictionary
+                # Raise an exception
+                else:
+                    log.error(traceback.format_exc())
+                    raise Exception("CustomResponse: check function returned an invalid dict")
+
+            # The check function can return a boolean value,
+            # indicating whether all inputs should be marked
+            # correct or incorrect
             else:
                 correct = ['correct'] * len(idset) if ret else ['incorrect'] * len(idset)
 
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
+
+        overall_message = self.clean_message_html(overall_message)
+        correct_map.set_overall_message(overall_message)
+
         for k in range(len(idset)):
             npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
+
+    def clean_message_html(self, msg):
+
+        # If *msg* is an empty string, then the code below
+        # will return "</html>".  To avoid this, we first check
+        # that *msg* is a non-empty string.
+        if msg:
+
+            # When we parse *msg* using etree, there needs to be a root
+            # element, so we wrap the *msg* text in <html> tags
+            msg = '<html>' + msg + '</html>'
+
+            # Replace < characters
+            msg = msg.replace('&#60;', '&lt;')
+
+            # Use etree to prettify the HTML
+            msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
+                                 pretty_print=True)
+
+            msg = msg.replace('&#13;', '')
+
+            # Remove the <html> tags we introduced earlier, so we're
+            # left with just the prettified message markup
+            msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
+
+            # Strip leading and trailing whitespace
+            return msg.strip()
+
+        # If we start with an empty string, then return an empty string
+        else:
+            return ""
 
     def get_answers(self):
         '''
@@ -1294,7 +1402,7 @@ class CodeResponse(LoncapaResponse):
 
         # State associated with the queueing request
         queuestate = {'key': queuekey,
-                      'time': qtime,}
+                      'time': qtime, }
 
         cmap = CorrectMap()
         if error:

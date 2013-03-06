@@ -1,6 +1,4 @@
 class CMS.Views.TabsEdit extends Backbone.View
-  events:
-    'click .new-tab': 'addNewTab'
 
   initialize: =>
     @$('.component').each((idx, element) =>
@@ -13,9 +11,10 @@ class CMS.Views.TabsEdit extends Backbone.View
         )
     )
 
+    @options.mast.find('.new-tab').on('click', @addNewTab)
     @$('.components').sortable(
       handle: '.drag-handle'
-      update: (event, ui) => alert 'not yet implemented!'
+      update: @tabMoved
       helper: 'clone'
       opacity: '0.5'
       placeholder: 'component-placeholder'
@@ -23,6 +22,20 @@ class CMS.Views.TabsEdit extends Backbone.View
       axis: 'y'
       items: '> .component'
     )    
+
+  tabMoved: (event, ui) =>
+    tabs = []
+    @$('.component').each((idx, element) =>
+        tabs.push($(element).data('id'))
+    )
+    $.ajax({
+      type:'POST',
+      url: '/reorder_static_tabs', 
+      data: JSON.stringify({
+        tabs : tabs
+      }),
+      contentType: 'application/json'
+    })
 
   addNewTab: (event) =>
     event.preventDefault()

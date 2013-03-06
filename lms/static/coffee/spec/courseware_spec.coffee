@@ -10,19 +10,6 @@ describe 'Courseware', ->
       Courseware.start()
       expect(Logger.bind).toHaveBeenCalled()
 
-  describe 'bind', ->
-    beforeEach ->
-      @courseware = new Courseware
-      setFixtures """
-        <div class="course-content">
-          <div class="sequence"></div>
-        </div>
-        """
-
-    it 'binds the content change event', ->
-      @courseware.bind()
-      expect($('.course-content .sequence')).toHandleWith 'contentChanged', @courseware.render
-
   describe 'render', ->
     beforeEach ->
       jasmine.stubRequests()
@@ -30,6 +17,7 @@ describe 'Courseware', ->
       spyOn(window, 'Histogram')
       spyOn(window, 'Problem')
       spyOn(window, 'Video')
+      spyOn(XModule, 'loadModules')
       setFixtures """
         <div class="course-content">
           <div id="video_1" class="video" data-streams="1.0:abc1234"></div>
@@ -41,12 +29,8 @@ describe 'Courseware', ->
         """
       @courseware.render()
 
-    it 'detect the video elements and convert them', ->
-      expect(window.Video).toHaveBeenCalledWith('1', '1.0:abc1234')
-      expect(window.Video).toHaveBeenCalledWith('2', '1.0:def5678')
-
-    it 'detect the problem element and convert it', ->
-      expect(window.Problem).toHaveBeenCalledWith(3, 'problem_3', '/example/url/')
+    it 'ensure that the XModules have been loaded', ->
+      expect(XModule.loadModules).toHaveBeenCalled()
 
     it 'detect the histrogram element and convert it', ->
       expect(window.Histogram).toHaveBeenCalledWith('3', [[0, 1]])

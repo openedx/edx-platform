@@ -3,6 +3,8 @@ metadata:
     display_name: Multiple Choice
     rerandomize: never
     showanswer: always
+    weight: ""
+    attempts: ""
     markdown: 
        "A multiple choice problem presents radio buttons for student input. Students can only select a single 
        option presented. Multiple Choice questions have been the subject of many areas of research due to the early 
@@ -23,10 +25,6 @@ metadata:
             (x) The iPod
             
             ( ) The vegetable peeler
-            
-            ( ) Android
-            
-            ( ) The Beatles
             
             
        [explanation]
@@ -49,8 +47,6 @@ data: |
            <choice correct="false" name="beatles">Napster</choice>
            <choice correct="true" name="ipod">The iPod</choice>
            <choice correct="false" name="peeler">The vegetable peeler</choice>
-           <choice correct="false" name="android">Android</choice>
-           <choice correct="false" name="beatles">The Beatles</choice>
         </choicegroup>
        </multiplechoiceresponse>
        <solution>

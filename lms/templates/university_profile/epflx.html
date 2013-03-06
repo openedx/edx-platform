@@ -1,0 +1,27 @@
+<%inherit file="base.html" />
+<%namespace name='static' file='../static_content.html'/>
+
+<%block name="title"><title>EPFLx</title></%block>
+
+<%block name="university_header">
+  <header class="search" style="background: url('/static/images/university/epfl/epfl-cover.jpg')">
+    <div class="inner-wrapper university-search">
+      <hgroup>
+        <div class="logo">
+           <img src="${static.url('images/university/epfl/epfl.png')}" />
+        </div>
+        <h1>EPFLx</h1>
+      </hgroup>
+    </div>
+  </header>
+
+</%block>
+
+<%block name="university_description">
+    <p>EPFL is one of the two Swiss Federal Institutes of Technology. With the status of a national school since 1969, the young engineering school has grown in many dimensions, to the extent of becoming one of the most famous European institutions of science and technology. It has three core missions: training, research and technology transfer. </p>
+
+ <p>EPFL is located in Lausanne in Switzerland, on the shores of the largest lake in Europe, Lake Geneva and at the foot of the Alps and Mont-Blanc. Its main campus brings together over 11,000 persons, students, researchers and staff in the same magical place. Because of its dynamism and rich student community, EPFL has been able to create a special spirit imbued with curiosity and simplicity. Daily interactions amongst students, researchers and entrepreneurs on campus give rise to new scientific, technological and architectural projects.
+</p>
+</%block>
+
+${parent.body()}

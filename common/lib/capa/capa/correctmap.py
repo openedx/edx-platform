@@ -3,6 +3,7 @@
 #
 # Used by responsetypes and capa_problem
 
+
 class CorrectMap(object):
     """
     Stores map between answer_id and response evaluation result for each question
@@ -26,6 +27,7 @@ class CorrectMap(object):
         self.cmap = dict()
         self.items = self.cmap.items
         self.keys = self.cmap.keys
+        self.overall_message = ""
         self.set(*args, **kwargs)
 
     def __getitem__(self, *args, **kwargs):
@@ -103,16 +105,21 @@ class CorrectMap(object):
         return self.is_queued(answer_id) and self.cmap[answer_id]['queuestate']['key'] == test_key
 
     def get_queuetime_str(self, answer_id):
-        return self.cmap[answer_id]['queuestate']['time']
+        if self.cmap[answer_id]['queuestate']:
+            return self.cmap[answer_id]['queuestate']['time']
+        else:
+            return None
 
     def get_npoints(self, answer_id):
-        npoints = self.get_property(answer_id, 'npoints')
-        if npoints is not None:
-            return npoints
-        elif self.is_correct(answer_id):
-            return 1
-         # if not correct and no points have been assigned, return 0
-        return 0
+        """ Return the number of points for an answer:
+            If the answer is correct, return the assigned
+            number of points (default: 1 point)
+            Otherwise, return 0 points """
+        if self.is_correct(answer_id):
+            npoints = self.get_property(answer_id, 'npoints')
+            return npoints if npoints is not None else 1
+        else:
+            return 0
 
     def set_property(self, answer_id, property, value):
         if answer_id in self.cmap:
@@ -152,6 +159,15 @@ class CorrectMap(object):
         if not isinstance(other_cmap, CorrectMap):
             raise Exception('CorrectMap.update called with invalid argument %s' % other_cmap)
         self.cmap.update(other_cmap.get_dict())
+        self.set_overall_message(other_cmap.get_overall_message())
 
 
+    def set_overall_message(self, message_str):
+        """ Set a message that applies to the question as a whole,
+            rather than to individual inputs. """
+        self.overall_message = str(message_str) if message_str else ""
 
+    def get_overall_message(self):
+        """ Retrieve a message that applies to the question as a whole.
+        If no message is available, returns the empty string """
+        return self.overall_message

@@ -1,25 +1,85 @@
-$gw-column: 80px;
-$gw-gutter: 20px;
+$baseline: 20px;
 
+// grid
+$gw-column: ($baseline*3);
+$gw-gutter: $baseline;
 $fg-column: $gw-column;
 $fg-gutter: $gw-gutter;
 $fg-max-columns: 12;
-$fg-max-width: 1400px;
-$fg-min-width: 810px;
+$fg-max-width: 1280px;
+$fg-min-width: 900px;
 
+// type
 $sans-serif: 'Open Sans', $verdana;
 $body-line-height: golden-ratio(.875em, 1);
-
-$white: rgb(255,255,255);
-$black: rgb(0,0,0);
-$pink: rgb(182,37,104);
 $error-red: rgb(253, 87, 87);
 
-$baseFontColor: #3c3c3c;
-$offBlack: #3c3c3c;
+// colors - new for re-org
 $black: rgb(0,0,0);
 $white: rgb(255,255,255);
-$blue: #5597dd;
+
+$gray: rgb(127,127,127);
+$gray-l1: tint($gray,20%);
+$gray-l2: tint($gray,40%);
+$gray-l3: tint($gray,60%);
+$gray-l4: tint($gray,80%);
+$gray-l5: tint($gray,90%);
+$gray-d1: shade($gray,20%);
+$gray-d2: shade($gray,40%);
+$gray-d3: shade($gray,60%);
+$gray-d4: shade($gray,80%);
+
+$blue: rgb(85, 151, 221);
+$blue-l1: tint($blue,20%);
+$blue-l2: tint($blue,40%);
+$blue-l3: tint($blue,60%);
+$blue-l4: tint($blue,80%);
+$blue-l5: tint($blue,90%);
+$blue-d1: shade($blue,20%);
+$blue-d2: shade($blue,40%);
+$blue-d3: shade($blue,60%);
+$blue-d4: shade($blue,80%);
+
+$pink: rgb(183, 37, 103);
+$pink-l1: tint($pink,20%);
+$pink-l2: tint($pink,40%);
+$pink-l3: tint($pink,60%);
+$pink-l4: tint($pink,80%);
+$pink-l5: tint($pink,90%);
+$pink-d1: shade($pink,20%);
+$pink-d2: shade($pink,40%);
+$pink-d3: shade($pink,60%);
+$pink-d4: shade($pink,80%);
+
+$green: rgb(37, 184, 90);
+$green-l1: tint($green,20%);
+$green-l2: tint($green,40%);
+$green-l3: tint($green,60%);
+$green-l4: tint($green,80%);
+$green-l5: tint($green,90%);
+$green-d1: shade($green,20%);
+$green-d2: shade($green,40%);
+$green-d3: shade($green,60%);
+$green-d4: shade($green,80%);
+
+$yellow: rgb(231, 214, 143);
+$yellow-l1: tint($yellow,20%);
+$yellow-l2: tint($yellow,40%);
+$yellow-l3: tint($yellow,60%);
+$yellow-l4: tint($yellow,80%);
+$yellow-l5: tint($yellow,90%);
+$yellow-d1: shade($yellow,20%);
+$yellow-d2: shade($yellow,40%);
+$yellow-d3: shade($yellow,60%);
+$yellow-d4: shade($yellow,80%);
+
+$shadow: rgba(0,0,0,0.2);
+$shadow-l1: rgba(0,0,0,0.1);
+$shadow-d1: rgba(0,0,0,0.4);
+
+// colors - inherited 
+$baseFontColor: #3c3c3c;
+$offBlack: #3c3c3c;
 $orange: #edbd3c;
 $red: #b20610;
 $green: #108614;

@@ -1,0 +1,135 @@
+// HTML component display: 
+* {
+  line-height: 1.4em;
+}
+
+h1 {
+    color: $baseFontColor;
+    font: normal 2em/1.4em $sans-serif;
+    letter-spacing: 1px;
+    margin: 0 0 1.416em 0;
+  }
+
+h2 {
+  color: #646464;
+  font: normal 1.2em/1.2em $sans-serif;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
+}
+
+h3, h4, h5, h6 {
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.2em;
+}
+
+h4 {
+  font-size: 1em;
+}
+
+h5 {
+  font-size: .83em;
+}
+
+h6 {
+  font-size: 0.75em;
+}
+
+p {
+  margin-bottom: 1.416em;
+  font-size: 1em;
+  line-height: 1.6em !important;
+  color: $baseFontColor;
+}
+
+em, i {
+  font-style: italic;
+
+  span {
+    font-style: italic;
+  }
+}
+
+strong, b {
+  font-weight: bold;
+
+  span {
+    font-weight: bold;
+  }
+}
+
+p + p, ul + p, ol + p {
+  margin-top: 20px;
+}
+
+blockquote {
+  margin: 1em 40px;
+}
+
+ol, ul {
+  margin: 1em 0;
+  padding: 0 0 0 1em;
+  color: $baseFontColor;
+
+  li {
+    margin-bottom: 0.708em;
+  }
+}
+
+ol {
+  list-style: decimal outside none;
+}
+
+ul {
+  list-style: disc outside none;
+}
+
+a {
+  &:link, &:visited, &:hover, &:active {
+    color: #1d9dd9;
+  } 
+}
+
+img {
+  max-width: 100%;
+}
+
+pre {
+  margin: 1em 0;
+  color: $baseFontColor;
+  font-family: monospace, serif;
+  font-size: 1em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+code {
+  color: $baseFontColor;
+  font-family: monospace, serif;
+  background: none;
+  padding: 0;
+}
+
+table {
+  width: 100%; 
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+th { 
+  background: #eee; 
+  font-weight: bold; 
+}
+
+table td, th { 
+  margin: 20px 0;
+  padding: 10px; 
+  border: 1px solid #ccc; 
+  text-align: left;
+  font-size: 14px;
+}

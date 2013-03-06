@@ -1,5 +1,6 @@
 from utils import *
 
+
 class Model(object):
 
     accessible_fields = ['id']
@@ -22,11 +23,11 @@ class Model(object):
         try:
             return self.attributes[name]
         except KeyError:
-            if self.retrieved or self.id == None:
+            if self.retrieved or self.id is None:
                 raise AttributeError("Field {0} does not exist".format(name))
             self.retrieve()
             return self.__getattr__(name)
-    
+
     def __setattr__(self, name, value):
         if name == 'attributes' or name not in self.accessible_fields:
             super(Model, self).__setattr__(name, value)
@@ -80,7 +81,7 @@ class Model(object):
 
     def initializable_attributes(self):
         return extract(self.attributes, self.initializable_fields)
-        
+
     @classmethod
     def before_save(cls, instance):
         pass
@@ -91,10 +92,10 @@ class Model(object):
 
     def save(self):
         self.__class__.before_save(self)
-        if self.id: # if we have id already, treat this as an update
+        if self.id:   # if we have id already, treat this as an update
             url = self.url(action='put', params=self.attributes)
             response = perform_request('put', url, self.updatable_attributes())
-        else: # otherwise, treat this as an insert
+        else:   # otherwise, treat this as an insert
             url = self.url(action='post', params=self.attributes)
             response = perform_request('post', url, self.initializable_attributes())
         self.retrieved = True
@@ -126,5 +127,5 @@ class Model(object):
                 return cls.url_with_id(params)
             except KeyError:
                 raise CommentClientError("Cannot perform action {0} without id".format(action))
-        else: # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
+        else:   # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
             return cls.url_without_id()

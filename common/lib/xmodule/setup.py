@@ -20,19 +20,24 @@ setup(
             "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "chapter = xmodule.seq_module:SequenceDescriptor",
             "combinedopenended = xmodule.combined_open_ended_module:CombinedOpenEndedDescriptor",
+            "conditional = xmodule.conditional_module:ConditionalDescriptor",
             "course = xmodule.course_module:CourseDescriptor",
             "customtag = xmodule.template_module:CustomTagDescriptor",
             "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "html = xmodule.html_module:HtmlDescriptor",
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "error = xmodule.error_module:ErrorDescriptor",
+            "peergrading = xmodule.peer_grading_module:PeerGradingDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
+            "randomize = xmodule.randomize_module:RandomizeDescriptor",
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
             "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
+            "timelimit = xmodule.timelimit_module:TimeLimitDescriptor",
             "vertical = xmodule.vertical_module:VerticalDescriptor",
             "video = xmodule.video_module:VideoDescriptor",
+            "videoalpha = xmodule.videoalpha_module:VideoAlphaDescriptor",
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
             "discussion = xmodule.discussion_module:DiscussionDescriptor",
@@ -40,7 +45,8 @@ setup(
             "static_tab = xmodule.html_module:StaticTabDescriptor",
             "custom_tag_template = xmodule.raw_module:RawDescriptor",
             "about = xmodule.html_module:AboutDescriptor",
-            "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor"
-        ]
+            "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
+            "foldit = xmodule.foldit_module:FolditDescriptor",
+         ]
     }
 )

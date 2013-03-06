@@ -1,5 +1,5 @@
 """
-This config file extends the test environment configuration 
+This config file extends the test environment configuration
 so that we can run the lettuce acceptance tests.
 """
 from .test import *
@@ -21,14 +21,14 @@ MODULESTORE = {
     }
 }
 
-# Set this up so that rake lms[acceptance] and running the 
+# Set this up so that rake lms[acceptance] and running the
 # harvest command both use the same (test) database
 # which they can flush without messing up your dev db
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ENV_ROOT / "db" / "test_mitx.db",
-        'TEST_NAME': ENV_ROOT / "db" / "test_mitx.db",     
+        'TEST_NAME': ENV_ROOT / "db" / "test_mitx.db",
     }
 }
 
@@ -38,4 +38,4 @@ MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('portal',)  # dummy app covers the home page, login, registration, and course enrollment
+LETTUCE_APPS = ('courseware',)

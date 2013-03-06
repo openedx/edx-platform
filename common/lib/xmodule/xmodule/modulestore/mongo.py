@@ -1,11 +1,13 @@
 import pymongo
 import sys
 import logging
+import copy
 
 from bson.son import SON
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
+from datetime import datetime, timedelta
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -27,9 +29,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     """
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
+    TODO (cdodge) when the 'split module store' work has been completed we can remove all
+    references to metadata_inheritance_tree
     """
     def __init__(self, modulestore, module_data, default_class, resources_fs,
-                 error_tracker, render_template):
+                 error_tracker, render_template, metadata_inheritance_tree = None):
         """
         modulestore: the module store that can be used to retrieve additional modules
 
@@ -54,18 +58,25 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         # cdodge: other Systems have a course_id attribute defined. To keep things consistent, let's
         # define an attribute here as well, even though it's None
         self.course_id = None
+        self.metadata_inheritance_tree = metadata_inheritance_tree
 
     def load_item(self, location):
         location = Location(location)
         json_data = self.module_data.get(location)
         if json_data is None:
-            return self.modulestore.get_item(location)
+            module = self.modulestore.get_item(location)
+            if module is not None:
+                # update our own cache after going to the DB to get cache miss
+                self.module_data.update(module.system.module_data)
+            return module
         else:
-            # TODO (vshnayder): metadata inheritance is somewhat broken because mongo, doesn't
-            # always load an entire course.  We're punting on this until after launch, and then
-            # will build a proper course policy framework.
+            # load the module and apply the inherited metadata
             try:
-                return XModuleDescriptor.load_from_json(json_data, self, self.default_class)
+                module = XModuleDescriptor.load_from_json(json_data, self, self.default_class)
+                if self.metadata_inheritance_tree is not None:
+                    metadata_to_inherit = self.metadata_inheritance_tree.get('parent_metadata', {}).get(location.url(),{})
+                    module.inherit_metadata(metadata_to_inherit)
+                return module
             except:
                 return ErrorDescriptor.from_json(
                     json_data,
@@ -142,6 +153,87 @@ class MongoModuleStore(ModuleStoreBase):
         self.fs_root = path(fs_root)
         self.error_tracker = error_tracker
         self.render_template = render_template
+        self.metadata_inheritance_cache = {}
+
+    def get_metadata_inheritance_tree(self, location):
+        '''
+        TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
+        '''
+        
+        # get all collections in the course, this query should not return any leaf nodes
+        query = { 
+                    '_id.org': location.org,
+                    '_id.course': location.course,
+                    '$or': [ 
+                    {"_id.category":"course"}, 
+                    {"_id.category":"chapter"},    
+                    {"_id.category":"sequential"},    
+                    {"_id.category":"vertical"}   
+                ]
+                }
+        # we just want the Location, children, and metadata
+        record_filter = {'_id':1,'definition.children':1,'metadata':1}
+
+        # call out to the DB
+        resultset = self.collection.find(query, record_filter)
+
+        results_by_url = {}
+        root = None
+
+        # now go through the results and order them by the location url
+        for result in resultset:
+            location = Location(result['_id'])
+            results_by_url[location.url()] = result
+            if location.category == 'course':
+                root = location.url()
+
+        # now traverse the tree and compute down the inherited metadata
+        metadata_to_inherit = {}
+        def _compute_inherited_metadata(url):
+            my_metadata = results_by_url[url]['metadata']
+            for key in my_metadata.keys():
+                if key not in XModuleDescriptor.inheritable_metadata:
+                    del my_metadata[key]
+            results_by_url[url]['metadata'] = my_metadata
+
+            # go through all the children and recurse, but only if we have
+            # in the result set. Remember results will not contain leaf nodes
+            for child in results_by_url[url].get('definition',{}).get('children',[]):
+                if child in results_by_url:
+                    new_child_metadata = copy.deepcopy(my_metadata)
+                    new_child_metadata.update(results_by_url[child]['metadata'])
+                    results_by_url[child]['metadata'] = new_child_metadata
+                    metadata_to_inherit[child] = new_child_metadata
+                    _compute_inherited_metadata(child)
+                else:
+                    # this is likely a leaf node, so let's record what metadata we need to inherit
+                    metadata_to_inherit[child] = my_metadata
+        
+        if root is not None:
+            _compute_inherited_metadata(root)
+
+        cache = {'parent_metadata': metadata_to_inherit, 
+            'timestamp' : datetime.now()}
+
+        return cache
+
+    def get_cached_metadata_inheritance_tree(self, location, max_age_allowed):
+        '''
+        TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
+        '''
+        cache_name = '{0}/{1}'.format(location.org, location.course)
+        cache = self.metadata_inheritance_cache.get(cache_name,{'parent_metadata': {}, 
+            'timestamp': datetime.now() - timedelta(hours=1)})
+        age = (datetime.now() - cache['timestamp'])
+
+        if age.seconds >= max_age_allowed:
+            logging.debug('loading entire inheritance tree for {0}'.format(cache_name))
+            cache = self.get_metadata_inheritance_tree(location)
+            self.metadata_inheritance_cache[cache_name] = cache
+
+        return cache
+
+
 
     def _clean_item_data(self, item):
         """
@@ -196,6 +288,15 @@ class MongoModuleStore(ModuleStoreBase):
 
         resource_fs = OSFS(root)
 
+        metadata_inheritance_tree = None
+
+        # if we are loading a course object, there is no parent to inherit the metadata from
+        # so don't bother getting it
+        if item['location']['category'] != 'course':
+            metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']), 300)
+
+        # TODO (cdodge): When the 'split module store' work has been completed, we should remove
+        # the 'metadata_inheritance_tree' parameter
         system = CachingDescriptorSystem(
             self,
             data_cache,
@@ -203,6 +304,7 @@ class MongoModuleStore(ModuleStoreBase):
             resource_fs,
             self.error_tracker,
             self.render_template,
+            metadata_inheritance_tree = metadata_inheritance_tree
         )
         return system.load_item(item['location'])
 
@@ -261,11 +363,11 @@ class MongoModuleStore(ModuleStoreBase):
             descendents of the queried modules for more efficient results later
             in the request. The depth is counted in the number of
             calls to get_children() to cache. None indicates to cache all descendents.
-
         """
         location = Location.ensure_fully_specified(location)
         item = self._find_one(location)
-        return self._load_items([item], depth)[0]
+        module = self._load_items([item], depth)[0]
+        return module
 
     def get_instance(self, course_id, location, depth=0):
         """
@@ -285,7 +387,8 @@ class MongoModuleStore(ModuleStoreBase):
             sort=[('revision', pymongo.ASCENDING)],
         )
 
-        return self._load_items(list(items), depth)
+        modules = self._load_items(list(items), depth)
+        return modules
 
     def clone_item(self, source, location):
         """
@@ -304,7 +407,7 @@ class MongoModuleStore(ModuleStoreBase):
             if location.category == 'static_tab':
                 course = self.get_course_for_item(item.location)
                 existing_tabs = course.tabs or []
-                existing_tabs.append({'type':'static_tab', 'name' : item.metadata.get('display_name'), 'url_slug' : item.location.name})
+                existing_tabs.append({'type': 'static_tab', 'name': item.metadata.get('display_name'), 'url_slug': item.location.name})
                 course.tabs = existing_tabs
                 self.update_metadata(course.location, course.metadata)
 
@@ -313,7 +416,7 @@ class MongoModuleStore(ModuleStoreBase):
             raise DuplicateItemError(location)
 
 
-    def get_course_for_item(self, location):
+    def get_course_for_item(self, location, depth=0):
         '''
         VS[compat]
         cdodge: for a given Xmodule, return the course that it belongs to
@@ -327,7 +430,7 @@ class MongoModuleStore(ModuleStoreBase):
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
         course_search_location = ['i4x', location.org, location.course, 'course', None]
-        courses = self.get_items(course_search_location)
+        courses = self.get_items(course_search_location, depth=depth)
 
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)
@@ -423,7 +526,7 @@ class MongoModuleStore(ModuleStoreBase):
 
 
     def get_parent_locations(self, location, course_id):
-        '''Find all locations that are the parents of this location in this 
+        '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
         '''
         location = Location.ensure_fully_specified(location)

@@ -22,6 +22,8 @@ log = logging.getLogger('mitx.' + __name__)
 registry = TagRegistry()
 
 #-----------------------------------------------------------------------------
+
+
 class MathRenderer(object):
     tags = ['math']
 
@@ -77,6 +79,7 @@ registry.register(MathRenderer)
 
 #-----------------------------------------------------------------------------
 
+
 class SolutionRenderer(object):
     '''
     A solution is just a <span>...</span> which is given an ID, that is used for displaying an
@@ -97,4 +100,3 @@ class SolutionRenderer(object):
         return etree.XML(html)
 
 registry.register(SolutionRenderer)
-

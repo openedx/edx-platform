@@ -12,14 +12,10 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from django.db import models
-#from django.core.cache import cache
 from django.contrib.auth.models import User
-
-#from cache_toolbox import cache_model, cache_relation
-
-#CACHE_TIMEOUT = 60 * 60 * 4 # Set the cache timeout to be four hours
-
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class StudentModule(models.Model):
     """
@@ -30,6 +26,7 @@ class StudentModule(models.Model):
     MODULE_TYPES = (('problem', 'problem'),
                     ('video', 'video'),
                     ('html', 'html'),
+                    ('timelimit', 'timelimit'),
                     )
     ## These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
@@ -63,6 +60,37 @@ class StudentModule(models.Model):
     def __unicode__(self):
         return '/'.join([self.course_id, self.module_type,
                          self.student.username, self.module_state_key, str(self.state)[:20]])
+
+
+class StudentModuleHistory(models.Model):
+    """Keeps a complete history of state changes for a given XModule for a given
+    Student. Right now, we restrict this to problems so that the table doesn't
+    explode in size."""
+
+    HISTORY_SAVING_TYPES = {'problem'}
+
+    class Meta:
+        get_latest_by = "created"
+
+    student_module = models.ForeignKey(StudentModule, db_index=True)
+    version = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+
+    # This should be populated from the modified field in StudentModule
+    created = models.DateTimeField(db_index=True)
+    state = models.TextField(null=True, blank=True)
+    grade = models.FloatField(null=True, blank=True)
+    max_grade = models.FloatField(null=True, blank=True)
+
+    @receiver(post_save, sender=StudentModule)
+    def save_history(sender, instance, **kwargs):
+        if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
+            history_entry = StudentModuleHistory(student_module=instance,
+                                                 version=None,
+                                                 created=instance.modified,
+                                                 state=instance.state,
+                                                 grade=instance.grade,
+                                                 max_grade=instance.max_grade)
+            history_entry.save()
 
 
 # TODO (cpennington): Remove these once the LMS switches to using XModuleDescriptors
@@ -113,6 +141,9 @@ class StudentModuleCache(object):
                                          descriptor_filter=lambda descriptor: True,
                                          select_for_update=False):
         """
+        obtain and return cache for descriptor descendents (ie children) AND modules required by the descriptor,
+        but which are not children of the module
+
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
         descriptor: An XModuleDescriptor
@@ -132,7 +163,7 @@ class StudentModuleCache(object):
             if depth is None or depth > 0:
                 new_depth = depth - 1 if depth is not None else depth
 
-                for child in descriptor.get_children():
+                for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
                     descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
 
             return descriptors
@@ -209,7 +240,7 @@ class OfflineComputedGradeLog(models.Model):
 
     course_id = models.CharField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
-    seconds = models.IntegerField(default=0)	# seconds elapsed for computation
+    seconds = models.IntegerField(default=0)  	# seconds elapsed for computation
     nstudents = models.IntegerField(default=0)
 
     def __unicode__(self):

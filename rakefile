@@ -134,7 +134,7 @@ end
 
     desc "Run pep8 on all #{system} code"
     task "pep8_#{system}" => report_dir do
-        sh("pep8 --ignore=E501 #{system}/djangoapps #{system}/lib | tee #{report_dir}/pep8.report")
+        sh("pep8 #{system} | tee #{report_dir}/pep8.report")
     end
     task :pep8 => "pep8_#{system}"
 
@@ -147,6 +147,11 @@ end
                 pythonpath_prefix = "PYTHONPATH=#{File.dirname(app)}"
             end
             app = File.basename(app)
+            if app =~ /.py$/
+                app = app.gsub('.py', '')
+            elsif app =~ /.pyc$/
+                next
+            end
             sh("#{pythonpath_prefix} pylint --rcfile=.pylintrc -f parseable #{app} | tee #{report_dir}/#{app}.pylint.report")
         end
     end
@@ -410,7 +415,10 @@ end
 namespace :cms do
   desc "Delete existing MongoDB based course"
   task :delete_course do
-    if ENV['LOC']
+    
+    if ENV['LOC'] and ENV['COMMIT']
+        sh(django_admin(:cms, :dev, :delete_course, ENV['LOC'], ENV['COMMIT']))
+    elsif ENV['LOC']
       sh(django_admin(:cms, :dev, :delete_course, ENV['LOC']))
     else
       raise "You must pass in a LOC parameter"
@@ -429,6 +437,13 @@ namespace :cms do
       raise "Please specify a DATA_DIR variable that point to your data directory.\n" +
         "Example: \`rake cms:import DATA_DIR=../data\`"
     end
+  end
+end
+
+namespace :cms do
+  desc "Imports all the templates from the code pack"
+  task :update_templates do
+    sh(django_admin(:cms, :dev, :update_templates))
   end
 end
 

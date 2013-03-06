@@ -25,7 +25,8 @@ class HtmlModule(XModule):
                     ]
          }
     js_module_name = "HTMLModule"
-    
+    css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
+
     def get_html(self):
         return self.html
 
@@ -132,7 +133,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
                     # TODO (ichuang): remove this after migration
                     # for Fall 2012 LMS migration: keep filename (and unmangled filename)
-                    definition['filename'] = [ filepath, filename ]
+                    definition['filename'] = [filepath, filename]
 
                     return definition
 
@@ -171,6 +172,13 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         elt.set("filename", relname)
         return elt
 
+    @property
+    def editable_metadata_fields(self):
+        """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
+        subset = [field for field in super(HtmlDescriptor,self).editable_metadata_fields
+                  if field not in ['empty']]
+        return subset
+
 
 class AboutDescriptor(HtmlDescriptor):
     """
@@ -179,12 +187,14 @@ class AboutDescriptor(HtmlDescriptor):
     """
     template_dir_name = "about"
 
+
 class StaticTabDescriptor(HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
     template_dir_name = "statictab"
+
 
 class CourseInfoDescriptor(HtmlDescriptor):
     """

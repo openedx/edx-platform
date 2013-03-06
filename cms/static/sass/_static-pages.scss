@@ -28,7 +28,9 @@
     border-radius: 0;
 
     &.new-component-item {
-      margin-top: 20px;
+      background: transparent;
+      border: none;
+      @include box-shadow(none);
     }
   }
 

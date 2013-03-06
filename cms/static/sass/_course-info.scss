@@ -37,6 +37,11 @@
 		padding: 34px 0 42px;
 		border-top: 1px solid #cbd1db;
 
+		&:first-child {
+			padding-top: 0;
+			border: none;
+		}
+
 		&.editing {
 			position: relative;
 			z-index: 1001;
@@ -87,6 +92,40 @@
 			border: 1px solid #ddd;
 			background: #f6f6f6;
 			padding: 20px;
+		}
+
+		ol, ul {
+		  margin: 1em 0;
+		  padding: 0 0 0 1em;
+		  color: $baseFontColor;
+
+		  li {
+		    margin-bottom: 0.708em;
+		  }
+		}
+
+		ol {
+		  list-style: decimal outside none;
+		}
+
+		ul {
+		  list-style: disc outside none;
+		}
+
+		pre {
+		  margin: 1em 0;
+		  color: $baseFontColor;
+		  font-family: monospace, serif;
+		  font-size: 1em;
+		  white-space: pre-wrap;
+		  word-wrap: break-word;
+		}
+
+		code {
+		  color: $baseFontColor;
+		  font-family: monospace, serif;
+		  background: none;
+		  padding: 0;
 		}
 	}
 

@@ -55,6 +55,7 @@ def update_template_dictionary(dictionary, request=None, course=None, article=No
     else:
         dictionary['staff_access'] = False
 
+
 def view(request, article_path, course_id=None):
     course = get_opt_course_with_access(request.user, course_id, 'load')
 
@@ -235,7 +236,7 @@ def history(request, article_path, page=1, course_id=None):
 
     page_size = 10
 
-    if page == None:
+    if page is None:
         page = 1
     try:
         p = int(page)
@@ -309,7 +310,7 @@ def revision_feed(request, page=1, namespace=None, course_id=None):
 
     page_size = 10
 
-    if page == None:
+    if page is None:
         page = 1
     try:
         p = int(page)

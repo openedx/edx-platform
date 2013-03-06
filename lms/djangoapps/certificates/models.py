@@ -35,6 +35,19 @@ State diagram:
             v                v             v
       [downloadable]   [downloadable]  [deleted]
 
+
+Eligibility:
+
+    Students are eligible for a certificate if they pass the course
+    with the following exceptions:
+
+       If the student has allow_certificate set to False in the student profile
+       he will never be issued a certificate.
+
+       If the user and course is present in the certificate whitelist table
+       then the student will be issued a certificate regardless of his grade,
+       unless he has allow_certificate set to False.
+
 """
 
 
@@ -46,7 +59,21 @@ class CertificateStatuses(object):
     deleted = 'deleted'
     downloadable = 'downloadable'
     notpassing = 'notpassing'
+    restricted = 'restricted'
     error = 'error'
+
+
+class CertificateWhitelist(models.Model):
+    """
+    Tracks students who are whitelisted, all users
+    in this table will always qualify for a certificate
+    regardless of their grade unless they are on the
+    embargoed country restriction list
+    (allow_certificate set to False in userprofile).
+    """
+    user = models.ForeignKey(User)
+    course_id = models.CharField(max_length=255, blank=True, default='')
+    whitelist = models.BooleanField(default=0)
 
 
 class GeneratedCertificate(models.Model):
@@ -87,6 +114,10 @@ def certificate_status_for_student(student, course_id):
     deleted      - The certificate has been deleted.
     downloadable - The certificate is available for download.
     notpassing   - The student was graded but is not passing
+    restricted   - The student is on the restricted embargo list and
+                   should not be issued a certificate. This will
+                   be set if allow_certificate is set to False in
+                   the userprofile table
 
     If the status is "downloadable", the dictionary also contains
     "download_url".

@@ -5,10 +5,11 @@ from functools import partial
 
 from django.conf import settings
 from django.core.context_processors import csrf
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -20,7 +21,7 @@ from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
-from courseware.models import StudentModuleCache
+from courseware.models import StudentModule, StudentModuleCache, StudentModuleHistory
 from module_render import toc_for_course, get_module, get_instance_module, get_module_for_descriptor
 
 from django_comment_client.utils import get_discussion_title
@@ -37,6 +38,7 @@ import comment_client
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
+
 
 
 def user_groups(user):
@@ -85,7 +87,8 @@ def render_accordion(request, course, chapter, section):
         Returns the html string'''
 
     # grab the table of contents
-    toc = toc_for_course(request.user, request, course, chapter, section)
+    user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    toc = toc_for_course(user, request, course, chapter, section)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
@@ -136,6 +139,7 @@ def redirect_to_course_position(course_module, first_time):
                                                           'chapter': chapter.url_name,
                                                           'section': section.url_name}))
 
+
 def save_child_position(seq_module, child_name, instance_module):
     """
     child_name: url_name of the child
@@ -150,6 +154,76 @@ def save_child_position(seq_module, child_name, instance_module):
                 seq_module.position = position
                 instance_module.state = seq_module.get_instance_state()
                 instance_module.save()
+
+def check_for_active_timelimit_module(request, course_id, course):
+    '''
+    Looks for a timing module for the given user and course that is currently active.
+    If found, returns a context dict with timer-related values to enable display of time remaining.
+    ''' 
+    context = {}
+    timelimit_student_modules = StudentModule.objects.filter(student=request.user, course_id=course_id, module_type='timelimit')
+    if timelimit_student_modules:
+        for timelimit_student_module in timelimit_student_modules: 
+            # get the corresponding section_descriptor for the given StudentModel entry:
+            module_state_key = timelimit_student_module.module_state_key
+            timelimit_descriptor = modulestore().get_instance(course_id, Location(module_state_key))
+            timelimit_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course.id, request.user, 
+                                                                                     timelimit_descriptor, depth=None)
+            timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor, 
+                                                     timelimit_module_cache, course.id, position=None)
+            if timelimit_module is not None and timelimit_module.category == 'timelimit' and \
+                    timelimit_module.has_begun and not timelimit_module.has_ended:
+                location = timelimit_module.location
+                # determine where to go when the timer expires:
+                if 'time_expired_redirect_url' not in timelimit_descriptor.metadata:
+                    raise Http404("No {0} metadata at this location: {1} ".format('time_expired_redirect_url', location))
+                time_expired_redirect_url = timelimit_descriptor.metadata.get('time_expired_redirect_url')
+                context['time_expired_redirect_url'] = time_expired_redirect_url
+                # Fetch the remaining time relative to the end time as stored in the module when it was started.
+                # This value should be in milliseconds.
+                remaining_time = timelimit_module.get_remaining_time_in_ms()
+                context['timer_expiration_duration'] = remaining_time
+                if 'suppress_toplevel_navigation' in timelimit_descriptor.metadata:
+                    context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata['suppress_toplevel_navigation']
+                return_url = reverse('jump_to', kwargs={'course_id':course_id, 'location':location})
+                context['timer_navigation_return_url'] = return_url
+    return context
+
+def update_timelimit_module(user, course_id, student_module_cache, timelimit_descriptor, timelimit_module):
+    '''
+    Updates the state of the provided timing module, starting it if it hasn't begun.
+    Returns dict with timer-related values to enable display of time remaining.
+    Returns 'timer_expiration_duration' in dict if timer is still active, and not if timer has expired.
+    ''' 
+    context = {}
+    # determine where to go when the exam ends:
+    if 'time_expired_redirect_url' not in timelimit_descriptor.metadata: 
+        raise Http404("No {0} metadata at this location: {1} ".format('time_expired_redirect_url', timelimit_module.location))
+    time_expired_redirect_url = timelimit_descriptor.metadata.get('time_expired_redirect_url')
+    context['time_expired_redirect_url'] = time_expired_redirect_url
+
+    if not timelimit_module.has_ended:
+        if not timelimit_module.has_begun:
+            # user has not started the exam, so start it now.
+            if 'duration' not in timelimit_descriptor.metadata:
+                raise Http404("No {0} metadata at this location: {1} ".format('duration', timelimit_module.location))
+            # The user may have an accommodation that has been granted to them.
+            # This accommodation information should already be stored in the module's state.
+            duration = int(timelimit_descriptor.metadata.get('duration'))
+            timelimit_module.begin(duration)
+            # we have changed state, so we need to persist the change:
+            instance_module = get_instance_module(course_id, user, timelimit_module, student_module_cache)
+            instance_module.state = timelimit_module.get_instance_state()
+            instance_module.save()
+            
+        # the exam has been started, either because the student is returning to the
+        # exam page, or because they have just visited it.  Fetch the remaining time relative to the
+        # end time as stored in the module when it was started.
+        context['timer_expiration_duration'] = timelimit_module.get_remaining_time_in_ms()
+        # also use the timed module to determine whether top-level navigation is visible:
+        if 'suppress_toplevel_navigation' in timelimit_descriptor.metadata:
+            context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata['suppress_toplevel_navigation']
+    return context
 
 @login_required
 @ensure_csrf_cookie
@@ -178,23 +252,24 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
-    course = get_course_with_access(request.user, course_id, 'load', depth=2)
-    staff_access = has_access(request.user, course, 'staff')
-    registered = registered_for_course(course, request.user)
+    user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    course = get_course_with_access(user, course_id, 'load', depth=2)
+    staff_access = has_access(user, course, 'staff')
+    registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug('User %s tried to view course %s but is not enrolled' % (request.user,course.location.url()))
+        log.debug('User %s tried to view course %s but is not enrolled' % (user, course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
 
     try:
         student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2)
+            course.id, user, course, depth=2)
 
         # Has this student been in this course before?
         first_time = student_module_cache.lookup(course_id, 'course', course.location.url()) is None
 
         # Load the module for the course
-        course_module = get_module_for_descriptor(request.user, request, course, student_module_cache, course.id)
+        course_module = get_module_for_descriptor(user, request, course, student_module_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
                         ' far, should have gotten a course module for this user')
@@ -211,15 +286,15 @@ def index(request, course_id, chapter=None, section=None,
             'init': '',
             'content': '',
             'staff_access': staff_access,
-            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
-            instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
+            instance_module = get_instance_module(course_id, user, course_module, student_module_cache)
             save_child_position(course_module, chapter, instance_module)
         else:
-            raise Http404
+            raise Http404('No chapter descriptor found with name {}'.format(chapter))
 
         chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:
@@ -232,20 +307,40 @@ def index(request, course_id, chapter=None, section=None,
                 # Specifically asked-for section doesn't exist
                 raise Http404
 
-            # Load all descendents of the section, because we're going to display it's
+            # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
+            # which will prefetch the children more efficiently than doing a recursive load
+            section_descriptor = modulestore().get_instance(course.id, section_descriptor.location, depth=None)
+
+            # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
-            section_module = get_module(request.user, request, section_descriptor.location,
-                                        student_module_cache, course.id, depth=None)
+            section_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+                course.id, user, section_descriptor, depth=None)
+
+            section_module = get_module(user, request, section_descriptor.location,
+                section_module_cache, course.id, position=position, depth=None)
             if section_module is None:
                 # User may be trying to be clever and access something
                 # they don't have access to.
                 raise Http404
 
             # Save where we are in the chapter
-            instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
+            instance_module = get_instance_module(course_id, user, chapter_module, student_module_cache)
             save_child_position(chapter_module, section, instance_module)
 
-
+            # check here if this section *is* a timed module.  
+            if section_module.category == 'timelimit':
+                timer_context = update_timelimit_module(user, course_id, student_module_cache, 
+                                                        section_descriptor, section_module)
+                if 'timer_expiration_duration' in timer_context:
+                    context.update(timer_context)
+                else:
+                    # if there is no expiration defined, then we know the timer has expired:
+                    return HttpResponseRedirect(timer_context['time_expired_redirect_url'])
+            else:
+                # check here if this page is within a course that has an active timed module running.  If so, then 
+                # add in the appropriate timer information to the rendering context:
+                context.update(check_for_active_timelimit_module(request, course_id, course))
+                
             context['content'] = section_module.get_html()
         else:
             # section is none, so display a message
@@ -275,7 +370,7 @@ def index(request, course_id, chapter=None, section=None,
             log.exception("Error in index view: user={user}, course={course},"
                           " chapter={chapter} section={section}"
                           "position={position}".format(
-                              user=request.user,
+                              user=user,
                               course=course,
                               chapter=chapter,
                               section=section,
@@ -284,7 +379,7 @@ def index(request, course_id, chapter=None, section=None,
             try:
                 result = render_to_response('courseware/courseware-error.html',
                                             {'staff_access': staff_access,
-                                            'course' : course})
+                                            'course': course})
             except:
                 # Let the exception propagate, relying on global config to at
                 # at least return a nice error message
@@ -292,6 +387,7 @@ def index(request, course_id, chapter=None, section=None,
                 raise
 
     return result
+
 
 @ensure_csrf_cookie
 def jump_to(request, course_id, location):
@@ -329,6 +425,7 @@ def jump_to(request, course_id, location):
     else:
         return redirect('courseware_position', course_id=course_id, chapter=chapter, section=section, position=position)
 
+
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
@@ -339,8 +436,9 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('courseware/info.html', {'request' : request, 'course_id' : course_id, 'cache' : None, 
+    return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
             'course': course, 'staff_access': staff_access})
+
 
 @ensure_csrf_cookie
 def static_tab(request, course_id, tab_slug):
@@ -364,9 +462,11 @@ def static_tab(request, course_id, tab_slug):
                               {'course': course,
                                'tab': tab,
                                'tab_contents': contents,
-                               'staff_access': staff_access,})
+                               'staff_access': staff_access, })
 
 # TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
+
+
 @ensure_csrf_cookie
 def syllabus(request, course_id):
     """
@@ -378,7 +478,7 @@ def syllabus(request, course_id):
     staff_access = has_access(request.user, course, 'staff')
 
     return render_to_response('courseware/syllabus.html', {'course': course,
-                                            'staff_access': staff_access,})
+                                            'staff_access': staff_access, })
 
 
 def registered_for_course(course, user):
@@ -389,6 +489,7 @@ def registered_for_course(course, user):
         return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
     else:
         return False
+
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -408,7 +509,7 @@ def course_about(request, course_id):
                               {'course': course,
                                'registered': registered,
                                'course_target': course_target,
-                               'show_courseware_link' : show_courseware_link})
+                               'show_courseware_link': show_courseware_link})
 
 
 @ensure_csrf_cookie
@@ -420,6 +521,7 @@ def static_university_profile(request, org_id):
     template_file = "university_profile/{0}.html".format(org_id).lower()
     context = dict(courses=[], org_id=org_id)
     return render_to_response(template_file, context)
+
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -442,6 +544,7 @@ def university_profile(request, org_id):
 
     return render_to_response(template_file, context)
 
+
 def render_notifications(request, course, notifications):
     context = {
         'notifications': notifications,
@@ -449,6 +552,7 @@ def render_notifications(request, course, notifications):
         'course': course,
     }
     return render_to_string('courseware/notifications.html', context)
+
 
 @login_required
 def news(request, course_id):
@@ -463,6 +567,7 @@ def news(request, course_id):
 
     return render_to_response('courseware/news.html', context)
 
+
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def progress(request, course_id, student_id=None):
@@ -470,7 +575,7 @@ def progress(request, course_id, student_id=None):
 
     Course staff are allowed to see the progress of students in their class.
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, course_id, 'load', depth=None)
     staff_access = has_access(request.user, course, 'staff')
 
     if student_id is None or student_id == request.user.id:
@@ -490,7 +595,7 @@ def progress(request, course_id, student_id=None):
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-        course_id, student, course)
+        course_id, student, course, depth=None)
 
     courseware_summary = grades.progress_summary(student, request, course,
                                                  student_module_cache)
@@ -508,3 +613,48 @@ def progress(request, course_id, student_id=None):
     context.update()
 
     return render_to_response('courseware/progress.html', context)
+
+
+@login_required
+def submission_history(request, course_id, student_username, location):
+    """Render an HTML fragment (meant for inclusion elsewhere) that renders a 
+    history of all state changes made by this user for this problem location.
+    Right now this only works for problems because that's all 
+    StudentModuleHistory records.
+    """
+    course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
+
+    # Permission Denied if they don't have staff access and are trying to see
+    # somebody else's submission history.
+    if (student_username != request.user.username) and (not staff_access):
+        raise PermissionDenied
+
+    try:
+        student = User.objects.get(username=student_username)
+        student_module = StudentModule.objects.get(course_id=course_id,
+                                                   module_state_key=location,
+                                                   student_id=student.id)
+    except User.DoesNotExist:
+        return HttpResponse("User {0} does not exist.".format(student_username))
+    except StudentModule.DoesNotExist:
+        return HttpResponse("{0} has never accessed problem {1}"
+                            .format(student_username, location))
+
+    history_entries = StudentModuleHistory.objects \
+                      .filter(student_module=student_module).order_by('-created')
+
+    # If no history records exist, let's force a save to get history started.
+    if not history_entries:
+        student_module.save()
+        history_entries = StudentModuleHistory.objects \
+                          .filter(student_module=student_module).order_by('-created')
+
+    context = {
+        'history_entries': history_entries,
+        'username': student.username,
+        'location': location,
+        'course_id': course_id
+    }
+
+    return render_to_response('courseware/submission_history.html', context)

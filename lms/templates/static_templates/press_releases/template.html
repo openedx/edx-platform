@@ -1,0 +1,60 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../../main.html" />
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="title"><title>TITLE</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<section class="pressrelease">
+  <section class="container">
+    <h1>TITLE</h1>
+    <hr class="horizontal-divider">
+      <article>
+    <h2>SUBTITLE</h2>
+
+        <p><strong>CAMBRIDGE, MA  &ndash; MONTH DAY, YEAR &ndash;</strong>
+
+Text</p>
+
+<p>more text</p>
+ 
+
+<h2>About edX</h2>
+
+<p><a href="https://www.edx.org/">EdX</a> is a not-for-profit enterprise of its founding partners <a href="http://www.harvard.edu">Harvard University</a> and the <a href="http://www.mit.edu">Massachusetts Institute of Technology</a> focused on transforming online and on-campus learning through groundbreaking methodologies, game-like experiences and cutting-edge research. EdX provides inspirational and transformative knowledge to students of all ages, social status, and income who form worldwide communities of learners. EdX uses its open source technology to transcend physical and social borders. We’re focused on people, not profit. EdX is based in Cambridge, Massachusetts in the USA.</p>
+
+
+      <section class="contact">
+        <p><strong>Media Contact:</strong></p>
+        <p>Dan O'Connell</p>
+        <p>oconnell@edx.org</p>
+        <p>(617) 480-6585</p>
+      </section>
+
+      <section class="footer">
+        <hr class="horizontal-divider">
+        <div class="logo"></div><h3 class="date">DATE: 01 - 29 - 2013</h3>
+        <div class="social-sharing">
+        <hr class="horizontal-divider">
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=:BLAH+BLAH+BLAH+http://www.edx.org/press/LINK" class="share">
+            <img src="${static.url('images/social/twitter-sharing.png')}">
+          </a>
+        </a>
+        <a href="mailto:?subject=BLAH%20BLAH%20BLAH…http://edx.org/press/LINK" class="share">
+          <img src="${static.url('images/social/email-sharing.png')}">
+        </a>
+        <div class="fb-like" data-href="http://edx.org/press/LINK" data-send="true" data-width="450" data-show-faces="true"></div>
+      </div>
+      </section>
+    </article>
+  </section>
+</section>

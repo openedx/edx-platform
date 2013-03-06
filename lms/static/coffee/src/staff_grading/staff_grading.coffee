@@ -9,9 +9,13 @@ state_graded = "graded"
 state_no_data = "no_data"
 state_error = "error"
 
-class StaffGradingBackend
+class @StaffGradingBackend
   constructor: (ajax_url, mock_backend) ->
     @ajax_url = ajax_url
+    # prevent this from trying to make requests when we don't have
+    # a proper url
+    if !ajax_url
+      mock_backend = true
     @mock_backend = mock_backend
     if @mock_backend
       @mock_cnt = 0
@@ -42,14 +46,41 @@ class StaffGradingBackend
 The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
             '''
             rubric: '''
-<ul>
-<li>Metals tend to be good electronic conductors, meaning that they have a large number of electrons which are able to access empty (mobile) energy states within the material.</li>
-<li>Sodium has a half-filled s-band, so there are a number of empty states immediately above the highest occupied energy levels within the band.</li>
-<li>Magnesium has a full s-band, but the the s-band and p-band overlap in magnesium. Thus are still a large number of available energy states immediately above the s-band highest occupied energy level.</li>
-</ul>
-
-<p>Please score your response according to how many of the above components you identified:</p>
-            '''
+<table class="rubric"><tbody><tr><th>Purpose</th>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-0" value="0"><label for="score-0-0">No product</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-1" value="1"><label for="score-0-1">Unclear purpose or main idea</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-2" value="2"><label for="score-0-2">Communicates an identifiable purpose and/or main idea for an audience</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-3" value="3"><label for="score-0-3">Achieves a clear and distinct purpose for a targeted audience and communicates main ideas with effectively used techniques to introduce and represent ideas and insights</label>
+            </td>
+        </tr><tr><th>Organization</th>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-0" value="0"><label for="score-1-0">No product</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-1" value="1"><label for="score-1-1">Organization is unclear; introduction, body, and/or conclusion are underdeveloped, missing or confusing.</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-2" value="2"><label for="score-1-2">Organization is occasionally unclear; introduction, body or conclusion may be underdeveloped.</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-3" value="3"><label for="score-1-3">Organization is clear and easy to follow; introduction, body and conclusion are defined and aligned with purpose.</label>
+            </td>
+        </tr></tbody></table>'''
             submission_id: @mock_cnt
             max_score: 2 + @mock_cnt % 3
             ml_error_info : 'ML accuracy info: ' + @mock_cnt
@@ -112,11 +143,12 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     else
       # TODO: replace with postWithPrefix when that's loaded
       $.post(@ajax_url + cmd, data, callback)
-        .error => callback({success: false, error: "Error occured while performing this operation"})
+        .error => callback({success: false, error: "Error occured while performing javascript AJAX post."})
 
 
-class StaffGrading
+class @StaffGrading
   constructor: (backend) ->
+    AjaxPrefix.addAjaxPrefix(jQuery, -> "")
     @backend = backend
 
     # all the jquery selectors
@@ -134,12 +166,12 @@ class StaffGrading
     @submission_container = $('.submission-container')
     @submission_wrapper = $('.submission-wrapper')
 
-    @rubric_container = $('.rubric-container')
-    @rubric_wrapper = $('.rubric-wrapper')
     @grading_wrapper = $('.grading-wrapper')
 
     @feedback_area = $('.feedback-area')
-    @score_selection_container = $('.score-selection-container')        
+    @score_selection_container = $('.score-selection-container')
+    @grade_selection_container = $('.grade-selection-container')
+    @flag_submission_checkbox = $('.flag-checkbox')
 
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
@@ -150,6 +182,12 @@ class StaffGrading
     @ml_error_info_container = $('.ml-error-info-container')
 
     @breadcrumbs = $('.breadcrumbs')
+
+
+    $(window).keydown @keydown_handler
+    @question_header = $('.question-header')
+    @question_header.click @collapse_question
+    @collapse_question()
     
     # model state
     @state = state_no_data
@@ -166,8 +204,9 @@ class StaffGrading
     @min_for_ml = 0
     @num_graded = 0
     @num_pending = 0
+    @score_lst = []
+    @grade = null
 
-    @score = null
     @problems = null
 
     # action handlers
@@ -181,31 +220,23 @@ class StaffGrading
 
 
   setup_score_selection: =>
-    # first, get rid of all the old inputs, if any.
-    @score_selection_container.html('Choose score: ')
+    @score_selection_container.html(@rubric)
+    $('input[class="score-selection"]').change => @graded_callback()
+    Rubric.initialize(@location)
 
-    # Now create new labels and inputs for each possible score.
-    for score in [0..@max_score]
-      id = 'score-' + score
-      label = """<label for="#{id}">#{score}</label>"""
-      
-      input = """
-              <input type="radio" name="score-selection" id="#{id}" value="#{score}"/>
-              """       # "  fix broken parsing in emacs
-      @score_selection_container.append(input + label)
 
-    # And now hook up an event handler again
-    $("input[name='score-selection']").change @graded_callback
-    
+  graded_callback: () =>
+   # show button if we have scores for all categories
+    if Rubric.check_complete()
+      @state = state_graded
+      @submit_button.show()
+
+  keydown_handler: (e) =>
+    if e.which == 13 && !@list_view && Rubric.check_complete()
+      @submit_and_get_next()
 
   set_button_text: (text) =>
     @action_button.attr('value', text)
-
-  graded_callback: (event) =>
-    @score = event.target.value
-    @state = state_graded
-    @message = ''
-    @render_view()
 
   ajax_callback: (response) =>
     # always clear out errors and messages on transition.
@@ -231,11 +262,13 @@ class StaffGrading
 
   skip_and_get_next: () =>
     data =
-      score: @score
+      score: Rubric.get_total_score()
+      rubric_scores: Rubric.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
       skipped: true
+      submission_flagged: false
     @backend.post('save_grade', data, @ajax_callback)
 
   get_problem_list: () ->
@@ -244,10 +277,12 @@ class StaffGrading
 
   submit_and_get_next: () ->
     data =
-      score: @score
+      score: Rubric.get_total_score()
+      rubric_scores: Rubric.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
+      submission_flagged: @flag_submission_checkbox.is(':checked')
     
     @backend.post('save_grade', data, @ajax_callback)
 
@@ -261,8 +296,8 @@ class StaffGrading
     @rubric = response.rubric
     @submission_id = response.submission_id
     @feedback_area.val('')
+    @grade = null
     @max_score = response.max_score
-    @score = null
     @ml_error_info=response.ml_error_info
     @prompt_name = response.problem_name
     @num_graded = response.num_graded
@@ -282,14 +317,21 @@ class StaffGrading
     @ml_error_info = null
     @submission_id = null
     @message = message
-    @score = null
+    @grade = null
     @max_score = 0
     @state = state_no_data
 
-
   render_view: () ->
     # clear the problem list and breadcrumbs
-    @problem_list.html('')
+    @problem_list.html('''
+        <tr>
+            <th>Problem Name</th>
+            <th>Graded</th>
+            <th>Available to Grade</th>
+            <th>Required</th>
+            <th>Progress</th>
+        </tr>
+    ''')    
     @breadcrumbs.html('')
     @problem_list_container.toggle(@list_view)
     if @backend.mock_backend
@@ -298,6 +340,7 @@ class StaffGrading
     @error_container.html(@error_msg)
     @message_container.toggle(@message != "")
     @error_container.toggle(@error_msg != "")
+    @flag_submission_checkbox.prop('checked', false)
 
 
     # only show the grading elements when we are not in list view or the state
@@ -306,7 +349,6 @@ class StaffGrading
       @state == state_no_data)
     @prompt_wrapper.toggle(show_grading_elements)
     @submission_wrapper.toggle(show_grading_elements)
-    @rubric_wrapper.toggle(show_grading_elements)
     @grading_wrapper.toggle(show_grading_elements)
     @meta_info_wrapper.toggle(show_grading_elements)
     @action_button.hide()
@@ -318,7 +360,7 @@ class StaffGrading
 
   problem_link:(problem) ->
     link = $('<a>').attr('href', "javascript:void(0)").append(
-      "#{problem.problem_name} (#{problem.num_graded} graded, #{problem.num_pending} pending, required to grade #{problem.num_required} more)")
+      "#{problem.problem_name}")
         .click =>
           @get_next_submission problem.location
 
@@ -331,7 +373,17 @@ class StaffGrading
 
   render_list: () ->
     for problem in @problems
-      @problem_list.append($('<li>').append(@problem_link(problem)))
+      problem_row = $('<tr>')
+      problem_row.append($('<td class="problem-name">').append(@problem_link(problem)))
+      problem_row.append($('<td>').append("#{problem.num_graded}"))
+      problem_row.append($('<td>').append("#{problem.num_pending}"))
+      problem_row.append($('<td>').append("#{problem.num_required}"))
+      row_progress_bar = $('<div>').addClass('progress-bar')
+      progress_value = parseInt(problem.num_graded)
+      progress_max = parseInt(problem.num_required) + progress_value
+      row_progress_bar.progressbar({value: progress_value, max: progress_max})
+      problem_row.append($('<td>').append(row_progress_bar))
+      @problem_list.append(problem_row)
 
   render_problem: () ->
     # make the view elements match the state.  Idempotent.
@@ -352,17 +404,15 @@ class StaffGrading
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
-      meta_list = $("<ul>")
-      meta_list.append("<li><span class='meta-info'>Pending - </span> #{@num_pending}</li>")
-      meta_list.append("<li><span class='meta-info'>Graded - </span> #{@num_graded}</li>")
-      meta_list.append("<li><span class='meta-info'>Needed for ML - </span> #{Math.max(@min_for_ml - @num_graded, 0)}</li>")
+      meta_list = $("<div>")
+      meta_list.append("<div class='meta-info'>#{@num_pending} available | </div>")
+      meta_list.append("<div class='meta-info'>#{@num_graded} graded | </div>")
+      meta_list.append("<div class='meta-info'>#{Math.max(@min_for_ml - @num_graded, 0)} more needed to start ML </div><br/>")
       @problem_meta_info.html(meta_list)
 
       @prompt_container.html(@prompt)
       @prompt_name_container.html("#{@prompt_name}")
       @submission_container.html(@make_paragraphs(@submission))
-      @rubric_container.html(@rubric)
-
       # no submit button until user picks grade.
       show_submit_button = false
       show_action_button = false
@@ -394,7 +444,19 @@ class StaffGrading
       @get_next_submission(@location)
     else
       @error('System got into invalid state for submission: ' + @state)
-  
+
+  collapse_question: () =>
+    @prompt_container.slideToggle()
+    @prompt_container.toggleClass('open')
+    if @question_header.text() == "(Hide)"
+      Logger.log 'staff_grading_hide_question', {location: @location}
+      new_text = "(Show)"
+    else
+      Logger.log 'staff_grading_show_question', {location: @location}
+      new_text = "(Hide)"
+    @question_header.text(new_text)
+
+
 
 # for now, just create an instance and load it...
 mock_backend = false

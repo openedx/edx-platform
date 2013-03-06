@@ -109,16 +109,16 @@ class HTMLSnippet(object):
         All of these will be loaded onto the page in the CMS
         """
         # cdodge: We've moved the xmodule.coffee script from an outside directory into the xmodule area of common
-        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly 
+        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly
         # fulfilled in a different area of code
         js = cls.js
-        
+
         if js is None:
             js = {}
 
         if 'coffee' not in js:
             js['coffee'] = []
-        
+
         js['coffee'].append(resource_string(__name__, 'js/src/xmodule.coffee'))
 
         return js
@@ -406,11 +406,10 @@ class ResourceTemplates(object):
                 log.warning("Skipping unknown template file %s" % template_file)
                 continue
             template_content = resource_string(__name__, os.path.join(dirname, template_file))
-            template = yaml.load(template_content)
+            template = yaml.safe_load(template_content)
             templates.append(Template(**template))
 
         return templates
-
 
 class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     """
@@ -515,6 +514,16 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         self._child_instances = None
         self._inherited_metadata = set()
 
+
+    # Class level variable
+    always_recalculate_grades = False
+    """
+    Return whether this descriptor always requires recalculation of grades, for
+    example if the score can change via an extrnal service, not just when the
+    student interacts with the module on the page.  A specific example is
+    FoldIt, which posts grade-changing updates through a separate API.
+    """
+
     @property
     def display_name(self):
         '''
@@ -538,7 +547,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     def start(self, value):
         if isinstance(value, time.struct_time):
             self.metadata['start'] = stringify_time(value)
-        
+
     @property
     def days_early_for_beta(self):
         """
@@ -575,15 +584,20 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     def inherit_metadata(self, metadata):
         """
         Updates this module with metadata inherited from a containing module.
-        Only metadata specified in self.inheritable_metadata will
+        Only metadata specified in inheritable_metadata will
         be inherited
         """
         # Set all inheritable metadata from kwargs that are
-        # in self.inheritable_metadata and aren't already set in metadata
+        # in inheritable_metadata and aren't already set in metadata
         for attr in self.inheritable_metadata:
             if attr not in self.metadata and attr in metadata:
                 self._inherited_metadata.add(attr)
                 self.metadata[attr] = metadata[attr]
+
+    def get_required_module_descriptors(self):
+        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
+        not children of this module"""
+        return []
 
     def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of
@@ -864,7 +878,9 @@ class ModuleSystem(object):
                  xqueue=None,
                  node_path="",
                  anonymous_student_id='',
-                 course_id=None):
+                 course_id=None,
+                 open_ended_grading_interface=None,
+                 s3_interface=None):
         '''
         Create a closure around the system environment.
 
@@ -915,6 +931,8 @@ class ModuleSystem(object):
         self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
+        self.open_ended_grading_interface = open_ended_grading_interface
+        self.s3_interface = s3_interface
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

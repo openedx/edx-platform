@@ -2,6 +2,7 @@ import cgi
 import datetime
 import dateutil
 import dateutil.parser
+import hashlib
 import json
 import logging
 import traceback
@@ -24,6 +25,24 @@ log = logging.getLogger("mitx.courseware")
 
 #-----------------------------------------------------------------------------
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+
+# Generated this many different variants of problems with rerandomize=per_student
+NUM_RANDOMIZATION_BINS = 20
+
+
+def randomization_bin(seed, problem_id):
+    """
+    Pick a randomization bin for the problem given the user's seed and a problem id.
+
+    We do this because we only want e.g. 20 randomizations of a problem to make analytics
+    interesting.  To avoid having sets of students that always get the same problems,
+    we'll combine the system's per-student seed with the problem id in picking the bin.
+    """
+    h = hashlib.sha1()
+    h.update(str(seed))
+    h.update(str(problem_id))
+    # get the first few digits of the hash, convert to an int, then mod.
+    return int(h.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
 
 def only_one(lst, default="", process=lambda x: x):
@@ -116,9 +135,11 @@ class CapaModule(XModule):
             self.grace_period = None
             self.close_date = self.display_due_date
 
-        self.max_attempts = self.metadata.get('attempts', None)
-        if self.max_attempts is not None:
-            self.max_attempts = int(self.max_attempts)
+        max_attempts = self.metadata.get('attempts', None)
+        if max_attempts is not None:
+            self.max_attempts = int(max_attempts)
+        else:
+            self.max_attempts = None
 
         self.show_answer = self.metadata.get('showanswer', 'closed')
 
@@ -136,13 +157,9 @@ class CapaModule(XModule):
 
         if self.rerandomize == 'never':
             self.seed = 1
-        elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
-            # TODO: This line is badly broken:
-            # (1) We're passing student ID to xmodule.
-            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
-            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
-            #     - analytics really needs small number of bins.
-            self.seed = system.id
+        elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
+            # see comment on randomization_bin
+            self.seed = randomization_bin(system.seed, self.location.url)
         else:
             self.seed = None
 
@@ -227,7 +244,147 @@ class CapaModule(XModule):
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
+            'progress': Progress.to_js_status_str(self.get_progress())
         })
+
+    def check_button_name(self):
+        """
+        Determine the name for the "check" button.
+        Usually it is just "Check", but if this is the student's
+        final attempt, change the name to "Final Check"
+        """
+        if self.max_attempts is not None:
+            final_check = (self.attempts >= self.max_attempts - 1)
+        else:
+            final_check = False
+
+        return "Final Check" if final_check else "Check"
+
+    def should_show_check_button(self):
+        """
+        Return True/False to indicate whether to show the "Check" button.
+        """
+        submitted_without_reset = (self.is_completed() and self.rerandomize == "always")
+
+        # If the problem is closed (past due / too many attempts)
+        # then we do NOT show the "check" button
+        # Also, do not show the "check" button if we're waiting
+        # for the user to reset a randomized problem
+        if self.closed() or submitted_without_reset:
+            return False
+        else:
+            return True
+
+    def should_show_reset_button(self):
+        """
+        Return True/False to indicate whether to show the "Reset" button.
+        """
+        is_survey_question = (self.max_attempts == 0)
+
+        if self.rerandomize in ["always", "onreset"]:
+
+            # If the problem is closed (and not a survey question with max_attempts==0),
+            # then do NOT show the reset button.
+            # If the problem hasn't been submitted yet, then do NOT show
+            # the reset button.
+            if (self.closed() and not is_survey_question) or not self.is_completed():
+                return False
+            else:
+                return True
+
+        # Only randomized problems need a "reset" button
+        else:
+            return False
+
+    def should_show_save_button(self):
+        """
+        Return True/False to indicate whether to show the "Save" button.
+        """
+
+        # If the user has forced the save button to display,
+        # then show it as long as the problem is not closed
+        # (past due / too many attempts)
+        if self.force_save_button == "true":
+            return not self.closed()
+        else:
+            is_survey_question = (self.max_attempts == 0)
+            needs_reset = self.is_completed() and self.rerandomize == "always"
+
+            # If the problem is closed (and not a survey question with max_attempts==0),
+            # then do NOT show the reset button
+            # If we're waiting for the user to reset a randomized problem
+            # then do NOT show the reset button
+            if (self.closed() and not is_survey_question) or needs_reset:
+                return False
+            else:
+                return True
+
+    def handle_problem_html_error(self, err):
+        """
+        Change our problem to a dummy problem containing
+        a warning message to display to users.
+
+        Returns the HTML to show to users
+
+        *err* is the Exception encountered while rendering the problem HTML.
+        """
+        log.exception(err)
+
+        # TODO (vshnayder): another switch on DEBUG.
+        if self.system.DEBUG:
+            msg = (
+                '[courseware.capa.capa_module] <font size="+1" color="red">'
+                'Failed to generate HTML for problem %s</font>' %
+                (self.location.url()))
+            msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<', '&lt;')
+            msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
+            html = msg
+
+        # We're in non-debug mode, and possibly even in production. We want
+        #   to avoid bricking of problem as much as possible
+        else:
+
+            # Presumably, student submission has corrupted LoncapaProblem HTML.
+            #   First, pull down all student answers
+            student_answers = self.lcp.student_answers
+            answer_ids = student_answers.keys()
+
+            # Some inputtypes, such as dynamath, have additional "hidden" state that
+            #   is not exposed to the student. Keep those hidden
+            # TODO: Use regex, e.g. 'dynamath' is suffix at end of answer_id
+            hidden_state_keywords = ['dynamath']
+            for answer_id in answer_ids:
+                for hidden_state_keyword in hidden_state_keywords:
+                    if answer_id.find(hidden_state_keyword) >= 0:
+                        student_answers.pop(answer_id)
+
+            #   Next, generate a fresh LoncapaProblem
+            self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
+                           state=None,   # Tabula rasa
+                           seed=self.seed, system=self.system)
+
+            # Prepend a scary warning to the student
+            warning  = '<div class="capa_reset">'\
+                       '<h2>Warning: The problem has been reset to its initial state!</h2>'\
+                       'The problem\'s state was corrupted by an invalid submission. ' \
+                       'The submission consisted of:'\
+                       '<ul>'
+            for student_answer in student_answers.values():
+                if student_answer != '':
+                    warning += '<li>' + cgi.escape(student_answer) + '</li>'
+            warning += '</ul>'\
+                       'If this error persists, please contact the course staff.'\
+                       '</div>'
+
+            html = warning
+            try:
+                html += self.lcp.get_html()
+            except Exception, err:   # Couldn't do it. Give up
+                log.exception(err)
+                raise
+
+        return html
+
 
     def get_problem_html(self, encapsulate=True):
         '''Return html for the problem.  Adds check, reset, save buttons
@@ -235,111 +392,32 @@ class CapaModule(XModule):
 
         try:
             html = self.lcp.get_html()
+
+        # If we cannot construct the problem HTML,
+        # then generate an error message instead.
         except Exception, err:
-            log.exception(err)
+            html = self.handle_problem_html_error(err)
 
-            # TODO (vshnayder): another switch on DEBUG.
-            if self.system.DEBUG:
-                msg = (
-                    '[courseware.capa.capa_module] <font size="+1" color="red">'
-                    'Failed to generate HTML for problem %s</font>' %
-                    (self.location.url()))
-                msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<', '&lt;')
-                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
-                html = msg
-            else:
-                # We're in non-debug mode, and possibly even in production. We want
-                #   to avoid bricking of problem as much as possible
 
-                # Presumably, student submission has corrupted LoncapaProblem HTML.
-                #   First, pull down all student answers
-                student_answers = self.lcp.student_answers
-                answer_ids = student_answers.keys()
-
-                # Some inputtypes, such as dynamath, have additional "hidden" state that
-                #   is not exposed to the student. Keep those hidden
-                # TODO: Use regex, e.g. 'dynamath' is suffix at end of answer_id
-                hidden_state_keywords = ['dynamath']
-                for answer_id in answer_ids:
-                    for hidden_state_keyword in hidden_state_keywords:
-                        if answer_id.find(hidden_state_keyword) >= 0:
-                            student_answers.pop(answer_id)
-
-                #   Next, generate a fresh LoncapaProblem
-                self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                               state=None, # Tabula rasa
-                               seed=self.seed, system=self.system)
-
-                # Prepend a scary warning to the student
-                warning  = '<div class="capa_reset">'\
-                           '<h2>Warning: The problem has been reset to its initial state!</h2>'\
-                           'The problem\'s state was corrupted by an invalid submission. ' \
-                           'The submission consisted of:'\
-                           '<ul>'
-                for student_answer in student_answers.values():
-                    if student_answer != '':
-                        warning += '<li>' + cgi.escape(student_answer) + '</li>'
-                warning += '</ul>'\
-                           'If this error persists, please contact the course staff.'\
-                           '</div>'
-
-                html = warning
-                try:
-                    html += self.lcp.get_html()
-                except Exception, err: # Couldn't do it. Give up
-                    log.exception(err)
-                    raise
+        # The convention is to pass the name of the check button
+        # if we want to show a check button, and False otherwise
+        # This works because non-empty strings evaluate to True
+        if self.should_show_check_button():
+            check_button = self.check_button_name() 
+        else:
+            check_button = False
 
         content = {'name': self.display_name,
                    'html': html,
                    'weight': self.descriptor.weight,
                    }
 
-        # We using strings as truthy values, because the terminology of the
-        # check button is context-specific.
-
-        # Put a "Check" button if unlimited attempts or still some left
-        if self.max_attempts is None or self.attempts < self.max_attempts-1:
-            check_button = "Check"
-        else:
-            # Will be final check so let user know that
-            check_button = "Final Check"
-
-        reset_button = True
-        save_button = True
-
-        # If we're after deadline, or user has exhausted attempts,
-        # question is read-only.
-        if self.closed():
-            check_button = False
-            reset_button = False
-            save_button = False
-
-        # User submitted a problem, and hasn't reset. We don't want
-        # more submissions.
-        if self.lcp.done and self.rerandomize == "always":
-            check_button = False
-            save_button = False
-
-        # Only show the reset button if pressing it will show different values
-        if self.rerandomize not in ["always", "onreset"]:
-            reset_button = False
-
-        # User hasn't submitted an answer yet -- we don't want resets
-        if not self.lcp.done:
-            reset_button = False
-
-        # We may not need a "save" button if infinite number of attempts and
-        # non-randomized. The problem author can force it. It's a bit weird for
-        # randomization to control this; should perhaps be cleaned up.
-        if (self.force_save_button == "false") and (self.max_attempts is None and self.rerandomize != "always"):
-            save_button = False
 
         context = {'problem': content,
                    'id': self.id,
                    'check_button': check_button,
-                   'reset_button': reset_button,
-                   'save_button': save_button,
+                   'reset_button': self.should_show_reset_button(),
+                   'save_button': self.should_show_save_button(),
                    'answer_available': self.answer_available(),
                    'ajax_url': self.system.ajax_url,
                    'attempts_used': self.attempts,
@@ -353,7 +431,7 @@ class CapaModule(XModule):
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
-        return self.system.replace_urls(html, self.metadata['data_dir'], course_namespace=self.location)
+        return self.system.replace_urls(html)
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -372,6 +450,7 @@ class CapaModule(XModule):
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
             'score_update': self.update_score,
+            'input_ajax': self.lcp.handle_input_ajax
             }
 
         if dispatch not in handlers:
@@ -386,38 +465,62 @@ class CapaModule(XModule):
             })
         return json.dumps(d, cls=ComplexEncoder)
 
+    def is_past_due(self):
+        """
+        Is it now past this problem's due date, including grace period?
+        """
+        return (self.close_date is not None and
+                datetime.datetime.utcnow() > self.close_date)
+
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
-        if self.attempts == self.max_attempts:
+        if self.max_attempts is not None and self.attempts >= self.max_attempts:
             return True
-        if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
+        if self.is_past_due():
             return True
 
         return False
 
+    def is_completed(self):
+        # used by conditional module
+        # return self.answer_available()
+        return self.lcp.done
+
+    def is_attempted(self):
+        # used by conditional module
+        return self.attempts > 0
+
+    def is_correct(self):
+        """True if full points"""
+        d = self.get_score()
+        return d['score'] == d['total']
+
     def answer_available(self):
-        ''' Is the user allowed to see an answer?
+        '''
+        Is the user allowed to see an answer?
         '''
         if self.show_answer == '':
             return False
-
-        if self.show_answer == "never":
+        elif self.show_answer == "never":
             return False
-
-        # Admins can see the answer, unless the problem explicitly prevents it
-        if self.system.user_is_staff:
+        elif self.system.user_is_staff:
+            # This is after the 'never' check because admins can see the answer
+            # unless the problem explicitly prevents it
             return True
-
-        if self.show_answer == 'attempted':
+        elif self.show_answer == 'attempted':
             return self.attempts > 0
-
-        if self.show_answer == 'answered':
+        elif self.show_answer == 'answered':
+            # NOTE: this is slightly different from 'attempted' -- resetting the problems
+            # makes lcp.done False, but leaves attempts unchanged.
             return self.lcp.done
-
-        if self.show_answer == 'closed':
+        elif self.show_answer == 'closed':
             return self.closed()
+        elif self.show_answer == 'finished':
+            return self.closed() or self.is_correct()
 
-        if self.show_answer == 'always':
+        elif self.show_answer == 'past_due':
+            return self.is_past_due()
+        elif self.show_answer == 'always':
             return True
 
         return False
@@ -458,7 +561,7 @@ class CapaModule(XModule):
         new_answers = dict()
         for answer_id in answers:
             try:
-                new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.metadata['data_dir'], course_namespace=self.location)}
+                new_answer = {answer_id: self.system.replace_urls(answers[answer_id])}
             except TypeError:
                 log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
                 new_answer = {answer_id: answers[answer_id]}
@@ -480,21 +583,61 @@ class CapaModule(XModule):
     def make_dict_of_responses(get):
         '''Make dictionary of student responses (aka "answers")
         get is POST dictionary.
+
+        The *get* dict has keys of the form 'x_y', which are mapped
+        to key 'y' in the returned dict.  For example,
+        'input_1_2_3' would be mapped to '1_2_3' in the returned dict.
+
+        Some inputs always expect a list in the returned dict
+        (e.g. checkbox inputs).  The convention is that
+        keys in the *get* dict that end with '[]' will always
+        have list values in the returned dict.
+        For example, if the *get* dict contains {'input_1[]': 'test' }
+        then the output dict would contain {'1': ['test'] }
+        (the value is a list).
+
+        Raises an exception if:
+
+            A key in the *get* dictionary does not contain >= 1 underscores
+            (e.g. "input" is invalid; "input_1" is valid)
+
+            Two keys end up with the same name in the returned dict.
+            (e.g. 'input_1' and 'input_1[]', which both get mapped
+            to 'input_1' in the returned dict)
         '''
         answers = dict()
         for key in get:
             # e.g. input_resistor_1 ==> resistor_1
             _, _, name = key.partition('_')
 
-            # This allows for answers which require more than one value for
-            # the same form input (e.g. checkbox inputs). The convention is that
-            # if the name ends with '[]' (which looks like an array), then the
-            # answer will be an array.
-            if not name.endswith('[]'):
-                answers[name] = get[key]
+            # If key has no underscores, then partition
+            # will return (key, '', '')
+            # We detect this and raise an error
+            if name is '':
+                raise ValueError("%s must contain at least one underscore" % str(key))
+
             else:
-                name = name[:-2]
-                answers[name] = get.getlist(key)
+                # This allows for answers which require more than one value for
+                # the same form input (e.g. checkbox inputs). The convention is that
+                # if the name ends with '[]' (which looks like an array), then the
+                # answer will be an array.
+                is_list_key = name.endswith('[]')
+                name = name[:-2] if is_list_key else name
+
+                if is_list_key:
+                    if type(get[key]) is list:
+                        val = get[key]
+                    else:
+                        val = [get[key]]
+                else:
+                    val = get[key]
+
+                # If the name already exists, then we don't want
+                # to override it.  Raise an error instead
+                if name in answers:
+                    raise ValueError("Key %s already exists in answers dict" % str(name))
+                else:
+                    answers[name] = val
 
         return answers
 
@@ -502,7 +645,7 @@ class CapaModule(XModule):
         ''' Checks whether answers to a problem are correct, and
             returns a map of correct/incorrect answers:
 
-            {'success' : bool,
+            {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
              'contents' : html}
             '''
         event_info = dict()
@@ -529,9 +672,9 @@ class CapaModule(XModule):
             current_time = datetime.datetime.now()
             prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
-            if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
+            if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
-                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback
+                return {'success': msg, 'html': ''}   # Prompts a modal dialog in ajax callback
 
         try:
             old_state = self.lcp.get_state()
@@ -561,11 +704,11 @@ class CapaModule(XModule):
         #       'success' will always be incorrect
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
-	event_info['attempts'] = self.attempts
+        event_info['attempts'] = self.attempts
         self.system.track_function('save_problem_check', event_info)
 
-	if hasattr(self.system,'psychometrics_handler'):	# update PsychometricsData using callback
-		self.system.psychometrics_handler(self.get_instance_state())
+        if hasattr(self.system, 'psychometrics_handler'):  	# update PsychometricsData using callback
+            self.system.psychometrics_handler(self.get_instance_state())
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
@@ -588,11 +731,11 @@ class CapaModule(XModule):
         event_info['answers'] = answers
 
         # Too late. Cannot submit
-        if self.closed():
+        if self.closed() and not self.max_attempts==0:
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'error': "Problem is closed"}
+                    'msg': "Problem is closed"}
 
         # Problem submitted. Student should reset before saving
         # again.
@@ -600,19 +743,27 @@ class CapaModule(XModule):
             event_info['failure'] = 'done'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'error': "Problem needs to be reset prior to save."}
+                    'msg': "Problem needs to be reset prior to save"}
 
         self.lcp.student_answers = answers
 
-        # TODO: should this be save_problem_fail?  Looks like success to me...
-        self.system.track_function('save_problem_fail', event_info)
-        return {'success': True}
+        self.system.track_function('save_problem_success', event_info)
+        msg = "Your answers have been saved"
+        if not self.max_attempts==0:
+            msg += " but not graded. Hit 'Check' to grade them."
+        return {'success': True,
+                'msg': msg}
 
     def reset_problem(self, get):
         ''' Changes problem state to unfinished -- removes student answers,
             and causes problem to rerender itself.
 
-            Returns problem html as { 'html' : html-string }.
+            Returns a dictionary of the form:
+            {'success': True/False,
+            'html': Problem HTML string }
+
+            If an error occurs, the dictionary will also have an
+            'error' key containing an error message.
         '''
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
@@ -635,6 +786,7 @@ class CapaModule(XModule):
             # reset random number generator seed (note the self.lcp.get_state()
             # in next line)
             self.lcp.seed = None
+    
 
         self.lcp = LoncapaProblem(self.definition['data'],
                                   self.location.html_id(), self.lcp.get_state(),
@@ -643,7 +795,8 @@ class CapaModule(XModule):
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)
 
-        return {'html': self.get_problem_html(encapsulate=False)}
+        return { 'success': True,
+                'html': self.get_problem_html(encapsulate=False)}
 
 
 class CapaDescriptor(RawDescriptor):
@@ -666,18 +819,18 @@ class CapaDescriptor(RawDescriptor):
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-    
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.metadata.get('markdown', '')})
+        _context.update({'markdown': self.metadata.get('markdown', ''),
+                         'enable_markdown' : 'markdown' in self.metadata})
         return _context
-    
+
     @property
     def editable_metadata_fields(self):
-        """Remove metadata from the editable fields since it has its own editor"""
-        subset = super(CapaDescriptor,self).editable_metadata_fields
-        if 'markdown' in subset:
-            subset.remove('markdown') 
+        """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
+        subset = [field for field in super(CapaDescriptor,self).editable_metadata_fields
+                  if field not in ['markdown', 'empty']]
         return subset
 
 

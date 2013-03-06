@@ -7,8 +7,9 @@
 %>
 
 <%! from django.core.urlresolvers import reverse %>
-<%block name="bodyclass">subsection</%block>
 <%block name="title">CMS Subsection</%block>
+<%block name="bodyclass">is-signedin course subsection</%block>
+
 
 <%namespace name="units" file="widgets/units.html" />
 <%namespace name='static' file='static_content.html'/>
@@ -21,11 +22,7 @@
       <article class="subsection-body window" data-id="${subsection.location}">
         <div class="subsection-name-input">
           <label>Display Name:</label>
-          <input type="text" value="${subsection.display_name}" class="subsection-display-name-input" data-metadata-name="display_name"/>
-        </div>
-        <div>
-          <label>Format:</label>
-          <input type="text" value="${subsection.metadata['format'] if 'format' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="format"/>
+          <input type="text" value="${subsection.display_name | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
         <div class="sortable-unit-list">
           <label>Units:</label>
@@ -48,7 +45,7 @@
 
     <div class="sidebar">
       <div class="unit-settings window id-holder" data-id="${subsection.location}">
-    <h4>Subsection Settings</h4>
+    <h4 class="header">Subsection Settings</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
         <label>Release date:<!-- <span class="description">Determines when this subsection and the units within it will be released publicly.</span>--></label>
@@ -101,6 +98,7 @@
     </div>
   </div>
 </div>
+</div>
 </%block>
 
 <%block name="jsextra">
@@ -111,6 +109,8 @@
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
+  
 
 <script type="text/javascript">
     $(document).ready(function() {
