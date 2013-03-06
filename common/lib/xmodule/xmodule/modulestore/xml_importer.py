@@ -211,6 +211,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     target_location_namespace,
                     verbose=verbose
                 )
+                course_items.append(module)
 
         # Import the rest of the modules
         for module in module_store.modules[course_id].itervalues():
