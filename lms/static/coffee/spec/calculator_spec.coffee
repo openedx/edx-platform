@@ -31,12 +31,19 @@ describe 'Calculator', ->
       $('form#calculator').submit()
 
   describe 'toggle', ->
-    it 'toggle the calculator and focus the input', ->
-      spyOn $.fn, 'focus'
-      @calculator.toggle(jQuery.Event("click"))
+    it 'focuses the input when toggled', ->
 
-      expect($('li.calc-main')).toHaveClass('open')
-      expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()
+      # Since the focus is called asynchronously, we need to
+      # wait until focus() is called.
+      didFocus = false
+      runs -> 
+          spyOn($.fn, 'focus').andCallFake (elementName) -> didFocus = true 
+          @calculator.toggle(jQuery.Event("click"))
+
+      waitsFor (-> didFocus), "focus() should have been called on the input", 1000
+
+      runs ->
+          expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()
 
     it 'toggle the close button on the calculator button', ->
       @calculator.toggle(jQuery.Event("click"))
