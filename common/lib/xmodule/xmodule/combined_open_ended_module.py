@@ -155,11 +155,14 @@ class CombinedOpenEndedModule(XModule):
 
     def get_html(self):
         self.save_instance_data()
-        return self.child_module.get_html()
+        return_value = self.child_module.get_html()
+        return return_value
 
     def handle_ajax(self, dispatch, get):
         self.save_instance_data()
-        return self.child_module.handle_ajax(dispatch, get)
+        return_value = self.child_module.handle_ajax(dispatch, get)
+        self.save_instance_data()
+        return return_value
 
     def get_instance_state(self):
         return self.child_module.get_instance_state()
@@ -177,9 +180,9 @@ class CombinedOpenEndedModule(XModule):
     def due_date(self):
         return self.child_module.due_date
 
-    def save_instance_date(self):
+    def save_instance_data(self):
         for attribute in self.student_attributes:
-            setattr(self,k, getattr(self.child_module,k))
+            setattr(self,attribute, getattr(self.child_module,attribute))
 
 
 class CombinedOpenEndedDescriptor(RawDescriptor):

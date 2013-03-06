@@ -134,7 +134,7 @@ class CombinedOpenEndedV1Module():
         self.student_attempts = instance_state.get('student_attempts', 0)
 
         #Allow reset is true if student has failed the criteria to move to the next child task
-        self.allow_reset = instance_state.get('ready_to_reset', False)
+        self.ready_to_reset = instance_state.get('ready_to_reset', False)
         self.attempts = self.instance_state.get('attempts', MAX_ATTEMPTS)
         self.is_scored = self.instance_state.get('is_graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
@@ -237,8 +237,8 @@ class CombinedOpenEndedV1Module():
         self.current_task_xml = self.task_xml[self.current_task_number]
 
         if self.current_task_number > 0:
-            self.allow_reset = self.check_allow_reset()
-            if self.allow_reset:
+            self.ready_to_reset = self.check_allow_reset()
+            if self.ready_to_reset:
                 self.current_task_number = self.current_task_number - 1
 
         current_task_type = self.get_tag_name(self.current_task_xml)
@@ -291,7 +291,7 @@ class CombinedOpenEndedV1Module():
         Input: None
         Output: the allow_reset attribute of the current module.
         """
-        if not self.allow_reset:
+        if not self.ready_to_reset:
             if self.current_task_number > 0:
                 last_response_data = self.get_last_response(self.current_task_number - 1)
                 current_response_data = self.get_current_attributes(self.current_task_number)
@@ -299,9 +299,9 @@ class CombinedOpenEndedV1Module():
                 if(current_response_data['min_score_to_attempt'] > last_response_data['score']
                    or current_response_data['max_score_to_attempt'] < last_response_data['score']):
                     self.state = self.DONE
-                    self.allow_reset = True
+                    self.ready_to_reset = True
 
-        return self.allow_reset
+        return self.ready_to_reset
 
     def get_context(self):
         """
@@ -315,7 +315,7 @@ class CombinedOpenEndedV1Module():
         context = {
             'items': [{'content': task_html}],
             'ajax_url': self.system.ajax_url,
-            'allow_reset': self.allow_reset,
+            'allow_reset': self.ready_to_reset,
             'state': self.state,
             'task_count': len(self.task_xml),
             'task_number': self.current_task_number + 1,
@@ -475,7 +475,7 @@ class CombinedOpenEndedV1Module():
         Output: boolean indicating whether or not the task state changed.
         """
         changed = False
-        if not self.allow_reset:
+        if not self.ready_to_reset:
             self.task_states[self.current_task_number] = self.current_task.get_instance_state()
             current_task_state = json.loads(self.task_states[self.current_task_number])
             if current_task_state['child_state'] == self.DONE:
@@ -624,7 +624,7 @@ class CombinedOpenEndedV1Module():
         Output: Dictionary to be rendered
         """
         self.update_task_states()
-        return {'success': True, 'html': self.get_html_nonsystem(), 'allow_reset': self.allow_reset}
+        return {'success': True, 'html': self.get_html_nonsystem(), 'allow_reset': self.ready_to_reset}
 
     def reset(self, get):
         """
@@ -633,7 +633,7 @@ class CombinedOpenEndedV1Module():
         Output: AJAX dictionary to tbe rendered
         """
         if self.state != self.DONE:
-            if not self.allow_reset:
+            if not self.ready_to_reset:
                 return self.out_of_sync_error(get)
 
         if self.student_attempts > self.attempts:
@@ -645,14 +645,14 @@ class CombinedOpenEndedV1Module():
                     self.student_attempts, self.attempts)
             }
         self.state = self.INITIAL
-        self.allow_reset = False
+        self.ready_to_reset = False
         for i in xrange(0, len(self.task_xml)):
             self.current_task_number = i
             self.setup_next_task(reset=True)
             self.current_task.reset(self.system)
             self.task_states[self.current_task_number] = self.current_task.get_instance_state()
         self.current_task_number = 0
-        self.allow_reset = False
+        self.ready_to_reset = False
         self.setup_next_task()
         return {'success': True, 'html': self.get_html_nonsystem()}
 
@@ -669,7 +669,7 @@ class CombinedOpenEndedV1Module():
             'state': self.state,
             'task_states': self.task_states,
             'student_attempts': self.student_attempts,
-            'ready_to_reset': self.allow_reset,
+            'ready_to_reset': self.ready_to_reset,
             }
 
         return json.dumps(state)
@@ -703,7 +703,7 @@ class CombinedOpenEndedV1Module():
         entirely, in which case they will be in the self.DONE state), and if it is scored or not.
         @return: Boolean corresponding to the above.
         """
-        return (self.state == self.DONE or self.allow_reset) and self.is_scored
+        return (self.state == self.DONE or self.ready_to_reset) and self.is_scored
 
     def get_score(self):
         """
