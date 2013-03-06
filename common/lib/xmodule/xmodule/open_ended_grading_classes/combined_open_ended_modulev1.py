@@ -138,7 +138,7 @@ class CombinedOpenEndedV1Module():
         self.attempts = self.instance_state.get('attempts', MAX_ATTEMPTS)
         self.is_scored = self.instance_state.get('is_graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
-        self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
+        self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
         display_due_date_string = self.instance_state.get('due', None)
 

@@ -58,16 +58,19 @@ class PeerGradingModule(XModule):
         else:
             self.peer_gs = MockPeerGradingService()
 
-        if self.use_for_single_location == True:
+        log.debug(self.use_for_single_location)
+        log.debug(type(self.use_for_single_location))
+        log.debug(self.use_for_single_location==True)
+        if self.use_for_single_location in TRUE_DICT:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
             except:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem.metadata.get('peer_grading_due', None)
+            due_date = self.linked_problem._model_data.get('peer_grading_due', None)
             if due_date:
-                self.metadata['due'] = due_date
+                self._model_data['due'] = due_date
 
         try:
             self.timeinfo = TimeInfo(self.display_due_date_string, self.grace_period_string)
@@ -120,7 +123,7 @@ class PeerGradingModule(XModule):
         """
         if self.closed():
             return self.peer_grading_closed()
-        if not self.use_for_single_location:
+        if self.use_for_single_location not in TRUE_DICT:
             return self.peer_grading()
         else:
             return self.peer_grading_problem({'location': self.link_to_location})['html']
@@ -171,7 +174,7 @@ class PeerGradingModule(XModule):
         pass
 
     def get_score(self):
-        if not self.use_for_single_location or not self.is_graded:
+        if self.use_for_single_location not in TRUE_DICT or self.is_graded not in TRUE_DICT:
             return None
 
         try:
@@ -204,7 +207,7 @@ class PeerGradingModule(XModule):
               randomization, and 5/7 on another
         '''
         max_grade = None
-        if self.use_for_single_location and self.is_graded:
+        if self.use_for_single_location in TRUE_DICT and self.is_graded in TRUE_DICT:
             max_grade = self.max_grade
         return max_grade
 
@@ -450,7 +453,6 @@ class PeerGradingModule(XModule):
                 error_text = problem_list_dict['error']
 
             problem_list = problem_list_dict['problem_list']
-
         except GradingServiceError:
             #This is a student_facing_error
             error_text = EXTERNAL_GRADER_NO_CONTACT_ERROR
@@ -480,8 +482,9 @@ class PeerGradingModule(XModule):
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                problem['due'] = descriptor.metadata.get('peer_grading_due', None)
-                grace_period_string = descriptor.metadata.get('graceperiod', None)
+                log.debug(descriptor.__dict__)
+                problem['due'] = descriptor._model_data.get('peer_grading_due', None)
+                grace_period_string = descriptor._model_data.get('graceperiod', None)
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period_string)
                 except:
@@ -516,7 +519,7 @@ class PeerGradingModule(XModule):
         Show individual problem interface
         '''
         if get is None or get.get('location') is None:
-            if not self.use_for_single_location:
+            if self.use_for_single_location not in TRUE_DICT:
                 #This is an error case, because it must be set to use a single location to be called without get parameters
                 #This is a dev_facing_error
                 log.error("Peer grading problem in peer_grading_module called with no get parameters, but use_for_single_location is False.")
