@@ -102,6 +102,9 @@ def get_current_child(xmodule):
     children.  If xmodule has no position or is out of bounds, return the first child.
     Returns None only if there are no children at all.
     """
+    if not hasattr(xmodule, 'position'):
+        return None
+
     if xmodule.position is None:
         pos = 0
     else:
@@ -303,6 +306,10 @@ def index(request, course_id, chapter=None, section=None,
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 raise Http404
+
+            # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
+            # which will prefetch the children more efficiently than doing a recursive load
+            section_descriptor = modulestore().get_instance(course.id, section_descriptor.location, depth=None)
 
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children

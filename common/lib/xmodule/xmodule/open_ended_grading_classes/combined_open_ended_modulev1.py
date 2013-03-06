@@ -77,6 +77,9 @@ class CombinedOpenEndedV1Module():
     INTERMEDIATE_DONE = 'intermediate_done'
     DONE = 'done'
 
+    #Where the templates live for this problem
+    TEMPLATE_DIR = "combinedopenended"
+
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, metadata = None, static_data = None, **kwargs):
 
@@ -334,7 +337,7 @@ class CombinedOpenEndedV1Module():
         Output: rendered html
         """
         context = self.get_context()
-        html = self.system.render_template('combined_open_ended.html', context)
+        html = self.system.render_template('{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
 
     def get_html_nonsystem(self):
@@ -345,7 +348,7 @@ class CombinedOpenEndedV1Module():
         Output: HTML rendered directly via Mako
         """
         context = self.get_context()
-        html = self.system.render_template('combined_open_ended.html', context)
+        html = self.system.render_template('{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
 
     def get_html_base(self):
@@ -522,7 +525,7 @@ class CombinedOpenEndedV1Module():
             'task_name' : 'Scored Rubric',
             'class_name' : 'combined-rubric-container'
         }
-        html = self.system.render_template('combined_open_ended_results.html', context)
+        html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
     def get_legend(self, get):
@@ -534,7 +537,7 @@ class CombinedOpenEndedV1Module():
         context = {
             'legend_list' : LEGEND_LIST,
             }
-        html = self.system.render_template('combined_open_ended_legend.html', context)
+        html = self.system.render_template('{0}/combined_open_ended_legend.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
     def get_results(self, get):
@@ -565,7 +568,7 @@ class CombinedOpenEndedV1Module():
                     'submission_id' : ri['submission_ids'][i],
                 }
                 context_list.append(context)
-        feedback_table = self.system.render_template('open_ended_result_table.html', {
+        feedback_table = self.system.render_template('{0}/open_ended_result_table.html'.format(self.TEMPLATE_DIR), {
             'context_list' : context_list,
             'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT,
             'human_grader_types' : HUMAN_GRADER_TYPE,
@@ -577,7 +580,7 @@ class CombinedOpenEndedV1Module():
             'task_name' : "Feedback",
             'class_name' : "result-container",
             }
-        html = self.system.render_template('combined_open_ended_results.html', context)
+        html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
     def get_status_ajax(self, get):
@@ -691,7 +694,7 @@ class CombinedOpenEndedV1Module():
             'legend_list' : LEGEND_LIST,
             'render_via_ajax' : render_via_ajax,
         }
-        status_html = self.system.render_template("combined_open_ended_status.html", context)
+        status_html = self.system.render_template("{0}/combined_open_ended_status.html".format(self.TEMPLATE_DIR), context)
 
         return status_html
 

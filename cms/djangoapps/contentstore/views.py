@@ -72,6 +72,10 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
+ADVANCED_COMPONENT_TYPES = ['annotatable','combinedopenended', 'peergrading']
+ADVANCED_COMPONENT_CATEGORY = 'advanced'
+ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
+
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
@@ -290,10 +294,31 @@ def edit_unit(request, location):
 
     component_templates = defaultdict(list)
 
+    # Check if there are any advanced modules specified in the course policy. These modules
+    # should be specified as a list of strings, where the strings are the names of the modules
+    # in ADVANCED_COMPONENT_TYPES that should be enabled for the course.
+    course_metadata = CourseMetadata.fetch(course.location)
+    course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, [])
+
+    # Set component types according to course policy file
+    component_types = list(COMPONENT_TYPES)
+    if isinstance(course_advanced_keys, list):
+        course_advanced_keys = [c for c in course_advanced_keys if c in ADVANCED_COMPONENT_TYPES]
+        if len(course_advanced_keys) > 0:
+            component_types.append(ADVANCED_COMPONENT_CATEGORY)
+    else:
+        log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
+
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
-        if template.location.category in COMPONENT_TYPES:
-            component_templates[template.location.category].append((
+        category = template.location.category
+
+        if category in course_advanced_keys:
+            category = ADVANCED_COMPONENT_CATEGORY
+
+        if category in component_types:
+            #This is a hack to create categories for different xmodules
+            component_templates[category].append((
                 template.lms.display_name,
                 template.location.url(),
                 hasattr(template, 'markdown') and template.markdown != '',
@@ -1107,6 +1132,7 @@ def module_info(request, module_location):
     else:
         return HttpResponseBadRequest()
 
+
 @login_required
 @ensure_csrf_cookie
 def get_course_settings(request, org, course, name):
@@ -1122,12 +1148,15 @@ def get_course_settings(request, org, course, name):
         raise PermissionDenied()
 
     course_module = modulestore().get_item(location)
-    course_details = CourseDetails.fetch(location)
 
     return render_to_response('settings.html', {
         'context_course': course_module,
-        'course_location' : location,
-        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
+        'course_location': location,
+        'details_url': reverse(course_settings_updates,
+                               kwargs={"org": org,
+                                       "course": course,
+                                       "name": name,
+                                       "section": "details"})
     })
 
 @login_required
