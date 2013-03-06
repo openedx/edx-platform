@@ -40,6 +40,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
     </openended>
     """
 
+    TEMPLATE_DIR = "combinedopenended/openended"
+
     def setup_response(self, system, location, definition, descriptor):
         """
         Sets up the response type.
@@ -397,10 +399,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             rubric_scores = rubric_dict['rubric_scores']
 
         if not response_items['success']:
-            return system.render_template("open_ended_error.html",
+            return system.render_template("{0}/open_ended_error.html".format(self.TEMPLATE_DIR),
                 {'errors': feedback})
 
-        feedback_template = system.render_template("open_ended_feedback.html", {
+        feedback_template = system.render_template("{0}/open_ended_feedback.html".format(self.TEMPLATE_DIR), {
             'grader_type': response_items['grader_type'],
             'score': "{0} / {1}".format(response_items['score'], self.max_score()),
             'feedback': feedback,
@@ -558,7 +560,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @return: Rendered html
         """
         context = {'msg': feedback, 'id': "1", 'rows': 50, 'cols': 50}
-        html = system.render_template('open_ended_evaluation.html', context)
+        html = system.render_template('{0}/open_ended_evaluation.html'.format(self.TEMPLATE_DIR), context)
         return html
 
     def handle_ajax(self, dispatch, get, system):
@@ -692,7 +694,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'accept_file_upload': self.accept_file_upload,
             'eta_message' : eta_string,
         }
-        html = system.render_template('open_ended.html', context)
+        html = system.render_template('{0}/open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
 
 
