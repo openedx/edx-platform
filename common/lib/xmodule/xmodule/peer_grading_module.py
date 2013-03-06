@@ -57,10 +57,7 @@ class PeerGradingModule(XModule):
             self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system)
         else:
             self.peer_gs = MockPeerGradingService()
-
-        log.debug(self.use_for_single_location)
-        log.debug(type(self.use_for_single_location))
-        log.debug(self.use_for_single_location==True)
+            
         if self.use_for_single_location in TRUE_DICT:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
