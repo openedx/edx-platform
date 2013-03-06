@@ -182,7 +182,9 @@ class CombinedOpenEndedModule(XModule):
 
     def save_instance_data(self):
         for attribute in self.student_attributes:
-            setattr(self,attribute, getattr(self.child_module,attribute))
+            child_attr = getattr(self.child_module,attribute)
+            if child_attr != getattr(self, attribute):
+                setattr(self,attribute, getattr(self.child_module,attribute))
 
 
 class CombinedOpenEndedDescriptor(RawDescriptor):
