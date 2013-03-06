@@ -1,7 +1,7 @@
 class @Annotatable
     _debug: false
 
-    wrapperSelector:            '.annotatable-wrapper'
+    # selectors for the annotatable xmodule 
     toggleAnnotationsSelector:  '.annotatable-toggle-annotations'
     toggleInstructionsSelector: '.annotatable-toggle-instructions'
     instructionsSelector:       '.annotatable-instructions'
@@ -9,6 +9,7 @@ class @Annotatable
     spanSelector:               '.annotatable-span'
     replySelector:              '.annotatable-reply'
 
+    # these selectors are for responding to events from the annotation capa problem type
     problemXModuleSelector:     '.xmodule_CapaModule'
     problemSelector:            'section.problem'
     problemInputSelector:       'section.problem .annotation-input'
@@ -17,6 +18,7 @@ class @Annotatable
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
         @el = el
+        @$el = $(el)
         @init()
 
     $: (selector) ->
@@ -27,31 +29,30 @@ class @Annotatable
         @initTips()
 
     initEvents: () ->
-        # For handling hide/show of annotations and instructions
-        @annotationsHidden = false
+        # Initialize toggle handlers for the instructions and annotations sections
+        [@annotationsHidden, @instructionsHidden] = [false, false]
         @$(@toggleAnnotationsSelector).bind 'click', @onClickToggleAnnotations
-
-        @instructionsHidden = false
         @$(@toggleInstructionsSelector).bind 'click', @onClickToggleInstructions
 
-        # For handling 'reply to annotation' events that scroll to the associated capa problem.
-        # These are contained in the tooltips, which should be rendered somewhere in the wrapper
-        # (see the qtip2 options, this must be set explicitly, otherwise they render in the body).
-        @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
+        # Initialize handler for 'reply to annotation' events that scroll to
+        # the associated problem. The reply buttons are part of the tooltip
+        # content. It's important that the tooltips be configured to render
+        # as descendants of the annotation module and *not* the document.body.
+        @$el.delegate @replySelector, 'click', @onClickReply
 
-        # For handling 'return to annotation' events from capa problems. Assumes that:
+        # Initialize handler for 'return to annotation' events triggered from problems.
         #   1) There are annotationinput capa problems rendered on the page
-        #   2) Each one has an embedded "return to annotation" link (from the capa problem template).
-        # The capa problem's html is injected via AJAX so this just sets a listener on the body and
-        # handles the click event there.
+        #   2) Each one has an embedded return link (see annotation capa problem template).
+        # Since the capa problem injects HTML content via AJAX, the best we can do is
+        # is let the click events bubble up to the body and handle them there. 
         $('body').delegate @problemReturnSelector, 'click', @onClickReturn
   
     initTips: () ->
-        @savedTips = []
+        # tooltips are used to display annotations for highlighted text spans
         @$(@spanSelector).each (index, el) =>
-            $(el).qtip(@getTipOptions el)
+            $(el).qtip(@getSpanTipOptions el)
 
-    getTipOptions: (el) ->
+    getSpanTipOptions: (el) ->
         content:
             title:
                 text: @makeTipTitle(el)
@@ -59,29 +60,21 @@ class @Annotatable
         position:
             my: 'bottom center' # of tooltip
             at: 'top center' # of target
-            target: 'mouse'
-            container: @$(@wrapperSelector)
+            target: $(el) # where the tooltip was triggered (i.e. the annotation span)
+            container: @$el
             adjust:
-                mouse: false # dont follow the mouse
-                y: -10
+                y: -5
         show:
             event: 'click mouseenter'
             solo: true
         hide:
             event: 'click mouseleave'
-            delay: 250,
-            fixed: true
+            delay: 500,
+            fixed: true # don't hide the tooltip if it is moused over
         style:
             classes: 'ui-tooltip-annotatable'
         events:
             show: @onShowTip
-            visible: @onVisibleTip
-
-    onShowTip: (event, api) =>
-        event.preventDefault() if @annotationsHidden
-
-    onVisibleTip: (event, api) =>
-        @constrainTipHorizontally(api.elements.tooltip, event.originalEvent.pageX)
 
     onClickToggleAnnotations: (e) => @toggleAnnotations()
 
@@ -90,6 +83,9 @@ class @Annotatable
     onClickReply: (e) => @replyTo(e.currentTarget)
 
     onClickReturn: (e) => @returnFrom(e.currentTarget)
+
+    onShowTip: (event, api) =>
+        event.preventDefault() if @annotationsHidden
 
     getSpanForProblemReturn: (el) ->
         problem_id = $(@problemReturnSelector).index(el)
@@ -109,7 +105,8 @@ class @Annotatable
         @toggleTips hide
 
     toggleTips: (hide) ->
-        if hide then @closeAndSaveTips() else @openSavedTips()
+        visible = @findVisibleTips()
+        @hideTips visible
 
     toggleAnnotationButtonText: (hide) ->
         buttonText = (if hide then 'Show' else 'Hide')+' Annotations'
@@ -126,7 +123,8 @@ class @Annotatable
         @$(@toggleInstructionsSelector).text(txt).removeClass(cls[0]).addClass(cls[1])
 
     toggleInstructionsText: (hide) ->
-        @$(@instructionsSelector)[if hide then 'slideUp' else 'slideDown']()
+        slideMethod = (if hide then 'slideUp' else 'slideDown')
+        @$(@instructionsSelector)[slideMethod]()
 
     toggleSpans: (hide) ->
         @$(@spanSelector).toggleClass 'hide', hide, 250
@@ -180,44 +178,17 @@ class @Annotatable
     createReplyLink: (problem_id) ->
         $("<a class=\"annotatable-reply\" href=\"javascript:void(0);\" data-problem-id=\"#{problem_id}\">Reply to Annotation</a>")
 
-    openSavedTips: () ->
-        @showTips @savedTips
-
-    closeAndSaveTips: () ->
-        @savedTips = @findVisibleTips()
-        @hideTips @savedTips
-
     findVisibleTips: () ->
         visible = []
         @$(@spanSelector).each (index, el) ->
             api = $(el).qtip('api')
             tip = $(api?.elements.tooltip)
             if tip.is(':visible')
-                visible.push [el, tip.offset()]
+                visible.push el
         visible
 
-    hideTips: (pairs) ->
-        elements = (pair[0] for pair in pairs)
+    hideTips: (elements) ->
         $(elements).qtip('hide')
-
-    showTips: (pairs) ->
-        $.each pairs, (index, pair) ->
-            [el, offset] = pair
-            $(el).qtip('show')
-            api = $(el).qtip('api')
-            $(api?.elements.tooltip).offset(offset)
-
-    constrainTipHorizontally: (tip, mouseX) ->
-        win_width = $(window).width()
-        tip_center = $(tip).width() / 2 # see position setting of tip
-        tip_offset = $(tip).offset()
-
-        if (tip_center + mouseX) > win_width
-          adjust_left = '-=' + (tip_center + mouseX - win_width)
-        else if (mouseX - tip_center) < 0
-          adjust_left = '+=' + (tip_center - mouseX)
-
-        $(tip).animate({ left: adjust_left }) if adjust_left?
 
     _once: (fn) ->
         done = false
