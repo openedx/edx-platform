@@ -1,0 +1,29 @@
+<div class="annotatable-wrapper">
+	<div class="annotatable-header">
+		% if display_name is not UNDEFINED and display_name is not None:
+		  <div class="annotatable-title">${display_name}</div>
+		% endif
+    </div>
+
+    % if instructions_html is not UNDEFINED and instructions_html is not None:
+    <div class="annotatable-section shaded">
+        <div class="annotatable-section-title">
+            Instructions
+            <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">Collapse Instructions</a>
+        </div>
+        <div class="annotatable-section-body annotatable-instructions">
+            ${instructions_html}
+        </div>
+    </div>
+    % endif
+
+    <div class="annotatable-section">
+        <div class="annotatable-section-title">
+            Guided Discussion
+            <a class="annotatable-toggle annotatable-toggle-annotations" href="javascript:void(0)">Hide Annotations</a>
+        </div>
+        <div class="annotatable-section-body annotatable-content">
+            ${content_html}
+        </div>
+    </div>
+</div>

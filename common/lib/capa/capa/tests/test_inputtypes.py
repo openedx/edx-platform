@@ -570,3 +570,65 @@ class DragAndDropTest(unittest.TestCase):
         context.pop('drag_and_drop_json')
         expected.pop('drag_and_drop_json')
         self.assertEqual(context, expected)
+
+
+class AnnotationInputTest(unittest.TestCase):
+    '''
+    Make sure option inputs work
+    '''
+    def test_rendering(self):
+        xml_str = '''
+<annotationinput>
+    <title>foo</title>
+    <text>bar</text>
+    <comment>my comment</comment>
+    <comment_prompt>type a commentary</comment_prompt>
+    <tag_prompt>select a tag</tag_prompt>
+    <options>
+        <option choice="correct">x</option>
+        <option choice="incorrect">y</option>
+        <option choice="partially-correct">z</option>
+    </options>
+</annotationinput>
+'''
+        element = etree.fromstring(xml_str)
+
+        value = {"comment": "blah blah", "options": [1]}
+        json_value = json.dumps(value)
+        state = {
+            'value': json_value,
+            'id': 'annotation_input',
+            'status': 'answered'
+        }
+
+        tag = 'annotationinput'
+
+        the_input = lookup_tag(tag)(test_system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {
+            'id': 'annotation_input',
+            'value': value,
+            'status': 'answered',
+            'msg': '',
+            'title': 'foo',
+            'text': 'bar',
+            'comment': 'my comment',
+            'comment_prompt': 'type a commentary',
+            'tag_prompt': 'select a tag',
+            'options': [
+                {'id': 0, 'description': 'x', 'choice': 'correct'},
+                {'id': 1, 'description': 'y', 'choice': 'incorrect'},
+                {'id': 2, 'description': 'z', 'choice': 'partially-correct'}
+            ],
+            'value': json_value,
+            'options_value': value['options'],
+            'has_options_value': len(value['options']) > 0,
+            'comment_value': value['comment'],
+            'debug': False,
+            'return_to_annotation': True
+        }
+
+        self.maxDiff = None
+        self.assertDictEqual(context, expected)

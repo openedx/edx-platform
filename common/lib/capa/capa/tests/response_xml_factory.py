@@ -666,3 +666,36 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
+
+class AnnotationResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for creating <annotationresponse> XML trees """
+    def create_response_element(self, **kwargs):
+        """ Create a <annotationresponse> element """
+        return etree.Element("annotationresponse")
+
+    def create_input_element(self, **kwargs):
+        """ Create a <annotationinput> element."""
+
+        input_element = etree.Element("annotationinput")
+
+        text_children = [
+            {'tag': 'title', 'text': kwargs.get('title', 'super cool annotation') },
+            {'tag': 'text', 'text': kwargs.get('text', 'texty text') },
+            {'tag': 'comment', 'text':kwargs.get('comment', 'blah blah erudite comment blah blah') },
+            {'tag': 'comment_prompt', 'text': kwargs.get('comment_prompt', 'type a commentary below') },
+            {'tag': 'tag_prompt', 'text': kwargs.get('tag_prompt', 'select one tag') }
+        ]
+
+        for child in text_children:
+            etree.SubElement(input_element, child['tag']).text = child['text']
+
+        default_options = [('green', 'correct'),('eggs', 'incorrect'),('ham', 'partially-correct')]
+        options = kwargs.get('options', default_options)
+        options_element = etree.SubElement(input_element, 'options')
+
+        for (description, correctness) in options:
+            option_element = etree.SubElement(options_element, 'option', {'choice': correctness})
+            option_element.text = description
+
+        return input_element
+
