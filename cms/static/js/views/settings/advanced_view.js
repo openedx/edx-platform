@@ -114,13 +114,13 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     },
 
     showMessage: function (type) {
-        this.$el.find(".message-status").removeClass("is-shown");
+        $(".wrapper-alert").removeClass("is-shown");
         if (type) {
             if (type === this.error_saving) {
-                this.$el.find(".message-status.error").addClass("is-shown");
+                $(".wrapper-alert-error").addClass("is-shown");
             }
             else if (type === this.successful_changes) {
-                this.$el.find(".message-status.confirm").addClass("is-shown");
+                $(".wrapper-alert-confirmation").addClass("is-shown");
                 this.hideSaveCancelButtons();
             }
         }

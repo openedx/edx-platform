@@ -102,7 +102,9 @@ editor.render();
     </aside>
   </section>
 </div>
+</%block>
 
+<%block name="view_notifications">
 <!-- notification: change has been made and a save is needed -->
 <div class="wrapper wrapper-notification wrapper-notification-warning">
   <div class="notification warning has-actions">
@@ -124,6 +126,37 @@ editor.render();
         </li>
       </ul>
     </nav>
+  </div>
+</div>
+</%block>
+
+<%block name="view_alerts">
+<!-- alert: save confirmed with close -->
+<div class="wrapper wrapper-alert wrapper-alert-confirmation">
+  <div class="alert confirmation">
+    <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">Your policy changes have been saved.</h2>
+      <p>Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.</p>
+    </div>
+
+    <a href="#" rel="view" class="action action-alert-close">
+      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
+      <span class="label">close alert</span>
+    </a>
+  </div>
+</div>
+
+<!-- alert: error -->
+<div class="wrapper wrapper-alert wrapper-alert-error">
+  <div class="alert error">
+    <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">There was an error saving your information</h2>
+      <p>Please see the error below and correct it to ensure there are no problems in rendering your course.</p>
+    </div>
   </div>
 </div>
 </%block>

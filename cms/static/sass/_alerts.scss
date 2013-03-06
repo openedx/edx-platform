@@ -234,7 +234,7 @@
   bottom: 0;
   z-index: 1000;
   width: 100%;
-  border-top: 4px solid $black;
+  border-width: 2px;
   padding: $baseline ($baseline*2);
 
   &.wrapper-notification-warning {
