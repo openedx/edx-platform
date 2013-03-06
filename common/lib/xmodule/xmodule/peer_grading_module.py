@@ -57,7 +57,7 @@ class PeerGradingModule(XModule):
             self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system)
         else:
             self.peer_gs = MockPeerGradingService()
-            
+
         if self.use_for_single_location in TRUE_DICT:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
@@ -479,7 +479,6 @@ class PeerGradingModule(XModule):
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                log.debug(descriptor.__dict__)
                 problem['due'] = descriptor._model_data.get('peer_grading_due', None)
                 grace_period_string = descriptor._model_data.get('graceperiod', None)
                 try:

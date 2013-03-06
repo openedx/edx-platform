@@ -579,7 +579,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'check_for_score': self.check_for_score,
         }
 
-        log.debug(dispatch)
         if dispatch not in handlers:
             #This is a dev_facing_error
             log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
