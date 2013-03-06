@@ -130,6 +130,17 @@ def _pdf_textbooks(tab, user, course, active_page):
                 for index, textbook in enumerate(course.pdf_textbooks)]
     return []
 
+def _html_textbooks(tab, user, course, active_page):
+    """
+    Generates one tab per textbook.  Only displays if user is authenticated.
+    """
+    if user.is_authenticated():
+        # since there can be more than one textbook, active_page is e.g. "book/0".
+        return [CourseTab(textbook['tab_title'], reverse('html_book', args=[course.id, index]),
+                          active_page == "htmltextbook/{0}".format(index))
+                for index, textbook in enumerate(course.html_textbooks)]
+    return []
+
 def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])

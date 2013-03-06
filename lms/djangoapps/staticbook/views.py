@@ -57,12 +57,46 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     # then remap all the chapter URLs as well, if they are provided.
     if 'chapters' in textbook:
         for entry in textbook['chapters']:
-            entry['url'] = remap_static_url(entry['url'], course)            
+            entry['url'] = remap_static_url(entry['url'], course)
 
 
     return render_to_response('static_pdfbook.html',
-                              {'book_index': book_index, 
-                               'course': course, 
+                              {'book_index': book_index,
+                               'course': course,
+                               'textbook': textbook,
+                               'chapter': chapter,
+                               'page': page,
+                               'staff_access': staff_access})
+
+@login_required
+def html_index(request, course_id, book_index, chapter=None, page=None):
+    course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
+
+    book_index = int(book_index)
+    textbook = course.html_textbooks[book_index]
+
+    def remap_static_url(original_url, course):
+        input_url = "'" + original_url + "'"
+        output_url = replace_static_urls(
+                    input_url,
+                    course.metadata['data_dir'],
+                    course_namespace=course.location
+                )
+        # strip off the quotes again...
+        return output_url[1:-1]
+
+    if 'url' in textbook:
+        textbook['url'] = remap_static_url(textbook['url'], course)
+    # then remap all the chapter URLs as well, if they are provided.
+    if 'chapters' in textbook:
+        for entry in textbook['chapters']:
+            entry['url'] = remap_static_url(entry['url'], course)
+
+
+    return render_to_response('static_htmlbook.html',
+                              {'book_index': book_index,
+                               'course': course,
                                'textbook': textbook,
                                'chapter': chapter,
                                'page': page,
