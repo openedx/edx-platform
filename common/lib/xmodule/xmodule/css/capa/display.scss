@@ -872,10 +872,11 @@ section.problem {
     textarea.comment { 
       $num-lines-to-show: 5;
       $line-height: 1.4em;
+      $padding: .2em;
       width: 100%; 
-      padding: .375em .75em;
+      padding: $padding (2 * $padding);
       line-height: $line-height;
-      height: ($line-height * $num-lines-to-show) + .375em;
+      height: ($num-lines-to-show * $line-height) + (2*$padding) - (($line-height - 1)/2);
     }
     .answer-annotation { display: block; margin: 0; }
 
