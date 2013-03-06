@@ -756,7 +756,7 @@ class ChemicalEquationInput(InputTypeBase):
 
     def handle_ajax(self, dispatch, get):
         '''
-        Since we only have one ajax handler for this input, check to see if it
+        Since we only have chemcalc preview this input, check to see if it
         matches the corresponding dispatch and send it through if it does
         '''
         if dispatch == 'preview_chemcalc':
