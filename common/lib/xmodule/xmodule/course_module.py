@@ -242,11 +242,11 @@ class CourseDescriptor(SequenceDescriptor):
                     log.error(msg)
                     continue
 
-    def defaut_grading_policy(self):
+    def default_grading_policy(self):
         """
         Return a dict which is a copy of the default grading policy
         """
-        default = {"GRADER": [
+        return {"GRADER": [
                 {
                     "type": "Homework",
                     "min_count": 12,
@@ -278,7 +278,6 @@ class CourseDescriptor(SequenceDescriptor):
             "GRADE_CUTOFFS": {
                 "Pass": 0.5
             }}
-        return copy.deepcopy(default)
 
     def set_grading_policy(self, course_policy):
         """
@@ -289,7 +288,7 @@ class CourseDescriptor(SequenceDescriptor):
             course_policy = {}
 
         # Load the global settings as a dictionary
-        grading_policy = self.defaut_grading_policy()
+        grading_policy = self.default_grading_policy()
 
         # Override any global settings with the course settings
         grading_policy.update(course_policy)
