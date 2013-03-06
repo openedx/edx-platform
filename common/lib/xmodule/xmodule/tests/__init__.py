@@ -18,7 +18,6 @@ import capa.calc as calc
 import xmodule
 from xmodule.x_module import ModuleSystem
 from mock import Mock
-import xml.sax.saxutils as saxutils
 
 open_ended_grading_interface = {
         'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
