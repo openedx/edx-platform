@@ -131,11 +131,11 @@ class CombinedOpenEndedV1Module():
         #Overall state of the combined open ended module
         self.state = instance_state.get('state', self.INITIAL)
 
-        self.attempts = instance_state.get('attempts', 0)
+        self.student_attempts = instance_state.get('student_attempts', 0)
 
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.allow_reset = instance_state.get('ready_to_reset', False)
-        self.max_attempts = self.instance_state.get('attempts', MAX_ATTEMPTS)
+        self.attempts = self.instance_state.get('attempts', MAX_ATTEMPTS)
         self.is_scored = self.instance_state.get('is_graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
         self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
@@ -161,7 +161,7 @@ class CombinedOpenEndedV1Module():
         #Static data is passed to the child modules to render
         self.static_data = {
             'max_score': self._max_score,
-            'max_attempts': self.max_attempts,
+            'max_attempts': self.attempts,
             'prompt': definition['prompt'],
             'rubric': definition['rubric'],
             'display_name': self.display_name,
@@ -195,7 +195,6 @@ class CombinedOpenEndedV1Module():
         last_response = last_response_data['response']
 
         loaded_task_state = json.loads(current_task_state)
-        log.debug(loaded_task_state)
         if loaded_task_state['child_state'] == self.INITIAL:
             loaded_task_state['child_state'] = self.ASSESSING
             loaded_task_state['child_created'] = True
@@ -276,7 +275,6 @@ class CombinedOpenEndedV1Module():
                 instance_state=current_task_state)
             self.task_states.append(self.current_task.get_instance_state())
             self.state = self.ASSESSING
-            log.debug(self.task_states)
         else:
             if self.current_task_number > 0 and not reset:
                 current_task_state = self.overwrite_state(current_task_state)
@@ -638,13 +636,13 @@ class CombinedOpenEndedV1Module():
             if not self.allow_reset:
                 return self.out_of_sync_error(get)
 
-        if self.attempts > self.max_attempts:
+        if self.student_attempts > self.attempts:
             return {
                 'success': False,
                 #This is a student_facing_error
                 'error': ('You have attempted this question {0} times.  '
                           'You are only allowed to attempt it {1} times.').format(
-                    self.attempts, self.max_attempts)
+                    self.student_attempts, self.attempts)
             }
         self.state = self.INITIAL
         self.allow_reset = False
@@ -670,7 +668,7 @@ class CombinedOpenEndedV1Module():
             'current_task_number': self.current_task_number,
             'state': self.state,
             'task_states': self.task_states,
-            'attempts': self.attempts,
+            'student_attempts': self.student_attempts,
             'ready_to_reset': self.allow_reset,
             }
 

@@ -454,11 +454,13 @@ class PeerGradingModule(XModule):
         except GradingServiceError:
             #This is a student_facing_error
             error_text = EXTERNAL_GRADER_NO_CONTACT_ERROR
+            log.error(error_text)
             success = False
         # catch error if if the json loads fails
         except ValueError:
             #This is a student_facing_error
             error_text = "Could not get list of problems to peer grade.  Please notify course staff."
+            log.error(error_text)
             success = False
 
 
@@ -553,7 +555,7 @@ class PeerGradingModule(XModule):
 
 class PeerGradingDescriptor(RawDescriptor):
     """
-    Module for adding peer grading questions
+    Module for adding combined open ended questions
     """
     mako_template = "widgets/raw-edit.html"
     module_class = PeerGradingModule
@@ -562,3 +564,4 @@ class PeerGradingDescriptor(RawDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "peer_grading"
+

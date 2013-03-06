@@ -12,12 +12,16 @@ from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import Comb
 log = logging.getLogger("mitx.courseware")
 
 
-V1_ATTRIBUTES = ["display_name", "current_task_number", "task_states", "state",
-                 "attempts", "ready_to_reset", "max_attempts", "is_graded", "accept_file_upload",
+V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
                  "skip_spelling_checks", "due", "graceperiod", "max_score"]
 
+V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
+                          "student_attempts", "ready_to_reset"]
+
+V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
+
 VERSION_TUPLES = (
-    ('1', CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_ATTRIBUTES),
+    ('1', CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES, V1_STUDENT_ATTRIBUTES),
 )
 
 DEFAULT_VERSION = 1
@@ -56,13 +60,13 @@ class CombinedOpenEndedModule(XModule):
 
     icon_class = 'problem'
 
-    display_name = String(help="Display name for this module", scope=Scope.settings)
+    display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
     current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.student_state)
     task_states = Object(help="State dictionaries of each task within this module.", default=[], scope=Scope.student_state)
     state = String(help="Which step within the current task that the student is on.", default="initial", scope=Scope.student_state)
-    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
+    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
     ready_to_reset = Boolean(help="If the problem is ready to be reset or not.",  default=False, scope=Scope.student_state)
-    max_attempts = Integer(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
+    attempts = Integer(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
     is_graded = Boolean(help="Whether or not the problem is graded.",  default=False, scope=Scope.settings)
     accept_file_upload = Boolean(help="Whether or not the problem accepts file uploads.",  default=False, scope=Scope.settings)
     skip_spelling_checks = Boolean(help="Whether or not to skip initial spelling checks.",  default=True, scope=Scope.settings)
@@ -124,7 +128,8 @@ class CombinedOpenEndedModule(XModule):
         versions = [i[0] for i in VERSION_TUPLES]
         descriptors = [i[1] for i in VERSION_TUPLES]
         modules = [i[2] for i in VERSION_TUPLES]
-        attributes = [i[3] for i in VERSION_TUPLES]
+        settings_attributes = [i[3] for i in VERSION_TUPLES]
+        student_attributes = [i[4] for i in VERSION_TUPLES]
 
         try:
             version_index = versions.index(self.version)
@@ -134,20 +139,26 @@ class CombinedOpenEndedModule(XModule):
             self.version = DEFAULT_VERSION
             version_index = versions.index(self.version)
 
+        self.student_attributes = student_attributes[version_index]
+        self.settings_attributes = settings_attributes[version_index]
+
+        attributes = self.student_attributes + self.settings_attributes
+
         static_data = {
             'rewrite_content_links' : self.rewrite_content_links,
         }
-        instance_state = { k: getattr(self,k) for k in attributes[version_index]}
-        instance_state.update({'data' : self.data})
+        instance_state = { k: getattr(self,k) for k in attributes}
         self.child_descriptor = descriptors[version_index](self.system)
         self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(self.data), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = instance_state, static_data= static_data, model_data=model_data)
+            instance_state = instance_state, static_data= static_data, model_data=model_data, attributes=attributes)
 
     def get_html(self):
+        self.save_instance_data()
         return self.child_module.get_html()
 
     def handle_ajax(self, dispatch, get):
+        self.save_instance_data()
         return self.child_module.handle_ajax(dispatch, get)
 
     def get_instance_state(self):
@@ -165,6 +176,10 @@ class CombinedOpenEndedModule(XModule):
     @property
     def due_date(self):
         return self.child_module.due_date
+
+    def save_instance_date(self):
+        for attribute in self.student_attributes:
+            setattr(self,k, getattr(self.child_module,k))
 
 
 class CombinedOpenEndedDescriptor(RawDescriptor):
