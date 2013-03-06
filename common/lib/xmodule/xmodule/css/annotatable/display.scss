@@ -17,6 +17,8 @@ $body-font-size: em(14);
   border-radius: .5em;
   margin-bottom: .5em;
 
+  &.shaded { background-color: #EDEDED; }
+
   .annotatable-section-title {
     font-weight: bold;
     a { font-weight: normal; }
