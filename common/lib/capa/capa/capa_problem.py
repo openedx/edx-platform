@@ -331,7 +331,7 @@ class LoncapaProblem(object):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        html = contextualize_text(etree.tostring(self.extracted_tree), self.context)
+        html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
         return html
 
 
