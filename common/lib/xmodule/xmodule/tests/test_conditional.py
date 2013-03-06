@@ -70,7 +70,7 @@ class ConditionalModuleTest(unittest.TestCase):
         """Make sure that conditional module works"""
 
         print "Starting import"
-        course = self.get_course('conditional')
+        course = self.get_course('conditional_and_poll')
 
         print "Course: ", course
         print "id: ", course.id
@@ -82,7 +82,9 @@ class ConditionalModuleTest(unittest.TestCase):
             location = descriptor.location
             return descriptor.xmodule(test_system)
 
-        location = Location(["i4x", "edX", "cond_test", "conditional", "condone"])
+        # edx - HarvardX
+        # cond_test - ER22x
+        location = Location(["i4x", "HarvardX", "ER22x", "conditional", "condone"])
 
         def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
             return text
@@ -91,14 +93,14 @@ class ConditionalModuleTest(unittest.TestCase):
 
         module = inner_get_module(location)
         print "module: ", module
-        print "module.condition: ", module.condition
+        print "module.conditions_map: ", module.conditions_map
         print "module children: ", module.get_children()
         print "module display items (children): ", module.get_display_items()
 
         html = module.get_html()
         print "html type: ", type(html)
         print "html: ", html
-        html_expect = "{'ajax_url': 'courses/course_id/modx/a_location', 'element_id': 'i4x-edX-cond_test-conditional-condone', 'id': 'i4x://edX/cond_test/conditional/condone'}"
+        html_expect = "{'ajax_url': 'courses/course_id/modx/a_location', 'element_id': 'i4x-HarvardX-ER22x-conditional-condone', 'id': 'i4x://HarvardX/ER22x/conditional/condone', 'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'}"
         self.assertEqual(html, html_expect)
 
         gdi =  module.get_display_items()
@@ -106,11 +108,13 @@ class ConditionalModuleTest(unittest.TestCase):
 
         ajax = json.loads(module.handle_ajax('', ''))
         print "ajax: ", ajax
-        self.assertTrue('ConditionalModule' in ajax['html'])
+        html = ajax['html']
+        self.assertFalse(any(['This is a secret' in item for item in html]))
 
         # now change state of the capa problem to make it completed
-        inner_get_module(Location('i4x://edX/cond_test/problem/choiceprob')).attempts = 1
+        inner_get_module(Location('i4x://HarvardX/ER22x/problem/choiceprob')).attempts = 1
 
         ajax = json.loads(module.handle_ajax('', ''))
         print "post-attempt ajax: ", ajax
-        self.assertTrue('This is a secret' in ajax['html'])
+        html = ajax['html']
+        self.assertTrue(any(['This is a secret' in item for item in html]))
