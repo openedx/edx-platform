@@ -29,6 +29,18 @@ $body-font-size: em(14);
     padding-top: .5em;
     @include clearfix;
   }
+
+  ul.instructions-template {
+    list-style: disc;
+    margin-left: 4em;
+    b { font-weight: bold; }
+    i { font-style: italic; }
+    code { 
+      display: inline;
+      white-space: pre; 
+      font-family: Courier New, monospace;
+    }
+  }
 }
 
 .annotatable-toggle {
