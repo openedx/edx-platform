@@ -58,16 +58,16 @@ class PeerGradingModule(XModule):
         else:
             self.peer_gs = MockPeerGradingService()
 
-        if self.use_for_single_location == True:
+        if self.use_for_single_location in TRUE_DICT:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
             except:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem.metadata.get('peer_grading_due', None)
+            due_date = self.linked_problem._model_data.get('peer_grading_due', None)
             if due_date:
-                self.metadata['due'] = due_date
+                self._model_data['due'] = due_date
 
         try:
             self.timeinfo = TimeInfo(self.display_due_date_string, self.grace_period_string)
@@ -120,7 +120,7 @@ class PeerGradingModule(XModule):
         """
         if self.closed():
             return self.peer_grading_closed()
-        if not self.use_for_single_location:
+        if self.use_for_single_location not in TRUE_DICT:
             return self.peer_grading()
         else:
             return self.peer_grading_problem({'location': self.link_to_location})['html']
@@ -171,7 +171,7 @@ class PeerGradingModule(XModule):
         pass
 
     def get_score(self):
-        if not self.use_for_single_location or not self.is_graded:
+        if self.use_for_single_location not in TRUE_DICT or self.is_graded not in TRUE_DICT:
             return None
 
         try:
@@ -204,7 +204,7 @@ class PeerGradingModule(XModule):
               randomization, and 5/7 on another
         '''
         max_grade = None
-        if self.use_for_single_location and self.is_graded:
+        if self.use_for_single_location in TRUE_DICT and self.is_graded in TRUE_DICT:
             max_grade = self.max_grade
         return max_grade
 
@@ -454,11 +454,13 @@ class PeerGradingModule(XModule):
         except GradingServiceError:
             #This is a student_facing_error
             error_text = EXTERNAL_GRADER_NO_CONTACT_ERROR
+            log.error(error_text)
             success = False
         # catch error if if the json loads fails
         except ValueError:
             #This is a student_facing_error
             error_text = "Could not get list of problems to peer grade.  Please notify course staff."
+            log.error(error_text)
             success = False
         except:
             log.exception("Could not contact peer grading service.")
@@ -481,8 +483,8 @@ class PeerGradingModule(XModule):
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                problem['due'] = descriptor.metadata.get('peer_grading_due', None)
-                grace_period_string = descriptor.metadata.get('graceperiod', None)
+                problem['due'] = descriptor._model_data.get('peer_grading_due', None)
+                grace_period_string = descriptor._model_data.get('graceperiod', None)
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period_string)
                 except:
@@ -517,7 +519,7 @@ class PeerGradingModule(XModule):
         Show individual problem interface
         '''
         if get is None or get.get('location') is None:
-            if not self.use_for_single_location:
+            if self.use_for_single_location not in TRUE_DICT:
                 #This is an error case, because it must be set to use a single location to be called without get parameters
                 #This is a dev_facing_error
                 log.error("Peer grading problem in peer_grading_module called with no get parameters, but use_for_single_location is False.")
@@ -565,40 +567,3 @@ class PeerGradingDescriptor(RawDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "peer_grading"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
-
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        """
-        Pull out the individual tasks, the rubric, and the prompt, and parse
-
-        Returns:
-        {
-        'rubric': 'some-html',
-        'prompt': 'some-html',
-        'task_xml': dictionary of xml strings,
-        }
-        """
-        expected_children = []
-        for child in expected_children:
-            if len(xml_object.xpath(child)) == 0:
-                #This is a staff_facing_error
-                raise ValueError("Peer grading definition must include at least one '{0}' tag.  Contact the learning sciences group for assistance.".format(child))
-
-        def parse_task(k):
-            """Assumes that xml_object has child k"""
-            return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(0, len(xml_object.xpath(k)))]
-
-        def parse(k):
-            """Assumes that xml_object has child k"""
-            return xml_object.xpath(k)[0]
-
-        return {}, []
-
-
-    def definition_to_xml(self, resource_fs):
-        '''Return an xml element representing this definition.'''
-        elt = etree.Element('peergrading')
-        return elt

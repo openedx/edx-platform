@@ -52,6 +52,7 @@ class SelfAssessmentTest(unittest.TestCase):
                 }
 
         self.module = SelfAssessmentModule(test_system, self.location,
+                                      self.definition,
                                       self.descriptor,
                                       static_data)
 
@@ -80,18 +81,18 @@ class SelfAssessmentTest(unittest.TestCase):
         self.assertEqual(self.module.get_score()['score'], 0)
 
         self.module.save_answer({'student_answer': "I am an answer"}, test_system)
-        self.assertEqual(self.module.state, self.module.ASSESSING)
+        self.assertEqual(self.module.child_state, self.module.ASSESSING)
 
         self.module.save_assessment(mock_query_dict, test_system)
-        self.assertEqual(self.module.state, self.module.DONE)
+        self.assertEqual(self.module.child_state, self.module.DONE)
 
 
         d = self.module.reset({})
         self.assertTrue(d['success'])
-        self.assertEqual(self.module.state, self.module.INITIAL)
+        self.assertEqual(self.module.child_state, self.module.INITIAL)
 
         # if we now assess as right, skip the REQUEST_HINT state
         self.module.save_answer({'student_answer': 'answer 4'}, test_system)
         responses['assessment'] = '1'
         self.module.save_assessment(mock_query_dict, test_system)
-        self.assertEqual(self.module.state, self.module.DONE)
+        self.assertEqual(self.module.child_state, self.module.DONE)

@@ -67,8 +67,12 @@ class OpenEndedChild(object):
     def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
         # Load instance state
+
         if instance_state is not None:
-            instance_state = json.loads(instance_state)
+            try:
+                instance_state = json.loads(instance_state)
+            except:
+                pass
         else:
             instance_state = {}
 
@@ -76,34 +80,30 @@ class OpenEndedChild(object):
         # None for any element, and score and hint can be None for the last (current)
         # element.
         # Scores are on scale from 0 to max_score
-        self.history = instance_state.get('history', [])
 
-        self.state = instance_state.get('state', self.INITIAL)
+        self.child_history=instance_state.get('child_history',[])
+        self.child_state=instance_state.get('child_state', self.INITIAL)
+        self.child_created = instance_state.get('child_created', False)
+        self.child_attempts = instance_state.get('child_attempts', 0)
 
-        self.created = instance_state.get('created', False)
-
-        self.attempts = instance_state.get('attempts', 0)
         self.max_attempts = static_data['max_attempts']
-
-        self.prompt = static_data['prompt']
-        self.rubric = static_data['rubric']
+        self.child_prompt = static_data['prompt']
+        self.child_rubric = static_data['rubric']
         self.display_name = static_data['display_name']
         self.accept_file_upload = static_data['accept_file_upload']
         self.close_date = static_data['close_date']
         self.s3_interface = static_data['s3_interface']
         self.skip_basic_checks = static_data['skip_basic_checks']
+        self._max_score = static_data['max_score']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
-        self._max_score = static_data['max_score']
         if system.open_ended_grading_interface:
             self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
             self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,system)
         else:
             self.peer_gs = MockPeerGradingService()
             self.controller_qs = None
-
-
 
         self.system = system
 
@@ -138,32 +138,32 @@ class OpenEndedChild(object):
                 #This is a student_facing_error
                 'error': 'The problem close date has passed, and this problem is now closed.'
             }
-        elif self.attempts > self.max_attempts:
+        elif self.child_attempts > self.max_attempts:
             return True, {
                 'success': False,
                 #This is a student_facing_error
-                'error': 'You have attempted this problem {0} times.  You are allowed {1} attempts.'.format(self.attempts, self.max_attempts)
+                'error': 'You have attempted this problem {0} times.  You are allowed {1} attempts.'.format(self.child_attempts, self.max_attempts)
             }
         else:
             return False, {}
 
     def latest_answer(self):
         """Empty string if not available"""
-        if not self.history:
+        if not self.child_history:
             return ""
-        return self.history[-1].get('answer', "")
+        return self.child_history[-1].get('answer', "")
 
     def latest_score(self):
         """None if not available"""
-        if not self.history:
+        if not self.child_history:
             return None
-        return self.history[-1].get('score')
+        return self.child_history[-1].get('score')
 
     def latest_post_assessment(self, system):
         """Empty string if not available"""
-        if not self.history:
+        if not self.child_history:
             return ""
-        return self.history[-1].get('post_assessment', "")
+        return self.child_history[-1].get('post_assessment', "")
 
     @staticmethod
     def sanitize_html(answer):
@@ -185,30 +185,30 @@ class OpenEndedChild(object):
         @return: None
         """
         answer = OpenEndedChild.sanitize_html(answer)
-        self.history.append({'answer': answer})
+        self.child_history.append({'answer': answer})
 
     def record_latest_score(self, score):
         """Assumes that state is right, so we're adding a score to the latest
         history element"""
-        self.history[-1]['score'] = score
+        self.child_history[-1]['score'] = score
 
     def record_latest_post_assessment(self, post_assessment):
         """Assumes that state is right, so we're adding a score to the latest
         history element"""
-        self.history[-1]['post_assessment'] = post_assessment
+        self.child_history[-1]['post_assessment'] = post_assessment
 
     def change_state(self, new_state):
         """
         A centralized place for state changes--allows for hooks.  If the
         current state matches the old state, don't run any hooks.
         """
-        if self.state == new_state:
+        if self.child_state == new_state:
             return
 
-        self.state = new_state
+        self.child_state = new_state
 
-        if self.state == self.DONE:
-            self.attempts += 1
+        if self.child_state == self.DONE:
+            self.child_attempts += 1
 
     def get_instance_state(self):
         """
@@ -217,17 +217,17 @@ class OpenEndedChild(object):
 
         state = {
             'version': self.STATE_VERSION,
-            'history': self.history,
-            'state': self.state,
+            'child_history': self.child_history,
+            'child_state': self.child_state,
             'max_score': self._max_score,
-            'attempts': self.attempts,
-            'created': False,
+            'child_attempts': self.child_attempts,
+            'child_created': False,
         }
         return json.dumps(state)
 
     def _allow_reset(self):
         """Can the module be reset?"""
-        return (self.state == self.DONE and self.attempts < self.max_attempts)
+        return (self.child_state == self.DONE and self.child_attempts < self.max_attempts)
 
     def max_score(self):
         """
@@ -259,10 +259,10 @@ class OpenEndedChild(object):
         '''
         if self._max_score > 0:
             try:
-                return Progress(self.get_score()['score'], self._max_score)
+                return Progress(int(self.get_score()['score']), int(self._max_score))
             except Exception as err:
                 #This is a dev_facing_error
-                log.exception("Got bad progress from open ended child module. Max Score: {1}".format(self._max_score))
+                log.exception("Got bad progress from open ended child module. Max Score: {0}".format(self._max_score))
                 return None
         return None
 
@@ -272,7 +272,7 @@ class OpenEndedChild(object):
         """
         #This is a dev_facing_error
         log.warning("Open ended child state out sync. state: %r, get: %r. %s",
-            self.state, get, msg)
+            self.child_state, get, msg)
         #This is a student_facing_error
         return {'success': False,
                 'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
