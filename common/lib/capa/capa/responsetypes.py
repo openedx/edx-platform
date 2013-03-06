@@ -1041,9 +1041,8 @@ class CustomResponse(LoncapaResponse):
         # build map giving "correct"ness of the answer(s)
         correct = self.context['correct']
         messages = self.context['messages']
-        correct_map = CorrectMap()
-
         overall_message = self.clean_message_html(self.context['overall_message'])
+        correct_map = CorrectMap()
         correct_map.set_overall_message(overall_message)
 
         for k in range(len(idset)):
@@ -1110,6 +1109,7 @@ class CustomResponse(LoncapaResponse):
                                if 'msg' in input_dict else None)
                         messages.append(msg)
                     self.context['messages'] = messages
+                    self.context['overall_message'] = overall_message
 
                 # Otherwise, we do not recognize the dictionary
                 # Raise an exception
