@@ -101,11 +101,11 @@ class FolditModule(XModule):
         # an exception
         try:
             showbasic = (self.metadata.get("show_basic_score").lower() == "true")
-        except:
+        except Exception:
             showbasic = False
         try:
             showleader = (self.metadata.get("show_leaderboard").lower() == "true")
-        except:
+        except Exception:
             showleader = False
 
         context = {
