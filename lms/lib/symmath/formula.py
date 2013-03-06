@@ -248,14 +248,21 @@ class formula(object):
         fix_hat(xml)
 
         def flatten_pmathml(xml):
-            '''
-            Give the text version of PMathML elements
+            ''' Give the text version of certain PMathML elements
+
+            Sometimes MathML will be given with each letter separated (it
+            doesn't know if its implicit multiplication or what). From an xml
+            node, find the (text only) variable name it represents. So it takes
+            <mrow>
+              <mi>m</mi>
+              <mi>a</mi>
+              <mi>x</mi>
+            </mrow>
+            and returns 'max', for easier use later on.
             '''
             tag = gettag(xml)
             if tag == 'mn': return xml.text
             elif tag == 'mi': return xml.text
-            # elif tag == 'msub': return '_'.join([flatten_pmathml(y) for y in xml])
-            # elif tag == 'msup': return '^'.join([flatten_pmathml(y) for y in xml])
             elif tag == 'mrow': return ''.join([flatten_pmathml(y) for y in xml])
             raise Exception, '[flatten_pmathml] unknown tag %s' % tag
 
@@ -263,23 +270,63 @@ class formula(object):
         # they have the character \u200b in the superscript
         # replace them with a__b so snuggle doesn't get confused
         def fix_superscripts(xml):
+            ''' Look for and replace sup elements with 'X__Y' or 'X_Y__Z'
+
+            In the javascript, variables with '__X' in them had an invisible
+            character inserted into the sup (to distinguish from powers)
+            E.g. normal:
+            <msubsup>
+              <mi>a</mi>
+              <mi>b</mi>
+              <mi>c</mi>
+            </msubsup>
+            to be interpreted '(a_b)^c' (nothing done by this method)
+
+            And modified:
+            <msubsup>
+              <mi>b</mi>
+              <mi>x</mi>
+              <mrow>
+                <mo>&#x200B;</mo>
+                <mi>d</mi>
+              </mrow>
+            </msubsup>
+            to be interpreted 'a_b__c'
+
+            also:
+            <msup>
+              <mi>x</mi>
+              <mrow>
+                <mo>&#x200B;</mo>
+                <mi>B</mi>
+              </mrow>
+            </msup>
+            to be 'x__B'
+            '''
             for k in xml:
                 tag = gettag(k)
 
-                # match node to a superscript
+                # match things like the last example--
+                # the second item in msub is an mrow with the first
+                # character equal to \u200b
                 if (tag == 'msup' and
                     len(k) == 2 and gettag(k[1]) == 'mrow' and
                     gettag(k[1][0]) == 'mo' and k[1][0].text == u'\u200b'): # whew
 
+                    # replace the msup with 'X__Y'
                     k[1].remove(k[1][0])
                     newk = etree.Element('mi')
                     newk.text = '%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]))
                     xml.replace(k, newk)
 
+                # match things like the middle example-
+                # the third item in msubsup is an mrow with the first
+                # character equal to \u200b
                 if (tag == 'msubsup' and
                     len(k) == 3 and gettag(k[2]) == 'mrow' and
                     gettag(k[2][0]) == 'mo' and k[2][0].text == u'\u200b'): # whew
 
+                    # replace the msubsup with 'X_Y__Z'
                     k[2].remove(k[2][0])
                     newk = etree.Element('mi')
                     newk.text = '%s_%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]), flatten_pmathml(k[2]))
@@ -316,7 +363,7 @@ class formula(object):
         try:
             xml = self.preprocess_pmathml(self.expr)
         except Exception, err:
-            # print 'Err %s while preprocessing; expr=%s' % (err, self.expr)
+            log.warning('Err %s while preprocessing; expr=%s' % (err, self.expr))
             return "<html>Error! Cannot process pmathml</html>"
         pmathml = etree.tostring(xml, pretty_print=True)
         self.the_pmathml = pmathml
