@@ -280,13 +280,13 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_expect_no_actions_wrong(self):
-        user_input = '{"draggables": [{"1": "t1"}, \
-         {"name_with_icon": "t2"}]}'
+        user_input = '[{"1": "t1"}, \
+         {"name_with_icon": "t2"}]'
         correct_answer = []
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_expect_no_actions_right(self):
-        user_input = '{"draggables": []}'
+        user_input = '[]'
         correct_answer = []
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
