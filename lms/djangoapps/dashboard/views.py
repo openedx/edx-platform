@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from django.http import Http404
 from mitxmako.shortcuts import render_to_response
+from django.db import connection
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from django.contrib.auth.models import User
@@ -12,16 +13,18 @@ def dictfetchall(cursor):
     '''Returns a list of all rows from a cursor as a column: result dict.
     Borrowed from Django documentation'''
     desc = cursor.description
-    table=[]
+    table = []
     table.append([col[0] for col in desc])
-    table = table + cursor.fetchall()
-    print "Table: " + str(table)
+    
+    # ensure response from db is a list, not a tuple (which is returned
+    # by MySQL backed django instances)
+    rows_from_cursor=cursor.fetchall()
+    table = table + [list(row) for row in rows_from_cursor]
     return table
 
 def SQL_query_to_list(cursor, query_string):
     cursor.execute(query_string)
     raw_result=dictfetchall(cursor)
-    print raw_result
     return raw_result
 
 def dashboard(request):
@@ -50,7 +53,6 @@ def dashboard(request):
     results["scalars"]["Total Enrollments Across All Courses"]=CourseEnrollment.objects.count()
 
     # establish a direct connection to the database (for executing raw SQL)
-    from django.db import connection
     cursor = connection.cursor()
 
     # define the queries that will generate our user-facing tables

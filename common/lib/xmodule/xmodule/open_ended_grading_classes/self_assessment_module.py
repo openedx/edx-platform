@@ -3,11 +3,8 @@ import logging
 from lxml import etree
 
 from xmodule.capa_module import ComplexEncoder
-from xmodule.editing_module import EditingDescriptor
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-from xmodule.xml_module import XmlDescriptor
-from xblock.core import List, Integer, String, Scope
 import openendedchild
 
 from combined_open_ended_rubric import CombinedOpenEndedRubric
@@ -33,27 +30,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
     </selfassessment>
     """
 
-    # states
-    INITIAL = 'initial'
-    ASSESSING = 'assessing'
-    REQUEST_HINT = 'request_hint'
-    DONE = 'done'
-
-    student_answers = List(scope=Scope.student_state, default=[])
-    scores = List(scope=Scope.student_state, default=[])
-    hints = List(scope=Scope.student_state, default=[])
-    state = String(scope=Scope.student_state, default=INITIAL)
-
-    # Used for progress / grading.  Currently get credit just for
-    # completion (doesn't matter if you self-assessed correct/incorrect).
-    max_score = Integer(scope=Scope.settings, default=openendedchild.MAX_SCORE)
-    max_attempts = Integer(scope=Scope.settings, default=openendedchild.MAX_ATTEMPTS)
-
-    attempts = Integer(scope=Scope.student_state, default=0)
-    rubric = String(scope=Scope.content)
-    prompt = String(scope=Scope.content)
-    submitmessage = String(scope=Scope.content)
-    hintprompt = String(scope=Scope.content)
+    TEMPLATE_DIR = "combinedopenended/selfassessment"
 
     def setup_response(self, system, location, definition, descriptor):
         """
@@ -91,7 +68,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'accept_file_upload': self.accept_file_upload,
         }
 
-        html = system.render_template('self_assessment_prompt.html', context)
+        html = system.render_template('{0}/self_assessment_prompt.html'.format(self.TEMPLATE_DIR), context)
         return html
 
 
@@ -152,7 +129,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             #This is a dev_facing_error
             raise ValueError("Self assessment module is in an illegal state '{0}'".format(self.state))
 
-        return system.render_template('self_assessment_rubric.html', context)
+        return system.render_template('{0}/self_assessment_rubric.html'.format(self.TEMPLATE_DIR), context)
 
     def get_hint_html(self, system):
         """
@@ -178,7 +155,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             #This is a dev_facing_error
             raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.state))
 
-        return system.render_template('self_assessment_hint.html', context)
+        return system.render_template('{0}/self_assessment_hint.html'.format(self.TEMPLATE_DIR), context)
 
 
     def save_answer(self, get, system):

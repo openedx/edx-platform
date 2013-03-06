@@ -460,6 +460,9 @@ class PeerGradingModule(XModule):
             #This is a student_facing_error
             error_text = "Could not get list of problems to peer grade.  Please notify course staff."
             success = False
+        except:
+            log.exception("Could not contact peer grading service.")
+            success = False
 
 
         def _find_corresponding_module_for_location(location):
@@ -562,3 +565,40 @@ class PeerGradingDescriptor(RawDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "peer_grading"
+
+    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
+    js_module_name = "HTMLEditingDescriptor"
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        """
+        Pull out the individual tasks, the rubric, and the prompt, and parse
+
+        Returns:
+        {
+        'rubric': 'some-html',
+        'prompt': 'some-html',
+        'task_xml': dictionary of xml strings,
+        }
+        """
+        expected_children = []
+        for child in expected_children:
+            if len(xml_object.xpath(child)) == 0:
+                #This is a staff_facing_error
+                raise ValueError("Peer grading definition must include at least one '{0}' tag.  Contact the learning sciences group for assistance.".format(child))
+
+        def parse_task(k):
+            """Assumes that xml_object has child k"""
+            return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(0, len(xml_object.xpath(k)))]
+
+        def parse(k):
+            """Assumes that xml_object has child k"""
+            return xml_object.xpath(k)[0]
+
+        return {}, []
+
+
+    def definition_to_xml(self, resource_fs):
+        '''Return an xml element representing this definition.'''
+        elt = etree.Element('peergrading')
+        return elt
