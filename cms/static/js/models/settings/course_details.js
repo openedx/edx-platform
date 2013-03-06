@@ -59,11 +59,6 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         // NOTE don't return empty errors as that will be interpreted as an error state
     },
 
-    url: function() {
-        var location = this.get('location');
-        return '/' + location.get('org') + "/" + location.get('course') + '/settings-details/' + location.get('name') + '/section/details';
-    },
-
     _videokey_illegal_chars : /[^a-zA-Z0-9_-]/g,
     save_videosource: function(newsource) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string

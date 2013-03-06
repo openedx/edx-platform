@@ -20,8 +20,8 @@
   <script type="text/javascript" charset="utf-8">
   $(document).ready(function(){
     var course_updates = new CMS.Models.CourseUpdateCollection();
-    course_updates.reset(${course_updates|n});
     course_updates.urlbase = '${url_base}';
+    course_updates.fetch();
 
     var course_handouts = new CMS.Models.ModuleInfo({
         id: '${handouts_location}'
