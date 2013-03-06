@@ -195,6 +195,7 @@ class CombinedOpenEndedV1Module():
         last_response = last_response_data['response']
 
         loaded_task_state = json.loads(current_task_state)
+        log.debug(loaded_task_state)
         if loaded_task_state['child_state'] == self.INITIAL:
             loaded_task_state['child_state'] = self.ASSESSING
             loaded_task_state['child_created'] = True
@@ -253,7 +254,6 @@ class CombinedOpenEndedV1Module():
 
         #This sends the etree_xml object through the descriptor module of the current task, and
         #returns the xml parsed by the descriptor
-        log.debug(current_task_state)
         self.current_task_parsed_xml = self.current_task_descriptor.definition_from_xml(etree_xml, self.system)
         if current_task_state is None and self.current_task_number == 0:
             self.current_task = child_task_module(self.system, self.location,
@@ -264,7 +264,7 @@ class CombinedOpenEndedV1Module():
             last_response_data = self.get_last_response(self.current_task_number - 1)
             last_response = last_response_data['response']
             current_task_state = json.dumps({
-                'state': self.ASSESSING,
+                'child_state': self.ASSESSING,
                 'version': self.STATE_VERSION,
                 'max_score': self._max_score,
                 'child_attempts': 0,
@@ -276,6 +276,7 @@ class CombinedOpenEndedV1Module():
                 instance_state=current_task_state)
             self.task_states.append(self.current_task.get_instance_state())
             self.state = self.ASSESSING
+            log.debug(self.task_states)
         else:
             if self.current_task_number > 0 and not reset:
                 current_task_state = self.overwrite_state(current_task_state)
@@ -394,7 +395,7 @@ class CombinedOpenEndedV1Module():
 
         task_parsed_xml = task_descriptor.definition_from_xml(etree_xml, self.system)
         task = children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor,
-            self.static_data, instance_state=self.instance_state, model_data = self._model_data)
+            self.static_data, instance_state=task_state, model_data = self._model_data)
         last_response = task.latest_answer()
         last_score = task.latest_score()
         last_post_assessment = task.latest_post_assessment(self.system)
@@ -479,7 +480,7 @@ class CombinedOpenEndedV1Module():
         if not self.allow_reset:
             self.task_states[self.current_task_number] = self.current_task.get_instance_state()
             current_task_state = json.loads(self.task_states[self.current_task_number])
-            if current_task_state['state'] == self.DONE:
+            if current_task_state['child_state'] == self.DONE:
                 self.current_task_number += 1
                 if self.current_task_number >= (len(self.task_xml)):
                     self.state = self.DONE

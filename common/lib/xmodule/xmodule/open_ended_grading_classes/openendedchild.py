@@ -65,7 +65,7 @@ class OpenEndedChild(object):
     }
 
     def __init__(self, system, location, definition, descriptor, static_data,
-                 instance_state=None, shared_state=None, model_data=None, task_number = None, **kwargs):
+                 instance_state=None, shared_state=None, **kwargs):
         # Load instance state
 
         if instance_state is not None:
@@ -80,27 +80,11 @@ class OpenEndedChild(object):
         # None for any element, and score and hint can be None for the last (current)
         # element.
         # Scores are on scale from 0 to max_score
-        self._model_data = model_data
-        task_state = {}
 
-        try:
-            self.child_history=instance_state['task_states'][task_number]['history']
-        except:
-            self.child_history = []
-        try:
-            self.child_state=instance_state['task_states'][task_number]['state']
-        except:
-            self.child_state = self.INITIAL
-
-        try:
-            self.child_created = instance_state['task_states'][task_number]['created']
-        except:
-            self.child_created = False
-
-        try:
-            self.child_attempts = instance_state['task_states'][task_number]['attempts']
-        except:
-            self.child_attempts = 0
+        self.child_history=instance_state.get('child_history',[])
+        self.child_state=instance_state.get('child_state', self.INITIAL)
+        self.child_created = instance_state.get('child_created', False)
+        self.child_attempts = instance_state.get('child_attempts', 0)
 
         self.max_attempts = static_data['max_attempts']
         self.child_prompt = static_data['prompt']
@@ -233,11 +217,11 @@ class OpenEndedChild(object):
 
         state = {
             'version': self.STATE_VERSION,
-            'history': self.child_history,
-            'state': self.child_state,
+            'child_history': self.child_history,
+            'child_state': self.child_state,
             'max_score': self._max_score,
-            'attempts': self.child_attempts,
-            'created': False,
+            'child_attempts': self.child_attempts,
+            'child_created': False,
         }
         return json.dumps(state)
 
@@ -275,7 +259,7 @@ class OpenEndedChild(object):
         '''
         if self._max_score > 0:
             try:
-                return Progress(self.get_score()['score'], self._max_score)
+                return Progress(int(self.get_score()['score']), int(self._max_score))
             except Exception as err:
                 #This is a dev_facing_error
                 log.exception("Got bad progress from open ended child module. Max Score: {0}".format(self._max_score))
