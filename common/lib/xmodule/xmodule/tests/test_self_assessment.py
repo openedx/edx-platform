@@ -53,13 +53,13 @@ class SelfAssessmentTest(unittest.TestCase):
                 'skip_basic_checks' : False,
                 }
 
-        self.module = SelfAssessmentModule(test_system, self.location,
+        self.module = SelfAssessmentModule(test_system(), self.location,
                                       self.definition, self.descriptor,
                                       static_data, 
                                       state, metadata=self.metadata)
 
     def test_get_html(self):
-        html = self.module.get_html(test_system)
+        html = self.module.get_html(self.module.system)
         self.assertTrue("This is sample prompt text" in html)
 
     def test_self_assessment_flow(self):
@@ -82,10 +82,11 @@ class SelfAssessmentTest(unittest.TestCase):
 
         self.assertEqual(self.module.get_score()['score'], 0)
 
-        self.module.save_answer({'student_answer': "I am an answer"}, test_system)
+        self.module.save_answer({'student_answer': "I am an answer"}, 
+                                self.module.system)
         self.assertEqual(self.module.state, self.module.ASSESSING)
 
-        self.module.save_assessment(mock_query_dict, test_system)
+        self.module.save_assessment(mock_query_dict, self.module.system)
         self.assertEqual(self.module.state, self.module.DONE)
 
 
@@ -94,7 +95,8 @@ class SelfAssessmentTest(unittest.TestCase):
         self.assertEqual(self.module.state, self.module.INITIAL)
 
         # if we now assess as right, skip the REQUEST_HINT state
-        self.module.save_answer({'student_answer': 'answer 4'}, test_system)
+        self.module.save_answer({'student_answer': 'answer 4'}, 
+                                self.module.system)
         responses['assessment'] = '1'
-        self.module.save_assessment(mock_query_dict, test_system)
+        self.module.save_assessment(mock_query_dict, self.module.system)
         self.assertEqual(self.module.state, self.module.DONE)

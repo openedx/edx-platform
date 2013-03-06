@@ -56,6 +56,9 @@ class ConditionalModuleTest(unittest.TestCase):
         '''Get a dummy system'''
         return DummySystem(load_error_modules)
 
+    def setUp(self):
+        self.test_system = test_system()
+
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
         print "Importing {0}".format(name)
@@ -85,14 +88,14 @@ class ConditionalModuleTest(unittest.TestCase):
             location = descriptor.location
             instance_state = instance_states.get(location.category, None)
             print "inner_get_module, location=%s, inst_state=%s" % (location, instance_state)
-            return descriptor.xmodule_constructor(test_system)(instance_state, shared_state)
+            return descriptor.xmodule_constructor(self.test_system)(instance_state, shared_state)
 
         location = Location(["i4x", "edX", "cond_test", "conditional", "condone"])
 
         def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
             return text
-        test_system.replace_urls = replace_urls
-        test_system.get_module = inner_get_module
+        self.test_system.replace_urls = replace_urls
+        self.test_system.get_module = inner_get_module
 
         module = inner_get_module(location)
         print "module: ", module
