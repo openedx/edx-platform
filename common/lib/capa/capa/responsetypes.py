@@ -1086,7 +1086,15 @@ class CustomResponse(LoncapaResponse):
                 # to the same correct/incorrect value
                 if 'ok' in ret:
                     correct = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
-                    self.context['messages'][0] = self.clean_message_html(ret['msg'])
+                    msg = ret.get('msg', None)
+                    msg = self.clean_message_html(msg)
+
+                    # If there is only one input, apply the message to that input
+                    # Otherwise, apply the message to the whole problem
+                    if len(idset) > 1:
+                        self.context['overall_message'] = msg
+                    else:
+                        self.context['messages'][0] = msg
 
                 # Another kind of dictionary the check function can return has
                 # the form:
