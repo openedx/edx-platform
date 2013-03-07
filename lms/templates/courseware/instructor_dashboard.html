@@ -372,6 +372,33 @@ function goto( mode)
 %if modeflag.get('Analytics'):
 
    <p>
+     Students enrolled:
+     % if students_enrolled_json and "data" in students_enrolled_json:
+       ${students_enrolled_json['data'][0]['students']}
+       <!-- ${students_enrolled_json['time']} -->
+     % endif
+   </p>
+
+   <p>
+     <p>Number of students per problem who have this problem graded as correct, as of ${students_per_problem_correct_json['time']}</p>
+
+     % if students_per_problem_correct_json and "data" in students_per_problem_correct_json:
+     <div class="divScroll">
+     <table class="stat_table">
+     <tr><th>Problem</th><th>Number of students</th></tr>
+     % for row in students_per_problem_correct_json['data']:
+     <tr> <td>${row['module_id']}</td> <td>${row['count']}</td> </tr>
+     % endfor
+     </table>
+     </div>
+     % endif
+   </p>
+
+%endif
+
+%if modeflag.get('Analytics 2'):
+
+   <p>
      Number of students enrolled for ${students_enrolled_json['data'][0]['course_id']}:
      % if students_enrolled_json is not None:
      % if students_enrolled_json['status'] == 'success':
