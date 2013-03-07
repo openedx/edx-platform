@@ -31,7 +31,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // because these are outside of this.$el, they can't be in the event hash
         $('.save-button').on('click', this, this.saveView);
         $('.cancel-button').on('click', this, this.revertView);
-        this.model.on('error', this.handleValidationError, this);
+        this.listenTo(this.model, 'error', CMS.ServerError);
+        this.listenTo(this.model, 'invalid', this.handleValidationError);
     },
     render: function() {
         // catch potential outside call before template loaded
