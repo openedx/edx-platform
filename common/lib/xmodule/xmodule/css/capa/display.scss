@@ -42,6 +42,14 @@ section.problem {
     label.choicegroup_correct{
       &:after{
         content: url('../images/correct-icon.png');
+        margin-left:15px
+      }
+    }
+
+    label.choicegroup_incorrect{
+      &:after{
+        content: url('../images/incorrect-icon.png');
+        margin-left:15px;
       }
     }
 
@@ -52,6 +60,7 @@ section.problem {
     .indicator_container {
       float: left;
       width: 25px;
+      height: 1px;
       margin-right: 15px;
     }
 
@@ -69,7 +78,7 @@ section.problem {
     }
 
     text {
-      display: block;
+      display: inline;
       margin-left: 25px;
     }
   }
