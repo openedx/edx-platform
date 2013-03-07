@@ -115,7 +115,7 @@ def get_date_for_press(publish_date):
 
 def press(request):
     json_articles = cache.get("student_press_json_articles")
-    if json_articles == None:
+    if json_articles is None:
         if hasattr(settings, 'RSS_URL'):
             content = urllib.urlopen(settings.PRESS_URL).read()
             json_articles = json.loads(content)
@@ -301,7 +301,7 @@ def change_enrollment(request):
     action = request.POST.get("enrollment_action", "")
 
     course_id = request.POST.get("course_id", None)
-    if course_id == None:
+    if course_id is None:
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'There was an error receiving the course id.'}))
 
@@ -554,7 +554,7 @@ def create_account(request, post_override=None):
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
-        js['value'] = "Username should only consist of A-Z and 0-9.".format(field=a)
+        js['value'] = "Username should only consist of A-Z and 0-9, with no spaces.".format(field=a)
         js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
@@ -1203,7 +1203,7 @@ def _get_news(top=None):
     "Return the n top news items on settings.RSS_URL"
 
     feed_data = cache.get("students_index_rss_feed_data")
-    if feed_data == None:
+    if feed_data is None:
         if hasattr(settings, 'RSS_URL'):
             feed_data = urllib.urlopen(settings.RSS_URL).read()
         else:

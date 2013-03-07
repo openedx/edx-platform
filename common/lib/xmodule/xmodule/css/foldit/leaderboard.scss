@@ -1,0 +1,20 @@
+$leaderboard: #F4F4F4;
+
+section.foldit {
+    div.folditchallenge {
+        table {
+            border: 1px solid lighten($leaderboard, 10%);
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background: $leaderboard;
+            color: darken($leaderboard, 25%);
+        }
+        td {
+            background: lighten($leaderboard, 3%);
+            border-bottom: 1px solid  #fff;
+            padding: 8px;
+        }
+    }
+}

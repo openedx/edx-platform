@@ -24,6 +24,7 @@ Specific Problem Types
 
    course_data_formats/drag_and_drop/drag_and_drop_input.rst
    course_data_formats/graphical_slider_tool/graphical_slider_tool.rst
+   course_data_formats/custom_response.rst
 
 
 Internal Data Formats

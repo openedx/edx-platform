@@ -1,28 +1,12 @@
 <section class="foldit">
-<p><strong>Due:</strong> ${due}
+ 
+    % if show_basic:
+    ${folditbasic}
+    % endif
 
-<p>
-<strong>Status:</strong>
-% if success:
-You have successfully gotten to level ${goal_level}.
-% else:
-You have not yet gotten to level ${goal_level}.
-% endif
-</p>
 
-<h3>Completed puzzles</h3>
-
-<table>
-  <tr>
-    <th>Level</th>
-    <th>Submitted</th>
-  </tr>
-  % for puzzle in completed:
-  <tr>
-    <td>${'{0}-{1}'.format(puzzle['set'], puzzle['subset'])}</td>
-    <td>${puzzle['created'].strftime('%Y-%m-%d %H:%M')}</td>
-  </tr>
-  % endfor
-</table>
+    % if show_leader:
+    ${folditchallenge}
+    % endif
 
 </section>

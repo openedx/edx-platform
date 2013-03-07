@@ -1,0 +1,16 @@
+<div class="folditchallenge">
+    <h3>Puzzle Leaderboard</h3>
+    
+    <table>
+        <tr>
+            <th>User</th>
+            <th>Score</th>
+        </tr>
+        % for pair in top_scores:
+        <tr>
+            <td>${pair[0]}</td>
+            <td>${pair[1]}</td>
+        </tr>
+        % endfor
+    </table>
+</div>

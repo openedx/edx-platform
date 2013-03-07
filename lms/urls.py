@@ -224,14 +224,6 @@ if settings.COURSEWARE_ENABLED:
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
 
-        # TODO (vshnayder): This is a hack.  It creates a direct connection from
-        # the LMS to capa functionality, and really wants to go through the
-        # input types system so that previews can be context-specific.
-        # Unfortunately, we don't have time to think through the right way to do
-        # that (and implement it), and it's not a terrible thing to provide a
-        # generic chemical-equation rendering service.
-        url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
-            name='preview_chemcalc'),
 
         # Software Licenses
 
@@ -360,7 +352,6 @@ if settings.COURSEWARE_ENABLED:
 
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
-
         urlpatterns += (
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
                 'courseware.views.news', name="news"),
@@ -372,6 +363,14 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>[^/]+)/$',
         'courseware.views.static_tab', name="static_tab"),
         )
+
+    if settings.MITX_FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
+        urlpatterns += (
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/submission_history/(?P<student_username>[^/]*)/(?P<location>.*?)$',
+                'courseware.views.submission_history',
+                name='submission_history'),
+        )
+
 
 if settings.ENABLE_JASMINE:
     urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)

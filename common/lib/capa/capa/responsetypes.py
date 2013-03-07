@@ -174,13 +174,14 @@ class LoncapaResponse(object):
         '''
         return sum(self.maxpoints.values())
 
-    def render_html(self, renderer):
+    def render_html(self, renderer, response_msg=''):
         '''
         Return XHTML Element tree representation of this Response.
 
         Arguments:
 
           - renderer : procedure which produces HTML given an ElementTree
+          - response_msg: a message displayed at the end of the Response
         '''
         # render ourself as a <span> + our content
         tree = etree.Element('span')
@@ -195,6 +196,11 @@ class LoncapaResponse(object):
             if item_xhtml is not None:
                 tree.append(item_xhtml)
         tree.tail = self.xml.tail
+
+        # Add a <div> for the message at the end of the response
+        if response_msg:
+            tree.append(self._render_response_msg_html(response_msg))
+
         return tree
 
     def evaluate_answers(self, student_answers, old_cmap):
@@ -318,6 +324,29 @@ class LoncapaResponse(object):
 
     def __unicode__(self):
         return u'LoncapaProblem Response %s' % self.xml.tag
+
+    def _render_response_msg_html(self, response_msg):
+        """ Render a <div> for a message that applies to the entire response.
+
+        *response_msg* is a string, which may contain XHTML markup
+        
+        Returns an etree element representing the response message <div> """
+        # First try wrapping the text in a <div> and parsing
+        # it as an XHTML tree
+        try:
+            response_msg_div = etree.XML('<div>%s</div>' % str(response_msg))
+
+        # If we can't do that, create the <div> and set the message
+        # as the text of the <div>
+        except:
+            response_msg_div = etree.Element('div')
+            response_msg_div.text = str(response_msg)
+
+
+        # Set the css class of the message <div>
+        response_msg_div.set("class", "response_message")
+
+        return response_msg_div
 
 
 #-----------------------------------------------------------------------------
@@ -882,7 +911,8 @@ def sympy_check2():
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
                             'chemicalequationinput', 'vsepr_input',
                             'drag_and_drop_input', 'editamoleculeinput',
-                            'designprotein2dinput', 'editageneinput']
+                            'designprotein2dinput', 'editageneinput',
+                            'annotationinput']
 
     def setup_response(self):
         xml = self.xml
@@ -965,6 +995,7 @@ def sympy_check2():
         # not expecting 'unknown's
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
+        overall_message = ""
 
         # put these in the context of the check function evaluator
         # note that this doesn't help the "cfn" version - only the exec version
@@ -996,6 +1027,10 @@ def sympy_check2():
             # the list of messages to be filled in by the check function
             'messages': messages,
 
+            # a message that applies to the entire response
+            # instead of a particular input
+            'overall_message': overall_message,
+
             # any options to be passed to the cfn
             'options': self.xml.get('options'),
             'testdat': 'hello world',
@@ -1010,6 +1045,7 @@ def sympy_check2():
                 exec self.code in self.context['global_context'], self.context
                 correct = self.context['correct']
                 messages = self.context['messages']
+                overall_message = self.context['overall_message']
             except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
@@ -1044,33 +1080,99 @@ def sympy_check2():
                 log.error(traceback.format_exc())
                 raise Exception("oops in customresponse (cfn) error %s" % err)
             log.debug("[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
+
             if type(ret) == dict:
-                correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
-                msg = ret['msg']
 
-                if 1:
-                    # try to clean up message html
-                    msg = '<html>' + msg + '</html>'
-                    msg = msg.replace('&#60;', '&lt;')
-                    #msg = msg.replace('&lt;','<')
-                    msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
-                                         pretty_print=True)
-                    #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
-                    msg = msg.replace('&#13;', '')
-                    #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
-                    msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
+                # One kind of dictionary the check function can return has the
+                # form {'ok': BOOLEAN, 'msg': STRING}
+                # If there are multiple inputs, they all get marked
+                # to the same correct/incorrect value
+                if 'ok' in ret:
+                    correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
+                    msg = ret.get('msg', None)
+                    msg = self.clean_message_html(msg)
 
-                messages[0] = msg
+                    # If there is only one input, apply the message to that input
+                    # Otherwise, apply the message to the whole problem
+                    if len(idset) > 1:
+                        overall_message = msg
+                    else:
+                        messages[0] = msg
+
+
+                # Another kind of dictionary the check function can return has
+                # the form:
+                # {'overall_message': STRING,
+                #  'input_list': [{ 'ok': BOOLEAN, 'msg': STRING }, ...] }
+                # 
+                # This allows the function to return an 'overall message'
+                # that applies to the entire problem, as well as correct/incorrect
+                # status and messages for individual inputs
+                elif 'input_list' in ret:
+                    overall_message = ret.get('overall_message', '')
+                    input_list = ret['input_list']
+
+                    correct = []
+                    messages = []
+                    for input_dict in input_list:
+                        correct.append('correct' if input_dict['ok'] else 'incorrect')
+                        msg = self.clean_message_html(input_dict['msg']) if 'msg' in input_dict else None
+                        messages.append(msg)
+
+                # Otherwise, we do not recognize the dictionary
+                # Raise an exception
+                else:
+                    log.error(traceback.format_exc())
+                    raise Exception("CustomResponse: check function returned an invalid dict")
+
+            # The check function can return a boolean value,
+            # indicating whether all inputs should be marked
+            # correct or incorrect
             else:
                 correct = ['correct'] * len(idset) if ret else ['incorrect'] * len(idset)
 
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
+
+        overall_message = self.clean_message_html(overall_message)
+        correct_map.set_overall_message(overall_message)
+
         for k in range(len(idset)):
             npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
+
+    def clean_message_html(self, msg):
+
+        # If *msg* is an empty string, then the code below
+        # will return "</html>".  To avoid this, we first check
+        # that *msg* is a non-empty string.
+        if msg:
+
+            # When we parse *msg* using etree, there needs to be a root
+            # element, so we wrap the *msg* text in <html> tags
+            msg = '<html>' + msg + '</html>'
+
+            # Replace < characters
+            msg = msg.replace('&#60;', '&lt;')
+
+            # Use etree to prettify the HTML
+            msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
+                                 pretty_print=True)
+
+            msg = msg.replace('&#13;', '')
+
+            # Remove the <html> tags we introduced earlier, so we're
+            # left with just the prettified message markup
+            msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
+
+            # Strip leading and trailing whitespace
+            return msg.strip()
+
+        # If we start with an empty string, then return an empty string
+        else:
+            return ""
 
     def get_answers(self):
         '''
@@ -1842,6 +1944,117 @@ class ImageResponse(LoncapaResponse):
                 dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
 #-----------------------------------------------------------------------------
 
+class AnnotationResponse(LoncapaResponse):
+    '''
+    Checking of annotation responses.
+
+    The response contains both a comment (student commentary) and an option (student tag).
+    Only the tag is currently graded. Answers may be incorrect, partially correct, or correct.
+    '''
+    response_tag = 'annotationresponse'
+    allowed_inputfields = ['annotationinput']
+    max_inputfields = 1
+    default_scoring = {'incorrect': 0, 'partially-correct': 1, 'correct': 2 }
+    def setup_response(self):
+        xml = self.xml
+        self.scoring_map = self._get_scoring_map()
+        self.answer_map = self._get_answer_map()
+        self.maxpoints = self._get_max_points()
+
+    def get_score(self, student_answers):
+        ''' Returns a CorrectMap for the student answer, which may include
+            partially correct answers.'''
+        student_answer = student_answers[self.answer_id]
+        student_option = self._get_submitted_option_id(student_answer)
+
+        scoring = self.scoring_map[self.answer_id]
+        is_valid = student_option is not None and student_option in scoring.keys()
+
+        (correctness, points) = ('incorrect', None)
+        if is_valid:
+            correctness = scoring[student_option]['correctness']
+            points = scoring[student_option]['points']
+
+        return CorrectMap(self.answer_id, correctness=correctness, npoints=points)
+
+    def get_answers(self):
+        return self.answer_map
+
+    def _get_scoring_map(self):
+        ''' Returns a dict of option->scoring for each input. '''
+        scoring = self.default_scoring
+        choices = dict([(choice,choice) for choice in scoring])
+        scoring_map = {}
+
+        for inputfield in self.inputfields:
+            option_scoring = dict([(option['id'], {
+                    'correctness': choices.get(option['choice']), 
+                    'points': scoring.get(option['choice'])
+                }) for option in self._find_options(inputfield) ])
+
+            scoring_map[inputfield.get('id')] = option_scoring
+
+        return scoring_map
+
+    def _get_answer_map(self):
+        ''' Returns a dict of answers for each input.'''
+        answer_map = {}
+        for inputfield in self.inputfields:
+            correct_option = self._find_option_with_choice(inputfield, 'correct')
+            if correct_option is not None:
+                answer_map[inputfield.get('id')] = correct_option.get('description')
+        return answer_map
+
+    def _get_max_points(self):
+        ''' Returns a dict of the max points for each input: input id -> maxpoints. '''
+        scoring = self.default_scoring
+        correct_points = scoring.get('correct')
+        return dict([(inputfield.get('id'), correct_points) for inputfield in self.inputfields])
+
+    def _find_options(self, inputfield):
+        ''' Returns an array of dicts where each dict represents an option. '''
+        elements = inputfield.findall('./options/option')
+        return [{
+                'id': index,
+                'description': option.text,
+                'choice': option.get('choice')
+            } for (index, option) in enumerate(elements) ]
+
+    def _find_option_with_choice(self, inputfield, choice):
+        ''' Returns the option with the given choice value, otherwise None. '''
+        for option in self._find_options(inputfield):
+            if option['choice'] == choice:
+                return option
+
+    def _unpack(self, json_value):
+        ''' Unpacks a student response value submitted as JSON.'''
+        d = json.loads(json_value)
+        if type(d) != dict:
+            d = {}
+
+        comment_value = d.get('comment', '')
+        if not isinstance(d, basestring):
+            comment_value = ''
+
+        options_value = d.get('options', [])
+        if not isinstance(options_value, list):
+            options_value = []
+
+        return {
+            'options_value': options_value,
+            'comment_value': comment_value
+        }
+
+    def _get_submitted_option_id(self, student_answer):
+        ''' Return the single option that was selected, otherwise None.'''
+        submitted = self._unpack(student_answer)
+        option_ids = submitted['options_value']
+        if len(option_ids) == 1:
+            return option_ids[0]
+        return None
+
+#-----------------------------------------------------------------------------
+
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
@@ -1858,4 +2071,5 @@ __all__ = [CodeResponse,
            ChoiceResponse,
            MultipleChoiceResponse,
            TrueFalseResponse,
-           JavascriptResponse]
+           JavascriptResponse,
+           AnnotationResponse]
