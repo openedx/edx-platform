@@ -1,0 +1,71 @@
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+<%block name="title">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>${course.number} Textbook</title>
+</%block>
+
+<%block name="headextra">
+<%static:css group='course'/>
+<%static:js group='courseware'/>
+</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+
+    $(document).ready(function() {
+        var options = {};
+        %if 'url' in textbook:
+            options.url = "${textbook['url']}";
+        %endif
+        %if 'chapters' in textbook:
+            var chptrs = [];
+            %for chap in textbook['chapters']:
+                chptrs.push("${chap['url']}");
+            %endfor
+            options.chapters = chptrs;
+        %endif
+        %if chapter is not None:
+            options.chapterNum = ${chapter};
+        %endif
+        %if page is not None:
+            options.pageNum = ${page};
+        %endif
+
+    });
+  </script>  
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='htmltextbook/{0}'.format(book_index)" />
+
+    <div id="outerContainer">
+      <div id="mainContainer" class="book-wrapper">
+
+        %if 'chapters' in textbook:
+	<section aria-label="Textbook Navigation" class="book-sidebar">
+	  <ul id="booknav" class="treeview-booknav">
+	      <%def name="print_entry(entry, index_value)">
+		  <li id="htmlchapter-${index_value}">
+		    <a class="chapter">
+		      ${entry.get('title')}
+		    </a>
+		  </li>
+	      </%def>
+
+	      % for (index, entry) in enumerate(textbook['chapters']):
+		${print_entry(entry, index+1)}
+	      % endfor
+	  </ul>
+	</section>
+        %endif
+
+        <section id="viewerContainer" class="book">
+<!--	  <section class="page"> -->
+            <iframe class="page" id="bookpage" src="${ textbook['chapters'][0]['url'] }">
+<!--          </section> -->
+        </section>
+
+      </div> <!-- mainContainer -->
+
+    </div> <!-- outerContainer -->

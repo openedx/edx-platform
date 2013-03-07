@@ -220,6 +220,7 @@ VALID_TAB_TYPES = {
     'external_link': TabImpl(key_checker(['name', 'link']), _external_link),
     'textbooks': TabImpl(null_validator, _textbooks),
     'pdf_textbooks': TabImpl(null_validator, _pdf_textbooks),
+    'html_textbooks': TabImpl(null_validator, _html_textbooks),
     'progress': TabImpl(need_name, _progress),
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
     'peer_grading': TabImpl(null_validator, _peer_grading),
