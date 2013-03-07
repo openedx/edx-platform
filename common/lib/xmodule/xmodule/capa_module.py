@@ -135,8 +135,8 @@ class CapaModule(XModule):
             self.grace_period = None
             self.close_date = self.display_due_date
 
-        max_attempts = self.metadata.get('attempts', None)
-        if max_attempts is not None:
+        max_attempts = self.metadata.get('attempts')
+        if max_attempts is not None and max_attempts != '':
             self.max_attempts = int(max_attempts)
         else:
             self.max_attempts = None
