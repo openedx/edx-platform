@@ -44,7 +44,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
             self.render();
         }
         );
-        this.model.on('error', this.handleValidationError, this);
+        this.listenTo(this.model, 'error', CMS.ServerError);
+        this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.model.get('graders').on('remove', this.render, this);
         this.model.get('graders').on('reset', this.render, this);
         this.model.get('graders').on('add', this.render, this);
@@ -316,7 +317,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
         'blur :input' : "inputUnfocus"
     },
     initialize : function() {
-        this.model.on('error', this.handleValidationError, this);
+        this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
         this.render();
     },

@@ -3,7 +3,8 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     // decorates the fields. Needs wiring per class, but this initialization shows how 
     // either have your init call this one or copy the contents
     initialize : function() {
-        this.model.on('error', this.handleValidationError, this);
+        this.listenTo(this.model, 'error', CMS.ServerError);
+        this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
     },
 
@@ -18,20 +19,11 @@ CMS.Views.ValidatingView = Backbone.View.extend({
         // which may be the subjects of validation errors
     },
     _cacheValidationErrors : [],
+
     handleValidationError : function(model, error) {
-        // error triggered either by validation or server error
         // error is object w/ fields and error strings
         for (var field in error) {
             var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);
-            if (ele.length === 0) {
-                // check if it might a server error: note a typo in the field name 
-                // or failure to put in a map may cause this to muffle validation errors
-                if (_.has(error, 'error') && _.has(error, 'responseText')) {
-                    CMS.ServerError(model, error);
-                    return;
-                }
-                else continue;
-            }
             this._cacheValidationErrors.push(ele);
             if ($(ele).is('div')) {
                 // put error on the contained inputs
