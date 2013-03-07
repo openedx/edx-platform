@@ -317,6 +317,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
         'blur :input' : "inputUnfocus"
     },
     initialize : function() {
+        this.listenTo(this.model, 'error', CMS.ServerError);
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
         this.render();
