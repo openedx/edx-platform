@@ -130,7 +130,7 @@ def save_scores(user, puzzle_scores):
                 current_score=current_score,
                 best_score=best_score,
                 score_version=score_version)
-            obj.save()
+        obj.save()
 
         score_responses.append({'PuzzleID': puzzle_id,
                                 'Status': 'Success'})
