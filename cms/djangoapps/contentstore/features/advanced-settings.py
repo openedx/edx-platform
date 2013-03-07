@@ -146,12 +146,16 @@ def create_entry(key, value):
     new_key_css = 'div#__new_advanced_key__ input'
     new_key_element = css_find(new_key_css).first
     new_key_element.fill(key)
-#   For some reason have to get the instance for each command (get error that it is no longer attached to the DOM)
-#   Have to do all this because Selenium has a bug that fill does not remove existing text
+#   For some reason have to get the instance for each command 
+#   (get error that it is no longer attached to the DOM)
+#   Have to do all this because Selenium fill does not remove existing text
     new_value_css = 'div.CodeMirror textarea'
     css_find(new_value_css).last.fill("")
     css_find(new_value_css).last._element.send_keys(Keys.DELETE, Keys.DELETE)
     css_find(new_value_css).last.fill(value)
+    # Add in a TAB key press because intermittently on ubuntu the
+    # last character of "value" above was not getting typed in
+    css_find(new_value_css).last._element.send_keys(Keys.TAB)
 
 
 def delete_entry(index):
