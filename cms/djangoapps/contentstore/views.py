@@ -534,7 +534,7 @@ def get_preview_module(request, preview_id, descriptor):
     preview_id (str): An identifier specifying which preview this module is used for
     location: A Location
     """
-    descriptor = modulestore().get_item(location)
+    
     return load_preview_module(request, preview_id, descriptor)
 
 
