@@ -120,7 +120,8 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.sql.SQLDebugPanel',
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
-    'debug_toolbar_mongo.panel.MongoDebugPanel',
+#   This is breaking Mongo updates-- Christina is investigating.
+#   'debug_toolbar_mongo.panel.MongoDebugPanel',
 
     #  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
     #  Django=1.3.1/1.4 where requests to views get duplicated (your method gets
@@ -135,4 +136,4 @@ DEBUG_TOOLBAR_CONFIG = {
 
 # To see stacktraces for MongoDB queries, set this to True.
 # Stacktraces slow down page loads drastically (for pages with lots of queries).
-DEBUG_TOOLBAR_MONGO_STACKTRACES = False
+# DEBUG_TOOLBAR_MONGO_STACKTRACES = False
