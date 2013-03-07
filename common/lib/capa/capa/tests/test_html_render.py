@@ -11,6 +11,20 @@ from . import test_system
 
 class CapaHtmlRenderTest(unittest.TestCase):
 
+    def test_blank_problem(self):
+        """
+        It's important that blank problems don't break, since that's
+        what you start with in studio.
+        """
+        xml_str = "<problem> </problem>"
+
+        # Create the problem
+        problem = LoncapaProblem(xml_str, '1', system=test_system)
+
+        # Render the HTML
+        rendered_html = etree.XML(problem.get_html())
+        # expect that we made it here without blowing up
+
     def test_include_html(self):
         # Create a test file to include
         self._create_test_file('test_include.xml',
@@ -25,7 +39,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Create the problem
         problem = LoncapaProblem(xml_str, '1', system=test_system)
-    
+
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
@@ -45,7 +59,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Create the problem
         problem = LoncapaProblem(xml_str, '1', system=test_system)
-    
+
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
@@ -64,7 +78,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Create the problem
         problem = LoncapaProblem(xml_str, '1', system=test_system)
-    
+
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
@@ -99,11 +113,11 @@ class CapaHtmlRenderTest(unittest.TestCase):
         response_element = rendered_html.find("span")
         self.assertEqual(response_element.tag, "span")
 
-        # Expect that the response <span> 
+        # Expect that the response <span>
         # that contains a <div> for the textline
         textline_element = response_element.find("div")
         self.assertEqual(textline_element.text, 'Input Template Render')
-        
+
         # Expect a child <div> for the solution
         # with the rendered template
         solution_element = rendered_html.find("div")
@@ -112,14 +126,14 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect that the template renderer was called with the correct
         # arguments, once for the textline input and once for
         # the solution
-        expected_textline_context = {'status': 'unsubmitted', 
-                                        'value': '', 
-                                        'preprocessor': None, 
-                                        'msg': '', 
-                                        'inline': False, 
-                                        'hidden': False, 
-                                        'do_math': False, 
-                                        'id': '1_2_1', 
+        expected_textline_context = {'status': 'unsubmitted',
+                                        'value': '',
+                                        'preprocessor': None,
+                                        'msg': '',
+                                        'inline': False,
+                                        'hidden': False,
+                                        'do_math': False,
+                                        'id': '1_2_1',
                                         'size': None}
 
         expected_solution_context = {'id': '1_solution_1'}
@@ -148,7 +162,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Create the problem and render the html
         problem = LoncapaProblem(xml_str, '1', system=test_system)
-        
+
         # Grade the problem
         correctmap = problem.grade_answers({'1_2_1': 'test'})
 

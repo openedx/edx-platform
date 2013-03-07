@@ -44,7 +44,7 @@ class CapaFactory(object):
     @staticmethod
     def answer_key():
         """ Return the key stored in the capa problem answer dict """
-        return ("-".join(['i4x', 'edX', 'capa_test', 'problem', 
+        return ("-".join(['i4x', 'edX', 'capa_test', 'problem',
                         'SampleProblem%d' % CapaFactory.num]) +
                 "_2_1")
 
@@ -142,6 +142,8 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(module.get_score()['score'], 0)
         self.assertNotEqual(module.url_name, other_module.url_name,
                             "Factory should be creating unique names for each problem")
+
+
 
 
     def test_correct(self):
@@ -332,7 +334,7 @@ class CapaModuleTest(unittest.TestCase):
                         'input_4': None,
                         'input_5': [],
                         'input_6': 5}
-        
+
         result = CapaModule.make_dict_of_responses(valid_get_dict)
 
         # Expect that we get a dict with "input" stripped from key names
@@ -475,7 +477,7 @@ class CapaModuleTest(unittest.TestCase):
 
             mock_is_queued.return_value = True
             mock_get_queuetime.return_value = datetime.datetime.now()
-        
+
             get_request_dict = { CapaFactory.input_key(): '3.14' }
             result = module.check_problem(get_request_dict)
 
@@ -506,7 +508,7 @@ class CapaModuleTest(unittest.TestCase):
     def test_reset_problem(self):
         module = CapaFactory.create()
 
-        # Mock the module's capa problem 
+        # Mock the module's capa problem
         # to simulate that the problem is done
         mock_problem = MagicMock(capa.capa_problem.LoncapaProblem)
         mock_problem.done = True
@@ -668,7 +670,7 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(max_attempts=0)
         self.assertFalse(module.should_show_check_button())
 
-        # If user submitted a problem but hasn't reset, 
+        # If user submitted a problem but hasn't reset,
         # do NOT show the check button
         # Note:  we can only reset when rerandomize="always"
         module = CapaFactory.create(rerandomize="always")
@@ -707,7 +709,7 @@ class CapaModuleTest(unittest.TestCase):
         module.lcp.done = True
         self.assertFalse(module.should_show_reset_button())
 
-        # If the user hasn't submitted an answer yet, 
+        # If the user hasn't submitted an answer yet,
         # then do NOT show the reset button
         module = CapaFactory.create()
         module.lcp.done = False
@@ -770,7 +772,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # If the user is out of attempts, do NOT show the save button
         attempts = random.randint(1,10)
-        module = CapaFactory.create(attempts=attempts, 
+        module = CapaFactory.create(attempts=attempts,
                                     max_attempts=attempts,
                                     force_save_button="true")
         module.lcp.done = True
@@ -783,6 +785,12 @@ class CapaModuleTest(unittest.TestCase):
                                     rerandomize="always")
         module.lcp.done = True
         self.assertTrue(module.should_show_save_button())
+
+    def test_no_max_attempts(self):
+        module = CapaFactory.create(max_attempts='')
+        html = module.get_problem_html()
+        # assert that we got here without exploding
+
 
     def test_get_problem_html(self):
         module = CapaFactory.create()
@@ -797,7 +805,7 @@ class CapaModuleTest(unittest.TestCase):
         module.should_show_reset_button = Mock(return_value=show_reset_button)
         module.should_show_save_button = Mock(return_value=show_save_button)
 
-        # Mock the system rendering function 
+        # Mock the system rendering function
         module.system.render_template = Mock(return_value="<div>Test Template HTML</div>")
 
         # Patch the capa problem's HTML rendering
@@ -809,7 +817,7 @@ class CapaModuleTest(unittest.TestCase):
 
             # Also render the problem encapsulated in a <div>
             html_encapsulated = module.get_problem_html(encapsulate=True)
-            
+
         # Expect that we get the rendered template back
         self.assertEqual(html, "<div>Test Template HTML</div>")
 
@@ -831,7 +839,7 @@ class CapaModuleTest(unittest.TestCase):
 
 
     def test_get_problem_html_error(self):
-        """ 
+        """
         In production, when an error occurs with the problem HTML
         rendering, a "dummy" problem is created with an error
         message to display to the user.
@@ -845,10 +853,10 @@ class CapaModuleTest(unittest.TestCase):
         # is asked to render itself as HTML
         module.lcp.get_html = Mock(side_effect=Exception("Test"))
 
-        # Stub out the test_system rendering function 
+        # Stub out the test_system rendering function
         module.system.render_template = Mock(return_value="<div>Test Template HTML</div>")
 
-        # Turn off DEBUG 
+        # Turn off DEBUG
         module.system.DEBUG = False
 
         # Try to render the module with DEBUG turned off
@@ -860,4 +868,4 @@ class CapaModuleTest(unittest.TestCase):
         self.assertTrue("error" in context['problem']['html'])
 
         # Expect that the module has created a new dummy problem with the error
-        self.assertNotEqual(original_problem, module.lcp) 
+        self.assertNotEqual(original_problem, module.lcp)
