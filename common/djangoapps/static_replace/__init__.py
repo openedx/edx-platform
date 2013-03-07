@@ -84,12 +84,15 @@ def replace_static_urls(text, data_directory, course_namespace=None):
         if rest.endswith('?raw'):
             return original
 
-        # course_namespace is not None, then use studio style urls
-        if course_namespace is not None and not isinstance(modulestore(), XMLModuleStore):
-            url = StaticContent.convert_legacy_static_url(rest, course_namespace)
         # In debug mode, if we can find the url as is,
-        elif settings.DEBUG and finders.find(rest, True):
+        if settings.DEBUG and finders.find(rest, True):
             return original
+        # course_namespace is not None, then use studio style urls
+        elif  course_namespace is not None and not isinstance(modulestore(), XMLModuleStore):
+            if staticfiles_storage.exists(rest):
+                url = staticfiles_storage.url(rest)
+            else:
+                url = StaticContent.convert_legacy_static_url(rest, course_namespace)
         # Otherwise, look the file up in staticfiles_storage, and append the data directory if needed
         else:
             course_path = "/".join((data_directory, rest))
