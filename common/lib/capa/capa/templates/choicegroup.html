@@ -1,6 +1,6 @@
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
     <div class="indicator_container">
-    % if input_type == 'checkbox':
+    % if input_type == 'checkbox' or not value:
         % if status == 'unsubmitted':
         <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
         % elif status == 'correct': 
