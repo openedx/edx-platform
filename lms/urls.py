@@ -3,6 +3,9 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
+
+from . import one_time_startup
+
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:

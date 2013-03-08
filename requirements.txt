@@ -58,3 +58,4 @@ ipython==0.13.1
 xmltodict==0.4.1
 paramiko==1.9.0
 Pillow==1.7.8
+dogapi==1.2.1
