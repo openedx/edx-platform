@@ -178,6 +178,7 @@ class CourseDescriptor(SequenceDescriptor):
     remote_gradebook = Object(scope=Scope.settings, default={})
     allow_anonymous = Boolean(scope=Scope.settings, default=True)
     allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
+    advanced_modules = List(help="Beta modules used in your course", default=[], scope=Scope.settings)
     has_children = True
 
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')

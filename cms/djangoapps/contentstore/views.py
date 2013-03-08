@@ -297,8 +297,7 @@ def edit_unit(request, location):
     # Check if there are any advanced modules specified in the course policy. These modules
     # should be specified as a list of strings, where the strings are the names of the modules
     # in ADVANCED_COMPONENT_TYPES that should be enabled for the course.
-    course_metadata = CourseMetadata.fetch(course.location)
-    course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, [])
+    course_advanced_keys = course.advanced_modules
 
     # Set component types according to course policy file
     component_types = list(COMPONENT_TYPES)
