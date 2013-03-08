@@ -195,7 +195,7 @@ def initialize_discussion_info(course):
         sort_key = module.sort_key
         category = " / ".join([x.strip() for x in category.split("/")])
         last_category = category.split("/")[-1]
-        discussion_id_map[id] = {"location": location, "title": last_category + " / " + title}
+        discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
         unexpanded_category_map[category].append({"title": title, "id": id,
             "sort_key": sort_key, "start_date": module.lms.start})
 

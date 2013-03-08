@@ -3,18 +3,20 @@ from lettuce.django import django_url
 from nose.tools import assert_true
 from nose.tools import assert_equal
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 from terrain.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from terrain.factories import CourseFactory, GroupFactory
-import xmodule.modulestore.django
+from xmodule.modulestore.django import _MODULESTORES, modulestore
+from xmodule.templates import update_templates
 from auth.authz import get_user_by_email
 
 from logging import getLogger
 logger = getLogger(__name__)
 
 ###########  STEP HELPERS ##############
-
-
 @step('I (?:visit|access|open) the Studio homepage$')
 def i_visit_the_studio_homepage(step):
     # To make this go to port 8001, put
@@ -52,9 +54,8 @@ def i_have_opened_a_new_course(step):
     log_into_studio()
     create_a_course()
 
+
 ####### HELPER FUNCTIONS ##############
-
-
 def create_studio_user(
         uname='robot',
         email='robot+studio@edx.org',
@@ -83,9 +84,9 @@ def flush_xmodule_store():
     # (though it shouldn't), do this manually
     # from the bash shell to drop it:
     # $ mongo test_xmodule --eval "db.dropDatabase()"
-    xmodule.modulestore.django._MODULESTORES = {}
-    xmodule.modulestore.django.modulestore().collection.drop()
-    xmodule.templates.update_templates()
+    _MODULESTORES = {}
+    modulestore().collection.drop()
+    update_templates()
 
 
 def assert_css_with_text(css, text):
@@ -94,8 +95,16 @@ def assert_css_with_text(css, text):
 
 
 def css_click(css):
-    assert_true(world.browser.is_element_present_by_css(css, 5))
-    world.browser.find_by_css(css).first.click()
+    '''
+    First try to use the regular click method, 
+    but if clicking in the middle of an element
+    doesn't work it might be that it thinks some other
+    element is on top of it there so click in the upper left
+    '''
+    try:
+        css_find(css).first.click()
+    except WebDriverException, e:
+        css_click_at(css)
 
 
 def css_click_at(css, x=10, y=10):
@@ -103,8 +112,7 @@ def css_click_at(css, x=10, y=10):
     A method to click at x,y coordinates of the element
     rather than in the center of the element
     '''
-    assert_true(world.browser.is_element_present_by_css(css, 5))
-    e = world.browser.find_by_css(css).first
+    e = css_find(css).first
     e.action_chains.move_to_element_with_offset(e._element, x, y)
     e.action_chains.click()
     e.action_chains.perform()
@@ -115,11 +123,16 @@ def css_fill(css, value):
 
 
 def css_find(css):
+    def is_visible(driver):
+        return EC.visibility_of_element_located((By.CSS_SELECTOR,css,))
+
+    assert_true(world.browser.is_element_present_by_css(css, 5))
+    wait_for(is_visible)
     return world.browser.find_by_css(css)
 
 
 def wait_for(func):
-    WebDriverWait(world.browser.driver, 10).until(func)
+    WebDriverWait(world.browser.driver, 5).until(func)
 
 
 def id_find(id):

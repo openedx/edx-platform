@@ -75,6 +75,11 @@ class SequenceModule(XModule):
         raise NotFoundError('Unexpected dispatch type')
 
     def render(self):
+        # If we're rendering this sequence, but no position is set yet,
+        # default the position to the first element
+        if self.position is None:
+            self.position = 1
+
         if self.rendered:
             return
         ## Returns a set of all types of all sub-children

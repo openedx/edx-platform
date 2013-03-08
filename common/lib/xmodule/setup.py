@@ -48,6 +48,7 @@ setup(
             "about = xmodule.html_module:AboutDescriptor",
             "wrapper = xmodule.wrapper_module:WrapperDescriptor",
             "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
+            "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
             "foldit = xmodule.foldit_module:FolditDescriptor",
          ]
     }

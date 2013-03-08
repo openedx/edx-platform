@@ -389,7 +389,11 @@ class XmlDescriptor(XModuleDescriptor):
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
                 #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
-                xml_object.set(attr, val)
+                try:
+                    xml_object.set(attr, val)
+                except Exception, e:
+                    logging.exception('Failed to serialize metadata attribute {0} with value {1}. This could mean data loss!!!  Exception: {2}'.format(attr, val, e))
+                    pass
 
         for key, value in self.xml_attributes.items():
             if key not in self.metadata_to_strip:

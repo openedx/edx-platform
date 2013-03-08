@@ -4,9 +4,6 @@ This config file runs the simplest dev environment"""
 from .common import *
 from logsettings import get_logger_config
 
-import logging
-import sys
-
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
@@ -107,3 +104,36 @@ CACHE_TIMEOUT = 0
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+################################ DEBUG TOOLBAR #################################
+INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
+MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
+                       'debug_toolbar.middleware.DebugToolbarMiddleware',)
+INTERNAL_IPS = ('127.0.0.1',)
+
+DEBUG_TOOLBAR_PANELS = (
+    'debug_toolbar.panels.version.VersionDebugPanel',
+    'debug_toolbar.panels.timer.TimerDebugPanel',
+    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderDebugPanel',
+    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+    'debug_toolbar.panels.sql.SQLDebugPanel',
+    'debug_toolbar.panels.signals.SignalDebugPanel',
+    'debug_toolbar.panels.logger.LoggingPanel',
+#   This is breaking Mongo updates-- Christina is investigating.
+#   'debug_toolbar_mongo.panel.MongoDebugPanel',
+
+    #  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
+    #  Django=1.3.1/1.4 where requests to views get duplicated (your method gets
+    #  hit twice). So you can uncomment when you need to diagnose performance
+    #  problems, but you shouldn't leave it on.
+    #  'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+    )
+
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False
+}
+
+# To see stacktraces for MongoDB queries, set this to True.
+# Stacktraces slow down page loads drastically (for pages with lots of queries).
+# DEBUG_TOOLBAR_MONGO_STACKTRACES = False

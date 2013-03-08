@@ -83,8 +83,57 @@ the slider.
 If no targets are provided, then a draggable can be dragged and placed anywhere
 on the base image.
 
-correct answer format
+Targets on draggables
 ---------------------
+
+Sometimes it is not enough to have targets only on the base image, and all of the
+draggables on these targets. If a complex problem exists where a draggable must
+become itself a target (or many targets), then the following extended syntax
+can be used: ::
+
+    <draggable {attribute list}>
+        <target {attribute list} />
+        <target {attribute list} />
+        <target {attribute list} />
+        ...
+    </draggable>
+
+The attribute list in the tags above ('draggable' and 'target') is the same as for
+normal 'draggable' and 'target' tags. The only difference is when you will be
+specifying inner target position coordinates. Using the 'x' and 'y' attributes you
+are setting the offset of the inner target from the upper-left corner of the
+parent draggable (that contains the inner target).
+
+Limitations of targets on draggables
+------------------------------------
+
+1.) Currently there is a limitation to the level of nesting of targets.
+
+Even though you can pile up a large number of draggables on targets that themselves
+are on draggables, the Drag and Drop instance will be graded only in the case if
+there is a maximum of two levels of targets. The first level are the "base" targets.
+They are attached to the base image. The second level are the targets defined on
+draggables.
+
+2.) Another limitation is that the target bounds are not checked against
+other targets.
+
+For now, it is the responsibility of the person who is constructing the course
+material to make sure that there is no overlapping of targets. It is also preferable
+that targets on draggables are smaller than the actual parent draggable. Technically
+this is not necessary, but from the usability perspective it is desirable.
+
+3.) You can have targets on draggables only in the case when there are base targets
+defined (base targets are attached to the base image).
+
+If you do not have base targets, then you can only have a single level of nesting
+(draggables on the base image). In this case the client side will be reporting (x,y)
+positions of each draggables on the base image.
+
+Correct answer format
+---------------------
+
+(NOTE: For specifying answers for targets on draggables please see next section.)
 
 There are two correct answer formats: short and long
 If short from correct answer is mapping of 'draggable_id' to 'target_id'::
@@ -180,7 +229,7 @@ Rules are: exact, anyof, unordered_equal, anyof+number, unordered_equal+number
             'rule': 'unordered_equal'
         }]
 
-- And sometimes you want to allow drag only two 'b' draggables, in these case you sould use 'anyof+number' of 'unordered_equal+number' rule::
+- And sometimes you want to allow drag only two 'b' draggables, in these case you should use 'anyof+number' of 'unordered_equal+number' rule::
 
     correct_answer = [
         {
@@ -204,6 +253,54 @@ for same number of draggables, anyof is equal to unordered_equal
 
 If we have can_reuse=true, than one must use only long form of correct answer.
 
+Answer format for targets on draggables
+---------------------------------------
+
+As with the cases described above, an answer must provide precise positioning for
+each draggable (on which targets it must reside). In the case when a draggable must
+be placed on a target that itself is on a draggable, then the answer must contain
+the chain of target-draggable-target. It is best to understand this on an example.
+
+Suppose we have three draggables - 'up', 's', and 'p'. Draggables 's', and 'p' have targets
+on themselves. More specifically, 'p' has three targets - '1', '2', and '3'. The first
+requirement is that 's', and 'p' are positioned on specific targets on the base image.
+The second requirement is that draggable 'up' is positioned on specific targets of
+draggable 'p'. Below is an excerpt from a problem.::
+
+    <draggable id="up" icon="/static/images/images_list/lcao-mo/up.png" can_reuse="true" />
+
+    <draggable id="s" icon="/static/images/images_list/lcao-mo/orbital_single.png" label="s orbital" can_reuse="true" >
+        <target id="1" x="0" y="0" w="32" h="32"/>
+    </draggable>
+
+    <draggable id="p" icon="/static/images/images_list/lcao-mo/orbital_triple.png" can_reuse="true" label="p orbital" >
+        <target id="1" x="0" y="0" w="32" h="32"/>
+        <target id="2" x="34" y="0" w="32" h="32"/>
+        <target id="3" x="68" y="0" w="32" h="32"/>
+    </draggable>
+
+    ...
+
+    correct_answer = [
+        {
+            'draggables': ['p'],
+            'targets': ['p-left-target', 'p-right-target'],
+            'rule': 'unordered_equal'
+        },
+        {
+            'draggables': ['s'],
+            'targets': ['s-left-target', 's-right-target'],
+            'rule': 'unordered_equal'
+        },
+        {
+            'draggables': ['up'],
+            'targets': ['p-left-target[p][1]', 'p-left-target[p][2]', 'p-right-target[p][2]', 'p-right-target[p][3]',],
+            'rule': 'unordered_equal'
+        }
+    ]
+
+Note that it is a requirement to specify rules for all draggables, even if some draggable gets included
+in more than one chain.
 
 Grading logic
 -------------
@@ -321,3 +418,8 @@ Draggables can be reused
 ------------------------
 
 .. literalinclude:: drag-n-drop-demo2.xml
+
+Examples of targets on draggables
+------------------------
+
+.. literalinclude:: drag-n-drop-demo3.xml

@@ -11,9 +11,14 @@
         }
 
         prev_id = "#" + this.id + "_preview";
-        preview_div = $(prev_id)
+        preview_div = $(prev_id);
 
-        $.get("/preview/chemcalc/", {"formula" : this.value}, create_handler(preview_div));
+        // find the closest parent problems-wrapper and use that url
+        url = $(this).closest('.problems-wrapper').data('url');
+        // grab the input id from the input
+        input_id = $(this).data('input-id')
+
+        Problem.inputAjax(url, input_id, 'preview_chemcalc', {"formula" : this.value}, create_handler(preview_div));
     }
 
     inputs = $('.chemicalequationinput input');

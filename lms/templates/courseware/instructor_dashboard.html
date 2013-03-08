@@ -57,9 +57,9 @@ function goto( mode)
   <section class="instructor-dashboard-content">
     <h1>Instructor Dashboard</h1>
 
-    <h2>[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> | 
+    <h2>[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
-            <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> | 
+            <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> |
           %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> |
@@ -75,7 +75,7 @@ function goto( mode)
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
     <input type="hidden" name="idash_mode" value="">
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Grades'):
 
     %if offline_grade_log:
@@ -111,9 +111,9 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
-  
+
     <%
-        rg = course.metadata.get('remote_gradebook',{})
+        rg = course.remote_gradebook
     %>
 
     <h3>Export grades to remote gradebook</h3>
@@ -157,7 +157,7 @@ function goto( mode)
 
  %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Psychometrics'):
 
     <p>Select a problem and an action:
@@ -178,7 +178,7 @@ function goto( mode)
 
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
   %if instructor_access:
     <hr width="40%" style="align:left">
@@ -208,7 +208,7 @@ function goto( mode)
   %endif
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Forum Admin'):
   %if instructor_access:
     <hr width="40%" style="align:left">
@@ -225,7 +225,7 @@ function goto( mode)
     <input type="submit" name="action" value="List course forum moderators">
     <input type="submit" name="action" value="List course forum community TAs">
     <p>
-    <input type="text" name="forummoderator"> 
+    <input type="text" name="forummoderator">
     <input type="submit" name="action" value="Remove forum moderator">
     <input type="submit" name="action" value="Add forum moderator">
     <input type="submit" name="action" value="Remove forum community TA">
@@ -236,7 +236,7 @@ function goto( mode)
   %endif
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Enrollment'):
 
     <hr width="40%" style="align:left">
@@ -249,9 +249,9 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
-  
+
     <%
-        rg = course.metadata.get('remote_gradebook',{})
+        rg = course.remote_gradebook
     %>
 
     <p>Pull enrollment from remote gradebook</p>
@@ -264,7 +264,7 @@ function goto( mode)
     <input type="submit" name="action" value="Overload enrollment list using remote gradebook">
     <input type="submit" name="action" value="Merge enrollment list with remote gradebook">
     <hr width="40%" style="align:left">
-  
+
   %endif
 
   <p>Add students: enter emails, separated by new lines or commas;</p>
@@ -273,21 +273,21 @@ function goto( mode)
 
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 
 %if modeflag.get('Data'):
     <hr width="40%" style="align:left">
     <p>
     <input type="submit" name="action" value="Download CSV of all student profile data">
     </p>
-    <p> Problem urlname: 
+    <p> Problem urlname:
         <input type="text" name="problem_to_dump" size="40">
         <input type="submit" name="action" value="Download CSV of all responses to problem">
     </p>
     <hr width="40%" style="align:left">
 %endif
-  
-##----------------------------------------------------------------------------- 
+
+##-----------------------------------------------------------------------------
 
 %if modeflag.get('Manage Groups'):
   %if instructor_access:
@@ -313,12 +313,12 @@ function goto( mode)
 %endif
 
     </form>
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 
 %if msg:
     <p></p><p>${msg}</p>
 %endif
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 
 %if datatable and modeflag.get('Psychometrics') is None:
 
@@ -344,7 +344,7 @@ function goto( mode)
     </p>
 %endif
 
-##-----------------------------------------------------------------------------  
+##-----------------------------------------------------------------------------
 %if modeflag.get('Psychometrics'):
 
     %for plot in plots:
@@ -365,12 +365,12 @@ function goto( mode)
     %endfor
 
 %endif
- 
-##-----------------------------------------------------------------------------  
+
+##-----------------------------------------------------------------------------
 ## always show msg
 
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
  % if course_errors is not UNDEFINED:
     <h2>Course errors</h2>
@@ -392,7 +392,7 @@ function goto( mode)
       %endif
       </div>
   % endif
-%endif      
+%endif
 
   </section>
 </div>

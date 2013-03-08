@@ -97,6 +97,7 @@ class FolditModule(XModule):
 
         showbasic = (self.show_basic_score.lower() == "true")
         showleader = (self.show_leaderboard.lower() == "true")
+
         context = {
             'due': self.due,
             'success': self.is_complete(),

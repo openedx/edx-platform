@@ -175,7 +175,7 @@ class CourseDescriptor(SequenceDescriptor):
     no_grade = Boolean(help="True if this course isn't graded", default=False, scope=Scope.settings)
     disable_progress_graph = Boolean(help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
     pdf_textbooks = List(help="List of dictionaries containing pdf_textbook configuration", default=None, scope=Scope.settings)
-    remote_gradebook = String(scope=Scope.settings, default='')
+    remote_gradebook = Object(scope=Scope.settings, default={})
     allow_anonymous = Boolean(scope=Scope.settings, default=True)
     allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
     has_children = True

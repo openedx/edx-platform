@@ -56,6 +56,9 @@ class ConditionalModuleTest(unittest.TestCase):
         '''Get a dummy system'''
         return DummySystem(load_error_modules)
 
+    def setUp(self):
+        self.test_system = test_system()
+
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
         print "Importing {0}".format(name)
@@ -80,7 +83,7 @@ class ConditionalModuleTest(unittest.TestCase):
                 location = descriptor
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
             location = descriptor.location
-            return descriptor.xmodule(test_system)
+            return descriptor.xmodule(self.test_system)
 
         # edx - HarvardX
         # cond_test - ER22x
@@ -88,8 +91,8 @@ class ConditionalModuleTest(unittest.TestCase):
 
         def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
             return text
-        test_system.replace_urls = replace_urls
-        test_system.get_module = inner_get_module
+        self.test_system.replace_urls = replace_urls
+        self.test_system.get_module = inner_get_module
 
         module = inner_get_module(location)
         print "module: ", module
