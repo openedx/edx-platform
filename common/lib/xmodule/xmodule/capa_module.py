@@ -29,9 +29,21 @@ class StringyInteger(Integer):
     A model type that converts from strings to integers when reading from json
     """
     def from_json(self, value):
-        if isinstance(value, basestring):
+        try:
             return int(value)
-        return value
+        except:
+            return value
+
+
+class StringyFloat(Float):
+    """
+    A model type that converts from string to floats when reading from json
+    """
+    def from_json(self, value):
+        try:
+            return float(value)
+        except:
+            return value
 
 
 # Generated this many different variants of problems with rerandomize=per_student
@@ -781,7 +793,7 @@ class CapaDescriptor(RawDescriptor):
 
     module_class = CapaModule
 
-    weight = Float(help="How much to weight this problem by", scope=Scope.settings)
+    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
     markdown = String(help="Markdown source of this module", scope=Scope.settings, default='')
 
     stores_state = True
