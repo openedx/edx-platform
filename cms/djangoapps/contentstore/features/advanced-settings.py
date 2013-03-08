@@ -97,7 +97,12 @@ def i_see_only_display_name(step):
 
 @step('there are no advanced policy settings$')
 def no_policy_settings(step):
-    assert_policy_entries([], [])
+    keys_css = 'input.policy-key'
+    val_css = 'textarea.json'
+    k = world.browser.is_element_not_present_by_css(keys_css, 5)
+    v = world.browser.is_element_not_present_by_css(val_css, 5)
+    assert_true(k)
+    assert_true(v)
 
 
 @step('they are alphabetized$')
@@ -170,8 +175,8 @@ def delete_entry(index):
 
 
 def assert_policy_entries(expected_keys, expected_values):
-    assert_entries('.key input', expected_keys)
-    assert_entries('.json', expected_values)
+    assert_entries('.key input.policy-key', expected_keys)
+    assert_entries('textarea.json', expected_values)
 
 
 def assert_entries(css, expected_values):
