@@ -69,7 +69,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
                                'staff_access': staff_access})
 
 @login_required
-def html_index(request, course_id, book_index, chapter=None, page=None):
+def html_index(request, course_id, book_index, chapter=None, anchor_id=None):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
@@ -99,5 +99,5 @@ def html_index(request, course_id, book_index, chapter=None, page=None):
                                'course': course,
                                'textbook': textbook,
                                'chapter': chapter,
-                               'page': page,
+                               'anchor_id': anchor_id,
                                'staff_access': staff_access})

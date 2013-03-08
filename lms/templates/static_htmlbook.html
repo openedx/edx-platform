@@ -27,35 +27,22 @@
             chapterToLoad = options.chapterNum;
         }
         var anchorToLoad = null;
-
-        loadUrlAsIframe = function htmlViewLoadUrlAsIframe(url, anchorId) {
-            if (anchorId != null) {
-                var newurl = url + "#" + anchorId;
-                $("#bookpage").src = newurl;
-            } else {
-                // $("#bookpage").src = url;
-                // $("#bookpage").append("<iframe seamless id="bookpage-iframe" src=" + url + "\"></iframe>")
-                parentElement = document.getElementById('bookpage');
-                while (parentElement.hasChildNodes())
-                    parentElement.removeChild(parentElement.lastChild);
-
-                $('<iframe id="bookpage-iframe" src="' + url + '"></iframe>"')
-                    // .css({'height':'40px','width':'200px'})
-                    .appendTo('#bookpage');
-            }
-        }; 
+        if (options.chapters) {
+            anchorToLoad = options.anchor_id;
+        }
 
         loadUrl = function htmlViewLoadUrl(url, anchorId) {
-            var newurl = url;
-            if (anchorId != null) {
-                newurl = url + "#" + anchorId;
-            } 
             // clear out previous load, if any:
             parentElement = document.getElementById('bookpage');
             while (parentElement.hasChildNodes())
                 parentElement.removeChild(parentElement.lastChild);
+	    // load new URL in:
+            $('#bookpage').load(url);
 
-            $('#bookpage').load(newurl);
+	    // if there is an anchor set, then go to that location:
+            if (anchorId != null) {
+		// TODO: add implementation....
+            } 
 
         }; 
 
@@ -104,6 +91,9 @@
         %endif
         %if chapter is not None:
             options.chapterNum = ${chapter};
+        %endif
+        %if anchor_id is not None:
+            options.anchor_id = ${anchor_id};
         %endif
 
         $('#outerContainer').myHTMLViewer(options);
