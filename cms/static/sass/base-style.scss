@@ -1,39 +1,49 @@
+// studio - css architecture
+// ====================
+
+// bourbon libs and resets
 @import 'bourbon/bourbon';
 @import 'bourbon/addons/button';
 @import 'vendor/normalize';
-@import 'keyframes';
-
 @import 'reset';
-@import 'mixins';
 
-@import "fonts";
+// utilities
+@import 'mixins';
 @import "variables";
 @import "cms_mixins";
-@import "extends";
+
+// assets
+@import "assets/fonts";
+@import "assets/graphics";
+@import 'assets/keyframes';
+
+// base
 @import "base";
-@import "header";
-@import "footer";
-@import "dashboard";
-@import "courseware";
-@import "subsection";
-@import "unit";
-@import "assets";
-@import "static-pages";
-@import "users";
-@import "import";
-@import "export";
-@import "settings";
-@import "course-info";
-@import "landing";
-@import "graphics";
-@import "modal";
-@import "alerts";
-@import "login";
-@import "account";
-@import "index";
-@import 'jquery-ui-calendar';
 
-@import 'content-types';
+// elements
+@import "elements/header";
+@import "elements/footer";
+@import "elements/navigation";
+@import "elements/modal";
+@import "elements/alerts";
+@import 'elements/jquery-ui-calendar';
 
-@import 'module/module-styles.scss';
-@import 'descriptor/module-styles.scss';
+// specific views
+@import "views/account";
+@import "views/assets";
+@import "views/updates";
+@import "views/dashboard";
+@import "views/export";
+@import "views/index";
+@import "views/import";
+@import "views/outline";
+@import "views/settings";
+@import "views/static-pages";
+@import "views/subsection";
+@import "views/unit";
+@import "views/users";
+
+@import 'assets/content-types';
+
+@import 'xmodule/module/module-styles.scss';
+@import 'xmodule/descriptor/module-styles.scss';

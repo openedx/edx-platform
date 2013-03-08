@@ -1,4 +1,4 @@
-// studio base styling
+// studio - base styling
 // ====================
 
 // basic reset
@@ -9,7 +9,7 @@ html {
 
 body {
   @include font-size(16);
-  min-width: 980px;
+  min-width: $fg-min-width;
   background: $gray-l5;
   line-height: 1.6;
   color: $baseFontColor;
