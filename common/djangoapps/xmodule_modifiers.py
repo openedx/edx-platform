@@ -33,7 +33,7 @@ def wrap_xmodule(get_html, module, template, context=None):
     def _get_html():
         context.update({
             'content': get_html(),
-            'display_name': module.lms.display_name,
+            'display_name': module.display_name,
             'class_': module.__class__.__name__,
             'module_name': module.js_module_name
         })

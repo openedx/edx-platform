@@ -101,7 +101,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
                       section.url_name == active_section)
 
             if not section.lms.hide_from_toc:
-                sections.append({'display_name': section.lms.display_name,
+                sections.append({'display_name': section.display_name_with_default,
                                  'url_name': section.url_name,
                                  'format': section.lms.format,
                                  'due': section.lms.due,
@@ -109,7 +109,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
                                  'graded': section.lms.graded,
                                  })
 
-        chapters.append({'display_name': chapter.lms.display_name,
+        chapters.append({'display_name': chapter.display_name_with_default,
                          'url_name': chapter.url_name,
                          'sections': sections,
                          'active': chapter.url_name == active_chapter})

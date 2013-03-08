@@ -243,8 +243,8 @@ class ImportTestCase(BaseCourseTestCase):
         toy_ch = toy.get_children()[0]
         two_toys_ch = two_toys.get_children()[0]
 
-        self.assertEqual(toy_ch.lms.display_name, "Overview")
-        self.assertEqual(two_toys_ch.lms.display_name, "Two Toy Overview")
+        self.assertEqual(toy_ch.display_name, "Overview")
+        self.assertEqual(two_toys_ch.display_name, "Two Toy Overview")
 
         # Also check that the grading policy loaded
         self.assertEqual(two_toys.grade_cutoffs['C'], 0.5999)
@@ -303,7 +303,7 @@ class ImportTestCase(BaseCourseTestCase):
         cloc = course.location
         loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
         html = modulestore.get_instance(course_id, loc)
-        self.assertEquals(html.lms.display_name, "Toy lab")
+        self.assertEquals(html.display_name, "Toy lab")
 
     def test_url_name_mangling(self):
         """

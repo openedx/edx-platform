@@ -497,7 +497,7 @@ class MongoModuleStore(ModuleStoreBase):
                 existing_tabs = course.tabs or []
                 existing_tabs.append({
                     'type': 'static_tab',
-                    'name': item.lms.display_name,
+                    'name': item.display_name,
                     'url_slug': item.location.name
                 })
                 course.tabs = existing_tabs

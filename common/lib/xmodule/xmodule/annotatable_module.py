@@ -103,7 +103,7 @@ class AnnotatableModule(XModule):
     def get_html(self):
         """ Renders parameters to template. """
         context = {
-            'display_name': self.display_name,
+            'display_name': self.display_name_with_default,
             'element_id': self.element_id,
             'instructions_html': self.instructions,
             'content_html': self._render_content()

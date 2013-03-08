@@ -473,7 +473,7 @@ class XMLModuleStore(ModuleStoreBase):
                     if category == "static_tab":
                         for tab in course_descriptor.tabs or []:
                             if tab.get('url_slug') == slug:
-                                module.lms.display_name = tab['name']
+                                module.display_name = tab['name']
                     module.data_dir = course_dir
                     self.modules[course_descriptor.id][module.location] = module
                 except Exception, e:

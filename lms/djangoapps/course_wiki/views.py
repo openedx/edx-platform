@@ -95,7 +95,7 @@ def course_wiki_redirect(request, course_id):
             root,
             course_slug,
             title=course_slug,
-            content="This is the wiki for **{0}**'s _{1}_.".format(course.org, course.lms.display_name),
+            content="This is the wiki for **{0}**'s _{1}_.".format(course.org, course.display_name_with_default),
             user_message="Course page automatically created.",
             user=None,
             ip_address=None,

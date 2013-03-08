@@ -137,7 +137,7 @@ class VideoAlphaModule(XModule):
             'sub': self.sub,
             'sources': self.sources,
             'track': self.track,
-            'display_name': self.display_name,
+            'display_name': self.display_name_with_default,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': caption_asset_path,

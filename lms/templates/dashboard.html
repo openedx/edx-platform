@@ -216,7 +216,7 @@
               % endif
               </p>
               <h2 class="university">${get_course_about_section(course, 'university')}</h2>
-              <h3><a href="${course_target}">${course.number} ${course.lms.display_name}</a></h3>
+              <h3><a href="${course_target}">${course.number} ${course.display_name_with_default}</a></h3>
             </hgroup>
 
             <%

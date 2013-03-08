@@ -135,7 +135,7 @@ def index(request):
 
     return render_to_response('index.html', {
         'new_course_template': Location('i4x', 'edx', 'templates', 'course', 'Empty'),
-        'courses': [(course.lms.display_name,
+        'courses': [(course.display_name,
                     reverse('course_index', args=[
                         course.location.org,
                         course.location.course,
@@ -319,7 +319,7 @@ def edit_unit(request, location):
         if category in component_types:
             #This is a hack to create categories for different xmodules
             component_templates[category].append((
-                template.lms.display_name,
+                template.display_name_with_default,
                 template.location.url(),
                 hasattr(template, 'markdown') and template.markdown != '',
                 template.cms.empty,
@@ -534,7 +534,7 @@ def get_preview_module(request, preview_id, descriptor):
     preview_id (str): An identifier specifying which preview this module is used for
     location: A Location
     """
-    
+
     return load_preview_module(request, preview_id, descriptor)
 
 
@@ -757,7 +757,7 @@ def clone_item(request):
 
     # replace the display name with an optional parameter passed in from the caller
     if display_name is not None:
-        new_item.lms.display_name = display_name
+        new_item.display_name = display_name
 
     get_modulestore(template).update_metadata(new_item.location.url(), own_metadata(new_item))
 
@@ -978,7 +978,7 @@ def reorder_static_tabs(request):
     for tab in course.tabs:
         if tab['type'] == 'static_tab':
             reordered_tabs.append({'type': 'static_tab',
-                'name': tab_items[static_tab_idx].lms.display_name,
+                'name': tab_items[static_tab_idx].display_name,
                 'url_slug': tab_items[static_tab_idx].location.name})
             static_tab_idx += 1
         else:

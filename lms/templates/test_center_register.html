@@ -93,7 +93,7 @@
   <section class="introduction">
     <header>
       <hgroup>
-        <h2><a href="${reverse('dashboard')}">${get_course_about_section(course, 'university')} ${course.number} ${course.lms.display_name}</a></h2>
+        <h2><a href="${reverse('dashboard')}">${get_course_about_section(course, 'university')} ${course.number} ${course.display_name_with_default}</a></h2>
 
         % if registration:
         <h1>Your Pearson VUE Proctored Exam Registration</h1>
@@ -457,7 +457,7 @@
       % if exam_info is not None:
         <ul>
           <li>
-            <span class="label">Exam Name:</span> <span class="value">${exam_info.display_name}</span>
+            <span class="label">Exam Name:</span> <span class="value">${exam_info.display_name_with_default}</span>
           </li>
           <li>
             <span class="label">First Eligible Appointment Date:</span> <span class="value">${exam_info.first_eligible_appointment_date_text}</span>

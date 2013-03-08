@@ -12,12 +12,12 @@
         <h2 class="sr">Current Course:</h2>
         <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
         <span class="course-org">${ctx_loc.org}</span><span class="course-number">${ctx_loc.course}</span>
-        <span class="course-title" title="${context_course.lms.display_name}">${context_course.lms.display_name}</span>
+        <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
         </a>
       </div>
 
       <nav class="nav-course primary nav-dropdown" role="navigation">
-        <h2 class="sr">${context_course.lms.display_name}'s Navigation:</h2>
+        <h2 class="sr">${context_course.display_name_with_default}'s Navigation:</h2>
 
         <ol>
           <li class="nav-item nav-course-courseware">

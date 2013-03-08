@@ -178,9 +178,7 @@ def get_course_about_section(course, section_key):
                 key=section_key, url=course.location.url()))
             return None
     elif section_key == "title":
-        if course.display_name is None:
-            return course.url_name
-        return course.display_name
+        return course.display_name_with_default
     elif section_key == "university":
         return course.location.org
     elif section_key == "number":

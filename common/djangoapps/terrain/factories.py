@@ -82,7 +82,7 @@ class XModuleCourseFactory(Factory):
 
         # This metadata code was copied from cms/djangoapps/contentstore/views.py
         if display_name is not None:
-            new_course.lms.display_name = display_name
+            new_course.display_name = display_name
 
         new_course.data_dir = uuid4().hex
         new_course.lms.start = gmtime()
@@ -145,7 +145,7 @@ class XModuleItemFactory(Factory):
 
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
-            new_item.lms.display_name = display_name
+            new_item.display_name = display_name
 
         store.update_metadata(new_item.location.url(), new_item.own_metadata)
 

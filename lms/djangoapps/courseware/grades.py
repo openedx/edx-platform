@@ -115,7 +115,7 @@ def answer_distributions(request, course):
             for problem_id in capa_module.lcp.student_answers:
                 # Answer can be a list or some other unhashable element.  Convert to string.
                 answer = str(capa_module.lcp.student_answers[problem_id])
-                key = (capa_module.url_name, capa_module.display_name, problem_id)
+                key = (capa_module.url_name, capa_module.display_name_with_default, problem_id)
                 counts[key][answer] += 1
 
     return counts
@@ -153,7 +153,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
         format_scores = []
         for section in sections:
             section_descriptor = section['section_descriptor']
-            section_name = section_descriptor.lms.display_name
+            section_name = section_descriptor.display_name_with_default
 
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
@@ -195,7 +195,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
 
-                    scores.append(Score(correct, total, graded, module_descriptor.lms.display_name))
+                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
 
                 section_total, graded_total = graders.aggregate_scores(scores, section_name)
                 if keep_raw_scores:
@@ -311,15 +311,15 @@ def progress_summary(student, request, course, model_data_cache):
                     continue
 
                 scores.append(Score(correct, total, graded,
-                    module_descriptor.lms.display_name))
+                    module_descriptor.display_name_with_default))
 
             scores.reverse()
             section_total, graded_total = graders.aggregate_scores(
-                scores, section_module.lms.display_name)
+                scores, section_module.display_name_with_default)
 
             format = section_module.lms.format
             sections.append({
-                'display_name': section_module.lms.display_name,
+                'display_name': section_module.display_name_with_default,
                 'url_name': section_module.url_name,
                 'scores': scores,
                 'section_total': section_total,
@@ -328,8 +328,8 @@ def progress_summary(student, request, course, model_data_cache):
                 'graded': graded,
             })
 
-        chapters.append({'course': course.lms.display_name,
-                         'display_name': chapter_module.lms.display_name,
+        chapters.append({'course': course.display_name_with_default,
+                         'display_name': chapter_module.display_name_with_default,
                          'url_name': chapter_module.url_name,
                          'sections': sections})
 

@@ -367,7 +367,7 @@ class CapaModule(XModule):
         else:
             check_button = False
 
-        content = {'name': self.display_name,
+        content = {'name': self.display_name_with_default,
                    'html': html,
                    'weight': self.descriptor.weight,
                    }

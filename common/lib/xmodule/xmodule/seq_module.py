@@ -18,14 +18,6 @@ log = logging.getLogger(__name__)
 class_priority = ['video', 'problem']
 
 
-def display_name(module):
-    if hasattr(module, 'display_name'):
-        return module.display_name
-
-    if hasattr(module, 'lms'):
-        return module.lms.display_name
-
-
 class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
@@ -89,9 +81,9 @@ class SequenceModule(XModule):
             childinfo = {
                 'content': child.get_html(),
                 'title': "\n".join(
-                    display_name(grand_child)
+                    grand_child.display_name
                     for grand_child in child.get_children()
-                    if display_name(grand_child)
+                    if grand_child.display_name is not None
                 ),
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
@@ -99,7 +91,7 @@ class SequenceModule(XModule):
                 'id': child.id,
             }
             if childinfo['title'] == '':
-                childinfo['title'] = display_name(child)
+                childinfo['title'] = child.display_name_with_default
             contents.append(childinfo)
 
         params = {'items': contents,

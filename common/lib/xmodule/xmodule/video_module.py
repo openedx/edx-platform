@@ -142,7 +142,7 @@ class VideoModule(XModule):
             'position': self.position,
             'source': self.source,
             'track': self.track,
-            'display_name': self.display_name,
+            'display_name': self.display_name_with_default,
             'caption_asset_path': caption_asset_path,
             'show_captions': self.show_captions,
             'start': self.start_time,

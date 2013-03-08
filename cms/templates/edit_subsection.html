@@ -22,7 +22,7 @@
       <article class="subsection-body window" data-id="${subsection.location}">
         <div class="subsection-name-input">
           <label>Display Name:</label>
-          <input type="text" value="${subsection.lms.display_name | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
+          <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
         <div class="sortable-unit-list">
           <label>Units:</label>
@@ -59,11 +59,11 @@
         </div>
         % if subsection.lms.start != parent_item.lms.start and subsection.lms.start:
             % if parent_start_date is None:
-            <p class="notice">The date above differs from the release date of ${parent_item.lms.display_name}, which is unset.
+            <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default}, which is unset.
             % else:
-            <p class="notice">The date above differs from the release date of ${parent_item.lms.display_name} – ${parent_start_date.strftime('%m/%d/%Y')} at ${parent_start_date.strftime('%H:%M')}.
+            <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default} – ${parent_start_date.strftime('%m/%d/%Y')} at ${parent_start_date.strftime('%H:%M')}.
             % endif
-            <a href="#" class="sync-date no-spinner">Sync to ${parent_item.lms.display_name}.</a></p>
+            <a href="#" class="sync-date no-spinner">Sync to ${parent_item.display_name_with_default}.</a></p>
         % endif
       </div>
 

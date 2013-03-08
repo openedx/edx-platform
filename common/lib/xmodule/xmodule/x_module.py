@@ -9,7 +9,7 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from xblock.core import XBlock
+from xblock.core import XBlock, Scope, String
 
 log = logging.getLogger(__name__)
 
@@ -99,6 +99,12 @@ class XModule(HTMLSnippet, XBlock):
     # in the module
     icon_class = 'other'
 
+    display_name = String(
+        help="Display name for this module",
+        scope=Scope.settings,
+        default=None,
+    )
+
     def __init__(self, system, location, descriptor, model_data):
         '''
         Construct a new xmodule
@@ -122,6 +128,17 @@ class XModule(HTMLSnippet, XBlock):
         self.category = self.location.category
         self._model_data = model_data
         self._loaded_children = None
+
+    @property
+    def display_name_with_default(self):
+        '''
+        Return a display name for the module: use display_name if defined in
+        metadata, otherwise convert the url name.
+        '''
+        name = self.display_name
+        if name is None:
+            name = self.url_name.replace('_', ' ')
+        return name
 
     def get_children(self):
         '''
@@ -335,6 +352,12 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
     FoldIt, which posts grade-changing updates through a separate API.
     """
 
+    display_name = String(
+        help="Display name for this module",
+        scope=Scope.settings,
+        default=None,
+    )
+
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
                  system,
@@ -364,6 +387,17 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
         self._model_data = model_data
 
         self._child_instances = None
+
+    @property
+    def display_name_with_default(self):
+        '''
+        Return a display name for the module: use display_name if defined in
+        metadata, otherwise convert the url name.
+        '''
+        name = self.display_name
+        if name is None:
+            name = self.url_name.replace('_', ' ')
+        return name
 
     def get_required_module_descriptors(self):
         """Returns a list of XModuleDescritpor instances upon which this module depends, but are
