@@ -8,6 +8,7 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
+from xblock.core import Scope, String
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +22,18 @@ class AnnotatableModule(XModule):
     js_module_name = "Annotatable"
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'annotatable'
+
+    data = String(help="XML data for the annotation", scope=Scope.content)
+
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
+
+        xmltree = etree.fromstring(self.data)
+
+        self.instructions = self._extract_instructions(xmltree)
+        self.content = etree.tostring(xmltree, encoding='unicode')
+        self.element_id = self.location.html_id()
+        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
 
     def _get_annotation_class_attr(self, index, el):
         """ Returns a dict with the CSS class attribute to set on the annotation
@@ -111,17 +124,6 @@ class AnnotatableModule(XModule):
 
         return self.system.render_template('annotatable.html', context)
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-
-        xmltree = etree.fromstring(self.definition['data'])
-
-        self.instructions = self._extract_instructions(xmltree)
-        self.content = etree.tostring(xmltree, encoding='unicode')
-        self.element_id = self.location.html_id()
-        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
 
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule
