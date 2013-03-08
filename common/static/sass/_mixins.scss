@@ -1,4 +1,4 @@
-// all - utilities - mixins and extends
+// studio - utilities - mixins and extends
 // ====================
 
 // font-sizing
@@ -152,3 +152,21 @@
 }
 
 // extends - ui
+.window {
+  @include clearfix();
+  @include border-radius(3px);
+  @include box-shadow(0 1px 1px $shadow-l1);
+  margin-bottom: $baseline;
+  border: 1px solid $gray-l2;
+  background: $white;
+}
+
+.elem-d1 {
+  @include clearfix();
+  @include box-sizing(border-box);
+}
+
+.elem-d2 {
+  @include clearfix();
+  @include box-sizing(border-box);
+}
