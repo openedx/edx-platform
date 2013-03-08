@@ -690,7 +690,7 @@ def save_item(request):
 
         # commit to datastore
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
-        store.update_metadata(item_location, own_metadat(existing_item))
+        store.update_metadata(item_location, own_metadata(existing_item))
 
     return HttpResponse()
 
