@@ -39,7 +39,7 @@ def reload_the_page(step):
 def edit_the_name_of_a_policy_key(step):
     policy_key_css = 'input.policy-key'
     e = css_find(policy_key_css).first
-    e.fill('new')
+    e.type('_new')
 
 
 @step(u'I press the "([^"]*)" notification button$')
@@ -121,7 +121,7 @@ def the_policy_key_name_is_unchanged(step):
 def the_policy_key_name_is_changed(step):
     policy_key_css = 'input.policy-key'
     val = css_find(policy_key_css).first.value
-    assert_equal(val, 'new')
+    assert_equal(val, 'display_name_new')
 
 
 @step(u'the policy key value is unchanged$')
@@ -184,14 +184,6 @@ def assert_entries(css, expected_values):
 
 def click_save():
     css = "a.save-button"
-
-    # def is_shown(driver):
-    #     visible = css_find(css).first.visible
-    #     if visible:
-    #         # Even when waiting for visible, this fails sporadically. Adding in a small wait.
-    #         time.sleep(float(1))
-    #     return visible
-    # wait_for(is_shown)
     css_click_at(css)
 
 

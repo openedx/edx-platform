@@ -126,7 +126,7 @@ def css_find(css):
     def is_visible(driver):
         return EC.visibility_of_element_located((By.CSS_SELECTOR,css,))
 
-    assert_true(world.browser.is_element_present_by_css(css, 5))
+    world.browser.is_element_present_by_css(css, 5)
     wait_for(is_visible)
     return world.browser.find_by_css(css)
 
