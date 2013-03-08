@@ -380,8 +380,7 @@ function goto( mode)
    </p>
 
    <p>
-     <p>Number of students per problem who have this problem graded as correct, as of ${students_per_problem_correct_json['time']}</p>
-
+     <p>Students answering correctly</p>
      % if students_per_problem_correct_json and "data" in students_per_problem_correct_json:
      <div class="divScroll">
      <table class="stat_table">
@@ -396,7 +395,7 @@ function goto( mode)
 
 %endif
 
-%if modeflag.get('Analytics 2'):
+%if modeflag.get('Analytics In Progress'):
 
    <p>
      Number of students enrolled for ${students_enrolled_json['data'][0]['course_id']}:
