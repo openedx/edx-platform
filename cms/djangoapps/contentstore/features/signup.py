@@ -1,4 +1,5 @@
 from lettuce import world, step
+from common import *
 
 
 @step('I fill in the registration form$')
@@ -13,10 +14,11 @@ def i_fill_in_the_registration_form(step):
 
 @step('I press the Create My Account button on the registration form$')
 def i_press_the_button_on_the_registration_form(step):
-    register_form = world.browser.find_by_css('form#register_form')
-    submit_css = 'button#submit'
-    register_form.find_by_css(submit_css).click()
-
+    submit_css = 'form#register_form button#submit'
+    # Workaround for click not working on ubuntu
+    # for some unknown reason.
+    e = css_find(submit_css)
+    e.type(' ')
 
 @step('I should see be on the studio home page$')
 def i_should_see_be_on_the_studio_home_page(step):

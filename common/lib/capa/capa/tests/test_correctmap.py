@@ -91,12 +91,12 @@ class CorrectMapTest(unittest.TestCase):
                     npoints=0)
 
         # Assert that we get the expected points
-        # If points assigned and correct --> npoints
+        # If points assigned --> npoints
         # If no points assigned and correct --> 1 point
-        # Otherwise --> 0 points
+        # If no points assigned and incorrect --> 0 points
         self.assertEqual(self.cmap.get_npoints('1_2_1'), 5)
         self.assertEqual(self.cmap.get_npoints('2_2_1'), 1)
-        self.assertEqual(self.cmap.get_npoints('3_2_1'), 0)
+        self.assertEqual(self.cmap.get_npoints('3_2_1'), 5)
         self.assertEqual(self.cmap.get_npoints('4_2_1'), 0)
         self.assertEqual(self.cmap.get_npoints('5_2_1'), 0)
 

@@ -13,6 +13,7 @@ from django.core.management import call_command
 def initial_setup(server):
     # Launch the browser app (choose one of these below)
     world.browser = Browser('chrome')
+    # world.browser = Browser('phantomjs')
     # world.browser = Browser('firefox')
 
 
