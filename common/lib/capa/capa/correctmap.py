@@ -111,10 +111,7 @@ class CorrectMap(object):
             return None
 
     def get_npoints(self, answer_id):
-        """ Return the number of points for an answer:
-            If the answer is correct, return the assigned
-            number of points (default: 1 point)
-            Otherwise, return 0 points """
+        """Return the number of points for an answer, used for partial credit."""
         npoints = self.get_property(answer_id, 'npoints')
         if npoints is not None:
             return npoints
