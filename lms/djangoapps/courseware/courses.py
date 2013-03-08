@@ -163,7 +163,7 @@ def get_course_about_section(course, section_key):
                 model_data_cache,
                 course.id,
                 not_found_ok=True,
-                wrap_xmodule_display=True
+                wrap_xmodule_display=False
             )
 
             html = ''
@@ -213,7 +213,7 @@ def get_course_info_section(request, course, section_key):
         loc,
         model_data_cache,
         course.id,
-        wrap_xmodule_display=True
+        wrap_xmodule_display=False
     )
 
     html = ''
