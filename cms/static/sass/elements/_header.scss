@@ -29,6 +29,10 @@
     margin: 0 auto;
     color: $gray-l1;
   }
+
+  nav .nav-item {
+    display: inline-block;
+  }
 }
 
 // ====================

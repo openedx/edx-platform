@@ -9,39 +9,39 @@
 
 // utilities
 @import 'mixins';
-@import "variables";
-@import "cms_mixins";
+@import 'variables';
+@import 'cms_mixins';
 
 // assets
-@import "assets/fonts";
-@import "assets/graphics";
+@import 'assets/fonts';
+@import 'assets/graphics';
 @import 'assets/keyframes';
 
 // base
-@import "base";
+@import 'base';
 
 // elements
-@import "elements/header";
-@import "elements/footer";
-@import "elements/navigation";
-@import "elements/modal";
-@import "elements/alerts";
+@import 'elements/header';
+@import 'elements/footer';
+@import 'elements/navigation';
+@import 'elements/modal';
+@import 'elements/alerts';
 @import 'elements/jquery-ui-calendar';
 
 // specific views
-@import "views/account";
-@import "views/assets";
-@import "views/updates";
-@import "views/dashboard";
-@import "views/export";
-@import "views/index";
-@import "views/import";
-@import "views/outline";
-@import "views/settings";
-@import "views/static-pages";
-@import "views/subsection";
-@import "views/unit";
-@import "views/users";
+@import 'views/account';
+@import 'views/assets';
+@import 'views/updates';
+@import 'views/dashboard';
+@import 'views/export';
+@import 'views/index';
+@import 'views/import';
+@import 'views/outline';
+@import 'views/settings';
+@import 'views/static-pages';
+@import 'views/subsection';
+@import 'views/unit';
+@import 'views/users';
 
 @import 'assets/content-types';
 
