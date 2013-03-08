@@ -2,6 +2,7 @@ from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata
+from xblock.core import Scope
 
 
 class CourseMetadata(object):
@@ -25,6 +26,9 @@ class CourseMetadata(object):
         descriptor = get_modulestore(course_location).get_item(course_location)
 
         for field in descriptor.fields + descriptor.lms.fields:
+            if field.scope != Scope.settings:
+                continue
+
             if field.name not in cls.FILTERED_LIST:
                 course[field.name] = field.read_from(descriptor)
 
