@@ -135,7 +135,7 @@ class TimeLimitDescriptor(XMLEditingDescriptor, XmlDescriptor):
                 if system.error_tracker is not None:
                     system.error_tracker("ERROR: " + str(e))
                 continue
-        return {'children': children}
+        return {}, children
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('timelimit')
