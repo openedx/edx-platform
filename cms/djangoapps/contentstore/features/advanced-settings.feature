@@ -7,6 +7,7 @@ Feature: Advanced (manual) course policy
     When I select the Advanced Settings
     Then I see only the display name
 
+  @skip-phantom
   Scenario: Test if there are no policy settings without existing UI controls
     Given I am on the Advanced Course Settings page in Studio
     When I delete the display name
@@ -14,6 +15,7 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then there are no advanced policy settings
 
+  @skip-phantom
   Scenario: Test cancel editing key name
     Given I am on the Advanced Course Settings page in Studio
     When I edit the name of a policy key
@@ -32,6 +34,7 @@ Feature: Advanced (manual) course policy
     And I press the "Cancel" notification button
     Then the policy key value is unchanged
 
+  @skip-phantom
   Scenario: Test editing key value
     Given I am on the Advanced Course Settings page in Studio
     When I edit the value of a policy key
