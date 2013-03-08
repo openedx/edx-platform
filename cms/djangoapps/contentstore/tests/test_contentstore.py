@@ -265,7 +265,33 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # note, we know the link it should be because that's what in the 'full' course in the test data
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
 
+    def test_export_course_with_unknown_metadata(self):
+        ms = modulestore('direct')
+        cs = contentstore()
 
+        import_from_xml(ms, 'common/test/data/', ['full'])
+        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        root_dir = path(mkdtemp_clean())
+
+        course = ms.get_item(location)
+
+        # add a bool piece of unknown metadata so we can verify we don't throw an exception
+        course.metadata['new_metadata'] = True
+
+        ms.update_metadata(location, course.metadata)
+
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+
+        # export out to a tempdir
+        bExported = False
+        try:
+            export_to_xml(ms, cs, location, root_dir, 'test_export')
+            bExported = True
+        except Exception:
+            pass
+
+        self.assertTrue(bExported)
 
 class ContentStoreTest(ModuleStoreTestCase):
     """

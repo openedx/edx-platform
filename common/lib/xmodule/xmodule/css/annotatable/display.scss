@@ -1,0 +1,169 @@
+$border-color: #C8C8C8;
+$body-font-size: em(14);
+
+.annotatable-header {
+  margin-bottom: .5em;
+  .annotatable-title {
+    font-size: em(22);
+    text-transform: uppercase;
+    padding: 2px 4px;
+  }
+}
+
+.annotatable-section {
+  position: relative;
+  padding: .5em 1em;
+  border: 1px solid $border-color;
+  border-radius: .5em;
+  margin-bottom: .5em;
+
+  &.shaded { background-color: #EDEDED; }
+
+  .annotatable-section-title {
+    font-weight: bold;
+    a { font-weight: normal; }
+  }
+  .annotatable-section-body {
+    border-top: 1px solid $border-color;
+    margin-top: .5em;
+    padding-top: .5em;
+    @include clearfix;
+  }
+
+  ul.instructions-template {
+    list-style: disc;
+    margin-left: 4em;
+    b { font-weight: bold; }
+    i { font-style: italic; }
+    code { 
+      display: inline;
+      white-space: pre; 
+      font-family: Courier New, monospace;
+    }
+  }
+}
+
+.annotatable-toggle {
+  position: absolute;
+  right: 0;
+  margin: 2px 1em 2px 0;
+  &.expanded:after { content: " \2191" }
+  &.collapsed:after { content: " \2193" }
+}
+
+.annotatable-span {
+  display: inline;
+  cursor: pointer;
+
+  @each $highlight in (
+    (yellow rgba(255,255,10,0.3) rgba(255,255,10,0.9)),
+    (red rgba(178,19,16,0.3) rgba(178,19,16,0.9)),
+    (orange rgba(255,165,0,0.3) rgba(255,165,0,0.9)),
+    (green rgba(25,255,132,0.3) rgba(25,255,132,0.9)),
+    (blue rgba(35,163,255,0.3) rgba(35,163,255,0.9)),
+    (purple rgba(115,9,178,0.3) rgba(115,9,178,0.9))) {
+    
+    $marker: nth($highlight,1);
+    $color: nth($highlight,2);
+    $selected_color: nth($highlight,3);
+
+    @if $marker == yellow {
+      &.highlight {
+        background-color: $color;
+        &.selected { background-color: $selected_color; }
+      }
+    }
+    &.highlight-#{$marker} {
+      background-color: $color;
+      &.selected { background-color: $selected_color; }
+    }
+  }
+
+  &.hide {
+    cursor: none;
+    background-color: inherit;
+    .annotatable-icon {
+      display: none;
+    }
+  }
+
+  .annotatable-comment {
+    display: none;
+  }
+}
+
+.ui-tooltip.qtip.ui-tooltip {
+  font-size: $body-font-size;
+  border: 1px solid #333;
+  border-radius: 1em;
+  background-color: rgba(0,0,0,.85);
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+
+  .ui-tooltip-titlebar {
+    font-size: em(16);
+    color: inherit;
+    background-color: transparent;
+    padding: 5px 10px;
+    border: none;
+    .ui-tooltip-title {
+      padding: 5px 0px;
+      border-bottom: 2px solid #333;
+      font-weight: bold;
+    }
+    .ui-tooltip-icon { 
+      right: 10px;
+      background: #333;
+    }
+    .ui-state-hover {
+      color: inherit;
+      border: 1px solid #ccc;
+    }
+  }
+  .ui-tooltip-content {
+    color: inherit;
+    font-size: em(14);
+    text-align: left;
+    font-weight: 400;
+    padding: 0 10px 10px 10px;
+    background-color: transparent;
+  } 
+  p { 
+      color: inherit; 
+      line-height: normal;
+  }
+}
+
+.ui-tooltip.qtip.ui-tooltip-annotatable {
+  max-width: 375px;
+  .ui-tooltip-content {  
+    padding: 0 10px;
+    .annotatable-comment {
+      display: block;
+      margin: 0px 0px 10px 0;
+      max-height: 225px;
+      overflow: auto;
+    }
+    .annotatable-reply {
+      display: block;
+      border-top: 2px solid #333;
+      padding: 5px 0;
+      margin: 0;
+      text-align: center;
+    }
+  }
+  &:after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    height: 0;
+    width: 0;
+    margin-left: -5px;
+    border: 10px solid transparent;
+    border-top-color: rgba(0, 0, 0, .85);
+  }
+}
+
+

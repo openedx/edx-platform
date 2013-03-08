@@ -95,7 +95,7 @@ class CorrectMap(object):
 
     def is_correct(self, answer_id):
         if answer_id in self.cmap:
-            return self.cmap[answer_id]['correctness'] == 'correct'
+            return self.cmap[answer_id]['correctness'] in ['correct', 'partially-correct']
         return None
 
     def is_queued(self, answer_id):
