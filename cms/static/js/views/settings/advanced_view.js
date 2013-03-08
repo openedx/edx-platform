@@ -229,7 +229,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 var error = {};
                 error[oldKey] = 'You have already defined "' + newKey + '" in the manual policy definitions.';
                 error[newKey] = "You tried to enter a duplicate of this key.";
-                this.model.trigger("error", this.model, error);
+                this.model.trigger("invalid", this.model, error);
                 return false;
             }
 
@@ -245,7 +245,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                     // swap to the key which the map knows about
                     validation[oldKey] = validation[newKey];
                 }
-                this.model.trigger("error", this.model, validation);
+                this.model.trigger("invalid", this.model, validation);
                 // abandon update
                 return;
             }
