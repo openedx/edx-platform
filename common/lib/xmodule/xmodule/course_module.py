@@ -139,7 +139,7 @@ class TextbookList(ModelType):
         json_data = []
         for val in values:
             if isinstance(val, Textbook):
-                json_data.append((textbook.title, textbook.book_url))
+                json_data.append((val.title, val.book_url))
             elif isinstance(val, tuple):
                 json_data.append(val)
             else:

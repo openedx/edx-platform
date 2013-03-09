@@ -17,6 +17,9 @@ class DateTuple(ModelType):
         return datetime.datetime(*value[0:6])
 
     def to_json(self, value):
+        if value is None:
+            return None
+
         return list(value.timetuple())
 
 
