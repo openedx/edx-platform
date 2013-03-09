@@ -88,7 +88,11 @@ def instructor_dashboard(request, course_id):
     data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
     data += compute_course_stats(course).items()
     if request.user.is_staff:
-        data.append(['metadata', escape(str(course._model_data))])
+        for field in course.fields:
+            data.append([field.name, json.dumps(field.read_json(course))])
+        for namespace in course.namespaces:
+            for field in getattr(course, namespace).fields:
+                data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
     datatable['data'] = data
 
     def return_csv(fn, datatable, fp=None):
