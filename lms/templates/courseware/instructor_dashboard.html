@@ -371,57 +371,46 @@ function goto( mode)
 
 %if modeflag.get('Analytics'):
 
-   <p>
-     Students enrolled:
-     % if students_enrolled_json and "data" in students_enrolled_json:
-       ${students_enrolled_json['data'][0]['students']}
-       <!-- ${students_enrolled_json['time']} -->
-     % endif
-   </p>
+  %if analytics_results.get("StudentsEnrolled"):
+    <p>
+      Students enrolled:
+      ${analytics_results["StudentsEnrolled"]['data'][0]['students']}
+    </p>
+  %endif
 
-   <p>
-     <p>Students answering correctly</p>
-     % if students_per_problem_correct_json and "data" in students_per_problem_correct_json:
-     <div class="divScroll">
-     <table class="stat_table">
-     <tr><th>Problem</th><th>Number of students</th></tr>
-     % for row in students_per_problem_correct_json['data']:
-     <tr> <td>${row['module_id']}</td> <td>${row['count']}</td> </tr>
-     % endfor
-     </table>
-     </div>
-     % endif
-   </p>
+  %if analytics_results.get("StudentsActive"):
+    <p>
+      Students active in the last week:
+      ${analytics_results["StudentsActive"]['data'][0]['active']}
+    </p>
+
+  %endif
+
+  ##This is not as helpful as it could be -- let's give full point distribution
+  ##instead.
+  %if analytics_results.get("StudentsPerProblemCorrect"):
+    <p>Students answering correctly</p>
+    <div class="divScroll">
+      <table class="stat_table">
+        <tr>
+          <th>Problem</th>
+          <th>Number of students</th>
+        </tr>
+      %for row in analytics_results['StudentsPerProblemCorrect']['data']:
+        <tr>
+          <td>${row['module_id'].split('/')[-1]}</td>
+          <td>${row['count']}</td>
+        </tr>
+      %endfor
+      </table>
+    </div>
+  %endif
+
 
 %endif
 
 %if modeflag.get('Analytics In Progress'):
 
-   <p>
-     Number of students enrolled for ${students_enrolled_json['data'][0]['course_id']}:
-     % if students_enrolled_json is not None:
-     % if students_enrolled_json['status'] == 'success':
-     ${students_enrolled_json['data'][0]['count']} as of ${students_enrolled_json['time']}
-     % else:
-     <i> ${students_enrolled_json['error']} </i>
-     % endif
-     % else:
-     <i> null data </i>
-     % endif
-   </p>
-
-   <p>
-     Number of students active for ${students_active_json['data'][0]['course_id']} for the past 7 days: 
-     % if students_active_json is not None:
-     % if students_active_json['status'] == 'success':
-     ${students_active_json['data'][0]['count']} as of ${students_active_json['time']}
-     % else:
-     <i> ${students_active_json['error']} </i>
-     % endif
-     % else:
-     <i> null data </i>
-     % endif
-   </p>
 
    <p>
      Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):

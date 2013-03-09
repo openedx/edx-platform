@@ -594,72 +594,34 @@ def instructor_dashboard(request, course_id):
 
     #----------------------------------------
     # analytics
+    def get_analytics_result(analytics_name):
+        url = settings.ANALYTICS_SERVER_URL + \
+              "get?aname={}&course_id={}".format(analytics_name, course_id)
+        res = requests.get(url)
+        if res.status_code == codes.OK:
+            # WARNING: do not use req.json because the preloaded json doesn't
+            #          preserve the order of the original record use instead: 
+            #          json.loads(req.content, object_pairs_hook=OrderedDict)
+            return json.loads(res.content, object_pairs_hook=OrderedDict)
+        else:
+            log.error("Error fetching %s, code: %s, msg: %s",
+                      (url, res.status_code, res.content))
+        return None
 
-    attempted_problems = None
-    students_enrolled_json = None
-    students_active_json = None
-    daily_activity_json = None
-    students_per_problem_correct_json = None
-    overall_grade_distribution = None
-    dropoff_per_day = None
+    analytics_results = {}
 
     if idash_mode == 'Analytics':
-
-        # get current day
-        to_day = datetime.today().date()
-        from_day = to_day - timedelta(days=7)
-
-        # WARNING: do not use req.json because the preloaded json doesn't preserve the order of the original record 
-        #          use instead: json.loads(req.content, object_pairs_hook=OrderedDict)
-
-        # number of students enrolled in this course
-        res = requests.get(settings.ANALYTICS_SERVER_URL + 
-                           "get?aname=StudentsEnrolled&course_id=%s" % course_id)
-        if res.status_code == codes.OK:
-            students_enrolled_json = json.loads(res.content,
-                                                object_pairs_hook=OrderedDict)
-        else:
-            students_enrolled_json = None
-
-#         # number of students active in the past 7 days (including current day), i.e. with at least one activity for the period
-#         #req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsActive&course_id=%s&from=%s" % (course_id,from_day))
-#         req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsActive&course_id=%s" % (course_id,))    # default is active past 7 days
-#         if req.content != 'None':
-#             students_active_json = json.loads(req.content, object_pairs_hook=OrderedDict)
-# 
-        # number of students per problem who have problem graded correct
-        res = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsPerProblemCorrect&course_id=%s" % (course_id,))
-        if res.status_code == codes.OK:
-            students_per_problem_correct_json = json.loads(res.content, object_pairs_hook=OrderedDict)
-        else:
-            students_per_problem_correct_json = None
-
-#         # number of students per problem who have problem graded correct <<< THIS IS FOR ACTIVE STUDENTS
-# #        req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsPerProblemCorrect&course_id=%s&from=%s" % (course_id,from_day))
-# #        if req.content != 'None':
-# #            students_per_problem_correct_json = json.loads(req.content, object_pairs_hook=OrderedDict)
-# 
-#         # grade distribution for the course +++ this is not the desired distribution +++
-#         req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=OverallGradeDistribution&course_id=%s" % (course_id,))
-#         if req.content != 'None':
-#             overall_grade_distribution = json.loads(req.content, object_pairs_hook=OrderedDict)
-# 
-#         # number of students distribution drop off per day
-#         req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsDropoffPerDay&course_id=%s&from=%s" % (course_id,from_day))
-#         if req.content != 'None':
-#             dropoff_per_day = json.loads(req.content, object_pairs_hook=OrderedDict)
-# 
-#         # number of students per problem who attempted this problem at least once
-#         req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsAttemptedProblems&course_id=%s" % course_id)
-#         if req.content != 'None':
-#             attempted_problems = json.loads(req.content, object_pairs_hook=OrderedDict)
-
-
-        # number of students active in the past 7 days (including current day) --- online version! experimental
-        to_day = datetime.today().date()
-        from_day = to_day - timedelta(days=7)
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=DailyActivityAnalyzer&course_id=%s&from=%s&to=%s" % (course_id,from_day, to_day))
-        daily_activity_json = req.json
+        DASHBOARD_ANALYTICS = [
+            "StudentsAttemptedProblems", # num students who tried given problem
+            "StudentsDailyActivity", # active students by day
+            "StudentsDropoffPerDay", # active students dropoff by day
+            "OverallGradeDistribution", # overall point distribution for course
+            "StudentsActive", # num students active in time period (default = 1wk)
+            "StudentsEnrolled", # num students enrolled
+            "StudentsPerProblemCorrect", # foreach problem, num students correct
+        ]
+        for analytic_name in DASHBOARD_ANALYTICS:
+            analytics_results[analytic_name] = get_analytics_result(analytic_name)
 
     #----------------------------------------
     # offline grades?
@@ -687,16 +649,7 @@ def instructor_dashboard(request, course_id):
                'offline_grade_log': offline_grades_available(course_id),
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
-
-               # The following are specific analytics metrics that should be 
-               # put in their own space...
-               'students_enrolled_json' : students_enrolled_json,
-            #   'students_active_json' : students_active_json,
-            #   'daily_activity_json' : daily_activity_json,
-               'students_per_problem_correct_json' : students_per_problem_correct_json,
-            #   'overall_grade_distribution' : overall_grade_distribution,
-            #   'dropoff_per_day' : dropoff_per_day,
-            #   'attempted_problems' : attempted_problems
+               'analytics_results' : analytics_results,
             }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
