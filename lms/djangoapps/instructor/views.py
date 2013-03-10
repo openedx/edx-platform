@@ -612,13 +612,14 @@ def instructor_dashboard(request, course_id):
 
     if idash_mode == 'Analytics':
         DASHBOARD_ANALYTICS = [
-            "StudentsAttemptedProblems", # num students who tried given problem
+            #"StudentsAttemptedProblems", # num students who tried given problem
             "StudentsDailyActivity", # active students by day
             "StudentsDropoffPerDay", # active students dropoff by day
-            "OverallGradeDistribution", # overall point distribution for course
+            #"OverallGradeDistribution", # overall point distribution for course
             "StudentsActive", # num students active in time period (default = 1wk)
             "StudentsEnrolled", # num students enrolled
-            "StudentsPerProblemCorrect", # foreach problem, num students correct
+            #"StudentsPerProblemCorrect", # foreach problem, num students correct,
+            "ProblemGradeDistribution", # foreach problem, grade distribution
         ]
         for analytic_name in DASHBOARD_ANALYTICS:
             analytics_results[analytic_name] = get_analytics_result(analytic_name)

@@ -383,8 +383,58 @@ function goto( mode)
       Students active in the last week:
       ${analytics_results["StudentsActive"]['data'][0]['active']}
     </p>
-
   %endif
+
+  %if analytics_results.get("StudentsDropoffPerDay"):
+    <p>Student activity day by day</p>
+    <div>
+      <table class="stat_table">
+        <tr>
+          <th>Day</th>
+          <th>Students</th>
+        </tr>
+      %for row in analytics_results['StudentsDropoffPerDay']['data']:
+        <tr>
+          ## For now, just discard the non-date portion
+          <td>${row['last_day'].split("T")[0]}</td>
+          <td>${row['num_students']}</td>
+        </tr>
+      %endfor
+      </table>
+    </div>
+  %endif
+  <br/>
+  %if analytics_results.get("ProblemGradeDistribution"):
+    <p>Answer distribution for problems</p>
+    <div>
+      <table class="stat_table">
+        <tr>
+          <th>Problem</th>
+          <th>Max</th>
+          <th colspan="99">Points Earned (Num Students)</th>
+        </tr>
+      %for row in analytics_results['ProblemGradeDistribution']['data']:
+        <tr>
+          <td>${row['module_id'].split('/')[-1]}</td>
+          <td>${max(grade_record['max_grade'] for grade_record in row["grade_info"])}
+          %for grade_record in row["grade_info"]:
+          <td>
+            %if isinstance(grade_record["grade"], float):
+              ${"{grade:.2f}".format(**grade_record)}
+            %else:
+              ${"{grade}".format(**grade_record)}
+            %endif
+            (${grade_record["num_students"]})
+          </td>
+          %endfor
+        </tr>
+      %endfor
+      </table>
+    </div>
+  %endif
+%endif
+
+%if modeflag.get('Analytics In Progress'):
 
   ##This is not as helpful as it could be -- let's give full point distribution
   ##instead.
@@ -405,12 +455,6 @@ function goto( mode)
       </table>
     </div>
   %endif
-
-
-%endif
-
-%if modeflag.get('Analytics In Progress'):
-
 
    <p>
      Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):
@@ -441,72 +485,6 @@ function goto( mode)
 </figure>
 </div>
 
-   <p>
-     <p>Number of students per problem who have this problem graded as correct, as of ${students_per_problem_correct_json['time']}</p>
-
-     % if students_per_problem_correct_json is not None:
-     % if students_per_problem_correct_json['status'] == 'success':
-     <div class="divScroll">
-     <table class="stat_table">
-     <tr><th>Problem</th><th>Number of students</th></tr>
-     % for row in students_per_problem_correct_json['data']:
-     <tr> <td>${row['module_id']}</td> <td>${row['count']}</td> </tr>
-     % endfor
-     </table>
-     </div>
-     % else:
-     <i> ${students_per_problem_correct_json['error']}</i>
-     % endif
-     % else:
-     <i> null data </i>
-     % endif
-   </p>
-
-
-   <p>
-     Students per module who attempted at least one problem
-
-     % if attempted_problems is not None:
-     , as of ${attempted_problems['time']}
-     % if attempted_problems['status'] == 'success':
-     <div class="divScroll">
-     <table class="stat_table">
-     <tr><th>Module</th><th>Number of students</th></tr>
-     % for row in attempted_problems['data']:
-     <tr> <td>${row['module_id']}</td> <td>${row['count']}</td> </tr>
-     % endfor
-     </table>
-     </div>
-     % else:
-     <i> ${attempted_problems['error']}</i>
-     % endif
-     % else:
-     <i>: null data </i>
-     % endif
-
-     </p>
-   <p>
-
-   <p>
-     <p>Grade distribution:</p>
-
-     % if overall_grade_distribution is not None:
-     % if overall_grade_distribution['status'] == 'success':
-     <div class="divScroll">
-     <table class="stat_table">
-     <tr><th>Grade</th><th>Number of students</th></tr>
-     % for row in overall_grade_distribution['data']:
-     <tr> <td>${row['overall_grade']}</td> <td>${row['count']}</td> </tr>
-     % endfor
-     </table>
-     </div>
-     % else:
-     <i> ${dropoff_per_day['error']}</i>
-     % endif
-     % else:
-     <i> null data </i>
-     % endif
-   </p>
 
 ##     <p>Number of students who dropped off per day before becoming inactive:</p>
 ##
