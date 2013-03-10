@@ -135,8 +135,8 @@ class CapaModule(XModule):
             self.grace_period = None
             self.close_date = self.display_due_date
 
-        max_attempts = self.metadata.get('attempts', None)
-        if max_attempts is not None:
+        max_attempts = self.metadata.get('attempts')
+        if max_attempts is not None and max_attempts != '':
             self.max_attempts = int(max_attempts)
         else:
             self.max_attempts = None
@@ -582,7 +582,7 @@ class CapaModule(XModule):
     @staticmethod
     def make_dict_of_responses(get):
         '''Make dictionary of student responses (aka "answers")
-        get is POST dictionary.
+        get is POST dictionary (Djano QueryDict).
 
         The *get* dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
@@ -606,6 +606,7 @@ class CapaModule(XModule):
             to 'input_1' in the returned dict)
         '''
         answers = dict()
+        
         for key in get:
             # e.g. input_resistor_1 ==> resistor_1
             _, _, name = key.partition('_')
@@ -613,7 +614,7 @@ class CapaModule(XModule):
             # If key has no underscores, then partition
             # will return (key, '', '')
             # We detect this and raise an error
-            if name is '':
+            if not name:
                 raise ValueError("%s must contain at least one underscore" % str(key))
 
             else:
@@ -625,10 +626,7 @@ class CapaModule(XModule):
                 name = name[:-2] if is_list_key else name
 
                 if is_list_key:
-                    if type(get[key]) is list:
-                        val = get[key]
-                    else:
-                        val = [get[key]]
+                    val = get.getlist(key)
                 else:
                     val = get[key]
 

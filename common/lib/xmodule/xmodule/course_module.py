@@ -246,7 +246,7 @@ class CourseDescriptor(SequenceDescriptor):
             policy = json.loads(cls.read_grading_policy(paths, system))
         except ValueError:
             system.error_tracker("Unable to decode grading policy as json")
-            policy = None
+            policy = {}
 
         # cdodge: import the grading policy information that is on disk and put into the
         # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
@@ -398,7 +398,7 @@ class CourseDescriptor(SequenceDescriptor):
         return self.metadata.get("cohort_config", {}).get(
             "auto_cohort_groups", [])
 
-    
+
     @property
     def top_level_discussion_topic_ids(self):
         """

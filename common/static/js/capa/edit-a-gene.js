@@ -1,27 +1,44 @@
 (function () {
     var timeout = 1000;
 
-    function initializeApplet(applet) {
-        console.log("Initializing " + applet);
-        waitForApplet(applet);
-    }
+    waitForGenex();
 
-    function waitForApplet(applet) {
-        if (applet.isActive && applet.isActive()) {
-            console.log("Applet is ready.");
-            var answerStr = applet.checkAnswer();
-            console.log(answerStr);
-            var input = $('.editageneinput input');
-            console.log(input);
-            input.val(answerStr);
-        } else if (timeout > 30 * 1000) {
-            console.error("Applet did not load on time.");
-        } else {
-            console.log("Waiting for applet...");
-            setTimeout(function() { waitForApplet(applet); }, timeout);
+    function waitForGenex() {
+        if (typeof(genex) !== "undefined" && genex) {
+            genex.onInjectionDone("genex");
+        }
+        else {
+            setTimeout(function() { waitForGenex(); }, timeout);
         }
     }
     
-    var applets = $('.editageneinput object');
-    applets.each(function(i, el) { initializeApplet(el); });
+    //NOTE:
+    // Genex uses six global functions:
+    // genexSetDNASequence (exported from GWT)
+    // genexSetClickEvent (exported from GWT)
+    // genexSetKeyEvent (exported from GWT)
+    // genexSetProblemNumber (exported from GWT)
+    //
+    // It calls genexIsReady with a deferred command when it has finished 
+    // initialization and has drawn itself
+    // genexStoreAnswer(answer) is called when the GWT [Store Answer] button
+    // is clicked
+    
+    genexIsReady = function() {
+        //Load DNA sequence
+        var dna_sequence = $('#dna_sequence').val();
+        genexSetDNASequence(dna_sequence);
+        //Now load mouse and keyboard handlers
+        genexSetClickEvent();
+        genexSetKeyEvent();
+        //Now load problem
+        var genex_problem_number = $('#genex_problem_number').val();
+        genexSetProblemNumber(genex_problem_number);    
+    };
+    genexStoreAnswer = function(ans) {
+        var problem = $('#genex_container').parents('.problem');
+        var input_field = problem.find('input[type="hidden"][name!="dna_sequence"][name!="genex_problem_number"]');
+        input_field.val(ans);
+    };
 }).call(this);
+
