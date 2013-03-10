@@ -104,8 +104,7 @@ SUBDOMAIN_BRANDING = {
 # have an actual course with that org set
 VIRTUAL_UNIVERSITIES = []
 
-COMMENTS_SERVICE_KEY = "***REMOVED***"
-COMMENTS_SERVICE_URL = "https://comments-edge-stage.herokuapp.com"
+COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
 ############################## Course static files ##########################
 if os.path.isdir(DATA_DIR):
