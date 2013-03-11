@@ -63,7 +63,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
 
