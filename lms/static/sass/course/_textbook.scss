@@ -161,6 +161,15 @@ div.book-wrapper {
 
       div {
         text-align: left;
+	line-height: 1.6em;
+	margin-left: 5px;
+	margin-right: 5px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	
+	.Paragraph, h2 {
+	   margin-top: 10px;
+	}	   
       }
     }
   }
