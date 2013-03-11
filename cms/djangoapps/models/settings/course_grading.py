@@ -231,7 +231,7 @@ class CourseGradingModel(object):
             del descriptor.lms.format
             del descriptor.lms.graded
 
-        get_modulestore(location).update_metadata(location, descriptor._model_data._kvs._data)
+        get_modulestore(location).update_metadata(location, descriptor._model_data._kvs._metadata)
 
 
     @staticmethod
