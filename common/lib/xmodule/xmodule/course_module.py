@@ -356,14 +356,14 @@ class CourseDescriptor(SequenceDescriptor):
         """
         Return the pdf_textbooks config, as a python object, or None if not specified.
         """
-        return self.metadata.get('pdf_textbooks')
+        return self.metadata.get('pdf_textbooks', [])
 
     @property
     def html_textbooks(self):
         """
         Return the html_textbooks config, as a python object, or None if not specified.
         """
-        return self.metadata.get('html_textbooks')
+        return self.metadata.get('html_textbooks', [])
 
     @tabs.setter
     def tabs(self, value):
