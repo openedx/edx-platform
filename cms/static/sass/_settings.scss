@@ -672,6 +672,11 @@ body.course.settings {
        .key {
          width: flex-grid(3, 9);
          margin-right: flex-gutter();
+
+          // disabled/uneditable style
+          label {
+            color: $gray-l2;
+          }
         }
 
         .value {
