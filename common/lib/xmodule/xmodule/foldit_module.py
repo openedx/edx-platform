@@ -86,7 +86,10 @@ class FolditModule(XModule):
         """
         from foldit.models import Score
 
-        return [(e['username'], e['score']) for e in Score.get_tops_n(10)]
+        leaders = [(e['username'], e['score']) for e in Score.get_tops_n(10)]
+        leaders.sort(key=lambda x: x[1])
+
+        return leaders
 
     def get_html(self):
         """
@@ -173,7 +176,10 @@ class FolditDescriptor(XmlDescriptor, EditingDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        """
-        Get the xml_object's attributes.
-        """
+        """ Get the xml_object's attributes.  """
+
         return {'metadata': xml_object.attrib}
+
+    def definition_to_xml(self):
+        xml_object = etree.Element('foldit')
+        return xml_object
