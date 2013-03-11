@@ -20,7 +20,6 @@ def i_select_advanced_settings(step):
         css_click(expand_icon_css)
     link_css = 'li.nav-course-settings-advanced a'
     css_click(link_css)
-    # world.browser.click_link_by_text('Advanced Settings')
 
 
 @step('I am on the Advanced Course Settings page in Studio$')
@@ -33,13 +32,6 @@ def i_am_on_advanced_course_settings(step):
 @step('I reload the page$')
 def reload_the_page(step):
     world.browser.reload()
-
-
-@step(u'I edit the name of a policy key$')
-def edit_the_name_of_a_policy_key(step):
-    policy_key_css = 'input.policy-key'
-    e = css_find(policy_key_css).first
-    e.type('_new')
 
 
 @step(u'I press the "([^"]*)" notification button$')
@@ -59,6 +51,11 @@ def press_the_notification_button(step, name):
         css_click_at(css)
         wait_for(is_invisible)
 
+    if name == "Save":
+        css = ""
+        wait_for(is_visible)
+
+
 @step(u'I edit the value of a policy key$')
 def edit_the_value_of_a_policy_key(step):
     """
@@ -66,21 +63,9 @@ def edit_the_value_of_a_policy_key(step):
     area, so cheat and do it from the policy key field :)
     """
     policy_key_css = 'input.policy-key'
-    e = css_find(policy_key_css).first
+    index = get_index_of("display_name")
+    e = css_find(policy_key_css)[index]
     e._element.send_keys(Keys.TAB, Keys.END, Keys.ARROW_LEFT, ' ', 'X')
-
-
-@step('I delete the display name$')
-def delete_the_display_name(step):
-    delete_entry(0)
-    click_save()
-
-
-@step('create New Entries$')
-def create_new_entries(step):
-    create_entry("z", "apple")
-    create_entry("a", "zebra")
-    click_save()
 
 
 @step('I create a JSON object$')
@@ -90,19 +75,11 @@ def create_JSON_object(step):
 
 
 ############### RESULTS ####################
-@step('I see only the display name$')
-def i_see_only_display_name(step):
-    assert_policy_entries(["display_name"], ['"Robot Super Course"'])
-
-
-@step('there are no advanced policy settings$')
-def no_policy_settings(step):
-    keys_css = 'input.policy-key'
-    val_css = 'textarea.json'
-    k = world.browser.is_element_not_present_by_css(keys_css, 5)
-    v = world.browser.is_element_not_present_by_css(val_css, 5)
-    assert_true(k)
-    assert_true(v)
+@step('I see default advanced settings$')
+def i_see_default_advanced_settings(step):
+    # Test only a few of the existing properties (there are around 34 of them)
+    assert_policy_entries(
+        ["advanced_modules", "display_name", "show_calculator"], ["[]", '"Robot Super Course"', "false"], False)
 
 
 @step('they are alphabetized$')
@@ -114,77 +91,39 @@ def they_are_alphabetized(step):
 def it_is_formatted(step):
     assert_policy_entries(["display_name", "json"], ['"Robot Super Course"', '{\n    "key": "value",\n    "key_2": "value_2"\n}'])
 
-
-@step(u'the policy key name is unchanged$')
-def the_policy_key_name_is_unchanged(step):
-    policy_key_css = 'input.policy-key'
-    val = css_find(policy_key_css).first.value
-    assert_equal(val, 'display_name')
-
-
-@step(u'the policy key name is changed$')
-def the_policy_key_name_is_changed(step):
-    policy_key_css = 'input.policy-key'
-    val = css_find(policy_key_css).first.value
-    assert_equal(val, 'display_name_new')
-
-
 @step(u'the policy key value is unchanged$')
 def the_policy_key_value_is_unchanged(step):
-    policy_value_css = 'li.course-advanced-policy-list-item div.value textarea'
-    val = css_find(policy_value_css).first.value
-    assert_equal(val, '"Robot Super Course"')
+    assert_equal(get_display_name_value(), '"Robot Super Course"')
 
 
 @step(u'the policy key value is changed$')
-def the_policy_key_value_is_unchanged(step):
-    policy_value_css = 'li.course-advanced-policy-list-item div.value textarea'
-    val = css_find(policy_value_css).first.value
-    assert_equal(val, '"Robot Super Course X"')
+def the_policy_key_value_is_changed(step):
+    assert_equal(get_display_name_value(), '"Robot Super Course X"')
 
 
 ############# HELPERS ###############
-def create_entry(key, value):
-    # Scroll down the page so the button is visible
-    world.scroll_to_bottom()
-    css_click_at('a.new-advanced-policy-item', 10, 10)
-    new_key_css = 'div#__new_advanced_key__ input'
-    new_key_element = css_find(new_key_css).first
-    new_key_element.fill(key)
-#   For some reason have to get the instance for each command 
-#   (get error that it is no longer attached to the DOM)
-#   Have to do all this because Selenium fill does not remove existing text
-    new_value_css = 'div.CodeMirror textarea'
-    css_find(new_value_css).last.fill("")
-    css_find(new_value_css).last._element.send_keys(Keys.DELETE, Keys.DELETE)
-    css_find(new_value_css).last.fill(value)
-    # Add in a TAB key press because intermittently on ubuntu the
-    # last character of "value" above was not getting typed in
-    css_find(new_value_css).last._element.send_keys(Keys.TAB)
+def assert_policy_entries(expected_keys, expected_values, assertLength=True):
+    key_css = '.key input.policy-key'
+    key_elements = css_find(key_css)
+    if assertLength:
+        assert_equal(len(expected_keys), len(key_elements))
+
+    value_css = 'textarea.json'
+    for counter in range(len(expected_keys)):
+        index = get_index_of(expected_keys[counter])
+        assert_false(index == -1, "Could not find key: " + expected_keys[counter])
+        assert_equal(expected_values[counter], css_find(value_css)[index].value, "value is incorrect")
 
 
-def delete_entry(index):
-    """ 
-    Delete the nth entry where index is 0-based
-    """
-    css = 'a.delete-button'
-    assert_true(world.browser.is_element_present_by_css(css, 5))
-    delete_buttons = css_find(css)
-    assert_true(len(delete_buttons) > index, "no delete button exists for entry " + str(index))
-    delete_buttons[index].click()
+def get_index_of(expected_key):
+    key_css = '.key input.policy-key'
+    for counter in range(len(css_find(key_css))):
+        #   Sometimes get stale reference if I hold on to the array of elements
+        key = css_find(key_css)[counter].value
+        if key == expected_key:
+            return counter
 
-
-def assert_policy_entries(expected_keys, expected_values):
-    assert_entries('.key input.policy-key', expected_keys)
-    assert_entries('textarea.json', expected_values)
-
-
-def assert_entries(css, expected_values):
-    webElements = css_find(css)
-    assert_equal(len(expected_values), len(webElements))
-#   Sometimes get stale reference if I hold on to the array of elements
-    for counter in range(len(expected_values)):
-        assert_equal(expected_values[counter], css_find(css)[counter].value)
+    return -1
 
 
 def click_save():
@@ -192,6 +131,7 @@ def click_save():
     css_click_at(css)
 
 
-def fill_last_field(value):
-    newValue = css_find('#__new_advanced_key__ input').first
-    newValue.fill(value)
+def get_display_name_value():
+    policy_value_css = 'textarea.json'
+    index = get_index_of("display_name")
+    return css_find(policy_value_css)[index].value
