@@ -734,6 +734,8 @@ class CapaModule(XModule):
 
         self.lcp.student_answers = answers
 
+        self.set_state_from_lcp()
+
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"
         if not self.max_attempts==0:
