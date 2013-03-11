@@ -165,7 +165,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     inherit_metadata(module, metadata_to_inherit)
                 return module
             except:
-                log.debug("Failed to load descriptor", exc_info=True)
+                log.warning("Failed to load descriptor", exc_info=True)
                 return ErrorDescriptor.from_json(
                     json_data,
                     self,

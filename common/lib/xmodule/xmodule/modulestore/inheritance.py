@@ -52,7 +52,7 @@ def own_metadata(module):
         if field.scope != Scope.settings:
             continue
 
-        if field.name in inherited_metadata and module._model_data[field.name] == inherited_metadata[field.name]:
+        if field.name in inherited_metadata and module._model_data.get(field.name) == inherited_metadata.get(field.name):
             continue
 
         if field.name not in module._model_data:

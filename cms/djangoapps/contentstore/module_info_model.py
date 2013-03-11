@@ -74,7 +74,7 @@ def set_module_info(store, location, post_data):
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
-        for metadata_key in posted_metadata.keys():
+        for metadata_key, value in posted_metadata.items():
 
             # let's strip out any metadata fields from the postback which have been identified as system metadata
             # and therefore should not be user-editable, so we should accept them back from the client
@@ -90,4 +90,4 @@ def set_module_info(store, location, post_data):
 
         # commit to datastore
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
-        store.update_metadata(item_location, module._model_data._kvs._metadata)
+        store.update_metadata(location, module._model_data._kvs._metadata)

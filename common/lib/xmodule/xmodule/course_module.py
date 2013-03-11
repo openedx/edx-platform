@@ -256,27 +256,27 @@ class CourseDescriptor(SequenceDescriptor):
                     "min_count": 12,
                     "drop_count": 2,
                     "short_label": "HW",
-                    "weight": 0.15
+                    "weight": 15
                 },
                 {
                     "type": "Lab",
                     "min_count": 12,
                     "drop_count": 2,
-                    "weight": 0.15
+                    "weight": 15
                 },
                 {
                     "type": "Midterm Exam",
                     "short_label": "Midterm",
                     "min_count": 1,
                     "drop_count": 0,
-                    "weight": 0.3
+                    "weight": 30
                 },
                 {
                     "type": "Final Exam",
                     "short_label": "Final",
                     "min_count": 1,
                     "drop_count": 0,
-                    "weight": 0.4
+                    "weight": 40
                 }
             ],
             "GRADE_CUTOFFS": {

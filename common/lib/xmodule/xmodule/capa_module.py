@@ -168,6 +168,8 @@ class CapaModule(XModule):
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
 
+            self.set_state_from_lcp()
+
     def new_lcp(self, state, text=None):
         if text is None:
             text = self.data
@@ -733,6 +735,8 @@ class CapaModule(XModule):
                     'msg': "Problem needs to be reset prior to save"}
 
         self.lcp.student_answers = answers
+
+        self.set_state_from_lcp()
 
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"
