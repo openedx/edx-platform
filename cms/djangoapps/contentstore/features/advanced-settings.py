@@ -39,7 +39,7 @@ def reload_the_page(step):
 def edit_the_name_of_a_policy_key(step):
     policy_key_css = 'input.policy-key'
     e = css_find(policy_key_css).first
-    e.fill('new')
+    e.type('_new')
 
 
 @step(u'I press the "([^"]*)" notification button$')
@@ -97,7 +97,12 @@ def i_see_only_display_name(step):
 
 @step('there are no advanced policy settings$')
 def no_policy_settings(step):
-    assert_policy_entries([], [])
+    keys_css = 'input.policy-key'
+    val_css = 'textarea.json'
+    k = world.browser.is_element_not_present_by_css(keys_css, 5)
+    v = world.browser.is_element_not_present_by_css(val_css, 5)
+    assert_true(k)
+    assert_true(v)
 
 
 @step('they are alphabetized$')
@@ -121,7 +126,7 @@ def the_policy_key_name_is_unchanged(step):
 def the_policy_key_name_is_changed(step):
     policy_key_css = 'input.policy-key'
     val = css_find(policy_key_css).first.value
-    assert_equal(val, 'new')
+    assert_equal(val, 'display_name_new')
 
 
 @step(u'the policy key value is unchanged$')
@@ -170,8 +175,8 @@ def delete_entry(index):
 
 
 def assert_policy_entries(expected_keys, expected_values):
-    assert_entries('.key input', expected_keys)
-    assert_entries('.json', expected_values)
+    assert_entries('.key input.policy-key', expected_keys)
+    assert_entries('textarea.json', expected_values)
 
 
 def assert_entries(css, expected_values):
@@ -184,14 +189,6 @@ def assert_entries(css, expected_values):
 
 def click_save():
     css = "a.save-button"
-
-    # def is_shown(driver):
-    #     visible = css_find(css).first.visible
-    #     if visible:
-    #         # Even when waiting for visible, this fails sporadically. Adding in a small wait.
-    #         time.sleep(float(1))
-    #     return visible
-    # wait_for(is_shown)
     css_click_at(css)
 
 

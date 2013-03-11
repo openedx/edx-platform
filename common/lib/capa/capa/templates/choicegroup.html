@@ -21,10 +21,14 @@
             <% 
                 if status == 'correct':
                     correctness = 'correct'
-                if status == 'incorrect':
+                elif status == 'incorrect':
                     correctness = 'incorrect'
+                else:
+                    correctness = None
             %>
+            % if correctness:
             class="choicegroup_${correctness}"
+            % endif
             % endif
             >  
             <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" value="${choice_id}"
