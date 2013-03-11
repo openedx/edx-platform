@@ -135,6 +135,9 @@ class CapaModule(XModule):
                 # see comment on randomization_bin
                 self.seed = randomization_bin(system.seed, self.location.url)
 
+        if self.max_attempts == '':
+            self.max_attempts = None
+
         # Need the problem location in openendedresponse to send out.  Adding
         # it to the system here seems like the least clunky way to get it
         # there.

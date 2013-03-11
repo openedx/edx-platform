@@ -276,10 +276,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         course = ms.get_item(location)
 
+        metadata = own_metadata(course)
         # add a bool piece of unknown metadata so we can verify we don't throw an exception
-        course.metadata['new_metadata'] = True
+        metadata['new_metadata'] = True
 
-        ms.update_metadata(location, course.metadata)
+        ms.update_metadata(location, metadata)
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
