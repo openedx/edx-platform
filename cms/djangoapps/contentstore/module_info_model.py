@@ -90,4 +90,4 @@ def set_module_info(store, location, post_data):
 
         # commit to datastore
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
-        store.update_metadata(item_location, module._model_data._kvs._metadata)
+        store.update_metadata(location, module._model_data._kvs._metadata)
