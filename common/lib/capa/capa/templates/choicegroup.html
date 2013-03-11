@@ -1,7 +1,7 @@
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
     <div class="indicator_container">
     % if input_type == 'checkbox' or not value:
-        % if status == 'unsubmitted':
+        % if status == 'unsubmitted' or show_correctness == 'never':
         <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
         % elif status == 'correct': 
         <span class="correct" id="status_${id}"></span>
@@ -21,10 +21,14 @@
             <% 
                 if status == 'correct':
                     correctness = 'correct'
-                if status == 'incorrect':
+                elif status == 'incorrect':
                     correctness = 'incorrect'
+                else:
+                    correctness = None
             %>
+            % if correctness and not show_correctness=='never':
             class="choicegroup_${correctness}"
+            % endif
             % endif
             >  
             <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" value="${choice_id}"
@@ -37,4 +41,7 @@
         <span id="answer_${id}"></span>
     </fieldset>
 
+    % if show_correctness == "never" and (value or status not in ['unsubmitted']):
+    <div class="capa_alert">${submitted_message}</div>
+    %endif
 </form>
