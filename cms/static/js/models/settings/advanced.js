@@ -1,8 +1,6 @@
 if (!CMS.Models['Settings']) CMS.Models.Settings = {};
 
 CMS.Models.Settings.Advanced = Backbone.Model.extend({
-    // the key for a newly added policy-- before the user has entered a key value
-    new_key : "__new_advanced_key__",
 
     defaults: {
         // the properties are whatever the user types in (in addition to whatever comes originally from the server)
@@ -12,16 +10,7 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
     blacklistKeys : [], // an array which the controller should populate directly for now [static not instance based]
 
     validate: function (attrs) {
-        var errors = {};
-        for (var key in attrs) {
-            if (key === this.new_key || _.isEmpty(key)) {
-                errors[key] = "A key must be entered.";
-            }
-            else if (_.contains(this.blacklistKeys, key)) {
-                errors[key] = key + " is a reserved keyword or can be edited on another screen";
-            }
-        }
-        if (!_.isEmpty(errors)) return errors;
+        // Keys can no longer be edited. We are currently not validating values.
     },
     
     save : function (attrs, options) {
