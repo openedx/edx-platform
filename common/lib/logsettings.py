@@ -88,7 +88,7 @@ def get_logger_config(log_dir,
         },
         'loggers': {
             'tracking': {
-                'handlers': ['tracking', 'http'],
+                'handlers': ['tracking'],
                 'level': 'DEBUG',
                 'propagate': False,
             },
@@ -120,12 +120,6 @@ def get_logger_config(log_dir,
                 'maxBytes': 1024 * 1024 * 2,
                 'backupCount': 5,
             },
-            'http' : {
-                'level': 'DEBUG',
-                'class': 'logging.handlers.HTTPHandler',
-                'host':'127.0.0.1:14141', 
-                'url':'/an_evt',
-            }
         })
     else:
         # for production environments we will only
