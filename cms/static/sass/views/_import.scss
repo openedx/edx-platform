@@ -1,7 +1,8 @@
 // studio - views - course import
 // ====================
 
-.import {
+body.course.import {
+  
   .import-overview {
     @extend .window;
     @include clearfix;

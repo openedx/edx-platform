@@ -1,7 +1,8 @@
 // studio - views - course static pages
 // ====================
 
-.static-pages {
+body.course.static-pages {
+  
   .new-static-page-button {
     @include grey-button;
     display: block;
