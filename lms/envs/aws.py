@@ -110,3 +110,6 @@ PEARSON = AUTH_TOKENS.get("PEARSON")
 
 # Datadog for events!
 DATADOG_API = AUTH_TOKENS.get("DATADOG_API")
+
+# Analytics dashboard server
+ANALYTICS_SERVER_URL = ENV_TOKENS.get("ANALYTICS_SERVER_URL")
