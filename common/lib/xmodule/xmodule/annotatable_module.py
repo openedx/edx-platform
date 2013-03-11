@@ -11,13 +11,13 @@ from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger(__name__)
 
+
 class AnnotatableModule(XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/html/display.coffee'),
                      resource_string(__name__, 'js/src/annotatable/display.coffee')],
-          'js': []
-         }
+          'js': []}
     js_module_name = "Annotatable"
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'annotatable'
@@ -34,11 +34,11 @@ class AnnotatableModule(XModule):
 
         if color is not None:
             if color in self.highlight_colors:
-                cls.append('highlight-'+color)
+                cls.append('highlight-' + color)
             attr['_delete'] = highlight_key
         attr['value'] = ' '.join(cls)
 
-        return { 'class' : attr }
+        return {'class': attr}
 
     def _get_annotation_data_attr(self, index, el):
         """ Returns a dict in which the keys are the HTML data attributes
@@ -58,7 +58,7 @@ class AnnotatableModule(XModule):
             if xml_key in el.attrib:
                 value = el.get(xml_key, '')
                 html_key = attrs_map[xml_key]
-                data_attrs[html_key] = { 'value': value, '_delete': xml_key }
+                data_attrs[html_key] = {'value': value, '_delete': xml_key}
 
         return data_attrs
 
@@ -75,7 +75,6 @@ class AnnotatableModule(XModule):
             if '_delete' in attr[key] and attr[key]['_delete'] is not None:
                 delete_key = attr[key]['_delete']
                 del el.attrib[delete_key]
-
 
     def _render_content(self):
         """ Renders annotatable content with annotation spans and returns HTML. """
@@ -123,9 +122,9 @@ class AnnotatableModule(XModule):
         self.element_id = self.location.html_id()
         self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
 
+
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule
     stores_state = True
     template_dir_name = "annotatable"
     mako_template = "widgets/raw-edit.html"
-
