@@ -170,4 +170,12 @@ class FolditDescriptor(XmlDescriptor, EditingDescriptor):
     # so always need to actually check.
     always_recalculate_grades = True
 
-    metadata_attributes = XmlDescriptor.metadata_attributes + ('required_level', 'required_sublevel')
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        """ Get the xml_object's attributes.  """
+
+        return {'metadata': xml_object.attrib}
+
+    def definition_to_xml(self):
+        xml_object = etree.Element('foldit')
+        return xml_object
