@@ -1,6 +1,8 @@
 from lettuce import world, step
 from common import *
 from nose.tools import assert_equal
+from selenium.webdriver.common.keys import Keys
+import time
 
 ############### ACTIONS ####################
 
@@ -37,10 +39,14 @@ def i_save_a_new_section_release_date(step):
     date_css = 'input.start-date.date.hasDatepicker'
     time_css = 'input.start-time.time.ui-timepicker-input'
     css_fill(date_css, '12/25/2013')
-    # click here to make the calendar go away
-    css_click(time_css)
+    # hit TAB to get to the time field
+    e = css_find(date_css).first
+    e._element.send_keys(Keys.TAB)
     css_fill(time_css, '12:00am')
-    css_click('a.save-button')
+    e = css_find(time_css).first
+    e._element.send_keys(Keys.TAB)
+    time.sleep(float(1))
+    world.browser.click_link_by_text('Save')
 
 
 ############ ASSERTIONS ###################
@@ -106,7 +112,7 @@ def the_section_release_date_picker_not_visible(step):
 def the_section_release_date_is_updated(step):
     css = 'span.published-status'
     status_text = world.browser.find_by_css(css).text
-    assert status_text == 'Will Release: 12/25/2013 at 12:00am'
+    assert_equal(status_text,'Will Release: 12/25/2013 at 12:00am')
 
 
 ############ HELPER METHODS ###################

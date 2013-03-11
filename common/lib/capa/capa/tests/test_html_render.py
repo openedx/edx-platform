@@ -3,6 +3,7 @@ from lxml import etree
 import os
 import textwrap
 import json
+
 import mock
 
 from capa.capa_problem import LoncapaProblem
@@ -49,6 +50,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         self.assertEqual(test_element.text, "Test include")
 
 
+
+
     def test_process_outtext(self):
         # Generate some XML with <startouttext /> and <endouttext />
         xml_str = textwrap.dedent("""
@@ -85,6 +88,25 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect that the script element has been removed from the rendered HTML
         script_element = rendered_html.find('script')
         self.assertEqual(None, script_element)
+
+    def test_render_javascript(self):
+        # Generate some XML with a <script> tag
+        xml_str = textwrap.dedent("""
+            <problem>
+                <script type="text/javascript">function(){}</script>
+            </problem>
+        """)
+
+        # Create the problem
+        problem = LoncapaProblem(xml_str, '1', system=test_system)
+
+        # Render the HTML
+        rendered_html = etree.XML(problem.get_html())
+
+
+        # expect the javascript is still present in the rendered html
+        self.assertTrue("<script type=\"text/javascript\">function(){}</script>" in etree.tostring(rendered_html))
+
 
     def test_render_response_xml(self):
         # Generate some XML for a string response

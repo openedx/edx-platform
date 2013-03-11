@@ -18,7 +18,6 @@ import pystache_custom as pystache
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import path_to_location
 
 log = logging.getLogger(__name__)
 
@@ -166,21 +165,12 @@ def initialize_discussion_info(course):
     # get all discussion models within this course_id
     all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course, 'discussion', None], course_id=course_id)
 
-    path_to_locations = {}
     for module in all_modules:
         skip_module = False
         for key in ('id', 'discussion_category', 'for'):
             if key not in module.metadata:
                 log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
                 skip_module = True
-
-        # cdodge: pre-compute the path_to_location. Note this can throw an exception for any
-        # dangling discussion modules
-        try:
-            path_to_locations[module.location] = path_to_location(modulestore(), course.id, module.location)
-        except NoPathToItem:
-            log.warning("Could not compute path_to_location for {0}. Perhaps this is an orphaned discussion module?!? Skipping...".format(module.location))
-            skip_module = True
 
         if skip_module:
             continue
@@ -246,7 +236,6 @@ def initialize_discussion_info(course):
     _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
     _DISCUSSIONINFO[course.id]['category_map'] = category_map
     _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now()
-    _DISCUSSIONINFO[course.id]['path_to_location'] = path_to_locations
 
 
 class JsonResponse(HttpResponse):
@@ -403,21 +392,8 @@ def get_courseware_context(content, course):
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
 
-        # cdodge: did we pre-compute, if so, then let's use that rather than recomputing
-        if 'path_to_location' in _DISCUSSIONINFO[course.id] and location in _DISCUSSIONINFO[course.id]['path_to_location']:
-            (course_id, chapter, section, position) = _DISCUSSIONINFO[course.id]['path_to_location'][location]
-        else:
-            try:
-                (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
-            except NoPathToItem:
-                # Object is not in the graph any longer, let's just get path to the base of the course
-                # so that we can at least return something to the caller
-                (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, course.location)
-
-        url = reverse('courseware_position', kwargs={"course_id":course_id,
-                                                     "chapter":chapter,
-                                                     "section":section,
-                                                     "position":position})
+        url = reverse('jump_to', kwargs={"course_id":course.location.course_id, 
+                                                    "location": location})
 
         content_info = {"courseware_url": url, "courseware_title": title}
     return content_info

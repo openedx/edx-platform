@@ -63,7 +63,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
 
@@ -102,6 +101,37 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                 course_tabs.append('i4x://edX/full/static_tab/{0}'.format(tab['url_slug']))
 
         self.assertEqual(reverse_tabs, course_tabs)
+
+    def test_delete(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        ms = modulestore('direct')
+        course = ms.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        sequential = ms.get_item(Location(['i4x', 'edX', 'full', 'sequential','Administrivia_and_Circuit_Elements', None]))
+
+        chapter = ms.get_item(Location(['i4x', 'edX', 'full', 'chapter','Week_1', None]))
+
+        # make sure the parent no longer points to the child object which was deleted
+        self.assertTrue(sequential.location.url() in chapter.definition['children'])
+
+        resp = self.client.post(reverse('delete_item'), json.dumps({'id': sequential.location.url(), 'delete_children':'true'}), "application/json")
+
+        bFound = False
+        try:
+            sequential = ms.get_item(Location(['i4x', 'edX', 'full', 'sequential','Administrivia_and_Circuit_Elements', None]))
+            bFound = True
+        except ItemNotFoundError:
+            pass
+
+        self.assertFalse(bFound)
+
+        chapter = ms.get_item(Location(['i4x', 'edX', 'full', 'chapter','Week_1', None]))
+
+        # make sure the parent no longer points to the child object which was deleted
+        self.assertFalse(sequential.location.url() in chapter.definition['children'])
+
+        
 
     def test_about_overrides(self):
         '''

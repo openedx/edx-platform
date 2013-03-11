@@ -1,9 +1,10 @@
 from lettuce import world, step
 from common import *
 import time
+from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.support import expected_conditions as EC
 
-from nose.tools import assert_equal
-from nose.tools import assert_true
+from nose.tools import assert_true, assert_false, assert_equal
 
 """
 http://selenium.googlecode.com/svn/trunk/docs/api/py/webdriver/selenium.webdriver.common.keys.html
@@ -19,6 +20,7 @@ def i_select_advanced_settings(step):
         css_click(expand_icon_css)
     link_css = 'li.nav-course-settings-advanced a'
     css_click(link_css)
+    # world.browser.click_link_by_text('Advanced Settings')
 
 
 @step('I am on the Advanced Course Settings page in Studio$')
@@ -37,13 +39,25 @@ def reload_the_page(step):
 def edit_the_name_of_a_policy_key(step):
     policy_key_css = 'input.policy-key'
     e = css_find(policy_key_css).first
-    e.fill('new')
+    e.type('_new')
 
 
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(step, name):
-    world.browser.click_link_by_text(name)
+    def is_visible(driver):
+        return EC.visibility_of_element_located((By.CSS_SELECTOR,css,))
+    def is_invisible(driver):
+        return EC.invisibility_of_element_located((By.CSS_SELECTOR,css,))
 
+    css = 'a.%s-button' % name.lower()
+    wait_for(is_visible)
+
+    try:
+        css_click_at(css)
+        wait_for(is_invisible)
+    except WebDriverException, e:
+        css_click_at(css)
+        wait_for(is_invisible)
 
 @step(u'I edit the value of a policy key$')
 def edit_the_value_of_a_policy_key(step):
@@ -83,7 +97,12 @@ def i_see_only_display_name(step):
 
 @step('there are no advanced policy settings$')
 def no_policy_settings(step):
-    assert_policy_entries([], [])
+    keys_css = 'input.policy-key'
+    val_css = 'textarea.json'
+    k = world.browser.is_element_not_present_by_css(keys_css, 5)
+    v = world.browser.is_element_not_present_by_css(val_css, 5)
+    assert_true(k)
+    assert_true(v)
 
 
 @step('they are alphabetized$')
@@ -99,29 +118,29 @@ def it_is_formatted(step):
 @step(u'the policy key name is unchanged$')
 def the_policy_key_name_is_unchanged(step):
     policy_key_css = 'input.policy-key'
-    e = css_find(policy_key_css).first
-    assert_equal(e.value, 'display_name')
+    val = css_find(policy_key_css).first.value
+    assert_equal(val, 'display_name')
 
 
 @step(u'the policy key name is changed$')
 def the_policy_key_name_is_changed(step):
     policy_key_css = 'input.policy-key'
-    e = css_find(policy_key_css).first
-    assert_equal(e.value, 'new')
+    val = css_find(policy_key_css).first.value
+    assert_equal(val, 'display_name_new')
 
 
 @step(u'the policy key value is unchanged$')
 def the_policy_key_value_is_unchanged(step):
     policy_value_css = 'li.course-advanced-policy-list-item div.value textarea'
-    e = css_find(policy_value_css).first
-    assert_equal(e.value, '"Robot Super Course"')
+    val = css_find(policy_value_css).first.value
+    assert_equal(val, '"Robot Super Course"')
 
 
 @step(u'the policy key value is changed$')
 def the_policy_key_value_is_unchanged(step):
     policy_value_css = 'li.course-advanced-policy-list-item div.value textarea'
-    e = css_find(policy_value_css).first
-    assert_equal(e.value, '"Robot Super Course X"')
+    val = css_find(policy_value_css).first.value
+    assert_equal(val, '"Robot Super Course X"')
 
 
 ############# HELPERS ###############
@@ -132,19 +151,23 @@ def create_entry(key, value):
     new_key_css = 'div#__new_advanced_key__ input'
     new_key_element = css_find(new_key_css).first
     new_key_element.fill(key)
-#   For some reason have to get the instance for each command (get error that it is no longer attached to the DOM)
-#   Have to do all this because Selenium has a bug that fill does not remove existing text
+#   For some reason have to get the instance for each command 
+#   (get error that it is no longer attached to the DOM)
+#   Have to do all this because Selenium fill does not remove existing text
     new_value_css = 'div.CodeMirror textarea'
     css_find(new_value_css).last.fill("")
     css_find(new_value_css).last._element.send_keys(Keys.DELETE, Keys.DELETE)
     css_find(new_value_css).last.fill(value)
+    # Add in a TAB key press because intermittently on ubuntu the
+    # last character of "value" above was not getting typed in
+    css_find(new_value_css).last._element.send_keys(Keys.TAB)
 
 
 def delete_entry(index):
     """ 
     Delete the nth entry where index is 0-based
     """
-    css = '.delete-button'
+    css = 'a.delete-button'
     assert_true(world.browser.is_element_present_by_css(css, 5))
     delete_buttons = css_find(css)
     assert_true(len(delete_buttons) > index, "no delete button exists for entry " + str(index))
@@ -152,8 +175,8 @@ def delete_entry(index):
 
 
 def assert_policy_entries(expected_keys, expected_values):
-    assert_entries('.key input', expected_keys)
-    assert_entries('.json', expected_values)
+    assert_entries('.key input.policy-key', expected_keys)
+    assert_entries('textarea.json', expected_values)
 
 
 def assert_entries(css, expected_values):
@@ -165,16 +188,8 @@ def assert_entries(css, expected_values):
 
 
 def click_save():
-    css = ".save-button"
-
-    def is_shown(driver):
-        visible = css_find(css).first.visible
-        if visible:
-            # Even when waiting for visible, this fails sporadically. Adding in a small wait.
-            time.sleep(float(1))
-        return visible
-    wait_for(is_shown)
-    css_click(css)
+    css = "a.save-button"
+    css_click_at(css)
 
 
 def fill_last_field(value):

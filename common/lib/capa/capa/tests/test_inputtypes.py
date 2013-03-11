@@ -102,6 +102,8 @@ class ChoiceGroupTest(unittest.TestCase):
                     'choices': [('foil1', '<text>This is foil One.</text>'),
                                 ('foil2', '<text>This is foil Two.</text>'),
                                 ('foil3', 'This is foil Three.'), ],
+                    'show_correctness': 'always',
+                    'submitted_message': 'Answer received.',
                     'name_array_suffix': expected_suffix,   # what is this for??
                     }
 
