@@ -19,7 +19,7 @@ from capa.xqueue_interface import dateformat
 
 class ResponseTest(unittest.TestCase):
     """ Base class for tests of capa responses."""
-    
+
     xml_factory_class = None
 
     def setUp(self):
@@ -43,7 +43,7 @@ class ResponseTest(unittest.TestCase):
 
         for input_str in incorrect_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'incorrect', 
+            self.assertEqual(result, 'incorrect',
                             msg="%s should be marked incorrect" % str(input_str))
 
 class MultiChoiceResponseTest(ResponseTest):
@@ -61,7 +61,7 @@ class MultiChoiceResponseTest(ResponseTest):
     def test_named_multiple_choice_grade(self):
         problem = self.build_problem(choices=[False, True, False],
                                     choice_names=["foil_1", "foil_2", "foil_3"])
-        
+
         # Ensure that we get the expected grades
         self.assert_grade(problem, 'choice_foil_1', 'incorrect')
         self.assert_grade(problem, 'choice_foil_2', 'correct')
@@ -117,7 +117,7 @@ class ImageResponseTest(ResponseTest):
 
         # Anything inside the rectangle (and along the borders) is correct
         # Everything else is incorrect
-        correct_inputs = ["[12,19]", "[10,10]", "[20,20]", 
+        correct_inputs = ["[12,19]", "[10,10]", "[20,20]",
                             "[10,15]", "[20,15]", "[15,10]", "[15,20]"]
         incorrect_inputs = ["[4,6]", "[25,15]", "[15,40]", "[15,4]"]
         self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
@@ -259,7 +259,7 @@ class OptionResponseTest(ResponseTest):
     xml_factory_class = OptionResponseXMLFactory
 
     def test_grade(self):
-        problem = self.build_problem(options=["first", "second", "third"], 
+        problem = self.build_problem(options=["first", "second", "third"],
                                     correct_option="second")
 
         # Assert that we get the expected grades
@@ -374,8 +374,8 @@ class StringResponseTest(ResponseTest):
         hints = [("wisconsin", "wisc", "The state capital of Wisconsin is Madison"),
                 ("minnesota", "minn", "The state capital of Minnesota is St. Paul")]
 
-        problem = self.build_problem(answer="Michigan", 
-                                    case_sensitive=False, 
+        problem = self.build_problem(answer="Michigan",
+                                    case_sensitive=False,
                                     hints=hints)
 
         # We should get a hint for Wisconsin
@@ -543,7 +543,7 @@ class ChoiceResponseTest(ResponseTest):
     xml_factory_class = ChoiceResponseXMLFactory
 
     def test_radio_group_grade(self):
-        problem = self.build_problem(choice_type='radio', 
+        problem = self.build_problem(choice_type='radio',
                                         choices=[False, True, False])
 
         # Check that we get the expected results
@@ -601,17 +601,17 @@ class NumericalResponseTest(ResponseTest):
         correct_responses = ["4", "4.0", "4.00"]
         incorrect_responses = ["", "3.9", "4.1", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
-        
+
 
     def test_grade_decimal_tolerance(self):
         problem = self.build_problem(question_text="What is 2 + 2 approximately?",
                                         explanation="The answer is 4",
                                         answer=4,
                                         tolerance=0.1)
-        correct_responses = ["4.0", "4.00", "4.09", "3.91"] 
+        correct_responses = ["4.0", "4.00", "4.09", "3.91"]
         incorrect_responses = ["", "4.11", "3.89", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
-                        
+
     def test_grade_percent_tolerance(self):
         problem = self.build_problem(question_text="What is 2 + 2 approximately?",
                                         explanation="The answer is 4",
@@ -642,6 +642,15 @@ class NumericalResponseTest(ResponseTest):
         incorrect_responses = ["", "2.11", "1.89", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
+    def test_exponential_answer(self):
+        problem = self.build_problem(question_text="What 5 * 10?",
+                                     explanation="The answer is 50",
+                                     answer="5e+1")
+        correct_responses = ["50", "50.0", "5e1", "5e+1", "50e0", "500e-1"]
+        incorrect_responses = ["", "3.9", "4.1", "0", "5.01e1"]
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
+
 
 class CustomResponseTest(ResponseTest):
     from response_xml_factory import CustomResponseXMLFactory
@@ -667,7 +676,7 @@ class CustomResponseTest(ResponseTest):
         # The code can also set the global overall_message (str)
         # to pass a message that applies to the whole response
         inline_script = textwrap.dedent("""
-        messages[0] = "Test Message" 
+        messages[0] = "Test Message"
         overall_message = "Overall message"
         """)
         problem = self.build_problem(answer=inline_script)
@@ -687,14 +696,14 @@ class CustomResponseTest(ResponseTest):
     def test_function_code_single_input(self):
 
         # For function code, we pass in these arguments:
-        # 
+        #
         #   'expect' is the expect attribute of the <customresponse>
         #
         #   'answer_given' is the answer the student gave (if there is just one input)
         #       or an ordered list of answers (if there are multiple inputs)
-        #   
         #
-        # The function should return a dict of the form 
+        #
+        # The function should return a dict of the form
         # { 'ok': BOOL, 'msg': STRING }
         #
         script = textwrap.dedent("""
@@ -727,7 +736,7 @@ class CustomResponseTest(ResponseTest):
     def test_function_code_multiple_input_no_msg(self):
 
         # Check functions also have the option of returning
-        # a single boolean value 
+        # a single boolean value
         # If true, mark all the inputs correct
         # If false, mark all the inputs incorrect
         script = textwrap.dedent("""
@@ -736,7 +745,7 @@ class CustomResponseTest(ResponseTest):
                         answer_given[1] == expect)
         """)
 
-        problem = self.build_problem(script=script, cfn="check_func", 
+        problem = self.build_problem(script=script, cfn="check_func",
                                     expect="42", num_inputs=2)
 
         # Correct answer -- expect both inputs marked correct
@@ -764,10 +773,10 @@ class CustomResponseTest(ResponseTest):
 
         # If the <customresponse> has multiple inputs associated with it,
         # the check function can return a dict of the form:
-        # 
+        #
         # {'overall_message': STRING,
         #  'input_list': [{'ok': BOOL, 'msg': STRING}, ...] }
-        # 
+        #
         # 'overall_message' is displayed at the end of the response
         #
         # 'input_list' contains dictionaries representing the correctness
@@ -784,7 +793,7 @@ class CustomResponseTest(ResponseTest):
                             {'ok': check3,  'msg': 'Feedback 3'} ] }
             """)
 
-        problem = self.build_problem(script=script, 
+        problem = self.build_problem(script=script,
                                     cfn="check_func", num_inputs=3)
 
         # Grade the inputs (one input incorrect)
@@ -821,11 +830,11 @@ class CustomResponseTest(ResponseTest):
                 check1 = (int(answer_given[0]) == 1)
                 check2 = (int(answer_given[1]) == 2)
                 check3 = (int(answer_given[2]) == 3)
-                return {'ok': (check1 and check2 and check3),  
+                return {'ok': (check1 and check2 and check3),
                         'msg': 'Message text'}
             """)
 
-        problem = self.build_problem(script=script, 
+        problem = self.build_problem(script=script,
                                     cfn="check_func", num_inputs=3)
 
         # Grade the inputs (one input incorrect)
@@ -862,7 +871,7 @@ class CustomResponseTest(ResponseTest):
         # Expect that an exception gets raised when we check the answer
         with self.assertRaises(Exception):
             problem.grade_answers({'1_2_1': '42'})
-    
+
     def test_invalid_dict_exception(self):
 
         # Construct a script that passes back an invalid dict format
