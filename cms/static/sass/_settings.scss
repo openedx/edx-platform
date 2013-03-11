@@ -239,9 +239,9 @@ body.course.settings {
 
     // not editable fields
     .field.is-not-editable {
-
-      label, .label {
-        color: $gray-l2;
+     
+      & label.is-focused {
+       color: $gray-d2;
       }
     }
 
@@ -668,11 +668,6 @@ body.course.settings {
        .key {
          width: flex-grid(3, 9);
          margin-right: flex-gutter();
-
-          // disabled/uneditable style
-          label {
-            color: $gray-l2;
-          }
         }
 
         .value {
