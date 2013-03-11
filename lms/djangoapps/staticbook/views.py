@@ -1,7 +1,7 @@
 from lxml import etree
 
-# from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from mitxmako.shortcuts import render_to_response
 
 from courseware.access import has_access
@@ -15,6 +15,8 @@ def index(request, course_id, book_index, page=None):
     staff_access = has_access(request.user, course, 'staff')
 
     book_index = int(book_index)
+    if book_index < 0 or book_index >= len(course.textbooks):
+        raise Http404("Invalid book index value: {0}".format(book_index))
     textbook = course.textbooks[book_index]
     table_of_contents = textbook.table_of_contents
 
@@ -40,6 +42,8 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     staff_access = has_access(request.user, course, 'staff')
 
     book_index = int(book_index)
+    if book_index < 0 or book_index >= len(course.pdf_textbooks):
+        raise Http404("Invalid book index value: {0}".format(book_index))
     textbook = course.pdf_textbooks[book_index]
 
     def remap_static_url(original_url, course):
@@ -74,6 +78,8 @@ def html_index(request, course_id, book_index, chapter=None, anchor_id=None):
     staff_access = has_access(request.user, course, 'staff')
 
     book_index = int(book_index)
+    if book_index < 0 or book_index >= len(course.html_textbooks):
+        raise Http404("Invalid book index value: {0}".format(book_index))
     textbook = course.html_textbooks[book_index]
 
     def remap_static_url(original_url, course):
