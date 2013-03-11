@@ -168,6 +168,8 @@ class CapaModule(XModule):
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
 
+            self.set_state_from_lcp()
+
     def new_lcp(self, state, text=None):
         if text is None:
             text = self.data
