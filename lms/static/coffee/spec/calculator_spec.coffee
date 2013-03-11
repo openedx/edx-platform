@@ -4,9 +4,6 @@ describe 'Calculator', ->
     @calculator = new Calculator
 
   describe 'bind', ->
-    beforeEach ->
-      Calculator.bind()
-
     it 'bind the calculator button', ->
       expect($('.calc')).toHandleWith 'click', @calculator.toggle
 
