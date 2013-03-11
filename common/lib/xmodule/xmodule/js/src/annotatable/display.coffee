@@ -75,6 +75,7 @@ class @Annotatable
             classes: 'ui-tooltip-annotatable'
         events:
             show: @onShowTip
+            move: @onMoveTip
 
     onClickToggleAnnotations: (e) => @toggleAnnotations()
 
@@ -86,6 +87,40 @@ class @Annotatable
 
     onShowTip: (event, api) =>
         event.preventDefault() if @annotationsHidden
+
+    onMoveTip: (event, api, position) =>
+        ###
+        This method handles an edge case in which a tooltip is displayed above
+        a non-overlapping span like this:
+
+                             (( TOOLTIP ))
+                                  \/
+        text text text ... text text text ...... <span span span>
+        <span span span>
+
+        The problem is that the tooltip looks disconnected from both spans, so
+        we should re-position the tooltip to appear above the span.
+        ###
+
+        tip = api.elements.tooltip
+        adjust_y = api.options.position?.adjust?.y || 0
+        target = api.elements.target
+        rects = $(target).get(0).getClientRects()
+        is_non_overlapping = (rects?.length == 2 and rects[0].left > rects[1].right)
+
+        if is_non_overlapping
+            focus_rect = rects[0]
+            rect_center = focus_rect.left + (focus_rect.width / 2)
+            rect_top = focus_rect.top
+            tip_width = $(tip).width()
+            tip_height = $(tip).height()
+            tip_left = rect_center - (tip_width / 2)
+            tip_top =  window.pageYOffset + rect_top - tip_height + adjust_y
+            win_width = $(window).width()
+            if tip_left + tip_width > win_width
+                tip_left = win_width - tip_width
+            position.left = tip_left
+            position.top = tip_top
 
     getSpanForProblemReturn: (el) ->
         problem_id = $(@problemReturnSelector).index(el)
