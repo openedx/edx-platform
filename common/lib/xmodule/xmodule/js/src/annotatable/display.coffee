@@ -1,7 +1,8 @@
 class @Annotatable
     _debug: false
 
-    # selectors for the annotatable xmodule 
+    # selectors for the annotatable xmodule
+    wrapperSelector:            '.annotatable-wrapper'
     toggleAnnotationsSelector:  '.annotatable-toggle-annotations'
     toggleInstructionsSelector: '.annotatable-toggle-instructions'
     instructionsSelector:       '.annotatable-instructions'
@@ -61,7 +62,7 @@ class @Annotatable
             my: 'bottom center' # of tooltip
             at: 'top center' # of target
             target: $(el) # where the tooltip was triggered (i.e. the annotation span)
-            container: @$el
+            container: @$(@wrapperSelector)
             adjust:
                 y: -5
         show:
@@ -104,23 +105,38 @@ class @Annotatable
 
         tip = api.elements.tooltip
         adjust_y = api.options.position?.adjust?.y || 0
+        container = api.options.position?.container || $('body')
         target = api.elements.target
+
         rects = $(target).get(0).getClientRects()
         is_non_overlapping = (rects?.length == 2 and rects[0].left > rects[1].right)
 
         if is_non_overlapping
-            focus_rect = rects[0]
+            # we want to choose the largest of the two non-overlapping spans and display
+            # the tooltip above the center of it (see api.options.position settings)
+            focus_rect = (if rects[0].width > rects[1].width then rects[0] else rects[1])
             rect_center = focus_rect.left + (focus_rect.width / 2)
             rect_top = focus_rect.top
             tip_width = $(tip).width()
             tip_height = $(tip).height()
-            tip_left = rect_center - (tip_width / 2)
-            tip_top =  window.pageYOffset + rect_top - tip_height + adjust_y
+
+            # tooltip is positioned relative to its container, so we need to factor in offsets
+            container_offset = $(container).offset()
+            offset_left = -container_offset.left
+            offset_top = $('body').scrollTop() - container_offset.top
+
+            tip_left = offset_left + rect_center - (tip_width / 2)
+            tip_top =  offset_top + rect_top - tip_height + adjust_y
+
+            # make sure the new tip position doesn't clip the edges of the screen
             win_width = $(window).width()
-            if tip_left + tip_width > win_width
-                tip_left = win_width - tip_width
-            position.left = tip_left
-            position.top = tip_top
+            if tip_left < offset_left
+                tip_left = offset_left
+            else if tip_left + tip_width > win_width + offset_left
+                tip_left = win_width + offset_left - tip_width
+
+            # final step: update the position object (used by qtip2 to show the tip after the move event)
+            $.extend position, 'left': tip_left, 'top': tip_top
 
     getSpanForProblemReturn: (el) ->
         problem_id = $(@problemReturnSelector).index(el)
