@@ -2444,7 +2444,7 @@ body.discussion {
     background-color:#fff;
   }
 
-.discussion-flag-abuse {
+.discussion-pin {
       font-size: 12px;
       float:right;
       padding-right: 5px;
@@ -2457,7 +2457,7 @@ body.discussion {
   width: 10px; 
   height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/notpinned.png') no-repeat 0 0; 
+  background: transparent url('../images/unpinned.png') no-repeat 0 0; 
 }
 
 .pinned .icon
