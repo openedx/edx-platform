@@ -10,6 +10,7 @@ import paramiko
 import boto
 
 dog_http_api.api_key = settings.DATADOG_API
+dog_stats_api.start(api_key=settings.DATADOG_API, statsd=True)
 
 
 class Command(BaseCommand):

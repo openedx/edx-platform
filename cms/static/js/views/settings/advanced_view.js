@@ -31,7 +31,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // because these are outside of this.$el, they can't be in the event hash
         $('.save-button').on('click', this, this.saveView);
         $('.cancel-button').on('click', this, this.revertView);
-        this.model.on('error', this.handleValidationError, this);
+        this.listenTo(this.model, 'error', CMS.ServerError);
+        this.listenTo(this.model, 'invalid', this.handleValidationError);
     },
     render: function() {
         // catch potential outside call before template loaded
@@ -228,7 +229,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 var error = {};
                 error[oldKey] = 'You have already defined "' + newKey + '" in the manual policy definitions.';
                 error[newKey] = "You tried to enter a duplicate of this key.";
-                this.model.trigger("error", this.model, error);
+                this.model.trigger("invalid", this.model, error);
                 return false;
             }
 
@@ -244,7 +245,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                     // swap to the key which the map knows about
                     validation[oldKey] = validation[newKey];
                 }
-                this.model.trigger("error", this.model, validation);
+                this.model.trigger("invalid", this.model, validation);
                 // abandon update
                 return;
             }

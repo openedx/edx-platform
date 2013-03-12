@@ -84,12 +84,19 @@ def replace_static_urls(text, data_directory, course_namespace=None):
         if rest.endswith('?raw'):
             return original
 
-        # course_namespace is not None, then use studio style urls
-        if course_namespace is not None and not isinstance(modulestore(), XMLModuleStore):
-            url = StaticContent.convert_legacy_static_url(rest, course_namespace)
         # In debug mode, if we can find the url as is,
-        elif settings.DEBUG and finders.find(rest, True):
+        if settings.DEBUG and finders.find(rest, True):
             return original
+        # if we're running with a MongoBacked store course_namespace is not None, then use studio style urls
+        elif  course_namespace is not None and not isinstance(modulestore(), XMLModuleStore):
+            # first look in the static file pipeline and see if we are trying to reference
+            # a piece of static content which is in the mitx repo (e.g. JS associated with an xmodule)
+            if staticfiles_storage.exists(rest):
+                url = staticfiles_storage.url(rest)
+            else:
+                # if not, then assume it's courseware specific content and then look in the
+                # Mongo-backed database
+                url = StaticContent.convert_legacy_static_url(rest, course_namespace)
         # Otherwise, look the file up in staticfiles_storage, and append the data directory if needed
         else:
             course_path = "/".join((data_directory, rest))

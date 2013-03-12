@@ -12,7 +12,7 @@ def check_path_to_location(modulestore):
          ("edX/toy/2012_Fall", "Overview", "Welcome", None)),
         ("i4x://edX/toy/chapter/Overview",
          ("edX/toy/2012_Fall", "Overview", None, None)),
-        )
+    )
     course_id = "edX/toy/2012_Fall"
 
     for location, expected in should_work:
@@ -20,6 +20,6 @@ def check_path_to_location(modulestore):
 
     not_found = (
         "i4x://edX/toy/video/WelcomeX", "i4x://edX/toy/course/NotHome"
-        )
+    )
     for location in not_found:
         assert_raises(ItemNotFoundError, path_to_location, modulestore, course_id, location)

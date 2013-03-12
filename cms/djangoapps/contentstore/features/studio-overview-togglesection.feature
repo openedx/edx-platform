@@ -21,6 +21,7 @@ Feature: Overview Toggle Section
 		Then I see the "Collapse All Sections" link
 		And all sections are expanded
 
+	@skip-phantom
 	Scenario: Collapse link is not removed after last section of a course is deleted
 		Given I have a course with 1 section
 		And I navigate to the course overview page
