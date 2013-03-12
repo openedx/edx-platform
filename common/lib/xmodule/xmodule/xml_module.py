@@ -137,18 +137,6 @@ class XmlDescriptor(XModuleDescriptor):
         'allow_anonymous_to_peers': bool_map
     }
 
-    # VS[compat].  Backwards compatibility code that can go away after
-    # importing 2012 courses.
-    # A set of metadata key conversions that we want to make
-    metadata_translations = {
-        'slug': 'url_name',
-        'name': 'display_name',
-        }
-
-    @classmethod
-    def _translate(cls, key):
-        'VS[compat]'
-        return cls.metadata_translations.get(key, key)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

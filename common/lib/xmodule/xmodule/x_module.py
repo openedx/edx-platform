@@ -358,6 +358,14 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
         default=None,
     )
 
+    # VS[compat].  Backwards compatibility code that can go away after
+    # importing 2012 courses.
+    # A set of metadata key conversions that we want to make
+    metadata_translations = {
+        'slug': 'url_name',
+        'name': 'display_name',
+        }
+
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
                  system,
@@ -493,6 +501,10 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
         system: A DescriptorSystem for interacting with external resources
         """
         model_data = {}
+
+        for key, value in json_data.get('metadata', {}).items():
+            model_data[cls._translate(key)] = value
+
         model_data.update(json_data.get('metadata', {}))
 
         definition = json_data.get('definition', {})
@@ -506,6 +518,11 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
                 model_data['data'] = definition['data']
 
         return cls(system=system, location=json_data['location'], model_data=model_data)
+
+    @classmethod
+    def _translate(cls, key):
+        'VS[compat]'
+        return cls.metadata_translations.get(key, key)
 
     # ================================= XML PARSING ============================
     @staticmethod
