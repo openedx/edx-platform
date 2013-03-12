@@ -490,6 +490,3 @@ class OpenEndedChild(object):
             eta_string = ""
 
         return eta_string
-
-
-

@@ -133,7 +133,6 @@ class CombinedOpenEndedRubric(object):
                 categories.append(self.extract_category(category))
         return categories
 
-
     def extract_category(self, category):
         '''
         construct an individual category
@@ -235,7 +234,6 @@ class CombinedOpenEndedRubric(object):
                                            })
         return html
 
-
     @staticmethod
     def validate_options(options):
         '''
@@ -328,9 +326,3 @@ class CombinedOpenEndedRubric(object):
             tuples.append([0, category, score, [], []])
             tup_ind = len(tuples) - 1
         return tuples, tup_ind
-
-
-
-
-
-

@@ -73,7 +73,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         html = system.render_template('{0}/self_assessment_prompt.html'.format(self.TEMPLATE_DIR), context)
         return html
 
-
     def handle_ajax(self, dispatch, get, system):
         """
         This is called by courseware.module_render, to handle an AJAX call.
@@ -158,7 +157,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.state))
 
         return system.render_template('{0}/self_assessment_hint.html'.format(self.TEMPLATE_DIR), context)
-
 
     def save_answer(self, get, system):
         """

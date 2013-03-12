@@ -77,7 +77,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             self.send_to_grader(self.latest_answer(), system)
             self.created = False
 
-
     def _parse(self, oeparam, prompt, rubric, system):
         '''
         Parse OpenEndedResponse XML:
@@ -270,7 +269,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         return True
 
-
     def get_answers(self):
         """
         Gets and shows the answer for this problem.
@@ -414,7 +412,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         })
 
         return feedback_template, rubric_scores
-
 
     def _parse_score_msg(self, score_msg, system, join_feedback=True):
         """
