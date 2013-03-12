@@ -6,4 +6,4 @@
 # XBlock:
 # Might change frequently, so put it in local-requirements.txt,
 # but conceptually is an external package, so it is in a separate repo.
--e git+ssh://git@github.com/MITx/xmodule-debugger@857dcfe8#egg=XBlock
+-e git+ssh://git@github.com/MITx/xmodule-debugger@6d5c2443#egg=XBlock
