@@ -268,7 +268,7 @@ class XmlDescriptor(XModuleDescriptor):
         """
         for attr in policy:
             attr_map = cls.xml_attribute_map.get(attr, AttrMap())
-            metadata[attr] = attr_map.from_xml(policy[attr])
+            metadata[cls._translate(attr)] = attr_map.from_xml(policy[attr])
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
