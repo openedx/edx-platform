@@ -2443,3 +2443,38 @@ body.discussion {
     font-style: italic;
     background-color:#fff;
   }
+
+.discussion-flag-abuse {
+      font-size: 12px;
+      float:right;
+      padding-right: 5px;
+      font-style: italic; 
+    }  
+    
+.notpinned .icon
+{
+  display: inline-block; 
+  width: 10px; 
+  height: 14px;
+  padding-right: 3px;
+  background: transparent url('../images/notpinned.png') no-repeat 0 0; 
+}
+
+.pinned .icon
+{
+  display: inline-block; 
+  width: 10px; 
+  height: 14px; 
+  padding-right: 3px;
+  background: transparent url('../images/pinned.png') no-repeat 0 0; 
+}
+
+.pinned span {
+  color: #B82066;
+  font-style: italic;
+}
+
+.notpinned span {
+  color: #888;
+  font-style: italic;
+}

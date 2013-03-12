@@ -210,6 +210,9 @@ def forum_form_discussion(request, course_id):
 
         user_cohort_id = get_cohort_id(request.user, course_id)
 
+    
+        
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
