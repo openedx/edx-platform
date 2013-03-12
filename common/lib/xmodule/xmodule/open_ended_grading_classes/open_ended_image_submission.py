@@ -5,6 +5,7 @@ to send them to S3.
 
 try:
     from PIL import Image
+
     ENABLE_PIL = True
 except:
     ENABLE_PIL = False
@@ -51,6 +52,7 @@ class ImageProperties(object):
     """
     Class to check properties of an image and to validate if they are allowed.
     """
+
     def __init__(self, image_data):
         """
         Initializes class variables
@@ -92,7 +94,7 @@ class ImageProperties(object):
             g = rgb[1]
             b = rgb[2]
             check_r = (r > 60)
-            check_g =  (r * 0.4) < g < (r * 0.85)
+            check_g = (r * 0.4) < g < (r * 0.85)
             check_b = (r * 0.2) < b < (r * 0.7)
             colors_okay = check_r and check_b and check_g
         except:
@@ -141,6 +143,7 @@ class URLProperties(object):
     Checks to see if a URL points to acceptable content.  Added to check if students are submitting reasonable
     links to the peer grading image functionality of the external grading service.
     """
+
     def __init__(self, url_string):
         self.url_string = url_string
 
@@ -212,7 +215,7 @@ def run_image_tests(image):
         success = image_properties.run_tests()
     except:
         log.exception("Cannot run image tests in combined open ended xmodule.  May be an issue with a particular image,"
-                    "or an issue with the deployment configuration of PIL/Pillow")
+                      "or an issue with the deployment configuration of PIL/Pillow")
     return success
 
 
@@ -252,7 +255,8 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
         return True, public_url
     except:
         #This is a dev_facing_error
-        error_message = "Could not connect to S3 to upload peer grading image.  Trying to utilize bucket: {0}".format(bucketname.lower())
+        error_message = "Could not connect to S3 to upload peer grading image.  Trying to utilize bucket: {0}".format(
+            bucketname.lower())
         log.error(error_message)
         return False, error_message
 

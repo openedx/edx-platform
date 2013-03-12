@@ -6,7 +6,7 @@ from django.test.utils import override_settings
 
 from course_groups.models import CourseUserGroup
 from course_groups.cohorts import (get_cohort, get_course_cohorts,
-                                   is_commentable_cohorted)
+                                   is_commentable_cohorted, get_cohort_by_name)
 
 from xmodule.modulestore.django import modulestore, _MODULESTORES
 
@@ -168,7 +168,7 @@ class TestCohorts(django.test.TestCase):
 
         self.assertEquals(get_cohort(user3, course.id), None,
                           "No groups->no auto-cohorting")
-        
+
         # Now make it different
         self.config_course_cohorts(course, [], cohorted=True,
                                    auto_cohort=True,
@@ -178,6 +178,37 @@ class TestCohorts(django.test.TestCase):
                           "New list->new group")
         self.assertEquals(get_cohort(user2, course.id).name, "AutoGroup",
                           "user2 should still be in originally placed cohort")
+
+
+    def test_auto_cohorting_randomization(self):
+        """
+        Make sure get_cohort() randomizes properly.
+        """
+        course = modulestore().get_course("edX/toy/2012_Fall")
+        self.assertEqual(course.id, "edX/toy/2012_Fall")
+        self.assertFalse(course.is_cohorted)
+
+        groups = ["group_{0}".format(n) for n in range(5)]
+        self.config_course_cohorts(course, [], cohorted=True,
+                                   auto_cohort=True,
+                                   auto_cohort_groups=groups)
+
+        # Assign 100 users to cohorts
+        for i in range(100):
+            user = User.objects.create(username="test_{0}".format(i),
+                                       email="a@b{0}.com".format(i))
+            get_cohort(user, course.id)
+
+        # Now make sure that the assignment was at least vaguely random:
+        # each cohort should have at least 1, and fewer than 50 students.
+        # (with 5 groups, probability of 0 users in any group is about
+        # .8**100= 2.0e-10)
+        for cohort_name in groups:
+            cohort = get_cohort_by_name(course.id, cohort_name)
+            num_users = cohort.users.count()
+            self.assertGreater(num_users, 1)
+            self.assertLess(num_users, 50)
+
 
 
     def test_get_course_cohorts(self):

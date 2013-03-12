@@ -32,10 +32,11 @@ if [ ! -d /mnt/virtualenvs/"$JOB_NAME" ]; then
     virtualenv /mnt/virtualenvs/"$JOB_NAME"
 fi
 
+export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
+
 source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
 pip install -q -r pre-requirements.txt
-pip install -q -r test-requirements.txt
-yes w | pip install -q -r requirements.txt
+yes w | pip install -q -r test-requirements.txt -r requirements.txt
 
 rake clobber
 rake pep8
