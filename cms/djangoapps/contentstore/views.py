@@ -90,11 +90,13 @@ def signup(request):
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('signup.html', {'csrf': csrf_token})
 
+
 def old_login_redirect(request):
     '''
     Redirect to the active login url.
     '''
     return redirect('login', permanent=True)
+
 
 @ssl_login_shortcut
 @ensure_csrf_cookie
@@ -108,6 +110,7 @@ def login_page(request):
         'forgot_password_link': "//{base}/#forgot-password-modal".format(base=settings.LMS_BASE),
     })
 
+
 def howitworks(request):
     if request.user.is_authenticated():
         return index(request)
@@ -115,6 +118,7 @@ def howitworks(request):
         return render_to_response('howitworks.html', {})
 
 # ==== Views for any logged-in user ==================================
+
 
 @login_required
 @ensure_csrf_cookie
@@ -148,6 +152,7 @@ def index(request):
 
 
 # ==== Views with per-item permissions================================
+
 
 def has_access(user, location, role=STAFF_ROLE_NAME):
     '''
@@ -396,6 +401,7 @@ def preview_component(request, location):
         'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
 
+
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -636,6 +642,17 @@ def delete_item(request):
     if item.location.revision is None and item.location.category == 'vertical' and delete_all_versions:
         modulestore('direct').delete_item(item.location)
 
+    # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
+
+    parent_locs = modulestore('direct').get_parent_locations(item_loc, None)
+
+    for parent_loc in parent_locs:
+        parent = modulestore('direct').get_item(parent_loc)
+        item_url = item_loc.url()
+        if item_url in parent.definition["children"]:
+            parent.definition["children"].remove(item_url)
+            modulestore('direct').update_children(parent.location, parent.definition["children"])
+
     return HttpResponse()
 
 
@@ -709,6 +726,7 @@ def create_draft(request):
 
     return HttpResponse()
 
+
 @login_required
 @expect_json
 def publish_draft(request):
@@ -738,6 +756,7 @@ def unpublish_unit(request):
 
     return HttpResponse()
 
+
 @login_required
 @expect_json
 def clone_item(request):
@@ -765,8 +784,7 @@ def clone_item(request):
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
-#@login_required
-#@ensure_csrf_cookie
+
 def upload_asset(request, org, course, coursename):
     '''
     cdodge: this method allows for POST uploading of files into the course asset library, which will
@@ -828,6 +846,7 @@ def upload_asset(request, org, course, coursename):
     response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
+
 '''
 This view will return all CMS users who are editors for the specified course
 '''
@@ -859,6 +878,7 @@ def create_json_response(errmsg = None):
         resp = HttpResponse(json.dumps({'Status': 'OK'}))
 
     return resp
+
 
 '''
 This POST-back view will add a user - specified by email - to the list of editors for
@@ -892,6 +912,7 @@ def add_user(request, location):
 
     return create_json_response()
 
+
 '''
 This POST-back view will remove a user - specified by email - from the list of editors for
 the specified course
@@ -922,6 +943,7 @@ def remove_user(request, location):
 # points to the temporary course landing page with log in and sign up
 def landing(request, org, course, coursename):
     return render_to_response('temp-course-landing.html', {})
+
 
 @login_required
 @ensure_csrf_cookie
@@ -1026,6 +1048,7 @@ def edit_tabs(request, org, course, coursename):
         'components': components
         })
 
+
 def not_found(request):
     return render_to_response('error.html', {'error': '404'})
 
@@ -1060,6 +1083,7 @@ def course_info(request, org, course, name, provided_id=None):
         'course_updates': json.dumps(get_course_updates(location)),
         'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url()
     })
+
 
 @expect_json
 @login_required
@@ -1158,6 +1182,7 @@ def get_course_settings(request, org, course, name):
                                        "section": "details"})
     })
 
+
 @login_required
 @ensure_csrf_cookie
 def course_config_graders_page(request, org, course, name):
@@ -1181,6 +1206,7 @@ def course_config_graders_page(request, org, course, name):
         'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 
+
 @login_required
 @ensure_csrf_cookie
 def course_config_advanced_page(request, org, course, name):
@@ -1203,6 +1229,7 @@ def course_config_advanced_page(request, org, course, name):
         'advanced_blacklist' : json.dumps(CourseMetadata.FILTERED_LIST),
         'advanced_dict' : json.dumps(CourseMetadata.fetch(location)),
     })
+
 
 @expect_json
 @login_required
@@ -1234,6 +1261,7 @@ def course_settings_updates(request, org, course, name, section):
     elif request.method == 'POST':   # post or put, doesn't matter.
         return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseSettingsEncoder),
                             mimetype="application/json")
+
 
 @expect_json
 @login_required
@@ -1360,6 +1388,7 @@ def asset_index(request, org, course, name):
 def edge(request):
     return render_to_response('university_profiles/edge.html', {})
 
+
 @login_required
 @expect_json
 def create_new_course(request):
@@ -1412,6 +1441,7 @@ def create_new_course(request):
 
     return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
+
 def initialize_course_tabs(course):
     # set up the default tabs
     # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
@@ -1428,6 +1458,7 @@ def initialize_course_tabs(course):
         {"type": "progress", "name": "Progress"}]
 
     modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
+
 
 @ensure_csrf_cookie
 @login_required
@@ -1506,6 +1537,7 @@ def import_course(request, org, course, name):
                         course_module.location.name])
         })
 
+
 @ensure_csrf_cookie
 @login_required
 def generate_export_course(request, org, course, name):
@@ -1556,6 +1588,7 @@ def export_course(request, org, course, name):
         'active_tab': 'export',
         'successful_import_redirect_url': ''
     })
+
 
 def event(request):
     '''
