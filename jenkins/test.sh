@@ -39,8 +39,8 @@ pip install -q -r pre-requirements.txt
 yes w | pip install -q -r test-requirements.txt -r requirements.txt
 
 rake clobber
-rake pep8 > pep8.log | cat pep8.log
-rake pylint > pylint.log | cat pylint.log
+rake pep8 > pep8.log || cat pep8.log
+rake pylint > pylint.log || cat pylint.log
 
 TESTS_FAILED=0
 rake test_cms[false] || TESTS_FAILED=1
