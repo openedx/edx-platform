@@ -1,14 +1,10 @@
-import json
 import logging
 import random
 
-from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.x_module import XModule
-from xmodule.xml_module import XmlDescriptor
-from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
 
-from pkg_resources import resource_string
+from xblock.core import Scope, Integer
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -99,6 +95,7 @@ class RandomizeDescriptor(SequenceDescriptor):
     stores_state = True
 
     def definition_to_xml(self, resource_fs):
+
         xml_object = etree.Element('randomize')
         for child in self.get_children():
             xml_object.append(
