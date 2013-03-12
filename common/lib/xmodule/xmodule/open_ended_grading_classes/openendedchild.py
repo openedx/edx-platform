@@ -74,7 +74,7 @@ class OpenEndedChild(object):
         'done': 'Done',
     }
 
-    def __init__(self, system, location, definition, descriptor, static_data, 
+    def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
         # Load instance state
         if instance_state is not None:
@@ -108,15 +108,14 @@ class OpenEndedChild(object):
         self._max_score = static_data['max_score']
         if system.open_ended_grading_interface:
             self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
-            self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,system)
+            self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,
+                                                                                 system)
         else:
             self.peer_gs = MockPeerGradingService()
-            self.controller_qs = None 
-
-
+            self.controller_qs = None
 
         self.system = system
-        
+
         self.location_string = location
         try:
             self.location_string = self.location_string.url()
@@ -152,7 +151,8 @@ class OpenEndedChild(object):
             return True, {
                 'success': False,
                 #This is a student_facing_error
-                'error': 'You have attempted this problem {0} times.  You are allowed {1} attempts.'.format(self.attempts, self.max_attempts)
+                'error': 'You have attempted this problem {0} times.  You are allowed {1} attempts.'.format(
+                    self.attempts, self.max_attempts)
             }
         else:
             return False, {}
@@ -180,8 +180,8 @@ class OpenEndedChild(object):
         try:
             answer = autolink_html(answer)
             cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=True,
-                host_whitelist=open_ended_image_submission.TRUSTED_IMAGE_DOMAINS,
-                whitelist_tags=set(['embed', 'iframe', 'a', 'img']))
+                              host_whitelist=open_ended_image_submission.TRUSTED_IMAGE_DOMAINS,
+                              whitelist_tags=set(['embed', 'iframe', 'a', 'img']))
             clean_html = cleaner.clean_html(answer)
             clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
         except:
@@ -282,7 +282,7 @@ class OpenEndedChild(object):
         """
         #This is a dev_facing_error
         log.warning("Open ended child state out sync. state: %r, get: %r. %s",
-            self.state, get, msg)
+                    self.state, get, msg)
         #This is a student_facing_error
         return {'success': False,
                 'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
@@ -308,7 +308,7 @@ class OpenEndedChild(object):
         @return: Boolean correct.
         """
         correct = False
-        if(isinstance(score, (int, long, float, complex))):
+        if (isinstance(score, (int, long, float, complex))):
             score_ratio = int(score) / float(self.max_score())
             correct = (score_ratio >= 0.66)
         return correct
@@ -342,7 +342,8 @@ class OpenEndedChild(object):
 
             try:
                 image_data.seek(0)
-                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key, self.s3_interface)
+                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key,
+                                                                                  self.s3_interface)
             except:
                 log.exception("Could not upload image to S3.")
 
@@ -404,9 +405,9 @@ class OpenEndedChild(object):
             #In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
             #a config issue (development vs deployment).  For now, just treat this as a "success"
             log.exception("Student AJAX post to combined open ended xmodule indicated that it contained an image, "
-                        "but the image was not able to be uploaded to S3.  This could indicate a config"
-                        "issue with this deployment, but it could also indicate a problem with S3 or with the"
-                        "student image itself.")
+                          "but the image was not able to be uploaded to S3.  This could indicate a config"
+                          "issue with this deployment, but it could also indicate a problem with S3 or with the"
+                          "student image itself.")
             overall_success = True
         elif not has_file_to_upload:
             #If there is no file to upload, probably the student has embedded the link in the answer text
@@ -445,7 +446,7 @@ class OpenEndedChild(object):
         response = {}
         #This is a student_facing_error
         error_string = ("You need to peer grade {0} more in order to make another submission.  "
-        "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
+                        "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
         try:
             response = self.peer_gs.get_data_for_location(self.location_string, student_id)
             count_graded = response['count_graded']
@@ -454,16 +455,18 @@ class OpenEndedChild(object):
             success = True
         except:
             #This is a dev_facing_error
-            log.error("Could not contact external open ended graders for location {0} and student {1}".format(self.location_string,student_id))
+            log.error("Could not contact external open ended graders for location {0} and student {1}".format(
+                self.location_string, student_id))
             #This is a student_facing_error
             error_message = "Could not contact the graders.  Please notify course staff."
             return success, allowed_to_submit, error_message
-        if count_graded>=count_required:
+        if count_graded >= count_required:
             return success, allowed_to_submit, ""
         else:
             allowed_to_submit = False
             #This is a student_facing_error
-            error_message = error_string.format(count_required-count_graded, count_graded, count_required, student_sub_count)
+            error_message = error_string.format(count_required - count_graded, count_graded, count_required,
+                                                student_sub_count)
             return success, allowed_to_submit, error_message
 
     def get_eta(self):
@@ -478,7 +481,7 @@ class OpenEndedChild(object):
 
         success = response['success']
         if isinstance(success, basestring):
-            success = (success.lower()=="true")
+            success = (success.lower() == "true")
 
         if success:
             eta = controller_query_service.convert_seconds_to_human_readable(response['eta'])
@@ -487,6 +490,3 @@ class OpenEndedChild(object):
             eta_string = ""
 
         return eta_string
-
-
-
