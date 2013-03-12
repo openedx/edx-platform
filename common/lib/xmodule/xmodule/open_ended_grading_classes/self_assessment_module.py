@@ -95,7 +95,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             #This is a dev_facing_error
             log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
             #This is a dev_facing_error
-            return json.dumps({'error': 'Error handling action.  Please try again.', 'success' : False})
+            return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
         before = self.get_progress()
         d = handlers[dispatch](get, system)
@@ -224,7 +224,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         try:
             score = int(get['assessment'])
             score_list = get.getlist('score_list[]')
-            for i in xrange(0,len(score_list)):
+            for i in xrange(0, len(score_list)):
                 score_list[i] = int(score_list[i])
         except ValueError:
             #This is a dev_facing_error
@@ -268,7 +268,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
                 'allow_reset': self._allow_reset()}
 
     def latest_post_assessment(self, system):
-        latest_post_assessment =  super(SelfAssessmentModule, self).latest_post_assessment(system)
+        latest_post_assessment = super(SelfAssessmentModule, self).latest_post_assessment(system)
         try:
             rubric_scores = json.loads(latest_post_assessment)
         except:
@@ -305,7 +305,9 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         for child in expected_children:
             if len(xml_object.xpath(child)) != 1:
                 #This is a staff_facing_error
-                raise ValueError("Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
+                raise ValueError(
+                    "Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
+                        child))
 
         def parse(k):
             """Assumes that xml_object has child k"""
