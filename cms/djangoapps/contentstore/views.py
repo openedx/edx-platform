@@ -325,7 +325,7 @@ def edit_unit(request, location):
             component_templates[category].append((
                 template.display_name_with_default,
                 template.location.url(),
-                hasattr(template, 'markdown') and template.markdown != '',
+                hasattr(template, 'markdown') and template.markdown is not None,
                 template.cms.empty,
             ))
 

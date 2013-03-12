@@ -801,7 +801,7 @@ class CapaDescriptor(RawDescriptor):
     module_class = CapaModule
 
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
-    markdown = String(help="Markdown source of this module", scope=Scope.settings, default='')
+    markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
     stores_state = True
     has_score = True
@@ -824,7 +824,7 @@ class CapaDescriptor(RawDescriptor):
     def get_context(self):
         _context = RawDescriptor.get_context(self)
         _context.update({'markdown': self.markdown,
-                         'enable_markdown' : self.markdown != ''})
+                         'enable_markdown': self.markdown is not None})
         return _context
 
     @property
