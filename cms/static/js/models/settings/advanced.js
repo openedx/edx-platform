@@ -7,7 +7,6 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
     },
     // which keys to send as the deleted keys on next save
     deleteKeys : [],
-    blacklistKeys : [], // an array which the controller should populate directly for now [static not instance based]
 
     validate: function (attrs) {
         // Keys can no longer be edited. We are currently not validating values.

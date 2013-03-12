@@ -1200,7 +1200,6 @@ def course_config_advanced_page(request, org, course, name):
     return render_to_response('settings_advanced.html', {
         'context_course': course_module,
         'course_location' : location,
-        'advanced_blacklist' : json.dumps(CourseMetadata.FILTERED_LIST),
         'advanced_dict' : json.dumps(CourseMetadata.fetch(location)),
     })
 
