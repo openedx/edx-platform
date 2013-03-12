@@ -172,9 +172,7 @@ class FolditDescriptor(XmlDescriptor, EditingDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        """ Get the xml_object's attributes.  """
-
-        return {'metadata': xml_object.attrib}
+        return ({}, [])
 
     def definition_to_xml(self):
         xml_object = etree.Element('foldit')
