@@ -152,10 +152,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     self.default_class
                 )
                 definition = json_data.get('definition', {})
+                metadata = json_data.get('metadata', {})
+                for old_name, new_name in class_.metadata_tranlations.items():
+                    metadata[new_name] = metadata[old_name]
+                    del metadata[old_name]
+
                 kvs = MongoKeyValueStore(
                     definition.get('data', {}),
                     definition.get('children', []),
-                    json_data.get('metadata', {}),
+                    metadata,
                 )
 
                 model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
