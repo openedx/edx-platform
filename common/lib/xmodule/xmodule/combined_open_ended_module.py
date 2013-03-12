@@ -6,7 +6,7 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float
+from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 
 log = logging.getLogger("mitx.courseware")
@@ -62,7 +62,7 @@ class CombinedOpenEndedModule(XModule):
 
     display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
     current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.student_state)
-    task_states = Object(help="State dictionaries of each task within this module.", default=[], scope=Scope.student_state)
+    task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.student_state)
     state = String(help="Which step within the current task that the student is on.", default="initial", scope=Scope.student_state)
     student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
     ready_to_reset = Boolean(help="If the problem is ready to be reset or not.",  default=False, scope=Scope.student_state)
@@ -124,6 +124,9 @@ class CombinedOpenEndedModule(XModule):
 
         self.system = system
         self.system.set('location', location)
+
+        if self.task_states is None:
+            self.task_states = []
 
         versions = [i[0] for i in VERSION_TUPLES]
         descriptors = [i[1] for i in VERSION_TUPLES]
