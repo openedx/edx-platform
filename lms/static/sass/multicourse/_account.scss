@@ -1,3 +1,6 @@
+// plus on button
+// border radius on inputs
+
 // Account-Centric (Login/Register)
 // =====
 
@@ -5,8 +8,121 @@
 .view-register, .view-login, .view-passwordreset {
   background: $white;
 
+
+
+  // edx.org - marketing typography
+  .heading-1, .heading-2, .heading-3, .heading-4, .heading-5, .body-text-emphasized, .body-text, .button-primary, .button-secondary {
+    display: block;
+    font-family: $sans-serif;
+    line-height: lh(1);
+  }
+
+  .heading-2 {
+    font-size: 25px;
+    margin: 0 0 $baseline 0;
+    font-weight: 300;
+    text-transform: uppercase;
+    color: $m-blue;
+  }
+
+  .heading-3 {
+    font-size: 21px;
+    margin: 0 0 $baseline 0;
+    font-weight: 300;
+    color: $m-gray-d2;
+  }
+
+  .heading-4 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0 !important;
+    color: $m-blue-s1;
+  }
+
+  .heading-5 {
+  }
+
+  // specific examples - body
+  .body-text-emphasized {
+    font-size: 18px;
+    margin: 0 0 $baseline 0;
+    font-weight: 300;
+    color: $m-gray-a1;
+    font-family: 'Open Sans', sans-serif;
+    line-height: lh(1.1);
+  }
+
+  .body-text {
+    font-size: 15px;
+    margin: 0 0 $baseline 0;
+    color: $m-gray-a1;
+    line-height: lh(1);
+  }
+
+  // specific examples - buttons
+  .button-primary {
+    @include border-radius(0);
+    @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
+    display: inline-block;
+    padding: $baseline/2 $baseline*2.5;
+    text-transform: lowercase;
+    color: $white;
+    letter-spacing: 0.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    border: none !important;
+    text-shadow: none;
+    letter-spacing: 0;
+    font-size: 16px;
+    box-shadow: none !important;
+  }
+
+  .button-secondary {
+    @include linear-gradient($m-gray 5%, $m-gray-d1 95%);
+    display: inline-block;
+    padding: $baseline/2 $baseline*2.5;
+    text-transform: lowercase;
+    color: $white;
+    letter-spacing: 0.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    border: none !important;
+    text-shadow: none;
+    letter-spacing: 0;
+    font-size: 16px;
+    box-shadow: 0 !important;
+  }
+
+  // layout
   .content-wrapper {
-    background: $m-gray-l;
+    background: $m-gray-l2;
+    padding-bottom: 0;
+  }
+
+  .container, .introduction {
+    @include box-sizing(border-box);
+    @include clearfix;
+    margin: 0 auto;
+    width: 960px;
+    background: $white;
+  }
+
+  .container {
+    padding: $baseline $baseline ($baseline*2) $baseline;
+  }
+
+  .introduction {
+    padding: ($baseline*2) $baseline 0 $baseline;
+
+    header h1 {
+      @extend .heading-2;
+      margin-bottom: $baseline;
+      padding-bottom: $baseline;
+      text-align: left;
+    }
   }
 }
 
@@ -27,13 +143,10 @@
 
 // shared
 .login, .register, .passwordreset, #forgot-password-modal #password-reset {
-  padding: ($baseline*1.5);
-  @include clearfix;
 
   // reset - horrible, but necessary
   p, ol, ul, h1, h2, h3, h4, h5, h6, label, input, textarea {
-    color: $m-gray;
-    font-family: $sans-serif;
+    @extend .body-text;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -50,8 +163,8 @@
     }
 
     &:hover, &:active {
-      border-bottom: 1px dotted $m-blue-s;
-      color: $m-blue-s;
+      border-bottom: 1px dotted $m-blue-s1;
+      color: $m-blue-s1;
     }
   }
 
@@ -59,72 +172,29 @@
     font-weight: 600;
   }
 
-  p, ul, ol, dl, blockquote {
-    font-size: $m-base-font-size;
-  }
-
   // basic layout
-  .introduction {
-    width: flex-grid(8);
-  }
-
   .content, aside {
     @include box-sizing(border-box);
+    margin: $baseline 0 0 0;
   }
 
   .content {
-    margin-right: flex-gutter();
-    width: flex-grid(8);
+    margin-right: ($baseline*2);
+    width: 660px;
     float: left;
   }
 
   aside {
-    margin: 0;
-    width: flex-grid(4);
+    width: 220px;
     float: left;
-  }
 
-  // introduction
-  .introduction {
-
-    header {
-      @include clearfix();
-
-      h1 {
-        float: left;
-        width: flex-grid(5,8);
-        margin-right: flex-gutter(0);
-        font-family: $sans-serif;
-        font-size: em(36);
-        font-weight: 700;
-        text-align: left;
-      }
-
-      .wrapper-action {
-        display: block;
-        float: right;
-        width: flex-grid(3,8);
-        margin-top: $baseline;
-        font-size: em(14);
-        text-align: right;
-
-        .action {
-          @include button(simple, $m-gray-l);
-          @include box-sizing(border-box);
-          @include border-radius(3px);
-          padding: ($baseline/4) ($baseline/2);
-          font-size: em(16);
-          font-weight: 700;
-          letter-spacing: 0;
-          text-align: center;
-        }
-      }  
+    p, ol, ul {
+      font-size: 14px !important;
     }
   }
 
   // content
   .content {
-    background: $white;
   }
 
   // aside
@@ -138,53 +208,24 @@
       }
 
       h3 {
+        @extend .heading-4;
         margin: 0 0 ($baseline/4) 0;
-        color: tint($black, 20%);
-        font-size: em(16);
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      p, ul, ol, dl, blockquote {
-        color: tint($m-gray, 30%);
-        font-size: em(14);
-      }
-
-      ol, ul {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-
-        li {
-          margin: 0 0 ($baseline/2);
-          line-height: 1.6em;
-        }
       }
     }
   }
 
   // forms
   form {
-    border: 1px solid tint($m-gray,70%);
-    @include border-radius(3px);
-    @include box-shadow(0 1px 2px 0 rgba(0,0,0, 0.3));
-
-    .instructions, fieldset, .form-actions, .status {
-      padding: ($baseline*1.5);
-    }
 
     .instructions {
-      padding-bottom: 0;
-      color: tint($m-gray, 30%);
-      font-size: em(14);
+      @extend .body-text-emphasized;
+      margin-bottom: $baseline;
     }
 
     fieldset {
       margin: 0;
-      padding-top: $baseline;
+      padding-top: 0;
       padding-bottom: $baseline;
-      // border-bottom: 1px solid rgba(216, 223, 230, 0.50);
-
     }
 
     .list-input {
@@ -222,9 +263,12 @@
 
       // elements
       label, input, textarea {
+        @include border-radius(0);
         display: block;
         font-family: $sans-serif;
         font-style: normal;
+        font-weight: 500;
+        color: $m-gray-d2;
       }
 
       label {
@@ -243,6 +287,7 @@
 
       input, textarea {
         width: 100%;
+        margin: 0;
         padding: $baseline ($baseline*.75);         
 
         &.long {
@@ -308,11 +353,11 @@
       &.is-focused {
 
         label {
-          color: $m-blue-s;          
+          color: $m-blue-s1;          
         }
 
         .tip {
-          color: $m-blue-s;
+          color: $m-blue-s1;
         }
       }
 
@@ -358,14 +403,7 @@
     @include clearfix();
 
     button[type="submit"] {
-      @include button(simple, $m-blue-s);
-      @include box-sizing(border-box);
-      @include border-radius(3px);
-      padding: ($baseline*0.75) $baseline;
-      font-size: em(16);
-      font-weight: 700;
-      letter-spacing: 0;
-      text-align: center;
+      @extend .button-primary;
 
       &:disabled {
         opacity: 0.3;
@@ -395,21 +433,23 @@
   // forms - messages/status
   .status {
     @include box-sizing(border-box);
-    @include box-shadow(inset 0 -1px 2px 0 tint($yellow, 85%));
-    border-top: 2px solid $yellow;
-    border-bottom: 1px solid tint($m-gray,70%);
-    background: tint($yellow,70%);
+    margin: 0 0 $baseline 0;
+    border-bottom: 3px solid shade($yellow, 10%);
+    padding: $baseline $baseline;
+    background: tint($yellow,20%);
 
     .message-title {
+      @extend .heading-4;
       margin: 0 0 ($baseline/4) 0;
       font-size: em(14);
       font-weight: 600;
+      color: $m-gray-d2 !important;
     }
 
     .message-copy {
-      margin: 0;
+      @extend .body-text;
+      margin: 0 !important;
       padding: 0;
-      font-size: em(14);
       list-style: none;
 
       li {
@@ -420,12 +460,18 @@
 
   .submission-error, .system-error {
     @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
-    border-top: 2px solid tint($red,65%);
-    background: tint($red,98%);
+    border-bottom: 3px solid shade($red, 10%);
+    background: tint($red,80%);
 
     .message-title {
       color: shade($red, 10%);
     }
+  }
+
+  // misc
+  .orn-plus {
+    color: $white;
+    padding: 0 $baseline/4;
   }
 }
 
@@ -434,24 +480,35 @@
 // login
 .view-login {
 
-  .group-form-accountpreferences {
-    padding-top: 0;
-    padding-bottom: 0;
+  .introduction {
+    padding: 0;
+
+    header {
+      height: 120px;
+      background: transparent url("../images/bg-banner-example.png") 0 0 no-repeat;
+    }
   }
 }
 
 // register
 .view-register {
 
-  .group-form-accountacknowledgements {
-    padding-top: 0;
-    padding-bottom: 0;
+  .introduction {
+    padding: 0;
+
+    header {
+      height: 120px;
+      background: transparent url("../images/bg-banner-example.png") 0 0 no-repeat;
+    }
   }
 }
 
 // password reset
 .view-passwordreset {
 
+  .introduction {
+
+  }
 }
 
 // modal password reset form
@@ -461,7 +518,7 @@
 
   .inner-wrapper {
     @include border-radius(2px);
-    background: $m-gray-l;
+    background: $m-gray-l1;
     padding-bottom: 0 !important;
   }
 
@@ -480,14 +537,6 @@
         font-size: em(24);
         font-weight: 700;
         text-transform: none;
-      }
-    }
-
-    .instructions {
-
-      p {
-        color: $m-gray;
-        font-size: em(14);
       }
     }
 

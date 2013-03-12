@@ -14,7 +14,6 @@ $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
 $serif: $georgia;
 
-
 $white: rgb(255,255,255);
 $black: rgb(0,0,0);
 $blue: rgb(29,157,217);
@@ -31,12 +30,21 @@ $outer-border-color: rgb(170, 170, 170);
 // old variables
 $light-gray: #ddd;
 $dark-gray: #333;
+
 // edx.org-related
-$m-gray-l: rgb(247, 247, 247);
-$m-gray: rgb(67,67,67);
-$m-blue: rgb(23,174,223);
-$m-blue-s: rgb(2,159,211);
-$m-base-font-size: em(16);
+$m-gray-l1: rgb(203,203,203);
+$m-gray-l2: rgb(246,246,246);
+$m-gray: rgb(153,153,153);
+$m-gray-d1: rgb(102,102,102);
+$m-gray-d2: rgb(51,51,51);
+$m-gray-a1: rgb(80,80,80);
+$m-blue: rgb(85, 151, 221);
+$m-blue-l1: rgb(230,245,252);
+$m-blue-d1: shade($m-blue,15%);
+$m-blue-s1: saturate($m-blue,15%);
+$m-pink: rgb(204,51,102);
+
+$m-base-font-size: em(15);
 
 
 $base-font-color: rgb(60,60,60);
