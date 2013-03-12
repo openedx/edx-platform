@@ -12,7 +12,7 @@ profile=no
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS
+ignore=CVS, migrations
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -43,7 +43,7 @@ disable=E1102,W0142
 output-format=text
 
 # Include message's id in output
-include-ids=no
+include-ids=yes
 
 # Put messages in a separate file for each module / package specified on the
 # command line instead of printing them on stdout. Reports (if any) will be
@@ -97,7 +97,7 @@ bad-functions=map,filter,apply,input
 module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
 
 # Regular expression which should only match correct module level names
-const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__)|log)$
 
 # Regular expression which should only match correct class names
 class-rgx=[A-Z_][a-zA-Z0-9]+$
