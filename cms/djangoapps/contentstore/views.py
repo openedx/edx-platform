@@ -649,9 +649,11 @@ def delete_item(request):
     for parent_loc in parent_locs:
         parent = modulestore('direct').get_item(parent_loc)
         item_url = item_loc.url()
-        if item_url in parent.definition["children"]:
-            parent.definition["children"].remove(item_url)
-            modulestore('direct').update_children(parent.location, parent.definition["children"])
+        if item_url in parent.children:
+            children = parent.children
+            children.remove(item_url)
+            parent.children = children
+            modulestore('direct').update_children(parent.location, parent.children)
 
     return HttpResponse()
 

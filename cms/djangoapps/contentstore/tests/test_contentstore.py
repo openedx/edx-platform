@@ -111,10 +111,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter','Week_1', None]))
 
         # make sure the parent no longer points to the child object which was deleted
-        self.assertTrue(sequential.location.url() in chapter.definition['children'])
+        self.assertTrue(sequential.location.url() in chapter.children)
 
         self.client.post(reverse('delete_item'),
-            json.dumps({'id': sequential.location.url(), 'delete_children':'true'}),
+            json.dumps({'id': sequential.location.url(), 'delete_children': 'true'}),
             "application/json")
 
         found = False
@@ -129,7 +129,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter','Week_1', None]))
 
         # make sure the parent no longer points to the child object which was deleted
-        self.assertFalse(sequential.location.url() in chapter.definition['children'])
+        self.assertFalse(sequential.location.url() in chapter.children)
 
 
 
