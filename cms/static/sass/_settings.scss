@@ -239,13 +239,9 @@ body.course.settings {
 
     // not editable fields
     .field.is-not-editable {
-
-      label, .label {
-        color: $gray-l3;
-      }
-
-      input {
-        opacity: 0.25;
+     
+      & label.is-focused {
+       color: $gray-d2;
       }
     }
 

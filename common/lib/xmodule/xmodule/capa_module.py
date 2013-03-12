@@ -90,7 +90,7 @@ class CapaModule(XModule):
     '''
     icon_class = 'problem'
 
-    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
+    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
     max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
     due = String(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
@@ -102,7 +102,7 @@ class CapaModule(XModule):
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
-    seed = Integer(help="Random seed for this student", scope=Scope.student_state)
+    seed = StringyInteger(help="Random seed for this student", scope=Scope.student_state)
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
