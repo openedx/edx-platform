@@ -213,7 +213,7 @@ class CourseGradingModel(object):
 
         descriptor = get_modulestore(location).get_item(location)
         return {
-                "graderType": descriptor.lms.format or 'Not Graded',
+                "graderType": descriptor.lms.format if descriptor.lms.format is not None else 'Not Graded',
                 "location": location,
                 "id": 99   # just an arbitrary value to
                 }

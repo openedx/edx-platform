@@ -24,7 +24,6 @@ class LmsNamespace(Namespace):
         help="What format this module is in (used for deciding which "
              "grader to apply, and what to show in the TOC)",
         scope=Scope.settings,
-        default='',
     )
 
     start = Date(help="Start time when this module is visible", scope=Scope.settings)

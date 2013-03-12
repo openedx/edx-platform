@@ -103,7 +103,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
             if not section.lms.hide_from_toc:
                 sections.append({'display_name': section.display_name_with_default,
                                  'url_name': section.url_name,
-                                 'format': section.lms.format,
+                                 'format': section.lms.format if section.lms.format is not None else '',
                                  'due': section.lms.due,
                                  'active': active,
                                  'graded': section.lms.graded,

@@ -317,7 +317,7 @@ def progress_summary(student, request, course, model_data_cache):
             section_total, graded_total = graders.aggregate_scores(
                 scores, section_module.display_name_with_default)
 
-            format = section_module.lms.format
+            format = section_module.lms.format if section_module.lms.format is not None else ''
             sections.append({
                 'display_name': section_module.display_name_with_default,
                 'url_name': section_module.url_name,

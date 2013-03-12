@@ -592,7 +592,7 @@ class CourseDescriptor(SequenceDescriptor):
                     # The xmoduledescriptors included here are only the ones that have scores.
                     section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)}
 
-                    section_format = s.lms.format
+                    section_format = s.lms.format if s.lms.format is not None else ''
                     graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
 
                     all_descriptors.extend(xmoduledescriptors)
