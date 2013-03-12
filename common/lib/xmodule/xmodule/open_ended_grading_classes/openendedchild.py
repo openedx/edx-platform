@@ -72,7 +72,7 @@ class OpenEndedChild(object):
             try:
                 instance_state = json.loads(instance_state)
             except:
-                pass
+                log.error("Could not load instance state for open ended.  Setting it to nothing.: {0}".format(instance_state))
         else:
             instance_state = {}
 

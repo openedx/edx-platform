@@ -130,6 +130,7 @@ class CombinedOpenEndedModule(XModule):
         modules = [i[2] for i in VERSION_TUPLES]
         settings_attributes = [i[3] for i in VERSION_TUPLES]
         student_attributes = [i[4] for i in VERSION_TUPLES]
+        version_error_string = "Could not find version {0}, using version {1} instead"
 
         try:
             version_index = versions.index(self.version)
@@ -151,7 +152,8 @@ class CombinedOpenEndedModule(XModule):
         self.child_descriptor = descriptors[version_index](self.system)
         self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(self.data), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = instance_state, static_data= static_data, model_data=model_data, attributes=attributes)
+            instance_state = instance_state, static_data= static_data, attributes=attributes)
+        self.save_instance_data()
 
     def get_html(self):
         self.save_instance_data()
