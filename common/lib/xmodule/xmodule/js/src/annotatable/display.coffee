@@ -123,7 +123,7 @@ class @Annotatable
             # tooltip is positioned relative to its container, so we need to factor in offsets
             container_offset = $(container).offset()
             offset_left = -container_offset.left
-            offset_top = $('body').scrollTop() - container_offset.top
+            offset_top = $(document).scrollTop() - container_offset.top
 
             tip_left = offset_left + rect_center - (tip_width / 2)
             tip_top =  offset_top + rect_top - tip_height + adjust_y
