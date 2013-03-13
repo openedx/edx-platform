@@ -86,7 +86,7 @@ def html_index(request, course_id, book_index, chapter=None, anchor_id=None):
         input_url = "'" + original_url + "'"
         output_url = replace_static_urls(
                     input_url,
-                    course.metadata['data_dir'],
+                    getattr(course, 'data_dir', None),
                     course_namespace=course.location
                 )
         # strip off the quotes again...
