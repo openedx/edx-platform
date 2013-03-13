@@ -371,6 +371,10 @@ function goto( mode)
 
 %if modeflag.get('Analytics'):
 
+  %if not any(analytics_results.values()):
+    <p>No Analytics are available at this time.</p>
+  %endif
+
   %if analytics_results.get("StudentsEnrolled"):
     <p>
       Students enrolled:

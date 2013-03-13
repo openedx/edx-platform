@@ -605,7 +605,7 @@ def instructor_dashboard(request, course_id):
             return json.loads(res.content, object_pairs_hook=OrderedDict)
         else:
             log.error("Error fetching %s, code: %s, msg: %s",
-                      (url, res.status_code, res.content))
+                      url, res.status_code, res.content)
         return None
 
     analytics_results = {}
