@@ -15,7 +15,7 @@ if Backbone?
     initialize: ->
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
       @collection.on "change", @reloadDisplayedCollection
-      @sortBy = "date"
+      @sortBy = "pinned"
       @discussionIds=""
       @collection.on "reset", (discussion) =>
         board = $(".current-board").html()
