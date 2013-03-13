@@ -153,9 +153,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 )
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
-                for old_name, new_name in class_.metadata_tranlations.items():
-                    metadata[new_name] = metadata[old_name]
-                    del metadata[old_name]
+                for old_name, new_name in class_.metadata_translations.items():
+                    if old_name in metadata:
+                        metadata[new_name] = metadata[old_name]
+                        del metadata[old_name]
 
                 kvs = MongoKeyValueStore(
                     definition.get('data', {}),
