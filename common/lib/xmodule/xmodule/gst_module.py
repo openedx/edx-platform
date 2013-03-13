@@ -20,7 +20,12 @@ from xblock.core import String, Scope
 log = logging.getLogger(__name__)
 
 
-class GraphicalSliderToolModule(XModule):
+class GraphicalSliderToolFields(object):
+    render = String(scope=Scope.content)
+    configuration = String(scope=Scope.content)
+
+
+class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
     ''' Graphical-Slider-Tool Module
     '''
 
@@ -43,9 +48,6 @@ class GraphicalSliderToolModule(XModule):
       ]
     }
     js_module_name = "GraphicalSliderTool"
-
-    render = String(scope=Scope.content)
-    configuration = String(scope=Scope.content)
 
     def get_html(self):
         """ Renders parameters to template. """
@@ -137,12 +139,9 @@ class GraphicalSliderToolModule(XModule):
                 '">' + self.configuration + '</root>'))
 
 
-class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
+class GraphicalSliderToolDescriptor(GraphicalSliderToolFields, MakoModuleDescriptor, XmlDescriptor):
     module_class = GraphicalSliderToolModule
     template_dir_name = 'graphical_slider_tool'
-
-    render = String(scope=Scope.content)
-    configuration = String(scope=Scope.content)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

@@ -21,10 +21,13 @@ log = logging.getLogger(__name__)
 # decides whether to create a staff or not-staff module.
 
 
-class ErrorModule(XModule):
-
+class ErrorFields(object):
     contents = String(scope=Scope.content)
     error_msg = String(scope=Scope.content)
+    display_name = String(scope=Scope.settings)
+
+
+class ErrorModule(ErrorFields, XModule):
 
     def get_html(self):
         '''Show an error to staff.
@@ -38,7 +41,7 @@ class ErrorModule(XModule):
             })
 
 
-class NonStaffErrorModule(XModule):
+class NonStaffErrorModule(ErrorFields, XModule):
     def get_html(self):
         '''Show an error to a student.
         TODO (vshnayder): proper style, divs, etc.
@@ -51,15 +54,11 @@ class NonStaffErrorModule(XModule):
             })
 
 
-class ErrorDescriptor(JSONEditingDescriptor):
+class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
     """
     Module that provides a raw editing view of broken xml.
     """
     module_class = ErrorModule
-
-    contents = String(scope=Scope.content)
-    error_msg = String(scope=Scope.content)
-    display_name = String(scope=Scope.settings)
 
     @classmethod
     def _construct(self, system, contents, error_msg, location):

@@ -17,7 +17,11 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 log = logging.getLogger("mitx.courseware")
 
 
-class HtmlModule(XModule):
+class HtmlFields(object):
+    data = String(help="Html contents to display for this module", scope=Scope.content)
+
+
+class HtmlModule(HtmlFields, XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/html/display.coffee')
@@ -26,13 +30,11 @@ class HtmlModule(XModule):
     js_module_name = "HTMLModule"
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
-    data = String(help="Html contents to display for this module", scope=Scope.content)
-
     def get_html(self):
         return self.data
 
 
-class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
+class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
     """
     Module for putting raw html in a course
     """
@@ -40,8 +42,6 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
-
-    data = String(help="Html contents to display for this module", scope=Scope.content)
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"

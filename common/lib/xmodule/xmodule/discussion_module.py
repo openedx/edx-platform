@@ -6,17 +6,20 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import String, Scope
 
 
-class DiscussionModule(XModule):
+class DiscussionFields(object):
+    discussion_id = String(scope=Scope.settings)
+    discussion_category = String(scope=Scope.settings)
+    discussion_target = String(scope=Scope.settings)
+    sort_key = String(scope=Scope.settings)
+
+
+class DiscussionModule(DiscussionFields, XModule):
     js = {'coffee':
             [resource_string(__name__, 'js/src/time.coffee'),
             resource_string(__name__, 'js/src/discussion/display.coffee')]
         }
     js_module_name = "InlineDiscussion"
 
-    discussion_id = String(scope=Scope.settings)
-    discussion_category = String(scope=Scope.settings)
-    discussion_target = String(scope=Scope.settings)
-    sort_key = String(scope=Scope.settings)
 
     def get_html(self):
         context = {
@@ -25,7 +28,7 @@ class DiscussionModule(XModule):
         return self.system.render_template('discussion/_discussion_module.html', context)
 
 
-class DiscussionDescriptor(RawDescriptor):
+class DiscussionDescriptor(DiscussionFields, RawDescriptor):
     module_class = DiscussionModule
     template_dir_name = "discussion"
 
@@ -35,8 +38,3 @@ class DiscussionDescriptor(RawDescriptor):
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['id'] = 'discussion_id'
     metadata_translations['for'] = 'discussion_target'
-
-    discussion_id = String(scope=Scope.settings)
-    discussion_category = String(scope=Scope.settings)
-    discussion_target = String(scope=Scope.settings)
-    sort_key = String(scope=Scope.settings)

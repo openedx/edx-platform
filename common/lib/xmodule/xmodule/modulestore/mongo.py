@@ -95,7 +95,7 @@ class MongoKeyValueStore(KeyValueStore):
             else:
                 return key.field_name in self._data
         else:
-            raise InvalidScopeError(key.scope)
+            return False
 
 MongoUsage = namedtuple('MongoUsage', 'id, def_id')
 

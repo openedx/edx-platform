@@ -9,7 +9,11 @@ from xblock.core import Scope, Integer
 log = logging.getLogger('mitx.' + __name__)
 
 
-class RandomizeModule(XModule):
+class RandomizeFields(object):
+    choice = Integer(help="Which random child was chosen", scope=Scope.student_state)
+
+
+class RandomizeModule(RandomizeFields, XModule):
     """
     Chooses a random child module.  Chooses the same one every time for each student.
 
@@ -31,9 +35,6 @@ class RandomizeModule(XModule):
         grading interaction is a tangle between super and subclasses of descriptors and
         modules.
 """
-
-    choice = Integer(help="Which random child was chosen", scope=Scope.student_state)
-
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
 
@@ -64,7 +65,6 @@ class RandomizeModule(XModule):
             self.child_descriptor = None
             self.child = None
 
-
     def get_child_descriptors(self):
         """
         For grading--return just the chosen child.
@@ -86,7 +86,7 @@ class RandomizeModule(XModule):
         return self.child.get_icon_class() if self.child else 'other'
 
 
-class RandomizeDescriptor(SequenceDescriptor):
+class RandomizeDescriptor(RandomizeFields, SequenceDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = RandomizeModule
 

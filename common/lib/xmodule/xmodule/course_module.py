@@ -147,9 +147,7 @@ class TextbookList(List):
         return json_data
 
 
-class CourseDescriptor(SequenceDescriptor):
-    module_class = SequenceModule
-
+class CourseFields(object):
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course", scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
@@ -206,6 +204,10 @@ class CourseDescriptor(SequenceDescriptor):
     # until we get grade integration set up.
     # Explicit comparison to True because we always want to return a bool.
     hide_progress_tab = Boolean(help="DO NOT USE THIS", scope=Scope.settings)
+
+
+class CourseDescriptor(CourseFields, SequenceDescriptor):
+    module_class = SequenceModule
 
     template_dir_name = 'course'
 

@@ -31,16 +31,18 @@ def group_from_value(groups, v):
     return g
 
 
-class ABTestModule(XModule):
-    """
-    Implements an A/B test with an aribtrary number of competing groups
-    """
-
+class ABTestFields(object):
     group_portions = Object(help="What proportions of students should go in each group", default={DEFAULT: 1}, scope=Scope.content)
     group_assignments = Object(help="What group this user belongs to", scope=Scope.student_preferences, default={})
     group_content = Object(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
     experiment = String(help="Experiment that this A/B test belongs to", scope=Scope.content)
     has_children = True
+
+
+class ABTestModule(ABTestFields, XModule):
+    """
+    Implements an A/B test with an aribtrary number of competing groups
+    """
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -75,15 +77,10 @@ class ABTestModule(XModule):
 
 # TODO (cpennington): Use Groups should be a first class object, rather than being
 # managed by ABTests
-class ABTestDescriptor(RawDescriptor, XmlDescriptor):
+class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
     module_class = ABTestModule
 
     template_dir_name = "abtest"
-
-    experiment = String(help="Experiment that this A/B test belongs to", scope=Scope.content)
-    group_portions = Object(help="What proportions of students should go in each group", default={})
-    group_content = Object(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
-    has_children = True
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

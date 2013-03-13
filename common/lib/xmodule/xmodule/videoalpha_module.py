@@ -19,7 +19,13 @@ import time
 log = logging.getLogger(__name__)
 
 
-class VideoAlphaModule(XModule):
+class VideoAlphaFields(object):
+    data = String(help="XML data for the problem", scope=Scope.content)
+    position = Integer(help="Current position in the video", scope=Scope.student_state, default=0)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+
+
+class VideoAlphaModule(VideoAlphaFields, XModule):
     """
     XML source example:
 
@@ -46,10 +52,6 @@ class VideoAlphaModule(XModule):
          if filename.endswith('.coffee')]}
     css = {'scss': [resource_string(__name__, 'css/videoalpha/display.scss')]}
     js_module_name = "VideoAlpha"
-
-    data = String(help="XML data for the problem", scope=Scope.content)
-    position = Integer(help="Current position in the video", scope=Scope.student_state, default=0)
-    display_name = String(help="Display name for this module", scope=Scope.settings)
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -147,7 +149,7 @@ class VideoAlphaModule(XModule):
         })
 
 
-class VideoAlphaDescriptor(RawDescriptor):
+class VideoAlphaDescriptor(VideoAlphaFields, RawDescriptor):
     module_class = VideoAlphaModule
     stores_state = True
     template_dir_name = "videoalpha"

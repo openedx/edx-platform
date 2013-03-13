@@ -19,7 +19,13 @@ import time
 log = logging.getLogger(__name__)
 
 
-class VideoModule(XModule):
+class VideoFields(object):
+    data = String(help="XML data for the problem", scope=Scope.content)
+    position = Integer(help="Current position in the video", scope=Scope.student_state, default=0)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+
+
+class VideoModule(VideoFields, XModule):
     video_time = 0
     icon_class = 'video'
 
@@ -32,10 +38,6 @@ class VideoModule(XModule):
          if filename.endswith('.coffee')]}
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
-
-    data = String(help="XML data for the problem", scope=Scope.content)
-    position = Integer(help="Current position in the video", scope=Scope.student_state, default=0)
-    display_name = String(help="Display name for this module", scope=Scope.settings)
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -151,7 +153,7 @@ class VideoModule(XModule):
         })
 
 
-class VideoDescriptor(RawDescriptor):
+class VideoDescriptor(VideoFields, RawDescriptor):
     module_class = VideoModule
     stores_state = True
     template_dir_name = "video"

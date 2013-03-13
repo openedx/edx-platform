@@ -26,17 +26,7 @@ from xblock.core import Scope, String, Object, Boolean, List
 log = logging.getLogger(__name__)
 
 
-class PollModule(XModule):
-    """Poll Module"""
-    js = {
-      'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
-      'js': [resource_string(__name__, 'js/src/poll/logme.js'),
-             resource_string(__name__, 'js/src/poll/poll.js'),
-             resource_string(__name__, 'js/src/poll/poll_main.js')]
-         }
-    css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
-    js_module_name = "Poll"
-
+class PollFields(object):
     # Name of poll to use in links to this poll
     display_name = String(help="Display name for this module", scope=Scope.settings)
 
@@ -46,6 +36,20 @@ class PollModule(XModule):
 
     answers = List(help="Poll answers from xml", scope=Scope.content, default=[])
     question = String(help="Poll question", scope=Scope.content, default='')
+
+    id = String(help="ID attribute for this module", scope=Scope.settings)
+
+
+class PollModule(PollFields, XModule):
+    """Poll Module"""
+    js = {
+      'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
+      'js': [resource_string(__name__, 'js/src/poll/logme.js'),
+             resource_string(__name__, 'js/src/poll/poll.js'),
+             resource_string(__name__, 'js/src/poll/poll_main.js')]
+         }
+    css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
+    js_module_name = "Poll"
 
     def handle_ajax(self, dispatch, get):
         """Ajax handler.
@@ -135,18 +139,13 @@ class PollModule(XModule):
             'reset': str(self.descriptor.xml_attributes.get('reset', 'true')).lower()})
 
 
-class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
+class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
     _tag_name = 'poll_question'
     _child_tag_name = 'answer'
 
     module_class = PollModule
     template_dir_name = 'poll'
     stores_state = True
-
-    answers = List(help="Poll answers", scope=Scope.content, default=[])
-    question = String(help="Poll question", scope=Scope.content, default='')
-    display_name = String(help="Display name for this module", scope=Scope.settings)
-    id = String(help="ID attribute for this module", scope=Scope.settings)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

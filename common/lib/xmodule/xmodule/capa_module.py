@@ -83,13 +83,7 @@ class ComplexEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class CapaModule(XModule):
-    '''
-    An XModule implementing LonCapa format problems, implemented by way of
-    capa.capa_problem.LoncapaProblem
-    '''
-    icon_class = 'problem'
-
+class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
     max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
     due = String(help="Date that this problem is due by", scope=Scope.settings)
@@ -103,6 +97,17 @@ class CapaModule(XModule):
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.student_state)
+    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+
+
+class CapaModule(CapaFields, XModule):
+    '''
+    An XModule implementing LonCapa format problems, implemented by way of
+    capa.capa_problem.LoncapaProblem
+    '''
+    icon_class = 'problem'
+
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
@@ -792,16 +797,13 @@ class CapaModule(XModule):
                 'html': self.get_problem_html(encapsulate=False)}
 
 
-class CapaDescriptor(RawDescriptor):
+class CapaDescriptor(CapaFields, RawDescriptor):
     """
     Module implementing problems in the LON-CAPA format,
     as implemented by capa.capa_problem
     """
 
     module_class = CapaModule
-
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
     stores_state = True
     has_score = True

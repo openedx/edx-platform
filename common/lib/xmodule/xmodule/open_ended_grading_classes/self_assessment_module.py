@@ -5,7 +5,6 @@ from lxml import etree
 from xmodule.capa_module import ComplexEncoder
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-from xblock.core import List, Integer, String, Scope
 import openendedchild
 
 from combined_open_ended_rubric import CombinedOpenEndedRubric

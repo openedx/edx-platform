@@ -82,7 +82,15 @@ class HTMLSnippet(object):
                                   .format(self.__class__))
 
 
-class XModule(HTMLSnippet, XBlock):
+class XModuleFields(object):
+    display_name = String(
+        help="Display name for this module",
+        scope=Scope.settings,
+        default=None,
+    )
+
+
+class XModule(XModuleFields, HTMLSnippet, XBlock):
     ''' Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order
@@ -99,11 +107,6 @@ class XModule(HTMLSnippet, XBlock):
     # in the module
     icon_class = 'other'
 
-    display_name = String(
-        help="Display name for this module",
-        scope=Scope.settings,
-        default=None,
-    )
 
     def __init__(self, system, location, descriptor, model_data):
         '''
@@ -307,7 +310,7 @@ class ResourceTemplates(object):
         return templates
 
 
-class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
+class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     """
     An XModuleDescriptor is a specification for an element of a course. This
     could be a problem, an organizational element (a group of content), or a
@@ -351,12 +354,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
     student interacts with the module on the page.  A specific example is
     FoldIt, which posts grade-changing updates through a separate API.
     """
-
-    display_name = String(
-        help="Display name for this module",
-        scope=Scope.settings,
-        default=None,
-    )
 
     # VS[compat].  Backwards compatibility code that can go away after
     # importing 2012 courses.

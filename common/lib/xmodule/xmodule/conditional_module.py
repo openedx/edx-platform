@@ -17,7 +17,11 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 log = logging.getLogger('mitx.' + __name__)
 
 
-class ConditionalModule(XModule):
+class ConditionalFields(object):
+    show_tag_list = List(help="Poll answers", scope=Scope.content)
+
+
+class ConditionalModule(ConditionalFields, XModule):
     """
     Blocks child module from showing unless certain conditions are met.
 
@@ -134,7 +138,7 @@ class ConditionalModule(XModule):
         return new_class
 
 
-class ConditionalDescriptor(SequenceDescriptor):
+class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
     """Descriptor for conditional xmodule."""
     _tag_name = 'conditional'
 
@@ -145,7 +149,6 @@ class ConditionalDescriptor(SequenceDescriptor):
     stores_state = True
     has_score = False
 
-    show_tag_list = List(help="Poll answers", scope=Scope.content)
 
     @staticmethod
     def parse_sources(xml_element, system, return_descriptor=False):

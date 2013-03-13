@@ -27,7 +27,17 @@ IS_GRADED = True
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
 
 
-class PeerGradingModule(XModule):
+class PeerGradingFields(object):
+    use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.", default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
+    link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION, scope=Scope.settings)
+    is_graded = Boolean(help="Whether or not this module is scored.",default=IS_GRADED, scope=Scope.settings)
+    display_due_date_string = String(help="Due date that should be displayed.", default=None, scope=Scope.settings)
+    grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
+    max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE, scope=Scope.settings)
+    student_data_for_location = Object(help="Student data for a given peer grading problem.", default=json.dumps({}),scope=Scope.student_state)
+
+
+class PeerGradingModule(PeerGradingFields, XModule):
     _VERSION = 1
 
     js = {'coffee': [resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
@@ -38,14 +48,6 @@ class PeerGradingModule(XModule):
     js_module_name = "PeerGrading"
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
-
-    use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.", default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
-    link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION, scope=Scope.settings)
-    is_graded = Boolean(help="Whether or not this module is scored.",default=IS_GRADED, scope=Scope.settings)
-    display_due_date_string = String(help="Due date that should be displayed.", default=None, scope=Scope.settings)
-    grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
-    max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE, scope=Scope.settings)
-    student_data_for_location = Object(help="Student data for a given peer grading problem.", default=json.dumps({}),scope=Scope.student_state)
 
     def __init__(self, system, location, descriptor, model_data):
         XModule.__init__(self, system, location, descriptor, model_data)
@@ -556,7 +558,7 @@ class PeerGradingModule(XModule):
         return json.dumps(state)
 
 
-class PeerGradingDescriptor(RawDescriptor):
+class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     """
     Module for adding peer grading questions
     """

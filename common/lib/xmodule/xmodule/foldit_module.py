@@ -11,10 +11,8 @@ from xblock.core import Scope, Integer, String
 
 log = logging.getLogger(__name__)
 
-class FolditModule(XModule):
 
-    css = {'scss': [resource_string(__name__, 'css/foldit/leaderboard.scss')]}
-
+class FolditFields(object):
     # default to what Spring_7012x uses
     required_level = Integer(default=4, scope=Scope.settings)
     required_sublevel = Integer(default=5, scope=Scope.settings)
@@ -22,6 +20,11 @@ class FolditModule(XModule):
 
     show_basic_score = String(scope=Scope.settings, default='false')
     show_leaderboard = String(scope=Scope.settings, default='false')
+
+
+class FolditModule(FolditFields, XModule):
+
+    css = {'scss': [resource_string(__name__, 'css/foldit/leaderboard.scss')]}
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -154,7 +157,7 @@ class FolditModule(XModule):
 
 
 
-class FolditDescriptor(XmlDescriptor, EditingDescriptor):
+class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):
     """
     Module for adding Foldit problems to courses
     """

@@ -15,17 +15,19 @@ from xblock.core import Float, String, Boolean, Scope
 log = logging.getLogger(__name__)
 
 
-class TimeLimitModule(XModule):
-    '''
-    Wrapper module which imposes a time constraint for the completion of its child.
-    '''
-
+class TimeLimitFields(object):
     beginning_at = Float(help="The time this timer was started", scope=Scope.student_state)
     ending_at = Float(help="The time this timer will end", scope=Scope.student_state)
     accomodation_code = String(help="A code indicating accommodations to be given the student", scope=Scope.student_state)
     time_expired_redirect_url = String(help="Url to redirect users to after the timelimit has expired", scope=Scope.settings)
     duration = Float(help="The length of this timer", scope=Scope.settings)
     suppress_toplevel_navigation = Boolean(help="Whether the toplevel navigation should be suppressed when viewing this module", scope=Scope.settings)
+
+
+class TimeLimitModule(TimeLimitFields, XModule):
+    '''
+    Wrapper module which imposes a time constraint for the completion of its child.
+    '''
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -117,7 +119,7 @@ class TimeLimitModule(XModule):
         else:
             return "other"
 
-class TimeLimitDescriptor(XMLEditingDescriptor, XmlDescriptor):
+class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
 
     module_class = TimeLimitModule
 

@@ -6,7 +6,11 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class EditingDescriptor(MakoModuleDescriptor):
+class EditingFields(object):
+    data = String(scope=Scope.content, default='')
+
+
+class EditingDescriptor(EditingFields, MakoModuleDescriptor):
     """
     Module that provides a raw editing view of its data and children.  It does not
     perform any validation on its definition---just passes it along to the browser.
@@ -14,8 +18,6 @@ class EditingDescriptor(MakoModuleDescriptor):
     This class is intended to be used as a mixin.
     """
     mako_template = "widgets/raw-edit.html"
-
-    data = String(scope=Scope.content, default='')
 
     # cdodge: a little refactoring here, since we're basically doing the same thing
     # here as with our parent class, let's call into it to get the basic fields

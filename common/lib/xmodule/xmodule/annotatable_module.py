@@ -12,7 +12,12 @@ from xblock.core import Scope, String
 
 log = logging.getLogger(__name__)
 
-class AnnotatableModule(XModule):
+
+class AnnotatableFields(object):
+    data = String(help="XML data for the annotation", scope=Scope.content)
+
+
+class AnnotatableModule(AnnotatableFields, XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/html/display.coffee'),
@@ -23,7 +28,6 @@ class AnnotatableModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'annotatable'
 
-    data = String(help="XML data for the annotation", scope=Scope.content)
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -125,7 +129,7 @@ class AnnotatableModule(XModule):
         return self.system.render_template('annotatable.html', context)
 
 
-class AnnotatableDescriptor(RawDescriptor):
+class AnnotatableDescriptor(AnnotatableFields, RawDescriptor):
     module_class = AnnotatableModule
     stores_state = True
     template_dir_name = "annotatable"

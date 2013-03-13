@@ -18,7 +18,15 @@ log = logging.getLogger(__name__)
 class_priority = ['video', 'problem']
 
 
-class SequenceModule(XModule):
+class SequenceFields(object):
+    has_children = True
+
+    # NOTE: Position is 1-indexed.  This is silly, but there are now student
+    # positions saved on prod, so it's not easy to fix.
+    position = Integer(help="Last tab viewed in this sequence", scope=Scope.student_state)
+
+
+class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {'coffee': [resource_string(__name__,
@@ -27,11 +35,6 @@ class SequenceModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
-    has_children = True
-
-    # NOTE: Position is 1-indexed.  This is silly, but there are now student
-    # positions saved on prod, so it's not easy to fix.
-    position = Integer(help="Last tab viewed in this sequence", scope=Scope.student_state)
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -114,11 +117,10 @@ class SequenceModule(XModule):
         return new_class
 
 
-class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
+class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
-    has_children = True
     stores_state = True  # For remembering where in the sequence the student is
 
     js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
