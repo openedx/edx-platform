@@ -1,0 +1,43 @@
+<%inherit file="base.html" />
+<%block name="title">Course Checklists</%block>
+<%block name="bodyclass">is-signedin course checklists</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+  // checklists - prototype/basic concept JS
+  $(document).ready(function() {
+    
+    
+  });
+</script>
+</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions has-subtitle">
+    <div class="title">
+      <span class="title-sub">UX Design</span>
+      <h1 class="title-1">Alerts &amp; Notifications</h1>
+    </div>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+      <section>
+        <header>
+          <h2 class="title-2">Alerts</h2>
+          <span class="tip">persistant, static messages to the user</span>
+        </header>
+
+        <p>In Studio, alerts are 1) general warnings/notes (e.g. drafts, published content, next steps) about the current view a user is interacting with or 2) notes about the status (e.g. saved confirmations, errors, next system steps) of any previous state that need to communicated to the user when arriving at the current view.</p>
+      </section>
+    </article>
+  </section>
+</div>
+</%block>
+
+<%block name="view_alerts">
+<!-- alerts, notifications, prompts here -->
+</%block>

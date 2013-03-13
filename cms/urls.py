@@ -83,6 +83,7 @@ urlpatterns = ('',
 
 # User creation and updating views
 urlpatterns += (
+    url(r'^ux-checklists$', 'contentstore.views.ux_checklists', name='checklists'),
     url(r'^howitworks$', 'contentstore.views.howitworks', name='howitworks'),
     url(r'^signup$', 'contentstore.views.signup', name='signup'),
 

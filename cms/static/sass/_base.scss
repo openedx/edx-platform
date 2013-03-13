@@ -214,7 +214,7 @@ h1 {
       color: $gray-l2;
     }
 
-    .title, .title-1 {
+    .title-1 {
       @include font-size(32);
       margin: 0;
       padding: 0;
@@ -283,8 +283,8 @@ h1 {
 
   .title-3 {
     @include font-size(16);
-    margin: 0 0 ($baseline/4) 0;
-    font-weight: 500;
+    margin: 0 0 ($baseline/2) 0;
+    font-weight: 600;
   }
 
   .title-4 {
@@ -770,6 +770,10 @@ hr.divide {
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
   word-wrap: break-word;
+}
+
+hr.divider {
+  @extend .sr;
 }
 
 // ====================

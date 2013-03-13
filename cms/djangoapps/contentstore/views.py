@@ -113,6 +113,9 @@ def howitworks(request):
     else: 
         return render_to_response('howitworks.html', {})
 
+def ux_checklists(request):
+    return render_to_response('ux-checklists.html', {})
+
 # ==== Views for any logged-in user ==================================
 
 

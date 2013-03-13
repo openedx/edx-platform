@@ -1,0 +1,246 @@
+<%inherit file="base.html" />
+<%block name="title">Course Checklists</%block>
+<%block name="bodyclass">is-signedin course uxdesign checklists</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions has-subtitle">
+    <div class="title">
+      <span class="title-sub">Tools</span>
+      <h1 class="title-1">Course Tasks &amp; Checklists</h1>
+    </div>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+      <form id="course-checklists" class="course-checklists" method="post" action="">
+        <h2 class="title title-3 sr">Current Checklists</h2>
+
+        <section class="course-checklist" id="course-checklist1">
+          <header>
+            <h3 class="checklist-title title-2">Getting Started with Studio</h3>
+            <span class="checklist-status status">Tasks Completed: <span class="status-count">2</span>/<span class="status-amount">5</span></span>
+          </header>
+
+          <ul class="list list-tasks">
+            <li class="task">
+              <div class="task-details">
+                <div class="field">
+                  <input type="checkbox" class="task-input" name="course-checklist1-task1" id="course-checklist1-task1" value="course-checklist1-task1 complete">
+                  <label for="course-checklist1-task1" class="title title-3 task-name">Add Course Team Members</label>
+                </div>
+                <p class="task-description">Grant your collaborators permission to edit your course so you can work together.</p>  
+              </div>
+
+              <ul class="list-actions task-actions">
+                <li>
+                  <a href="#" class="action action-primary">Edit Team Members</a>
+                </li>
+              </ul>
+            </li>
+            <li class="task is-completed">
+              <div class="task-details">
+                <div class="field">
+                  <input checked type="checkbox" class="task-input" name="course-checklist1-task2" id="course-checklist1-task2" value="course-checklist1-task2 complete">
+                  <label for="course-checklist1-task2" class="title title-3 task-name">Set Important Dates for Your Course</label>
+                </div>
+                <p class="task-description">Establish a course start and end date, course enrollment start and end dates, content release and due dates, and other important dates.</p>  
+              </div>
+
+              <ul class="list-actions task-actions">
+                <li>
+                  <a href="#" class="action action-primary">Edit Dates</a>
+                </li>
+              </ul>
+            </li>
+            <li class="task">
+              <div class="task-details">
+                <div class="field">
+                  <input type="checkbox" class="task-input" name="course-checklist1-task1" id="course-checklist1-task1" value="course-checklist1-task1 complete">
+                  <label for="course-checklist1-task1" class="title title-3 task-name">Add Course Team Members</label>
+                </div>
+                <p class="task-description">Grant your collaborators permission to edit your course so you can work together.</p>  
+              </div>
+
+              <ul class="list-actions task-actions">
+                <li>
+                  <a href="#" class="action action-primary">Edit Team Members</a>
+                </li>
+              </ul>
+            </li>
+            <li class="task is-completed">
+              <div class="task-details">
+                <div class="field">
+                  <input checked type="checkbox" class="task-input" name="course-checklist1-task2" id="course-checklist1-task2" value="course-checklist1-task2 complete">
+                  <label for="course-checklist1-task2" class="title title-3 task-name">Set Important Dates for Your Course</label>
+                </div>
+                <p class="task-description">Establish a course start and end date, course enrollment start and end dates, content release and due dates, and other important dates.</p>  
+              </div>
+
+              <ul class="list-actions task-actions">
+                <li>
+                  <a href="#" class="action action-primary">Edit Dates</a>
+                </li>
+              </ul>
+            </li>
+            <li class="task">
+              <div class="task-details">
+                <div class="field">
+                  <input type="checkbox" class="task-input" name="course-checklist1-task1" id="course-checklist1-task1" value="course-checklist1-task1 complete">
+                  <label for="course-checklist1-task1" class="title title-3 task-name">Add Course Team Members</label>
+                </div>
+                <p class="task-description">Grant your collaborators permission to edit your course so you can work together.</p>  
+              </div>
+
+              <ul class="list-actions task-actions">
+                <li>
+                  <a href="#" class="action action-primary">Edit Team Members</a>
+                </li>
+              </ul>
+            </li>
+            <li class="task is-not-available">
+              <div class="task-details">
+                <div class="field">
+                  <input type="checkbox" class="task-input" name="course-checklist1-task2" id="course-checklist1-task2" value="course-checklist1-task2 complete">
+                  <label for="course-checklist1-task2" class="title title-3 task-name">Set Important Dates for Your Course</label>
+                </div>
+                <p class="task-description">Establish a course start and end date, course enrollment start and end dates, content release and due dates, and other important dates.</p>  
+              </div>
+
+              <ul class="list-actions task-actions">
+                <li>
+                  <a href="#" class="action action-primary">Edit Dates</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <ul class="list-actions course-checklist-actions">
+            <h5 class="sr">Edit This Checklist</h5>
+            <li>
+              <a href="#" class="action action-primary"><i class="ss-icon ss-symbolicons-standard icon-add">&#x002B;</i> Add a Task <span class="sr">to This Checklist</span></a>
+            </li>
+            <li>
+              <a href="#" class="action action-secondary action-delete"><i class="ss-icon ss-symbolicons-block icon-delete">&#xE0D0;</i> Delete This Checklist</a>
+            </li>
+          </ul>
+        </section>
+
+        <hr class="divider" />
+
+        <h2 class="title title-3 sr">Completed Checklists</h2>
+
+        <section class="course-checklist is-completed" id="course-checklist1">
+          <header>
+            <h3 class="checklist-title title-2">Getting Started with Studio</h3>
+            <span class="checklist-status status"><i class="ss-icon ss-symbolicons-standard icon-confirm">&#x2713;</i> Tasks Completed: <span class="status-count">5</span>/<span class="status-amount">5</span></span>
+          </header>
+
+          <ul class="list list-tasks">
+            <li class="task">
+
+            </li>
+            <li class="task is-completed">
+
+            </li>
+            <li class="task is-not-available">
+
+            </li>
+          </ul>
+
+          <nav class="course-checklist-actions">
+            <h5 class="sr">Edit This Checklist</h5>
+            <ul class="list-actions">
+              <li>
+                <a href="#" class="action action-primary action-create"><i class="ss-icon ss-symbolicons-standard icon-add">&#x002B;</i> Add a Task <span class="sr">to This Checklist</span></a>
+              </li>
+              <li>
+                <a href="#" class="action action-secondary action-delete"><i class="ss-icon ss-symbolicons-block icon-delete">&#xE0D0;</i> Delete This Checklist</a>
+              </li>
+            </ul>
+          </nav>
+        </section>
+
+        <hr class="divider" />
+      </form>
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title title-3">What are Checklists?</h3>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title title-3">Current Checklists</h3>
+
+        <nav class="nav-page checklists-current">
+          <ol>
+            <li class="nav-item">
+              <a href="#course-checklist1">Getting Started with Studio</a>
+            </li>
+            <li class="nav-item">
+              <a href="#course-checklist2">Draft a Rough Course Outline</a>
+            </li>
+            <li class="nav-item">
+              <a href="#course-checklist3">Explore edX's Support Tools</a>
+            </li>
+            <li class="nav-item">
+              <a href="#course-checklist4">Draft your Course Introduction</a>
+            </li>
+          </ol>
+        </nav>
+      </div>
+
+      <div class="bit">
+        <h3 class="title title-3">Completed Checklists</h3>
+
+        <nav class="nav-page checklists-completed">
+          <ol>
+            <li class="nav-item">
+              <a href="#course-checklist1">Getting Started with Studio</a>
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </section>
+</div>
+</%block>
+
+<%block name="view_alerts">
+<!-- alert: save confirmed with close -->
+<div class="wrapper wrapper-alert wrapper-alert-confirmation">
+  <div class="alert confirmation">
+    <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">Your policy changes have been saved.</h2>
+      <p>Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.</p>
+    </div>
+
+    <a href="#" rel="view" class="action action-alert-close">
+      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
+      <span class="label">close alert</span>
+    </a>
+  </div>
+</div>
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+  // checklists - prototype/basic js
+  $(document).ready(function() {
+    
+    $('.course-checklist .checklist-title').each(function(e){
+      $(this).addClass('is-selectable').click(function(e){
+        (e).preventDefault();
+        $(this).closest('.course-checklist').toggleClass('is-collapsed');
+      });
+    });
+    
+  });
+</script>
+</%block>
