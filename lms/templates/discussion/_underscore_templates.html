@@ -46,11 +46,14 @@
 
       <div class="post-body">${'<%- body %>'}</div>
       
-      % if has_permission(user, 'create_commentx', course.id):
+      % if has_permission(user, 'change_permission', course.id):
       <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">                
       <i class="icon"></i><span class="pin-label">Pin Thread</span></div> 
-      elif pinned:
-        THIS ONE IS PINNED
+      %else:
+      ${"<% if (pinned) { %>"}
+      <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">                
+      <i class="icon"></i><span class="pin-label">Pin Thread</span></div> 
+      ${"<% }  %>"}  
       % endif
       
       
