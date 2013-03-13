@@ -184,6 +184,11 @@ def _combined_open_ended_grading(tab, user, course, active_page):
         return tab
     return []
 
+def _student_notes(tab, user, course, active_page):
+    if settings.MITX_FEATURES.get('ENABLE_STUDENT_NOTES'):
+        link = reverse('notes', args=[course.id])
+        return [CourseTab('My Notes', link, active_page == 'notes')]
+    return []
 
 #### Validators
 
@@ -226,6 +231,7 @@ VALID_TAB_TYPES = {
     'peer_grading': TabImpl(null_validator, _peer_grading),
     'staff_grading': TabImpl(null_validator, _staff_grading),
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
+    'notes': TabImpl(null_validator, _student_notes)
     }
 
 
@@ -318,6 +324,8 @@ def get_default_tabs(user, course, active_page):
         tabs.append(CourseTab('Discussion', link, active_page == 'discussion'))
 
     tabs.extend(_wiki({'name': 'Wiki', 'type': 'wiki'}, user, course, active_page))
+
+    tabs.extend(_student_notes({'name': 'My Notes', 'type': 'notes'}, user, course, active_page))
 
     if user.is_authenticated() and not course.hide_progress_tab:
         tabs.extend(_progress({'name': 'Progress'}, user, course, active_page))

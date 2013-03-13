@@ -86,7 +86,9 @@ MITX_FEATURES = {
 
     # Give a UI to show a student's submission history in a problem by the 
     # Staff Debug tool.
-    'ENABLE_STUDENT_HISTORY_VIEW': True
+    'ENABLE_STUDENT_HISTORY_VIEW': True,
+
+    'ENABLE_STUDENT_NOTES': True
 }
 
 # Used for A/B testing
@@ -414,6 +416,9 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
   'js/vendor/swfobject/swfobject.js',
   'js/vendor/jquery.ba-bbq.min.js',
+  'js/vendor/annotator.min.js',
+  'js/vendor/annotator.store.min.js',
+  'js/vendor/annotator.tags.min.js'
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
@@ -431,6 +436,7 @@ PIPELINE_CSS = {
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
+            'css/vendor/annotator.min.css',
             'sass/course.scss'
         ],
         'output_filename': 'css/lms-course.css',
@@ -580,4 +586,7 @@ INSTALLED_APPS = (
 
     # Discussion forums
     'django_comment_client',
+
+    # Student notes
+    'notes',
 )
