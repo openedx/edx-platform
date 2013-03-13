@@ -37,8 +37,6 @@ class PollFields(object):
     answers = List(help="Poll answers from xml", scope=Scope.content, default=[])
     question = String(help="Poll question", scope=Scope.content, default='')
 
-    id = String(help="ID attribute for this module", scope=Scope.settings)
-
 
 class PollModule(PollFields, XModule):
     """Poll Module"""
@@ -193,7 +191,6 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
             tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
         xml_object.set('display_name', self.display_name)
-        xml_object.set('id', self.id)
 
         def add_child(xml_obj, answer):
             child_str = '<{tag_name} id="{id}">{text}</{tag_name}>'.format(

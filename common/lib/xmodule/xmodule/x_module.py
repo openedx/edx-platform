@@ -123,14 +123,17 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         model_data: A dictionary-like object that maps field names to values
             for those fields.
         '''
+        self._model_data = model_data
         self.system = system
         self.location = Location(location)
         self.descriptor = descriptor
-        self.id = self.location.url()
         self.url_name = self.location.name
         self.category = self.location.category
-        self._model_data = model_data
         self._loaded_children = None
+
+    @property
+    def id(self):
+        return self.location.url()
 
     @property
     def display_name_with_default(self):
@@ -392,6 +395,10 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         self._model_data = model_data
 
         self._child_instances = None
+
+    @property
+    def id(self):
+        return self.location.url()
 
     @property
     def display_name_with_default(self):
