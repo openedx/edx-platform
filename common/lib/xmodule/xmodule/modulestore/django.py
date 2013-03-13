@@ -8,6 +8,14 @@ from __future__ import absolute_import
 from importlib import import_module
 from os import environ
 
+# cdodge: ICK! Sorry about this but I'm not sure how to resolve. We have some unit tests which do not setup a
+# Django runtime. This import expects to find a "CACHE =" in a configuration, which doesn't exist in the
+# test environment
+try:
+    from django.core.cache import get_cache, InvalidCacheBackendError
+except:
+    pass
+
 from django.conf import settings
 
 _MODULESTORES = {}
@@ -33,11 +41,16 @@ def modulestore(name='default'):
         class_ = load_function(settings.MODULESTORE[name]['ENGINE'])
 
         options = {}
+        try:
+            options = {'metadata_inheritance_cache': get_cache('mongo_metadata_inheritance')}
+        except InvalidCacheBackendError:
+            pass
+
         options.update(settings.MODULESTORE[name]['OPTIONS'])
         for key in FUNCTION_KEYS:
             if key in options:
                 options[key] = load_function(options[key])
-
+                
         _MODULESTORES[name] = class_(
             **options
         )
