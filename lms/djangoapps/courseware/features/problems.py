@@ -8,7 +8,8 @@ problem_urls = { 'drop down': '/courses/edX/model_course/2013_Spring/courseware/
                 'multiple choice': '/courses/edX/model_course/2013_Spring/courseware/Problem_Components/Multiple_Choice_Problems',
                 'checkbox': '/courses/edX/model_course/2013_Spring/courseware/Problem_Components/Checkbox_Problems', 
                 'string': '/courses/edX/model_course/2013_Spring/courseware/Problem_Components/String_Problems',
-                'numerical': '/courses/edX/model_course/2013_Spring/courseware/Problem_Components/Numerical_Problems', }
+                'numerical': '/courses/edX/model_course/2013_Spring/courseware/Problem_Components/Numerical_Problems', 
+                'formula': '/courses/edX/model_course/2013_Spring/courseware/Problem_Components/Formula_Problems', }
 
 @step(u'I am viewing a "([^"]*)" problem')
 def view_problem(step, problem_type):
@@ -48,6 +49,11 @@ def answer_problem(step, problem_type, correctness):
         textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2,2))
         textfield.fill(textvalue)
 
+    elif problem_type == 'formula':
+        textfield = world.browser.find_by_css("input#input_i4x-edX-model_course-problem-Formula_Problem_2_1")
+        textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
+        textfield.fill(textvalue)
+
     check_problem(step)
 
 @step(u'I check a problem')
@@ -82,7 +88,7 @@ def assert_answer_mark(step, problem_type, correctness):
                 assert(world.browser.is_element_present_by_css(mark_classes[0], wait_time=4) or
                         world.browser.is_element_present_by_css(mark_classes[1], wait_time=4))
 
-    elif problem_type in ["string", "numerical"]:
+    elif problem_type in ["string", "numerical", "formula"]:
         if correctness == 'unanswered':
             assert(world.browser.is_element_not_present_by_css('div.correct'))
             assert(world.browser.is_element_not_present_by_css('div.incorrect'))

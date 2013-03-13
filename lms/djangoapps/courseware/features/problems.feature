@@ -15,6 +15,7 @@ Feature: Answer choice problems
         | checkbox          |
         | string            |
         | numerical         |
+        | formula           |
 
     Scenario: I can answer a problem incorrectly
         Given I am viewing a "<ProblemType>" problem
@@ -28,6 +29,7 @@ Feature: Answer choice problems
         | checkbox          |
         | string            |
         | numerical         |
+        | formula           |
 
     Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
@@ -41,6 +43,7 @@ Feature: Answer choice problems
         | checkbox          |
         | string            |
         | numerical         |
+        | formula           |
 
 
     Scenario: I can reset a problem
@@ -61,3 +64,5 @@ Feature: Answer choice problems
         | string            | incorrect     |
         | numerical         | correct       |
         | numerical         | incorrect     |
+        | formula           | correct       |
+        | formula           | incorrect     |
