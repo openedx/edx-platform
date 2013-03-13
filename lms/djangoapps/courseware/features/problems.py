@@ -51,8 +51,8 @@ def assert_answer_mark(step, problem_type, correctness):
 
     if problem_type == "multiple choice":
         if correctness == 'unanswered':
-            mark_classes = ['.choicegroup_correct', '.choicegroup_incorrect',
-                            '.correct', '.incorrect']
+            mark_classes = ['label.choicegroup_correct', 'label.choicegroup_incorrect',
+                            'span.correct', 'span.incorrect']
             for css in mark_classes:
                 assert(world.browser.is_element_not_present_by_css(css))
                     
@@ -65,15 +65,15 @@ def assert_answer_mark(step, problem_type, correctness):
                 # Two ways to be marked incorrect: either applying a 
                 # class to the label (marking a particular option)
                 # or applying a class to a span (marking the whole problem incorrect)
-                mark_classes = ['.choicegroup_incorrect', '.incorrect']
+                mark_classes = ['label.choicegroup_incorrect', 'label.incorrect']
                 assert(world.browser.is_element_present_by_css(mark_classes[0], wait_time=4) or
                         world.browser.is_element_present_by_css(mark_classes[1], wait_time=4))
 
     else:
         if correctness == 'unanswered':
-            assert(world.browser.is_element_not_present_by_css('.correct'))
-            assert(world.browser.is_element_not_present_by_css('.incorrect'))
+            assert(world.browser.is_element_not_present_by_css('span.correct'))
+            assert(world.browser.is_element_not_present_by_css('span.incorrect'))
 
         else:
-            mark_class = '.correct' if correctness == 'correct' else '.incorrect'
+            mark_class = 'span.correct' if correctness == 'correct' else 'span.incorrect'
             assert(world.browser.is_element_present_by_css(mark_class, wait_time=4))
