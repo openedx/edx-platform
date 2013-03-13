@@ -114,7 +114,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertTrue(sequential.location.url() in chapter.children)
 
         self.client.post(reverse('delete_item'),
-            json.dumps({'id': sequential.location.url(), 'delete_children': 'true'}),
+            json.dumps({'id': sequential.location.url(), 'delete_children': 'true', 'delete_all_versions': 'true'}),
             "application/json")
 
         found = False

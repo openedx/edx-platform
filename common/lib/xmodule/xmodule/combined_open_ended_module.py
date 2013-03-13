@@ -89,7 +89,6 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
     def __init__(self, system, location, descriptor, model_data):
         XModule.__init__(self, system, location, descriptor, model_data)
-
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
 
@@ -152,13 +151,13 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         attributes = self.student_attributes + self.settings_attributes
 
         static_data = {
-            'rewrite_content_links' : self.rewrite_content_links,
+            'rewrite_content_links': self.rewrite_content_links,
         }
-        instance_state = { k: getattr(self,k) for k in attributes}
+        instance_state = {k: getattr(self, k) for k in attributes}
         self.child_descriptor = descriptors[version_index](self.system)
         self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(self.data), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = instance_state, static_data= static_data, attributes=attributes)
+                                    instance_state=instance_state, static_data=static_data, attributes=attributes)
         self.save_instance_data()
 
     def get_html(self):
@@ -190,9 +189,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
     def save_instance_data(self):
         for attribute in self.student_attributes:
-            child_attr = getattr(self.child_module,attribute)
+            child_attr = getattr(self.child_module, attribute)
             if child_attr != getattr(self, attribute):
-                setattr(self,attribute, getattr(self.child_module,attribute))
+                setattr(self, attribute, getattr(self.child_module, attribute))
 
 
 class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):

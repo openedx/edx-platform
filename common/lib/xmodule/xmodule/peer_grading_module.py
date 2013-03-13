@@ -44,7 +44,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
                      resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     ]}
+    ]}
     js_module_name = "PeerGrading"
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
@@ -55,7 +55,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         #We need to set the location here so the child modules can use it
         system.set('location', location)
         self.system = system
-        if(self.system.open_ended_grading_interface):
+        if (self.system.open_ended_grading_interface):
             self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system)
         else:
             self.peer_gs = MockPeerGradingService()
@@ -139,13 +139,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
             'save_grade': self.save_grade,
             'save_calibration_essay': self.save_calibration_essay,
             'problem': self.peer_grading_problem,
-            }
+        }
 
         if dispatch not in handlers:
             #This is a dev_facing_error
             log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
             #This is a dev_facing_error
-            return json.dumps({'error': 'Error handling action.  Please try again.', 'success' : False})
+            return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
         d = handlers[dispatch](get)
 
@@ -182,9 +182,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
         except:
             success, response = self.query_data_for_location()
             if not success:
-                log.exception("No instance data found and could not get data from controller for loc {0} student {1}".format(
-                    self.system.location.url(), self.system.anonymous_student_id
-                ))
+                log.exception(
+                    "No instance data found and could not get data from controller for loc {0} student {1}".format(
+                        self.system.location.url(), self.system.anonymous_student_id
+                    ))
                 return None
             count_graded = response['count_graded']
             count_required = response['count_required']
@@ -195,7 +196,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         score_dict = {
             'score': int(count_graded >= count_required),
             'total': self.max_grade,
-            }
+        }
 
         return score_dict
 
@@ -244,7 +245,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             .format(self.peer_gs.url, location, grader_id))
             #This is a student_facing_error
             return {'success': False,
-                               'error': EXTERNAL_GRADER_NO_CONTACT_ERROR}
+                    'error': EXTERNAL_GRADER_NO_CONTACT_ERROR}
 
     def save_grade(self, get):
         """
@@ -262,7 +263,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
             error: if there was an error in the submission, this is the error message
         """
 
-        required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]', 'submission_flagged'])
+        required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]',
+                        'submission_flagged'])
         success, message = self._check_required(get, required)
         if not success:
             return self._err_response(message)
@@ -278,14 +280,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
-                score, feedback, submission_key, rubric_scores, submission_flagged)
+                                               score, feedback, submission_key, rubric_scores, submission_flagged)
             return response
         except GradingServiceError:
             #This is a dev_facing_error
             log.exception("""Error saving grade to open ended grading service.  server url: {0}, location: {1}, submission_id:{2},
                             submission_key: {3}, score: {4}"""
             .format(self.peer_gs.url,
-                location, submission_id, submission_key, score)
+                    location, submission_id, submission_key, score)
             )
             #This is a student_facing_error
             return {
@@ -373,7 +375,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             .format(self.peer_gs.url, location))
             #This is a student_facing_error
             return {'success': False,
-                               'error': EXTERNAL_GRADER_NO_CONTACT_ERROR}
+                    'error': EXTERNAL_GRADER_NO_CONTACT_ERROR}
         # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError:
             #This is a dev_facing_error
@@ -381,7 +383,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             .format(rubric))
             #This is a student_facing_error
             return {'success': False,
-                               'error': 'Error displaying submission.  Please notify course staff.'}
+                    'error': 'Error displaying submission.  Please notify course staff.'}
 
 
     def save_calibration_essay(self, get):
@@ -417,11 +419,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
-                submission_key, score, feedback, rubric_scores)
+                                                           submission_key, score, feedback, rubric_scores)
             return response
         except GradingServiceError:
             #This is a dev_facing_error
-            log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
+            log.exception(
+                "Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(
+                    location, submission_id, submission_key, grader_id))
             #This is a student_facing_error
             return self._err_response('There was an error saving your score.  Please notify course staff.')
 
@@ -431,7 +435,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         '''
         html = self.system.render_template('peer_grading/peer_grading_closed.html', {
             'use_for_single_location': self.use_for_single_location
-            })
+        })
         return html
 
 
@@ -501,7 +505,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 problem['due'] = None
                 problem['closed'] = False
 
-
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading.html', {
             'course_id': self.system.course_id,
@@ -512,7 +515,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             # Checked above
             'staff_access': False,
             'use_single_location': self.use_for_single_location,
-            })
+        })
 
         return html
 
@@ -524,7 +527,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
             if self.use_for_single_location not in TRUE_DICT:
                 #This is an error case, because it must be set to use a single location to be called without get parameters
                 #This is a dev_facing_error
-                log.error("Peer grading problem in peer_grading_module called with no get parameters, but use_for_single_location is False.")
+                log.error(
+                    "Peer grading problem in peer_grading_module called with no get parameters, but use_for_single_location is False.")
                 return {'html': "", 'success': False}
             problem_location = self.link_to_location
 
@@ -540,7 +544,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             # Checked above
             'staff_access': False,
             'use_single_location': self.use_for_single_location,
-            })
+        })
 
         return {'html': html, 'success': True}
 
@@ -553,7 +557,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         state = {
             'student_data_for_location': self.student_data_for_location,
-            }
+        }
 
         return json.dumps(state)
 

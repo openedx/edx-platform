@@ -10,7 +10,7 @@ import logging
 from lxml import etree
 import capa.xqueue_interface as xqueue_interface
 
-from xmodule.capa_module import  ComplexEncoder
+from xmodule.capa_module import ComplexEncoder
 from xmodule.editing_module import EditingDescriptor
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
@@ -77,7 +77,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             self.send_to_grader(self.latest_answer(), system)
             self.child_created = False
 
-
     def _parse(self, oeparam, prompt, rubric, system):
         '''
         Parse OpenEndedResponse XML:
@@ -104,7 +103,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             # response types)
         except TypeError, ValueError:
             #This is a dev_facing_error
-            log.exception("Grader payload from external open ended grading server is not a json object! Object: {0}".format(grader_payload))
+            log.exception(
+                "Grader payload from external open ended grading server is not a json object! Object: {0}".format(
+                    grader_payload))
 
         self.initial_display = find_with_default(oeparam, 'initial_display', '')
         self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
@@ -148,7 +149,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         for tag in ['feedback', 'submission_id', 'grader_id', 'score']:
             if tag not in survey_responses:
                 #This is a student_facing_error
-                return {'success': False, 'msg': "Could not find needed tag {0} in the survey responses.  Please try submitting again.".format(tag)}
+                return {'success': False,
+                        'msg': "Could not find needed tag {0} in the survey responses.  Please try submitting again.".format(
+                            tag)}
         try:
             submission_id = int(survey_responses['submission_id'])
             grader_id = int(survey_responses['grader_id'])
@@ -188,7 +191,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         }
 
         (error, msg) = qinterface.send_to_queue(header=xheader,
-            body=json.dumps(contents))
+                                                body=json.dumps(contents))
 
         #Convert error to a success value
         success = True
@@ -222,8 +225,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                                                  str(len(self.child_history)))
 
         xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['callback_url'],
-            lms_key=queuekey,
-            queue_name=self.queue_name)
+                                                lms_key=queuekey,
+                                                queue_name=self.queue_name)
 
         contents = self.payload.copy()
 
@@ -241,7 +244,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         (error, msg) = qinterface.send_to_queue(header=xheader,
-            body=json.dumps(contents))
+                                                body=json.dumps(contents))
 
         # State associated with the queueing request
         queuestate = {'key': queuekey,
@@ -265,7 +268,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         self.child_state = self.POST_ASSESSMENT
 
         return True
-
 
     def get_answers(self):
         """
@@ -300,7 +302,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # We want to display available feedback in a particular order.
         # This dictionary specifies which goes first--lower first.
-        priorities = {  # These go at the start of the feedback
+        priorities = {# These go at the start of the feedback
                       'spelling': 0,
                       'grammar': 1,
                       # needs to be after all the other feedback
@@ -400,7 +402,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         if not response_items['success']:
             return system.render_template("{0}/open_ended_error.html".format(self.TEMPLATE_DIR),
-                {'errors': feedback})
+                                          {'errors': feedback})
 
         feedback_template = system.render_template("{0}/open_ended_feedback.html".format(self.TEMPLATE_DIR), {
             'grader_type': response_items['grader_type'],
@@ -410,7 +412,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         })
 
         return feedback_template, rubric_scores
-
 
     def _parse_score_msg(self, score_msg, system, join_feedback=True):
         """
@@ -437,13 +438,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'valid': False,
             'score': 0,
             'feedback': '',
-            'rubric_scores' : [[0]],
-            'grader_types' : [''],
-            'feedback_items' : [''],
-            'feedback_dicts' : [{}],
-            'grader_ids' : [0],
-            'submission_ids' : [0],
-            }
+            'rubric_scores': [[0]],
+            'grader_types': [''],
+            'feedback_items': [''],
+            'feedback_dicts': [{}],
+            'grader_ids': [0],
+            'submission_ids': [0],
+        }
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
@@ -470,7 +471,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 log.error(error_message)
                 fail['feedback'] = error_message
                 return fail
-            #This is to support peer grading
+                #This is to support peer grading
         if isinstance(score_result['score'], list):
             feedback_items = []
             rubric_scores = []
@@ -527,12 +528,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'valid': True,
             'score': score,
             'feedback': feedback,
-            'rubric_scores' : rubric_scores,
-            'grader_types' : grader_types,
-            'feedback_items' : feedback_items,
-            'feedback_dicts' : feedback_dicts,
-            'grader_ids' : grader_ids,
-            'submission_ids' : submission_ids,
+            'rubric_scores': rubric_scores,
+            'grader_types': grader_types,
+            'feedback_items': feedback_items,
+            'feedback_dicts': feedback_dicts,
+            'grader_ids': grader_ids,
+            'submission_ids': submission_ids,
         }
 
     def latest_post_assessment(self, system, short_feedback=False, join_feedback=True):
@@ -545,7 +546,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             return ""
 
         feedback_dict = self._parse_score_msg(self.child_history[-1].get('post_assessment', ""), system,
-            join_feedback=join_feedback)
+                                              join_feedback=join_feedback)
         if not short_feedback:
             return feedback_dict['feedback'] if feedback_dict['valid'] else ''
         if feedback_dict['valid']:
@@ -585,7 +586,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             #This is a dev_facing_error
             log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
             #This is a dev_facing_error
-            return json.dumps({'error': 'Error handling action.  Please try again.', 'success' : False})
+            return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
         before = self.get_progress()
         d = handlers[dispatch](get, system)
@@ -679,7 +680,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             correct = ""
             previous_answer = self.initial_display
 
-
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,
@@ -692,7 +692,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'child_type': 'openended',
             'correct': correct,
             'accept_file_upload': self.accept_file_upload,
-            'eta_message' : eta_string,
+            'eta_message': eta_string,
         }
         html = system.render_template('{0}/open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
@@ -726,7 +726,9 @@ class OpenEndedDescriptor():
         for child in ['openendedparam']:
             if len(xml_object.xpath(child)) != 1:
                 #This is a staff_facing_error
-                raise ValueError("Open Ended definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
+                raise ValueError(
+                    "Open Ended definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
+                        child))
 
         def parse(k):
             """Assumes that xml_object has child k"""

@@ -57,21 +57,23 @@ def _reverse_without_slash(url_name, course_id):
     ajax_url = reverse(url_name, kwargs={'course_id': course_id})
     return ajax_url
 
+
 DESCRIPTION_DICT = {
-            'Peer Grading': "View all problems that require peer assessment in this particular course.",
-            'Staff Grading': "View ungraded submissions submitted by students for the open ended problems in the course.",
-            'Problems you have submitted': "View open ended problems that you have previously submitted for grading.",
-            'Flagged Submissions': "View submissions that have been flagged by students as inappropriate."
-    }
+    'Peer Grading': "View all problems that require peer assessment in this particular course.",
+    'Staff Grading': "View ungraded submissions submitted by students for the open ended problems in the course.",
+    'Problems you have submitted': "View open ended problems that you have previously submitted for grading.",
+    'Flagged Submissions': "View submissions that have been flagged by students as inappropriate."
+}
 ALERT_DICT = {
-            'Peer Grading': "New submissions to grade",
-            'Staff Grading': "New submissions to grade",
-            'Problems you have submitted': "New grades have been returned",
-            'Flagged Submissions': "Submissions have been flagged for review"
-    }
+    'Peer Grading': "New submissions to grade",
+    'Staff Grading': "New submissions to grade",
+    'Problems you have submitted': "New grades have been returned",
+    'Flagged Submissions': "Submissions have been flagged for review"
+}
 
 STUDENT_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify course staff."
 STAFF_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
+
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
@@ -99,10 +101,10 @@ def peer_grading(request, course_id):
     #Get the current course
     course = get_course_with_access(request.user, course_id, 'load')
     course_id_parts = course.id.split("/")
-    false_dict = [False,"False", "false", "FALSE"]
+    false_dict = [False, "False", "false", "FALSE"]
 
     #Reverse the base course url
-    base_course_url  = reverse('courses')
+    base_course_url = reverse('courses')
     try:
         #TODO:  This will not work with multiple runs of a course.  Make it work.  The last key in the Location passed
         #to get_items is called revision.  Is this the same as run?
@@ -154,7 +156,7 @@ def student_problem_list(request, course_id):
     success = False
     error_text = ""
     problem_list = []
-    base_course_url  = reverse('courses')
+    base_course_url = reverse('courses')
 
     try:
         problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
@@ -181,7 +183,7 @@ def student_problem_list(request, course_id):
                 except:
                     #This is a student_facing_error
                     eta_string = "Error getting ETA."
-            problem_list[i].update({'eta_string' : eta_string})
+            problem_list[i].update({'eta_string': eta_string})
 
     except GradingServiceError:
         #This is a student_facing_error
@@ -222,7 +224,7 @@ def flagged_problem_list(request, course_id):
     success = False
     error_text = ""
     problem_list = []
-    base_course_url  = reverse('courses')
+    base_course_url = reverse('courses')
 
     try:
         problem_list_json = controller_qs.get_flagged_problem_list(course_id)
@@ -250,14 +252,14 @@ def flagged_problem_list(request, course_id):
 
     ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_id)
     context = {
-            'course': course,
-            'course_id': course_id,
-            'ajax_url': ajax_url,
-            'success': success,
-            'problem_list': problem_list,
-            'error_text': error_text,
-            # Checked above
-            'staff_access': True,
+        'course': course,
+        'course_id': course_id,
+        'ajax_url': ajax_url,
+        'success': success,
+        'problem_list': problem_list,
+        'error_text': error_text,
+        # Checked above
+        'staff_access': True,
     }
     return render_to_response('open_ended_problems/open_ended_flagged_problems.html', context)
 
@@ -312,7 +314,7 @@ def combined_notifications(request, course_id):
     }
 
     return render_to_response('open_ended_problems/combined_notifications.html',
-        combined_dict
+                              combined_dict
     )
 
 
@@ -325,13 +327,14 @@ def take_action_on_flags(request, course_id):
     if request.method != 'POST':
         raise Http404
 
-
     required = ['submission_id', 'action_type', 'student_id']
     for key in required:
         if key not in request.POST:
             #This is a staff_facing_error
-            return HttpResponse(json.dumps({'success': False, 'error': STAFF_ERROR_MESSAGE + 'Missing key {0} from submission.  Please reload and try again.'.format(key)}),
-                mimetype="application/json")
+            return HttpResponse(json.dumps({'success': False,
+                                            'error': STAFF_ERROR_MESSAGE + 'Missing key {0} from submission.  Please reload and try again.'.format(
+                                                key)}),
+                                mimetype="application/json")
 
     p = request.POST
     submission_id = p['submission_id']
@@ -345,5 +348,7 @@ def take_action_on_flags(request, course_id):
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
         #This is a dev_facing_error
-        log.exception("Error taking action on flagged peer grading submissions, submission_id: {0}, action_type: {1}, grader_id: {2}".format(submission_id, action_type, grader_id))
+        log.exception(
+            "Error taking action on flagged peer grading submissions, submission_id: {0}, action_type: {1}, grader_id: {2}".format(
+                submission_id, action_type, grader_id))
         return _err_response(STAFF_ERROR_MESSAGE)

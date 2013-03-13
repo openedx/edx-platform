@@ -7,7 +7,7 @@ django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open
 from django.test import TestCase
 from open_ended_grading import staff_grading_service
 from xmodule.open_ended_grading_classes import peer_grading_service
-from xmodule import  peer_grading_module
+from xmodule import peer_grading_module
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 
@@ -22,6 +22,7 @@ from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 
 import logging
+
 log = logging.getLogger(__name__)
 from django.test.utils import override_settings
 from django.http import QueryDict
@@ -36,6 +37,7 @@ class TestStaffGradingService(ct.PageLoader):
     access control and error handling logic -- all the actual work is on the
     backend.
     '''
+
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
@@ -50,6 +52,7 @@ class TestStaffGradingService(ct.PageLoader):
 
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
+
         def make_instructor(course):
             group_name = _course_staff_group_name(course.location)
             g = Group.objects.create(name=group_name)
@@ -130,6 +133,7 @@ class TestPeerGradingService(ct.PageLoader):
     access control and error handling logic -- all the actual work is on the
     backend.
     '''
+
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
@@ -145,16 +149,16 @@ class TestPeerGradingService(ct.PageLoader):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-        model_data = {'data' : "<peergrading/>"}
+        model_data = {'data': "<peergrading/>"}
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = ModuleSystem(
             ajax_url=location,
             track_function=None,
-            get_module = None,
+            get_module=None,
             render_template=render_to_string,
             replace_urls=None,
-            xblock_model_data= {},
-            s3_interface = test_util_open_ended.S3_INTERFACE,
+            xblock_model_data={},
+            s3_interface=test_util_open_ended.S3_INTERFACE,
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
         )
         self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, location, model_data)
@@ -182,18 +186,20 @@ class TestPeerGradingService(ct.PageLoader):
 
     def test_save_grade_success(self):
         data = {
-                'rubric_scores[]': [0, 0],
-                'location': self.location,
-                'submission_id': 1,
-                'submission_key': 'fake key',
-                'score': 2,
-                'feedback': 'feedback',
-                'submission_flagged': 'false'
-                }
+            'rubric_scores[]': [0, 0],
+            'location': self.location,
+            'submission_id': 1,
+            'submission_key': 'fake key',
+            'score': 2,
+            'feedback': 'feedback',
+            'submission_flagged': 'false'
+        }
 
         qdict = MagicMock()
+
         def fake_get_item(key):
             return data[key]
+
         qdict.__getitem__.side_effect = fake_get_item
         qdict.getlist = fake_get_item
         qdict.keys = data.keys
@@ -244,18 +250,20 @@ class TestPeerGradingService(ct.PageLoader):
 
     def test_save_calibration_essay_success(self):
         data = {
-                'rubric_scores[]': [0, 0],
-                'location': self.location,
-                'submission_id': 1,
-                'submission_key': 'fake key',
-                'score': 2,
-                'feedback': 'feedback',
-                'submission_flagged': 'false'
-                }
+            'rubric_scores[]': [0, 0],
+            'location': self.location,
+            'submission_id': 1,
+            'submission_key': 'fake key',
+            'score': 2,
+            'feedback': 'feedback',
+            'submission_flagged': 'false'
+        }
 
         qdict = MagicMock()
+
         def fake_get_item(key):
             return data[key]
+
         qdict.__getitem__.side_effect = fake_get_item
         qdict.getlist = fake_get_item
         qdict.keys = data.keys

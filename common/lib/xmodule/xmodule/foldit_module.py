@@ -89,7 +89,7 @@ class FolditModule(FolditFields, XModule):
         from foldit.models import Score
 
         leaders = [(e['username'], e['score']) for e in Score.get_tops_n(10)]
-        leaders.sort(key=lambda x: x[1])
+        leaders.sort(key=lambda x: -x[1])
 
         return leaders
 
