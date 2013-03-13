@@ -297,9 +297,9 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
-    if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS') and instance_module is not None:
+    if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set('psychometrics_handler',		# set callback for updating PsychometricsData
-                   make_psychometrics_data_update_handler(instance_module))
+                   make_psychometrics_data_update_handler(course_id, user, descriptor.location.url()))
 
     try:
         module = descriptor.xmodule(system)
