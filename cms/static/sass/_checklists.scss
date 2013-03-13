@@ -1,0 +1,273 @@
+// Studio - Course Settings
+// ====================
+body.course.checklists {
+
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
+  }
+
+  // checklists - general
+  .course-checklist {
+    @extend .window;
+    margin: 0 0 ($baseline*2) 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    header {
+      @include clearfix();
+      margin-bottom: 0;
+      padding: $baseline ($baseline*1.5);
+
+      .checklist-title {
+        @include transition(color .15s .25s ease-in-out);
+        width: flex-grid(7, 9);
+        margin: 0 flex-gutter() 0 0;
+        float: left;
+
+        &.is-selectable {
+          cursor: pointer;
+
+          &:hover {
+            color: $blue;
+          }
+        }
+      }
+
+      .checklist-status {
+        @include font-size(13);
+        width: flex-grid(2, 9);
+        float: right;
+        margin-top: ($baseline/2);
+        text-align: right;
+        color: $gray-l2;
+
+        .status-count {
+          @include font-size(16);
+          margin-left: ($baseline/4);
+          margin-right: ($baseline/4);
+          color: $gray-d3;
+          font-weight: 600;
+        }
+
+        .status-amount {
+          @include font-size(16);
+          margin-left: ($baseline/4);
+          color: $gray-d3;
+          font-weight: 600;
+        }
+      }
+    }
+
+    // checklist actions
+    .course-checklist-actions {
+      @include clearfix();
+      @include box-shadow(inset 0 1px 1px $shadow-l1);
+      @include transition(border .15s ease-in-out .25s);
+      border-top: 1px solid $gray-l2;
+      padding: $baseline ($baseline*1.5);
+      background: $gray-l4;
+
+      .action-primary {
+        @include green-button();
+        float: left;
+
+        .icon-add {
+          @include font-size(12);
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+        }
+      }
+
+      .action-secondary {
+        @include font-size(14);
+        @include grey-button();
+        font-weight: 400;
+        float: right;
+
+        .icon-delete {
+          @include font-size(12);
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+        }
+      }
+    }
+
+    // state - collapsed
+    &.is-collapsed {
+
+      .list-tasks {
+        height: 0;
+      }
+    }
+
+    // state - completed
+    &.is-completed {
+      
+      header {
+
+        .checklist-title {
+          color: $gray-l1;
+        }
+
+        .checklist-status {
+          
+          .status-count, .status-amount, .icon-confirm {
+            color: $green;          
+          }
+        }
+
+        .checklist-status .icon-confirm {
+          @include font-size(12);
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+        }
+      }
+    }
+
+    // state - not available
+    .is-not-available {
+
+    }
+  }
+
+  // list of tasks
+  .list-tasks {
+    height: auto;
+    overflow: hidden;
+
+    .task {
+      @include transition(background .15s ease-in-out .25s, border .15s ease-in-out .25s);
+      @include clearfix();
+      position: relative;
+      border-top: 1px solid $white;
+      border-bottom: 1px solid $gray-l5;
+      padding: $baseline ($baseline*1.5);
+      background: $white;
+      opacity: 1.0;
+
+
+      &:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+      }
+
+      label {
+        float: left;
+        width: flex-grid(7,9);
+        font-weight: 500;
+
+        .task-input {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: flex-gutter();
+        }
+
+        .task-details {
+          display: inline-block;
+          vertical-align: middle;
+          width: flex-grid(6,7);
+
+          .task-name {
+            @include transition(color .15s .25s ease-in-out);
+            vertical-align: baseline;
+            cursor: pointer;
+            margin-bottom: 0;
+          }   
+
+          .task-description {
+            @include transition(color .15s .25s ease-in-out);
+            @include font-size(14);
+            color: $gray-l2;
+          }
+
+          .task-support {
+            @include transition(opacity .15s .25s ease-in-out);
+            @include font-size(12);
+            opacity: 0;
+            pointer-events: none;
+          }
+        }
+      }
+
+      .task-actions {
+        @include transition(opacity .15s .25s ease-in-out);
+        @include clearfix();
+        display: inline-block;
+        vertical-align: middle;
+        float: left;
+        width: flex-grid(2,9);
+        margin: ($baseline/2) 0 0 flex-gutter();
+        opacity: 0;
+        pointer-events: none;
+        text-align: right;
+
+        .action-primary {
+          @include blue-button;
+          @include transition(all .15s);
+          @include font-size(12);
+          font-weight: 600;
+          text-align: center;
+        }
+
+        .action-secondary {
+          @include font-size(13);
+          margin-top: ($baseline/2);
+        }
+      }
+
+      // state - hover
+      &:hover {
+        background: $blue-l5;
+        border-bottom-color: $blue-l4;
+        border-top-color: $blue-l4;
+        opacity: 1.0;
+
+        .task-details {
+          .task-support {
+            opacity: 1.0;
+            pointer-events: auto;
+          }
+        }
+
+        .task-actions {
+          opacity: 1.0;
+          pointer-events: auto;
+        }
+      }
+
+
+      // state - completed
+      &.is-completed {
+        background: $gray-l6;
+        border-top-color: $gray-l5;
+        border-bottom-color: $gray-l5;
+
+        .task-details {
+          opacity: 0.50;
+        }
+
+        &:hover {
+
+          .task-details {
+            opacity: 1.0;            
+          }
+        }
+      }
+    }
+  }
+
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
+}
