@@ -221,3 +221,4 @@ PEARSON_TEST_PASSWORD = "12345"
 ########################## ANALYTICS TESTING ########################
 
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
+ANALYTICS_API_KEY = ""

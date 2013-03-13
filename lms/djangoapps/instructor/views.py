@@ -599,7 +599,9 @@ def instructor_dashboard(request, course_id):
         logs and swallows errors.
         """
         url = settings.ANALYTICS_SERVER_URL + \
-              "get?aname={}&course_id={}".format(analytics_name, course_id)
+              "get?aname={}&course_id={}&apikey={}".format(analytics_name,
+                                                           course_id,
+                                                           settings.ANALYTICS_API_KEY)
         try:
             res = requests.get(url)
         except Exception:
