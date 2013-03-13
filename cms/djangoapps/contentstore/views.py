@@ -646,15 +646,15 @@ def delete_item(request):
         modulestore('direct').delete_item(item.location)
 
     # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
+    if delete_all_versions:
+        parent_locs = modulestore('direct').get_parent_locations(item_loc, None)
 
-    parent_locs = modulestore('direct').get_parent_locations(item_loc, None)
-
-    for parent_loc in parent_locs:
-        parent = modulestore('direct').get_item(parent_loc)
-        item_url = item_loc.url()
-        if item_url in parent.definition["children"]:
-            parent.definition["children"].remove(item_url)
-            modulestore('direct').update_children(parent.location, parent.definition["children"])
+        for parent_loc in parent_locs:
+            parent = modulestore('direct').get_item(parent_loc)
+            item_url = item_loc.url()
+            if item_url in parent.definition["children"]:
+                parent.definition["children"].remove(item_url)
+                modulestore('direct').update_children(parent.location, parent.definition["children"])
 
     return HttpResponse()
 
