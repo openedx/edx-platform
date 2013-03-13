@@ -141,11 +141,7 @@ end
     desc "Run pylint on all #{system} code"
     task "pylint_#{system}" => report_dir do
         Dir["#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
-            if File.exists? "#{app}/setup.py"
-                pythonpath_prefix = "PYTHONPATH=#{app}"
-            else
-                pythonpath_prefix = "PYTHONPATH=#{File.dirname(app)}"
-            end
+            pythonpath_prefix = "PYTHONPATH=#{system}:#{system}/djangoapps:#{system}/lib:common/djangoapps:common/lib"
             app = File.basename(app)
             if app =~ /.py$/
                 app = app.gsub('.py', '')
@@ -423,7 +419,7 @@ end
 namespace :cms do
   desc "Delete existing MongoDB based course"
   task :delete_course do
-    
+
     if ENV['LOC'] and ENV['COMMIT']
         sh(django_admin(:cms, :dev, :delete_course, ENV['LOC'], ENV['COMMIT']))
     elsif ENV['LOC']
