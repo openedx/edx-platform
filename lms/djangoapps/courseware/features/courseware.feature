@@ -4,7 +4,7 @@ Feature: View the Courseware Tab
   I want to view the info on the courseware tab
 
     Scenario: I can get to the courseware tab when logged in
-    Given I am registered for a course
+    Given I am registered for the course "MITx/6.002x/2013_Spring"
     And I log in
     And I click on View Courseware
     When I click on the "Courseware" tab

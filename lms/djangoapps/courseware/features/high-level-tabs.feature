@@ -8,7 +8,7 @@ Feature: All the high level tabs should work
 # TODO: break this apart so that if one fails the others
 # will still run
   Scenario: A student can see all tabs of the course
-    Given I am registered for a course
+    Given I am registered for the course "MITx/6.002x/2013_Spring"
     And I log in
     And I click on View Courseware
     When I click on the "Courseware" tab

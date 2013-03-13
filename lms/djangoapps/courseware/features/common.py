@@ -81,11 +81,15 @@ def i_am_not_logged_in(step):
     world.browser.cookies.delete()
 
 
-@step(u'I am registered for a course$')
-def i_am_registered_for_a_course(step):
+@step(u'I am registered for the course "([^"]*)"$')
+def i_am_registered_for_the_course(step, course_id):
     world.create_user('robot')
     u = User.objects.get(username='robot')
-    CourseEnrollment.objects.create(user=u, course_id='MITx/6.002x/2012_Fall')
+
+    # If the user is not already enrolled, enroll the user.
+    if len(CourseEnrollment.objects.filter(user=u, course_id=course_id)) == 0:
+        CourseEnrollment.objects.create(user=u, course_id=course_id)
+
     world.log_in('robot@edx.org', 'test')
 
 

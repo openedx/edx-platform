@@ -6,11 +6,11 @@ Feature: Register for a course
   	Scenario: I can register for a course
   	Given I am logged in
     And I visit the courses page
-		When I register for the course numbered "6.002x"
+    When I register for the course "MITx/6.002x/2013_Spring"
   	Then I should see the course numbered "6.002x" in my dashboard
 
     Scenario: I can unregister for a course
-    Given I am registered for a course
+    Given I am registered for the course "MITx/6.002x/2013_Spring"
     And I visit the dashboard
     When I click the link with the text "Unregister"
     And I press the "Unregister" button in the Unenroll dialog

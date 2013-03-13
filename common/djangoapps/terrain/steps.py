@@ -116,6 +116,11 @@ def scroll_to_bottom():
 
 @world.absorb
 def create_user(uname):
+
+    # If the user already exists, don't try to create it again
+    if len(User.objects.filter(username=uname)) > 0:
+        return
+
     portal_user = UserFactory.build(username=uname, email=uname + '@edx.org')
     portal_user.set_password('test')
     portal_user.save()
@@ -133,13 +138,17 @@ def log_in(email, password):
     world.browser.visit(django_url('/'))
     world.browser.is_element_present_by_css('header.global', 10)
     world.browser.click_link_by_href('#login-modal')
+
+    # wait for the login dialog to load
+    assert(world.browser.is_element_present_by_css('form#login_form', wait_time=10))
+
     login_form = world.browser.find_by_css('form#login_form')
-    login_form.find_by_name('email').fill(email)
-    login_form.find_by_name('password').fill(password)
+    login_form.find_by_name('email').type(email)
+    login_form.find_by_name('password').type(password)
     login_form.find_by_name('submit').click()
 
     # wait for the page to redraw
-    assert world.browser.is_element_present_by_css('.content-wrapper', 10)
+    assert world.browser.is_element_present_by_css('.content-wrapper', wait_time=10)
 
 
 @world.absorb
