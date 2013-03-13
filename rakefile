@@ -140,7 +140,7 @@ end
 
     desc "Run pylint on all #{system} code"
     task "pylint_#{system}" => report_dir do
-        Dir["#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
+        Dir["#{system}/*.py", "#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
             pythonpath_prefix = "PYTHONPATH=#{system}:#{system}/djangoapps:#{system}/lib:common/djangoapps:common/lib"
             app = File.basename(app)
             if app =~ /.py$/
