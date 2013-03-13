@@ -366,6 +366,12 @@ class ChoiceGroup(InputTypeBase):
 
         self.choices = self.extract_choices(self.xml)
 
+    @classmethod
+    def get_attributes(cls):
+        return [Attribute("show_correctness", "always"),
+                Attribute("submitted_message", "Answer received.")]
+
+
     def _extra_context(self):
         return {'input_type': self.html_input_type,
                 'choices': self.choices,

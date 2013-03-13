@@ -183,7 +183,7 @@ def evaluator(variables, functions, string, cs=False):
 
     # 0.33k or -17
     number = (Optional(minus | plus) + inner_number
-              + Optional(CaselessLiteral("E") + Optional("-") + number_part)
+              + Optional(CaselessLiteral("E") + Optional((plus | minus)) + number_part)
               + Optional(number_suffix))
     number = number.setParseAction(number_parse_action)  # Convert to number
 

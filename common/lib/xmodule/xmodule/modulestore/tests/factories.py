@@ -46,10 +46,10 @@ class XModuleCourseFactory(Factory):
         new_course.metadata['start'] = stringify_time(gmtime())
 
         new_course.tabs = [{"type": "courseware"},
-            {"type": "course_info", "name": "Course Info"}, 
-            {"type": "discussion", "name": "Discussion"},
-            {"type": "wiki", "name": "Wiki"},
-            {"type": "progress", "name": "Progress"}]
+                           {"type": "course_info", "name": "Course Info"},
+                           {"type": "discussion", "name": "Discussion"},
+                           {"type": "wiki", "name": "Wiki"},
+                           {"type": "progress", "name": "Progress"}]
 
         # Update the data in the mongo datastore
         store.update_metadata(new_course.location.url(), new_course.own_metadata)
