@@ -23,7 +23,9 @@ body.course.checklists {
 
     header {
       @include clearfix();
+      @include box-shadow(inset 0 -1px 1px $shadow-l1);
       margin-bottom: 0;
+      border-bottom: 1px solid $gray-l3;
       padding: $baseline ($baseline*1.5);
 
       .checklist-title {
@@ -31,6 +33,14 @@ body.course.checklists {
         width: flex-grid(7, 9);
         margin: 0 flex-gutter() 0 0;
         float: left;
+
+        .icon-confirm {
+          @include font-size(20);
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+          color: $gray-l4;
+        }
 
         &.is-selectable {
           cursor: pointer;
@@ -105,6 +115,10 @@ body.course.checklists {
     // state - collapsed
     &.is-collapsed {
 
+      header {
+        @include box-shadow(none);
+      }
+
       .list-tasks {
         height: 0;
       }
@@ -115,8 +129,8 @@ body.course.checklists {
       
       header {
 
-        .checklist-title {
-          color: $gray-l1;
+        .checklist-title, .icon-confirm {
+          color: $green;
         }
 
         .checklist-status {
@@ -147,7 +161,8 @@ body.course.checklists {
     overflow: hidden;
 
     .task {
-      @include transition(background .15s ease-in-out .25s, border .15s ease-in-out .25s);
+      @include transition(background .15s ease-in-out .25s);
+      @include transition(border .15s ease-in-out .25s);
       @include clearfix();
       position: relative;
       border-top: 1px solid $white;
@@ -169,13 +184,13 @@ body.course.checklists {
 
         .task-input {
           display: inline-block;
-          vertical-align: middle;
-          margin-right: flex-gutter();
+          vertical-align: text-top;
+          margin: ($baseline/2) flex-gutter() 0 0;
         }
 
         .task-details {
           display: inline-block;
-          vertical-align: middle;
+          vertical-align: text-top;
           width: flex-grid(6,7);
 
           .task-name {
@@ -234,6 +249,7 @@ body.course.checklists {
         opacity: 1.0;
 
         .task-details {
+
           .task-support {
             opacity: 1.0;
             pointer-events: auto;
@@ -253,14 +269,17 @@ body.course.checklists {
         border-top-color: $gray-l5;
         border-bottom-color: $gray-l5;
 
-        .task-details {
-          opacity: 0.50;
+        .task-name {
+          color: $gray-l2;
         }
 
         &:hover {
+          background: $blue-l5;
+          border-bottom-color: $blue-l4;
+          border-top-color: $blue-l4;
 
           .task-details {
-            opacity: 1.0;            
+            opacity:1.0;
           }
         }
       }
