@@ -595,13 +595,20 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # analytics
     def get_analytics_result(analytics_name):
+        """Return data for an Analytic piece, or None if it doesn't exist. It 
+        logs and swallows errors.
+        """
         url = settings.ANALYTICS_SERVER_URL + \
               "get?aname={}&course_id={}".format(analytics_name, course_id)
-        res = requests.get(url)
+        try:
+            res = requests.get(url)
+        except Exception:
+            log.exception("Error trying to access analytics at %s", url)
+            return None
+
         if res.status_code == codes.OK:
             # WARNING: do not use req.json because the preloaded json doesn't
-            #          preserve the order of the original record use instead: 
-            #          json.loads(req.content, object_pairs_hook=OrderedDict)
+            # preserve the order of the original record (hence OrderedDict).
             return json.loads(res.content, object_pairs_hook=OrderedDict)
         else:
             log.error("Error fetching %s, code: %s, msg: %s",
