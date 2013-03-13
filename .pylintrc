@@ -36,8 +36,10 @@ load-plugins=
 disable=
 # W0141: Used builtin function 'map'
 # W0142: Used * or ** magic
+# R0901: Too many ancestors
 # R0903: Too few public methods (1/2)
-    W0141,W0142,R0903
+# R0904: Too many public methods
+    W0141,W0142,R0901,R0903,R0904
 
 
 [REPORTS]
