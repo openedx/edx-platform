@@ -8,8 +8,6 @@ from django.http import Http404
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xblock.core import Integer, Scope, String
 
@@ -120,13 +118,6 @@ class VideoModule(VideoFields, XModule):
         return self.youtube
 
     def get_html(self):
-        if isinstance(modulestore(), XMLModuleStore):
-            # VS[compat]
-            # cdodge: filesystem static content support.
-            caption_asset_path = "/static/{0}/subs/".format(self.descriptor.data_dir)
-        else:
-            caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
-
         # We normally let JS parse this, but in the case that we need a hacked
         # out <object> player because YouTube has broken their <iframe> API for
         # the third time in a year, we need to extract it server side.
@@ -145,7 +136,7 @@ class VideoModule(VideoFields, XModule):
             'source': self.source,
             'track': self.track,
             'display_name': self.display_name_with_default,
-            'caption_asset_path': caption_asset_path,
+            'caption_asset_path': "/static/subs/",
             'show_captions': self.show_captions,
             'start': self.start_time,
             'end': self.end_time,

@@ -8,13 +8,7 @@ from __future__ import absolute_import
 from importlib import import_module
 from os import environ
 
-# cdodge: ICK! Sorry about this but I'm not sure how to resolve. We have some unit tests which do not setup a
-# Django runtime. This import expects to find a "CACHE =" in a configuration, which doesn't exist in the
-# test environment
-try:
-    from django.core.cache import get_cache, InvalidCacheBackendError
-except:
-    pass
+from django.core.cache import get_cache, InvalidCacheBackendError
 
 from django.conf import settings
 
