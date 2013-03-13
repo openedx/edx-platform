@@ -46,7 +46,7 @@
 
       <div class="post-body">${'<%- body %>'}</div>
       
-      % if has_permission(user, 'change_permission', course.id):
+      % if course and has_permission(user, 'openclose_thread', course.id):
       <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">                
       <i class="icon"></i><span class="pin-label">Pin Thread</span></div> 
       %else:

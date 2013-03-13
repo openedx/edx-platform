@@ -92,6 +92,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     #now add the group name if the thread has a group id
     for thread in threads:
+        
         if thread.get('group_id'):
             thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
             thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])

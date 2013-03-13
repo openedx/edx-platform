@@ -58,10 +58,24 @@ if Backbone?
           @current_page = response.page
 
     sortByDate: (thread) ->
-      thread.get("created_at")
+
+        if thread.get('pinned')
+          #use tomorrow's date
+          today = new Date();
+          new Date(today.getTime() + (24 * 60 * 60 * 1000));
+        else
+          thread.get("created_at")
+
+
+      
 
     sortByDateRecentFirst: (thread) ->
-      -(new Date(thread.get("created_at")).getTime())
+        if thread.get('pinned')
+          #use tomorrow's date
+          today = new Date();
+          -(new Date(today.getTime() + (24 * 60 * 60 * 1000)));
+        else
+          -(new Date(thread.get("created_at")).getTime())
       #return String.fromCharCode.apply(String,
       #  _.map(thread.get("created_at").split(""),
       #        ((c) -> return 0xffff - c.charChodeAt()))
