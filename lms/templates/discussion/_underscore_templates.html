@@ -46,10 +46,17 @@
 
       <div class="post-body">${'<%- body %>'}</div>
       
-      % if has_permission(user, 'create_comment', course.id):
-      <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">                
-      <i class="icon"></i><span class="pin-label">Pin Thread</span></div>   
+      % if has_permission(user, 'create_commentx', course.id):
+      <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">                
+      <i class="icon"></i><span class="pin-label">Pin Thread</span></div> 
+      elif pinned:
+        THIS ONE IS PINNED
       % endif
+      
+      
+      
+      
+      
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
           (this post is about <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)

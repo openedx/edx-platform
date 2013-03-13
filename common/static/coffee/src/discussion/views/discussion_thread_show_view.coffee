@@ -3,7 +3,7 @@ if Backbone?
 
     events:
       "click .discussion-vote": "toggleVote"
-      "click .discussion-pin": "togglePin"
+      "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
       "click .action-edit": "edit"
       "click .action-delete": "delete"
