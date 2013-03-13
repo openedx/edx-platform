@@ -84,6 +84,8 @@ class Thread(models.Model):
         url = _url_for_pin_thread(thread_id)
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
+        print "\n\n\n\n\n\n*******************"
+        print request
         self.update_attributes(request)    
 
     def un_pin(self, user, thread_id):

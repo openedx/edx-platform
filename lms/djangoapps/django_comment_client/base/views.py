@@ -295,13 +295,13 @@ def undo_vote_for_thread(request, course_id, thread_id):
 def pin_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.pin(user,thread)
+    thread.pin(user,thread_id)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 def un_pin_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.un_pin(user,thread)
+    thread.un_pin(user,thread_id)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 
