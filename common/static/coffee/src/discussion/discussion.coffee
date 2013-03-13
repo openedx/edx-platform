@@ -58,7 +58,13 @@ if Backbone?
           @current_page = response.page
 
     sortByDate: (thread) ->
-
+        #   
+        #The comment client asks each thread for a value by which to sort the collection
+        #and calls this sort routine regardless of the order returned from the LMS/comments service
+        #so, this takes advantage of this per-thread value and returns tomorrow's date
+        #for pinned threads, ensuring that they appear first, which is the intent of pinned threads
+        #the negative is to display most recent first
+        #
         if thread.get('pinned')
           #use tomorrow's date
           today = new Date();
@@ -67,9 +73,11 @@ if Backbone?
           thread.get("created_at")
 
 
-      
-
     sortByDateRecentFirst: (thread) ->
+        #
+        #Same as above
+        #the negative is to display most recent first (basically to flip the order)
+        #
         if thread.get('pinned')
           #use tomorrow's date
           today = new Date();
