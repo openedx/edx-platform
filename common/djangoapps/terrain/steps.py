@@ -142,9 +142,14 @@ def log_in(email, password):
     # wait for the login dialog to load
     assert(world.browser.is_element_present_by_css('form#login_form', wait_time=10))
 
-    login_form = world.browser.find_by_css('form#login_form')
-    login_form.find_by_name('email').type(email)
-    login_form.find_by_name('password').type(password)
+    # For some reason, the page sometimes includes two #login_form
+    # elements, the first of which is not visible.
+    # To avoid this, we always select the last of the two #login_form
+    # dialogs
+    login_form = world.browser.find_by_css('form#login_form').last
+
+    login_form.find_by_name('email').fill(email)
+    login_form.find_by_name('password').fill(password)
     login_form.find_by_name('submit').click()
 
     # wait for the page to redraw
