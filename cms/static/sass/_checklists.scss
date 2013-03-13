@@ -21,6 +21,32 @@ body.course.checklists {
       margin-bottom: 0;
     }
 
+    // visual status
+    .viz-checklist-status {
+      @include text-hide();
+      @include size(100%,($baseline/4));
+      position: relative;
+      display: block;
+      margin: 0;
+      background: $gray-l4;
+
+      .viz-checklist-status-value {
+        @include transition(width 2s ease-in-out .25s);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: ($baseline/4);
+        background: $green;
+
+        .int {
+          @include text-sr();
+        }
+      }
+    }
+    // <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
+
+    // header/title
     header {
       @include clearfix();
       @include box-shadow(inset 0 -1px 1px $shadow-l1);
@@ -127,6 +153,13 @@ body.course.checklists {
     // state - completed
     &.is-completed {
       
+      .viz-checklist-status {
+
+        .viz-checklist-status-value {
+          width: 100%;
+        }
+      }
+
       header {
 
         .checklist-title, .icon-confirm {
@@ -273,10 +306,20 @@ body.course.checklists {
           color: $gray-l2;
         }
 
+        .task-actions {
+
+          .action-primary {
+            @include grey-button;
+            @include font-size(12);
+            font-weight: 600;
+            text-align: center;
+          }
+        }
+
         &:hover {
-          background: $blue-l5;
-          border-bottom-color: $blue-l4;
-          border-top-color: $blue-l4;
+          background: $gray-l5;
+          border-bottom-color: $gray-l4;
+          border-top-color: $gray-l4;
 
           .task-details {
             opacity:1.0;
