@@ -16,7 +16,6 @@ function (HTML5Video, bind) {
         makeFunctionsPublic(state);
         renderElements(state);
         bindHandlers();
-        registerCallbacks(state);
     };
 
     // ***************************************************************
@@ -120,24 +119,6 @@ function (HTML5Video, bind) {
 
     }
 
-    // function registerCallbacks(state)
-    //
-    //     Register function callbacks to be called by other modules.
-    function registerCallbacks(state) {
-        state.callbacks.videoControl.togglePlaybackPlay.push(state.videoPlayer.play);
-        state.callbacks.videoControl.togglePlaybackPause.push(state.videoPlayer.pause);
-
-        state.callbacks.videoQualityControl.toggleQuality.push(state.videoPlayer.handlePlaybackQualityChange);
-        state.callbacks.videoProgressSlider.onSlide.push(state.videoPlayer.onSeek);
-        state.callbacks.videoProgressSlider.onStop.push(state.videoPlayer.onSeek);
-
-        state.callbacks.videoVolumeControl.onChange.push(state.videoPlayer.onVolumeChange);
-
-        state.callbacks.videoSpeedControl.changeVideoSpeed.push(state.videoPlayer.onSpeedChange);
-
-        state.callbacks.videoCaption.seekPlayer.push(state.videoPlayer.onSeek);
-    }
-
     // function reinitAsFlash(state)
     //
     //     When we are about to play a YouTube video in HTML5 mode and discover that we only
@@ -149,8 +130,8 @@ function (HTML5Video, bind) {
 
         // Remember for future page loads that we should use Flash mode.
         $.cookie('current_player_mode', 'flash', {
-            expires: 3650,
-            path: '/'
+            'expires': 3650,
+            'path': '/'
         });
         state.currentPlayerMode = 'flash';
 
@@ -214,8 +195,7 @@ function (HTML5Video, bind) {
             } else {
                 this.videoPlayer.player.cueVideoById(this.youtubeId(), this.videoPlayer.currentTime);
             }
-        }
-        if (this.currentPlayerMode === 'flash') {
+
             this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
         }
     }
@@ -234,10 +214,7 @@ function (HTML5Video, bind) {
     }
 
     function onEnded() {
-        $.each(this.callbacks.videoPlayer.onEnded, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value();
-        });
+        this.trigger(['videoControl','pause'], null, 'method');
     }
 
     function onPause() {
@@ -246,10 +223,7 @@ function (HTML5Video, bind) {
         clearInterval(this.videoPlayer.updateInterval);
         delete this.videoPlayer.updateInterval;
 
-        $.each(this.callbacks.videoPlayer.onPause, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value();
-        });
+        this.trigger(['videoControl','pause'], null, 'method');
     }
 
     function onPlay() {
@@ -259,10 +233,7 @@ function (HTML5Video, bind) {
             this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
         }
 
-        $.each(this.callbacks.videoPlayer.onPlay, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value();
-        });
+        this.trigger(['videoControl','play'], null, 'method');
     }
 
     function onUnstarted() { }
@@ -276,10 +247,7 @@ function (HTML5Video, bind) {
 
         quality = this.videoPlayer.player.getPlaybackQuality();
 
-        $.each(this.callbacks.videoPlayer.onPlaybackQualityChange, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value(quality);
-        });
+        this.trigger(['videoQualityControl', 'onQualityChange'], quality, 'method');
     }
 
     function onReady() {
@@ -306,10 +274,7 @@ function (HTML5Video, bind) {
                     _this.speeds.push(value.toFixed(2).replace(/\.00$/, '.0'));
                 });
 
-                $.each(this.callbacks.videoPlayer.onSpeedSetChange, function (index, value) {
-                    // Each value is a registered callback (JavaScript function object).
-                    value(_this.speeds, _this.speed);
-                });
+                this.trigger(['videoSpeedControl', 'reRender'], {'newSpeeds': this.speeds, 'currentSpeed': this.speed}, 'method');
 
                 this.setSpeed($.cookie('video_speed'));
             }
@@ -346,10 +311,9 @@ function (HTML5Video, bind) {
 
         duration = this.videoPlayer.duration();
 
-        $.each(this.callbacks.videoPlayer.updatePlayTime, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value(time, duration);
-        });
+        this.trigger(['videoProgressSlider', 'updatePlayTime'], {'time': time, 'duration': duration}, 'method');
+        this.trigger(['videoControl', 'updateVcrVidTime'], {'time': time, 'duration': duration}, 'method');
+        this.trigger(['videoCaption', 'updatePlayTime'], time, 'method');
     }
 
     function isPlaying() {

@@ -18,7 +18,6 @@ function (bind) {
         makeFunctionsPublic(state);
         renderElements(state);
         bindHandlers(state);
-        registerCallbacks(state);
     };
 
     // ***************************************************************
@@ -64,13 +63,6 @@ function (bind) {
         state.videoQualityControl.el.on('click', state.videoQualityControl.toggleQuality);
     }
 
-    // function registerCallbacks(state)
-    //
-    //     Register function callbacks to be called by other modules.
-    function registerCallbacks(state) {
-        state.callbacks.videoPlayer.onPlaybackQualityChange.push(state.videoQualityControl.onQualityChange);
-    }
-
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
@@ -100,10 +92,7 @@ function (bind) {
             newQuality = 'hd720';
         }
 
-        $.each(this.callbacks.videoQualityControl.toggleQuality, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value(newQuality);
-        });
+        this.trigger(['videoPlayer', 'handlePlaybackQualityChange'], newQuality, 'method');
     }
 
 });

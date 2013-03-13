@@ -13,7 +13,6 @@ function (bind) {
         makeFunctionsPublic(state);
         renderElements(state);
         bindHandlers(state);
-        registerCallbacks(state);
     };
 
     // ***************************************************************
@@ -35,8 +34,6 @@ function (bind) {
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function renderElements(state) {
-        state.videoVolumeControl.currentVolume = 100;
-
         state.videoVolumeControl.el = $(
             '<div class="volume">' +
                 '<a href="#"></a>' +
@@ -51,15 +48,30 @@ function (bind) {
 
         state.videoControl.secondaryControlsEl.prepend(state.videoVolumeControl.el);
 
+        // Figure out what the current volume is. Set it up so that muting/unmuting works correctly.
+        // If no information about volume level could be retrieved, then we will use the default
+        // 100 level (full volume).
+        state.videoVolumeControl.currentVolume = parseInt($.cookie('video_player_volume_level'), 10);
+        state.videoVolumeControl.previousVolume = 100;
+        if (
+            (isFinite(state.videoVolumeControl.currentVolume) === false) ||
+            (state.videoVolumeControl.currentVolume < 0) ||
+            (state.videoVolumeControl.currentVolume > 100)
+        ) {
+            state.videoVolumeControl.currentVolume = 100;
+        }
+
         state.videoVolumeControl.slider = state.videoVolumeControl.volumeSliderEl.slider({
             'orientation': 'vertical',
             'range': 'min',
             'min': 0,
             'max': 100,
-            'value': 100,
+            'value': state.videoVolumeControl.currentVolume,
             'change': state.videoVolumeControl.onChange,
             'slide': state.videoVolumeControl.onChange
         });
+
+        state.videoVolumeControl.el.toggleClass('muted', state.videoVolumeControl.currentVolume === 0);
     }
 
     // function bindHandlers(state)
@@ -77,13 +89,6 @@ function (bind) {
         });
     }
 
-    // function registerCallbacks(state)
-    //
-    //     Register function callbacks to be called by other modules.
-    function registerCallbacks(state) {
-
-    }
-
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
@@ -94,10 +99,12 @@ function (bind) {
         this.videoVolumeControl.currentVolume = ui.value;
         this.videoVolumeControl.el.toggleClass('muted', this.videoVolumeControl.currentVolume === 0);
 
-        $.each(this.callbacks.videoVolumeControl.onChange, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value(ui.value);
+        $.cookie('video_player_volume_level', ui.value, {
+            'expires': 3650,
+            'path': '/'
         });
+
+        this.trigger(['videoPlayer', 'onVolumeChange'], ui.value, 'method');
     }
 
     function toggleMute(event) {

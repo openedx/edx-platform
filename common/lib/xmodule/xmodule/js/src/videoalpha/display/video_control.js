@@ -13,7 +13,6 @@ function (bind) {
         makeFunctionsPublic(state);
         renderElements(state);
         bindHandlers(state);
-        registerCallbacks(state);
     };
 
     // ***************************************************************
@@ -25,6 +24,8 @@ function (bind) {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
+        state.videoControl.showControls     = bind(showControls, state);
+        state.videoControl.hideControls     = bind(hideControls, state);
         state.videoControl.play             = bind(play, state);
         state.videoControl.pause            = bind(pause, state);
         state.videoControl.togglePlayback   = bind(togglePlayback, state);
@@ -80,6 +81,9 @@ function (bind) {
         } else {
             state.videoControl.play();
         }
+
+        state.controlHideTimeout = setTimeout(state.videoControl.hideControls, 3000);
+        state.el.find('.video-roof').on('mousemove', state.videoControl.showControls);
     }
 
     // function bindHandlers(state)
@@ -91,21 +95,81 @@ function (bind) {
         $(document).on('keyup', state.videoControl.exitFullScreen);
     }
 
-    // function registerCallbacks(state)
-    //
-    //     Register function callbacks to be called by other modules.
-    function registerCallbacks(state) {
-        state.callbacks.videoPlayer.onPlay.push(state.videoControl.play);
-        state.callbacks.videoPlayer.onPause.push(state.videoControl.pause);
-        state.callbacks.videoPlayer.onEnded.push(state.videoControl.pause);
-        state.callbacks.videoPlayer.updatePlayTime.push(state. videoControl.updateVcrVidTime);
-    }
-
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+
+    function showControls(event) {
+        var elPosition, elWidth, elHeight;
+
+        normalize(event);
+
+        elPosition = this.el.position();
+        elWidth = this.el.width();
+        elHeight = this.el.height();
+
+        if (
+            (event.pageX < elPosition.left) ||
+            (event.pageX > elPosition.left + elWidth) ||
+            (event.pageY < elPosition.top) ||
+            (event.pageY > elPosition.top + elHeight)
+        ) {
+            return;
+        }
+
+        if (this.controlState === 'invisible') {
+            this.videoControl.el.show();
+            this.controlState = 'visible';
+            this.controlHideTimeout = setTimeout(this.videoControl.hideControls, 3000);
+        }/* else if (this.controlState === 'hiding') {
+            this.videoControl.el.stop(true, false);
+            this.videoControl.el.show();
+            this.controlState = 'visible';
+            this.controlHideTimeout = setTimeout(this.videoControl.hideControls, 3000);
+        }*/ else if (this.controlState === 'visible') {
+            clearTimeout(this.controlHideTimeout);
+            this.controlHideTimeout = setTimeout(this.videoControl.hideControls, 3000);
+        }
+
+        this.controlShowLock = false;
+
+        if (this.videoPlayer && this.videoPlayer.player) {
+            (function (event, _this) {
+                var c1;
+                c1 = 0;
+                _this.el.find('#' + _this.id).children().each(function (index, value) {
+                    $(value).trigger(event);
+                    c1 += 1;
+                });
+            }(event, this));
+        }
+
+        return;
+
+        function normalize(event) {
+            if(!event.offsetX) {
+                event.offsetX = (event.pageX - $(event.target).offset().left);
+                event.offsetY = (event.pageY - $(event.target).offset().top);
+            }
+
+            return event;
+        }
+    }
+
+    function hideControls() {
+        var _this;
+
+        this.controlHideTimeout = null;
+        this.controlState = 'hiding';
+
+        _this = this;
+
+        this.videoControl.el.fadeOut(1000, function () {
+            _this.controlState = 'invisible';
+        });
+    }
 
     function play() {
         this.videoControl.playPauseEl.removeClass('play').addClass('pause').attr('title', 'Pause');
@@ -121,15 +185,9 @@ function (bind) {
         event.preventDefault();
 
         if (this.videoControl.playPauseState === 'playing') {
-            $.each(this.callbacks.videoControl.togglePlaybackPause, function (index, value) {
-                // Each value is a registered callback (JavaScript function object).
-                value();
-            });
+            this.trigger(['videoPlayer', 'pause'], null, 'method');
         } else { // if (this.videoControl.playPauseState === 'paused') {
-            $.each(this.callbacks.videoControl.togglePlaybackPlay, function (index, value) {
-                // Each value is a registered callback (JavaScript function object).
-                value();
-            });
+            this.trigger(['videoPlayer', 'play'], null, 'method');
         }
     }
 
@@ -146,11 +204,7 @@ function (bind) {
             this.videoControl.fullScreenEl.attr('title', 'Exit fill browser');
         }
 
-
-        $.each(this.callbacks.videoControl.toggleFullScreen, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value();
-        });
+        this.trigger(['videoCaption', 'resize'], null, 'method');
     }
 
     function exitFullScreen(event) {
@@ -159,12 +213,8 @@ function (bind) {
         }
     }
 
-    function updateVcrVidTime(time, duration) {
-        var progress;
-
-        progress = Time.format(time) + ' / ' + Time.format(duration);
-
-        this.videoControl.vidTimeEl.html(progress);
+    function updateVcrVidTime(params) {
+        this.videoControl.vidTimeEl.html(Time.format(params.time) + ' / ' + Time.format(params.duration));
     }
 
 });

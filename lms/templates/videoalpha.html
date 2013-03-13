@@ -6,14 +6,14 @@
 
 <div
   id="video_${id}"
-  class="video"
+      class="videoalpha"
   
   % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
   data-streams="${youtube_streams}"
   % endif
 
   ${'data-sub="{}"'.format(sub) if sub else ''}
-  ${'data-autoplay="{}"'.format(sub) if sub else ''}
+      ${'data-autoplay="{}"'.format(autoplay) if autoplay else ''}
   % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
   ${'data-mp4-source="{}"'.format(sources.get('mp4')) if sources.get('mp4') else ''}
   ${'data-webm-source="{}"'.format(sources.get('webm')) if sources.get('webm') else ''}
@@ -32,6 +32,7 @@
     <section class="video-player">
       <div id="${id}"></div>
     </section>
+        <section class="video-roof"></section>
     <section class="video-controls"></section>
   </article>
 </div>

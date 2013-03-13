@@ -96,7 +96,7 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
 
         self.autoplay = xmltree.get('autoplay') or ''
         if self.autoplay.lower() not in ['true', 'false']:
-            self.autoplay = ''
+            self.autoplay = 'true'
 
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')

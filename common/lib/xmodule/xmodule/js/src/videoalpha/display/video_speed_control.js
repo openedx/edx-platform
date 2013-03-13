@@ -13,7 +13,6 @@ function (bind) {
         makeFunctionsPublic(state);
         renderElements(state);
         bindHandlers(state);
-        registerCallbacks(state);
     };
 
     // ***************************************************************
@@ -92,13 +91,6 @@ function (bind) {
         }
     }
 
-    // function registerCallbacks(state)
-    //
-    //     Register function callbacks to be called by other modules.
-    function registerCallbacks(state) {
-        state.callbacks.videoPlayer.onSpeedSetChange.push(state.videoSpeedControl.reRender);
-    }
-
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
@@ -112,8 +104,6 @@ function (bind) {
     }
 
     function changeVideoSpeed(event) {
-        var _this;
-
         event.preventDefault();
 
         if (!$(event.target).parent().hasClass('active')) {
@@ -123,21 +113,16 @@ function (bind) {
                 parseFloat(this.videoSpeedControl.currentSpeed).toFixed(2).replace(/\.00$/, '.0')
             );
 
-            _this = this;
-
-            $.each(this.callbacks.videoSpeedControl.changeVideoSpeed, function (index, value) {
-                // Each value is a registered callback (JavaScript function object).
-                value(_this.videoSpeedControl.currentSpeed);
-            });
+            this.trigger(['videoPlayer', 'onSpeedChange'], this.videoSpeedControl.currentSpeed, 'method');
         }
     }
 
-    function reRender(newSpeeds, currentSpeed) {
+    function reRender(params /*newSpeeds, currentSpeed*/) {
         var _this;
 
         this.videoSpeedControl.videoSpeedsEl.empty();
         this.videoSpeedControl.videoSpeedsEl.find('li').removeClass('active');
-        this.videoSpeedControl.speeds = newSpeeds;
+        this.videoSpeedControl.speeds = params.newSpeeds;
 
         _this = this;
         $.each(this.videoSpeedControl.speeds, function(index, speed) {
@@ -149,7 +134,7 @@ function (bind) {
 
             listItem = $('<li>').attr('data-speed', speed).html(link);
 
-            if (speed === currentSpeed) {
+            if (speed === params.currentSpeed) {
                 listItem.addClass('active');
             }
 

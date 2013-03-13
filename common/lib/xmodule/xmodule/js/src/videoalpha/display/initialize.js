@@ -27,6 +27,7 @@ function (bind, VideoPlayer) {
         state.setSpeed    = bind(setSpeed, state);
         state.youtubeId   = bind(youtubeId, state);
         state.getDuration = bind(getDuration, state);
+        state.trigger     = bind(trigger, state);
     }
 
     // function renderElements(state)
@@ -36,7 +37,7 @@ function (bind, VideoPlayer) {
     //     way - you don't have to do repeated jQuery element selects.
     function renderElements(state, element) {
         // The parent element of the video, and the ID.
-        state.el = $(element).find('.video');
+        state.el = $(element).find('.videoalpha');
         state.id = state.el.attr('id').replace(/video_/, '');
 
         // We store all settings passed to us by the server in one place. These are "read only", so don't
@@ -113,8 +114,8 @@ function (bind, VideoPlayer) {
             state.hide_captions = true;
 
             $.cookie('hide_captions', state.hide_captions, {
-                expires: 3650,
-                path: '/'
+                'expires': 3650,
+                'path': '/'
             });
 
             state.el.addClass('closed');
@@ -128,8 +129,8 @@ function (bind, VideoPlayer) {
         (function (currentPlayerMode) {
             if ((currentPlayerMode !== 'html5') && (currentPlayerMode !== 'flash')) {
                 $.cookie('current_player_mode', 'html5', {
-                    expires: 3650,
-                    path: '/'
+                    'expires': 3650,
+                    'path': '/'
                 });
                 state.currentPlayerMode = 'html5';
             } else  {
@@ -137,39 +138,9 @@ function (bind, VideoPlayer) {
             }
         }($.cookie('current_player_mode')));
 
-        // Will be used by various components to register callbacks that can be then called by video core,
-        // or other components.
-        state.callbacks = {
-            'videoPlayer': {
-                'onPlay': [],
-                'onPause': [],
-                'onEnded': [],
-                'onPlaybackQualityChange': [],
-                'updatePlayTime': [],
-                'onSpeedSetChange': []
-            },
-            'videoControl': {
-                'togglePlaybackPlay': [],
-                'togglePlaybackPause': [],
-                'toggleFullScreen': []
-            },
-            'videoQualityControl': {
-                'toggleQuality': []
-            },
-            'videoProgressSlider': {
-                'onSlide': [],
-                'onStop': []
-            },
-            'videoVolumeControl': {
-                'onChange': []
-            },
-            'videoSpeedControl': {
-                'changeVideoSpeed': []
-            },
-            'videoCaption': {
-                'seekPlayer': []
-            }
-        };
+        // Possible value are: 'visible', 'hiding', and 'invisible'.
+        state.controlState = 'visible';
+        state.controlHideTimeout = null;
 
         // Launch embedding of actual video content, or set it up so that it will be done as soon as the
         // appropriate video player (YouTube or stand alone HTML5) is loaded, and can handle embedding.
@@ -291,8 +262,8 @@ function (bind, VideoPlayer) {
 
         if (updateCookie !== false) {
             $.cookie('video_speed', this.speed, {
-                expires: 3650,
-                path: '/'
+                'expires': 3650,
+                'path': '/'
             });
         }
     }
@@ -305,7 +276,20 @@ function (bind, VideoPlayer) {
         return this.metadata[this.youtubeId()].duration;
     }
 
-     /*
+    /* he function .trigger() expects the parameter @callType one of
+     *
+     *     'event'
+     *     'method'
+     *
+     * Based on this parameter, this function can be used in two ways.
+     *
+     *
+     *
+     * First use: A safe way to trigger jQuery events.
+     * -----------------------------------------------
+     *
+     * @callType === 'event'
+     *
      * Because jQuery events can be triggered on some jQuery object, we must make sure that
      * we don't trigger an event on an undefined object. For this we will have an in-between
      * method that will check for the existance of an object before triggering an event on it.
@@ -321,34 +305,60 @@ function (bind, VideoPlayer) {
      *
      * object, and, if found to be present, will trigger the specified event on this object.
      *
-     * @eventName - the name of the event to trigger on the specified object.
+     * @eventName is a string the name of the event to trigger on the specified object.
+     *
+     * @extraParameters is an object or an array that should be passed to the triggered method.
+     *
+     *
+     * Second use: A safe way to call methods.
+     * ---------------------------------------
+     *
+     * @callType === 'method'
+     *
+     * Parameter @eventName is NOT necessary.
+     *
+     * The trigger() function will assume that the @objChain is a complete chain with a method
+     * (function) at the end. It will call this function. So for example, when trigger() is
+     * called like so:
+     *
+     *     state.trigger(['videoPlayer', 'pause'], {'param1': 10}, 'method');
+     *
+     * Then trigger() will execute:
+     *
+     *     state.videoPlayer.pause({'param1': 10});
      */
-    function trigger(objChain, eventName, extraParameters) {
-        var tmpObj;
+    function trigger(objChain, extraParameters, callType, eventName) {
+        var i, tmpObj;
 
         // Remember that 'this' is the 'state' object.
         tmpObj = this;
 
-        getFinalObj(0);
+        // At the end of the loop the variable 'tmpObj' will either be the correct
+        // object/function to trigger/invoke. If the 'objChain' chain of object is
+        // incorrect (one of the link is non-existent), then the loop will immediately
+        // exit.
+        while (objChain.length > 0) {
+            i = objChain.shift();
 
-        if (tmpObj === null) {
+            if (tmpObj.hasOwnProperty(i) === true) {
+                tmpObj = tmpObj[i];
+            } else {
+                // An incorrect object chain was specified.
+
+                return false;
+            }
+        }
+
+        // Based on the type, either trigger, or invoke.
+        if (callType === 'event') {
+            tmpObj.trigger(eventName, extraParameters);
+        } else if (callType === 'method') {
+            tmpObj(extraParameters);
+        } else {
             return false;
         }
 
-        tmpObj.trigger(eventName, extraParameters);
-
         return true;
-
-        function getFinalObj(i) {
-            if (objChain.length !== i) {
-                if (tmpObj.hasOwnProperty(objChain[i]) === true) {
-                    tmpObj = tmpObj[objChain[i]];
-                    getFinalObj(i + 1);
-                } else {
-                    tmpObj = null;
-                }
-            }
-        }
     }
 });
 

@@ -13,7 +13,6 @@ function (bind) {
         makeFunctionsPublic(state);
         renderElements(state);
         bindHandlers(state);
-        registerCallbacks(state);
     };
 
     // ***************************************************************
@@ -88,15 +87,9 @@ function (bind) {
         );
     }
 
-    // function registerCallbacks(state)
-    //
-    //     Register function callbacks to be called by other modules.
-    function registerCallbacks(state) {
-        state.callbacks.videoPlayer.updatePlayTime.push(state.videoCaption.updatePlayTime);
-        state.callbacks.videoControl.toggleFullScreen.push(state.videoCaption.resize);
-    }
-
     function fetchCaption(state) {
+        state.videoCaption.hideCaptions(state.hide_captions);
+
         $.getWithPrefix(captionURL(state), function(captions) {
             state.videoCaption.captions = captions.text;
             state.videoCaption.start = captions.start;
@@ -113,6 +106,10 @@ function (bind) {
     }
 
     function captionURL(state) {
+        console.log('We are inside captionURL() function.');
+        console.log('state.config.caption_asset_path = "' + state.config.caption_asset_path + '".');
+        console.log('state.youtubeId("1.0") = "' + state.youtubeId('1.0') + '".');
+
         return '' + state.config.caption_asset_path + state.youtubeId('1.0') + '.srt.sjson';
     }
 
@@ -257,10 +254,7 @@ function (bind) {
         event.preventDefault();
         time = Math.round(Time.convert($(event.target).data('start'), '1.0', this.speed) / 1000);
 
-        $.each(this.callbacks.videoCaption.seekPlayer, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value(time);
-        });
+        this.trigger(['videoPlayer', 'onSeek'], time, 'method');
     }
 
     function calculateOffset(element) {

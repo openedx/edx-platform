@@ -20,7 +20,6 @@ function (bind) {
         makeFunctionsPublic(state);
         renderElements(state);
         bindHandlers(state);
-        registerCallbacks(state);
     };
 
     // ***************************************************************
@@ -60,19 +59,12 @@ function (bind) {
 
     }
 
-    // function registerCallbacks(state)
-    //
-    //     Register function callbacks to be called by other modules.
-    function registerCallbacks(state) {
-        state.callbacks.videoPlayer.updatePlayTime.push(state.videoProgressSlider.updatePlayTime);
-    }
-
     function buildSlider(state) {
         state.videoProgressSlider.slider = state.videoProgressSlider.el.slider({
-            'range':  'min',
+            'range': 'min',
             'change': state.videoProgressSlider.onChange,
-            'slide':  state.videoProgressSlider.onSlide,
-            'stop':   state.videoProgressSlider.onStop
+            'slide': state.videoProgressSlider.onSlide,
+            'stop': state.videoProgressSlider.onStop
         });
     }
 
@@ -106,10 +98,7 @@ function (bind) {
         this.videoProgressSlider.frozen = true;
         this.videoProgressSlider.updateTooltip(ui.value);
 
-        $.each(this.callbacks.videoProgressSlider.onSlide, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value(ui.value);
-        });
+        this.trigger(['videoPlayer', 'onSeek'], ui.value, 'method');
     }
 
     function onChange(event, ui) {
@@ -123,10 +112,7 @@ function (bind) {
 
         this.videoProgressSlider.frozen = true;
 
-        $.each(this.callbacks.videoProgressSlider.onStop, function (index, value) {
-            // Each value is a registered callback (JavaScript function object).
-            value(ui.value);
-        });
+        this.trigger(['videoPlayer', 'onSeek'], ui.value, 'method');
 
         setTimeout(function() {
             _this.videoProgressSlider.frozen = false;
@@ -137,10 +123,10 @@ function (bind) {
         this.videoProgressSlider.handle.qtip('option', 'content.text', '' + Time.format(value));
     }
 
-    function updatePlayTime(currentTime, duration) {
+    function updatePlayTime(params) {
         if ((this.videoProgressSlider.slider) && (!this.videoProgressSlider.frozen)) {
-            this.videoProgressSlider.slider.slider('option', 'max', duration);
-            this.videoProgressSlider.slider.slider('value', currentTime);
+            this.videoProgressSlider.slider.slider('option', 'max', params.duration);
+            this.videoProgressSlider.slider.slider('value', params.time);
         }
     }
 
