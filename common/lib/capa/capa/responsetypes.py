@@ -911,7 +911,8 @@ def sympy_check2():
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
                             'chemicalequationinput', 'vsepr_input',
                             'drag_and_drop_input', 'editamoleculeinput',
-                            'designprotein2dinput', 'editageneinput']
+                            'designprotein2dinput', 'editageneinput',
+                            'annotationinput']
 
     def setup_response(self):
         xml = self.xml
@@ -1943,6 +1944,117 @@ class ImageResponse(LoncapaResponse):
                 dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
 #-----------------------------------------------------------------------------
 
+class AnnotationResponse(LoncapaResponse):
+    '''
+    Checking of annotation responses.
+
+    The response contains both a comment (student commentary) and an option (student tag).
+    Only the tag is currently graded. Answers may be incorrect, partially correct, or correct.
+    '''
+    response_tag = 'annotationresponse'
+    allowed_inputfields = ['annotationinput']
+    max_inputfields = 1
+    default_scoring = {'incorrect': 0, 'partially-correct': 1, 'correct': 2 }
+    def setup_response(self):
+        xml = self.xml
+        self.scoring_map = self._get_scoring_map()
+        self.answer_map = self._get_answer_map()
+        self.maxpoints = self._get_max_points()
+
+    def get_score(self, student_answers):
+        ''' Returns a CorrectMap for the student answer, which may include
+            partially correct answers.'''
+        student_answer = student_answers[self.answer_id]
+        student_option = self._get_submitted_option_id(student_answer)
+
+        scoring = self.scoring_map[self.answer_id]
+        is_valid = student_option is not None and student_option in scoring.keys()
+
+        (correctness, points) = ('incorrect', None)
+        if is_valid:
+            correctness = scoring[student_option]['correctness']
+            points = scoring[student_option]['points']
+
+        return CorrectMap(self.answer_id, correctness=correctness, npoints=points)
+
+    def get_answers(self):
+        return self.answer_map
+
+    def _get_scoring_map(self):
+        ''' Returns a dict of option->scoring for each input. '''
+        scoring = self.default_scoring
+        choices = dict([(choice,choice) for choice in scoring])
+        scoring_map = {}
+
+        for inputfield in self.inputfields:
+            option_scoring = dict([(option['id'], {
+                    'correctness': choices.get(option['choice']), 
+                    'points': scoring.get(option['choice'])
+                }) for option in self._find_options(inputfield) ])
+
+            scoring_map[inputfield.get('id')] = option_scoring
+
+        return scoring_map
+
+    def _get_answer_map(self):
+        ''' Returns a dict of answers for each input.'''
+        answer_map = {}
+        for inputfield in self.inputfields:
+            correct_option = self._find_option_with_choice(inputfield, 'correct')
+            if correct_option is not None:
+                answer_map[inputfield.get('id')] = correct_option.get('description')
+        return answer_map
+
+    def _get_max_points(self):
+        ''' Returns a dict of the max points for each input: input id -> maxpoints. '''
+        scoring = self.default_scoring
+        correct_points = scoring.get('correct')
+        return dict([(inputfield.get('id'), correct_points) for inputfield in self.inputfields])
+
+    def _find_options(self, inputfield):
+        ''' Returns an array of dicts where each dict represents an option. '''
+        elements = inputfield.findall('./options/option')
+        return [{
+                'id': index,
+                'description': option.text,
+                'choice': option.get('choice')
+            } for (index, option) in enumerate(elements) ]
+
+    def _find_option_with_choice(self, inputfield, choice):
+        ''' Returns the option with the given choice value, otherwise None. '''
+        for option in self._find_options(inputfield):
+            if option['choice'] == choice:
+                return option
+
+    def _unpack(self, json_value):
+        ''' Unpacks a student response value submitted as JSON.'''
+        d = json.loads(json_value)
+        if type(d) != dict:
+            d = {}
+
+        comment_value = d.get('comment', '')
+        if not isinstance(d, basestring):
+            comment_value = ''
+
+        options_value = d.get('options', [])
+        if not isinstance(options_value, list):
+            options_value = []
+
+        return {
+            'options_value': options_value,
+            'comment_value': comment_value
+        }
+
+    def _get_submitted_option_id(self, student_answer):
+        ''' Return the single option that was selected, otherwise None.'''
+        submitted = self._unpack(student_answer)
+        option_ids = submitted['options_value']
+        if len(option_ids) == 1:
+            return option_ids[0]
+        return None
+
+#-----------------------------------------------------------------------------
+
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
@@ -1959,4 +2071,5 @@ __all__ = [CodeResponse,
            ChoiceResponse,
            MultipleChoiceResponse,
            TrueFalseResponse,
-           JavascriptResponse]
+           JavascriptResponse,
+           AnnotationResponse]

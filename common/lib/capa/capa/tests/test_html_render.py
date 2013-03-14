@@ -3,6 +3,7 @@ from lxml import etree
 import os
 import textwrap
 import json
+
 import mock
 
 from capa.capa_problem import LoncapaProblem
@@ -10,6 +11,20 @@ from response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFact
 from . import test_system
 
 class CapaHtmlRenderTest(unittest.TestCase):
+
+    def test_blank_problem(self):
+        """
+        It's important that blank problems don't break, since that's
+        what you start with in studio.
+        """
+        xml_str = "<problem> </problem>"
+
+        # Create the problem
+        problem = LoncapaProblem(xml_str, '1', system=test_system)
+
+        # Render the HTML
+        rendered_html = etree.XML(problem.get_html())
+        # expect that we made it here without blowing up
 
     def test_include_html(self):
         # Create a test file to include
@@ -25,7 +40,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Create the problem
         problem = LoncapaProblem(xml_str, '1', system=test_system)
-    
+
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
@@ -33,6 +48,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         test_element = rendered_html.find("test")
         self.assertEqual(test_element.tag, "test")
         self.assertEqual(test_element.text, "Test include")
+
+
 
 
     def test_process_outtext(self):
@@ -45,7 +62,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Create the problem
         problem = LoncapaProblem(xml_str, '1', system=test_system)
-    
+
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
@@ -64,13 +81,32 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Create the problem
         problem = LoncapaProblem(xml_str, '1', system=test_system)
-    
+
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
         # Expect that the script element has been removed from the rendered HTML
         script_element = rendered_html.find('script')
         self.assertEqual(None, script_element)
+
+    def test_render_javascript(self):
+        # Generate some XML with a <script> tag
+        xml_str = textwrap.dedent("""
+            <problem>
+                <script type="text/javascript">function(){}</script>
+            </problem>
+        """)
+
+        # Create the problem
+        problem = LoncapaProblem(xml_str, '1', system=test_system)
+
+        # Render the HTML
+        rendered_html = etree.XML(problem.get_html())
+
+
+        # expect the javascript is still present in the rendered html
+        self.assertTrue("<script type=\"text/javascript\">function(){}</script>" in etree.tostring(rendered_html))
+
 
     def test_render_response_xml(self):
         # Generate some XML for a string response
@@ -99,11 +135,11 @@ class CapaHtmlRenderTest(unittest.TestCase):
         response_element = rendered_html.find("span")
         self.assertEqual(response_element.tag, "span")
 
-        # Expect that the response <span> 
+        # Expect that the response <span>
         # that contains a <div> for the textline
         textline_element = response_element.find("div")
         self.assertEqual(textline_element.text, 'Input Template Render')
-        
+
         # Expect a child <div> for the solution
         # with the rendered template
         solution_element = rendered_html.find("div")
@@ -112,19 +148,21 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect that the template renderer was called with the correct
         # arguments, once for the textline input and once for
         # the solution
-        expected_textline_context = {'status': 'unsubmitted', 
-                                        'value': '', 
-                                        'preprocessor': None, 
-                                        'msg': '', 
-                                        'inline': False, 
-                                        'hidden': False, 
-                                        'do_math': False, 
-                                        'id': '1_2_1', 
+        expected_textline_context = {'status': 'unsubmitted',
+                                        'value': '',
+                                        'preprocessor': None,
+                                        'msg': '',
+                                        'inline': False,
+                                        'hidden': False,
+                                        'do_math': False,
+                                        'id': '1_2_1',
                                         'size': None}
 
         expected_solution_context = {'id': '1_solution_1'}
 
         expected_calls = [mock.call('textline.html', expected_textline_context),
+                mock.call('solutionspan.html', expected_solution_context),
+                mock.call('textline.html', expected_textline_context),
                 mock.call('solutionspan.html', expected_solution_context)]
 
         self.assertEqual(test_system.render_template.call_args_list,
@@ -146,7 +184,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Create the problem and render the html
         problem = LoncapaProblem(xml_str, '1', system=test_system)
-        
+
         # Grade the problem
         correctmap = problem.grade_answers({'1_2_1': 'test'})
 

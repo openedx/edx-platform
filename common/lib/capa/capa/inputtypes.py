@@ -45,8 +45,10 @@ import re
 import shlex  # for splitting quoted strings
 import sys
 import os
+import pyparsing
 
 from registry import TagRegistry
+from capa.chem import chemcalc
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -215,6 +217,18 @@ class InputTypeBase(object):
         """
         pass
 
+    def handle_ajax(self, dispatch, get):
+        """
+        InputTypes that need to handle specialized AJAX should override this.
+
+        Input:
+            dispatch: a string that can be used to determine how to handle the data passed in
+            get: a dictionary containing the data that was sent with the ajax call
+
+        Output:
+            a dictionary object that can be serialized into JSON. This will be sent back to the Javascript. 
+        """
+        pass
 
     def _get_render_context(self):
         """
@@ -351,6 +365,12 @@ class ChoiceGroup(InputTypeBase):
             raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
 
         self.choices = self.extract_choices(self.xml)
+
+    @classmethod
+    def get_attributes(cls):
+        return [Attribute("show_correctness", "always"),
+                Attribute("submitted_message", "Answer received.")]
+
 
     def _extra_context(self):
         return {'input_type': self.html_input_type,
@@ -740,6 +760,45 @@ class ChemicalEquationInput(InputTypeBase):
         """
         return {'previewer': '/static/js/capa/chemical_equation_preview.js', }
 
+    def handle_ajax(self, dispatch, get):
+        '''
+        Since we only have chemcalc preview this input, check to see if it
+        matches the corresponding dispatch and send it through if it does
+        '''
+        if dispatch == 'preview_chemcalc':
+            return self.preview_chemcalc(get)
+        return {}
+
+    def preview_chemcalc(self, get):
+        """
+        Render an html preview of a chemical formula or equation.  get should
+        contain a key 'formula' and value 'some formula string'.
+
+        Returns a json dictionary:
+        {
+           'preview' : 'the-preview-html' or ''
+           'error' : 'the-error' or ''
+        }
+        """
+
+        result = {'preview': '',
+                  'error': ''}
+        formula = get['formula']
+        if formula is None:
+            result['error'] = "No formula specified."
+            return result
+
+        try:
+            result['preview'] = chemcalc.render_to_html(formula)
+        except pyparsing.ParseException as p:
+            result['error'] = "Couldn't parse formula: {0}".format(p)
+        except Exception:
+            # this is unexpected, so log
+            log.warning("Error while previewing chemical formula", exc_info=True)
+            result['error'] = "Error while rendering preview"
+
+        return result
+
 registry.register(ChemicalEquationInput)
 
 #-----------------------------------------------------------------------------
@@ -909,33 +968,142 @@ registry.register(DesignProtein2dInput)
 class EditAGeneInput(InputTypeBase):
     """
         An input type for editing a gene. Integrates with the genex java applet.
-        
+
         Example:
-        
+
         <editagene width="800" hight="500" dna_sequence="ETAAGGCTATAACCGA" />
         """
-    
+
     template = "editageneinput.html"
     tags = ['editageneinput']
-    
+
     @classmethod
     def get_attributes(cls):
         """
-            Note: width, hight, and dna_sequencee are required.
-            """
+        Note: width, height, and dna_sequencee are required.
+        """
         return [Attribute('width'),
                 Attribute('height'),
-                Attribute('dna_sequence')
+                Attribute('dna_sequence'),
+                Attribute('genex_problem_number')
                 ]
-    
+
     def _extra_context(self):
         """
             """
         context = {
             'applet_loader': '/static/js/capa/edit-a-gene.js',
         }
-        
+
         return context
 
 registry.register(EditAGeneInput)
+
+#---------------------------------------------------------------------
+
+class AnnotationInput(InputTypeBase):
+    """
+    Input type for annotations: students can enter some notes or other text
+    (currently ungraded), and then choose from a set of tags/optoins, which are graded.
+
+    Example:
+
+        <annotationinput>
+            <title>Annotation Exercise</title>
+            <text>
+                They are the ones who, at the public assembly, had put savage derangement [ate] into my thinking
+                [phrenes] |89 on that day when I myself deprived Achilles of his honorific portion [geras]
+            </text>
+            <comment>Agamemnon says that ate or 'derangement' was the cause of his actions: why could Zeus say the same thing?</comment>
+            <comment_prompt>Type a commentary below:</comment_prompt>
+            <tag_prompt>Select one tag:</tag_prompt>
+            <options>
+                <option choice="correct">ate - both a cause and an effect</option>
+                <option choice="incorrect">ate - a cause</option>
+                <option choice="partially-correct">ate - an effect</option>
+            </options>
+        </annotationinput>
+
+    # TODO: allow ordering to be randomized
+    """
+
+    template = "annotationinput.html"
+    tags = ['annotationinput']
+
+    def setup(self):
+        xml = self.xml
+
+        self.debug = False # set to True to display extra debug info with input
+        self.return_to_annotation = True # return only works in conjunction with annotatable xmodule
+
+        self.title = xml.findtext('./title', 'Annotation Exercise')
+        self.text = xml.findtext('./text')
+        self.comment = xml.findtext('./comment')
+        self.comment_prompt = xml.findtext('./comment_prompt', 'Type a commentary below:')
+        self.tag_prompt = xml.findtext('./tag_prompt', 'Select one tag:')
+        self.options = self._find_options()
+
+        # Need to provide a value that JSON can parse if there is no
+        # student-supplied value yet.
+        if self.value == '':
+            self.value = 'null'
+
+        self._validate_options()
+
+    def _find_options(self):
+        ''' Returns an array of dicts where each dict represents an option. '''
+        elements = self.xml.findall('./options/option')
+        return [{
+                'id': index,
+                'description': option.text,
+                'choice': option.get('choice')
+            } for (index, option) in enumerate(elements) ]
+
+    def _validate_options(self):
+        ''' Raises a ValueError if the choice attribute is missing or invalid. '''
+        valid_choices = ('correct', 'partially-correct', 'incorrect')
+        for option in self.options:
+            choice = option['choice']
+            if choice is None:
+                raise ValueError('Missing required choice attribute.')
+            elif choice not in valid_choices:
+                raise ValueError('Invalid choice attribute: {0}. Must be one of: {1}'.format(choice, ', '.join(valid_choices)))
+
+    def _unpack(self, json_value):
+        ''' Unpacks the json input state into a dict. '''
+        d = json.loads(json_value)
+        if type(d) != dict:
+            d = {}
+
+        comment_value = d.get('comment', '')
+        if not isinstance(comment_value, basestring):
+            comment_value = ''
+
+        options_value = d.get('options', [])
+        if not isinstance(options_value, list):
+            options_value = []
+
+        return {
+            'options_value': options_value,
+            'has_options_value': len(options_value) > 0, # for convenience
+            'comment_value': comment_value,
+        }
+
+    def _extra_context(self):
+        extra_context = {
+                'title': self.title,
+                'text': self.text,
+                'comment': self.comment,
+                'comment_prompt': self.comment_prompt,
+                'tag_prompt': self.tag_prompt,
+                'options': self.options,
+                'return_to_annotation': self.return_to_annotation,
+                'debug': self.debug
+        }
+
+        extra_context.update(self._unpack(self.value))
+
+        return extra_context
+
+registry.register(AnnotationInput)
 

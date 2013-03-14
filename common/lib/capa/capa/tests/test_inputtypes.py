@@ -102,6 +102,8 @@ class ChoiceGroupTest(unittest.TestCase):
                     'choices': [('foil1', '<text>This is foil One.</text>'),
                                 ('foil2', '<text>This is foil Two.</text>'),
                                 ('foil3', 'This is foil Three.'), ],
+                    'show_correctness': 'always',
+                    'submitted_message': 'Answer received.',
                     'name_array_suffix': expected_suffix,   # what is this for??
                     }
 
@@ -482,26 +484,42 @@ class ChemicalEquationTest(unittest.TestCase):
     '''
     Check that chemical equation inputs work.
     '''
-
-    def test_rendering(self):
-        size = "42"
-        xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=size)
+    def setUp(self):
+        self.size = "42"
+        xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
 
         element = etree.fromstring(xml_str)
 
         state = {'value': 'H2OYeah', }
-        the_input = lookup_tag('chemicalequationinput')(test_system, element, state)
+        self.the_input = lookup_tag('chemicalequationinput')(test_system, element, state)
 
-        context = the_input._get_render_context()
+
+    def test_rendering(self):
+        ''' Verify that the render context matches the expected render context'''
+        context = self.the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
                     'value': 'H2OYeah',
                     'status': 'unanswered',
                     'msg': '',
-                    'size': size,
+                    'size': self.size,
                     'previewer': '/static/js/capa/chemical_equation_preview.js',
                     }
         self.assertEqual(context, expected)
+
+    
+    def test_chemcalc_ajax_sucess(self):
+        ''' Verify that using the correct dispatch and valid data produces a valid response'''
+        
+        data = {'formula': "H"}
+        response = self.the_input.handle_ajax("preview_chemcalc", data)
+
+        self.assertTrue('preview' in response)
+        self.assertNotEqual(response['preview'], '')
+        self.assertEqual(response['error'], "")
+
+
+    
 
 
 class DragAndDropTest(unittest.TestCase):
@@ -570,3 +588,65 @@ class DragAndDropTest(unittest.TestCase):
         context.pop('drag_and_drop_json')
         expected.pop('drag_and_drop_json')
         self.assertEqual(context, expected)
+
+
+class AnnotationInputTest(unittest.TestCase):
+    '''
+    Make sure option inputs work
+    '''
+    def test_rendering(self):
+        xml_str = '''
+<annotationinput>
+    <title>foo</title>
+    <text>bar</text>
+    <comment>my comment</comment>
+    <comment_prompt>type a commentary</comment_prompt>
+    <tag_prompt>select a tag</tag_prompt>
+    <options>
+        <option choice="correct">x</option>
+        <option choice="incorrect">y</option>
+        <option choice="partially-correct">z</option>
+    </options>
+</annotationinput>
+'''
+        element = etree.fromstring(xml_str)
+
+        value = {"comment": "blah blah", "options": [1]}
+        json_value = json.dumps(value)
+        state = {
+            'value': json_value,
+            'id': 'annotation_input',
+            'status': 'answered'
+        }
+
+        tag = 'annotationinput'
+
+        the_input = lookup_tag(tag)(test_system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {
+            'id': 'annotation_input',
+            'value': value,
+            'status': 'answered',
+            'msg': '',
+            'title': 'foo',
+            'text': 'bar',
+            'comment': 'my comment',
+            'comment_prompt': 'type a commentary',
+            'tag_prompt': 'select a tag',
+            'options': [
+                {'id': 0, 'description': 'x', 'choice': 'correct'},
+                {'id': 1, 'description': 'y', 'choice': 'incorrect'},
+                {'id': 2, 'description': 'z', 'choice': 'partially-correct'}
+            ],
+            'value': json_value,
+            'options_value': value['options'],
+            'has_options_value': len(value['options']) > 0,
+            'comment_value': value['comment'],
+            'debug': False,
+            'return_to_annotation': True
+        }
+
+        self.maxDiff = None
+        self.assertDictEqual(context, expected)

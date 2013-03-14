@@ -86,7 +86,10 @@ class FolditModule(XModule):
         """
         from foldit.models import Score
 
-        return [(e['username'], e['score']) for e in Score.get_tops_n(10)]
+        leaders = [(e['username'], e['score']) for e in Score.get_tops_n(10)]
+        leaders.sort(key=lambda x: -x[1])
+
+        return leaders
 
     def get_html(self):
         """
@@ -96,8 +99,9 @@ class FolditModule(XModule):
             self.required_level,
             self.required_sublevel)
 
-        showbasic = (self.metadata.get("show_basic_score").lower() == "true")
-        showleader = (self.metadata.get("show_leaderboard").lower() == "true")
+        showbasic = (self.metadata.get("show_basic_score", "").lower() == "true")
+        showleader = (self.metadata.get("show_leaderboard", "").lower() == "true")
+
         context = {
             'due': self.due_str,
             'success': self.is_complete(),

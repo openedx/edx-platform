@@ -3,6 +3,9 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
+
+from . import one_time_startup
+
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -224,14 +227,6 @@ if settings.COURSEWARE_ENABLED:
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
 
-        # TODO (vshnayder): This is a hack.  It creates a direct connection from
-        # the LMS to capa functionality, and really wants to go through the
-        # input types system so that previews can be context-specific.
-        # Unfortunately, we don't have time to think through the right way to do
-        # that (and implement it), and it's not a terrible thing to provide a
-        # generic chemical-equation rendering service.
-        url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
-            name='preview_chemcalc'),
 
         # Software Licenses
 
@@ -284,6 +279,15 @@ if settings.COURSEWARE_ENABLED:
             'staticbook.views.pdf_index'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<page>[^/]*)$',
             'staticbook.views.pdf_index'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/$',
+            'staticbook.views.html_index', name="html_book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
+            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<anchor_id>[^/]*)/$',
+            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/(?P<anchor_id>[^/]*)/$',
+            'staticbook.views.html_index'),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
             'courseware.views.index', name="courseware"),
