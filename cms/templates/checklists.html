@@ -2,6 +2,27 @@
 <%block name="title">Course Checklists</%block>
 <%block name="bodyclass">is-signedin course uxdesign checklists</%block>
 
+<%namespace name='static' file='static_content.html'/>
+<%block name="jsextra">
+
+<script type="text/javascript" src="${static.url('js/views/checklists_view.js')}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var editor = new CMS.Views.Checklists({
+            el: $('.course-checklists')
+        });
+
+        // No need to call render yet-- state is not being injected.
+        //  editor.render();
+
+    });
+
+</script>
+</%block>
+
+
 <%block name="content">
 <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
@@ -542,18 +563,11 @@
 
         <nav class="nav-page checklists-current">
             <ol>
+                % for checklist in checklists:
                 <li class="nav-item">
-                    <a href="#course-checklist1">Getting Started with Studio</a>
+                    <a href=${'#course-checklist' + str(loop.index)}>${checklist['short_description']}</a>
                 </li>
-                <li class="nav-item">
-                    <a href="#course-checklist2">Draft a Rough Course Outline</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#course-checklist3">Explore edX's Support Tools</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#course-checklist4">Draft your Course Introduction</a>
-                </li>
+                % endfor
             </ol>
         </nav>
     </div>
@@ -564,7 +578,7 @@
         <nav class="nav-page checklists-completed">
             <ol>
                 <li class="nav-item">
-                    <a href="#course-checklist1">Getting Started with Studio</a>
+                    <a href="#course-checklist1">TODO-- hook up completed checklists</a>
                 </li>
             </ol>
         </nav>
@@ -574,80 +588,3 @@
 </div>
 </%block>
 
-<%block name="view_alerts">
-<!-- alert: save confirmed with close -->
-<div class="wrapper wrapper-alert wrapper-alert-confirmation">
-    <div class="alert confirmation">
-        <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
-
-        <div class="copy">
-            <h2 class="title title-3">Your policy changes have been saved.</h2>
-            <p>Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.</p>
-        </div>
-
-        <a href="#" rel="view" class="action action-alert-close">
-            <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
-            <span class="label">close alert</span>
-        </a>
-    </div>
-</div>
-</%block>
-
-<%block name="jsextra">
-<script type="text/javascript">
-    // checklists - prototype/basic js
-    $(document).ready(function() {
-
-        $('.course-checklist .checklist-title').each(function(e){
-            $(this).addClass('is-selectable').attr('title','Collapse/Expand this Checklist').bind('click', toggleChecklist);
-        });
-
-        $('.course-checklist .task label').each(function(e){
-            $(this).bind('click', toggleTask);
-        });
-
-        // demo/proof of concept for visual progress
-        $('.demo-checklistviz').click(function(e){
-            (e).preventDefault();
-            $('#course-checklist1 .viz-checklist-status .viz-checklist-status-value').css('width','25%');
-        });
-
-        function toggleChecklist(e) {
-            (e).preventDefault();
-            $(this).closest('.course-checklist').toggleClass('is-collapsed');
-        }
-
-        function toggleTask(e) {
-            (e).preventDefault();
-
-            var $taskInput = $(this).find('.task-input');
-
-            if ($taskInput.attr('checked')) {
-                $taskInput.removeAttr('checked');
-                console.log('removing check');
-            }
-            else {
-                $taskInput.attr('checked', 'checked');
-                console.log('adding check');
-            }
-
-            $(this).closest('.task').toggleClass('is-completed');
-        }
-
-        // in-progress update checklist progress (based on checkbox check/uncheck events)
-        function updateChecklistProgress() {
-            var $statusCount = $(this).closest('.course-checklist').find('.status-count');
-            var $statusAmount = $(this).closest('.course-checklist').find('.status-amount');
-
-            if ($(this).attr('checked')) {
-                console.log('adding');
-            }
-
-            else {
-                console.log('subtracting');
-            }
-        }
-
-    });
-</script>
-</%block>

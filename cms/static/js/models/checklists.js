@@ -1,0 +1,1 @@
+if (!CMS.Models['Checklists']) CMS.Models.Checklists = new Object();
