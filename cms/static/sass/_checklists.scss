@@ -60,11 +60,19 @@ body.course.checklists {
         margin: 0 flex-gutter() 0 0;
         float: left;
 
+        .ui-toggle-expansion {
+          @include font-size(14);
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: $baseline;
+          color: $gray-l4;
+        }
+
         .icon-confirm {
           @include font-size(20);
           display: inline-block;
           vertical-align: middle;
-          margin-right: ($baseline/4);
+          margin-right: ($baseline/2);
           color: $gray-l4;
         }
 
@@ -73,6 +81,10 @@ body.course.checklists {
 
           &:hover {
             color: $blue;
+
+            .ui-toggle-expansion {
+              color: $blue;
+            }
           }
         }
       }
@@ -143,6 +155,14 @@ body.course.checklists {
 
       header {
         @include box-shadow(none);
+
+        .checklist-title {
+
+          .ui-toggle-expansion {
+            @include transform(rotate(-90deg));
+            @include transform-origin(50% 50%);
+          }
+        }
       }
 
       .list-tasks {
