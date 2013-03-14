@@ -3,6 +3,9 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
+
+from . import one_time_startup
+
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -276,6 +279,15 @@ if settings.COURSEWARE_ENABLED:
             'staticbook.views.pdf_index'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<page>[^/]*)$',
             'staticbook.views.pdf_index'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/$',
+            'staticbook.views.html_index', name="html_book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
+            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<anchor_id>[^/]*)/$',
+            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/(?P<anchor_id>[^/]*)/$',
+            'staticbook.views.html_index'),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
             'courseware.views.index', name="courseware"),

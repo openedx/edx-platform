@@ -30,3 +30,4 @@ cover_html/
 .redcar/
 chromedriver.log
 /nbproject
+ghostdriver.log

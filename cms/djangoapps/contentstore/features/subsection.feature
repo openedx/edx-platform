@@ -17,6 +17,7 @@ Feature: Create Subsection
     And I click to edit the subsection name
     Then I see the complete subsection name with a quote in the editor
 
+    @skip-phantom
     Scenario: Delete a subsection
     Given I have opened a new course section in Studio
     And I have added a new subsection

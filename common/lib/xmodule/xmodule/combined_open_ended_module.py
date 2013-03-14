@@ -10,13 +10,13 @@ from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import Comb
 
 log = logging.getLogger("mitx.courseware")
 
-
 VERSION_TUPLES = (
     ('1', CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module),
 )
 
 DEFAULT_VERSION = 1
 DEFAULT_VERSION = str(DEFAULT_VERSION)
+
 
 class CombinedOpenEndedModule(XModule):
     """
@@ -60,7 +60,7 @@ class CombinedOpenEndedModule(XModule):
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
-            instance_state, shared_state, **kwargs)
+                         instance_state, shared_state, **kwargs)
 
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
@@ -129,13 +129,15 @@ class CombinedOpenEndedModule(XModule):
             version_index = versions.index(self.version)
 
         static_data = {
-            'rewrite_content_links' : self.rewrite_content_links,
+            'rewrite_content_links': self.rewrite_content_links,
         }
 
         self.child_descriptor = descriptors[version_index](self.system)
-        self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(definition['data']), self.system)
+        self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(definition['data']),
+                                                                               self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = json.dumps(instance_state), metadata = self.metadata, static_data= static_data)
+                                                   instance_state=json.dumps(instance_state), metadata=self.metadata,
+                                                   static_data=static_data)
 
     def get_html(self):
         return self.child_module.get_html()

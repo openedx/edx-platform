@@ -1,4 +1,4 @@
-source :rubygems
+source 'https://rubygems.org'
 gem 'rake', '~> 10.0.3'
 gem 'sass', '3.1.15'
 gem 'bourbon', '~> 1.3.6'
