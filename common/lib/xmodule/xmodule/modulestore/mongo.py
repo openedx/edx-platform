@@ -215,7 +215,7 @@ class MongoModuleStore(ModuleStoreBase):
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, metadata_inheritance_cache=None, **kwargs):
+                 user=None, password=None, **kwargs):
 
         ModuleStoreBase.__init__(self)
 
@@ -246,10 +246,6 @@ class MongoModuleStore(ModuleStoreBase):
         self.fs_root = path(fs_root)
         self.error_tracker = error_tracker
         self.render_template = render_template
-        if metadata_inheritance_cache is None:
-            logging.warning('metadata_inheritance_cache is None. Should be defined (unless running unit tests). Check config files....')
-
-        self.metadata_inheritance_cache = metadata_inheritance_cache
 
     def get_metadata_inheritance_tree(self, location):
         '''
@@ -322,6 +318,9 @@ class MongoModuleStore(ModuleStoreBase):
         tree = None
         if self.metadata_inheritance_cache is not None:
             tree = self.metadata_inheritance_cache.get(key_name)
+        else:
+            # This is to help guard against an accident prod runtime without a cache
+            logging.warning('Running MongoModuleStore without metadata_inheritance_cache. This should not happen in production!')
 
         if tree is None or force_refresh:
             tree = self.get_metadata_inheritance_tree(location)

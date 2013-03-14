@@ -253,7 +253,7 @@ class XMLModuleStore(ModuleStoreBase):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, data_dir, default_class=None, course_dirs=None, load_error_modules=True, metadata_inheritance_cache=None):
+    def __init__(self, data_dir, default_class=None, course_dirs=None, load_error_modules=True):
         """
         Initialize an XMLModuleStore from data_dir
 
