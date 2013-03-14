@@ -70,6 +70,7 @@ class @Problem
           @bind()
       
       @num_queued_items = @new_queued_items.length
+      @updateProgress response
       if @num_queued_items == 0 
         delete window.queuePollerID
       else

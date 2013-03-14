@@ -44,7 +44,6 @@ from lxml import etree
 import re
 import shlex  # for splitting quoted strings
 import sys
-import os
 import pyparsing
 
 from .registry import TagRegistry
@@ -97,7 +96,8 @@ class Attribute(object):
         """
         val = element.get(self.name)
         if self.default == self._sentinel and val is None:
-            raise ValueError('Missing required attribute {0}.'.format(self.name))
+            raise ValueError(
+                'Missing required attribute {0}.'.format(self.name))
 
         if val is None:
             # not required, so return default
@@ -149,7 +149,8 @@ class InputTypeBase(object):
 
         self.id = state.get('id', xml.get('id'))
         if self.id is None:
-            raise ValueError("input id state is None. xml is {0}".format(etree.tostring(xml)))
+            raise ValueError("input id state is None. xml is {0}".format(
+                etree.tostring(xml)))
 
         self.value = state.get('value', '')
 
@@ -169,13 +170,14 @@ class InputTypeBase(object):
             self.process_requirements()
 
             # Call subclass "constructor" -- means they don't have to worry about calling
-            # super().__init__, and are isolated from changes to the input constructor interface.
+            # super().__init__, and are isolated from changes to the input
+            # constructor interface.
             self.setup()
         except Exception as err:
             # Something went wrong: add xml to message, but keep the traceback
-            msg = "Error in xml '{x}': {err} ".format(x=etree.tostring(xml), err=str(err))
+            msg = "Error in xml '{x}': {err} ".format(
+                x=etree.tostring(xml), err=str(err))
             raise Exception, msg, sys.exc_info()[2]
-
 
     @classmethod
     def get_attributes(cls):
@@ -186,7 +188,6 @@ class InputTypeBase(object):
         """
         return []
 
-
     def process_requirements(self):
         """
         Subclasses can declare lists of required and optional attributes.  This
@@ -196,7 +197,8 @@ class InputTypeBase(object):
         Processes attributes, putting the results in the self.loaded_attributes dictionary.  Also creates a set
         self.to_render, containing the names of attributes that should be included in the context by default.
         """
-        # Use local dicts and sets so that if there are exceptions, we don't end up in a partially-initialized state.
+        # Use local dicts and sets so that if there are exceptions, we don't
+        # end up in a partially-initialized state.
         loaded = {}
         to_render = set()
         for a in self.get_attributes():
@@ -226,7 +228,7 @@ class InputTypeBase(object):
             get: a dictionary containing the data that was sent with the ajax call
 
         Output:
-            a dictionary object that can be serialized into JSON. This will be sent back to the Javascript. 
+            a dictionary object that can be serialized into JSON. This will be sent back to the Javascript.
         """
         pass
 
@@ -247,8 +249,9 @@ class InputTypeBase(object):
             'value': self.value,
             'status': self.status,
             'msg': self.msg,
-            }
-        context.update((a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
+        }
+        context.update((a, v) for (
+            a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
         context.update(self._extra_context())
         return context
 
@@ -371,7 +374,6 @@ class ChoiceGroup(InputTypeBase):
         return [Attribute("show_correctness", "always"),
                 Attribute("submitted_message", "Answer received.")]
 
-
     def _extra_context(self):
         return {'input_type': self.html_input_type,
                 'choices': self.choices,
@@ -436,7 +438,6 @@ class JavascriptInput(InputTypeBase):
                 Attribute('display_class', None),
                 Attribute('display_file', None), ]
 
-
     def setup(self):
         # Need to provide a value that JSON can parse if there is no
         # student-supplied value yet.
@@ -459,7 +460,6 @@ class TextLine(InputTypeBase):
     template = "textline.html"
     tags = ['textline']
 
-
     @classmethod
     def get_attributes(cls):
         """
@@ -474,12 +474,12 @@ class TextLine(InputTypeBase):
 
             # Attributes below used in setup(), not rendered directly.
             Attribute('math', None, render=False),
-            # TODO: 'dojs' flag is temporary, for backwards compatibility with 8.02x
+            # TODO: 'dojs' flag is temporary, for backwards compatibility with
+            # 8.02x
             Attribute('dojs', None, render=False),
             Attribute('preprocessorClassName', None, render=False),
             Attribute('preprocessorSrc', None, render=False),
-            ]
-
+        ]
 
     def setup(self):
         self.do_math = bool(self.loaded_attributes['math'] or
@@ -490,11 +490,11 @@ class TextLine(InputTypeBase):
         self.preprocessor = None
         if self.do_math:
             # Preprocessor to insert between raw input and Mathjax
-            self.preprocessor = {'class_name': self.loaded_attributes['preprocessorClassName'],
-                                 'script_src': self.loaded_attributes['preprocessorSrc']}
+            self.preprocessor = {
+                'class_name': self.loaded_attributes['preprocessorClassName'],
+                'script_src': self.loaded_attributes['preprocessorSrc']}
             if None in self.preprocessor.values():
                 self.preprocessor = None
-
 
     def _extra_context(self):
         return {'do_math': self.do_math,
@@ -539,7 +539,8 @@ class FileSubmission(InputTypeBase):
         """
         # Check if problem has been queued
         self.queue_len = 0
-        # Flag indicating that the problem has been queued, 'msg' is length of queue
+        # Flag indicating that the problem has been queued, 'msg' is length of
+        # queue
         if self.status == 'incomplete':
             self.status = 'queued'
             self.queue_len = self.msg
@@ -547,7 +548,6 @@ class FileSubmission(InputTypeBase):
 
     def _extra_context(self):
         return {'queue_len': self.queue_len, }
-        return context
 
 registry.register(FileSubmission)
 
@@ -562,8 +562,9 @@ class CodeInput(InputTypeBase):
 
     template = "codeinput.html"
     tags = ['codeinput',
-            'textbox',        # Another (older) name--at some point we may want to make it use a
-                              # non-codemirror editor.
+            'textbox',
+            # Another (older) name--at some point we may want to make it use a
+            # non-codemirror editor.
             ]
 
     # pulled out for testing
@@ -590,13 +591,15 @@ class CodeInput(InputTypeBase):
         """
         Implement special logic: handle queueing state, and default input.
         """
-        # if no student input yet, then use the default input given by the problem
+        # if no student input yet, then use the default input given by the
+        # problem
         if not self.value:
             self.value = self.xml.text
 
         # Check if problem has been queued
         self.queue_len = 0
-        # Flag indicating that the problem has been queued, 'msg' is length of queue
+        # Flag indicating that the problem has been queued, 'msg' is length of
+        # queue
         if self.status == 'incomplete':
             self.status = 'queued'
             self.queue_len = self.msg
@@ -610,8 +613,67 @@ registry.register(CodeInput)
 
 
 #-----------------------------------------------------------------------------
+
+
+class MatlabInput(CodeInput):
+    '''
+    InputType for handling Matlab code input
+    '''
+    template = "matlabinput.html"
+    tags = ['matlabinput']
+
+    # pulled out for testing
+    submitted_msg = ("Submitted.  As soon as your submission is"
+                     " graded, this message will be replaced with the grader's feedback.")
+
+    def setup(self):
+        '''
+        Handle matlab-specific parsing
+        '''
+        xml = self.xml
+        self.plot_payload = xml.findtext('./plot_payload')
+        # if no student input yet, then use the default input given by the
+        # problem
+        if not self.value:
+            self.value = self.xml.text
+
+        # Check if problem has been queued
+        self.queue_len = 0
+        # Flag indicating that the problem has been queued, 'msg' is length of
+        # queue
+        if self.status == 'incomplete':
+            self.status = 'queued'
+            self.queue_len = self.msg
+            self.msg = self.submitted_msg
+
+
+
+    def handle_ajax(self, dispatch, get):
+        if dispatch == 'plot':
+            # put the data in the queue and ship it off
+            pass
+        elif dispatch == 'display':
+            # render the response
+            pass
+
+    def plot_data(self, get):
+        ''' send data via xqueue to the mathworks backend'''
+
+        # only send data if xqueue exists
+        if self.system.xqueue is not None:
+            pass
+
+
+
+
+registry.register(MatlabInput)
+
+
+#-----------------------------------------------------------------------------
+
 class Schematic(InputTypeBase):
     """
+    InputType for the schematic editor
     """
 
     template = "schematicinput.html"
@@ -630,7 +692,6 @@ class Schematic(InputTypeBase):
             Attribute('initial_value', None),
             Attribute('submit_analyses', None), ]
 
-        return context
 
 registry.register(Schematic)
 
@@ -660,19 +721,18 @@ class ImageInput(InputTypeBase):
                 Attribute('height'),
                 Attribute('width'), ]
 
-
     def setup(self):
         """
         if value is of the form [x,y] then parse it and send along coordinates of previous answer
         """
-        m = re.match('\[([0-9]+),([0-9]+)]', self.value.strip().replace(' ', ''))
+        m = re.match('\[([0-9]+),([0-9]+)]',
+                     self.value.strip().replace(' ', ''))
         if m:
             # Note: we subtract 15 to compensate for the size of the dot on the screen.
             # (is a 30x30 image--lms/static/green-pointer.png).
             (self.gx, self.gy) = [int(x) - 15 for x in m.groups()]
         else:
             (self.gx, self.gy) = (0, 0)
-
 
     def _extra_context(self):
 
@@ -730,7 +790,7 @@ class VseprInput(InputTypeBase):
 
 registry.register(VseprInput)
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 
 
 class ChemicalEquationInput(InputTypeBase):
@@ -794,7 +854,8 @@ class ChemicalEquationInput(InputTypeBase):
             result['error'] = "Couldn't parse formula: {0}".format(p)
         except Exception:
             # this is unexpected, so log
-            log.warning("Error while previewing chemical formula", exc_info=True)
+            log.warning(
+                "Error while previewing chemical formula", exc_info=True)
             result['error'] = "Error while rendering preview"
 
         return result
@@ -843,16 +904,16 @@ class DragAndDropInput(InputTypeBase):
                                       'can_reuse': ""}
 
             tag_attrs['target'] = {'id': Attribute._sentinel,
-                                    'x': Attribute._sentinel,
-                                    'y': Attribute._sentinel,
-                                    'w': Attribute._sentinel,
-                                    'h': Attribute._sentinel}
+                                   'x': Attribute._sentinel,
+                                   'y': Attribute._sentinel,
+                                   'w': Attribute._sentinel,
+                                   'h': Attribute._sentinel}
 
             dic = dict()
 
             for attr_name in tag_attrs[tag_type].keys():
                 dic[attr_name] = Attribute(attr_name,
-                    default=tag_attrs[tag_type][attr_name]).parse_from_xml(tag)
+                                           default=tag_attrs[tag_type][attr_name]).parse_from_xml(tag)
 
             if tag_type == 'draggable' and not self.no_labels:
                 dic['label'] = dic['label'] or dic['id']
@@ -865,7 +926,7 @@ class DragAndDropInput(InputTypeBase):
 
         # add labels to images?:
         self.no_labels = Attribute('no_labels',
-                                        default="False").parse_from_xml(self.xml)
+                                   default="False").parse_from_xml(self.xml)
 
         to_js = dict()
 
@@ -874,16 +935,16 @@ class DragAndDropInput(InputTypeBase):
 
         # outline places on image where to drag adn drop
         to_js['target_outline'] = Attribute('target_outline',
-                                        default="False").parse_from_xml(self.xml)
+                                            default="False").parse_from_xml(self.xml)
         # one draggable per target?
         to_js['one_per_target'] = Attribute('one_per_target',
-                                        default="True").parse_from_xml(self.xml)
+                                            default="True").parse_from_xml(self.xml)
         # list of draggables
         to_js['draggables'] = [parse(draggable, 'draggable') for draggable in
-                                                self.xml.iterchildren('draggable')]
+                               self.xml.iterchildren('draggable')]
         # list of targets
         to_js['targets'] = [parse(target, 'target') for target in
-                                                self.xml.iterchildren('target')]
+                            self.xml.iterchildren('target')]
 
         # custom background color for labels:
         label_bg_color = Attribute('label_bg_color',
@@ -896,7 +957,7 @@ class DragAndDropInput(InputTypeBase):
 
 registry.register(DragAndDropInput)
 
-#--------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 
 
 class EditAMoleculeInput(InputTypeBase):
@@ -934,6 +995,7 @@ registry.register(EditAMoleculeInput)
 
 #-----------------------------------------------------------------------------
 
+
 class DesignProtein2dInput(InputTypeBase):
     """
     An input type for design of a protein in 2D. Integrates with the Protex java applet.
@@ -968,6 +1030,7 @@ class DesignProtein2dInput(InputTypeBase):
 registry.register(DesignProtein2dInput)
 
 #-----------------------------------------------------------------------------
+
 
 class EditAGeneInput(InputTypeBase):
     """
@@ -1005,6 +1068,7 @@ registry.register(EditAGeneInput)
 
 #---------------------------------------------------------------------
 
+
 class AnnotationInput(InputTypeBase):
     """
     Input type for annotations: students can enter some notes or other text
@@ -1037,13 +1101,14 @@ class AnnotationInput(InputTypeBase):
     def setup(self):
         xml = self.xml
 
-        self.debug = False # set to True to display extra debug info with input
-        self.return_to_annotation = True # return only works in conjunction with annotatable xmodule
+        self.debug = False  # set to True to display extra debug info with input
+        self.return_to_annotation = True  # return only works in conjunction with annotatable xmodule
 
         self.title = xml.findtext('./title', 'Annotation Exercise')
         self.text = xml.findtext('./text')
         self.comment = xml.findtext('./comment')
-        self.comment_prompt = xml.findtext('./comment_prompt', 'Type a commentary below:')
+        self.comment_prompt = xml.findtext(
+            './comment_prompt', 'Type a commentary below:')
         self.tag_prompt = xml.findtext('./tag_prompt', 'Select one tag:')
         self.options = self._find_options()
 
@@ -1061,7 +1126,7 @@ class AnnotationInput(InputTypeBase):
                 'id': index,
                 'description': option.text,
                 'choice': option.get('choice')
-            } for (index, option) in enumerate(elements) ]
+                } for (index, option) in enumerate(elements)]
 
     def _validate_options(self):
         ''' Raises a ValueError if the choice attribute is missing or invalid. '''
@@ -1071,7 +1136,8 @@ class AnnotationInput(InputTypeBase):
             if choice is None:
                 raise ValueError('Missing required choice attribute.')
             elif choice not in valid_choices:
-                raise ValueError('Invalid choice attribute: {0}. Must be one of: {1}'.format(choice, ', '.join(valid_choices)))
+                raise ValueError('Invalid choice attribute: {0}. Must be one of: {1}'.format(
+                    choice, ', '.join(valid_choices)))
 
     def _unpack(self, json_value):
         ''' Unpacks the json input state into a dict. '''
@@ -1089,20 +1155,20 @@ class AnnotationInput(InputTypeBase):
 
         return {
             'options_value': options_value,
-            'has_options_value': len(options_value) > 0, # for convenience
+            'has_options_value': len(options_value) > 0,  # for convenience
             'comment_value': comment_value,
         }
 
     def _extra_context(self):
         extra_context = {
-                'title': self.title,
-                'text': self.text,
-                'comment': self.comment,
-                'comment_prompt': self.comment_prompt,
-                'tag_prompt': self.tag_prompt,
-                'options': self.options,
-                'return_to_annotation': self.return_to_annotation,
-                'debug': self.debug
+            'title': self.title,
+            'text': self.text,
+            'comment': self.comment,
+            'comment_prompt': self.comment_prompt,
+            'tag_prompt': self.tag_prompt,
+            'options': self.options,
+            'return_to_annotation': self.return_to_annotation,
+            'debug': self.debug
         }
 
         extra_context.update(self._unpack(self.value))
@@ -1110,4 +1176,3 @@ class AnnotationInput(InputTypeBase):
         return extra_context
 
 registry.register(AnnotationInput)
-
