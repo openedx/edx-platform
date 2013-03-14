@@ -14,6 +14,10 @@
 
 <div class="wrapper-content wrapper">
 <section class="content">
+<div class="introduction">
+    <p class="copy">Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.<a href="" class="demo-checklistviz">Test Checklist Progress Visualization</a></p>
+</div>
+
 <article class="content-primary" role="main">
 <form id="course-checklists" class="course-checklists" method="post" action="">
 <h2 class="title title-3 sr">Current Checklists</h2>
@@ -21,6 +25,7 @@
 
 % for checklist in checklists:
 <section class="course-checklist" id=${'course-checklist' + str(loop.index)}>
+    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
     <header>
         <h3 class="checklist-title title-2"><i class="ss-icon ss-symbolicons-standard icon-confirm">&#x2713;</i>${checklist['short_description']}</h3>
         <span class="checklist-status status">Tasks Completed: <span class="status-count">0</span>/<span class="status-amount">4</span></span>
@@ -53,6 +58,8 @@
 % endfor
 
 <section class="course-checklist" id="course-checklist1">
+    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
+
     <header>
         <h3 class="checklist-title title-2"><i class="ss-icon ss-symbolicons-standard icon-confirm">&#x2713;</i> Getting Started with Studio</h3>
         <span class="checklist-status status">Tasks Completed: <span class="status-count">0</span>/<span class="status-amount">4</span></span>
@@ -134,6 +141,8 @@
 </section>
 
 <section class="course-checklist" id="course-checklist2">
+    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
+
     <header>
         <h3 class="checklist-title title-2"><i class="ss-icon ss-symbolicons-standard icon-confirm">&#x2713;</i> Draft a Rough Course Outline</h3>
         <span class="checklist-status status">Tasks Completed: <span class="status-count">0</span>/<span class="status-amount">7</span></span>
@@ -272,6 +281,8 @@
 </section>
 
 <section class="course-checklist" id="course-checklist3">
+    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
+
     <header>
         <h3 class="checklist-title title-2"><i class="ss-icon ss-symbolicons-standard icon-confirm">&#x2713;</i> Explore edX's Support Tools</h3>
         <span class="checklist-status status">Tasks Completed: <span class="status-count">0</span>/<span class="status-amount">4</span></span>
@@ -353,9 +364,10 @@
 </section>
 
 <section class="course-checklist" id="course-checklist4">
+    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
+
     <header>
         <h3 class="checklist-title title-2"><i class="ss-icon ss-symbolicons-standard icon-confirm">&#x2713;</i> Draft your Course Introduction</h3>
-        <span class="checklist-status status">Tasks Completed: <span class="status-count">0</span>/<span class="status-amount">4</span></span>
     </header>
 
     <ul class="list list-tasks">
@@ -364,8 +376,8 @@
                 <input type="checkbox" class="task-input" name="course-checklist4-task1" id="course-checklist4-task1" value="course-checklist4-task1 complete">
 
                 <div class="task-details">
-                    <h4 class="task-name title title-3">Drafting a Course Description/h4>
-                        <p class="task-description">Courses on edX each have their own introduction page, including a course video, description, and more. Draft the introduction students will read before deciding to enroll in your course.</p>
+                    <h4 class="task-name title title-3">Drafting a Course Description</h4>
+                    <p class="task-description">Courses on edX each have their own introduction page, including a course video, description, and more. Draft the introduction students will read before deciding to enroll in your course.</p>
                 </div>
             </label>
 
@@ -376,7 +388,7 @@
             </ul>
         </li>
 
-        <li class="task is-completed">
+        <li class="task">
             <label for="course-checklist4-task2">
                 <input type="checkbox" class="task-input" name="course-checklist4-task2" id="course-checklist4-task2" value="course-checklist4-task2 complete">
 
@@ -444,6 +456,8 @@
 <h2 class="title title-3 sr">Completed Checklists</h2>
 
 <section class="course-checklist is-completed" id="course-checklist5">
+    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
+
     <header>
         <h3 class="checklist-title title-2"><i class="ss-icon ss-symbolicons-standard icon-confirm">&#x2713;</i> Completed Checklist Example</h3>
         <span class="checklist-status status">Tasks Completed: <span class="status-count">3</span>/<span class="status-amount">3</span></span>
@@ -590,6 +604,12 @@
 
         $('.course-checklist .task label').each(function(e){
             $(this).bind('click', toggleTask);
+        });
+
+        // demo/proof of concept for visual progress
+        $('.demo-checklistviz').click(function(e){
+            (e).preventDefault();
+            $('#course-checklist1 .viz-checklist-status .viz-checklist-status-value').css('width','25%');
         });
 
         function toggleChecklist(e) {
