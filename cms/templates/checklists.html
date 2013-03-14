@@ -97,7 +97,7 @@
           <ol>
             % for checklist in checklists:
             <li class="nav-item">
-              <a href="${'#course-checklist' + str(loop.index)}">${checklist['short_description']}</a>
+              <a rel="view" href="${'#course-checklist' + str(loop.index)}">${checklist['short_description']}</a>
             </li>
             % endfor
           </ol>

@@ -49,6 +49,9 @@ $(document).ready(function () {
         (e).preventDefault();
     });
 
+    // smooth scrolling page links
+    $('a[rel*="view"]').smoothScroll({offset: -200, easing: 'swing', speed: 2000});
+
     // nav - dropdown related
     $body.click(function (e) {
         $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
