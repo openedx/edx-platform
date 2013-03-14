@@ -12,6 +12,12 @@ def view_problem(step, problem_type):
 
 @step(u'I answer a "([^"]*)" problem "([^"]*)ly"')
 def answer_problem(step, problem_type, correctness):
+    """ Mark a given problem type correct or incorrect, then submit it.
+
+    *problem_type* is a string representing the type of problem (e.g. 'drop down')
+    *correctness* is in ['correct', 'incorrect']
+    """
+
     assert(correctness in ['correct', 'incorrect'])
 
     if problem_type == "drop down":
@@ -44,6 +50,7 @@ def answer_problem(step, problem_type, correctness):
         textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
         inputfield('formula').fill(textvalue)
 
+    # Submit the problem
     check_problem(step)
 
 @step(u'I check a problem')
@@ -56,46 +63,70 @@ def reset_problem(step):
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')
 def assert_answer_mark(step, problem_type, correctness):
+    """ Assert that the expected answer mark is visible for a given problem type.
+
+    *problem_type* is a string identifying the type of problem (e.g. 'drop down')
+    *correctness* is in ['correct', 'incorrect', 'unanswered']
+
+    Asserting that a problem is marked 'unanswered' means that
+    the problem is NOT marked correct and NOT marked incorrect.
+    This can occur, for example, if the user has reset the problem.  """
+
+    # Dictionaries that map problem types to the css selectors
+    # for correct/incorrect marks.  
+    # The elements are lists of selectors because a particular problem type
+    # might be marked in multiple ways.  
+    # For example, multiple choice is marked incorrect differently 
+    # depending on whether the user selects an incorrect 
+    # item or submits without selecting any item)
+    correct_selectors = { 'drop down': ['span.correct'],
+                           'multiple choice': ['label.choicegroup_correct'],
+                            'checkbox': ['span.correct'],
+                            'string': ['div.correct'],
+                            'numerical': ['div.correct'],
+                            'formula': ['div.correct'], }
+
+    incorrect_selectors = { 'drop down': ['span.incorrect'],
+                           'multiple choice': ['label.choicegroup_incorrect', 
+                                                'span.incorrect'],
+                            'checkbox': ['span.incorrect'],
+                            'string': ['div.incorrect'],
+                            'numerical': ['div.incorrect'],
+                            'formula': ['div.incorrect'], }
+
     assert(correctness in ['correct', 'incorrect', 'unanswered'])
+    assert(problem_type in correct_selectors and problem_type in incorrect_selectors)
 
-    if problem_type == "multiple choice":
-        if correctness == 'unanswered':
-            mark_classes = ['label.choicegroup_correct', 'label.choicegroup_incorrect',
-                            'span.correct', 'span.incorrect']
-            for css in mark_classes:
-                assert(world.browser.is_element_not_present_by_css(css))
-                    
-        else:
-            if correctness == 'correct':
-                mark_class = '.choicegroup_correct'
-                assert(world.browser.is_element_present_by_css(mark_class, wait_time=4))
+    # Assert that the question has the expected mark
+    # (either correct or incorrect)
+    if correctness in ["correct", "incorrect"]:
 
-            else:
-                # Two ways to be marked incorrect: either applying a 
-                # class to the label (marking a particular option)
-                # or applying a class to a span (marking the whole problem incorrect)
-                mark_classes = ['label.choicegroup_incorrect', 'span.incorrect']
-                assert(world.browser.is_element_present_by_css(mark_classes[0], wait_time=4) or
-                        world.browser.is_element_present_by_css(mark_classes[1], wait_time=4))
+        selector_dict = correct_selectors if correctness == "correct" else incorrect_selectors
 
-    elif problem_type in ["string", "numerical", "formula"]:
-        if correctness == 'unanswered':
-            assert(world.browser.is_element_not_present_by_css('div.correct'))
-            assert(world.browser.is_element_not_present_by_css('div.incorrect'))
-        else:
-            mark_class = 'div.correct' if correctness == 'correct' else 'div.incorrect'
-            assert(world.browser.is_element_present_by_css(mark_class, wait_time=4))
+        # At least one of the correct selectors should be present
+        for sel in selector_dict[problem_type]:
+            has_expected_mark = world.browser.is_element_present_by_css(sel, wait_time=4)
 
+            # As soon as we find the selector, break out of the loop
+            if has_expected_mark:
+                break
+
+        # Expect that we found the right mark (correct or incorrect)
+        assert(has_expected_mark)
+
+    # Assert that the question has neither correct nor incorrect
+    # because it is unanswered (possibly reset)
     else:
-        if correctness == 'unanswered':
-            assert(world.browser.is_element_not_present_by_css('span.correct'))
-            assert(world.browser.is_element_not_present_by_css('span.incorrect'))
+        # Get all the correct/incorrect selectors for this problem type
+        selector_list = correct_selectors[problem_type] + incorrect_selectors[problem_type]
 
-        else:
-            mark_class = 'span.correct' if correctness == 'correct' else 'span.incorrect'
-            assert(world.browser.is_element_present_by_css(mark_class, wait_time=4))
+        # Assert that none of the correct/incorrect selectors are present
+        for sel in selector_list:
+            assert(world.browser.is_element_not_present_by_css(sel, wait_time=4))
+
 
 def problem_url(problem_type):
+    """ Construct a url to a page with the given problem type """
     base = '/courses/edX/model_course/2013_Spring/courseware/Problem_Components/'
     url_extensions = { 'drop down': 'Drop_Down_Problems',
                    'multiple choice': 'Multiple_Choice_Problems',
@@ -110,6 +141,13 @@ def problem_url(problem_type):
 
 
 def inputfield(problem_type, choice=None):
+    """ Return the <input> element for *problem_type*.
+    For example, if problem_type is 'string', return
+    the text field for the string problem in the test course.
+
+    *choice* is the name of the checkbox input in a group
+    of checkboxes. """
+
     field_extensions = { 'drop down': 'Drop_Down_Problem',
                            'multiple choice': 'Multiple_Choice_Problem',
                             'checkbox': 'Checkbox_Problem', 
