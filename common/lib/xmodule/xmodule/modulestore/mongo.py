@@ -24,7 +24,6 @@ from .exceptions import (ItemNotFoundError,
                          DuplicateItemError)
 from .inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
 
-
 log = logging.getLogger(__name__)
 
 # TODO (cpennington): This code currently operates under the assumption that
@@ -216,7 +215,7 @@ class MongoModuleStore(ModuleStoreBase):
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, **kwargs):
+                 user=None, password=None, metadata_inheritance_cache=None, **kwargs):
 
         ModuleStoreBase.__init__(self)
 
@@ -247,7 +246,10 @@ class MongoModuleStore(ModuleStoreBase):
         self.fs_root = path(fs_root)
         self.error_tracker = error_tracker
         self.render_template = render_template
-        self.metadata_inheritance_cache = {}
+        if metadata_inheritance_cache is None:
+            logging.warning('metadata_inheritance_cache is None. Should be defined (unless running unit tests). Check config files....')
+
+        self.metadata_inheritance_cache = metadata_inheritance_cache
 
     def get_metadata_inheritance_tree(self, location):
         '''
@@ -255,18 +257,14 @@ class MongoModuleStore(ModuleStoreBase):
         '''
 
         # get all collections in the course, this query should not return any leaf nodes
+        # note this is a bit ugly as when we add new categories of containers, we have to add it here
         query = {
                     '_id.org': location.org,
                     '_id.course': location.course,
-                    '$or': [
-                    {"_id.category":"course"},
-                    {"_id.category":"chapter"},
-                    {"_id.category":"sequential"},
-                    {"_id.category":"vertical"}
-                ]
+                    '_id.category': {'$in': [ 'course', 'chapter', 'sequential', 'vertical']}
                 }
         # we just want the Location, children, and metadata
-        record_filter = {'_id':1,'definition.children':1,'metadata':1}
+        record_filter = {'_id': 1, 'definition.children': 1, 'metadata': 1}
 
         # call out to the DB
         resultset = self.collection.find(query, record_filter)
@@ -284,7 +282,13 @@ class MongoModuleStore(ModuleStoreBase):
         # now traverse the tree and compute down the inherited metadata
         metadata_to_inherit = {}
         def _compute_inherited_metadata(url):
-            my_metadata = results_by_url[url]['metadata']
+            my_metadata = {}
+            # check for presence of metadata key. Note that a given module may not yet be fully formed.
+            # example: update_item -> update_children -> update_metadata sequence on new item create
+            # if we get called here without update_metadata called first then 'metadata' hasn't been set
+            # as we're not fully transactional at the DB layer. Same comment applies to below key name
+            # check
+            my_metadata = results_by_url[url].get('metadata', {})
             for key in my_metadata.keys():
                 if key not in INHERITABLE_METADATA:
                     del my_metadata[key]
@@ -295,7 +299,7 @@ class MongoModuleStore(ModuleStoreBase):
             for child in results_by_url[url].get('definition',{}).get('children',[]):
                 if child in results_by_url:
                     new_child_metadata = copy.deepcopy(my_metadata)
-                    new_child_metadata.update(results_by_url[child]['metadata'])
+                    new_child_metadata.update(results_by_url[child].get('metadata', {}))
                     results_by_url[child]['metadata'] = new_child_metadata
                     metadata_to_inherit[child] = new_child_metadata
                     _compute_inherited_metadata(child)
@@ -306,28 +310,30 @@ class MongoModuleStore(ModuleStoreBase):
         if root is not None:
             _compute_inherited_metadata(root)
 
-        cache = {'parent_metadata': metadata_to_inherit,
+        return {'parent_metadata': metadata_to_inherit,
             'timestamp' : datetime.now()}
 
-        return cache
-
-    def get_cached_metadata_inheritance_tree(self, location, max_age_allowed):
+    def get_cached_metadata_inheritance_tree(self, location, force_refresh=False):
         '''
         TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
         '''
-        cache_name = '{0}/{1}'.format(location.org, location.course)
-        cache = self.metadata_inheritance_cache.get(cache_name,{'parent_metadata': {},
-            'timestamp': datetime.now() - timedelta(hours=1)})
-        age = (datetime.now() - cache['timestamp'])
+        key_name = '{0}/{1}'.format(location.org, location.course)
 
-        if age.seconds >= max_age_allowed:
-            logging.debug('loading entire inheritance tree for {0}'.format(cache_name))
-            cache = self.get_metadata_inheritance_tree(location)
-            self.metadata_inheritance_cache[cache_name] = cache
+        tree = None
+        if self.metadata_inheritance_cache is not None:
+            tree = self.metadata_inheritance_cache.get(key_name)
 
-        return cache
+        if tree is None or force_refresh:
+            tree = self.get_metadata_inheritance_tree(location)
+            if self.metadata_inheritance_cache is not None:
+                self.metadata_inheritance_cache.set(key_name, tree)
 
+        return tree
 
+    def clear_cached_metadata_inheritance_tree(self, location):
+        key_name = '{0}/{1}'.format(location.org, location.course)       
+        if self.metadata_inheritance_cache is not None:
+            self.metadata_inheritance_cache.delete(key_name)
 
     def _clean_item_data(self, item):
         """
@@ -387,7 +393,7 @@ class MongoModuleStore(ModuleStoreBase):
         # if we are loading a course object, there is no parent to inherit the metadata from
         # so don't bother getting it
         if item['location']['category'] != 'course':
-            metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']), 300)
+            metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']))
 
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
@@ -513,6 +519,9 @@ class MongoModuleStore(ModuleStoreBase):
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(location)
 
+        # recompute (and update) the metadata inheritance tree which is cached
+        self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)
+
     def get_course_for_item(self, location, depth=0):
         '''
         VS[compat]
@@ -577,6 +586,8 @@ class MongoModuleStore(ModuleStoreBase):
         """
 
         self._update_single_item(location, {'definition.children': children})
+        # recompute (and update) the metadata inheritance tree which is cached
+        self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)
 
     def update_metadata(self, location, metadata):
         """
@@ -601,7 +612,8 @@ class MongoModuleStore(ModuleStoreBase):
             self.update_metadata(course.location, own_metadata(course))
 
         self._update_single_item(location, {'metadata': metadata})
-
+        # recompute (and update) the metadata inheritance tree which is cached
+        self.get_cached_metadata_inheritance_tree(loc, force_refresh = True)      
 
     def delete_item(self, location):
         """
@@ -620,6 +632,8 @@ class MongoModuleStore(ModuleStoreBase):
             self.update_metadata(course.location, own_metadata(course))
 
         self.collection.remove({'_id': Location(location).dict()})
+        # recompute (and update) the metadata inheritance tree which is cached
+        self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)  
 
 
     def get_parent_locations(self, location, course_id):

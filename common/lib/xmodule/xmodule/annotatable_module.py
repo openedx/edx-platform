@@ -5,8 +5,6 @@ from pkg_resources import resource_string, resource_listdir
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.mongo import MongoModuleStore
-from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xblock.core import Scope, String
 
