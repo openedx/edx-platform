@@ -297,10 +297,7 @@ def edit_unit(request, location):
     # in ADVANCED_COMPONENT_TYPES that should be enabled for the course.
     course_metadata = CourseMetadata.fetch(course.location)
     course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, [])
-    log.debug(course.tabs)
-    log.debug(type(course.tabs))
-    log.debug("LOOK HERE NOW!!!!!")
-
+    
     # Set component types according to course policy file
     component_types = list(COMPONENT_TYPES)
     if isinstance(course_advanced_keys, list):
@@ -1337,21 +1334,14 @@ def course_advanced_updates(request, org, course, name):
         request_body = json.loads(request.body)
         filter_tabs = True
         if ADVANCED_COMPONENT_POLICY_KEY in request_body:
-            log.debug("Advanced component in.")
             for oe_type in OPEN_ENDED_COMPONENT_TYPES:
-                log.debug(request_body[ADVANCED_COMPONENT_POLICY_KEY])
                 if oe_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
-                    log.debug("OE type in.")
                     course_module = modulestore().get_item(location)
                     changed, new_tabs = add_open_ended_panel_tab(course_module)
-                    log.debug(new_tabs)
                     if changed:
                         request_body.update({'tabs' : new_tabs})
                     filter_tabs = False
                     break
-        log.debug(request_body)
-        log.debug(filter_tabs)
-        log.debug("LOOK HERE FOR TAB SAVING!!!!")
         response_json = json.dumps(CourseMetadata.update_from_json(location, request_body, filter_tabs=filter_tabs))
         return HttpResponse(response_json, mimetype="application/json")
 
