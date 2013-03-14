@@ -61,6 +61,7 @@ body.course.checklists {
         float: left;
 
         .ui-toggle-expansion {
+          @include transition(rotate .15s ease-in-out .25s);
           @include font-size(14);
           display: inline-block;
           vertical-align: middle;
