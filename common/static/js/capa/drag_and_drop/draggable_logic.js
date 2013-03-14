@@ -354,7 +354,11 @@ return {
             'width': this.iconWidthSmall,
             'height': this.iconHeightSmall,
             'left': 50 - this.iconWidthSmall * 0.5,
-            'top': ((this.labelEl !== null) ? 5 : 50 - this.iconHeightSmall * 0.5)
+
+            // Before:
+            // 'top': ((this.labelEl !== null) ? (100 - this.iconHeightSmall - 25) * 0.5 : 50 - this.iconHeightSmall * 0.5)
+            // After:
+            'top': ((this.labelEl !== null) ? 37.5 : 50.0) - 0.5 * this.iconHeightSmall
         });
         this.iconEl.appendTo(this.containerEl);
 
@@ -367,7 +371,11 @@ return {
                 'padding-right': 0,
                 'z-index': this.zIndex,
                 'left': 50 - this.labelWidth * 0.5,
-                'top': 5 + this.iconHeightSmall + 5
+
+                // Before:
+                // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
+                // After:
+                'top': 42.5 + 0.5 * this.iconHeightSmall
             });
             this.labelEl.appendTo(this.containerEl);
         }
