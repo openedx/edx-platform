@@ -56,20 +56,12 @@ body.course.checklists {
 
       .checklist-title {
         @include transition(color .15s .25s ease-in-out);
-        width: flex-grid(7, 9);
+        width: flex-grid(6, 9);
         margin: 0 flex-gutter() 0 0;
         float: left;
 
         .ui-toggle-expansion {
           @include font-size(14);
-          display: inline-block;
-          vertical-align: middle;
-          margin-right: $baseline;
-          color: $gray-l4;
-        }
-
-        .icon-confirm {
-          @include font-size(20);
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/2);
@@ -91,11 +83,20 @@ body.course.checklists {
 
       .checklist-status {
         @include font-size(13);
-        width: flex-grid(2, 9);
+        width: flex-grid(3, 9);
         float: right;
         margin-top: ($baseline/2);
         text-align: right;
         color: $gray-l2;
+        
+
+        .icon-confirm {
+          @include font-size(20);
+          display: inline-block;
+          vertical-align: middle;
+          margin-left: ($baseline/2);
+          color: $gray-l4;
+        }
 
         .status-count {
           @include font-size(16);
@@ -192,13 +193,6 @@ body.course.checklists {
             color: $green;          
           }
         }
-
-        .checklist-status .icon-confirm {
-          @include font-size(12);
-          display: inline-block;
-          vertical-align: middle;
-          margin-right: ($baseline/4);
-        }
       }
     }
 
@@ -230,41 +224,38 @@ body.course.checklists {
         border-bottom: none;
       }
 
-      label {
+      .task-input {
+        display: inline-block;
+        vertical-align: text-top;
         float: left;
-        width: flex-grid(7,9);
+        margin: ($baseline/2) flex-gutter() 0 0;
+      }
+
+      .task-details {
+        display: inline-block;
+        vertical-align: text-top;
+        float: left;
+        width: flex-grid(6,9);
         font-weight: 500;
 
-        .task-input {
-          display: inline-block;
-          vertical-align: text-top;
-          margin: ($baseline/2) flex-gutter() 0 0;
+        .task-name {
+          @include transition(color .15s .25s ease-in-out);
+          vertical-align: baseline;
+          cursor: pointer;
+          margin-bottom: 0;
+        }   
+
+        .task-description {
+          @include transition(color .15s .25s ease-in-out);
+          @include font-size(14);
+          color: $gray-l2;
         }
 
-        .task-details {
-          display: inline-block;
-          vertical-align: text-top;
-          width: flex-grid(6,7);
-
-          .task-name {
-            @include transition(color .15s .25s ease-in-out);
-            vertical-align: baseline;
-            cursor: pointer;
-            margin-bottom: 0;
-          }   
-
-          .task-description {
-            @include transition(color .15s .25s ease-in-out);
-            @include font-size(14);
-            color: $gray-l2;
-          }
-
-          .task-support {
-            @include transition(opacity .15s .25s ease-in-out);
-            @include font-size(12);
-            opacity: 0;
-            pointer-events: none;
-          }
+        .task-support {
+          @include transition(opacity .15s .25s ease-in-out);
+          @include font-size(12);
+          opacity: 0;
+          pointer-events: none;
         }
       }
 
@@ -273,7 +264,7 @@ body.course.checklists {
         @include clearfix();
         display: inline-block;
         vertical-align: middle;
-        float: left;
+        float: right;
         width: flex-grid(2,9);
         margin: ($baseline/2) 0 0 flex-gutter();
         opacity: 0;
