@@ -214,7 +214,11 @@ define(['logme', 'draggable_events', 'draggable_logic'], function (logme, dragga
                     'width': draggableObj.iconWidthSmall,
                     'height': draggableObj.iconHeightSmall,
                     'left': 50 - draggableObj.iconWidthSmall * 0.5,
-                    'top': ((obj.label.length > 0) ? 5 : 50 - draggableObj.iconHeightSmall * 0.5)
+
+                    // Before:
+                    // 'top': ((obj.label.length > 0) ? (100 - draggableObj.iconHeightSmall - 25) * 0.5 : 50 - draggableObj.iconHeightSmall * 0.5)
+                    // After:
+                    'top': ((obj.label.length > 0) ? 37.5 : 50.0) - 0.5 * draggableObj.iconHeightSmall
                 });
                 draggableObj.iconImgEl.css({
                     'position': 'absolute',
@@ -243,7 +247,11 @@ define(['logme', 'draggable_events', 'draggable_logic'], function (logme, dragga
                     draggableObj.labelWidth = draggableObj.labelEl.width();
                     draggableObj.labelEl.css({
                         'left': 50 - draggableObj.labelWidth * 0.5,
-                        'top': 5 + draggableObj.iconHeightSmall + 5
+
+                        // Before:
+                        // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
+                        // After:
+                        'top': 42.5 + 0.5 * draggableObj.iconHeightSmall
                     });
 
                     draggableObj.attachMouseEventsTo('labelEl');
