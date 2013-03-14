@@ -297,7 +297,7 @@ def edit_unit(request, location):
     # in ADVANCED_COMPONENT_TYPES that should be enabled for the course.
     course_metadata = CourseMetadata.fetch(course.location)
     course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, [])
-    
+
     # Set component types according to course policy file
     component_types = list(COMPONENT_TYPES)
     if isinstance(course_advanced_keys, list):
@@ -310,7 +310,6 @@ def edit_unit(request, location):
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
         category = template.location.category
-
         if category in course_advanced_keys:
             category = ADVANCED_COMPONENT_CATEGORY
 
@@ -1332,15 +1331,24 @@ def course_advanced_updates(request, org, course, name):
     elif real_method == 'POST' or real_method == 'PUT':
         # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
         request_body = json.loads(request.body)
+        #Whether or not to filter the tabs key out of the settings metadata
         filter_tabs = True
+        #Check to see if the user instantiated any advanced components.  This is a hack to add the open ended panel tab
+        #to a course automatically if the user has indicated that they want to edit the combinedopenended or peergrading
+        #module.
         if ADVANCED_COMPONENT_POLICY_KEY in request_body:
+            #Check to see if the user instantiated any open ended components
             for oe_type in OPEN_ENDED_COMPONENT_TYPES:
                 if oe_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
+                    #Get the course so that we can scrape current tabs
                     course_module = modulestore().get_item(location)
+                    #Add an open ended tab to the course if needed
                     changed, new_tabs = add_open_ended_panel_tab(course_module)
+                    #If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
                     if changed:
                         request_body.update({'tabs' : new_tabs})
-                    filter_tabs = False
+                        #Indicate that tabs should not be filtered out of the metadata
+                        filter_tabs = False
                     break
         response_json = json.dumps(CourseMetadata.update_from_json(location, request_body, filter_tabs=filter_tabs))
         return HttpResponse(response_json, mimetype="application/json")
