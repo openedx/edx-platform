@@ -418,7 +418,7 @@ class CapaModule(XModule):
         # if we want to show a check button, and False otherwise
         # This works because non-empty strings evaluate to True
         if self.should_show_check_button():
-            check_button = self.check_button_name() 
+            check_button = self.check_button_name()
         else:
             check_button = False
 
@@ -571,7 +571,7 @@ class CapaModule(XModule):
         else:
             answers = self.lcp.get_question_answers()
 
-	    # answers (eg <solution>) may have embedded images
+            # answers (eg <solution>) may have embedded images
         #   but be careful, some problems are using non-string answer dicts
         new_answers = dict()
         for answer_id in answers:
@@ -621,7 +621,7 @@ class CapaModule(XModule):
             to 'input_1' in the returned dict)
         '''
         answers = dict()
-        
+
         for key in get:
             # e.g. input_resistor_1 ==> resistor_1
             _, _, name = key.partition('_')
@@ -744,7 +744,7 @@ class CapaModule(XModule):
         event_info['answers'] = answers
 
         # Too late. Cannot submit
-        if self.closed() and not self.max_attempts==0:
+        if self.closed() and not self.max_attempts ==0:
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
@@ -762,7 +762,7 @@ class CapaModule(XModule):
 
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"
-        if not self.max_attempts==0:
+        if not self.max_attempts ==0:
             msg += " but not graded. Hit 'Check' to grade them."
         return {'success': True,
                 'msg': msg}
@@ -799,7 +799,7 @@ class CapaModule(XModule):
             # reset random number generator seed (note the self.lcp.get_state()
             # in next line)
             self.lcp.seed = None
-    
+
 
         self.lcp = LoncapaProblem(self.definition['data'],
                                   self.location.html_id(), self.lcp.get_state(),
@@ -808,7 +808,7 @@ class CapaModule(XModule):
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)
 
-        return { 'success': True,
+        return {'success': True,
                 'html': self.get_problem_html(encapsulate=False)}
 
 
@@ -836,13 +836,13 @@ class CapaDescriptor(RawDescriptor):
     def get_context(self):
         _context = RawDescriptor.get_context(self)
         _context.update({'markdown': self.metadata.get('markdown', ''),
-                         'enable_markdown' : 'markdown' in self.metadata})
+                         'enable_markdown': 'markdown' in self.metadata})
         return _context
 
     @property
     def editable_metadata_fields(self):
         """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
-        subset = [field for field in super(CapaDescriptor,self).editable_metadata_fields
+        subset = [field for field in super(CapaDescriptor, self).editable_metadata_fields
                   if field not in ['markdown', 'empty']]
         return subset
 

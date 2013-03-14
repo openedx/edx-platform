@@ -356,7 +356,7 @@ class CapaModuleTest(unittest.TestCase):
         valid_get_dict = self._querydict_from_dict({'input_2[]': ['test1', 'test2']})
         result = CapaModule.make_dict_of_responses(valid_get_dict)
         self.assertTrue('2' in result)
-        self.assertEqual(['test1','test2'], result['2'])
+        self.assertEqual(['test1', 'test2'], result['2'])
 
         # If we use [] at the end of a key name, we should always
         # get a list, even if there's just one value
@@ -374,7 +374,7 @@ class CapaModuleTest(unittest.TestCase):
         # One of the values would overwrite the other, so detect this
         # and raise an exception
         invalid_get_dict = self._querydict_from_dict({'input_1[]': 'test 1',
-                                                    'input_1': 'test 2' })
+                                                    'input_1': 'test 2'})
         with self.assertRaises(ValueError):
             result = CapaModule.make_dict_of_responses(invalid_get_dict)
 
@@ -412,7 +412,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_html.return_value = "Test HTML"
 
             # Check the problem
-            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            get_request_dict = { CapaFactory.input_key(): '3.14'}
             result = module.check_problem(get_request_dict)
 
         # Expect that the problem is marked correct
@@ -434,7 +434,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_is_correct.return_value = False
 
             # Check the problem
-            get_request_dict = { CapaFactory.input_key(): '0' }
+            get_request_dict = { CapaFactory.input_key(): '0'}
             result = module.check_problem(get_request_dict)
 
         # Expect that the problem is marked correct
@@ -452,7 +452,7 @@ class CapaModuleTest(unittest.TestCase):
         with patch('xmodule.capa_module.CapaModule.closed') as mock_closed:
             mock_closed.return_value = True
             with self.assertRaises(xmodule.exceptions.NotFoundError):
-                get_request_dict = { CapaFactory.input_key(): '3.14' }
+                get_request_dict = { CapaFactory.input_key(): '3.14'}
                 module.check_problem(get_request_dict)
 
         # Expect that number of attempts NOT incremented
@@ -468,7 +468,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that we cannot submit
         with self.assertRaises(xmodule.exceptions.NotFoundError):
-            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            get_request_dict = { CapaFactory.input_key(): '3.14'}
             module.check_problem(get_request_dict)
 
         # Expect that number of attempts NOT incremented
@@ -483,7 +483,7 @@ class CapaModuleTest(unittest.TestCase):
         module.lcp.done = True
 
         # Expect that we can submit successfully
-        get_request_dict = { CapaFactory.input_key(): '3.14' }
+        get_request_dict = { CapaFactory.input_key(): '3.14'}
         result = module.check_problem(get_request_dict)
 
         self.assertEqual(result['success'], 'correct')
@@ -504,7 +504,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_is_queued.return_value = True
             mock_get_queuetime.return_value = datetime.datetime.now()
 
-            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            get_request_dict = { CapaFactory.input_key(): '3.14'}
             result = module.check_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
@@ -521,7 +521,7 @@ class CapaModuleTest(unittest.TestCase):
         with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
             mock_grade.side_effect = capa.responsetypes.StudentInputError('test error')
 
-            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            get_request_dict = { CapaFactory.input_key(): '3.14'}
             result = module.check_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
@@ -595,11 +595,11 @@ class CapaModuleTest(unittest.TestCase):
         module.lcp.done = False
 
         # Save the problem
-        get_request_dict = { CapaFactory.input_key(): '3.14' }
+        get_request_dict = { CapaFactory.input_key(): '3.14'}
         result = module.save_problem(get_request_dict)
 
         # Expect that answers are saved to the problem
-        expected_answers = { CapaFactory.answer_key(): '3.14' }
+        expected_answers = { CapaFactory.answer_key(): '3.14'}
         self.assertEqual(module.lcp.student_answers, expected_answers)
 
         # Expect that the result is success
@@ -617,7 +617,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_closed.return_value = True
 
             # Try to save the problem
-            get_request_dict = { CapaFactory.input_key(): '3.14' }
+            get_request_dict = { CapaFactory.input_key(): '3.14'}
             result = module.save_problem(get_request_dict)
 
         # Expect that the result is failure
@@ -631,7 +631,7 @@ class CapaModuleTest(unittest.TestCase):
         module.lcp.done = True
 
         # Try to save
-        get_request_dict = { CapaFactory.input_key(): '3.14' }
+        get_request_dict = { CapaFactory.input_key(): '3.14'}
         result = module.save_problem(get_request_dict)
 
         # Expect that we cannot save
@@ -645,7 +645,7 @@ class CapaModuleTest(unittest.TestCase):
         module.lcp.done = True
 
         # Try to save
-        get_request_dict = { CapaFactory.input_key(): '3.14' }
+        get_request_dict = { CapaFactory.input_key(): '3.14'}
         result = module.save_problem(get_request_dict)
 
         # Expect that we succeed
@@ -657,7 +657,7 @@ class CapaModuleTest(unittest.TestCase):
         # Just in case, we also check what happens if we have
         # more attempts than allowed.
         attempts = random.randint(1, 10)
-        module = CapaFactory.create(attempts=attempts-1, max_attempts=attempts)
+        module = CapaFactory.create(attempts=attempts -1, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Final Check")
 
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
@@ -667,14 +667,14 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(module.check_button_name(), "Final Check")
 
         # Otherwise, button name is "Check"
-        module = CapaFactory.create(attempts=attempts-2, max_attempts=attempts)
+        module = CapaFactory.create(attempts=attempts -2, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Check")
 
-        module = CapaFactory.create(attempts=attempts-3, max_attempts=attempts)
+        module = CapaFactory.create(attempts=attempts -3, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Check")
 
         # If no limit on attempts, then always show "Check"
-        module = CapaFactory.create(attempts=attempts-3)
+        module = CapaFactory.create(attempts=attempts -3)
         self.assertEqual(module.check_button_name(), "Check")
 
         module = CapaFactory.create(attempts=0)
@@ -682,7 +682,7 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_should_show_check_button(self):
 
-        attempts = random.randint(1,10)
+        attempts = random.randint(1, 10)
 
         # If we're after the deadline, do NOT show check button
         module = CapaFactory.create(due=self.yesterday_str)
@@ -718,7 +718,7 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_should_show_reset_button(self):
 
-        attempts = random.randint(1,10)
+        attempts = random.randint(1, 10)
 
         # If we're after the deadline, do NOT show the reset button
         module = CapaFactory.create(due=self.yesterday_str)
@@ -755,7 +755,7 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_should_show_save_button(self):
 
-        attempts = random.randint(1,10)
+        attempts = random.randint(1, 10)
 
         # If we're after the deadline, do NOT show the save button
         module = CapaFactory.create(due=self.yesterday_str)
@@ -808,7 +808,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertFalse(module.should_show_save_button())
 
         # If the user is out of attempts, do NOT show the save button
-        attempts = random.randint(1,10)
+        attempts = random.randint(1, 10)
         module = CapaFactory.create(attempts=attempts,
                                     max_attempts=attempts,
                                     force_save_button="true")
@@ -834,9 +834,9 @@ class CapaModuleTest(unittest.TestCase):
 
         # We've tested the show/hide button logic in other tests,
         # so here we hard-wire the values
-        show_check_button = bool(random.randint(0,1) % 2)
-        show_reset_button = bool(random.randint(0,1) % 2)
-        show_save_button = bool(random.randint(0,1) % 2)
+        show_check_button = bool(random.randint(0, 1) % 2)
+        show_reset_button = bool(random.randint(0, 1) % 2)
+        show_save_button = bool(random.randint(0, 1) % 2)
 
         module.should_show_check_button = Mock(return_value=show_check_button)
         module.should_show_reset_button = Mock(return_value=show_reset_button)
@@ -859,7 +859,7 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(html, "<div>Test Template HTML</div>")
 
         # Check the rendering context
-        render_args,_ = module.system.render_template.call_args
+        render_args, _ = module.system.render_template.call_args
         self.assertEqual(len(render_args), 2)
 
         template_name = render_args[0]
@@ -900,7 +900,7 @@ class CapaModuleTest(unittest.TestCase):
         html = module.get_problem_html()
 
         # Check the rendering context
-        render_args,_ = module.system.render_template.call_args
+        render_args, _ = module.system.render_template.call_args
         context = render_args[1]
         self.assertTrue("error" in context['problem']['html'])
 
