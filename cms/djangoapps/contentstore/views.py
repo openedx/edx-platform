@@ -47,6 +47,7 @@ from auth.authz import is_user_in_course_group_role, get_users_in_course_group_b
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
 from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item
+from .utils import add_open_ended_panel_tab
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from contentstore.course_info_model import get_course_updates,\
@@ -68,7 +69,8 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-ADVANCED_COMPONENT_TYPES = ['annotatable','combinedopenended', 'peergrading']
+OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
+ADVANCED_COMPONENT_TYPES = ['annotatable'] + OPEN_ENDED_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -295,6 +297,9 @@ def edit_unit(request, location):
     # in ADVANCED_COMPONENT_TYPES that should be enabled for the course.
     course_metadata = CourseMetadata.fetch(course.location)
     course_advanced_keys = course_metadata.get(ADVANCED_COMPONENT_POLICY_KEY, [])
+    log.debug(course.tabs)
+    log.debug(type(course.tabs))
+    log.debug("LOOK HERE NOW!!!!!")
 
     # Set component types according to course policy file
     component_types = list(COMPONENT_TYPES)
@@ -1329,7 +1334,26 @@ def course_advanced_updates(request, org, course, name):
         return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))), mimetype="application/json")
     elif real_method == 'POST' or real_method == 'PUT':
         # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
-        return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
+        request_body = json.loads(request.body)
+        filter_tabs = True
+        if ADVANCED_COMPONENT_POLICY_KEY in request_body:
+            log.debug("Advanced component in.")
+            for oe_type in OPEN_ENDED_COMPONENT_TYPES:
+                log.debug(request_body[ADVANCED_COMPONENT_POLICY_KEY])
+                if oe_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
+                    log.debug("OE type in.")
+                    course_module = modulestore().get_item(location)
+                    changed, new_tabs = add_open_ended_panel_tab(course_module)
+                    log.debug(new_tabs)
+                    if changed:
+                        request_body.update({'tabs' : new_tabs})
+                    filter_tabs = False
+                    break
+        log.debug(request_body)
+        log.debug(filter_tabs)
+        log.debug("LOOK HERE FOR TAB SAVING!!!!")
+        response_json = json.dumps(CourseMetadata.update_from_json(location, request_body, filter_tabs=filter_tabs))
+        return HttpResponse(response_json, mimetype="application/json")
 
 
 @login_required

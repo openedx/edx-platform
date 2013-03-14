@@ -2,9 +2,10 @@ from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+import copy
 
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
-
+OPEN_ENDED_PANEL = {"name" : "Open Ended Panel", "type" : "open_ended"}
 
 def get_modulestore(location):
     """
@@ -158,3 +159,12 @@ def update_item(location, value):
         get_modulestore(location).delete_item(location)
     else:
         get_modulestore(location).update_item(location, value)
+
+def add_open_ended_panel_tab(course):
+    course_tabs = copy.copy(course.tabs)
+    changed = False
+    if OPEN_ENDED_PANEL not in course_tabs:
+        course_tabs.append(OPEN_ENDED_PANEL)
+        changed = True
+    return changed, course_tabs
+

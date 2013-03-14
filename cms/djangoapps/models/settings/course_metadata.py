@@ -1,6 +1,7 @@
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 from xmodule.x_module import XModuleDescriptor
+import copy
 
 
 class CourseMetadata(object):
@@ -30,7 +31,7 @@ class CourseMetadata(object):
         return course
 
     @classmethod
-    def update_from_json(cls, course_location, jsondict):
+    def update_from_json(cls, course_location, jsondict, filter_tabs=True):
         """
         Decode the json into CourseMetadata and save any changed attrs to the db.
         
@@ -40,9 +41,13 @@ class CourseMetadata(object):
 
         dirty = False
 
+        filtered_list = copy.copy(cls.FILTERED_LIST)
+        if not filter_tabs:
+            filtered_list.remove("tabs")
+
         for k, v in jsondict.iteritems():
             # should it be an error if one of the filtered list items is in the payload?
-            if k not in cls.FILTERED_LIST and (k not in descriptor.metadata or descriptor.metadata[k] != v):
+            if k not in filtered_list and (k not in descriptor.metadata or descriptor.metadata[k] != v):
                 dirty = True
                 descriptor.metadata[k] = v
 
