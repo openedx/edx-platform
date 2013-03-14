@@ -74,6 +74,15 @@ def to_latex(x):
     # LatexPrinter._print_dot = _print_dot
     xs = latex(x)
     xs = xs.replace(r'\XI', 'XI')	 # workaround for strange greek
+
+    # substitute back into latex form for scripts
+    # literally something of the form
+    # 'scriptN' becomes '\\mathcal{N}'
+    # note: can't use something akin to the _print_hat method above because we sometimes get 'script(N)__B' or more complicated terms
+    xs = re.sub(r'script([a-zA-Z0-9]+)',
+                '\\mathcal{\\1}',
+                xs)
+
     #return '<math>%s{}{}</math>' % (xs[1:-1])
     if xs[0] == '$':
         return '[mathjax]%s[/mathjax]<br>' % (xs[1:-1])	 # for sympy v6
@@ -106,6 +115,7 @@ def my_sympify(expr, normphase=False, matrix=False, abcsym=False, do_qubit=False
                   'i': sympy.I,			# lowercase i is also sqrt(-1)
                   'Q': sympy.Symbol('Q'),	 # otherwise it is a sympy "ask key"
                   'I': sympy.Symbol('I'),	 # otherwise it is sqrt(-1)
+                  'N': sympy.Symbol('N'),	 # or it is some kind of sympy function
                   #'X':sympy.sympify('Matrix([[0,1],[1,0]])'),
                   #'Y':sympy.sympify('Matrix([[0,-I],[I,0]])'),
                   #'Z':sympy.sympify('Matrix([[1,0],[0,-1]])'),
@@ -265,6 +275,21 @@ class formula(object):
             elif tag == 'mi': return xml.text
             elif tag == 'mrow': return ''.join([flatten_pmathml(y) for y in xml])
             raise Exception, '[flatten_pmathml] unknown tag %s' % tag
+
+        def fix_mathvariant(parent):
+            '''Fix certain kinds of math variants
+
+            Literally replace <mstyle mathvariant="script"><mi>N</mi></mstyle>
+            with 'scriptN'. There have been problems using script_N or script(N)
+            '''
+            for child in parent:
+                if (gettag(child) == 'mstyle' and child.get('mathvariant') == 'script'):
+                    newchild = etree.Element('mi')
+                    newchild.text = 'script%s' % flatten_pmathml(child[0])
+                    parent.replace(child, newchild)
+                fix_mathvariant(child)
+        fix_mathvariant(xml)
+
 
         # find "tagged" superscripts
         # they have the character \u200b in the superscript

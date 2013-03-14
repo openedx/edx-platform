@@ -19,8 +19,22 @@ This is a partial list of features, to be revised as we go along:
 
       An example of a problem::
 
-	  <symbolicresponse expect="a_b^c + b_x__d" size="30">
-            <textline math="1" preprocessorClassName="SymbolicMathjaxPreprocessor" preprocessorSrc="/static/js/capa/symbolic_mathjax_preprocessor.js"/>
-	  </symbolicresponse>
+      <symbolicresponse expect="a_b^c + b_x__d" size="30">
+        <textline math="1"
+           preprocessorClassName="SymbolicMathjaxPreprocessor"
+           preprocessorSrc="/static/js/capa/symbolic_mathjax_preprocessor.js"/>
+      </symbolicresponse>
 
       It's a bit of a pain to enter that.
+
+    * The script-style math variant. What would be outputted in latex if you
+      entered ``\mathcal{N}``. This is used in some variables.
+
+      An example::
+
+          <symbolicresponse expect="scriptN_B + x" size="30">
+            <textline math="1"/>
+          </symbolicresponse>
+
+      There is no fancy preprocessing needed, but if you had superscripts or
+      something, you would need to include that part.
