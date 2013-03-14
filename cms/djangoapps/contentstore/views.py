@@ -113,9 +113,6 @@ def howitworks(request):
     else: 
         return render_to_response('howitworks.html', {})
 
-def ux_checklists(request):
-    return render_to_response('ux-checklists.html', {})
-
 # ==== Views for any logged-in user ==================================
 
 
@@ -179,11 +176,7 @@ def course_index(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     lms_link = get_lms_link_for_item(location)
 
@@ -1071,11 +1064,7 @@ def course_info(request, org, course, name, provided_id=None):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
 
@@ -1170,11 +1159,7 @@ def get_course_settings(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
 
@@ -1197,11 +1182,7 @@ def course_config_graders_page(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
     course_details = CourseGradingModel.fetch(location)
@@ -1221,11 +1202,7 @@ def course_config_advanced_page(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
 
@@ -1280,11 +1257,7 @@ def course_grader_updates(request, org, course, name, grader_index=None):
     org, course: Attributes of the Location for the item to edit
     """
 
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
         real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
@@ -1314,11 +1287,7 @@ def course_advanced_updates(request, org, course, name):
 
     org, course: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-    
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
     if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
@@ -1335,6 +1304,27 @@ def course_advanced_updates(request, org, course, name):
         return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
 
 
+#@ensure_csrf_cookie  what is this cookie?
+@login_required
+def get_checklists(request, org, course, name):
+    location = get_location_and_verify_access(request, org, course, name)
+
+    modulestore = get_modulestore(location)
+    course_module = modulestore.get_item(location)
+    new_course_template =  Location('i4x', 'edx', 'templates', 'course', 'Empty')
+    template_module = modulestore.get_item(new_course_template)
+
+    # If course was created before checklists were introduced, copy them over from the template.
+    key = "checklists"
+    if not key in course_module.metadata:
+        course_module.metadata[key] = template_module.metadata[key]
+        modulestore.update_metadata(location, course_module.metadata)
+
+
+    return render_to_response('checklists.html',
+        {'checklists' : course_module.metadata[key]})
+
+
 @login_required
 @ensure_csrf_cookie
 def asset_index(request, org, course, name):
@@ -1343,12 +1333,7 @@ def asset_index(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
+    location = get_location_and_verify_access(request, org, course, name)
 
     upload_asset_callback_url = reverse('upload_asset', kwargs={
             'org': org,
@@ -1473,11 +1458,7 @@ def initialize_course_tabs(course):
 @login_required
 def import_course(request, org, course, name):
 
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     if request.method == 'POST':
         filename = request.FILES['course-data'].name
@@ -1550,10 +1531,7 @@ def import_course(request, org, course, name):
 @ensure_csrf_cookie
 @login_required
 def generate_export_course(request, org, course, name):
-    location = ['i4x', org, course, 'course', name]
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     loc = Location(location)
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
@@ -1586,11 +1564,9 @@ def generate_export_course(request, org, course, name):
 @login_required
 def export_course(request, org, course, name):
 
-    location = ['i4x', org, course, 'course', name]
+    location = get_location_and_verify_access(request, org, course, name)
+
     course_module = modulestore().get_item(location)
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
 
     return render_to_response('export.html', {
         'context_course': course_module,
@@ -1605,3 +1581,12 @@ def event(request):
     console logs don't get distracted :-)
     '''
     return HttpResponse(True)
+
+def get_location_and_verify_access(request, org, course, name):
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    return location

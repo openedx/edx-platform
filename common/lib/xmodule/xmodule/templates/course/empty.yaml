@@ -2,5 +2,31 @@
 metadata:
     display_name: Empty
     start: 2020-10-10T10:00
+    checklists: [
+      {"short_description" : "Getting Started With Studio",
+       "items" : [{"short_description": "Add Course Team Members",
+                   "long_description": "Grant your collaborators permission to edit your course so you can work together.",
+                   "is_checked": false,
+                   "action_url": "/manage_users/",
+                   "action_text": "Edit Course Team"},
+                  {"short_description": "Drink Whiskey",
+                   "long_description": "Team-building activity.",
+                   "is_checked": false,
+                   "action_url": "/drink_alcohol",
+                   "action_text": "Drink"}],
+       "completed" : false},
+       {"short_description" : "Launching Your Course",
+       "items" : [{"short_description": "Add Content",
+                   "long_description": "Create videos and problems.",
+                   "is_checked": false,
+                   "action_url": "",
+                   "action_text": ""},
+                   {"short_description": "View Course as a Student",
+                    "long_description": "Create a student account and view your course.",
+                    "is_checked": false,
+                    "action_url": "",
+                    "action_text": ""}],
+        "completed" : false}
+     ]
 data: { 'textbooks' : [ ], 'wiki_slug' : null }
 children: []
