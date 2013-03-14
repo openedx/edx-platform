@@ -22,7 +22,6 @@ CMS.Views.Checklists = Backbone.View.extend({
     },
 
     toggleTask : function (e) {
-        (e).preventDefault();
         $(e.target).closest('.task').toggleClass('is-completed');
     },
 

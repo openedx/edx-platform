@@ -1322,7 +1322,10 @@ def get_checklists(request, org, course, name):
 
 
     return render_to_response('checklists.html',
-        {'checklists' : course_module.metadata[key]})
+        {
+            'context_course': course_module,
+            'checklists' : course_module.metadata[key]
+        })
 
 
 @login_required
