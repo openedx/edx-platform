@@ -312,14 +312,23 @@ class CapaModule(XModule):
 
             # If the student has unlimited attempts, and their answers
             # are not randomized, then we do not need a save button
-            # because they can use the "Check" button
+            # because they can use the "Check" button without consequences.
+            #
+            # The consequences we want to avoid are:
+            # * Using up an attempt (if max_attempts is set)
+            # * Changing the current problem, and no longer being
+            #   able to view it (if rerandomize is "always")
+            #
+            # In those cases. the if statement below is false,
+            # and the save button can still be displayed.
+            #
             if self.max_attempts is None and self.rerandomize != "always":
                 return False
 
             # If the problem is closed (and not a survey question with max_attempts==0),
-            # then do NOT show the reset button
+            # then do NOT show the save button
             # If we're waiting for the user to reset a randomized problem
-            # then do NOT show the reset button
+            # then do NOT show the save button
             elif (self.closed() and not is_survey_question) or needs_reset:
                 return False
             else:
