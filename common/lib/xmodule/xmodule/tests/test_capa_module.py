@@ -733,20 +733,18 @@ class CapaModuleTest(unittest.TestCase):
         # If the user has unlimited attempts and we are not randomizing,
         # then do NOT show a save button
         # because they can keep using "Check"
-        module = CapaFactory.create(max_attempts=None, rerandomize="never")
-        module.lcp.done = False
+        module = CapaFactory.create(max_attempts=None, rerandomize="never", done=False)
         self.assertFalse(module.should_show_save_button())
 
-        module = CapaFactory.create(max_attempts=None, rerandomize="never")
-        module.lcp.done = True
+        module = CapaFactory.create(max_attempts=None, rerandomize="never", done=True)
         self.assertFalse(module.should_show_save_button())
 
         # Otherwise, DO show the save button
         module = CapaFactory.create(done=False)
         self.assertTrue(module.should_show_save_button())
 
-        # If we're not randomizing, then we can re-save
-        module = CapaFactory.create(rerandomize="never", done=True)
+        # If we're not randomizing and we have limited attempts,  then we can save
+        module = CapaFactory.create(rerandomize="never", max_attempts=2, done=True)
         self.assertTrue(module.should_show_save_button())
 
         # If survey question for capa (max_attempts = 0),
