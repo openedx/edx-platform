@@ -48,6 +48,8 @@ import pyparsing
 
 from .registry import TagRegistry
 from capa.chem import chemcalc
+import xqueue_interface
+from datetime import datetime
 
 log = logging.getLogger(__name__)
 
@@ -639,6 +641,7 @@ class MatlabInput(CodeInput):
 
         # Check if problem has been queued
         self.queue_len = 0
+        self.queuename = 'matlab'
         # Flag indicating that the problem has been queued, 'msg' is length of
         # queue
         if self.status == 'incomplete':
@@ -650,20 +653,44 @@ class MatlabInput(CodeInput):
 
     def handle_ajax(self, dispatch, get):
         if dispatch == 'plot':
-            # put the data in the queue and ship it off
-            pass
-        elif dispatch == 'display':
+            return self.plot_data(get)
+        elif dispatch == 'xqueue_response':
             # render the response
             pass
 
     def plot_data(self, get):
         ''' send data via xqueue to the mathworks backend'''
-
         # only send data if xqueue exists
         if self.system.xqueue is not None:
-            pass
+            # pull relevant info out of get
+            response = get['submission']
+
+            # construct xqueue headers
+            qinterface = self.system.xqueue['interface']
+            qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+            callback_url = self.system.xqueue['construct_callback']('input_ajax')
+            anonymous_student_id = self.system.anonymous_student_id
+            queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+                                                     anonymous_student_id +
+                                                     self.id)
+            xheader = xqueue_interface.make_xheader(
+                    lms_callback_url = callback_url,
+                    lms_key = queuekey,
+                    queue_name = self.queuename)
 
 
+            # construct xqueue body
+            student_info = {'anonymous_student_id': anonymous_student_id,
+                    'submission_time': qtime}
+            contents = {'grader_payload': self.plot_payload,
+                        'student_info': json.dumps(student_info),
+                        'student_response': response}
+
+            (error, msg) = qinterface.send_to_queue(header=xheader,
+                                                    body = json.dumps(contents))
+
+            return json.dumps({'success': error != 0, 'message': msg})
+        return json.dumps({'success': False, 'message': 'Cannot connect to the queue'})
 
 
 registry.register(MatlabInput)

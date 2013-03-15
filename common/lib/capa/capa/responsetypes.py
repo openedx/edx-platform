@@ -1271,8 +1271,9 @@ class CodeResponse(LoncapaResponse):
 
     Expects 'xqueue' dict in ModuleSystem with the following keys that are needed by CodeResponse:
         system.xqueue = { 'interface': XqueueInterface object,
-                          'callback_url': Per-StudentModule callback URL
-                                          where results are posted (string),
+                          'construct_callback': Per-StudentModule callback URL
+                                          constructor, defaults to using 'score_update'
+                                          as the correct dispatch (function),
                           'default_queuename': Default queuename to submit request (string)
                         }
 
