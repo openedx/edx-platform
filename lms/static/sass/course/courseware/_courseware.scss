@@ -119,6 +119,10 @@ div.course-wrapper {
       }
     }
 
+    section.xmodule_WrapperModule ol.vert-mod > li {
+      border-bottom: none;
+    }
+
     section.tutorials {
       h2 {
         margin-bottom: lh();
@@ -219,7 +223,7 @@ div.course-wrapper {
 .xmodule_VideoModule {
   margin-bottom: 30px;
 
-  
+
 }
 
 textarea.short-form-response {
@@ -237,7 +241,7 @@ section.self-assessment {
         margin-top: 5px;
         margin-bottom: 5px;
     }
-    
+
     div {
         margin-top: 5px;
         margin-bottom: 5px;

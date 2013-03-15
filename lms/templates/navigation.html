@@ -41,7 +41,7 @@ site_status_msg = get_site_status_msg(course_id)
   <h1 class="logo"><a href="${reverse('root')}"><img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/></a></h1>
 
     % if course:
-      <h2><span class="provider">${course.org}:</span> ${course.number} ${course.title}</h2>
+      <h2><span class="provider">${course.org}:</span> ${course.number} ${course.display_name_with_default}</h2>
     % endif
 
     <ol class="left find-courses-button">

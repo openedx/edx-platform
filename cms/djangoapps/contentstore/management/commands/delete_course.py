@@ -7,7 +7,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import Location
 from xmodule.course_module import CourseDescriptor
-from prompt import query_yes_no
+from .prompt import query_yes_no
 
 from auth.authz import _delete_course_group
 

@@ -1,9 +1,4 @@
-// Wrapper for RequireJS. It will make the standard requirejs(), require(), and
-// define() functions from Require JS available inside the anonymous function.
-//
-// See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
-
 define(['logme'], function (logme) {
     return configParser;
 
@@ -16,7 +11,7 @@ define(['logme'], function (logme) {
             'targetOutline': true,
             'labelBgColor': '#d6d6d6',
             'individualTargets': null, // Depends on 'targets'.
-            'errors': 0 // Number of errors found while parsing config.
+            'foundErrors': false // Whether or not we find errors while processing the config.
         };
 
         getDraggables(state, config);
@@ -28,7 +23,7 @@ define(['logme'], function (logme) {
 
         setIndividualTargets(state);
 
-        if (state.config.errors !== 0) {
+        if (state.config.foundErrors !== false) {
             return false;
         }
 
@@ -38,35 +33,34 @@ define(['logme'], function (logme) {
     function getDraggables(state, config) {
         if (config.hasOwnProperty('draggables') === false) {
             logme('ERROR: "config" does not have a property "draggables".');
-            state.config.errors += 1;
+            state.config.foundErrors = true;
         } else if ($.isArray(config.draggables) === true) {
-            (function (i) {
-                while (i < config.draggables.length) {
-                    if (processDraggable(state, config.draggables[i]) !== true) {
-                        state.config.errors += 1;
-                    }
-                    i += 1;
+            config.draggables.every(function (draggable) {
+                if (processDraggable(state, draggable) !== true) {
+                    state.config.foundErrors = true;
+
+                    // Exit immediately from .every() call.
+                    return false;
                 }
-            }(0));
-        } else if ($.isPlainObject(config.draggables) === true) {
-            if (processDraggable(state, config.draggables) !== true) {
-                state.config.errors += 1;
-            }
+
+                // Continue to next .every() call.
+                return true;
+            });
         } else {
             logme('ERROR: The type of config.draggables is no supported.');
-            state.config.errors += 1;
+            state.config.foundErrors = true;
         }
     }
 
     function getBaseImage(state, config) {
         if (config.hasOwnProperty('base_image') === false) {
             logme('ERROR: "config" does not have a property "base_image".');
-            state.config.errors += 1;
+            state.config.foundErrors = true;
         } else if (typeof config.base_image === 'string') {
             state.config.baseImage = config.base_image;
         } else {
             logme('ERROR: Property config.base_image is not of type "string".');
-            state.config.errors += 1;
+            state.config.foundErrors = true;
         }
     }
 
@@ -77,28 +71,27 @@ define(['logme'], function (logme) {
             // Draggables can be positioned anywhere on the image, and the server will
             // get an answer in the form of (x, y) coordinates for each draggable.
         } else if ($.isArray(config.targets) === true) {
-            (function (i) {
-                while (i < config.targets.length) {
-                    if (processTarget(state, config.targets[i]) !== true) {
-                        state.config.errors += 1;
-                    }
-                    i += 1;
+            config.targets.every(function (target) {
+                if (processTarget(state, target) !== true) {
+                    state.config.foundErrors = true;
+
+                    // Exit immediately from .every() call.
+                    return false;
                 }
-            }(0));
-        } else if ($.isPlainObject(config.targets) === true) {
-            if (processTarget(state, config.targets) !== true) {
-                state.config.errors += 1;
-            }
+
+                // Continue to next .every() call.
+                return true;
+            });
         } else {
             logme('ERROR: Property config.targets is not of a supported type.');
-            state.config.errors += 1;
+            state.config.foundErrors = true;
         }
     }
 
     function getOnePerTarget(state, config) {
         if (config.hasOwnProperty('one_per_target') === false) {
             logme('ERROR: "config" does not have a property "one_per_target".');
-            state.config.errors += 1;
+            state.config.foundErrors = true;
         } else if (typeof config.one_per_target === 'string') {
             if (config.one_per_target.toLowerCase() === 'true') {
                 state.config.onePerTarget = true;
@@ -106,42 +99,45 @@ define(['logme'], function (logme) {
                 state.config.onePerTarget = false;
             } else {
                 logme('ERROR: Property config.one_per_target can either be "true", or "false".');
-                state.config.errors += 1;
+                state.config.foundErrors = true;
             }
         } else {
             logme('ERROR: Property config.one_per_target is not of a supported type.');
-            state.config.errors += 1;
+            state.config.foundErrors = true;
         }
     }
 
     function getTargetOutline(state, config) {
-        if (config.hasOwnProperty('target_outline') === false) {
-            // It is possible that no "target_outline" was specified. This is not an error.
-            // In this case the default value of 'true' (boolean) will be used.
-        } else if (typeof config.target_outline === 'string') {
-            if (config.target_outline.toLowerCase() === 'true') {
-                state.config.targetOutline = true;
-            } else if (config.target_outline.toLowerCase() === 'false') {
-                state.config.targetOutline = false;
+        // It is possible that no "target_outline" was specified. This is not an error.
+        // In this case the default value of 'true' (boolean) will be used.
+
+        if (config.hasOwnProperty('target_outline') === true) {
+            if (typeof config.target_outline === 'string') {
+                if (config.target_outline.toLowerCase() === 'true') {
+                    state.config.targetOutline = true;
+                } else if (config.target_outline.toLowerCase() === 'false') {
+                    state.config.targetOutline = false;
+                } else {
+                    logme('ERROR: Property config.target_outline can either be "true", or "false".');
+                    state.config.foundErrors = true;
+                }
             } else {
-                logme('ERROR: Property config.target_outline can either be "true", or "false".');
-                state.config.errors += 1;
+                logme('ERROR: Property config.target_outline is not of a supported type.');
+                state.config.foundErrors = true;
             }
-        } else {
-            logme('ERROR: Property config.target_outline is not of a supported type.');
-            state.config.errors += 1;
         }
     }
 
     function getLabelBgColor(state, config) {
-        if (config.hasOwnProperty('label_bg_color') === false) {
-            // It is possible that no "label_bg_color" was specified. This is not an error.
-            // In this case the default value of '#d6d6d6' (string) will be used.
-        } else if (typeof config.label_bg_color === 'string') {
-            state.config.labelBgColor = config.label_bg_color;
-        } else {
-            logme('ERROR: Property config.label_bg_color is not of a supported type.');
-            returnStatus = false;
+        // It is possible that no "label_bg_color" was specified. This is not an error.
+        // In this case the default value of '#d6d6d6' (string) will be used.
+
+        if (config.hasOwnProperty('label_bg_color') === true) {
+            if (typeof config.label_bg_color === 'string') {
+                state.config.labelBgColor = config.label_bg_color;
+            } else {
+                logme('ERROR: Property config.label_bg_color is not of a supported type.');
+            }
         }
     }
 
@@ -159,8 +155,20 @@ define(['logme'], function (logme) {
             (attrIsString(obj, 'icon') === false) ||
             (attrIsString(obj, 'label') === false) ||
 
-            (attrIsBoolean(obj, 'can_reuse', false) === false)
+            (attrIsBoolean(obj, 'can_reuse', false) === false) ||
+
+            (obj.hasOwnProperty('target_fields') === false)
         ) {
+            return false;
+        }
+
+        // Check that all targets in the 'target_fields' property are proper target objects.
+        // We will be testing the return value from .every() call (it can be 'true' or 'false').
+        if (obj.target_fields.every(
+            function (targetObj) {
+                return processTarget(state, targetObj, false);
+            }
+        ) === false) {
             return false;
         }
 
@@ -169,7 +177,14 @@ define(['logme'], function (logme) {
         return true;
     }
 
-    function processTarget(state, obj) {
+    // We need 'pushToState' parameter in order to simply test an object for the fact that it is a
+    // proper target (without pushing it to the 'state' object). When
+    //
+    //     pushToState === false
+    //
+    // the object being tested is not going to be pushed to 'state'. The function will onyl return
+    // 'true' or 'false.
+    function processTarget(state, obj, pushToState) {
         if (
             (attrIsString(obj, 'id') === false) ||
 
@@ -182,7 +197,9 @@ define(['logme'], function (logme) {
             return false;
         }
 
-        state.config.targets.push(obj);
+        if (pushToState !== false) {
+            state.config.targets.push(obj);
+        }
 
         return true;
     }
@@ -250,10 +267,5 @@ define(['logme'], function (logme) {
 
         return true;
     }
-});
-
-// End of wrapper for RequireJS. As you can see, we are passing
-// namespaced Require JS variables to an anonymous function. Within
-// it, you can use the standard requirejs(), require(), and define()
-// functions as if they were in the global namespace.
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define)
+}); // End-of: define(['logme'], function (logme) {
+}(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

@@ -1,14 +1,16 @@
-# ======== Instructor views =============================================================================
-
+"""
+Instructor Views
+"""
 from collections import defaultdict
 import csv
-import itertools
 import json
 import logging
 import os
 import re
 import requests
+from requests.status_codes import codes
 import urllib
+from collections import OrderedDict
 import json
 
 from StringIO import StringIO
@@ -19,6 +21,7 @@ from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
+import requests
 from django.core.urlresolvers import reverse
 
 from courseware import grades
@@ -88,7 +91,11 @@ def instructor_dashboard(request, course_id):
     data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
     data += compute_course_stats(course).items()
     if request.user.is_staff:
-        data.append(['metadata', escape(str(course.metadata))])
+        for field in course.fields:
+            data.append([field.name, json.dumps(field.read_json(course))])
+        for namespace in course.namespaces:
+            for field in getattr(course, namespace).fields:
+                data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
     datatable['data'] = data
 
     def return_csv(fn, datatable, fp=None):
@@ -136,7 +143,7 @@ def instructor_dashboard(request, course_id):
 
     if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
-            data_dir = course.metadata['data_dir']
+            data_dir = getattr(course, 'data_dir')
             log.debug('git pull {0}'.format(data_dir))
             gdir = settings.DATA_DIR / data_dir
             if not os.path.exists(gdir):
@@ -150,7 +157,7 @@ def instructor_dashboard(request, course_id):
         if 'Reload course' in action:
             log.debug('reloading {0} ({1})'.format(course_id, course))
             try:
-                data_dir = course.metadata['data_dir']
+                data_dir = getattr(course, 'data_dir')
                 modulestore().try_load_course(data_dir)
                 msg += "<br/><p>Course reloaded from {0}</p>".format(data_dir)
                 track.views.server_track(request, 'reload {0}'.format(data_dir), {}, page='idashboard')
@@ -404,7 +411,7 @@ def instructor_dashboard(request, course_id):
         def getdat(u):
             p = u.profile
             return [u.username, u.email] + [getattr(p,x,'') for x in profkeys]
-        
+
         datatable['data'] = [getdat(u) for u in enrolled_students]
         datatable['title'] = 'Student profile data for course %s' % course_id
         return return_csv('profiledata_%s.csv' % course_id, datatable)
@@ -426,7 +433,7 @@ def instructor_dashboard(request, course_id):
             msg+="<font color='red'>Couldn't find module with that urlname.  </font>"
             msg += "<pre>%s</pre>" % escape(err)
             smdat = []
-        
+
         if smdat:
             datatable = {'header': ['username', 'state']}
             datatable['data'] = [ [x.student.username, x.state] for x in smdat ]
@@ -587,6 +594,46 @@ def instructor_dashboard(request, course_id):
     if idash_mode == 'Psychometrics':
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
 
+    #----------------------------------------
+    # analytics
+    def get_analytics_result(analytics_name):
+        """Return data for an Analytic piece, or None if it doesn't exist. It
+        logs and swallows errors.
+        """
+        url = settings.ANALYTICS_SERVER_URL + \
+              "get?aname={}&course_id={}&apikey={}".format(analytics_name,
+                                                           course_id,
+                                                           settings.ANALYTICS_API_KEY)
+        try:
+            res = requests.get(url)
+        except Exception:
+            log.exception("Error trying to access analytics at %s", url)
+            return None
+
+        if res.status_code == codes.OK:
+            # WARNING: do not use req.json because the preloaded json doesn't
+            # preserve the order of the original record (hence OrderedDict).
+            return json.loads(res.content, object_pairs_hook=OrderedDict)
+        else:
+            log.error("Error fetching %s, code: %s, msg: %s",
+                      url, res.status_code, res.content)
+        return None
+
+    analytics_results = {}
+
+    if idash_mode == 'Analytics':
+        DASHBOARD_ANALYTICS = [
+            # "StudentsAttemptedProblems",  # num students who tried given problem
+            "StudentsDailyActivity",  # active students by day
+            "StudentsDropoffPerDay",  # active students dropoff by day
+            # "OverallGradeDistribution",  # overall point distribution for course
+            "StudentsActive",  # num students active in time period (default = 1wk)
+            "StudentsEnrolled",  # num students enrolled
+            # "StudentsPerProblemCorrect",  # foreach problem, num students correct
+            "ProblemGradeDistribution",  # foreach problem, grade distribution
+        ]
+        for analytic_name in DASHBOARD_ANALYTICS:
+            analytics_results[analytic_name] = get_analytics_result(analytic_name)
 
     #----------------------------------------
     # offline grades?
@@ -608,11 +655,14 @@ def instructor_dashboard(request, course_id):
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
+
                'djangopid': os.getpid(),
                'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
                'offline_grade_log': offline_grades_available(course_id),
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
-               }
+
+               'analytics_results': analytics_results,
+            }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 
@@ -621,7 +671,7 @@ def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
     Perform remote gradebook action.  Returns msg, datatable.
     '''
-    rg = course.metadata.get('remote_gradebook', '')
+    rg = course.remote_gradebook
     if not rg:
         msg = "No remote gradebook defined in course metadata"
         return msg, {}

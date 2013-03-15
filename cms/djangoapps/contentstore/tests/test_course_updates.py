@@ -1,4 +1,4 @@
-from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
+from contentstore.tests.test_course_settings import CourseTestCase
 from django.core.urlresolvers import reverse
 import json
 

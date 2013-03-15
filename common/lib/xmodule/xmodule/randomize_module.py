@@ -1,19 +1,19 @@
-import json
 import logging
 import random
 
-from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.x_module import XModule
-from xmodule.xml_module import XmlDescriptor
-from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
 
-from pkg_resources import resource_string
+from xblock.core import Scope, Integer
 
 log = logging.getLogger('mitx.' + __name__)
 
 
-class RandomizeModule(XModule):
+class RandomizeFields(object):
+    choice = Integer(help="Which random child was chosen", scope=Scope.student_state)
+
+
+class RandomizeModule(RandomizeFields, XModule):
     """
     Chooses a random child module.  Chooses the same one every time for each student.
 
@@ -35,30 +35,23 @@ class RandomizeModule(XModule):
         grading interaction is a tangle between super and subclasses of descriptors and
         modules.
 """
-
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
 
         # NOTE: calling self.get_children() creates a circular reference--
         # it calls get_child_descriptors() internally, but that doesn't work until
         # we've picked a choice
         num_choices = len(self.descriptor.get_children())
 
-        self.choice = None
-        if instance_state is not None:
-            state = json.loads(instance_state)
-            self.choice = state.get('choice', None)
-            if self.choice > num_choices:
-                # Oops.  Children changed. Reset.
-                self.choice = None
+        if self.choice > num_choices:
+            # Oops.  Children changed. Reset.
+            self.choice = None
 
         if self.choice is None:
             # choose one based on the system seed, or randomly if that's not available
             if num_choices > 0:
-                if system.seed is not None:
-                    self.choice = system.seed % num_choices
+                if self.system.seed is not None:
+                    self.choice = self.system.seed % num_choices
                 else:
                     self.choice = random.randrange(0, num_choices)
 
@@ -71,11 +64,6 @@ class RandomizeModule(XModule):
         else:
             self.child_descriptor = None
             self.child = None
-
-
-    def get_instance_state(self):
-        return json.dumps({'choice': self.choice})
-
 
     def get_child_descriptors(self):
         """
@@ -98,7 +86,7 @@ class RandomizeModule(XModule):
         return self.child.get_icon_class() if self.child else 'other'
 
 
-class RandomizeDescriptor(SequenceDescriptor):
+class RandomizeDescriptor(RandomizeFields, SequenceDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = RandomizeModule
 
@@ -107,6 +95,7 @@ class RandomizeDescriptor(SequenceDescriptor):
     stores_state = True
 
     def definition_to_xml(self, resource_fs):
+
         xml_object = etree.Element('randomize')
         for child in self.get_children():
             xml_object.append(

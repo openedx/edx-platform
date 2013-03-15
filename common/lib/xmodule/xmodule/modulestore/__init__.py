@@ -423,6 +423,7 @@ class ModuleStoreBase(ModuleStore):
         Set up the error-tracking logic.
         '''
         self._location_errors = {}    # location -> ErrorLog
+        self.metadata_inheritance_cache = None
 
     def _get_errorlog(self, location):
         """

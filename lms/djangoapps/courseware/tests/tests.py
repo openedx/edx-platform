@@ -19,9 +19,9 @@ from xmodule.modulestore.mongo import MongoModuleStore
 
 # Need access to internal func to put users in the right group
 from courseware import grades
+from courseware.model_data import ModelDataCache
 from courseware.access import (has_access, _course_staff_group_name,
                                course_beta_test_group_name)
-from courseware.models import StudentModuleCache
 
 from student.models import Registration
 from xmodule.error_module import ErrorDescriptor
@@ -325,7 +325,7 @@ class PageLoader(ActivateLoginTestCase):
                     num_bad += 1
                 elif isinstance(descriptor, ErrorDescriptor):
                     msg = "ERROR error descriptor loaded: "
-                    msg = msg + descriptor.definition['data']['error_msg']
+                    msg = msg + descriptor.error_msg
                     all_ok = False
                     num_bad += 1
 
@@ -560,8 +560,8 @@ class TestViewAuth(PageLoader):
 
         # Make courses start in the future
         tomorrow = time.time() + 24 * 3600
-        self.toy.metadata['start'] = stringify_time(time.gmtime(tomorrow))
-        self.full.metadata['start'] = stringify_time(time.gmtime(tomorrow))
+        self.toy.lms.start = time.gmtime(tomorrow)
+        self.full.lms.start = time.gmtime(tomorrow)
 
         self.assertFalse(self.toy.has_started())
         self.assertFalse(self.full.has_started())
@@ -730,11 +730,11 @@ class TestViewAuth(PageLoader):
         yesterday = time.time() - 24 * 3600
 
         # toy course's hasn't started
-        self.toy.metadata['start'] = stringify_time(time.gmtime(tomorrow))
+        self.toy.lms.start = time.gmtime(tomorrow)
         self.assertFalse(self.toy.has_started())
 
         # but should be accessible for beta testers
-        self.toy.metadata['days_early_for_beta'] = '2'
+        self.toy.lms.days_early_for_beta = 2
 
         # student user shouldn't see it
         student_user = user(self.student)
@@ -778,27 +778,27 @@ class TestCourseGrader(PageLoader):
         self.factory = RequestFactory()
 
     def get_grade_summary(self):
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             self.graded_course.id, self.student_user, self.graded_course)
 
         fake_request = self.factory.get(reverse('progress',
                                        kwargs={'course_id': self.graded_course.id}))
 
         return grades.grade(self.student_user, fake_request,
-                            self.graded_course, student_module_cache)
+                            self.graded_course, model_data_cache)
 
     def get_homework_scores(self):
         return self.get_grade_summary()['totaled_scores']['Homework']
 
     def get_progress_summary(self):
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             self.graded_course.id, self.student_user, self.graded_course)
 
         fake_request = self.factory.get(reverse('progress',
                                        kwargs={'course_id': self.graded_course.id}))
 
         progress_summary = grades.progress_summary(self.student_user, fake_request,
-                                                   self.graded_course, student_module_cache)
+                                                   self.graded_course, model_data_cache)
         return progress_summary
 
     def check_grade_percent(self, percent):

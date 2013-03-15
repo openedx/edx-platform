@@ -7,7 +7,7 @@ import json
 import mock
 
 from capa.capa_problem import LoncapaProblem
-from response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
+from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
 from . import test_system
 
 class CapaHtmlRenderTest(unittest.TestCase):

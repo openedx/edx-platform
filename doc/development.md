@@ -9,9 +9,8 @@ This will read the `Gemfile` and install all of the gems specified there.
 
 ### Python
 
-In order, run the following:
+Run the following::
 
-    pip install -r pre-requirements.txt
     pip install -r requirements.txt
     pip install -r test-requirements.txt
 

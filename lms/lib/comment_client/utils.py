@@ -3,7 +3,7 @@ import logging
 import requests
 import settings
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 
 def strip_none(dic):

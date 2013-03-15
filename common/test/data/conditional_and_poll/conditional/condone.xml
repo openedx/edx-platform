@@ -1,0 +1,3 @@
+        <conditional attempted="True" sources="i4x://HarvardX/ER22x/problem/choiceprob">
+            <html url_name="secret_page" />
+        </conditional>

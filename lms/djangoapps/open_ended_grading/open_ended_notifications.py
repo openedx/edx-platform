@@ -1,6 +1,6 @@
 from django.conf import settings
 from xmodule.open_ended_grading_classes import peer_grading_service
-from staff_grading_service import StaffGradingService
+from .staff_grading_service import StaffGradingService
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 import json
 from student.models import unique_id_for_user
@@ -61,7 +61,14 @@ def staff_grading_notifications(course, user):
 
 
 def peer_grading_notifications(course, user):
-    system = ModuleSystem(None, None, None, render_to_string, None)
+    system = ModuleSystem(
+        ajax_url=None,
+        track_function=None,
+        get_module = None,
+        render_template=render_to_string,
+        replace_urls=None,
+        xblock_model_data= {}
+    )
     peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
     img_path = ""
@@ -97,7 +104,14 @@ def peer_grading_notifications(course, user):
 
 
 def combined_notifications(course, user):
-    system = ModuleSystem(None, None, None, render_to_string, None)
+    system = ModuleSystem(
+        ajax_url=None,
+        track_function=None,
+        get_module = None,
+        render_template=render_to_string,
+        replace_urls=None,
+        xblock_model_data= {}
+    )
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, course, 'staff')

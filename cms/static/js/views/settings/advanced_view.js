@@ -6,14 +6,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 
     // Model class is CMS.Models.Settings.Advanced
     events : {
-        'click .delete-button' : "deleteEntry",
-        'click .new-button' : "addEntry",
-        // update model on changes
-        'change .policy-key' : "updateKey",
-        // keypress to catch alpha keys and backspace/delete on some browsers
-        'keypress .policy-key' : "showSaveCancelButtons",
-        // keyup to catch backspace/delete reliably
-        'keyup .policy-key' : "showSaveCancelButtons",
         'focus :input' : "focusInput",
         'blur :input' : "blurInput"
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
@@ -95,15 +87,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                             mirror.setValue(stringValue);
                         } catch(quotedE) {
                             // TODO: validation error
-                            console.log("Error with JSON, even after converting to String.");
-                            console.log(quotedE);
+                            // console.log("Error with JSON, even after converting to String.");
+                            // console.log(quotedE);
                             JSONValue = undefined;
                         }
-                    }
-                    else {
-                        // TODO: validation error
-                        console.log("Error with JSON, but will not convert to String.");
-                        console.log(e);
                     }
                 }
                 if (JSONValue !== undefined) {
@@ -113,7 +100,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             }
         });
     },
-
     showMessage: function (type) {
         this.$el.find(".message-status").removeClass("is-shown");
         if (type) {
@@ -128,55 +114,18 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         else {
             // This is the case of the page first rendering, or when Cancel is pressed.
             this.hideSaveCancelButtons();
-            this.toggleNewButton(true);
         }
     },
-
     showSaveCancelButtons: function(event) {
         if (!this.buttonsVisible) {
-            if (event && (event.type === 'keypress' || event.type === 'keyup')) {
-                // check whether it's really an altering event: note, String.fromCharCode(keyCode) will 
-                // give positive values for control/command/option-letter combos; so, don't use it
-                if (!((event.charCode && String.fromCharCode(event.charCode) !== "") ||
-                        // 8 = backspace, 46 = delete
-                        event.keyCode === 8 || event.keyCode === 46)) return;
-            }
             this.$el.find(".message-status").removeClass("is-shown");
             $('.wrapper-notification').addClass('is-shown');
             this.buttonsVisible = true;
         }
     },
-
     hideSaveCancelButtons: function() {
         $('.wrapper-notification').removeClass('is-shown');
         this.buttonsVisible = false;
-    },
-
-    toggleNewButton: function (enable) {
-        var newButton = this.$el.find(".new-button");
-        if (enable) {
-            newButton.removeClass('disabled');
-        }
-        else {
-            newButton.addClass('disabled');
-        }
-    },
-
-    deleteEntry : function(event) {
-        event.preventDefault();
-        // find out which entry
-        var li$ = $(event.currentTarget).closest('li');
-        // Not data b/c the validation view uses it for a selector
-        var key = $('.key', li$).attr('id');
-
-        delete this.selectorToField[this.fieldToSelectorMap[key]];
-        delete this.fieldToSelectorMap[key];
-        if (key !== this.model.new_key) {
-            this.model.deleteKeys.push(key);
-            this.model.unset(key);
-        }
-        li$.remove();
-        this.showSaveCancelButtons();
     },
     saveView : function(event) {
         // TODO one last verification scan:
@@ -201,102 +150,15 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             error : CMS.ServerError
         });
     },
-    addEntry : function() {
-        var listEle$ = this.$el.find('.course-advanced-policy-list');
-        var newEle = this.renderTemplate("", "");
-        listEle$.append(newEle);
-        // need to re-find b/c replaceWith seems to copy rather than use the specific ele instance
-        var policyValueDivs = this.$el.find('#' + this.model.new_key).closest('li').find('.json');
-        // only 1 but hey, let's take advantage of the context mechanism
-        _.each(policyValueDivs, this.attachJSONEditor, this);
-        this.toggleNewButton(false);
-    },
-    updateKey : function(event) {
-        var parentElement = $(event.currentTarget).closest('.key');
-        // old key: either the key as in the model or new_key.
-        // That is, it doesn't change as the val changes until val is accepted.
-        var oldKey = parentElement.attr('id');
-        // TODO: validation of keys with spaces. For now at least trim strings to remove initial and
-        // trailing whitespace
-        var newKey = $.trim($(event.currentTarget).val());
-        if (oldKey !== newKey) {
-            // TODO: is it OK to erase other validation messages?
-            this.clearValidationErrors();
-
-            if (!this.validateKey(oldKey, newKey)) return;
-
-            if (this.model.has(newKey)) {
-                var error = {};
-                error[oldKey] = 'You have already defined "' + newKey + '" in the manual policy definitions.';
-                error[newKey] = "You tried to enter a duplicate of this key.";
-                this.model.trigger("invalid", this.model, error);
-                return false;
-            }
-
-            // explicitly call validate to determine whether to proceed (relying on triggered error means putting continuation in the success
-            // method which is uglier I think?)
-            var newEntryModel = {};
-            // set the new key's value to the old one's
-            newEntryModel[newKey] = (oldKey === this.model.new_key ? '' : this.model.get(oldKey));
-
-            var validation = this.model.validate(newEntryModel);
-            if (validation) {
-                if (_.has(validation, newKey)) {
-                    // swap to the key which the map knows about
-                    validation[oldKey] = validation[newKey];
-                }
-                this.model.trigger("invalid", this.model, validation);
-                // abandon update
-                return;
-            }
-
-            // Now safe to actually do the update
-            this.model.set(newEntryModel);
-
-            // update maps
-            var selector = this.fieldToSelectorMap[oldKey];
-            this.selectorToField[selector] = newKey;
-            this.fieldToSelectorMap[newKey] = selector;
-            delete this.fieldToSelectorMap[oldKey];
-
-            if (oldKey !== this.model.new_key) {
-                // mark the old key for deletion and delete from field maps
-                this.model.deleteKeys.push(oldKey);
-                this.model.unset(oldKey) ;
-            }
-            else {
-                // id for the new entry will now be the key value. Enable new entry button.
-                this.toggleNewButton(true);
-            }
-            
-            // check for newkey being the name of one which was previously deleted in this session
-            var wasDeleting = this.model.deleteKeys.indexOf(newKey);
-            if (wasDeleting >= 0) {
-                this.model.deleteKeys.splice(wasDeleting, 1);
-            }
-
-            // Update the ID to the new value.
-            parentElement.attr('id', newKey);
-            
-        }
-    },
-    validateKey : function(oldKey, newKey) {
-        // model validation can't handle malformed keys nor notice if 2 fields have same key; so, need to add that chk here
-        // TODO ensure there's no spaces or illegal chars (note some checking for spaces currently done in model's
-        // validate method.
-        return true;
-    },
-
     renderTemplate: function (key, value) {
         var newKeyId = _.uniqueId('policy_key_'),
         newEle = this.template({ key : key, value : JSON.stringify(value, null, 4),
             keyUniqueId: newKeyId, valueUniqueId: _.uniqueId('policy_value_')});
         
-        this.fieldToSelectorMap[(_.isEmpty(key) ? this.model.new_key : key)] = newKeyId;
-        this.selectorToField[newKeyId] = (_.isEmpty(key) ? this.model.new_key : key);
+        this.fieldToSelectorMap[key] = newKeyId;
+        this.selectorToField[newKeyId] = key;
         return newEle;
     },
-    
     focusInput : function(event) {
         $(event.target).prev().addClass("is-focused");
     },
