@@ -2,13 +2,117 @@ from lettuce import world, step
 from lettuce.django import django_url
 from selenium.webdriver.support.ui import Select
 import random
-from common import i_am_registered_for_the_course
+import textwrap
+from common import i_am_registered_for_the_course, TEST_SECTION_NAME, section_location
+from terrain.factories import ItemFactory
+from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
+                        ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
+                        StringResponseXMLFactory, NumericalResponseXMLFactory, \
+                        FormulaResponseXMLFactory, CustomResponseXMLFactory
+
+# Factories from capa.tests.response_xml_factory that we will use
+# to generate the problem XML, with the keyword args used to configure
+# the output.
+problem_factory_dict = {
+    'drop down': {
+        'factory': OptionResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Option 2',
+            'options': ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+            'correct_option': 'Option 2'}},
+
+    'multiple choice': {
+        'factory': MultipleChoiceResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Choice 3',
+            'choices': [False, False, True, False],
+            'choice_names': ['choice_1', 'choice_2', 'choice_3', 'choice_4']}},
+
+    'checkbox': {
+        'factory': ChoiceResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Choices 1 and 3',
+            'choice_type':'checkbox',
+            'choices':[True, False, True, False, False],
+            'choice_names': ['Choice 1', 'Choice 2', 'Choice 3', 'Choice 4']}},
+
+    'string': {
+        'factory': StringResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The answer is "correct string"',
+            'case_sensitive': False,
+            'answer': 'correct string' }},
+
+    'numerical': {
+        'factory': NumericalResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The answer is pi + 1',
+            'answer': '4.14159',
+            'tolerance': '0.00001',
+            'math_display': True }},
+
+    'formula': {
+        'factory': FormulaResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The solution is [mathjax]x^2+2x+y[/mathjax]',
+            'sample_dict': {'x': (-100, 100), 'y': (-100, 100) },
+            'num_samples': 10,
+            'tolerance': 0.00001,
+            'math_display': True,
+            'answer': 'x^2+2*x+y'}},
+
+    'script': {
+        'factory': CustomResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'Enter two integers that sum to 10.',
+            'cfn': 'test_add_to_ten',
+            'expect': '10',
+            'num_inputs': 2,
+            'script': textwrap.dedent("""
+                def test_add_to_ten(expect,ans):
+                    try:
+                        a1=int(ans[0])
+                        a2=int(ans[1])
+                    except ValueError:
+                        a1=0
+                        a2=0
+                    return (a1+a2)==int(expect)
+            """) }},
+       }
+
+def add_problem_to_course(course, problem_type):
+
+    assert(problem_type in problem_factory_dict)
+
+    # Generate the problem XML using capa.tests.response_xml_factory
+    factory_dict = problem_factory_dict[problem_type]
+    problem_xml = factory_dict['factory'].build_xml(**factory_dict['kwargs'])
+
+    # Create a problem item using our generated XML
+    # We set rerandomize=always in the metadata so that the "Reset" button
+    # will appear.
+    problem_item = ItemFactory.create(parent_location=section_location(course),
+                        template="i4x://edx/templates/problem/Blank_Common_Problem",
+                        display_name=str(problem_type),
+                        data=problem_xml,
+                        metadata={'rerandomize':'always'})
 
 @step(u'I am viewing a "([^"]*)" problem')
 def view_problem(step, problem_type):
-    i_am_registered_for_the_course(step, 'edX/model_course/2013_Spring')
-    url = django_url(problem_url(problem_type))
+    i_am_registered_for_the_course(step, 'model_course')
+
+    # Ensure that the course has this problem type
+    add_problem_to_course('model_course', problem_type)
+
+    # Go to the one section in the factory-created course
+    # which should be loaded with the correct problem
+    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    section_name = chapter_name
+    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' % 
+                    (chapter_name, section_name))
+                        
     world.browser.visit(url)
+
 
 @step(u'I answer a "([^"]*)" problem "([^"]*)ly"')
 def answer_problem(step, problem_type, correctness):
@@ -21,7 +125,7 @@ def answer_problem(step, problem_type, correctness):
     assert(correctness in ['correct', 'incorrect'])
 
     if problem_type == "drop down":
-        select_name = "input_i4x-edX-model_course-problem-Drop_Down_Problem_2_1"
+        select_name = "input_i4x-edx-model_course-problem-drop_down_2_1"
         option_text = 'Option 2' if correctness == 'correct' else 'Option 3'
         world.browser.select(select_name, option_text)
 
@@ -125,21 +229,6 @@ def assert_answer_mark(step, problem_type, correctness):
             assert(world.browser.is_element_not_present_by_css(sel, wait_time=4))
 
 
-def problem_url(problem_type):
-    """ Construct a url to a page with the given problem type """
-    base = '/courses/edX/model_course/2013_Spring/courseware/Problem_Components/'
-    url_extensions = { 'drop down': 'Drop_Down_Problems',
-                   'multiple choice': 'Multiple_Choice_Problems',
-                    'checkbox': 'Checkbox_Problems', 
-                    'string': 'String_Problems',
-                    'numerical': 'Numerical_Problems', 
-                    'formula': 'Formula_Problems', }
-
-    assert(problem_type in url_extensions)
-    return base + url_extensions[problem_type]
-
-
-
 def inputfield(problem_type, choice=None):
     """ Return the <input> element for *problem_type*.
     For example, if problem_type is 'string', return
@@ -148,19 +237,14 @@ def inputfield(problem_type, choice=None):
     *choice* is the name of the checkbox input in a group
     of checkboxes. """
 
-    field_extensions = { 'drop down': 'Drop_Down_Problem',
-                           'multiple choice': 'Multiple_Choice_Problem',
-                            'checkbox': 'Checkbox_Problem', 
-                            'string': 'String_Problem',
-                            'numerical': 'Numerical_Problem', 
-                            'formula': 'Formula_Problem', }
-
-    assert(problem_type in field_extensions)
-    extension = field_extensions[problem_type]
-    sel = "input#input_i4x-edX-model_course-problem-%s_2_1" % extension
+    sel = "input#input_i4x-edx-model_course-problem-%s_2_1" % problem_type.replace(" ", "_")
 
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"
         sel = sel + base + str(choice)
 
+    # If the input element doesn't exist, fail immediately
+    assert(world.browser.is_element_present_by_css(sel, wait_time=4))
+
+    # Retrieve the input element
     return world.browser.find_by_css(sel)

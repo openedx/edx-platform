@@ -1,9 +1,12 @@
 from lettuce import world, step
 from lettuce.django import django_url
+from common import TEST_COURSE_ORG, TEST_COURSE_NAME
 
 @step('I register for the course "([^"]*)"$')
-def i_register_for_the_course(step, course_id):
-    world.browser.visit(django_url('courses/%s/about' % course_id))
+def i_register_for_the_course(step, course):
+    cleaned_name = TEST_COURSE_NAME.replace(' ', '_')
+    url = django_url('courses/%s/%s/%s/about' % (TEST_COURSE_ORG, course, cleaned_name))
+    world.browser.visit(url)
 
     intro_section = world.browser.find_by_css('section.intro')
     register_link = intro_section.find_by_css('a.register')

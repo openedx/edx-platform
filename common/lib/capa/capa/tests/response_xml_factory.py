@@ -151,13 +151,11 @@ class ResponseXMLFactory(object):
             choice_element = etree.SubElement(group_element, "choice")
             choice_element.set("correct", "true" if correct_val else "false")
 
-            # Add some text describing the choice
-            etree.SubElement(choice_element, "startouttext")
-            etree.text = "Choice description"
-            etree.SubElement(choice_element, "endouttext")
-
             # Add a name identifying the choice, if one exists
+            # For simplicity, we use the same string as both the
+            # name attribute and the text of the element
             if name:
+                choice_element.text = str(name)
                 choice_element.set("name", str(name))
 
         return group_element
