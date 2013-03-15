@@ -7,8 +7,8 @@ from json.encoder import JSONEncoder
 import time
 from contentstore.utils import get_modulestore
 from util.converters import jsdate_to_time, time_to_date
-from cms.djangoapps.models.settings import course_grading
-from cms.djangoapps.contentstore.utils import update_item
+from models.settings import course_grading
+from contentstore.utils import update_item
 import re
 import logging
 

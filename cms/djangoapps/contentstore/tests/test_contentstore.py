@@ -13,7 +13,7 @@ import copy
 from json import loads
 
 from django.contrib.auth.models import User
-from cms.djangoapps.contentstore.utils import get_modulestore
+from contentstore.utils import get_modulestore
 
 from utils import ModuleStoreTestCase, parse_json
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

@@ -58,12 +58,12 @@ from contentstore.course_info_model import get_course_updates,\
 from cache_toolbox.core import del_cached_content
 from xmodule.timeparse import stringify_time
 from contentstore.module_info_model import get_module_info, set_module_info
-from cms.djangoapps.models.settings.course_details import CourseDetails,\
+from models.settings.course_details import CourseDetails,\
     CourseSettingsEncoder
-from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.djangoapps.contentstore.utils import get_modulestore
+from models.settings.course_grading import CourseGradingModel
+from contentstore.utils import get_modulestore
 from django.shortcuts import redirect
-from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from models.settings.course_metadata import CourseMetadata
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 

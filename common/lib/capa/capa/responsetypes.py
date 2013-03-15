@@ -231,16 +231,14 @@ class LoncapaResponse(object):
         # hint specified by function?
         hintfn = hintgroup.get('hintfn')
         if hintfn:
-            '''
-            Hint is determined by a function defined in the <script> context; evaluate
-            that function to obtain list of hint, hintmode for each answer_id.
+            # Hint is determined by a function defined in the <script> context; evaluate
+            # that function to obtain list of hint, hintmode for each answer_id.
 
-            The function should take arguments (answer_ids, student_answers, new_cmap, old_cmap)
-            and it should modify new_cmap as appropriate.
+            # The function should take arguments (answer_ids, student_answers, new_cmap, old_cmap)
+            # and it should modify new_cmap as appropriate.
 
-            We may extend this in the future to add another argument which provides a
-            callback procedure to a social hint generation system.
-            '''
+            # We may extend this in the future to add another argument which provides a
+            # callback procedure to a social hint generation system.
             if not hintfn in self.context:
                 msg = 'missing specified hint function %s in script context' % hintfn
                 msg += "\nSee XML source line %s" % getattr(self.xml, 'sourceline', '<unavailable>')
@@ -329,7 +327,7 @@ class LoncapaResponse(object):
         """ Render a <div> for a message that applies to the entire response.
 
         *response_msg* is a string, which may contain XHTML markup
-        
+
         Returns an etree element representing the response message <div> """
         # First try wrapping the text in a <div> and parsing
         # it as an XHTML tree
@@ -1104,7 +1102,7 @@ def sympy_check2():
                 # the form:
                 # {'overall_message': STRING,
                 #  'input_list': [{ 'ok': BOOLEAN, 'msg': STRING }, ...] }
-                # 
+                #
                 # This allows the function to return an 'overall message'
                 # that applies to the entire problem, as well as correct/incorrect
                 # status and messages for individual inputs
@@ -1988,7 +1986,7 @@ class AnnotationResponse(LoncapaResponse):
 
         for inputfield in self.inputfields:
             option_scoring = dict([(option['id'], {
-                    'correctness': choices.get(option['choice']), 
+                    'correctness': choices.get(option['choice']),
                     'points': scoring.get(option['choice'])
                 }) for option in self._find_options(inputfield) ])
 

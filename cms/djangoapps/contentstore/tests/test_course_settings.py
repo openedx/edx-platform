@@ -10,16 +10,16 @@ from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 
 from xmodule.modulestore import Location
-from cms.djangoapps.models.settings.course_details import (CourseDetails,
+from models.settings.course_details import (CourseDetails,
                                                     CourseSettingsEncoder)
-from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.djangoapps.contentstore.utils import get_modulestore
+from models.settings.course_grading import CourseGradingModel
+from contentstore.utils import get_modulestore
 
 from django.test import TestCase
 from utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.django import modulestore
 
