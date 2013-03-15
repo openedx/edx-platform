@@ -22,11 +22,10 @@ V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 
 VERSION_TUPLES = (
-    ('1', CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES, V1_STUDENT_ATTRIBUTES),
+    (1, CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES, V1_STUDENT_ATTRIBUTES),
 )
 
 DEFAULT_VERSION = 1
-DEFAULT_VERSION = str(DEFAULT_VERSION)
 
 
 class CombinedOpenEndedFields(object):
