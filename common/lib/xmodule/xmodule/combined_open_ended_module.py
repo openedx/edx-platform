@@ -8,6 +8,7 @@ from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
 from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
+import copy
 
 log = logging.getLogger("mitx.courseware")
 
@@ -137,13 +138,14 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         student_attributes = [i[4] for i in VERSION_TUPLES]
         version_error_string = "Could not find version {0}, using version {1} instead"
 
+        version_to_use = copy.copy(self.version)
         try:
-            version_index = versions.index(self.version)
+            version_index = versions.index(version_to_use)
         except:
             #This is a dev_facing_error
-            log.error(version_error_string.format(self.version, DEFAULT_VERSION))
-            self.version = DEFAULT_VERSION
-            version_index = versions.index(self.version)
+            log.error(version_error_string.format(version_to_use, DEFAULT_VERSION))
+            version_to_use = DEFAULT_VERSION
+            version_index = versions.index(version_to_use)
 
         self.student_attributes = student_attributes[version_index]
         self.settings_attributes = settings_attributes[version_index]
