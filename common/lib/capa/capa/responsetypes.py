@@ -1413,8 +1413,9 @@ class CodeResponse(LoncapaResponse):
         queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
                                                  anonymous_student_id +
                                                  self.answer_id)
+        callback_url = self.system.xqueue['construct_callback']()
         xheader = xqueue_interface.make_xheader(
-            lms_callback_url=self.system.xqueue['callback_url'],
+            lms_callback_url=callback_url,
             lms_key=queuekey,
             queue_name=self.queue_name)
 
