@@ -21,10 +21,10 @@ V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
 
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 
-VersionTuple= namedtuple('VersionTuple', ['version', 'descriptor', 'module', 'settings_attributes', 'student_attributes'])
-VERSION_TUPLES = (
-    VersionTuple(1, CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES, V1_STUDENT_ATTRIBUTES),
-)
+VersionTuple= namedtuple('VersionTuple', ['descriptor', 'module', 'settings_attributes', 'student_attributes'])
+VERSION_TUPLES = {
+    1: VersionTuple(CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES, V1_STUDENT_ATTRIBUTES),
+}
 
 DEFAULT_VERSION = 1
 
@@ -36,8 +36,7 @@ class VersionInteger(Integer):
     def from_json(self, value):
         try:
             value = int(value)
-            versions = [i.version for i in VERSION_TUPLES]
-            if value not in versions:
+            if value not in VERSION_TUPLES:
                 version_error_string = "Could not find version {0}, using version {1} instead"
                 log.error(version_error_string.format(value, DEFAULT_VERSION))
                 value = DEFAULT_VERSION
@@ -147,11 +146,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         if self.task_states is None:
             self.task_states = []
 
-        versions = [i.version for i in VERSION_TUPLES]
-
-        version_index = versions.index(self.version)
-
-        version_tuple = VERSION_TUPLES[version_index]
+        version_tuple = VERSION_TUPLES[self.version]
 
         self.student_attributes = version_tuple.student_attributes
         self.settings_attributes = version_tuple.settings_attributes
