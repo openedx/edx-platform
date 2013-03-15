@@ -164,9 +164,9 @@ class XModuleItemFactory(Factory):
             new_item.display_name = display_name
 
         # Add additional metadata or override current metadata
-        new_item.metadata.update(metadata)
-
-        store.update_metadata(new_item.location.url(), own_metadata(new_item))
+        item_metadata = own_metadata(new_item)
+        item_metadata.update(metadata)
+        store.update_metadata(new_item.location.url(), item_metadata)
 
         # replace the data with the optional *data* parameter
         if data is not None:
