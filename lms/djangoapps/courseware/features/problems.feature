@@ -16,6 +16,7 @@ Feature: Answer choice problems
         | string            |
         | numerical         |
         | formula           |
+        | script            |
 
     Scenario: I can answer a problem incorrectly
         Given I am viewing a "<ProblemType>" problem
@@ -30,6 +31,7 @@ Feature: Answer choice problems
         | string            |
         | numerical         |
         | formula           |
+        | script            |
 
     Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
@@ -44,6 +46,7 @@ Feature: Answer choice problems
         | string            |
         | numerical         |
         | formula           |
+        | script            |
 
 
     Scenario: I can reset a problem
@@ -66,3 +69,5 @@ Feature: Answer choice problems
         | numerical         | incorrect     |
         | formula           | correct       |
         | formula           | incorrect     |
+        | script            | correct       |
+        | script            | incorrect     |

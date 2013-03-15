@@ -154,6 +154,19 @@ def answer_problem(step, problem_type, correctness):
         textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
         inputfield('formula').fill(textvalue)
 
+    elif problem_type == 'script':
+        # Correct answer is any two integers that sum to 10
+        first_addend = random.randint(-100, 100)
+        second_addend = 10 - first_addend
+
+        # If we want an incorrect answer, then change
+        # the second addend so they no longer sum to 10
+        if correctness == 'incorrect':
+            second_addend += random.randint(1, 10)
+
+        inputfield('script', input_num=1).fill(str(first_addend))
+        inputfield('script', input_num=2).fill(str(second_addend))
+
     # Submit the problem
     check_problem(step)
 
@@ -188,7 +201,8 @@ def assert_answer_mark(step, problem_type, correctness):
                             'checkbox': ['span.correct'],
                             'string': ['div.correct'],
                             'numerical': ['div.correct'],
-                            'formula': ['div.correct'], }
+                            'formula': ['div.correct'], 
+                            'script': ['div.correct'], }
 
     incorrect_selectors = { 'drop down': ['span.incorrect'],
                            'multiple choice': ['label.choicegroup_incorrect', 
@@ -196,7 +210,8 @@ def assert_answer_mark(step, problem_type, correctness):
                             'checkbox': ['span.incorrect'],
                             'string': ['div.incorrect'],
                             'numerical': ['div.incorrect'],
-                            'formula': ['div.incorrect'], }
+                            'formula': ['div.incorrect'], 
+                            'script': ['div.incorrect'] }
 
     assert(correctness in ['correct', 'incorrect', 'unanswered'])
     assert(problem_type in correct_selectors and problem_type in incorrect_selectors)
@@ -229,7 +244,7 @@ def assert_answer_mark(step, problem_type, correctness):
             assert(world.browser.is_element_not_present_by_css(sel, wait_time=4))
 
 
-def inputfield(problem_type, choice=None):
+def inputfield(problem_type, choice=None, input_num=1):
     """ Return the <input> element for *problem_type*.
     For example, if problem_type is 'string', return
     the text field for the string problem in the test course.
@@ -237,7 +252,8 @@ def inputfield(problem_type, choice=None):
     *choice* is the name of the checkbox input in a group
     of checkboxes. """
 
-    sel = "input#input_i4x-edx-model_course-problem-%s_2_1" % problem_type.replace(" ", "_")
+    sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" % 
+            (problem_type.replace(" ", "_"), str(input_num)))
 
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"

@@ -136,7 +136,7 @@ def log_in(email, password):
     # This is complicated by the fact that sometimes a second #login_form
     # dialog loads, while the first one remains hidden.
     # We give them both time to load, starting with the second one.
-    world.browser.is_element_present_by_css('section.content-wrapper form#login_form', wait_time=2)
+    world.browser.is_element_present_by_css('section.content-wrapper form#login_form', wait_time=4)
     world.browser.is_element_present_by_css('form#login_form', wait_time=2)
 
     # For some reason, the page sometimes includes two #login_form
