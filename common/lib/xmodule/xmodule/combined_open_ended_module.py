@@ -26,6 +26,24 @@ VERSION_TUPLES = (
 
 DEFAULT_VERSION = 1
 
+class VersionInteger(Integer):
+    """
+    A model type that converts from strings to integers when reading from json.
+    Also does error checking to see if version is correct or not.
+    """
+    def from_json(self, value):
+        try:
+            value = int(value)
+            versions = [i[0] for i in VERSION_TUPLES]
+            try:
+                versions.index(value)
+            except:
+                version_error_string = "Could not find version {0}, using version {1} instead"
+                log.error(version_error_string.format(value, DEFAULT_VERSION))
+                value = DEFAULT_VERSION
+        except:
+            value = DEFAULT_VERSION
+        return value
 
 class CombinedOpenEndedFields(object):
     display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
@@ -41,7 +59,7 @@ class CombinedOpenEndedFields(object):
     due = String(help="Date that this problem is due by", default=None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None, scope=Scope.settings)
     max_score = Integer(help="Maximum score for the problem.", default=1, scope=Scope.settings)
-    version = Integer(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
+    version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
 
 
@@ -134,16 +152,8 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         modules = [i[2] for i in VERSION_TUPLES]
         settings_attributes = [i[3] for i in VERSION_TUPLES]
         student_attributes = [i[4] for i in VERSION_TUPLES]
-        version_error_string = "Could not find version {0}, using version {1} instead"
 
-        version_to_use = self.version
-        try:
-            version_index = versions.index(version_to_use)
-        except:
-            #This is a dev_facing_error
-            log.error(version_error_string.format(version_to_use, DEFAULT_VERSION))
-            version_to_use = DEFAULT_VERSION
-            version_index = versions.index(version_to_use)
+        version_index = versions.index(self.version)
 
         self.student_attributes = student_attributes[version_index]
         self.settings_attributes = settings_attributes[version_index]
