@@ -32,7 +32,7 @@ class StringyInteger(Integer):
         try:
             return int(value)
         except:
-            return value
+            return None
 
 
 class StringyFloat(Float):
@@ -43,7 +43,7 @@ class StringyFloat(Float):
         try:
             return float(value)
         except:
-            return value
+            return None
 
 
 # Generated this many different variants of problems with rerandomize=per_student
@@ -139,9 +139,6 @@ class CapaModule(CapaFields, XModule):
             elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
                 # see comment on randomization_bin
                 self.seed = randomization_bin(system.seed, self.location.url)
-
-        if self.max_attempts == '':
-            self.max_attempts = None
 
         # Need the problem location in openendedresponse to send out.  Adding
         # it to the system here seems like the least clunky way to get it
@@ -391,7 +388,7 @@ class CapaModule(CapaFields, XModule):
 
         content = {'name': self.display_name_with_default,
                    'html': html,
-                   'weight': self.descriptor.weight,
+                   'weight': self.weight,
                    }
 
         context = {'problem': content,
