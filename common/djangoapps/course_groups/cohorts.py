@@ -15,6 +15,12 @@ from .models import CourseUserGroup
 log = logging.getLogger(__name__)
 
 
+# tl;dr: global state is bad.  capa reseeds random every time a problem is loaded.  Even
+# if and when that's fixed, it's a good idea to have a local generator to avoid any other
+# code that messes with the global random module.
+local_random = random.Random()
+
+
 def is_course_cohorted(course_id):
     """
     Given a course id, return a boolean for whether or not the course is
@@ -129,13 +135,7 @@ def get_cohort(user, course_id):
         return None
 
     # Put user in a random group, creating it if needed
-    choice = random.randrange(0, n)
-    group_name = choices[choice]
-
-    # Victor: we are seeing very strange behavior on prod, where almost all users
-    # end up in the same group.  Log at INFO to try to figure out what's going on.
-    log.info("DEBUG: adding user {0} to cohort {1}.  choice={2}".format(
-        user, group_name,choice))
+    group_name = local_random.choice(choices)
 
     group, created = CourseUserGroup.objects.get_or_create(
         course_id=course_id,
