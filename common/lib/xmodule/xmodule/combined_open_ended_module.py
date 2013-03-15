@@ -12,27 +12,29 @@ from collections import namedtuple
 
 log = logging.getLogger("mitx.courseware")
 
-
 V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
-                 "skip_spelling_checks", "due", "graceperiod", "max_score"]
+                          "skip_spelling_checks", "due", "graceperiod", "max_score"]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
-                          "student_attempts", "ready_to_reset"]
+                         "student_attempts", "ready_to_reset"]
 
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 
-VersionTuple= namedtuple('VersionTuple', ['descriptor', 'module', 'settings_attributes', 'student_attributes'])
+VersionTuple = namedtuple('VersionTuple', ['descriptor', 'module', 'settings_attributes', 'student_attributes'])
 VERSION_TUPLES = {
-    1: VersionTuple(CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES, V1_STUDENT_ATTRIBUTES),
+    1: VersionTuple(CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES,
+                    V1_STUDENT_ATTRIBUTES),
 }
 
 DEFAULT_VERSION = 1
+
 
 class VersionInteger(Integer):
     """
     A model type that converts from strings to integers when reading from json.
     Also does error checking to see if version is correct or not.
     """
+
     def from_json(self, value):
         try:
             value = int(value)
@@ -44,19 +46,26 @@ class VersionInteger(Integer):
             value = DEFAULT_VERSION
         return value
 
+
 class CombinedOpenEndedFields(object):
     display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
     current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.student_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.student_state)
-    state = String(help="Which step within the current task that the student is on.", default="initial", scope=Scope.student_state)
-    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
-    ready_to_reset = Boolean(help="If the problem is ready to be reset or not.",  default=False, scope=Scope.student_state)
+    state = String(help="Which step within the current task that the student is on.", default="initial",
+                   scope=Scope.student_state)
+    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
+                               scope=Scope.student_state)
+    ready_to_reset = Boolean(help="If the problem is ready to be reset or not.", default=False,
+                             scope=Scope.student_state)
     attempts = Integer(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
-    is_graded = Boolean(help="Whether or not the problem is graded.",  default=False, scope=Scope.settings)
-    accept_file_upload = Boolean(help="Whether or not the problem accepts file uploads.",  default=False, scope=Scope.settings)
-    skip_spelling_checks = Boolean(help="Whether or not to skip initial spelling checks.",  default=True, scope=Scope.settings)
+    is_graded = Boolean(help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
+    accept_file_upload = Boolean(help="Whether or not the problem accepts file uploads.", default=False,
+                                 scope=Scope.settings)
+    skip_spelling_checks = Boolean(help="Whether or not to skip initial spelling checks.", default=True,
+                                   scope=Scope.settings)
     due = String(help="Date that this problem is due by", default=None, scope=Scope.settings)
-    graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None, scope=Scope.settings)
+    graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
+                         scope=Scope.settings)
     max_score = Integer(help="Maximum score for the problem.", default=1, scope=Scope.settings)
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
@@ -160,7 +169,8 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         self.child_descriptor = version_tuple.descriptor(self.system)
         self.child_definition = version_tuple.descriptor.definition_from_xml(etree.fromstring(self.data), self.system)
         self.child_module = version_tuple.module(self.system, location, self.child_definition, self.child_descriptor,
-                                    instance_state=instance_state, static_data=static_data, attributes=attributes)
+                                                 instance_state=instance_state, static_data=static_data,
+                                                 attributes=attributes)
         self.save_instance_data()
 
     def get_html(self):
