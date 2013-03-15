@@ -29,4 +29,5 @@ cover_html/
 .idea/
 .redcar/
 chromedriver.log
+/nbproject
 ghostdriver.log

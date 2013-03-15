@@ -91,6 +91,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     #now add the group name if the thread has a group id
     for thread in threads:
+        
         if thread.get('group_id'):
             thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
             thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
@@ -209,6 +210,9 @@ def forum_form_discussion(request, course_id):
         cohorted_commentables = get_cohorted_commentables(course_id)
 
         user_cohort_id = get_cohort_id(request.user, course_id)
+
+    
+        
 
         context = {
             'csrf': csrf(request)['csrf_token'],
