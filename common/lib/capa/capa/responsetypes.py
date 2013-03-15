@@ -870,7 +870,7 @@ class CustomResponse(LoncapaResponse):
     Custom response.  The python code to be run should be in <answer>...</answer>
     or in a <script>...</script>
     '''
-    snippets = [{'snippet': """<customresponse>
+    snippets = [{'snippet': r"""<customresponse>
     <text>
     <br/>
     Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
@@ -1195,7 +1195,7 @@ class SymbolicResponse(CustomResponse):
     """
     Symbolic math response checking, using symmath library.
     """
-    snippets = [{'snippet': '''<problem>
+    snippets = [{'snippet': r'''<problem>
       <text>Compute \[ \exp\left(-i \frac{\theta}{2} \left[ \begin{matrix} 0 & 1 \\ 1 & 0 \end{matrix} \right] \right) \]
       and give the resulting \(2\times 2\) matrix: <br/>
         <symbolicresponse answer="">
