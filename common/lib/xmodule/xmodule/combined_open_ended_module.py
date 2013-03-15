@@ -35,9 +35,7 @@ class VersionInteger(Integer):
         try:
             value = int(value)
             versions = [i[0] for i in VERSION_TUPLES]
-            try:
-                versions.index(value)
-            except:
+            if value not in versions:
                 version_error_string = "Could not find version {0}, using version {1} instead"
                 log.error(version_error_string.format(value, DEFAULT_VERSION))
                 value = DEFAULT_VERSION
