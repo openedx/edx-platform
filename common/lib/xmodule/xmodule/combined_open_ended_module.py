@@ -8,7 +8,6 @@ from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
 from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
-import copy
 
 log = logging.getLogger("mitx.courseware")
 
@@ -137,7 +136,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         student_attributes = [i[4] for i in VERSION_TUPLES]
         version_error_string = "Could not find version {0}, using version {1} instead"
 
-        version_to_use = copy.copy(self.version)
+        version_to_use = self.version
         try:
             version_index = versions.index(version_to_use)
         except:
