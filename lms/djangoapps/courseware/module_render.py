@@ -18,7 +18,7 @@ from requests.auth import HTTPBasicAuth
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
-from models import StudentModule
+from .models import StudentModule
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import unique_id_for_user
 from xmodule.errortracker import exc_info_to_str

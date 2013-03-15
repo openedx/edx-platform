@@ -1,6 +1,6 @@
 from django.conf import settings
 from xmodule.open_ended_grading_classes import peer_grading_service
-from staff_grading_service import StaffGradingService
+from .staff_grading_service import StaffGradingService
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 import json
 from student.models import unique_id_for_user

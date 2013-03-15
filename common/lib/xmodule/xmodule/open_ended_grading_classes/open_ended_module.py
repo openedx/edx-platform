@@ -22,7 +22,7 @@ from numpy import median
 
 from datetime import datetime
 
-from combined_open_ended_rubric import CombinedOpenEndedRubric
+from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
 log = logging.getLogger("mitx.courseware")
 

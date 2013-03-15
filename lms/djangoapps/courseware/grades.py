@@ -10,12 +10,12 @@ from django.contrib.auth.models import User
 
 from .model_data import ModelDataCache, LmsKeyValueStore
 from xblock.core import Scope
-from module_render import get_module
+from .module_render import get_module
 from xmodule import graders
 from xmodule.capa_module import CapaModule
 from xmodule.course_module import CourseDescriptor
 from xmodule.graders import Score
-from models import StudentModule
+from .models import StudentModule
 
 log = logging.getLogger("mitx.courseware")
 

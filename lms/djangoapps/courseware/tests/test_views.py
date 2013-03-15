@@ -19,7 +19,7 @@ from xmodule.modulestore.exceptions import InvalidLocationError,\
 import courseware.views as views
 from xmodule.modulestore import Location
 
-from factories import UserFactory
+from .factories import UserFactory
 
 
 class Stub():

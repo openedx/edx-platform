@@ -12,7 +12,7 @@ from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 from xmodule.x_module import XModule, XModuleDescriptor
 import courseware.access as access
-from factories import CourseEnrollmentAllowedFactory
+from .factories import CourseEnrollmentAllowedFactory
 
 
 class AccessTestCase(TestCase):

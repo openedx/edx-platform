@@ -15,7 +15,7 @@ from json import loads
 from django.contrib.auth.models import User
 from contentstore.utils import get_modulestore
 
-from utils import ModuleStoreTestCase, parse_json
+from .utils import ModuleStoreTestCase, parse_json
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import Location

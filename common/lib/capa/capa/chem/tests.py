@@ -2,7 +2,7 @@ import codecs
 from fractions import Fraction
 import unittest
 
-from chemcalc import (compare_chemical_expression, divide_chemical_expression,
+from .chemcalc import (compare_chemical_expression, divide_chemical_expression,
                       render_to_html, chemical_equations_equal)
 
 import miller

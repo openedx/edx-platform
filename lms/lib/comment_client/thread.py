@@ -1,4 +1,4 @@
-from utils import *
+from .utils import *
 
 import models
 import settings

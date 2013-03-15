@@ -39,11 +39,11 @@ import verifiers
 import verifiers.draganddrop
 
 import calc
-from correctmap import CorrectMap
+from .correctmap import CorrectMap
 import eia
 import inputtypes
 import customrender
-from util import contextualize_text, convert_files_to_filenames
+from .util import contextualize_text, convert_files_to_filenames
 import xqueue_interface
 
 # to be replaced with auto-registering

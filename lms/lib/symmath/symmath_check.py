@@ -13,7 +13,7 @@ import sys
 import string
 import re
 import traceback
-from formula import *
+from .formula import *
 import logging
 
 log = logging.getLogger(__name__)

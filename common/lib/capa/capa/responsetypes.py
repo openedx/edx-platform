@@ -28,10 +28,10 @@ from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
 # specific library imports
-from calc import evaluator, UndefinedVariable
-from correctmap import CorrectMap
+from .calc import evaluator, UndefinedVariable
+from .correctmap import CorrectMap
 from datetime import datetime
-from util import *
+from .util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
 import xqueue_interface

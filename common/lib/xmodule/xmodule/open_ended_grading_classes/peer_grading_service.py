@@ -1,7 +1,7 @@
 import json
 import logging
 
-from grading_service_module import GradingService
+from .grading_service_module import GradingService
 
 log = logging.getLogger(__name__)
 

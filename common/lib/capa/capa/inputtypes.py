@@ -47,7 +47,7 @@ import sys
 import os
 import pyparsing
 
-from registry import TagRegistry
+from .registry import TagRegistry
 from capa.chem import chemcalc
 
 log = logging.getLogger(__name__)

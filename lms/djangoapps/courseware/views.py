@@ -22,7 +22,7 @@ from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.model_data import ModelDataCache
-from module_render import toc_for_course, get_module_for_descriptor, get_module
+from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
 
 from django_comment_client.utils import get_discussion_title

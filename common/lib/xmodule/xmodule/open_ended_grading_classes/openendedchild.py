@@ -12,7 +12,7 @@ from xmodule.stringify import stringify_children
 from xmodule.xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
-from peer_grading_service import PeerGradingService, MockPeerGradingService
+from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
 
 from datetime import datetime

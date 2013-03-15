@@ -11,7 +11,7 @@ from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from timeinfo import TimeInfo
+from .timeinfo import TimeInfo
 from xblock.core import Object, Integer, Boolean, String, Scope
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService

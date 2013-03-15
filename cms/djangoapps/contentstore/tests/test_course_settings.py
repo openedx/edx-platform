@@ -16,7 +16,7 @@ from models.settings.course_grading import CourseGradingModel
 from contentstore.utils import get_modulestore
 
 from django.test import TestCase
-from utils import ModuleStoreTestCase
+from .utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata

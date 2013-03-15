@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404
 
-from module_render import get_module
+from .module_render import get_module
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore

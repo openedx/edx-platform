@@ -10,7 +10,7 @@ from xmodule.stringify import stringify_children
 from xmodule.xml_module import XmlDescriptor
 import self_assessment_module
 import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
+from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 
 log = logging.getLogger("mitx.courseware")
 

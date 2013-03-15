@@ -1,4 +1,4 @@
-from utils import *
+from .utils import *
 
 
 class Model(object):

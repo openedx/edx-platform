@@ -25,7 +25,7 @@ from courseware.tests.tests import PageLoader
 from student.models import Registration
 from courseware.model_data import ModelDataCache
 
-from factories import UserFactory
+from .factories import UserFactory
 
 
 class Stub:
