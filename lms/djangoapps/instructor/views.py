@@ -1,8 +1,8 @@
-# ======== Instructor views =============================================================================
-
+"""
+Instructor Views
+"""
 from collections import defaultdict
 import csv
-import itertools
 import json
 import logging
 import os
@@ -10,8 +10,6 @@ import re
 import requests
 from requests.status_codes import codes
 import urllib
-import datetime
-from datetime import datetime, timedelta
 from collections import OrderedDict
 import json
 
@@ -595,7 +593,7 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # analytics
     def get_analytics_result(analytics_name):
-        """Return data for an Analytic piece, or None if it doesn't exist. It 
+        """Return data for an Analytic piece, or None if it doesn't exist. It
         logs and swallows errors.
         """
         url = settings.ANALYTICS_SERVER_URL + \
@@ -621,14 +619,14 @@ def instructor_dashboard(request, course_id):
 
     if idash_mode == 'Analytics':
         DASHBOARD_ANALYTICS = [
-            #"StudentsAttemptedProblems", # num students who tried given problem
-            "StudentsDailyActivity", # active students by day
-            "StudentsDropoffPerDay", # active students dropoff by day
-            #"OverallGradeDistribution", # overall point distribution for course
-            "StudentsActive", # num students active in time period (default = 1wk)
-            "StudentsEnrolled", # num students enrolled
-            #"StudentsPerProblemCorrect", # foreach problem, num students correct,
-            "ProblemGradeDistribution", # foreach problem, grade distribution
+            # "StudentsAttemptedProblems",  # num students who tried given problem
+            "StudentsDailyActivity",  # active students by day
+            "StudentsDropoffPerDay",  # active students dropoff by day
+            # "OverallGradeDistribution",  # overall point distribution for course
+            "StudentsActive",  # num students active in time period (default = 1wk)
+            "StudentsEnrolled",  # num students enrolled
+            # "StudentsPerProblemCorrect",  # foreach problem, num students correct
+            "ProblemGradeDistribution",  # foreach problem, grade distribution
         ]
         for analytic_name in DASHBOARD_ANALYTICS:
             analytics_results[analytic_name] = get_analytics_result(analytic_name)
@@ -659,7 +657,7 @@ def instructor_dashboard(request, course_id):
                'offline_grade_log': offline_grades_available(course_id),
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
-               'analytics_results' : analytics_results,
+               'analytics_results': analytics_results,
             }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
