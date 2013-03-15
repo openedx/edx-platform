@@ -99,8 +99,10 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
             thread['group_name'] = ""
             thread['group_string'] = "This post visible to everyone."
         
-        #temporary patch for backward compatibility to comments service
-        thread['pinning'] = False
+        #patch for backward compatibility to comments service
+        if not 'pinned' in thread:
+            thread['pinned'] = False
+        
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
@@ -249,8 +251,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
     try:
         thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
         
-        #temporary patch for backward compatibility with comments service
-        thread["pinned"] = False
+        #patch for backward compatibility with comments service
+        if not 'pinned' in thread.attributes:
+            thread['pinned'] = False
         
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         log.error("Error loading single thread.")
@@ -292,8 +295,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
             if thread.get('group_id') and not thread.get('group_name'):
                 thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
 
-            #temporary patch for backward compatibility with comments service
-            thread["pinned"] = False
+            #patch for backward compatibility with comments service
+            if not "pinned" in thread:
+                thread["pinned"] = False
 
         threads = [utils.safe_content(thread) for thread in threads]
 

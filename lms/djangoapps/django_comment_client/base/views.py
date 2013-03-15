@@ -116,8 +116,9 @@ def create_thread(request, course_id, commentable_id):
     
     thread.save()
 
-    #patch for backward compatibility with comments service
-    thread['pinned'] = False
+    #patch for backward compatibility to comments service
+    if not 'pinned' in thread.attributes:
+        thread['pinned'] = False
     
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
