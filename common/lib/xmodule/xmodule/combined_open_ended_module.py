@@ -8,6 +8,7 @@ from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
 from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
+from collections import namedtuple
 
 log = logging.getLogger("mitx.courseware")
 
@@ -20,8 +21,9 @@ V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
 
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 
+VersionTuple= namedtuple('VersionTuple', ['version', 'descriptor', 'module', 'settings_attributes', 'student_attributes'])
 VERSION_TUPLES = (
-    (1, CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES, V1_STUDENT_ATTRIBUTES),
+    VersionTuple(1, CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES, V1_STUDENT_ATTRIBUTES),
 )
 
 DEFAULT_VERSION = 1
@@ -34,7 +36,7 @@ class VersionInteger(Integer):
     def from_json(self, value):
         try:
             value = int(value)
-            versions = [i[0] for i in VERSION_TUPLES]
+            versions = [i.version for i in VERSION_TUPLES]
             if value not in versions:
                 version_error_string = "Could not find version {0}, using version {1} instead"
                 log.error(version_error_string.format(value, DEFAULT_VERSION))
@@ -145,16 +147,14 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         if self.task_states is None:
             self.task_states = []
 
-        versions = [i[0] for i in VERSION_TUPLES]
-        descriptors = [i[1] for i in VERSION_TUPLES]
-        modules = [i[2] for i in VERSION_TUPLES]
-        settings_attributes = [i[3] for i in VERSION_TUPLES]
-        student_attributes = [i[4] for i in VERSION_TUPLES]
+        versions = [i.version for i in VERSION_TUPLES]
 
         version_index = versions.index(self.version)
 
-        self.student_attributes = student_attributes[version_index]
-        self.settings_attributes = settings_attributes[version_index]
+        version_tuple = VERSION_TUPLES[version_index]
+
+        self.student_attributes = version_tuple.student_attributes
+        self.settings_attributes = version_tuple.settings_attributes
 
         attributes = self.student_attributes + self.settings_attributes
 
@@ -162,9 +162,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
             'rewrite_content_links': self.rewrite_content_links,
         }
         instance_state = {k: getattr(self, k) for k in attributes}
-        self.child_descriptor = descriptors[version_index](self.system)
-        self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(self.data), self.system)
-        self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
+        self.child_descriptor = version_tuple.descriptor(self.system)
+        self.child_definition = version_tuple.descriptor.definition_from_xml(etree.fromstring(self.data), self.system)
+        self.child_module = version_tuple.module(self.system, location, self.child_definition, self.child_descriptor,
                                     instance_state=instance_state, static_data=static_data, attributes=attributes)
         self.save_instance_data()
 
