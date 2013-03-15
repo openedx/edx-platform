@@ -23,13 +23,14 @@ from xmodule.html_module import HtmlDescriptor
 
 from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
+from .inheritance import compute_inherited_metadata
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
 
 etree.set_default_parser(edx_xml_parser)
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 
 # VS[compat]
@@ -73,7 +74,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # VS[compat]. Take this out once course conversion is done (perhaps leave the uniqueness check)
 
                 # tags that really need unique names--they store (or should store) state.
-                need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter', 'videosequence', 'timelimit')
+                need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter',
+                                    'videosequence', 'poll_question', 'timelimit')
 
                 attr = xml_data.attrib
                 tag = xml_data.tag
@@ -161,7 +163,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     etree.tostring(xml_data, encoding='unicode'), self, self.org,
                     self.course, xmlstore.default_class)
             except Exception as err:
-                print err, self.load_error_modules
                 if not self.load_error_modules:
                     raise
 
@@ -174,7 +175,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Normally, we don't want lots of exception traces in our logs from common
                 # content problems.  But if you're debugging the xml loading code itself,
                 # uncomment the next line.
-                # log.exception(msg)
+                log.exception(msg)
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
@@ -186,12 +187,13 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     err_msg
                 )
 
-            descriptor.metadata['data_dir'] = course_dir
+            setattr(descriptor, 'data_dir', course_dir)
 
             xmlstore.modules[course_id][descriptor.location] = descriptor
 
-            for child in descriptor.get_children():
-                parent_tracker.add_parent(child.location, descriptor.location)
+            if hasattr(descriptor, 'children'):
+                for child in descriptor.get_children():
+                    parent_tracker.add_parent(child.location, descriptor.location)
             return descriptor
 
         render_template = lambda: ''
@@ -318,8 +320,6 @@ class XMLModuleStore(ModuleStoreBase):
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
 
-
-
     def __unicode__(self):
         '''
         String representation - for debugging
@@ -344,8 +344,6 @@ class XMLModuleStore(ModuleStoreBase):
             tracker(msg)
             log.warning(msg + " " + str(err))
         return {}
-
-
 
     def load_course(self, course_dir, tracker):
         """
@@ -430,7 +428,7 @@ class XMLModuleStore(ModuleStoreBase):
             # breaks metadata inheritance via get_children().  Instead
             # (actually, in addition to, for now), we do a final inheritance pass
             # after we have the course descriptor.
-            XModuleDescriptor.compute_inherited_metadata(course_descriptor)
+            compute_inherited_metadata(course_descriptor)
 
             # now import all pieces of course_info which is expected to be stored
             # in <content_dir>/info or <content_dir>/info/<url_name>
@@ -449,7 +447,6 @@ class XMLModuleStore(ModuleStoreBase):
 
 
     def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
-
         self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
 
          # then look in a override folder based on the course run
@@ -460,26 +457,29 @@ class XMLModuleStore(ModuleStoreBase):
     def _load_extra_content(self, system, course_descriptor, category, path, course_dir):
 
         for filepath in glob.glob(path / '*'):
-            if not os.path.isdir(filepath):
-                with open(filepath) as f:
-                    try:
-                        html = f.read().decode('utf-8')
-                        # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
-                        slug = os.path.splitext(os.path.basename(filepath))[0]
-                        loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
-                        module = HtmlDescriptor(system, definition={'data': html}, **{'location': loc})
-                        # VS[compat]:
-                        # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
-                        # from the course policy
-                        if category == "static_tab":
-                            for tab in course_descriptor.tabs or []:
-                                if tab.get('url_slug') == slug:
-                                    module.metadata['display_name'] = tab['name']
-                        module.metadata['data_dir'] = course_dir
-                        self.modules[course_descriptor.id][module.location] = module
-                    except Exception, e:
-                        logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
-                        system.error_tracker("ERROR: " + str(e))
+            if not os.path.isfile(filepath):
+                continue
+
+            with open(filepath) as f:
+                try:
+                    html = f.read().decode('utf-8')
+                    # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
+                    slug = os.path.splitext(os.path.basename(filepath))[0]
+                    loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
+                    module = HtmlDescriptor(system, loc, {'data': html})
+                    # VS[compat]:
+                    # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
+                    # from the course policy
+                    if category == "static_tab":
+                        for tab in course_descriptor.tabs or []:
+                            if tab.get('url_slug') == slug:
+                                module.display_name = tab['name']
+                    module.data_dir = course_dir
+                    self.modules[course_descriptor.id][module.location] = module
+                except Exception, e:
+                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
+                    system.error_tracker("ERROR: " + str(e))
+
 
     def get_instance(self, course_id, location, depth=0):
         """

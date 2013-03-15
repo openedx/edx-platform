@@ -4,7 +4,6 @@ class @Video
     @id = @el.attr('id').replace(/video_/, '')
     @start = @el.data('start')
     @end = @el.data('end')
-    @caption_data_dir = @el.data('caption-data-dir')
     @caption_asset_path = @el.data('caption-asset-path')
     @show_captions = @el.data('show-captions') == "true"
     window.player = null

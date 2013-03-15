@@ -91,7 +91,11 @@ def instructor_dashboard(request, course_id):
     data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
     data += compute_course_stats(course).items()
     if request.user.is_staff:
-        data.append(['metadata', escape(str(course.metadata))])
+        for field in course.fields:
+            data.append([field.name, json.dumps(field.read_json(course))])
+        for namespace in course.namespaces:
+            for field in getattr(course, namespace).fields:
+                data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
     datatable['data'] = data
 
     def return_csv(fn, datatable, fp=None):
@@ -139,7 +143,7 @@ def instructor_dashboard(request, course_id):
 
     if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
-            data_dir = course.metadata['data_dir']
+            data_dir = getattr(course, 'data_dir')
             log.debug('git pull {0}'.format(data_dir))
             gdir = settings.DATA_DIR / data_dir
             if not os.path.exists(gdir):
@@ -153,7 +157,7 @@ def instructor_dashboard(request, course_id):
         if 'Reload course' in action:
             log.debug('reloading {0} ({1})'.format(course_id, course))
             try:
-                data_dir = course.metadata['data_dir']
+                data_dir = getattr(course, 'data_dir')
                 modulestore().try_load_course(data_dir)
                 msg += "<br/><p>Course reloaded from {0}</p>".format(data_dir)
                 track.views.server_track(request, 'reload {0}'.format(data_dir), {}, page='idashboard')
@@ -407,7 +411,7 @@ def instructor_dashboard(request, course_id):
         def getdat(u):
             p = u.profile
             return [u.username, u.email] + [getattr(p,x,'') for x in profkeys]
-        
+
         datatable['data'] = [getdat(u) for u in enrolled_students]
         datatable['title'] = 'Student profile data for course %s' % course_id
         return return_csv('profiledata_%s.csv' % course_id, datatable)
@@ -429,7 +433,7 @@ def instructor_dashboard(request, course_id):
             msg+="<font color='red'>Couldn't find module with that urlname.  </font>"
             msg += "<pre>%s</pre>" % escape(err)
             smdat = []
-        
+
         if smdat:
             datatable = {'header': ['username', 'state']}
             datatable['data'] = [ [x.student.username, x.state] for x in smdat ]
@@ -667,7 +671,7 @@ def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
     Perform remote gradebook action.  Returns msg, datatable.
     '''
-    rg = course.metadata.get('remote_gradebook', '')
+    rg = course.remote_gradebook
     if not rg:
         msg = "No remote gradebook defined in course metadata"
         return msg, {}

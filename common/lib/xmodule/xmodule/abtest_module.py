@@ -1,4 +1,3 @@
-import json
 import random
 import logging
 from lxml import etree
@@ -7,6 +6,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.exceptions import InvalidDefinitionError
+from xblock.core import String, Scope, Object, BlockScope
 
 DEFAULT = "_DEFAULT_GROUP"
 
@@ -31,29 +31,42 @@ def group_from_value(groups, v):
     return g
 
 
-class ABTestModule(XModule):
+class ABTestFields(object):
+    group_portions = Object(help="What proportions of students should go in each group", default={DEFAULT: 1}, scope=Scope.content)
+    group_assignments = Object(help="What group this user belongs to", scope=Scope.student_preferences, default={})
+    group_content = Object(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
+    experiment = String(help="Experiment that this A/B test belongs to", scope=Scope.content)
+    has_children = True
+
+
+class ABTestModule(ABTestFields, XModule):
     """
     Implements an A/B test with an aribtrary number of competing groups
     """
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
 
-        if shared_state is None:
-
+        if self.group is None:
             self.group = group_from_value(
-                self.definition['data']['group_portions'].items(),
+                self.group_portions.items(),
                 random.uniform(0, 1)
             )
-        else:
-            shared_state = json.loads(shared_state)
-            self.group = shared_state['group']
 
-    def get_shared_state(self):
-        return json.dumps({'group': self.group})
+    @property
+    def group(self):
+        return self.group_assignments.get(self.experiment)
+
+    @group.setter
+    def group(self, value):
+        self.group_assignments[self.experiment] = value
+
+    @group.deleter
+    def group(self):
+        del self.group_assignments[self.experiment]
 
     def get_child_descriptors(self):
-        active_locations = set(self.definition['data']['group_content'][self.group])
+        active_locations = set(self.group_content[self.group])
         return [desc for desc in self.descriptor.get_children() if desc.location.url() in active_locations]
 
     def displayable_items(self):
@@ -64,42 +77,10 @@ class ABTestModule(XModule):
 
 # TODO (cpennington): Use Groups should be a first class object, rather than being
 # managed by ABTests
-class ABTestDescriptor(RawDescriptor, XmlDescriptor):
+class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
     module_class = ABTestModule
 
     template_dir_name = "abtest"
-
-    def __init__(self, system, definition=None, **kwargs):
-        """
-        definition is a dictionary with the following layout:
-            {'data': {
-                'experiment': 'the name of the experiment',
-                'group_portions': {
-                    'group_a': 0.1,
-                    'group_b': 0.2
-                },
-                'group_contents': {
-                    'group_a': [
-                        'url://for/content/module/1',
-                        'url://for/content/module/2',
-                    ],
-                    'group_b': [
-                        'url://for/content/module/3',
-                    ],
-                    DEFAULT: [
-                        'url://for/default/content/1'
-                    ]
-                }
-            },
-            'children': [
-                'url://for/content/module/1',
-                'url://for/content/module/2',
-                'url://for/content/module/3',
-                'url://for/default/content/1',
-            ]}
-        """
-        kwargs['shared_state_key'] = definition['data']['experiment']
-        RawDescriptor.__init__(self, system, definition, **kwargs)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -118,19 +99,16 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 "ABTests must specify an experiment. Not found in:\n{xml}"
                 .format(xml=etree.tostring(xml_object, pretty_print=True)))
 
-        definition = {
-            'data': {
-                'experiment': experiment,
-                'group_portions': {},
-                'group_content': {DEFAULT: []},
-            },
-            'children': []}
+        group_portions = {}
+        group_content = {}
+        children = []
+
         for group in xml_object:
             if group.tag == 'default':
                 name = DEFAULT
             else:
                 name = group.get('name')
-                definition['data']['group_portions'][name] = float(group.get('portion', 0))
+                group_portions[name] = float(group.get('portion', 0))
 
             child_content_urls = []
             for child in group:
@@ -140,29 +118,33 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                     log.exception("Unable to load child when parsing ABTest. Continuing...")
                     continue
 
-            definition['data']['group_content'][name] = child_content_urls
-            definition['children'].extend(child_content_urls)
+            group_content[name] = child_content_urls
+            children.extend(child_content_urls)
 
         default_portion = 1 - sum(
-            portion for (name, portion) in definition['data']['group_portions'].items())
+            portion for (name, portion) in group_portions.items()
+        )
 
         if default_portion < 0:
             raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
 
-        definition['data']['group_portions'][DEFAULT] = default_portion
-        definition['children'].sort()
+        group_portions[DEFAULT] = default_portion
+        children.sort()
 
-        return definition
+        return {
+            'group_portions': group_portions,
+            'group_content': group_content,
+        }, children
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('abtest')
-        xml_object.set('experiment', self.definition['data']['experiment'])
-        for name, group in self.definition['data']['group_content'].items():
+        xml_object.set('experiment', self.experiment)
+        for name, group in self.group_content.items():
             if name == DEFAULT:
                 group_elem = etree.SubElement(xml_object, 'default')
             else:
                 group_elem = etree.SubElement(xml_object, 'group', attrib={
-                    'portion': str(self.definition['data']['group_portions'][name]),
+                    'portion': str(self.group_portions[name]),
                     'name': name,
                 })
 
@@ -171,7 +153,6 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
 
         return xml_object
-
 
     def has_dynamic_children(self):
         return True

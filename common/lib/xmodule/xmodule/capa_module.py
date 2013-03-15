@@ -6,25 +6,45 @@ import hashlib
 import json
 import logging
 import traceback
-import re
 import sys
 
-from datetime import timedelta
 from lxml import etree
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
 from capa.util import convert_files_to_filenames
-from progress import Progress
+from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError
+from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float
+from .fields import Timedelta
 
 log = logging.getLogger("mitx.courseware")
 
-#-----------------------------------------------------------------------------
-TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+
+class StringyInteger(Integer):
+    """
+    A model type that converts from strings to integers when reading from json
+    """
+    def from_json(self, value):
+        try:
+            return int(value)
+        except:
+            return None
+
+
+class StringyFloat(Float):
+    """
+    A model type that converts from string to floats when reading from json
+    """
+    def from_json(self, value):
+        try:
+            return float(value)
+        except:
+            return None
+
 
 # Generated this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
@@ -45,41 +65,15 @@ def randomization_bin(seed, problem_id):
     return int(h.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
 
-def only_one(lst, default="", process=lambda x: x):
-    """
-    If lst is empty, returns default
+class Randomization(String):
+    def from_json(self, value):
+        if value in ("", "true"):
+            return "always"
+        elif value == "false":
+            return "per_student"
+        return value
 
-    If lst has a single element, applies process to that element and returns it.
-
-    Otherwise, raises an exception.
-    """
-    if len(lst) == 0:
-        return default
-    elif len(lst) == 1:
-        return process(lst[0])
-    else:
-        raise Exception('Malformed XML: expected at most one element in list.')
-
-
-def parse_timedelta(time_str):
-    """
-    time_str: A string with the following components:
-        <D> day[s] (optional)
-        <H> hour[s] (optional)
-        <M> minute[s] (optional)
-        <S> second[s] (optional)
-
-    Returns a datetime.timedelta parsed from the string
-    """
-    parts = TIMEDELTA_REGEX.match(time_str)
-    if not parts:
-        return
-    parts = parts.groupdict()
-    time_params = {}
-    for (name, param) in parts.iteritems():
-        if param:
-            time_params[name] = int(param)
-    return timedelta(**time_params)
+    to_json = from_json
 
 
 class ComplexEncoder(json.JSONEncoder):
@@ -89,12 +83,31 @@ class ComplexEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class CapaModule(XModule):
+class CapaFields(object):
+    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
+    max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    due = String(help="Date that this problem is due by", scope=Scope.settings)
+    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
+    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
+    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
+    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    data = String(help="XML data for the problem", scope=Scope.content)
+    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
+    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
+    done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+    seed = StringyInteger(help="Random seed for this student", scope=Scope.student_state)
+    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+
+
+class CapaModule(CapaFields, XModule):
     '''
     An XModule implementing LonCapa format problems, implemented by way of
     capa.capa_problem.LoncapaProblem
     '''
     icon_class = 'problem'
+
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
@@ -107,61 +120,25 @@ class CapaModule(XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None,
-                 shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor, instance_state,
-                         shared_state, **kwargs)
+    def __init__(self, system, location, descriptor, model_data):
+        XModule.__init__(self, system, location, descriptor, model_data)
 
-        self.attempts = 0
-        self.max_attempts = None
-
-        dom2 = etree.fromstring(definition['data'])
-
-        display_due_date_string = self.metadata.get('due', None)
-        if display_due_date_string is not None:
-            self.display_due_date = dateutil.parser.parse(display_due_date_string)
-            #log.debug("Parsed " + display_due_date_string +
-            #          " to " + str(self.display_due_date))
+        if self.due:
+            due_date = dateutil.parser.parse(self.due)
         else:
-            self.display_due_date = None
+            due_date = None
 
-        grace_period_string = self.metadata.get('graceperiod', None)
-        if grace_period_string is not None and self.display_due_date:
-            self.grace_period = parse_timedelta(grace_period_string)
-            self.close_date = self.display_due_date + self.grace_period
-            #log.debug("Then parsed " + grace_period_string +
-            #          " to closing date" + str(self.close_date))
+        if self.graceperiod is not None and due_date:
+            self.close_date = due_date + self.graceperiod
         else:
-            self.grace_period = None
-            self.close_date = self.display_due_date
+            self.close_date = due_date
 
-        max_attempts = self.metadata.get('attempts')
-        if max_attempts is not None and max_attempts != '':
-            self.max_attempts = int(max_attempts)
-        else:
-            self.max_attempts = None
-
-        self.show_answer = self.metadata.get('showanswer', 'closed')
-
-        self.force_save_button = self.metadata.get('force_save_button', 'false')
-
-        if self.show_answer == "":
-            self.show_answer = "closed"
-
-        if instance_state is not None:
-            instance_state = json.loads(instance_state)
-        if instance_state is not None and 'attempts' in instance_state:
-            self.attempts = instance_state['attempts']
-
-        self.name = only_one(dom2.xpath('/problem/@name'))
-
-        if self.rerandomize == 'never':
-            self.seed = 1
-        elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
-            # see comment on randomization_bin
-            self.seed = randomization_bin(system.seed, self.location.url)
-        else:
-            self.seed = None
+        if self.seed is None:
+            if self.rerandomize == 'never':
+                self.seed = 1
+            elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
+                # see comment on randomization_bin
+                self.seed = randomization_bin(system.seed, self.location.url)
 
         # Need the problem location in openendedresponse to send out.  Adding
         # it to the system here seems like the least clunky way to get it
@@ -171,8 +148,7 @@ class CapaModule(XModule):
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
-            self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                                      instance_state, seed=self.seed, system=self.system)
+            self.lcp = self.new_lcp(self.get_state_for_lcp())
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
@@ -189,35 +165,38 @@ class CapaModule(XModule):
                 problem_text = ('<problem><text><span class="inline-error">'
                                 'Problem %s has an error:</span>%s</text></problem>' %
                                 (self.location.url(), msg))
-                self.lcp = LoncapaProblem(
-                    problem_text, self.location.html_id(),
-                    instance_state, seed=self.seed, system=self.system)
+                self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
 
-    @property
-    def rerandomize(self):
-        """
-        Property accessor that returns self.metadata['rerandomize'] in a
-        canonical form
-        """
-        rerandomize = self.metadata.get('rerandomize', 'always')
-        if rerandomize in ("", "always", "true"):
-            return "always"
-        elif rerandomize in ("false", "per_student"):
-            return "per_student"
-        elif rerandomize == "never":
-            return "never"
-        elif rerandomize == "onreset":
-            return "onreset"
-        else:
-            raise Exception("Invalid rerandomize attribute " + rerandomize)
+            self.set_state_from_lcp()
 
-    def get_instance_state(self):
-        state = self.lcp.get_state()
-        state['attempts'] = self.attempts
-        return json.dumps(state)
+    def new_lcp(self, state, text=None):
+        if text is None:
+            text = self.data
+
+        return LoncapaProblem(
+            problem_text=text,
+            id=self.location.html_id(),
+            state=state,
+            system=self.system,
+        )
+
+    def get_state_for_lcp(self):
+        return {
+            'done': self.done,
+            'correct_map': self.correct_map,
+            'student_answers': self.student_answers,
+            'seed': self.seed,
+        }
+
+    def set_state_from_lcp(self):
+        lcp_state = self.lcp.get_state()
+        self.done = lcp_state['done']
+        self.correct_map = lcp_state['correct_map']
+        self.student_answers = lcp_state['student_answers']
+        self.seed = lcp_state['seed']
 
     def get_score(self):
         return self.lcp.get_score()
@@ -234,7 +213,7 @@ class CapaModule(XModule):
         if total > 0:
             try:
                 return Progress(score, total)
-            except Exception as err:
+            except Exception:
                 log.exception("Got bad progress")
                 return None
         return None
@@ -291,7 +270,6 @@ class CapaModule(XModule):
                 return False
             else:
                 return True
-
         # Only randomized problems need a "reset" button
         else:
             return False
@@ -358,6 +336,8 @@ class CapaModule(XModule):
         # We're in non-debug mode, and possibly even in production. We want
         #   to avoid bricking of problem as much as possible
         else:
+            # We're in non-debug mode, and possibly even in production. We want
+            #   to avoid bricking of problem as much as possible
 
             # Presumably, student submission has corrupted LoncapaProblem HTML.
             #   First, pull down all student answers
@@ -374,9 +354,8 @@ class CapaModule(XModule):
                         student_answers.pop(answer_id)
 
             #   Next, generate a fresh LoncapaProblem
-            self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                           state=None,   # Tabula rasa
-                           seed=self.seed, system=self.system)
+            self.lcp = self.new_lcp(None)
+            self.set_state_from_lcp()
 
             # Prepend a scary warning to the student
             warning  = '<div class="capa_reset">'\
@@ -394,8 +373,8 @@ class CapaModule(XModule):
             html = warning
             try:
                 html += self.lcp.get_html()
-            except Exception, err:   # Couldn't do it. Give up
-                log.exception(err)
+            except Exception:  # Couldn't do it. Give up
+                log.exception("Unable to generate html from LoncapaProblem")
                 raise
 
         return html
@@ -422,11 +401,10 @@ class CapaModule(XModule):
         else:
             check_button = False
 
-        content = {'name': self.display_name,
+        content = {'name': self.display_name_with_default,
                    'html': html,
-                   'weight': self.descriptor.weight,
+                   'weight': self.weight,
                    }
-
 
         context = {'problem': content,
                    'id': self.id,
@@ -514,28 +492,28 @@ class CapaModule(XModule):
         '''
         Is the user allowed to see an answer?
         '''
-        if self.show_answer == '':
+        if self.showanswer == '':
             return False
-        elif self.show_answer == "never":
+        elif self.showanswer == "never":
             return False
         elif self.system.user_is_staff:
             # This is after the 'never' check because admins can see the answer
             # unless the problem explicitly prevents it
             return True
-        elif self.show_answer == 'attempted':
+        elif self.showanswer == 'attempted':
             return self.attempts > 0
-        elif self.show_answer == 'answered':
+        elif self.showanswer == 'answered':
             # NOTE: this is slightly different from 'attempted' -- resetting the problems
             # makes lcp.done False, but leaves attempts unchanged.
             return self.lcp.done
-        elif self.show_answer == 'closed':
+        elif self.showanswer == 'closed':
             return self.closed()
-        elif self.show_answer == 'finished':
+        elif self.showanswer == 'finished':
             return self.closed() or self.is_correct()
 
-        elif self.show_answer == 'past_due':
+        elif self.showanswer == 'past_due':
             return self.is_past_due()
-        elif self.show_answer == 'always':
+        elif self.showanswer == 'always':
             return True
 
         return False
@@ -554,6 +532,8 @@ class CapaModule(XModule):
         queuekey = get['queuekey']
         score_msg = get['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
+        self.set_state_from_lcp()
+        self.publish_grade()
 
         return dict()  # No AJAX return is needed
 
@@ -565,13 +545,14 @@ class CapaModule(XModule):
         '''
         event_info = dict()
         event_info['problem_id'] = self.location.url()
-        self.system.track_function('show_answer', event_info)
+        self.system.track_function('showanswer', event_info)
         if not self.answer_available():
             raise NotFoundError('Answer is not available')
         else:
             answers = self.lcp.get_question_answers()
+            self.set_state_from_lcp()
 
-            # answers (eg <solution>) may have embedded images
+        # answers (eg <solution>) may have embedded images
         #   but be careful, some problems are using non-string answer dicts
         new_answers = dict()
         for answer_id in answers:
@@ -654,6 +635,18 @@ class CapaModule(XModule):
 
         return answers
 
+    def publish_grade(self):
+        """
+        Publishes the student's current grade to the system as an event
+        """
+        score = self.lcp.get_score()
+        self.system.publish({
+            'event_name': 'grade',
+            'value': score['score'],
+            'max_value': score['total'],
+        })
+
+
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and
             returns a map of correct/incorrect answers:
@@ -667,7 +660,6 @@ class CapaModule(XModule):
 
         answers = self.make_dict_of_responses(get)
         event_info['answers'] = convert_files_to_filenames(answers)
-
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
@@ -675,7 +667,7 @@ class CapaModule(XModule):
             raise NotFoundError('Problem is closed')
 
         # Problem submitted. Student should reset before checking again
-        if self.lcp.done and self.rerandomize == "always":
+        if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
             self.system.track_function('save_problem_check_fail', event_info)
             raise NotFoundError('Problem must be reset before it can be checked again')
@@ -687,12 +679,11 @@ class CapaModule(XModule):
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
-                return {'success': msg, 'html': ''}   # Prompts a modal dialog in ajax callback
+                return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
         try:
-            old_state = self.lcp.get_state()
-            lcp_id = self.lcp.problem_id
             correct_map = self.lcp.grade_answers(answers)
+            self.set_state_from_lcp()
         except StudentInputError as inst:
             log.exception("StudentInputError in capa_module:problem_check")
             return {'success': inst.message}
@@ -701,11 +692,13 @@ class CapaModule(XModule):
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
                 return {'success': msg}
-            log.exception("Error in capa_module problem checking")
-            raise Exception("error in capa_module")
+            raise
 
         self.attempts = self.attempts + 1
         self.lcp.done = True
+
+        self.set_state_from_lcp()
+        self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
         success = 'correct'
@@ -720,7 +713,7 @@ class CapaModule(XModule):
         event_info['attempts'] = self.attempts
         self.system.track_function('save_problem_check', event_info)
 
-        if hasattr(self.system, 'psychometrics_handler'):  	# update PsychometricsData using callback
+        if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
             self.system.psychometrics_handler(self.get_instance_state())
 
         # render problem into HTML
@@ -752,13 +745,15 @@ class CapaModule(XModule):
 
         # Problem submitted. Student should reset before saving
         # again.
-        if self.lcp.done and self.rerandomize == "always":
+        if self.done and self.rerandomize == "always":
             event_info['failure'] = 'done'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
                     'msg': "Problem needs to be reset prior to save"}
 
         self.lcp.student_answers = answers
+
+        self.set_state_from_lcp()
 
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"
@@ -788,22 +783,24 @@ class CapaModule(XModule):
             return {'success': False,
                     'error': "Problem is closed"}
 
-        if not self.lcp.done:
+        if not self.done:
             event_info['failure'] = 'not_done'
             self.system.track_function('reset_problem_fail', event_info)
             return {'success': False,
                     'error': "Refresh the page and make an attempt before resetting."}
 
-        self.lcp.do_reset()
         if self.rerandomize in ["always", "onreset"]:
             # reset random number generator seed (note the self.lcp.get_state()
             # in next line)
-            self.lcp.seed = None
+            seed = None
+        else:
+            seed = self.lcp.seed
 
+        # Generate a new problem with either the previous seed or a new seed
+        self.lcp = self.new_lcp({'seed': seed})
 
-        self.lcp = LoncapaProblem(self.definition['data'],
-                                  self.location.html_id(), self.lcp.get_state(),
-                                  system=self.system)
+        # Pull in the new problem seed
+        self.set_state_from_lcp()
 
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)
@@ -812,7 +809,7 @@ class CapaModule(XModule):
                 'html': self.get_problem_html(encapsulate=False)}
 
 
-class CapaDescriptor(RawDescriptor):
+class CapaDescriptor(CapaFields, RawDescriptor):
     """
     Module implementing problems in the LON-CAPA format,
     as implemented by capa.capa_problem
@@ -833,19 +830,26 @@ class CapaDescriptor(RawDescriptor):
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
 
+    # The capa format specifies that what we call max_attempts in the code
+    # is the attribute `attempts`. This will do that conversion
+    metadata_translations = dict(RawDescriptor.metadata_translations)
+    metadata_translations['attempts'] = 'max_attempts'
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.metadata.get('markdown', ''),
-                         'enable_markdown': 'markdown' in self.metadata})
+        _context.update({'markdown': self.markdown,
+                         'enable_markdown': self.markdown is not None})
         return _context
 
     @property
     def editable_metadata_fields(self):
-        """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
-        subset = [field for field in super(CapaDescriptor, self).editable_metadata_fields
-                  if field not in ['markdown', 'empty']]
+        """Remove metadata from the editable fields since it has its own editor"""
+        subset = super(CapaDescriptor, self).editable_metadata_fields
+        if 'markdown' in subset:
+            del subset['markdown']
+        if 'empty' in subset:
+            del subset['empty']
         return subset
-
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
@@ -856,12 +860,3 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
-
-    def __init__(self, *args, **kwargs):
-        super(CapaDescriptor, self).__init__(*args, **kwargs)
-
-        weight_string = self.metadata.get('weight', None)
-        if weight_string:
-            self.weight = float(weight_string)
-        else:
-            self.weight = None

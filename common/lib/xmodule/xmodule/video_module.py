@@ -8,9 +8,8 @@ from django.http import Http404
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
+from xblock.core import Integer, Scope, String
 
 import datetime
 import time
@@ -18,7 +17,13 @@ import time
 log = logging.getLogger(__name__)
 
 
-class VideoModule(XModule):
+class VideoFields(object):
+    data = String(help="XML data for the problem", scope=Scope.content)
+    position = Integer(help="Current position in the video", scope=Scope.student_state, default=0)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+
+
+class VideoModule(VideoFields, XModule):
     video_time = 0
     icon_class = 'video'
 
@@ -32,22 +37,15 @@ class VideoModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-        xmltree = etree.fromstring(self.definition['data'])
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
+
+        xmltree = etree.fromstring(self.data)
         self.youtube = xmltree.get('youtube')
-        self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
         self.source = self._get_source(xmltree)
         self.track = self._get_track(xmltree)
         self.start_time, self.end_time = self._get_timeframe(xmltree)
-
-        if instance_state is not None:
-            state = json.loads(instance_state)
-            if 'position' in state:
-                self.position = int(float(state['position']))
 
     def _get_source(self, xmltree):
         # find the first valid source
@@ -120,13 +118,6 @@ class VideoModule(XModule):
         return self.youtube
 
     def get_html(self):
-        if isinstance(modulestore(), XMLModuleStore):
-            # VS[compat]
-            # cdodge: filesystem static content support.
-            caption_asset_path = "/static/{0}/subs/".format(self.metadata['data_dir'])
-        else:
-            caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
-
         # We normally let JS parse this, but in the case that we need a hacked
         # out <object> player because YouTube has broken their <iframe> API for
         # the third time in a year, we need to extract it server side.
@@ -144,10 +135,8 @@ class VideoModule(XModule):
             'position': self.position,
             'source': self.source,
             'track': self.track,
-            'display_name': self.display_name,
-            # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
-            'data_dir': self.metadata['data_dir'],
-            'caption_asset_path': caption_asset_path,
+            'display_name': self.display_name_with_default,
+            'caption_asset_path': "/static/subs/",
             'show_captions': self.show_captions,
             'start': self.start_time,
             'end': self.end_time,
@@ -155,7 +144,7 @@ class VideoModule(XModule):
         })
 
 
-class VideoDescriptor(RawDescriptor):
+class VideoDescriptor(VideoFields, RawDescriptor):
     module_class = VideoModule
     stores_state = True
     template_dir_name = "video"
