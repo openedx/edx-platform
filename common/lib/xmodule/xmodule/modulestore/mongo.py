@@ -9,6 +9,7 @@ from fs.osfs import OSFS
 from itertools import repeat
 from path import path
 from datetime import datetime, timedelta
+from uuid import uuid4
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -496,6 +497,12 @@ class MongoModuleStore(ModuleStoreBase):
         """
         try:
             source_item = self.collection.find_one(location_to_query(source))
+
+            # allow for some programmatically generated substitutions in metadata, e.g. Discussion_id's should be auto-generated
+            for key in source_item['metadata'].keys():
+                if source_item['metadata'][key] == '$$GUID$$':
+                    source_item['metadata'][key] = uuid4().hex
+
             source_item['_id'] = Location(location).dict()
             self.collection.insert(source_item)
             item = self._load_items([source_item])[0]
