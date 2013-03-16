@@ -18,8 +18,20 @@ log = logging.getLogger(__name__)
 # tl;dr: global state is bad.  capa reseeds random every time a problem is loaded.  Even
 # if and when that's fixed, it's a good idea to have a local generator to avoid any other
 # code that messes with the global random module.
-local_random = random.Random()
+_local_random = None
 
+def local_random():
+    """
+    Get the local random number generator.  In a function so that we don't run
+    random.Random() at import time.
+    """
+    # ironic, isn't it?
+    global _local_random
+    
+    if _local_random is None:
+        _local_random = random.Random()
+
+    return _local_random
 
 def is_course_cohorted(course_id):
     """
@@ -135,7 +147,7 @@ def get_cohort(user, course_id):
         return None
 
     # Put user in a random group, creating it if needed
-    group_name = local_random.choice(choices)
+    group_name = local_random().choice(choices)
 
     group, created = CourseUserGroup.objects.get_or_create(
         course_id=course_id,
