@@ -40,6 +40,16 @@ class XMLEditingDescriptor(EditingDescriptor):
     js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/xml.coffee')]}
     js_module_name = "XMLEditingDescriptor"
 
+class MetadataOnlyEditingDescriptor(EditingDescriptor):
+    """
+    Module that provides a raw editing view of its data as XML. It does not perform
+    any validation of its definition
+    """
+
+    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/metadata-only.coffee')]}
+    js_module_name = "MetadataOnlyEditingDescriptor"
+
+    mako_template = "widgets/metadata-only-edit.html"
 
 class JSONEditingDescriptor(EditingDescriptor):
     """

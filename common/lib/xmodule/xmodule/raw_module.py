@@ -1,5 +1,5 @@
 from lxml import etree
-from xmodule.editing_module import XMLEditingDescriptor
+from xmodule.editing_module import XMLEditingDescriptor, MetadataOnlyEditingDescriptor
 from xmodule.xml_module import XmlDescriptor
 import logging
 import sys
