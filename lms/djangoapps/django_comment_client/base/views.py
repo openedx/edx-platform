@@ -116,6 +116,10 @@ def create_thread(request, course_id, commentable_id):
     
     thread.save()
 
+    #patch for backward compatibility to comments service
+    if not 'pinned' in thread.attributes:
+        thread['pinned'] = False
+    
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
@@ -287,6 +291,21 @@ def undo_vote_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unvote(thread)
+    return JsonResponse(utils.safe_content(thread.to_dict()))
+
+@require_POST
+@login_required
+@permitted
+def pin_thread(request, course_id, thread_id):
+    user = cc.User.from_django_user(request.user)
+    thread = cc.Thread.find(thread_id)
+    thread.pin(user,thread_id)
+    return JsonResponse(utils.safe_content(thread.to_dict()))
+
+def un_pin_thread(request, course_id, thread_id):
+    user = cc.User.from_django_user(request.user)
+    thread = cc.Thread.find(thread_id)
+    thread.un_pin(user,thread_id)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 
