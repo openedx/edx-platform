@@ -8,6 +8,13 @@ class StringyBoolean(Boolean):
             return value.lower() == 'true'
         return value
 
+class StringyFloat(Float):
+    def from_json(self, value):
+        try:
+            return float(value)
+        except:
+            return None
+
 
 class LmsNamespace(Namespace):
     hide_from_toc = StringyBoolean(
@@ -34,5 +41,5 @@ class LmsNamespace(Namespace):
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
     rerandomize = String(help="When to rerandomize the problem", default="always", scope=Scope.settings)
-    days_early_for_beta = Float(help="Number of days early to show content to beta users", default=None, scope=Scope.settings)
+    days_early_for_beta = StringyFloat(help="Number of days early to show content to beta users", default=None, scope=Scope.settings)
 
