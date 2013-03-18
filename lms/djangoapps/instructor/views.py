@@ -92,9 +92,15 @@ def instructor_dashboard(request, course_id):
     data += compute_course_stats(course).items()
     if request.user.is_staff:
         for field in course.fields:
+            if getattr(field.scope, 'student', False):
+                continue
+
             data.append([field.name, json.dumps(field.read_json(course))])
         for namespace in course.namespaces:
             for field in getattr(course, namespace).fields:
+                if getattr(field.scope, 'student', False):
+                    continue
+
                 data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
     datatable['data'] = data
 
