@@ -134,6 +134,8 @@ class InputTypeBase(object):
                       * 'id' -- the id of this input, typically
                                 "{problem-location}_{response-num}_{input-num}"
                       * 'status' (answered, unanswered, unsubmitted)
+                      * 'input_state' -- dictionary containing any inputtype-specific state
+                                        that has been preserved
                       * 'feedback' (dictionary containing keys for hints, errors, or other
                          feedback from previous attempt.  Specifically 'message', 'hint',
                          'hintmode'.  If 'hintmode' is 'always', the hint is always displayed.)
@@ -160,6 +162,7 @@ class InputTypeBase(object):
         self.msg = feedback.get('message', '')
         self.hint = feedback.get('hint', '')
         self.hintmode = feedback.get('hintmode', None)
+        self.input_state = state.get('input_state', {})
 
         # put hint above msg if it should be displayed
         if self.hintmode == 'always':
@@ -643,8 +646,11 @@ class MatlabInput(CodeInput):
         self.queue_len = 0
         self.queuename = 'matlab'
         # Flag indicating that the problem has been queued, 'msg' is length of
+        self.queue_msg = None
         # queue
         if self.status == 'incomplete':
+            if 'queue_msg' in self.input_state:
+                self.queue_msg = self.input_state['queue_msg']
             self.status = 'queued'
             self.queue_len = self.msg
             self.msg = self.submitted_msg
@@ -652,13 +658,47 @@ class MatlabInput(CodeInput):
 
 
     def handle_ajax(self, dispatch, get):
+        ''' Handle AJAX calls directed to this input'''
         if dispatch == 'plot':
-            return self.plot_data(get)
-        elif dispatch == 'xqueue_response':
-            # render the response
-            pass
+            return self._plot_data(get)
 
-    def plot_data(self, get):
+    def ungraded_response(self, queue_msg, queuekey):
+        ''' Handle any XQueue responses that have to be saved and rendered '''
+        # check the queuekey against the saved queuekey
+        if('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued' 
+                and self.input_state['queuekey'] == queuekey):
+            msg = _parse_message(queue_msg)
+            # save the queue message so that it can be rendered later
+            self.input_state['queue_msg'] = msg
+            self.input_state['queued'] = 'dequeued'
+
+    def _extra_context(self):
+        ''' Set up additional context variables'''
+        extra_context = {'queue_len': self.queue_len}
+        if self.queue_msg is not None:
+            extra_context['queue_msg'] = self.queue_msg
+        else:
+            extra_context['queue_msg'] = ''
+        return extra_context
+
+    def _parse_data(self, queue_msg):
+        '''
+        takes a queue_msg returned from the queue and parses it and returns
+        whatever is stored in msg
+        returns string msg
+        '''
+        try:
+            result = json.loads(queue_msg)
+        except (TypeError, ValueError):
+            log.error("External message should be a JSON serialized dict."
+                    " Received queue_msg = %s" % queue_msg)
+            raise
+        # TODO: needs more error checking
+        msg = result['msg']
+        return msg
+
+
+    def _plot_data(self, get):
         ''' send data via xqueue to the mathworks backend'''
         # only send data if xqueue exists
         if self.system.xqueue is not None:
@@ -668,7 +708,7 @@ class MatlabInput(CodeInput):
             # construct xqueue headers
             qinterface = self.system.xqueue['interface']
             qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
-            callback_url = self.system.xqueue['construct_callback']('input_ajax')
+            callback_url = self.system.xqueue['construct_callback']('ungraded_response')
             anonymous_student_id = self.system.anonymous_student_id
             queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
                                                      anonymous_student_id +
@@ -677,6 +717,10 @@ class MatlabInput(CodeInput):
                     lms_callback_url = callback_url,
                     lms_key = queuekey,
                     queue_name = self.queuename)
+
+            # save the input state
+            self.input_state['queuekey'] = queuekey
+            self.input_state['queuestate'] = 'queued'
 
 
             # construct xqueue body

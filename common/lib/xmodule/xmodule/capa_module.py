@@ -93,6 +93,7 @@ class CapaFields(object):
     rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
+    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.student_state, default={})
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
@@ -188,6 +189,7 @@ class CapaModule(CapaFields, XModule):
             'done': self.done,
             'correct_map': self.correct_map,
             'student_answers': self.student_answers,
+            'input_state': self.input_state,
             'seed': self.seed,
         }
 
@@ -195,6 +197,7 @@ class CapaModule(CapaFields, XModule):
         lcp_state = self.lcp.get_state()
         self.done = lcp_state['done']
         self.correct_map = lcp_state['correct_map']
+        self.input_state = lcp_state['input_state']
         self.student_answers = lcp_state['student_answers']
         self.seed = lcp_state['seed']
 
@@ -443,7 +446,8 @@ class CapaModule(CapaFields, XModule):
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
             'score_update': self.update_score,
-            'input_ajax': self.lcp.handle_input_ajax
+            'input_ajax': self.lcp.handle_input_ajax,
+            'ungraded_response': self.handle_ungraded_response
             }
 
         if dispatch not in handlers:
@@ -536,6 +540,17 @@ class CapaModule(CapaFields, XModule):
         self.publish_grade()
 
         return dict()  # No AJAX return is needed
+
+    def handle_ungraded_response(self, get):
+        '''
+        Get the XQueue response
+        '''
+        queuekey = get['queuekey']
+        score_msg = get['xqueue_body']
+        # pass along the xqueue message to the problem
+        self.lcp.ungraded_response(score_msg, queuekey)
+
+        self.set_state_from_lcp()
 
     def get_answer(self, get):
         '''

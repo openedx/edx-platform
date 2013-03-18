@@ -111,6 +111,7 @@ class LoncapaProblem(object):
         if self.system is None:
             raise Exception()
         self.seed = seed
+        self.input_state = None
 
         if state:
             if 'seed' in state:
@@ -121,10 +122,15 @@ class LoncapaProblem(object):
                 self.correct_map.set_dict(state['correct_map'])
             if 'done' in state:
                 self.done = state['done']
+            if 'input_state' in state:
+                self.input_state = state['input_state']
 
         # TODO: Does this deplete the Linux entropy pool? Is this fast enough?
         if not self.seed:
             self.seed = struct.unpack('i', os.urandom(4))[0]
+
+        if not self.input_state:
+            self.input_state = {}
 
         # Convert startouttext and endouttext to proper <text></text>
         problem_text = re.sub("startouttext\s*/", "text", problem_text)
@@ -188,6 +194,7 @@ class LoncapaProblem(object):
         return {'seed': self.seed,
                 'student_answers': self.student_answers,
                 'correct_map': self.correct_map.get_dict(),
+                'input_state': self.input_state,
                 'done': self.done}
 
     def get_max_score(self):
@@ -236,6 +243,19 @@ class LoncapaProblem(object):
                 responder.update_score(score_msg, cmap, queuekey)
         self.correct_map.set_dict(cmap.get_dict())
         return cmap
+
+    def ungraded_response(self, xqueue_msg, queuekey):
+        '''
+        Handle any responses from the xqueue that are not related to grading
+
+        Does not return any value
+        '''
+        # check against each inputtype
+        for the_input in self.inputs.values():
+            # if the input type has an xqueue_response function, pass in the values
+            if hasattr(the_input, 'ungraded_response'):
+                the_input.ungraded_response(xqueue_msg, queuekey)
+
 
     def is_queued(self):
         '''
@@ -527,11 +547,15 @@ class LoncapaProblem(object):
             value = ""
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
+            
+            if input_id not in self.input_state:
+                self.input_state[input_id] = {}
 
             # do the rendering
             state = {'value': value,
                    'status': status,
                    'id': input_id,
+                   'input_state': self.input_state[input_id],
                    'feedback': {'message': msg,
                                 'hint': hint,
                                 'hintmode': hintmode, }}

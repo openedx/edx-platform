@@ -344,6 +344,35 @@ class MatlabTest(unittest.TestCase):
                    'mode': self.mode,
                    'rows': self.rows,
                    'cols': self.cols,
+                   'queue_msg': '',
+                   'linenumbers': 'true',
+                   'hidden': '',
+                   'tabsize': int(self.tabsize),
+                   'queue_len': '3',
+                   }
+
+        self.assertEqual(context, expected)
+
+
+    def test_rendering_with_state(self):
+        state = {'value': 'print "good evening"',
+                 'status': 'incomplete',
+                 'input_state': {'queue_msg': 'message'},
+                 'feedback': {'message': '3'}, }
+        elt = etree.fromstring(self.xml)
+
+        input_class = lookup_tag('matlabinput')
+        the_input = self.input_class(test_system, elt, state)
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': 'print "good evening"',
+                   'status': 'queued',
+                   'msg': self.input_class.submitted_msg,
+                   'mode': self.mode,
+                   'rows': self.rows,
+                   'cols': self.cols,
+                   'queue_msg': 'message',
                    'linenumbers': 'true',
                    'hidden': '',
                    'tabsize': int(self.tabsize),
@@ -358,8 +387,9 @@ class MatlabTest(unittest.TestCase):
 
         test_system.xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
         
-
         self.assertTrue(response['success'])
+        self.assertTrue(self.the_input.input_state['queuekey'] is not None)
+        self.assertEqual(self.the_input.input_state['queuestate'], 'queued')
 
 
 
