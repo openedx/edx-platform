@@ -7,7 +7,9 @@ Xml format of conditional module [xmodule]
 Format description
 ==================
 
-The main tag of Conditional module input is::
+The main tag of Conditional module input is:
+
+.. code-block:: xml
 
     <conditional> ... </conditional>
 
@@ -20,7 +22,7 @@ The main container for a single instance of Conditional module. The following at
 be specified for this tag::
 
     sources - location id of required modules, separated by ';'
-    message - message for case, where one of conditions  not passed.
+    message - message for case, where one or more are not passed. Here you can use variable {link}, which generate link to required module.
 
     completed - map to `is_completed` module method
     attempted - map to `is_attempted` module method
@@ -30,25 +32,46 @@ be specified for this tag::
 show tag
 --------
 
-Like unix symlink to some set of xmodules. The following attributes can
+Symlink to some set of xmodules. The following attributes can
 be specified for this tag::
 
-    sources - location id of required modules, separated by ';'
+    sources - location id of modules, separated by ';'
 
 Example
 =======
 
-Examples of draggables that can't be reused
+Examples of conditional depends on poll
 -------------------------------------------
 
 .. code-block:: xml
-        <conditional sources="i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
-        message="{link} must be answered for this to become visible.">
-        <html>
-            <h2>You see this, cause your vote value for "First question" was "man"</h2>
-            <h2>Code example:</h2>
-            <pre style="border: 1px solid; padding: 10px;">
-            </pre>
-        </html>
-        </conditional>
 
+    <conditional sources="i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
+    message="{link} must be answered for this to become visible.">
+    <html>
+        <h2>You see this, cause your vote value for "First question" was "man"</h2>
+    </html>
+    </conditional>
+
+Examples of conditional depends on poll (use <show> tag)
+-------------------------------------------
+
+.. code-block:: xml
+
+    <conditional sources="i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
+    message="{link} must be answered for this to become visible.">
+    <html>
+        <show sources="i4x://MITx/0.000x/problem/test_1; i4x://MITx/0.000x/Video/Avi_resources; i4x://MITx/0.000x/problem/test_1"/>
+    </html>
+    </conditional>
+
+Examples of conditional depends on problem
+-------------------------------------------
+
+.. code-block:: xml
+
+    <conditional sources="i4x://MITx/0.000x/problem/Conditional:lec27_Q1" attempted="True">
+        <html display_name="HTML for attempted problem">You see this, cause "lec27_Q1" is attempted.</html>
+    </conditional>
+    <conditional sources="i4x://MITx/0.000x/problem/Conditional:lec27_Q1" attempted="False">
+        <html display_name="HTML for not attempted problem">You see this, cause "lec27_Q1" is not attempted.</html>
+    </conditional>
