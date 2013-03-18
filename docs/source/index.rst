@@ -14,7 +14,6 @@ Contents:
    overview.rst
    common-lib.rst
    djangoapps.rst
-   xml_formats.rst
 
 Indices and tables
 ==================

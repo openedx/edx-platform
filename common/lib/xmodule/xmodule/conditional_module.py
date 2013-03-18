@@ -39,9 +39,6 @@ class ConditionalModule(ConditionalFields, XModule):
             attempted - map to `is_attempted` module method
             poll_answer - map to `poll_answer` module attribute
             voted - map to `voted` module attribute
-
-        <conditional> tag attributes:
-            sources - location id of modules, separated by ';'
     """
 
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
