@@ -1,19 +1,9 @@
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
-from lxml import etree
-from lxml.html import rewrite_links
 from lxml.html.clean import Cleaner, autolink_html
-from path import path
-import os
-import sys
-import hashlib
-import capa.xqueue_interface as xqueue_interface
 import re
 
-from xmodule.capa_module import only_one, ComplexEncoder
+from xmodule.capa_module import ComplexEncoder
 import open_ended_image_submission
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
@@ -22,7 +12,7 @@ from xmodule.stringify import stringify_children
 from xmodule.xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
-from peer_grading_service import PeerGradingService, MockPeerGradingService
+from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
 
 from datetime import datetime
@@ -74,11 +64,15 @@ class OpenEndedChild(object):
         'done': 'Done',
     }
 
-    def __init__(self, system, location, definition, descriptor, static_data, 
+    def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
         # Load instance state
+
         if instance_state is not None:
-            instance_state = json.loads(instance_state)
+            try:
+                instance_state = json.loads(instance_state)
+            except:
+                log.error("Could not load instance state for open ended.  Setting it to nothing.: {0}".format(instance_state))
         else:
             instance_state = {}
 
@@ -86,37 +80,34 @@ class OpenEndedChild(object):
         # None for any element, and score and hint can be None for the last (current)
         # element.
         # Scores are on scale from 0 to max_score
-        self.history = instance_state.get('history', [])
 
-        self.state = instance_state.get('state', self.INITIAL)
+        self.child_history=instance_state.get('child_history',[])
+        self.child_state=instance_state.get('child_state', self.INITIAL)
+        self.child_created = instance_state.get('child_created', False)
+        self.child_attempts = instance_state.get('child_attempts', 0)
 
-        self.created = instance_state.get('created', False)
-
-        self.attempts = instance_state.get('attempts', 0)
         self.max_attempts = static_data['max_attempts']
-
-        self.prompt = static_data['prompt']
-        self.rubric = static_data['rubric']
+        self.child_prompt = static_data['prompt']
+        self.child_rubric = static_data['rubric']
         self.display_name = static_data['display_name']
         self.accept_file_upload = static_data['accept_file_upload']
         self.close_date = static_data['close_date']
         self.s3_interface = static_data['s3_interface']
         self.skip_basic_checks = static_data['skip_basic_checks']
+        self._max_score = static_data['max_score']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
-        self._max_score = static_data['max_score']
         if system.open_ended_grading_interface:
             self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
-            self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,system)
+            self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,
+                                                                                 system)
         else:
             self.peer_gs = MockPeerGradingService()
-            self.controller_qs = None 
-
-
+            self.controller_qs = None
 
         self.system = system
-        
+
         self.location_string = location
         try:
             self.location_string = self.location_string.url()
@@ -148,40 +139,42 @@ class OpenEndedChild(object):
                 #This is a student_facing_error
                 'error': 'The problem close date has passed, and this problem is now closed.'
             }
-        elif self.attempts > self.max_attempts:
+        elif self.child_attempts > self.max_attempts:
             return True, {
                 'success': False,
                 #This is a student_facing_error
-                'error': 'You have attempted this problem {0} times.  You are allowed {1} attempts.'.format(self.attempts, self.max_attempts)
+                'error': 'You have attempted this problem {0} times.  You are allowed {1} attempts.'.format(
+                    self.child_attempts, self.max_attempts
+                )
             }
         else:
             return False, {}
 
     def latest_answer(self):
         """Empty string if not available"""
-        if not self.history:
+        if not self.child_history:
             return ""
-        return self.history[-1].get('answer', "")
+        return self.child_history[-1].get('answer', "")
 
     def latest_score(self):
         """None if not available"""
-        if not self.history:
+        if not self.child_history:
             return None
-        return self.history[-1].get('score')
+        return self.child_history[-1].get('score')
 
     def latest_post_assessment(self, system):
         """Empty string if not available"""
-        if not self.history:
+        if not self.child_history:
             return ""
-        return self.history[-1].get('post_assessment', "")
+        return self.child_history[-1].get('post_assessment', "")
 
     @staticmethod
     def sanitize_html(answer):
         try:
             answer = autolink_html(answer)
             cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=True,
-                host_whitelist=open_ended_image_submission.TRUSTED_IMAGE_DOMAINS,
-                whitelist_tags=set(['embed', 'iframe', 'a', 'img']))
+                              host_whitelist=open_ended_image_submission.TRUSTED_IMAGE_DOMAINS,
+                              whitelist_tags=set(['embed', 'iframe', 'a', 'img']))
             clean_html = cleaner.clean_html(answer)
             clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
         except:
@@ -195,30 +188,30 @@ class OpenEndedChild(object):
         @return: None
         """
         answer = OpenEndedChild.sanitize_html(answer)
-        self.history.append({'answer': answer})
+        self.child_history.append({'answer': answer})
 
     def record_latest_score(self, score):
         """Assumes that state is right, so we're adding a score to the latest
         history element"""
-        self.history[-1]['score'] = score
+        self.child_history[-1]['score'] = score
 
     def record_latest_post_assessment(self, post_assessment):
         """Assumes that state is right, so we're adding a score to the latest
         history element"""
-        self.history[-1]['post_assessment'] = post_assessment
+        self.child_history[-1]['post_assessment'] = post_assessment
 
     def change_state(self, new_state):
         """
         A centralized place for state changes--allows for hooks.  If the
         current state matches the old state, don't run any hooks.
         """
-        if self.state == new_state:
+        if self.child_state == new_state:
             return
 
-        self.state = new_state
+        self.child_state = new_state
 
-        if self.state == self.DONE:
-            self.attempts += 1
+        if self.child_state == self.DONE:
+            self.child_attempts += 1
 
     def get_instance_state(self):
         """
@@ -227,17 +220,17 @@ class OpenEndedChild(object):
 
         state = {
             'version': self.STATE_VERSION,
-            'history': self.history,
-            'state': self.state,
+            'child_history': self.child_history,
+            'child_state': self.child_state,
             'max_score': self._max_score,
-            'attempts': self.attempts,
-            'created': False,
+            'child_attempts': self.child_attempts,
+            'child_created': False,
         }
         return json.dumps(state)
 
     def _allow_reset(self):
         """Can the module be reset?"""
-        return (self.state == self.DONE and self.attempts < self.max_attempts)
+        return (self.child_state == self.DONE and self.child_attempts < self.max_attempts)
 
     def max_score(self):
         """
@@ -269,10 +262,10 @@ class OpenEndedChild(object):
         '''
         if self._max_score > 0:
             try:
-                return Progress(self.get_score()['score'], self._max_score)
+                return Progress(int(self.get_score()['score']), int(self._max_score))
             except Exception as err:
                 #This is a dev_facing_error
-                log.exception("Got bad progress from open ended child module. Max Score: {1}".format(self._max_score))
+                log.exception("Got bad progress from open ended child module. Max Score: {0}".format(self._max_score))
                 return None
         return None
 
@@ -282,7 +275,7 @@ class OpenEndedChild(object):
         """
         #This is a dev_facing_error
         log.warning("Open ended child state out sync. state: %r, get: %r. %s",
-            self.state, get, msg)
+                    self.child_state, get, msg)
         #This is a student_facing_error
         return {'success': False,
                 'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
@@ -308,7 +301,7 @@ class OpenEndedChild(object):
         @return: Boolean correct.
         """
         correct = False
-        if(isinstance(score, (int, long, float, complex))):
+        if (isinstance(score, (int, long, float, complex))):
             score_ratio = int(score) / float(self.max_score())
             correct = (score_ratio >= 0.66)
         return correct
@@ -342,7 +335,8 @@ class OpenEndedChild(object):
 
             try:
                 image_data.seek(0)
-                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key, self.s3_interface)
+                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key,
+                                                                                  self.s3_interface)
             except:
                 log.exception("Could not upload image to S3.")
 
@@ -404,9 +398,9 @@ class OpenEndedChild(object):
             #In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
             #a config issue (development vs deployment).  For now, just treat this as a "success"
             log.exception("Student AJAX post to combined open ended xmodule indicated that it contained an image, "
-                        "but the image was not able to be uploaded to S3.  This could indicate a config"
-                        "issue with this deployment, but it could also indicate a problem with S3 or with the"
-                        "student image itself.")
+                          "but the image was not able to be uploaded to S3.  This could indicate a config"
+                          "issue with this deployment, but it could also indicate a problem with S3 or with the"
+                          "student image itself.")
             overall_success = True
         elif not has_file_to_upload:
             #If there is no file to upload, probably the student has embedded the link in the answer text
@@ -445,7 +439,7 @@ class OpenEndedChild(object):
         response = {}
         #This is a student_facing_error
         error_string = ("You need to peer grade {0} more in order to make another submission.  "
-        "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
+                        "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
         try:
             response = self.peer_gs.get_data_for_location(self.location_string, student_id)
             count_graded = response['count_graded']
@@ -454,16 +448,18 @@ class OpenEndedChild(object):
             success = True
         except:
             #This is a dev_facing_error
-            log.error("Could not contact external open ended graders for location {0} and student {1}".format(self.location_string,student_id))
+            log.error("Could not contact external open ended graders for location {0} and student {1}".format(
+                self.location_string, student_id))
             #This is a student_facing_error
             error_message = "Could not contact the graders.  Please notify course staff."
             return success, allowed_to_submit, error_message
-        if count_graded>=count_required:
+        if count_graded >= count_required:
             return success, allowed_to_submit, ""
         else:
             allowed_to_submit = False
             #This is a student_facing_error
-            error_message = error_string.format(count_required-count_graded, count_graded, count_required, student_sub_count)
+            error_message = error_string.format(count_required - count_graded, count_graded, count_required,
+                                                student_sub_count)
             return success, allowed_to_submit, error_message
 
     def get_eta(self):
@@ -478,7 +474,7 @@ class OpenEndedChild(object):
 
         success = response['success']
         if isinstance(success, basestring):
-            success = (success.lower()=="true")
+            success = (success.lower() == "true")
 
         if success:
             eta = controller_query_service.convert_seconds_to_human_readable(response['eta'])
@@ -487,6 +483,3 @@ class OpenEndedChild(object):
             eta_string = ""
 
         return eta_string
-
-
-

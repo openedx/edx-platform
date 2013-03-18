@@ -1,10 +1,7 @@
-django-nose
-coverage
-nosexcover
-pylint
-pep8
-lettuce
-selenium
-factory_boy
-splinter
+coverage==3.6
+pylint==0.27.0
+pep8==1.4.5
+lettuce==0.2.15
+selenium==2.31.0
+splinter==0.5.0
 

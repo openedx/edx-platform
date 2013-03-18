@@ -1,5 +1,5 @@
 from lettuce import world, step
-from factories import *
+from .factories import *
 from lettuce.django import django_url
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment

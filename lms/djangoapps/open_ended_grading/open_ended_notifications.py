@@ -1,6 +1,6 @@
 from django.conf import settings
 from xmodule.open_ended_grading_classes import peer_grading_service
-from staff_grading_service import StaffGradingService
+from .staff_grading_service import StaffGradingService
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 import json
 from student.models import unique_id_for_user
@@ -22,7 +22,7 @@ NOTIFICATION_TYPES = (
     ('staff_needs_to_grade', 'staff_grading', 'Staff Grading'),
     ('new_student_grading_to_view', 'open_ended_problems', 'Problems you have submitted'),
     ('flagged_submissions_exist', 'open_ended_flagged_problems', 'Flagged Submissions')
-    )
+)
 
 
 def staff_grading_notifications(course, user):
@@ -46,7 +46,9 @@ def staff_grading_notifications(course, user):
         #Non catastrophic error, so no real action
         notifications = {}
         #This is a dev_facing_error
-        log.info("Problem with getting notifications from staff grading service for course {0} user {1}.".format(course_id, student_id))
+        log.info(
+            "Problem with getting notifications from staff grading service for course {0} user {1}.".format(course_id,
+                                                                                                            student_id))
 
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
@@ -59,7 +61,14 @@ def staff_grading_notifications(course, user):
 
 
 def peer_grading_notifications(course, user):
-    system = ModuleSystem(None, None, None, render_to_string, None)
+    system = ModuleSystem(
+        ajax_url=None,
+        track_function=None,
+        get_module = None,
+        render_template=render_to_string,
+        replace_urls=None,
+        xblock_model_data= {}
+    )
     peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
     img_path = ""
@@ -80,7 +89,9 @@ def peer_grading_notifications(course, user):
         #Non catastrophic error, so no real action
         notifications = {}
         #This is a dev_facing_error
-        log.info("Problem with getting notifications from peer grading service for course {0} user {1}.".format(course_id, student_id))
+        log.info(
+            "Problem with getting notifications from peer grading service for course {0} user {1}.".format(course_id,
+                                                                                                           student_id))
 
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
@@ -93,7 +104,14 @@ def peer_grading_notifications(course, user):
 
 
 def combined_notifications(course, user):
-    system = ModuleSystem(None, None, None, render_to_string, None)
+    system = ModuleSystem(
+        ajax_url=None,
+        track_function=None,
+        get_module = None,
+        render_template=render_to_string,
+        replace_urls=None,
+        xblock_model_data= {}
+    )
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, course, 'staff')
@@ -105,7 +123,9 @@ def combined_notifications(course, user):
         return notification_dict
 
     min_time_to_query = user.last_login
-    last_module_seen = StudentModule.objects.filter(student=user, course_id=course_id, modified__gt=min_time_to_query).values('modified').order_by('-modified')
+    last_module_seen = StudentModule.objects.filter(student=user, course_id=course_id,
+                                                    modified__gt=min_time_to_query).values('modified').order_by(
+        '-modified')
     last_module_seen_count = last_module_seen.count()
 
     if last_module_seen_count > 0:
@@ -117,7 +137,8 @@ def combined_notifications(course, user):
 
     img_path = ""
     try:
-        controller_response = controller_qs.check_combined_notifications(course.id, student_id, user_is_staff, last_time_viewed)
+        controller_response = controller_qs.check_combined_notifications(course.id, student_id, user_is_staff,
+                                                                         last_time_viewed)
         log.debug(controller_response)
         notifications = json.loads(controller_response)
         if notifications['success']:
@@ -127,7 +148,9 @@ def combined_notifications(course, user):
         #Non catastrophic error, so no real action
         notifications = {}
         #This is a dev_facing_error
-        log.exception("Problem with getting notifications from controller query service for course {0} user {1}.".format(course_id, student_id))
+        log.exception(
+            "Problem with getting notifications from controller query service for course {0} user {1}.".format(
+                course_id, student_id))
 
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
@@ -151,7 +174,8 @@ def set_value_in_cache(student_id, course_id, notification_type, value):
 
 
 def create_key_name(student_id, course_id, notification_type):
-    key_name = "{prefix}{type}_{course}_{student}".format(prefix=KEY_PREFIX, type=notification_type, course=course_id, student=student_id)
+    key_name = "{prefix}{type}_{course}_{student}".format(prefix=KEY_PREFIX, type=notification_type, course=course_id,
+                                                          student=student_id)
     return key_name
 
 

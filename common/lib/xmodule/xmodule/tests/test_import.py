@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from path import path
 import unittest
 from fs.memoryfs import MemoryFS
@@ -12,6 +14,7 @@ from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import compute_inherited_metadata
 
 from .test_export import DATA_DIR
 
@@ -75,7 +78,6 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(descriptor.__class__.__name__,
                          'ErrorDescriptor')
 
-
     def test_unique_url_names(self):
         '''Check that each error gets its very own url_name'''
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
@@ -86,7 +88,6 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor2 = system.process_xml(bad_xml2)
 
         self.assertNotEqual(descriptor1.location, descriptor2.location)
-
 
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
@@ -103,8 +104,10 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(re_import_descriptor.__class__.__name__,
                          'ErrorDescriptor')
 
-        self.assertEqual(descriptor.definition['data'],
-                         re_import_descriptor.definition['data'])
+        self.assertEqual(descriptor.contents,
+                         re_import_descriptor.contents)
+        self.assertEqual(descriptor.error_msg,
+                         re_import_descriptor.error_msg)
 
     def test_fixed_xml_tag(self):
         """Make sure a tag that's been fixed exports as the original tag type"""
@@ -138,23 +141,20 @@ class ImportTestCase(BaseCourseTestCase):
         url_name = 'test1'
         start_xml = '''
         <course org="{org}" course="{course}"
-                graceperiod="{grace}" url_name="{url_name}" unicorn="purple">
+                due="{due}" url_name="{url_name}" unicorn="purple">
             <chapter url="hi" url_name="ch" display_name="CH">
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
-        </course>'''.format(grace=v, org=ORG, course=COURSE, url_name=url_name)
+        </course>'''.format(due=v, org=ORG, course=COURSE, url_name=url_name)
         descriptor = system.process_xml(start_xml)
+        compute_inherited_metadata(descriptor)
 
-        print descriptor, descriptor.metadata
-        self.assertEqual(descriptor.metadata['graceperiod'], v)
-        self.assertEqual(descriptor.metadata['unicorn'], 'purple')
+        print descriptor, descriptor._model_data
+        self.assertEqual(descriptor.lms.due, v)
 
-        # Check that the child inherits graceperiod correctly
+        # Check that the child inherits due correctly
         child = descriptor.get_children()[0]
-        self.assertEqual(child.metadata['graceperiod'], v)
-
-        # check that the child does _not_ inherit any unicorns
-        self.assertTrue('unicorn' not in child.metadata)
+        self.assertEqual(child.lms.due, v)
 
         # Now export and check things
         resource_fs = MemoryFS()
@@ -181,12 +181,12 @@ class ImportTestCase(BaseCourseTestCase):
         # did we successfully strip the url_name from the definition contents?
         self.assertTrue('url_name' not in course_xml.attrib)
 
-        # Does the chapter tag now have a graceperiod attribute?
+        # Does the chapter tag now have a due attribute?
         # hardcoded path to child
         with resource_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
-        self.assertFalse('graceperiod' in chapter_xml.attrib)
+        self.assertFalse('due' in chapter_xml.attrib)
 
     def test_is_pointer_tag(self):
         """
@@ -224,12 +224,11 @@ class ImportTestCase(BaseCourseTestCase):
         def check_for_key(key, node):
             "recursive check for presence of key"
             print "Checking {0}".format(node.location.url())
-            self.assertTrue(key in node.metadata)
+            self.assertTrue(key in node._model_data)
             for c in node.get_children():
                 check_for_key(key, c)
 
         check_for_key('graceperiod', course)
-
 
     def test_policy_loading(self):
         """Make sure that when two courses share content with the same
@@ -252,8 +251,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Also check that keys from policy are run through the
         # appropriate attribute maps -- 'graded' should be True, not 'true'
-        self.assertEqual(toy.metadata['graded'], True)
-
+        self.assertEqual(toy.lms.graded, True)
 
     def test_definition_loading(self):
         """When two courses share the same org and course name and
@@ -271,9 +269,8 @@ class ImportTestCase(BaseCourseTestCase):
         location = Location(["i4x", "edX", "toy", "video", "Welcome"])
         toy_video = modulestore.get_instance(toy_id, location)
         two_toy_video =  modulestore.get_instance(two_toy_id, location)
-        self.assertEqual(toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh8")
-        self.assertEqual(two_toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh9")
-
+        self.assertEqual(etree.fromstring(toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh8")
+        self.assertEqual(etree.fromstring(two_toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh9")
 
     def test_colon_in_url_name(self):
         """Ensure that colons in url_names convert to file paths properly"""
@@ -331,6 +328,22 @@ class ImportTestCase(BaseCourseTestCase):
 
             self.assertEqual(len(video.url_name), len('video_') + 12)
 
+    def test_poll_and_conditional_xmodule(self):
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['conditional_and_poll'])
+
+        course = modulestore.get_courses()[0]
+        chapters = course.get_children()
+        ch1 = chapters[0]
+        sections = ch1.get_children()
+
+        self.assertEqual(len(sections), 1)
+
+        location = course.location
+        location = Location(location.tag, location.org, location.course,
+            'sequential', 'Problem_Demos')
+        module = modulestore.get_instance(course.id, location)
+        self.assertEqual(len(module.children), 2)
+
     def test_error_on_import(self):
         '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorModule'''
 
@@ -354,7 +367,7 @@ class ImportTestCase(BaseCourseTestCase):
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
-        self.assertEqual(gst_sample.definition['render'], render_string_from_sample_gst_xml)
+        self.assertEqual(gst_sample.render, render_string_from_sample_gst_xml)
 
     def test_cohort_config(self):
         """
@@ -370,13 +383,13 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertFalse(course.is_cohorted)
 
         # empty config -> False
-        course.metadata['cohort_config'] = {}
+        course.cohort_config = {}
         self.assertFalse(course.is_cohorted)
 
         # false config -> False
-        course.metadata['cohort_config'] = {'cohorted': False}
+        course.cohort_config = {'cohorted': False}
         self.assertFalse(course.is_cohorted)
 
         # and finally...
-        course.metadata['cohort_config'] = {'cohorted': True}
+        course.cohort_config = {'cohorted': True}
         self.assertTrue(course.is_cohorted)

@@ -8,13 +8,14 @@ from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from models import StudentModuleCache
-from module_render import get_module, get_instance_module
+from .model_data import ModelDataCache, LmsKeyValueStore
+from xblock.core import Scope
+from .module_render import get_module
 from xmodule import graders
 from xmodule.capa_module import CapaModule
 from xmodule.course_module import CourseDescriptor
 from xmodule.graders import Score
-from models import StudentModule
+from .models import StudentModule
 
 log = logging.getLogger("mitx.courseware")
 
@@ -58,37 +59,39 @@ def yield_problems(request, course, student):
     the list, but there may be others as well).
     """
     grading_context = course.grading_context
-    student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
 
+    descriptor_locations = (descriptor.location.url() for descriptor in grading_context['all_descriptors'])
+    existing_student_modules = set(StudentModule.objects.filter(
+        module_state_key__in=descriptor_locations
+    ).values_list('module_state_key', flat=True))
+
+    sections_to_list = []
     for section_format, sections in grading_context['graded_sections'].iteritems():
         for section in sections:
 
             section_descriptor = section['section_descriptor']
 
             # If the student hasn't seen a single problem in the section, skip it.
-            skip = True
             for moduledescriptor in section['xmoduledescriptors']:
-                if student_module_cache.lookup(
-                        course.id, moduledescriptor.category, moduledescriptor.location.url()):
-                    skip = False
+                if moduledescriptor.location.url() in existing_student_modules:
+                    sections_to_list.append(section_descriptor)
                     break
 
-            if skip:
-                continue
+    model_data_cache = ModelDataCache(sections_to_list, course.id, student)
+    for section_descriptor in sections_to_list:
+        section_module = get_module(student, request,
+                                    section_descriptor.location, model_data_cache,
+                                    course.id)
+        if section_module is None:
+            # student doesn't have access to this module, or something else
+            # went wrong.
+            # log.debug("couldn't get module for student {0} for section location {1}"
+            #           .format(student.username, section_descriptor.location))
+            continue
 
-            section_module = get_module(student, request,
-                                        section_descriptor.location, student_module_cache,
-                                        course.id)
-            if section_module is None:
-                # student doesn't have access to this module, or something else
-                # went wrong.
-                # log.debug("couldn't get module for student {0} for section location {1}"
-                #           .format(student.username, section_descriptor.location))
-                continue
-
-            for problem in yield_module_descendents(section_module):
-                if isinstance(problem, CapaModule):
-                    yield problem
+        for problem in yield_module_descendents(section_module):
+            if isinstance(problem, CapaModule):
+                yield problem
 
 
 def answer_distributions(request, course):
@@ -112,13 +115,13 @@ def answer_distributions(request, course):
             for problem_id in capa_module.lcp.student_answers:
                 # Answer can be a list or some other unhashable element.  Convert to string.
                 answer = str(capa_module.lcp.student_answers[problem_id])
-                key = (capa_module.url_name, capa_module.display_name, problem_id)
+                key = (capa_module.url_name, capa_module.display_name_with_default, problem_id)
                 counts[key][answer] += 1
 
     return counts
 
 
-def grade(student, request, course, student_module_cache=None, keep_raw_scores=False):
+def grade(student, request, course, model_data_cache=None, keep_raw_scores=False):
     """
     This grades a student as quickly as possible. It retuns the
     output from the course grader, augmented with the final letter
@@ -140,8 +143,8 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
     grading_context = course.grading_context
     raw_scores = []
 
-    if student_module_cache is None:
-        student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
+    if model_data_cache is None:
+        model_data_cache = ModelDataCache(grading_context['all_descriptors'], course.id, student)
 
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
@@ -150,13 +153,19 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
         format_scores = []
         for section in sections:
             section_descriptor = section['section_descriptor']
-            section_name = section_descriptor.metadata.get('display_name')
+            section_name = section_descriptor.display_name_with_default
 
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             for moduledescriptor in section['xmoduledescriptors']:
-                if student_module_cache.lookup(
-                        course.id, moduledescriptor.category, moduledescriptor.location.url()):
+                # Create a fake key to pull out a StudentModule object from the ModelDataCache
+                key = LmsKeyValueStore.Key(
+                    Scope.student_state,
+                    student.id,
+                    moduledescriptor.location,
+                    None
+                )
+                if model_data_cache.find(key):
                     should_grade_section = True
                     break
 
@@ -167,11 +176,11 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
                     # TODO: We need the request to pass into here. If we could forgo that, our arguments
                     # would be simpler
                     return get_module(student, request, descriptor.location,
-                                        student_module_cache, course.id)
+                                        model_data_cache, course.id)
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
 
-                    (correct, total) = get_score(course.id, student, module_descriptor, create_module, student_module_cache)
+                    (correct, total) = get_score(course.id, student, module_descriptor, create_module, model_data_cache)
                     if correct is None and total is None:
                         continue
 
@@ -181,12 +190,12 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
                         else:
                             correct = total
 
-                    graded = module_descriptor.metadata.get("graded", False)
+                    graded = module_descriptor.lms.graded
                     if not total > 0:
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
 
-                    scores.append(Score(correct, total, graded, module_descriptor.metadata.get('display_name')))
+                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
 
                 section_total, graded_total = graders.aggregate_scores(scores, section_name)
                 if keep_raw_scores:
@@ -243,7 +252,7 @@ def grade_for_percentage(grade_cutoffs, percentage):
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
-def progress_summary(student, request, course, student_module_cache):
+def progress_summary(student, request, course, model_data_cache):
     """
     This pulls a summary of all problems in the course.
 
@@ -257,7 +266,7 @@ def progress_summary(student, request, course, student_module_cache):
     Arguments:
         student: A User object for the student to grade
         course: A Descriptor containing the course to grade
-        student_module_cache: A StudentModuleCache initialized with all
+        model_data_cache: A ModelDataCache initialized with all
              instance_modules for the student
 
     If the student does not have access to load the course module, this function
@@ -269,7 +278,7 @@ def progress_summary(student, request, course, student_module_cache):
     # TODO: We need the request to pass into here. If we could forgo that, our arguments
     # would be simpler
     course_module = get_module(student, request,
-                                course.location, student_module_cache,
+                                course.location, model_data_cache,
                                 course.id, depth=None)
     if not course_module:
         # This student must not have access to the course.
@@ -279,19 +288,17 @@ def progress_summary(student, request, course, student_module_cache):
     # Don't include chapters that aren't displayable (e.g. due to error)
     for chapter_module in course_module.get_display_items():
         # Skip if the chapter is hidden
-        hidden = chapter_module.metadata.get('hide_from_toc', 'false')
-        if hidden.lower() == 'true':
+        if chapter_module.lms.hide_from_toc:
             continue
 
         sections = []
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
-            hidden = section_module.metadata.get('hide_from_toc', 'false')
-            if hidden.lower() == 'true':
+            if section_module.lms.hide_from_toc:
                 continue
 
             # Same for sections
-            graded = section_module.metadata.get('graded', False)
+            graded = section_module.lms.graded
             scores = []
 
             module_creator = section_module.system.get_module
@@ -299,37 +306,37 @@ def progress_summary(student, request, course, student_module_cache):
             for module_descriptor in yield_dynamic_descriptor_descendents(section_module.descriptor, module_creator):
 
                 course_id = course.id
-                (correct, total) = get_score(course_id, student, module_descriptor, module_creator, student_module_cache)
+                (correct, total) = get_score(course_id, student, module_descriptor, module_creator, model_data_cache)
                 if correct is None and total is None:
                     continue
 
                 scores.append(Score(correct, total, graded,
-                    module_descriptor.metadata.get('display_name')))
+                    module_descriptor.display_name_with_default))
 
             scores.reverse()
             section_total, graded_total = graders.aggregate_scores(
-                scores, section_module.metadata.get('display_name'))
+                scores, section_module.display_name_with_default)
 
-            format = section_module.metadata.get('format', "")
+            format = section_module.lms.format if section_module.lms.format is not None else ''
             sections.append({
-                'display_name': section_module.display_name,
+                'display_name': section_module.display_name_with_default,
                 'url_name': section_module.url_name,
                 'scores': scores,
                 'section_total': section_total,
                 'format': format,
-                'due': section_module.metadata.get("due", ""),
+                'due': section_module.lms.due,
                 'graded': graded,
             })
 
-        chapters.append({'course': course.display_name,
-                         'display_name': chapter_module.display_name,
+        chapters.append({'course': course.display_name_with_default,
+                         'display_name': chapter_module.display_name_with_default,
                          'url_name': chapter_module.url_name,
                          'sections': sections})
 
     return chapters
 
 
-def get_score(course_id, user, problem_descriptor, module_creator, student_module_cache):
+def get_score(course_id, user, problem_descriptor, module_creator, model_data_cache):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
     e.g. (5,7) if you got 5 out of 7 points.
@@ -341,8 +348,11 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
     problem_descriptor: an XModuleDescriptor
     module_creator: a function that takes a descriptor, and returns the corresponding XModule for this user.
            Can return None if user doesn't have access, or if something else went wrong.
-    cache: A StudentModuleCache
+    cache: A ModelDataCache
     """
+    if not user.is_authenticated():
+        return (None, None)
+
     if problem_descriptor.always_recalculate_grades:
         problem = module_creator(problem_descriptor)
         d = problem.get_score()
@@ -355,34 +365,42 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
         # These are not problems, and do not have a score
         return (None, None)
 
-    correct = 0.0
+    # Create a fake KeyValueStore key to pull out the StudentModule
+    key = LmsKeyValueStore.Key(
+        Scope.student_state,
+        user.id,
+        problem_descriptor.location,
+        None
+    )
 
-    instance_module = student_module_cache.lookup(
-        course_id, problem_descriptor.category, problem_descriptor.location.url())
+    student_module = model_data_cache.find(key)
 
-    if not instance_module:
-        # If the problem was not in the cache, we need to instantiate the problem.
-        # Otherwise, the max score (cached in instance_module) won't be available
+    if student_module is not None and student_module.max_grade is not None:
+        correct = student_module.grade if student_module.grade is not None else 0
+        total = student_module.max_grade
+    else:
+        # If the problem was not in the cache, or hasn't been graded yet,
+        # we need to instantiate the problem.
+        # Otherwise, the max score (cached in student_module) won't be available
         problem = module_creator(problem_descriptor)
         if problem is None:
             return (None, None)
-        instance_module = get_instance_module(course_id, user, problem, student_module_cache)
 
-    # If this problem is ungraded/ungradable, bail
-    if not instance_module or instance_module.max_grade is None:
-        return (None, None)
+        correct = 0.0
+        total = problem.max_score()
 
-    correct = instance_module.grade if instance_module.grade is not None else 0
-    total = instance_module.max_grade
+        # Problem may be an error module (if something in the problem builder failed)
+        # In which case total might be None
+        if total is None:
+            return (None, None)
 
-    if correct is not None and total is not None:
-        #Now we re-weight the problem, if specified
-        weight = getattr(problem_descriptor, 'weight', None)
-        if weight is not None:
-            if total == 0:
-                log.exception("Cannot reweight a problem with zero total points. Problem: " + str(instance_module))
-                return (correct, total)
-            correct = correct * weight / total
-            total = weight
+    #Now we re-weight the problem, if specified
+    weight = problem_descriptor.weight
+    if weight is not None:
+        if total == 0:
+            log.exception("Cannot reweight a problem with zero total points. Problem: " + str(student_module))
+            return (correct, total)
+        correct = correct * weight / total
+        total = weight
 
     return (correct, total)

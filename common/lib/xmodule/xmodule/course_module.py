@@ -9,7 +9,7 @@ from datetime import datetime
 
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from xmodule.timeparse import parse_time, stringify_time
+from xmodule.timeparse import parse_time
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
 from datetime import datetime
@@ -19,8 +19,40 @@ import requests
 import time
 import copy
 
+from xblock.core import Scope, ModelType, List, String, Object, Boolean
+from .fields import Date
+
 
 log = logging.getLogger(__name__)
+
+
+class StringOrDate(Date):
+    def from_json(self, value):
+        """
+        Parse an optional metadata key containing a time: if present, complain
+        if it doesn't parse.
+        Return None if not present or invalid.
+        """
+        if value is None:
+            return None
+
+        try:
+            return time.strptime(value, self.time_format)
+        except ValueError:
+            return value
+
+    def to_json(self, value):
+        """
+        Convert a time struct to a string
+        """
+        if value is None:
+            return None
+
+        try:
+            return time.strftime(self.time_format, value)
+        except (ValueError, TypeError):
+            return value
+
 
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
@@ -28,98 +60,171 @@ edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
 
 _cached_toc = {}
 
+class Textbook(object):
+    def __init__(self, title, book_url):
+        self.title = title
+        self.book_url = book_url
+        self.start_page = int(self.table_of_contents[0].attrib['page'])
 
-class CourseDescriptor(SequenceDescriptor):
-    module_class = SequenceModule
+        # The last page should be the last element in the table of contents,
+        # but it may be nested. So recurse all the way down the last element
+        last_el = self.table_of_contents[-1]
+        while last_el.getchildren():
+            last_el = last_el[-1]
 
-    template_dir_name = 'course'
+        self.end_page = int(last_el.attrib['page'])
 
-    class Textbook:
-        def __init__(self, title, book_url):
-            self.title = title
-            self.book_url = book_url
-            self.table_of_contents = self._get_toc_from_s3()
-            self.start_page = int(self.table_of_contents[0].attrib['page'])
+    @lazyproperty
+    def table_of_contents(self):
+        """
+        Accesses the textbook's table of contents (default name "toc.xml") at the URL self.book_url
 
-            # The last page should be the last element in the table of contents,
-            # but it may be nested. So recurse all the way down the last element
-            last_el = self.table_of_contents[-1]
-            while last_el.getchildren():
-                last_el = last_el[-1]
+        Returns XML tree representation of the table of contents
+        """
+        toc_url = self.book_url + 'toc.xml'
 
-            self.end_page = int(last_el.attrib['page'])
+        # cdodge: I've added this caching of TOC because in Mongo-backed instances (but not Filesystem stores)
+        # course modules have a very short lifespan and are constantly being created and torn down.
+        # Since this module in the __init__() method does a synchronous call to AWS to get the TOC
+        # this is causing a big performance problem. So let's be a bit smarter about this and cache
+        # each fetch and store in-mem for 10 minutes.
+        # NOTE: I have to get this onto sandbox ASAP as we're having runtime failures. I'd like to swing back and
+        # rewrite to use the traditional Django in-memory cache.
+        try:
+            # see if we already fetched this
+            if toc_url in _cached_toc:
+                (table_of_contents, timestamp) = _cached_toc[toc_url]
+                age = datetime.now() - timestamp
+                # expire every 10 minutes
+                if age.seconds < 600:
+                    return table_of_contents
+        except Exception as err:
+            pass
 
-        @property
-        def table_of_contents(self):
-            return self.table_of_contents
+        # Get the table of contents from S3
+        log.info("Retrieving textbook table of contents from %s" % toc_url)
+        try:
+            r = requests.get(toc_url)
+        except Exception as err:
+            msg = 'Error %s: Unable to retrieve textbook table of contents at %s' % (err, toc_url)
+            log.error(msg)
+            raise Exception(msg)
 
-        def _get_toc_from_s3(self):
-            """
-            Accesses the textbook's table of contents (default name "toc.xml") at the URL self.book_url
+        # TOC is XML. Parse it
+        try:
+            table_of_contents = etree.fromstring(r.text)
+        except Exception as err:
+            msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
+            log.error(msg)
+            raise Exception(msg)
 
-            Returns XML tree representation of the table of contents
-            """
-            toc_url = self.book_url + 'toc.xml'
+        return table_of_contents
 
-            # cdodge: I've added this caching of TOC because in Mongo-backed instances (but not Filesystem stores)
-            # course modules have a very short lifespan and are constantly being created and torn down.
-            # Since this module in the __init__() method does a synchronous call to AWS to get the TOC
-            # this is causing a big performance problem. So let's be a bit smarter about this and cache
-            # each fetch and store in-mem for 10 minutes.
-            # NOTE: I have to get this onto sandbox ASAP as we're having runtime failures. I'd like to swing back and
-            # rewrite to use the traditional Django in-memory cache.
+
+class TextbookList(List):
+    def from_json(self, values):
+        textbooks = []
+        for title, book_url in values:
             try:
-                # see if we already fetched this
-                if toc_url in _cached_toc:
-                    (table_of_contents, timestamp) = _cached_toc[toc_url]
-                    age = datetime.now() - timestamp
-                    # expire every 10 minutes
-                    if age.seconds < 600:
-                        return table_of_contents
-            except Exception as err:
-                pass
-
-            # Get the table of contents from S3
-            log.info("Retrieving textbook table of contents from %s" % toc_url)
-            try:
-                r = requests.get(toc_url)
-            except Exception as err:
-                msg = 'Error %s: Unable to retrieve textbook table of contents at %s' % (err, toc_url)
-                log.error(msg)
-                raise Exception(msg)
-
-            # TOC is XML. Parse it
-            try:
-                table_of_contents = etree.fromstring(r.text)
-                _cached_toc[toc_url] = (table_of_contents, datetime.now())
-            except Exception as err:
-                msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
-                log.error(msg)
-                raise Exception(msg)
-
-            return table_of_contents
-
-    def __init__(self, system, definition=None, **kwargs):
-        super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-        self.textbooks = []
-        for title, book_url in self.definition['data']['textbooks']:
-            try:
-                self.textbooks.append(self.Textbook(title, book_url))
+                textbooks.append(Textbook(title, book_url))
             except:
                 # If we can't get to S3 (e.g. on a train with no internet), don't break
                 # the rest of the courseware.
                 log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
                 continue
 
-        self.wiki_slug = self.definition['data']['wiki_slug'] or self.location.course
+        return textbooks
+
+    def to_json(self, values):
+        json_data = []
+        for val in values:
+            if isinstance(val, Textbook):
+                json_data.append((val.title, val.book_url))
+            elif isinstance(val, tuple):
+                json_data.append(val)
+            else:
+                continue
+        return json_data
+
+
+class CourseFields(object):
+    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course", scope=Scope.content)
+    wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
+    enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
+    enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
+    start = Date(help="Start time when this module is visible", scope=Scope.settings)
+    end = Date(help="Date that this class ends", scope=Scope.settings)
+    advertised_start = StringOrDate(help="Date that this course is advertised to start", scope=Scope.settings)
+    grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
+    show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+    tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
+    end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
+    discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
+    discussion_topics = Object(
+        help="Map of topics names to ids",
+        scope=Scope.settings,
+        computed_default=lambda c: {'General': {'id': c.location.html_id()}},
+        )
+    testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
+    announcement = Date(help="Date this course is announced", scope=Scope.settings)
+    cohort_config = Object(help="Dictionary defining cohort configuration", scope=Scope.settings)
+    is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
+    no_grade = Boolean(help="True if this course isn't graded", default=False, scope=Scope.settings)
+    disable_progress_graph = Boolean(help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
+    pdf_textbooks = List(help="List of dictionaries containing pdf_textbook configuration", scope=Scope.settings)
+    html_textbooks = List(help="List of dictionaries containing html_textbook configuration", scope=Scope.settings)
+    remote_gradebook = Object(scope=Scope.settings)
+    allow_anonymous = Boolean(scope=Scope.settings, default=True)
+    allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
+    advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
+    has_children = True
+
+    info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
+
+    # An extra property is used rather than the wiki_slug/number because
+    # there are courses that change the number for different runs. This allows
+    # courses to share the same css_class across runs even if they have
+    # different numbers.
+    #
+    # TODO get rid of this as soon as possible or potentially build in a robust
+    # way to add in course-specific styling. There needs to be a discussion
+    # about the right way to do this, but arjun will address this ASAP. Also
+    # note that the courseware template needs to change when this is removed.
+    css_class = String(help="DO NOT USE THIS", scope=Scope.settings)
+
+    # TODO: This is a quick kludge to allow CS50 (and other courses) to
+    # specify their own discussion forums as external links by specifying a
+    # "discussion_link" in their policy JSON file. This should later get
+    # folded in with Syllabus, Course Info, and additional Custom tabs in a
+    # more sensible framework later.
+    discussion_link = String(help="DO NOT USE THIS", scope=Scope.settings)
+
+    # TODO: same as above, intended to let internal CS50 hide the progress tab
+    # until we get grade integration set up.
+    # Explicit comparison to True because we always want to return a bool.
+    hide_progress_tab = Boolean(help="DO NOT USE THIS", scope=Scope.settings)
+
+
+class CourseDescriptor(CourseFields, SequenceDescriptor):
+    module_class = SequenceModule
+
+    template_dir_name = 'course'
+
+
+    def __init__(self, *args, **kwargs):
+        super(CourseDescriptor, self).__init__(*args, **kwargs)
+
+        if self.wiki_slug is None:
+            self.wiki_slug = self.location.course
 
         msg = None
         if self.start is None:
             msg = "Course loaded without a valid start date. id = %s" % self.id
             # hack it -- start in 1970
-            self.metadata['start'] = stringify_time(time.gmtime(0))
+            self.start = time.gmtime(0)
             log.critical(msg)
-            system.error_tracker(msg)
+            self.system.error_tracker(msg)
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
@@ -128,10 +233,10 @@ class CourseDescriptor(SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
         self._grading_policy = {}
-        self.set_grading_policy(self.definition['data'].get('grading_policy', None))
+        self.set_grading_policy(self.grading_policy)
 
         self.test_center_exams = []
-        test_center_info = self.metadata.get('testcenter_info')
+        test_center_info = self.testcenter_info
         if test_center_info is not None:
             for exam_name in test_center_info:
                 try:
@@ -144,11 +249,11 @@ class CourseDescriptor(SequenceDescriptor):
                     log.error(msg)
                     continue
 
-    def defaut_grading_policy(self):
+    def default_grading_policy(self):
         """
         Return a dict which is a copy of the default grading policy
         """
-        default = {"GRADER": [
+        return {"GRADER": [
                 {
                     "type": "Homework",
                     "min_count": 12,
@@ -180,7 +285,6 @@ class CourseDescriptor(SequenceDescriptor):
             "GRADE_CUTOFFS": {
                 "Pass": 0.5
             }}
-        return copy.deepcopy(default)
 
     def set_grading_policy(self, course_policy):
         """
@@ -191,7 +295,7 @@ class CourseDescriptor(SequenceDescriptor):
             course_policy = {}
 
         # Load the global settings as a dictionary
-        grading_policy = self.defaut_grading_policy()
+        grading_policy = self.default_grading_policy()
 
         # Override any global settings with the course settings
         grading_policy.update(course_policy)
@@ -222,7 +326,6 @@ class CourseDescriptor(SequenceDescriptor):
 
         return policy_str
 
-
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
@@ -250,13 +353,12 @@ class CourseDescriptor(SequenceDescriptor):
 
         # cdodge: import the grading policy information that is on disk and put into the
         # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
-        instance.definition['data']['grading_policy'] = policy
+        instance.grading_policy = policy
 
         # now set the current instance. set_grading_policy() will apply some inheritance rules
         instance.set_grading_policy(policy)
 
         return instance
-
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -272,12 +374,12 @@ class CourseDescriptor(SequenceDescriptor):
             wiki_slug = wiki_tag.attrib.get("slug", default=None)
             xml_object.remove(wiki_tag)
 
-        definition = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
 
-        definition.setdefault('data', {})['textbooks'] = textbooks
-        definition['data']['wiki_slug'] = wiki_slug
+        definition['textbooks'] = textbooks
+        definition['wiki_slug'] = wiki_slug
 
-        return definition
+        return definition, children
 
     def has_ended(self):
         """
@@ -293,30 +395,6 @@ class CourseDescriptor(SequenceDescriptor):
         return time.gmtime() > self.start
 
     @property
-    def end(self):
-        return self._try_parse_time("end")
-    @end.setter
-    def end(self, value):
-        if isinstance(value, time.struct_time):
-            self.metadata['end'] = stringify_time(value)
-    @property
-    def enrollment_start(self):
-        return self._try_parse_time("enrollment_start")
-
-    @enrollment_start.setter
-    def enrollment_start(self, value):
-        if isinstance(value, time.struct_time):
-            self.metadata['enrollment_start'] = stringify_time(value)
-    @property
-    def enrollment_end(self):
-        return self._try_parse_time("enrollment_end")
-
-    @enrollment_end.setter
-    def enrollment_end(self, value):
-        if isinstance(value, time.struct_time):
-            self.metadata['enrollment_end'] = stringify_time(value)
-
-    @property
     def grader(self):
         return grader_from_conf(self.raw_grader)
 
@@ -328,7 +406,7 @@ class CourseDescriptor(SequenceDescriptor):
     def raw_grader(self, value):
         # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
         self._grading_policy['RAW_GRADER'] = value
-        self.definition['data'].setdefault('grading_policy', {})['GRADER'] = value
+        self.grading_policy['GRADER'] = value
 
     @property
     def grade_cutoffs(self):
@@ -337,7 +415,11 @@ class CourseDescriptor(SequenceDescriptor):
     @grade_cutoffs.setter
     def grade_cutoffs(self, value):
         self._grading_policy['GRADE_CUTOFFS'] = value
-        self.definition['data'].setdefault('grading_policy', {})['GRADE_CUTOFFS'] = value
+
+        # XBlock fields don't update after mutation
+        policy = self.grading_policy
+        policy['GRADE_CUTOFFS'] = value
+        self.grading_policy = policy
 
 
     @property
@@ -345,33 +427,11 @@ class CourseDescriptor(SequenceDescriptor):
         return min(self._grading_policy['GRADE_CUTOFFS'].values())
 
     @property
-    def tabs(self):
-        """
-        Return the tabs config, as a python object, or None if not specified.
-        """
-        return self.metadata.get('tabs')
-
-    @property
-    def pdf_textbooks(self):
-        """
-        Return the pdf_textbooks config, as a python object, or None if not specified.
-        """
-        return self.metadata.get('pdf_textbooks')
-
-    @tabs.setter
-    def tabs(self, value):
-        self.metadata['tabs'] = value
-
-    @property
-    def show_calculator(self):
-        return self.metadata.get("show_calculator", None) == "Yes"
-
-    @property
     def is_cohorted(self):
         """
         Return whether the course is cohorted.
         """
-        config = self.metadata.get("cohort_config")
+        config = self.cohort_config
         if config is None:
             return False
 
@@ -385,7 +445,7 @@ class CourseDescriptor(SequenceDescriptor):
         if not self.is_cohorted:
             return False
 
-        return bool(self.metadata.get("cohort_config", {}).get(
+        return bool(self.cohort_config.get(
             "auto_cohort", False))
 
     @property
@@ -395,8 +455,10 @@ class CourseDescriptor(SequenceDescriptor):
         specified. Returns specified list even if is_cohorted and/or auto_cohort are
         false.
         """
-        return self.metadata.get("cohort_config", {}).get(
-            "auto_cohort_groups", [])
+        if self.cohort_config is None:
+            return []
+        else:
+            return self.cohort_config.get("auto_cohort_groups", [])
 
 
     @property
@@ -404,7 +466,7 @@ class CourseDescriptor(SequenceDescriptor):
         """
         Return list of topic ids defined in course policy.
         """
-        topics = self.metadata.get("discussion_topics", {})
+        topics = self.discussion_topics
         return [d["id"] for d in topics.values()]
 
 
@@ -415,7 +477,7 @@ class CourseDescriptor(SequenceDescriptor):
         the empty set.  Note that all inline discussions are automatically
         cohorted based on the course's is_cohorted setting.
         """
-        config = self.metadata.get("cohort_config")
+        config = self.cohort_config
         if config is None:
             return set()
 
@@ -424,13 +486,13 @@ class CourseDescriptor(SequenceDescriptor):
 
 
     @property
-    def is_new(self):
+    def is_newish(self):
         """
-        Returns if the course has been flagged as new in the metadata. If
+        Returns if the course has been flagged as new. If
         there is no flag, return a heuristic value considering the
         announcement and the start dates.
         """
-        flag = self.metadata.get('is_new', None)
+        flag = self.is_new
         if flag is None:
             # Use a heuristic if the course has not been flagged
             announcement, start, now = self._sorting_dates()
@@ -450,8 +512,8 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def sorting_score(self):
         """
-        Returns a number that can be used to sort the courses according
-        the how "new"" they are. The "newness"" score is computed using a
+        Returns a tuple that can be used to sort the courses according
+        the how "new" they are. The "newness" score is computed using a
         heuristic that takes into account the announcement and
         (advertized) start dates of the course if available.
 
@@ -476,12 +538,13 @@ class CourseDescriptor(SequenceDescriptor):
         def to_datetime(timestamp):
             return datetime(*timestamp[:6])
 
-        def get_date(field):
-            timetuple = self._try_parse_time(field)
-            return to_datetime(timetuple) if timetuple else None
-
-        announcement = get_date('announcement')
-        start = get_date('advertised_start') or to_datetime(self.start)
+        announcement = self.announcement
+        if announcement is not None:
+            announcement = to_datetime(announcement)
+        if self.advertised_start is None or isinstance(self.advertised_start, basestring):
+            start = to_datetime(self.start)
+        else:
+            start = to_datetime(self.advertised_start)
         now = to_datetime(time.gmtime())
 
         return announcement, start, now
@@ -506,7 +569,7 @@ class CourseDescriptor(SequenceDescriptor):
 
         all_descriptors - This contains a list of all xmodules that can
             effect grading a student. This is used to efficiently fetch
-            all the xmodule state for a StudentModuleCache without walking
+            all the xmodule state for a ModelDataCache without walking
             the descriptor tree again.
 
 
@@ -524,14 +587,14 @@ class CourseDescriptor(SequenceDescriptor):
         for c in self.get_children():
             sections = []
             for s in c.get_children():
-                if s.metadata.get('graded', False):
+                if s.lms.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
                     xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
                     section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)}
 
-                    section_format = s.metadata.get('format', "")
+                    section_format = s.lms.format if s.lms.format is not None else ''
                     graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
 
                     all_descriptors.extend(xmoduledescriptors)
@@ -572,58 +635,23 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        parsed_advertised_start = self._try_parse_time('advertised_start')
-
-        # If the advertised start isn't a real date string, we assume it's free
-        # form text...
-        if parsed_advertised_start is None and \
-           ('advertised_start' in self.metadata):
-            return self.metadata['advertised_start']
-
-        displayed_start = parsed_advertised_start or self.start
-
-        # If we have neither an advertised start or a real start, just return TBD
-        if not displayed_start:
-            return "TBD"
-
-        return time.strftime("%b %d, %Y", displayed_start)
+        if isinstance(self.advertised_start, basestring):
+            return self.advertised_start
+        elif self.advertised_start is None and self.start is None:
+            return 'TBD'
+        else:
+            return time.strftime("%b %d, %Y", self.advertised_start or self.start)
 
     @property
     def end_date_text(self):
         return time.strftime("%b %d, %Y", self.end)
-
-    # An extra property is used rather than the wiki_slug/number because
-    # there are courses that change the number for different runs. This allows
-    # courses to share the same css_class across runs even if they have
-    # different numbers.
-    #
-    # TODO get rid of this as soon as possible or potentially build in a robust
-    # way to add in course-specific styling. There needs to be a discussion
-    # about the right way to do this, but arjun will address this ASAP. Also
-    # note that the courseware template needs to change when this is removed.
-    @property
-    def css_class(self):
-        return self.metadata.get('css_class', '')
-
-    @property
-    def info_sidebar_name(self):
-        return self.metadata.get('info_sidebar_name', 'Course Handouts')
-
-    @property
-    def discussion_link(self):
-        """TODO: This is a quick kludge to allow CS50 (and other courses) to
-        specify their own discussion forums as external links by specifying a
-        "discussion_link" in their policy JSON file. This should later get
-        folded in with Syllabus, Course Info, and additional Custom tabs in a
-        more sensible framework later."""
-        return self.metadata.get('discussion_link', None)
 
     @property
     def forum_posts_allowed(self):
         try:
             blackout_periods = [(parse_time(start), parse_time(end))
                                 for start, end
-                                in self.metadata.get('discussion_blackouts', [])]
+                                in self.discussion_blackouts]
             now = time.gmtime()
             for start, end in blackout_periods:
                 if start <= now <= end:
@@ -632,23 +660,6 @@ class CourseDescriptor(SequenceDescriptor):
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
 
         return True
-
-    @property
-    def hide_progress_tab(self):
-        """TODO: same as above, intended to let internal CS50 hide the progress tab
-        until we get grade integration set up."""
-        # Explicit comparison to True because we always want to return a bool.
-        return self.metadata.get('hide_progress_tab') == True
-
-    @property
-    def end_of_course_survey_url(self):
-        """
-        Pull from policy.  Once we have our own survey module set up, can change this to point to an automatically
-        created survey for each class.
-
-        Returns None if no url specified.
-        """
-        return self.metadata.get('end_of_course_survey_url')
 
     class TestCenterExam(object):
         def __init__(self, course_id, exam_name, exam_info):
@@ -735,10 +746,6 @@ class CourseDescriptor(SequenceDescriptor):
     def get_test_center_exam(self, exam_series_code):
         exams = [exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
         return exams[0] if len(exams) == 1 else None
-
-    @property
-    def title(self):
-        return self.display_name
 
     @property
     def number(self):

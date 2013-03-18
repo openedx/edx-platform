@@ -172,11 +172,13 @@ urlpatterns = ('',
     url(r'^press/edx-expands-internationally$', 'static_template_view.views.render',
         {'template': 'press_releases/edx_expands_internationally.html'},
         name="press/edx-expands-internationally"),
-
+    url(r'^press/xblock_announcement$', 'static_template_view.views.render',
+        {'template': 'press_releases/xblock_announcement.html'},
+        name="press/xblock-announcement"),
 
     # Should this always update to point to the latest press release?
     (r'^pressrelease$', 'django.views.generic.simple.redirect_to',
-     {'url': '/press/edx-expands-internationally'}),
+     {'url': '/press/xblock-announcement'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
@@ -279,6 +281,15 @@ if settings.COURSEWARE_ENABLED:
             'staticbook.views.pdf_index'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<page>[^/]*)$',
             'staticbook.views.pdf_index'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/$',
+            'staticbook.views.html_index', name="html_book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
+            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<anchor_id>[^/]*)/$',
+            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/(?P<anchor_id>[^/]*)/$',
+            'staticbook.views.html_index'),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
             'courseware.views.index', name="courseware"),

@@ -10,16 +10,16 @@ from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 
 from xmodule.modulestore import Location
-from cms.djangoapps.models.settings.course_details import (CourseDetails,
+from models.settings.course_details import (CourseDetails,
                                                     CourseSettingsEncoder)
-from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.djangoapps.contentstore.utils import get_modulestore
+from models.settings.course_grading import CourseGradingModel
+from contentstore.utils import get_modulestore
 
 from django.test import TestCase
-from utils import ModuleStoreTestCase
+from .utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.django import modulestore
 
@@ -246,8 +246,9 @@ class CourseGradingTest(CourseTestCase):
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "cutoff add D")
 
-        test_grader.grace_period = {'hours' :  4, 'minutes' : 5, 'seconds': 0}
+        test_grader.grace_period = {'hours': 4, 'minutes': 5, 'seconds': 0}
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
+        print test_grader.grace_period, altered_grader.grace_period
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "4 hour grace period")
 
     def test_update_grader_from_json(self):
@@ -286,31 +287,31 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     def test_update_from_json(self):
         test_model = CourseMetadata.update_from_json(self.course_location,
-            { "a" : 1,
-              "b_a_c_h" : { "c" : "test" },
-              "test_text" : "a text string"})
+            { "advertised_start" : "start A",
+              "testcenter_info" : { "c" : "test" },
+              "days_early_for_beta" : 2})
         self.update_check(test_model)
         # try fresh fetch to ensure persistence
         test_model = CourseMetadata.fetch(self.course_location)
         self.update_check(test_model)
         # now change some of the existing metadata
         test_model = CourseMetadata.update_from_json(self.course_location,
-            { "a" : 2,
+            { "advertised_start" : "start B",
               "display_name" : "jolly roger"})
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name'], 'jolly roger', "not expected value")
-        self.assertIn('a', test_model, 'Missing revised a metadata field')
-        self.assertEqual(test_model['a'], 2, "a not expected value")
+        self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
+        self.assertEqual(test_model['advertised_start'], 'start B', "advertised_start not expected value")
 
     def update_check(self, test_model):
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
-        self.assertIn('a', test_model, 'Missing new a metadata field')
-        self.assertEqual(test_model['a'], 1, "a not expected value")
-        self.assertIn('b_a_c_h', test_model, 'Missing b_a_c_h metadata field')
-        self.assertDictEqual(test_model['b_a_c_h'], { "c" : "test" }, "b_a_c_h not expected value")
-        self.assertIn('test_text', test_model, 'Missing test_text metadata field')
-        self.assertEqual(test_model['test_text'], "a text string", "test_text not expected value")
+        self.assertIn('advertised_start', test_model, 'Missing new advertised_start metadata field')
+        self.assertEqual(test_model['advertised_start'], 'start A', "advertised_start not expected value")
+        self.assertIn('testcenter_info', test_model, 'Missing testcenter_info metadata field')
+        self.assertDictEqual(test_model['testcenter_info'], { "c" : "test" }, "testcenter_info not expected value")
+        self.assertIn('days_early_for_beta', test_model, 'Missing days_early_for_beta metadata field')
+        self.assertEqual(test_model['days_early_for_beta'], 2, "days_early_for_beta not expected value")
 
 
     def test_delete_key(self):
@@ -321,5 +322,5 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['display_name'], 'Testing', "not expected value")
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         # check for deletion effectiveness
-        self.assertNotIn('showanswer', test_model, 'showanswer field still in')
-        self.assertNotIn('xqa_key', test_model, 'xqa_key field still in')
+        self.assertEqual('closed', test_model['showanswer'], 'showanswer field still in')
+        self.assertEqual(None, test_model['xqa_key'], 'xqa_key field still in')

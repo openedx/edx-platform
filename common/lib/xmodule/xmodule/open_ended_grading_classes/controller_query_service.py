@@ -1,5 +1,5 @@
 import logging
-from grading_service_module import GradingService
+from .grading_service_module import GradingService
 
 log = logging.getLogger(__name__)
 
@@ -8,6 +8,7 @@ class ControllerQueryService(GradingService):
     """
     Interface to staff grading backend.
     """
+
     def __init__(self, config, system):
         config['system'] = system
         super(ControllerQueryService, self).__init__(config)
@@ -59,7 +60,7 @@ class ControllerQueryService(GradingService):
     def get_flagged_problem_list(self, course_id):
         params = {
             'course_id': course_id,
-            }
+        }
 
         response = self.get(self.flagged_problem_list_url, params)
         return response
@@ -70,20 +71,21 @@ class ControllerQueryService(GradingService):
             'student_id': student_id,
             'submission_id': submission_id,
             'action_type': action_type
-            }
+        }
 
         response = self.post(self.take_action_on_flags_url, params)
         return response
+
 
 def convert_seconds_to_human_readable(seconds):
     if seconds < 60:
         human_string = "{0} seconds".format(seconds)
     elif seconds < 60 * 60:
-        human_string = "{0} minutes".format(round(seconds/60,1))
-    elif seconds < (24*60*60):
-        human_string = "{0} hours".format(round(seconds/(60*60),1))
+        human_string = "{0} minutes".format(round(seconds / 60, 1))
+    elif seconds < (24 * 60 * 60):
+        human_string = "{0} hours".format(round(seconds / (60 * 60), 1))
     else:
-        human_string = "{0} days".format(round(seconds/(60*60*24),1))
+        human_string = "{0} days".format(round(seconds / (60 * 60 * 24), 1))
 
     eta_string = "{0}".format(human_string)
     return eta_string

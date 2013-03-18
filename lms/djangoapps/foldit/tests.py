@@ -143,11 +143,12 @@ class FolditTestCase(TestCase):
     def test_SetPlayerPuzzleScores_manyplayers(self):
         """
         Check that when we send scores from multiple users, the correct order
-        of scores is displayed.
+        of scores is displayed. Note that, before being processed by
+        display_score, lower scores are better.
         """
         puzzle_id = ['1']
-        player1_score = 0.07
-        player2_score = 0.08
+        player1_score = 0.08
+        player2_score = 0.02
         response1 = self.make_puzzle_score_request(puzzle_id, player1_score,
                 self.user)
 
@@ -164,8 +165,12 @@ class FolditTestCase(TestCase):
         self.assertEqual(len(top_10), 2)
 
         # Top score should be player2_score. Second should be player1_score
-        self.assertEqual(top_10[0]['score'], Score.display_score(player2_score))
-        self.assertEqual(top_10[1]['score'], Score.display_score(player1_score))
+        self.assertAlmostEqual(top_10[0]['score'],
+                Score.display_score(player2_score),
+                delta=0.5)
+        self.assertAlmostEqual(top_10[1]['score'],
+                Score.display_score(player1_score),
+                delta=0.5)
 
         # Top score user should be self.user2.username
         self.assertEqual(top_10[0]['username'], self.user2.username)

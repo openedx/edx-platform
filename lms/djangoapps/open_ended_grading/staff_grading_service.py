@@ -20,10 +20,12 @@ log = logging.getLogger(__name__)
 
 STAFF_ERROR_MESSAGE = 'Could not contact the external grading server.  Please contact the development team.  If you do not have a point of contact, you can contact Vik at vik@edx.org.'
 
+
 class MockStaffGradingService(object):
     """
     A simple mockup of a staff grading service, testing.
     """
+
     def __init__(self):
         self.cnt = 0
 
@@ -43,15 +45,18 @@ class MockStaffGradingService(object):
     def get_problem_list(self, course_id, grader_id):
         self.cnt += 1
         return json.dumps({'success': True,
-        'problem_list': [
-          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1', 
-            'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5, 'min_for_ml': 10}),
-          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
-            'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5, 'min_for_ml': 10})
-        ]})
+                           'problem_list': [
+                               json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
+                                           'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5,
+                                           'min_for_ml': 10}),
+                               json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
+                                           'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5,
+                                           'min_for_ml': 10})
+                           ]})
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores, submission_flagged):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
+                   submission_flagged):
         return self.get_next(course_id, 'fake location', grader_id)
 
 
@@ -59,8 +64,16 @@ class StaffGradingService(GradingService):
     """
     Interface to staff grading backend.
     """
+
     def __init__(self, config):
-        config['system'] = ModuleSystem(None, None, None, render_to_string, None)
+        config['system'] = ModuleSystem(
+            ajax_url=None,
+            track_function=None,
+            get_module = None,
+            render_template=render_to_string,
+            replace_urls=None,
+            xblock_model_data= {}
+        )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']
         self.login_url = self.url + '/login/'
@@ -109,12 +122,13 @@ class StaffGradingService(GradingService):
             GradingServiceError: something went wrong with the connection.
         """
         response = self.get(self.get_next_url,
-                                      params={'location': location,
-                                              'grader_id': grader_id})
+                            params={'location': location,
+                                    'grader_id': grader_id})
         return json.dumps(self._render_rubric(response))
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores, submission_flagged):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
+                   submission_flagged):
         """
         Save a score and feedback for a submission.
 
@@ -253,14 +267,14 @@ def get_problem_list(request, course_id):
     try:
         response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user))
         return HttpResponse(response,
-                mimetype="application/json")
+                            mimetype="application/json")
     except GradingServiceError:
         #This is a dev_facing_error
         log.exception("Error from staff grading service in open ended grading.  server url: {0}"
-                      .format(staff_grading_service().url))
+        .format(staff_grading_service().url))
         #This is a staff_facing_error
         return HttpResponse(json.dumps({'success': False,
-                           'error': STAFF_ERROR_MESSAGE}))
+                                        'error': STAFF_ERROR_MESSAGE}))
 
 
 def _get_next(course_id, grader_id, location):
@@ -272,7 +286,7 @@ def _get_next(course_id, grader_id, location):
     except GradingServiceError:
         #This is a dev facing error
         log.exception("Error from staff grading service in open ended grading.  server url: {0}"
-                      .format(staff_grading_service().url))
+        .format(staff_grading_service().url))
         #This is a staff_facing_error
         return json.dumps({'success': False,
                            'error': STAFF_ERROR_MESSAGE})
@@ -297,7 +311,7 @@ def save_grade(request, course_id):
     if request.method != 'POST':
         raise Http404
 
-    required = set(['score', 'feedback', 'submission_id', 'location','submission_flagged', 'rubric_scores[]'])
+    required = set(['score', 'feedback', 'submission_id', 'location', 'submission_flagged', 'rubric_scores[]'])
     actual = set(request.POST.keys())
     missing = required - actual
     if len(missing) > 0:
@@ -307,22 +321,23 @@ def save_grade(request, course_id):
     grader_id = unique_id_for_user(request.user)
     p = request.POST
 
-
     location = p['location']
-    skipped =  'skipped' in p
+    skipped = 'skipped' in p
 
     try:
         result_json = staff_grading_service().save_grade(course_id,
-                                          grader_id,
-                                          p['submission_id'],
-                                          p['score'],
-                                          p['feedback'],
-                                          skipped,
-                                          p.getlist('rubric_scores[]'),
-                                          p['submission_flagged'])
+                                                         grader_id,
+                                                         p['submission_id'],
+                                                         p['score'],
+                                                         p['feedback'],
+                                                         skipped,
+                                                         p.getlist('rubric_scores[]'),
+                                                         p['submission_flagged'])
     except GradingServiceError:
         #This is a dev_facing_error
-        log.exception("Error saving grade in the staff grading interface in open ended grading.  Request: {0} Course ID: {1}".format(request, course_id))
+        log.exception(
+            "Error saving grade in the staff grading interface in open ended grading.  Request: {0} Course ID: {1}".format(
+                request, course_id))
         #This is a staff_facing_error
         return _err_response(STAFF_ERROR_MESSAGE)
 
@@ -330,13 +345,16 @@ def save_grade(request, course_id):
         result = json.loads(result_json)
     except ValueError:
         #This is a dev_facing_error
-        log.exception("save_grade returned broken json in the staff grading interface in open ended grading: {0}".format(result_json))
+        log.exception(
+            "save_grade returned broken json in the staff grading interface in open ended grading: {0}".format(
+                result_json))
         #This is a staff_facing_error
         return _err_response(STAFF_ERROR_MESSAGE)
 
     if not result.get('success', False):
         #This is a dev_facing_error
-        log.warning('Got success=False from staff grading service in open ended grading.  Response: {0}'.format(result_json))
+        log.warning(
+            'Got success=False from staff grading service in open ended grading.  Response: {0}'.format(result_json))
         return _err_response(STAFF_ERROR_MESSAGE)
 
     # Ok, save_grade seemed to work.  Get the next submission to grade.

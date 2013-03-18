@@ -59,7 +59,7 @@ class Score(models.Model):
         scores = Score.objects \
             .filter(puzzle_id__in=puzzles) \
             .annotate(total_score=models.Sum('best_score')) \
-            .order_by('-total_score')[:n]
+            .order_by('total_score')[:n]
         num = len(puzzles)
 
         return [{'username': s.user.username,

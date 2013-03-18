@@ -5,7 +5,7 @@ import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
 
-from combined_open_ended_rubric import CombinedOpenEndedRubric
+from .combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
 
 log = logging.getLogger(__name__)
@@ -19,6 +19,7 @@ class GradingService(object):
     """
     Interface to staff grading backend.
     """
+
     def __init__(self, config):
         self.username = config['username']
         self.password = config['password']
@@ -34,8 +35,8 @@ class GradingService(object):
         Returns the decoded json dict of the response.
         """
         response = self.session.post(self.login_url,
-            {'username': self.username,
-             'password': self.password, })
+                                     {'username': self.username,
+                                      'password': self.password, })
 
         response.raise_for_status()
 
@@ -47,7 +48,7 @@ class GradingService(object):
         """
         try:
             op = lambda: self.session.post(url, data=data,
-                allow_redirects=allow_redirects)
+                                           allow_redirects=allow_redirects)
             r = self._try_with_login(op)
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
@@ -63,8 +64,8 @@ class GradingService(object):
         """
         log.debug(params)
         op = lambda: self.session.get(url,
-            allow_redirects=allow_redirects,
-            params=params)
+                                      allow_redirects=allow_redirects,
+                                      params=params)
         try:
             r = self._try_with_login(op)
         except (RequestException, ConnectionError, HTTPError) as err:
@@ -92,7 +93,7 @@ class GradingService(object):
             r = self._login()
             if r and not r.get('success'):
                 log.warning("Couldn't log into staff_grading backend. Response: %s",
-                    r)
+                            r)
                 # try again
             response = operation()
             response.raise_for_status()

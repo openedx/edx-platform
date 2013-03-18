@@ -79,6 +79,17 @@ if Backbone?
           @getContent(id).updateInfo(info)
       $.extend @contentInfos, infos
 
+    pinThread: ->
+      pinned = @get("pinned")
+      @set("pinned",pinned)
+      @trigger "change", @
+
+    unPinThread: ->
+      pinned = @get("pinned")
+      @set("pinned",pinned)
+      @trigger "change", @
+
+
   class @Thread extends @Content
     urlMappers:
       'retrieve' : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
@@ -91,6 +102,8 @@ if Backbone?
       'delete'   : -> DiscussionUtil.urlFor('delete_thread', @id)
       'follow'   : -> DiscussionUtil.urlFor('follow_thread', @id)
       'unfollow' : -> DiscussionUtil.urlFor('unfollow_thread', @id)
+      'pinThread'   : -> DiscussionUtil.urlFor("pin_thread", @id)
+      'unPinThread' : -> DiscussionUtil.urlFor("un_pin_thread", @id)
 
     initialize: ->
       @set('thread', @)

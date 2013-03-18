@@ -21,13 +21,14 @@ from fs.errors import ResourceNotFoundError
 from courseware.access import has_access
 
 from lxml.html import rewrite_links
-from module_render import get_module
+from .module_render import get_module
 from courseware.access import has_access
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.x_module import XModule
 from student.models import unique_id_for_user
+from courseware.model_data import ModelDataCache
 
 from open_ended_grading import open_ended_notifications
 
@@ -130,6 +131,17 @@ def _pdf_textbooks(tab, user, course, active_page):
                 for index, textbook in enumerate(course.pdf_textbooks)]
     return []
 
+def _html_textbooks(tab, user, course, active_page):
+    """
+    Generates one tab per textbook.  Only displays if user is authenticated.
+    """
+    if user.is_authenticated():
+        # since there can be more than one textbook, active_page is e.g. "book/0".
+        return [CourseTab(textbook['tab_title'], reverse('html_book', args=[course.id, index]),
+                          active_page == "htmltextbook/{0}".format(index))
+                for index, textbook in enumerate(course.html_textbooks)]
+    return []
+
 def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])
@@ -209,6 +221,7 @@ VALID_TAB_TYPES = {
     'external_link': TabImpl(key_checker(['name', 'link']), _external_link),
     'textbooks': TabImpl(null_validator, _textbooks),
     'pdf_textbooks': TabImpl(null_validator, _pdf_textbooks),
+    'html_textbooks': TabImpl(null_validator, _html_textbooks),
     'progress': TabImpl(need_name, _progress),
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
     'peer_grading': TabImpl(null_validator, _peer_grading),
@@ -332,10 +345,12 @@ def get_static_tab_by_slug(course, tab_slug):
     return None
 
 
-def get_static_tab_contents(request, cache, course, tab):
+def get_static_tab_contents(request, course, tab):
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
-    tab_module = get_module(request.user, request, loc, cache, course.id)
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course.id,
+        request.user, modulestore().get_instance(course.id, loc), depth=0)
+    tab_module = get_module(request.user, request, loc, model_data_cache, course.id)
 
     logging.debug('course_module = {0}'.format(tab_module))
 

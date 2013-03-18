@@ -90,6 +90,8 @@ VIEW_PERMISSIONS = {
     'undo_vote_for_comment':    [['unvote', 'is_open']],
     'vote_for_thread'   :       [['vote', 'is_open']],
     'undo_vote_for_thread':     [['unvote', 'is_open']],
+    'pin_thread':    ['create_comment'],
+    'un_pin_thread':    ['create_comment'],
     'follow_thread'     :       ['follow_thread'],
     'follow_commentable':       ['follow_commentable'],
     'follow_user'       :       ['follow_user'],

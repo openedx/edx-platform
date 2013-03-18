@@ -28,13 +28,11 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             <annotation title="footnote" body="the end">The Iliad of Homer by Samuel Butler</annotation>
         </annotatable>
     '''
-    definition = { 'data': sample_xml }
     descriptor = Mock()
-    instance_state = None
-    shared_state = None
+    module_data = {'data': sample_xml}
 
     def setUp(self):
-        self.annotatable = AnnotatableModule(test_system(), self.location, self.definition, self.descriptor, self.instance_state, self.shared_state)
+        self.annotatable = AnnotatableModule(test_system(), self.location, self.descriptor, self.module_data)
 
     def test_annotation_data_attr(self):
         el = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')

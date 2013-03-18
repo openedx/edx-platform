@@ -3,13 +3,11 @@ import logging
 from lxml import etree
 
 from xmodule.capa_module import ComplexEncoder
-from xmodule.editing_module import EditingDescriptor
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-from xmodule.xml_module import XmlDescriptor
 import openendedchild
 
-from combined_open_ended_rubric import CombinedOpenEndedRubric
+from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
 log = logging.getLogger("mitx.courseware")
 
@@ -31,8 +29,12 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         </submitmessage>
     </selfassessment>
     """
-
     TEMPLATE_DIR = "combinedopenended/selfassessment"
+    # states
+    INITIAL = 'initial'
+    ASSESSING = 'assessing'
+    REQUEST_HINT = 'request_hint'
+    DONE = 'done'
 
     def setup_response(self, system, location, definition, descriptor):
         """
@@ -43,8 +45,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         @param descriptor: SelfAssessmentDescriptor
         @return: None
         """
-        self.prompt = stringify_children(self.prompt)
-        self.rubric = stringify_children(self.rubric)
+        self.child_prompt = stringify_children(self.child_prompt)
+        self.child_rubric = stringify_children(self.child_rubric)
 
     def get_html(self, system):
         """
@@ -53,18 +55,18 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         @return: Rendered HTML
         """
         #set context variables and render template
-        if self.state != self.INITIAL:
+        if self.child_state != self.INITIAL:
             latest = self.latest_answer()
             previous_answer = latest if latest is not None else ''
         else:
             previous_answer = ''
 
         context = {
-            'prompt': self.prompt,
+            'prompt': self.child_prompt,
             'previous_answer': previous_answer,
             'ajax_url': system.ajax_url,
             'initial_rubric': self.get_rubric_html(system),
-            'state': self.state,
+            'state': self.child_state,
             'allow_reset': self._allow_reset(),
             'child_type': 'selfassessment',
             'accept_file_upload': self.accept_file_upload,
@@ -72,7 +74,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         html = system.render_template('{0}/self_assessment_prompt.html'.format(self.TEMPLATE_DIR), context)
         return html
-
 
     def handle_ajax(self, dispatch, get, system):
         """
@@ -95,7 +96,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             #This is a dev_facing_error
             log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
             #This is a dev_facing_error
-            return json.dumps({'error': 'Error handling action.  Please try again.', 'success' : False})
+            return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
         before = self.get_progress()
         d = handlers[dispatch](get, system)
@@ -110,11 +111,11 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         """
         Return the appropriate version of the rubric, based on the state.
         """
-        if self.state == self.INITIAL:
+        if self.child_state == self.INITIAL:
             return ''
 
         rubric_renderer = CombinedOpenEndedRubric(system, False)
-        rubric_dict = rubric_renderer.render_rubric(self.rubric)
+        rubric_dict = rubric_renderer.render_rubric(self.child_rubric)
         success = rubric_dict['success']
         rubric_html = rubric_dict['html']
 
@@ -123,13 +124,13 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
                    'max_score': self._max_score,
         }
 
-        if self.state == self.ASSESSING:
+        if self.child_state == self.ASSESSING:
             context['read_only'] = False
-        elif self.state in (self.POST_ASSESSMENT, self.DONE):
+        elif self.child_state in (self.POST_ASSESSMENT, self.DONE):
             context['read_only'] = True
         else:
             #This is a dev_facing_error
-            raise ValueError("Self assessment module is in an illegal state '{0}'".format(self.state))
+            raise ValueError("Self assessment module is in an illegal state '{0}'".format(self.child_state))
 
         return system.render_template('{0}/self_assessment_rubric.html'.format(self.TEMPLATE_DIR), context)
 
@@ -137,10 +138,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         """
         Return the appropriate version of the hint view, based on state.
         """
-        if self.state in (self.INITIAL, self.ASSESSING):
+        if self.child_state in (self.INITIAL, self.ASSESSING):
             return ''
 
-        if self.state == self.DONE:
+        if self.child_state == self.DONE:
             # display the previous hint
             latest = self.latest_post_assessment(system)
             hint = latest if latest is not None else ''
@@ -149,16 +150,15 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         context = {'hint': hint}
 
-        if self.state == self.POST_ASSESSMENT:
+        if self.child_state == self.POST_ASSESSMENT:
             context['read_only'] = False
-        elif self.state == self.DONE:
+        elif self.child_state == self.DONE:
             context['read_only'] = True
         else:
             #This is a dev_facing_error
-            raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.state))
+            raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.child_state))
 
         return system.render_template('{0}/self_assessment_hint.html'.format(self.TEMPLATE_DIR), context)
-
 
     def save_answer(self, get, system):
         """
@@ -177,7 +177,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if closed:
             return msg
 
-        if self.state != self.INITIAL:
+        if self.child_state != self.INITIAL:
             return self.out_of_sync_error(get)
 
         error_message = ""
@@ -218,13 +218,13 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         'message_html' only if success is true
         """
 
-        if self.state != self.ASSESSING:
+        if self.child_state != self.ASSESSING:
             return self.out_of_sync_error(get)
 
         try:
             score = int(get['assessment'])
             score_list = get.getlist('score_list[]')
-            for i in xrange(0,len(score_list)):
+            for i in xrange(0, len(score_list)):
                 score_list[i] = int(score_list[i])
         except ValueError:
             #This is a dev_facing_error
@@ -241,7 +241,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         self.change_state(self.DONE)
         d['allow_reset'] = self._allow_reset()
 
-        d['state'] = self.state
+        d['state'] = self.child_state
         return d
 
     def save_hint(self, get, system):
@@ -255,7 +255,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         with the error key only present if success is False and message_html
         only if True.
         '''
-        if self.state != self.POST_ASSESSMENT:
+        if self.child_state != self.POST_ASSESSMENT:
             # Note: because we only ask for hints on wrong answers, may not have
             # the same number of hints and answers.
             return self.out_of_sync_error(get)
@@ -268,7 +268,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
                 'allow_reset': self._allow_reset()}
 
     def latest_post_assessment(self, system):
-        latest_post_assessment =  super(SelfAssessmentModule, self).latest_post_assessment(system)
+        latest_post_assessment = super(SelfAssessmentModule, self).latest_post_assessment(system)
         try:
             rubric_scores = json.loads(latest_post_assessment)
         except:
@@ -278,7 +278,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         return [rubric_scores]
 
 
-class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
+class SelfAssessmentDescriptor():
     """
     Module for adding self assessment questions to courses
     """
@@ -289,6 +289,9 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "selfassessment"
+
+    def __init__(self, system):
+        self.system =system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -305,7 +308,9 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         for child in expected_children:
             if len(xml_object.xpath(child)) != 1:
                 #This is a staff_facing_error
-                raise ValueError("Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
+                raise ValueError(
+                    "Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
+                        child))
 
         def parse(k):
             """Assumes that xml_object has child k"""
@@ -318,7 +323,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         elt = etree.Element('selfassessment')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

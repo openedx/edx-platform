@@ -47,10 +47,10 @@ import sys
 import os
 import pyparsing
 
-from registry import TagRegistry
+from .registry import TagRegistry
 from capa.chem import chemcalc
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 #########################################################################
 
@@ -365,6 +365,12 @@ class ChoiceGroup(InputTypeBase):
             raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
 
         self.choices = self.extract_choices(self.xml)
+
+    @classmethod
+    def get_attributes(cls):
+        return [Attribute("show_correctness", "always"),
+                Attribute("submitted_message", "Answer received.")]
+
 
     def _extra_context(self):
         return {'input_type': self.html_input_type,
@@ -850,6 +856,10 @@ class DragAndDropInput(InputTypeBase):
 
             if tag_type == 'draggable' and not self.no_labels:
                 dic['label'] = dic['label'] or dic['id']
+
+            if tag_type == 'draggable':
+                dic['target_fields'] = [parse(target, 'target') for target in
+                                                tag.iterchildren('target')]
 
             return dic
 

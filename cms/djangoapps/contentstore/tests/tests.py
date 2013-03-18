@@ -8,7 +8,7 @@ import json
 from fs.osfs import OSFS
 import copy
 
-from cms.djangoapps.contentstore.utils import get_modulestore
+from contentstore.utils import get_modulestore
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.store_utilities import clone_course
@@ -24,7 +24,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from utils import ModuleStoreTestCase, parse_json, user, registration
+from .utils import ModuleStoreTestCase, parse_json, user, registration
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):
