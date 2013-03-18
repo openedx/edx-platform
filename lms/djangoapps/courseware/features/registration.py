@@ -2,6 +2,7 @@ from lettuce import world, step
 from lettuce.django import django_url
 from common import TEST_COURSE_ORG, TEST_COURSE_NAME
 
+
 @step('I register for the course "([^"]*)"$')
 def i_register_for_the_course(step, course):
     cleaned_name = TEST_COURSE_NAME.replace(' ', '_')

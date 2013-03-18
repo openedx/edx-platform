@@ -154,7 +154,7 @@ class XModuleItemFactory(Factory):
 
         # If a display name is set, use that
         dest_name = display_name.replace(" ", "_") if display_name is not None else uuid4().hex
-        dest_location = parent_location._replace(category=template.category, 
+        dest_location = parent_location._replace(category=template.category,
                                                 name=dest_name)
 
         new_item = store.clone_item(template, dest_location)

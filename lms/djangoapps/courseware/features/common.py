@@ -89,6 +89,7 @@ TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'Test Course'
 TEST_SECTION_NAME = "Problem"
 
+
 @step(u'The course "([^"]*)" exists$')
 def create_course(step, course):
 
@@ -100,7 +101,7 @@ def create_course(step, course):
     # Create the course
     # We always use the same org and display name,
     # but vary the course identifier (e.g. 600x or 191x)
-    course = CourseFactory.create(org=TEST_COURSE_ORG, 
+    course = CourseFactory.create(org=TEST_COURSE_ORG,
                                 number=course,
                                 display_name=TEST_COURSE_NAME)
 
@@ -111,6 +112,7 @@ def create_course(step, course):
     problem_section = ItemFactory.create(parent_location=section.location,
                                         template='i4x://edx/templates/sequential/Empty',
                                         display_name=TEST_SECTION_NAME)
+
 
 @step(u'I am registered for the course "([^"]*)"$')
 def i_am_registered_for_the_course(step, course):
@@ -125,6 +127,7 @@ def i_am_registered_for_the_course(step, course):
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(course))
 
     world.log_in('robot@edx.org', 'test')
+
 
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
 def add_tab_to_course(step, course, extra_tab_name):
@@ -155,9 +158,11 @@ def flush_xmodule_store():
     modulestore().collection.drop()
     update_templates()
 
+
 def course_id(course_num):
-    return "%s/%s/%s" % (TEST_COURSE_ORG, course_num, 
+    return "%s/%s/%s" % (TEST_COURSE_ORG, course_num,
                         TEST_COURSE_NAME.replace(" ", "_"))
+
 
 def course_location(course_num):
     return Location(loc_or_tag="i4x",
@@ -165,6 +170,7 @@ def course_location(course_num):
                     course=course_num,
                     category='course',
                     name=TEST_COURSE_NAME.replace(" ", "_"))
+
 
 def section_location(course_num):
     return Location(loc_or_tag="i4x",

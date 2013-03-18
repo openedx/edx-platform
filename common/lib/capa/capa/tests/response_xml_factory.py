@@ -1,6 +1,7 @@
 from lxml import etree
 from abc import ABCMeta, abstractmethod
 
+
 class ResponseXMLFactory(object):
     """ Abstract base class for capa response XML factories.
     Subclasses override create_response_element and
@@ -13,7 +14,7 @@ class ResponseXMLFactory(object):
         """ Subclasses override to return an etree element
         representing the capa response XML
         (e.g. <numericalresponse>).
-        
+
         The tree should NOT contain any input elements
         (such as <textline />) as these will be added later."""
         return None
@@ -25,7 +26,7 @@ class ResponseXMLFactory(object):
         return None
 
     def build_xml(self, **kwargs):
-        """ Construct an XML string for a capa response 
+        """ Construct an XML string for a capa response
         based on **kwargs.
 
         **kwargs is a dictionary that will be passed
@@ -37,7 +38,7 @@ class ResponseXMLFactory(object):
 
         *question_text*: The text of the question to display,
             wrapped in <p> tags.
-        
+
         *explanation_text*: The detailed explanation that will
             be shown if the user answers incorrectly.
 
@@ -75,7 +76,7 @@ class ResponseXMLFactory(object):
         for i in range(0, int(num_responses)):
             response_element = self.create_response_element(**kwargs)
             root.append(response_element)
-            
+
             # Add input elements
             for j in range(0, int(num_inputs)):
                 input_element = self.create_input_element(**kwargs)
@@ -135,7 +136,7 @@ class ResponseXMLFactory(object):
         # Names of group elements
         group_element_names = {'checkbox': 'checkboxgroup',
                                 'radio': 'radiogroup',
-                                'multiple': 'choicegroup' }
+                                'multiple': 'choicegroup'}
 
         # Retrieve **kwargs
         choices = kwargs.get('choices', [True])
@@ -215,7 +216,7 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
 
         *answer*: Inline script that calculates the answer
         """
-        
+
         # Retrieve **kwargs
         cfn = kwargs.get('cfn', None)
         expect = kwargs.get('expect', None)
@@ -245,7 +246,7 @@ class SchematicResponseXMLFactory(ResponseXMLFactory):
 
     def create_response_element(self, **kwargs):
         """ Create the <schematicresponse> XML element.
-        
+
         Uses *kwargs*:
 
         *answer*: The Python script used to evaluate the answer.
@@ -272,6 +273,7 @@ class SchematicResponseXMLFactory(ResponseXMLFactory):
         For testing, we create a bare-bones version of <schematic>."""
         return etree.Element("schematic")
 
+
 class CodeResponseXMLFactory(ResponseXMLFactory):
     """ Factory for creating <coderesponse> XML trees """
 
@@ -284,9 +286,9 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
 
     def create_response_element(self, **kwargs):
         """ Create a <coderesponse> XML element:
-            
+
             Uses **kwargs:
-                
+
             *initial_display*: The code that initially appears in the textbox
                                 [DEFAULT: "Enter code here"]
             *answer_display*: The answer to display to the student
@@ -326,6 +328,7 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         # return None here
         return None
 
+
 class ChoiceResponseXMLFactory(ResponseXMLFactory):
     """ Factory for creating <choiceresponse> XML trees """
 
@@ -354,13 +357,13 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
 
         *num_samples*: The number of times to sample the student's answer
                         to numerically compare it to the correct answer.
-        
+
         *tolerance*: The tolerance within which answers will be accepted
-                        [DEFAULT: 0.01] 
+                        [DEFAULT: 0.01]
 
         *answer*: The answer to the problem.  Can be a formula string
-                    or a Python variable defined in a script 
-                    (e.g. "$calculated_answer" for a Python variable 
+                    or a Python variable defined in a script
+                    (e.g. "$calculated_answer" for a Python variable
                     called calculated_answer)
                     [REQUIRED]
 
@@ -385,7 +388,7 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         # Set the sample information
         sample_str = self._sample_str(sample_dict, num_samples, tolerance)
         response_element.set("samples", sample_str)
-                
+
 
         # Set the tolerance
         responseparam_element = etree.SubElement(response_element, "responseparam")
@@ -406,7 +409,7 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
 
                 # We could sample a different range, but for simplicity,
                 # we use the same sample string for the hints
-                # that we used previously.  
+                # that we used previously.
                 formulahint_element.set("samples", sample_str)
 
                 formulahint_element.set("answer", str(hint_prompt))
@@ -434,9 +437,10 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         high_range_vals = [str(f[1]) for f in sample_dict.values()]
         sample_str = (",".join(sample_dict.keys()) + "@" +
                         ",".join(low_range_vals) + ":" +
-                        ",".join(high_range_vals) + 
+                        ",".join(high_range_vals) +
                         "#" + str(num_samples))
         return sample_str
+
 
 class ImageResponseXMLFactory(ResponseXMLFactory):
     """ Factory for producing <imageresponse> XML """
@@ -448,9 +452,9 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
 
     def create_input_element(self, **kwargs):
         """ Create the <imageinput> element.
-        
+
         Uses **kwargs:
-            
+
         *src*: URL for the image file [DEFAULT: "/static/image.jpg"]
 
         *width*: Width of the image [DEFAULT: 100]
@@ -488,7 +492,7 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
         input_element.set("src", str(src))
         input_element.set("width", str(width))
         input_element.set("height", str(height))
-        
+
         if rectangle:
             input_element.set("rectangle", rectangle)
 
@@ -496,6 +500,7 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
             input_element.set("regions", regions)
 
         return input_element
+
 
 class JavascriptResponseXMLFactory(ResponseXMLFactory):
     """ Factory for producing <javascriptresponse> XML """
@@ -520,7 +525,7 @@ class JavascriptResponseXMLFactory(ResponseXMLFactory):
 
         # Both display_src and display_class given,
         # or neither given
-        assert((display_src and display_class) or 
+        assert((display_src and display_class) or
                 (not display_src and not display_class))
 
         # Create the <javascriptresponse> element
@@ -550,6 +555,7 @@ class JavascriptResponseXMLFactory(ResponseXMLFactory):
         """ Create the <javascriptinput> element """
         return etree.Element("javascriptinput")
 
+
 class MultipleChoiceResponseXMLFactory(ResponseXMLFactory):
     """ Factory for producing <multiplechoiceresponse> XML """
 
@@ -562,6 +568,7 @@ class MultipleChoiceResponseXMLFactory(ResponseXMLFactory):
         kwargs['choice_type'] = 'multiple'
         return ResponseXMLFactory.choicegroup_input_xml(**kwargs)
 
+
 class TrueFalseResponseXMLFactory(ResponseXMLFactory):
     """ Factory for producing <truefalseresponse> XML """
 
@@ -573,6 +580,7 @@ class TrueFalseResponseXMLFactory(ResponseXMLFactory):
         """ Create the <choicegroup> element"""
         kwargs['choice_type'] = 'multiple'
         return ResponseXMLFactory.choicegroup_input_xml(**kwargs)
+
 
 class OptionResponseXMLFactory(ResponseXMLFactory):
     """ Factory for producing <optionresponse> XML"""
@@ -618,7 +626,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
     def create_response_element(self, **kwargs):
         """ Create a <stringresponse> XML element.
-        
+
             Uses **kwargs:
 
             *answer*: The correct answer (a string) [REQUIRED]
@@ -640,7 +648,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         # Create the <stringresponse> element
         response_element = etree.Element("stringresponse")
 
-        # Set the answer attribute 
+        # Set the answer attribute
         response_element.set("answer", str(answer))
 
         # Set the case sensitivity
@@ -665,6 +673,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
 
+
 class AnnotationResponseXMLFactory(ResponseXMLFactory):
     """ Factory for creating <annotationresponse> XML trees """
     def create_response_element(self, **kwargs):
@@ -677,17 +686,17 @@ class AnnotationResponseXMLFactory(ResponseXMLFactory):
         input_element = etree.Element("annotationinput")
 
         text_children = [
-            {'tag': 'title', 'text': kwargs.get('title', 'super cool annotation') },
-            {'tag': 'text', 'text': kwargs.get('text', 'texty text') },
-            {'tag': 'comment', 'text':kwargs.get('comment', 'blah blah erudite comment blah blah') },
-            {'tag': 'comment_prompt', 'text': kwargs.get('comment_prompt', 'type a commentary below') },
-            {'tag': 'tag_prompt', 'text': kwargs.get('tag_prompt', 'select one tag') }
+            {'tag': 'title', 'text': kwargs.get('title', 'super cool annotation')},
+            {'tag': 'text', 'text': kwargs.get('text', 'texty text')},
+            {'tag': 'comment', 'text':kwargs.get('comment', 'blah blah erudite comment blah blah')},
+            {'tag': 'comment_prompt', 'text': kwargs.get('comment_prompt', 'type a commentary below')},
+            {'tag': 'tag_prompt', 'text': kwargs.get('tag_prompt', 'select one tag')}
         ]
 
         for child in text_children:
             etree.SubElement(input_element, child['tag']).text = child['text']
 
-        default_options = [('green', 'correct'),('eggs', 'incorrect'),('ham', 'partially-correct')]
+        default_options = [('green', 'correct'),('eggs', 'incorrect'), ('ham', 'partially-correct')]
         options = kwargs.get('options', default_options)
         options_element = etree.SubElement(input_element, 'options')
 
@@ -696,4 +705,3 @@ class AnnotationResponseXMLFactory(ResponseXMLFactory):
             option_element.text = description
 
         return input_element
-

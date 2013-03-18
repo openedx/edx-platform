@@ -13,7 +13,7 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure
 # the output.
-problem_factory_dict = {
+PROBLEM_FACTORY_DICT = {
     'drop down': {
         'factory': OptionResponseXMLFactory(),
         'kwargs': {
@@ -32,8 +32,8 @@ problem_factory_dict = {
         'factory': ChoiceResponseXMLFactory(),
         'kwargs': {
             'question_text': 'The correct answer is Choices 1 and 3',
-            'choice_type':'checkbox',
-            'choices':[True, False, True, False, False],
+            'choice_type': 'checkbox',
+            'choices': [True, False, True, False, False],
             'choice_names': ['Choice 1', 'Choice 2', 'Choice 3', 'Choice 4']}},
 
     'string': {
@@ -41,7 +41,7 @@ problem_factory_dict = {
         'kwargs': {
             'question_text': 'The answer is "correct string"',
             'case_sensitive': False,
-            'answer': 'correct string' }},
+            'answer': 'correct string'}},
 
     'numerical': {
         'factory': NumericalResponseXMLFactory(),
@@ -49,13 +49,13 @@ problem_factory_dict = {
             'question_text': 'The answer is pi + 1',
             'answer': '4.14159',
             'tolerance': '0.00001',
-            'math_display': True }},
+            'math_display': True}},
 
     'formula': {
         'factory': FormulaResponseXMLFactory(),
         'kwargs': {
             'question_text': 'The solution is [mathjax]x^2+2x+y[/mathjax]',
-            'sample_dict': {'x': (-100, 100), 'y': (-100, 100) },
+            'sample_dict': {'x': (-100, 100), 'y': (-100, 100)},
             'num_samples': 10,
             'tolerance': 0.00001,
             'math_display': True,
@@ -77,15 +77,16 @@ problem_factory_dict = {
                         a1=0
                         a2=0
                     return (a1+a2)==int(expect)
-            """) }},
+            """)}},
        }
+
 
 def add_problem_to_course(course, problem_type):
 
-    assert(problem_type in problem_factory_dict)
+    assert(problem_type in PROBLEM_FACTORY_DICT)
 
     # Generate the problem XML using capa.tests.response_xml_factory
-    factory_dict = problem_factory_dict[problem_type]
+    factory_dict = PROBLEM_FACTORY_DICT[problem_type]
     problem_xml = factory_dict['factory'].build_xml(**factory_dict['kwargs'])
 
     # Create a problem item using our generated XML
@@ -95,7 +96,8 @@ def add_problem_to_course(course, problem_type):
                         template="i4x://edx/templates/problem/Blank_Common_Problem",
                         display_name=str(problem_type),
                         data=problem_xml,
-                        metadata={'rerandomize':'always'})
+                        metadata={'rerandomize': 'always'})
+
 
 @step(u'I am viewing a "([^"]*)" problem')
 def view_problem(step, problem_type):
@@ -108,9 +110,9 @@ def view_problem(step, problem_type):
     # which should be loaded with the correct problem
     chapter_name = TEST_SECTION_NAME.replace(" ", "_")
     section_name = chapter_name
-    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' % 
+    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
                     (chapter_name, section_name))
-                        
+
     world.browser.visit(url)
 
 
@@ -147,7 +149,7 @@ def answer_problem(step, problem_type, correctness):
         inputfield('string').fill(textvalue)
 
     elif problem_type == 'numerical':
-        textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2,2))
+        textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2, 2))
         inputfield('numerical').fill(textvalue)
 
     elif problem_type == 'formula':
@@ -170,13 +172,16 @@ def answer_problem(step, problem_type, correctness):
     # Submit the problem
     check_problem(step)
 
+
 @step(u'I check a problem')
 def check_problem(step):
     world.browser.find_by_css("input.check").click()
 
+
 @step(u'I reset the problem')
 def reset_problem(step):
     world.browser.find_by_css('input.reset').click()
+
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')
 def assert_answer_mark(step, problem_type, correctness):
@@ -190,28 +195,28 @@ def assert_answer_mark(step, problem_type, correctness):
     This can occur, for example, if the user has reset the problem.  """
 
     # Dictionaries that map problem types to the css selectors
-    # for correct/incorrect marks.  
+    # for correct/incorrect marks.
     # The elements are lists of selectors because a particular problem type
-    # might be marked in multiple ways.  
-    # For example, multiple choice is marked incorrect differently 
-    # depending on whether the user selects an incorrect 
+    # might be marked in multiple ways.
+    # For example, multiple choice is marked incorrect differently
+    # depending on whether the user selects an incorrect
     # item or submits without selecting any item)
-    correct_selectors = { 'drop down': ['span.correct'],
+    correct_selectors = {'drop down': ['span.correct'],
                            'multiple choice': ['label.choicegroup_correct'],
                             'checkbox': ['span.correct'],
                             'string': ['div.correct'],
                             'numerical': ['div.correct'],
-                            'formula': ['div.correct'], 
+                            'formula': ['div.correct'],
                             'script': ['div.correct'], }
 
-    incorrect_selectors = { 'drop down': ['span.incorrect'],
-                           'multiple choice': ['label.choicegroup_incorrect', 
+    incorrect_selectors = {'drop down': ['span.incorrect'],
+                           'multiple choice': ['label.choicegroup_incorrect',
                                                 'span.incorrect'],
                             'checkbox': ['span.incorrect'],
                             'string': ['div.incorrect'],
                             'numerical': ['div.incorrect'],
-                            'formula': ['div.incorrect'], 
-                            'script': ['div.incorrect'] }
+                            'formula': ['div.incorrect'],
+                            'script': ['div.incorrect']}
 
     assert(correctness in ['correct', 'incorrect', 'unanswered'])
     assert(problem_type in correct_selectors and problem_type in incorrect_selectors)
@@ -252,7 +257,7 @@ def inputfield(problem_type, choice=None, input_num=1):
     *choice* is the name of the checkbox input in a group
     of checkboxes. """
 
-    sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" % 
+    sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
             (problem_type.replace(" ", "_"), str(input_num)))
 
     if choice is not None:

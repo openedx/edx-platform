@@ -35,7 +35,7 @@ Feature: Answer choice problems
 
     Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
-        When I check a problem 
+        When I check a problem
         Then My "<ProblemType>" answer is marked "incorrect"
 
         Examples:

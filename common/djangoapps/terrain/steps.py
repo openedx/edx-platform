@@ -101,6 +101,7 @@ def i_am_an_edx_user(step):
 
 #### helper functions
 
+
 @world.absorb
 def scroll_to_bottom():
     # Maximize the browser
