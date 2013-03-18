@@ -201,6 +201,16 @@ def import_from_xml(store, data_dir, course_dirs=None,
     course_items = []
     for course_id in module_store.modules.keys():
 
+        if target_location_namespace is not None:
+            pseudo_course_id = '/'.join([target_location_namespace.org, target_location_namespace.course])
+        else:
+            course_id_components = course_id.split('/')
+            pseudo_course_id = '/'.join([course_id_components[0], course_id_components[1]])
+
+        # turn off all write signalling while importing as this is a high volume operation
+        if pseudo_course_id not in store.ignore_write_events_on_courses:
+            store.ignore_write_events_on_courses.append(pseudo_course_id)
+
         course_data_path = None
         course_location = None
 
@@ -295,6 +305,12 @@ def import_from_xml(store, data_dir, course_dirs=None,
             # NOTE: It's important to use own_metadata here to avoid writing
             # inherited metadata everywhere.
             store.update_metadata(module.location, dict(own_metadata(module)))
+
+        # turn back on all write signalling
+        if pseudo_course_id  in store.ignore_write_events_on_courses:
+            store.ignore_write_events_on_courses.remove(pseudo_course_id)
+            store.refresh_cached_metadata_inheritance_tree(target_location_namespace if 
+                target_location_namespace is not None else course_location)
 
     return module_store, course_items
 
