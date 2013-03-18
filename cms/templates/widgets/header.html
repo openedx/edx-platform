@@ -5,24 +5,24 @@
 
     <div class="wrapper wrapper-left ">
       <h1 class="branding"><a href="/">edX Studio</a></h1>
-      
+
       % if context_course:
       <% ctx_loc = context_course.location %>
       <div class="info-course">
         <h2 class="sr">Current Course:</h2>
         <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
         <span class="course-org">${ctx_loc.org}</span><span class="course-number">${ctx_loc.course}</span>
-        <span class="course-title" title="${context_course.display_name}">${context_course.display_name}</span>
+        <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
         </a>
       </div>
-      
+
       <nav class="nav-course primary nav-dropdown" role="navigation">
-        <h2 class="sr">${context_course.display_name}'s Navigation:</h2>
+        <h2 class="sr">${context_course.display_name_with_default}'s Navigation:</h2>
 
         <ol>
           <li class="nav-item nav-course-courseware">
             <h3 class="title"><span class="label-prefix">Course </span>Content <i class="ss-icon ss-symbolicons-block icon-expand">&#x25BE;</i></h3>
-            
+
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
@@ -32,12 +32,12 @@
                   <li class="nav-item nav-course-courseware-uploads"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Files &amp; Uploads</a></li>
                 </ul>
               </div>
-            </div>            
+            </div>
           </li>
 
           <li class="nav-item nav-course-settings">
             <h3 class="title"><span class="label-prefix">Course </span>Settings <i class="ss-icon ss-symbolicons-block icon-expand">&#x25BE;</i></h3>
-            
+
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
@@ -47,12 +47,12 @@
                   <li class="nav-item nav-course-settings-advanced"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
                 </ul>
               </div>
-            </div>            
+            </div>
           </li>
 
           <li class="nav-item nav-course-tools">
             <h3 class="title">Tools <i class="ss-icon ss-symbolicons-block icon-expand">&#x25BE;</i></h3>
-            
+
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
@@ -67,16 +67,16 @@
       </nav>
       % endif
     </div>
-    
+
     <div class="wrapper wrapper-right">
-      % if user.is_authenticated():    
+      % if user.is_authenticated():
       <nav class="nav-account nav-is-signedin nav-dropdown">
         <h2 class="sr">Currently logged in as:</h2>
         <ol>
           <li class="nav-item nav-account-username">
             <a href="#" class="title">
               <span class="account-username">
-                <i class="ss-icon ss-symbolicons-standard icon-user">&#x1F464;</i> 
+                <i class="ss-icon ss-symbolicons-standard icon-user">&#x1F464;</i>
                 ${ user.username }
               </span>
               <i class="ss-icon ss-symbolicons-block icon-expand">&#x25BE;</i>
@@ -112,7 +112,7 @@
           </li>
         </ol>
       </nav>
-      % endif      
+      % endif
     </div>
   </header>
 </div>

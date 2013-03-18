@@ -8,6 +8,7 @@ from .xml import XMLModuleStore
 from .exceptions import DuplicateItemError
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
+from .inheritance import own_metadata
 
 log = logging.getLogger(__name__)
 
@@ -19,6 +20,8 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
 
     # now import all static assets
     static_dir = course_data_path / subpath
+
+    verbose = True
 
     for dirname, dirnames, filenames in os.walk(static_dir):
         for filename in filenames:
@@ -95,6 +98,79 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
     return link
 
 
+def import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None, verbose=False):
+    # remap module to the new namespace
+    if target_location_namespace is not None:
+        # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
+        # the caller passed in
+        if module.location.category != 'course':
+            module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
+                course=target_location_namespace.course)
+        else:
+            module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
+                course=target_location_namespace.course, name=target_location_namespace.name)
+
+        # then remap children pointers since they too will be re-namespaced
+        if module.has_children:
+            children_locs = module.children
+            new_locs = []
+            for child in children_locs:
+                child_loc = Location(child)
+                new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
+                    course=target_location_namespace.course)
+
+                new_locs.append(new_child_loc.url())
+
+            module.children = new_locs
+
+    if hasattr(module, 'data'):
+        # cdodge: now go through any link references to '/static/' and make sure we've imported
+        # it as a StaticContent asset
+        try:
+            remap_dict = {}
+
+            # use the rewrite_links as a utility means to enumerate through all links
+            # in the module data. We use that to load that reference into our asset store
+            # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
+            # do the rewrites natively in that code.
+            # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
+            # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
+            # no good, so we have to do this kludge
+            if isinstance(module.data, str) or isinstance(module.data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
+                lxml_rewrite_links(module.data, lambda link: verify_content_links(module, course_data_path,
+                    static_content_store, link, remap_dict))
+
+                for key in remap_dict.keys():
+                    module.data = module.data.replace(key, remap_dict[key])
+
+        except Exception:
+            logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
+
+        modulestore.update_item(module.location, module.data)
+
+    if module.has_children:
+        modulestore.update_children(module.location, module.children)
+
+    modulestore.update_metadata(module.location, own_metadata(module))
+
+
+def import_course_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None, verbose=False):
+    # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
+    # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
+    # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
+    # if there is *any* tabs - then there at least needs to be some predefined ones
+    if module.tabs is None or len(module.tabs) == 0:
+        module.tabs = [{"type": "courseware"},
+            {"type": "course_info", "name": "Course Info"},
+            {"type": "discussion", "name": "Discussion"},
+            {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
+
+    # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
+    # so let's make sure we import in case there are no other references to it in the modules
+    verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
+    import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace, verbose=verbose)
+
+
 def import_from_xml(store, data_dir, course_dirs=None,
                     default_class='xmodule.raw_module.RawDescriptor',
                     load_error_modules=True, static_content_store=None, target_location_namespace=None, verbose=False):
@@ -135,7 +211,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
         # course module is committed first into the store
         for module in module_store.modules[course_id].itervalues():
             if module.category == 'course':
-                course_data_path = path(data_dir) / module.metadata['data_dir']
+                course_data_path = path(data_dir) / module.data_dir
                 course_location = module.location
 
                 module = remap_namespace(module, target_location_namespace)
@@ -151,10 +227,10 @@ def import_from_xml(store, data_dir, course_dirs=None,
                         {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
 
-                store.update_item(module.location, module.definition['data'])
-                if 'children' in module.definition:
-                    store.update_children(module.location, module.definition['children'])
-                store.update_metadata(module.location, dict(module.own_metadata))
+                if hasattr(module, 'data'):
+                    store.update_item(module.location, module.data)
+                store.update_children(module.location, module.children)
+                store.update_metadata(module.location, dict(own_metadata(module)))
 
                 # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
                 # so let's make sure we import in case there are no other references to it in the modules
@@ -186,8 +262,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
             if verbose:
                 log.debug('importing module location {0}'.format(module.location))
 
-            if 'data' in module.definition:
-                module_data = module.definition['data']
+            if hasattr(module, 'data'):
+                module_data = module.data
 
                 # cdodge: now go through any link references to '/static/' and make sure we've imported
                 # it as a StaticContent asset
@@ -213,15 +289,14 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 store.update_item(module.location, module_data)
 
-            if 'children' in module.definition:
-                store.update_children(module.location, module.definition['children'])
+            if hasattr(module, 'children') and module.children != []:
+                store.update_children(module.location, module.children)
 
             # NOTE: It's important to use own_metadata here to avoid writing
             # inherited metadata everywhere.
-            store.update_metadata(module.location, dict(module.own_metadata))
+            store.update_metadata(module.location, dict(own_metadata(module)))
 
     return module_store, course_items
-
 
 def remap_namespace(module, target_location_namespace):
     if target_location_namespace is None:
@@ -237,20 +312,20 @@ def remap_namespace(module, target_location_namespace):
             course=target_location_namespace.course, name=target_location_namespace.name)
 
     # then remap children pointers since they too will be re-namespaced
-    children_locs = module.definition.get('children')
-    if children_locs is not None:
-        new_locs = []
-        for child in children_locs:
-            child_loc = Location(child)
-            new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                course=target_location_namespace.course)
+    if hasattr(module,'children'):
+        children_locs = module.children
+        if children_locs is not None and children_locs != []:
+            new_locs = []
+            for child in children_locs:
+                child_loc = Location(child)
+                new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
+                    course=target_location_namespace.course)
 
-            new_locs.append(new_child_loc.url())
+                new_locs.append(new_child_loc.url())
 
-        module.definition['children'] = new_locs
+            module.children = new_locs
 
     return module
-
 
 def validate_category_hierarchy(module_store, course_id, parent_category, expected_child_category):
     err_cnt = 0
@@ -262,7 +337,7 @@ def validate_category_hierarchy(module_store, course_id, parent_category, expect
             parents.append(module)
 
     for parent in parents:
-        for child_loc in [Location(child) for child in parent.definition.get('children', [])]:
+        for child_loc in [Location(child) for child in parent.children]:
             if child_loc.category != expected_child_category:
                 err_cnt += 1
                 print 'ERROR: child {0} of parent {1} was expected to be category of {2} but was {3}'.format(
@@ -274,7 +349,7 @@ def validate_category_hierarchy(module_store, course_id, parent_category, expect
 def validate_data_source_path_existence(path, is_err=True, extra_msg=None):
     _cnt = 0
     if not os.path.exists(path):
-        print ("{0}: Expected folder at {1}. {2}".format('ERROR' if is_err == True else 'WARNING', path, extra_msg if 
+        print ("{0}: Expected folder at {1}. {2}".format('ERROR' if is_err == True else 'WARNING', path, extra_msg if
             extra_msg is not None else ''))
         _cnt = 1
     return _cnt

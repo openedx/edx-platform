@@ -8,7 +8,6 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 from .common import *
-from logsettings import get_logger_config
 import os
 from path import path
 
@@ -116,7 +115,14 @@ CACHES = {
         'KEY_PREFIX': 'general',
         'VERSION': 4,
         'KEY_FUNCTION': 'util.memcache.safe_key',
-    }
+    },
+
+    'mongo_metadata_inheritance': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': '/var/tmp/mongo_metadata_inheritance',
+        'TIMEOUT': 300,
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    } 
 }
 
 # Dummy secret key for dev

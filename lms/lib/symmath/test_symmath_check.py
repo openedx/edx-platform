@@ -1,5 +1,5 @@
 from unittest import TestCase
-from symmath_check import symmath_check
+from .symmath_check import symmath_check
 
 class SymmathCheckTest(TestCase):
     def test_symmath_check_integers(self):

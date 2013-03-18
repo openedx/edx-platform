@@ -62,7 +62,7 @@ from courseware.tests.tests import PageLoader, TEST_DATA_XML_MODULESTORE
 #        #self.assertEqual(resp.status_code, 200)
 #        #self.assertEqual(my_save.something, "expected", "complaint if not true")
 #
-#        self.toy.metadata["cohort_config"] = {"cohorted": True}
+#        self.toy.cohort_config = {"cohorted": True}
 #
 #        # call the view again ...
 #

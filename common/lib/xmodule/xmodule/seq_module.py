@@ -8,6 +8,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
+from xblock.core import Integer, Scope
 from pkg_resources import resource_string
 
 log = logging.getLogger(__name__)
@@ -17,7 +18,15 @@ log = logging.getLogger(__name__)
 class_priority = ['video', 'problem']
 
 
-class SequenceModule(XModule):
+class SequenceFields(object):
+    has_children = True
+
+    # NOTE: Position is 1-indexed.  This is silly, but there are now student
+    # positions saved on prod, so it's not easy to fix.
+    position = Integer(help="Last tab viewed in this sequence", scope=Scope.student_state)
+
+
+class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {'coffee': [resource_string(__name__,
@@ -26,22 +35,13 @@ class SequenceModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None,
-                 shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-        # NOTE: Position is 1-indexed.  This is silly, but there are now student
-        # positions saved on prod, so it's not easy to fix.
-        self.position = 1
 
-        if instance_state is not None:
-            state = json.loads(instance_state)
-            if 'position' in state:
-                self.position = int(state['position'])
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
 
         # if position is specified in system, then use that instead
-        if system.get('position'):
-            self.position = int(system.get('position'))
+        if self.system.get('position'):
+            self.position = int(self.system.get('position'))
 
         self.rendered = False
 
@@ -70,6 +70,11 @@ class SequenceModule(XModule):
         raise NotFoundError('Unexpected dispatch type')
 
     def render(self):
+        # If we're rendering this sequence, but no position is set yet,
+        # default the position to the first element
+        if self.position is None:
+            self.position = 1
+
         if self.rendered:
             return
         ## Returns a set of all types of all sub-children
@@ -79,9 +84,9 @@ class SequenceModule(XModule):
             childinfo = {
                 'content': child.get_html(),
                 'title': "\n".join(
-                    grand_child.display_name.strip()
+                    grand_child.display_name
                     for grand_child in child.get_children()
-                    if 'display_name'  in grand_child.metadata
+                    if grand_child.display_name is not None
                 ),
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
@@ -89,7 +94,7 @@ class SequenceModule(XModule):
                 'id': child.id,
             }
             if childinfo['title'] == '':
-                childinfo['title'] = child.metadata.get('display_name', '')
+                childinfo['title'] = child.display_name_with_default
             contents.append(childinfo)
 
         params = {'items': contents,
@@ -112,11 +117,11 @@ class SequenceModule(XModule):
         return new_class
 
 
-class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
+class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
-    stores_state = True   # For remembering where in the sequence the student is
+    stores_state = True  # For remembering where in the sequence the student is
 
     js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
     js_module_name = "SequenceDescriptor"
@@ -132,7 +137,7 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
                 if system.error_tracker is not None:
                     system.error_tracker("ERROR: " + str(e))
                 continue
-        return {'children': children}
+        return {}, children
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('sequential')

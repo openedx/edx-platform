@@ -1,7 +1,7 @@
 import dateutil
 import dateutil.parser
 import datetime
-from timeparse import parse_timedelta
+from .timeparse import parse_timedelta
 
 import logging
 log = logging.getLogger(__name__)

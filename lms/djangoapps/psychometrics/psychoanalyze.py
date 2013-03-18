@@ -297,12 +297,18 @@ def generate_plots_for_problem(problem):
 #-----------------------------------------------------------------------------
 
 
-def make_psychometrics_data_update_handler(studentmodule):
+def make_psychometrics_data_update_handler(course_id, user, module_state_key):
     """
     Construct and return a procedure which may be called to update
     the PsychometricsData instance for the given StudentModule instance.
     """
-    sm = studentmodule
+    sm = studentmodule.objects.get_or_create(
+        course_id=course_id,
+        student=user,
+        module_state_key=module_state_key,
+        defaults={'state': '{}', 'module_type': 'problem'},
+    )
+
     try:
         pmd = PsychometricData.objects.using(db).get(studentmodule=sm)
     except PsychometricData.DoesNotExist:
