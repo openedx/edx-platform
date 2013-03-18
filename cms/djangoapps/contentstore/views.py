@@ -1103,11 +1103,7 @@ def course_info_updates(request, org, course, provided_id=None):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
-    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
-        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
-    else:
-        real_method = request.method
+    real_method = get_request_method(request)
 
     if request.method == 'GET':
         return HttpResponse(json.dumps(get_course_updates(location)), mimetype="application/json")
@@ -1130,11 +1126,7 @@ def module_info(request, module_location):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
-    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
-        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
-    else:
-        real_method = request.method
+    real_method = get_request_method(request)
 
     rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
     logging.debug('rewrite_static_links = {0} {1}'.format(request.GET.get('rewrite_url_links', 'False'), rewrite_static_links))
@@ -1259,21 +1251,18 @@ def course_grader_updates(request, org, course, name, grader_index=None):
 
     location = get_location_and_verify_access(request, org, course, name)
 
-    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
-        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
-    else:
-        real_method = request.method
+    real_method = get_request_method(request)
 
     if real_method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
-        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(['i4x', org, course, 'course', name]), grader_index)),
+        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(location), grader_index)),
                             mimetype="application/json")
     elif real_method == "DELETE":
-        # ??? Shoudl this return anything? Perhaps success fail?
-        CourseGradingModel.delete_grader(Location(['i4x', org, course, 'course', name]), grader_index)
+        # ??? Should this return anything? Perhaps success fail?
+        CourseGradingModel.delete_grader(Location(location), grader_index)
         return HttpResponse()
     elif request.method == 'POST':   # post or put, doesn't matter.
-        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course', name]), request.POST)),
+        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(location), request.POST)),
                             mimetype="application/json")
 
 
@@ -1289,11 +1278,7 @@ def course_advanced_updates(request, org, course, name):
     """
     location = get_location_and_verify_access(request, org, course, name)
 
-    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
-    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
-        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
-    else:
-        real_method = request.method
+    real_method = get_request_method(request)
         
     if real_method == 'GET':
         return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
@@ -1320,12 +1305,31 @@ def get_checklists(request, org, course, name):
         course_module.metadata[key] = template_module.metadata[key]
         modulestore.update_metadata(location, course_module.metadata)
 
-
+    checklists = course_module.metadata[key]
     return render_to_response('checklists.html',
         {
             'context_course': course_module,
-            'checklists' : course_module.metadata[key]
+            'checklists' : checklists,
+            'checklists_json' : json.dumps(checklists)
+
         })
+
+@login_required
+def update_checklist(request, org, course, name, checklist_index=None):
+    location = get_location_and_verify_access(request, org, course, name)
+    modulestore = get_modulestore(location)
+    course_module = modulestore.get_item(location)
+    key = "checklists"
+
+    real_method = get_request_method(request)
+    if checklist_index is not None and (real_method == 'POST' or real_method == 'PUT'):
+        modified_checklist = json.loads(request.body)
+        (course_module.metadata[key])[int(checklist_index)] = modified_checklist
+        modulestore.update_metadata(location, course_module.metadata)
+        return HttpResponse(json.dumps(modified_checklist), mimetype="application/json")
+    elif request.method == 'GET':
+        # TODO: Would we ever get in this condition? Any point in having this code?
+        return HttpResponse(json.dumps(course_module.metadata[key]), mimetype="application/json")
 
 
 @login_required
@@ -1593,3 +1597,12 @@ def get_location_and_verify_access(request, org, course, name):
         raise PermissionDenied()
 
     return location
+
+def get_request_method(request):
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+
+    return real_method

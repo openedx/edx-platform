@@ -1,21 +1,28 @@
 <%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
 <%block name="title">Course Checklists</%block>
 <%block name="bodyclass">is-signedin course uxdesign checklists</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%block name="jsextra">
 
+<script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
 <script type="text/javascript" src="${static.url('js/views/checklists_view.js')}"></script>
+<script type="text/javascript" src="${static.url('js/models/checklists.js')}"></script>
+<script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
 
 <script type="text/javascript">
     $(document).ready(function () {
+        // TODO: do a fetch instead of passing text into constructor.
+        var checklistCollection = new CMS.Models.ChecklistCollection(${checklists_json | n}, {parse: true});
+        checklistCollection.url = "${reverse('checklists_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
 
         var editor = new CMS.Views.Checklists({
-            el: $('.course-checklists')
+            el: $('.course-checklists'),
+            collection: checklistCollection
         });
 
-        // No need to call render yet-- state is not being injected.
-        //  editor.render();
+        editor.render();
 
     });
 
@@ -42,46 +49,6 @@
     <article class="content-primary" role="main">
       <form id="course-checklists" class="course-checklists" method="post" action="">
         <h2 class="title title-3 sr">Current Checklists</h2>
-
-
-        % for checklist in checklists:
-        <section class="course-checklist" id=${'course-checklist' + str(loop.index)}>
-          <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
-          <header>
-            <h3 class="checklist-title title-2 is-selectable" title="Collapse/Expand this Checklist">
-              <i class="ss-icon ss-symbolicons-standard icon-arrow ui-toggle-expansion">&#x25BE;</i>
-              ${checklist['short_description']}</h3>
-              <span class="checklist-status status">
-                Tasks Completed: <span class="status-count">0</span>/<span class="status-amount">4</span>
-                <i class="ss-icon ss-symbolicons-standard icon-confirm">&#x2713;</i>
-              </span>
-          </header>
-        
-          <ul class="list list-tasks">
-          
-            % for item in checklist['items']:
-            <li class="task">
-              <input type="checkbox" class="task-input" name=${'course-checklist' + str(loop.parent.index) + '-task' + str(loop.index)}
-               id=${'course-checklist' + str(loop.parent.index) + '-task' + str(loop.index)}
-               value=${item['is_checked']}>
-              <label class="task-details" for=${'course-checklist' + str(loop.parent.index) + '-task' + str(loop.index)}>
-                <h4 class="task-name title title-3">${item['short_description']}</h4>
-                <p class="task-description">${item['long_description']}</p>
-              </label>
-
-              % if item['action_text'] is not '' and item['action_url'] is not '':
-              <ul class="list-actions task-actions">
-                <li>
-                  <a href=${item['action_url']} class="action action-primary">${item['action_text']}</a>
-                </li>
-              </ul>
-              % endif
-            </li>
-            % endfor
-
-          </ul>
-        </section>
-        % endfor
       </form>
     </article>
 

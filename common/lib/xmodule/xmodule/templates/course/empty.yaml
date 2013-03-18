@@ -23,10 +23,10 @@ metadata:
                      "long_description": "They'll help you learn the other course authoring tools available to you, and will also help you find help when you need it.",
                      "is_checked": false,
                      "action_url": "",
-                     "action_text": ""}],
-         "completed" : false},
-         {"short_description" : "Draft a Rough Course Outline",
-          "items" : [{"short_description": "Create your first Section and Subsection",
+                     "action_text": ""}]
+        },
+        {"short_description" : "Draft a Rough Course Outline",
+         "items" : [{"short_description": "Create your first Section and Subsection",
                       "long_description": "Walk through the mechanics of building your course's first section and subsection through your course outline to start.",
                       "is_checked": false,
                       "action_url": "/course/",
@@ -60,10 +60,10 @@ metadata:
                       "long_description": "Some course authors find creating a section for unsorted, in-progress work useful. To do this, create a section and set the release date to the distant future.",
                       "is_checked": false,
                       "action_url": "/course/",
-                      "action_text": "Edit in Course Outline"}],
-          "completed" : false},
-          {"short_description" : "Explore edX's Support Tools",
-          "items" : [{"short_description": "Explore the Studio Help Forum",
+                      "action_text": "Edit in Course Outline"}]
+        },
+        {"short_description" : "Explore edX's Support Tools",
+         "items" : [{"short_description": "Explore the Studio Help Forum",
                       "long_description": "Access the Studio Help forum from the menu that appears when you click your user name in the top right corner of Studio.",
                       "is_checked": false,
                       "action_url": "http://help.edge.edx.org/",
@@ -77,10 +77,10 @@ metadata:
                       "long_description": "View the searchable Studio documentation to find answers to your questions or information about how to do specific tasks. Once you download the PDF, you can view it offline.",
                       "is_checked": false,
                       "action_url": "/",
-                      "action_text": "Download Documentation"}],
-          "completed" : false},
-          {"short_description" : "Draft your Course Introduction",
-          "items" : [{"short_description": "Drafting a Course Description",
+                      "action_text": "Download Documentation"}]
+        },
+        {"short_description" : "Draft your Course Introduction",
+         "items" : [{"short_description": "Drafting a Course Description",
                       "long_description": "Courses on edX each have their own introduction page, including a course video, description, and more. Draft the introduction students will read before deciding to enroll in your course.",
                       "is_checked": false,
                       "action_url": "/settings-details/",
@@ -99,8 +99,8 @@ metadata:
                       "long_description": "Before a student jumps into a course without the necessary preparation, we'd like them to understand the prerequisites that will make them more likely to succeed.",
                       "is_checked": false,
                       "action_url": "/settings-details/",
-                      "action_text": "Edit Course Details &amp; Schedule"}],
-          "completed" : false}
-     ]
+                      "action_text": "Edit Course Details &amp; Schedule"}]
+        }
+    ]
 data: { 'textbooks' : [ ], 'wiki_slug' : null }
 children: []

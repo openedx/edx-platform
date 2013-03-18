@@ -14,10 +14,6 @@ $(document).ready(function () {
     // scopes (namely the course-info tab)
     window.$modalCover = $modalCover;
 
-    // Control whether template caching in local memory occurs (see template_loader.js). Caching screws up development but may
-    // be a good optimization in production (it works fairly well)
-    window.cachetemplates = false;
-
     $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
     $newComponentTypePicker = $('.new-component');

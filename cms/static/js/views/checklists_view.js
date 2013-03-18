@@ -5,15 +5,52 @@ CMS.Views.Checklists = Backbone.View.extend({
 
     events : {
         'click .course-checklist .checklist-title' : "toggleChecklist",
-        'click .course-checklist .task label' : "toggleTask",
-        'click .demo-checklistviz' : "demoUpdateProgress"
+        'click .course-checklist .task input' : "toggleTask"
     },
 
     initialize : function() {
-        // adding class and title needs to happen in HTML
-//        $('.course-checklist .checklist-title').each(function(e){
-//            $(this).addClass('is-selectable').attr('title','Collapse/Expand this Checklist').bind('click', this.toggleChecklist);
-//        });
+        var self = this;
+        // instantiates an editor template for each update in the collection
+        window.templateLoader.loadRemoteTemplate("checklist",
+            "/static/client_templates/checklist.html",
+            function (raw_template) {
+                self.template = _.template(raw_template);
+                self.render();
+            }
+        );
+    },
+
+    render: function() {
+        // catch potential outside call before template loaded
+        if (!this.template) return this;
+
+        this.$el.empty();
+
+        var self = this;
+        _.each(this.collection.models,
+            function(checklist, index) {
+                self.$el.append(self.renderTemplate(checklist, index));
+            });
+
+        return this;
+    },
+
+    renderTemplate: function (checklist, index) {
+        var checklistItems = checklist.attributes['items'];
+        var itemsChecked = 0;
+        _.each(checklistItems,
+            function(checklist) {
+                if (checklist['is_checked']) {
+                    itemsChecked +=1;
+                }
+            });
+        var percentChecked = Math.round((itemsChecked/checklistItems.length)*100);
+        return this.template({
+            checklistIndex : index,
+            checklistShortDescription : checklist.attributes['short_description'],
+            items: checklistItems,
+            itemsChecked: itemsChecked,
+            percentChecked: percentChecked});
     },
 
     toggleChecklist : function(e) {
@@ -22,27 +59,25 @@ CMS.Views.Checklists = Backbone.View.extend({
     },
 
     toggleTask : function (e) {
-        $(e.target).closest('.task').toggleClass('is-completed');
-    },
+        var self = this;
 
-    // TODO: remove
-    demoUpdateProgress : function(e) {
-        (e).preventDefault();
-        $('#course-checklist0 .viz-checklist-status .viz-checklist-status-value').css('width','25%');
-    },
+        var completed = 'is-completed';
+        var $checkbox = $(e.target);
+        var $task = $checkbox.closest('.task');
+        $task.toggleClass(completed);
 
-    // TODO: not used. In-progress update checklist progress (based on checkbox check/uncheck events)
-    updateChecklistProgress : function(e) {
-        var $statusCount = this.$el.closest('.course-checklist').find('.status-count');
-        var $statusAmount = this.$el.closest('.course-checklist').find('.status-amount');
-
-        if (this.$el.attr('checked')) {
-            console.log('adding');
-        }
-
-        else {
-            console.log('subtracting');
-        }
+        var checklist_index = $checkbox.data('checklist');
+        var task_index = $checkbox.data('task');
+        var model = this.collection.at(checklist_index);
+        model.attributes.items[task_index].is_checked = $task.hasClass(completed);
+        model.save({},
+            {
+                success : function() {
+                    var updatedTemplate = self.renderTemplate(model, checklist_index);
+                    self.$el.find('#course-checklist'+checklist_index).first().replaceWith(updatedTemplate);
+                },
+                error : CMS.ServerError
+            });
     }
 
 });
