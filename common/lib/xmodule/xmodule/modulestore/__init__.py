@@ -251,7 +251,6 @@ class Location(_LocationBase):
     def __repr__(self):
         return "Location%s" % repr(tuple(self))
 
-
     @property
     def course_id(self):
         """Return the ID of the Course that this item belongs to by looking
@@ -413,7 +412,6 @@ class ModuleStore(object):
         return courses
 
 
-
 class ModuleStoreBase(ModuleStore):
     '''
     Implement interface functionality that can be shared.
@@ -424,6 +422,7 @@ class ModuleStoreBase(ModuleStore):
         '''
         self._location_errors = {}    # location -> ErrorLog
         self.metadata_inheritance_cache = None
+        self.modulestore_update_signal = None  # can be set by runtime to route notifications of datastore changes
 
     def _get_errorlog(self, location):
         """

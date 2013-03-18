@@ -31,6 +31,10 @@ log = logging.getLogger(__name__)
 # there is only one revision for each item. Once we start versioning inside the CMS,
 # that assumption will have to change
 
+def get_course_id_no_run(location):
+    '''
+    '''
+    return "/".join([location.org, location.course])
 
 class MongoKeyValueStore(KeyValueStore):
     """
@@ -527,6 +531,15 @@ class MongoModuleStore(ModuleStoreBase):
 
         # recompute (and update) the metadata inheritance tree which is cached
         self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
+
+    def fire_updated_modulestore_signal(self, course_id, location):
+        if self.modulestore_update_signal is not None:
+            self.modulestore_update_signal.send(None,
+                modulestore = self,
+                course_id = course_id,
+                location = location
+            )
 
     def get_course_for_item(self, location, depth=0):
         '''
@@ -594,6 +607,8 @@ class MongoModuleStore(ModuleStoreBase):
         self._update_single_item(location, {'definition.children': children})
         # recompute (and update) the metadata inheritance tree which is cached
         self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)
+        # fire signal that we've written to DB
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
     def update_metadata(self, location, metadata):
         """
@@ -619,7 +634,8 @@ class MongoModuleStore(ModuleStoreBase):
 
         self._update_single_item(location, {'metadata': metadata})
         # recompute (and update) the metadata inheritance tree which is cached
-        self.get_cached_metadata_inheritance_tree(loc, force_refresh = True)      
+        self.get_cached_metadata_inheritance_tree(loc, force_refresh = True)  
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))   
 
     def delete_item(self, location):
         """
@@ -640,7 +656,7 @@ class MongoModuleStore(ModuleStoreBase):
         self.collection.remove({'_id': Location(location).dict()})
         # recompute (and update) the metadata inheritance tree which is cached
         self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)  
-
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))   
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this

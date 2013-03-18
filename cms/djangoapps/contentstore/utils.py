@@ -6,6 +6,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
 
+
 def get_modulestore(location):
     """
     Returns the correct modulestore to use for modifying the specified location
