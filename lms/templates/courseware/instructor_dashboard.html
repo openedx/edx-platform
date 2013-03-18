@@ -6,6 +6,8 @@
   <%static:css group='course'/>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
   <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
 
 </%block>
@@ -35,12 +37,55 @@ table.stat_table td {
 	border-color: #666666;
 	background-color: #ffffff;
 }
+.divScroll {  
+	height: 200px;  
+	overflow: scroll;  
+}  
 
 a.selectedmode { background-color: yellow; }
 
 textarea {
   height: 200px;
 }
+
+.jvectormap-label {
+    position: absolute;
+    display: none;
+    border: solid 1px #CDCDCD;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background: #292929;
+    color: white;
+    font-family: sans-serif, Verdana;
+    font-size: smaller;
+    padding: 3px;
+}
+
+.jvectormap-zoomin, .jvectormap-zoomout {
+    position: absolute;
+    left: 10px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background: #292929;
+    padding: 3px;
+    color: white;
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    line-height: 10px;
+    text-align: center;
+}
+
+.jvectormap-zoomin {
+    top: 10px;
+}
+
+.jvectormap-zoomout {
+    top: 30px;
+}
+
 </style>
 
 <script language="JavaScript" type="text/javascript">
@@ -57,15 +102,19 @@ function goto( mode)
   <section class="instructor-dashboard-content">
     <h1>Instructor Dashboard</h1>
 
-    <h2>[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> | 
+    <h2>[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
-            <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> | 
+            <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> |
           %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> |
           <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a> |
           <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">DataDump</a> |
-          <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a> ]
+          <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a>
+          %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
+             | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">Analytics</a> 
+          %endif
+	  ]
     </h2>
 
   <div style="text-align:right"><span id="djangopid">${djangopid}</span>
@@ -75,7 +124,7 @@ function goto( mode)
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
     <input type="hidden" name="idash_mode" value="">
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Grades'):
 
     %if offline_grade_log:
@@ -111,9 +160,9 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
-  
+
     <%
-        rg = course.metadata.get('remote_gradebook',{})
+        rg = course.remote_gradebook
     %>
 
     <h3>Export grades to remote gradebook</h3>
@@ -157,7 +206,7 @@ function goto( mode)
 
  %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Psychometrics'):
 
     <p>Select a problem and an action:
@@ -178,7 +227,7 @@ function goto( mode)
 
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
   %if instructor_access:
     <hr width="40%" style="align:left">
@@ -208,7 +257,7 @@ function goto( mode)
   %endif
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Forum Admin'):
   %if instructor_access:
     <hr width="40%" style="align:left">
@@ -225,7 +274,7 @@ function goto( mode)
     <input type="submit" name="action" value="List course forum moderators">
     <input type="submit" name="action" value="List course forum community TAs">
     <p>
-    <input type="text" name="forummoderator"> 
+    <input type="text" name="forummoderator">
     <input type="submit" name="action" value="Remove forum moderator">
     <input type="submit" name="action" value="Add forum moderator">
     <input type="submit" name="action" value="Remove forum community TA">
@@ -236,7 +285,7 @@ function goto( mode)
   %endif
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Enrollment'):
 
     <hr width="40%" style="align:left">
@@ -249,9 +298,9 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
-  
+
     <%
-        rg = course.metadata.get('remote_gradebook',{})
+        rg = course.remote_gradebook
     %>
 
     <p>Pull enrollment from remote gradebook</p>
@@ -264,7 +313,7 @@ function goto( mode)
     <input type="submit" name="action" value="Overload enrollment list using remote gradebook">
     <input type="submit" name="action" value="Merge enrollment list with remote gradebook">
     <hr width="40%" style="align:left">
-  
+
   %endif
 
   <p>Add students: enter emails, separated by new lines or commas;</p>
@@ -273,21 +322,21 @@ function goto( mode)
 
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 
 %if modeflag.get('Data'):
     <hr width="40%" style="align:left">
     <p>
     <input type="submit" name="action" value="Download CSV of all student profile data">
     </p>
-    <p> Problem urlname: 
+    <p> Problem urlname:
         <input type="text" name="problem_to_dump" size="40">
         <input type="submit" name="action" value="Download CSV of all responses to problem">
     </p>
     <hr width="40%" style="align:left">
 %endif
-  
-##----------------------------------------------------------------------------- 
+
+##-----------------------------------------------------------------------------
 
 %if modeflag.get('Manage Groups'):
   %if instructor_access:
@@ -313,11 +362,171 @@ function goto( mode)
 %endif
 
     </form>
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 
 %if msg:
     <p></p><p>${msg}</p>
 %endif
+##-----------------------------------------------------------------------------
+
+%if modeflag.get('Analytics'):
+
+  %if not any(analytics_results.values()):
+    <p>No Analytics are available at this time.</p>
+  %endif
+
+  %if analytics_results.get("StudentsEnrolled"):
+    <p>
+      Students enrolled:
+      ${analytics_results["StudentsEnrolled"]['data'][0]['students']}
+    </p>
+  %endif
+
+  %if analytics_results.get("StudentsActive"):
+    <p>
+      Students active in the last week:
+      ${analytics_results["StudentsActive"]['data'][0]['active']}
+    </p>
+  %endif
+
+  %if analytics_results.get("StudentsDropoffPerDay"):
+    <p>Student activity day by day</p>
+    <div>
+      <table class="stat_table">
+        <tr>
+          <th>Day</th>
+          <th>Students</th>
+        </tr>
+      %for row in analytics_results['StudentsDropoffPerDay']['data']:
+        <tr>
+          ## For now, just discard the non-date portion
+          <td>${row['last_day'].split("T")[0]}</td>
+          <td>${row['num_students']}</td>
+        </tr>
+      %endfor
+      </table>
+    </div>
+  %endif
+  <br/>
+  %if analytics_results.get("ProblemGradeDistribution"):
+    <p>Answer distribution for problems</p>
+    <div>
+      <table class="stat_table">
+        <tr>
+          <th>Problem</th>
+          <th>Max</th>
+          <th colspan="99">Points Earned (Num Students)</th>
+        </tr>
+      %for row in analytics_results['ProblemGradeDistribution']['data']:
+        <tr>
+          <td>${row['module_id'].split('/')[-1]}</td>
+          <td>${max(grade_record['max_grade'] for grade_record in row["grade_info"])}
+          %for grade_record in row["grade_info"]:
+          <td>
+            %if isinstance(grade_record["grade"], float):
+              ${"{grade:.2f}".format(**grade_record)}
+            %else:
+              ${"{grade}".format(**grade_record)}
+            %endif
+            (${grade_record["num_students"]})
+          </td>
+          %endfor
+        </tr>
+      %endfor
+      </table>
+    </div>
+  %endif
+%endif
+
+%if modeflag.get('Analytics In Progress'):
+
+  ##This is not as helpful as it could be -- let's give full point distribution
+  ##instead.
+  %if analytics_results.get("StudentsPerProblemCorrect"):
+    <p>Students answering correctly</p>
+    <div class="divScroll">
+      <table class="stat_table">
+        <tr>
+          <th>Problem</th>
+          <th>Number of students</th>
+        </tr>
+      %for row in analytics_results['StudentsPerProblemCorrect']['data']:
+        <tr>
+          <td>${row['module_id'].split('/')[-1]}</td>
+          <td>${row['count']}</td>
+        </tr>
+      %endfor
+      </table>
+    </div>
+  %endif
+
+   <p>
+     Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):
+   </p>
+
+<div id="posts-list" class="clearfix">
+<figure>
+    <div id="world-map-students" style="width: 720px; height: 400px"></div>
+    <script>
+      var student_data = {BD : '300', BE : '156', BF : '7', BG : '246', BA : '62', BB : '1', BN : '7', BO : '61', JP : '153', BI : '4', BJ : '6', BT : '11', JM : '32', JO : '67', WS : '1', BR : '1941', BS : '5', JE : '6', BY : '166', BZ : '4', RU : '1907', RW : '50', RS : '128', TL : '1', RE : '2', A2 : '59', TJ : '9', RO : '232', GU : '3', GT : '76', GR : '565', BH : '22', GY : '6', GG : '2', GF : '1', GE : '22', GD : '7', GB : '2023', GA : '4', GM : '18', GL : '2', GI : '1', GH : '393', OM : '25', TN : '143', BW : '26', HR : '76', HT : '38', HU : '259', HK : '103', HN : '51', AD : '1', PR : '40', PS : '38', PT : '487', PY : '38', PA : '21', PG : '11', PE : '342', PK : '1833', PH : '571', TM : '1', PL : '736', ZM : '61', EE : '67', EG : '961', ZA : '184', EC : '118', AL : '44', AO : '10', SB : '2', EU : '183', ET : '153', SO : '1', ZW : '42', KY : '3', ES : '1954', ER : '3', ME : '6', MD : '26', MG : '10', UY : '64', UZ : '40', MM : '21', ML : '4', MO : '3', MN : '49', US : '11899', MU : '11', MT : '15', MW : '41', MV : '5', MP : '4', MR : '1', IM : '2', UG : '133', MY : '207', MX : '844', AT : '83', FR : '446', MA : '175', A1 : '167', AX : '1', FI : '97', FJ : '9', NI : '23', NL : '240', NO : '110', NA : '27', NC : '1', NE : '4', NG : '753', NZ : '98', NP : '200', CI : '9', CH : '144', CO : '851', CN : '282', CM : '82', CL : '243', CA : '1129', CD : '7', CZ : '161', CY : '26', CR : '137', CV : '11', CU : '15', SZ : '6', SY : '58', KG : '47', KE : '282', SR : '5', KI : '1', KH : '40', SV : '155', KM : '1', ST : '1', SK : '66', KR : '141', SI : '70', KP : '1', KW : '28', SN : '16', SL : '11', KZ : '174', SA : '352', SG : '217', SE : '172', SD : '61', DO : '104', DM : '5', DJ : '6', DK : '105', DE : '941', YE : '90', DZ : '281', MK : '28', TZ : '124', LC : '5', LA : '7', TW : '115', TT : '33', TR : '288', LK : '96', LV : '52', TO : '2', LT : '114', LU : '21', LR : '9', LS : '9', TH : '84', TG : '11', LY : '15', VC : '6', AE : '151', VE : '180', AG : '1', AF : '21', IQ : '29', VI : '1', IS : '14', IR : '153', AM : '37', IT : '365', VN : '269', AP : '23', AR : '258', AU : '661', IL : '159', AW : '3', IN : '7836', LB : '28', AZ : '22', IE : '210', ID : '382', UA : '860', QA : '23', MZ : '8'};
+      $(function(){
+        $('#world-map-students').vectorMap({
+          map: 'world_mill_en',
+          backgroundColor: '#eeeeee',
+          series: {
+            regions: [{
+              values: student_data,
+              scale: ['#C8EEFF', '#0071A4'],
+              normalizeFunction: 'polynomial'
+            }]
+          },
+          onRegionLabelShow: function(event, label, code){
+            label.text(label.text() + ': ' + (student_data[code] != null ? student_data[code] : 0));
+          }
+        });
+      });
+    </script>
+</figure>
+</div>
+
+
+##     <p>Number of students who dropped off per day before becoming inactive:</p>
+##
+##     % if dropoff_per_day is not None:
+##     % if dropoff_per_day['status'] == 'success':
+##     <div class="divScroll">
+##     <table class="stat_table">
+##     <tr><th>Day</th><th>Number of students</th></tr>
+##     % for k,v in dropoff_per_day['data'].items():
+##     <tr> <td>${k}</td> <td>${v}</td> </tr>
+##     % endfor
+##     </table>
+##     </div>
+##     % else:
+##     <i> ${dropoff_per_day['error']}</i>
+##     % endif
+##     % else:
+##     <i> null data </i>
+##     % endif
+##   </p>
+##
+
+
+##   <p>
+##     <h2>Daily activity (online version):</h2>
+##     <table class="stat_table">
+##     <tr><th>Day</td><th>Number of students</td></tr>
+##     % for k,v in daily_activity_json['data'].items():
+##     <tr>
+##     <td>${k}</td> <td>${v}</td>
+##     </tr>
+##     % endfor
+##     </table>
+##   </p>
+
+
+%endif
+
 ##----------------------------------------------------------------------------- 
 
 %if datatable and modeflag.get('Psychometrics') is None:
@@ -344,7 +553,7 @@ function goto( mode)
     </p>
 %endif
 
-##-----------------------------------------------------------------------------  
+##-----------------------------------------------------------------------------
 %if modeflag.get('Psychometrics'):
 
     %for plot in plots:
@@ -365,12 +574,12 @@ function goto( mode)
     %endfor
 
 %endif
- 
-##-----------------------------------------------------------------------------  
+
+##-----------------------------------------------------------------------------
 ## always show msg
 
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
  % if course_errors is not UNDEFINED:
     <h2>Course errors</h2>
@@ -392,7 +601,7 @@ function goto( mode)
       %endif
       </div>
   % endif
-%endif      
+%endif
 
   </section>
 </div>

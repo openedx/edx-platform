@@ -81,10 +81,13 @@ MITX_FEATURES = {
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
 
+    # analytics experiments
+    'ENABLE_INSTRUCTOR_ANALYTICS': False,
+
     # Flip to True when the YouTube iframe API breaks (again)
     'USE_YOUTUBE_OBJECT_API': False,
 
-    # Give a UI to show a student's submission history in a problem by the 
+    # Give a UI to show a student's submission history in a problem by the
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True
 }
@@ -210,8 +213,8 @@ WIKI_ENABLED = False
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
-                                          'title'  :  'Circuits and Electronics',
+COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number': '6.002x',
+                                          'title': 'Circuits and Electronics',
                                           'xmlpath': '6002x/',
                                           'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
                                           }

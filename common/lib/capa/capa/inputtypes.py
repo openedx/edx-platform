@@ -47,10 +47,10 @@ import sys
 import os
 import pyparsing
 
-from registry import TagRegistry
+from .registry import TagRegistry
 from capa.chem import chemcalc
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 #########################################################################
 
@@ -856,6 +856,10 @@ class DragAndDropInput(InputTypeBase):
 
             if tag_type == 'draggable' and not self.no_labels:
                 dic['label'] = dic['label'] or dic['id']
+
+            if tag_type == 'draggable':
+                dic['target_fields'] = [parse(target, 'target') for target in
+                                                tag.iterchildren('target')]
 
             return dic
 

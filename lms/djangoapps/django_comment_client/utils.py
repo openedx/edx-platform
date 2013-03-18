@@ -4,6 +4,10 @@ import time
 import urllib
 from datetime import datetime
 
+from courseware.module_render import get_module
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import path_to_location
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
@@ -167,23 +171,23 @@ def initialize_discussion_info(course):
 
     for module in all_modules:
         skip_module = False
-        for key in ('id', 'discussion_category', 'for'):
-            if key not in module.metadata:
+        for key in ('discussion_id', 'discussion_category', 'discussion_target'):
+            if getattr(module, key) is None:
                 log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
                 skip_module = True
 
         if skip_module:
             continue
 
-        id = module.metadata['id']
-        category = module.metadata['discussion_category']
-        title = module.metadata['for']
-        sort_key = module.metadata.get('sort_key', title)
+        id = module.discussion_id
+        category = module.discussion_category
+        title = module.discussion_target
+        sort_key = module.sort_key
         category = " / ".join([x.strip() for x in category.split("/")])
         last_category = category.split("/")[-1]
         discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
         unexpanded_category_map[category].append({"title": title, "id": id,
-            "sort_key": sort_key, "start_date": module.start})
+            "sort_key": sort_key, "start_date": module.lms.start})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
@@ -225,9 +229,7 @@ def initialize_discussion_info(course):
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
     # in the backend.
-    default_topics = {'General': {'id': course.location.html_id()}}
-    discussion_topics = course.metadata.get('discussion_topics', default_topics)
-    for topic, entry in discussion_topics.items():
+    for topic, entry in course.discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic),
                                           "start_date": time.gmtime()}
@@ -406,7 +408,7 @@ def safe_content(content):
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
-        'read', 'group_id', 'group_name', 'group_string'
+        'read', 'group_id', 'group_name', 'group_string', 'pinned'
     ]
 
     if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):

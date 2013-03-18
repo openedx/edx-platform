@@ -120,8 +120,8 @@ default_options = {
 }
 
 task :predjango do
-    sh("find . -type f -name '*.pyc' -delete")
-    sh('pip install -q --upgrade --no-deps -r local-requirements.txt')
+    sh("find . -type f -name *.pyc -delete")
+    sh('pip install -q --no-index -r local-requirements.txt')
 end
 
 task :clean_test_files do
@@ -140,12 +140,8 @@ end
 
     desc "Run pylint on all #{system} code"
     task "pylint_#{system}" => report_dir do
-        Dir["#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
-            if File.exists? "#{app}/setup.py"
-                pythonpath_prefix = "PYTHONPATH=#{app}"
-            else
-                pythonpath_prefix = "PYTHONPATH=#{File.dirname(app)}"
-            end
+        Dir["#{system}/*.py", "#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
+            pythonpath_prefix = "PYTHONPATH=#{system}:#{system}/djangoapps:#{system}/lib:common/djangoapps:common/lib"
             app = File.basename(app)
             if app =~ /.py$/
                 app = app.gsub('.py', '')
@@ -183,6 +179,12 @@ end
 
 TEST_TASK_DIRS = []
 
+task :fastlms do
+    # this is >2 times faster that rake [lms], and does not need web, good for local dev
+    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
+    sh("#{django_admin} runserver --traceback --settings=lms.envs.dev   --pythonpath=.")
+end
+
 [:lms, :cms].each do |system|
     report_dir = report_dir_path(system)
 
@@ -196,6 +198,8 @@ TEST_TASK_DIRS = []
         args.with_defaults(:stop_on_failure => 'true')
         run_tests(system, report_dir, args.stop_on_failure)
     end
+
+    task :fasttest => "fasttest_#{system}"
 
     TEST_TASK_DIRS << system
 
@@ -415,7 +419,7 @@ end
 namespace :cms do
   desc "Delete existing MongoDB based course"
   task :delete_course do
-    
+
     if ENV['LOC'] and ENV['COMMIT']
         sh(django_admin(:cms, :dev, :delete_course, ENV['LOC'], ENV['COMMIT']))
     elsif ENV['LOC']

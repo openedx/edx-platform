@@ -57,10 +57,15 @@ pre, #dna-strand {
   background: white;
 }
 .gwt-DialogBox .dialogBottomCenter {
+  background: url(images/hborder.png) repeat-x 0px -2945px;
+  -background: url(images/hborder_ie6.png) repeat-x 0px -2144px;
 }
 .gwt-DialogBox .dialogMiddleLeft {
+  background: url(images/vborder.png) repeat-y -31px 0px;
 }
 .gwt-DialogBox .dialogMiddleRight {
+  background: url(images/vborder.png) repeat-y -32px 0px;
+  -background: url(images/vborder_ie6.png) repeat-y -32px 0px;
 }
 .gwt-DialogBox .dialogTopLeftInner {
   width: 10px;
@@ -82,12 +87,20 @@ pre, #dna-strand {
   zoom: 1;
 }
 .gwt-DialogBox .dialogTopLeft {
+  background: url(images/circles.png) no-repeat -20px 0px;
+  -background: url(images/circles_ie6.png) no-repeat -20px 0px;
 }
 .gwt-DialogBox .dialogTopRight {
+  background: url(images/circles.png) no-repeat -28px 0px;
+  -background: url(images/circles_ie6.png) no-repeat -28px 0px;
 }
 .gwt-DialogBox .dialogBottomLeft {
+  background: url(images/circles.png) no-repeat 0px -36px;
+  -background: url(images/circles_ie6.png) no-repeat 0px -36px;
 }
 .gwt-DialogBox .dialogBottomRight {
+  background: url(images/circles.png) no-repeat -8px -36px;
+  -background: url(images/circles_ie6.png) no-repeat -8px -36px;
 }
 * html .gwt-DialogBox .dialogTopLeftInner {
   width: 10px;

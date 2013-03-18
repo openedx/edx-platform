@@ -1,13 +1,14 @@
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
 import time
 from contentstore.utils import get_modulestore
 from util.converters import jsdate_to_time, time_to_date
-from cms.djangoapps.models.settings import course_grading
-from cms.djangoapps.contentstore.utils import update_item
+from models.settings import course_grading
+from contentstore.utils import update_item
 import re
 import logging
 
@@ -43,25 +44,25 @@ class CourseDetails(object):
 
         temploc = course_location._replace(category='about', name='syllabus')
         try:
-            course.syllabus = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.syllabus = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = temploc._replace(name='overview')
         try:
-            course.overview = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.overview = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = temploc._replace(name='effort')
         try:
-            course.effort = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.effort = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = temploc._replace(name='video')
         try:
-            raw_video = get_modulestore(temploc).get_item(temploc).definition['data']
+            raw_video = get_modulestore(temploc).get_item(temploc).data
             course.intro_video = CourseDetails.parse_video_tag(raw_video)
         except ItemNotFoundError:
             pass
@@ -116,7 +117,7 @@ class CourseDetails(object):
             descriptor.enrollment_end = converted
 
         if dirty:
-            get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
+            get_modulestore(course_location).update_metadata(course_location, own_metadata(descriptor))
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
@@ -132,7 +133,6 @@ class CourseDetails(object):
         temploc = temploc._replace(name='video')
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
         update_item(temploc, recomposed_video_tag)
-
 
         # Could just generate and return a course obj w/o doing any db reads, but I put the reads in as a means to confirm
         # it persisted correctly

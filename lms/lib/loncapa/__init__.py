@@ -1,3 +1,3 @@
 #!/usr/bin/python
 
-from loncapa_check import *
+from .loncapa_check import *

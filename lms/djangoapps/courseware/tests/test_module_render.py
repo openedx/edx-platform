@@ -15,7 +15,6 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
-from courseware.models import StudentModule, StudentModuleCache
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import Location
@@ -24,8 +23,9 @@ from xmodule.modulestore.django import modulestore, _MODULESTORES
 from xmodule.seq_module import SequenceModule
 from courseware.tests.tests import PageLoader
 from student.models import Registration
+from courseware.model_data import ModelDataCache
 
-from factories import UserFactory
+from .factories import UserFactory
 
 
 class Stub:
@@ -59,18 +59,6 @@ class ModuleRenderTestCase(PageLoader):
     def test_get_module(self):
         self.assertIsNone(render.get_module('dummyuser', None,
                                             'invalid location', None, None))
-
-    def test_get_instance_module(self):
-        mock_user = MagicMock()
-        mock_user.is_authenticated.return_value = False
-        self.assertIsNone(render.get_instance_module('dummy', mock_user, 'dummy',
-                                                     'dummy'))
-        mock_user_2 = MagicMock()
-        mock_user_2.is_authenticated.return_value = True
-        mock_module = MagicMock()
-        mock_module.descriptor.stores_state = False
-        self.assertIsNone(render.get_instance_module('dummy', mock_user_2,
-                                                     mock_module, 'dummy'))
 
     def test_modx_dispatch(self):
         self.assertRaises(Http404, render.modx_dispatch, 'dummy', 'dummy',
@@ -133,6 +121,8 @@ class TestTOC(TestCase):
         chapter_url = '%s/%s/%s' % ('/courses', self.course_name, chapter)
         factory = RequestFactory()
         request = factory.get(chapter_url)
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+            self.toy_course.id, self.portal_user, self.toy_course, depth=2)
 
         expected = ([{'active': True, 'sections':
                     [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
@@ -149,7 +139,7 @@ class TestTOC(TestCase):
                     'format': '', 'due': '', 'active': False}],
                     'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None)
+        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
         self.assertEqual(expected, actual)
 
     def test_toc_toy_from_section(self):
@@ -158,6 +148,8 @@ class TestTOC(TestCase):
         section = 'Welcome'
         factory = RequestFactory()
         request = factory.get(chapter_url)
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+            self.toy_course.id, self.portal_user, self.toy_course, depth=2)
 
         expected = ([{'active': True, 'sections':
                     [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
@@ -174,5 +166,5 @@ class TestTOC(TestCase):
                     'format': '', 'due': '', 'active': False}],
                     'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section)
+        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, model_data_cache)
         self.assertEqual(expected, actual)

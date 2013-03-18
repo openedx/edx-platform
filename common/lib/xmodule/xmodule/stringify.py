@@ -1,4 +1,5 @@
-from itertools import chain
+# -*- coding: utf-8 -*-
+
 from lxml import etree
 
 

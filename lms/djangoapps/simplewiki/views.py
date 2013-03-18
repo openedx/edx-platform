@@ -14,7 +14,7 @@ from courseware.access import has_access
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
-from models import Revision, Article, Namespace, CreateArticleForm, RevisionFormWithTitle, RevisionForm
+from .models import Revision, Article, Namespace, CreateArticleForm, RevisionFormWithTitle, RevisionForm
 import wiki_settings
 
 
