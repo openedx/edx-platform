@@ -1,3 +1,9 @@
+/* TODO: move top-level variables to a common _variables.scss. 
+ * NOTE: These variables were only added here because when this was integrated with the CMS,
+ * SASS compilation errors were triggered because the CMS didn't have the same variables defined
+ * that the LMS did, so the quick fix was to localize the LMS variables not shared by the CMS.
+ * -Abarrett and Vshnayder
+ */
 $border-color: #C8C8C8;
 $body-font-size: em(14);
 
