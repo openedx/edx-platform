@@ -487,6 +487,7 @@ task :autodeploy_properties do
     end
 end
 
+# --- Develop documentation ---
 desc "Invoke sphinx 'make build' to generate docs."
 task :builddocs do
     Dir.chdir('docs') do
@@ -513,3 +514,33 @@ desc "Build docs and show them in browser"
 task :doc => :builddocs do
     Rake::Task["showdocs"].invoke
 end
+# --- Develop documentation ---
+
+# --- Public documentation ---
+desc "Invoke sphinx 'make build' to generate docs."
+task :buildpubdocs do
+    Dir.chdir('doc/public') do
+        sh('make html')
+    end
+end
+
+desc "Show docs in browser (mac and ubuntu)."
+task :showpubdocs do
+    Dir.chdir('doc/public/build/html') do
+        if RUBY_PLATFORM.include? 'darwin'  #  mac os
+            sh('open index.html')
+        elsif RUBY_PLATFORM.include? 'linux'  # make more ubuntu specific?
+            sh('sensible-browser index.html')  # ubuntu
+        else
+            raise "\nUndefined how to run browser on your machine.
+Please use 'rake showpubdocs' and then manually open
+'mitx/doc/public/build/html/index.html."
+        end
+    end
+end
+
+desc "Build docs and show them in browser"
+task :pubdoc => :buildpubdocs do
+    Rake::Task["showpubdocs"].invoke
+end
+# --- Public documentation ---
