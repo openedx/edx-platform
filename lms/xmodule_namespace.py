@@ -1,14 +1,28 @@
-from xblock.core import Namespace, Boolean, Scope, String, List, Float
+"""
+Namespace that defines fields common to all blocks used in the LMS
+"""
+from xblock.core import Namespace, Boolean, Scope, String, Float
 from xmodule.fields import Date, Timedelta
 
 
 class StringyBoolean(Boolean):
+    """
+    Reads strings from JSON as booleans.
+
+    'true' (case insensitive) return True, other strings return False
+    Other types are returned unchanged
+    """
     def from_json(self, value):
         if isinstance(value, basestring):
             return value.lower() == 'true'
         return value
 
+
 class StringyFloat(Float):
+    """
+    Reads values as floats. If the value parses as a float, returns
+    that, otherwise returns None
+    """
     def from_json(self, value):
         try:
             return float(value)
@@ -17,6 +31,9 @@ class StringyFloat(Float):
 
 
 class LmsNamespace(Namespace):
+    """
+    Namespace that defines fields common to all blocks used in the LMS
+    """
     hide_from_toc = StringyBoolean(
         help="Whether to display this module in the table of contents",
         default=False,
@@ -38,8 +55,14 @@ class LmsNamespace(Namespace):
     source_file = String(help="DO NOT USE", scope=Scope.settings)
     xqa_key = String(help="DO NOT USE", scope=Scope.settings)
     ispublic = Boolean(help="Whether this course is open to the public, or only to admins", scope=Scope.settings)
-    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
+    graceperiod = Timedelta(
+        help="Amount of time after the due date that submissions will be accepted",
+        scope=Scope.settings
+    )
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
     rerandomize = String(help="When to rerandomize the problem", default="always", scope=Scope.settings)
-    days_early_for_beta = StringyFloat(help="Number of days early to show content to beta users", default=None, scope=Scope.settings)
-
+    days_early_for_beta = StringyFloat(
+        help="Number of days early to show content to beta users",
+        default=None,
+        scope=Scope.settings
+    )
