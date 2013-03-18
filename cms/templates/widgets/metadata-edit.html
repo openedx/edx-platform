@@ -1,18 +1,17 @@
-% if metadata:
 <%
   import hashlib
   hlskey = hashlib.md5(module.location.url()).hexdigest()
 %>
 <section class="metadata_edit">
   <ul>
-    % for keyname in editable_metadata_fields:
+    % for field_name, field_value in editable_metadata_fields.items():
     <li>
-        % if keyname=='source_code':
-	    <a href="#hls-modal-${hlskey}" style="color:yellow;" id="hls-trig-${hlskey}" >Edit High Level Source</a>
-        % else:
-            <label>${keyname}:</label>
- 	    <input type='text' data-metadata-name='${keyname}' value='${metadata[keyname]}' size='60' />
-	% endif
+      % if field_name == 'source_code':
+        <a href="#hls-modal-${hlskey}" style="color:yellow;" id="hls-trig-${hlskey}" >Edit High Level Source</a>
+      % else:
+        <label>${field_name}:</label>
+ 	      <input type='text' data-metadata-name='${field_name}' value='${field_value}' size='60' />
+      % endif
     </li>
     % endfor
   </ul>
@@ -22,4 +21,3 @@
   % endif
 
 </section>
-% endif

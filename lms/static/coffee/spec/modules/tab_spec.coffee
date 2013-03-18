@@ -22,18 +22,23 @@ describe 'Tab', ->
     it 'bind the tabs', ->
       expect($.fn.tabs).toHaveBeenCalledWith show: @tab.onShow
 
+  # As of jQuery 1.9, the onShow callback is deprecated
+  # http://jqueryui.com/upgrade-guide/1.9/#deprecated-show-event-renamed-to-activate
+  # The code below tests that onShow does what is expected,
+  # but note that onShow will NOT be called when the user
+  # clicks on the tab if we're using jQuery version >= 1.9
   describe 'onShow', ->
     beforeEach ->
       @tab = new Tab 1, @items
-      $('[href="#tab-1-0"]').click()
+      @tab.onShow($('#tab-1-0'), {'index': 1})
 
     it 'replace content in the container', ->
-      $('[href="#tab-1-1"]').click()
+      @tab.onShow($('#tab-1-1'), {'index': 1})
       expect($('#tab-1-0').html()).toEqual ''
       expect($('#tab-1-1').html()).toEqual 'Video 2'
       expect($('#tab-1-2').html()).toEqual ''
 
     it 'trigger contentChanged event on the element', ->
       spyOnEvent @tab.el, 'contentChanged'
-      $('[href="#tab-1-1"]').click()
+      @tab.onShow($('#tab-1-1'), {'index': 1})
       expect('contentChanged').toHaveBeenTriggeredOn @tab.el

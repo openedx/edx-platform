@@ -405,6 +405,21 @@ textarea.text {
     @include linear-gradient($paleYellow, tint($paleYellow, 90%));
     outline: 0;
   }
+
+  &[disabled] {
+    border-color: $gray-l4;
+    color: $gray-l2;
+  }
+
+  &[readonly] {
+    border-color: $gray-l4;
+    color: $gray-l1;
+
+    &:focus {
+      @include linear-gradient($lightGrey, tint($lightGrey, 90%));
+      outline: 0;
+    }
+  }
 }
 
 // forms - specific

@@ -3,10 +3,10 @@ Feature: Open ended grading
   In order to complete the courseware questions
   I want the machine learning grading to be functional
 
-    # Commenting these all out right now until we can 
+    # Commenting these all out right now until we can
     # make a reference implementation for a course with
     # an open ended grading problem that is always available
-    # 
+    #
     # Scenario: An answer that is too short is rejected
     # Given I navigate to an openended question
     # And I enter the answer "z"

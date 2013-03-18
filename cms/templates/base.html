@@ -6,10 +6,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>
-        <%block name="title"></%block> | 
+        <%block name="title"></%block> |
         % if context_course:
         <% ctx_loc = context_course.location %>
-        ${context_course.display_name} | 
+        ${context_course.display_name_with_default} |
         % endif
         edX Studio
     </title>
@@ -22,7 +22,7 @@
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-symbolicons-block.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
-   
+
     <%block name="header_extras"></%block>
   </head>
 

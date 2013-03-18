@@ -11,8 +11,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
 from django.views.decorators.csrf import requires_csrf_token, csrf_protect
 
-from models import CourseSoftware
-from models import get_courses_licenses, get_or_create_license, get_license
+from .models import CourseSoftware
+from .models import get_courses_licenses, get_or_create_license, get_license
 
 
 log = logging.getLogger("mitx.licenses")

@@ -28,11 +28,6 @@ class CustomTagModule(XModule):
         More information given in <a href="/book/234">the text</a>
     """
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-
     def get_html(self):
         return self.descriptor.rendered_html
 
@@ -62,19 +57,15 @@ class CustomTagDescriptor(RawDescriptor):
         # cdodge: look up the template as a module
         template_loc = self.location._replace(category='custom_tag_template', name=template_name)
 
-        template_module = self.system.load_item(template_loc)
-        template_module_data = template_module.definition['data']
+        template_module = modulestore().get_instance(system.course_id, template_loc)
+        template_module_data = template_module.data
         template = Template(template_module_data)
         return template.render(**params)
 
 
-    def __init__(self, system, definition, **kwargs):
-        '''Render and save the template for this descriptor instance'''
-        super(CustomTagDescriptor, self).__init__(system, definition, **kwargs)
-
     @property
     def rendered_html(self):
-        return self.render_template(self.system, self.definition['data'])
+        return self.render_template(self.system, self.data)
 
     def export_to_file(self):
         """

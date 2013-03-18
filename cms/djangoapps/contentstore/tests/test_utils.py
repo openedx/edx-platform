@@ -1,4 +1,4 @@
-from  cms.djangoapps.contentstore import utils
+from  contentstore import utils
 import mock
 from django.test import TestCase
 

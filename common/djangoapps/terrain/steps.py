@@ -1,5 +1,5 @@
 from lettuce import world, step
-from factories import *
+from .factories import *
 from lettuce.django import django_url
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
@@ -69,6 +69,11 @@ def the_page_title_should_be(step, title):
     assert_equals(world.browser.title, title)
 
 
+@step(u'the page title should contain "([^"]*)"$')
+def the_page_title_should_contain(step, title):
+    assert(title in world.browser.title)
+
+
 @step('I am a logged in user$')
 def i_am_logged_in_user(step):
     create_user('robot')
@@ -78,18 +83,6 @@ def i_am_logged_in_user(step):
 @step('I am not logged in$')
 def i_am_not_logged_in(step):
     world.browser.cookies.delete()
-
-
-@step('I am registered for a course$')
-def i_am_registered_for_a_course(step):
-    create_user('robot')
-    u = User.objects.get(username='robot')
-    CourseEnrollment.objects.get_or_create(user=u, course_id='MITx/6.002x/2012_Fall')
-
-
-@step('I am registered for course "([^"]*)"$')
-def i_am_registered_for_course_by_id(step, course_id):
-    register_by_course_id(course_id)
 
 
 @step('I am staff for course "([^"]*)"$')
@@ -108,6 +101,7 @@ def i_am_an_edx_user(step):
 
 #### helper functions
 
+
 @world.absorb
 def scroll_to_bottom():
     # Maximize the browser
@@ -116,6 +110,11 @@ def scroll_to_bottom():
 
 @world.absorb
 def create_user(uname):
+
+    # If the user already exists, don't try to create it again
+    if len(User.objects.filter(username=uname)) > 0:
+        return
+
     portal_user = UserFactory.build(username=uname, email=uname + '@edx.org')
     portal_user.set_password('test')
     portal_user.save()
@@ -133,13 +132,25 @@ def log_in(email, password):
     world.browser.visit(django_url('/'))
     world.browser.is_element_present_by_css('header.global', 10)
     world.browser.click_link_by_href('#login-modal')
-    login_form = world.browser.find_by_css('form#login_form')
+
+    # Wait for the login dialog to load
+    # This is complicated by the fact that sometimes a second #login_form
+    # dialog loads, while the first one remains hidden.
+    # We give them both time to load, starting with the second one.
+    world.browser.is_element_present_by_css('section.content-wrapper form#login_form', wait_time=4)
+    world.browser.is_element_present_by_css('form#login_form', wait_time=2)
+
+    # For some reason, the page sometimes includes two #login_form
+    # elements, the first of which is not visible.
+    # To avoid this, we always select the last of the two #login_form dialogs
+    login_form = world.browser.find_by_css('form#login_form').last
+
     login_form.find_by_name('email').fill(email)
     login_form.find_by_name('password').fill(password)
     login_form.find_by_name('submit').click()
 
     # wait for the page to redraw
-    assert world.browser.is_element_present_by_css('.content-wrapper', 10)
+    assert world.browser.is_element_present_by_css('.content-wrapper', wait_time=10)
 
 
 @world.absorb

@@ -1,0 +1,63 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../../main.html" />
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="title"><title>edX Takes First Step toward Open Source Vision by Releasing XBlock SDK</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+var js, fjs = d.getElementsByTagName(s)[0];
+if (d.getElementById(id)) return;
+js = d.createElement(s); js.id = id;
+js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<section class="pressrelease">
+  <section class="container">
+    <h1>edX Takes First Step toward Open Source Vision by Releasing XBlock SDK</h1>
+    <hr class="horizontal-divider"/>
+    <article>
+      <h2>With Release of XBlock Source Code, Global Community Invited to Participate in the Development of the edX Learning Platform and the Next Generation of Online and Blended Courses</h2>
+
+      <p><strong>CAMBRIDGE, MA and SANTA CLARA, CA (PyCon 2013) &ndash; March 14, 2013 &ndash; </strong> <a href="https://www.edx.org/">EdX</a>, the not-for-profit online learning enterprise founded by <a href="http://harvard.edu">Harvard University</a> and the <a href="http://www.mit.edu">Massachusetts Institute of Technology</a> (MIT), today released its XBlock SDK to the general public under the Affero GPL open source license.   XBlock is the underlying architecture supporting the rich, interactive course content found in edX courses.  With XBlock, educational institutions are able to go far beyond simple text and videos to deliver interactive learning built specifically for the Internet environment.  The release of the XBlock source code marks the first step toward edX’s vision of creating an open online learning platform that mirrors the collaborative philosophy of MOOCs themselves and is an invitation to the global community of developers to work with edX to deliver the world’s best and most accessible online learning experience.</p>
+
+      <p>XBlock is a component architecture that enables developers to create independent course components, or XBlocks, that are able to work seamlessly with other components in the construction and presentation of an online course.  Course authors are able to combine XBlocks from a variety of sources – from text and video to sophisticated wiki-based collaborative learning environments and online laboratories – to create rich engaging online courses.  The XBlock architecture will enable the easy integration of next generation education tools like the circuit simulator in edX’s popular <a href="https://www.edx.org/courses/MITx/6.002x/2013_Spring/about">Circuits and Electronics</a> course (6.002x) and the molecular manipulator in the new <a href="https://www.edx.org/courses/MITx/7.00x/2013_Spring/about">Introduction to Biology – The Secret of Life</a> course (7.00x) taught by Eric Lander, one of the leaders of the Human Genome Project.</p>
+
+      <p>XBlock is not limited to just delivering courses.  A complete educational ecosystem will make use of a number of web applications, all of which require access to course content and data.  XBlocks provide the structure and APIs needed to build components for use by those applications.  edX will be working with independent developers to continue to extend the functionality of XBlock through the XBlock SDK and future open source initiatives.</p>
+
+      <p>“From its beginning, edX has been committed to developing the world’s best learning platform and tapping our global community to help us get there,” said Rob Rubin, edX Vice President of Engineering. “We look forward to working with the world’s developers, educators and researchers to help evolve the platform and ensure that everyone, everywhere has access to the world-class education that edX provides.”</p>
+
+      <p>The XBlock source code is available immediately and can be accessed at <a href="http://github.com/edX/XBlock">http://github.com/edX/XBlock</a>.</p>
+
+      <h2>About edX</h2>
+
+      <p><a href="https://www.edx.org/">EdX</a> is a not-for-profit enterprise of its founding partners <a href="http://www.harvard.edu">Harvard University</a> and the <a href="http://www.mit.edu">Massachusetts Institute of Technology</a> focused on transforming online and on-campus learning through groundbreaking methodologies, game-like experiences and cutting-edge research. EdX provides inspirational and transformative knowledge to students of all ages, social status, and income who form worldwide communities of learners. EdX uses its open source technology to transcend physical and social borders. We’re focused on people, not profit. EdX is based in Cambridge, Massachusetts in the USA.</p>
+
+      <section class="contact">
+        <p><strong>Media Contacts:</strong></p>
+        <p>Dan O'Connell</p>
+        <p>oconnell@edx.org</p>
+        <p>(617) 480-6585</p>
+        <br/>
+        <p>Gerald Kimber White</p>
+        <p>gerald.kimberwhite@rfbinder.com</p>
+        <p>781-455-8250</p>
+      </section>
+
+      <section class="footer">
+        <hr class="horizontal-divider"/>
+        <div class="logo"></div><h3 class="date">03 - 15 - 2013</h3>
+        <div class="social-sharing">
+          <hr class="horizontal-divider"/>
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=edX+Takes+First+Step+toward+Open+Source+Vision+by+Releasing+XBlock+SDK:+http://www.edx.org/press/xblock-announcement" class="share">
+          <img src="${static.url('images/social/twitter-sharing.png')}"/></a>
+          <a href="mailto:?subject=edX%20Takes%20First%20Step%20toward%20Open%20Source%20Vision%20by%20Releasing%20XBlock%20SDK…http://www.edx.org/press/xblock-announcement" class="share">
+          <img src="${static.url('images/social/email-sharing.png')}"/></a>
+          <div class="fb-like" data-href="http://edx.org/press/xblock-announcement" data-send="true" data-width="450" data-show-faces="true"></div>
+        </div>
+      </section>
+    </article>
+  </section>
+</section>

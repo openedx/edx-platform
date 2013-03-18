@@ -29,8 +29,6 @@ class SelfAssessmentTest(unittest.TestCase):
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
                          "SampleQuestion"])
 
-    metadata = {'attempts': '10'}
-
     descriptor = Mock()
 
     def setUp(self):
@@ -54,9 +52,9 @@ class SelfAssessmentTest(unittest.TestCase):
         }
 
         self.module = SelfAssessmentModule(test_system(), self.location,
-                                           self.definition, self.descriptor,
-                                           static_data,
-                                           state, metadata=self.metadata)
+                                           self.definition,
+                                           self.descriptor,
+                                           static_data)
 
     def test_get_html(self):
         html = self.module.get_html(self.module.system)
@@ -85,18 +83,18 @@ class SelfAssessmentTest(unittest.TestCase):
 
         self.module.save_answer({'student_answer': "I am an answer"},
                                 self.module.system)
-        self.assertEqual(self.module.state, self.module.ASSESSING)
+        self.assertEqual(self.module.child_state, self.module.ASSESSING)
 
         self.module.save_assessment(mock_query_dict, self.module.system)
-        self.assertEqual(self.module.state, self.module.DONE)
+        self.assertEqual(self.module.child_state, self.module.DONE)
 
         d = self.module.reset({})
         self.assertTrue(d['success'])
-        self.assertEqual(self.module.state, self.module.INITIAL)
+        self.assertEqual(self.module.child_state, self.module.INITIAL)
 
         # if we now assess as right, skip the REQUEST_HINT state
         self.module.save_answer({'student_answer': 'answer 4'},
                                 self.module.system)
         responses['assessment'] = '1'
         self.module.save_assessment(mock_query_dict, self.module.system)
-        self.assertEqual(self.module.state, self.module.DONE)
+        self.assertEqual(self.module.child_state, self.module.DONE)

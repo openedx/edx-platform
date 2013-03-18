@@ -6,7 +6,7 @@ from tempfile import NamedTemporaryFile
 from django.test import TestCase
 from django.core.management import call_command
 
-from models import CourseSoftware, UserLicense
+from .models import CourseSoftware, UserLicense
 
 COURSE_1 = 'edX/toy/2012_Fall'
 

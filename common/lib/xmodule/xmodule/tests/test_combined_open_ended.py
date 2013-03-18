@@ -57,7 +57,8 @@ class OpenEndedChildTest(unittest.TestCase):
     def setUp(self):
         self.test_system = test_system()
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
-                                             self.definition, self.descriptor, self.static_data, self.metadata)
+                                            self.definition, self.descriptor, self.static_data, self.metadata)
+
 
     def test_latest_answer_empty(self):
         answer = self.openendedchild.latest_answer()
@@ -123,7 +124,7 @@ class OpenEndedChildTest(unittest.TestCase):
     def test_reset(self):
         self.openendedchild.reset(self.test_system)
         state = json.loads(self.openendedchild.get_instance_state())
-        self.assertEqual(state['state'], OpenEndedChild.INITIAL)
+        self.assertEqual(state['child_state'], OpenEndedChild.INITIAL)
 
     def test_is_last_response_correct(self):
         new_answer = "New Answer"
@@ -209,7 +210,7 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
 
         state = json.loads(self.openendedmodule.get_instance_state())
-        self.assertIsNotNone(state['state'], OpenEndedModule.DONE)
+        self.assertIsNotNone(state['child_state'], OpenEndedModule.DONE)
 
     def test_send_to_grader(self):
         submission = "This is a student submission"
@@ -335,12 +336,15 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
 
     def setUp(self):
         self.test_system = test_system()
+        # TODO: this constructor call is definitely wrong, but neither branch
+        # of the merge matches the module constructor.  Someone (Vik?) should fix this.
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                     self.location,
                                                     self.definition,
                                                     self.descriptor,
                                                     static_data=self.static_data,
-                                                    metadata=self.metadata)
+                                                    metadata=self.metadata,
+                                                    instance_state={})
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
