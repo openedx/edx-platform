@@ -391,8 +391,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         # if we are loading a course object, there is no parent to inherit the metadata from
         # so don't bother getting it
-        if item['location']['category'] != 'course':
-            metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']))
+        metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']))
 
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
