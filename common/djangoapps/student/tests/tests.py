@@ -9,8 +9,8 @@ import logging
 from django.test import TestCase
 from mock import Mock
 
-from .models import unique_id_for_user
-from .views import process_survey_link, _cert_info
+from student.models import unique_id_for_user
+from student.views import process_survey_link, _cert_info
 
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
