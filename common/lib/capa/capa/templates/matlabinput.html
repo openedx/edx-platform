@@ -34,7 +34,7 @@
   </div>
 
   <div class="plot-button">
-          <input type="button" name="plot-button" value="Plot" />
+      <input type="button" class="save" name="plot-button" id="plot_${id}" value="Plot" />
   </div>
 
   <script>
@@ -57,7 +57,50 @@
         },
         smartIndent: false
       });
+
       $("#textbox_${id}").find('.CodeMirror-scroll').height(${int(13.5*eval(rows))});
+
+      // hook up the plot button
+      var plot = function(event) {
+          url = $(this).closest('.problems-wrapper').data('url');
+          input_id = "${id}";
+
+          // save the codemirror text to the textarea
+          cm.save();
+          var input = $("#input_${id}");
+          // pull out the coded text
+          submission = input.val();
+
+          answer = input.serialize();
+
+          // setup callback for 
+          var plot_callback = function(response) {
+              if(response.success) {
+                  window.location.reload();
+              }
+              else {
+                  // TODO: show message
+              }
+          }
+
+          var save_callback = function(response) { 
+                  if(response.success) {
+                      Problem.inputAjax(url, input_id, 'plot', 
+                        {'submission': submission}, plot_callback);
+                  }
+                  else {
+                  // TODO: show any messages
+                  }
+          }
+
+          // save the answer
+          $.postWithPrefix(url + '/problem_save', answer, save_callback);
+
+
+
+      }
+      $('#plot_${id}').click(plot);
+
     });
   </script>
 </section>

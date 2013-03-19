@@ -162,7 +162,7 @@ class InputTypeBase(object):
         self.msg = feedback.get('message', '')
         self.hint = feedback.get('hint', '')
         self.hintmode = feedback.get('hintmode', None)
-        self.input_state = state.get('input_state', {})
+        self.input_state_dict = state.get('input_state', {})
 
         # put hint above msg if it should be displayed
         if self.hintmode == 'always':
@@ -635,6 +635,11 @@ class MatlabInput(CodeInput):
         '''
         Handle matlab-specific parsing
         '''
+        # if we don't have state for this input type yet, make one
+        if self.id not in self.input_state_dict:
+            self.input_state_dict[self.id] = {}
+
+        self.input_state = self.input_state_dict[self.id]
         xml = self.xml
         self.plot_payload = xml.findtext('./plot_payload')
         # if no student input yet, then use the default input given by the
@@ -647,10 +652,13 @@ class MatlabInput(CodeInput):
         self.queuename = 'matlab'
         # Flag indicating that the problem has been queued, 'msg' is length of
         self.queue_msg = None
+        if 'queue_msg' in self.input_state:
+            self.queue_msg = self.input_state['queue_msg']
+        if 'queued' in self.input_state and self.input_state['queuestate'] is not None:
+            self.status = 'queued'
+            self.queue_len = 1
         # queue
         if self.status == 'incomplete':
-            if 'queue_msg' in self.input_state:
-                self.queue_msg = self.input_state['queue_msg']
             self.status = 'queued'
             self.queue_len = self.msg
             self.msg = self.submitted_msg
@@ -667,10 +675,11 @@ class MatlabInput(CodeInput):
         # check the queuekey against the saved queuekey
         if('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued' 
                 and self.input_state['queuekey'] == queuekey):
-            msg = _parse_message(queue_msg)
+            msg = self._parse_data(queue_msg)
             # save the queue message so that it can be rendered later
             self.input_state['queue_msg'] = msg
-            self.input_state['queued'] = 'dequeued'
+            self.input_state['queuestate'] = None
+            self.input_state['queuekey'] = None
 
     def _extra_context(self):
         ''' Set up additional context variables'''
@@ -733,8 +742,9 @@ class MatlabInput(CodeInput):
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body = json.dumps(contents))
 
-            return json.dumps({'success': error != 0, 'message': msg})
-        return json.dumps({'success': False, 'message': 'Cannot connect to the queue'})
+
+            return {'success': error == 0, 'message': msg}
+        return {'success': False, 'message': 'Cannot connect to the queue'}
 
 
 registry.register(MatlabInput)

@@ -460,6 +460,7 @@ class CapaModule(CapaFields, XModule):
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
             })
+        self.set_state_from_lcp()
         return json.dumps(d, cls=ComplexEncoder)
 
     def is_past_due(self):
@@ -549,8 +550,8 @@ class CapaModule(CapaFields, XModule):
         score_msg = get['xqueue_body']
         # pass along the xqueue message to the problem
         self.lcp.ungraded_response(score_msg, queuekey)
-
         self.set_state_from_lcp()
+        return dict()
 
     def get_answer(self, get):
         '''

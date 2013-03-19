@@ -548,14 +548,11 @@ class LoncapaProblem(object):
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
             
-            if input_id not in self.input_state:
-                self.input_state[input_id] = {}
-
             # do the rendering
             state = {'value': value,
                    'status': status,
                    'id': input_id,
-                   'input_state': self.input_state[input_id],
+                   'input_state': self.input_state,
                    'feedback': {'message': msg,
                                 'hint': hint,
                                 'hintmode': hintmode, }}

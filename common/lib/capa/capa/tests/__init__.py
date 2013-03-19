@@ -20,7 +20,7 @@ def calledback_url(dispatch = 'score_update'):
     return dispatch
 
 xqueue_interface = MagicMock()
-xqueue_interface.send_to_queue.return_value = (1, 'Success!')
+xqueue_interface.send_to_queue.return_value = (0, 'Success!')
 
 test_system = Mock(
     ajax_url='courses/course_id/modx/a_location',

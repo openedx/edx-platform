@@ -357,7 +357,7 @@ class MatlabTest(unittest.TestCase):
     def test_rendering_with_state(self):
         state = {'value': 'print "good evening"',
                  'status': 'incomplete',
-                 'input_state': {'queue_msg': 'message'},
+                 'input_state': {'prob_1_2': {'queue_msg': 'message'}},
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
@@ -383,7 +383,7 @@ class MatlabTest(unittest.TestCase):
 
     def test_plot_data(self):
         get = {'submission': 'x = 1234;'}
-        response = json.loads(self.the_input.handle_ajax("plot", get))
+        response = self.the_input.handle_ajax("plot", get)
 
         test_system.xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
         
