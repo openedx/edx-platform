@@ -446,7 +446,7 @@ class CapaModule(CapaFields, XModule):
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
             'score_update': self.update_score,
-            'input_ajax': self.lcp.handle_input_ajax,
+            'input_ajax': self.handle_input_ajax,
             'ungraded_response': self.handle_ungraded_response
             }
 
@@ -460,7 +460,6 @@ class CapaModule(CapaFields, XModule):
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
             })
-        self.set_state_from_lcp()
         return json.dumps(d, cls=ComplexEncoder)
 
     def is_past_due(self):
@@ -544,7 +543,10 @@ class CapaModule(CapaFields, XModule):
 
     def handle_ungraded_response(self, get):
         '''
-        Get the XQueue response
+        Delivers a response to the capa problem where the expectation where this response does
+        not have relevant grading information
+
+        No ajax return is needed, so an empty dict is returned
         '''
         queuekey = get['queuekey']
         score_msg = get['xqueue_body']
@@ -552,6 +554,17 @@ class CapaModule(CapaFields, XModule):
         self.lcp.ungraded_response(score_msg, queuekey)
         self.set_state_from_lcp()
         return dict()
+
+    def handle_input_ajax(self, get):
+        '''
+        Passes information down to the capa problem so that it can handle its own ajax calls
+        Returns the response from the capa problem
+        '''
+        response = self.lcp.handle_input_ajax(get)
+        # save any state changes that may occur
+        self.set_state_from_lcp()
+        return response
+        
 
     def get_answer(self, get):
         '''

@@ -16,7 +16,6 @@ This is used by capa_module.
 from __future__ import division
 
 from datetime import datetime
-import json
 import logging
 import math
 import numpy
@@ -32,8 +31,6 @@ from xml.sax.saxutils import unescape
 from copy import deepcopy
 
 import chem
-import chem.chemcalc
-import chem.chemtools
 import chem.miller
 import verifiers
 import verifiers.draganddrop
@@ -70,9 +67,6 @@ global_context = {'random': random,
                   'scipy': scipy,
                   'calc': calc,
                   'eia': eia,
-                  'chemcalc': chem.chemcalc,
-                  'chemtools': chem.chemtools,
-                  'miller': chem.miller,
                   'draganddrop': verifiers.draganddrop}
 
 # These should be removed from HTML output, including all subelements
@@ -371,7 +365,7 @@ class LoncapaProblem(object):
             dispatch = get['dispatch']
             return self.inputs[input_id].handle_ajax(dispatch, get)
         else:
-            log.warning("Could not find matching input for id: %s" % problem_id)
+            log.warning("Could not find matching input for id: %s" % input_id)
             return {}
 
 

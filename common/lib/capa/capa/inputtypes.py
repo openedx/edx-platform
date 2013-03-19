@@ -37,7 +37,6 @@ graded status as'status'
 # makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
 # general css and layout strategy for capa, document it, then implement it.
 
-from collections import namedtuple
 import json
 import logging
 from lxml import etree
@@ -623,6 +622,13 @@ registry.register(CodeInput)
 class MatlabInput(CodeInput):
     '''
     InputType for handling Matlab code input
+
+    Example:
+     <matlabinput rows="10" cols="80" tabsize="4">
+        <plot_payload>
+          %api_key=API_KEY
+        </plot_payload>
+    </matlabinput>
     '''
     template = "matlabinput.html"
     tags = ['matlabinput']
