@@ -1,8 +1,6 @@
 from lettuce import world, step
-from django.core.management import call_command
 from nose.tools import assert_equals, assert_in
 from lettuce.django import django_url
-from django.conf import settings
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from xmodule.modulestore import Location
@@ -123,6 +121,7 @@ def i_am_registered_for_the_course(step, course):
     u = User.objects.get(username='robot')
 
     # If the user is not already enrolled, enroll the user.
+    # TODO: change to factory
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(course))
 
     world.log_in('robot@edx.org', 'test')

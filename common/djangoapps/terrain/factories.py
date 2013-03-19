@@ -38,7 +38,7 @@ class GroupFactory(GroupFactory):
 
 
 @world.absorb
-class CourseEnrollment(CourseEnrollment):
+class CourseEnrollmentFactory(CourseEnrollment):
     """
     Courses that the user is enrolled in
     """ 
@@ -46,7 +46,7 @@ class CourseEnrollment(CourseEnrollment):
 
 
 @world.absorb
-class CourseEnrollmentAllowed(CourseEnrollmentAllowed):
+class CourseEnrollmentAllowedFactory(CourseEnrollmentAllowed):
     """
     Users allowed to enroll in the course outside of the usual window
     """ 
