@@ -10,6 +10,8 @@ import time
 import re
 import os.path
 
+from .xqueue_setup import *
+
 from logging import getLogger
 logger = getLogger(__name__)
 

@@ -4,8 +4,7 @@ Feature: Answer problems
     I want to answer problems
 
     Scenario: I can answer a problem correctly
-        Given External graders respond "correct" 
-        And I am viewing a "<ProblemType>" problem
+        Given I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "correctly"
         Then My "<ProblemType>" answer is marked "correct"
 
@@ -18,11 +17,9 @@ Feature: Answer problems
         | numerical         |
         | formula           |
         | script            |
-        | code              |
 
     Scenario: I can answer a problem incorrectly
-        Given External graders respond "incorrect" 
-        And I am viewing a "<ProblemType>" problem
+        Given I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "incorrectly"
         Then My "<ProblemType>" answer is marked "incorrect"
 
@@ -35,11 +32,10 @@ Feature: Answer problems
         | numerical         |
         | formula           |
         | script            |
-        | code              |
 
     Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
-        When I check a problem
+        When I check a problem 
         Then My "<ProblemType>" answer is marked "incorrect"
 
         Examples:
@@ -75,3 +71,16 @@ Feature: Answer problems
         | formula           | incorrect     |
         | script            | correct       |
         | script            | incorrect     |
+
+
+    Scenario: I can answer a code-based problem
+        Given I am viewing a "code" problem
+        And External graders respond "<Correctness>" with message "Test Message"
+        When I answer a "code" problem "<Correctness>"
+        Then My "code" answer is marked "<Correctness>"
+        And I should see "Test Message" somewhere in the page
+
+        Examples:
+        | Correctness   |
+        | correct       |
+        | incorrect     |

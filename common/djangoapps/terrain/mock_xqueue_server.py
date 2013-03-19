@@ -2,7 +2,10 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import json
 import urllib
 import urlparse
+import time
 
+from logging import getLogger
+logger = getLogger(__name__)
 
 class MockXQueueRequestHandler(BaseHTTPRequestHandler):
     '''
@@ -16,11 +19,10 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         '''
-        Handle a POST request from the client, interpreted
-        as either a login request or a submission for grading request.
+        Handle a POST request from the client
 
         Sends back an immediate success/failure response.
-        If grading is required, it then POSTS back to the client
+        It then POSTS back to the client
         with grading results, as configured in MockXQueueServer.
         '''
         self._send_head()
@@ -28,21 +30,60 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
         # Retrieve the POST data
         post_dict = self._post_dict()
 
-        # Send a response indicating success/failure
-        success = self._send_immediate_response(post_dict)
+        # Log the request
+        logger.debug("XQueue received POST request %s to path %s" % 
+                    (str(post_dict), self.path))
 
-        # If the client submitted a valid submission request,
-        # we need to post back to the callback url
-        # with the grading result
-        if success and self._is_grade_request():
-            self._send_grade_response(post_dict['lms_callback_url'],
-                                        post_dict['lms_key'])
+        # Respond only to grading requests
+        if self._is_grade_request():
+            try:
+                xqueue_header = json.loads(post_dict['xqueue_header'])
+                xqueue_body = json.loads(post_dict['xqueue_body'])
+
+                callback_url = xqueue_header['lms_callback_url']
+
+            except KeyError:
+                # If the message doesn't have a header or body,
+                # then it's malformed.
+                # Respond with failure
+                error_msg = "XQueue received invalid grade request"
+                self._send_immediate_response(False, message=error_msg)
+
+            except ValueError:
+                # If we could not decode the body or header,
+                # respond with failure
+                
+                error_msg = "XQueue could not decode grade request"
+                self._send_immediate_response(False, message=error_msg)
+
+            else:
+                # Send an immediate response of success 
+                # The grade request is formed correctly
+                self._send_immediate_response(True)
+
+                # Wait a bit before POSTing back to the callback url with the
+                # grade result configured by the server
+                # Otherwise, the problem will not realize it's
+                # queued and it will keep waiting for a response
+                # indefinitely
+                delayed_grade_func = lambda: self._send_grade_response(callback_url, 
+                                                                        xqueue_header)
+
+                timer = threading.Timer(2, delayed_grade_func)
+                timer.start()
+
+        # If we get a request that's not to the grading submission
+        # URL, return an error
+        else:
+            error_message = "Invalid request URL"
+            self._send_immediate_response(False, message=error_message)
+
 
     def _send_head(self):
         '''
         Send the response code and MIME headers
         '''
-        if self._is_login_request() or self._is_grade_request():
+        if self._is_grade_request():
             self.send_response(200)
         else:
             self.send_response(500)
@@ -78,46 +119,33 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
 
         return post_dict
 
-    def _send_immediate_response(self, post_dict):
+    def _send_immediate_response(self, success, message=""):
         '''
-        Check the post_dict for the appropriate fields
-        for this request (login or grade submission)
-        If it finds them, inform the client of success.
-        Otherwise, inform the client of failure
+        Send an immediate success/failure message
+        back to the client
         '''
-
-        # Allow any user to log in, as long as the POST
-        # dict has a username and password
-        if self._is_login_request():
-            success = 'username' in post_dict and 'password' in post_dict
-
-        elif self._is_grade_request():
-            success = ('lms_callback_url' in post_dict and
-                        'lms_key' in post_dict and
-                        'queue_name' in post_dict)
-        else:
-            success = False
 
         # Send the response indicating success/failure
         response_str = json.dumps({'return_code': 0 if success else 1,
-                                'content': '' if success else 'Error'})
+                                'content': message})
+
+        # Log the response
+        logger.debug("XQueue: sent response %s" % response_str)
 
         self.wfile.write(response_str)
 
-        return success
-
-    def _send_grade_response(self, postback_url, queuekey):
+    def _send_grade_response(self, postback_url, xqueue_header):
         '''
         POST the grade response back to the client
         using the response provided by the server configuration
         '''
-        response_dict = {'queuekey': queuekey,
-                        'xqueue_body': self.server.grade_response}
+        response_dict = {'xqueue_header': json.dumps(xqueue_header),
+                        'xqueue_body': json.dumps(self.server.grade_response())}
+
+        # Log the response
+        logger.debug("XQueue: sent grading response %s" % str(response_dict))
 
         MockXQueueRequestHandler.post_to_url(postback_url, response_dict)
-
-    def _is_login_request(self):
-        return 'xqueue/login' in self.path
 
     def _is_grade_request(self):
         return 'xqueue/submit' in self.path
@@ -138,7 +166,8 @@ class MockXQueueServer(HTTPServer):
     to POST requests to localhost.
     '''
 
-    def __init__(self, port_num, grade_response_dict):
+    def __init__(self, port_num, 
+            grade_response_dict={'correct':True, 'score': 1, 'msg': ''}):
         '''
         Initialize the mock XQueue server instance.
 
@@ -148,18 +177,36 @@ class MockXQueueServer(HTTPServer):
             and sent in response to XQueue grading requests.
         '''
 
-        self.grade_response = grade_response_dict
+        self.set_grade_response(grade_response_dict)
 
         handler = MockXQueueRequestHandler
         address = ('', port_num)
         HTTPServer.__init__(self, address, handler)
 
-    @property
+    def shutdown(self):
+        '''
+        Stop the server and free up the port
+        '''
+        # First call superclass shutdown()
+        HTTPServer.shutdown(self)
+
+        # We also need to manually close the socket
+        self.socket.close()
+
     def grade_response(self):
         return self._grade_response
 
-    @grade_response.setter
-    def grade_response(self, grade_response_dict):
+    def set_grade_response(self, grade_response_dict):
+
+        # Check that the grade response has the right keys
+        assert('correct' in grade_response_dict and
+                'score' in grade_response_dict and
+                'msg' in grade_response_dict)
+
+        # Wrap the message in <div> tags to ensure that it is valid XML
+        grade_response_dict['msg'] = "<div>%s</div>" % grade_response_dict['msg']
+
+        # Save the response dictionary
         self._grade_response = grade_response_dict
 
 
@@ -190,16 +237,6 @@ class MockXQueueServerTest(unittest.TestCase):
 
         # Stop the server, freeing up the port
         self.server.shutdown()
-        self.server.socket.close()
-
-    def test_login_request(self):
-
-        # Send a login request
-        login_request = {'username': 'Test', 'password': 'Test'}
-        response_handle = urllib.urlopen(self.server_url + '/xqueue/login',
-                                urllib.urlencode(login_request))
-        response_dict = json.loads(response_handle.read())
-        self.assertEqual(response_dict['return_code'], 0)
 
     def test_grade_request(self):
 
@@ -209,19 +246,33 @@ class MockXQueueServerTest(unittest.TestCase):
 
         # Send a grade request
         callback_url = 'http://127.0.0.1:8000/test_callback'
-        grade_request = {'lms_callback_url': callback_url,
-                        'lms_key': 'test_queuekey',
-                        'queue_name': 'test_queue'}
+
+        grade_header = json.dumps({'lms_callback_url': callback_url,
+                                    'lms_key': 'test_queuekey',
+                                    'queue_name': 'test_queue'})
+
+        grade_body = json.dumps({'student_info': 'test', 
+                                'grader_payload': 'test',
+                                'student_response': 'test'})
+
+        grade_request = {'xqueue_header': grade_header,
+                        'xqueue_body': grade_body}
+
         response_handle = urllib.urlopen(self.server_url + '/xqueue/submit',
                                 urllib.urlencode(grade_request))
+
         response_dict = json.loads(response_handle.read())
 
         # Expect that the response is success
         self.assertEqual(response_dict['return_code'], 0)
 
+        # Wait a bit before checking that the server posted back
+        time.sleep(3)
+
         # Expect that the server tries to post back the grading info
-        expected_callback_dict = {'queuekey': 'test_queuekey',
-                                'xqueue_body': {'correct': True,
-                                                'score': 1, 'msg': ''}}
+        xqueue_body = json.dumps({'correct': True, 'score': 1, 
+                                    'msg': '<div></div>'})
+        expected_callback_dict = {'xqueue_header': grade_header,
+                                'xqueue_body': xqueue_body }
         MockXQueueRequestHandler.post_to_url.assert_called_with(callback_url,
                                                         expected_callback_dict)
