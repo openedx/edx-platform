@@ -7,6 +7,7 @@ import time
 from logging import getLogger
 logger = getLogger(__name__)
 
+
 class MockXQueueRequestHandler(BaseHTTPRequestHandler):
     '''
     A handler for XQueue POST requests.
@@ -31,7 +32,7 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
         post_dict = self._post_dict()
 
         # Log the request
-        logger.debug("XQueue received POST request %s to path %s" % 
+        logger.debug("XQueue received POST request %s to path %s" %
                     (str(post_dict), self.path))
 
         # Respond only to grading requests
@@ -52,12 +53,12 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
             except ValueError:
                 # If we could not decode the body or header,
                 # respond with failure
-                
+
                 error_msg = "XQueue could not decode grade request"
                 self._send_immediate_response(False, message=error_msg)
 
             else:
-                # Send an immediate response of success 
+                # Send an immediate response of success
                 # The grade request is formed correctly
                 self._send_immediate_response(True)
 
@@ -66,7 +67,7 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
                 # Otherwise, the problem will not realize it's
                 # queued and it will keep waiting for a response
                 # indefinitely
-                delayed_grade_func = lambda: self._send_grade_response(callback_url, 
+                delayed_grade_func = lambda: self._send_grade_response(callback_url,
                                                                         xqueue_header)
 
                 timer = threading.Timer(2, delayed_grade_func)
@@ -166,8 +167,8 @@ class MockXQueueServer(HTTPServer):
     to POST requests to localhost.
     '''
 
-    def __init__(self, port_num, 
-            grade_response_dict={'correct':True, 'score': 1, 'msg': ''}):
+    def __init__(self, port_num,
+            grade_response_dict={'correct': True, 'score': 1, 'msg': ''}):
         '''
         Initialize the mock XQueue server instance.
 
@@ -251,7 +252,7 @@ class MockXQueueServerTest(unittest.TestCase):
                                     'lms_key': 'test_queuekey',
                                     'queue_name': 'test_queue'})
 
-        grade_body = json.dumps({'student_info': 'test', 
+        grade_body = json.dumps({'student_info': 'test',
                                 'grader_payload': 'test',
                                 'student_response': 'test'})
 
@@ -270,9 +271,9 @@ class MockXQueueServerTest(unittest.TestCase):
         time.sleep(3)
 
         # Expect that the server tries to post back the grading info
-        xqueue_body = json.dumps({'correct': True, 'score': 1, 
+        xqueue_body = json.dumps({'correct': True, 'score': 1,
                                     'msg': '<div></div>'})
         expected_callback_dict = {'xqueue_header': grade_header,
-                                'xqueue_body': xqueue_body }
+                                'xqueue_body': xqueue_body}
         MockXQueueRequestHandler.post_to_url.assert_called_with(callback_url,
                                                         expected_callback_dict)

@@ -4,7 +4,7 @@ Feature: Answer problems
     I want to answer problems
 
     Scenario: I can answer a problem correctly
-        Given External graders respond "correct" 
+        Given External graders respond "correct"
         And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "correctly"
         Then My "<ProblemType>" answer is marked "correct"
@@ -21,7 +21,7 @@ Feature: Answer problems
         | code              |
 
     Scenario: I can answer a problem incorrectly
-        Given External graders respond "incorrect" 
+        Given External graders respond "incorrect"
         And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "incorrectly"
         Then My "<ProblemType>" answer is marked "incorrect"

@@ -80,7 +80,7 @@ PROBLEM_FACTORY_DICT = {
                         a1=0
                         a2=0
                     return (a1+a2)==int(expect)
-            """) }},
+            """)}},
     'code': {
         'factory': CodeResponseXMLFactory(),
         'kwargs': {
@@ -123,6 +123,7 @@ def view_problem(step, problem_type):
                     (chapter_name, section_name))
 
     world.browser.visit(url)
+
 
 @step(u'External graders respond "([^"]*)"')
 def set_external_grader_response(step, correctness):
@@ -193,14 +194,14 @@ def answer_problem(step, problem_type, correctness):
     elif problem_type == 'code':
         # The fake xqueue server is configured to respond
         # correct / incorrect no matter what we submit.
-        # Furthermore, since the inline code response uses 
-        # JavaScript to make the code display nicely, it's difficult 
-        # to programatically input text 
+        # Furthermore, since the inline code response uses
+        # JavaScript to make the code display nicely, it's difficult
+        # to programatically input text
         # (there's not <textarea> we can just fill text into)
         # For this reason, we submit the initial code in the response
         # (configured in the problem XML above)
         pass
-        
+
     # Submit the problem
     check_problem(step)
 
@@ -246,8 +247,8 @@ def assert_answer_mark(step, problem_type, correctness):
                             'checkbox': ['span.correct'],
                             'string': ['div.correct'],
                             'numerical': ['div.correct'],
-                            'formula': ['div.correct'], 
-                            'script': ['div.correct'], 
+                            'formula': ['div.correct'],
+                            'script': ['div.correct'],
                             'code': ['span.correct'], }
 
     incorrect_selectors = {'drop down': ['span.incorrect'],
@@ -256,7 +257,7 @@ def assert_answer_mark(step, problem_type, correctness):
                             'checkbox': ['span.incorrect'],
                             'string': ['div.incorrect'],
                             'numerical': ['div.incorrect'],
-                            'formula': ['div.incorrect'], 
+                            'formula': ['div.incorrect'],
                             'script': ['div.incorrect'],
                             'code': ['span.incorrect'], }
 
