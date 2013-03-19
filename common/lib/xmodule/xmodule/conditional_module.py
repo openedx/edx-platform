@@ -39,6 +39,22 @@ class ConditionalModule(ConditionalFields, XModule):
             attempted - map to `is_attempted` module method
             poll_answer - map to `poll_answer` module attribute
             voted - map to `voted` module attribute
+
+        <show> tag attributes:
+            sources - location id of required modules, separated by ';'
+
+        You can add you own rules for <conditional> tag, like
+        "completed", "attempted" etc. To do that yo must extend
+        `ConditionalModule.conditions_map` variable and add pair:
+            my_attr: my_property/my_method
+
+        After that you can use it:
+            <conditional my_attr="some value" ...>
+                ...
+            </conditional>
+
+        And my_property/my_method will be called for required modules.
+
     """
 
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
