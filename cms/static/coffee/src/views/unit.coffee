@@ -109,7 +109,14 @@ class CMS.Views.UnitEdit extends Backbone.View
       id: $component.data('id')
     }, =>
       $component.remove()
-      @model.save(children: @components())
+      # b/c we don't vigilantly keep children up to date
+      # get rid of it before it hurts someone
+      # sorry for the js, i couldn't figure out the coffee equivalent
+      `_this.model.save({children: _this.components()},
+          {success: function(model) {
+              model.unset('children');
+          }}
+      );`
     )
 
   deleteDraft: (event) ->
