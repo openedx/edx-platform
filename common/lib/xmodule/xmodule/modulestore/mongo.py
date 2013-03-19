@@ -388,10 +388,6 @@ class MongoModuleStore(ModuleStoreBase):
 
         resource_fs = OSFS(root)
 
-        metadata_inheritance_tree = None
-
-        # if we are loading a course object, there is no parent to inherit the metadata from
-        # so don't bother getting it
         metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']))
 
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
