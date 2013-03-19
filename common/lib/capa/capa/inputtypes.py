@@ -702,7 +702,6 @@ class MatlabInput(CodeInput):
             log.error("External message should be a JSON serialized dict."
                     " Received queue_msg = %s" % queue_msg)
             raise
-        # TODO: needs more error checking
         msg = result['msg']
         return msg
 
