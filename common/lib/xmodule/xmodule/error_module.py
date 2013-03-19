@@ -8,6 +8,7 @@ from xmodule.x_module import XModule
 from xmodule.editing_module import JSONEditingDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
+from xblock.core import String, Scope
 
 
 log = logging.getLogger(__name__)
@@ -20,7 +21,14 @@ log = logging.getLogger(__name__)
 # decides whether to create a staff or not-staff module.
 
 
-class ErrorModule(XModule):
+class ErrorFields(object):
+    contents = String(scope=Scope.content)
+    error_msg = String(scope=Scope.content)
+    display_name = String(scope=Scope.settings)
+
+
+class ErrorModule(ErrorFields, XModule):
+
     def get_html(self):
         '''Show an error to staff.
         TODO (vshnayder): proper style, divs, etc.
@@ -28,12 +36,12 @@ class ErrorModule(XModule):
         # staff get to see all the details
         return self.system.render_template('module-error.html', {
             'staff_access': True,
-            'data': self.definition['data']['contents'],
-            'error': self.definition['data']['error_msg'],
+            'data': self.contents,
+            'error': self.error_msg,
             })
 
 
-class NonStaffErrorModule(XModule):
+class NonStaffErrorModule(ErrorFields, XModule):
     def get_html(self):
         '''Show an error to a student.
         TODO (vshnayder): proper style, divs, etc.
@@ -46,7 +54,7 @@ class NonStaffErrorModule(XModule):
             })
 
 
-class ErrorDescriptor(JSONEditingDescriptor):
+class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
     """
     Module that provides a raw editing view of broken xml.
     """
@@ -66,26 +74,22 @@ class ErrorDescriptor(JSONEditingDescriptor):
                 name=hashlib.sha1(contents).hexdigest()
             )
 
-        definition = {
-            'data': {
-                'error_msg': str(error_msg),
-                'contents': contents,
-            }
-        }
-
         # real metadata stays in the content, but add a display name
-        metadata = {'display_name': 'Error: ' + location.name}
+        model_data = {
+            'error_msg': str(error_msg),
+            'contents': contents,
+            'display_name': 'Error: ' + location.name
+        }
         return ErrorDescriptor(
             system,
-            definition,
-            location=location,
-            metadata=metadata
+            location,
+            model_data,
         )
 
     def get_context(self):
         return {
             'module': self,
-            'data': self.definition['data']['contents'],
+            'data': self.contents,
         }
 
     @classmethod
@@ -101,10 +105,7 @@ class ErrorDescriptor(JSONEditingDescriptor):
     def from_descriptor(cls, descriptor, error_msg='Error not available'):
         return cls._construct(
             descriptor.system,
-            json.dumps({
-                'definition': descriptor.definition,
-                'metadata': descriptor.metadata,
-            }, indent=4),
+            descriptor._model_data,
             error_msg,
             location=descriptor.location,
         )
@@ -148,14 +149,14 @@ class ErrorDescriptor(JSONEditingDescriptor):
         files, etc.  That would just get re-wrapped on import.
         '''
         try:
-            xml = etree.fromstring(self.definition['data']['contents'])
+            xml = etree.fromstring(self.contents)
             return etree.tostring(xml, encoding='unicode')
         except etree.XMLSyntaxError:
             # still not valid.
             root = etree.Element('error')
-            root.text = self.definition['data']['contents']
+            root.text = self.contents
             err_node = etree.SubElement(root, 'error_msg')
-            err_node.text = self.definition['data']['error_msg']
+            err_node.text = self.error_msg
             return etree.tostring(root, encoding='unicode')
 
 

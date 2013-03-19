@@ -205,7 +205,10 @@
           position: relative;
           width: 100%;
 
-          p {
+          section {
+            color: $base-font-color;
+            font: normal 1em/1.6em $serif;
+            margin: 0px;
             height: 100%;
             overflow: hidden;
             text-overflow: ellipsis;

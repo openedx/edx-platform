@@ -1,15 +1,41 @@
-// Wrapper for RequireJS. It will make the standard requirejs(), require(), and
-// define() functions from Require JS available inside the anonymous function.
-//
-// See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
-
 define(
     ['logme', 'state', 'config_parser', 'container', 'base_image', 'scroller', 'draggables', 'targets', 'update_input'],
     function (logme, State, configParser, Container, BaseImage, Scroller, Draggables, Targets, updateInput) {
     return Main;
 
     function Main() {
+
+        // https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array/every
+        //
+        // Array.prototype.every is a recent addition to the ECMA-262 standard; as such it may not be present in
+        // other implementations of the standard.
+        if (!Array.prototype.every) {
+            Array.prototype.every = function(fun /*, thisp */) {
+                var thisp, t, len, i;
+
+                if (this == null) {
+                    throw new TypeError();
+                }
+
+                t = Object(this);
+                len = t.length >>> 0;
+                if (typeof fun != 'function') {
+                    throw new TypeError();
+                }
+
+                thisp = arguments[1];
+
+                for (i = 0; i < len; i++) {
+                    if (i in t && !fun.call(thisp, t[i], i, t)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            };
+        }
+
         $('.drag_and_drop_problem_div').each(processProblem);
     }
 
@@ -59,7 +85,7 @@ define(
                 return;
             }
 
-            Targets(state);
+            Targets.initializeBaseTargets(state);
             Scroller(state);
             Draggables.init(state);
 
@@ -72,10 +98,5 @@ define(
             }
         }());
     }
-});
-
-// End of wrapper for RequireJS. As you can see, we are passing
-// namespaced Require JS variables to an anonymous function. Within
-// it, you can use the standard requirejs(), require(), and define()
-// functions as if they were in the global namespace.
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define)
+}); // End-of: define(
+}(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

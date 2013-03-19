@@ -47,7 +47,7 @@ class CorrectMap(object):
             queuestate=None, **kwargs):
 
         if answer_id is not None:
-            self.cmap[answer_id] = {'correctness': correctness,
+            self.cmap[str(answer_id)] = {'correctness': correctness,
                                     'npoints': npoints,
                                     'msg': msg,
                                     'hint': hint,

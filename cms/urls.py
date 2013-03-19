@@ -104,3 +104,9 @@ if settings.ENABLE_JASMINE:
     urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 urlpatterns = patterns(*urlpatterns)
+
+#Custom error pages
+handler404 = 'contentstore.views.render_404'
+handler500 = 'contentstore.views.render_500'
+
+

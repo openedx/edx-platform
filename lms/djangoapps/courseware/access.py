@@ -164,7 +164,7 @@ def _has_access_course_desc(user, course, action):
         if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
             # if this feature is on, only allow courses that have ispublic set to be
             # seen by non-staff
-            if course.metadata.get('ispublic'):
+            if course.lms.ispublic:
                 debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
                 return True
             return _has_staff_access_to_descriptor(user, course)
@@ -240,7 +240,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
             return True
 
         # Check start date
-        if descriptor.start is not None:
+        if descriptor.lms.start is not None:
             now = time.gmtime()
             effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
             if now > effective_start:
@@ -495,9 +495,9 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
     NOTE: If testing manually, make sure MITX_FEATURES['DISABLE_START_DATES'] = False
     in envs/dev.py!
     """
-    if descriptor.days_early_for_beta is None:
+    if descriptor.lms.days_early_for_beta is None:
         # bail early if no beta testing is set up
-        return descriptor.start
+        return descriptor.lms.start
 
     user_groups = [g.name for g in user.groups.all()]
 
@@ -508,13 +508,13 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
         # subtract, convert back.
         # (fun fact: datetime(*a_time_struct[:6]) is the beautiful syntax for
         # converting time_structs into datetimes)
-        start_as_datetime = datetime(*descriptor.start[:6])
-        delta = timedelta(descriptor.days_early_for_beta)
+        start_as_datetime = datetime(*descriptor.lms.start[:6])
+        delta = timedelta(descriptor.lms.days_early_for_beta)
         effective = start_as_datetime - delta
         # ...and back to time_struct
         return effective.timetuple()
 
-    return descriptor.start
+    return descriptor.lms.start
 
 
 def _has_instructor_access_to_location(user, location, course_context=None):

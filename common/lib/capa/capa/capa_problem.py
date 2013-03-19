@@ -39,11 +39,11 @@ import verifiers
 import verifiers.draganddrop
 
 import calc
-from correctmap import CorrectMap
+from .correctmap import CorrectMap
 import eia
 import inputtypes
 import customrender
-from util import contextualize_text, convert_files_to_filenames
+from .util import contextualize_text, convert_files_to_filenames
 import xqueue_interface
 
 # to be replaced with auto-registering
@@ -78,7 +78,7 @@ global_context = {'random': random,
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam", "openendedrubric"]
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 #-----------------------------------------------------------------------------
 # main class for this module
@@ -108,6 +108,8 @@ class LoncapaProblem(object):
         self.do_reset()
         self.problem_id = id
         self.system = system
+        if self.system is None:
+            raise Exception()
         self.seed = seed
 
         if state:

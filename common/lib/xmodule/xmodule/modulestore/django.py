@@ -33,11 +33,12 @@ def modulestore(name='default'):
         class_ = load_function(settings.MODULESTORE[name]['ENGINE'])
 
         options = {}
+
         options.update(settings.MODULESTORE[name]['OPTIONS'])
         for key in FUNCTION_KEYS:
             if key in options:
                 options[key] = load_function(options[key])
-
+                
         _MODULESTORES[name] = class_(
             **options
         )

@@ -1,0 +1,271 @@
+from lettuce import world, step
+from lettuce.django import django_url
+from selenium.webdriver.support.ui import Select
+import random
+import textwrap
+from common import i_am_registered_for_the_course, TEST_SECTION_NAME, section_location
+from terrain.factories import ItemFactory
+from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
+                        ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
+                        StringResponseXMLFactory, NumericalResponseXMLFactory, \
+                        FormulaResponseXMLFactory, CustomResponseXMLFactory
+
+# Factories from capa.tests.response_xml_factory that we will use
+# to generate the problem XML, with the keyword args used to configure
+# the output.
+PROBLEM_FACTORY_DICT = {
+    'drop down': {
+        'factory': OptionResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Option 2',
+            'options': ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+            'correct_option': 'Option 2'}},
+
+    'multiple choice': {
+        'factory': MultipleChoiceResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Choice 3',
+            'choices': [False, False, True, False],
+            'choice_names': ['choice_1', 'choice_2', 'choice_3', 'choice_4']}},
+
+    'checkbox': {
+        'factory': ChoiceResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Choices 1 and 3',
+            'choice_type': 'checkbox',
+            'choices': [True, False, True, False, False],
+            'choice_names': ['Choice 1', 'Choice 2', 'Choice 3', 'Choice 4']}},
+
+    'string': {
+        'factory': StringResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The answer is "correct string"',
+            'case_sensitive': False,
+            'answer': 'correct string'}},
+
+    'numerical': {
+        'factory': NumericalResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The answer is pi + 1',
+            'answer': '4.14159',
+            'tolerance': '0.00001',
+            'math_display': True}},
+
+    'formula': {
+        'factory': FormulaResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The solution is [mathjax]x^2+2x+y[/mathjax]',
+            'sample_dict': {'x': (-100, 100), 'y': (-100, 100)},
+            'num_samples': 10,
+            'tolerance': 0.00001,
+            'math_display': True,
+            'answer': 'x^2+2*x+y'}},
+
+    'script': {
+        'factory': CustomResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'Enter two integers that sum to 10.',
+            'cfn': 'test_add_to_ten',
+            'expect': '10',
+            'num_inputs': 2,
+            'script': textwrap.dedent("""
+                def test_add_to_ten(expect,ans):
+                    try:
+                        a1=int(ans[0])
+                        a2=int(ans[1])
+                    except ValueError:
+                        a1=0
+                        a2=0
+                    return (a1+a2)==int(expect)
+            """)}},
+       }
+
+
+def add_problem_to_course(course, problem_type):
+
+    assert(problem_type in PROBLEM_FACTORY_DICT)
+
+    # Generate the problem XML using capa.tests.response_xml_factory
+    factory_dict = PROBLEM_FACTORY_DICT[problem_type]
+    problem_xml = factory_dict['factory'].build_xml(**factory_dict['kwargs'])
+
+    # Create a problem item using our generated XML
+    # We set rerandomize=always in the metadata so that the "Reset" button
+    # will appear.
+    problem_item = ItemFactory.create(parent_location=section_location(course),
+                        template="i4x://edx/templates/problem/Blank_Common_Problem",
+                        display_name=str(problem_type),
+                        data=problem_xml,
+                        metadata={'rerandomize': 'always'})
+
+
+@step(u'I am viewing a "([^"]*)" problem')
+def view_problem(step, problem_type):
+    i_am_registered_for_the_course(step, 'model_course')
+
+    # Ensure that the course has this problem type
+    add_problem_to_course('model_course', problem_type)
+
+    # Go to the one section in the factory-created course
+    # which should be loaded with the correct problem
+    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    section_name = chapter_name
+    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
+                    (chapter_name, section_name))
+
+    world.browser.visit(url)
+
+
+@step(u'I answer a "([^"]*)" problem "([^"]*)ly"')
+def answer_problem(step, problem_type, correctness):
+    """ Mark a given problem type correct or incorrect, then submit it.
+
+    *problem_type* is a string representing the type of problem (e.g. 'drop down')
+    *correctness* is in ['correct', 'incorrect']
+    """
+
+    assert(correctness in ['correct', 'incorrect'])
+
+    if problem_type == "drop down":
+        select_name = "input_i4x-edx-model_course-problem-drop_down_2_1"
+        option_text = 'Option 2' if correctness == 'correct' else 'Option 3'
+        world.browser.select(select_name, option_text)
+
+    elif problem_type == "multiple choice":
+        if correctness == 'correct':
+            inputfield('multiple choice', choice='choice_3').check()
+        else:
+            inputfield('multiple choice', choice='choice_2').check()
+
+    elif problem_type == "checkbox":
+        if correctness == 'correct':
+            inputfield('checkbox', choice='choice_0').check()
+            inputfield('checkbox', choice='choice_2').check()
+        else:
+            inputfield('checkbox', choice='choice_3').check()
+
+    elif problem_type == 'string':
+        textvalue = 'correct string' if correctness == 'correct' else 'incorrect'
+        inputfield('string').fill(textvalue)
+
+    elif problem_type == 'numerical':
+        textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2, 2))
+        inputfield('numerical').fill(textvalue)
+
+    elif problem_type == 'formula':
+        textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
+        inputfield('formula').fill(textvalue)
+
+    elif problem_type == 'script':
+        # Correct answer is any two integers that sum to 10
+        first_addend = random.randint(-100, 100)
+        second_addend = 10 - first_addend
+
+        # If we want an incorrect answer, then change
+        # the second addend so they no longer sum to 10
+        if correctness == 'incorrect':
+            second_addend += random.randint(1, 10)
+
+        inputfield('script', input_num=1).fill(str(first_addend))
+        inputfield('script', input_num=2).fill(str(second_addend))
+
+    # Submit the problem
+    check_problem(step)
+
+
+@step(u'I check a problem')
+def check_problem(step):
+    world.browser.find_by_css("input.check").click()
+
+
+@step(u'I reset the problem')
+def reset_problem(step):
+    world.browser.find_by_css('input.reset').click()
+
+
+@step(u'My "([^"]*)" answer is marked "([^"]*)"')
+def assert_answer_mark(step, problem_type, correctness):
+    """ Assert that the expected answer mark is visible for a given problem type.
+
+    *problem_type* is a string identifying the type of problem (e.g. 'drop down')
+    *correctness* is in ['correct', 'incorrect', 'unanswered']
+
+    Asserting that a problem is marked 'unanswered' means that
+    the problem is NOT marked correct and NOT marked incorrect.
+    This can occur, for example, if the user has reset the problem.  """
+
+    # Dictionaries that map problem types to the css selectors
+    # for correct/incorrect marks.
+    # The elements are lists of selectors because a particular problem type
+    # might be marked in multiple ways.
+    # For example, multiple choice is marked incorrect differently
+    # depending on whether the user selects an incorrect
+    # item or submits without selecting any item)
+    correct_selectors = {'drop down': ['span.correct'],
+                           'multiple choice': ['label.choicegroup_correct'],
+                            'checkbox': ['span.correct'],
+                            'string': ['div.correct'],
+                            'numerical': ['div.correct'],
+                            'formula': ['div.correct'],
+                            'script': ['div.correct'], }
+
+    incorrect_selectors = {'drop down': ['span.incorrect'],
+                           'multiple choice': ['label.choicegroup_incorrect',
+                                                'span.incorrect'],
+                            'checkbox': ['span.incorrect'],
+                            'string': ['div.incorrect'],
+                            'numerical': ['div.incorrect'],
+                            'formula': ['div.incorrect'],
+                            'script': ['div.incorrect']}
+
+    assert(correctness in ['correct', 'incorrect', 'unanswered'])
+    assert(problem_type in correct_selectors and problem_type in incorrect_selectors)
+
+    # Assert that the question has the expected mark
+    # (either correct or incorrect)
+    if correctness in ["correct", "incorrect"]:
+
+        selector_dict = correct_selectors if correctness == "correct" else incorrect_selectors
+
+        # At least one of the correct selectors should be present
+        for sel in selector_dict[problem_type]:
+            has_expected_mark = world.browser.is_element_present_by_css(sel, wait_time=4)
+
+            # As soon as we find the selector, break out of the loop
+            if has_expected_mark:
+                break
+
+        # Expect that we found the right mark (correct or incorrect)
+        assert(has_expected_mark)
+
+    # Assert that the question has neither correct nor incorrect
+    # because it is unanswered (possibly reset)
+    else:
+        # Get all the correct/incorrect selectors for this problem type
+        selector_list = correct_selectors[problem_type] + incorrect_selectors[problem_type]
+
+        # Assert that none of the correct/incorrect selectors are present
+        for sel in selector_list:
+            assert(world.browser.is_element_not_present_by_css(sel, wait_time=4))
+
+
+def inputfield(problem_type, choice=None, input_num=1):
+    """ Return the <input> element for *problem_type*.
+    For example, if problem_type is 'string', return
+    the text field for the string problem in the test course.
+
+    *choice* is the name of the checkbox input in a group
+    of checkboxes. """
+
+    sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
+            (problem_type.replace(" ", "_"), str(input_num)))
+
+    if choice is not None:
+        base = "_choice_" if problem_type == "multiple choice" else "_"
+        sel = sel + base + str(choice)
+
+    # If the input element doesn't exist, fail immediately
+    assert(world.browser.is_element_present_by_css(sel, wait_time=4))
+
+    # Retrieve the input element
+    return world.browser.find_by_css(sel)

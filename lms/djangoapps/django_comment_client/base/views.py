@@ -72,12 +72,12 @@ def create_thread(request, course_id, commentable_id):
     course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
 
-    if course.metadata.get("allow_anonymous", True):
+    if course.allow_anonymous:
         anonymous = post.get('anonymous', 'false').lower() == 'true'
     else:
         anonymous = False
 
-    if course.metadata.get("allow_anonymous_to_peers", False):
+    if course.allow_anonymous_to_peers:
         anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
     else:
         anonymous_to_peers = False
@@ -96,7 +96,7 @@ def create_thread(request, course_id, commentable_id):
     #kevinchugh because the new requirement is that all groups will be determined
     #by the group id in the request this all goes away
     #not anymore, only for admins
-    
+
     # Cohort the thread if the commentable is cohorted.
     if is_commentable_cohorted(course_id, commentable_id):
         user_group_id = get_cohort_id(user, course_id)
@@ -113,9 +113,13 @@ def create_thread(request, course_id, commentable_id):
 
         if group_id:
             thread.update_attributes(group_id=group_id)
-    
+
     thread.save()
 
+    #patch for backward compatibility to comments service
+    if not 'pinned' in thread.attributes:
+        thread['pinned'] = False
+    
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
@@ -147,12 +151,12 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
     comment = cc.Comment(**extract(post, ['body']))
 
     course = get_course_with_access(request.user, course_id, 'load')
-    if course.metadata.get("allow_anonymous", True):
+    if course.allow_anonymous:
         anonymous = post.get('anonymous', 'false').lower() == 'true'
     else:
         anonymous = False
 
-    if course.metadata.get("allow_anonymous_to_peers", False):
+    if course.allow_anonymous_to_peers:
         anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
     else:
         anonymous_to_peers = False
@@ -287,6 +291,21 @@ def undo_vote_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unvote(thread)
+    return JsonResponse(utils.safe_content(thread.to_dict()))
+
+@require_POST
+@login_required
+@permitted
+def pin_thread(request, course_id, thread_id):
+    user = cc.User.from_django_user(request.user)
+    thread = cc.Thread.find(thread_id)
+    thread.pin(user,thread_id)
+    return JsonResponse(utils.safe_content(thread.to_dict()))
+
+def un_pin_thread(request, course_id, thread_id):
+    user = cc.User.from_django_user(request.user)
+    thread = cc.Thread.find(thread_id)
+    thread.un_pin(user,thread_id)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 

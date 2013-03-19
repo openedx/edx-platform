@@ -54,6 +54,7 @@ def test_system():
         debug=True,
         xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10},
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
+        xblock_model_data=lambda descriptor: descriptor._model_data,
         anonymous_student_id='student',
         open_ended_grading_interface= open_ended_grading_interface
     )
