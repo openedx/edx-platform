@@ -1,6 +1,6 @@
 from student.tests.factories import (UserFactory, UserProfileFactory,
                                     RegistrationFactory, GroupFactory, 
-                                    CourseEnrollmentAllowed,
+                                    CourseEnrollmentAllowed, CourseEnrollment,
                                     CourseFactory, ItemFactory)
 from lettuce import world
 
@@ -33,6 +33,14 @@ class RegistrationFactory(RegistrationFactory):
 class GroupFactory(GroupFactory):
     """
     Groups for user permissions for courses
+    """ 
+    pass
+
+
+@world.absorb
+class CourseEnrollment(CourseEnrollment):
+    """
+    Courses that the user is enrolled in
     """ 
     pass
 

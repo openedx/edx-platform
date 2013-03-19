@@ -4,7 +4,6 @@ from selenium.webdriver.support.ui import Select
 import random
 import textwrap
 from common import i_am_registered_for_the_course, TEST_SECTION_NAME, section_location
-from terrain.factories import ItemFactory
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
                         ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
                         StringResponseXMLFactory, NumericalResponseXMLFactory, \
@@ -92,7 +91,7 @@ def add_problem_to_course(course, problem_type):
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    problem_item = ItemFactory.create(parent_location=section_location(course),
+    problem_item = world.ItemFactory.create(parent_location=section_location(course),
                         template="i4x://edx/templates/problem/Blank_Common_Problem",
                         display_name=str(problem_type),
                         data=problem_xml,

@@ -5,7 +5,6 @@ from lettuce.django import django_url
 from django.conf import settings
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-from terrain.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import _MODULESTORES, modulestore
 from xmodule.templates import update_templates
@@ -101,15 +100,15 @@ def create_course(step, course):
     # Create the course
     # We always use the same org and display name,
     # but vary the course identifier (e.g. 600x or 191x)
-    course = CourseFactory.create(org=TEST_COURSE_ORG,
+    course = world.CourseFactory.create(org=TEST_COURSE_ORG,
                                 number=course,
                                 display_name=TEST_COURSE_NAME)
 
     # Add a section to the course to contain problems
-    section = ItemFactory.create(parent_location=course.location,
+    section = world.ItemFactory.create(parent_location=course.location,
                                 display_name=TEST_SECTION_NAME)
 
-    problem_section = ItemFactory.create(parent_location=section.location,
+    problem_section = world.ItemFactory.create(parent_location=section.location,
                                         template='i4x://edx/templates/sequential/Empty',
                                         display_name=TEST_SECTION_NAME)
 
@@ -131,7 +130,7 @@ def i_am_registered_for_the_course(step, course):
 
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
 def add_tab_to_course(step, course, extra_tab_name):
-    section_item = ItemFactory.create(parent_location=course_location(course),
+    section_item = world.ItemFactory.create(parent_location=course_location(course),
                                     template="i4x://edx/templates/static_tab/Empty",
                                     display_name=str(extra_tab_name))
 

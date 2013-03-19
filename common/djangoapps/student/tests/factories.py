@@ -1,8 +1,8 @@
 from student.models import (User, UserProfile, Registration, 
-                            CourseEnrollmentAllowed)
+                            CourseEnrollmentAllowed, CourseEnrollment)
 from django.contrib.auth.models import Group
 from datetime import datetime
-from factory import Factory
+from factory import Factory, SubFactory
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from time import gmtime
@@ -48,6 +48,13 @@ class UserFactory(Factory):
     is_superuser = False
     last_login = datetime(2012, 1, 1)
     date_joined = datetime(2011, 1, 1)
+
+
+class CourseEnrollmentFactory(Factory):
+    FACTORY_FOR = CourseEnrollment
+
+    user = SubFactory(UserFactory)
+    course_id = 'edX/toy/2012_Fall'
 
 
 class CourseEnrollmentAllowedFactory(Factory):
