@@ -7,8 +7,6 @@ from selenium.common.exceptions import WebDriverException, StaleElementReference
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-from terrain.factories import UserFactory, RegistrationFactory, UserProfileFactory
-from terrain.factories import CourseFactory, GroupFactory
 from xmodule.modulestore.django import _MODULESTORES, modulestore
 from xmodule.templates import update_templates
 from auth.authz import get_user_by_email
@@ -61,7 +59,7 @@ def create_studio_user(
         email='robot+studio@edx.org',
         password='test',
         is_staff=False):
-    studio_user = UserFactory.build(
+    studio_user = world.UserFactory.build(
         username=uname,
         email=email,
         password=password,
@@ -69,11 +67,11 @@ def create_studio_user(
     studio_user.set_password(password)
     studio_user.save()
 
-    registration = RegistrationFactory(user=studio_user)
+    registration = world.RegistrationFactory(user=studio_user)
     registration.register(studio_user)
     registration.activate()
 
-    user_profile = UserProfileFactory(user=studio_user)
+    user_profile = world.UserProfileFactory(user=studio_user)
 
 
 def flush_xmodule_store():
@@ -175,11 +173,11 @@ def log_into_studio(
 
 
 def create_a_course():
-    c = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    c = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
-    g = GroupFactory.create(name='instructor_MITx/999/Robot_Super_Course')
+    g = world.GroupFactory.create(name='instructor_MITx/999/Robot_Super_Course')
     u = get_user_by_email('robot+studio@edx.org')
     u.groups.add(g)
     u.save()

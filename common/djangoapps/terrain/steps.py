@@ -119,11 +119,11 @@ def create_user(uname):
     portal_user.set_password('test')
     portal_user.save()
 
-    registration = RegistrationFactory(user=portal_user)
+    registration = world.RegistrationFactory(user=portal_user)
     registration.register(portal_user)
     registration.activate()
 
-    user_profile = UserProfileFactory(user=portal_user)
+    user_profile = world.UserProfileFactory(user=portal_user)
 
 
 @world.absorb
