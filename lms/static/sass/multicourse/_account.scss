@@ -180,12 +180,12 @@
 
   .content {
     margin-right: ($baseline*2);
-    width: 660px;
+    width: 600px;
     float: left;
   }
 
   aside {
-    width: 220px;
+    width: 280px;
     float: left;
 
     p, ol, ul {
@@ -461,10 +461,14 @@
   .submission-error, .system-error {
     @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
     border-bottom: 3px solid shade($red, 10%);
-    background: tint($red,80%);
+    background: tint($red,95%);
 
     .message-title {
-      color: shade($red, 10%);
+      color: shade($red, 10%) !important;
+    }
+
+    .message-copy {
+
     }
   }
 
@@ -485,6 +489,7 @@
 
     header {
       height: 120px;
+      border-bottom: 1px solid $m-gray;
       background: transparent url("../images/bg-banner-login.png") 0 0 no-repeat;
     }
   }
@@ -498,6 +503,7 @@
 
     header {
       height: 120px;
+      border-bottom: 1px solid $m-gray;
       background: transparent url("../images/bg-banner-register.png") 0 0 no-repeat;
     }
   }
@@ -518,15 +524,15 @@
 
   .inner-wrapper {
     @include border-radius(2px);
-    background: $m-gray-l1;
+    background: $white;
     padding-bottom: 0 !important;
   }
 
   #password-reset {
+    padding: $baseline;
 
     header {
-      border-bottom: 1px solid tint($m-gray,70%);
-      background-image: none;
+      margin: 0;
       padding: 0;
 
       &:before {
@@ -534,21 +540,24 @@
       }
 
       h2 {
-        font-size: em(24);
-        font-weight: 700;
-        text-transform: none;
+        @extend .heading-2;
+        text-align: left;
       }
     }
 
     fieldset {
-      padding: 0 !important;
-      margin: ($baseline*1.25) 0 !important;
+      margin-bottom: ($baseline/2);
+      padding: 0;
+    }
+
+    .instructions p {
+      margin-bottom: ($baseline/4);
     }
 
     form {
       @include border-radius(0);
       @include box-shadow(none);
-      margin: $baseline 0;
+      margin: 0;
       border: none;
       padding: 0;
 
@@ -576,9 +585,13 @@
   }
 
   .modal-form-error {
-    @include border-radius(2px);
-    border: 1px solid tint($red,65%);
-    background: tint($red,98%);
-    color: $red;
+    @extend .body-text;
+    @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
+    @include box-sizing(border-box);
+    margin: $baseline 0 ($baseline/2) 0 !important;
+    padding: $baseline;
+    border: none;
+    border-bottom: 3px solid shade($red, 10%);
+    background: tint($red,95%);
   }
 }
