@@ -1299,12 +1299,11 @@ def get_checklists(request, org, course, name):
     template_module = modulestore.get_item(new_course_template)
 
     # If course was created before checklists were introduced, copy them over from the template.
-    key = "checklists"
-    if not key in course_module.metadata:
-        course_module.metadata[key] = template_module.metadata[key]
-        modulestore.update_metadata(location, course_module.metadata)
+    if not course_module.checklists:
+        course_module.checklists = template_module.checklists
+        modulestore.update_metadata(location, own_metadata(course_module))
 
-    checklists = course_module.metadata[key]
+    checklists = course_module.checklists
     return render_to_response('checklists.html',
         {
             'context_course': course_module,
@@ -1318,17 +1317,16 @@ def update_checklist(request, org, course, name, checklist_index=None):
     location = get_location_and_verify_access(request, org, course, name)
     modulestore = get_modulestore(location)
     course_module = modulestore.get_item(location)
-    key = "checklists"
 
     real_method = get_request_method(request)
     if checklist_index is not None and (real_method == 'POST' or real_method == 'PUT'):
         modified_checklist = json.loads(request.body)
-        (course_module.metadata[key])[int(checklist_index)] = modified_checklist
-        modulestore.update_metadata(location, course_module.metadata)
+        course_module.checklists[int(checklist_index)] = modified_checklist
+        modulestore.update_metadata(location, own_metadata(course_module))
         return HttpResponse(json.dumps(modified_checklist), mimetype="application/json")
     elif request.method == 'GET':
         # TODO: Would we ever get in this condition? Any point in having this code?
-        return HttpResponse(json.dumps(course_module.metadata[key]), mimetype="application/json")
+        return HttpResponse(json.dumps(course_module.checklists), mimetype="application/json")
 
 
 @login_required

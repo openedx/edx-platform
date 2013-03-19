@@ -1,4 +1,11 @@
-<section class="course-checklist" id="<%= 'course-checklist' + checklistIndex %>">
+<% var allChecked = itemsChecked == items.length; %>
+<section
+    <% if (allChecked) { %>
+    class="course-checklist is-completed"
+    <% } else { %>
+    class="course-checklist"
+    <% } %>
+    id="<%= 'course-checklist' + checklistIndex %>">
     <% var widthPercentage = 'width:' + percentChecked + '%;'; %>
     <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value" style="<%= widthPercentage %>">
         <span class="int"><%= percentChecked %></span>% of checklist completed</span></span>
