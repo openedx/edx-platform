@@ -493,7 +493,10 @@ class MongoModuleStore(ModuleStoreBase):
         try:
             source_item = self.collection.find_one(location_to_query(source))
             source_item['_id'] = Location(location).dict()
-            self.collection.insert(source_item)
+            self.collection.insert(source_item,
+                # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
+                # from overriding our default value set in the init method.
+                safe=self.collection.safe)
             item = self._load_items([source_item])[0]
 
             # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
@@ -556,6 +559,9 @@ class MongoModuleStore(ModuleStoreBase):
             {'$set': update},
             multi=False,
             upsert=True,
+            # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
+            # from overriding our default value set in the init method.
+            safe=self.collection.safe
         )
         if result['n'] == 0:
             raise ItemNotFoundError(location)
@@ -626,7 +632,10 @@ class MongoModuleStore(ModuleStoreBase):
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
             self.update_metadata(course.location, own_metadata(course))
 
-        self.collection.remove({'_id': Location(location).dict()})
+        self.collection.remove({'_id': Location(location).dict()},
+            # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
+            # from overriding our default value set in the init method.
+            safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
         self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)
 
