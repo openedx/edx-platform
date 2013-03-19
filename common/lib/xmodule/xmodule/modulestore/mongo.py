@@ -303,6 +303,7 @@ class MongoModuleStore(ModuleStoreBase):
                     # this is likely a leaf node, so let's record what metadata we need to inherit
                     metadata_to_inherit[child] = my_metadata
 
+
         if root is not None:
             _compute_inherited_metadata(root)
 
@@ -330,7 +331,7 @@ class MongoModuleStore(ModuleStoreBase):
         return tree
 
     def clear_cached_metadata_inheritance_tree(self, location):
-        key_name = '{0}/{1}'.format(location.org, location.course)       
+        key_name = '{0}/{1}'.format(location.org, location.course)
         if self.metadata_inheritance_cache is not None:
             self.metadata_inheritance_cache.delete(key_name)
 
@@ -387,12 +388,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         resource_fs = OSFS(root)
 
-        metadata_inheritance_tree = None
-
-        # if we are loading a course object, there is no parent to inherit the metadata from
-        # so don't bother getting it
-        if item['location']['category'] != 'course':
-            metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']))
+        metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']))
 
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
@@ -612,7 +608,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         self._update_single_item(location, {'metadata': metadata})
         # recompute (and update) the metadata inheritance tree which is cached
-        self.get_cached_metadata_inheritance_tree(loc, force_refresh = True)      
+        self.get_cached_metadata_inheritance_tree(loc, force_refresh = True)
 
     def delete_item(self, location):
         """
@@ -632,7 +628,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         self.collection.remove({'_id': Location(location).dict()})
         # recompute (and update) the metadata inheritance tree which is cached
-        self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)  
+        self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)
 
 
     def get_parent_locations(self, location, course_id):
