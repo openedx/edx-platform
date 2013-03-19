@@ -22,12 +22,12 @@ The main container for a single instance of Conditional module. The following at
 be specified for this tag::
 
     sources - location id of required modules, separated by ';'
-    message - message for case, where one or more are not passed. Here you can use variable {link}, which generate link to required module.
+    [message | ""] - message for case, where one or more are not passed. Here you can use variable {link}, which generate link to required module.
 
-    completed - map to `is_completed` module method
-    attempted - map to `is_attempted` module method
-    poll_answer - map to `poll_answer` module attribute
-    voted - map to `voted` module attribute
+    [completed] - map to `is_completed` module method
+    [attempted] - map to `is_attempted` module method
+    [poll_answer] - map to `poll_answer` module attribute
+    [voted] - map to `voted` module attribute
 
 show tag
 --------
@@ -47,9 +47,9 @@ Examples of conditional depends on poll
 
     <conditional sources="i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
     message="{link} must be answered for this to become visible.">
-    <html>
-        <h2>You see this, cause your vote value for "First question" was "man"</h2>
-    </html>
+        <html>
+            <h2>You see this, cause your vote value for "First question" was "man"</h2>
+        </html>
     </conditional>
 
 Examples of conditional depends on poll (use <show> tag)
@@ -59,9 +59,9 @@ Examples of conditional depends on poll (use <show> tag)
 
     <conditional sources="i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
     message="{link} must be answered for this to become visible.">
-    <html>
-        <show sources="i4x://MITx/0.000x/problem/test_1; i4x://MITx/0.000x/Video/Avi_resources; i4x://MITx/0.000x/problem/test_1"/>
-    </html>
+        <html>
+            <show sources="i4x://MITx/0.000x/problem/test_1; i4x://MITx/0.000x/Video/Avi_resources; i4x://MITx/0.000x/problem/test_1"/>
+        </html>
     </conditional>
 
 Examples of conditional depends on problem

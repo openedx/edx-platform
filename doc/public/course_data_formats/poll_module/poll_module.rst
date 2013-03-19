@@ -22,9 +22,9 @@ poll_question tag
 Xmodule for creating poll functionality - voting system. The following attributes can
 be specified for this tag::
 
-    name - Name
-    display_name - Display name
-    reset - Can reset/revote many time (value = True/False)
+    name - Name of xmodule.
+    [display_name| AUTOGENERATE] - Display name of xmodule. When this attribute is not defined - display name autogenerate with some hash.
+    [reset | False] - Can reset/revote many time (value = True/False)
 
 
 answer tag
