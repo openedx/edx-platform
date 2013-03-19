@@ -216,7 +216,7 @@ def signin_user(request):
     This view will display the non-modal login form
     """
     context = {}
-    return render_to_response('login.html', context)
+    return render_to_response('accounts_login.html', context)
 
 def register_user(request):
     """
@@ -1160,10 +1160,10 @@ def test_center_login(request):
     if not timelimit_descriptor:
         log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
-        
-    timelimit_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id, testcenteruser.user, 
+
+    timelimit_module_cache = ModuleDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
                                                                                  timelimit_descriptor, depth=None)
-    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor, 
+    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
                                                  timelimit_module_cache, course_id, position=None)
     if not timelimit_module.category == 'timelimit':
         log.error("cand {} on exam {} for course {}: non-timelimit module at location {}".format(client_candidate_id, exam_series_code, course_id, location))
