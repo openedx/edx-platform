@@ -967,12 +967,13 @@ registry.register(DesignProtein2dInput)
 
 class EditAGeneInput(InputTypeBase):
     """
-        An input type for editing a gene. Integrates with the genex java applet.
+        An input type for editing a gene.
+        Integrates with the genex GWT application.
 
         Example:
 
-        <editagene width="800" hight="500" dna_sequence="ETAAGGCTATAACCGA" />
-        """
+        <editagene genex_dna_sequence="CGAT" genex_problem_number="1"/>
+    """
 
     template = "editageneinput.html"
     tags = ['editageneinput']
@@ -982,9 +983,7 @@ class EditAGeneInput(InputTypeBase):
         """
         Note: width, height, and dna_sequencee are required.
         """
-        return [Attribute('width'),
-                Attribute('height'),
-                Attribute('dna_sequence'),
+        return [Attribute('genex_dna_sequence'),
                 Attribute('genex_problem_number')
                 ]
 
