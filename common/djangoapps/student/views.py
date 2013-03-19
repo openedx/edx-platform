@@ -216,7 +216,7 @@ def signin_user(request):
     This view will display the non-modal login form
     """
     context = {}
-    return render_to_response('accounts_login.html', context)
+    return render_to_response('login.html', context)
 
 def register_user(request):
     """
@@ -366,7 +366,7 @@ def change_enrollment(request):
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
 
-    return render_to_response('login.html', {'error': error})
+    return render_to_response('accounts_login.html', {'error': error})
 
 
 # Need different levels of logging
@@ -1161,8 +1161,8 @@ def test_center_login(request):
         log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
 
-    timelimit_module_cache = ModuleDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
-                                                                                 timelimit_descriptor, depth=None)
+    timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
+                                                                             timelimit_descriptor, depth=None)
     timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
                                                  timelimit_module_cache, course_id, position=None)
     if not timelimit_module.category == 'timelimit':
