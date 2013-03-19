@@ -4,7 +4,12 @@
 <article class="discussion-article" data-id="${discussion_id| h}">
   <a href="#" class="dogear"></a>
   <div class="discussion-post">
+  
     <header>
+    %if thread['group_id']
+      <div class="group-visibility-label">This post visible only to group ${cohort_dictionary[thread['group_id']]}. </div>
+    %endif
+      
         <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>${thread['votes']['up_count']}</span></a>
       <h1>${thread['title']}</h1>
       <p class="posted-details">

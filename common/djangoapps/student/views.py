@@ -44,9 +44,8 @@ from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
-from courseware.models import StudentModuleCache
 from courseware.views import get_module_for_descriptor, jump_to
-from courseware.module_render import get_instance_module
+from courseware.model_data import ModelDataCache
 
 from statsd import statsd
 
@@ -115,7 +114,7 @@ def get_date_for_press(publish_date):
 
 def press(request):
     json_articles = cache.get("student_press_json_articles")
-    if json_articles == None:
+    if json_articles is None:
         if hasattr(settings, 'RSS_URL'):
             content = urllib.urlopen(settings.PRESS_URL).read()
             json_articles = json.loads(content)
@@ -316,7 +315,7 @@ def change_enrollment(request):
     action = request.POST.get("enrollment_action", "")
 
     course_id = request.POST.get("course_id", None)
-    if course_id == None:
+    if course_id is None:
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'There was an error receiving the course id.'}))
 
@@ -333,7 +332,7 @@ def change_enrollment(request):
         if not has_access(user, course, 'enroll'):
             return {'success': False,
                     'error': 'enrollment in {} not allowed at this time'
-                    .format(course.display_name)}
+                    .format(course.display_name_with_default)}
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
@@ -398,7 +397,7 @@ def login_user(request, error=""):
         try:
             login(request, user)
             if request.POST.get('remember') == 'true':
-                request.session.set_expiry(None)  # or change to 604800 for 7 days
+                request.session.set_expiry(604800)
                 log.debug("Setting user session to never expire")
             else:
                 request.session.set_expiry(0)
@@ -567,7 +566,7 @@ def create_account(request, post_override=None):
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
-        js['value'] = "Username should only consist of A-Z and 0-9.".format(field=a)
+        js['value'] = "Username should only consist of A-Z and 0-9, with no spaces.".format(field=a)
         js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
@@ -1161,10 +1160,10 @@ def test_center_login(request):
     if not timelimit_descriptor:
         log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
-
-    timelimit_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
+        
+    timelimit_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id, testcenteruser.user, 
                                                                                  timelimit_descriptor, depth=None)
-    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
+    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor, 
                                                  timelimit_module_cache, course_id, position=None)
     if not timelimit_module.category == 'timelimit':
         log.error("cand {} on exam {} for course {}: non-timelimit module at location {}".format(client_candidate_id, exam_series_code, course_id, location))
@@ -1189,9 +1188,6 @@ def test_center_login(request):
 
     if time_accommodation_code:
         timelimit_module.accommodation_code = time_accommodation_code
-        instance_module = get_instance_module(course_id, testcenteruser.user, timelimit_module, timelimit_module_cache)
-        instance_module.state = timelimit_module.get_instance_state()
-        instance_module.save()
         log.info("cand {} on exam {} for course {}: receiving accommodation {}".format(client_candidate_id, exam_series_code, course_id, time_accommodation_code))
 
     # UGLY HACK!!!
@@ -1215,7 +1211,7 @@ def _get_news(top=None):
     "Return the n top news items on settings.RSS_URL"
 
     feed_data = cache.get("students_index_rss_feed_data")
-    if feed_data == None:
+    if feed_data is None:
         if hasattr(settings, 'RSS_URL'):
             feed_data = urllib.urlopen(settings.RSS_URL).read()
         else:

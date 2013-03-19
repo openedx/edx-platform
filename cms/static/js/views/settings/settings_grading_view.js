@@ -3,9 +3,9 @@ if (!CMS.Views['Settings']) CMS.Views.Settings = {}; // ensure the pseudo pkg ex
 CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGradingPolicy
     events : {
-        "blur input" : "updateModel",
-        "blur textarea" : "updateModel",
-        "blur span[contenteditable=true]" : "updateDesignation",
+        "change input" : "updateModel",
+        "change textarea" : "updateModel",
+        "change span[contenteditable=true]" : "updateDesignation",
         "click .settings-extra header" : "showSettingsExtras",
         "click .new-grade-button" : "addNewGrade",
         "click .remove-button" : "removeGrade",
@@ -44,7 +44,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
             self.render();
         }
         );
-        this.model.on('error', this.handleValidationError, this);
+        this.listenTo(this.model, 'error', CMS.ServerError);
+        this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.model.get('graders').on('remove', this.render, this);
         this.model.get('graders').on('reset', this.render, this);
         this.model.get('graders').on('add', this.render, this);
@@ -90,8 +91,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     setGracePeriod : function(event) {
         event.data.clearValidationErrors();
         var newVal = event.data.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
-        if (event.data.model.get('grace_period') != newVal) event.data.model.save('grace_period', newVal,
-                { error : CMS.ServerError});
+        if (event.data.model.get('grace_period') != newVal) event.data.model.save('grace_period', newVal);
     },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
@@ -227,8 +227,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
                     object[cutoff['designation']] = cutoff['cutoff'] / 100.0;
                     return object;
                 }, 
-                {}),
-                { error : CMS.ServerError});
+                {}));
     },
 
     addNewGrade: function(e) {
@@ -310,15 +309,16 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGrader
     events : {
-        "blur input" : "updateModel",
-        "blur textarea" : "updateModel",
+        "change input" : "updateModel",
+        "change textarea" : "updateModel",
         "click .remove-grading-data" : "deleteModel",
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
         'blur :input' : "inputUnfocus"
     },
     initialize : function() {
-        this.model.on('error', this.handleValidationError, this);
+        this.listenTo(this.model, 'error', CMS.ServerError);
+        this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
         this.render();
     },

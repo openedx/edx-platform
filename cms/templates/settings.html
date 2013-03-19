@@ -23,36 +23,42 @@ from contentstore import utils
   
   <script type="text/javascript">
     $(document).ready(function(){
-    
+      
+      // hilighting labels when fields are focused in
       $("form :input").focus(function() {
         $("label[for='" + this.id + "']").addClass("is-focused");
       }).blur(function() {
         $("label").removeClass("is-focused");
         });
-        
-      var editor = new CMS.Views.Settings.Details({
-          el: $('.settings-details'),
-          model: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true})
-        });
-        
-        editor.render();
+      var model = new CMS.Models.Settings.CourseDetails();
+      model.urlRoot = '${details_url}';
+      model.fetch({success : 
+          function(model) {
+              var editor = new CMS.Views.Settings.Details({
+                  el: $('.settings-details'),
+                  model: model
+                });
+                
+              editor.render();
+          }
+      });
     });
       
   </script>
 </%block>
 
 <%block name="content">
-<div class="wrapper-content wrapper">
-  <section class="content">
-    <header class="page">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-subtitle">
+    <div class="title">
       <span class="title-sub">Settings</span>
       <h1 class="title-1">Schedule &amp; Details</h1>
-    </header>
+    </div>
+  </header>
+</div>
 
-    <!-- <div class="introduction">
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.</p>
-    </div> -->
-
+<div class="wrapper-content wrapper">
+  <section class="content">
     <article class="content-primary" role="main">
       <form id="settings_details" class="settings-details" method="post" action="">
         <section class="group-settings basic">
@@ -64,17 +70,17 @@ from contentstore import utils
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
               <label for="course-organization">Organization</label>
-              <input type="text" class="long" id="course-organization" value="[Course Organization]" disabled="disabled" />
+              <input title="This field is disabled: this information cannot be changed." type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
             </li>
 
             <li class="field text is-not-editable" id="field-course-number">
               <label for="course-number">Course Number</label>
-              <input type="text" class="short" id="course-number" value="[Course No.]" disabled="disabled">
+              <input title="This field is disabled: this information cannot be changed." type="text" class="short" id="course-number" value="[Course No.]" readonly>
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
               <label for="course-name">Course Name</label>
-              <input type="text" class="long" id="course-name" value="[Course Name]" disabled="disabled" />
+              <input title="This field is disabled: this information cannot be changed." type="text" class="long" id="course-name" value="[Course Name]" readonly />
             </li>
           </ol>
           <span class="tip tip-stacked">These are used in <a rel="external" href="${utils.get_lms_link_for_about_page(course_location)}" />your course URL</a>, and cannot be changed</span>
@@ -205,7 +211,7 @@ from contentstore import utils
 
     <aside class="content-supplementary" role="complimentary">
      <div class="bit">
-        <h3 class="title-3">How will these settings be used</h3>
+        <h3 class="title-3">How will these settings be used?</h3>
         <p>Your course's schedule settings determine when students can enroll in and begin a course as well as when the course.</p>
 
         <p>Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.</p>
@@ -220,6 +226,7 @@ from contentstore import utils
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
             <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
           </ul>
         </nav>
       % endif

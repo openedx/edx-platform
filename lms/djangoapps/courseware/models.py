@@ -12,8 +12,10 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class StudentModule(models.Model):
     """
@@ -55,126 +57,174 @@ class StudentModule(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
 
+    def __repr__(self):
+        return 'StudentModule<%r>' % ({
+            'course_id': self.course_id,
+            'module_type': self.module_type,
+            'student': self.student.username,
+            'module_state_key': self.module_state_key,
+            'state': str(self.state)[:20],
+        },)
+
     def __unicode__(self):
-        return '/'.join([self.course_id, self.module_type,
-                         self.student.username, self.module_state_key, str(self.state)[:20]])
+        return unicode(repr(self))
 
 
-# TODO (cpennington): Remove these once the LMS switches to using XModuleDescriptors
+class StudentModuleHistory(models.Model):
+    """Keeps a complete history of state changes for a given XModule for a given
+    Student. Right now, we restrict this to problems so that the table doesn't
+    explode in size."""
+
+    HISTORY_SAVING_TYPES = {'problem'}
+
+    class Meta:
+        get_latest_by = "created"
+
+    student_module = models.ForeignKey(StudentModule, db_index=True)
+    version = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+
+    # This should be populated from the modified field in StudentModule
+    created = models.DateTimeField(db_index=True)
+    state = models.TextField(null=True, blank=True)
+    grade = models.FloatField(null=True, blank=True)
+    max_grade = models.FloatField(null=True, blank=True)
+
+    @receiver(post_save, sender=StudentModule)
+    def save_history(sender, instance, **kwargs):
+        if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
+            history_entry = StudentModuleHistory(student_module=instance,
+                                                 version=None,
+                                                 created=instance.modified,
+                                                 state=instance.state,
+                                                 grade=instance.grade,
+                                                 max_grade=instance.max_grade)
+            history_entry.save()
 
 
-class StudentModuleCache(object):
+class XModuleContentField(models.Model):
     """
-    A cache of StudentModules for a specific student
+    Stores data set in the Scope.content scope by an xmodule field
     """
-    def __init__(self, course_id, user, descriptors, select_for_update=False):
-        '''
-        Find any StudentModule objects that are needed by any descriptor
-        in descriptors. Avoids making multiple queries to the database.
-        Note: Only modules that have store_state = True or have shared
-        state will have a StudentModule.
 
-        Arguments
-        user: The user for which to fetch maching StudentModules
-        descriptors: An array of XModuleDescriptors.
-        select_for_update: Flag indicating whether the rows should be locked until end of transaction
-        '''
-        if user.is_authenticated():
-            module_ids = self._get_module_state_keys(descriptors)
+    class Meta:
+        unique_together = (('definition_id', 'field_name'),)
 
-            # This works around a limitation in sqlite3 on the number of parameters
-            # that can be put into a single query
-            self.cache = []
-            chunk_size = 500
-            for id_chunk in [module_ids[i:i + chunk_size] for i in xrange(0, len(module_ids), chunk_size)]:
-                if select_for_update:
-                    self.cache.extend(StudentModule.objects.select_for_update().filter(
-                        course_id=course_id,
-                        student=user,
-                        module_state_key__in=id_chunk)
-                    )
-                else:
-                    self.cache.extend(StudentModule.objects.filter(
-                        course_id=course_id,
-                        student=user,
-                        module_state_key__in=id_chunk)
-                    )
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
 
-        else:
-            self.cache = []
+    # The definition id for the module
+    definition_id = models.CharField(max_length=255, db_index=True)
 
-    @classmethod
-    def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
-                                         descriptor_filter=lambda descriptor: True,
-                                         select_for_update=False):
-        """
-        obtain and return cache for descriptor descendents (ie children) AND modules required by the descriptor,
-        but which are not children of the module
+    # The value of the field. Defaults to None dumped as json
+    value = models.TextField(default='null')
 
-        course_id: the course in the context of which we want StudentModules.
-        user: the django user for whom to load modules.
-        descriptor: An XModuleDescriptor
-        depth is the number of levels of descendent modules to load StudentModules for, in addition to
-            the supplied descriptor. If depth is None, load all descendent StudentModules
-        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule
-            should be cached
-        select_for_update: Flag indicating whether the rows should be locked until end of transaction
-        """
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
 
-        def get_child_descriptors(descriptor, depth, descriptor_filter):
-            if descriptor_filter(descriptor):
-                descriptors = [descriptor]
-            else:
-                descriptors = []
+    def __repr__(self):
+        return 'XModuleContentField<%r>' % ({
+            'field_name': self.field_name,
+            'definition_id': self.definition_id,
+            'value': self.value,
+        },)
 
-            if depth is None or depth > 0:
-                new_depth = depth - 1 if depth is not None else depth
+    def __unicode__(self):
+        return unicode(repr(self))
 
-                for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
-                    descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
 
-            return descriptors
+class XModuleSettingsField(models.Model):
+    """
+    Stores data set in the Scope.settings scope by an xmodule field
+    """
 
-        descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
+    class Meta:
+        unique_together = (('usage_id', 'field_name'),)
 
-        return StudentModuleCache(course_id, user, descriptors, select_for_update)
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
 
-    def _get_module_state_keys(self, descriptors):
-        '''
-        Get a list of the state_keys needed for StudentModules
-        required for this module descriptor
+    # The usage id for the module
+    usage_id = models.CharField(max_length=255, db_index=True)
 
-        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule
-            should be cached
-        '''
-        keys = []
-        for descriptor in descriptors:
-            if descriptor.stores_state:
-                keys.append(descriptor.location.url())
+    # The value of the field. Defaults to None, dumped as json
+    value = models.TextField(default='null')
 
-            shared_state_key = getattr(descriptor, 'shared_state_key', None)
-            if shared_state_key is not None:
-                keys.append(shared_state_key)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
 
-        return keys
+    def __repr__(self):
+        return 'XModuleSettingsField<%r>' % ({
+            'field_name': self.field_name,
+            'usage_id': self.usage_id,
+            'value': self.value,
+        },)
 
-    def lookup(self, course_id, module_type, module_state_key):
-        '''
-        Look for a student module with the given course_id, type, and id in the cache.
+    def __unicode__(self):
+        return unicode(repr(self))
 
-        cache -- list of student modules
 
-        returns first found object, or None
-        '''
-        for o in self.cache:
-            if (o.course_id == course_id and
-                o.module_type == module_type and
-                o.module_state_key == module_state_key):
-                return o
-        return None
+class XModuleStudentPrefsField(models.Model):
+    """
+    Stores data set in the Scope.student_preferences scope by an xmodule field
+    """
 
-    def append(self, student_module):
-        self.cache.append(student_module)
+    class Meta:
+        unique_together = (('student', 'module_type', 'field_name'),)
+
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
+
+    # The type of the module for these preferences
+    module_type = models.CharField(max_length=64, db_index=True)
+
+    # The value of the field. Defaults to None dumped as json
+    value = models.TextField(default='null')
+
+    student = models.ForeignKey(User, db_index=True)
+
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __repr__(self):
+        return 'XModuleStudentPrefsField<%r>' % ({
+            'field_name': self.field_name,
+            'module_type': self.module_type,
+            'student': self.student.username,
+            'value': self.value,
+        },)
+
+    def __unicode__(self):
+        return unicode(repr(self))
+
+
+class XModuleStudentInfoField(models.Model):
+    """
+    Stores data set in the Scope.student_preferences scope by an xmodule field
+    """
+
+    class Meta:
+        unique_together = (('student', 'field_name'),)
+
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
+
+    # The value of the field. Defaults to None dumped as json
+    value = models.TextField(default='null')
+
+    student = models.ForeignKey(User, db_index=True)
+
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __repr__(self):
+        return 'XModuleStudentInfoField<%r>' % ({
+            'field_name': self.field_name,
+            'student': self.student.username,
+            'value': self.value,
+        },)
+
+    def __unicode__(self):
+        return unicode(repr(self))
 
 
 class OfflineComputedGrade(models.Model):

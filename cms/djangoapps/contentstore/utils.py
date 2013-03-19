@@ -39,10 +39,10 @@ def get_course_location_for_item(location):
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)
         if found_cnt == 0:
-            raise BaseException('Could not find course at {0}'.format(course_search_location))
+            raise Exception('Could not find course at {0}'.format(course_search_location))
 
         if found_cnt > 1:
-            raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+            raise Exception('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
 
         location = courses[0].location
 
@@ -75,12 +75,20 @@ def get_course_for_item(location):
     return courses[0]
 
 
-def get_lms_link_for_item(location, preview=False):
+def get_lms_link_for_item(location, preview=False, course_id=None):
+    if course_id is None:
+        course_id = get_course_id(location)
+
     if settings.LMS_BASE is not None:
-        lms_link = "//{preview}{lms_base}/courses/{course_id}/jump_to/{location}".format(
-            preview='preview.' if preview else '',
-            lms_base=settings.LMS_BASE,
-            course_id=get_course_id(location),
+        if preview:
+            lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE',
+                'preview.' + settings.LMS_BASE)
+        else:
+            lms_base = settings.LMS_BASE
+     
+        lms_link = "//{lms_base}/courses/{course_id}/jump_to/{location}".format(
+            lms_base=lms_base,
+            course_id=course_id,
             location=Location(location)
         )
     else:
@@ -128,7 +136,7 @@ def compute_unit_state(unit):
     'private' content is editabled and not visible in the LMS
     """
 
-    if unit.metadata.get('is_draft', False):
+    if unit.cms.is_draft:
         try:
             modulestore('direct').get_item(unit.location)
             return UnitState.draft

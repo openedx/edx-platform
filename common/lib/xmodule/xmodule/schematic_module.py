@@ -1,6 +1,6 @@
 import json
 
-from x_module import XModule, XModuleDescriptor
+from .x_module import XModule, XModuleDescriptor
 
 
 class ModuleDescriptor(XModuleDescriptor):

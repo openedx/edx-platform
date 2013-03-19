@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
+from . import one_time_startup
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -47,6 +48,10 @@ urlpatterns = ('',
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-grading/(?P<name>[^/]+)$', 'contentstore.views.course_config_graders_page', name='course_settings'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-details/(?P<name>[^/]+)/section/(?P<section>[^/]+).*$', 'contentstore.views.course_settings_updates', name='course_settings'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-grading/(?P<name>[^/]+)/(?P<grader_index>.*)$', 'contentstore.views.course_grader_updates', name='course_settings'),
+    # This is the URL to initially render the course advanced settings.
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-advanced/(?P<name>[^/]+)$', 'contentstore.views.course_config_advanced_page', name='course_advanced_settings'),
+    # This is the URL used by BackBone for updating and re-fetching the model.
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-advanced/(?P<name>[^/]+)/update.*$', 'contentstore.views.course_advanced_updates', name='course_advanced_settings_updates'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<category>[^/]+)/(?P<name>[^/]+)/gradeas.*$', 'contentstore.views.assignment_type_update', name='assignment_type_update'),
 
@@ -99,3 +104,9 @@ if settings.ENABLE_JASMINE:
     urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 urlpatterns = patterns(*urlpatterns)
+
+#Custom error pages
+handler404 = 'contentstore.views.render_404'
+handler500 = 'contentstore.views.render_500'
+
+

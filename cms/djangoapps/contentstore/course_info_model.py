@@ -1,7 +1,7 @@
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from lxml import html
+from lxml import html, etree
 import re
 from django.http import HttpResponseBadRequest
 import logging
@@ -26,9 +26,9 @@ def get_course_updates(location):
 
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = html.fromstring(course_updates.definition['data'])
-    except:
-        course_html_parsed = html.fromstring("<ol></ol>")
+        course_html_parsed = etree.fromstring(course_updates.data)
+    except etree.XMLSyntaxError:
+        course_html_parsed = etree.fromstring("<ol></ol>")
 
     # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
     course_upd_collection = []
@@ -60,13 +60,13 @@ def update_course_updates(location, update, passed_id=None):
     try:
         course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = html.fromstring(course_updates.definition['data'])
-    except:
-        course_html_parsed = html.fromstring("<ol></ol>")
+        course_html_parsed = etree.fromstring(course_updates.data)
+    except etree.XMLSyntaxError:
+        course_html_parsed = etree.fromstring("<ol></ol>")
 
     # No try/catch b/c failure generates an error back to client
     new_html_parsed = html.fromstring('<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>')
@@ -85,13 +85,12 @@ def update_course_updates(location, update, passed_id=None):
             passed_id = course_updates.location.url() + "/" + str(idx)
 
         # update db record
-        course_updates.definition['data'] = html.tostring(course_html_parsed)
-        modulestore('direct').update_item(location, course_updates.definition['data'])
+        course_updates.data = etree.tostring(course_html_parsed)
+        modulestore('direct').update_item(location, course_updates.data)
 
-        return {"id": passed_id,
-                "date": update['date'],
-                "content": update['content']}
-
+        return {"id" : passed_id,
+                "date" : update['date'],
+                "content" :update['content']}
 
 def delete_course_update(location, update, passed_id):
     """
@@ -99,19 +98,19 @@ def delete_course_update(location, update, passed_id):
     Returns the resulting course_updates b/c their ids change.
     """
     if not passed_id:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
     try:
         course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
     # TODO use delete_blank_text parser throughout and cache as a static var in a class
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = html.fromstring(course_updates.definition['data'])
-    except:
-        course_html_parsed = html.fromstring("<ol></ol>")
+        course_html_parsed = etree.fromstring(course_updates.data)
+    except etree.XMLSyntaxError:
+        course_html_parsed = etree.fromstring("<ol></ol>")
 
     if course_html_parsed.tag == 'ol':
         # ??? Should this use the id in the json or in the url or does it matter?
@@ -122,9 +121,9 @@ def delete_course_update(location, update, passed_id):
             course_html_parsed.remove(element_to_delete)
 
         # update db record
-        course_updates.definition['data'] = html.tostring(course_html_parsed)
+        course_updates.data = etree.tostring(course_html_parsed)
         store = modulestore('direct')
-        store.update_item(location, course_updates.definition['data'])
+        store.update_item(location, course_updates.data)
 
     return get_course_updates(location)
 

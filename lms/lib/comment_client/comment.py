@@ -1,6 +1,6 @@
-from utils import *
+from .utils import *
 
-from thread import Thread
+from .thread import Thread
 import models
 import settings
 

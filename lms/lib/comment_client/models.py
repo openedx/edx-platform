@@ -1,4 +1,4 @@
-from utils import *
+from .utils import *
 
 
 class Model(object):
@@ -23,7 +23,7 @@ class Model(object):
         try:
             return self.attributes[name]
         except KeyError:
-            if self.retrieved or self.id == None:
+            if self.retrieved or self.id is None:
                 raise AttributeError("Field {0} does not exist".format(name))
             self.retrieve()
             return self.__getattr__(name)

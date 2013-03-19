@@ -10,6 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from foldit.models import Score, PuzzleComplete
 from student.models import unique_id_for_user
 
+import re
+
 log = logging.getLogger(__name__)
 
 
@@ -38,6 +40,13 @@ def foldit_ops(request):
                      "user %s, scores json %r, verify %r",
                      request.user, puzzle_scores_json, pz_verify_json)
         else:
+            # This is needed because we are not getting valid json - the
+            # value of ScoreType is an unquoted string. Right now regexes are
+            # quoting the string, but ideally the json itself would be fixed.
+            # To allow for fixes without breaking this, the regex should only
+            # match unquoted strings,
+            a = re.compile(r':([a-zA-Z]*),')
+            puzzle_scores_json = re.sub(a, ':"\g<1>",', puzzle_scores_json)
             puzzle_scores = json.loads(puzzle_scores_json)
             responses.append(save_scores(request.user, puzzle_scores))
 
@@ -98,10 +107,31 @@ def save_scores(user, puzzle_scores):
         # BestScore (energy), CurrentScore (Energy), ScoreVersion (int)
 
         puzzle_id = score['PuzzleID']
-
-        # TODO: save the score
+        best_score = score['BestScore']
+        current_score = score['CurrentScore']
+        score_version = score['ScoreVersion']
 
         # SetPlayerPuzzleScoreResponse object
+        # Score entries are unique on user/unique_user_id/puzzle_id/score_version
+        try:
+            obj = Score.objects.get(
+                user=user,
+                unique_user_id=unique_id_for_user(user),
+                puzzle_id=puzzle_id,
+                score_version=score_version)
+            obj.current_score = current_score
+            obj.best_score = best_score
+
+        except Score.DoesNotExist:
+            obj = Score(
+                user=user,
+                unique_user_id=unique_id_for_user(user),
+                puzzle_id=puzzle_id,
+                current_score=current_score,
+                best_score=best_score,
+                score_version=score_version)
+        obj.save()
+
         score_responses.append({'PuzzleID': puzzle_id,
                                 'Status': 'Success'})
 

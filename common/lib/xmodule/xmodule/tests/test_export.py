@@ -4,7 +4,7 @@ from fs.osfs import OSFS
 from nose.tools import assert_equals, assert_true
 from path import path
 from tempfile import mkdtemp
-from shutil import copytree
+import shutil
 
 from xmodule.modulestore.xml import XMLModuleStore
 
@@ -18,25 +18,14 @@ TEST_DIR = TEST_DIR / 'test'
 DATA_DIR = TEST_DIR / 'data'
 
 
-def strip_metadata(descriptor, key):
-    """
-    Recursively strips tag from all children.
-    """
-    print "strip {key} from {desc}".format(key=key, desc=descriptor.location.url())
-    descriptor.metadata.pop(key, None)
-    for d in descriptor.get_children():
-        strip_metadata(d, key)
-
-
 def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
     """
     print "strip filename from {desc}".format(desc=descriptor.location.url())
-    descriptor.definition.pop('filename', None)
+    descriptor._model_data.pop('filename', None)
     for d in descriptor.get_children():
         strip_filenames(d)
-
 
 
 class RoundTripTestCase(unittest.TestCase):
@@ -46,11 +35,11 @@ class RoundTripTestCase(unittest.TestCase):
         Thus we make sure that export and import work properly.
     '''
     def check_export_roundtrip(self, data_dir, course_dir):
-        root_dir = path(mkdtemp())
+        root_dir = path(self.temp_dir)
         print "Copying test course to temp dir {0}".format(root_dir)
 
         data_dir = path(data_dir)
-        copytree(data_dir / course_dir, root_dir / course_dir)
+        shutil.copytree(data_dir / course_dir, root_dir / course_dir)
 
         print "Starting import"
         initial_import = XMLModuleStore(root_dir, course_dirs=[course_dir])
@@ -77,10 +66,6 @@ class RoundTripTestCase(unittest.TestCase):
         exported_course = courses2[0]
 
         print "Checking course equality"
-        # HACK: data_dir metadata tags break equality because they
-        # aren't real metadata, and depend on paths. Remove them.
-        strip_metadata(initial_course, 'data_dir')
-        strip_metadata(exported_course, 'data_dir')
 
         # HACK: filenames change when changing file formats
         # during imports from old-style courses.  Ignore them.
@@ -105,9 +90,10 @@ class RoundTripTestCase(unittest.TestCase):
             self.assertEquals(initial_import.modules[course_id][location],
                               second_import.modules[course_id][location])
 
-
     def setUp(self):
         self.maxDiff = None
+        self.temp_dir = mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
 
     def test_toy_roundtrip(self):
         self.check_export_roundtrip(DATA_DIR, "toy")
@@ -117,6 +103,9 @@ class RoundTripTestCase(unittest.TestCase):
 
     def test_full_roundtrip(self):
         self.check_export_roundtrip(DATA_DIR, "full")
+
+    def test_conditional_and_poll_roundtrip(self):
+        self.check_export_roundtrip(DATA_DIR, "conditional_and_poll")
 
     def test_selfassessment_roundtrip(self):
         #Test selfassessment xmodule to see if it exports correctly

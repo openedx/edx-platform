@@ -6,7 +6,7 @@ from django.test.utils import override_settings
 
 from course_groups.models import CourseUserGroup
 from course_groups.cohorts import (get_cohort, get_course_cohorts,
-                                   is_commentable_cohorted)
+                                   is_commentable_cohorted, get_cohort_by_name)
 
 from xmodule.modulestore.django import modulestore, _MODULESTORES
 
@@ -47,7 +47,10 @@ class TestCohorts(django.test.TestCase):
 
     @staticmethod
     def config_course_cohorts(course, discussions,
-                              cohorted, cohorted_discussions=None):
+                              cohorted,
+                              cohorted_discussions=None,
+                              auto_cohort=None,
+                              auto_cohort_groups=None):
         """
         Given a course with no discussion set up, add the discussions and set
         the cohort config appropriately.
@@ -59,6 +62,9 @@ class TestCohorts(django.test.TestCase):
             cohorted: bool.
             cohorted_discussions: optional list of topic names.  If specified,
                 converts them to use the same ids as topic names.
+            auto_cohort: optional bool.
+            auto_cohort_groups: optional list of strings
+                      (names of groups to put students into).
 
         Returns:
             Nothing -- modifies course in place.
@@ -70,13 +76,19 @@ class TestCohorts(django.test.TestCase):
                               "id": to_id(name)})
                       for name in discussions)
 
-        course.metadata["discussion_topics"] = topics
+        course.discussion_topics = topics
 
         d = {"cohorted": cohorted}
         if cohorted_discussions is not None:
             d["cohorted_discussions"] = [to_id(name)
                                          for name in cohorted_discussions]
-        course.metadata["cohort_config"] = d
+
+        if auto_cohort is not None:
+            d["auto_cohort"] = auto_cohort
+        if auto_cohort_groups is not None:
+            d["auto_cohort_groups"] = auto_cohort_groups
+
+        course.cohort_config = d
 
 
     def setUp(self):
@@ -89,12 +101,9 @@ class TestCohorts(django.test.TestCase):
 
 
     def test_get_cohort(self):
-        # Need to fix this, but after we're testing on staging.  (Looks like
-        # problem is that when get_cohort internally tries to look up the
-        # course.id, it fails, even though we loaded it through the modulestore.
-
-        # Proper fix: give all tests a standard modulestore that uses the test
-        # dir.
+        """
+        Make sure get_cohort() does the right thing when the course is cohorted
+        """
         course = modulestore().get_course("edX/toy/2012_Fall")
         self.assertEqual(course.id, "edX/toy/2012_Fall")
         self.assertFalse(course.is_cohorted)
@@ -121,6 +130,85 @@ class TestCohorts(django.test.TestCase):
 
         self.assertEquals(get_cohort(other_user, course.id), None,
                           "other_user shouldn't have a cohort")
+
+    def test_auto_cohorting(self):
+        """
+        Make sure get_cohort() does the right thing when the course is auto_cohorted
+        """
+        course = modulestore().get_course("edX/toy/2012_Fall")
+        self.assertEqual(course.id, "edX/toy/2012_Fall")
+        self.assertFalse(course.is_cohorted)
+
+        user1 = User.objects.create(username="test", email="a@b.com")
+        user2 = User.objects.create(username="test2", email="a2@b.com")
+        user3 = User.objects.create(username="test3", email="a3@b.com")
+
+        cohort = CourseUserGroup.objects.create(name="TestCohort",
+                                                course_id=course.id,
+                               group_type=CourseUserGroup.COHORT)
+
+        # user1 manually added to a cohort
+        cohort.users.add(user1)
+
+        # Make the course auto cohorted...
+        self.config_course_cohorts(course, [], cohorted=True,
+                                   auto_cohort=True,
+                                   auto_cohort_groups=["AutoGroup"])
+
+        self.assertEquals(get_cohort(user1, course.id).id, cohort.id,
+                          "user1 should stay put")
+
+        self.assertEquals(get_cohort(user2, course.id).name, "AutoGroup",
+                          "user2 should be auto-cohorted")
+
+        # Now make the group list empty
+        self.config_course_cohorts(course, [], cohorted=True,
+                                   auto_cohort=True,
+                                   auto_cohort_groups=[])
+
+        self.assertEquals(get_cohort(user3, course.id), None,
+                          "No groups->no auto-cohorting")
+
+        # Now make it different
+        self.config_course_cohorts(course, [], cohorted=True,
+                                   auto_cohort=True,
+                                   auto_cohort_groups=["OtherGroup"])
+
+        self.assertEquals(get_cohort(user3, course.id).name, "OtherGroup",
+                          "New list->new group")
+        self.assertEquals(get_cohort(user2, course.id).name, "AutoGroup",
+                          "user2 should still be in originally placed cohort")
+
+
+    def test_auto_cohorting_randomization(self):
+        """
+        Make sure get_cohort() randomizes properly.
+        """
+        course = modulestore().get_course("edX/toy/2012_Fall")
+        self.assertEqual(course.id, "edX/toy/2012_Fall")
+        self.assertFalse(course.is_cohorted)
+
+        groups = ["group_{0}".format(n) for n in range(5)]
+        self.config_course_cohorts(course, [], cohorted=True,
+                                   auto_cohort=True,
+                                   auto_cohort_groups=groups)
+
+        # Assign 100 users to cohorts
+        for i in range(100):
+            user = User.objects.create(username="test_{0}".format(i),
+                                       email="a@b{0}.com".format(i))
+            get_cohort(user, course.id)
+
+        # Now make sure that the assignment was at least vaguely random:
+        # each cohort should have at least 1, and fewer than 50 students.
+        # (with 5 groups, probability of 0 users in any group is about
+        # .8**100= 2.0e-10)
+        for cohort_name in groups:
+            cohort = get_cohort_by_name(course.id, cohort_name)
+            num_users = cohort.users.count()
+            self.assertGreater(num_users, 1)
+            self.assertLess(num_users, 50)
+
 
 
     def test_get_course_cohorts(self):

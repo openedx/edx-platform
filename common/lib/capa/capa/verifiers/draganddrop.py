@@ -27,6 +27,49 @@ values are (x,y) coordinates of centers of dragged images.
 import json
 
 
+def flat_user_answer(user_answer):
+    """
+    Convert nested `user_answer` to flat format.
+
+        {'up': {'first': {'p': 'p_l'}}}
+
+        to
+
+        {'up': 'p_l[p][first]'}
+    """
+
+    def parse_user_answer(answer):
+        key = answer.keys()[0]
+        value = answer.values()[0]
+        if isinstance(value, dict):
+
+            # Make complex value:
+            # Example:
+            # Create like 'p_l[p][first]' from {'first': {'p': 'p_l'}
+            complex_value_list = []
+            v_value = value
+            while isinstance(v_value, dict):
+                v_key = v_value.keys()[0]
+                v_value = v_value.values()[0]
+                complex_value_list.append(v_key)
+
+            complex_value = '{0}'.format(v_value)
+            for i in reversed(complex_value_list):
+                complex_value = '{0}[{1}]'.format(complex_value, i)
+
+            res = {key: complex_value}
+            return res
+        else:
+            return answer
+
+    result = []
+    for answer in user_answer:
+        parse_answer = parse_user_answer(answer)
+        result.append(parse_answer)
+
+    return result
+
+
 class PositionsCompare(list):
     """ Class for comparing positions.
 
@@ -111,42 +154,41 @@ class DragAndDrop(object):
         Returns: bool.
         '''
         for draggable in self.excess_draggables:
-            if not self.excess_draggables[draggable]:
+            if self.excess_draggables[draggable]:
                 return False  # user answer has more draggables than correct answer
 
         # Number of draggables in user_groups may be differ that in
         # correct_groups, that is incorrect, except special case with 'number'
-        for groupname, draggable_ids in self.correct_groups.items():
-
+        for index, draggable_ids in enumerate(self.correct_groups):
             # 'number' rule special case
             # for reusable draggables we may get in self.user_groups
             # {'1': [u'2', u'2', u'2'], '0': [u'1', u'1'], '2': [u'3']}
             # if '+number' is in rule - do not remove duplicates and strip
             # '+number' from rule
-            current_rule = self.correct_positions[groupname].keys()[0]
+            current_rule = self.correct_positions[index].keys()[0]
             if 'number' in current_rule:
-                rule_values = self.correct_positions[groupname][current_rule]
+                rule_values = self.correct_positions[index][current_rule]
                 # clean rule, do not do clean duplicate items
-                self.correct_positions[groupname].pop(current_rule, None)
+                self.correct_positions[index].pop(current_rule, None)
                 parsed_rule = current_rule.replace('+', '').replace('number', '')
-                self.correct_positions[groupname][parsed_rule] = rule_values
+                self.correct_positions[index][parsed_rule] = rule_values
             else:  # remove dublicates
-                self.user_groups[groupname] = list(set(self.user_groups[groupname]))
+                self.user_groups[index] = list(set(self.user_groups[index]))
 
-            if sorted(draggable_ids) != sorted(self.user_groups[groupname]):
+            if sorted(draggable_ids) != sorted(self.user_groups[index]):
                 return False
 
         # Check that in every group, for rule of that group, user positions of
         # every element are equal with correct positions
-        for groupname in self.correct_groups:
+        for index, _ in enumerate(self.correct_groups):
             rules_executed = 0
             for rule in ('exact', 'anyof', 'unordered_equal'):
                 # every group has only one rule
-                if self.correct_positions[groupname].get(rule, None):
+                if self.correct_positions[index].get(rule, None):
                     rules_executed += 1
                     if not self.compare_positions(
-                            self.correct_positions[groupname][rule],
-                            self.user_positions[groupname]['user'], flag=rule):
+                            self.correct_positions[index][rule],
+                            self.user_positions[index]['user'], flag=rule):
                         return False
             if not rules_executed:  # no correct rules for current group
             # probably xml content mistake - wrong rules names
@@ -248,7 +290,7 @@ class DragAndDrop(object):
             correct_answer = {'name4': 't1',
                             'name_with_icon': 't1',
                             '5': 't2',
-                            '7':'t2'}
+                            '7': 't2'}
 
             It is draggable_name: dragable_position mapping.
 
@@ -284,48 +326,56 @@ class DragAndDrop(object):
 
         Args:
             user_answer: json
-            correct_answer: dict  or list
+            correct_answer: dict or list
         """
 
-        self.correct_groups = dict()  # correct groups from xml
-        self.correct_positions = dict()  # correct positions for comparing
-        self.user_groups = dict()  # will be populated from user answer
-        self.user_positions = dict()  # will be populated from user answer
+        self.correct_groups = []  # Correct groups from xml.
+        self.correct_positions = []  # Correct positions for comparing.
+        self.user_groups = []  # Will be populated from user answer.
+        self.user_positions = []  # Will be populated from user answer.
 
-        # convert from dict answer format to list format
+        # Convert from dict answer format to list format.
         if isinstance(correct_answer, dict):
             tmp = []
             for key, value in correct_answer.items():
-                tmp_dict = {'draggables': [], 'targets': [], 'rule': 'exact'}
-                tmp_dict['draggables'].append(key)
-                tmp_dict['targets'].append(value)
-                tmp.append(tmp_dict)
+                tmp.append({
+                    'draggables': [key],
+                    'targets': [value],
+                    'rule': 'exact'})
             correct_answer = tmp
 
+        # Convert string `user_answer` to object.
         user_answer = json.loads(user_answer)
 
-        # check if we have draggables that are not in correct answer:
-        self.excess_draggables = {}
+        # This dictionary will hold a key for each draggable the user placed on
+        # the image.  The value is True if that draggable is not mentioned in any
+        # correct_answer entries.  If the draggable is mentioned in at least one
+        # correct_answer entry, the value is False.
+        # default to consider every user answer excess until proven otherwise.
+        self.excess_draggables = dict((users_draggable.keys()[0],True)
+            for users_draggable in user_answer)
 
-        # create identical data structures from user answer and correct answer
-        for i in xrange(0, len(correct_answer)):
-            groupname = str(i)
-            self.correct_groups[groupname] = correct_answer[i]['draggables']
-            self.correct_positions[groupname] = {correct_answer[i]['rule']:
-                                                correct_answer[i]['targets']}
-            self.user_groups[groupname] = []
-            self.user_positions[groupname] = {'user': []}
-            for draggable_dict in user_answer['draggables']:
-                # draggable_dict is 1-to-1 {draggable_name: position}
+        # Convert nested `user_answer` to flat format.
+        user_answer = flat_user_answer(user_answer)
+
+        # Create identical data structures from user answer and correct answer.
+        for answer in correct_answer:
+            user_groups_data = []
+            user_positions_data = []
+            for draggable_dict in user_answer:
+                # Draggable_dict is 1-to-1 {draggable_name: position}.
                 draggable_name = draggable_dict.keys()[0]
-                if draggable_name in self.correct_groups[groupname]:
-                    self.user_groups[groupname].append(draggable_name)
-                    self.user_positions[groupname]['user'].append(
+                if draggable_name in answer['draggables']:
+                    user_groups_data.append(draggable_name)
+                    user_positions_data.append(
                                             draggable_dict[draggable_name])
-                    self.excess_draggables[draggable_name] = True
-                else:
-                    self.excess_draggables[draggable_name] = \
-                    self.excess_draggables.get(draggable_name, False)
+                    # proved that this is not excess
+                    self.excess_draggables[draggable_name] = False
+
+            self.correct_groups.append(answer['draggables'])
+            self.correct_positions.append({answer['rule']: answer['targets']})
+            self.user_groups.append(user_groups_data)
+            self.user_positions.append({'user': user_positions_data})
 
 
 def grade(user_input, correct_answer):

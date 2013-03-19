@@ -1,14 +1,10 @@
 from lettuce import world, step
 from common import *
+from nose.tools import assert_equal
+from selenium.webdriver.common.keys import Keys
+import time
 
 ############### ACTIONS ####################
-
-
-@step('I have opened a new course in Studio$')
-def i_have_opened_a_new_course(step):
-    clear_courses()
-    log_into_studio()
-    create_a_course()
 
 
 @step('I click the new section link$')
@@ -19,10 +15,12 @@ def i_click_new_section_link(step):
 
 @step('I enter the section name and click save$')
 def i_save_section_name(step):
-    name_css = '.new-section-name'
-    save_css = '.new-section-name-save'
-    css_fill(name_css, 'My Section')
-    css_click(save_css)
+    save_section_name('My Section')
+
+
+@step('I enter a section name with a quote and click save$')
+def i_save_section_name_with_quote(step):
+    save_section_name('Section with "Quote"')
 
 
 @step('I have added a new section$')
@@ -41,18 +39,39 @@ def i_save_a_new_section_release_date(step):
     date_css = 'input.start-date.date.hasDatepicker'
     time_css = 'input.start-time.time.ui-timepicker-input'
     css_fill(date_css, '12/25/2013')
-    # click here to make the calendar go away
-    css_click(time_css)
+    # hit TAB to get to the time field
+    e = css_find(date_css).first
+    e._element.send_keys(Keys.TAB)
     css_fill(time_css, '12:00am')
-    css_click('a.save-button')
+    e = css_find(time_css).first
+    e._element.send_keys(Keys.TAB)
+    time.sleep(float(1))
+    world.browser.click_link_by_text('Save')
+
 
 ############ ASSERTIONS ###################
 
 
 @step('I see my section on the Courseware page$')
 def i_see_my_section_on_the_courseware_page(step):
-    section_css = 'span.section-name-span'
-    assert_css_with_text(section_css, 'My Section')
+    see_my_section_on_the_courseware_page('My Section')
+
+
+@step('I see my section name with a quote on the Courseware page$')
+def i_see_my_section_name_with_quote_on_the_courseware_page(step):
+    see_my_section_on_the_courseware_page('Section with "Quote"')
+
+
+@step('I click to edit the section name$')
+def i_click_to_edit_section_name(step):
+    css_click('span.section-name-span')
+
+
+@step('I see the complete section name with a quote in the editor$')
+def i_see_complete_section_name_with_quote_in_editor(step):
+    css = '.edit-section-name'
+    assert world.browser.is_element_present_by_css(css, 5)
+    assert_equal(world.browser.find_by_css(css).value, 'Section with "Quote"')
 
 
 @step('the section does not exist$')
@@ -93,4 +112,18 @@ def the_section_release_date_picker_not_visible(step):
 def the_section_release_date_is_updated(step):
     css = 'span.published-status'
     status_text = world.browser.find_by_css(css).text
-    assert status_text == 'Will Release: 12/25/2013 at 12:00am'
+    assert_equal(status_text,'Will Release: 12/25/2013 at 12:00am')
+
+
+############ HELPER METHODS ###################
+
+def save_section_name(name):
+    name_css = '.new-section-name'
+    save_css = '.new-section-name-save'
+    css_fill(name_css, name)
+    css_click(save_css)
+
+
+def see_my_section_on_the_courseware_page(name):
+    section_css = 'span.section-name-span'
+    assert_css_with_text(section_css, name)

@@ -1,9 +1,9 @@
-from comment import Comment
-from thread import Thread
-from user import User
-from commentable import Commentable
+from .comment import Comment
+from .thread import Thread
+from .user import User
+from .commentable import Commentable
 
-from utils import *
+from .utils import *
 
 import settings
 

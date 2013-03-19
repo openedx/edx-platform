@@ -2,7 +2,6 @@
 
 import logging
 import urllib
-import re
 
 from django.conf import settings
 from django.views.decorators.cache import cache_control
@@ -12,26 +11,33 @@ from django.core.urlresolvers import reverse
 from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
-from controller_query_service import ControllerQueryService
-from xmodule.grading_service_module import GradingServiceError
+from xmodule.x_module import ModuleSystem
+from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService, convert_seconds_to_human_readable
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
-from .staff_grading import StaffGrading
 from student.models import unique_id_for_user
 
-import open_ended_util
 import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
+from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
-controller_url = open_ended_util.get_controller_url()
-controller_qs = ControllerQueryService(controller_url)
+system = ModuleSystem(
+    ajax_url=None,
+    track_function=None,
+    get_module = None,
+    render_template=render_to_string,
+    replace_urls = None,
+    xblock_model_data= {}
+)
+controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
 
 """
 Reverses the URL from the name and the course id, and then adds a trailing slash if
@@ -51,18 +57,22 @@ def _reverse_without_slash(url_name, course_id):
     ajax_url = reverse(url_name, kwargs={'course_id': course_id})
     return ajax_url
 
+
 DESCRIPTION_DICT = {
-            'Peer Grading': "View all problems that require peer assessment in this particular course.",
-            'Staff Grading': "View ungraded submissions submitted by students for the open ended problems in the course.",
-            'Problems you have submitted': "View open ended problems that you have previously submitted for grading.",
-            'Flagged Submissions': "View submissions that have been flagged by students as inappropriate."
-    }
+    'Peer Grading': "View all problems that require peer assessment in this particular course.",
+    'Staff Grading': "View ungraded submissions submitted by students for the open ended problems in the course.",
+    'Problems you have submitted': "View open ended problems that you have previously submitted for grading.",
+    'Flagged Submissions': "View submissions that have been flagged by students as inappropriate."
+}
 ALERT_DICT = {
-            'Peer Grading': "New submissions to grade",
-            'Staff Grading': "New submissions to grade",
-            'Problems you have submitted': "New grades have been returned",
-            'Flagged Submissions': "Submissions have been flagged for review"
-    }
+    'Peer Grading': "New submissions to grade",
+    'Staff Grading': "New submissions to grade",
+    'Problems you have submitted': "New grades have been returned",
+    'Flagged Submissions': "Submissions have been flagged for review"
+}
+
+STUDENT_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify course staff."
+STAFF_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -88,19 +98,31 @@ def peer_grading(request, course_id):
     Show a peer grading interface
     '''
 
+    #Get the current course
     course = get_course_with_access(request.user, course_id, 'load')
     course_id_parts = course.id.split("/")
-    course_id_norun = "/".join(course_id_parts[0:2])
-    pg_location = "i4x://" + course_id_norun + "/peergrading/init"
+    false_dict = [False, "False", "false", "FALSE"]
 
-    base_course_url  = reverse('courses')
+    #Reverse the base course url
+    base_course_url = reverse('courses')
     try:
-        problem_url_parts = search.path_to_location(modulestore(), course.id, pg_location)
+        #TODO:  This will not work with multiple runs of a course.  Make it work.  The last key in the Location passed
+        #to get_items is called revision.  Is this the same as run?
+        #Get the peer grading modules currently in the course
+        items = modulestore().get_items(['i4x', None, course_id_parts[1], 'peergrading', None])
+        #See if any of the modules are centralized modules (ie display info from multiple problems)
+        items = [i for i in items if i.metadata.get("use_for_single_location", True) in false_dict]
+        #Get the first one
+        item_location = items[0].location
+        #Generate a url for the first module and redirect the user to it
+        problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
 
         return HttpResponseRedirect(problem_url)
     except:
+        #This is a student_facing_error
         error_message = "Error with initializing peer grading.  Centralized module does not exist.  Please contact course staff."
+        #This is a dev_facing_error
         log.exception(error_message + "Current course is: {0}".format(course_id))
         return HttpResponse(error_message)
 
@@ -134,32 +156,48 @@ def student_problem_list(request, course_id):
     success = False
     error_text = ""
     problem_list = []
-    base_course_url  = reverse('courses')
+    base_course_url = reverse('courses')
 
-    #try:
-    problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
-    problem_list_dict = json.loads(problem_list_json)
-    success = problem_list_dict['success']
-    if 'error' in problem_list_dict:
-        error_text = problem_list_dict['error']
-        problem_list = []
-    else:
-        problem_list = problem_list_dict['problem_list']
+    try:
+        problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
+        problem_list_dict = json.loads(problem_list_json)
+        success = problem_list_dict['success']
+        if 'error' in problem_list_dict:
+            error_text = problem_list_dict['error']
+            problem_list = []
+        else:
+            problem_list = problem_list_dict['problem_list']
 
-    for i in xrange(0, len(problem_list)):
-        problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
-        problem_url = generate_problem_url(problem_url_parts, base_course_url)
-        problem_list[i].update({'actual_url': problem_url})
+        for i in xrange(0, len(problem_list)):
+            problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
+            problem_url = generate_problem_url(problem_url_parts, base_course_url)
+            problem_list[i].update({'actual_url': problem_url})
+            eta_available = problem_list[i]['eta_available']
+            if isinstance(eta_available, basestring):
+                eta_available = (eta_available.lower() == "true")
 
-    """
+            eta_string = "N/A"
+            if eta_available:
+                try:
+                    eta_string = convert_seconds_to_human_readable(int(problem_list[i]['eta']))
+                except:
+                    #This is a student_facing_error
+                    eta_string = "Error getting ETA."
+            problem_list[i].update({'eta_string': eta_string})
+
     except GradingServiceError:
-        error_text = "Error occured while contacting the grading service"
+        #This is a student_facing_error
+        error_text = STUDENT_ERROR_MESSAGE
+        #This is a dev facing error
+        log.error("Problem contacting open ended grading service.")
         success = False
     # catch error if if the json loads fails
     except ValueError:
-        error_text = "Could not get problem list"
+        #This is a student facing error
+        error_text = STUDENT_ERROR_MESSAGE
+        #This is a dev_facing_error
+        log.error("Problem with results from external grading service for open ended.")
         success = False
-    """
 
     ajax_url = _reverse_with_slash('open_ended_problems', course_id)
 
@@ -186,7 +224,7 @@ def flagged_problem_list(request, course_id):
     success = False
     error_text = ""
     problem_list = []
-    base_course_url  = reverse('courses')
+    base_course_url = reverse('courses')
 
     try:
         problem_list_json = controller_qs.get_flagged_problem_list(course_id)
@@ -199,23 +237,29 @@ def flagged_problem_list(request, course_id):
             problem_list = problem_list_dict['flagged_submissions']
 
     except GradingServiceError:
-        error_text = "Error occured while contacting the grading service"
+        #This is a staff_facing_error
+        error_text = STAFF_ERROR_MESSAGE
+        #This is a dev_facing_error
+        log.error("Could not get flagged problem list from external grading service for open ended.")
         success = False
     # catch error if if the json loads fails
     except ValueError:
-        error_text = "Could not get problem list"
+        #This is a staff_facing_error
+        error_text = STAFF_ERROR_MESSAGE
+        #This is a dev_facing_error
+        log.error("Could not parse problem list from external grading service response.")
         success = False
 
     ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_id)
     context = {
-            'course': course,
-            'course_id': course_id,
-            'ajax_url': ajax_url,
-            'success': success,
-            'problem_list': problem_list,
-            'error_text': error_text,
-            # Checked above
-            'staff_access': True,
+        'course': course,
+        'course_id': course_id,
+        'ajax_url': ajax_url,
+        'success': success,
+        'problem_list': problem_list,
+        'error_text': error_text,
+        # Checked above
+        'staff_access': True,
     }
     return render_to_response('open_ended_problems/open_ended_flagged_problems.html', context)
 
@@ -270,7 +314,7 @@ def combined_notifications(request, course_id):
     }
 
     return render_to_response('open_ended_problems/combined_notifications.html',
-        combined_dict
+                              combined_dict
     )
 
 
@@ -283,12 +327,14 @@ def take_action_on_flags(request, course_id):
     if request.method != 'POST':
         raise Http404
 
-
     required = ['submission_id', 'action_type', 'student_id']
     for key in required:
         if key not in request.POST:
-            return HttpResponse(json.dumps({'success': False, 'error': 'Missing key {0}'.format(key)}),
-                mimetype="application/json")
+            #This is a staff_facing_error
+            return HttpResponse(json.dumps({'success': False,
+                                            'error': STAFF_ERROR_MESSAGE + 'Missing key {0} from submission.  Please reload and try again.'.format(
+                                                key)}),
+                                mimetype="application/json")
 
     p = request.POST
     submission_id = p['submission_id']
@@ -301,5 +347,8 @@ def take_action_on_flags(request, course_id):
         response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
-        log.exception("Error saving calibration grade, submission_id: {0}, submission_key: {1}, grader_id: {2}".format(submission_id, submission_key, grader_id))
-        return _err_response('Could not connect to grading service')
+        #This is a dev_facing_error
+        log.exception(
+            "Error taking action on flagged peer grading submissions, submission_id: {0}, action_type: {1}, grader_id: {2}".format(
+                submission_id, action_type, grader_id))
+        return _err_response(STAFF_ERROR_MESSAGE)

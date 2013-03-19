@@ -143,11 +143,12 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     else
       # TODO: replace with postWithPrefix when that's loaded
       $.post(@ajax_url + cmd, data, callback)
-        .error => callback({success: false, error: "Error occured while performing this operation"})
+        .error => callback({success: false, error: "Error occured while performing javascript AJAX post."})
 
 
 class @StaffGrading
   constructor: (backend) ->
+    AjaxPrefix.addAjaxPrefix(jQuery, -> "")
     @backend = backend
 
     # all the jquery selectors
@@ -182,6 +183,8 @@ class @StaffGrading
 
     @breadcrumbs = $('.breadcrumbs')
 
+
+    $(window).keydown @keydown_handler
     @question_header = $('.question-header')
     @question_header.click @collapse_question
     @collapse_question()
@@ -218,7 +221,8 @@ class @StaffGrading
 
   setup_score_selection: =>
     @score_selection_container.html(@rubric)
-    $('.score-selection').click => @graded_callback()
+    $('input[class="score-selection"]').change => @graded_callback()
+    Rubric.initialize(@location)
 
 
   graded_callback: () =>
@@ -226,6 +230,10 @@ class @StaffGrading
     if Rubric.check_complete()
       @state = state_graded
       @submit_button.show()
+
+  keydown_handler: (e) =>
+    if e.which == 13 && !@list_view && Rubric.check_complete()
+      @submit_and_get_next()
 
   set_button_text: (text) =>
     @action_button.attr('value', text)
@@ -441,8 +449,10 @@ class @StaffGrading
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
     if @question_header.text() == "(Hide)"
+      Logger.log 'staff_grading_hide_question', {location: @location}
       new_text = "(Show)"
     else
+      Logger.log 'staff_grading_show_question', {location: @location}
       new_text = "(Hide)"
     @question_header.text(new_text)
 

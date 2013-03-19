@@ -144,6 +144,7 @@ var CohortManager = (function ($) {
             $(".remove", tr).html('<a href="#">remove</a>')
                 .click(function() { 
                     remove_user_from_cohort(item.username, current_cohort_id, tr);
+                    return false;
                 });
             
             detail_users.append(tr);
@@ -217,6 +218,7 @@ var CohortManager = (function ($) {
         show_cohorts_button.click(function() { 
             state = state_summary;
             render();
+            return false;
         });
         
         add_cohort_input.change(function() {
@@ -231,12 +233,14 @@ var CohortManager = (function ($) {
             var add_url = url + '/add';
             data = {'name': add_cohort_input.val()}
             $.post(add_url, data).done(added_cohort);
+            return false;
         });
 
         add_members_button.click(function() { 
             var add_url = detail_url + '/add';
             data = {'users': users_area.val()}
             $.post(add_url, data).done(added_users);
+            return false;
         });
 
 

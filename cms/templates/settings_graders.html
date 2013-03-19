@@ -39,17 +39,17 @@ from contentstore import utils
 </%block>
 
 <%block name="content">
-<div class="wrapper-content wrapper">
-  <section class="content">
-    <header class="page">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-subtitle">
+    <div class="title">
       <span class="title-sub">Settings</span>
       <h1 class="title-1">Grading</h1>
-    </header>
+    </div>
+  </header>
+</div>
 
-    <!-- <div class="introduction">
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.</p>
-    </div> -->
-
+<div class="wrapper-content wrapper">
+  <section class="content">
     <article class="content-primary" role="main">
       <form id="settings_details" class="settings-grading" method="post" action="">
         <section class="group-settings grade-range">
@@ -126,7 +126,7 @@ from contentstore import utils
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">How will these settings be used</h3>
+        <h3 class="title-3">How will these settings be used?</h3>
         <p>Your grading settings will be used to calculate students grades and performance.</p>
 
         <p>Overall grade range will be used in students' final grades, which are calculated by the weighting you determine for each custom assignment type.</p>
@@ -141,6 +141,7 @@ from contentstore import utils
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Details &amp; Schedule</a></li>
             <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
           </ul>
         </nav>
       % endif

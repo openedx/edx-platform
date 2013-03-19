@@ -1,19 +1,22 @@
 from lettuce import world, step
-from factories import *
-from django.core.management import call_command
 from lettuce.django import django_url
-from django.conf import settings
-from django.core.management import call_command
 from nose.tools import assert_true
 from nose.tools import assert_equal
-import xmodule.modulestore.django
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+from terrain.factories import UserFactory, RegistrationFactory, UserProfileFactory
+from terrain.factories import CourseFactory, GroupFactory
+from xmodule.modulestore.django import _MODULESTORES, modulestore
+from xmodule.templates import update_templates
+from auth.authz import get_user_by_email
 
 from logging import getLogger
 logger = getLogger(__name__)
 
 ###########  STEP HELPERS ##############
-
-
 @step('I (?:visit|access|open) the Studio homepage$')
 def i_visit_the_studio_homepage(step):
     # To make this go to port 8001, put
@@ -44,9 +47,15 @@ def i_press_the_category_delete_icon(step, category):
         assert False, 'Invalid category: %s' % category
     css_click(css)
 
+
+@step('I have opened a new course in Studio$')
+def i_have_opened_a_new_course(step):
+    clear_courses()
+    log_into_studio()
+    create_a_course()
+
+
 ####### HELPER FUNCTIONS ##############
-
-
 def create_studio_user(
         uname='robot',
         email='robot+studio@edx.org',
@@ -75,9 +84,9 @@ def flush_xmodule_store():
     # (though it shouldn't), do this manually
     # from the bash shell to drop it:
     # $ mongo test_xmodule --eval "db.dropDatabase()"
-    xmodule.modulestore.django._MODULESTORES = {}
-    xmodule.modulestore.django.modulestore().collection.drop()
-    xmodule.templates.update_templates()
+    _MODULESTORES = {}
+    modulestore().collection.drop()
+    update_templates()
 
 
 def assert_css_with_text(css, text):
@@ -86,11 +95,48 @@ def assert_css_with_text(css, text):
 
 
 def css_click(css):
-    world.browser.find_by_css(css).first.click()
+    '''
+    First try to use the regular click method, 
+    but if clicking in the middle of an element
+    doesn't work it might be that it thinks some other
+    element is on top of it there so click in the upper left
+    '''
+    try:
+        css_find(css).first.click()
+    except WebDriverException, e:
+        css_click_at(css)
+
+
+def css_click_at(css, x=10, y=10):
+    '''
+    A method to click at x,y coordinates of the element
+    rather than in the center of the element
+    '''
+    e = css_find(css).first
+    e.action_chains.move_to_element_with_offset(e._element, x, y)
+    e.action_chains.click()
+    e.action_chains.perform()
 
 
 def css_fill(css, value):
     world.browser.find_by_css(css).first.fill(value)
+
+
+def css_find(css):
+    def is_visible(driver):
+        return EC.visibility_of_element_located((By.CSS_SELECTOR,css,))
+
+    world.browser.is_element_present_by_css(css, 5)
+    wait_for(is_visible)
+    return world.browser.find_by_css(css)
+
+
+def wait_for(func):
+    WebDriverWait(world.browser.driver, 5).until(func)
+
+
+def id_find(id):
+    return world.browser.find_by_id(id)
 
 
 def clear_courses():
@@ -129,9 +175,18 @@ def log_into_studio(
 
 
 def create_a_course():
-    css_click('a.new-course-button')
-    fill_in_course_info()
-    css_click('input.new-course-save')
+    c = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+    # Add the user to the instructor group of the course
+    # so they will have the permissions to see it in studio
+    g = GroupFactory.create(name='instructor_MITx/999/Robot_Super_Course')
+    u = get_user_by_email('robot+studio@edx.org')
+    u.groups.add(g)
+    u.save()
+    world.browser.reload()
+
+    course_link_css = 'span.class-name'
+    css_click(course_link_css)
     course_title_css = 'span.course-title'
     assert_true(world.browser.is_element_present_by_css(course_title_css, 5))
 
@@ -145,6 +200,7 @@ def add_section(name='My Section'):
     css_click(save_css)
     span_css = 'span.section-name-span'
     assert_true(world.browser.is_element_present_by_css(span_css, 5))
+
 
 def add_subsection(name='Subsection One'):
     css = 'a.new-subsection-item'

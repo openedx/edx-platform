@@ -29,6 +29,7 @@ import sys
 
 from lxml import etree
 from xml.sax.saxutils import unescape
+from copy import deepcopy
 
 import chem
 import chem.chemcalc
@@ -38,11 +39,11 @@ import verifiers
 import verifiers.draganddrop
 
 import calc
-from correctmap import CorrectMap
+from .correctmap import CorrectMap
 import eia
 import inputtypes
 import customrender
-from util import contextualize_text, convert_files_to_filenames
+from .util import contextualize_text, convert_files_to_filenames
 import xqueue_interface
 
 # to be replaced with auto-registering
@@ -77,7 +78,7 @@ global_context = {'random': random,
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam", "openendedrubric"]
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 #-----------------------------------------------------------------------------
 # main class for this module
@@ -107,6 +108,8 @@ class LoncapaProblem(object):
         self.do_reset()
         self.problem_id = id
         self.system = system
+        if self.system is None:
+            raise Exception()
         self.seed = seed
 
         if state:
@@ -145,6 +148,13 @@ class LoncapaProblem(object):
 
         if not self.student_answers:  # True when student_answers is an empty dict
             self.set_initial_display()
+
+        # dictionary of InputType objects associated with this problem
+        #   input_id string -> InputType object
+        self.inputs = {}
+
+        self.extracted_tree = self._extract_html(self.tree)
+
 
     def do_reset(self):
         '''
@@ -324,7 +334,27 @@ class LoncapaProblem(object):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        return contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        return html
+
+
+    def handle_input_ajax(self, get):
+        '''
+        InputTypes can support specialized AJAX calls. Find the correct input and pass along the correct data
+
+        Also, parse out the dispatch from the get so that it can be passed onto the input type nicely
+        '''
+
+        # pull out the id
+        input_id = get['input_id']
+        if self.inputs[input_id]:
+            dispatch = get['dispatch']
+            return self.inputs[input_id].handle_ajax(dispatch, get)
+        else:
+            log.warning("Could not find matching input for id: %s" % problem_id)
+            return {}
+
+
 
     # ======= Private Methods Below ========
 
@@ -458,6 +488,8 @@ class LoncapaProblem(object):
             finally:
                 sys.path = original_path
 
+
+
     def _extract_html(self, problemtree):  # private
         '''
         Main (private) function which converts Problem XML tree to HTML.
@@ -471,7 +503,7 @@ class LoncapaProblem(object):
         if (problemtree.tag == 'script' and problemtree.get('type')
             and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
-            return problemtree
+            return deepcopy(problemtree)
 
         if problemtree.tag in html_problem_semantics:
             return
@@ -484,8 +516,9 @@ class LoncapaProblem(object):
             msg = ''
             hint = ''
             hintmode = None
+            input_id = problemtree.get('id')
             if problemid in self.correct_map:
-                pid = problemtree.get('id')
+                pid = input_id
                 status = self.correct_map.get_correctness(pid)
                 msg = self.correct_map.get_msg(pid)
                 hint = self.correct_map.get_hint(pid)
@@ -496,21 +529,23 @@ class LoncapaProblem(object):
                 value = self.student_answers[problemid]
 
             # do the rendering
-
             state = {'value': value,
                    'status': status,
-                   'id': problemtree.get('id'),
+                   'id': input_id,
                    'feedback': {'message': msg,
                                 'hint': hint,
                                 'hintmode': hintmode, }}
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
-            the_input = input_type_cls(self.system, problemtree, state)
-            return the_input.get_html()
+            # save the input type so that we can make ajax calls on it if we need to
+            self.inputs[input_id] = input_type_cls(self.system, problemtree, state)
+            return self.inputs[input_id].get_html()
 
         # let each Response render itself
         if problemtree in self.responders:
-            return self.responders[problemtree].render_html(self._extract_html)
+            overall_msg = self.correct_map.get_overall_message()
+            return self.responders[problemtree].render_html(self._extract_html,
+                                                response_msg=overall_msg)
 
         # let each custom renderer render itself:
         if problemtree.tag in customrender.registry.registered_tags():

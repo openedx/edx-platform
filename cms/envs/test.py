@@ -27,6 +27,9 @@ STATIC_ROOT = TEST_ROOT / "staticfiles"
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 
+# Makes the tests run much faster...
+SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
+
 # TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
@@ -94,6 +97,13 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    },
+
+    'mongo_metadata_inheritance': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': '/var/tmp/mongo_metadata_inheritance',
+        'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }

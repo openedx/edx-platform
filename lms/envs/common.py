@@ -20,7 +20,6 @@ Longer TODO:
 """
 import sys
 import os
-import tempfile
 from xmodule.static_content import write_module_styles, write_module_js
 
 from path import path
@@ -82,8 +81,15 @@ MITX_FEATURES = {
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
 
+    # analytics experiments
+    'ENABLE_INSTRUCTOR_ANALYTICS': False,
+
     # Flip to True when the YouTube iframe API breaks (again)
     'USE_YOUTUBE_OBJECT_API': False,
+
+    # Give a UI to show a student's submission history in a problem by the
+    # Staff Debug tool.
+    'ENABLE_STUDENT_HISTORY_VIEW': True
 }
 
 # Used for A/B testing
@@ -133,7 +139,8 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
-MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
+from tempdir import mkdtemp_clean
+MAKO_MODULE_DIR = mkdtemp_clean('mako')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'templates',
@@ -206,8 +213,8 @@ WIKI_ENABLED = False
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
-                                          'title'  :  'Circuits and Electronics',
+COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number': '6.002x',
+                                          'title': 'Circuits and Electronics',
                                           'xmlpath': '6002x/',
                                           'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
                                           }
@@ -310,36 +317,29 @@ WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
 
-################################# Staff grading config  #####################
-
-#By setting up the default settings with an incorrect user name and password,
-# will get an error when attempting to connect
-STAFF_GRADING_INTERFACE = {
-    'url': 'http://sandbox-grader-001.m.edx.org/staff_grading',
-    'username': 'incorrect_user',
-    'password': 'incorrect_pass',
-    }
-
-# Used for testing, debugging
-MOCK_STAFF_GRADING = False
-
 ################################# Pearson TestCenter config  ################
 
 PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
 # TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
 
-################################# Peer grading config  #####################
+################################# open ended grading config  #####################
 
 #By setting up the default settings with an incorrect user name and password,
 # will get an error when attempting to connect
-PEER_GRADING_INTERFACE = {
+OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
+    'staff_grading' : 'staff_grading',
+    'peer_grading' : 'peer_grading',
+    'grading_controller' : 'grading_controller'
     }
 
-# Used for testing, debugging
+# Used for testing, debugging peer grading
 MOCK_PEER_GRADING = False
+
+# Used for testing, debugging staff grading
+MOCK_STAFF_GRADING = False
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'

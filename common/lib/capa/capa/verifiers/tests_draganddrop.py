@@ -1,7 +1,8 @@
 import unittest
 
 import draganddrop
-from draganddrop import PositionsCompare
+from .draganddrop import PositionsCompare
+import json
 
 
 class Test_PositionsCompare(unittest.TestCase):
@@ -40,78 +41,314 @@ class Test_PositionsCompare(unittest.TestCase):
 
 class Test_DragAndDrop_Grade(unittest.TestCase):
 
-    def test_targets_true(self):
-        user_input = '{"draggables": [{"1": "t1"}, \
-         {"name_with_icon": "t2"}]}'
-        correct_answer = {'1':              't1', 'name_with_icon': 't2'}
+    def test_targets_are_draggable_1(self):
+        user_input = json.dumps([
+            {'p': 'p_l'},
+            {'up': {'first': {'p': 'p_l'}}}
+        ])
+
+        correct_answer = [
+            {
+                'draggables': ['p'],
+                'targets': [
+                    'p_l', 'p_r'
+                ],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['up'],
+                'targets': [
+                    'p_l[p][first]'
+                ],
+                'rule': 'anyof'
+            }
+        ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
+    def test_targets_are_draggable_2(self):
+        user_input = json.dumps([
+            {'p': 'p_l'},
+            {'p': 'p_r'},
+            {'s': 's_l'},
+            {'s': 's_r'},
+            {'up': {'1': {'p': 'p_l'}}},
+            {'up': {'3': {'p': 'p_l'}}},
+            {'up': {'1': {'p': 'p_r'}}},
+            {'up': {'3': {'p': 'p_r'}}},
+            {'up_and_down': {'1': {'s': 's_l'}}},
+            {'up_and_down': {'1': {'s': 's_r'}}}
+        ])
+
+        correct_answer = [
+            {
+                'draggables': ['p'],
+                'targets': ['p_l', 'p_r'],
+                'rule': 'unordered_equal'
+            },
+            {
+                'draggables': ['s'],
+                'targets': ['s_l', 's_r'],
+                'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['up_and_down'],
+              'targets': [
+                's_l[s][1]', 's_r[s][1]'
+              ],
+              'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['up'],
+              'targets': [
+                'p_l[p][1]', 'p_l[p][3]', 'p_r[p][1]', 'p_r[p][3]'
+              ],
+              'rule': 'unordered_equal'
+            }
+        ]
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+    def test_targets_are_draggable_2_manual_parsing(self):
+        user_input = json.dumps([
+            {'up': 'p_l[p][1]'},
+            {'p': 'p_l'},
+            {'up': 'p_l[p][3]'},
+            {'up': 'p_r[p][1]'},
+            {'p': 'p_r'},
+            {'up': 'p_r[p][3]'},
+            {'up_and_down': 's_l[s][1]'},
+            {'s': 's_l'},
+            {'up_and_down': 's_r[s][1]'},
+            {'s': 's_r'}
+        ])
+
+        correct_answer = [
+            {
+                'draggables': ['p'],
+                'targets': ['p_l', 'p_r'],
+                'rule': 'unordered_equal'
+            },
+            {
+                'draggables': ['s'],
+                'targets': ['s_l', 's_r'],
+                'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['up_and_down'],
+              'targets': [
+                's_l[s][1]', 's_r[s][1]'
+              ],
+              'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['up'],
+              'targets': [
+                'p_l[p][1]', 'p_l[p][3]', 'p_r[p][1]', 'p_r[p][3]'
+              ],
+              'rule': 'unordered_equal'
+            }
+        ]
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+    def test_targets_are_draggable_3_nested(self):
+        user_input = json.dumps([
+            {'molecule': 'left_side_tagret'},
+            {'molecule': 'right_side_tagret'},
+            {'p': {'p_target': {'molecule': 'left_side_tagret'}}},
+            {'p': {'p_target': {'molecule': 'right_side_tagret'}}},
+            {'s': {'s_target': {'molecule': 'left_side_tagret'}}},
+            {'s': {'s_target': {'molecule': 'right_side_tagret'}}},
+            {'up': {'1': {'p': {'p_target': {'molecule': 'left_side_tagret'}}}}},
+            {'up': {'3': {'p': {'p_target': {'molecule': 'left_side_tagret'}}}}},
+            {'up': {'1': {'p': {'p_target': {'molecule': 'right_side_tagret'}}}}},
+            {'up': {'3': {'p': {'p_target': {'molecule': 'right_side_tagret'}}}}},
+            {'up_and_down': {'1': {'s': {'s_target': {'molecule': 'left_side_tagret'}}}}},
+            {'up_and_down': {'1': {'s': {'s_target': {'molecule': 'right_side_tagret'}}}}}
+        ])
+
+        correct_answer = [
+            {
+                'draggables': ['molecule'],
+                'targets': ['left_side_tagret', 'right_side_tagret'],
+                'rule': 'unordered_equal'
+            },
+            {
+                'draggables': ['p'],
+                'targets': [
+                    'left_side_tagret[molecule][p_target]',
+                    'right_side_tagret[molecule][p_target]'
+                ],
+                'rule': 'unordered_equal'
+            },
+            {
+                'draggables': ['s'],
+                'targets': [
+                    'left_side_tagret[molecule][s_target]',
+                    'right_side_tagret[molecule][s_target]'
+                ],
+                'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['up_and_down'],
+              'targets': [
+                'left_side_tagret[molecule][s_target][s][1]',
+                'right_side_tagret[molecule][s_target][s][1]'
+              ],
+              'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['up'],
+              'targets': [
+                'left_side_tagret[molecule][p_target][p][1]',
+                'left_side_tagret[molecule][p_target][p][3]',
+                'right_side_tagret[molecule][p_target][p][1]',
+                'right_side_tagret[molecule][p_target][p][3]'
+              ],
+              'rule': 'unordered_equal'
+            }
+        ]
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+    def test_targets_are_draggable_4_real_example(self):
+        user_input = json.dumps([
+            {'single_draggable': 's_l'},
+            {'single_draggable': 's_r'},
+            {'single_draggable': 'p_sigma'},
+            {'single_draggable': 'p_sigma*'},
+            {'single_draggable': 's_sigma'},
+            {'single_draggable': 's_sigma*'},
+            {'double_draggable': 'p_pi*'},
+            {'double_draggable': 'p_pi'},
+            {'triple_draggable': 'p_l'},
+            {'triple_draggable': 'p_r'},
+            {'up': {'1': {'triple_draggable': 'p_l'}}},
+            {'up': {'2': {'triple_draggable': 'p_l'}}},
+            {'up': {'2': {'triple_draggable': 'p_r'}}},
+            {'up': {'3': {'triple_draggable': 'p_r'}}},
+            {'up_and_down': {'1': {'single_draggable': 's_l'}}},
+            {'up_and_down': {'1': {'single_draggable': 's_r'}}},
+            {'up_and_down': {'1': {'single_draggable': 's_sigma'}}},
+            {'up_and_down': {'1': {'single_draggable': 's_sigma*'}}},
+            {'up_and_down': {'1': {'double_draggable': 'p_pi'}}},
+            {'up_and_down': {'2': {'double_draggable': 'p_pi'}}}
+        ])
+
+        # 10 targets:
+        # s_l, s_r, p_l, p_r, s_sigma, s_sigma*, p_pi, p_sigma, p_pi*, p_sigma*
+        #
+        # 3 draggable objects, which have targets (internal target ids - 1, 2, 3):
+        # single_draggable, double_draggable, triple_draggable
+        #
+        # 2 draggable objects:
+        # up, up_and_down
+        correct_answer = [
+            {
+              'draggables': ['triple_draggable'],
+              'targets': ['p_l', 'p_r'],
+              'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['double_draggable'],
+              'targets': ['p_pi', 'p_pi*'],
+              'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['single_draggable'],
+              'targets': ['s_l', 's_r', 's_sigma', 's_sigma*', 'p_sigma', 'p_sigma*'],
+              'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['up'],
+              'targets': ['p_l[triple_draggable][1]', 'p_l[triple_draggable][2]',
+              'p_r[triple_draggable][2]', 'p_r[triple_draggable][3]'],
+              'rule': 'unordered_equal'
+            },
+            {
+              'draggables': ['up_and_down'],
+              'targets': ['s_l[single_draggable][1]', 's_r[single_draggable][1]',
+              's_sigma[single_draggable][1]', 's_sigma*[single_draggable][1]',
+              'p_pi[double_draggable][1]', 'p_pi[double_draggable][2]'],
+              'rule': 'unordered_equal'
+            },
+
+        ]
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+    def test_targets_true(self):
+        user_input = '[{"1": "t1"}, \
+         {"name_with_icon": "t2"}]'
+        correct_answer = {'1': 't1', 'name_with_icon': 't2'}
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+    def test_expect_no_actions_wrong(self):
+        user_input = '[{"1": "t1"}, \
+         {"name_with_icon": "t2"}]'
+        correct_answer = []
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
+
+    def test_expect_no_actions_right(self):
+        user_input = '[]'
+        correct_answer = []
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+
     def test_targets_false(self):
-        user_input = '{"draggables": [{"1": "t1"}, \
-        {"name_with_icon": "t2"}]}'
-        correct_answer = {'1':              't3', 'name_with_icon': 't2'}
+        user_input = '[{"1": "t1"}, \
+        {"name_with_icon": "t2"}]'
+        correct_answer = {'1': 't3', 'name_with_icon': 't2'}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_multiple_images_per_target_true(self):
-        user_input = '{\
-        "draggables": [{"1": "t1"}, {"name_with_icon": "t2"}, \
-        {"2": "t1"}]}'
-        correct_answer = {'1':              't1', 'name_with_icon': 't2',
+        user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}, \
+        {"2": "t1"}]'
+        correct_answer = {'1': 't1', 'name_with_icon': 't2',
         '2': 't1'}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_multiple_images_per_target_false(self):
-        user_input = '{\
-        "draggables": [{"1": "t1"}, {"name_with_icon": "t2"}, \
-        {"2": "t1"}]}'
-        correct_answer = {'1':              't2', 'name_with_icon': 't2',
+        user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}, \
+        {"2": "t1"}]'
+        correct_answer = {'1': 't2', 'name_with_icon': 't2',
         '2': 't1'}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_and_positions(self):
-        user_input = '{"draggables": [{"1": [10,10]}, \
-         {"name_with_icon": [[10,10],4]}]}'
+        user_input = '[{"1": [10,10]}, \
+         {"name_with_icon": [[10,10],4]}]'
         correct_answer = {'1':  [10, 10], 'name_with_icon': [[10, 10], 4]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_position_and_targets(self):
-        user_input = '{"draggables": [{"1": "t1"}, {"name_with_icon": "t2"}]}'
+        user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}]'
         correct_answer = {'1':    't1', 'name_with_icon': 't2'}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_exact(self):
-        user_input = '{"draggables": \
-        [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
+        user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1':   [10, 10], 'name_with_icon': [20, 20]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_false(self):
-        user_input = '{"draggables": \
-        [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
+        user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1':   [25, 25], 'name_with_icon': [20, 20]}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_true_in_radius(self):
-        user_input = '{"draggables": \
-        [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
+        user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1':   [14, 14], 'name_with_icon': [20, 20]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_true_in_manual_radius(self):
-        user_input = '{"draggables": \
-        [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
+        user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1':   [[40, 10], 30], 'name_with_icon': [20, 20]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_false_in_manual_radius(self):
-        user_input = '{"draggables": \
-        [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
+        user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_correct_answer_not_has_key_from_user_answer(self):
-        user_input = '{"draggables": [{"1": "t1"}, \
-        {"name_with_icon": "t2"}]}'
+        user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}]'
         correct_answer = {'3':   't3', 'name_with_icon': 't2'}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
@@ -119,20 +356,20 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         """Draggables can be places anywhere on base image.
             Place grass in the middle of the image and ant in the
             right upper corner."""
-        user_input = '{"draggables": \
-        [{"ant":[610.5,57.449951171875]},{"grass":[322.5,199.449951171875]}]}'
+        user_input = '[{"ant":[610.5,57.449951171875]},\
+            {"grass":[322.5,199.449951171875]}]'
 
         correct_answer = {'grass':     [[300, 200], 200], 'ant': [[500, 0], 200]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_lcao_correct(self):
         """Describe carbon molecule in LCAO-MO"""
-        user_input = '{"draggables":[{"1":"s_left"}, \
+        user_input = '[{"1":"s_left"}, \
         {"5":"s_right"},{"4":"s_sigma"},{"6":"s_sigma_star"},{"7":"p_left_1"}, \
         {"8":"p_left_2"},{"10":"p_right_1"},{"9":"p_right_2"}, \
         {"2":"p_pi_1"},{"3":"p_pi_2"},{"11":"s_sigma_name"}, \
         {"13":"s_sigma_star_name"},{"15":"p_pi_name"},{"16":"p_pi_star_name"}, \
-        {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]}'
+        {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]'
 
         correct_answer = [{
         'draggables': ['1', '2', '3', '4', '5', '6'],
@@ -166,12 +403,12 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_lcao_extra_element_incorrect(self):
         """Describe carbon molecule in LCAO-MO"""
-        user_input = '{"draggables":[{"1":"s_left"}, \
+        user_input = '[{"1":"s_left"}, \
         {"5":"s_right"},{"4":"s_sigma"},{"6":"s_sigma_star"},{"7":"p_left_1"}, \
         {"8":"p_left_2"},{"17":"p_left_3"},{"10":"p_right_1"},{"9":"p_right_2"}, \
         {"2":"p_pi_1"},{"3":"p_pi_2"},{"11":"s_sigma_name"}, \
         {"13":"s_sigma_star_name"},{"15":"p_pi_name"},{"16":"p_pi_star_name"}, \
-        {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]}'
+        {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]'
 
         correct_answer = [{
         'draggables': ['1', '2', '3', '4', '5', '6'],
@@ -205,9 +442,9 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_reuse_draggable_no_mupliples(self):
         """Test reusable draggables (no mupltiple draggables per target)"""
-        user_input = '{"draggables":[{"1":"target1"}, \
+        user_input = '[{"1":"target1"}, \
         {"2":"target2"},{"1":"target3"},{"2":"target4"},{"2":"target5"}, \
-        {"3":"target6"}]}'
+        {"3":"target6"}]'
         correct_answer = [
         {
             'draggables': ['1'],
@@ -228,9 +465,9 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_reuse_draggable_with_mupliples(self):
         """Test reusable draggables with mupltiple draggables per target"""
-        user_input = '{"draggables":[{"1":"target1"}, \
+        user_input = '[{"1":"target1"}, \
         {"2":"target2"},{"1":"target1"},{"2":"target4"},{"2":"target4"}, \
-        {"3":"target6"}]}'
+        {"3":"target6"}]'
         correct_answer = [
         {
             'draggables': ['1'],
@@ -251,10 +488,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_reuse_many_draggable_with_mupliples(self):
         """Test reusable draggables with mupltiple draggables per target"""
-        user_input = '{"draggables":[{"1":"target1"}, \
+        user_input = '[{"1":"target1"}, \
         {"2":"target2"},{"1":"target1"},{"2":"target4"},{"2":"target4"}, \
         {"3":"target6"}, {"4": "target3"}, {"5": "target4"}, \
-        {"5": "target5"}, {"6": "target2"}]}'
+        {"5": "target5"}, {"6": "target2"}]'
         correct_answer = [
         {
             'draggables': ['1', '4'],
@@ -280,12 +517,12 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_reuse_many_draggable_with_mupliples_wrong(self):
         """Test reusable draggables with mupltiple draggables per target"""
-        user_input = '{"draggables":[{"1":"target1"}, \
+        user_input = '[{"1":"target1"}, \
         {"2":"target2"},{"1":"target1"}, \
         {"2":"target3"}, \
         {"2":"target4"}, \
         {"3":"target6"}, {"4": "target3"}, {"5": "target4"}, \
-        {"5": "target5"}, {"6": "target2"}]}'
+        {"5": "target5"}, {"6": "target2"}]'
         correct_answer = [
         {
             'draggables': ['1', '4'],
@@ -311,10 +548,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_label_10_targets_with_a_b_c_false(self):
         """Test reusable draggables (no mupltiple draggables per target)"""
-        user_input = '{"draggables":[{"a":"target1"}, \
+        user_input = '[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"},{"a":"target4"},{"b":"target5"}, \
         {"c":"target6"}, {"a":"target7"},{"b":"target8"},{"c":"target9"}, \
-         {"a":"target1"}]}'
+         {"a":"target1"}]'
         correct_answer = [
         {
             'draggables': ['a'],
@@ -335,10 +572,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_label_10_targets_with_a_b_c_(self):
         """Test reusable draggables (no mupltiple draggables per target)"""
-        user_input = '{"draggables":[{"a":"target1"}, \
+        user_input = '[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"},{"a":"target4"},{"b":"target5"}, \
         {"c":"target6"}, {"a":"target7"},{"b":"target8"},{"c":"target9"}, \
-         {"a":"target10"}]}'
+         {"a":"target10"}]'
         correct_answer = [
         {
             'draggables': ['a'],
@@ -359,10 +596,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_label_10_targets_with_a_b_c_multiple(self):
         """Test reusable draggables  (mupltiple draggables per target)"""
-        user_input = '{"draggables":[{"a":"target1"}, \
+        user_input = '[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"},{"b":"target5"}, \
         {"c":"target6"}, {"a":"target7"},{"b":"target8"},{"c":"target9"}, \
-         {"a":"target1"}]}'
+         {"a":"target1"}]'
         correct_answer = [
         {
             'draggables': ['a', 'a', 'a'],
@@ -383,10 +620,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_label_10_targets_with_a_b_c_multiple_false(self):
         """Test reusable draggables  (mupltiple draggables per target)"""
-        user_input = '{"draggables":[{"a":"target1"}, \
+        user_input = '[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"},{"a":"target4"},{"b":"target5"}, \
         {"c":"target6"}, {"a":"target7"},{"b":"target8"},{"c":"target9"}, \
-         {"a":"target1"}]}'
+         {"a":"target1"}]'
         correct_answer = [
         {
             'draggables': ['a', 'a', 'a'],
@@ -407,10 +644,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_label_10_targets_with_a_b_c_reused(self):
         """Test a b c in 10 labels reused"""
-        user_input = '{"draggables":[{"a":"target1"}, \
+        user_input = '[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"},{"b":"target5"}, \
         {"c":"target6"}, {"b":"target8"},{"c":"target9"}, \
-         {"a":"target10"}]}'
+         {"a":"target10"}]'
         correct_answer = [
         {
             'draggables': ['a', 'a'],
@@ -431,10 +668,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_label_10_targets_with_a_b_c_reused_false(self):
         """Test a b c in 10 labels reused false"""
-        user_input = '{"draggables":[{"a":"target1"}, \
+        user_input = '[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"},{"b":"target5"}, {"a":"target8"},\
         {"c":"target6"}, {"b":"target8"},{"c":"target9"}, \
-         {"a":"target10"}]}'
+         {"a":"target10"}]'
         correct_answer = [
         {
             'draggables': ['a', 'a'],
@@ -455,9 +692,9 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_mixed_reuse_and_not_reuse(self):
         """Test reusable draggables """
-        user_input = '{"draggables":[{"a":"target1"}, \
+        user_input = '[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"}, {"a":"target4"},\
-         {"a":"target5"}]}'
+         {"a":"target5"}]'
         correct_answer = [
         {
             'draggables': ['a', 'b'],
@@ -473,8 +710,8 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_mixed_reuse_and_not_reuse_number(self):
         """Test reusable draggables with number """
-        user_input = '{"draggables":[{"a":"target1"}, \
-        {"b":"target2"},{"c":"target3"}, {"a":"target4"}]}'
+        user_input = '[{"a":"target1"}, \
+        {"b":"target2"},{"c":"target3"}, {"a":"target4"}]'
         correct_answer = [
         {
             'draggables': ['a', 'a', 'b'],
@@ -490,8 +727,8 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_mixed_reuse_and_not_reuse_number_false(self):
         """Test reusable draggables with numbers, but wrong"""
-        user_input = '{"draggables":[{"a":"target1"}, \
-        {"b":"target2"},{"c":"target3"}, {"a":"target4"}, {"a":"target10"}]}'
+        user_input = '[{"a":"target1"}, \
+        {"b":"target2"},{"c":"target3"}, {"a":"target4"}, {"a":"target10"}]'
         correct_answer = [
         {
             'draggables': ['a', 'a', 'b'],
@@ -506,9 +743,9 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_alternative_correct_answer(self):
-        user_input = '{"draggables":[{"name_with_icon":"t1"},\
+        user_input = '[{"name_with_icon":"t1"},\
         {"name_with_icon":"t1"},{"name_with_icon":"t1"},{"name4":"t1"}, \
-        {"name4":"t1"}]}'
+        {"name4":"t1"}]'
         correct_answer = [
         {'draggables': ['name4'], 'targets': ['t1', 't1'], 'rule': 'exact'},
         {'draggables': ['name_with_icon'], 'targets': ['t1', 't1', 't1'],
@@ -521,14 +758,13 @@ class Test_DragAndDrop_Populate(unittest.TestCase):
 
     def test_1(self):
         correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
-        user_input = '{"draggables": \
-        [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
+        user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         dnd = draganddrop.DragAndDrop(correct_answer, user_input)
 
-        correct_groups = {'1': ['name_with_icon'], '0': ['1']}
-        correct_positions = {'1': {'exact': [[20, 20]]}, '0': {'exact': [[[40, 10], 29]]}}
-        user_groups = {'1': [u'name_with_icon'], '0': [u'1']}
-        user_positions = {'1': {'user': [[20, 20]]}, '0': {'user': [[10, 10]]}}
+        correct_groups = [['1'], ['name_with_icon']]
+        correct_positions = [{'exact': [[[40, 10], 29]]}, {'exact': [[20, 20]]}]
+        user_groups = [['1'], ['name_with_icon']]
+        user_positions = [{'user': [[10, 10]]}, {'user': [[20, 20]]}]
 
         self.assertEqual(correct_groups, dnd.correct_groups)
         self.assertEqual(correct_positions, dnd.correct_positions)
@@ -539,49 +775,49 @@ class Test_DragAndDrop_Populate(unittest.TestCase):
 class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
 
     def test_1(self):
-        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertTrue(dnd.compare_positions(correct=[[1, 1], [2, 3]],
                                               user=[[2, 3], [1, 1]],
                                               flag='anyof'))
 
     def test_2a(self):
-        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertTrue(dnd.compare_positions(correct=[[1, 1], [2, 3]],
                                                user=[[2, 3], [1, 1]],
                                                flag='exact'))
 
     def test_2b(self):
-        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertFalse(dnd.compare_positions(correct=[[1, 1], [2, 3]],
                                                user=[[2, 13], [1, 1]],
                                                flag='exact'))
 
     def test_3(self):
-        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertFalse(dnd.compare_positions(correct=["a", "b"],
                                                user=["a", "b", "c"],
                                                flag='anyof'))
 
     def test_4(self):
-        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertTrue(dnd.compare_positions(correct=["a", "b", "c"],
                                               user=["a", "b"],
                                               flag='anyof'))
 
     def test_5(self):
-        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertFalse(dnd.compare_positions(correct=["a", "b", "c"],
                                                user=["a", "c", "b"],
                                                flag='exact'))
 
     def test_6(self):
-        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertTrue(dnd.compare_positions(correct=["a", "b", "c"],
                                                user=["a", "c", "b"],
                                                flag='anyof'))
 
     def test_7(self):
-        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertFalse(dnd.compare_positions(correct=["a", "b", "b"],
                                                user=["a", "c", "b"],
                                                flag='anyof'))

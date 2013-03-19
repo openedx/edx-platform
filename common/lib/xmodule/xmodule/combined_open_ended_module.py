@@ -1,37 +1,77 @@
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
 from lxml import etree
-from lxml.html import rewrite_links
-from path import path
-import os
-import sys
 
 from pkg_resources import resource_string
 
-from .capa_module import only_one, ComplexEncoder
-from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
-from .stringify import stringify_children
+from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
-from combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
+from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float, List
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
+from collections import namedtuple
 
 log = logging.getLogger("mitx.courseware")
 
+V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
+                          "skip_spelling_checks", "due", "graceperiod", "max_score"]
 
-VERSION_TUPLES = (
-    ('1', CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module),
-)
+V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
+                         "student_attempts", "ready_to_reset"]
+
+V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
+
+VersionTuple = namedtuple('VersionTuple', ['descriptor', 'module', 'settings_attributes', 'student_attributes'])
+VERSION_TUPLES = {
+    1: VersionTuple(CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES,
+                    V1_STUDENT_ATTRIBUTES),
+}
 
 DEFAULT_VERSION = 1
-DEFAULT_VERSION = str(DEFAULT_VERSION)
 
-class CombinedOpenEndedModule(XModule):
+
+class VersionInteger(Integer):
+    """
+    A model type that converts from strings to integers when reading from json.
+    Also does error checking to see if version is correct or not.
+    """
+
+    def from_json(self, value):
+        try:
+            value = int(value)
+            if value not in VERSION_TUPLES:
+                version_error_string = "Could not find version {0}, using version {1} instead"
+                log.error(version_error_string.format(value, DEFAULT_VERSION))
+                value = DEFAULT_VERSION
+        except:
+            value = DEFAULT_VERSION
+        return value
+
+
+class CombinedOpenEndedFields(object):
+    display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
+    current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.student_state)
+    task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.student_state)
+    state = String(help="Which step within the current task that the student is on.", default="initial",
+                   scope=Scope.student_state)
+    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
+                               scope=Scope.student_state)
+    ready_to_reset = Boolean(help="If the problem is ready to be reset or not.", default=False,
+                             scope=Scope.student_state)
+    attempts = Integer(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
+    is_graded = Boolean(help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
+    accept_file_upload = Boolean(help="Whether or not the problem accepts file uploads.", default=False,
+                                 scope=Scope.settings)
+    skip_spelling_checks = Boolean(help="Whether or not to skip initial spelling checks.", default=True,
+                                   scope=Scope.settings)
+    due = String(help="Date that this problem is due by", default=None, scope=Scope.settings)
+    graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
+                         scope=Scope.settings)
+    max_score = Integer(help="Maximum score for the problem.", default=1, scope=Scope.settings)
+    version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
+    data = String(help="XML data for the problem", scope=Scope.content)
+
+
+class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
     It transitions between problems, and support arbitrary ordering.
@@ -62,6 +102,8 @@ class CombinedOpenEndedModule(XModule):
     INTERMEDIATE_DONE = 'intermediate_done'
     DONE = 'done'
 
+    icon_class = 'problem'
+
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
@@ -70,11 +112,8 @@ class CombinedOpenEndedModule(XModule):
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-            instance_state, shared_state, **kwargs)
-
+    def __init__(self, system, location, descriptor, model_data):
+        XModule.__init__(self, system, location, descriptor, model_data)
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
 
@@ -113,45 +152,37 @@ class CombinedOpenEndedModule(XModule):
         self.system = system
         self.system.set('location', location)
 
-        # Load instance state
-        if instance_state is not None:
-            instance_state = json.loads(instance_state)
-        else:
-            instance_state = {}
+        if self.task_states is None:
+            self.task_states = []
 
-        self.version = self.metadata.get('version', DEFAULT_VERSION)
-        if not isinstance(self.version, basestring):
-            try:
-                self.version = str(self.version)
-            except:
-                log.error("Version {0} is not correct.  Going with version {1}".format(self.version, DEFAULT_VERSION))
-                self.version = DEFAULT_VERSION
+        version_tuple = VERSION_TUPLES[self.version]
 
-        versions = [i[0] for i in VERSION_TUPLES]
-        descriptors = [i[1] for i in VERSION_TUPLES]
-        modules = [i[2] for i in VERSION_TUPLES]
+        self.student_attributes = version_tuple.student_attributes
+        self.settings_attributes = version_tuple.settings_attributes
 
-        try:
-            version_index = versions.index(self.version)
-        except:
-            log.error("Version {0} is not correct.  Going with version {1}".format(self.version, DEFAULT_VERSION))
-            self.version = DEFAULT_VERSION
-            version_index = versions.index(self.version)
+        attributes = self.student_attributes + self.settings_attributes
 
         static_data = {
-            'rewrite_content_links' : self.rewrite_content_links,
+            'rewrite_content_links': self.rewrite_content_links,
         }
-
-        self.child_descriptor = descriptors[version_index](self.system)
-        self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(definition['xml_string']), self.system)
-        self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = json.dumps(instance_state), metadata = self.metadata, static_data= static_data)
+        instance_state = {k: getattr(self, k) for k in attributes}
+        self.child_descriptor = version_tuple.descriptor(self.system)
+        self.child_definition = version_tuple.descriptor.definition_from_xml(etree.fromstring(self.data), self.system)
+        self.child_module = version_tuple.module(self.system, location, self.child_definition, self.child_descriptor,
+                                                 instance_state=instance_state, static_data=static_data,
+                                                 attributes=attributes)
+        self.save_instance_data()
 
     def get_html(self):
-        return self.child_module.get_html()
+        self.save_instance_data()
+        return_value = self.child_module.get_html()
+        return return_value
 
     def handle_ajax(self, dispatch, get):
-        return self.child_module.handle_ajax(dispatch, get)
+        self.save_instance_data()
+        return_value = self.child_module.handle_ajax(dispatch, get)
+        self.save_instance_data()
+        return return_value
 
     def get_instance_state(self):
         return self.child_module.get_instance_state()
@@ -159,8 +190,8 @@ class CombinedOpenEndedModule(XModule):
     def get_score(self):
         return self.child_module.get_score()
 
-    def max_score(self):
-        return self.child_module.max_score()
+    #def max_score(self):
+    #    return self.child_module.max_score()
 
     def get_progress(self):
         return self.child_module.get_progress()
@@ -169,16 +200,18 @@ class CombinedOpenEndedModule(XModule):
     def due_date(self):
         return self.child_module.due_date
 
-    @property
-    def display_name(self):
-        return self.child_module.display_name
+    def save_instance_data(self):
+        for attribute in self.student_attributes:
+            child_attr = getattr(self.child_module, attribute)
+            if child_attr != getattr(self, attribute):
+                setattr(self, attribute, getattr(self.child_module, attribute))
 
 
-class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
+class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     """
     Module for adding combined open ended questions
     """
-    mako_template = "widgets/html-edit.html"
+    mako_template = "widgets/raw-edit.html"
     module_class = CombinedOpenEndedModule
     filename_extension = "xml"
 
@@ -186,35 +219,3 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     has_score = True
     template_dir_name = "combinedopenended"
 
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
-
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        """
-        Pull out the individual tasks, the rubric, and the prompt, and parse
-
-        Returns:
-        {
-        'rubric': 'some-html',
-        'prompt': 'some-html',
-        'task_xml': dictionary of xml strings,
-        }
-        """
-
-        return {'xml_string' : etree.tostring(xml_object), 'metadata' : xml_object.attrib}
-
-
-    def definition_to_xml(self, resource_fs):
-        '''Return an xml element representing this definition.'''
-        elt = etree.Element('combinedopenended')
-
-        def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
-            child_node = etree.fromstring(child_str)
-            elt.append(child_node)
-
-        for child in ['task']:
-            add_child(child)
-
-        return elt

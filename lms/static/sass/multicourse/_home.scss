@@ -1,6 +1,11 @@
 .home {
   padding: 0px;
 
+  > .container {
+    @include box-sizing(border-box);
+    width: flex-grid(12);
+  }
+
   > header {
     background: rgb(255,255,255);
     @include background-image(url('/static/images/homepage-bg.jpg'));
@@ -175,9 +180,6 @@
   }
 
   .university-partners {
-    @include background-image(linear-gradient(180deg, rgba(245,245,245, 0) 0%,
-                                                      rgba(245,245,245, 1) 50%,
-                                                      rgba(245,245,245, 0) 100%));
     border-bottom: 1px solid rgb(210,210,210);
     margin-bottom: 0px;
     overflow: hidden;
@@ -300,7 +302,6 @@
         }
 
         img {
-          max-width: 190px;
           position: relative;
           @include transition(all, 0.25s, ease-in-out);
           vertical-align: middle;
@@ -320,6 +321,44 @@
 
           img {
             top: -100px;
+          }
+        }
+      }
+    }
+
+    &.university-partners2x6 {
+      @include box-sizing(border-box);
+      width: flex-grid(12, 12);
+
+      .partners {
+        @include box-sizing(border-box);
+        @include clearfix();
+        margin-left: 60px;
+        padding: 12px 0;
+
+        .partner {
+          @include box-sizing(border-box);
+          width: flex-grid(2, 12);
+          display: block;
+          float: left;
+          padding: 0 12px;
+
+          a {
+
+            img {
+              width: 100%;
+              height: auto;
+            }
+
+            .name > span {
+              font-size: 1.0em;
+            }
+
+            &:hover {
+              .name {
+                bottom: 14px;
+              }
+            }
           }
         }
       }

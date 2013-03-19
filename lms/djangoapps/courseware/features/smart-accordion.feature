@@ -23,37 +23,41 @@ Feature: There are courses on the homepage
   As an acceptance test
   I want to count all the chapters, sections, and tabs for each course
 
-  Scenario: Navigate through course MITx/3.091x/2012_Fall
-    Given I am registered for course "MITx/3.091x/2012_Fall"
-    And I log in
-    Then I verify all the content of each course
+  # Commenting these all out for now because they don't always run,
+  # they have too many prerequesites, e.g. the course exists, and
+  # is within the start and end dates, etc.
 
-  Scenario: Navigate through course MITx/6.002x/2012_Fall
-    Given I am registered for course "MITx/6.002x/2012_Fall"
-    And I log in
-    Then I verify all the content of each course
+  # Scenario: Navigate through course MITx/3.091x/2012_Fall
+  #   Given I am registered for course "MITx/3.091x/2012_Fall"
+  #   And I log in
+  #   Then I verify all the content of each course
 
-  Scenario: Navigate through course MITx/6.00x/2012_Fall
-    Given I am registered for course "MITx/6.00x/2012_Fall"
-    And I log in
-    Then I verify all the content of each course
+  # Scenario: Navigate through course MITx/6.002x/2012_Fall
+  #   Given I am registered for course "MITx/6.002x/2012_Fall"
+  #   And I log in
+  #   Then I verify all the content of each course
 
-  Scenario: Navigate through course HarvardX/PH207x/2012_Fall
-    Given I am registered for course "HarvardX/PH207x/2012_Fall"
-    And I log in
-    Then I verify all the content of each course
+  # Scenario: Navigate through course MITx/6.00x/2012_Fall
+  #   Given I am registered for course "MITx/6.00x/2012_Fall"
+  #   And I log in
+  #   Then I verify all the content of each course
 
-  Scenario: Navigate through course BerkeleyX/CS169.1x/2012_Fall
-    Given I am registered for course "BerkeleyX/CS169.1x/2012_Fall"
-    And I log in
-    Then I verify all the content of each course
+  # Scenario: Navigate through course HarvardX/PH207x/2012_Fall
+  #   Given I am registered for course "HarvardX/PH207x/2012_Fall"
+  #   And I log in
+  #   Then I verify all the content of each course
 
-  Scenario: Navigate through course BerkeleyX/CS169.2x/2012_Fall
-    Given I am registered for course "BerkeleyX/CS169.2x/2012_Fall"
-    And I log in
-    Then I verify all the content of each course
+  # Scenario: Navigate through course BerkeleyX/CS169.1x/2012_Fall
+  #   Given I am registered for course "BerkeleyX/CS169.1x/2012_Fall"
+  #   And I log in
+  #   Then I verify all the content of each course
 
-  Scenario: Navigate through course BerkeleyX/CS184.1x/2012_Fall
-    Given I am registered for course "BerkeleyX/CS184.1x/2012_Fall"
-    And I log in
-    Then I verify all the content of each course
+  # Scenario: Navigate through course BerkeleyX/CS169.2x/2012_Fall
+  #   Given I am registered for course "BerkeleyX/CS169.2x/2012_Fall"
+  #   And I log in
+  #   Then I verify all the content of each course
+
+  # Scenario: Navigate through course BerkeleyX/CS184.1x/2012_Fall
+  #   Given I am registered for course "BerkeleyX/CS184.1x/2012_Fall"
+  #   And I log in
+  #   Then I verify all the content of each course
