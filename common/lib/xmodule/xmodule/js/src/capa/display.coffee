@@ -41,6 +41,11 @@ class @Problem
         @el.attr progress: response.progress_status
         @el.trigger('progressChanged')
 
+  forceUpdate: (response) =>
+    @el.attr progress: response.progress_status
+    @el.trigger('progressChanged')
+    
+
   queueing: =>
     @queued_items = @$(".xqueue")
     @num_queued_items = @queued_items.length
@@ -70,8 +75,8 @@ class @Problem
           @bind()
       
       @num_queued_items = @new_queued_items.length
-      @updateProgress response
       if @num_queued_items == 0 
+        @forceUpdate response
         delete window.queuePollerID
       else
         # TODO: Some logic to dynamically adjust polling rate based on queuelen
