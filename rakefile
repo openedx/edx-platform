@@ -488,17 +488,6 @@ task :autodeploy_properties do
 end
 
 
-task :tst, [:options] do |t, args|
-    puts args.options
-    if args.options == 'pub'
-        path = "doc/public"
-    else
-        path = "docs"
-    end
-
-    puts vvv
-end
-
 # --- Develop and public documentation ---
 desc "Invoke sphinx 'make build' to generate docs."
 task :builddocs, [:options] do |t, args|
