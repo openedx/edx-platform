@@ -1291,6 +1291,11 @@ def course_advanced_updates(request, org, course, name):
 #@ensure_csrf_cookie  what is this cookie?
 @login_required
 def get_checklists(request, org, course, name):
+    """
+    Send models, views, and html for displaying the course checklists.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
     location = get_location_and_verify_access(request, org, course, name)
 
     modulestore = get_modulestore(location)
@@ -1303,29 +1308,41 @@ def get_checklists(request, org, course, name):
         course_module.checklists = template_module.checklists
         modulestore.update_metadata(location, own_metadata(course_module))
 
-    checklists = course_module.checklists
     return render_to_response('checklists.html',
         {
             'context_course': course_module,
-            'checklists' : checklists,
-            'checklists_json' : json.dumps(checklists)
+            'checklists' : course_module.checklists
 
         })
 
+
 @login_required
 def update_checklist(request, org, course, name, checklist_index=None):
+    """
+    restful CRUD operations on course checklists. The payload is a json rep of
+    the modified checklist. For PUT or POST requests, the index of the
+    checklist being modified must be included; the returned payload will
+    be just that one checklist. For GET requests, the returned payload
+    is a json representation of the list of all checklists.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
     location = get_location_and_verify_access(request, org, course, name)
     modulestore = get_modulestore(location)
     course_module = modulestore.get_item(location)
 
     real_method = get_request_method(request)
-    if checklist_index is not None and (real_method == 'POST' or real_method == 'PUT'):
-        modified_checklist = json.loads(request.body)
-        course_module.checklists[int(checklist_index)] = modified_checklist
-        modulestore.update_metadata(location, own_metadata(course_module))
-        return HttpResponse(json.dumps(modified_checklist), mimetype="application/json")
+    if real_method == 'POST' or real_method == 'PUT':
+        if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
+            modified_checklist = json.loads(request.body)
+            course_module.checklists[int(checklist_index)] = modified_checklist
+            modulestore.update_metadata(location, own_metadata(course_module))
+            return HttpResponse(json.dumps(modified_checklist), mimetype="application/json")
+        else:
+            return HttpResponseBadRequest("Could not save checklist state because the checklist index was out of range or unspecified.",
+                content_type="text/plain")
     elif request.method == 'GET':
-        # TODO: Would we ever get in this condition? Any point in having this code?
+        # In the JavaScript view initialize method, we do a fetch to get all the checklists.
         return HttpResponse(json.dumps(course_module.checklists), mimetype="application/json")
 
 
@@ -1594,7 +1611,12 @@ def render_404(request):
 def render_500(request):
     return HttpResponseServerError(render_to_string('500.html', {}))
 
+
 def get_location_and_verify_access(request, org, course, name):
+    """
+    Create the location tuple verify that the user has permissions
+    to view the location.
+    """
     location = ['i4x', org, course, 'course', name]
 
     # check that logged in user has permissions to this item
@@ -1603,7 +1625,12 @@ def get_location_and_verify_access(request, org, course, name):
 
     return location
 
+
 def get_request_method(request):
+    """
+    Using HTTP_X_HTTP_METHOD_OVERRIDE, in the request metadata, determine
+    what type of request came from the client.
+    """
     # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
     if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
         real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']

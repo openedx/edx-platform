@@ -22,14 +22,43 @@ def i_see_default_checklists(step):
     assert_true(checklists[3].text.endswith('Draft your Course Introduction'))
 
 
-@step('I can select tasks in a checklist$')
-def i_can_select_tasks(step):
+@step('I can check and uncheck tasks in a checklist$')
+def i_can_check_and_uncheck_tasks(step):
     # Use the 2nd checklist as a reference
-    assert_equal('0', css_find('#course-checklist1 .status-count').first.text)
-    assert_equal('7', css_find('#course-checklist1 .status-amount').first.text)
-    # TODO: check progress bar, select several items and check how things change
+    verifyChecklist2Status(0, 7, 0)
+    toggleTask(1, 0)
+    verifyChecklist2Status(1, 7, 14)
+    toggleTask(1, 3)
+    verifyChecklist2Status(2, 7, 29)
+    toggleTask(1, 6)
+    verifyChecklist2Status(3, 7, 43)
+    toggleTask(1, 3)
+    verifyChecklist2Status(2, 7, 29)
 
 
-@step('They are still selected after I reload the page$')
-def tasks_still_selected_after_reload(step):
+@step('They are correctly selected after I reload the page$')
+def tasks_correctly_selected_after_reload(step):
     reload_the_page(step)
+    verifyChecklist2Status(2, 7, 29)
+    # verify that task 7 is still selected by toggling its checkbox state and making sure that it deselects
+    toggleTask(1, 6)
+    verifyChecklist2Status(1, 7, 14)
+
+
+############### HELPER METHODS ####################
+def verifyChecklist2Status(completed, total, percentage):
+    def verify_count(driver):
+        try:
+            statusCount = css_find('#course-checklist1 .status-count').first
+            return statusCount.text == str(completed)
+        except StaleElementReferenceException:
+            return False
+
+    wait_for(verify_count)
+    assert_equal(str(total), css_find('#course-checklist1 .status-amount').first.text)
+    # Would like to check the CSS width, but not sure how to do that.
+    assert_equal(str(percentage), css_find('#course-checklist1 .viz-checklist-status-value .int').first.text)
+
+
+def toggleTask(checklist, task):
+    css_click('#course-checklist' + str(checklist) +'-task' + str(task))

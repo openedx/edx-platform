@@ -13,16 +13,13 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        // TODO: do a fetch instead of passing text into constructor.
-        var checklistCollection = new CMS.Models.ChecklistCollection(${checklists_json | n}, {parse: true});
+        var checklistCollection = new CMS.Models.ChecklistCollection();
         checklistCollection.url = "${reverse('checklists_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
 
         var editor = new CMS.Views.Checklists({
             el: $('.course-checklists'),
             collection: checklistCollection
         });
-
-        editor.render();
 
     });
 

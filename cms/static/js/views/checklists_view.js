@@ -10,12 +10,18 @@ CMS.Views.Checklists = Backbone.View.extend({
 
     initialize : function() {
         var self = this;
-        // instantiates an editor template for each update in the collection
-        window.templateLoader.loadRemoteTemplate("checklist",
-            "/static/client_templates/checklist.html",
-            function (raw_template) {
-                self.template = _.template(raw_template);
-                self.render();
+
+        this.collection.fetch({
+                complete: function () {
+                    window.templateLoader.loadRemoteTemplate("checklist",
+                        "/static/client_templates/checklist.html",
+                        function (raw_template) {
+                            self.template = _.template(raw_template);
+                            self.render();
+                        }
+                    );
+                },
+                error: CMS.ServerError
             }
         );
     },

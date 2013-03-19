@@ -1,3 +1,4 @@
+// Model for checklists_view.js.
 CMS.Models.Checklist = Backbone.Model.extend({
 });
 
