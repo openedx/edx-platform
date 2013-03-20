@@ -8,7 +8,7 @@ from collections import namedtuple
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -304,6 +304,7 @@ class MongoModuleStore(ModuleStoreBase):
                     # this is likely a leaf node, so let's record what metadata we need to inherit
                     metadata_to_inherit[child] = my_metadata
 
+
         if root is not None:
             _compute_inherited_metadata(root)
 
@@ -336,7 +337,7 @@ class MongoModuleStore(ModuleStoreBase):
            self.get_cached_metadata_inheritance_tree(location, force_refresh = True)
 
     def clear_cached_metadata_inheritance_tree(self, location):
-        key_name = '{0}/{1}'.format(location.org, location.course)       
+        key_name = '{0}/{1}'.format(location.org, location.course)
         if self.metadata_inheritance_cache is not None:
             self.metadata_inheritance_cache.delete(key_name)
 
@@ -393,12 +394,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         resource_fs = OSFS(root)
 
-        metadata_inheritance_tree = None
-
-        # if we are loading a course object, there is no parent to inherit the metadata from
-        # so don't bother getting it
-        if item['location']['category'] != 'course':
-            metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']))
+        metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']))
 
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
@@ -503,7 +499,12 @@ class MongoModuleStore(ModuleStoreBase):
         try:
             source_item = self.collection.find_one(location_to_query(source))
             source_item['_id'] = Location(location).dict()
-            self.collection.insert(source_item)
+            self.collection.insert(
+                source_item,
+                # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
+                # from overriding our default value set in the init method.
+                safe=self.collection.safe
+            )
             item = self._load_items([source_item])[0]
 
             # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
@@ -566,6 +567,9 @@ class MongoModuleStore(ModuleStoreBase):
             {'$set': update},
             multi=False,
             upsert=True,
+            # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
+            # from overriding our default value set in the init method.
+            safe=self.collection.safe
         )
         if result['n'] == 0:
             raise ItemNotFoundError(location)
@@ -618,7 +622,11 @@ class MongoModuleStore(ModuleStoreBase):
 
         self._update_single_item(location, {'metadata': metadata})
         # recompute (and update) the metadata inheritance tree which is cached
+<<<<<<< HEAD
         self.refresh_cached_metadata_inheritance_tree(loc)      
+=======
+        self.get_cached_metadata_inheritance_tree(loc, force_refresh = True)
+>>>>>>> fbd409c914c2dc005fd6b46af6daaee262205e0e
 
     def delete_item(self, location):
         """
@@ -636,9 +644,16 @@ class MongoModuleStore(ModuleStoreBase):
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
             self.update_metadata(course.location, own_metadata(course))
 
-        self.collection.remove({'_id': Location(location).dict()})
+        self.collection.remove({'_id': Location(location).dict()},
+            # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
+            # from overriding our default value set in the init method.
+            safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
+<<<<<<< HEAD
         self.refresh_cached_metadata_inheritance_tree(Location(location))  
+=======
+        self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)
+>>>>>>> fbd409c914c2dc005fd6b46af6daaee262205e0e
 
 
     def get_parent_locations(self, location, course_id):

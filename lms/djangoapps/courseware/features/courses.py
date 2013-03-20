@@ -9,6 +9,7 @@ logger = getLogger(__name__)
 
 ## support functions
 
+
 def get_courses():
     '''
     Returns dict of lists of courses available, keyed by course.org (ie university).

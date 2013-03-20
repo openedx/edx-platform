@@ -39,9 +39,9 @@ Feature: Homepage for web users
     | MITx        |
     | HarvardX    |
     | BerkeleyX   |
-    | UTx         |    
+    | UTx         |
     | WellesleyX  |
-    | GeorgetownX |  
+    | GeorgetownX |
 
   # # TODO: Add scenario that tests the courses available
   # # using a policy or a configuration file

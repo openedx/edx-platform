@@ -18,7 +18,8 @@ from django.core.files.temp import NamedTemporaryFile
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
 
-from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
+from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.context_processors import csrf
@@ -1597,3 +1598,11 @@ def event(request):
     console logs don't get distracted :-)
     '''
     return HttpResponse(True)
+
+
+def render_404(request):
+    return HttpResponseNotFound(render_to_string('404.html', {}))
+
+
+def render_500(request):
+    return HttpResponseServerError(render_to_string('500.html', {}))
