@@ -1,3 +1,7 @@
+"""
+Classes to provide the LMS runtime data storage to XBlocks
+"""
+
 import json
 from collections import namedtuple, defaultdict
 from itertools import chain
@@ -14,10 +18,16 @@ from xblock.core import Scope
 
 
 class InvalidWriteError(Exception):
-    pass
+    """
+    Raised to indicate that writing to a particular key
+    in the KeyValueStore is disabled
+    """
 
 
 def chunks(items, chunk_size):
+    """
+    Yields the values from items in chunks of size chunk_size
+    """
     items = list(items)
     return (items[i:i + chunk_size] for i in xrange(0, len(items), chunk_size))
 
@@ -67,6 +77,15 @@ class ModelDataCache(object):
         """
 
         def get_child_descriptors(descriptor, depth, descriptor_filter):
+            """
+            Return a list of all child descriptors down to the specified depth
+            that match the descriptor filter. Includes `descriptor`
+
+            descriptor: The parent to search inside
+            depth: The number of levels to descend, or None for infinite depth
+            descriptor_filter(descriptor): A function that returns True
+                if descriptor should be included in the results
+            """
             if descriptor_filter(descriptor):
                 descriptors = [descriptor]
             else:
@@ -168,6 +187,9 @@ class ModelDataCache(object):
         return scope_map
 
     def _cache_key_from_kvs_key(self, key):
+        """
+        Return the key used in the ModelDataCache for the specified KeyValueStore key
+        """
         if key.scope == Scope.student_state:
             return (key.scope, key.block_scope_id.url())
         elif key.scope == Scope.content:
@@ -180,6 +202,10 @@ class ModelDataCache(object):
             return (key.scope, key.field_name)
 
     def _cache_key_from_field_object(self, scope, field_object):
+        """
+        Return the key used in the ModelDataCache for the specified scope and
+        field
+        """
         if scope == Scope.student_state:
             return (scope, field_object.module_state_key)
         elif scope == Scope.content:
@@ -230,7 +256,7 @@ class ModelDataCache(object):
                 usage_id='%s-%s' % (self.course_id, key.block_scope_id.url()),
             )
         elif key.scope == Scope.student_preferences:
-            field_object, _= XModuleStudentPrefsField.objects.get_or_create(
+            field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
                 field_name=key.field_name,
                 module_type=key.block_scope_id,
                 student=self.user.pk,
@@ -276,6 +302,7 @@ class LmsKeyValueStore(KeyValueStore):
         Scope.student_info,
         Scope.children,
     )
+
     def __init__(self, descriptor_model_data, model_data_cache):
         self._descriptor_model_data = descriptor_model_data
         self._model_data_cache = model_data_cache
@@ -357,4 +384,3 @@ class LmsKeyValueStore(KeyValueStore):
 
 
 LmsUsage = namedtuple('LmsUsage', 'id, def_id')
-
