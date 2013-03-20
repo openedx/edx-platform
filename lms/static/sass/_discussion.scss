@@ -2450,6 +2450,13 @@ body.discussion {
       padding-right: 5px;
       font-style: italic; 
     }  
+
+.discussion-pin-inline {
+      font-size: 12px;
+      float:right;
+      padding-right: 5px;
+      font-style: italic; 
+    }  
     
 .notpinned .icon
 {
@@ -2477,4 +2484,9 @@ body.discussion {
 .notpinned span {
   color: #888;
   font-style: italic;
+}
+
+.pinned-false
+{
+display:none;
 }
