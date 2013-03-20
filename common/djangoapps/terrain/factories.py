@@ -1,12 +1,17 @@
-from student.tests.factories import (UserFactory, UserProfileFactory,
-                                     RegistrationFactory, GroupFactory,
-                                     CourseEnrollmentAllowed,
-                                     CourseFactory, ItemFactory)
+'''
+Factories are defined in other modules and absorbed here into the
+lettuce world so that they can be used by both unit tests
+and integration / BDD tests.
+
+TODO: move the course and item factories out of student and into
+xmodule/modulestore
+'''
+import student.tests.factories as sf
 from lettuce import world
 
 
 @world.absorb
-class UserFactory(UserFactory):
+class UserFactory(sf.UserFactory):
     """
     User account for lms / cms
     """
@@ -14,7 +19,7 @@ class UserFactory(UserFactory):
 
 
 @world.absorb
-class UserProfileFactory(UserProfileFactory):
+class UserProfileFactory(sf.UserProfileFactory):
     """
     Demographics etc for the User
     """
@@ -22,7 +27,7 @@ class UserProfileFactory(UserProfileFactory):
 
 
 @world.absorb
-class RegistrationFactory(RegistrationFactory):
+class RegistrationFactory(sf.RegistrationFactory):
     """
     Activation key for registering the user account
     """
@@ -30,7 +35,7 @@ class RegistrationFactory(RegistrationFactory):
 
 
 @world.absorb
-class GroupFactory(GroupFactory):
+class GroupFactory(sf.GroupFactory):
     """
     Groups for user permissions for courses
     """
@@ -38,7 +43,7 @@ class GroupFactory(GroupFactory):
 
 
 @world.absorb
-class CourseEnrollmentAllowedFactory(CourseEnrollmentAllowed):
+class CourseEnrollmentAllowedFactory(sf.CourseEnrollmentAllowed):
     """
     Users allowed to enroll in the course outside of the usual window
     """
@@ -46,7 +51,7 @@ class CourseEnrollmentAllowedFactory(CourseEnrollmentAllowed):
 
 
 @world.absorb
-class CourseFactory(CourseFactory):
+class CourseFactory(sf.CourseFactory):
     """
     Courseware courses
     """
@@ -54,7 +59,7 @@ class CourseFactory(CourseFactory):
 
 
 @world.absorb
-class ItemFactory(ItemFactory):
+class ItemFactory(sf.ItemFactory):
     """
     Everything included inside a course
     """
