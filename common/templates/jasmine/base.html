@@ -13,14 +13,19 @@
     <script  src="{% static 'js/vendor/jasmine-jquery.js' %}"></script>
     <script  src="{% static 'console-runner.js' %}"></script>
 
+    {% load compressed %}
+    {# static files #}
+    {% for url in suite.static_files %}
+    <script src="{{ STATIC_URL }}{{ url }}"></script>
+    {% endfor %}
+
+    {% compressed_js 'js-test-source' %}
+
     {# source files #}
     {% for url in suite.js_files %}
     <script src="{{ url }}"></script>
     {% endfor %}
 
-    {% load compressed %}
-    {# static files #}
-    {% compressed_js 'js-test-source' %}
 
     {# spec files #}
     {% compressed_js 'spec' %}

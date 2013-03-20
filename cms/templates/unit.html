@@ -44,12 +44,12 @@
       </div>
       <div class="main-column">
         <article class="unit-body window">
-          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name | h}" class="unit-display-name-input" /></p>
+          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
           <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>
             % endfor
-            <li class="new-component-item adding">              
+            <li class="new-component-item adding">
               <div class="new-component">
                 <h5>Add New Component</h5>
                 <ul class="new-component-type">
@@ -86,7 +86,7 @@
                                           <span class="name"> ${name}</span>
                                         </a>
                                       </li>
-                                    
+
                                     % else:
                                       <li class="editor-md">
                                         <a href="#" data-location="${location}">
@@ -95,7 +95,7 @@
                                       </li>
                                     % endif
                                 % endif
-                    
+
                               %endfor
                           </ul>
                         </div>
@@ -103,20 +103,20 @@
                             <div class="tab" id="tab2">
                               <ul class="new-component-template">
                                   % for name, location, has_markdown, is_empty in templates:
-                                    % if not has_markdown:  
+                                    % if not has_markdown:
                                         % if is_empty:
                                           <li class="editor-manual empty">
                                             <a href="#" data-location="${location}">
                                               <span class="name">${name}</span>
                                             </a>
                                           </li>
-                                        
+
                                         % else:
                                           <li class="editor-manual">
                                             <a href="#" data-location="${location}">
                                               <span class="name"> ${name}</span>
                                             </a>
-                                        
+
                                           </li>
                                         % endif
                                     % endif
@@ -147,13 +147,13 @@
             <div class="row published-alert">
               <p class="edit-draft-message">This unit has been published. To make changes, you must <a href="#" class="create-draft">edit a draft</a>.</p>
               <p class="publish-draft-message">This is a draft of the published unit. To update the live version, you must <a href="#" class="publish-draft">replace it with this draft</a>.</p>
-            </div>            
+            </div>
             <div class="row status">
-              <p>This unit is scheduled to be released to <strong>students</strong> 
+              <p>This unit is scheduled to be released to <strong>students</strong>
               % if release_date is not None:
                   on <strong>${release_date}</strong>
-              % endif 
-              with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name}"</a></p>
+              % endif
+              with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name_with_default}"</a></p>
             </div>
             <div class="row unit-actions">
               <a href="#" class="delete-draft delete-button">Delete Draft</a>
@@ -168,18 +168,18 @@
             <div><input type="text" class="url" value="/courseware/${section.url_name}/${subsection.url_name}" disabled /></div>
             <ol>
               <li>
-                <a href="#" class="section-item">${section.display_name}</a>
+                <a href="#" class="section-item">${section.display_name_with_default}</a>
                 <ol>
                   <li>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}" class="section-item">
                       <span class="folder-icon"></span>
-                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
+                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                     </a>
                     ${units.enum_units(subsection, actions=False, selected=unit.location)}
                   </li>
                 </ol>
               </li>
-            </ol>            
+            </ol>
           </div>
         </div>
       </div>

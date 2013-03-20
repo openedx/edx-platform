@@ -31,8 +31,8 @@
         // when a form is successfully filled out, return back to the dashboard.
         location.href="${reverse('dashboard')}";
       } else {
-    	// 	This is performed by the following code that parses the errors returned as json by the 
-    	// 	registration form validation. 
+    	// 	This is performed by the following code that parses the errors returned as json by the
+    	// 	registration form validation.
         var field_errors = json.field_errors;
         var non_field_errors = json.non_field_errors;
         var fieldname;
@@ -55,7 +55,7 @@
 
           $("[id='"+field_id+"']").addClass('error');
 
-          field_errorlist = field_errors[fieldname];      
+          field_errorlist = field_errors[fieldname];
           for (i=0; i < field_errorlist.length; i+= 1) {
             field_error = field_errorlist[i];
             error_msg = '<span class="field-name">' + field_label + ':</span>' + '<span class="field-error">' + field_error + '</span>';
@@ -88,24 +88,24 @@
   </script>
 </%block>
 
-<section class="testcenter-register container">    
-  
+<section class="testcenter-register container">
+
   <section class="introduction">
     <header>
       <hgroup>
-        <h2><a href="${reverse('dashboard')}">${get_course_about_section(course, 'university')} ${course.number} ${course.title}</a></h2>      
-        
+        <h2><a href="${reverse('dashboard')}">${get_course_about_section(course, 'university')} ${course.number} ${course.display_name_with_default}</a></h2>
+
         % if registration:
         <h1>Your Pearson VUE Proctored Exam Registration</h1>
-        % else: 
+        % else:
         <h1>Register for a Pearson VUE Proctored Exam</h1>
         % endif
       </hgroup>
     </header>
   </section>
-  
-  <% 
-    exam_help_href = "mailto:exam-help@edx.org?subject=Pearson VUE Exam - " + get_course_about_section(course, 'university') + " - " + course.number 
+
+  <%
+    exam_help_href = "mailto:exam-help@edx.org?subject=Pearson VUE Exam - " + get_course_about_section(course, 'university') + " - " + course.number
   %>
 
   % if registration:
@@ -118,14 +118,14 @@
     </section>
     % endif
 
-    % if registration.demographics_is_rejected:      
+    % if registration.demographics_is_rejected:
     <section class="status message message-flash demographics-rejected message-action is-shown">
       <h3 class="message-title">Your demographic information contained an error and was rejected</h3>
       <p class="message-copy">Please check the information you provided, and correct the errors noted below.
     </section>
     % endif
-   
-    % if registration.registration_is_rejected:      
+
+    % if registration.registration_is_rejected:
     <section class="status message message-flash registration-rejected message-action is-shown">
       <h3 class="message-title">Your registration for the Pearson exam has been rejected</h3>
       <p class="message-copy">Please see your <strong>registration status</strong> details for more information.</p>
@@ -140,14 +140,14 @@
     % endif
 
   % endif
-  
+
   <section class="content">
     <header>
       <h3 class="is-hidden">Registration Form</h3>
     </header>
-  % if exam_info.is_registering():  
+  % if exam_info.is_registering():
     <form id="testcenter_register_form" method="post" data-remote="true" action="/create_exam_registration">
-  % else:    
+  % else:
     <form id="testcenter_register_form" method="post" data-remote="true" action="/create_exam_registration" class="disabled">
       <!-- registration closed, so tell them they can't do anything: -->
       <div class="status message registration-closed is-shown">
@@ -155,12 +155,12 @@
         <p class="message-copy">Your previous information is available below, however you may not edit any of the information.
       </div>
   % endif
-      
+
       % if registration:
       <p class="instructions">
-        Please use the following form if you need to update your demographic information used in your Pearson VUE Proctored Exam. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>. 
+        Please use the following form if you need to update your demographic information used in your Pearson VUE Proctored Exam. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
       </p>
-      % else: 
+      % else:
       <p class="instructions">
         Please provide the following demographic information to register for a Pearson VUE Proctored Exam. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
       </p>
@@ -175,11 +175,11 @@
       <div class="form-fields-primary">
         <fieldset class="group group-form group-form-personalinformation">
           <legend class="is-hidden">Personal Information</legend>
-          
+
           <ol class="list-input">
             <li class="field" id="field-salutation">
               <label for="salutation">Salutation</label>
-              <input class="short" id="salutation" type="text" name="salutation" value="${testcenteruser.salutation}" placeholder="e.g. Mr., Ms., Mrs., Dr." />              
+              <input class="short" id="salutation" type="text" name="salutation" value="${testcenteruser.salutation}" placeholder="e.g. Mr., Ms., Mrs., Dr." />
             </li>
             <li class="field required" id="field-first_name">
               <label for="first_name">First Name </label>
@@ -199,14 +199,14 @@
             </li>
           </ol>
         </fieldset>
-        
+
         <fieldset class="group group-form group-form-mailingaddress">
           <legend class="is-hidden">Mailing Address</legend>
-          
+
           <ol class="list-input">
             <li class="field required" id="field-address_1">
               <label class="long" for="address_1">Address Line #1</label>
-              <input id="address_1" type="text" name="address_1" value="${testcenteruser.address_1}" placeholder="e.g. 112 Mercer Street" />              
+              <input id="address_1" type="text" name="address_1" value="${testcenteruser.address_1}" placeholder="e.g. 112 Mercer Street" />
             </li>
             <li class="field-group addresses">
               <div class="field" id="field-address_2">
@@ -221,7 +221,7 @@
             <li class="field required postal-1" id="field-city">
               <label for="city">City</label>
               <input id="city" class="long" type="text" name="city" value="${testcenteruser.city}" placeholder="e.g. Newark" />
-            </li>         
+            </li>
             <li class="field-group postal-2">
               <div class="field" id="field-state">
                 <label for="state">State/Province</label>
@@ -238,15 +238,15 @@
             </li>
           </ol>
         </fieldset>
-        
+
         <fieldset class="group group-form group-form-contactinformation">
           <legend class="is-hidden">Contact &amp; Other Information</legend>
-          
+
           <ol class="list-input">
             <li class="field-group phoneinfo">
               <div class="field required" id="field-phone">
                 <label for="phone">Phone Number</label>
-                <input id="phone" type="tel" name="phone" value="${testcenteruser.phone}" />              
+                <input id="phone" type="tel" name="phone" value="${testcenteruser.phone}" />
               </div>
               <div class="field" id="field-extension">
                 <label for="extension">Extension</label>
@@ -274,12 +274,12 @@
           </ol>
         </fieldset>
       </div>
-      
+
       % if registration:
         % if registration.accommodation_request and len(registration.accommodation_request) > 0:
       <div class="form-fields-secondary is-shown disabled" id="form-fields-secondary">
         % endif
-      % else: 
+      % else:
       <div class="form-fields-secondary" id="form-fields-secondary">
       % endif
 
@@ -287,13 +287,13 @@
           % if registration.accommodation_request and len(registration.accommodation_request) > 0:
         <p class="note"><span class="title">Note</span>: Your previous accommodation request below needs to be reviewed in detail <strong>and will add a significant delay to your registration process</strong>.</p>
           % endif
-        % else: 
+        % else:
         <p class="note"><span class="title">Note</span>: Accommodation requests are not part of your demographic information, <strong>and cannot be changed once submitted</strong>. Accommodation requests, which are reviewed on a case-by-case basis, <strong>will add significant delay to the registration process</strong>.</p>
         % endif
-                  
+
         <fieldset class="group group-form group-form-optional">
           <legend class="is-hidden">Optional Information</legend>
-          
+
           <ol class="list-input">
             % if registration:
               % if registration.accommodation_request and len(registration.accommodation_request) > 0:
@@ -302,21 +302,21 @@
               <p class="value" id="accommodations">${registration.accommodation_request}</p>
             </li>
               % endif
-            % else: 
+            % else:
             <li class="field" id="field-accommodation_request">
               <label for="accommodation_request">Accommodations Requested</label>
-              <textarea class="long" id="accommodation_request" name="accommodation_request" value="" placeholder=""></textarea>             
+              <textarea class="long" id="accommodation_request" name="accommodation_request" value="" placeholder=""></textarea>
             </li>
             % endif
           </ol>
         </fieldset>
       </div>
-      
+
       <div class="form-actions">
         % if registration:
         <button type="submit" id="submit" class="action action-primary action-update">Update Demographics</button>
         <a href="${reverse('dashboard')}" class="action action-secondary action-cancel">Cancel Update</a>
-        % else: 
+        % else:
         <button type="submit" id="submit" class="action action-primary action-register">Register for Pearson VUE Test</button>
         <a href="${reverse('dashboard')}" class="action action-secondary action-cancel">Cancel Registration</a>
         % endif
@@ -325,68 +325,68 @@
           <p id="submission-error-heading" class="message-copy"></p>
           <ul id="submission-error-list"></ul>
         </div>
-      </div>      
+      </div>
     </form>
 
     % if registration:
       % if registration.accommodation_request and len(registration.accommodation_request) > 0:
     <a class="actions form-fields-secondary-visibility is-hidden" href="#form-fields-secondary">Special (<abbr title="Americans with Disabilities Act">ADA</abbr>) Accommodations</a>
       % endif
-    % else: 
+    % else:
     <a class="actions form-fields-secondary-visibility" href="#form-fields-secondary">Special (<abbr title="Americans with Disabilities Act">ADA</abbr>) Accommodations</a>
     % endif
   </section>
-    
+
   <aside>
    % if registration:
 
-    % if registration.is_accepted:     
+    % if registration.is_accepted:
     <div class="message message-status registration-processed is-shown">
-    % endif     
-    % if registration.is_rejected:     
+    % endif
+    % if registration.is_rejected:
     <div class="message message-status registration-rejected is-shown">
-    % endif     
-    % if registration.is_pending:     
+    % endif
+    % if registration.is_pending:
     <div class="message message-status registration-pending is-shown">
-    % endif     
+    % endif
       <h3>Pearson Exam Registration Status</h3>
 
       <ol class="status-list">
         <!-- first provide status of demographics -->
-        % if registration.demographics_is_pending:     
+        % if registration.demographics_is_pending:
         <li class="item status status-pending status-demographics">
           <h4 class="title">Demographic Information</h4>
           <p class="details">The demographic information you most recently provided is pending. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
         </li>
-        % endif     
-        % if registration.demographics_is_accepted:     
+        % endif
+        % if registration.demographics_is_accepted:
         <li class="item status status-processed status-demographics">
           <h4 class="title">Demographic Information</h4>
           <p class="details">The demographic information you most recently provided has been processed. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
         </li>
-        % endif     
-        % if registration.demographics_is_rejected:     
+        % endif
+        % if registration.demographics_is_rejected:
         <li class="item status status-rejected status-demographics">
           <h4 class="title">Demographic Information</h4>
           <p class="details">The demographic information you most recently provided has been rejected by Pearson. You can correct and submit it again before the exam registration closes on <strong>${exam_info.registration_end_date_text}</strong>.
           The error message is:</p>
-          
+
           <ul class="error-list">
             <li class="item">${registration.testcenter_user.upload_error_message}.</li>
           </ul>
-          
+
           <p class="action">If the error is not correctable by revising your demographic information, please <a class="contact-link" href="${exam_help_href}">contact edX at exam-help@edx.org</a>.</p>
         </li>
-        % endif     
+        % endif
 
         <!-- then provide status of accommodations, if any -->
-        % if registration.accommodation_is_pending:     
+        % if registration.accommodation_is_pending:
         <li class="item status status-pending status-accommodations">
           <h4 class="title">Accommodations Request</h4>
           <p class="details">Your requested accommodations are pending. Within a few days, you should see confirmation here of granted accommodations.</p>
         </li>
-        % endif     
-        % if registration.accommodation_is_accepted:     
+        % endif
+        % if registration.accommodation_is_accepted:
         <li class="item status status-processed status-accommodations">
           <h4 class="title">Accommodations Request</h4>
           <p class="details">Your requested accommodations have been reviewed and processed. You are allowed:</p>
@@ -395,50 +395,50 @@
             % for accommodation_name in registration.get_accommodation_names():
             <li class="item">${accommodation_name}</li>
             % endfor
-          </ul> 
+          </ul>
         </li>
-        % endif     
-        % if registration.accommodation_is_rejected:     
+        % endif
+        % if registration.accommodation_is_rejected:
         <li class="item status status-processed status-accommodations">
           <h4 class="title">Accommodations Request</h4>
           <p class="details">Your requested accommodations have been reviewed and processed. You are allowed no accommodations.</p>
-          
+
           <p class="action">Please <a class="contact-link" href="${exam_help_href}">contact edX at exam-help@edx.org</a> if you have any questions.</p>
         </li>
-        % endif     
+        % endif
 
         <!-- finally provide status of registration -->
-        % if registration.registration_is_pending:     
+        % if registration.registration_is_pending:
         <li class="item status status-pending status-registration">
           <h4 class="title">Registration Request</h4>
           <p class="details">Your exam registration is pending. Once your information is processed, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
         </li>
-        % endif     
-        % if registration.registration_is_accepted:     
+        % endif
+        % if registration.registration_is_accepted:
         <li class="item status status-processed status-registration">
           <h4 class="title">Registration Request</h4>
           <p class="details">Your exam registration has been processed and has been forwarded to Pearson. <strong>You are now able to <a href="${registration.registration_signup_url}" class="exam-link">schedule a Pearson exam</a></strong>.</p>
         </li>
-        % endif     
-        % if registration.registration_is_rejected:     
+        % endif
+        % if registration.registration_is_rejected:
         <li class="item status status-rejected status-registration">
           <h4 class="title">Registration Request</h4>
           <p class="details">Your exam registration has been rejected by Pearson. <strong>You currently cannot schedule an exam</strong>. The errors found include:</p>
-          
+
           <ul class="error-list">
             <li class="item">${registration.upload_error_message}</li>
           </ul>
-          
+
           <p class="action">Please <a class="contact-link" href="${exam_help_href}">contact edX at exam-help@edx.org</a>.</p>
         </li>
         % endif
       </ol>
-   
+
    </div>
-   
+
 
    % endif
-    
+
     <div class="details details-course">
       <h4>About ${get_course_about_section(course, 'university')} ${course.number}</h4>
       <p>
@@ -451,27 +451,27 @@
       % endif
       </p>
     </div>
-    
+
     <div class="details details-registration">
       <h4>Pearson VUE Test Details</h4>
       % if exam_info is not None:
         <ul>
           <li>
-            <span class="label">Exam Name:</span> <span class="value">${exam_info.display_name}</span>
+            <span class="label">Exam Name:</span> <span class="value">${exam_info.display_name_with_default}</span>
           </li>
           <li>
             <span class="label">First Eligible Appointment Date:</span> <span class="value">${exam_info.first_eligible_appointment_date_text}</span>
           </li>
           <li>
             <span class="label">Last Eligible Appointment Date:</span> <span class="value">${exam_info.last_eligible_appointment_date_text}</span>
-          </li>            
+          </li>
           <li>
             <span class="label">Registration Ends:</span> <span class="value">${exam_info.registration_end_date_text}</span>
-          </li>            
+          </li>
         </ul>
       % endif
     </div>
-    
+
     <div class="details details-contact">
       <h4>Questions</h4>
       <p>If you have a specific question pertaining to your registration, you may <a class="contact-link" href="${exam_help_href}">contact edX at exam-help@edx.org</a>.</p>

@@ -7,10 +7,9 @@ from lxml import etree
 from path import path
 
 from pkg_resources import resource_string
-from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
+from xblock.core import Scope, String
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
-from xmodule.modulestore import Location
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
@@ -18,7 +17,11 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 log = logging.getLogger("mitx.courseware")
 
 
-class HtmlModule(XModule):
+class HtmlFields(object):
+    data = String(help="Html contents to display for this module", scope=Scope.content)
+
+
+class HtmlModule(HtmlFields, XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/html/display.coffee')
@@ -28,17 +31,10 @@ class HtmlModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     def get_html(self):
-        return self.html
-
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-        self.html = self.definition['data']
+        return self.data
 
 
-
-class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
+class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
     """
     Module for putting raw html in a course
     """
@@ -91,7 +87,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
             cls.clean_metadata_from_xml(definition_xml)
-            return {'data': stringify_children(definition_xml)}
+            return {'data': stringify_children(definition_xml)}, []
         else:
             # html is special.  cls.filename_extension is 'xml', but
             # if 'filename' is in the definition, that means to load
@@ -104,8 +100,6 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             #log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
             filepath = "{base}/{name}.html".format(base=base, name=filename)
             #log.debug("looking for html file for {0} at {1}".format(location, filepath))
-
-
 
             # VS[compat]
             # TODO (cpennington): If the file doesn't exist at the right path,
@@ -135,7 +129,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
                     # for Fall 2012 LMS migration: keep filename (and unmangled filename)
                     definition['filename'] = [filepath, filename]
 
-                    return definition
+                    return definition, []
 
             except (ResourceNotFoundError) as err:
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
@@ -151,19 +145,18 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         string to filename.html.
         '''
         try:
-            return etree.fromstring(self.definition['data'])
+            return etree.fromstring(self.data)
         except etree.XMLSyntaxError:
             pass
 
         # Not proper format.  Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
-        pathdir = path(pathname).dirname()
         filepath = u'{category}/{pathname}.html'.format(category=self.category,
                                                     pathname=pathname)
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
-            file.write(self.definition['data'].encode('utf-8'))
+            file.write(self.data.encode('utf-8'))
 
         # write out the relative name
         relname = path(pathname).basename()
@@ -175,8 +168,11 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     @property
     def editable_metadata_fields(self):
         """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
-        subset = [field for field in super(HtmlDescriptor,self).editable_metadata_fields
-                  if field not in ['empty']]
+        subset = super(HtmlDescriptor, self).editable_metadata_fields
+
+        if 'empty' in subset:
+            del subset['empty']
+
         return subset
 
 

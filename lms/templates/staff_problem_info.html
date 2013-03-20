@@ -49,12 +49,18 @@ ${module_content}
     <div class="staff_info" style="display:block">
 is_released = ${is_released}
 location = ${location | h}
-github = <a href="${edit_link}">${edit_link | h}</a>
-%if source_file:
-source_url = <a href="${source_url}">${source_file | h}</a>
-%endif
-definition = <pre>${definition | h}</pre>
-metadata = ${metadata | h}
+<table>
+  <tr><th>Module Fields</th></tr>
+  %for name, field in fields:
+  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+  %endfor
+</table>
+<table>
+  <tr><th>edX Fields</th></tr>
+  %for name, field in lms_fields:
+  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+  %endfor
+</table>
 category = ${category | h}
     </div>
     %if render_histogram:
@@ -86,18 +92,21 @@ category = ${category | h}
 
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.
-  setup_debug('${element_id}',
-    %if edit_link:
-      '${edit_link}',
-    %else:
-      null,
-    %endif
-    {
-        'location': '${location}',
-        'xqa_key': '${xqa_key}',
-        'category': '${category}',
-        'user': '${user}'
-    });
+$(function () {
+    setup_debug('${element_id}',
+        %if edit_link:
+        '${edit_link}',
+        %else:
+        null,
+        %endif
+        {
+            'location': '${location}',
+            'xqa_key': '${xqa_key}',
+            'category': '${category}',
+            'user': '${user}'
+        }
+    );
+});
 </script>
 %endif
 
