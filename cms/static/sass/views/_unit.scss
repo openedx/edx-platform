@@ -385,12 +385,6 @@ body.course.unit {
         border-color: #6696d7;
       }
 
-      .component-actions {
-        position: absolute;
-        top: 7px;
-        right: 9px;
-      }
-
       .drag-handle {
         position: absolute;
         display: block;
@@ -661,27 +655,27 @@ body.course.unit {
       display: none;
     }
   }
+}
 
-  // editing units from courseware
-  body.unit {
+// editing units from courseware
+body.unit {
 
-    .component {
-      padding-top: 30px;
+  .component {
+    padding-top: 30px;
 
-      .component-actions {
-        @include box-sizing(border-box);
-        position: absolute;
-        width: 100%;
-        padding: 15px;
-        top: 0;
-        left: 0;
-        border-bottom: 1px solid $lightBluishGrey2;
-        background: $lightGrey;
-      }
+    .component-actions {
+      @include box-sizing(border-box);
+      position: absolute;
+      width: 100%;
+      padding: 15px;
+      top: 0;
+      left: 0;
+      border-bottom: 1px solid $lightBluishGrey2;
+      background: $lightGrey;
+    }
 
-      &.editing {
-        padding-top: 0;
-      }
+    &.editing {
+      padding-top: 0;
     }
   }
 }
