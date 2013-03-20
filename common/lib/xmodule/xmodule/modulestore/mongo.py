@@ -622,11 +622,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         self._update_single_item(location, {'metadata': metadata})
         # recompute (and update) the metadata inheritance tree which is cached
-<<<<<<< HEAD
         self.refresh_cached_metadata_inheritance_tree(loc)      
-=======
-        self.get_cached_metadata_inheritance_tree(loc, force_refresh = True)
->>>>>>> fbd409c914c2dc005fd6b46af6daaee262205e0e
 
     def delete_item(self, location):
         """
@@ -649,12 +645,7 @@ class MongoModuleStore(ModuleStoreBase):
             # from overriding our default value set in the init method.
             safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
-<<<<<<< HEAD
         self.refresh_cached_metadata_inheritance_tree(Location(location))  
-=======
-        self.get_cached_metadata_inheritance_tree(Location(location), force_refresh = True)
->>>>>>> fbd409c914c2dc005fd6b46af6daaee262205e0e
-
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this
