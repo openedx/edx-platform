@@ -1,13 +1,14 @@
 from lettuce import world, step
 from lettuce.django import django_url
-from selenium.webdriver.support.ui import Select
 import random
 import textwrap
+import time
 from common import i_am_registered_for_the_course, TEST_SECTION_NAME, section_location
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
-    FormulaResponseXMLFactory, CustomResponseXMLFactory
+    FormulaResponseXMLFactory, CustomResponseXMLFactory, \
+    CodeResponseXMLFactory
 
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure
@@ -77,7 +78,13 @@ PROBLEM_FACTORY_DICT = {
                         a2=0
                     return (a1+a2)==int(expect)
             """)}},
-}
+    'code': {
+        'factory': CodeResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'Submit code to an external grader',
+            'initial_display': 'print "Hello world!"',
+            'grader_payload': '{"grader": "ps1/Spring2013/test_grader.py"}', }},
+       }
 
 
 def add_problem_to_course(course, problem_type):
@@ -113,6 +120,19 @@ def view_problem(step, problem_type):
                     (chapter_name, section_name))
 
     world.browser.visit(url)
+
+
+@step(u'External graders respond "([^"]*)"')
+def set_external_grader_response(step, correctness):
+    assert(correctness in ['correct', 'incorrect'])
+
+    response_dict = {'correct': True if correctness == 'correct' else False,
+                    'score': 1 if correctness == 'correct' else 0,
+                    'msg': 'Your problem was graded %s' % correctness}
+
+    # Set the fake xqueue server to always respond
+    # correct/incorrect when asked to grade a problem
+    world.xqueue_server.set_grade_response(response_dict)
 
 
 @step(u'I answer a "([^"]*)" problem "([^"]*)ly"')
@@ -168,18 +188,29 @@ def answer_problem(step, problem_type, correctness):
         inputfield('script', input_num=1).fill(str(first_addend))
         inputfield('script', input_num=2).fill(str(second_addend))
 
+    elif problem_type == 'code':
+        # The fake xqueue server is configured to respond
+        # correct / incorrect no matter what we submit.
+        # Furthermore, since the inline code response uses
+        # JavaScript to make the code display nicely, it's difficult
+        # to programatically input text
+        # (there's not <textarea> we can just fill text into)
+        # For this reason, we submit the initial code in the response
+        # (configured in the problem XML above)
+        pass
+
     # Submit the problem
     check_problem(step)
 
 
 @step(u'I check a problem')
 def check_problem(step):
-    world.browser.find_by_css("input.check").click()
+    world.css_click("input.check")
 
 
 @step(u'I reset the problem')
 def reset_problem(step):
-    world.browser.find_by_css('input.reset').click()
+    world.css_click('input.reset')
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')

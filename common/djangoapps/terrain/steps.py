@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import time
 import re
 import os.path
+from selenium.common.exceptions import WebDriverException
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -214,3 +215,15 @@ def save_the_course_content(path='/tmp'):
     f = open('%s/%s' % (path, filename), 'w')
     f.write(output)
     f.close
+
+@world.absorb
+def css_click(css_selector):
+    try:
+        world.browser.find_by_css(css_selector).click()
+
+    except WebDriverException:
+        # Occassionally, MathJax or other JavaScript can cover up
+        # an element  temporarily.
+        # If this happens, wait a second, then try again
+        time.sleep(1)
+        world.browser.find_by_css(css_selector).click()

@@ -48,6 +48,18 @@ DATABASES = {
     }
 }
 
+# Set up XQueue information so that the lms will send
+# requests to a mock XQueue server running locally
+XQUEUE_PORT = 8027
+XQUEUE_INTERFACE = {
+    "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
+    "django_auth": {
+        "username": "lms",
+        "password": "***REMOVED***"
+    },
+    "basic_auth": ('anant', 'agarwal'),
+}
+
 # Do not display the YouTube videos in the browser while running the
 # acceptance tests. This makes them faster and more reliable
 MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
