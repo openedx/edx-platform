@@ -45,9 +45,6 @@ $(document).ready(function () {
         (e).preventDefault();
     });
 
-    // smooth scrolling page links
-    $('a[rel*="view"]').smoothScroll({offset: -200, easing: 'swing', speed: 2000});
-
     // nav - dropdown related
     $body.click(function (e) {
         $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
@@ -75,16 +72,17 @@ $(document).ready(function () {
     });
 
     // general link management - new window/tab
-    $('a[rel="external"]').attr('title', 'This link will open in a new browser window/tab').click(function (e) {
-        window.open($(this).attr('href'));
-        e.preventDefault();
-    });
+    $('a[rel="external"]').attr('title', 'This link will open in a new browser window/tab').bind('click', linkNewWindow);
 
     // general link management - lean modal window
     $('a[rel="modal"]').attr('title', 'This link will open in a modal window').leanModal({overlay: 0.50, closeButton: '.action-modal-close' });
     $('.action-modal-close').click(function (e) {
         (e).preventDefault();
     });
+
+    // general link management - smooth scrolling page links
+    $('a[rel*="view"]').bind('click', linkSmoothScroll);
+
 
     // toggling overview section details
     $(function () {
@@ -155,10 +153,23 @@ $(document).ready(function () {
     });
 });
 
-// function collapseAll(e) {
-//     $('.branch').addClass('collapsed');
-//     $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
-// }
+function linkSmoothScroll(e) {
+    (e).preventDefault();
+
+    $.smoothScroll({ 
+        offset: -200, 
+        easing: 'swing', 
+        speed: 1000,
+        scrollElement: null,
+        scrollTarget: $(this).attr('href')
+    });
+    console.log('clicked!');
+}
+
+function linkNewWindow(e) {
+    window.open($(this).attr('href'));
+    e.preventDefault();
+}
 
 function toggleSections(e) {
     e.preventDefault();
