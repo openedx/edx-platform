@@ -1,7 +1,5 @@
 from lettuce import world, step
 from lettuce.django import django_url
-from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import WebDriverException
 import random
 import textwrap
 import time
@@ -208,20 +206,12 @@ def answer_problem(step, problem_type, correctness):
 
 @step(u'I check a problem')
 def check_problem(step):
-    try:
-        world.browser.find_by_css("input.check").click()
-
-    except WebDriverException:
-        # Occassionally, MathJax or other JavaScript can cover up
-        # the 'Check' input temporarily.
-        # If this happens, wait a second, then try again
-        time.sleep(1)
-        world.browser.find_by_css("input.check").click()
+    world.css_click("input.check")
 
 
 @step(u'I reset the problem')
 def reset_problem(step):
-    world.browser.find_by_css('input.reset').click()
+    world.css_click('input.reset')
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')
