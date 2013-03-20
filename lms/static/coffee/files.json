@@ -5,8 +5,5 @@
     "/static/js/vendor/jquery-ui.min.js",
     "/static/js/vendor/jquery.leanModal.min.js",
     "/static/js/vendor/flot/jquery.flot.js"
-  ],
-  "static_files": [
-    "js/application.js"
   ]
 }
