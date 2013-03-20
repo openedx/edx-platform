@@ -121,7 +121,7 @@ class ModelDataCache(object):
                 'module_state_key__in',
                 (descriptor.location.url() for descriptor in self.descriptors),
                 course_id=self.course_id,
-                student=self.user,
+                student=self.user.pk,
             )
         elif scope == Scope.content:
             return self._chunked_query(
@@ -145,13 +145,13 @@ class ModelDataCache(object):
                 XModuleStudentPrefsField,
                 'module_type__in',
                 set(descriptor.location.category for descriptor in self.descriptors),
-                student=self.user,
+                student=self.user.pk,
                 field_name__in=set(field.name for field in fields),
             )
         elif scope == Scope.student_info:
             return self._query(
                 XModuleStudentInfoField,
-                student=self.user,
+                student=self.user.pk,
                 field_name__in=set(field.name for field in fields),
             )
         else:
@@ -214,7 +214,7 @@ class ModelDataCache(object):
         if key.scope == Scope.student_state:
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
-                student=self.user,
+                student=self.user.pk,
                 module_type=key.block_scope_id.category,
                 module_state_key=key.block_scope_id.url(),
                 defaults={'state': json.dumps({})},
@@ -233,12 +233,12 @@ class ModelDataCache(object):
             field_object, _= XModuleStudentPrefsField.objects.get_or_create(
                 field_name=key.field_name,
                 module_type=key.block_scope_id,
-                student=self.user,
+                student=self.user.pk,
             )
         elif key.scope == Scope.student_info:
             field_object, _ = XModuleStudentInfoField.objects.get_or_create(
                 field_name=key.field_name,
-                student=self.user,
+                student=self.user.pk,
             )
 
         cache_key = self._cache_key_from_kvs_key(key)
