@@ -159,6 +159,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             for moduledescriptor in section['xmoduledescriptors']:
                 # Create a fake key to pull out a StudentModule object from the ModelDataCache
+
                 key = LmsKeyValueStore.Key(
                     Scope.student_state,
                     student.id,
