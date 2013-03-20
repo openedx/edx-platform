@@ -43,7 +43,7 @@ urlpatterns = ('',
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
         'contentstore.views.remove_user', name='remove_user'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$', 'contentstore.views.course_info', name='course_info'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course_info/updates/(?P<provided_id>.*)$', 'contentstore.views.course_info_updates', name='course_info'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course_info/updates/(?P<provided_id>.*)$', 'contentstore.views.course_info_updates', name='course_info_json'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-details/(?P<name>[^/]+)$', 'contentstore.views.get_course_settings', name='course_settings'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-grading/(?P<name>[^/]+)$', 'contentstore.views.course_config_graders_page', name='course_settings'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-details/(?P<name>[^/]+)/section/(?P<section>[^/]+).*$', 'contentstore.views.course_settings_updates', name='course_settings'),
@@ -100,12 +100,12 @@ urlpatterns += (
     )
 
 if settings.ENABLE_JASMINE:
-    ## Jasmine
+    # # Jasmine
     urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 urlpatterns = patterns(*urlpatterns)
 
-#Custom error pages
+# Custom error pages
 handler404 = 'contentstore.views.render_404'
 handler500 = 'contentstore.views.render_500'
 
