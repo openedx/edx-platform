@@ -2,7 +2,7 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import json
 import urllib
 import urlparse
-import time
+import threading
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -209,71 +209,3 @@ class MockXQueueServer(HTTPServer):
 
         # Save the response dictionary
         self._grade_response = grade_response_dict
-
-
-# ----------------------------
-# Tests
-
-import mock
-import threading
-import unittest
-
-
-class MockXQueueServerTest(unittest.TestCase):
-
-    def setUp(self):
-
-        # Create the server
-        server_port = 8034
-        self.server_url = 'http://127.0.0.1:%d' % server_port
-        self.server = MockXQueueServer(server_port,
-                                {'correct': True, 'score': 1, 'msg': ''})
-
-        # Start the server in a separate daemon thread
-        server_thread = threading.Thread(target=self.server.serve_forever)
-        server_thread.daemon = True
-        server_thread.start()
-
-    def tearDown(self):
-
-        # Stop the server, freeing up the port
-        self.server.shutdown()
-
-    def test_grade_request(self):
-
-        # Patch post_to_url() so we can intercept
-        # outgoing POST requests from the server
-        MockXQueueRequestHandler.post_to_url = mock.Mock()
-
-        # Send a grade request
-        callback_url = 'http://127.0.0.1:8000/test_callback'
-
-        grade_header = json.dumps({'lms_callback_url': callback_url,
-                                    'lms_key': 'test_queuekey',
-                                    'queue_name': 'test_queue'})
-
-        grade_body = json.dumps({'student_info': 'test',
-                                'grader_payload': 'test',
-                                'student_response': 'test'})
-
-        grade_request = {'xqueue_header': grade_header,
-                        'xqueue_body': grade_body}
-
-        response_handle = urllib.urlopen(self.server_url + '/xqueue/submit',
-                                urllib.urlencode(grade_request))
-
-        response_dict = json.loads(response_handle.read())
-
-        # Expect that the response is success
-        self.assertEqual(response_dict['return_code'], 0)
-
-        # Wait a bit before checking that the server posted back
-        time.sleep(3)
-
-        # Expect that the server tries to post back the grading info
-        xqueue_body = json.dumps({'correct': True, 'score': 1,
-                                    'msg': '<div></div>'})
-        expected_callback_dict = {'xqueue_header': grade_header,
-                                'xqueue_body': xqueue_body}
-        MockXQueueRequestHandler.post_to_url.assert_called_with(callback_url,
-                                                        expected_callback_dict)
