@@ -142,8 +142,11 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
 
     onDelete: function(event) {
         event.preventDefault();
-        // TODO ask for confirmation
-        // remove the dom element and delete the model
+
+        if (!confirm('Are you sure you want to delete this update? This action cannot be undone.')) {
+            return;
+        }
+
         var targetModel = this.eventModel(event);
         this.modelDom(event).remove();
         var cacheThis = this;
