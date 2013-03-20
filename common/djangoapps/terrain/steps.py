@@ -143,7 +143,7 @@ def log_in(username, password):
     assert(user is not None and user.is_active)
 
     # Send a fake HttpRequest to log the user in
-    # We need to process the request using 
+    # We need to process the request using
     # Session middleware and Authentication middleware
     # to ensure that session state can be stored
     request = HttpRequest()

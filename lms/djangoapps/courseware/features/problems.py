@@ -215,7 +215,7 @@ def reset_problem(step):
 
 
 # Dictionaries that map problem types to the css selectors
-# for correct/incorrect marks.
+# for correct/incorrect/unanswered marks.
 # The elements are lists of selectors because a particular problem type
 # might be marked in multiple ways.
 # For example, multiple choice is marked incorrect differently
