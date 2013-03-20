@@ -228,7 +228,8 @@ CORRECTNESS_SELECTORS = {
                         'string': ['div.correct'],
                         'numerical': ['div.correct'],
                         'formula': ['div.correct'],
-                        'script': ['div.correct'], },
+                        'script': ['div.correct'], 
+                        'code': ['span.correct']},
 
         'incorrect': {'drop down': ['span.incorrect'],
                        'multiple choice': ['label.choicegroup_incorrect',
@@ -237,7 +238,8 @@ CORRECTNESS_SELECTORS = {
                         'string': ['div.incorrect'],
                         'numerical': ['div.incorrect'],
                         'formula': ['div.incorrect'],
-                        'script': ['div.incorrect']},
+                        'script': ['div.incorrect'],
+                        'code': ['span.incorrect']},
 
         'unanswered': {'drop down': ['span.unanswered'],
                        'multiple choice': ['span.unanswered'],
@@ -245,7 +247,8 @@ CORRECTNESS_SELECTORS = {
                         'string': ['div.unanswered'],
                         'numerical': ['div.unanswered'],
                         'formula': ['div.unanswered'],
-                        'script': ['div.unanswered']}}
+                        'script': ['div.unanswered'],
+                        'code': ['span.unanswered'] }}
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')
