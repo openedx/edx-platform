@@ -77,7 +77,8 @@ def should_see_in_the_page(step, text):
 @step('I am logged in$')
 def i_am_logged_in(step):
     world.create_user('robot')
-    world.log_in('robot@edx.org', 'test')
+    world.log_in('robot', 'test')
+    world.browser.visit(django_url('/'))
 
 
 @step('I am not logged in$')
@@ -126,7 +127,7 @@ def i_am_registered_for_the_course(step, course):
     # If the user is not already enrolled, enroll the user.
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(course))
 
-    world.log_in('robot@edx.org', 'test')
+    world.log_in('robot', 'test')
 
 
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
