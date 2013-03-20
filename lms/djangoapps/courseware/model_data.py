@@ -240,7 +240,7 @@ class ModelDataCache(object):
         if key.scope == Scope.student_state:
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
-                student=self.user.pk,
+                student=self.user,
                 module_type=key.block_scope_id.category,
                 module_state_key=key.block_scope_id.url(),
                 defaults={'state': json.dumps({})},
@@ -259,12 +259,12 @@ class ModelDataCache(object):
             field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
                 field_name=key.field_name,
                 module_type=key.block_scope_id,
-                student=self.user.pk,
+                student=self.user,
             )
         elif key.scope == Scope.student_info:
             field_object, _ = XModuleStudentInfoField.objects.get_or_create(
                 field_name=key.field_name,
-                student=self.user.pk,
+                student=self.user,
             )
 
         cache_key = self._cache_key_from_kvs_key(key)
