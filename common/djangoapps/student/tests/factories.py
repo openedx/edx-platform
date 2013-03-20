@@ -1,4 +1,4 @@
-from student.models import (User, UserProfile, Registration, 
+from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment)
 from django.contrib.auth.models import Group
 from datetime import datetime
@@ -101,10 +101,10 @@ class XModuleCourseFactory(Factory):
 
         new_course.lms.start = gmtime()
         new_course.tabs = [{"type": "courseware"},
-            {"type": "course_info", "name": "Course Info"},
-            {"type": "discussion", "name": "Discussion"},
-            {"type": "wiki", "name": "Wiki"},
-            {"type": "progress", "name": "Progress"}]
+                           {"type": "course_info", "name": "Course Info"},
+                           {"type": "discussion", "name": "Discussion"},
+                           {"type": "wiki", "name": "Wiki"},
+                           {"type": "progress", "name": "Progress"}]
 
         # Update the data in the mongo datastore
         store.update_metadata(new_course.location.url(), own_metadata(new_course))
@@ -170,7 +170,7 @@ class XModuleItemFactory(Factory):
         # If a display name is set, use that
         dest_name = display_name.replace(" ", "_") if display_name is not None else uuid4().hex
         dest_location = parent_location._replace(category=template.category,
-                                                name=dest_name)
+                                                 name=dest_name)
 
         new_item = store.clone_item(template, dest_location)
 

@@ -5,9 +5,9 @@ import random
 import textwrap
 from common import i_am_registered_for_the_course, TEST_SECTION_NAME, section_location
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
-                        ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
-                        StringResponseXMLFactory, NumericalResponseXMLFactory, \
-                        FormulaResponseXMLFactory, CustomResponseXMLFactory
+    ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
+    StringResponseXMLFactory, NumericalResponseXMLFactory, \
+    FormulaResponseXMLFactory, CustomResponseXMLFactory
 
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure
@@ -77,7 +77,7 @@ PROBLEM_FACTORY_DICT = {
                         a2=0
                     return (a1+a2)==int(expect)
             """)}},
-       }
+}
 
 
 def add_problem_to_course(course, problem_type):
@@ -92,10 +92,10 @@ def add_problem_to_course(course, problem_type):
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
     problem_item = world.ItemFactory.create(parent_location=section_location(course),
-                        template="i4x://edx/templates/problem/Blank_Common_Problem",
-                        display_name=str(problem_type),
-                        data=problem_xml,
-                        metadata={'rerandomize': 'always'})
+                                            template="i4x://edx/templates/problem/Blank_Common_Problem",
+                                            display_name=str(problem_type),
+                                            data=problem_xml,
+                                            metadata={'rerandomize': 'always'})
 
 
 @step(u'I am viewing a "([^"]*)" problem')
@@ -201,21 +201,21 @@ def assert_answer_mark(step, problem_type, correctness):
     # depending on whether the user selects an incorrect
     # item or submits without selecting any item)
     correct_selectors = {'drop down': ['span.correct'],
-                           'multiple choice': ['label.choicegroup_correct'],
-                            'checkbox': ['span.correct'],
-                            'string': ['div.correct'],
-                            'numerical': ['div.correct'],
-                            'formula': ['div.correct'],
-                            'script': ['div.correct'], }
+                         'multiple choice': ['label.choicegroup_correct'],
+                         'checkbox': ['span.correct'],
+                         'string': ['div.correct'],
+                         'numerical': ['div.correct'],
+                         'formula': ['div.correct'],
+                         'script': ['div.correct'], }
 
     incorrect_selectors = {'drop down': ['span.incorrect'],
                            'multiple choice': ['label.choicegroup_incorrect',
-                                                'span.incorrect'],
-                            'checkbox': ['span.incorrect'],
-                            'string': ['div.incorrect'],
-                            'numerical': ['div.incorrect'],
-                            'formula': ['div.incorrect'],
-                            'script': ['div.incorrect']}
+                                               'span.incorrect'],
+                           'checkbox': ['span.incorrect'],
+                           'string': ['div.incorrect'],
+                           'numerical': ['div.incorrect'],
+                           'formula': ['div.incorrect'],
+                           'script': ['div.incorrect']}
 
     assert(correctness in ['correct', 'incorrect', 'unanswered'])
     assert(problem_type in correct_selectors and problem_type in incorrect_selectors)
@@ -257,7 +257,7 @@ def inputfield(problem_type, choice=None, input_num=1):
     of checkboxes. """
 
     sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
-            (problem_type.replace(" ", "_"), str(input_num)))
+           (problem_type.replace(" ", "_"), str(input_num)))
 
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"

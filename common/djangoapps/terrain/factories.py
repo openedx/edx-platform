@@ -1,7 +1,7 @@
 from student.tests.factories import (UserFactory, UserProfileFactory,
-                                    RegistrationFactory, GroupFactory, 
-                                    CourseEnrollmentAllowed,
-                                    CourseFactory, ItemFactory)
+                                     RegistrationFactory, GroupFactory,
+                                     CourseEnrollmentAllowed,
+                                     CourseFactory, ItemFactory)
 from lettuce import world
 
 
@@ -9,7 +9,7 @@ from lettuce import world
 class UserFactory(UserFactory):
     """
     User account for lms / cms
-    """ 
+    """
     pass
 
 
@@ -17,7 +17,7 @@ class UserFactory(UserFactory):
 class UserProfileFactory(UserProfileFactory):
     """
     Demographics etc for the User
-    """ 
+    """
     pass
 
 
@@ -25,7 +25,7 @@ class UserProfileFactory(UserProfileFactory):
 class RegistrationFactory(RegistrationFactory):
     """
     Activation key for registering the user account
-    """ 
+    """
     pass
 
 
@@ -33,7 +33,7 @@ class RegistrationFactory(RegistrationFactory):
 class GroupFactory(GroupFactory):
     """
     Groups for user permissions for courses
-    """ 
+    """
     pass
 
 
@@ -41,7 +41,7 @@ class GroupFactory(GroupFactory):
 class CourseEnrollmentAllowedFactory(CourseEnrollmentAllowed):
     """
     Users allowed to enroll in the course outside of the usual window
-    """ 
+    """
     pass
 
 
@@ -49,13 +49,13 @@ class CourseEnrollmentAllowedFactory(CourseEnrollmentAllowed):
 class CourseFactory(CourseFactory):
     """
     Courseware courses
-    """ 
+    """
     pass
-    
+
 
 @world.absorb
 class ItemFactory(ItemFactory):
     """
     Everything included inside a course
-    """ 
+    """
     pass
