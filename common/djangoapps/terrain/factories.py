@@ -2,11 +2,9 @@
 Factories are defined in other modules and absorbed here into the
 lettuce world so that they can be used by both unit tests
 and integration / BDD tests.
-
-TODO: move the course and item factories out of student and into
-xmodule/modulestore
 '''
 import student.tests.factories as sf
+import xmodule.modulestore.tests.factories as xf
 from lettuce import world
 
 
@@ -51,7 +49,7 @@ class CourseEnrollmentAllowedFactory(sf.CourseEnrollmentAllowed):
 
 
 @world.absorb
-class CourseFactory(sf.CourseFactory):
+class CourseFactory(xf.CourseFactory):
     """
     Courseware courses
     """
@@ -59,7 +57,7 @@ class CourseFactory(sf.CourseFactory):
 
 
 @world.absorb
-class ItemFactory(sf.ItemFactory):
+class ItemFactory(xf.ItemFactory):
     """
     Everything included inside a course
     """
