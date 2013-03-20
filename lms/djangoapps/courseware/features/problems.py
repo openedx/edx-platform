@@ -214,72 +214,63 @@ def reset_problem(step):
     world.css_click('input.reset')
 
 
+# Dictionaries that map problem types to the css selectors
+# for correct/incorrect marks.
+# The elements are lists of selectors because a particular problem type
+# might be marked in multiple ways.
+# For example, multiple choice is marked incorrect differently
+# depending on whether the user selects an incorrect
+# item or submits without selecting any item)
+CORRECTNESS_SELECTORS = {
+        'correct': {'drop down': ['span.correct'],
+                       'multiple choice': ['label.choicegroup_correct'],
+                        'checkbox': ['span.correct'],
+                        'string': ['div.correct'],
+                        'numerical': ['div.correct'],
+                        'formula': ['div.correct'],
+                        'script': ['div.correct'], },
+
+        'incorrect': {'drop down': ['span.incorrect'],
+                       'multiple choice': ['label.choicegroup_incorrect',
+                                            'span.incorrect'],
+                        'checkbox': ['span.incorrect'],
+                        'string': ['div.incorrect'],
+                        'numerical': ['div.incorrect'],
+                        'formula': ['div.incorrect'],
+                        'script': ['div.incorrect']},
+
+        'unanswered': {'drop down': ['span.unanswered'],
+                       'multiple choice': ['span.unanswered'],
+                        'checkbox': ['span.unanswered'],
+                        'string': ['div.unanswered'],
+                        'numerical': ['div.unanswered'],
+                        'formula': ['div.unanswered'],
+                        'script': ['div.unanswered']}}
+
+
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')
 def assert_answer_mark(step, problem_type, correctness):
     """ Assert that the expected answer mark is visible for a given problem type.
 
     *problem_type* is a string identifying the type of problem (e.g. 'drop down')
     *correctness* is in ['correct', 'incorrect', 'unanswered']
+    """
 
-    Asserting that a problem is marked 'unanswered' means that
-    the problem is NOT marked correct and NOT marked incorrect.
-    This can occur, for example, if the user has reset the problem.  """
+    # Determine which selector(s) to look for based on correctness
+    assert(correctness in CORRECTNESS_SELECTORS)
+    selector_dict = CORRECTNESS_SELECTORS[correctness]
+    assert(problem_type in selector_dict)
 
-    # Dictionaries that map problem types to the css selectors
-    # for correct/incorrect marks.
-    # The elements are lists of selectors because a particular problem type
-    # might be marked in multiple ways.
-    # For example, multiple choice is marked incorrect differently
-    # depending on whether the user selects an incorrect
-    # item or submits without selecting any item)
-    correct_selectors = {'drop down': ['span.correct'],
-                           'multiple choice': ['label.choicegroup_correct'],
-                            'checkbox': ['span.correct'],
-                            'string': ['div.correct'],
-                            'numerical': ['div.correct'],
-                            'formula': ['div.correct'],
-                            'script': ['div.correct'],
-                            'code': ['span.correct'], }
+    # At least one of the correct selectors should be present
+    for sel in selector_dict[problem_type]:
+        has_expected = world.browser.is_element_present_by_css(sel, wait_time=4)
 
-    incorrect_selectors = {'drop down': ['span.incorrect'],
-                           'multiple choice': ['label.choicegroup_incorrect',
-                                                'span.incorrect'],
-                            'checkbox': ['span.incorrect'],
-                            'string': ['div.incorrect'],
-                            'numerical': ['div.incorrect'],
-                            'formula': ['div.incorrect'],
-                            'script': ['div.incorrect'],
-                            'code': ['span.incorrect'], }
+        # As soon as we find the selector, break out of the loop
+        if has_expected:
+            break
 
-    assert(correctness in ['correct', 'incorrect', 'unanswered'])
-    assert(problem_type in correct_selectors and problem_type in incorrect_selectors)
-
-    # Assert that the question has the expected mark
-    # (either correct or incorrect)
-    if correctness in ["correct", "incorrect"]:
-
-        selector_dict = correct_selectors if correctness == "correct" else incorrect_selectors
-
-        # At least one of the correct selectors should be present
-        for sel in selector_dict[problem_type]:
-            has_expected_mark = world.browser.is_element_present_by_css(sel, wait_time=4)
-
-            # As soon as we find the selector, break out of the loop
-            if has_expected_mark:
-                break
-
-        # Expect that we found the right mark (correct or incorrect)
-        assert(has_expected_mark)
-
-    # Assert that the question has neither correct nor incorrect
-    # because it is unanswered (possibly reset)
-    else:
-        # Get all the correct/incorrect selectors for this problem type
-        selector_list = correct_selectors[problem_type] + incorrect_selectors[problem_type]
-
-        # Assert that none of the correct/incorrect selectors are present
-        for sel in selector_list:
-            assert(world.browser.is_element_not_present_by_css(sel, wait_time=4))
+    # Expect that we found the expected selector
+    assert(has_expected)
 
 
 def inputfield(problem_type, choice=None, input_num=1):
