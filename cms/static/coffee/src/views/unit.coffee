@@ -34,7 +34,10 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     @$('.components').sortable(
       handle: '.drag-handle'
-      update: (event, ui) => @model.save(children: @components())
+      update: (event, ui) =>
+        payload = children : @components()
+        options = success : => @model.unset('children')
+        @model.save(payload, options)
       helper: 'clone'
       opacity: '0.5'
       placeholder: 'component-placeholder'
