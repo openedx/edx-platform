@@ -376,7 +376,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         return data
 
-    def _load_item(self, item, data_cache, depth=0):
+    def _load_item(self, item, data_cache, should_apply_metadata_inheritence=True):
         """
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
@@ -389,9 +389,8 @@ class MongoModuleStore(ModuleStoreBase):
         resource_fs = OSFS(root)
 
         metadata_inheritance_tree = None
-        # if we are loading a course object, if we're not prefetching children (depth != 0) then don't
-        # bother with the metadata inheritence 
-        if item['location']['category'] != 'course' or depth != 0:
+
+        if should_apply_metadata_inheritence:
             metadata_inheritance_tree = self.get_cached_metadata_inheritance_tree(Location(item['location']))
 
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
@@ -414,7 +413,10 @@ class MongoModuleStore(ModuleStoreBase):
         """
         data_cache = self._cache_children(items, depth)
 
-        return [self._load_item(item, data_cache, depth) for item in items]
+        # if we are loading a course object, if we're not prefetching children (depth != 0) then don't
+        # bother with the metadata inheritence 
+        return [self._load_item(item, data_cache, 
+            should_apply_metadata_inheritence=(item['location']['category'] != 'course' or depth != 0)) for item in items]
 
     def get_courses(self):
         '''
