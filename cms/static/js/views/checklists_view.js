@@ -5,7 +5,8 @@ CMS.Views.Checklists = Backbone.View.extend({
 
     events : {
         'click .course-checklist .checklist-title' : "toggleChecklist",
-        'click .course-checklist .task input' : "toggleTask"
+        'click .course-checklist .task input' : "toggleTask",
+        'click a[rel="external"]' : "openInNewTab"
     },
 
     initialize : function() {
@@ -60,7 +61,7 @@ CMS.Views.Checklists = Backbone.View.extend({
     },
 
     toggleChecklist : function(e) {
-        (e).preventDefault();
+        e.preventDefault();
         $(e.target).closest('.course-checklist').toggleClass('is-collapsed');
     },
 
@@ -84,6 +85,11 @@ CMS.Views.Checklists = Backbone.View.extend({
                 },
                 error : CMS.ServerError
             });
+    },
+
+    openInNewTab : function(e) {
+        e.preventDefault();
+        window.open($(e.target).attr('href'));
     }
 
 });

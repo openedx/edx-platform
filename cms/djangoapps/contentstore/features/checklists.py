@@ -19,7 +19,7 @@ def i_see_default_checklists(step):
     assert_true(checklists[0].text.endswith('Getting Started With Studio'))
     assert_true(checklists[1].text.endswith('Draft a Rough Course Outline'))
     assert_true(checklists[2].text.endswith("Explore edX\'s Support Tools"))
-    assert_true(checklists[3].text.endswith('Draft your Course Introduction'))
+    assert_true(checklists[3].text.endswith('Draft Your Course About Page'))
 
 
 @step('I can check and uncheck tasks in a checklist$')

@@ -51,7 +51,7 @@ from xmodule.contentstore.content import StaticContent
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item, get_url_reverse
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from contentstore.course_info_model import get_course_updates,\
@@ -141,10 +141,7 @@ def index(request):
     return render_to_response('index.html', {
         'new_course_template': Location('i4x', 'edx', 'templates', 'course', 'Empty'),
         'courses': [(course.display_name,
-                    reverse('course_index', args=[
-                        course.location.org,
-                        course.location.course,
-                        course.location.name]),
+                    get_url_reverse('CourseOutline', course),
                     get_lms_link_for_item(course.location, course_id=course.location.course_id))
                     for course in courses],
         'user': request.user,
@@ -1308,11 +1305,12 @@ def get_checklists(request, org, course, name):
         course_module.checklists = template_module.checklists
         modulestore.update_metadata(location, own_metadata(course_module))
 
+    checklists = course_module.checklists
+    create_checklist_action_urls(checklists, course_module)
     return render_to_response('checklists.html',
         {
             'context_course': course_module,
-            'checklists' : course_module.checklists
-
+            'checklists' : checklists
         })
 
 
@@ -1337,14 +1335,23 @@ def update_checklist(request, org, course, name, checklist_index=None):
             modified_checklist = json.loads(request.body)
             course_module.checklists[int(checklist_index)] = modified_checklist
             modulestore.update_metadata(location, own_metadata(course_module))
+            create_checklist_action_urls([modified_checklist], course_module)
             return HttpResponse(json.dumps(modified_checklist), mimetype="application/json")
         else:
             return HttpResponseBadRequest("Could not save checklist state because the checklist index was out of range or unspecified.",
                 content_type="text/plain")
     elif request.method == 'GET':
         # In the JavaScript view initialize method, we do a fetch to get all the checklists.
-        return HttpResponse(json.dumps(course_module.checklists), mimetype="application/json")
+        checklists = course_module.checklists
+        create_checklist_action_urls(checklists, course_module)
+        return HttpResponse(json.dumps(checklists), mimetype="application/json")
 
+
+def create_checklist_action_urls(checklists, course_module):
+    # Expand action names to their URLs.
+    for checklist in checklists:
+        for item in checklist.get('items'):
+            item['action_url'] = get_url_reverse(item.get('action_url'), course_module)
 
 @login_required
 @ensure_csrf_cookie
@@ -1539,10 +1546,7 @@ def import_course(request, org, course, name):
         return render_to_response('import.html', {
             'context_course': course_module,
             'active_tab': 'import',
-            'successful_import_redirect_url': reverse('course_index', args=[
-                        course_module.location.org,
-                        course_module.location.course,
-                        course_module.location.name])
+            'successful_import_redirect_url': get_url_reverse('CourseOutline', course_module)
         })
 
 

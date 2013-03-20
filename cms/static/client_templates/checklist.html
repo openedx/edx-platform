@@ -45,7 +45,8 @@
                 <% if (item['action_text'] !== '' && item['action_url'] !== '') { %>
                 <ul class="list-actions task-actions">
                     <li>
-                        <a href="<%= item['action_url'] %>" class="action action-primary"><%= item['action_text'] %></a>
+                        <a href="<%= item['action_url'] %>" rel="external" class="action action-primary"
+                           title="This link will open in a new browser window/tab"><%= item['action_text'] %></a>
                     </li>
                 </ul>
                 <% } %>
