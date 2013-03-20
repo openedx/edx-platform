@@ -657,8 +657,8 @@ class MatlabInput(CodeInput):
         self.queue_len = 0
         self.queuename = 'matlab'
         # Flag indicating that the problem has been queued, 'msg' is length of
-        self.queue_msg = None
-        if 'queue_msg' in self.input_state:
+        self.queue_msg = ''
+        if 'queue_msg' in self.input_state and self.status in ['incomplete', 'unsubmitted']:
             self.queue_msg = self.input_state['queue_msg']
         if 'queued' in self.input_state and self.input_state['queuestate'] is not None:
             self.status = 'queued'
@@ -689,11 +689,10 @@ class MatlabInput(CodeInput):
 
     def _extra_context(self):
         ''' Set up additional context variables'''
-        extra_context = {'queue_len': self.queue_len}
-        if self.queue_msg is not None:
-            extra_context['queue_msg'] = self.queue_msg
-        else:
-            extra_context['queue_msg'] = ''
+        extra_context = {
+                'queue_len': self.queue_len,
+                'queue_msg': self.queue_msg
+                }
         return extra_context
 
     def _parse_data(self, queue_msg):
@@ -746,7 +745,6 @@ class MatlabInput(CodeInput):
 
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body = json.dumps(contents))
-
 
             return {'success': error == 0, 'message': msg}
         return {'success': False, 'message': 'Cannot connect to the queue'}
