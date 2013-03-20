@@ -1147,10 +1147,10 @@ def sympy_check2():
                     correct = []
                     messages = []
                     for input_dict in input_list:
-                        correct.append('correct' if input_dict[
-                                       'ok'] else 'incorrect')
-                        msg = self.clean_message_html(input_dict[
-                                                      'msg']) if 'msg' in input_dict else None
+                        correct.append('correct' 
+                                if input_dict['ok'] else 'incorrect')
+                        msg = (self.clean_message_html(input_dict['msg']) 
+                                if 'msg' in input_dict else None)
                         messages.append(msg)
 
                 # Otherwise, we do not recognize the dictionary
@@ -1164,8 +1164,8 @@ def sympy_check2():
             # indicating whether all inputs should be marked
             # correct or incorrect
             else:
-                correct = ['correct'] * len(
-                    idset) if ret else ['incorrect'] * len(idset)
+                n = len(idset)
+                correct = ['correct'] * n if ret else ['incorrect'] * n
 
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
@@ -1174,8 +1174,8 @@ def sympy_check2():
         correct_map.set_overall_message(overall_message)
 
         for k in range(len(idset)):
-            npoints = self.maxpoints[idset[
-                k]] if correct[k] == 'correct' else 0
+            npoints = (self.maxpoints[idset[k]] 
+                    if correct[k] == 'correct' else 0)
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map

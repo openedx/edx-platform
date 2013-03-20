@@ -543,8 +543,16 @@ class CapaModule(CapaFields, XModule):
 
     def handle_ungraded_response(self, get):
         '''
-        Delivers a response to the capa problem where the expectation where this response does
-        not have relevant grading information
+        Delivers a response from the XQueue to the capa problem
+
+        The score of the problem will not be updated
+
+        Args:
+            - get (dict) must contain keys:
+                            queuekey - a key specific to this response
+                            xqueue_body - the body of the response
+        Returns:
+            empty dictionary
 
         No ajax return is needed, so an empty dict is returned
         '''
@@ -557,8 +565,12 @@ class CapaModule(CapaFields, XModule):
 
     def handle_input_ajax(self, get):
         '''
-        Passes information down to the capa problem so that it can handle its own ajax calls
-        Returns the response from the capa problem
+        Handle ajax calls meant for a particular input in the problem
+
+        Args:
+            - get (dict) - data that should be passed to the input
+        Returns:
+            - dict containing the response from the input
         '''
         response = self.lcp.handle_input_ajax(get)
         # save any state changes that may occur

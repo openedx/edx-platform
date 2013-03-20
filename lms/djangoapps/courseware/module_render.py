@@ -182,7 +182,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http')
     )
 
-    def make_xqueue_callback(dispatch = 'score_update'):
+    def make_xqueue_callback(dispatch='score_update'):
         # Fully qualified callback URL for external queueing system
         xqueue_callback_url = '{proto}://{host}'.format(
             host=request.get_host(),

@@ -91,8 +91,12 @@ class LoncapaProblem(object):
 
          - problem_text (string): xml defining the problem
          - id           (string): identifier for this problem; often a filename (no spaces)
-         - state        (dict): student state
-         - seed         (int): random number generator seed (int)
+         - state        (dict): containing the following keys:
+                                - 'seed' - (int) random number generator seed
+                                - 'student_answers' - (dict) maps input id to the stored answer for that input
+                                - 'correct_map' (CorrectMap) a map of each input to their 'correctness'
+                                - 'done' - (bool) indicates whether or not this problem is considered done
+                                - 'input_state' - (dict) maps input_id to a dictionary that holds the state for that input
          - system       (ModuleSystem): ModuleSystem instance which provides OS,
                                         rendering, and user context
 
@@ -104,27 +108,16 @@ class LoncapaProblem(object):
         self.system = system
         if self.system is None:
             raise Exception()
-        self.seed = seed
-        self.input_state = None
 
-        if state:
-            if 'seed' in state:
-                self.seed = state['seed']
-            if 'student_answers' in state:
-                self.student_answers = state['student_answers']
-            if 'correct_map' in state:
-                self.correct_map.set_dict(state['correct_map'])
-            if 'done' in state:
-                self.done = state['done']
-            if 'input_state' in state:
-                self.input_state = state['input_state']
+        state = state if state else {}
+        self.seed = seed if seed else state.get('seed', struct.unpack('i', os.urandom(4))[0]) 
+        self.student_answers = state.get('student_answers', {})
+        if 'correct_map' in state:
+            self.correct_map.set_dict(state['correct_map'])
+        self.done = state.get('done', False)
+        self.input_state = state.get('input_state', {})
 
-        # TODO: Does this deplete the Linux entropy pool? Is this fast enough?
-        if not self.seed:
-            self.seed = struct.unpack('i', os.urandom(4))[0]
 
-        if not self.input_state:
-            self.input_state = {}
 
         # Convert startouttext and endouttext to proper <text></text>
         problem_text = re.sub("startouttext\s*/", "text", problem_text)
@@ -240,13 +233,14 @@ class LoncapaProblem(object):
 
     def ungraded_response(self, xqueue_msg, queuekey):
         '''
-        Handle any responses from the xqueue that are not related to grading
+        Handle any responses from the xqueue that do not contain grades
+        Will try to pass the queue message to all inputtypes that can handle ungraded responses 
 
         Does not return any value
         '''
         # check against each inputtype
         for the_input in self.inputs.values():
-            # if the input type has an xqueue_response function, pass in the values
+            # if the input type has an ungraded function, pass in the values
             if hasattr(the_input, 'ungraded_response'):
                 the_input.ungraded_response(xqueue_msg, queuekey)
 
@@ -542,11 +536,14 @@ class LoncapaProblem(object):
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
             
+            if input_id not in self.input_state:
+                self.input_state[input_id] = {}
+                
             # do the rendering
             state = {'value': value,
                    'status': status,
                    'id': input_id,
-                   'input_state': self.input_state,
+                   'input_state': self.input_state[input_id],
                    'feedback': {'message': msg,
                                 'hint': hint,
                                 'hintmode': hintmode, }}
