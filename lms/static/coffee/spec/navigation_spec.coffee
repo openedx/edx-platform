@@ -32,11 +32,9 @@ describe 'Navigation', ->
             heightStyle: 'content'
 
       it 'binds the accordionchange event', ->
-        Navigation.bind()
         expect($('#accordion')).toHandleWith 'accordionchange', @navigation.log
 
       it 'bind the navigation toggle', ->
-        Navigation.bind()
         expect($('#open_close_accordion a')).toHandleWith 'click', @navigation.toggle
 
     describe 'when the #accordion does not exists', ->
@@ -45,7 +43,6 @@ describe 'Navigation', ->
 
       it 'does not activate the accordion', ->
         spyOn $.fn, 'accordion'
-        Navigation.bind()
         expect($('#accordion').accordion).wasNotCalled()
 
   describe 'toggle', ->

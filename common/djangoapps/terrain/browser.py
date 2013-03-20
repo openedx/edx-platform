@@ -3,6 +3,11 @@ from splinter.browser import Browser
 from logging import getLogger
 import time
 
+# Let the LMS and CMS do their one-time setup
+# For example, setting up mongo caches
+from lms import one_time_startup
+from cms import one_time_startup
+
 logger = getLogger(__name__)
 logger.info("Loading the lettuce acceptance testing terrain file...")
 
