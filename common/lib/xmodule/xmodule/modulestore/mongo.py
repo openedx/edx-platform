@@ -8,7 +8,7 @@ from collections import namedtuple
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -493,10 +493,12 @@ class MongoModuleStore(ModuleStoreBase):
         try:
             source_item = self.collection.find_one(location_to_query(source))
             source_item['_id'] = Location(location).dict()
-            self.collection.insert(source_item,
+            self.collection.insert(
+                source_item,
                 # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
                 # from overriding our default value set in the init method.
-                safe=self.collection.safe)
+                safe=self.collection.safe
+            )
             item = self._load_items([source_item])[0]
 
             # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
