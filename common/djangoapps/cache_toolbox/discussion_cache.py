@@ -1,13 +1,13 @@
 import logging
 from django.core.cache import cache, get_cache
-from datetime import datetime, timedelta
+from datetime import datetime
 
 def _get_discussion_cache():
-    return cache
+    return get_cache('mongo_metadata_inheritance')
 
 
 def get_discussion_cache_key(course_id):
-    return 'discussion_{0}'.format(course_id)
+    return 'discussion_items_{0}'.format(course_id)
 
 
 def get_discussion_cache_entry(modulestore, course_id):
@@ -16,10 +16,7 @@ def get_discussion_cache_entry(modulestore, course_id):
     
     if cache is not None:
         cache_entry = cache.get(get_discussion_cache_key(course_id), None)
-        if cache_entry is not None:
-            delta = datetime.now() - cache_entry.get('timestamp', datetime.min)
-            if delta > Timedelta(0,300):
-                cache_entry = None
+        # @todo: add expiry here
     
     if cache_entry is None:
         cache_entry = generate_discussion_cache_entry(modulestore, course_id)
@@ -33,9 +30,11 @@ def generate_discussion_cache_entry(modulestore, course_id):
         course_id=course_id)
 
     cache = _get_discussion_cache()
+    entry = {'modules': all_discussion_modules, 'timestamp': datetime.now()}
+    logging.debug('**** entry = {0}'.format(entry))
     if cache is not None:
-        cache.set(get_discussion_cache_key(course_id), {'modules': all_discussion_modules, 'timestamp': datetime.now()})
-    return all_discussion_modules
+        cache.set(get_discussion_cache_key(course_id), entry)
+    return entry
 
 
 def modulestore_update_signal_handler(modulestore = None, course_id = None, location = None, **kwargs):

@@ -155,7 +155,8 @@ def initialize_discussion_info(course):
     unexpanded_category_map = defaultdict(list)
 
     # get all discussion models within this course_id
-    all_modules = get_discussion_cache_entry(modulestore(), course_id)
+    all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course,
+        'discussion', None], course_id=course_id)
 
     for module in all_modules:
         skip_module = False
