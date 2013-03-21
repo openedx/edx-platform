@@ -4,12 +4,11 @@ import random
 import textwrap
 import time
 from common import i_am_registered_for_the_course, TEST_SECTION_NAME, section_location
-from terrain.factories import ItemFactory
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
-                        ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
-                        StringResponseXMLFactory, NumericalResponseXMLFactory, \
-                        FormulaResponseXMLFactory, CustomResponseXMLFactory, \
-                        CodeResponseXMLFactory
+    ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
+    StringResponseXMLFactory, NumericalResponseXMLFactory, \
+    FormulaResponseXMLFactory, CustomResponseXMLFactory, \
+    CodeResponseXMLFactory
 
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure
@@ -99,11 +98,11 @@ def add_problem_to_course(course, problem_type):
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    problem_item = ItemFactory.create(parent_location=section_location(course),
-                        template="i4x://edx/templates/problem/Blank_Common_Problem",
-                        display_name=str(problem_type),
-                        data=problem_xml,
-                        metadata={'rerandomize': 'always'})
+    problem_item = world.ItemFactory.create(parent_location=section_location(course),
+                                            template="i4x://edx/templates/problem/Blank_Common_Problem",
+                                            display_name=str(problem_type),
+                                            data=problem_xml,
+                                            metadata={'rerandomize': 'always'})
 
 
 @step(u'I am viewing a "([^"]*)" problem')
@@ -275,7 +274,6 @@ def assert_answer_mark(step, problem_type, correctness):
     # Expect that we found the expected selector
     assert(has_expected)
 
-
 def inputfield(problem_type, choice=None, input_num=1):
     """ Return the <input> element for *problem_type*.
     For example, if problem_type is 'string', return
@@ -285,7 +283,7 @@ def inputfield(problem_type, choice=None, input_num=1):
     of checkboxes. """
 
     sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
-            (problem_type.replace(" ", "_"), str(input_num)))
+           (problem_type.replace(" ", "_"), str(input_num)))
 
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"
