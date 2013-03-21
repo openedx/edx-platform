@@ -90,13 +90,21 @@ class CourseUpdateTest(CourseTestCase):
             'course': self.course_location.course,
             'provided_id': ''})
 
-        resp = self.client.post(url, json.dumps(payload), "application/json")
-
-        payload = json.loads(resp.content)
-
         self.assertContains(
             self.client.post(url, json.dumps(payload), "application/json"),
             '<garbage')
+
+        # set to valid html which would break an xml parser
+        content = "<p><br><br></p>"
+        payload = {'content': content,
+                   'date': 'January 11, 2013'}
+        url = reverse('course_info_json', kwargs={'org': self.course_location.org,
+            'course': self.course_location.course,
+            'provided_id': ''})
+
+        resp = self.client.post(url, json.dumps(payload), "application/json")
+        payload = json.loads(resp.content)
+        self.assertHTMLEqual(content, json.loads(resp.content)['content'])
 
         # now try to delete a non-existent update
         url = reverse('course_info_json', kwargs={'org': self.course_location.org,
