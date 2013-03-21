@@ -31,13 +31,20 @@
             anchorToLoad = options.anchor_id;
         }
 
+        var onComplete = function(url) {
+            return function() { 
+                annotationData = { 'uri': url }
+                $(this).trigger('notes:init', [annotationData]);
+            }
+        };
+
         loadUrl = function htmlViewLoadUrl(url, anchorId) {
             // clear out previous load, if any:
             parentElement = document.getElementById('bookpage');
             while (parentElement.hasChildNodes())
                 parentElement.removeChild(parentElement.lastChild);
 	    // load new URL in:
-            $('#bookpage').load(url);
+            $('#bookpage').load(url, null, onComplete(url));
 
 	    // if there is an anchor set, then go to that location:
             if (anchorId != null) {

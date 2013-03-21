@@ -2,6 +2,7 @@ from lxml import etree
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_response
 
 from courseware.access import has_access
@@ -25,7 +26,9 @@ def index(request, course_id, book_index, page=None):
 
     return render_to_response('staticbook.html',
                               {'book_index': book_index, 'page': int(page),
-                               'course': course, 'book_url': textbook.book_url,
+                               'course': course,
+                               'book_url': textbook.book_url,
+                               'notes_api_url': reverse('notes_api_root', {'course_id': course_id}),
                                'table_of_contents': table_of_contents,
                                'start_page': textbook.start_page,
                                'end_page': textbook.end_page,
@@ -99,10 +102,10 @@ def html_index(request, course_id, book_index, chapter=None, anchor_id=None):
         for entry in textbook['chapters']:
             entry['url'] = remap_static_url(entry['url'], course)
 
-
     return render_to_response('static_htmlbook.html',
                               {'book_index': book_index,
                                'course': course,
+                               'notes_api_url': reverse('notes_api_root', kwargs={'course_id': course_id}),
                                'textbook': textbook,
                                'chapter': chapter,
                                'anchor_id': anchor_id,

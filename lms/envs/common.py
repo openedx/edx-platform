@@ -427,6 +427,7 @@ main_vendor_js = [
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.coffee'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.coffee'))
+notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
 
 PIPELINE_CSS = {
     'application': {
@@ -458,7 +459,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.coffee') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.coffee')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js)
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -491,7 +492,11 @@ PIPELINE_JS = {
     'open_ended': {
         'source_filenames': open_ended_js,
         'output_filename': 'js/open_ended.js'
-    }
+    },
+    'notes': {
+        'source_filenames': notes_js,
+        'output_filename': 'js/notes.js'
+    },
 }
 
 PIPELINE_DISABLE_WRAPPER = True

@@ -6,20 +6,19 @@ import logging
 
 log = logging.getLogger(__name__)
 
-#----------------------------------------------------------------------#
-# HTML views.
-#
-# Example for enabling annotator.js (snippet):
-#
-# $('body').annotator()
-#   .annotator('addPlugin', 'Tags')
-#   .annotator('addPlugin', 'Store', { 'prefix': '/courses/HarvardX/CB22x/2013_Spring/notes/api' });
-#
-# See annotator.js docs:
-#
-#   https://github.com/okfn/annotator/wiki
-
 def notes(request, course_id):
+    ''' Displays a student's notes in a course.
+
+$('body').annotator()
+    .annotator('addPlugin', 'Tags')
+    .annotator('addPlugin', 'Store', {
+        'prefix': /^(\/courses\/[^/]+\/[^/]+\/[^/]+)/.exec(window.location.href.toString().split(window.location.host)[1]
+        'annotationData': {
+            'uri': window.location.href.toString().split(window.location.host)[1]
+        }
+    });
+
+    '''
     course = get_course_with_access(request.user, course_id, 'load')
 
     notes = Note.objects.filter(user_id=request.user.id)

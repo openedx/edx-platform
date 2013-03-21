@@ -326,7 +326,7 @@ def get_default_tabs(user, course, active_page):
 
     tabs.extend(_wiki({'name': 'Wiki', 'type': 'wiki'}, user, course, active_page))
 
-    tabs.extend(_student_notes({'name': 'My Notes', 'type': 'notes'}, user, course, active_page))
+    tabs.extend(_student_notes({'name': 'Notes', 'type': 'notes'}, user, course, active_page))
 
     if user.is_authenticated() and not course.hide_progress_tab:
         tabs.extend(_progress({'name': 'Progress'}, user, course, active_page))
