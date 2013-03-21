@@ -1,7 +1,12 @@
 from lettuce import world, step
 from .factories import *
 from lettuce.django import django_url
+from django.conf import settings
+from django.http import HttpRequest
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.middleware import AuthenticationMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 from student.models import CourseEnrollment
 from urllib import quote_plus
 from nose.tools import assert_equals
@@ -78,7 +83,7 @@ def the_page_title_should_contain(step, title):
 @step('I am a logged in user$')
 def i_am_logged_in_user(step):
     create_user('robot')
-    log_in('robot@edx.org', 'test')
+    log_in('robot', 'test')
 
 
 @step('I am not logged in$')
@@ -93,7 +98,7 @@ def i_am_staff_for_course_by_id(step, course_id):
 
 @step('I log in$')
 def i_log_in(step):
-    log_in('robot@edx.org', 'test')
+    log_in('robot', 'test')
 
 
 @step(u'I am an edX user$')
@@ -120,38 +125,46 @@ def create_user(uname):
     portal_user.set_password('test')
     portal_user.save()
 
-    registration = RegistrationFactory(user=portal_user)
+    registration = world.RegistrationFactory(user=portal_user)
     registration.register(portal_user)
     registration.activate()
 
-    user_profile = UserProfileFactory(user=portal_user)
+    user_profile = world.UserProfileFactory(user=portal_user)
 
 
 @world.absorb
-def log_in(email, password):
-    world.browser.cookies.delete()
-    world.browser.visit(django_url('/'))
-    world.browser.is_element_present_by_css('header.global', 10)
-    world.browser.click_link_by_href('#login-modal')
+def log_in(username, password):
+    '''
+    Log the user in programatically
+    '''
 
-    # Wait for the login dialog to load
-    # This is complicated by the fact that sometimes a second #login_form
-    # dialog loads, while the first one remains hidden.
-    # We give them both time to load, starting with the second one.
-    world.browser.is_element_present_by_css('section.content-wrapper form#login_form', wait_time=4)
-    world.browser.is_element_present_by_css('form#login_form', wait_time=2)
+    # Authenticate the user
+    user = authenticate(username=username, password=password)
+    assert(user is not None and user.is_active)
 
-    # For some reason, the page sometimes includes two #login_form
-    # elements, the first of which is not visible.
-    # To avoid this, we always select the last of the two #login_form dialogs
-    login_form = world.browser.find_by_css('form#login_form').last
+    # Send a fake HttpRequest to log the user in
+    # We need to process the request using
+    # Session middleware and Authentication middleware
+    # to ensure that session state can be stored
+    request = HttpRequest()
+    SessionMiddleware().process_request(request)
+    AuthenticationMiddleware().process_request(request)
+    login(request, user)
 
-    login_form.find_by_name('email').fill(email)
-    login_form.find_by_name('password').fill(password)
-    login_form.find_by_name('submit').click()
+    # Save the session
+    request.session.save()
 
-    # wait for the page to redraw
-    assert world.browser.is_element_present_by_css('.content-wrapper', wait_time=10)
+    # Retrieve the sessionid and add it to the browser's cookies
+    cookie_dict = {settings.SESSION_COOKIE_NAME: request.session.session_key}
+    try:
+        world.browser.cookies.add(cookie_dict)
+
+    # WebDriver has an issue where we cannot set cookies
+    # before we make a GET request, so if we get an error,
+    # we load the '/' page and try again
+    except:
+        world.browser.visit(django_url('/'))
+        world.browser.cookies.add(cookie_dict)
 
 
 @world.absorb
@@ -207,6 +220,7 @@ def save_the_course_content(path='/tmp'):
     # use string slicing to grab everything after 'courseware/' in the URL
     u = world.browser.url
     section_url = u[u.find('courseware/') + 11:]
+
 
     if not os.path.exists(path):
         os.makedirs(path)

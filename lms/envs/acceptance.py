@@ -29,6 +29,14 @@ MODULESTORE = {
     }
 }
 
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db': 'test_xcontent',
+    }
+}
+
 # Set this up so that rake lms[acceptance] and running the
 # harvest command both use the same (test) database
 # which they can flush without messing up your dev db
