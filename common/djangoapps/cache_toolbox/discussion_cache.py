@@ -25,13 +25,15 @@ def get_discussion_cache_entry(modulestore, course_id):
 
 
 def generate_discussion_cache_entry(modulestore, course_id):
+    # make this a NOP for now. We have to figure out how to pickle the result set
+    return
+    
     components = course_id.split('/')
     all_discussion_modules = modulestore.get_items(['i4x', components[0], components[1], 'discussion', None], 
         course_id=course_id)
 
     cache = _get_discussion_cache()
     entry = {'modules': all_discussion_modules, 'timestamp': datetime.now()}
-    logging.debug('**** entry = {0}'.format(entry))
     if cache is not None:
         cache.set(get_discussion_cache_key(course_id), entry)
     return entry
@@ -40,6 +42,7 @@ def generate_discussion_cache_entry(modulestore, course_id):
 def modulestore_update_signal_handler(modulestore = None, course_id = None, location = None, **kwargs):
     """called when there is an write event in our modulestore
     """
+    return
     if location.category == 'discussion':
         logging.debug('******* got modulestore update signal. Regenerating discussion cache for {0}'.format(course_id))
         # refresh the cache entry if we've changed a discussion module
