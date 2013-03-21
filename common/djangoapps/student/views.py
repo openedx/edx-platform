@@ -423,7 +423,7 @@ def login_user(request, error=""):
             expires = cookie_date(expires_time)
 
         response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
-                            request.session.session_key, max_age=max_age,
+                            'true', max_age=max_age,
                             expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
                             path=settings.SESSION_COOKIE_PATH,
                             secure=settings.SESSION_COOKIE_SECURE or None,
