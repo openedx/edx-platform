@@ -2454,8 +2454,10 @@ body.discussion {
 .discussion-pin-inline {
       font-size: 12px;
       float:right;
-      padding-right: 5px;
-      font-style: italic; 
+      font-style: italic;
+      position: relative;
+      right:-20px;
+      top:-13px;
     }  
     
 .notpinned .icon
