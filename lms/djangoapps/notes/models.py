@@ -21,4 +21,5 @@ class Note(models.Model):
         if type(json_body) is dict:
             d.update(json_body)
         d['id'] = self.id
+        d['user_id'] = self.user.id
         return d

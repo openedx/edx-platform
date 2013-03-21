@@ -1,0 +1,25 @@
+<%namespace name='static' file='static_content.html'/>
+<%inherit file="main.html" />
+
+<%block name="headextra">
+    <%static:css group='course'/>
+    <%static:js group='courseware'/>
+</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+  </script>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='notes'" />
+
+<section class="container">
+    <div class="notes-wrapper">
+        <h2>My Notes</h2>
+        <pre>${json_notes}</pre>
+    </div>
+</section>
+
+
+
+

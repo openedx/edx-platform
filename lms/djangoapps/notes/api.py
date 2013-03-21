@@ -88,9 +88,7 @@ def create(request, course_id):
 def read(request, course_id, note_id):
     try:
         note = Note.objects.get(id=note_id)
-    except Note.DoesNotExist:
-        return [HttpResponse('', status=404), None]
-    except Note.MultipleObjectsReturned:
+    except:
         return [HttpResponse('', status=404), None]
 
     if not note.user.id == request.user.id:
@@ -101,9 +99,7 @@ def read(request, course_id, note_id):
 def update(request, course_id, note_id):
     try:
         note = Note.objects.get(note_id)
-    except Note.DoesNotExist:
-        return [HttpResponse('', status=404), None]
-    except Note.MultipleObjectsReturned:
+    except:
         return [HttpResponse('', status=404), None]
 
     if not note.user.id == request.user.id:
@@ -117,13 +113,13 @@ def update(request, course_id, note_id):
 def delete(request, course_id, note_id):
     try:
         note = Note.objects.get(note_id)
-    except Note.DoesNotExist:
-        return [HttpResponse('', status=404), None]
-    except Note.MultipleObjectsReturned:
+    except:
         return [HttpResponse('', status=404), None]
 
     if not note.user.id == request.user.id:
         return [HttpResponse('', status=403)]
+
+    note.delete()
 
     return [HttpResponse('', status=204), None]
 
