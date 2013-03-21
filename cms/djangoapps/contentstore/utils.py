@@ -161,10 +161,19 @@ def update_item(location, value):
         get_modulestore(location).update_item(location, value)
 
 
-def get_url_reverse(course_page_name, course):
-    # TODO: document and write unit tests
+def get_url_reverse(course_page_name, course_module):
+    """
+    Returns the course URL link to the specified location. This value is suitable to use as an href link.
+
+    course_page_name should correspond to an attribute in CoursePageNames (for example, 'ManageUsers'
+    or 'SettingsDetails'), or else it will simply be returned. This method passes back unknown values of
+    course_page_names so that it can also be used for absolute (known) URLs.
+
+    course_module is used to obtain the location, org, course, and name properties for a course, if
+    course_page_name corresponds to an attribute in CoursePageNames.
+    """
     url_name = getattr(CoursePageNames, course_page_name, None)
-    ctx_loc = course.location
+    ctx_loc = course_module.location
 
     if CoursePageNames.ManageUsers == url_name:
         return reverse(url_name, kwargs={"location": ctx_loc})

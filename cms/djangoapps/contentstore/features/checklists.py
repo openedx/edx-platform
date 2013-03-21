@@ -12,6 +12,12 @@ def i_select_checklists(step):
     css_click(link_css)
 
 
+@step('I have opened Checklists$')
+def i_have_opened_checklists(step):
+    step.given('I have opened a new course in Studio')
+    step.given('I select Checklists from the Tools menu')
+
+
 @step('I see the four default edX checklists$')
 def i_see_default_checklists(step):
     checklists = css_find('.checklist-title')
@@ -45,6 +51,31 @@ def tasks_correctly_selected_after_reload(step):
     verifyChecklist2Status(1, 7, 14)
 
 
+@step('I select a link to the course outline$')
+def i_select_a_link_to_the_course_outline(step):
+    clickActionLink(1, 0, 'Edit Course Outline')
+
+
+@step('I am brought to the course outline page$')
+def i_am_brought_to_course_outline(step):
+    assert_equal('Course Outline', css_find('.outline .title-1')[0].text)
+    assert_equal(1, len(world.browser.windows))
+
+
+@step('I select a link to help page$')
+def i_select_a_link_to_the_help_page(step):
+    clickActionLink(2, 0, 'Visit Studio Help')
+
+
+@step('I am brought to the help page in a new window$')
+def i_am_brought_to_help_page_in_new_window(step):
+    step.given('I see the four default edX checklists')
+    windows = world.browser.windows
+    assert_equal(2, len(windows))
+    world.browser.switch_to_window(windows[1])
+    assert_equal('http://help.edge.edx.org/', world.browser.url)
+
+
 ############### HELPER METHODS ####################
 def verifyChecklist2Status(completed, total, percentage):
     def verify_count(driver):
@@ -62,3 +93,17 @@ def verifyChecklist2Status(completed, total, percentage):
 
 def toggleTask(checklist, task):
     css_click('#course-checklist' + str(checklist) +'-task' + str(task))
+
+
+def clickActionLink(checklist, task, actionText):
+    # toggle checklist item to make sure that the link button is showing
+    toggleTask(checklist, task)
+    action_link = css_find('#course-checklist' + str(checklist) + ' a')[task]
+
+    # text will be empty initially, wait for it to populate
+    def verify_action_link_text(driver):
+        return action_link.text == actionText
+
+    wait_for(verify_action_link_text)
+    action_link.click()
+
