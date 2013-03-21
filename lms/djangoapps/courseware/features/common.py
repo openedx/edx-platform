@@ -1,11 +1,8 @@
 from lettuce import world, step
-from django.core.management import call_command
 from nose.tools import assert_equals, assert_in
 from lettuce.django import django_url
-from django.conf import settings
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-from terrain.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import _MODULESTORES, modulestore
 from xmodule.templates import update_templates
@@ -77,7 +74,8 @@ def should_see_in_the_page(step, text):
 @step('I am logged in$')
 def i_am_logged_in(step):
     world.create_user('robot')
-    world.log_in('robot@edx.org', 'test')
+    world.log_in('robot', 'test')
+    world.browser.visit(django_url('/'))
 
 
 @step('I am not logged in$')
@@ -101,17 +99,17 @@ def create_course(step, course):
     # Create the course
     # We always use the same org and display name,
     # but vary the course identifier (e.g. 600x or 191x)
-    course = CourseFactory.create(org=TEST_COURSE_ORG,
-                                number=course,
-                                display_name=TEST_COURSE_NAME)
+    course = world.CourseFactory.create(org=TEST_COURSE_ORG,
+                                        number=course,
+                                        display_name=TEST_COURSE_NAME)
 
     # Add a section to the course to contain problems
-    section = ItemFactory.create(parent_location=course.location,
-                                display_name=TEST_SECTION_NAME)
+    section = world.ItemFactory.create(parent_location=course.location,
+                                       display_name=TEST_SECTION_NAME)
 
-    problem_section = ItemFactory.create(parent_location=section.location,
-                                        template='i4x://edx/templates/sequential/Empty',
-                                        display_name=TEST_SECTION_NAME)
+    problem_section = world.ItemFactory.create(parent_location=section.location,
+                                               template='i4x://edx/templates/sequential/Empty',
+                                               display_name=TEST_SECTION_NAME)
 
 
 @step(u'I am registered for the course "([^"]*)"$')
@@ -124,16 +122,17 @@ def i_am_registered_for_the_course(step, course):
     u = User.objects.get(username='robot')
 
     # If the user is not already enrolled, enroll the user.
+    # TODO: change to factory
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(course))
 
-    world.log_in('robot@edx.org', 'test')
+    world.log_in('robot', 'test')
 
 
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
 def add_tab_to_course(step, course, extra_tab_name):
-    section_item = ItemFactory.create(parent_location=course_location(course),
-                                    template="i4x://edx/templates/static_tab/Empty",
-                                    display_name=str(extra_tab_name))
+    section_item = world.ItemFactory.create(parent_location=course_location(course),
+                                            template="i4x://edx/templates/static_tab/Empty",
+                                            display_name=str(extra_tab_name))
 
 
 @step(u'I am an edX user$')
@@ -161,7 +160,7 @@ def flush_xmodule_store():
 
 def course_id(course_num):
     return "%s/%s/%s" % (TEST_COURSE_ORG, course_num,
-                        TEST_COURSE_NAME.replace(" ", "_"))
+                         TEST_COURSE_NAME.replace(" ", "_"))
 
 
 def course_location(course_num):

@@ -1,14 +1,14 @@
 from lettuce import world, step
 from lettuce.django import django_url
-from selenium.webdriver.support.ui import Select
 import random
 import textwrap
+import time
 from common import i_am_registered_for_the_course, TEST_SECTION_NAME, section_location
-from terrain.factories import ItemFactory
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
-                        ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
-                        StringResponseXMLFactory, NumericalResponseXMLFactory, \
-                        FormulaResponseXMLFactory, CustomResponseXMLFactory
+    ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
+    StringResponseXMLFactory, NumericalResponseXMLFactory, \
+    FormulaResponseXMLFactory, CustomResponseXMLFactory, \
+    CodeResponseXMLFactory
 
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure
@@ -78,6 +78,12 @@ PROBLEM_FACTORY_DICT = {
                         a2=0
                     return (a1+a2)==int(expect)
             """)}},
+    'code': {
+        'factory': CodeResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'Submit code to an external grader',
+            'initial_display': 'print "Hello world!"',
+            'grader_payload': '{"grader": "ps1/Spring2013/test_grader.py"}', }},
        }
 
 
@@ -92,11 +98,11 @@ def add_problem_to_course(course, problem_type):
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    problem_item = ItemFactory.create(parent_location=section_location(course),
-                        template="i4x://edx/templates/problem/Blank_Common_Problem",
-                        display_name=str(problem_type),
-                        data=problem_xml,
-                        metadata={'rerandomize': 'always'})
+    problem_item = world.ItemFactory.create(parent_location=section_location(course),
+                                            template="i4x://edx/templates/problem/Blank_Common_Problem",
+                                            display_name=str(problem_type),
+                                            data=problem_xml,
+                                            metadata={'rerandomize': 'always'})
 
 
 @step(u'I am viewing a "([^"]*)" problem')
@@ -114,6 +120,19 @@ def view_problem(step, problem_type):
                     (chapter_name, section_name))
 
     world.browser.visit(url)
+
+
+@step(u'External graders respond "([^"]*)"')
+def set_external_grader_response(step, correctness):
+    assert(correctness in ['correct', 'incorrect'])
+
+    response_dict = {'correct': True if correctness == 'correct' else False,
+                    'score': 1 if correctness == 'correct' else 0,
+                    'msg': 'Your problem was graded %s' % correctness}
+
+    # Set the fake xqueue server to always respond
+    # correct/incorrect when asked to grade a problem
+    world.xqueue_server.set_grade_response(response_dict)
 
 
 @step(u'I answer a "([^"]*)" problem "([^"]*)ly"')
@@ -169,18 +188,66 @@ def answer_problem(step, problem_type, correctness):
         inputfield('script', input_num=1).fill(str(first_addend))
         inputfield('script', input_num=2).fill(str(second_addend))
 
+    elif problem_type == 'code':
+        # The fake xqueue server is configured to respond
+        # correct / incorrect no matter what we submit.
+        # Furthermore, since the inline code response uses
+        # JavaScript to make the code display nicely, it's difficult
+        # to programatically input text
+        # (there's not <textarea> we can just fill text into)
+        # For this reason, we submit the initial code in the response
+        # (configured in the problem XML above)
+        pass
+
     # Submit the problem
     check_problem(step)
 
 
 @step(u'I check a problem')
 def check_problem(step):
-    world.browser.find_by_css("input.check").click()
+    world.css_click("input.check")
 
 
 @step(u'I reset the problem')
 def reset_problem(step):
-    world.browser.find_by_css('input.reset').click()
+    world.css_click('input.reset')
+
+
+# Dictionaries that map problem types to the css selectors
+# for correct/incorrect/unanswered marks.
+# The elements are lists of selectors because a particular problem type
+# might be marked in multiple ways.
+# For example, multiple choice is marked incorrect differently
+# depending on whether the user selects an incorrect
+# item or submits without selecting any item)
+CORRECTNESS_SELECTORS = {
+        'correct': {'drop down': ['span.correct'],
+                       'multiple choice': ['label.choicegroup_correct'],
+                        'checkbox': ['span.correct'],
+                        'string': ['div.correct'],
+                        'numerical': ['div.correct'],
+                        'formula': ['div.correct'],
+                        'script': ['div.correct'], 
+                        'code': ['span.correct']},
+
+        'incorrect': {'drop down': ['span.incorrect'],
+                       'multiple choice': ['label.choicegroup_incorrect',
+                                            'span.incorrect'],
+                        'checkbox': ['span.incorrect'],
+                        'string': ['div.incorrect'],
+                        'numerical': ['div.incorrect'],
+                        'formula': ['div.incorrect'],
+                        'script': ['div.incorrect'],
+                        'code': ['span.incorrect']},
+
+        'unanswered': {'drop down': ['span.unanswered'],
+                       'multiple choice': ['span.unanswered'],
+                        'checkbox': ['span.unanswered'],
+                        'string': ['div.unanswered'],
+                        'numerical': ['div.unanswered'],
+                        'formula': ['div.unanswered'],
+                        'script': ['div.unanswered'],
+                        'code': ['span.unanswered'] }}
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')
@@ -189,65 +256,23 @@ def assert_answer_mark(step, problem_type, correctness):
 
     *problem_type* is a string identifying the type of problem (e.g. 'drop down')
     *correctness* is in ['correct', 'incorrect', 'unanswered']
+    """
 
-    Asserting that a problem is marked 'unanswered' means that
-    the problem is NOT marked correct and NOT marked incorrect.
-    This can occur, for example, if the user has reset the problem.  """
+    # Determine which selector(s) to look for based on correctness
+    assert(correctness in CORRECTNESS_SELECTORS)
+    selector_dict = CORRECTNESS_SELECTORS[correctness]
+    assert(problem_type in selector_dict)
 
-    # Dictionaries that map problem types to the css selectors
-    # for correct/incorrect marks.
-    # The elements are lists of selectors because a particular problem type
-    # might be marked in multiple ways.
-    # For example, multiple choice is marked incorrect differently
-    # depending on whether the user selects an incorrect
-    # item or submits without selecting any item)
-    correct_selectors = {'drop down': ['span.correct'],
-                           'multiple choice': ['label.choicegroup_correct'],
-                            'checkbox': ['span.correct'],
-                            'string': ['div.correct'],
-                            'numerical': ['div.correct'],
-                            'formula': ['div.correct'],
-                            'script': ['div.correct'], }
+    # At least one of the correct selectors should be present
+    for sel in selector_dict[problem_type]:
+        has_expected = world.browser.is_element_present_by_css(sel, wait_time=4)
 
-    incorrect_selectors = {'drop down': ['span.incorrect'],
-                           'multiple choice': ['label.choicegroup_incorrect',
-                                                'span.incorrect'],
-                            'checkbox': ['span.incorrect'],
-                            'string': ['div.incorrect'],
-                            'numerical': ['div.incorrect'],
-                            'formula': ['div.incorrect'],
-                            'script': ['div.incorrect']}
+        # As soon as we find the selector, break out of the loop
+        if has_expected:
+            break
 
-    assert(correctness in ['correct', 'incorrect', 'unanswered'])
-    assert(problem_type in correct_selectors and problem_type in incorrect_selectors)
-
-    # Assert that the question has the expected mark
-    # (either correct or incorrect)
-    if correctness in ["correct", "incorrect"]:
-
-        selector_dict = correct_selectors if correctness == "correct" else incorrect_selectors
-
-        # At least one of the correct selectors should be present
-        for sel in selector_dict[problem_type]:
-            has_expected_mark = world.browser.is_element_present_by_css(sel, wait_time=4)
-
-            # As soon as we find the selector, break out of the loop
-            if has_expected_mark:
-                break
-
-        # Expect that we found the right mark (correct or incorrect)
-        assert(has_expected_mark)
-
-    # Assert that the question has neither correct nor incorrect
-    # because it is unanswered (possibly reset)
-    else:
-        # Get all the correct/incorrect selectors for this problem type
-        selector_list = correct_selectors[problem_type] + incorrect_selectors[problem_type]
-
-        # Assert that none of the correct/incorrect selectors are present
-        for sel in selector_list:
-            assert(world.browser.is_element_not_present_by_css(sel, wait_time=4))
-
+    # Expect that we found the expected selector
+    assert(has_expected)
 
 def inputfield(problem_type, choice=None, input_num=1):
     """ Return the <input> element for *problem_type*.
@@ -258,7 +283,7 @@ def inputfield(problem_type, choice=None, input_num=1):
     of checkboxes. """
 
     sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
-            (problem_type.replace(" ", "_"), str(input_num)))
+           (problem_type.replace(" ", "_"), str(input_num)))
 
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"

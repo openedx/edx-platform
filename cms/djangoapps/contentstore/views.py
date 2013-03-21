@@ -54,12 +54,12 @@ from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_
 from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item
 
 from xmodule.modulestore.xml_importer import import_from_xml
-from contentstore.course_info_model import get_course_updates,\
+from contentstore.course_info_model import get_course_updates, \
     update_course_updates, delete_course_update
 from cache_toolbox.core import del_cached_content
 from xmodule.timeparse import stringify_time
 from contentstore.module_info_model import get_module_info, set_module_info
-from models.settings.course_details import CourseDetails,\
+from models.settings.course_details import CourseDetails, \
     CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from contentstore.utils import get_modulestore
@@ -73,7 +73,7 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-ADVANCED_COMPONENT_TYPES = ['annotatable','combinedopenended', 'peergrading']
+ADVANCED_COMPONENT_TYPES = ['annotatable', 'combinedopenended', 'peergrading']
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -325,7 +325,7 @@ def edit_unit(request, location):
             category = ADVANCED_COMPONENT_CATEGORY
 
         if category in component_types:
-            #This is a hack to create categories for different xmodules
+            # This is a hack to create categories for different xmodules
             component_templates[category].append((
                 template.display_name_with_default,
                 template.location.url(),
@@ -420,7 +420,7 @@ def assignment_type_update(request, org, course, category, name):
     if request.method == 'GET':
         return HttpResponse(json.dumps(CourseGradingModel.get_section_grader_type(location)),
                             mimetype="application/json")
-    elif request.method == 'POST':   # post or put, doesn't matter.
+    elif request.method == 'POST':  # post or put, doesn't matter.
         return HttpResponse(json.dumps(CourseGradingModel.update_section_grader_type(location, request.POST)),
                             mimetype="application/json")
 
@@ -834,7 +834,7 @@ def upload_asset(request, org, course, coursename):
     if thumbnail_content is not None:
         content.thumbnail_location = thumbnail_location
 
-    #then commit the content
+    # then commit the content
     contentstore().save(content)
     del_cached_content(content.location)
 
@@ -877,7 +877,7 @@ def manage_users(request, location):
     })
 
 
-def create_json_response(errmsg = None):
+def create_json_response(errmsg=None):
     if errmsg is not None:
         resp = HttpResponse(json.dumps({'Status': 'Failed', 'ErrMsg': errmsg}))
     else:
@@ -1121,14 +1121,22 @@ def course_info_updates(request, org, course, provided_id=None):
         real_method = request.method
 
     if request.method == 'GET':
-        return HttpResponse(json.dumps(get_course_updates(location)), mimetype="application/json")
-    elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
-        return HttpResponse(json.dumps(delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
+        return HttpResponse(json.dumps(get_course_updates(location)),
+            mimetype="application/json")
+    elif real_method == 'DELETE':
+        try:
+            return HttpResponse(json.dumps(delete_course_update(location,
+                request.POST, provided_id)), mimetype="application/json")
+        except:
+            return HttpResponseBadRequest("Failed to delete",
+                content_type="text/plain")
     elif request.method == 'POST':
         try:
-            return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+            return HttpResponse(json.dumps(update_course_updates(location,
+                request.POST, provided_id)), mimetype="application/json")
         except:
-            return HttpResponseBadRequest("Failed to save: malformed html", content_type="text/plain")
+            return HttpResponseBadRequest("Failed to save",
+                content_type="text/plain")
 
 
 @expect_json
@@ -1263,7 +1271,7 @@ def course_settings_updates(request, org, course, name, section):
         # Cannot just do a get w/o knowing the course name :-(
         return HttpResponse(json.dumps(manager.fetch(Location(['i4x', org, course, 'course', name])), cls=CourseSettingsEncoder),
                             mimetype="application/json")
-    elif request.method == 'POST':   # post or put, doesn't matter.
+    elif request.method == 'POST':  # post or put, doesn't matter.
         return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseSettingsEncoder),
                             mimetype="application/json")
 
@@ -1298,12 +1306,12 @@ def course_grader_updates(request, org, course, name, grader_index=None):
         # ??? Shoudl this return anything? Perhaps success fail?
         CourseGradingModel.delete_grader(Location(['i4x', org, course, 'course', name]), grader_index)
         return HttpResponse()
-    elif request.method == 'POST':   # post or put, doesn't matter.
+    elif request.method == 'POST':  # post or put, doesn't matter.
         return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course', name]), request.POST)),
                             mimetype="application/json")
 
 
-## NB: expect_json failed on ["key", "key2"] and json payload
+# # NB: expect_json failed on ["key", "key2"] and json payload
 @login_required
 @ensure_csrf_cookie
 def course_advanced_updates(request, org, course, name):
@@ -1561,7 +1569,7 @@ def generate_export_course(request, org, course, name):
     logging.debug('root = {0}'.format(root_dir))
 
     export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name)
-    #filename = root_dir / name + '.tar.gz'
+    # filename = root_dir / name + '.tar.gz'
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
     tf = tarfile.open(name=export_file.name, mode='w:gz')
