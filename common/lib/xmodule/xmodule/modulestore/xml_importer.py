@@ -4,6 +4,8 @@ import mimetypes
 from lxml.html import rewrite_links as lxml_rewrite_links
 from path import path
 
+from xblock.core import Scope
+
 from .xml import XMLModuleStore
 from .exceptions import DuplicateItemError
 from xmodule.modulestore import Location
@@ -273,8 +275,18 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 if verbose:
                     log.debug('importing module location {0}'.format(module.location))
 
-                if hasattr(module, 'data'):
-                    module_data = module.data
+                content = {}
+                for field in module.fields:
+                    if field.scope != Scope.content:
+                        continue
+                    try:
+                        content[field.name] = module._model_data[field.name]
+                    except KeyError:
+                        # Ignore any missing keys in _model_data
+                        pass
+     
+                if 'data' in content:
+                    module_data = content['data']
 
                     # cdodge: now go through any link references to '/static/' and make sure we've imported
                     # it as a StaticContent asset
@@ -298,7 +310,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     except Exception, e:
                         logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
 
-                    store.update_item(module.location, module_data)
+                store.update_item(module.location, content)
 
                 if hasattr(module, 'children') and module.children != []:
                     store.update_children(module.location, module.children)

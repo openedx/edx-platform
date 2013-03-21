@@ -1,4 +1,8 @@
-.export {
+// studio - views - course export
+// ====================
+
+body.course.export {
+  
   .export-overview {
     @extend .window;
     @include clearfix;
@@ -118,6 +122,4 @@
       }
     }
   }
-
-
 }
