@@ -101,6 +101,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertEqual(reverse_tabs, course_tabs)
 
+    def test_import_polls(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        module_store = modulestore('direct')
+        found = False
+
+        item = None
+        items = module_store.get_items(['i4x', 'edX', 'full', 'poll_question', None, None])
+        found = len(items) > 0
+
+        self.assertTrue(found)
+        # check that there's actually content in the 'question' field
+        self.assertGreater(len(items[0].question),0)
+
     def test_delete(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
