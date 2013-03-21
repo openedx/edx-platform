@@ -63,10 +63,18 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == 2)
 
+        # can't test non-json paylod b/c expect_json throws error
+        # try json w/o required fields
+        self.assertContains(
+            self.client.post(url, json.dumps({'garbage': 1}),
+                "application/json"),
+            'Failed to save', status_code=400)
+
         # now try to update a non-existent update
-        url = reverse('course_info_json', kwargs={'org': self.course_location.org,
-            'course': self.course_location.course,
-            'provided_id': '9'})
+        url = reverse('course_info_json',
+            kwargs={'org': self.course_location.org,
+                'course': self.course_location.course,
+                'provided_id': '9'})
         content = 'blah blah'
         payload = {'content': content,
                    'date': 'January 21, 2013'}
