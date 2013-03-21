@@ -791,9 +791,7 @@ def upload_asset(request, org, course, coursename):
         return HttpResponseBadRequest()
 
     # construct a location from the passed in path
-    location = ['i4x', org, course, 'course', coursename]
-    if not has_access(request.user, location):
-        return HttpResponseForbidden()
+    location = get_location_and_verify_access(request, org, course, coursename)
 
     # Does the course actually exist?!? Get anything from it to prove its existance
 
@@ -945,11 +943,7 @@ def landing(request, org, course, coursename):
 @ensure_csrf_cookie
 def static_pages(request, org, course, coursename):
 
-    location = ['i4x', org, course, 'course', coursename]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, coursename)
 
     course = modulestore().get_item(location)
 
@@ -1221,11 +1215,7 @@ def course_settings_updates(request, org, course, name, section):
     org, course: Attributes of the Location for the item to edit
     section: one of details, faculty, grading, problems, discussions
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    get_location_and_verify_access(request, org, course, name)
 
     if section == 'details':
         manager = CourseDetails
@@ -1293,7 +1283,7 @@ def course_advanced_updates(request, org, course, name):
         return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
 
 
-#@ensure_csrf_cookie  what is this cookie?
+@ensure_csrf_cookie
 @login_required
 def get_checklists(request, org, course, name):
     """
@@ -1313,8 +1303,7 @@ def get_checklists(request, org, course, name):
         course_module.checklists = template_module.checklists
         modulestore.update_metadata(location, own_metadata(course_module))
 
-    checklists = course_module.checklists
-    create_checklist_action_urls(checklists, course_module)
+    checklists = get_checklists_with_action_urls(course_module)
     return render_to_response('checklists.html',
         {
             'context_course': course_module,
@@ -1322,6 +1311,7 @@ def get_checklists(request, org, course, name):
         })
 
 
+@ensure_csrf_cookie
 @login_required
 def update_checklist(request, org, course, name, checklist_index=None):
     """
@@ -1343,23 +1333,30 @@ def update_checklist(request, org, course, name, checklist_index=None):
             modified_checklist = json.loads(request.body)
             course_module.checklists[int(checklist_index)] = modified_checklist
             modulestore.update_metadata(location, own_metadata(course_module))
-            create_checklist_action_urls([modified_checklist], course_module)
-            return HttpResponse(json.dumps(modified_checklist), mimetype="application/json")
+            checklists = get_checklists_with_action_urls(course_module)
+            return HttpResponse(json.dumps(checklists), mimetype="application/json")
         else:
             return HttpResponseBadRequest("Could not save checklist state because the checklist index was out of range or unspecified.",
                 content_type="text/plain")
     elif request.method == 'GET':
         # In the JavaScript view initialize method, we do a fetch to get all the checklists.
-        checklists = course_module.checklists
-        create_checklist_action_urls(checklists, course_module)
+        checklists = get_checklists_with_action_urls(course_module)
         return HttpResponse(json.dumps(checklists), mimetype="application/json")
 
 
-def create_checklist_action_urls(checklists, course_module):
+def get_checklists_with_action_urls(course_module):
+    """
+    Gets the checklists out of the course module and expands their action urls.
+    Returns the checklists with modified urls (different from what is stored in the course moduule).
+    """
+    checklists = course_module.checklists
     # Expand action names to their URLs.
     for checklist in checklists:
         for item in checklist.get('items'):
             item['action_url'] = get_url_reverse(item.get('action_url'), course_module)
+
+    return checklists
+
 
 @login_required
 @ensure_csrf_cookie
@@ -1597,9 +1594,6 @@ def export_course(request, org, course, name):
     location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
 
     return render_to_response('export.html', {
         'context_course': course_module,
@@ -1627,7 +1621,7 @@ def render_500(request):
 def get_location_and_verify_access(request, org, course, name):
     """
     Create the location tuple verify that the user has permissions
-    to view the location.
+    to view the location. Returns the location.
     """
     location = ['i4x', org, course, 'course', name]
 
@@ -1641,7 +1635,7 @@ def get_location_and_verify_access(request, org, course, name):
 def get_request_method(request):
     """
     Using HTTP_X_HTTP_METHOD_OVERRIDE, in the request metadata, determine
-    what type of request came from the client.
+    what type of request came from the client, and return it.
     """
     # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
     if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:

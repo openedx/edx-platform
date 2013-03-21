@@ -19,3 +19,4 @@ Feature: Course checklists
     Given I have opened Checklists
     When I select a link to help page
     Then I am brought to the help page in a new window
+
