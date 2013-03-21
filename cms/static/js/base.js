@@ -167,9 +167,14 @@ function linkSmoothScroll(e) {
 }
 
 function linkNewWindow(e) {
-    window.open($(this).attr('href'));
+    window.open($(e.target).attr('href'));
     e.preventDefault();
 }
+
+// On AWS instances, base.js gets wrapped in a separate scope as part of Django static
+// pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
+// when we can access it from other scopes (namely the checklists)
+window.cmsLinkNewWindow = linkNewWindow;
 
 function toggleSections(e) {
     e.preventDefault();
