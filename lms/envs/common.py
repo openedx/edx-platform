@@ -37,6 +37,8 @@ DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
+EDXMKTG_COOKIE_NAME = 'edxloggedin'
+
 # Features
 MITX_FEATURES = {
     'SAMPLE': False,

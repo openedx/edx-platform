@@ -7,7 +7,7 @@ import string
 import sys
 import urllib
 import uuid
-
+import time
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -23,6 +23,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
+from django.utils.http import cookie_date
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
@@ -410,8 +411,25 @@ def login_user(request, error=""):
         try_change_enrollment(request)
 
         statsd.increment("common.student.successful_login")
+        response = HttpResponse(json.dumps({'success': True}))
 
-        return HttpResponse(json.dumps({'success': True}))
+        # set the login cookie for the edx marketing site
+        if request.session.get_expire_at_browser_close():
+            max_age = None
+            expires = None
+        else:
+            max_age = request.session.get_expiry_age()
+            expires_time = time.time() + max_age
+            expires = cookie_date(expires_time)
+
+        response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
+                            request.session.session_key, max_age=max_age,
+                            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                            path=settings.SESSION_COOKIE_PATH,
+                            secure=settings.SESSION_COOKIE_SECURE or None,
+                            httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+
+        return response
 
     log.warning("Login failed - Account not active for user {0}, resending activation".format(username))
 
@@ -425,9 +443,17 @@ def login_user(request, error=""):
 
 @ensure_csrf_cookie
 def logout_user(request):
-    ''' HTTP request to log out the user. Redirects to marketing page'''
+    '''
+    HTTP request to log out the user. Redirects to marketing page.
+    Deletes both the CSRF and sessionid cookies so the marketing
+    site can determine the logged in state of the user
+    '''
+
     logout(request)
-    return redirect('/')
+    response = redirect('/')
+    response.delete_cookie(settings.EDXMKTG_COOKIE_NAME,
+                           settings.SESSION_COOKIE_DOMAIN)
+    return response
 
 
 @login_required
