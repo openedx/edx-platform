@@ -6,7 +6,7 @@
   @return #{$pxval / $base}em;
 }
 
-@mixin font-size($sizeValue: 1.6){
+@mixin font-size($sizeValue: 16){
   font-size: $sizeValue + px;
   font-size: ($sizeValue/10) + rem;
 }
