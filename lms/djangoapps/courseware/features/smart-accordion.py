@@ -2,7 +2,7 @@ from lettuce import world, step
 from re import sub
 from nose.tools import assert_equals
 from xmodule.modulestore.django import modulestore
-from courses import *
+from common import *
 
 from logging import getLogger
 logger = getLogger(__name__)

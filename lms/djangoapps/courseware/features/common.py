@@ -6,6 +6,9 @@ from student.models import CourseEnrollment
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import _MODULESTORES, modulestore
 from xmodule.templates import update_templates
+from xmodule.course_module import CourseDescriptor
+from courseware.courses import get_course_by_id
+from xmodule import seq_module, vertical_module
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -94,3 +97,87 @@ def section_location(course_num):
                     course=course_num,
                     category='sequential',
                     name=TEST_SECTION_NAME.replace(" ", "_"))
+
+
+def get_courses():
+    '''
+    Returns dict of lists of courses available, keyed by course.org (ie university).
+    Courses are sorted by course.number.
+    '''
+    courses = [c for c in modulestore().get_courses()
+               if isinstance(c, CourseDescriptor)]
+    courses = sorted(courses, key=lambda course: course.number)
+    return courses
+
+
+def get_courseware_with_tabs(course_id):
+    """
+    Given a course_id (string), return a courseware array of dictionaries for the
+    top three levels of navigation. Same as get_courseware() except include
+    the tabs on the right hand main navigation page.
+
+    This hides the appropriate courseware as defined by the hide_from_toc field:
+    chapter.lms.hide_from_toc
+
+    Example:
+
+    [{
+        'chapter_name': 'Overview',
+        'sections': [{
+            'clickable_tab_count': 0,
+            'section_name': 'Welcome',
+            'tab_classes': []
+        }, {
+            'clickable_tab_count': 1,
+            'section_name': 'System Usage Sequence',
+            'tab_classes': ['VerticalDescriptor']
+        }, {
+            'clickable_tab_count': 0,
+            'section_name': 'Lab0: Using the tools',
+            'tab_classes': ['HtmlDescriptor', 'HtmlDescriptor', 'CapaDescriptor']
+        }, {
+            'clickable_tab_count': 0,
+            'section_name': 'Circuit Sandbox',
+            'tab_classes': []
+        }]
+    }, {
+        'chapter_name': 'Week 1',
+        'sections': [{
+            'clickable_tab_count': 4,
+            'section_name': 'Administrivia and Circuit Elements',
+            'tab_classes': ['VerticalDescriptor', 'VerticalDescriptor', 'VerticalDescriptor', 'VerticalDescriptor']
+        }, {
+            'clickable_tab_count': 0,
+            'section_name': 'Basic Circuit Analysis',
+            'tab_classes': ['CapaDescriptor', 'CapaDescriptor', 'CapaDescriptor']
+        }, {
+            'clickable_tab_count': 0,
+            'section_name': 'Resistor Divider',
+            'tab_classes': []
+        }, {
+            'clickable_tab_count': 0,
+            'section_name': 'Week 1 Tutorials',
+            'tab_classes': []
+        }]
+    }, {
+        'chapter_name': 'Midterm Exam',
+        'sections': [{
+            'clickable_tab_count': 2,
+            'section_name': 'Midterm Exam',
+            'tab_classes': ['VerticalDescriptor', 'VerticalDescriptor']
+        }]
+    }]
+    """
+
+    course = get_course_by_id(course_id)
+    chapters = [chapter for chapter in course.get_children() if not chapter.lms.hide_from_toc]
+    courseware = [{'chapter_name': c.display_name_with_default,
+                   'sections': [{'section_name': s.display_name_with_default,
+                                'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0,
+                                'tabs': [{'children_count': len(t.get_children()) if (type(t) == vertical_module.VerticalDescriptor) else 0,
+                                         'class': t.__class__.__name__}
+                                         for t in s.get_children()]}
+                                for s in c.get_children() if not s.lms.hide_from_toc]}
+                  for c in chapters]
+
+    return courseware
