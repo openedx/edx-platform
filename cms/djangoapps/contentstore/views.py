@@ -57,7 +57,6 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from contentstore.course_info_model import get_course_updates, \
     update_course_updates, delete_course_update
 from cache_toolbox.core import del_cached_content
-from xmodule.timeparse import stringify_time
 from contentstore.module_info_model import get_module_info, set_module_info
 from models.settings.course_details import CourseDetails, \
     CourseSettingsEncoder
@@ -1299,11 +1298,14 @@ def get_checklists(request, org, course, name):
     template_module = modulestore.get_item(new_course_template)
 
     # If course was created before checklists were introduced, copy them over from the template.
+    copied = False
     if not course_module.checklists:
         course_module.checklists = template_module.checklists
-        modulestore.update_metadata(location, own_metadata(course_module))
+        copied = True
 
-    checklists = get_checklists_with_action_urls(course_module)
+    checklists, modified = expand_checklist_action_urls(course_module)
+    if copied or modified:
+        modulestore.update_metadata(location, own_metadata(course_module))
     return render_to_response('checklists.html',
         {
             'context_course': course_module,
@@ -1330,32 +1332,42 @@ def update_checklist(request, org, course, name, checklist_index=None):
     real_method = get_request_method(request)
     if real_method == 'POST' or real_method == 'PUT':
         if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
-            modified_checklist = json.loads(request.body)
-            course_module.checklists[int(checklist_index)] = modified_checklist
+            index = int(checklist_index)
+            course_module.checklists[index] = json.loads(request.body)
+            checklists, modified = expand_checklist_action_urls(course_module)
             modulestore.update_metadata(location, own_metadata(course_module))
-            checklists = get_checklists_with_action_urls(course_module)
-            return HttpResponse(json.dumps(checklists), mimetype="application/json")
+            return HttpResponse(json.dumps(checklists[index]), mimetype="application/json")
         else:
             return HttpResponseBadRequest("Could not save checklist state because the checklist index was out of range or unspecified.",
                 content_type="text/plain")
     elif request.method == 'GET':
         # In the JavaScript view initialize method, we do a fetch to get all the checklists.
-        checklists = get_checklists_with_action_urls(course_module)
+        checklists, modified = expand_checklist_action_urls(course_module)
+        if modified:
+            modulestore.update_metadata(location, own_metadata(course_module))
         return HttpResponse(json.dumps(checklists), mimetype="application/json")
+    else:
+        return HttpResponseBadRequest("Unsupported request.", content_type="text/plain")
 
 
-def get_checklists_with_action_urls(course_module):
+def expand_checklist_action_urls(course_module):
     """
-    Gets the checklists out of the course module and expands their action urls.
-    Returns the checklists with modified urls (different from what is stored in the course moduule).
+    Gets the checklists out of the course module and expands their action urls
+    if they have not yet been expanded.
+
+    Returns the checklists with modified urls, as well as a boolean
+    indicating whether or not the checklists were modified.
     """
     checklists = course_module.checklists
-    # Expand action names to their URLs.
+    modified = False
     for checklist in checklists:
-        for item in checklist.get('items'):
-            item['action_url'] = get_url_reverse(item.get('action_url'), course_module)
+        if not checklist.get('action_urls_expanded', False):
+            for item in checklist.get('items'):
+                item['action_url'] = get_url_reverse(item.get('action_url'), course_module)
+            checklist['action_urls_expanded'] = True
+            modified = True
 
-    return checklists
+    return checklists, modified
 
 
 @login_required

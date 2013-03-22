@@ -1,4 +1,4 @@
-from  contentstore import utils
+from contentstore import utils
 import mock
 from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -36,6 +36,9 @@ class UrlReverseTestCase(ModuleStoreTestCase):
 
         self.assertEquals('/mitX/666/course/URL_Reverse_Course',
             utils.get_url_reverse('CourseOutline', course))
+
+        self.assertEquals('/mitX/666/checklists/URL_Reverse_Course',
+            utils.get_url_reverse('Checklists', course))
 
     def test_unknown_passes_through(self):
         course = CourseFactory.create(org='mitX', number='666', display_name='URL Reverse Course')
