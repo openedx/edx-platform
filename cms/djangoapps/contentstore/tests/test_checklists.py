@@ -1,3 +1,4 @@
+""" Unit tests for checklist methods in views.py. """
 from contentstore.utils import get_modulestore, get_url_reverse
 from contentstore.tests.test_course_settings import CourseTestCase
 from xmodule.modulestore.inheritance import own_metadata
@@ -5,16 +6,21 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from django.core.urlresolvers import reverse
 import json
 
+
 class ChecklistTestCase(CourseTestCase):
+    """ Test for checklist get and put methods. """
     def setUp(self):
+        """ Creates the test course. """
         super(ChecklistTestCase, self).setUp()
         self.course = CourseFactory.create(org='mitX', number='333', display_name='Checklists Course')
 
     def get_persisted_checklists(self):
+        """ Returns the checklists as persisted in the modulestore. """
         modulestore = get_modulestore(self.course.location)
         return modulestore.get_item(self.course.location).checklists
 
     def test_get_checklists(self):
+        """ Tests the get checklists method. """
         checklists_url = get_url_reverse('Checklists', self.course)
         response = self.client.get(checklists_url)
         self.assertContains(response, "Getting Started With Studio")
@@ -30,17 +36,17 @@ class ChecklistTestCase(CourseTestCase):
         self.assertEquals(payload, response.content)
 
     def test_update_checklists_no_index(self):
-        # No checklist index, should return all of them.
+        """ No checklist index, should return all of them. """
         update_url = reverse('checklists_updates', kwargs={
-                                                    'org': self.course.location.org,
-                                                    'course': self.course.location.course,
-                                                    'name': self.course.location.name})
+            'org': self.course.location.org,
+            'course': self.course.location.course,
+            'name': self.course.location.name})
 
         returned_checklists = json.loads(self.client.get(update_url).content)
         self.assertListEqual(self.get_persisted_checklists(), returned_checklists)
 
     def test_update_checklists_index_ignored_on_get(self):
-        # Checklist index ignored on get.
+        """ Checklist index ignored on get. """
         update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
                                                            'course': self.course.location.course,
                                                            'name': self.course.location.name,
@@ -50,7 +56,7 @@ class ChecklistTestCase(CourseTestCase):
         self.assertListEqual(self.get_persisted_checklists(), returned_checklists)
 
     def test_update_checklists_post_no_index(self):
-        # No checklist index, will error on post.
+        """ No checklist index, will error on post. """
         update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
                                                            'course': self.course.location.course,
                                                            'name': self.course.location.name})
@@ -58,7 +64,7 @@ class ChecklistTestCase(CourseTestCase):
         self.assertContains(response, 'Could not save checklist', status_code=400)
 
     def test_update_checklists_index_out_of_range(self):
-        # Checklist index out of range, will error on post.
+        """ Checklist index out of range, will error on post. """
         update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
                                                            'course': self.course.location.course,
                                                            'name': self.course.location.name,
@@ -67,7 +73,7 @@ class ChecklistTestCase(CourseTestCase):
         self.assertContains(response, 'Could not save checklist', status_code=400)
 
     def test_update_checklists_index(self):
-        # Check that an update of a particular checklist works.
+        """ Check that an update of a particular checklist works. """
         update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
                                                            'course': self.course.location.course,
                                                            'name': self.course.location.name,
@@ -81,7 +87,7 @@ class ChecklistTestCase(CourseTestCase):
         self.assertEqual(self.get_persisted_checklists()[2], returned_checklist)
 
     def test_update_checklists_delete_unsupported(self):
-        # Delete operation is not supported.
+        """ Delete operation is not supported. """
         update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
                                                            'course': self.course.location.course,
                                                            'name': self.course.location.name,

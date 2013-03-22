@@ -179,12 +179,13 @@ def get_url_reverse(course_page_name, course_module):
         return reverse(url_name, kwargs={"location": ctx_loc})
     elif url_name in [CoursePageNames.SettingsDetails, CoursePageNames.SettingsGrading,
                       CoursePageNames.CourseOutline, CoursePageNames.Checklists]:
-        return reverse(url_name, kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})
+        return reverse(url_name, kwargs={'org': ctx_loc.org, 'course': ctx_loc.course, 'name': ctx_loc.name})
     else:
         return course_page_name
 
 
 class CoursePageNames:
+    """ Constants for pages that are recognized by get_url_reverse method. """
     ManageUsers = "manage_users"
     SettingsDetails = "settings_details"
     SettingsGrading = "settings_grading"
