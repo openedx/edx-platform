@@ -10,7 +10,7 @@ class CourseMetadata(object):
     For CRUD operations on metadata fields which do not have specific editors on the other pages including any user generated ones.
     The objects have no predefined attrs but instead are obj encodings of the editable metadata.
     '''
-    FILTERED_LIST = XModuleDescriptor.system_metadata_fields + ['start', 'end', 'enrollment_start', 'enrollment_end', 'tabs', 'graceperiod']
+    FILTERED_LIST = XModuleDescriptor.system_metadata_fields + ['start', 'end', 'enrollment_start', 'enrollment_end', 'tabs', 'graceperiod', 'checklists']
 
     @classmethod
     def fetch(cls, course_location):

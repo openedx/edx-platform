@@ -179,7 +179,7 @@ class CourseFields(object):
     allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
     advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
     has_children = True
-
+    checklists=List(scope=Scope.settings)
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
 
     # An extra property is used rather than the wiki_slug/number because

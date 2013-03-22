@@ -51,13 +51,13 @@ from xmodule.contentstore.content import StaticContent
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, \
+    get_date_display, UnitState, get_course_for_item, get_url_reverse
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from contentstore.course_info_model import get_course_updates, \
     update_course_updates, delete_course_update
 from cache_toolbox.core import del_cached_content
-from xmodule.timeparse import stringify_time
 from contentstore.module_info_model import get_module_info, set_module_info
 from models.settings.course_details import CourseDetails, \
     CourseSettingsEncoder
@@ -141,10 +141,7 @@ def index(request):
     return render_to_response('index.html', {
         'new_course_template': Location('i4x', 'edx', 'templates', 'course', 'Empty'),
         'courses': [(course.display_name,
-                    reverse('course_index', args=[
-                        course.location.org,
-                        course.location.course,
-                        course.location.name]),
+                    get_url_reverse('CourseOutline', course),
                     get_lms_link_for_item(course.location, course_id=course.location.course_id))
                     for course in courses],
         'user': request.user,
@@ -181,19 +178,15 @@ def course_index(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     lms_link = get_lms_link_for_item(location)
 
     upload_asset_callback_url = reverse('upload_asset', kwargs={
-            'org': org,
-            'course': course,
-            'coursename': name
-            })
+        'org': org,
+        'course': course,
+        'coursename': name
+    })
 
     course = modulestore().get_item(location)
     sections = course.get_children()
@@ -249,7 +242,7 @@ def edit_subsection(request, location):
         for field
         in item.fields
         if field.name not in ['display_name', 'start', 'due', 'format'] and
-           field.scope == Scope.settings
+            field.scope == Scope.settings
     )
 
     can_view_live = False
@@ -261,18 +254,18 @@ def edit_subsection(request, location):
             break
 
     return render_to_response('edit_subsection.html',
-                              {'subsection': item,
-                               'context_course': course,
-                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
-                               'lms_link': lms_link,
-                               'preview_link': preview_link,
-                                'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
-                                'parent_location': course.location,
-                               'parent_item': parent,
-                               'policy_metadata': policy_metadata,
-                               'subsection_units': subsection_units,
-                               'can_view_live': can_view_live
-                               })
+        {'subsection': item,
+         'context_course': course,
+         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+         'lms_link': lms_link,
+         'preview_link': preview_link,
+         'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+         'parent_location': course.location,
+         'parent_item': parent,
+         'policy_metadata': policy_metadata,
+         'subsection_units': subsection_units,
+         'can_view_live': can_view_live
+        })
 
 
 @login_required
@@ -798,9 +791,7 @@ def upload_asset(request, org, course, coursename):
         return HttpResponseBadRequest()
 
     # construct a location from the passed in path
-    location = ['i4x', org, course, 'course', coursename]
-    if not has_access(request.user, location):
-        return HttpResponseForbidden()
+    location = get_location_and_verify_access(request, org, course, coursename)
 
     # Does the course actually exist?!? Get anything from it to prove its existance
 
@@ -952,11 +943,7 @@ def landing(request, org, course, coursename):
 @ensure_csrf_cookie
 def static_pages(request, org, course, coursename):
 
-    location = ['i4x', org, course, 'course', coursename]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, coursename)
 
     course = modulestore().get_item(location)
 
@@ -1068,11 +1055,7 @@ def course_info(request, org, course, name, provided_id=None):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
 
@@ -1111,11 +1094,7 @@ def course_info_updates(request, org, course, provided_id=None):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
-    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
-        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
-    else:
-        real_method = request.method
+    real_method = get_request_method(request)
 
     if request.method == 'GET':
         return HttpResponse(json.dumps(get_course_updates(location)),
@@ -1146,11 +1125,7 @@ def module_info(request, module_location):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
-    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
-        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
-    else:
-        real_method = request.method
+    real_method = get_request_method(request)
 
     rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
     logging.debug('rewrite_static_links = {0} {1}'.format(request.GET.get('rewrite_url_links', 'False'), rewrite_static_links))
@@ -1175,11 +1150,7 @@ def get_course_settings(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
 
@@ -1202,11 +1173,7 @@ def course_config_graders_page(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
     course_details = CourseGradingModel.fetch(location)
@@ -1226,11 +1193,7 @@ def course_config_advanced_page(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
 
@@ -1252,11 +1215,7 @@ def course_settings_updates(request, org, course, name, section):
     org, course: Attributes of the Location for the item to edit
     section: one of details, faculty, grading, problems, discussions
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    get_location_and_verify_access(request, org, course, name)
 
     if section == 'details':
         manager = CourseDetails
@@ -1284,27 +1243,20 @@ def course_grader_updates(request, org, course, name, grader_index=None):
     org, course: Attributes of the Location for the item to edit
     """
 
-    location = ['i4x', org, course, 'course', name]
+    location = get_location_and_verify_access(request, org, course, name)
 
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
-    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
-        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
-    else:
-        real_method = request.method
+    real_method = get_request_method(request)
 
     if real_method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
-        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(['i4x', org, course, 'course', name]), grader_index)),
+        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(location), grader_index)),
                             mimetype="application/json")
     elif real_method == "DELETE":
-        # ??? Shoudl this return anything? Perhaps success fail?
-        CourseGradingModel.delete_grader(Location(['i4x', org, course, 'course', name]), grader_index)
+        # ??? Should this return anything? Perhaps success fail?
+        CourseGradingModel.delete_grader(Location(location), grader_index)
         return HttpResponse()
-    elif request.method == 'POST':  # post or put, doesn't matter.
-        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course', name]), request.POST)),
+    elif request.method == 'POST':   # post or put, doesn't matter.
+        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(location), request.POST)),
                             mimetype="application/json")
 
 
@@ -1318,18 +1270,10 @@ def course_advanced_updates(request, org, course, name):
 
     org, course: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
+    location = get_location_and_verify_access(request, org, course, name)
 
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
-    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
-    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
-        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
-    else:
-        real_method = request.method
-
+    real_method = get_request_method(request)
+        
     if real_method == 'GET':
         return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
     elif real_method == 'DELETE':
@@ -1337,6 +1281,95 @@ def course_advanced_updates(request, org, course, name):
     elif real_method == 'POST' or real_method == 'PUT':
         # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
         return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
+
+
+@ensure_csrf_cookie
+@login_required
+def get_checklists(request, org, course, name):
+    """
+    Send models, views, and html for displaying the course checklists.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+
+    modulestore = get_modulestore(location)
+    course_module = modulestore.get_item(location)
+    new_course_template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
+    template_module = modulestore.get_item(new_course_template)
+
+    # If course was created before checklists were introduced, copy them over from the template.
+    copied = False
+    if not course_module.checklists:
+        course_module.checklists = template_module.checklists
+        copied = True
+
+    checklists, modified = expand_checklist_action_urls(course_module)
+    if copied or modified:
+        modulestore.update_metadata(location, own_metadata(course_module))
+    return render_to_response('checklists.html',
+        {
+            'context_course': course_module,
+            'checklists': checklists
+        })
+
+
+@ensure_csrf_cookie
+@login_required
+def update_checklist(request, org, course, name, checklist_index=None):
+    """
+    restful CRUD operations on course checklists. The payload is a json rep of
+    the modified checklist. For PUT or POST requests, the index of the
+    checklist being modified must be included; the returned payload will
+    be just that one checklist. For GET requests, the returned payload
+    is a json representation of the list of all checklists.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+    modulestore = get_modulestore(location)
+    course_module = modulestore.get_item(location)
+
+    real_method = get_request_method(request)
+    if real_method == 'POST' or real_method == 'PUT':
+        if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
+            index = int(checklist_index)
+            course_module.checklists[index] = json.loads(request.body)
+            checklists, modified = expand_checklist_action_urls(course_module)
+            modulestore.update_metadata(location, own_metadata(course_module))
+            return HttpResponse(json.dumps(checklists[index]), mimetype="application/json")
+        else:
+            return HttpResponseBadRequest(
+                "Could not save checklist state because the checklist index was out of range or unspecified.",
+                content_type="text/plain")
+    elif request.method == 'GET':
+        # In the JavaScript view initialize method, we do a fetch to get all the checklists.
+        checklists, modified = expand_checklist_action_urls(course_module)
+        if modified:
+            modulestore.update_metadata(location, own_metadata(course_module))
+        return HttpResponse(json.dumps(checklists), mimetype="application/json")
+    else:
+        return HttpResponseBadRequest("Unsupported request.", content_type="text/plain")
+
+
+def expand_checklist_action_urls(course_module):
+    """
+    Gets the checklists out of the course module and expands their action urls
+    if they have not yet been expanded.
+
+    Returns the checklists with modified urls, as well as a boolean
+    indicating whether or not the checklists were modified.
+    """
+    checklists = course_module.checklists
+    modified = False
+    for checklist in checklists:
+        if not checklist.get('action_urls_expanded', False):
+            for item in checklist.get('items'):
+                item['action_url'] = get_url_reverse(item.get('action_url'), course_module)
+            checklist['action_urls_expanded'] = True
+            modified = True
+
+    return checklists, modified
 
 
 @login_required
@@ -1347,18 +1380,13 @@ def asset_index(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
+    location = get_location_and_verify_access(request, org, course, name)
 
     upload_asset_callback_url = reverse('upload_asset', kwargs={
-            'org': org,
-            'course': course,
-            'coursename': name
-            })
+        'org': org,
+        'course': course,
+        'coursename': name
+    })
 
     course_module = modulestore().get_item(location)
 
@@ -1474,11 +1502,7 @@ def initialize_course_tabs(course):
 @login_required
 def import_course(request, org, course, name):
 
-    location = ['i4x', org, course, 'course', name]
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     if request.method == 'POST':
         filename = request.FILES['course-data'].name
@@ -1541,20 +1565,14 @@ def import_course(request, org, course, name):
         return render_to_response('import.html', {
             'context_course': course_module,
             'active_tab': 'import',
-            'successful_import_redirect_url': reverse('course_index', args=[
-                        course_module.location.org,
-                        course_module.location.course,
-                        course_module.location.name])
+            'successful_import_redirect_url': get_url_reverse('CourseOutline', course_module)
         })
 
 
 @ensure_csrf_cookie
 @login_required
 def generate_export_course(request, org, course, name):
-    location = ['i4x', org, course, 'course', name]
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
+    location = get_location_and_verify_access(request, org, course, name)
 
     loc = Location(location)
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
@@ -1587,11 +1605,9 @@ def generate_export_course(request, org, course, name):
 @login_required
 def export_course(request, org, course, name):
 
-    location = ['i4x', org, course, 'course', name]
+    location = get_location_and_verify_access(request, org, course, name)
+
     course_module = modulestore().get_item(location)
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
 
     return render_to_response('export.html', {
         'context_course': course_module,
@@ -1614,3 +1630,31 @@ def render_404(request):
 
 def render_500(request):
     return HttpResponseServerError(render_to_string('500.html', {}))
+
+
+def get_location_and_verify_access(request, org, course, name):
+    """
+    Create the location tuple verify that the user has permissions
+    to view the location. Returns the location.
+    """
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    return location
+
+
+def get_request_method(request):
+    """
+    Using HTTP_X_HTTP_METHOD_OVERRIDE, in the request metadata, determine
+    what type of request came from the client, and return it.
+    """
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+
+    return real_method
