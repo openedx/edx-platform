@@ -5,7 +5,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from django.core.urlresolvers import reverse
 import json
 
-
 class ChecklistTestCase(CourseTestCase):
     def setUp(self):
         super(ChecklistTestCase, self).setUp()
@@ -38,8 +37,7 @@ class ChecklistTestCase(CourseTestCase):
                                                     'name': self.course.location.name})
 
         returned_checklists = json.loads(self.client.get(update_url).content)
-        self.assertListEqual(self.get_persisted_checklists(),
-            returned_checklists)
+        self.assertListEqual(self.get_persisted_checklists(), returned_checklists)
 
     def test_update_checklists_index_ignored_on_get(self):
         # Checklist index ignored on get.
@@ -69,12 +67,11 @@ class ChecklistTestCase(CourseTestCase):
         self.assertContains(response, 'Could not save checklist', status_code=400)
 
     def test_update_checklists_index(self):
-        # Checklist index out of range, will error on post.
+        # Check that an update of a particular checklist works.
         update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
                                                            'course': self.course.location.course,
                                                            'name': self.course.location.name,
                                                            'checklist_index': 2})
-
         payload = self.course.checklists[2]
         self.assertFalse(payload.get('is_checked'))
         payload['is_checked'] = True
@@ -83,8 +80,8 @@ class ChecklistTestCase(CourseTestCase):
         self.assertTrue(returned_checklist.get('is_checked'))
         self.assertEqual(self.get_persisted_checklists()[2], returned_checklist)
 
-    def test_update_checklists_deleted_unsupported(self):
-        # Checklist index out of range, will error on post.
+    def test_update_checklists_delete_unsupported(self):
+        # Delete operation is not supported.
         update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
                                                            'course': self.course.location.course,
                                                            'name': self.course.location.name,
