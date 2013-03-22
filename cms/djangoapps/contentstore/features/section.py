@@ -105,13 +105,13 @@ def i_see_a_link_to_create_a_new_subsection(step):
 @step('the section release date picker is not visible$')
 def the_section_release_date_picker_not_visible(step):
     css = 'div.edit-subsection-publish-settings'
-    assert False, world.browser.find_by_css(css).visible
+    assert not world.css_visible(css)
 
 
 @step('the section release date is updated$')
 def the_section_release_date_is_updated(step):
     css = 'span.published-status'
-    status_text = world.browser.find_by_css(css).text
+    status_text = world.css_text(css)
     assert_equal(status_text,'Will Release: 12/25/2013 at 12:00am')
 
 
