@@ -1,5 +1,4 @@
 from lettuce import world, step
-from terrain.factories import *
 from common import *
 from nose.tools import assert_true, assert_false, assert_equal
 
@@ -10,15 +9,15 @@ logger = getLogger(__name__)
 @step(u'I have a course with no sections$')
 def have_a_course(step):
     clear_courses()
-    course = CourseFactory.create()
+    course = world.CourseFactory.create()
 
 
 @step(u'I have a course with 1 section$')
 def have_a_course_with_1_section(step):
     clear_courses()
-    course = CourseFactory.create()
-    section = ItemFactory.create(parent_location=course.location)
-    subsection1 = ItemFactory.create(
+    course = world.CourseFactory.create()
+    section = world.ItemFactory.create(parent_location=course.location)
+    subsection1 = world.ItemFactory.create(
         parent_location=section.location,
         template='i4x://edx/templates/sequential/Empty',
         display_name='Subsection One',)
@@ -27,20 +26,20 @@ def have_a_course_with_1_section(step):
 @step(u'I have a course with multiple sections$')
 def have_a_course_with_two_sections(step):
     clear_courses()
-    course = CourseFactory.create()
-    section = ItemFactory.create(parent_location=course.location)
-    subsection1 = ItemFactory.create(
+    course = world.CourseFactory.create()
+    section = world.ItemFactory.create(parent_location=course.location)
+    subsection1 = world.ItemFactory.create(
         parent_location=section.location,
         template='i4x://edx/templates/sequential/Empty',
         display_name='Subsection One',)
-    section2 = ItemFactory.create(
+    section2 = world.ItemFactory.create(
         parent_location=course.location,
         display_name='Section Two',)
-    subsection2 = ItemFactory.create(
+    subsection2 = world.ItemFactory.create(
         parent_location=section2.location,
         template='i4x://edx/templates/sequential/Empty',
         display_name='Subsection Alpha',)
-    subsection3 = ItemFactory.create(
+    subsection3 = world.ItemFactory.create(
         parent_location=section2.location,
         template='i4x://edx/templates/sequential/Empty',
         display_name='Subsection Beta',)

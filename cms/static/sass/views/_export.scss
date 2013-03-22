@@ -1,0 +1,125 @@
+// studio - views - course export
+// ====================
+
+body.course.export {
+  
+  .export-overview {
+    @extend .window;
+    @include clearfix;
+    padding: 30px 40px;
+  }
+
+  .description {
+    float: left;
+    width: 62%;
+    margin-right: 3%;
+    font-size: 14px;
+
+    h2 {
+      font-weight: 700;
+      font-size: 19px;
+      margin-bottom: 20px;
+    }
+
+    strong {
+      font-weight: 700;
+    }
+
+    p + p {
+      margin-top: 20px;
+    }
+
+    ul {
+      margin: 20px 0;
+      list-style: disc inside;
+
+      li {
+        margin: 0 0 5px 0;
+      }
+    }
+  }
+
+  .export-form-wrapper {
+  
+    .export-form {
+      float: left;
+      width: 35%;
+      padding: 25px 30px 35px;
+      @include box-sizing(border-box);
+      border: 1px solid $mediumGrey;
+      border-radius: 3px;
+      background: $lightGrey;
+      text-align: center;
+
+      h2 {
+        margin-bottom: 30px;
+        font-size: 26px;
+        font-weight: 300;
+      }
+
+      .error-block {
+        display: none;
+        margin-bottom: 15px;
+        font-size: 13px;
+      }
+
+      .error-block {
+        color: $error-red;
+      }
+
+      .button-export {
+        @include green-button;
+        padding: 10px 50px 11px;
+        font-size: 17px;
+      }
+
+      .message-status {
+        margin-top: 10px;
+        font-size: 12px;
+      }
+
+      .progress-bar {
+        display: none;
+        width: 350px;
+        height: 30px;
+        margin: 30px auto 10px;
+        border: 1px solid $blue;
+
+        &.loaded {
+          border-color: #66b93d;
+
+          .progress-fill {
+            background: #66b93d;
+          }
+        }
+      }
+
+      .progress-fill {
+        width: 0%;
+        height: 30px;
+        background: $blue;
+        color: #fff;
+        line-height: 48px;
+      }
+    }
+
+    // downloading state
+    &.is-downloading {
+
+      .progress-bar {
+        display: block;
+      }
+
+      .button-export {
+        padding: 10px 50px 11px;
+        font-size: 17px;
+
+        &.disabled {
+
+          pointer-events: none;
+          cursor: default;
+        }
+      }
+    }
+  }
+}

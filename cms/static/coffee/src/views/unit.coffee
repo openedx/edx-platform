@@ -34,7 +34,10 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     @$('.components').sortable(
       handle: '.drag-handle'
-      update: (event, ui) => @model.save(children: @components())
+      update: (event, ui) =>
+        payload = children : @components()
+        options = success : => @model.unset('children')
+        @model.save(payload, options)
       helper: 'clone'
       opacity: '0.5'
       placeholder: 'component-placeholder'
@@ -109,7 +112,14 @@ class CMS.Views.UnitEdit extends Backbone.View
       id: $component.data('id')
     }, =>
       $component.remove()
-      @model.save(children: @components())
+      # b/c we don't vigilantly keep children up to date
+      # get rid of it before it hurts someone
+      # sorry for the js, i couldn't figure out the coffee equivalent
+      `_this.model.save({children: _this.components()},
+          {success: function(model) {
+              model.unset('children');
+          }}
+      );`
     )
 
   deleteDraft: (event) ->
