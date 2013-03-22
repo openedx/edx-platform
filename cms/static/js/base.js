@@ -95,9 +95,9 @@ $(document).ready(function () {
     });
     $('.toggle-button-sections').bind('click', toggleSections);
 
-    // autosave when a field is updated on the subsection page
-    $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
-    $('.subsection-display-name-input, .unit-subtitle, .policy-list-name, .policy-list-value').each(function (i) {
+    // autosave when leaving input field
+    $body.on('change', '.subsection-display-name-input', saveSubsection);
+    $('.subsection-display-name-input').each(function () {
         this.val = $(this).val();
     });
     $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
@@ -113,11 +113,6 @@ $(document).ready(function () {
     // add new/delete subsection
     $('.new-subsection-item').bind('click', addNewSubsection);
     $('.delete-subsection-button').bind('click', deleteSubsection);
-    // add/remove policy metadata button click handlers
-    $('.add-policy-data').bind('click', addPolicyMetadata);
-    $('.remove-policy-data').bind('click', removePolicyMetadata);
-    $body.on('click', '.policy-list-element .save-button', savePolicyMetadata);
-    $body.on('click', '.policy-list-element .cancel-button', cancelPolicyMetadata);
 
     $('.sync-date').bind('click', syncReleaseDate);
 
@@ -155,11 +150,6 @@ $(document).ready(function () {
         $('.edit-subsection-publish-settings').find('.save-button').show();
     });
 });
-
-// function collapseAll(e) {
-//     $('.branch').addClass('collapsed');
-//     $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
-// }
 
 function toggleSections(e) {
     e.preventDefault();
@@ -219,56 +209,6 @@ function syncReleaseDate(e) {
     $("#start_time").val("");
 }
 
-function addPolicyMetadata(e) {
-    e.preventDefault();
-    var template = $('#add-new-policy-element-template > li');
-    var newNode = template.clone();
-    var _parent_el = $(this).parent('ol:.policy-list');
-    newNode.insertBefore('.add-policy-data');
-    $('.remove-policy-data').bind('click', removePolicyMetadata);
-    newNode.find('.policy-list-name').focus();
-}
-
-function savePolicyMetadata(e) {
-    e.preventDefault();
-
-    var $policyElement = $(this).parents('.policy-list-element');
-    saveSubsection()
-    $policyElement.removeClass('new-policy-list-element');
-    $policyElement.find('.policy-list-name').attr('disabled', 'disabled');
-    $policyElement.removeClass('editing');
-}
-
-function cancelPolicyMetadata(e) {
-    e.preventDefault();
-
-    var $policyElement = $(this).parents('.policy-list-element');
-    if (!$policyElement.hasClass('editing')) {
-        $policyElement.remove();
-    } else {
-        $policyElement.removeClass('new-policy-list-element');
-        $policyElement.find('.policy-list-name').val($policyElement.data('currentValues')[0]);
-        $policyElement.find('.policy-list-value').val($policyElement.data('currentValues')[1]);
-    }
-    $policyElement.removeClass('editing');
-}
-
-function removePolicyMetadata(e) {
-    e.preventDefault();
-
-    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!'))
-        return;
-
-    policy_name = $(this).data('policy-name');
-    var _parent_el = $(this).parent('li:.policy-list-element');
-    if ($(_parent_el).hasClass("new-policy-list-element")) {
-        _parent_el.remove();
-    } else {
-        _parent_el.appendTo("#policy-to-delete");
-    }
-    saveSubsection()
-}
-
 function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
     var edxTimeStr = null;
 
@@ -294,31 +234,6 @@ function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
     return getEdxTimeFromDateTimeVals(input_date, input_time, format);
 }
 
-function checkForNewValue(e) {
-    if ($(this).parents('.new-policy-list-element')[0]) {
-        return;
-    }
-
-    if (this.val) {
-        this.hasChanged = this.val != $(this).val();
-    } else {
-        this.hasChanged = false;
-    }
-
-    this.val = $(this).val();
-    if (this.hasChanged) {
-        if (this.saveTimer) {
-            clearTimeout(this.saveTimer);
-        }
-
-        this.saveTimer = setTimeout(function () {
-            $changedInput = $(e.target);
-            saveSubsection();
-            this.saveTimer = null;
-        }, 500);
-    }
-}
-
 function autosaveInput(e) {
     if (this.saveTimer) {
         clearTimeout(this.saveTimer);
@@ -332,6 +247,7 @@ function autosaveInput(e) {
 }
 
 function saveSubsection() {
+    // Spinner is no longer used by subsection name, but is still used by date and time pickers on the right.
     if ($changedInput && !$changedInput.hasClass('no-spinner')) {
         $spinner.css({
             'position': 'absolute',
@@ -353,20 +269,6 @@ function saveSubsection() {
         var el = metadata_fields[i];
         metadata[$(el).data("metadata-name")] = el.value;
     }
-
-    // now add 'free-formed' metadata which are presented to the user as dual input fields (name/value)
-    $('ol.policy-list > li.policy-list-element').each(function (i, element) {
-        var name = $(element).children('.policy-list-name').val();
-        metadata[name] = $(element).children('.policy-list-value').val();
-    });
-
-    // now add any 'removed' policy metadata which is stored in a separate hidden div
-    // 'null' presented to the server means 'remove'
-    $("#policy-to-delete > li.policy-list-element").each(function (i, element) {
-        var name = $(element).children('.policy-list-name').val();
-        if (name != "")
-            metadata[name] = null;
-    });
 
     // Piece back together the date/time UI elements into one date/time string
     // NOTE: our various "date/time" metadata elements don't always utilize the same formatting string
