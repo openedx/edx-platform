@@ -1,0 +1,74 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="title">Course Checklists</%block>
+<%block name="bodyclass">is-signedin course uxdesign checklists</%block>
+
+<%namespace name='static' file='static_content.html'/>
+<%block name="jsextra">
+
+<script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
+<script type="text/javascript" src="${static.url('js/views/checklists_view.js')}"></script>
+<script type="text/javascript" src="${static.url('js/models/checklists.js')}"></script>
+<script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var checklistCollection = new CMS.Models.ChecklistCollection();
+        checklistCollection.url = "${reverse('checklists_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
+
+        var editor = new CMS.Views.Checklists({
+            el: $('.course-checklists'),
+            collection: checklistCollection
+        });
+
+    });
+
+</script>
+</%block>
+
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions has-subtitle">
+    <div class="title">
+      <span class="title-sub">Tools</span>
+      <h1 class="title-1">Course Checklists</h1>
+    </div>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+      <form id="course-checklists" class="course-checklists" method="post" action="">
+        <h2 class="title title-3 sr">Current Checklists</h2>
+      </form>
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title title-3">What are checklists?</h3>
+        <p>
+          Running a course on edX is a complex undertaking. Course checklists are designed to help you understand and keep track of all the steps necessary to get your course ready for students.
+        </p>
+        <p>
+          These checklists are shared among your course team, and any changes you make are immediately visible to other members of the team and saved automatically.
+        </p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title title-3">Studio checklists</h3>
+        <nav class="nav-page checklists-current">
+          <ol>
+            % for checklist in checklists:
+            <li class="nav-item">
+              <a rel="view" href="${'#course-checklist' + str(loop.index)}">${checklist['short_description']}</a>
+            </li>
+            % endfor
+          </ol>
+        </nav>
+      </div>
+    </aside>
+  </section>
+</div>
+</%block>
