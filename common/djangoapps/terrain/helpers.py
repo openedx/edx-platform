@@ -12,6 +12,7 @@ import os.path
 from selenium.common.exceptions import WebDriverException
 from urllib import quote_plus
 from lettuce.django import django_url
+import time
 
 @world.absorb
 def wait(seconds):
