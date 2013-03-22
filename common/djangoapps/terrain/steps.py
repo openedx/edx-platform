@@ -1,5 +1,6 @@
 from lettuce import world, step
-from .helpers import *
+from .course_helpers import *
+from .ui_helpers import *
 from lettuce.django import django_url
 from nose.tools import assert_equals
 import time

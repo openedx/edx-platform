@@ -12,17 +12,6 @@ import os.path
 from selenium.common.exceptions import WebDriverException
 from urllib import quote_plus
 from lettuce.django import django_url
-import time
-
-@world.absorb
-def wait(seconds):
-    time.sleep(float(seconds))
-
-@world.absorb
-def scroll_to_bottom():
-    # Maximize the browser
-    world.browser.execute_script("window.scrollTo(0, screen.height);")
-
 
 @world.absorb
 def create_user(uname):
@@ -87,15 +76,6 @@ def register_by_course_id(course_id, is_staff=False):
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id)
 
 
-@world.absorb
-def save_the_html(path='/tmp'):
-    u = world.browser.url
-    html = world.browser.html.encode('ascii', 'ignore')
-    filename = '%s.html' % quote_plus(u)
-    f = open('%s/%s' % (path, filename), 'w')
-    f.write(html)
-    f.close
-
 
 @world.absorb
 def save_the_course_content(path='/tmp'):
@@ -139,15 +119,3 @@ def save_the_course_content(path='/tmp'):
     f = open('%s/%s' % (path, filename), 'w')
     f.write(output)
     f.close
-
-@world.absorb
-def css_click(css_selector):
-    try:
-        world.browser.find_by_css(css_selector).click()
-
-    except WebDriverException:
-        # Occassionally, MathJax or other JavaScript can cover up
-        # an element  temporarily.
-        # If this happens, wait a second, then try again
-        time.sleep(1)
-        world.browser.find_by_css(css_selector).click()
