@@ -15,8 +15,7 @@ def i_have_opened_a_new_course_section(step):
 
 @step('I click the New Subsection link')
 def i_click_the_new_subsection_link(step):
-    css = 'a.new-subsection-item'
-    css_click(css)
+    world.css_click('a.new-subsection-item')
 
 
 @step('I enter the subsection name and click save$')
@@ -31,13 +30,13 @@ def i_save_subsection_name_with_quote(step):
 
 @step('I click to edit the subsection name$')
 def i_click_to_edit_subsection_name(step):
-    css_click('span.subsection-name-value')
+    world.css_click('span.subsection-name-value')
 
 
 @step('I see the complete subsection name with a quote in the editor$')
 def i_see_complete_subsection_name_with_quote_in_editor(step):
     css = '.subsection-display-name-input'
-    assert world.browser.is_element_present_by_css(css, 5)
+    assert world.is_css_present(css)
     assert_equal(world.browser.find_by_css(css).value, 'Subsection With "Quote"')
 
 
@@ -70,11 +69,11 @@ def the_subsection_does_not_exist(step):
 def save_subsection_name(name):
     name_css = 'input.new-subsection-name-input'
     save_css = 'input.new-subsection-name-save'
-    css_fill(name_css, name)
-    css_click(save_css)
+    world.css_fill(name_css, name)
+    world.css_click(save_css)
 
 def see_subsection_name(name):
     css = 'span.subsection-name'
-    assert world.browser.is_element_present_by_css(css)
+    assert world.is_css_present(css)
     css = 'span.subsection-name-value'
-    assert_css_with_text(css, name)
+    assert world.css_has_text(css, name)
