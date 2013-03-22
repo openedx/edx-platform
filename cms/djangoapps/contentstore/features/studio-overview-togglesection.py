@@ -8,13 +8,13 @@ logger = getLogger(__name__)
 
 @step(u'I have a course with no sections$')
 def have_a_course(step):
-    clear_courses()
+    world.clear_courses()
     course = world.CourseFactory.create()
 
 
 @step(u'I have a course with 1 section$')
 def have_a_course_with_1_section(step):
-    clear_courses()
+    world.clear_courses()
     course = world.CourseFactory.create()
     section = world.ItemFactory.create(parent_location=course.location)
     subsection1 = world.ItemFactory.create(
@@ -25,7 +25,7 @@ def have_a_course_with_1_section(step):
 
 @step(u'I have a course with multiple sections$')
 def have_a_course_with_two_sections(step):
-    clear_courses()
+    world.clear_courses()
     course = world.CourseFactory.create()
     section = world.ItemFactory.create(parent_location=course.location)
     subsection1 = world.ItemFactory.create(

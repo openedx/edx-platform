@@ -6,7 +6,7 @@ from common import *
 
 @step('There are no courses$')
 def no_courses(step):
-    clear_courses()
+    world.clear_courses()
 
 
 @step('I click the New Course button$')

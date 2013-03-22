@@ -24,7 +24,7 @@ def create_course(step, course):
     # First clear the modulestore so we don't try to recreate
     # the same course twice
     # This also ensures that the necessary templates are loaded
-    flush_xmodule_store()
+    world.clear_courses()
 
     # Create the course
     # We always use the same org and display name,
@@ -63,19 +63,6 @@ def add_tab_to_course(step, course, extra_tab_name):
     section_item = world.ItemFactory.create(parent_location=course_location(course),
                                             template="i4x://edx/templates/static_tab/Empty",
                                             display_name=str(extra_tab_name))
-
-
-def flush_xmodule_store():
-    # Flush and initialize the module store
-    # It needs the templates because it creates new records
-    # by cloning from the template.
-    # Note that if your test module gets in some weird state
-    # (though it shouldn't), do this manually
-    # from the bash shell to drop it:
-    # $ mongo test_xmodule --eval "db.dropDatabase()"
-    _MODULESTORES = {}
-    modulestore().collection.drop()
-    update_templates()
 
 
 def course_id(course_num):

@@ -7,6 +7,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from student.models import CourseEnrollment
+from xmodule.modulestore.django import _MODULESTORES, modulestore
+from xmodule.templates import update_templates
 from bs4 import BeautifulSoup
 import os.path
 from urllib import quote_plus
@@ -119,3 +121,16 @@ def save_the_course_content(path='/tmp'):
     f = open('%s/%s' % (path, filename), 'w')
     f.write(output)
     f.close
+
+@world.absorb
+def clear_courses():
+    # Flush and initialize the module store
+    # It needs the templates because it creates new records
+    # by cloning from the template.
+    # Note that if your test module gets in some weird state
+    # (though it shouldn't), do this manually
+    # from the bash shell to drop it:
+    # $ mongo test_xmodule --eval "db.dropDatabase()"
+    _MODULESTORES = {}
+    modulestore().collection.drop()
+    update_templates()

@@ -7,7 +7,7 @@ from nose.tools import assert_equal
 
 @step('I have opened a new course section in Studio$')
 def i_have_opened_a_new_course_section(step):
-    clear_courses()
+    world.clear_courses()
     log_into_studio()
     create_a_course()
     add_section()

@@ -43,7 +43,7 @@ def i_press_the_category_delete_icon(step, category):
 
 @step('I have opened a new course in Studio$')
 def i_have_opened_a_new_course(step):
-    clear_courses()
+    world.clear_courses()
     log_into_studio()
     create_a_course()
 
@@ -67,23 +67,6 @@ def create_studio_user(
     registration.activate()
 
     user_profile = world.UserProfileFactory(user=studio_user)
-
-
-def flush_xmodule_store():
-    # Flush and initialize the module store
-    # It needs the templates because it creates new records
-    # by cloning from the template.
-    # Note that if your test module gets in some weird state
-    # (though it shouldn't), do this manually
-    # from the bash shell to drop it:
-    # $ mongo test_xmodule --eval "db.dropDatabase()"
-    _MODULESTORES = {}
-    modulestore().collection.drop()
-    update_templates()
-
-
-def clear_courses():
-    flush_xmodule_store()
 
 
 def fill_in_course_info(
