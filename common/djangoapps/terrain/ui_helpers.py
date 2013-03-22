@@ -21,6 +21,22 @@ def css_click(css_selector):
         world.browser.find_by_css(css_selector).click()
 
 @world.absorb
+def css_fill(css_selector, text):
+    world.browser.find_by_css(css_selector).first.fill(text)
+
+@world.absorb
+def click_link(partial_text):
+    world.browser.find_link_by_partial_text(partial_text).first.click()
+
+@world.absorb
+def css_text(css_selector):
+    return world.browser.find_by_css(css_selector).first.text
+
+@world.absorb
+def css_visible(css_selector):
+    return world.browser.find_by_css(css_selector).visible
+
+@world.absorb
 def save_the_html(path='/tmp'):
     u = world.browser.url
     html = world.browser.html.encode('ascii', 'ignore')

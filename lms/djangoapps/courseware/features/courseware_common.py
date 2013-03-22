@@ -9,10 +9,9 @@ def i_click_on_view_courseware(step):
 
 
 @step('I click on the "([^"]*)" tab$')
-def i_click_on_the_tab(step, tab):
-    world.browser.find_link_by_partial_text(tab).first.click()
+def i_click_on_the_tab(step, tab_text):
+    world.click_link(tab_text)
     world.save_the_html()
-
 
 @step('I visit the courseware URL$')
 def i_visit_the_course_info_url(step):
@@ -32,13 +31,9 @@ def i_am_on_the_dashboard_page(step):
 
 
 @step('the "([^"]*)" tab is active$')
-def the_tab_is_active(step, tab):
-    css = '.course-tabs a.active'
-    active_tab = world.browser.find_by_css(css)
-    assert (active_tab.text == tab)
-
+def the_tab_is_active(step, tab_text):
+    assert world.css_text('.course-tabs a.active') == tab_text
 
 @step('the login dialog is visible$')
 def login_dialog_visible(step):
-    css = 'form#login_form.login_form'
-    assert world.browser.find_by_css(css).visible
+    assert world.css_visible('form#login_form.login_form')
