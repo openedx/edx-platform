@@ -13,6 +13,7 @@ logger = getLogger(__name__)
 def wait(step, seconds):
     world.wait(seconds)
 
+
 @step('I reload the page$')
 def reload_the_page(step):
     world.browser.reload()
@@ -72,9 +73,11 @@ def the_page_title_should_be(step, title):
 def the_page_title_should_contain(step, title):
     assert(title in world.browser.title)
 
+
 @step('I log in$')
 def i_log_in(step):
     world.log_in('robot', 'test')
+
 
 @step('I am a logged in user$')
 def i_am_logged_in_user(step):
@@ -101,9 +104,11 @@ def click_the_link_called(step, text):
 def should_have_the_url(step, url):
     assert_equals(world.browser.url, url)
 
+
 @step(r'should see (?:the|a) link (?:called|with the text) "([^"]*)"$')
 def should_see_a_link_called(step, text):
     assert len(world.browser.find_link_by_text(text)) > 0
+
 
 @step(r'should see "(.*)" (?:somewhere|anywhere) in (?:the|this) page')
 def should_see_in_the_page(step, text):
@@ -130,4 +135,3 @@ def i_am_an_edx_user(step):
 @step(u'User "([^"]*)" is an edX user$')
 def registered_edx_user(step, uname):
     world.create_user(uname)
-

@@ -3,6 +3,7 @@ from lettuce import before, after, world
 from django.conf import settings
 import threading
 
+
 @before.all
 def setup_mock_xqueue_server():
 

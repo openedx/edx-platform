@@ -22,4 +22,4 @@ def i_check_checkbox(step, checkbox):
 @step('I should see "([^"]*)" in the dashboard banner$')
 def i_should_see_text_in_the_dashboard_banner_section(step, text):
     css_selector = "section.dashboard-banner h2"
-    assert (text in world.browser.find_by_css(css_selector).text)
+    assert (text in world.css_text(css_selector))

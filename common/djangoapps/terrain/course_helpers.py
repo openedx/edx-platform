@@ -12,6 +12,7 @@ import os.path
 from urllib import quote_plus
 from lettuce.django import django_url
 
+
 @world.absorb
 def create_user(uname):
 

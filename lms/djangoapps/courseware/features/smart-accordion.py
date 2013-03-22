@@ -32,20 +32,20 @@ def i_verify_all_the_content_of_each_course(step):
         pass
 
     for test_course in registered_courses:
-        test_course.find_by_css('a').click()
+        test_course.css_click('a')
         check_for_errors()
 
         # Get the course. E.g. 'MITx/6.002x/2012_Fall'
         current_course = sub('/info', '', sub('.*/courses/', '', world.browser.url))
         validate_course(current_course, ids)
 
-        world.browser.find_link_by_text('Courseware').click()
-        assert world.browser.is_element_present_by_id('accordion', wait_time=2)
+        world.click_link('Courseware')
+        assert world.is_css_present('accordion')
         check_for_errors()
         browse_course(current_course)
 
         # clicking the user link gets you back to the user's home page
-        world.browser.find_by_css('.user-link').click()
+        world.css_click('.user-link')
         check_for_errors()
 
 
@@ -94,7 +94,7 @@ def browse_course(course_id):
             world.browser.find_by_css('#accordion > nav > div')[chapter_it].find_by_tag('li')[section_it].find_by_tag('a').click()
 
             ## sometimes the course-content takes a long time to load
-            assert world.browser.is_element_present_by_css('.course-content', wait_time=5)
+            assert world.is_css_present('.course-content')
 
             ## look for server error div
             check_for_errors()

@@ -61,8 +61,7 @@ def see_the_grader_status(step, status):
 
 @step('I see the red X$')
 def see_the_red_x(step):
-    x_css = 'div.grader-status > span.incorrect'
-    assert world.browser.find_by_css(x_css)
+    assert world.is_css_present('div.grader-status > span.incorrect')
 
 
 @step(u'I see the grader score "([^"]*)"$')
@@ -74,8 +73,7 @@ def see_the_grader_score(step, score):
 
 @step('I see the link for full output$')
 def see_full_output_link(step):
-    link_css = 'a.full'
-    assert world.browser.find_by_css(link_css)
+    assert world.is_css_present('a.full')
 
 
 @step('I see the spelling grading message "([^"]*)"$')
