@@ -1,6 +1,7 @@
 from lettuce import world, step
 import time
 from urllib import quote_plus
+from selenium.common.exceptions import WebDriverException
 
 @world.absorb
 def wait(seconds):

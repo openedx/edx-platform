@@ -9,7 +9,6 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from student.models import CourseEnrollment
 from bs4 import BeautifulSoup
 import os.path
-from selenium.common.exceptions import WebDriverException
 from urllib import quote_plus
 from lettuce.django import django_url
 
