@@ -1,15 +1,26 @@
 import time
 import datetime
-import re
 import calendar
+import dateutil.parser
+
+
+tz = "{:+03d}:{:02d}".format(time.timezone / 3600, time.timezone % 3600)
 
 
 def time_to_date(time_obj):
     """
-    Convert a time.time_struct to a true universal time (can pass to js Date constructor)
+    Convert a time.time_struct to a true universal time (can pass to js Date
+    constructor)
     """
-    # TODO change to using the isoformat() function on datetime. js date can parse those
     return calendar.timegm(time_obj) * 1000
+
+
+def time_to_isodate(source):
+    '''Convert to an iso date'''
+    if isinstance(source, time.struct_time):
+        return time.strftime('%Y-%m-%dT%H:%M:%S' + tz, source)
+    elif isinstance(source, datetime):
+        return source.isoformat() + tz
 
 
 def jsdate_to_time(field):
@@ -19,8 +30,7 @@ def jsdate_to_time(field):
     if field is None:
         return field
     elif isinstance(field, basestring):
-        # ISO format but ignores time zone assuming it's Z.
-        d = datetime.datetime(*map(int, re.split('[^\d]', field)[:6]))  # stop after seconds. Debatable
+        d = dateutil.parser.parse(field)
         return d.utctimetuple()
     elif isinstance(field, (int, long, float)):
         return time.gmtime(field / 1000)
