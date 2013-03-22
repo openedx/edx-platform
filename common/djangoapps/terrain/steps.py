@@ -25,6 +25,11 @@ def reload_the_page(step):
     world.browser.reload()
 
 
+@step('I press the browser back button$')
+def browser_back(step):
+    world.browser.driver.back()
+
+
 @step('I (?:visit|access|open) the homepage$')
 def i_visit_the_homepage(step):
     world.browser.visit(django_url('/'))

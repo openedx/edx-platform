@@ -12,6 +12,13 @@ CMS.Models.ChecklistCollection = Backbone.Collection.extend({
             });
 
         return response;
+    },
+
+    // Disable caching so the browser back button will work (checklists have links to other
+    // places within Studio).
+    fetch: function (options) {
+        options.cache = false;
+        return Backbone.Collection.prototype.fetch.call(this, options);
     }
 });
 
