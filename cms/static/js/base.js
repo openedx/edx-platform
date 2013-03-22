@@ -158,7 +158,6 @@ function linkSmoothScroll(e) {
         scrollElement: null,
         scrollTarget: $(this).attr('href')
     });
-    console.log('clicked!');
 }
 
 function linkNewWindow(e) {
