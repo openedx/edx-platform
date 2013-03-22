@@ -26,42 +26,40 @@ def browser_back(step):
 
 @step('I (?:visit|access|open) the homepage$')
 def i_visit_the_homepage(step):
-    world.browser.visit(django_url('/'))
-    assert world.browser.is_element_present_by_css('header.global', 10)
-
+    world.visit('/')
+    assert world.is_css_present('header.global')
 
 @step(u'I (?:visit|access|open) the dashboard$')
 def i_visit_the_dashboard(step):
-    world.browser.visit(django_url('/dashboard'))
-    assert world.browser.is_element_present_by_css('section.container.dashboard', 5)
-
+    world.visit('/dashboard')
+    assert world.is_css_present('section.container.dashboard')
 
 @step('I should be on the dashboard page$')
 def i_should_be_on_the_dashboard(step):
-    assert world.browser.is_element_present_by_css('section.container.dashboard', 5)
+    assert world.is_css_present('section.container.dashboard')
     assert world.browser.title == 'Dashboard'
 
 
 @step(u'I (?:visit|access|open) the courses page$')
 def i_am_on_the_courses_page(step):
-    world.browser.visit(django_url('/courses'))
-    assert world.browser.is_element_present_by_css('section.courses')
+    world.visit('/courses')
+    assert world.is_css_present('section.courses')
 
 
 @step(u'I press the "([^"]*)" button$')
 def and_i_press_the_button(step, value):
     button_css = 'input[value="%s"]' % value
-    world.browser.find_by_css(button_css).first.click()
+    world.css_click(button_css)
 
 
 @step(u'I click the link with the text "([^"]*)"$')
 def click_the_link_with_the_text_group1(step, linktext):
-    world.browser.find_link_by_text(linktext).first.click()
+    world.click_link(linktext)
 
 
 @step('I should see that the path is "([^"]*)"$')
 def i_should_see_that_the_path_is(step, path):
-    assert world.browser.url == django_url(path)
+    assert world.url_equals(path)
 
 
 @step(u'the page title should be "([^"]*)"$')
@@ -97,8 +95,7 @@ def i_am_staff_for_course_by_id(step, course_id):
 
 @step(r'click (?:the|a) link (?:called|with the text) "([^"]*)"$')
 def click_the_link_called(step, text):
-    world.browser.find_link_by_text(text).click()
-
+    world.click_link(text)
 
 @step(r'should see that the url is "([^"]*)"$')
 def should_have_the_url(step, url):
@@ -112,7 +109,7 @@ def should_see_a_link_called(step, text):
 
 @step(r'should see "(.*)" (?:somewhere|anywhere) in (?:the|this) page')
 def should_see_in_the_page(step, text):
-    assert_in(text, world.browser.html)
+    assert_in(text, world.css_text('body'))
 
 
 @step('I am logged in$')

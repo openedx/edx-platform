@@ -50,7 +50,12 @@ def click_link(partial_text):
 
 @world.absorb
 def css_text(css_selector):
-    return world.browser.find_by_css(css_selector).first.text
+
+    # Wait for the css selector to appear
+    if world.is_css_present(css_selector):
+        return world.browser.find_by_css(css_selector).first.text
+    else:
+        return ""
 
 
 @world.absorb
