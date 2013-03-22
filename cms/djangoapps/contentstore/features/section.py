@@ -112,7 +112,7 @@ def the_section_release_date_picker_not_visible(step):
 def the_section_release_date_is_updated(step):
     css = 'span.published-status'
     status_text = world.css_text(css)
-    assert_equal(status_text,'Will Release: 12/25/2013 at 12:00am')
+    assert_equal(status_text, 'Will Release: 12/25/2013 at 12:00am')
 
 
 ############ HELPER METHODS ###################

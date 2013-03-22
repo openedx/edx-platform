@@ -72,6 +72,7 @@ def save_subsection_name(name):
     world.css_fill(name_css, name)
     world.css_click(save_css)
 
+
 def see_subsection_name(name):
     css = 'span.subsection-name'
     assert world.is_css_present(css)

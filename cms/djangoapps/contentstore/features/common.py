@@ -10,6 +10,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 ###########  STEP HELPERS ##############
+
 @step('I (?:visit|access|open) the Studio homepage$')
 def i_visit_the_studio_homepage(step):
     # To make this go to port 8001, put

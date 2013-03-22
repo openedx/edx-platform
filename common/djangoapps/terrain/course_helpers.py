@@ -122,6 +122,7 @@ def save_the_course_content(path='/tmp'):
     f.write(output)
     f.close
 
+
 @world.absorb
 def clear_courses():
     # Flush and initialize the module store

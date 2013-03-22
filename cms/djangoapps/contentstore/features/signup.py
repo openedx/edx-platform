@@ -20,6 +20,7 @@ def i_press_the_button_on_the_registration_form(step):
     e = world.css_find(submit_css)
     e.type(' ')
 
+
 @step('I should see be on the studio home page$')
 def i_should_see_be_on_the_studio_home_page(step):
     assert world.browser.find_by_css('div.inner-wrapper')

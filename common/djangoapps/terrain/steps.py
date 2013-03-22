@@ -29,10 +29,12 @@ def i_visit_the_homepage(step):
     world.visit('/')
     assert world.is_css_present('header.global')
 
+
 @step(u'I (?:visit|access|open) the dashboard$')
 def i_visit_the_dashboard(step):
     world.visit('/dashboard')
     assert world.is_css_present('section.container.dashboard')
+
 
 @step('I should be on the dashboard page$')
 def i_should_be_on_the_dashboard(step):
@@ -96,6 +98,7 @@ def i_am_staff_for_course_by_id(step, course_id):
 @step(r'click (?:the|a) link (?:called|with the text) "([^"]*)"$')
 def click_the_link_called(step, text):
     world.click_link(text)
+
 
 @step(r'should see that the url is "([^"]*)"$')
 def should_have_the_url(step, url):

@@ -43,6 +43,7 @@ def i_see_the_course_in_my_courses(step):
     course_css = 'span.class-name'
     assert world.css_has_text(course_css, 'Robot Super Course')
 
+
 @step('the course is loaded$')
 def course_is_loaded(step):
     class_css = 'a.class-name'
