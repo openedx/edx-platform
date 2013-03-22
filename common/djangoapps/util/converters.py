@@ -4,9 +4,6 @@ import calendar
 import dateutil.parser
 
 
-tz = "{:+03d}:{:02d}".format(time.timezone / 3600, time.timezone % 3600)
-
-
 def time_to_date(time_obj):
     """
     Convert a time.time_struct to a true universal time (can pass to js Date
@@ -18,9 +15,9 @@ def time_to_date(time_obj):
 def time_to_isodate(source):
     '''Convert to an iso date'''
     if isinstance(source, time.struct_time):
-        return time.strftime('%Y-%m-%dT%H:%M:%S' + tz, source)
+        return time.strftime('%Y-%m-%dT%H:%M:%SZ', source)
     elif isinstance(source, datetime):
-        return source.isoformat() + tz
+        return source.isoformat() + 'Z'
 
 
 def jsdate_to_time(field):

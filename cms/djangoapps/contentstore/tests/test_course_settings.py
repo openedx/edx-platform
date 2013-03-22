@@ -22,6 +22,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.django import modulestore
+import time
 
 
 # YYYY-MM-DDThh:mm:ss.s+/-HH:MM
@@ -39,6 +40,7 @@ class ConvertersTestCase(TestCase):
             + str(date2) + "!=" + str(expected_delta))
 
     def test_iso_to_struct(self):
+        '''Test conversion from iso compatible date strings to struct_time'''
         self.compare_dates(converters.jsdate_to_time("2013-01-01"),
             converters.jsdate_to_time("2012-12-31"),
             datetime.timedelta(days=1))
@@ -54,9 +56,27 @@ class ConvertersTestCase(TestCase):
         self.compare_dates(converters.jsdate_to_time("2013-01-01T00:00:00Z"),
             converters.jsdate_to_time("2012-12-31T23:59:59Z"),
             datetime.timedelta(seconds=1))
-        self.compare_dates(converters.jsdate_to_time("2012-12-31T23:00:01-01:00"),
+        self.compare_dates(
+            converters.jsdate_to_time("2012-12-31T23:00:01-01:00"),
             converters.jsdate_to_time("2013-01-01T00:00:00+01:00"),
             datetime.timedelta(hours=1, seconds=1))
+
+    def test_struct_to_iso(self):
+        '''
+        Test converting time reprs to iso dates
+        '''
+        self.assertEqual(
+            converters.time_to_isodate(
+                time.strptime("2012-12-31T23:59:59Z", "%Y-%m-%dT%H:%M:%SZ")),
+            "2012-12-31T23:59:59Z")
+        self.assertEqual(
+            converters.time_to_isodate(
+                jsdate_to_time("2012-12-31T23:59:59Z")),
+            "2012-12-31T23:59:59Z")
+        self.assertEqual(
+            converters.time_to_isodate(
+                jsdate_to_time("2012-12-31T23:00:01-01:00")),
+            "2013-01-01T00:00:01Z")
 
 
 class CourseTestCase(ModuleStoreTestCase):

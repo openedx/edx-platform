@@ -11,8 +11,10 @@ log = logging.getLogger(__name__)
 
 
 class Date(ModelType):
-    tz = "{:+03d}:{:02d}".format(time.timezone / 3600, time.timezone % 3600)
-
+    '''
+    Date fields know how to parse and produce json (iso) compatible formats.
+    '''
+    # NB: these are copies of util.converters.*
     def from_json(self, field):
         """
         Parse an optional metadata key containing a time: if present, complain
@@ -44,7 +46,7 @@ class Date(ModelType):
             # struct_times are always utc
             return time.strftime('%Y-%m-%dT%H:%M:%SZ', value)
         elif isinstance(value, datetime.datetime):
-            return value.isoformat() + Date.tz
+            return value.isoformat() + 'Z'
 
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
