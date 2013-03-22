@@ -51,7 +51,8 @@ from xmodule.contentstore.content import StaticContent
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item, get_url_reverse
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, \
+    get_date_display, UnitState, get_course_for_item, get_url_reverse
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from contentstore.course_info_model import get_course_updates, \
@@ -182,10 +183,10 @@ def course_index(request, org, course, name):
     lms_link = get_lms_link_for_item(location)
 
     upload_asset_callback_url = reverse('upload_asset', kwargs={
-            'org': org,
-            'course': course,
-            'coursename': name
-            })
+        'org': org,
+        'course': course,
+        'coursename': name
+    })
 
     course = modulestore().get_item(location)
     sections = course.get_children()
@@ -241,7 +242,7 @@ def edit_subsection(request, location):
         for field
         in item.fields
         if field.name not in ['display_name', 'start', 'due', 'format'] and
-           field.scope == Scope.settings
+            field.scope == Scope.settings
     )
 
     can_view_live = False
@@ -253,18 +254,18 @@ def edit_subsection(request, location):
             break
 
     return render_to_response('edit_subsection.html',
-                              {'subsection': item,
-                               'context_course': course,
-                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
-                               'lms_link': lms_link,
-                               'preview_link': preview_link,
-                                'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
-                                'parent_location': course.location,
-                               'parent_item': parent,
-                               'policy_metadata': policy_metadata,
-                               'subsection_units': subsection_units,
-                               'can_view_live': can_view_live
-                               })
+        {'subsection': item,
+         'context_course': course,
+         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+         'lms_link': lms_link,
+         'preview_link': preview_link,
+         'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+         'parent_location': course.location,
+         'parent_item': parent,
+         'policy_metadata': policy_metadata,
+         'subsection_units': subsection_units,
+         'can_view_live': can_view_live
+        })
 
 
 @login_required
@@ -1294,7 +1295,7 @@ def get_checklists(request, org, course, name):
 
     modulestore = get_modulestore(location)
     course_module = modulestore.get_item(location)
-    new_course_template =  Location('i4x', 'edx', 'templates', 'course', 'Empty')
+    new_course_template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
     template_module = modulestore.get_item(new_course_template)
 
     # If course was created before checklists were introduced, copy them over from the template.
@@ -1309,7 +1310,7 @@ def get_checklists(request, org, course, name):
     return render_to_response('checklists.html',
         {
             'context_course': course_module,
-            'checklists' : checklists
+            'checklists': checklists
         })
 
 
@@ -1338,7 +1339,8 @@ def update_checklist(request, org, course, name, checklist_index=None):
             modulestore.update_metadata(location, own_metadata(course_module))
             return HttpResponse(json.dumps(checklists[index]), mimetype="application/json")
         else:
-            return HttpResponseBadRequest("Could not save checklist state because the checklist index was out of range or unspecified.",
+            return HttpResponseBadRequest(
+                "Could not save checklist state because the checklist index was out of range or unspecified.",
                 content_type="text/plain")
     elif request.method == 'GET':
         # In the JavaScript view initialize method, we do a fetch to get all the checklists.
@@ -1381,10 +1383,10 @@ def asset_index(request, org, course, name):
     location = get_location_and_verify_access(request, org, course, name)
 
     upload_asset_callback_url = reverse('upload_asset', kwargs={
-            'org': org,
-            'course': course,
-            'coursename': name
-            })
+        'org': org,
+        'course': course,
+        'coursename': name
+    })
 
     course_module = modulestore().get_item(location)
 
