@@ -72,6 +72,9 @@ def the_page_title_should_be(step, title):
 def the_page_title_should_contain(step, title):
     assert(title in world.browser.title)
 
+@step('I log in$')
+def i_log_in(step):
+    world.log_in('robot', 'test')
 
 @step('I am a logged in user$')
 def i_am_logged_in_user(step):
@@ -89,11 +92,42 @@ def i_am_staff_for_course_by_id(step, course_id):
     world.register_by_course_id(course_id, True)
 
 
-@step('I log in$')
-def i_log_in(step):
+@step(r'click (?:the|a) link (?:called|with the text) "([^"]*)"$')
+def click_the_link_called(step, text):
+    world.browser.find_link_by_text(text).click()
+
+
+@step(r'should see that the url is "([^"]*)"$')
+def should_have_the_url(step, url):
+    assert_equals(world.browser.url, url)
+
+@step(r'should see (?:the|a) link (?:called|with the text) "([^"]*)"$')
+def should_see_a_link_called(step, text):
+    assert len(world.browser.find_link_by_text(text)) > 0
+
+@step(r'should see "(.*)" (?:somewhere|anywhere) in (?:the|this) page')
+def should_see_in_the_page(step, text):
+    assert_in(text, world.browser.html)
+
+
+@step('I am logged in$')
+def i_am_logged_in(step):
+    world.create_user('robot')
     world.log_in('robot', 'test')
+    world.browser.visit(django_url('/'))
+
+
+@step('I am not logged in$')
+def i_am_not_logged_in(step):
+    world.browser.cookies.delete()
 
 
 @step(u'I am an edX user$')
 def i_am_an_edx_user(step):
     world.create_user('robot')
+
+
+@step(u'User "([^"]*)" is an edX user$')
+def registered_edx_user(step, uname):
+    world.create_user(uname)
+
