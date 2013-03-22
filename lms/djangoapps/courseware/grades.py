@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 from .model_data import ModelDataCache, LmsKeyValueStore
 from xblock.core import Scope
-from .module_render import get_module
+from .module_render import get_module, get_module_for_descriptor
 from xmodule import graders
 from xmodule.capa_module import CapaModule
 from xmodule.course_module import CourseDescriptor
@@ -176,8 +176,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                 def create_module(descriptor):
                     # TODO: We need the request to pass into here. If we could forgo that, our arguments
                     # would be simpler
-                    return get_module(student, request, descriptor.location,
-                                        model_data_cache, course.id)
+                    return get_module_for_descriptor(student, request, descriptor, model_data_cache, course.id)
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
 
