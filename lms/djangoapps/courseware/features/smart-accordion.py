@@ -81,7 +81,7 @@ def browse_course(course_id):
         num_rendered_sections = len(rendered_sections)
 
         msg = ('%d sections expected, %d sections found on page, %s - %d - %s' %
-                (num_sections, num_rendered_sections, course_id, chapter_it, chapters[chapter_it]['chapter_name']))
+               (num_sections, num_rendered_sections, course_id, chapter_it, chapters[chapter_it]['chapter_name']))
         #logger.debug(msg)
         assert num_sections == num_rendered_sections, msg
 
@@ -112,7 +112,7 @@ def browse_course(course_id):
                 num_rendered_tabs = 0
 
             msg = ('%d tabs expected, %d tabs found, %s - %d - %s' %
-                        (num_tabs, num_rendered_tabs, course_id, section_it, sections[section_it]['section_name']))
+                   (num_tabs, num_rendered_tabs, course_id, section_it, sections[section_it]['section_name']))
             #logger.debug(msg)
 
             # Save the HTML to a file for later comparison
@@ -137,7 +137,7 @@ def browse_course(course_id):
                     rendered_items = world.browser.find_by_css('div#seq_content > section > ol > li > section')
                     num_rendered_items = len(rendered_items)
                     msg = ('%d items expected, %d items found, %s - %d - %s - tab %d' %
-                        (tab_children, num_rendered_items, course_id, section_it, sections[section_it]['section_name'], tab_it))
+                           (tab_children, num_rendered_items, course_id, section_it, sections[section_it]['section_name'], tab_it))
                     #logger.debug(msg)
                     assert tab_children == num_rendered_items, msg
 

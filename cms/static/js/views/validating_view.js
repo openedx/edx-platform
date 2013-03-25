@@ -25,11 +25,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
         for (var field in error) {
             var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);
             this._cacheValidationErrors.push(ele);
-            if ($(ele).is('div')) {
-                // put error on the contained inputs
-                $(ele).find('input, textarea').addClass('error');
-            }
-            else $(ele).addClass('error');
+            this.getInputElements(ele).addClass('error');
             $(ele).parent().append(this.errorTemplate({message : error[field]}));
         }
     },
@@ -37,12 +33,8 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     clearValidationErrors : function() {
         // error is object w/ fields and error strings
         while (this._cacheValidationErrors.length > 0) {
-            var ele = this._cacheValidationErrors.pop(); 
-            if ($(ele).is('div')) {
-                // put error on the contained inputs
-                $(ele).find('input, textarea').removeClass('error');
-            }
-            else $(ele).removeClass('error');
+            var ele = this._cacheValidationErrors.pop();
+            this.getInputElements(ele).removeClass('error');
             $(ele).nextAll('.message-error').remove();
         }
     },
@@ -65,5 +57,16 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     },
     inputUnfocus : function(event) {
         $("label[for='" + event.currentTarget.id + "']").removeClass("is-focused");
+    },
+
+    getInputElements: function(ele) {
+        var inputElements = 'input, textarea';
+        if ($(ele).is(inputElements)) {
+            return $(ele);
+        }
+        else {
+            // put error on the contained inputs
+            return $(ele).find(inputElements);
+        }
     }
 });

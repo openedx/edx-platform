@@ -181,12 +181,21 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         host=request.get_host(),
         proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http')
     )
-    xqueue_callback_url += reverse('xqueue_callback',
-                                  kwargs=dict(course_id=course_id,
-                                              userid=str(user.id),
-                                              id=descriptor.location.url(),
-                                              dispatch='score_update'),
-                                  )
+
+    def make_xqueue_callback(dispatch='score_update'):
+        # Fully qualified callback URL for external queueing system
+        xqueue_callback_url = '{proto}://{host}'.format(
+            host=request.get_host(),
+            proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http')
+        )
+
+        xqueue_callback_url += reverse('xqueue_callback',
+                                      kwargs=dict(course_id=course_id,
+                                                  userid=str(user.id),
+                                                  id=descriptor.location.url(),
+                                                  dispatch=dispatch),
+                                      )
+        return xqueue_callback_url
 
     # Default queuename is course-specific and is derived from the course that
     #   contains the current module.
@@ -194,7 +203,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
     xqueue = {'interface': xqueue_interface,
-              'callback_url': xqueue_callback_url,
+              'construct_callback': make_xqueue_callback,
               'default_queuename': xqueue_default_queuename.replace(' ', '_'),
               'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
              }

@@ -1,12 +1,14 @@
-Feature: Answer choice problems
+Feature: Answer problems
     As a student in an edX course
     In order to test my understanding of the material
-    I want to answer choice based problems
+    I want to answer problems
 
     Scenario: I can answer a problem correctly
-        Given I am viewing a "<ProblemType>" problem
+        Given External graders respond "correct"
+        And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "correctly"
         Then My "<ProblemType>" answer is marked "correct"
+        And The "<ProblemType>" problem displays a "correct" answer
 
         Examples:
         | ProblemType       |
@@ -17,11 +19,14 @@ Feature: Answer choice problems
         | numerical         |
         | formula           |
         | script            |
+        | code              |
 
     Scenario: I can answer a problem incorrectly
-        Given I am viewing a "<ProblemType>" problem
+        Given External graders respond "incorrect"
+        And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "incorrectly"
         Then My "<ProblemType>" answer is marked "incorrect"
+        And The "<ProblemType>" problem displays a "incorrect" answer
 
         Examples:
         | ProblemType       |
@@ -32,11 +37,13 @@ Feature: Answer choice problems
         | numerical         |
         | formula           |
         | script            |
+        | code              |
 
     Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
         When I check a problem
         Then My "<ProblemType>" answer is marked "incorrect"
+        And The "<ProblemType>" problem displays a "blank" answer
 
         Examples:
         | ProblemType       |
@@ -54,6 +61,7 @@ Feature: Answer choice problems
         And I answer a "<ProblemType>" problem "<Correctness>ly"
         When I reset the problem
         Then My "<ProblemType>" answer is marked "unanswered"
+        And The "<ProblemType>" problem displays a "blank" answer
 
         Examples:
         | ProblemType       | Correctness   |

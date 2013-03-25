@@ -75,10 +75,15 @@ class UserProfile(models.Model):
     GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
     gender = models.CharField(blank=True, null=True, max_length=6, db_index=True,
                               choices=GENDER_CHOICES)
-    LEVEL_OF_EDUCATION_CHOICES = (('p_se', 'Doctorate in science or engineering'),
-                                  ('p_oth', 'Doctorate in another field'),
+
+    # [03/21/2013] removed these, but leaving comment since there'll still be
+    # p_se and p_oth in the existing data in db.
+    # ('p_se', 'Doctorate in science or engineering'),
+    # ('p_oth', 'Doctorate in another field'),
+    LEVEL_OF_EDUCATION_CHOICES = (('p', 'Doctorate'),
                                   ('m', "Master's or professional degree"),
                                   ('b', "Bachelor's degree"),
+                                  ('a', "Associate's degree"),
                                   ('hs', "Secondary/high school"),
                                   ('jhs', "Junior secondary/junior high/middle school"),
                                   ('el', "Elementary/primary school"),
