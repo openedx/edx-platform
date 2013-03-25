@@ -8,6 +8,7 @@ Feature: Answer problems
         And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "correctly"
         Then My "<ProblemType>" answer is marked "correct"
+        And The "<ProblemType>" problem displays a "correct" answer
 
         Examples:
         | ProblemType       |
@@ -25,6 +26,7 @@ Feature: Answer problems
         And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "incorrectly"
         Then My "<ProblemType>" answer is marked "incorrect"
+        And The "<ProblemType>" problem displays a "incorrect" answer
 
         Examples:
         | ProblemType       |
@@ -41,6 +43,7 @@ Feature: Answer problems
         Given I am viewing a "<ProblemType>" problem
         When I check a problem
         Then My "<ProblemType>" answer is marked "incorrect"
+        And The "<ProblemType>" problem displays a "blank" answer
 
         Examples:
         | ProblemType       |
@@ -58,6 +61,7 @@ Feature: Answer problems
         And I answer a "<ProblemType>" problem "<Correctness>ly"
         When I reset the problem
         Then My "<ProblemType>" answer is marked "unanswered"
+        And The "<ProblemType>" problem displays a "blank" answer
 
         Examples:
         | ProblemType       | Correctness   |
