@@ -1,3 +1,8 @@
+'''
+Steps for problem.feature lettuce tests
+'''
+
+
 from lettuce import world, step
 from lettuce.django import django_url
 import random
@@ -88,6 +93,9 @@ PROBLEM_FACTORY_DICT = {
 
 
 def add_problem_to_course(course, problem_type):
+    '''
+    Add a problem to the course we have created using factories.
+    '''
 
     assert(problem_type in PROBLEM_FACTORY_DICT)
 
@@ -98,11 +106,12 @@ def add_problem_to_course(course, problem_type):
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    problem_item = world.ItemFactory.create(parent_location=section_location(course),
-                                            template="i4x://edx/templates/problem/Blank_Common_Problem",
-                                            display_name=str(problem_type),
-                                            data=problem_xml,
-                                            metadata={'rerandomize': 'always'})
+    template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
+    world.ItemFactory.create(parent_location=section_location(course),
+                            template=template_name,
+                            display_name=str(problem_type),
+                            data=problem_xml,
+                            metadata={'rerandomize': 'always'})
 
 
 @step(u'I am viewing a "([^"]*)" problem')
@@ -164,11 +173,13 @@ def answer_problem(step, problem_type, correctness):
             inputfield('checkbox', choice='choice_3').check()
 
     elif problem_type == 'string':
-        textvalue = 'correct string' if correctness == 'correct' else 'incorrect'
+        textvalue = 'correct string' if correctness == 'correct' \
+                                    else 'incorrect'
         inputfield('string').fill(textvalue)
 
     elif problem_type == 'numerical':
-        textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2, 2))
+        textvalue = "pi + 1" if correctness == 'correct' \
+                            else str(random.randint(-2, 2))
         inputfield('numerical').fill(textvalue)
 
     elif problem_type == 'formula':
@@ -201,6 +212,7 @@ def answer_problem(step, problem_type, correctness):
 
     # Submit the problem
     check_problem(step)
+
 
 @step(u'The "([^"]*)" problem displays a "([^"]*)" answer')
 def assert_problem_has_answer(step, problem_type, answer_class):
@@ -242,7 +254,8 @@ def assert_problem_has_answer(step, problem_type, answer_class):
         if answer_class == 'blank':
             expected = ''
         else:
-            expected = 'correct string' if answer_class == 'correct' else 'incorrect'
+            expected = 'correct string' if answer_class == 'correct' \
+                                        else 'incorrect'
 
         assert_textfield('string', expected)
 
@@ -286,7 +299,7 @@ CORRECTNESS_SELECTORS = {
                         'string': ['div.correct'],
                         'numerical': ['div.correct'],
                         'formula': ['div.correct'],
-                        'script': ['div.correct'], 
+                        'script': ['div.correct'],
                         'code': ['span.correct']},
 
         'incorrect': {'drop down': ['span.incorrect'],
@@ -306,12 +319,14 @@ CORRECTNESS_SELECTORS = {
                         'numerical': ['div.unanswered'],
                         'formula': ['div.unanswered'],
                         'script': ['div.unanswered'],
-                        'code': ['span.unanswered'] }}
+                        'code': ['span.unanswered']}}
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')
 def assert_answer_mark(step, problem_type, correctness):
-    """ Assert that the expected answer mark is visible for a given problem type.
+    """
+    Assert that the expected answer mark is visible
+    for a given problem type.
 
     *problem_type* is a string identifying the type of problem (e.g. 'drop down')
     *correctness* is in ['correct', 'incorrect', 'unanswered']
@@ -349,12 +364,13 @@ def inputfield(problem_type, choice=None, input_num=1):
         base = "_choice_" if problem_type == "multiple choice" else "_"
         sel = sel + base + str(choice)
 
-    
+
     # If the input element doesn't exist, fail immediately
     assert(world.browser.is_element_present_by_css(sel, wait_time=4))
 
     # Retrieve the input element
     return world.browser.find_by_css(sel)
+
 
 def assert_checked(problem_type, choices):
     '''
@@ -365,14 +381,15 @@ def assert_checked(problem_type, choices):
     '''
 
     all_choices = ['choice_0', 'choice_1', 'choice_2', 'choice_3']
-    for ch in all_choices:
-        el = inputfield(problem_type, choice=ch)
+    for this_choice in all_choices:
+        element = inputfield(problem_type, choice=this_choice)
 
-        if ch in choices:
-            assert el.checked
+        if this_choice in choices:
+            assert element.checked
         else:
-            assert not el.checked
+            assert not element.checked
+
 
 def assert_textfield(problem_type, expected_text, input_num=1):
-    el = inputfield(problem_type, input_num=input_num)
-    assert el.value == expected_text
+    element = inputfield(problem_type, input_num=input_num)
+    assert element.value == expected_text
