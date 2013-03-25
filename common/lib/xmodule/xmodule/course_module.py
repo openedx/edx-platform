@@ -1,6 +1,6 @@
 import logging
 from cStringIO import StringIO
-from math import exp, erf
+from math import exp
 from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
@@ -24,9 +24,8 @@ log = logging.getLogger(__name__)
 class StringOrDate(Date):
     def from_json(self, value):
         """
-        Parse an optional metadata key containing a time: if present, complain
-        if it doesn't parse.
-        Return None if not present or invalid.
+        Parse an optional metadata key containing a time or a string:
+        if present, assume it's a string if it doesn't parse.
         """
         try:
             result = super(StringOrDate, self).from_json(value)
@@ -39,7 +38,7 @@ class StringOrDate(Date):
 
     def to_json(self, value):
         """
-        Convert a time struct to a string
+        Convert a time struct or string to a string.
         """
         try:
             result = super(StringOrDate, self).to_json(value)
@@ -176,7 +175,7 @@ class CourseFields(object):
     allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
     advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
     has_children = True
-    checklists=List(scope=Scope.settings)
+    checklists = List(scope=Scope.settings)
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
 
     # An extra property is used rather than the wiki_slug/number because
