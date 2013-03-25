@@ -65,5 +65,7 @@ class Note(models.Model):
                 'end': self.range_end,
                 'endOffset': self.range_end_offset
             }],
-            'tags': self.tags.split(",")
+            'tags': self.tags.split(","),
+            'created': str(self.created),
+            'updated': str(self.updated)
         }
