@@ -1,6 +1,6 @@
 import logging
 from cStringIO import StringIO
-from math import exp, erf
+from math import exp
 from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
@@ -12,14 +12,9 @@ from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
-from datetime import datetime
 import json
-import logging
-import requests
-import time
-import copy
 
-from xblock.core import Scope, ModelType, List, String, Object, Boolean
+from xblock.core import Scope, List, String, Object, Boolean
 from .fields import Date
 
 
@@ -29,36 +24,37 @@ log = logging.getLogger(__name__)
 class StringOrDate(Date):
     def from_json(self, value):
         """
-        Parse an optional metadata key containing a time: if present, complain
-        if it doesn't parse.
-        Return None if not present or invalid.
+        Parse an optional metadata key containing a time or a string:
+        if present, assume it's a string if it doesn't parse.
         """
-        if value is None:
-            return None
-
         try:
-            return time.strptime(value, self.time_format)
+            result = super(StringOrDate, self).from_json(value)
         except ValueError:
             return value
+        if result is None:
+            return value
+        else:
+            return result
 
     def to_json(self, value):
         """
-        Convert a time struct to a string
+        Convert a time struct or string to a string.
         """
-        if value is None:
-            return None
-
         try:
-            return time.strftime(self.time_format, value)
-        except (ValueError, TypeError):
+            result = super(StringOrDate, self).to_json(value)
+        except:
             return value
-
+        if result is None:
+            return value
+        else:
+            return result
 
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
 
 _cached_toc = {}
+
 
 class Textbook(object):
     def __init__(self, title, book_url):
@@ -179,7 +175,7 @@ class CourseFields(object):
     allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
     advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
     has_children = True
-    checklists=List(scope=Scope.settings)
+    checklists = List(scope=Scope.settings)
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
 
     # An extra property is used rather than the wiki_slug/number because
@@ -367,7 +363,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             textbooks.append((textbook.get('title'), textbook.get('book_url')))
             xml_object.remove(textbook)
 
-        #Load the wiki tag if it exists
+        # Load the wiki tag if it exists
         wiki_slug = None
         wiki_tag = xml_object.find("wiki")
         if wiki_tag is not None:
@@ -675,7 +671,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # *end* of the same day, not the same time.  It's going to be used as the
             # end of the exam overall, so we don't want the exam to disappear too soon.
             # It's also used optionally as the registration end date, so time matters there too.
-            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')   # or self.first_eligible_appointment_date
+            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')  # or self.first_eligible_appointment_date
             if self.last_eligible_appointment_date is None:
                 raise ValueError("Last appointment date must be specified")
             self.registration_start_date = self._try_parse_time('Registration_Start_Date') or time.gmtime(0)
