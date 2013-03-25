@@ -311,7 +311,7 @@ def change_enrollment(request):
             course = course_from_id(course_id)
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
-                      .format(user.username, enrollment.course_id))
+                      .format(user.username, course_id))
             return {'success': False, 'error': 'The course requested does not exist.'}
 
         if not has_access(user, course, 'enroll'):
