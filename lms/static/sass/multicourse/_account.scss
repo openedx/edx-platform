@@ -126,21 +126,6 @@
   }
 }
 
-// js-enabled
-.js {
-
-  #register-form, #login-form {
-
-    .status.message {
-      display: none;
-
-      &.is-shown {
-        display: block;
-      }
-    }
-  }
-}
-
 // shared
 .login, .register, .passwordreset, #forgot-password-modal #password-reset {
 
@@ -476,6 +461,17 @@
   .orn-plus {
     color: $white;
     padding: 0 $baseline/4;
+  }
+
+  #register-form, #login-form {
+
+    .status.message {
+      display: none;
+
+      &.is-shown {
+        display: block;
+      }
+    }
   }
 }
 
