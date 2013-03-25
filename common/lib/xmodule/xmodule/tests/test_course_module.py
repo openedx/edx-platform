@@ -125,7 +125,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         descriptor = self.get_dummy_course(start='2013-01-15T12:00')
         assert(descriptor.is_newish is True)
 
-        descriptor = self.get_dummy_course(start='2013-03-00T12:00')
+        descriptor = self.get_dummy_course(start='2013-03-01T12:00')
         assert(descriptor.is_newish is True)
 
         descriptor = self.get_dummy_course(start='2012-10-15T12:00')
