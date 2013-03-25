@@ -542,6 +542,10 @@
       }
     }
 
+    .message {
+      margin: $baseline 0 0 0;
+    }
+
     fieldset {
       margin-bottom: ($baseline/2);
       padding: 0;
