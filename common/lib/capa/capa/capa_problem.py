@@ -91,6 +91,7 @@ class LoncapaProblem(object):
 
          - problem_text (string): xml defining the problem
          - id           (string): identifier for this problem; often a filename (no spaces)
+         - seed         (int): random number generator seed (int) 
          - state        (dict): containing the following keys:
                                 - 'seed' - (int) random number generator seed
                                 - 'student_answers' - (dict) maps input id to the stored answer for that input
@@ -110,7 +111,7 @@ class LoncapaProblem(object):
             raise Exception()
 
         state = state if state else {}
-        self.seed = seed if seed else state.get('seed', struct.unpack('i', os.urandom(4))[0]) 
+        self.seed = seed if seed is not None else state.get('seed', struct.unpack('i', os.urandom(4))[0]) 
         self.student_answers = state.get('student_answers', {})
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])
