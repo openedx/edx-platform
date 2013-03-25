@@ -111,7 +111,14 @@ class LoncapaProblem(object):
             raise Exception()
 
         state = state if state else {}
-        self.seed = seed if seed is not None else state.get('seed', struct.unpack('i', os.urandom(4))[0]) 
+
+        # Set seed according to the following priority:
+        #       1. Contained in problem's state
+        #       2. Passed into capa_problem via constructor
+        #       3. Assign from the OS's random number generator
+        self.seed = state.get('seed', seed)
+        if self.seed is None:
+            self.seed = struct.unpack('i', os.urandom(4))
         self.student_answers = state.get('student_answers', {})
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])
