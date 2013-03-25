@@ -105,7 +105,7 @@ def read(request, course_id, note_id):
 
 def update(request, course_id, note_id):
     try:
-        note = Note.objects.get(note_id)
+        note = Note.objects.get(id=note_id)
     except:
         return [HttpResponse('', status=404), None]
 
@@ -118,13 +118,16 @@ def update(request, course_id, note_id):
         log.debug(e)
         return [HttpResponse('', status=500), None]
 
-    note.save(update_fields=['text', 'tags', 'updated'])
+    note.save()
 
-    return [HttpResponse('', status=303), None]
+    response = HttpResponse('', status=303)
+    response['Location'] = note.get_absolute_url()
+
+    return [response, None]
 
 def delete(request, course_id, note_id):
     try:
-        note = Note.objects.get(note_id)
+        note = Note.objects.get(id=note_id)
     except:
         return [HttpResponse('', status=404), None]
 

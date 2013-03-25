@@ -40,7 +40,6 @@ class StudentNotes
     getStoreConfig: (uri) ->
         prefix = @getPrefix()
         if uri is null
-            console.log 'getURIPath()', uri, @getURIPath()
             uri = @getURIPath()
 
         storeConfig =
