@@ -26,16 +26,13 @@
       }).blur(function() {
         $("label").parent().removeClass("is-focused");
       });
-
     });
-  </script>
 
-
-  <script type="text/javascript">
     (function() {
       $(document).delegate('#login-form', 'ajax:success', function(data, json, xhr) {
         if(json.success) {
           $('.message.submission-error').removeClass('is-shown'); 
+          toggleSubmitButton();
           var u=decodeURI(window.location.search);
           next=u.split("next=")[1];
           if (next) {
@@ -45,12 +42,25 @@
           }
         } else {
           $('.message.submission-error').addClass('is-shown'); 
+          toggleSubmitButton();
           $('.message.submission-error .message-copy').html(json.value);
         }
       });
-    })(this)
-  </script>
+    })(this);
 
+    function toggleSubmitButton(e) {
+      var $msgError = $('form .status.submission-error');
+      var $submitButton = $('form .form-actions #submit');
+
+      if(!$msgError.hasClass('is-shown')) {
+        $submitButton.prop('disabled', true);
+      }
+
+      else {
+        $submitButton.prop('disabled', false);
+      }
+    }
+  </script>
 </%block>
 
 <section class="introduction">

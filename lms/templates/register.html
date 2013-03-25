@@ -33,6 +33,34 @@
       });
 
     });
+
+    (function() {
+     $(document).delegate('#register-form', 'ajax:success', function(data, json, xhr) {
+       if(json.success) {
+        $('.message.submission-error').removeClass('is-shown'); 
+        toggleSubmitButton();
+        location.href="${reverse('dashboard')}";
+       } else {
+         $('.status.message.submission-error').addClass('is-shown');
+         $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+         $(".field-error").removeClass('field-error');
+         $("[data-field='"+json.field+"']").addClass('field-error')
+       }
+      });
+    })(this);
+
+    function toggleSubmitButton(e) {
+      var $msgError = $('form .status.submission-error');
+      var $submitButton = $('form .form-actions #submit').prop('disabled', true);
+
+      if(!$msgError.hasClass('is-shown')) {
+        $submitButton.prop('disabled', true);
+      }
+
+      else {
+        $submitButton.prop('disabled', false);
+      }
+    }
   </script>
 </%block>
 
@@ -209,20 +237,3 @@
     </div>
   </aside>
 </section>
-
-<script type="text/javascript">
-  (function() {
-   $(document).delegate('#register-form', 'ajax:success', function(data, json, xhr) {
-     if(json.success) {
-       location.href="${reverse('dashboard')}";
-     } else {
-       $('.status.message.submission-error').addClass('is-shown');
-       $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
-       $(".field-error").removeClass('field-error');
-       $("[data-field='"+json.field+"']").addClass('field-error')
-     }
-    });
-  })(this)
-</script>
-
-
