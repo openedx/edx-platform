@@ -25,11 +25,14 @@ CMS.Views.ValidatingView = Backbone.View.extend({
         for (var field in error) {
             var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);
             this._cacheValidationErrors.push(ele);
-            if ($(ele).is('div')) {
-                // put error on the contained inputs
-                $(ele).find('input, textarea').addClass('error');
+            var inputElements = 'input, textarea';
+            if ($(ele).is(inputElements)) {
+                $(ele).addClass('error');
             }
-            else $(ele).addClass('error');
+            else {
+                // put error on the contained inputs
+                $(ele).find(inputElements).addClass('error');
+            }
             $(ele).parent().append(this.errorTemplate({message : error[field]}));
         }
     },
