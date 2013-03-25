@@ -25,6 +25,14 @@ end
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
 
+    desc "Start #{system} Celery worker"
+    task "#{system}_worker", [:options] => [:predjango] do |t, args|
+      args.with_defaults(:options => default_options[system])
+      django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
+      command = 'celery worker'
+      sh("#{django_admin} #{command} --loglevel=INFO --settings=#{system}.envs.dev_with_worker --pythonpath=. #{args.join(' ')}")
+    end
+
     # Per environment tasks
     environments(system).each do |env|
         desc "Attempt to import the settings file #{system}.envs.#{env} and report any errors"

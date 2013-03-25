@@ -163,6 +163,7 @@ INSTALLED_APPS += ('lms_migration',)
 LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 
 ################################ OpenID Auth #################################
+
 MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 MITX_FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
@@ -177,11 +178,17 @@ OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
-################################ MIT Certificates SSL Auth #################################
+######################## MIT Certificates SSL Auth ############################
 
 MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
-################################ DEBUG TOOLBAR #################################
+################################# CELERY ######################################
+
+# By default don't use a worker, execute tasks as if they were local functions
+CELERY_ALWAYS_EAGER = True
+
+################################ DEBUG TOOLBAR ################################
+
 INSTALLED_APPS += ('debug_toolbar',)
 MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
                        'debug_toolbar.middleware.DebugToolbarMiddleware',)
@@ -207,7 +214,9 @@ DEBUG_TOOLBAR_PANELS = (
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False
 }
+
 #################### FILE UPLOADS (for discussion forums) #####################
+
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"

@@ -240,6 +240,51 @@ STATICFILES_IGNORE_PATTERNS = (
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
 
+################################# CELERY ######################################
+
+# Message configuration
+
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERY_MESSAGE_COMPRESSION = 'gzip'
+
+# Results configuration
+
+CELERY_IGNORE_RESULT = False
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+
+# Events configuration
+
+CELERY_TRACK_STARTED = True
+
+CELERY_SEND_EVENTS = True
+CELERY_SEND_TASK_SENT_EVENT = True
+
+# Exchange configuration
+
+CELERY_DEFAULT_EXCHANGE = 'edx.core'
+CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
+
+# Queues configuration
+
+HIGH_PRIORITY_QUEUE = 'edx.core.high'
+DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
+LOW_PRIORITY_QUEUE = 'edx.core.low'
+
+CELERY_QUEUE_HA_POLICY = 'all'
+
+CELERY_CREATE_MISSING_QUEUES = True
+
+CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
+CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+
+CELERY_QUEUES = {
+    HIGH_PRIORITY_QUEUE: {},
+    LOW_PRIORITY_QUEUE: {},
+    DEFAULT_PRIORITY_QUEUE: {}
+}
+
 ############################ APPS #####################################
 
 INSTALLED_APPS = (
@@ -249,7 +294,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
+    'djcelery',
     'south',
+
+    # Monitor the status of services
+    'service_status',
 
     # For CMS
     'contentstore',

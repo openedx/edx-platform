@@ -108,6 +108,12 @@ CACHES = {
     }
 }
 
+################################# CELERY ######################################
+
+CELERY_ALWAYS_EAGER = True
+CELERY_RESULT_BACKEND = 'cache'
+BROKER_TRANSPORT = 'memory'
+
 ################### Make tests faster
 #http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
 PASSWORD_HASHERS = (
@@ -120,4 +126,3 @@ SEGMENT_IO_KEY = '***REMOVED***'
 
 # disable NPS survey in test mode
 MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
-
