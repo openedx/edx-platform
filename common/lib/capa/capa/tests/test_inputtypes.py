@@ -381,6 +381,32 @@ class MatlabTest(unittest.TestCase):
 
         self.assertEqual(context, expected)
 
+    def test_rendering_while_queued(self):
+        state = {'value': 'print "good evening"',
+                 'status': 'incomplete',
+                 'input_state': {'queuestate': 'queued'},
+                 }
+        elt = etree.fromstring(self.xml)
+
+        input_class = lookup_tag('matlabinput')
+        the_input = self.input_class(test_system, elt, state)
+        context = the_input._get_render_context()
+        expected = {'id': 'prob_1_2',
+                    'value': 'print "good evening"',
+                   'status': 'queued',
+                   'msg': self.input_class.plot_submitted_msg,
+                   'mode': self.mode,
+                   'rows': self.rows,
+                   'cols': self.cols,
+                   'queue_msg': '',
+                   'linenumbers': 'true',
+                   'hidden': '',
+                   'tabsize': int(self.tabsize),
+                   'queue_len': '1',
+                   }
+
+        self.assertEqual(context, expected)
+
     def test_plot_data(self):
         get = {'submission': 'x = 1234;'}
         response = self.the_input.handle_ajax("plot", get)
@@ -390,6 +416,43 @@ class MatlabTest(unittest.TestCase):
         self.assertTrue(response['success'])
         self.assertTrue(self.the_input.input_state['queuekey'] is not None)
         self.assertEqual(self.the_input.input_state['queuestate'], 'queued')
+
+    def test_ungraded_response_success(self):
+        queuekey = 'abcd'
+        input_state = {'queuekey': queuekey, 'queuestate': 'queued'}
+        state = {'value': 'print "good evening"',
+                 'status': 'incomplete',
+                 'input_state': input_state,
+                 'feedback': {'message': '3'}, }
+        elt = etree.fromstring(self.xml)
+
+        the_input = self.input_class(test_system, elt, state)
+        inner_msg = 'hello!'
+        queue_msg = json.dumps({'msg': inner_msg})
+
+        the_input.ungraded_response(queue_msg, queuekey)
+        self.assertTrue(input_state['queuekey'] is None)
+        self.assertTrue(input_state['queuestate'] is None)
+        self.assertEqual(input_state['queue_msg'], inner_msg)
+
+    def test_ungraded_response_key_mismatch(self):
+        queuekey = 'abcd'
+        input_state = {'queuekey': queuekey, 'queuestate': 'queued'}
+        state = {'value': 'print "good evening"',
+                 'status': 'incomplete',
+                 'input_state': input_state,
+                 'feedback': {'message': '3'}, }
+        elt = etree.fromstring(self.xml)
+
+        the_input = self.input_class(test_system, elt, state)
+        inner_msg = 'hello!'
+        queue_msg = json.dumps({'msg': inner_msg})
+
+        the_input.ungraded_response(queue_msg, 'abc')
+        self.assertEqual(input_state['queuekey'], queuekey)
+        self.assertEqual(input_state['queuestate'], 'queued')
+        self.assertFalse('queue_msg' in input_state)
+
 
 
 
