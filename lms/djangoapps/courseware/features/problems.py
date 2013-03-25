@@ -2,8 +2,8 @@ from lettuce import world, step
 from lettuce.django import django_url
 import random
 import textwrap
-import time
-from common import i_am_registered_for_the_course, TEST_SECTION_NAME, section_location
+from common import i_am_registered_for_the_course, \
+                TEST_SECTION_NAME, section_location
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
@@ -26,7 +26,7 @@ PROBLEM_FACTORY_DICT = {
         'kwargs': {
             'question_text': 'The correct answer is Choice 3',
             'choices': [False, False, True, False],
-            'choice_names': ['choice_1', 'choice_2', 'choice_3', 'choice_4']}},
+            'choice_names': ['choice_0', 'choice_1', 'choice_2', 'choice_3']}},
 
     'checkbox': {
         'factory': ChoiceResponseXMLFactory(),
@@ -152,9 +152,9 @@ def answer_problem(step, problem_type, correctness):
 
     elif problem_type == "multiple choice":
         if correctness == 'correct':
-            inputfield('multiple choice', choice='choice_3').check()
-        else:
             inputfield('multiple choice', choice='choice_2').check()
+        else:
+            inputfield('multiple choice', choice='choice_1').check()
 
     elif problem_type == "checkbox":
         if correctness == 'correct':
@@ -201,6 +201,65 @@ def answer_problem(step, problem_type, correctness):
 
     # Submit the problem
     check_problem(step)
+
+@step(u'The "([^"]*)" problem displays a "([^"]*)" answer')
+def assert_problem_has_answer(step, problem_type, answer_class):
+    '''
+    Assert that the problem is displaying a particular answer.
+    These correspond to the same correct/incorrect
+    answers we set in answer_problem()
+
+    We can also check that a problem has been left blank
+    by setting answer_class='blank'
+    '''
+    assert answer_class in ['correct', 'incorrect', 'blank']
+
+    if problem_type == "drop down":
+        if answer_class == 'blank':
+            assert world.browser.is_element_not_present_by_css('option[selected="true"]')
+        else:
+            actual = world.browser.find_by_css('option[selected="true"]').value
+            expected = 'Option 2' if answer_class == 'correct' else 'Option 3'
+            assert actual == expected
+
+    elif problem_type == "multiple choice":
+        if answer_class == 'correct':
+            assert_checked('multiple choice', ['choice_2'])
+        elif answer_class == 'incorrect':
+            assert_checked('multiple choice', ['choice_1'])
+        else:
+            assert_checked('multiple choice', [])
+
+    elif problem_type == "checkbox":
+        if answer_class == 'correct':
+            assert_checked('checkbox', ['choice_0', 'choice_2'])
+        elif answer_class == 'incorrect':
+            assert_checked('checkbox', ['choice_3'])
+        else:
+            assert_checked('checkbox', [])
+
+    elif problem_type == 'string':
+        if answer_class == 'blank':
+            expected = ''
+        else:
+            expected = 'correct string' if answer_class == 'correct' else 'incorrect'
+
+        assert_textfield('string', expected)
+
+    elif problem_type == 'formula':
+        if answer_class == 'blank':
+            expected = ''
+        else:
+            expected = "x^2+2*x+y" if answer_class == 'correct' else 'x^2'
+
+        assert_textfield('formula', expected)
+
+    else:
+        # The other response types use random data,
+        # which would be difficult to check
+        # We trade input value coverage in the other tests for
+        # input type coverage in this test.
+        pass
 
 
 @step(u'I check a problem')
@@ -274,6 +333,7 @@ def assert_answer_mark(step, problem_type, correctness):
     # Expect that we found the expected selector
     assert(has_expected)
 
+
 def inputfield(problem_type, choice=None, input_num=1):
     """ Return the <input> element for *problem_type*.
     For example, if problem_type is 'string', return
@@ -289,8 +349,30 @@ def inputfield(problem_type, choice=None, input_num=1):
         base = "_choice_" if problem_type == "multiple choice" else "_"
         sel = sel + base + str(choice)
 
+    
     # If the input element doesn't exist, fail immediately
     assert(world.browser.is_element_present_by_css(sel, wait_time=4))
 
     # Retrieve the input element
     return world.browser.find_by_css(sel)
+
+def assert_checked(problem_type, choices):
+    '''
+    Assert that choice names given in *choices* are the only
+    ones checked.
+
+    Works for both radio and checkbox problems
+    '''
+
+    all_choices = ['choice_0', 'choice_1', 'choice_2', 'choice_3']
+    for ch in all_choices:
+        el = inputfield(problem_type, choice=ch)
+
+        if ch in choices:
+            assert el.checked
+        else:
+            assert not el.checked
+
+def assert_textfield(problem_type, expected_text, input_num=1):
+    el = inputfield(problem_type, input_num=input_num)
+    assert el.value == expected_text
