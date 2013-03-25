@@ -32,9 +32,9 @@
         }
 
         var onComplete = function(url) {
-            return function() { 
-                annotationData = { 'uri': url }
-                $(this).trigger('notes:init', [annotationData]);
+            return function() {
+                var annotationData = { 'uri': url }
+                $('#viewerContainer').trigger('notes:init', [annotationData]);
             }
         };
 

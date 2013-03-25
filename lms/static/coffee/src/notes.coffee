@@ -1,43 +1,39 @@
-class @StudentNotes
-    targets: []
+class StudentNotes
+    _debug: true
 
-    storeConfig:
-        prefix: ''
-        annotationData:
-            uri: ''
+    targets: [] # elements with annotator() instances
 
-    constructor: () ->
-        @storeConfig =
-            prefix: @getPrefix()
-            annotationData:
-                uri: @getURIPath()
+    constructor: ($, el) ->
+        console.log 'student notes init', arguments, this if @_debug
 
-        $(document).ready(@init)
-
-    init: ($) =>
-        if not StudentNotes.ready
-            $(document).delegate('*', {
-                'notes:init': @onInitNotes,
-                'notes:load': @onLoadNotes
-            })
-            StudentNotes.ready = true
+        if $(el).data('notes-ready') isnt 'yes'
+            $(el).delegate '*', 'notes:init': @onInitNotes
+            $(el).data('notes-ready', 'yes')
 
     onInitNotes: (event, annotationData=null) =>
-        found = (target for target in @targets when target is event.target)
+        event.stopPropagation()
 
-        storeConfig = $.extend {}, @storeConfig
-        $.extend(storeConfig.annotationData, annotationData) if annotationData
+        found = @targets.some (target) -> target is event.target
 
-        if found.length is 0
+        if found
+            annotator = $(event.target).data('annotator')
+            store = annotator.plugins['Store']
+            store.options.annotationData = annotationData if annotationData
+            store.loadAnnotations()
+        else
             $(event.target).annotator()
-              .annotator('addPlugin', 'Tags')
-              .annotator('addPlugin', 'Store', storeConfig)
-
+                .annotator('addPlugin', 'Tags')
+                .annotator('addPlugin', 'Store', @getStoreConfig(annotationData))
             @targets.push(event.target)
 
-    onLoadNotes: (event) =>
-        if event.target in @targets
-            $(event.target).annotator().annotator('loadAnnotations')
+    getStoreConfig: (annotationData) ->
+        storeConfig =
+            prefix: @getPrefix()
+            annotationData:
+                uri: @getURIPath() # defaults to current URI path
+
+        $.extend storeConfig.annotationData, annotationData  if annotationData
+        storeConfig
 
     getPrefix: () ->
         re = /^(\/courses\/[^/]+\/[^/]+\/[^/]+)/
@@ -47,3 +43,5 @@ class @StudentNotes
 
     getURIPath: () ->
         window.location.href.toString().split(window.location.host)[1]
+
+$(document).ready ($) -> new StudentNotes($, this)
