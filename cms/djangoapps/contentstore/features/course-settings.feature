@@ -23,6 +23,3 @@ Feature: Course Settings
     And I have entered a new course start date
     Then The warning about course start date goes away
     And My new course start date is shown on refresh
-
-
-
