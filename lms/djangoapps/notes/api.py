@@ -1,4 +1,5 @@
 from django.http import HttpResponse, Http404
+from django.core.exceptions import ValidationError
 from notes.models import Note
 import json
 import logging
@@ -73,13 +74,19 @@ def api_format(request, response, data):
 # Exposed API actions via the resource map.
 
 def index(request, course_id):
-    notes = Note.objects.all()
+    notes = Note.objects.filter(course_id=course_id, user=request.user)
     return [HttpResponse(), [note.as_dict() for note in notes]]
 
 def create(request, course_id):
-    note = Note(course_id=course_id, body=request.body, user=request.user)
-    note.save()
+    note = Note(course_id=course_id, user=request.user)
 
+    try:
+        note.clean(request.body)
+    except ValidationError as e:
+        log.debug(e)
+        return [HttpResponse('', status=500), None]
+
+    note.save()
     response = HttpResponse('', status=303)
     response['Location'] = note.get_absolute_url()
 
@@ -105,8 +112,13 @@ def update(request, course_id, note_id):
     if not note.user.id == request.user.id:
         return [HttpResponse('', status=403)]
 
-    note.body = request.body
-    note.save(update_fields=['body', 'updated'])
+    try:
+        note.clean(request.body)
+    except ValidationError as e:
+        log.debug(e)
+        return [HttpResponse('', status=500), None]
+
+    note.save(update_fields=['text', 'tags', 'updated'])
 
     return [HttpResponse('', status=303), None]
 
@@ -124,7 +136,20 @@ def delete(request, course_id, note_id):
     return [HttpResponse('', status=204), None]
 
 def search(request, course_id):
-    return [HttpResponse(), []]
+    limit = request.GET.get('limit')
+    uri = request.GET.get('uri')
+
+    filters = {'course_id':course_id, 'user':request.user}
+    if uri is not None:
+        filters['uri'] = uri
+
+    notes = Note.objects.filter(**filters)
+    #if limit is not None and limit > 0:
+        #notes = notes[:limit]
+
+    result = {'rows': [note.as_dict() for note in notes]}
+
+    return [HttpResponse(), result]
 
 def version(request, course_id):
     return [HttpResponse(), {'name': 'Notes API', 'version': '1.0'}]

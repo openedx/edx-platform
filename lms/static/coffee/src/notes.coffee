@@ -1,47 +1,74 @@
 class StudentNotes
     _debug: true
 
-    targets: [] # elements with annotator() instances
+    targets: [] # holds elements with annotator() instances
 
+    # Adds a listener for "notes" events that may bubble up from descendants.
     constructor: ($, el) ->
         console.log 'student notes init', arguments, this if @_debug
 
-        if $(el).data('notes-ready') isnt 'yes'
-            $(el).delegate '*', 'notes:init': @onInitNotes
-            $(el).data('notes-ready', 'yes')
+        if not $(el).data('notes-instance')
+            events = 'notes:init': @onInitNotes
+            $(el).delegate('*', events)
+            $(el).data('notes-instance', @)
 
-    onInitNotes: (event, annotationData=null) =>
+    # Initializes annotations on a container element in response to an init event.
+    onInitNotes: (event, uri=null) =>
         event.stopPropagation()
 
+        storeConfig = @getStoreConfig uri
         found = @targets.some (target) -> target is event.target
 
         if found
             annotator = $(event.target).data('annotator')
-            store = annotator.plugins['Store']
-            store.options.annotationData = annotationData if annotationData
-            store.loadAnnotations()
+            if annotator
+                store = annotator.plugins['Store']
+                $.extend(store.options, storeConfig)
+                if uri
+                    store.loadAnnotationsFromSearch(storeConfig['loadFromSearch'])
+                else
+                    console.log 'URI is required to load annotations'
+            else
+                console.log 'No annotator() instance found for target: ', event.target
         else
             $(event.target).annotator()
                 .annotator('addPlugin', 'Tags')
-                .annotator('addPlugin', 'Store', @getStoreConfig(annotationData))
+                .annotator('addPlugin', 'Store', storeConfig)
             @targets.push(event.target)
 
-    getStoreConfig: (annotationData) ->
-        storeConfig =
-            prefix: @getPrefix()
-            annotationData:
-                uri: @getURIPath() # defaults to current URI path
+    # Returns a JSON config object that can be passed to the annotator Store plugin
+    getStoreConfig: (uri) ->
+        prefix = @getPrefix()
+        if uri is null
+            console.log 'getURIPath()', uri, @getURIPath()
+            uri = @getURIPath()
 
-        $.extend storeConfig.annotationData, annotationData  if annotationData
+        storeConfig =
+            prefix: prefix
+            loadFromSearch:
+                uri: uri
+                limit: 0
+            annotationData:
+                uri: uri
         storeConfig
 
+    # Returns the API endpoint for the annotation store
     getPrefix: () ->
         re = /^(\/courses\/[^/]+\/[^/]+\/[^/]+)/
         match = re.exec(@getURIPath())
         prefix = (if match then match[1] else '')
         return "#{prefix}/notes/api"
 
+    # Returns the URI path of the current page for filtering annotations
     getURIPath: () ->
         window.location.href.toString().split(window.location.host)[1]
 
-$(document).ready ($) -> new StudentNotes($, this)
+
+# Enable notes by default on the document root.
+# To initialize annotations on a container element in the document:
+#
+#   $('#myElement').trigger('notes:init');
+#
+# Comment this line to disable notes.
+
+$(document).ready ($) -> new StudentNotes $, @
