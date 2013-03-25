@@ -89,7 +89,7 @@ metadata:
                       {"short_description": "Download the Studio Documentation",
                       "long_description": "Download the searchable Studio reference documentation in PDF form.",
                       "is_checked": false,
-                      "action_url": "http://help.edge.edx.org/help/assets/8ccd409f979c8639dd463e126eb840dc67f09098/Getting_Started_with_Studio.pdf",
+                      "action_url": "http://files.edx.org/Getting_Started_with_Studio.pdf",
                       "action_text": "Download Documentation",
                       "action_external": true}]
         },
