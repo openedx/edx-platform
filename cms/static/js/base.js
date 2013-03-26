@@ -236,7 +236,7 @@ function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
             time_val = '00:00';
 
         // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
-        date = Date.parse(date_val + " " + time_val);
+        var date = Date.parse(date_val + " " + time_val);
         if (format == null)
             format = 'yyyy-MM-ddTHH:mm';
 
@@ -254,6 +254,7 @@ function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
 }
 
 function autosaveInput(e) {
+    var self = this;
     if (this.saveTimer) {
         clearTimeout(this.saveTimer);
     }
@@ -261,7 +262,7 @@ function autosaveInput(e) {
     this.saveTimer = setTimeout(function () {
         $changedInput = $(e.target);
         saveSubsection();
-        this.saveTimer = null;
+        self.saveTimer = null;
     }, 500);
 }
 
@@ -303,6 +304,7 @@ function saveSubsection() {
         data: JSON.stringify({ 'id': id, 'metadata': metadata}),
         success: function () {
             $spinner.delay(500).fadeOut(150);
+            $changedInput = null;
         },
         error: function () {
             showToastMessage('There has been an error while saving your changes.');
