@@ -1072,13 +1072,11 @@ def sympy_check2():
                 correct = self.context['correct']
                 messages = self.context['messages']
                 overall_message = self.context['overall_message']
+
             except Exception as err:
-                print "oops in customresponse (code) error %s" % err
-                print "context = ", self.context
-                print traceback.format_exc()
-                # Notify student
-                raise StudentInputError(
-                    "Error: Problem could not be evaluated with your input")
+                self._handle_exec_exception(err)
+                pass
+
         else:
             # self.code is not a string; assume its a function
 
@@ -1105,13 +1103,9 @@ def sympy_check2():
                     nargs, args, kwargs))
 
                 ret = fn(*args[:nargs], **kwargs)
+
             except Exception as err:
-                log.error("oops in customresponse (cfn) error %s" % err)
-                # print "context = ",self.context
-                log.error(traceback.format_exc())
-                raise Exception("oops in customresponse (cfn) error %s" % err)
-            log.debug(
-                "[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
+                self._handle_exec_exception(err)
 
             if type(ret) == dict:
 
@@ -1157,7 +1151,7 @@ def sympy_check2():
                 # Raise an exception
                 else:
                     log.error(traceback.format_exc())
-                    raise Exception(
+                    raise LoncapaProblemError(
                         "CustomResponse: check function returned an invalid dict")
 
             # The check function can return a boolean value,
@@ -1226,6 +1220,23 @@ def sympy_check2():
         if self.expect:
             return {self.answer_ids[0]: self.expect}
         return self.default_answer_map
+
+    def _handle_exec_exception(self, err):
+        '''
+        Handle an exception raised during the execution of
+        custom Python code.
+
+        Raises a StudentInputError
+        '''
+
+        # Log the error if we are debugging
+        msg = 'Error occurred while evaluating CustomResponse: %s' % str(err)
+        log.debug(msg)
+        log.debug(traceback.format_exc())
+
+        # Notify student
+        raise StudentInputError(
+            "Error: Problem could not be evaluated with your input")
 
 #-----------------------------------------------------------------------------
 

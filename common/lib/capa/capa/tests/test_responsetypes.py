@@ -13,6 +13,7 @@ import textwrap
 from . import test_system
 
 import capa.capa_problem as lcp
+from capa.responsetypes import LoncapaProblemError, StudentInputError
 from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat
@@ -853,7 +854,7 @@ class CustomResponseTest(ResponseTest):
         # Message is interpreted as an "overall message"
         self.assertEqual(correct_map.get_overall_message(), 'Message text')
 
-    def test_script_exception(self):
+    def test_script_exception_function(self):
 
         # Construct a script that will raise an exception
         script = textwrap.dedent("""
@@ -864,7 +865,17 @@ class CustomResponseTest(ResponseTest):
         problem = self.build_problem(script=script, cfn="check_func")
 
         # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(Exception):
+        with self.assertRaises(StudentInputError):
+            problem.grade_answers({'1_2_1': '42'})
+
+    def test_script_exception_inline(self):
+
+        # Construct a script that will raise an exception
+        script = 'raise Exception("Test")'
+        problem = self.build_problem(answer=script)
+
+        # Expect that an exception gets raised when we check the answer
+        with self.assertRaises(StudentInputError):
             problem.grade_answers({'1_2_1': '42'})
 
     def test_invalid_dict_exception(self):
@@ -878,7 +889,7 @@ class CustomResponseTest(ResponseTest):
         problem = self.build_problem(script=script, cfn="check_func")
 
         # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(Exception):
+        with self.assertRaises(LoncapaProblemError):
             problem.grade_answers({'1_2_1': '42'})
 
 
