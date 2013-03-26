@@ -70,6 +70,17 @@
   padding: 20px;
 }
 
+.widget-layout .flash {
+  margin: -10px 0 15px 0;
+  padding: 5px 10px !important;
+  background-image: none !important;
+}
+
+.widget-layout .flash-error {
+  background: rgb(178, 6, 16) !important;
+  color: rgb(255,255,255) !important;
+}
+
 .widget-layout label {
   font-size: 14px;
   margin-bottom: 5px;

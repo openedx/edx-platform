@@ -81,10 +81,10 @@ $(document).ready(function () {
     });
 
     // general link management - smooth scrolling page links
-    $('a[rel*="view"]').bind('click', linkSmoothScroll);
+    $('a[rel*="view"]').bind('click', smoothScrollLink);
 
     // tender feedback window scrolling
-    $('a.show-tender').bind('click', linkSmoothScrollTop);
+    $('a.show-tender').bind('click', smoothScrollTop);
 
 
     // toggling overview section details
@@ -151,7 +151,7 @@ $(document).ready(function () {
     });
 });
 
-function linkSmoothScroll(e) {
+function smoothScrollLink(e) {
     (e).preventDefault();
 
     $.smoothScroll({ 
@@ -163,7 +163,7 @@ function linkSmoothScroll(e) {
     });
 }
 
-function linkSmoothScrollTop(e) {
+function smoothScrollTop(e) {
     (e).preventDefault();
 
     $.smoothScroll({ 
