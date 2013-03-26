@@ -4,6 +4,43 @@
 <%block name="headextra">
     <%static:css group='course'/>
     <%static:js group='courseware'/>
+<style type="text/css">
+    blockquote {
+        background:#f9f9f9;
+        border-left:10px solid #ccc;
+        margin:1.5em 10px;
+        padding:.5em 10px;
+    }
+    blockquote:before {
+        color:#ccc;
+        content:'“';
+        font-size:4em;
+        line-height:.1em;
+        margin-right:.25em;
+        vertical-align:-.4em;
+    }
+    blockquote p {
+        display:inline;
+    }
+    .notes-wrapper {
+        padding: 32px 40px;
+    }
+    .note {
+        border-bottom: 1px solid #ccc;
+        padding: 0 0 1em 0;
+    }
+    .note .text {
+        margin-bottom: 1em;
+    }
+    .note ul.meta {
+        margin: .5em 0;
+    }
+    .note ul.meta li {
+        font-size: .9em;
+        margin-bottom: .5em;
+    }
+</style>
+
 </%block>
 
 <%block name="js_extra">
@@ -16,7 +53,20 @@
 <section class="container">
     <div class="notes-wrapper">
         <h2>My Notes</h2>
-        <pre>${json_notes}</pre>
+        % for note in notes:
+        <div class="note">
+            <blockquote>${note.quote}</blockquote>
+            <div class="text">${note.text.replace("\n", "<br />") | n}</div>
+            <ul class="meta">
+                % if note.tags:
+                    <li class="tags">Tags: ${note.tags|h}</li>
+                % endif
+                <li class="user">Author: ${note.user.username}</li>
+                <li class="time">Created: ${note.created.strftime('%m/%d/%Y %H:%m')}</li>
+                <li class="uri">Source: <a href="${note.uri}">${note.uri}</a></li>
+                </ul>
+        </div>
+        % endfor
     </div>
 </section>
 

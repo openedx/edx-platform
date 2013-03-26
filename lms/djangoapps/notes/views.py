@@ -7,21 +7,11 @@ import logging
 log = logging.getLogger(__name__)
 
 def notes(request, course_id):
-    ''' Displays a student's notes in a course.
-
-$('body').annotator()
-    .annotator('addPlugin', 'Tags')
-    .annotator('addPlugin', 'Store', {
-        'prefix': /^(\/courses\/[^/]+\/[^/]+\/[^/]+)/.exec(window.location.href.toString().split(window.location.host)[1]
-        'annotationData': {
-            'uri': window.location.href.toString().split(window.location.host)[1]
-        }
-    });
-
-    '''
+    ''' Displays a student's notes in a course. '''
     course = get_course_with_access(request.user, course_id, 'load')
 
-    notes = Note.objects.filter(user_id=request.user.id)
+    notes = Note.objects.filter(course_id=course_id, user=request.user).order_by('-created', 'uri')
+
     prettyprint = {'sort_keys':True, 'indent':2, 'separators':(',', ': ')}
     json_notes = json.dumps([n.as_dict() for n in notes], **prettyprint)
 
