@@ -1075,7 +1075,6 @@ def sympy_check2():
 
             except Exception as err:
                 self._handle_exec_exception(err)
-                pass
 
         else:
             # self.code is not a string; assume its a function
