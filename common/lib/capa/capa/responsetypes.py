@@ -1229,8 +1229,8 @@ def sympy_check2():
         '''
 
         # Log the error if we are debugging
-        msg = 'Error occurred while evaluating CustomResponse: %s' % str(err)
-        log.debug(msg)
+        msg = 'Error occurred while evaluating CustomResponse'
+        log.debug(msg, exc_info=True)
         log.debug(traceback.format_exc())
 
         # Notify student
