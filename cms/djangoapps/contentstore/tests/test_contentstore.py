@@ -37,6 +37,14 @@ TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
+class MongoCollectionFindWrapper(object):
+    def __init__(self, original):
+        self.original = original
+        self.counter = 0
+
+    def find(self, query, *args, **kwargs):
+        self.counter = self.counter+1
+        return self.original(query, *args, **kwargs)
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
@@ -144,8 +152,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)
-
-
 
     def test_about_overrides(self):
         '''
@@ -312,7 +318,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
+        wrapper = MongoCollectionFindWrapper(module_store.collection.find)
+        module_store.collection.find = wrapper.find
         course = module_store.get_item(location, depth=2)
+
+        # make sure we haven't done too many round trips to DB
+        # note we say 4 round trips here for 1) the course, 2 & 3) for the chapters and sequentials, and
+        # 4) because of the RT due to calculating the inherited metadata
+        self.assertEqual(wrapper.counter, 4)
 
         # make sure we pre-fetched a known sequential which should be at depth=2
         self.assertTrue(Location(['i4x', 'edX', 'full', 'sequential', 
