@@ -97,6 +97,7 @@ class MongoKeyValueStore(KeyValueStore):
         else:
             return False
 
+
 MongoUsage = namedtuple('MongoUsage', 'id, def_id')
 
 
@@ -108,7 +109,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     references to metadata_inheritance_tree
     """
     def __init__(self, modulestore, module_data, default_class, resources_fs,
-                 error_tracker, render_template, metadata_cache = None):
+                 error_tracker, render_template, metadata_cache=None):
         """
         modulestore: the module store that can be used to retrieve additional modules
 
@@ -136,6 +137,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.metadata_cache = metadata_cache
 
     def load_item(self, location):
+        """
+        Return an XModule instance for the specified location
+        """
         location = Location(location)
         json_data = self.module_data.get(location)
         if json_data is None:
@@ -197,12 +201,12 @@ def location_to_query(location, wildcard=True):
     return query
 
 
-def namedtuple_to_son(namedtuple, prefix=''):
+def namedtuple_to_son(ntuple, prefix=''):
     """
     Converts a namedtuple into a SON object with the same key order
     """
     son = SON()
-    for idx, field_name in enumerate(namedtuple._fields):
+    for idx, field_name in enumerate(ntuple._fields):
         son[prefix + field_name] = namedtuple[idx]
     return son
 
@@ -231,7 +235,6 @@ class MongoModuleStore(ModuleStoreBase):
 
         if user is not None and password is not None:
             self.collection.database.authenticate(user, password)
-
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
@@ -262,7 +265,7 @@ class MongoModuleStore(ModuleStoreBase):
         query = {
                     '_id.org': location.org,
                     '_id.course': location.course,
-                    '_id.category': {'$in': [ 'course', 'chapter', 'sequential', 'vertical']}
+                    '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical']}
                 }
         # we just want the Location, children, and metadata
         record_filter = {'_id': 1, 'definition.children': 1, 'metadata': 1}
@@ -284,6 +287,9 @@ class MongoModuleStore(ModuleStoreBase):
         metadata_to_inherit = {}
 
         def _compute_inherited_metadata(url):
+            """
+            Helper method for computing inherited metadata for a specific location url
+            """
             my_metadata = {}
             # check for presence of metadata key. Note that a given module may not yet be fully formed.
             # example: update_item -> update_children -> update_metadata sequence on new item create
@@ -325,12 +331,14 @@ class MongoModuleStore(ModuleStoreBase):
             trees = self.metadata_inheritance_cache.get_many(list(set([metadata_cache_key(loc) for loc in locations])))
         else:
             # This is to help guard against an accident prod runtime without a cache
-            logging.warning('Running MongoModuleStore without metadata_inheritance_cache. This should not happen in production!')
+            logging.warning('Running MongoModuleStore without metadata_inheritance_cache. '
+                            'This should not happen in production!')
 
         to_cache = {}
         for loc in locations:
-            if metadata_cache_key(loc) not in trees:
-                to_cache[metadata_cache_key(loc)] = trees[metadata_cache_key(loc)] = self.get_metadata_inheritance_tree(loc)
+            cache_key = metadata_cache_key(loc)
+            if cache_key not in trees:
+                to_cache[cache_key] = trees[cache_key] = self.get_metadata_inheritance_tree(loc)
 
         if to_cache and self.metadata_inheritance_cache is not None:
             self.metadata_inheritance_cache.set_many(to_cache)
@@ -338,11 +346,19 @@ class MongoModuleStore(ModuleStoreBase):
         return trees
 
     def refresh_cached_metadata_inheritance_tree(self, location):
+        """
+        Refresh the cached metadata inheritance tree for the org/course combination
+        for location
+        """
         pseudo_course_id = '/'.join([location.org, location.course])
         if pseudo_course_id not in self.ignore_write_events_on_courses:
-           self.get_cached_metadata_inheritance_trees([location], force_refresh=True)
+            self.get_cached_metadata_inheritance_trees([location], force_refresh=True)
 
     def clear_cached_metadata_inheritance_tree(self, location):
+        """
+        Delete the cached metadata inheritance tree for the org/course combination
+        for location
+        """
         if self.metadata_inheritance_cache is not None:
             self.metadata_inheritance_cache.delete(metadata_cache_key(location))
 
@@ -372,7 +388,7 @@ class MongoModuleStore(ModuleStoreBase):
                 data[Location(item['location'])] = item
 
             if depth == 0:
-                break;
+                break
 
             # Load all children by id. See
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
@@ -412,8 +428,6 @@ class MongoModuleStore(ModuleStoreBase):
             root.mkdir()
 
         resource_fs = OSFS(root)
-
-        metadata_inheritance_tree = None
 
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
@@ -572,7 +586,8 @@ class MongoModuleStore(ModuleStoreBase):
             raise Exception('Could not find course at {0}'.format(course_search_location))
 
         if found_cnt > 1:
-            raise Exception('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+            raise Exception('Found more than one course at {0}. There should only be one!!! '
+                            'Dump = {1}'.format(course_search_location, courses))
 
         return courses[0]
 
@@ -688,4 +703,7 @@ class MongoModuleStore(ModuleStoreBase):
 
 # DraftModuleStore is first, because it needs to intercept calls to MongoModuleStore
 class DraftMongoModuleStore(DraftModuleStore, MongoModuleStore):
+    """
+    Version of MongoModuleStore with draft capability mixed in
+    """
     pass
