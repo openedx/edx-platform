@@ -363,7 +363,11 @@ class CombinedOpenEndedV1Module():
         """
         self.update_task_states()
         html = self.current_task.get_html(self.system)
-        return_html = rewrite_links(html, self.rewrite_content_links)
+        return_html = html
+        try:
+            return_html = rewrite_links(html, self.rewrite_content_links)
+        except:
+            pass
         return return_html
 
     def get_current_attributes(self, task_number):
