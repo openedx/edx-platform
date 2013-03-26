@@ -1,0 +1,142 @@
+// tender help/support widget
+// ====================
+
+#tender_frame, #tender_window {
+  background-image: none !important;
+  background: none;
+}
+
+#tender_window {
+  @include border-radius(3px);
+  @include box-shadow(0 2px 3px $shadow);
+  background: $white !important;
+  border: 1px solid $gray;
+}
+
+#tender_window {
+  padding: 0 !important;
+}
+
+#tender_frame {
+  background: $white;
+}
+
+#tender_closer {
+  color: $blue-l2 !important;
+  margin-top: 15px;
+  margin-right: 5px;
+  text-transform: uppercase;
+
+  &:hover {
+    color: $blue-l4 !important;
+  }
+}
+
+// ====================
+
+// tender style overrides - not rendered through here, but an archive is needed
+#tender_frame iframe html {
+  font-size: 62.5%;
+}
+
+.widget-layout {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.widget-layout .search, 
+.widget-layout .tabs, 
+.widget-layout .footer, 
+.widget-layout .header h1 a {
+  display: none;
+}
+
+.widget-layout .header {
+  background: rgb(85, 151, 221);
+  padding: 20px;
+}
+
+.widget-layout h1, .widget-layout h2, .widget-layout h3, .widget-layout h4, .widget-layout h5, .widget-layout h6, .widget-layout label {
+  font-weight: 600;
+}
+
+.widget-layout .header h1 {
+  font-weight: 500;
+  font-size: 24px;
+}
+
+.widget-layout .content {
+  overflow: auto;
+  padding: 20px;
+}
+
+.widget-layout label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #4c4c4c;
+  font-weight: 500;
+}
+
+.widget-layout input[type="text"], .widget-layout textarea {
+  padding: 10px;
+  font-size: 16px;
+  color: rgb(0,0,0) !important;
+  border: 1px solid #b0b6c2;
+  border-radius: 2px;
+  background-color: #edf1f5;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #edf1f5),color-stop(100%, #fdfdfe));
+  background-image: -webkit-linear-gradient(top, #edf1f5,#fdfdfe);
+  background-image: -moz-linear-gradient(top, #edf1f5,#fdfdfe);
+  background-image: -ms-linear-gradient(top, #edf1f5,#fdfdfe);
+  background-image: -o-linear-gradient(top, #edf1f5,#fdfdfe);
+  background-image: linear-gradient(top, #edf1f5,#fdfdfe);
+  background-color: #edf1f5;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.1) inset;
+  -moz-box-shadow: 0 1px 2px rgba(0,0,0,0.1) inset;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1) inset;
+}
+
+.widget-layout input[type="text"]:focus, .widget-layout textarea:focus {
+  background-color: #fffcf1;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fffcf1),color-stop(100%, #fffefd));
+  background-image: -webkit-linear-gradient(top, #fffcf1,#fffefd);
+  background-image: -moz-linear-gradient(top, #fffcf1,#fffefd);
+  background-image: -ms-linear-gradient(top, #fffcf1,#fffefd);
+  background-image: -o-linear-gradient(top, #fffcf1,#fffefd);
+  background-image: linear-gradient(top, #fffcf1,#fffefd);
+  outline: 0;
+}
+
+.widget-layout textarea {
+  width: 97%;
+}
+
+.widget-layout .form-actions {
+  border-top: 1px solid #ccc;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.widget-layout dl.form {
+  float: none;
+  width: 100%;
+  border-bottom: 1px solid #f2f2f2;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+
+.widget-layout #brain_buster_captcha {
+
+}
+
+// specific elements
+.widget-layout #discussion_body {
+  margin: 0 0 15px 0;
+}
+
+.widget-layout .category dt, .widget-layout .category dd {
+  display: inline-block !important;
+}
+
+.widget-layout .category dt {
+  margin-right: 15px !important;
+}
