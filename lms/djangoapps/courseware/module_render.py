@@ -208,9 +208,6 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
               'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
              }
 
-    def get_or_default(key, default):
-        getattr(settings, key, default)
-
     #This is a hacky way to pass settings to the combined open ended xmodule
     #It needs an S3 interface to upload images to S3
     #It needs the open ended grading interface in order to get peer grading to be done
@@ -226,11 +223,10 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         open_ended_grading_interface['mock_staff_grading'] = settings.MOCK_STAFF_GRADING
         if is_descriptor_combined_open_ended:
             s3_interface = {
-                'access_key' : get_or_default('AWS_ACCESS_KEY_ID',''),
-                'secret_access_key' : get_or_default('AWS_SECRET_ACCESS_KEY',''),
-                'storage_bucket_name' : get_or_default('AWS_STORAGE_BUCKET_NAME','')
+                'access_key' : getattr(settings,'AWS_ACCESS_KEY_ID',''),
+                'secret_access_key' : getattr(settings,'AWS_SECRET_ACCESS_KEY',''),
+                'storage_bucket_name' : getattr(settings,'AWS_STORAGE_BUCKET_NAME','')
             }
-
 
     def inner_get_module(descriptor):
         """
