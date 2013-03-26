@@ -303,6 +303,7 @@ function saveSubsection() {
         data: JSON.stringify({ 'id': id, 'metadata': metadata}),
         success: function () {
             $spinner.delay(500).fadeOut(150);
+            $changedInput = null;
         },
         error: function () {
             showToastMessage('There has been an error while saving your changes.');
