@@ -24,7 +24,7 @@ MAX_ATTEMPTS = 1
 MAX_SCORE = 1
 
 #The highest score allowed for the overall xmodule and for each rubric point
-MAX_SCORE_ALLOWED = 3
+MAX_SCORE_ALLOWED = 50
 
 #If true, default behavior is to score module as a practice problem.  Otherwise, no grade at all is shown in progress
 #Metadata overrides this.
