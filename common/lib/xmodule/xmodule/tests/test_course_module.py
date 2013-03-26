@@ -89,18 +89,19 @@ class IsNewCourseTestCase(unittest.TestCase):
             ((day2, None, None), (day1, None, None), self.assertLess),
             ((day1, None, None), (day1, None, None), self.assertEqual),
 
-            # Non-parseable advertised starts are ignored in preference
-            # to actual starts
-            ((day2, None, "Spring 2013"), (day1, None, "Fall 2012"), self.assertLess),
-            ((day1, None, "Spring 2013"), (day1, None, "Fall 2012"), self.assertEqual),
+            # Non-parseable advertised starts are ignored in preference to actual starts
+            ((day2, None, "Spring"), (day1, None, "Fall"), self.assertLess),
+            ((day1, None, "Spring"), (day1, None, "Fall"), self.assertEqual),
+
+            # Partially parsable advertised starts should take priority over start dates
+            ((day2, None, "October 2013"), (day2, None, "October 2012"), self.assertLess),
+            ((day2, None, "October 2013"), (day1, None, "October 2013"), self.assertEqual),
 
             # Parseable advertised starts take priority over start dates
             ((day1, None, day2), (day1, None, day1), self.assertLess),
             ((day2, None, day2), (day1, None, day2), self.assertEqual),
-
         ]
 
-        data = []
         for a, b, assertion in dates:
             a_score = self.get_dummy_course(start=a[0], announcement=a[1], advertised_start=a[2]).sorting_score
             b_score = self.get_dummy_course(start=b[0], announcement=b[1], advertised_start=b[2]).sorting_score
