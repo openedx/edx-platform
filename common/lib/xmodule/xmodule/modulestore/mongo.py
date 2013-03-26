@@ -366,6 +366,9 @@ class MongoModuleStore(ModuleStoreBase):
                 children.extend(item.get('definition', {}).get('children', []))
                 data[Location(item['location'])] = item
 
+            if depth == 0:
+                break;
+
             # Load all children by id. See
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
