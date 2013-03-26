@@ -207,7 +207,7 @@ def namedtuple_to_son(ntuple, prefix=''):
     """
     son = SON()
     for idx, field_name in enumerate(ntuple._fields):
-        son[prefix + field_name] = namedtuple[idx]
+        son[prefix + field_name] = ntuple[idx]
     return son
 
 
@@ -703,6 +703,9 @@ class MongoModuleStore(ModuleStoreBase):
 
 # DraftModuleStore is first, because it needs to intercept calls to MongoModuleStore
 class DraftMongoModuleStore(DraftModuleStore, MongoModuleStore):
+    """
+    Version of MongoModuleStore with draft capability mixed in
+    """
     """
     Version of MongoModuleStore with draft capability mixed in
     """
