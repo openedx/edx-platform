@@ -7,6 +7,8 @@ import requests
 import time
 from datetime import datetime
 
+import dateutil.parser
+
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time
@@ -150,7 +152,7 @@ class CourseFields(object):
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
-    advertised_start = StringOrDate(help="Date that this course is advertised to start", scope=Scope.settings)
+    advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
     grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", scope=Scope.settings)
@@ -537,10 +539,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         announcement = self.announcement
         if announcement is not None:
             announcement = to_datetime(announcement)
-        if self.advertised_start is None or isinstance(self.advertised_start, basestring):
+
+        try:
+            start = dateutil.parser.parse(self.advertised_start)
+        except (ValueError, AttributeError):
             start = to_datetime(self.start)
-        else:
-            start = to_datetime(self.advertised_start)
+
         now = to_datetime(time.gmtime())
 
         return announcement, start, now
