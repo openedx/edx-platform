@@ -23,6 +23,8 @@ class Date(ModelType):
         """
         if field is None:
             return field
+        elif field is "":
+            return None
         elif isinstance(field, basestring):
             d = dateutil.parser.parse(field)
             return d.utctimetuple()
