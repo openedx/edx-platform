@@ -225,7 +225,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
             s3_interface = {
                 'access_key' : getattr(settings,'AWS_ACCESS_KEY_ID',''),
                 'secret_access_key' : getattr(settings,'AWS_SECRET_ACCESS_KEY',''),
-                'storage_bucket_name' : getattr(settings,'AWS_STORAGE_BUCKET_NAME','')
+                'storage_bucket_name' : getattr(settings,'AWS_STORAGE_BUCKET_NAME','openended')
             }
 
     def inner_get_module(descriptor):
