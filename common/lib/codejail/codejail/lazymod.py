@@ -1,6 +1,7 @@
 """A module proxy for delayed importing of modules.
 
-Lifted from http://barnesc.blogspot.com/2006/06/automatic-python-imports-with-autoimp.html
+From http://barnesc.blogspot.com/2006/06/automatic-python-imports-with-autoimp.html,
+in the public domain.
 
 """
 
