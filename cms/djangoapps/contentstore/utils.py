@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -127,7 +128,7 @@ class UnitState(object):
     public = 'public'
 
 
-def compute_unit_state(unit):
+def compute_unit_state(unit, subsection=None):
     """
     Returns whether this unit is 'draft', 'public', or 'private'.
 
@@ -137,7 +138,8 @@ def compute_unit_state(unit):
     'private' content is editabled and not visible in the LMS
     """
 
-    if unit.cms.is_draft:
+    logging.debug('****** is_draft = {0}'.format(getattr(unit, 'is_draft', False)))
+    if getattr(unit, 'is_draft', False):
         try:
             modulestore('direct').get_item(unit.location)
             return UnitState.draft

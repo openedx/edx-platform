@@ -188,7 +188,7 @@ def course_index(request, org, course, name):
         'coursename': name
     })
 
-    course = modulestore().get_item(location)
+    course = modulestore().get_item(location, depth=3)
     sections = course.get_children()
 
     return render_to_response('overview.html', {

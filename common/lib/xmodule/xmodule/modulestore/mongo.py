@@ -3,7 +3,6 @@ import sys
 import logging
 import copy
 
-from bson.son import SON
 from collections import namedtuple
 from fs.osfs import OSFS
 from itertools import repeat
@@ -18,7 +17,7 @@ from xmodule.error_module import ErrorDescriptor
 from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from xblock.core import Scope
 
-from . import ModuleStoreBase, Location
+from . import ModuleStoreBase, Location, namedtuple_to_son
 from .draft import DraftModuleStore
 from .exceptions import (ItemNotFoundError,
                          DuplicateItemError)
@@ -196,16 +195,6 @@ def location_to_query(location, wildcard=True):
     return query
 
 
-def namedtuple_to_son(namedtuple, prefix=''):
-    """
-    Converts a namedtuple into a SON object with the same key order
-    """
-    son = SON()
-    for idx, field_name in enumerate(namedtuple._fields):
-        son[prefix + field_name] = namedtuple[idx]
-    return son
-
-
 class MongoModuleStore(ModuleStoreBase):
     """
     A Mongodb backed ModuleStore
@@ -372,13 +361,14 @@ class MongoModuleStore(ModuleStoreBase):
             # Load all children by id. See
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
-            if children:
+            if children and depth > 0:
                 query = {
                     '_id': {'$in': [namedtuple_to_son(Location(child)) for child in children]}
                 }
-                to_process = self.collection.find(query)
+                to_process = list(self.collection.find(query))
             else:
-                to_process = []
+                break
+
             # If depth is None, then we just recurse until we hit all the descendents
             if depth is not None:
                 depth -= 1
