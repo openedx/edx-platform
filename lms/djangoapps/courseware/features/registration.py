@@ -1,3 +1,6 @@
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from lettuce import world, step
 from lettuce.django import django_url
 from common import TEST_COURSE_ORG, TEST_COURSE_NAME

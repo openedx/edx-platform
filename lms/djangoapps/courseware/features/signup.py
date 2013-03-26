@@ -1,5 +1,7 @@
-from lettuce import world, step
+#pylint: disable=C0111
+#pylint: disable=W0621
 
+from lettuce import world, step
 
 @step('I fill in "([^"]*)" on the registration form with "([^"]*)"$')
 def when_i_fill_in_field_on_the_registration_form_with_value(step, field, value):

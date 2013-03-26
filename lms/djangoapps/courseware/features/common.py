@@ -1,3 +1,6 @@
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from lettuce import world, step
 from nose.tools import assert_equals, assert_in
 from lettuce.django import django_url
