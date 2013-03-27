@@ -733,7 +733,7 @@ class CapaModule(CapaFields, XModule):
             # the full exception, including traceback,
             # in the response
             if self.system.user_is_staff:
-                msg = traceback.format_exc()
+                msg = "Staff debug info: %s" % traceback.format_exc()
 
             # Otherwise, display just an error message,
             # without a stack trace
