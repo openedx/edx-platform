@@ -17,8 +17,9 @@ class StaticContentServer(object):
             try:
                 loc = StaticContent.get_location_from_path(request.path)
             except InvalidLocationError:
+                # return a 'Bad Request' to browser as we have a malformed Location
                 response = HttpResponse()
-                response.status_code = 404
+                response.status_code = 400
                 return response     
 
             # first look in our cache so we don't have to round-trip to the DB
