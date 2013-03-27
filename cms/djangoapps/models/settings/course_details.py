@@ -1,14 +1,14 @@
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
 import time
+import calendar
 from contentstore.utils import get_modulestore
-from util.converters import jsdate_to_time, time_to_date
 from models.settings import course_grading
 from contentstore.utils import update_item
+from xmodule.fields import Date
 import re
 import logging
 
@@ -81,8 +81,14 @@ class CourseDetails(object):
 
         dirty = False
 
+        # In the descriptor's setter, the date is converted to JSON using Date's to_json method.
+        # Calling to_json on something that is already JSON doesn't work. Since reaching directly
+        # into the model is nasty, convert the JSON Date to a Python date, which is what the
+        # setter expects as input.
+        date = Date()
+
         if 'start_date' in jsondict:
-            converted = jsdate_to_time(jsondict['start_date'])
+            converted = date.from_json(jsondict['start_date'])
         else:
             converted = None
         if converted != descriptor.start:
@@ -90,7 +96,7 @@ class CourseDetails(object):
             descriptor.start = converted
 
         if 'end_date' in jsondict:
-            converted = jsdate_to_time(jsondict['end_date'])
+            converted = date.from_json(jsondict['end_date'])
         else:
             converted = None
 
@@ -99,7 +105,7 @@ class CourseDetails(object):
             descriptor.end = converted
 
         if 'enrollment_start' in jsondict:
-            converted = jsdate_to_time(jsondict['enrollment_start'])
+            converted = date.from_json(jsondict['enrollment_start'])
         else:
             converted = None
 
@@ -108,7 +114,7 @@ class CourseDetails(object):
             descriptor.enrollment_start = converted
 
         if 'enrollment_end' in jsondict:
-            converted = jsdate_to_time(jsondict['enrollment_end'])
+            converted = date.from_json(jsondict['enrollment_end'])
         else:
             converted = None
 
@@ -172,12 +178,20 @@ class CourseDetails(object):
 
 # TODO move to a more general util? Is there a better way to do the isinstance model check?
 class CourseSettingsEncoder(json.JSONEncoder):
+    @staticmethod
+    def time_to_date(time_obj):
+        """
+        Convert a time.time_struct to a true universal time (can pass to js Date
+        constructor)
+        """
+        return calendar.timegm(time_obj) * 1000
+
     def default(self, obj):
         if isinstance(obj, CourseDetails) or isinstance(obj, course_grading.CourseGradingModel):
             return obj.__dict__
         elif isinstance(obj, Location):
             return obj.dict()
         elif isinstance(obj, time.struct_time):
-            return time_to_date(obj)
+            return CourseSettingsEncoder.time_to_date(obj)
         else:
             return JSONEncoder.default(self, obj)
