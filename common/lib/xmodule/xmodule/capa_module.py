@@ -576,7 +576,7 @@ class CapaModule(CapaFields, XModule):
         # save any state changes that may occur
         self.set_state_from_lcp()
         return response
-        
+
 
     def get_answer(self, get):
         '''
@@ -731,7 +731,7 @@ class CapaModule(CapaFields, XModule):
 
             # If the user is a staff member, include
             # the full exception, including traceback,
-            # in the response 
+            # in the response
             if self.system.user_is_staff:
                 msg = traceback.format_exc()
 
@@ -740,7 +740,7 @@ class CapaModule(CapaFields, XModule):
             else:
                 msg = "Error: %s" % str(inst.message)
 
-            return {'success': msg }
+            return {'success': msg}
 
         except Exception, err:
             if self.system.DEBUG:
@@ -792,7 +792,7 @@ class CapaModule(CapaFields, XModule):
         event_info['answers'] = answers
 
         # Too late. Cannot submit
-        if self.closed() and not self.max_attempts ==0:
+        if self.closed() and not self.max_attempts == 0:
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
@@ -812,7 +812,7 @@ class CapaModule(CapaFields, XModule):
 
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"
-        if not self.max_attempts ==0:
+        if not self.max_attempts == 0:
             msg += " but not graded. Hit 'Check' to grade them."
         return {'success': True,
                 'msg': msg}

@@ -1141,9 +1141,9 @@ def sympy_check2():
                     correct = []
                     messages = []
                     for input_dict in input_list:
-                        correct.append('correct' 
+                        correct.append('correct'
                                 if input_dict['ok'] else 'incorrect')
-                        msg = (self.clean_message_html(input_dict['msg']) 
+                        msg = (self.clean_message_html(input_dict['msg'])
                                 if 'msg' in input_dict else None)
                         messages.append(msg)
 
@@ -1168,7 +1168,7 @@ def sympy_check2():
         correct_map.set_overall_message(overall_message)
 
         for k in range(len(idset)):
-            npoints = (self.maxpoints[idset[k]] 
+            npoints = (self.maxpoints[idset[k]]
                     if correct[k] == 'correct' else 0)
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
@@ -2085,7 +2085,7 @@ class AnnotationResponse(LoncapaResponse):
             option_scoring = dict([(option['id'], {
                     'correctness': choices.get(option['choice']),
                     'points': scoring.get(option['choice'])
-                }) for option in self._find_options(inputfield) ])
+                }) for option in self._find_options(inputfield)])
 
             scoring_map[inputfield.get('id')] = option_scoring
 
