@@ -516,11 +516,8 @@ class CapaModuleTest(unittest.TestCase):
             result = module.check_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            self.assertTrue('test error' in result['success'])
-
-            # We do NOT include traceback information for
-            # a non-staff user
-            self.assertFalse('Traceback' in result['success'])
+            expected_msg = 'Error: Problem could not be evaluated with your input'
+            self.assertEqual(expected_msg, result['success'])
 
         # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)

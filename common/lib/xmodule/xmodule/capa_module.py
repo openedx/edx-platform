@@ -735,10 +735,10 @@ class CapaModule(CapaFields, XModule):
             if self.system.user_is_staff:
                 msg = traceback.format_exc()
 
-            # Otherwise, display just the error message,
+            # Otherwise, display just an error message,
             # without a stack trace
             else:
-                msg = inst.message
+                msg = "Error: Problem could not be evaluated with your input"
 
             return {'success': msg }
 
