@@ -267,8 +267,13 @@ class MongoModuleStore(ModuleStoreBase):
                     '_id.course': location.course,
                     '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical']}
                 }
-        # we just want the Location, children, and metadata
-        record_filter = {'_id': 1, 'definition.children': 1, 'metadata': 1}
+        # we just want the Location, children, and inheritable metadata
+        record_filter = {'_id': 1, 'definition.children': 1}
+
+        # just get the inheritable metadata since that is all we need for the computation
+        # this minimizes both data pushed over the wire
+        for attr in INHERITABLE_METADATA:
+            record_filter['metadata.{0}'.format(attr)] = 1
 
         # call out to the DB
         resultset = self.collection.find(query, record_filter)
