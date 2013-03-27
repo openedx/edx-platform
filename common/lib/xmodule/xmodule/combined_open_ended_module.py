@@ -6,9 +6,10 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float, List
+from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
+from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
 
 log = logging.getLogger("mitx.courseware")
 
@@ -68,6 +69,7 @@ class CombinedOpenEndedFields(object):
                          scope=Scope.settings)
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
+    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):

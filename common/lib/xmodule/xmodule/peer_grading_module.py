@@ -13,6 +13,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from .timeinfo import TimeInfo
 from xblock.core import Object, Integer, Boolean, String, Scope
+from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
 
@@ -26,7 +27,6 @@ IS_GRADED = True
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
 
-
 class PeerGradingFields(object):
     use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.", default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
     link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION, scope=Scope.settings)
@@ -35,6 +35,7 @@ class PeerGradingFields(object):
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
     max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE, scope=Scope.settings)
     student_data_for_location = Object(help="Student data for a given peer grading problem.", default=json.dumps({}),scope=Scope.student_state)
+    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
 
 
 class PeerGradingModule(PeerGradingFields, XModule):

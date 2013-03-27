@@ -7,6 +7,7 @@ metadata:
     display_name: Open Ended Response
     skip_spelling_checks: False
     accept_file_upload: False
+    weight: ""
 data: |
   <combinedopenended>
   	<rubric>
