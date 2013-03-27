@@ -24,7 +24,7 @@ MAX_ATTEMPTS = 1
 MAX_SCORE = 1
 
 #The highest score allowed for the overall xmodule and for each rubric point
-MAX_SCORE_ALLOWED = 3
+MAX_SCORE_ALLOWED = 50
 
 #If true, default behavior is to score module as a practice problem.  Otherwise, no grade at all is shown in progress
 #Metadata overrides this.
@@ -363,7 +363,15 @@ class CombinedOpenEndedV1Module():
         """
         self.update_task_states()
         html = self.current_task.get_html(self.system)
-        return_html = rewrite_links(html, self.rewrite_content_links)
+        return_html = html
+        try:
+            #Without try except block, get this error:
+            # File "/home/vik/mitx_all/mitx/common/lib/xmodule/xmodule/x_module.py", line 263, in rewrite_content_links
+            # if link.startswith(XASSET_SRCREF_PREFIX):
+            # Placing try except so that if the error is fixed, this code will start working again.
+            return_html = rewrite_links(html, self.rewrite_content_links)
+        except:
+            pass
         return return_html
 
     def get_current_attributes(self, task_number):
@@ -782,7 +790,7 @@ class CombinedOpenEndedV1Descriptor():
     template_dir_name = "combinedopenended"
 
     def __init__(self, system):
-        self.system =system
+        self.system = system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
