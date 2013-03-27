@@ -18,9 +18,11 @@
         <li class="nav-item nav-peripheral-help">
           <a href="http://help.edge.edx.org/" rel="external"><i class="ss-icon ss-symbolicons-block icon-help">&#xEE11;</i> edX Studio Help</a>
         </li>
+        % if user.is_authenticated():
         <li class="nav-item nav-peripheral-feedback">
           <a class="show-tender" href="http://help.edge.edx.org/discussion/new" title="Use our feedback tool, Tender, to share your feedback"><i class="ss-icon ss-symbolicons-block icon-feedback">&#xE398;</i> Provide Feedback</a>
-        </li>        
+        </li>
+        % endif    
         <li class="nav-item nav-peripheral-contact">
           <a href="https://www.edx.org/contact" rel="external"><i class="ss-icon ss-symbolicons-block icon-contact">&#x2709;</i> Contact edX</a>
         </li>
