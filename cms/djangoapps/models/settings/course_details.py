@@ -178,20 +178,12 @@ class CourseDetails(object):
 
 # TODO move to a more general util? Is there a better way to do the isinstance model check?
 class CourseSettingsEncoder(json.JSONEncoder):
-    @staticmethod
-    def time_to_date(time_obj):
-        """
-        Convert a time.time_struct to a true universal time (can pass to js Date
-        constructor)
-        """
-        return calendar.timegm(time_obj) * 1000
-
     def default(self, obj):
         if isinstance(obj, CourseDetails) or isinstance(obj, course_grading.CourseGradingModel):
             return obj.__dict__
         elif isinstance(obj, Location):
             return obj.dict()
         elif isinstance(obj, time.struct_time):
-            return CourseSettingsEncoder.time_to_date(obj)
+            return Date().to_json(obj)
         else:
             return JSONEncoder.default(self, obj)
