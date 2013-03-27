@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
 from requests.auth import HTTPBasicAuth
@@ -449,10 +449,10 @@ def modx_dispatch(request, dispatch, location, course_id):
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
 
-    # For XModule-specific errors, we respond with 404
+    # For XModule-specific errors, we respond with 400
     except ProcessingError:
         log.exception("Module encountered an error while prcessing AJAX call")
-        raise Http404
+        return HttpResponseBadRequest()
 
     # If any other error occurred, re-raise it to trigger a 500 response
     except:

@@ -461,7 +461,7 @@ class CapaModule(CapaFields, XModule):
 
         except Exception as err:
             _, _, traceback_obj = sys.exc_info()
-            raise ProcessingError, ProcessingError(err.message), traceback_obj
+            raise ProcessingError, err.message, traceback_obj
 
         after = self.get_progress()
         d.update({

@@ -455,7 +455,7 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
 
     except ProcessingError:
         log.exception("Module raised an error while processing AJAX request")
-        raise Http404
+        return HttpResponseBadRequest()
 
     except:
         log.exception("error processing ajax call")
