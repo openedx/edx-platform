@@ -36,6 +36,10 @@ class ResponseTest(unittest.TestCase):
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness)
 
+    def assert_answer_format(self, problem):
+        answers = problem.get_question_answers()
+        self.assertTrue(answers['1_2_1'] is not None)
+
     def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):
         for input_str in correct_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
@@ -165,6 +169,13 @@ class ImageResponseTest(ResponseTest):
         correct_inputs = ["[13,12]", "[110,112]"]
         incorrect_inputs = ["[0,0]", "[600,300]"]
         self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
+
+    def test_show_answer(self):
+        rectangle_str = "(100,100)-(200,200)"
+        region_str = "[[10,10], [20,10], [20, 30]]"
+
+        problem = self.build_problem(regions=region_str, rectangle=rectangle_str)
+        self.assert_answer_format(problem)
 
 
 class SymbolicResponseTest(unittest.TestCase):
