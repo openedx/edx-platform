@@ -24,7 +24,6 @@ MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg i
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 
 
-
 WIKI_ENABLED = True
 
 LOGGING = get_logger_config(ENV_ROOT / "log",
@@ -143,7 +142,7 @@ if os.path.isdir(DATA_DIR):
 
 MITX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
 
-################################# Open ended grading config  #####################
+############################ Open ended grading config  #####################
 
 OPEN_ENDED_GRADING_INTERFACE = {
     'url' : 'http://127.0.0.1:3033/',
@@ -154,7 +153,7 @@ OPEN_ENDED_GRADING_INTERFACE = {
     'grading_controller' : 'grading_controller'
 }
 
-################################ LMS Migration #################################
+############################## LMS Migration ##################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
 MITX_FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.mitx.mit.edu/xqa'
@@ -173,7 +172,7 @@ INSTALLED_APPS += ('django_openid_auth',)
 
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
-OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'  	# TODO: accept more endpoints
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'  # TODO: accept more endpoints
 OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
@@ -208,7 +207,7 @@ DEBUG_TOOLBAR_PANELS = (
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False
 }
-############################ FILE UPLOADS (for discussion forums) #############################
+#################### FILE UPLOADS (for discussion forums) #####################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
