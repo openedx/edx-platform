@@ -27,16 +27,16 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then the policy key value is changed
 
-  Scenario: Test how multi -line input appears
+  Scenario: Test how multi-line input appears
     Given I am on the Advanced Course Settings page in Studio
     When I create a JSON object as a value
     Then it is displayed as formatted
     And I reload the page
     Then it is displayed as formatted
 
-  Scenario: Test automatic quoting of non -JSON values
+  Scenario: Test automatic quoting of non-JSON values
     Given I am on the Advanced Course Settings page in Studio
-    When I create a non -JSON value not in quotes
+    When I create a non-JSON value not in quotes
     Then it is displayed as a string
     And I reload the page
     Then it is displayed as a string
