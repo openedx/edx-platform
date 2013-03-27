@@ -8,6 +8,7 @@ from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponse
@@ -411,6 +412,9 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Check parameters and fail fast if there's a problem
     if not Location.is_valid(location):
         raise Http404("Invalid location")
+
+    if not request.user.is_authenticated():
+        raise PermissionDenied
 
     # Check for submitted files and basic file size checks
     p = request.POST.copy()
