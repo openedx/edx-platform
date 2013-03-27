@@ -17,6 +17,7 @@ import logging
 import numbers
 import numpy
 import os
+import sys
 import random
 import re
 import requests
@@ -1233,9 +1234,9 @@ def sympy_check2():
         log.debug(msg, exc_info=True)
         log.debug(traceback.format_exc())
 
-        # Notify student
-        raise StudentInputError(
-            "Error: Problem could not be evaluated with your input")
+        # Notify student with a student input error
+        _, _, traceback_obj = sys.exc_info()
+        raise StudentInputError, StudentInputError(err.message), traceback_obj
 
 #-----------------------------------------------------------------------------
 

@@ -505,6 +505,9 @@ class CapaModuleTest(unittest.TestCase):
     def test_check_problem_student_input_error(self):
         module = CapaFactory.create(attempts=1)
 
+        # Ensure that the user is NOT staff
+        module.system.user_is_staff = False
+
         # Simulate a student input exception
         with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
             mock_grade.side_effect = capa.responsetypes.StudentInputError('test error')
@@ -515,10 +518,32 @@ class CapaModuleTest(unittest.TestCase):
             # Expect an AJAX alert message in 'success'
             self.assertTrue('test error' in result['success'])
 
+            # We do NOT include traceback information for
+            # a non-staff user
+            self.assertFalse('Traceback' in result['success'])
+
         # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)
 
+    def test_check_problem_student_input_error_with_staff_user(self):
+        module = CapaFactory.create(attempts=1)
 
+        # Ensure that the user IS staff
+        module.system.user_is_staff = True
+
+        # Simulate a student input exception
+        with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+            mock_grade.side_effect = capa.responsetypes.StudentInputError('test error')
+
+            get_request_dict = { CapaFactory.input_key(): '3.14'}
+            result = module.check_problem(get_request_dict)
+
+            # Expect an AJAX alert message in 'success'
+            self.assertTrue('test error' in result['success'])
+
+            # We DO include traceback information for staff users
+            self.assertTrue('Traceback' in result['success'])
+        
     def test_reset_problem(self):
         module = CapaFactory.create(done=True)
         module.new_lcp = Mock(wraps=module.new_lcp)

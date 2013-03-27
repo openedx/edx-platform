@@ -725,9 +725,23 @@ class CapaModule(CapaFields, XModule):
         try:
             correct_map = self.lcp.grade_answers(answers)
             self.set_state_from_lcp()
+
         except StudentInputError as inst:
             log.exception("StudentInputError in capa_module:problem_check")
-            return {'success': inst.message}
+
+            # If the user is a staff member, include
+            # the full exception, including traceback,
+            # in the response 
+            if self.system.user_is_staff:
+                msg = traceback.format_exc()
+
+            # Otherwise, display just the error message,
+            # without a stack trace
+            else:
+                msg = inst.message
+
+            return {'success': msg }
+
         except Exception, err:
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
