@@ -325,7 +325,12 @@ def change_enrollment(request):
                               "course:{0}".format(course_num),
                               "run:{0}".format(run)])
 
-        enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        try:
+            enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        except IntegrityError:
+            # If we've already created this enrollment in a separate transaction,
+            # then just continue
+            pass
         return {'success': True}
 
     elif action == "unenroll":
