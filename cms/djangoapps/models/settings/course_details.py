@@ -4,7 +4,6 @@ from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
 import time
-import calendar
 from contentstore.utils import get_modulestore
 from models.settings import course_grading
 from contentstore.utils import update_item
