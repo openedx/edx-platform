@@ -5,6 +5,7 @@ from django.http import HttpResponse, Http404, HttpResponseNotModified
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
+from xmodule.modulestore import InvalidLocationError
 from cache_toolbox.core import get_cached_content, set_cached_content
 from xmodule.exceptions import NotFoundError
 
@@ -13,7 +14,14 @@ class StaticContentServer(object):
     def process_request(self, request):
         # look to see if the request is prefixed with 'c4x' tag
         if request.path.startswith('/' + XASSET_LOCATION_TAG + '/'):
-            loc = StaticContent.get_location_from_path(request.path)
+            try:
+                loc = StaticContent.get_location_from_path(request.path)
+            except InvalidLocationError:
+                # return a 'Bad Request' to browser as we have a malformed Location
+                response = HttpResponse()
+                response.status_code = 400
+                return response     
+
             # first look in our cache so we don't have to round-trip to the DB
             content = get_cached_content(loc)
             if content is None:

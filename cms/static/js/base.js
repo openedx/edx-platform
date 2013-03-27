@@ -81,7 +81,7 @@ $(document).ready(function () {
     });
 
     // general link management - smooth scrolling page links
-    $('a[rel*="view"]').bind('click', linkSmoothScroll);
+    $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
 
     // toggling overview section details
@@ -148,7 +148,7 @@ $(document).ready(function () {
     });
 });
 
-function linkSmoothScroll(e) {
+function smoothScrollLink(e) {
     (e).preventDefault();
 
     $.smoothScroll({ 

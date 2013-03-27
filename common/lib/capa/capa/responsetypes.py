@@ -1961,9 +1961,10 @@ class ImageResponse(LoncapaResponse):
         self.ielements = self.inputfields
         self.answer_ids = [ie.get('id') for ie in self.ielements]
 
+
     def get_score(self, student_answers):
         correct_map = CorrectMap()
-        expectedset = self.get_answers()
+        expectedset = self.get_mapped_answers()
         for aid in self.answer_ids:  # loop through IDs of <imageinput>
         #  fields in our stanza
             given = student_answers[
@@ -2018,11 +2019,42 @@ class ImageResponse(LoncapaResponse):
                             break
         return correct_map
 
-    def get_answers(self):
-        return (
+    def get_mapped_answers(self):
+        '''
+        Returns the internal representation of the answers
+
+        Input:
+            None
+        Returns:
+            tuple (dict, dict) -
+                rectangles (dict) - a map of inputs to the defined rectangle for that input
+                regions (dict) - a map of inputs to the defined region for that input
+        '''
+        answers =  (
             dict([(ie.get('id'), ie.get(
                 'rectangle')) for ie in self.ielements]),
             dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
+        return answers
+
+    def get_answers(self):
+        '''
+        Returns the external representation of the answers
+
+        Input:
+            None
+        Returns:
+            dict (str, (str, str)) - a map of inputs to a tuple of their rectange
+                and their regions
+        '''
+        answers = {}
+        for ie in self.ielements:
+            ie_id = ie.get('id')
+            answers[ie_id] = (ie.get('rectangle'), ie.get('regions'))
+
+        return answers
+            
+
+
 #-----------------------------------------------------------------------------
 
 
@@ -2087,8 +2119,8 @@ class AnnotationResponse(LoncapaResponse):
             correct_option = self._find_option_with_choice(
                 inputfield, 'correct')
             if correct_option is not None:
-                answer_map[inputfield.get(
-                    'id')] = correct_option.get('description')
+                input_id = inputfield.get('id')
+                answer_map[input_id] = correct_option.get('description')
         return answer_map
 
     def _get_max_points(self):
