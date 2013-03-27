@@ -342,14 +342,6 @@ class TestCoursesLoadTestCase_XmlModulestore(PageLoaderTestCase):
 
         self.check_random_page_loads(module_store)
 
-    def test_full_course_loads(self):
-        module_store = XMLModuleStore(TEST_DATA_DIR,
-                                      default_class='xmodule.hidden_module.HiddenDescriptor',
-                                      course_dirs=['full'],
-                                      load_error_modules=True,
-        )
-        self.check_random_page_loads(module_store)
-
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
@@ -365,10 +357,6 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
         import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
         self.check_random_page_loads(module_store)
 
-    def test_full_course_loads(self):
-        module_store = modulestore()
-        import_from_xml(module_store, TEST_DATA_DIR, ['full'])
-        self.check_random_page_loads(module_store)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
