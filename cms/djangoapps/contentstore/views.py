@@ -42,7 +42,7 @@ from xmodule.modulestore.mongo import MongoUsage
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, ProcessingError
 from functools import partial
 
 from xmodule.contentstore.django import contentstore
@@ -448,9 +448,15 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, request.POST)
+
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
+
+    except ProcessingError:
+        log.exception("Module raised an error while processing AJAX request")
+        raise Http404
+
     except:
         log.exception("error processing ajax call")
         raise
