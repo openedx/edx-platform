@@ -1,0 +1,18 @@
+// studio - elements - sock
+// ====================
+
+.wrapper-sock {
+  margin: 0;
+  padding: $baseline $baseline $footer-primary-height $baseline;
+  position: relative;
+  width: 100%;
+
+  .sock {
+    @include clearfix();
+    @include font-size(13);
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto ($baseline*2) auto;
+  }
+}

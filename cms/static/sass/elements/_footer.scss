@@ -2,10 +2,14 @@
 // ====================
 
 .wrapper-footer {
-  margin: ($baseline*1.5) 0 $baseline 0;
+  @include box-shadow(inset 0 1px 2px $shadow-d1);
+  margin: ($baseline*1.5) 0 0 0;
   padding: $baseline;
-  position: relative;
+  position: absolute;
+  bottom: 0;
   width: 100%;
+  height: $footer-primary-height;
+  background: $gray-l3;
 
   footer.primary {
     @include clearfix();
@@ -14,14 +18,20 @@
     min-width: $fg-min-width;
     width: flex-grid(12);
     margin: 0 auto;
-    padding-top: $baseline;
-    border-top: 1px solid $gray-l4;
-    color: $gray-l2;
+    color: $gray-l1;
 
     .colophon {
       width: flex-grid(4, 12);
       float: left;
       margin-right: flex-gutter(2);
+    }
+
+    a {
+      color: $gray;
+
+      &:hover, &:active {
+        color: $gray-d2;
+      }
     }
 
     .nav-peripheral {
@@ -36,14 +46,32 @@
         &:last-child {
           margin-right: 0;
         }
-      }
-    }
 
-    a {
-      color: $gray-l1;
+        a {
+          @include border-radius(2px);
+          padding: ($baseline/2) ($baseline*0.75);
+          background: transparent;
 
-      &:hover, &:active {
-        color: $blue;
+          .ss-icon {
+            @include transition(top .25s ease-in-out .25s);
+            @include font-size(15);
+            position: relative;
+            top: 0;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: ($baseline/4);
+            color: $gray-l1;
+          }
+
+          &:hover, &:active {
+            color: $gray-d2;
+
+            .ss-icon {
+              top: -($baseline/10);
+              color: $gray-d2;
+            }
+          }
+        }
       }
     }
   }

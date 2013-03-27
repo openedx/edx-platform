@@ -12,6 +12,9 @@ $fg-max-columns: 12;
 $fg-max-width: 1280px;
 $fg-min-width: 900px;
 
+// elements
+$footer-primary-height: ($baseline*3);
+
 // type
 $sans-serif: 'Open Sans', $verdana;
 $body-line-height: golden-ratio(.875em, 1);
@@ -57,6 +60,10 @@ $blue-s3: saturate($blue,45%);
 $blue-u1: desaturate($blue,15%);
 $blue-u2: desaturate($blue,30%);
 $blue-u3: desaturate($blue,45%);
+$blue-t0: rgba(85, 151, 221,0.125);
+$blue-t1: rgba(85, 151, 221,0.25);
+$blue-t2: rgba(85, 151, 221,0.50);
+$blue-t3: rgba(85, 151, 221,0.75);
 
 $pink: rgb(183, 37, 103);
 $pink-l1: tint($pink,20%);
