@@ -213,6 +213,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
             self.assertEqual(resp.status_code, 200)
 
+    def test_bad_contentstore_request(self):
+        resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
+        self.assertEqual(resp.status_code, 400)
+
     def test_delete_course(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
