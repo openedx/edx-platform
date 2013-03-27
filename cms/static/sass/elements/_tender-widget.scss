@@ -9,6 +9,7 @@
 #tender_window {
   @include border-radius(3px);
   @include box-shadow(0 2px 3px $shadow);
+  height: 650px !important;
   background: $white !important;
   border: 1px solid $gray;
 }
@@ -72,7 +73,7 @@
 
 .widget-layout .flash {
   margin: -10px 0 15px 0;
-  padding: 5px 10px !important;
+  padding: 10px 20px !important;
   background-image: none !important;
 }
 
