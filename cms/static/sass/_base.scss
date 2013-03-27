@@ -56,6 +56,14 @@ h1 {
   min-height: 100%;
 }
 
+.wrapper-main {
+  padding-bottom: $footer-primary-height;
+}
+
+.js.footer-is-expanded .wrapper-main {
+  padding-bottom: ($footer-primary-height*4);
+}
+
 // layout - basic page header
 .wrapper-mast {
   margin: 0;

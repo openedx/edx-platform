@@ -34,10 +34,10 @@ $(document).ready(function () {
         $(this).select();
     });
 
+    $('body').addClass('js');
+
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
-
-    $('body').addClass('js');
 
     // lean/simple modal
     $('a[rel*=modal]').leanModal({overlay : 0.80, closeButton: '.action-modal-close' });
@@ -86,6 +86,8 @@ $(document).ready(function () {
     // tender feedback window scrolling
     $('a.show-tender').bind('click', smoothScrollTop);
 
+    // toggling footer additional support
+    $('.show-support').bind('click', toggleSupport);
 
     // toggling overview section details
     $(function () {
@@ -454,6 +456,11 @@ function onKeyUp(e) {
     if (e.which == 87) {
         $body.toggleClass('show-wip hide-wip');
     }
+}
+
+function toggleSupport(e) {
+   e.preventDefault();
+   $body.toggleClass('footer-is-expanded');
 }
 
 function toggleSubmodules(e) {

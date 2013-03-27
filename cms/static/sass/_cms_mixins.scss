@@ -110,6 +110,21 @@
 	}
 }
 
+@mixin gray-button {
+	@include button;
+	border: 1px solid $gray-d1;
+	border-radius: 3px;
+	@include linear-gradient(top, $white-t1, rgba(255, 255, 255, 0));
+	background-color: $gray-d2;
+	@include box-shadow(0 1px 0 $white-t1 inset);
+	color: $gray-l3;
+
+	&:hover {
+		background-color: $gray-d3;
+		color: $white;
+	}
+}
+
 @mixin green-button {
 	@include button;
 	border: 1px solid $darkGreen;

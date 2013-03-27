@@ -53,8 +53,9 @@
 
     <div class="wrapper-view wrapper">
         <%include file="widgets/header.html" />
-        <%block name="content"></%block>
-        <%include file="widgets/sock.html" />
+        <div class="wrapper-main wrapper">
+            <%block name="content"></%block>            
+        </div>
         <%include file="widgets/footer.html" />
     </div>
 
