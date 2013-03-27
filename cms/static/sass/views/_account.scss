@@ -71,7 +71,7 @@ body.signup, body.signin {
           @include blue-button;
           @include transition(all .15s);
           @include font-size(15);
-          display:block;
+          display: block;
           width: 100%;
           padding: ($baseline*0.75) ($baseline/2);
           font-weight: 600;

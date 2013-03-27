@@ -357,7 +357,8 @@ h1 {
 // layout - grandfathered
 .main-wrapper {
   position: relative;
-  margin: 40px;
+  margin: ($baseline*2);
+  padding-bottom: $footer-primary-height;
 }
 
 .inner-wrapper {
