@@ -2,16 +2,16 @@ from mock import MagicMock
 import json
 
 from django.http import Http404, HttpResponse
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
-import courseware.module_render as render
 from xmodule.modulestore.django import modulestore
-from courseware.tests.tests import PageLoader
+import courseware.module_render as render
+from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.model_data import ModelDataCache
 
 from .factories import UserFactory
@@ -38,7 +38,7 @@ TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class ModuleRenderTestCase(PageLoader):
+class ModuleRenderTestCase(LoginEnrollmentTestCase):
     def setUp(self):
         self.location = ['i4x', 'edX', 'toy', 'chapter', 'Overview']
         self.course_id = 'edX/toy/2012_Fall'
@@ -54,10 +54,9 @@ class ModuleRenderTestCase(PageLoader):
         mock_request = MagicMock()
         mock_request.FILES.keys.return_value = ['file_id']
         mock_request.FILES.getlist.return_value = ['file'] * (settings.MAX_FILEUPLOADS_PER_INPUT + 1)
-        self.assertEquals(render.modx_dispatch(mock_request, 'dummy', self.location,
-                                          'dummy').content,
-                         json.dumps({'success': 'Submission aborted! Maximum %d files may be submitted at once' %
-                                     settings.MAX_FILEUPLOADS_PER_INPUT}))
+        self.assertEquals(render.modx_dispatch(mock_request, 'dummy', self.location, 'dummy').content,
+                          json.dumps({'success': 'Submission aborted! Maximum %d files may be submitted at once' %
+                                      settings.MAX_FILEUPLOADS_PER_INPUT}))
         mock_request_2 = MagicMock()
         mock_request_2.FILES.keys.return_value = ['file_id']
         inputfile = Stub()
@@ -68,7 +67,7 @@ class ModuleRenderTestCase(PageLoader):
         self.assertEquals(render.modx_dispatch(mock_request_2, 'dummy', self.location,
                                                'dummy').content,
                           json.dumps({'success': 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
-                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))}))
+                                      (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))}))
         mock_request_3 = MagicMock()
         mock_request_3.POST.copy.return_value = {}
         mock_request_3.FILES = False
@@ -79,10 +78,10 @@ class ModuleRenderTestCase(PageLoader):
         self.assertRaises(ItemNotFoundError, render.modx_dispatch,
                           mock_request_3, 'dummy', self.location, 'toy')
         self.assertRaises(Http404, render.modx_dispatch, mock_request_3, 'dummy',
-                            self.location, self.course_id)
+                          self.location, self.course_id)
         mock_request_3.POST.copy.return_value = {'position': 1}
         self.assertIsInstance(render.modx_dispatch(mock_request_3, 'goto_position',
-                            self.location, self.course_id), HttpResponse)
+                                                   self.location, self.course_id), HttpResponse)
 
     def test_get_score_bucket(self):
         self.assertEquals(render.get_score_bucket(0, 10), 'incorrect')
@@ -124,19 +123,19 @@ class TestTOC(TestCase):
             self.toy_course.id, self.portal_user, self.toy_course, depth=2)
 
         expected = ([{'active': True, 'sections':
-                    [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
-                    'format': u'Lecture Sequence', 'due': '', 'active': False},
-                    {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
-                    'format': '', 'due': '', 'active': False},
-                    {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
-                    'format': '', 'due': '', 'active': False},
-                    {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
-                    'format': '', 'due': '', 'active': False}],
-                    'url_name': 'Overview', 'display_name': u'Overview'},
-                    {'active': False, 'sections':
-                    [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
-                    'format': '', 'due': '', 'active': False}],
-                    'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
+                      [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
+                        'format': u'Lecture Sequence', 'due': '', 'active': False},
+                       {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
+                        'format': '', 'due': '', 'active': False},
+                       {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
+                        'format': '', 'due': '', 'active': False},
+                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
+                        'format': '', 'due': '', 'active': False}],
+                      'url_name': 'Overview', 'display_name': u'Overview'},
+                     {'active': False, 'sections':
+                      [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
+                        'format': '', 'due': '', 'active': False}],
+                      'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
         self.assertEqual(expected, actual)
@@ -151,19 +150,19 @@ class TestTOC(TestCase):
             self.toy_course.id, self.portal_user, self.toy_course, depth=2)
 
         expected = ([{'active': True, 'sections':
-                    [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
-                    'format': u'Lecture Sequence', 'due': '', 'active': False},
-                    {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
-                    'format': '', 'due': '', 'active': True},
-                    {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
-                    'format': '', 'due': '', 'active': False},
-                    {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
-                    'format': '', 'due': '', 'active': False}],
-                    'url_name': 'Overview', 'display_name': u'Overview'},
-                    {'active': False, 'sections':
-                    [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
-                    'format': '', 'due': '', 'active': False}],
-                    'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
+                      [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
+                        'format': u'Lecture Sequence', 'due': '', 'active': False},
+                       {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
+                        'format': '', 'due': '', 'active': True},
+                       {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
+                        'format': '', 'due': '', 'active': False},
+                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
+                        'format': '', 'due': '', 'active': False}],
+                      'url_name': 'Overview', 'display_name': u'Overview'},
+                     {'active': False, 'sections':
+                      [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
+                        'format': '', 'due': '', 'active': False}],
+                      'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, model_data_cache)
         self.assertEqual(expected, actual)
