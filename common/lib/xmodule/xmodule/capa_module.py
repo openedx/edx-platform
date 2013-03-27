@@ -735,7 +735,8 @@ class CapaModule(CapaFields, XModule):
             self.set_state_from_lcp()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
-            log.exception("StudentInputError in capa_module:problem_check")
+            log.warning("StudentInputError in capa_module:problem_check",
+                        exc_info=True)
 
             # If the user is a staff member, include
             # the full exception, including traceback,

@@ -451,7 +451,8 @@ def modx_dispatch(request, dispatch, location, course_id):
 
     # For XModule-specific errors, we respond with 400
     except ProcessingError:
-        log.exception("Module encountered an error while prcessing AJAX call")
+        log.warning("Module encountered an error while prcessing AJAX call",
+                    exc_info=True)
         return HttpResponseBadRequest()
 
     # If any other error occurred, re-raise it to trigger a 500 response
