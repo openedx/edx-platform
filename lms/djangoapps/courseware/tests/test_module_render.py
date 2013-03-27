@@ -2,6 +2,7 @@ from mock import MagicMock
 import json
 
 from django.http import Http404, HttpResponse
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
