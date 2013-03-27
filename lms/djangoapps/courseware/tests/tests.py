@@ -1,6 +1,8 @@
 import logging
 import json
 import time
+import random
+
 from urlparse import urlsplit, urlunsplit
 
 from django.contrib.auth.models import User, Group
@@ -242,7 +244,6 @@ class LoginEnrollmentTestCase(TestCase):
                          "got code {0} for url '{1}'. Expected code {2}".format(resp.status_code, url, code))
         return resp
 
-
 class ActivateLoginTest(LoginEnrollmentTestCase):
     '''Test logging in and logging out'''
     def setUp(self):
@@ -260,8 +261,10 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
 class PageLoaderTestCase(LoginEnrollmentTestCase):
     ''' Base class that adds a function to load all pages in a modulestore '''
 
-    def check_pages_load(self, module_store):
-        """Make all locations in course load"""
+    def check_random_page_loads(self, module_store):
+        '''
+        Choose a page in the course randomly, and assert that it loads
+        '''
        # enroll in the course before trying to access pages
         courses = module_store.get_courses()
         self.assertEqual(len(courses), 1)
@@ -269,77 +272,57 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         self.enroll(course)
         course_id = course.id
 
-        num = 0
-        num_bad = 0
-        all_ok = True
+        descriptor = random.choice(module_store.get_items(
+                                Location(None, None, None, None, None)))
 
-        for descriptor in module_store.get_items(
-                Location(None, None, None, None, None)):
 
-            num += 1
-            print "Checking ", descriptor.location.url()
+        # We have ancillary course information now as modules 
+        # and we can't simply use 'jump_to' to view them
+        if descriptor.location.category == 'about':
+            self._assert_loads('about_course', 
+                                {'course_id': course_id},
+                                descriptor)
 
-            # We have ancillary course information now as modules and we can't simply use 'jump_to' to view them
-            if descriptor.location.category == 'about':
-                resp = self.client.get(reverse('about_course', kwargs={'course_id': course_id}))
-                msg = str(resp.status_code)
+        elif descriptor.location.category == 'static_tab':
+            kwargs = {'course_id': course_id, 
+                    'tab_slug': descriptor.location.name}
+            self._assert_loads('static_tab', kwargs, descriptor)
 
-                if resp.status_code != 200:
-                    msg = "ERROR " + msg
-                    all_ok = False
-                    num_bad += 1
-            elif descriptor.location.category == 'static_tab':
-                resp = self.client.get(reverse('static_tab', kwargs={'course_id': course_id, 'tab_slug': descriptor.location.name}))
-                msg = str(resp.status_code)
+        elif descriptor.location.category == 'course_info':
+            self._assert_loads('info', kwargs={'course_id': course_id}, 
+                                descriptor)
 
-                if resp.status_code != 200:
-                    msg = "ERROR " + msg
-                    all_ok = False
-                    num_bad += 1
-            elif descriptor.location.category == 'course_info':
-                resp = self.client.get(reverse('info', kwargs={'course_id': course_id}))
-                msg = str(resp.status_code)
+        elif descriptor.location.category == 'custom_tag_template':
+            pass
 
-                if resp.status_code != 200:
-                    msg = "ERROR " + msg
-                    all_ok = False
-                    num_bad += 1
-            elif descriptor.location.category == 'custom_tag_template':
-                pass
-            else:
-                #print descriptor.__class__, descriptor.location
-                resp = self.client.get(reverse('jump_to',
-                                       kwargs={'course_id': course_id,
-                                               'location': descriptor.location.url()}), follow=True)
-                msg = str(resp.status_code)
+        else:
 
-                if resp.status_code != 200:
-                    msg = "ERROR " + msg + ": " + descriptor.location.url()
-                    all_ok = False
-                    num_bad += 1
-                elif resp.redirect_chain[0][1] != 302:
-                    msg = "ERROR on redirect from " + descriptor.location.url()
-                    all_ok = False
-                    num_bad += 1
+            kwargs = {'course_id': course_id,
+                   'location': descriptor.location.url()}
 
-                # check content to make sure there were no rendering failures
-                content = resp.content
-                if content.find("this module is temporarily unavailable") >= 0:
-                    msg = "ERROR unavailable module "
-                    all_ok = False
-                    num_bad += 1
-                elif isinstance(descriptor, ErrorDescriptor):
-                    msg = "ERROR error descriptor loaded: "
-                    msg = msg + descriptor.error_msg
-                    all_ok = False
-                    num_bad += 1
+            self._assert_loads('jump_to', kwargs, descriptor, 
+                                expect_redirect=True,
+                                check_content=True)
 
-            print msg
-            self.assertTrue(all_ok)  # fail fast
 
-        print "{0}/{1} good".format(num - num_bad, num)
-        log.info("{0}/{1} good".format(num - num_bad, num))
-        self.assertTrue(all_ok)
+    def _assert_loads(self, django_url, kwargs, descriptor,
+                        expect_redirect=False,
+                        check_content=False):
+
+        url = reverse(django_url, kwargs=kwargs)
+        response = self.client.get(url, follow=True)
+
+        if response.status_code != 200:
+            self.fail('Status %d for page %s' %
+                    (resp.status_code, descriptor.location.url()))
+
+        if expect_redirect:
+            self.assertEqual(response.redirect_chain[0][1], 302)
+
+        if check_content:
+            unavailable_msg = "this module is temporarily unavailable"
+            self.assertEqual(response.content.find(unavailable_msg), -1)
+            self.assertFalse(isinstance(descriptor, ErrorDescriptor))
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
@@ -357,7 +340,7 @@ class TestCoursesLoadTestCase_XmlModulestore(PageLoaderTestCase):
                                       load_error_modules=True,
         )
 
-        self.check_pages_load(module_store)
+        self.check_random_page_loads(module_store)
 
     def test_full_course_loads(self):
         module_store = XMLModuleStore(TEST_DATA_DIR,
@@ -365,7 +348,7 @@ class TestCoursesLoadTestCase_XmlModulestore(PageLoaderTestCase):
                                       course_dirs=['full'],
                                       load_error_modules=True,
         )
-        self.check_pages_load(module_store)
+        self.check_random_page_loads(module_store)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -380,12 +363,12 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
     def test_toy_course_loads(self):
         module_store = modulestore()
         import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
-        self.check_pages_load(module_store)
+        self.check_random_page_loads(module_store)
 
     def test_full_course_loads(self):
         module_store = modulestore()
         import_from_xml(module_store, TEST_DATA_DIR, ['full'])
-        self.check_pages_load(module_store)
+        self.check_random_page_loads(module_store)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
