@@ -12,12 +12,13 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
-from capa.responsetypes import StudentInputError
+from capa.responsetypes import StudentInputError, \
+                                ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float
 from .fields import Timedelta
 
@@ -454,7 +455,14 @@ class CapaModule(CapaFields, XModule):
             return 'Error'
 
         before = self.get_progress()
-        d = handlers[dispatch](get)
+
+        try:
+            d = handlers[dispatch](get)
+
+        except Exception as err:
+            _, _, traceback_obj = sys.exc_info()
+            raise ProcessingError, ProcessingError(err.message), traceback_obj
+
         after = self.get_progress()
         d.update({
             'progress_changed': after != before,
@@ -726,7 +734,7 @@ class CapaModule(CapaFields, XModule):
             correct_map = self.lcp.grade_answers(answers)
             self.set_state_from_lcp()
 
-        except StudentInputError as inst:
+        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
             log.exception("StudentInputError in capa_module:problem_check")
 
             # If the user is a staff member, include

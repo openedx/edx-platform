@@ -53,12 +53,17 @@ class LoncapaProblemError(Exception):
 
 class ResponseError(Exception):
     '''
-    Error for failure in processing a response
+    Error for failure in processing a response, including
+    exceptions that occur when executing a custom script.
     '''
     pass
 
 
 class StudentInputError(Exception):
+    '''
+    Error for an invalid student input.
+    For example, submitting a string when the problem expects a number
+    '''
     pass
 
 #-----------------------------------------------------------------------------
@@ -1151,7 +1156,7 @@ def sympy_check2():
                 # Raise an exception
                 else:
                     log.error(traceback.format_exc())
-                    raise LoncapaProblemError(
+                    raise ResponseError(
                         "CustomResponse: check function returned an invalid dict")
 
             # The check function can return a boolean value,
@@ -1226,7 +1231,7 @@ def sympy_check2():
         Handle an exception raised during the execution of
         custom Python code.
 
-        Raises a StudentInputError
+        Raises a ResponseError
         '''
 
         # Log the error if we are debugging
@@ -1236,7 +1241,7 @@ def sympy_check2():
 
         # Notify student with a student input error
         _, _, traceback_obj = sys.exc_info()
-        raise StudentInputError, StudentInputError(err.message), traceback_obj
+        raise ResponseError, ResponseError(err.message), traceback_obj
 
 #-----------------------------------------------------------------------------
 
@@ -1912,7 +1917,14 @@ class SchematicResponse(LoncapaResponse):
         submission = [json.loads(student_answers[
                                  k]) for k in sorted(self.answer_ids)]
         self.context.update({'submission': submission})
-        exec self.code in global_context, self.context
+
+        try:
+            exec self.code in global_context, self.context
+
+        except Exception as err:
+            _, _, traceback_obj = sys.exc_info()
+            raise ResponseError, ResponseError(err.message), traceback_obj
+
         cmap = CorrectMap()
         cmap.set_dict(dict(zip(sorted(
             self.answer_ids), self.context['correct'])))

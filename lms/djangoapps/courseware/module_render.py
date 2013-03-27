@@ -22,7 +22,7 @@ from .models import StudentModule
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import unique_id_for_user
 from xmodule.errortracker import exc_info_to_str
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
@@ -443,9 +443,18 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, p)
+
+    # If we can't find the module, respond with a 404
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
+
+    # For XModule-specific errors, we respond with 404
+    except ProcessingError:
+        log.exception("Module encountered an error while prcessing AJAX call")
+        raise Http404
+
+    # If any other error occurred, re-raise it to trigger a 500 response
     except:
         log.exception("error processing ajax call")
         raise
