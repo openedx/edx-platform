@@ -369,14 +369,14 @@ def login_user(request, error=""):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
-        log.warning("Login failed - Unknown user email: {0}".format(email))
+        log.warning(u"Login failed - Unknown user email: {0}".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': 'Email or password is incorrect.'}))  # TODO: User error message
 
     username = user.username
     user = authenticate(username=username, password=password)
     if user is None:
-        log.warning("Login failed - password for {0} is invalid".format(email))
+        log.warning(u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': 'Email or password is incorrect.'}))
 
@@ -392,7 +392,7 @@ def login_user(request, error=""):
             log.critical("Login failed - Could not create session. Is memcached running?")
             log.exception(e)
 
-        log.info("Login success - {0} ({1})".format(username, email))
+        log.info(u"Login success - {0} ({1})".format(username, email))
 
         try_change_enrollment(request)
 
@@ -400,7 +400,7 @@ def login_user(request, error=""):
 
         return HttpResponse(json.dumps({'success': True}))
 
-    log.warning("Login failed - Account not active for user {0}, resending activation".format(username))
+    log.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
     not_activated_msg = "This account has not been activated. We have " + \
