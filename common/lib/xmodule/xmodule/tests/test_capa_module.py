@@ -516,7 +516,7 @@ class CapaModuleTest(unittest.TestCase):
             result = module.check_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            expected_msg = 'Error: Problem could not be evaluated with your input'
+            expected_msg = 'Error: test error'
             self.assertEqual(expected_msg, result['success'])
 
         # Expect that the number of attempts is NOT incremented

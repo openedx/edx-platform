@@ -834,7 +834,7 @@ class NumericalResponse(LoncapaResponse):
             import sys
             type, value, traceback = sys.exc_info()
 
-            raise StudentInputError, ("Invalid input: could not interpret '%s' as a number" %
+            raise StudentInputError, ("Could not interpret '%s' as a number" %
                                       cgi.escape(student_answer)), traceback
 
         if correct:

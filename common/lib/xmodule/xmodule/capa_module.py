@@ -738,7 +738,7 @@ class CapaModule(CapaFields, XModule):
             # Otherwise, display just an error message,
             # without a stack trace
             else:
-                msg = "Error: Problem could not be evaluated with your input"
+                msg = "Error: %s" % str(inst.message)
 
             return {'success': msg }
 
