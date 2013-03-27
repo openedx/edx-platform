@@ -1,14 +1,7 @@
-import logging
-from mock import MagicMock, patch
+from mock import MagicMock
 import json
-import factory
-import unittest
-from nose.tools import set_trace
 
-from django.http import Http404, HttpResponse, HttpRequest
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.test.client import Client
+from django.http import Http404, HttpResponse
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -16,13 +9,9 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.exceptions import NotFoundError
-from xmodule.modulestore import Location
 import courseware.module_render as render
-from xmodule.modulestore.django import modulestore, _MODULESTORES
-from xmodule.seq_module import SequenceModule
+from xmodule.modulestore.django import modulestore
 from courseware.tests.tests import PageLoader
-from student.models import Registration
 from courseware.model_data import ModelDataCache
 
 from .factories import UserFactory
@@ -52,7 +41,6 @@ TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 class ModuleRenderTestCase(PageLoader):
     def setUp(self):
         self.location = ['i4x', 'edX', 'toy', 'chapter', 'Overview']
-        self._MODULESTORES = {}
         self.course_id = 'edX/toy/2012_Fall'
         self.toy_course = modulestore().get_course(self.course_id)
 
@@ -104,12 +92,23 @@ class ModuleRenderTestCase(PageLoader):
         self.assertEquals(render.get_score_bucket(11, 10), 'incorrect')
         self.assertEquals(render.get_score_bucket(-1, 10), 'incorrect')
 
+    def test_anonymous_modx_dispatch(self):
+        dispatch_url = reverse(
+            'modx_dispatch',
+            args=[
+                'edX/toy/2012_Fall',
+                'i4x://edX/toy/videosequence/Toy_Videos',
+                'goto_position'
+            ]
+        )
+        response = self.client.post(dispatch_url, {'position': 2})
+        self.assertEquals(403, response.status_code)
+
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestTOC(TestCase):
     """Check the Table of Contents for a course"""
     def setUp(self):
-        self._MODULESTORES = {}
 
         # Toy courses should be loaded
         self.course_name = 'edX/toy/2012_Fall'
