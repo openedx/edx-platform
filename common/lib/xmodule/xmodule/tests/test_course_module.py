@@ -1,5 +1,6 @@
 import unittest
 from time import strptime
+
 from fs.memoryfs import MemoryFS
 
 from mock import Mock, patch
@@ -108,7 +109,22 @@ class IsNewCourseTestCase(unittest.TestCase):
             print "Comparing %s to %s" % (a, b)
             assertion(a_score, b_score)
 
+    @patch('xmodule.course_module.time.gmtime')
+    def test_start_date_text(self, gmtime_mock):
+        gmtime_mock.return_value = NOW
 
+        settings = [
+            # start, advertized, result
+            ('2012-12-02T12:00', None, 'Dec 02, 2012'),
+            ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011'),
+            ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012'),
+            ('2012-12-02T12:00', 'November, 2011', 'November, 2011'),
+        ]
+
+        for s in settings:
+            d = self.get_dummy_course(start=s[0], advertised_start=s[1])
+            print "Checking start=%s advertised=%s" % (s[0], s[1])
+            self.assertEqual(d.start_date_text, s[2])
 
     @patch('xmodule.course_module.time.gmtime')
     def test_is_newish(self, gmtime_mock):
