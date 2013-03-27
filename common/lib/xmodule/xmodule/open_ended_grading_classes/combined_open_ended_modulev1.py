@@ -365,6 +365,10 @@ class CombinedOpenEndedV1Module():
         html = self.current_task.get_html(self.system)
         return_html = html
         try:
+            #Without try except block, get this error:
+            # File "/home/vik/mitx_all/mitx/common/lib/xmodule/xmodule/x_module.py", line 263, in rewrite_content_links
+            # if link.startswith(XASSET_SRCREF_PREFIX):
+            # Placing try except so that if the error is fixed, this code will start working again.
             return_html = rewrite_links(html, self.rewrite_content_links)
         except:
             pass
@@ -786,7 +790,7 @@ class CombinedOpenEndedV1Descriptor():
     template_dir_name = "combinedopenended"
 
     def __init__(self, system):
-        self.system =system
+        self.system = system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
