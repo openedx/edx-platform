@@ -1,3 +1,6 @@
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from lettuce import world, step
 from common import *
 from nose.tools import assert_equal
@@ -8,7 +11,7 @@ from nose.tools import assert_equal
 @step('I click the new section link$')
 def i_click_new_section_link(step):
     link_css = 'a.new-courseware-section-button'
-    css_click(link_css)
+    world.css_click(link_css)
 
 
 @step('I enter the section name and click save$')
@@ -29,7 +32,7 @@ def i_have_added_new_section(step):
 @step('I click the Edit link for the release date$')
 def i_click_the_edit_link_for_the_release_date(step):
     button_css = 'div.section-published-date a.edit-button'
-    css_click(button_css)
+    world.css_click(button_css)
 
 
 @step('I save a new section release date$')
@@ -54,13 +57,13 @@ def i_see_my_section_name_with_quote_on_the_courseware_page(step):
 
 @step('I click to edit the section name$')
 def i_click_to_edit_section_name(step):
-    css_click('span.section-name-span')
+    world.css_click('span.section-name-span')
 
 
 @step('I see the complete section name with a quote in the editor$')
 def i_see_complete_section_name_with_quote_in_editor(step):
     css = '.edit-section-name'
-    assert world.browser.is_element_present_by_css(css, 5)
+    assert world.is_css_present(css)
     assert_equal(world.browser.find_by_css(css).value, 'Section with "Quote"')
 
 
@@ -75,7 +78,7 @@ def i_see_a_release_date_for_my_section(step):
     import re
 
     css = 'span.published-status'
-    assert world.browser.is_element_present_by_css(css)
+    assert world.is_css_present(css)
     status_text = world.browser.find_by_css(css).text
 
     # e.g. 11/06/2012 at 16:25
@@ -89,20 +92,20 @@ def i_see_a_release_date_for_my_section(step):
 @step('I see a link to create a new subsection$')
 def i_see_a_link_to_create_a_new_subsection(step):
     css = 'a.new-subsection-item'
-    assert world.browser.is_element_present_by_css(css)
+    assert world.is_css_present(css)
 
 
 @step('the section release date picker is not visible$')
 def the_section_release_date_picker_not_visible(step):
     css = 'div.edit-subsection-publish-settings'
-    assert False, world.browser.find_by_css(css).visible
+    assert not world.css_visible(css)
 
 
 @step('the section release date is updated$')
 def the_section_release_date_is_updated(step):
     css = 'span.published-status'
-    status_text = world.browser.find_by_css(css).text
-    assert_equal(status_text,'Will Release: 12/25/2013 at 12:00am')
+    status_text = world.css_text(css)
+    assert_equal(status_text, 'Will Release: 12/25/2013 at 12:00am')
 
 
 ############ HELPER METHODS ###################
@@ -110,10 +113,10 @@ def the_section_release_date_is_updated(step):
 def save_section_name(name):
     name_css = '.new-section-name'
     save_css = '.new-section-name-save'
-    css_fill(name_css, name)
-    css_click(save_css)
+    world.css_fill(name_css, name)
+    world.css_click(save_css)
 
 
 def see_my_section_on_the_courseware_page(name):
     section_css = 'span.section-name-span'
-    assert_css_with_text(section_css, name)
+    assert world.css_has_text(section_css, name)
