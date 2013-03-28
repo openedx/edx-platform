@@ -87,7 +87,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def _get_draft_counts(self, item):
         cnt = 1 if getattr(item, 'is_draft', False) else 0
-        print "Checking {0}. Result = {1}".format(item.location, cnt)
         for child in item.get_children():
             cnt = cnt + self._get_draft_counts(child)
 
