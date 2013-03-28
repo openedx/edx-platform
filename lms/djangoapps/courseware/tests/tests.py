@@ -578,22 +578,29 @@ class TestViewAuth(LoginEnrollmentTestCase):
         def check_non_staff(course):
             """Check that access is right for non-staff in course"""
             print '=== Checking non-staff access for {0}'.format(course.id)
-            for url in instructor_urls(course) + dark_student_urls(course) + reverse_urls(['courseware'], course):
-                print 'checking for 404 on {0}'.format(url)
-                self.check_for_get_code(404, url)
 
-            for url in light_student_urls(course):
-                print 'checking for 200 on {0}'.format(url)
-                self.check_for_get_code(200, url)
+            # Randomly sample a dark url
+            url = random.choice( instructor_urls(course) + 
+                                    dark_student_urls(course) + 
+                                    reverse_urls(['courseware'], course))
+            print 'checking for 404 on {0}'.format(url)
+            self.check_for_get_code(404, url)
+
+            # Randomly sample a light url
+            url = random.choice(light_student_urls(course))
+            print 'checking for 200 on {0}'.format(url)
+            self.check_for_get_code(200, url)
 
         def check_staff(course):
             """Check that access is right for staff in course"""
             print '=== Checking staff access for {0}'.format(course.id)
-            for url in (instructor_urls(course) +
-                        dark_student_urls(course) +
-                        light_student_urls(course)):
-                print 'checking for 200 on {0}'.format(url)
-                self.check_for_get_code(200, url)
+    
+            # Randomly sample a url
+            url = random.choice(instructor_urls(course) +
+                                dark_student_urls(course) +
+                                light_student_urls(course))
+            print 'checking for 200 on {0}'.format(url)
+            self.check_for_get_code(200, url)
 
             # The student progress tab is not accessible to a student
             # before launch, so the instructor view-as-student feature should return a 404 as well.
