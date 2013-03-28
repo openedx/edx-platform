@@ -6,9 +6,9 @@ import shutil
 import sys
 import textwrap
 
-import jailpy
+from codejail import jailpy
+from codejail.util import temp_directory, change_directory
 
-from util import temp_directory, change_directory
 
 def safe_exec(code, globals_dict, files=None, python_path=None):
     """Execute code as "exec" does, but safely.
@@ -98,7 +98,7 @@ def json_safe(d):
     ok_types = (type(None), int, long, float, str, unicode, list, tuple, dict)
     bad_keys = ("__builtins__",)
     jd = {}
-    for k,v in d.iteritems():
+    for k, v in d.iteritems():
         if not isinstance(v, ok_types):
             continue
         if k in bad_keys:

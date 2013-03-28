@@ -3,7 +3,6 @@
 import contextlib
 import os
 import shutil
-import sys
 import tempfile
 
 
@@ -18,6 +17,7 @@ class TempDirectory(object):
         if self.delete_when_done:
             # if this errors, something is genuinely wrong, so don't ignore errors.
             shutil.rmtree(self.temp_dir)
+
 
 @contextlib.contextmanager
 def temp_directory(delete_when_done=True):
@@ -39,6 +39,7 @@ class ChangeDirectory(object):
 
     def clean_up(self):
         os.chdir(self.old_dir)
+
 
 @contextlib.contextmanager
 def change_directory(new_dir):

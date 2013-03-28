@@ -5,6 +5,7 @@ from django.conf import settings
 
 import codejail.jailpy
 
+
 class ConfigureCodeJailMiddleware(object):
     """Middleware to configure codejail on startup."""
 

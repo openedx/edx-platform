@@ -7,6 +7,7 @@ from nose.plugins.skip import SkipTest
 
 from codejail.safe_exec import safe_exec, not_safe_exec
 
+
 class SafeExecTests(object):
     """The tests for `safe_exec`, will be mixed into specific test classes below."""
     def test_set_values(self):
@@ -59,6 +60,7 @@ class TestSafeExec(SafeExecTests, unittest.TestCase):
     """Run SafeExecTests, with the real safe_exec."""
     def safe_exec(self, *args, **kwargs):
         safe_exec(*args, **kwargs)
+
 
 class TestNotSafeExec(SafeExecTests, unittest.TestCase):
     """Run SafeExecTests, with not_safe_exec."""

@@ -4,7 +4,8 @@
 #   - AppArmor.md from xserver
 
 import logging
-import os, os.path
+import os
+import os.path
 import resource
 import shutil
 import subprocess
@@ -22,6 +23,7 @@ log = logging.getLogger(__name__)
 
 PYTHON_CMD = None
 
+
 def configure(python_bin, user=None):
     """Configure the jailpy module."""
     global PYTHON_CMD
@@ -29,6 +31,7 @@ def configure(python_bin, user=None):
     if user:
         PYTHON_CMD.extend(['sudo', '-u', 'sandbox'])
     PYTHON_CMD.extend([python_bin, '-E'])
+
 
 def is_configured():
     return bool(PYTHON_CMD)
@@ -42,7 +45,9 @@ if hasattr(sys, 'real_prefix'):
 
 class JailResult(object):
     """A passive object for us to return from jailpy."""
-    pass
+    def __init__(self):
+        self.stdout = self.stderr = self.status = None
+
 
 def jailpy(code, files=None, argv=None, stdin=None):
     """
@@ -104,7 +109,7 @@ def set_process_limits():
     resource.setrlimit(resource.RLIMIT_NPROC, (0, 0))   # no subprocesses
     resource.setrlimit(resource.RLIMIT_FSIZE, (0, 0))   # no files
 
-    mem = 32 * 2**20     # 32 MB should be enough for anyone, right? :)
+    mem = 32 * (2 ** 20)     # 32 MB should be enough for anyone, right? :)
     resource.setrlimit(resource.RLIMIT_STACK, (mem, mem))
     resource.setrlimit(resource.RLIMIT_RSS, (mem, mem))
     resource.setrlimit(resource.RLIMIT_DATA, (mem, mem))
