@@ -183,7 +183,10 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.test_system.location = self.location
         self.mock_xqueue = MagicMock()
         self.mock_xqueue.send_to_queue.return_value = (None, "Message")
-        self.test_system.xqueue = {'interface': self.mock_xqueue, 'callback_url': '/', 'default_queuename': 'testqueue',
+        def constructed_callback(dispatch="score_update"):
+            return dispatch
+        
+        self.test_system.xqueue = {'interface': self.mock_xqueue, 'construct_callback': constructed_callback, 'default_queuename': 'testqueue',
                                    'waittime': 1}
         self.openendedmodule = OpenEndedModule(self.test_system, self.location,
                                                self.definition, self.descriptor, self.static_data, self.metadata)

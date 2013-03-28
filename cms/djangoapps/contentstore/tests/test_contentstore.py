@@ -37,6 +37,14 @@ TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
+class MongoCollectionFindWrapper(object):
+    def __init__(self, original):
+        self.original = original
+        self.counter = 0
+
+    def find(self, query, *args, **kwargs):
+        self.counter = self.counter+1
+        return self.original(query, *args, **kwargs)
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
@@ -101,6 +109,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertEqual(reverse_tabs, course_tabs)
 
+    def test_import_polls(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        module_store = modulestore('direct')
+        found = False
+
+        item = None
+        items = module_store.get_items(['i4x', 'edX', 'full', 'poll_question', None, None])
+        found = len(items) > 0
+
+        self.assertTrue(found)
+        # check that there's actually content in the 'question' field
+        self.assertGreater(len(items[0].question),0)
+
     def test_delete(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
@@ -130,8 +152,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)
-
-
 
     def test_about_overrides(self):
         '''
@@ -192,6 +212,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
             self.assertEqual(resp.status_code, 200)
+
+    def test_bad_contentstore_request(self):
+        resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
+        self.assertEqual(resp.status_code, 400)
 
     def test_delete_course(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -292,6 +316,28 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check that /static/ has been converted to the full path
         # note, we know the link it should be because that's what in the 'full' course in the test data
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
+
+    def test_prefetch_children(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        module_store = modulestore('direct')
+        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        wrapper = MongoCollectionFindWrapper(module_store.collection.find)
+        module_store.collection.find = wrapper.find
+        course = module_store.get_item(location, depth=2)
+
+        # make sure we haven't done too many round trips to DB
+        # note we say 4 round trips here for 1) the course, 2 & 3) for the chapters and sequentials, and
+        # 4) because of the RT due to calculating the inherited metadata
+        self.assertEqual(wrapper.counter, 4)
+
+        # make sure we pre-fetched a known sequential which should be at depth=2
+        self.assertTrue(Location(['i4x', 'edX', 'full', 'sequential',
+            'Administrivia_and_Circuit_Elements', None]) in course.system.module_data)
+
+        # make sure we don't have a specific vertical which should be at depth=3
+        self.assertFalse(Location(['i4x', 'edX', 'full', 'vertical', 'vertical_58',
+            None]) in course.system.module_data)
 
     def test_export_course_with_unknown_metadata(self):
         module_store = modulestore('direct')
@@ -514,7 +560,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         module_store.update_children(parent.location, parent.children + [new_component_location.url()])
 
         # flush the cache
-        module_store.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
         new_module = module_store.get_item(new_component_location)
 
         # check for grace period definition which should be defined at the course level
@@ -529,7 +575,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         module_store.update_metadata(new_module.location, own_metadata(new_module))
 
         # flush the cache and refetch
-        module_store.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
         new_module = module_store.get_item(new_component_location)
 
         self.assertEqual(timedelta(1), new_module.lms.graceperiod)

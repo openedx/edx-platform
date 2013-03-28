@@ -9,7 +9,8 @@ from django.core.cache import get_cache, InvalidCacheBackendError
 cache = get_cache('mongo_metadata_inheritance')
 for store_name in settings.MODULESTORE:
     store = modulestore(store_name)
-    store.metadata_inheritance_cache = cache
+    store.metadata_inheritance_cache_subsystem = cache
+    store.request_cache = RequestCache.get_request_cache()
 
     modulestore_update_signal = Signal(
                             providing_args=['modulestore', 'course_id', 'location']

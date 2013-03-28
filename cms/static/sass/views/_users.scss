@@ -1,0 +1,82 @@
+// studio - views - course users
+// ====================
+
+body.course.users {
+
+  .new-user-form {
+    display: none;
+    padding: 15px 20px;
+    background-color: $lightBluishGrey2;
+
+    #result {
+      display: none;
+      float: left;
+      margin-bottom: 15px;
+      padding: 3px 15px;
+      border-radius: 3px;
+      background: $error-red;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .form-elements {
+      clear: both;
+    }
+
+    label {
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .email-input {
+      width: 350px;
+      padding: 8px 8px 10px;
+      border-color: $darkGrey;
+    }
+
+    .add-button {
+      @include blue-button;
+      padding: 5px 20px 9px;
+    }
+
+    .cancel-button {
+      @include white-button;
+      padding: 5px 20px 9px;
+    }
+  }
+
+  .user-list {
+    border: 1px solid $mediumGrey;
+    background: #fff;
+
+    li {
+      position: relative;
+      padding: 20px;
+      border-bottom: 1px solid $mediumGrey;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      span {
+        display: inline-block;
+      }
+
+      .user-name {
+        margin-right: 10px;
+        font-size: 24px;
+        font-weight: 300;
+      }
+
+      .user-email {
+        font-size: 14px;
+        font-style: italic;
+        color: $mediumGrey;
+      }
+
+      .item-actions {
+        top: 24px;
+      }
+    }
+  }
+}

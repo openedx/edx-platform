@@ -17,6 +17,14 @@ Feature: Create Subsection
     And I click to edit the subsection name
     Then I see the complete subsection name with a quote in the editor
 
+    Scenario: Assign grading type to a subsection and verify it is still shown after refresh (bug #258)
+    Given I have opened a new course section in Studio
+    And I have added a new subsection
+    And I mark it as Homework
+    Then I see it marked as Homework
+    And I reload the page
+    Then I see it marked as Homework
+
     @skip-phantom
     Scenario: Delete a subsection
     Given I have opened a new course section in Studio

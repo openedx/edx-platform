@@ -25,8 +25,7 @@ class XModuleCourseFactory(Factory):
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
-        # This logic was taken from the create_new_course method in
-        # cms/djangoapps/contentstore/views.py
+
         template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
         org = kwargs.get('org')
         number = kwargs.get('number')
@@ -43,8 +42,7 @@ class XModuleCourseFactory(Factory):
         if display_name is not None:
             new_course.display_name = display_name
 
-        new_course.start = gmtime()
-
+        new_course.lms.start = gmtime()
         new_course.tabs = [{"type": "courseware"},
                            {"type": "course_info", "name": "Course Info"},
                            {"type": "discussion", "name": "Discussion"},
@@ -81,21 +79,41 @@ class XModuleItemFactory(Factory):
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
         """
-        kwargs must include parent_location, template. Can contain display_name
-        target_class is ignored
+        Uses *kwargs*:
+
+        *parent_location* (required): the location of the parent module
+            (e.g. the parent course or section)
+
+        *template* (required): the template to create the item from
+            (e.g. i4x://templates/section/Empty)
+
+        *data* (optional): the data for the item
+            (e.g. XML problem definition for a problem item)
+
+        *display_name* (optional): the display name of the item
+
+        *metadata* (optional): dictionary of metadata attributes
+
+        *target_class* is ignored
         """
 
         DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
         parent_location = Location(kwargs.get('parent_location'))
         template = Location(kwargs.get('template'))
+        data = kwargs.get('data')
         display_name = kwargs.get('display_name')
+        metadata = kwargs.get('metadata', {})
 
         store = modulestore('direct')
 
         # This code was based off that in cms/djangoapps/contentstore/views.py
         parent = store.get_item(parent_location)
-        dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
+
+        # If a display name is set, use that
+        dest_name = display_name.replace(" ", "_") if display_name is not None else uuid4().hex
+        dest_location = parent_location._replace(category=template.category,
+                                                 name=dest_name)
 
         new_item = store.clone_item(template, dest_location)
 
@@ -103,7 +121,14 @@ class XModuleItemFactory(Factory):
         if display_name is not None:
             new_item.display_name = display_name
 
-        store.update_metadata(new_item.location.url(), own_metadata(new_item))
+        # Add additional metadata or override current metadata
+        item_metadata = own_metadata(new_item)
+        item_metadata.update(metadata)
+        store.update_metadata(new_item.location.url(), item_metadata)
+
+        # replace the data with the optional *data* parameter
+        if data is not None:
+            store.update_item(new_item.location, data)
 
         if new_item.location.category not in DETACHED_CATEGORIES:
             store.update_children(parent_location, parent.children + [new_item.location.url()])
