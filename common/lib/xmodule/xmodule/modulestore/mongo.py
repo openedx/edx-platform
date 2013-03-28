@@ -339,20 +339,16 @@ class MongoModuleStore(ModuleStoreBase):
         if not force_refresh:
             # see if we are first in the request cache (if present)
             if self.request_cache is not None and key in self.request_cache.data.get('metadata_inheritance', {}):
-                logging.debug('***** HIT IN REQUEST CACHE')
                 return self.request_cache.data['metadata_inheritance'][key]
 
             # then look in any caching subsystem (e.g. memcached)
             if self.metadata_inheritance_cache_subsystem is not None:
                 tree = self.metadata_inheritance_cache_subsystem.get(key, {})
-                if tree:
-                    logging.debug('***** HIT IN MEMCACHED')
             else:
                 logging.warning('Running MongoModuleStore without a metadata_inheritance_cache_subsystem. This is OK in localdev and testing environment. Not OK in production.')
 
         if not tree:
             # if not in subsystem, or we are on force refresh, then we have to compute
-            logging.debug('***** COMPUTING METADATA')
             tree = self.compute_metadata_inheritance_tree(location)
 
         # now populate a request_cache, if available
