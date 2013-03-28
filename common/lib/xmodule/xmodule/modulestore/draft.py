@@ -191,66 +191,35 @@ class DraftModuleStore(ModuleStoreBase):
         super(DraftModuleStore, self).clone_item(location, as_draft(location))
         super(DraftModuleStore, self).delete_item(location)
 
-    def _cache_children(self, items, depth=0):
-        """
-        Returns a dictionary mapping Location -> item data, populated with json data
-        for all descendents of items up to the specified depth.
-        (0 = no descendents, 1 = children, 2 = grandchildren, etc)
-        If depth is None, will load all the children.
-        This will make a number of queries that is linear in the depth.
-        """
+    def _query_children_for_cache_children(self, items):
+        # first get non-draft in a round-trip
+        queried_children = []
+        to_process_non_drafts = super(DraftModuleStore, self)._query_children_for_cache_children(items)
 
-        data = {}
-        to_process = list(items)
-        while to_process and depth is None or depth >= 0:
-            children = []
-            for item in to_process:
-                self._clean_item_data(item)
-                children.extend(item.get('definition', {}).get('children', []))
-                data[Location(item['location'])] = item
+        to_process_dict = {}
+        for non_draft in to_process_non_drafts:
+            to_process_dict[Location(non_draft["_id"])] = non_draft
 
-            if depth == 0:
-                break;
+        # now query all draft content in another round-trip
+        query = {
+            '_id': {'$in': [namedtuple_to_son(as_draft(Location(item))) for item in items]}
+        }
+        to_process_drafts = list(self.collection.find(query))
 
-            # Load all children by id. See
-            # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
-            # for or-query syntax
-            to_process = []
-            if children:
-                # first get non-draft in a round-trip
-                query = {
-                    '_id': {'$in': [namedtuple_to_son(Location(child)) for child in children]}
-                }
-                to_process_non_drafts = list(self.collection.find(query))
+        # now we have to go through all drafts and replace the non-draft
+        # with the draft. This is because the semantics of the DraftStore is to
+        # always return the draft - if available
+        for draft in to_process_drafts:
+            draft_loc = Location(draft["_id"])
+            draft_as_non_draft_loc = draft_loc._replace(revision=None)
 
-                to_process_dict = {}
-                for non_draft in to_process_non_drafts:
-                    to_process_dict[Location(non_draft["_id"])] = non_draft
+            # does non-draft exist in the collection
+            # if so, replace it
+            if draft_as_non_draft_loc in to_process_dict:
+                to_process_dict[draft_as_non_draft_loc] = draft
 
-                # now query all draft content in a round-trip
-                query = {
-                    '_id': {'$in': [namedtuple_to_son(as_draft(Location(child))) for child in children]}
-                }
-                to_process_drafts = list(self.collection.find(query))
+        # convert the dict - which is used for look ups - back into a list
+        for key, value in to_process_dict.iteritems():
+            queried_children.append(value)  
 
-                # now we have to go through all drafts and replace the non-draft
-                # with the draft. This is because the semantics of the DraftStore is to
-                # always return the draft - if available
-                for draft in to_process_drafts:
-                    draft_loc = Location(draft["_id"])
-                    draft_as_non_draft_loc = draft_loc._replace(revision=None)
-
-                    # does non-draft exist in the collection
-                    # if so, replace it
-                    if draft_as_non_draft_loc in to_process_dict:
-                        to_process_dict[draft_as_non_draft_loc] = draft
-
-                # convert the dict - which is used for look ups - back into a list
-                for key, value in to_process_dict.iteritems():
-                    to_process.append(value)
-
-            # If depth is None, then we just recurse until we hit all the descendents
-            if depth is not None:
-                depth -= 1
-
-        return data
+        return queried_children

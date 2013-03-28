@@ -363,6 +363,13 @@ class MongoModuleStore(ModuleStoreBase):
         item['location'] = item['_id']
         del item['_id']
 
+    def _query_children_for_cache_children(self, items):
+        # first get non-draft in a round-trip
+        query = {
+            '_id': {'$in': [namedtuple_to_son(Location(item)) for item in items]}
+        }
+        return list(self.collection.find(query))
+
     def _cache_children(self, items, depth=0):
         """
         Returns a dictionary mapping Location -> item data, populated with json data
@@ -382,18 +389,14 @@ class MongoModuleStore(ModuleStoreBase):
                 data[Location(item['location'])] = item
 
             if depth == 0:
-                break
+                break;
 
             # Load all children by id. See
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
-            if children and depth > 0:
-                query = {
-                    '_id': {'$in': [namedtuple_to_son(Location(child)) for child in children]}
-                }
-                to_process = list(self.collection.find(query))
-            else:
-                break
+            to_process = []
+            if children:
+                to_process = self._query_children_for_cache_children(children)
 
             # If depth is None, then we just recurse until we hit all the descendents
             if depth is not None:
