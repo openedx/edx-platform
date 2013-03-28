@@ -40,12 +40,23 @@ def i_click_to_edit_subsection_name(step):
 def i_see_complete_subsection_name_with_quote_in_editor(step):
     css = '.subsection-display-name-input'
     assert world.is_css_present(css)
-    assert_equal(world.browser.find_by_css(css).value, 'Subsection With "Quote"')
+    assert_equal(world.css_find(css).value, 'Subsection With "Quote"')
 
 
 @step('I have added a new subsection$')
 def i_have_added_a_new_subsection(step):
     add_subsection()
+
+
+@step('I mark it as Homework$')
+def i_mark_it_as_homework(step):
+    world.css_click('a.menu-toggle')
+    world.browser.click_link_by_text('Homework')
+
+
+@step('I see it marked as Homework$')
+def i_see_it_marked__as_homework(step):
+    assert_equal(world.css_find(".status-label").value, 'Homework')
 
 
 ############ ASSERTIONS ###################
