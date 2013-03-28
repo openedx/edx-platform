@@ -460,6 +460,9 @@ def perform_xlint(data_dir, course_dirs,
         err_cnt += validate_category_hierarchy(module_store, course_id, "sequential", "vertical")
         # don't allow metadata on verticals, since we can't edit them in studio
         err_cnt += validate_no_non_editable_metadata(module_store, course_id, "vertical")
+        # don't allow metadata on chapters, since we can't edit them in studio
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "chapter")
+        
 
         # check for a presence of a course marketing video
         location_elements = course_id.split('/')
