@@ -287,8 +287,19 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         self.enroll(course)
         course_id = course.id
 
-        descriptor = random.choice(module_store.get_items(
-                                Location(None, None, None, None, None)))
+
+        # Search for items in the course
+        # None is treated as a wildcard
+        course_loc = course.location
+        location_query = Location(course_loc.tag, course_loc.org, 
+                                course_loc.course, None, None, None)
+
+        items = module_store.get_items(location_query)
+
+        if len(items) < 1:
+            self.fail('Could not retrieve any items from course')
+        else:
+            descriptor = random.choice(items)
 
 
         # We have ancillary course information now as modules
