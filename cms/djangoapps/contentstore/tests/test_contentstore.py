@@ -117,7 +117,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         course = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple', 
             'course', '2012_Fall', None]), depth=None)
 
-        # make sure no draft items have been returned
+        # make sure just one draft item have been returned
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 1)       
 
