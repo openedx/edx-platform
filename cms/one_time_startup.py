@@ -3,6 +3,7 @@ from django.conf import settings
 from xmodule.modulestore.django import modulestore
 from cache_toolbox.discussion_cache import discussion_cache_register_for_updates
 from django.dispatch import Signal
+from request_cache.middleware import RequestCache
 
 from django.core.cache import get_cache, InvalidCacheBackendError
 
