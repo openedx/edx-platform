@@ -350,18 +350,20 @@ class MongoModuleStore(ModuleStoreBase):
         if not tree:
             # if not in subsystem, or we are on force refresh, then we have to compute
             tree = self.compute_metadata_inheritance_tree(location)
+            
+            # now write out computed tree to caching subsystem (e.g. memcached), if available
+            if self.metadata_inheritance_cache_subsystem is not None:
+                self.metadata_inheritance_cache_subsystem.set(key, tree)
 
-        # now populate a request_cache, if available
+        # now populate a request_cache, if available. NOTE, we are outside of the
+        # scope of the above if: statement so that after a memcache hit, it'll get
+        # put into the request_cache
         if self.request_cache is not None:
             # we can't assume the 'metadatat_inheritance' part of the request cache dict has been
             # defined
             if 'metadata_inheritance' not in self.request_cache.data:
                 self.request_cache.data['metadata_inheritance'] = {}
             self.request_cache.data['metadata_inheritance'][key] = tree
-
-        # now write to caching subsystem (e.g. memcached), if available
-        if self.metadata_inheritance_cache_subsystem is not None:
-            self.metadata_inheritance_cache_subsystem.set(key, tree)
 
         return tree
 
