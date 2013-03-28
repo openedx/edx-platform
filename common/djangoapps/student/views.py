@@ -419,6 +419,9 @@ def login_user(request, error=""):
         response = HttpResponse(json.dumps({'success': True}))
 
         # set the login cookie for the edx marketing site
+        # we want this cookie to be accessed via javascript
+        # so httponly is set to None
+
         if request.session.get_expire_at_browser_close():
             max_age = None
             expires = None
@@ -427,12 +430,13 @@ def login_user(request, error=""):
             expires_time = time.time() + max_age
             expires = cookie_date(expires_time)
 
+
         response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
                             'true', max_age=max_age,
                             expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-                            path=settings.SESSION_COOKIE_PATH,
-                            secure=settings.SESSION_COOKIE_SECURE or None,
-                            httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+                            path='/',
+                            secure=None,
+                            httponly=None)
 
         return response
 
@@ -457,7 +461,8 @@ def logout_user(request):
     logout(request)
     response = redirect('/')
     response.delete_cookie(settings.EDXMKTG_COOKIE_NAME,
-                           settings.SESSION_COOKIE_DOMAIN)
+                           path='/',
+                           domain=settings.SESSION_COOKIE_DOMAIN)
     return response
 
 
