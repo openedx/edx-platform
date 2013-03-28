@@ -522,6 +522,12 @@ def static_university_profile(request, org_id):
     """
     Return the profile for the particular org_id that does not have any courses.
     """
+    # Redirect to the properly capitalized org_id
+    last_path = request.path.split('/')[-1]
+    if last_path != org_id:
+        return redirect('static_university_profile', org_id=org_id)
+
+    # Render template
     template_file = "university_profile/{0}.html".format(org_id).lower()
     context = dict(courses=[], org_id=org_id)
     return render_to_response(template_file, context)
@@ -533,17 +539,28 @@ def university_profile(request, org_id):
     """
     Return the profile for the particular org_id.  404 if it's not valid.
     """
+    virtual_orgs_ids = settings.VIRTUAL_UNIVERSITIES
+    meta_orgs = getattr(settings, 'META_UNIVERSITIES', {})
+
+    # Get all the ids associated with this organization
     all_courses = modulestore().get_courses()
-    valid_org_ids = set(c.org for c in all_courses).union(settings.VIRTUAL_UNIVERSITIES)
-    if org_id not in valid_org_ids:
+    valid_orgs_ids = set(c.org for c in all_courses)
+    valid_orgs_ids.update(virtual_orgs_ids + meta_orgs.keys())
+
+    if org_id not in valid_orgs_ids:
         raise Http404("University Profile not found for {0}".format(org_id))
 
-    # Only grab courses for this org...
-    courses = get_courses_by_university(request.user,
-                                        domain=request.META.get('HTTP_HOST'))[org_id]
-    courses = sort_by_announcement(courses)
+    # Grab all courses for this organization(s)
+    org_ids = set([org_id] + meta_orgs.get(org_id, []))
+    org_courses = []
+    domain = request.META.get('HTTP_HOST')
+    for key in org_ids:
+        cs = get_courses_by_university(request.user, domain=domain)[key]
+        org_courses.extend(cs)
 
-    context = dict(courses=courses, org_id=org_id)
+    org_courses = sort_by_announcement(org_courses)
+
+    context = dict(courses=org_courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
     return render_to_response(template_file, context)
