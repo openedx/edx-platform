@@ -1,6 +1,6 @@
 from lettuce import world, step
 from common import *
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true
 
 ############### ACTIONS ####################
 
@@ -11,6 +11,18 @@ def i_have_opened_a_new_course_section(step):
     log_into_studio()
     create_a_course()
     add_section()
+
+
+@step('I have added a new subsection$')
+def i_have_added_a_new_subsection(step):
+    add_subsection()
+
+
+@step('I have opened a new subsection in Studio$')
+def i_have_opened_a_new_subsection(step):
+    step.given('I have opened a new course section in Studio')
+    step.given('I have added a new subsection')
+    css_click('span.subsection-name-value')
 
 
 @step('I click the New Subsection link')
@@ -41,9 +53,19 @@ def i_see_complete_subsection_name_with_quote_in_editor(step):
     assert_equal(world.browser.find_by_css(css).value, 'Subsection With "Quote"')
 
 
-@step('I have added a new subsection$')
-def i_have_added_a_new_subsection(step):
-    add_subsection()
+@step('I have set a release date and due date in different years$')
+def test_have_set_dates_in_different_years(step):
+    set_date_and_time('input#start_date', '12/25/2013', 'input#start_time', '3:00am')
+    css_click('.set-date')
+    set_date_and_time('input#due_date', '1/2/2014', 'input#due_time', '4:00am')
+
+
+@step('I see the correct dates$')
+def i_see_the_correct_dates(step):
+    assert_equal('12/25/2013', css_find('input#start_date').first.value)
+    assert_equal('3:00am', css_find('input#start_time').first.value)
+    assert_equal('1/2/2014', css_find('input#due_date').first.value)
+    assert_equal('4:00am', css_find('input#due_time').first.value)
 
 
 ############ ASSERTIONS ###################

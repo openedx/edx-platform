@@ -1,8 +1,6 @@
 from lettuce import world, step
 from common import *
 from nose.tools import assert_equal
-from selenium.webdriver.common.keys import Keys
-import time
 
 ############### ACTIONS ####################
 
@@ -36,16 +34,8 @@ def i_click_the_edit_link_for_the_release_date(step):
 
 @step('I save a new section release date$')
 def i_save_a_new_section_release_date(step):
-    date_css = 'input.start-date.date.hasDatepicker'
-    time_css = 'input.start-time.time.ui-timepicker-input'
-    css_fill(date_css, '12/25/2013')
-    # hit TAB to get to the time field
-    e = css_find(date_css).first
-    e._element.send_keys(Keys.TAB)
-    css_fill(time_css, '12:00am')
-    e = css_find(time_css).first
-    e._element.send_keys(Keys.TAB)
-    time.sleep(float(1))
+    set_date_and_time('input.start-date.date.hasDatepicker', '12/25/2013',
+        'input.start-time.time.ui-timepicker-input', '12:00am')
     world.browser.click_link_by_text('Save')
 
 
