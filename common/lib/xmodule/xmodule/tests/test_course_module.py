@@ -1,5 +1,6 @@
 import unittest
 from time import strptime
+
 from fs.memoryfs import MemoryFS
 
 from mock import Mock, patch
@@ -89,25 +90,41 @@ class IsNewCourseTestCase(unittest.TestCase):
             ((day2, None, None), (day1, None, None), self.assertLess),
             ((day1, None, None), (day1, None, None), self.assertEqual),
 
-            # Non-parseable advertised starts are ignored in preference
-            # to actual starts
-            ((day2, None, "Spring 2013"), (day1, None, "Fall 2012"), self.assertLess),
-            ((day1, None, "Spring 2013"), (day1, None, "Fall 2012"), self.assertEqual),
+            # Non-parseable advertised starts are ignored in preference to actual starts
+            ((day2, None, "Spring"), (day1, None, "Fall"), self.assertLess),
+            ((day1, None, "Spring"), (day1, None, "Fall"), self.assertEqual),
+
+            # Partially parsable advertised starts should take priority over start dates
+            ((day2, None, "October 2013"), (day2, None, "October 2012"), self.assertLess),
+            ((day2, None, "October 2013"), (day1, None, "October 2013"), self.assertEqual),
 
             # Parseable advertised starts take priority over start dates
             ((day1, None, day2), (day1, None, day1), self.assertLess),
             ((day2, None, day2), (day1, None, day2), self.assertEqual),
-
         ]
 
-        data = []
         for a, b, assertion in dates:
             a_score = self.get_dummy_course(start=a[0], announcement=a[1], advertised_start=a[2]).sorting_score
             b_score = self.get_dummy_course(start=b[0], announcement=b[1], advertised_start=b[2]).sorting_score
             print "Comparing %s to %s" % (a, b)
             assertion(a_score, b_score)
 
+    @patch('xmodule.course_module.time.gmtime')
+    def test_start_date_text(self, gmtime_mock):
+        gmtime_mock.return_value = NOW
 
+        settings = [
+            # start, advertized, result
+            ('2012-12-02T12:00', None, 'Dec 02, 2012'),
+            ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011'),
+            ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012'),
+            ('2012-12-02T12:00', 'November, 2011', 'November, 2011'),
+        ]
+
+        for s in settings:
+            d = self.get_dummy_course(start=s[0], advertised_start=s[1])
+            print "Checking start=%s advertised=%s" % (s[0], s[1])
+            self.assertEqual(d.start_date_text, s[2])
 
     @patch('xmodule.course_module.time.gmtime')
     def test_is_newish(self, gmtime_mock):
