@@ -138,7 +138,6 @@ def compute_unit_state(unit, subsection=None):
     'private' content is editabled and not visible in the LMS
     """
 
-    logging.debug('****** is_draft = {0}'.format(getattr(unit, 'is_draft', False)))
     if getattr(unit, 'is_draft', False):
         try:
             modulestore('direct').get_item(unit.location)

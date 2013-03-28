@@ -209,23 +209,46 @@ class DraftModuleStore(ModuleStoreBase):
                 children.extend(item.get('definition', {}).get('children', []))
                 data[Location(item['location'])] = item
 
+            if depth == 0:
+                break;
+
             # Load all children by id. See
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
+            to_process = []
             if children:
+                # first get non-draft in a round-trip
                 query = {
                     '_id': {'$in': [namedtuple_to_son(Location(child)) for child in children]}
                 }
-                to_process = list(self.collection.find(query))
+                to_process_non_drafts = list(self.collection.find(query))
 
+                to_process_dict = {}
+                for non_draft in to_process_non_drafts:
+                    to_process_dict[Location(non_draft["_id"])] = non_draft
+
+                # now query all draft content in a round-trip
                 query = {
                     '_id': {'$in': [namedtuple_to_son(as_draft(Location(child))) for child in children]}
                 }
-                to_process.extend(list(self.collection.find(query)))
-                logging.debug('**** depth = {0}'.format(depth))
-                logging.debug('**** to_process = {0}'.format(to_process))
-            else:
-                to_process = []  
+                to_process_drafts = list(self.collection.find(query))
+
+                # now we have to go through all drafts and replace the non-draft
+                # with the draft. This is because the semantics of the DraftStore is to
+                # always return the draft - if available
+                for draft in to_process_drafts:
+                    draft_loc = Location(draft["_id"])
+                    draft_as_non_draft_loc = draft_loc._replace(revision=None)
+
+                    # does non-draft exist in the collection
+                    # if so, replace it
+                    if draft_as_non_draft_loc in to_process_dict:
+                        to_process_dict[draft_as_non_draft_loc] = draft
+
+                # convert the dict - which is used for look ups - back into a list
+                for key, value in to_process_dict.iteritems():
+                    to_process.append(value)
+
             # If depth is None, then we just recurse until we hit all the descendents
             if depth is not None:
                 depth -= 1
