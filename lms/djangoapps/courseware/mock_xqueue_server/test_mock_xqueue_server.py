@@ -7,6 +7,8 @@ import urlparse
 import time
 from mock_xqueue_server import MockXQueueServer, MockXQueueRequestHandler
 
+from nose.plugins.skip import SkipTest
+
 
 class MockXQueueServerTest(unittest.TestCase):
     '''
@@ -21,6 +23,11 @@ class MockXQueueServerTest(unittest.TestCase):
     '''
 
     def setUp(self):
+
+        # This is a test of the test setup,
+        # so it does not need to run as part of the unit test suite
+        # You can re-enable it by commenting out the line below
+        raise SkipTest
 
         # Create the server
         server_port = 8034
