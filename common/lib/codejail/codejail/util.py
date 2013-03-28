@@ -32,25 +32,6 @@ def temp_directory(delete_when_done=True):
         tmp.clean_up()
 
 
-class ModuleIsolation(object):
-    """
-    Manage changes to sys.modules so that we can roll back imported modules.
-
-    Create this object, it will snapshot the currently imported modules. When
-    you call `clean_up()`, it will delete any module imported since its creation.
-    """
-    def __init__(self):
-        # Save all the names of all the imported modules.
-        self.mods = set(sys.modules)
-
-    def clean_up(self):
-        # Get a list of modules that didn't exist when we were created
-        new_mods = [m for m in sys.modules if m not in self.mods]
-        # and delete them all so another import will run code for real again.
-        for m in new_mods:
-            del sys.modules[m]
-
-
 class ChangeDirectory(object):
     def __init__(self, new_dir):
         self.old_dir = os.getcwd()

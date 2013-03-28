@@ -6,39 +6,16 @@ import shutil
 import sys
 import textwrap
 
-import lazymod
 import jailpy
 
-from util import temp_directory, change_directory, TempDirectory
+from util import temp_directory, change_directory
 
-# We'll need the code from lazymod.py for use in jailpy, so read it now.
-lazymod_py_file = lazymod.__file__
-if lazymod_py_file.endswith("c"):
-    lazymod_py_file = lazymod_py_file[:-1]
-
-lazymod_py = open(lazymod_py_file).read()
-
-
-def names_and_modules(assumed_imports):
-    """Get uniform names and modules from assumed_imports."""
-    for modname in assumed_imports:
-        if isinstance(modname, tuple):
-            yield modname
-        else:
-            yield modname, modname
-
-
-def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=None):
+def safe_exec(code, globals_dict, files=None, python_path=None):
     """Execute code as "exec" does, but safely.
 
     `code` is a string of Python code.  `globals_dict` is used as the globals
     during execution.  Modifications the code makes to `globals_dict` are
     reflected in the dictionary on return.
-
-    `assumed_imports` is a list of modules to make available as implicit
-    imports for the code.  Entries are either a name, "mod", which makes
-    "import mod" part of the code, or a pair, ("f", "fooey"), which makes
-    "import fooey as f" part of the code.  The module name can be dotted.
 
     Returns None.  Changes made by `code` are visible in `globals_dict`.
 
@@ -71,11 +48,6 @@ def safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=
         pybase = os.path.basename(pydir)
         the_code.append("sys.path.append(%r)\n" % pybase)
         files.append(pydir)
-
-    if assumed_imports:
-        the_code.append(lazymod_py)
-        for name, modname in names_and_modules(assumed_imports):
-            the_code.append("g_dict['{}'] = LazyModule('{}')\n".format(name, modname))
 
     the_code.append(textwrap.dedent(
         # Execute the sandboxed code.
@@ -140,7 +112,7 @@ def json_safe(d):
     return json.loads(json.dumps(jd))
 
 
-def not_safe_exec(code, globals_dict, assumed_imports=None, files=None, python_path=None):
+def not_safe_exec(code, globals_dict, files=None, python_path=None):
     """Another implementation of `safe_exec`, but not safe.
 
     This can be swapped in for debugging problems in sandboxed Python code.
@@ -150,9 +122,6 @@ def not_safe_exec(code, globals_dict, assumed_imports=None, files=None, python_p
 
     """
     g_dict = json_safe(globals_dict)
-
-    for name, modname in names_and_modules(assumed_imports or ()):
-        g_dict[name] = lazymod.LazyModule(modname)
 
     with temp_directory(delete_when_done=True) as tmpdir:
         with change_directory(tmpdir):

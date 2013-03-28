@@ -14,19 +14,6 @@ class SafeExecTests(object):
         self.safe_exec("a = 17", g)
         self.assertEqual(g['a'], 17)
 
-    def test_assumed_imports(self):
-        g = {}
-        # Using string without importing it is bad.
-        with self.assertRaises(Exception):
-            self.safe_exec("a = string.ascii_lowercase[0]", g)
-        # Using string with an assumed import is fine.
-        self.safe_exec("a = string.ascii_lowercase[0]", g, assumed_imports=["string"])
-        self.assertEqual(g['a'], 'a')
-        # Can also import with a shorthand.
-        self.safe_exec("a = op.join('x', 'y')", g, assumed_imports=[("op", "os.path")])
-        self.assertEqual(g['a'][0], 'x')
-        self.assertEqual(g['a'][-1], 'y')
-
     def test_files_are_copied(self):
         g = {}
         self.safe_exec(
