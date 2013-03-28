@@ -27,9 +27,6 @@ from .inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
 
 log = logging.getLogger(__name__)
 
-import threading
-_mongo_metadata_request_cache_threadlocal = threading.local()
-
 # TODO (cpennington): This code currently operates under the assumption that
 # there is only one revision for each item. Once we start versioning inside the CMS,
 # that assumption will have to change
