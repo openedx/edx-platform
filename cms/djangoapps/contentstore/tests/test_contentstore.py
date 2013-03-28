@@ -85,6 +85,44 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
 
+    def _get_draft_counts(self, item):
+        cnt = 1 if getattr(item, 'is_draft', False) else 0
+        print "Checking {0}. Result = {1}".format(item.location, cnt)
+        for child in item.get_children():
+            cnt = cnt + self._get_draft_counts(child)
+
+        return cnt
+
+    def test_get_depth_with_drafts(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+
+        course = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple', 
+            'course', '2012_Fall', None]), depth=None)
+
+        # make sure no draft items have been returned
+        num_drafts = self._get_draft_counts(course)
+        self.assertEqual(num_drafts, 0)
+
+        problem = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple', 
+            'problem', 'ps01-simple', None]))
+
+        # put into draft
+        modulestore('draft').clone_item(problem.location, problem.location)
+
+        # make sure we can query that item and verify that it is a draft
+        draft_problem = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple', 
+            'problem', 'ps01-simple', None]))
+        self.assertTrue(getattr(draft_problem,'is_draft', False))
+
+        #now requery with depth
+        course = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple', 
+            'course', '2012_Fall', None]), depth=None)
+
+        # make sure no draft items have been returned
+        num_drafts = self._get_draft_counts(course)
+        self.assertEqual(num_drafts, 1)       
+
+
     def test_static_tab_reordering(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
