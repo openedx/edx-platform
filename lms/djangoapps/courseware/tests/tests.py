@@ -469,10 +469,13 @@ class TestViewAuth(LoginEnrollmentTestCase):
                                                             'student_id': get_user(self.student).id}))
             return urls
 
-        # shouldn't be able to get to the instructor pages
-        for url in instructor_urls(self.toy) + instructor_urls(self.full):
-            print 'checking for 404 on {0}'.format(url)
-            self.check_for_get_code(404, url)
+        # Randomly sample an instructor page
+        url = random.choice(instructor_urls(self.toy) + 
+                            instructor_urls(self.full))
+
+        # Shouldn't be able to get to the instructor pages
+        print 'checking for 404 on {0}'.format(url)
+        self.check_for_get_code(404, url)
 
         # Make the instructor staff in the toy course
         group_name = _course_staff_group_name(self.toy.location)
@@ -483,13 +486,13 @@ class TestViewAuth(LoginEnrollmentTestCase):
         self.login(self.instructor, self.password)
 
         # Now should be able to get to the toy course, but not the full course
-        for url in instructor_urls(self.toy):
-            print 'checking for 200 on {0}'.format(url)
-            self.check_for_get_code(200, url)
+        url = random.choice(instructor_urls(self.toy))
+        print 'checking for 200 on {0}'.format(url)
+        self.check_for_get_code(200, url)
 
-        for url in instructor_urls(self.full):
-            print 'checking for 404 on {0}'.format(url)
-            self.check_for_get_code(404, url)
+        url = random.choice(instructor_urls(self.full))
+        print 'checking for 404 on {0}'.format(url)
+        self.check_for_get_code(404, url)
 
         # now also make the instructor staff
         instructor = get_user(self.instructor)
@@ -497,9 +500,10 @@ class TestViewAuth(LoginEnrollmentTestCase):
         instructor.save()
 
         # and now should be able to load both
-        for url in instructor_urls(self.toy) + instructor_urls(self.full):
-            print 'checking for 200 on {0}'.format(url)
-            self.check_for_get_code(200, url)
+        url = random.choice(instructor_urls(self.toy) + 
+                            instructor_urls(self.full))
+        print 'checking for 200 on {0}'.format(url)
+        self.check_for_get_code(200, url)
 
     def run_wrapped(self, test):
         """
