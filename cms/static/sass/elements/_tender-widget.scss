@@ -9,6 +9,7 @@
 #tender_window {
   @include border-radius(3px);
   @include box-shadow(0 2px 3px $shadow);
+  height: ($baseline*35) !important;
   background: $white !important;
   border: 1px solid $gray;
 }
@@ -23,8 +24,6 @@
 
 #tender_closer {
   color: $blue-l2 !important;
-  margin-top: 10px;
-  margin-right: 5px;
   text-transform: uppercase;
 
   &:hover {
@@ -52,7 +51,7 @@
 
 .widget-layout .header {
   background: rgb(85, 151, 221);
-  padding: 20px;
+  padding: 10px 20px;
 }
 
 .widget-layout h1, .widget-layout h2, .widget-layout h3, .widget-layout h4, .widget-layout h5, .widget-layout h6, .widget-layout label {
@@ -60,8 +59,7 @@
 }
 
 .widget-layout .header h1 {
-  font-weight: 500;
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .widget-layout .content {
@@ -72,7 +70,7 @@
 
 .widget-layout .flash {
   margin: -10px 0 15px 0;
-  padding: 5px 10px !important;
+  padding: 10px 20px !important;
   background-image: none !important;
 }
 
@@ -194,9 +192,14 @@
   display: block !important;
 }
 
+.widget-layout dl#brain_buster_captcha #captcha_answer {
+  border-color: #333;
+}
+
 .widget-layout dl#brain_buster_captcha dd label {
   display: block;
-  margin: 0 15px 0 0 !important;
+  font-weight: 700;
+  margin: 0 15px 5px 0 !important;
 }
 
 .widget-layout dl#brain_buster_captcha dd #captcha_answer {
