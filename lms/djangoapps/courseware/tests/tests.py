@@ -289,7 +289,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self._assert_loads('static_tab', kwargs, descriptor)
 
         elif descriptor.location.category == 'course_info':
-            self._assert_loads('info', kwargs={'course_id': course_id}, 
+            self._assert_loads('info', {'course_id': course_id}, 
                                 descriptor)
 
         elif descriptor.location.category == 'custom_tag_template':
