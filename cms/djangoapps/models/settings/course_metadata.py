@@ -4,7 +4,7 @@ from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata
 from xblock.core import Scope
 from xmodule.course_module import CourseDescriptor
-
+import copy
 
 class CourseMetadata(object):
     '''
@@ -39,7 +39,7 @@ class CourseMetadata(object):
         return course
 
     @classmethod
-    def update_from_json(cls, course_location, jsondict):
+    def update_from_json(cls, course_location, jsondict, filter_tabs=True):
         """
         Decode the json into CourseMetadata and save any changed attrs to the db.
 
