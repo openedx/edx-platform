@@ -25,7 +25,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.modulestore.inheritance import own_metadata
 
 from xmodule.capa_module import CapaDescriptor
@@ -159,6 +159,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertTrue(found)
         # check that there's actually content in the 'question' field
         self.assertGreater(len(items[0].question),0)
+
+    def test_xlint_fails(self):
+        err_cnt = perform_xlint('common/test/data', ['full'])
+        self.assertGreater(err_cnt, 0)
 
     def test_delete(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
