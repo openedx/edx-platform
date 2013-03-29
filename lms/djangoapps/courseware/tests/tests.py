@@ -430,8 +430,8 @@ class TestNavigation(LoginEnrollmentTestCase):
                                kwargs={'course_id': self.toy.id}))
 
         self.assertRedirectsNoFollow(resp, reverse('courseware_chapter',
-                                      kwargs={'course_id': self.toy.id,
-                                               'chapter': 'Overview'}))
+                                     kwargs={'course_id': self.toy.id,
+                                             'chapter': 'Overview'}))
 
         # Now we directly navigate to a section in a different chapter
         self.check_for_get_code(200, reverse('courseware_section',
@@ -863,14 +863,14 @@ class TestCourseGrader(LoginEnrollmentTestCase):
         problem_location = "i4x://edX/graded/problem/%s" % problem_url_name
 
         modx_url = reverse('modx_dispatch',
-                            kwargs={'course_id': self.graded_course.id,
-                                    'location': problem_location,
-                                    'dispatch': 'problem_check', })
+                           kwargs={'course_id': self.graded_course.id,
+                                   'location': problem_location,
+                                   'dispatch': 'problem_check', })
 
         resp = self.client.post(modx_url, {
-        'input_i4x-edX-graded-problem-%s_2_1' % problem_url_name: responses[0],
-        'input_i4x-edX-graded-problem-%s_2_2' % problem_url_name: responses[1],
-        })
+                                'input_i4x-edX-graded-problem-%s_2_1' % problem_url_name: responses[0],
+                                'input_i4x-edX-graded-problem-%s_2_2' % problem_url_name: responses[1],
+                                })
         print "modx_url", modx_url, "responses", responses
         print "resp", resp
 
@@ -885,9 +885,9 @@ class TestCourseGrader(LoginEnrollmentTestCase):
         problem_location = self.problem_location(problem_url_name)
 
         modx_url = reverse('modx_dispatch',
-                            kwargs={'course_id': self.graded_course.id,
-                                    'location': problem_location,
-                                    'dispatch': 'problem_reset', })
+                           kwargs={'course_id': self.graded_course.id,
+                                   'location': problem_location,
+                                   'dispatch': 'problem_reset', })
 
         resp = self.client.post(modx_url)
         return resp
