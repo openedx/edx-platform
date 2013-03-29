@@ -6,7 +6,7 @@ These tags do not have state, so they just get passed the system (for access to 
 and the xml element.
 """
 
-from registry import TagRegistry
+from .registry import TagRegistry
 
 import logging
 import re
@@ -15,13 +15,15 @@ import json
 
 from lxml import etree
 import xml.sax.saxutils as saxutils
-from registry import TagRegistry
+from .registry import TagRegistry
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 registry = TagRegistry()
 
 #-----------------------------------------------------------------------------
+
+
 class MathRenderer(object):
     tags = ['math']
 
@@ -77,6 +79,7 @@ registry.register(MathRenderer)
 
 #-----------------------------------------------------------------------------
 
+
 class SolutionRenderer(object):
     '''
     A solution is just a <span>...</span> which is given an ID, that is used for displaying an
@@ -97,4 +100,3 @@ class SolutionRenderer(object):
         return etree.XML(html)
 
 registry.register(SolutionRenderer)
-

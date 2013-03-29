@@ -1,0 +1,152 @@
+<%inherit file="base.html" />
+<%block name="title">Grading Settings</%block>
+<%block name="bodyclass">is-signedin course grading settings</%block>
+
+<%namespace name='static' file='static_content.html'/>
+<%!
+from contentstore import utils 
+%>
+
+<%block name="jsextra">
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  
+  <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/settings/settings_grading_view.js')}"></script>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+
+      $("form :input").focus(function() {
+        $("label[for='" + this.id + "']").addClass("is-focused");
+      }).blur(function() {
+        $("label").removeClass("is-focused");
+      });
+    
+      var editor = new CMS.Views.Settings.Grading({
+          el: $('.settings-grading'),
+          model : new CMS.Models.Settings.CourseGradingPolicy(${course_details|n},{parse:true})
+      });
+      
+      editor.render();
+    });
+      
+  </script>
+</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-subtitle">
+    <div class="title">
+      <span class="title-sub">Settings</span>
+      <h1 class="title-1">Grading</h1>
+    </div>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+      <form id="settings_details" class="settings-grading" method="post" action="">
+        <section class="group-settings grade-range">
+          <header>
+            <h2 class="title-2">Overall Grade Range</h2>
+            <span class="tip">Your overall grading scale for student final grades</span>
+          </header>
+
+          <ol class="list-input">
+            <li class="field" id="field-course-grading-range">
+              <div class="grade-controls course-grading-range well">
+                <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
+                <div class="grade-slider">
+                  <div class="grade-bar">
+                    <ol class="increments">
+                      <li class="increment-0">0</li>
+                      <li class="increment-10">10</li>
+                      <li class="increment-20">20</li>
+                      <li class="increment-30">30</li>
+                      <li class="increment-40">40</li>
+                      <li class="increment-50">50</li>
+                      <li class="increment-60">60</li>
+                      <li class="increment-70">70</li>
+                      <li class="increment-80">80</li>
+                      <li class="increment-90">90</li>
+                      <li class="increment-100">100</li>
+                    </ol>
+                    <ol class="grades">
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <hr class="divide" />
+
+        <section class="group-settings grade-rules">
+          <header>
+            <h2 class="title-2">Grading Rules &amp; Policies</h2>
+            <span class="tip">Deadlines, requirements, and logistics around grading student work</span>
+          </header>
+
+          <ol class="list-input">
+            <li class="field text" id="field-course-grading-graceperiod">
+              <label for="course-grading-graceperiod">Grace Period on Deadline:</label>
+              <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
+              <span class="tip tip-inline">Leeway on due dates</span>
+            </li>
+          </ol>
+        </section>
+
+        <hr class="divide" />
+
+        <section class="group-settings assignment-types">
+          <header>
+            <h2 class="title-2">Assignment Types</h2>
+            <span class="tip">Categories and labels for any exercises that are gradable</span>
+          </header>
+
+          <ol class="list-input course-grading-assignment-list enum">
+              
+          </ol> 
+
+          <div class="actions">
+            <a href="#" class="new-button new-course-grading-item add-grading-data">
+              <span class="plus-icon white"></span>New Assignment Type
+            </a>            
+          </div>
+        </section>
+      </form>
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">How will these settings be used?</h3>
+        <p>Your grading settings will be used to calculate students grades and performance.</p>
+
+        <p>Overall grade range will be used in students' final grades, which are calculated by the weighting you determine for each custom assignment type.</p>
+      </div>
+
+      <div class="bit">
+      % if context_course:
+      <% ctx_loc = context_course.location %>
+      <%! from django.core.urlresolvers import reverse %>
+        <h3 class="title-3">Other Course Settings</h3>
+        <nav class="nav-related">
+          <ul>
+            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Details &amp; Schedule</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
+          </ul>
+        </nav>
+      % endif
+      </div>
+    </aside>
+  </section>
+</div>
+</%block>

@@ -1,7 +1,8 @@
-from utils import *
+from .utils import *
 
 import models
 import settings
+
 
 class User(models.Model):
 
@@ -82,17 +83,22 @@ class User(models.Model):
         response = perform_request('get', url, retrieve_params)
         self.update_attributes(**response)
 
+
 def _url_for_vote_comment(comment_id):
     return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)
+
 
 def _url_for_vote_thread(thread_id):
     return "{prefix}/threads/{thread_id}/votes".format(prefix=settings.PREFIX, thread_id=thread_id)
 
+
 def _url_for_subscription(user_id):
     return "{prefix}/users/{user_id}/subscriptions".format(prefix=settings.PREFIX, user_id=user_id)
 
+
 def _url_for_user_active_threads(user_id):
     return "{prefix}/users/{user_id}/active_threads".format(prefix=settings.PREFIX, user_id=user_id)
+
 
 def _url_for_user_subscribed_threads(user_id):
     return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)

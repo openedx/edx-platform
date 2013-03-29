@@ -11,7 +11,6 @@ from .common import *
 import os
 from path import path
 
-
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
 NOSE_ARGS = ['--with-xunit']
@@ -19,11 +18,17 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 TEST_ROOT = path('test_root')
 
+# Makes the tests run much faster...
+SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
+
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
+
+# Makes the tests run much faster...
+SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
@@ -36,17 +41,31 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
+modulestore_options = {
+    'default_class': 'xmodule.raw_module.RawDescriptor',
+    'host': 'localhost',
+    'db': 'test_xmodule',
+    'collection': 'modulestore',
+    'fs_root': GITHUB_REPO_ROOT,
+    'render_template': 'mitxmako.shortcuts.render_to_string',
+}
+
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': {
-            'default_class': 'xmodule.raw_module.RawDescriptor',
-            'host': 'localhost',
-            'db': 'test_xmodule',
-            'collection': 'modulestore',
-            'fs_root': GITHUB_REPO_ROOT,
-            'render_template': 'mitxmako.shortcuts.render_to_string',
-        }
+        'OPTIONS': modulestore_options
+    },
+    'direct': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': modulestore_options
+    }
+}
+
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db': 'xcontent',
     }
 }
 
@@ -55,21 +74,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ENV_ROOT / "db" / "cms.db",
     },
-
-    # The following are for testing purposes...
-    'edX/toy/2012_Fall': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "course1.db",
-    },
-    
-    'edx/full/6.002_Spring_2012': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "course2.db",
-    }
 }
 
+LMS_BASE = "localhost:8000"
+
 CACHES = {
-    # This is the cache used for most things. Askbot will not work without a 
+    # This is the cache used for most things. Askbot will not work without a
     # functioning cache -- it relies on caching to load its settings in places.
     # In staging/prod envs, the sessions also live here.
     'default': {
@@ -88,5 +98,19 @@ CACHES = {
         'KEY_PREFIX': 'general',
         'VERSION': 4,
         'KEY_FUNCTION': 'util.memcache.safe_key',
+    },
+
+    'mongo_metadata_inheritance': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': '/var/tmp/mongo_metadata_inheritance',
+        'TIMEOUT': 300,
+        'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
+
+################### Make tests faster
+#http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)

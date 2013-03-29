@@ -61,12 +61,14 @@ invalid = ("foo", ["foo"], ["foo", "bar"],
            invalid_dict,
            invalid_dict2)
 
+
 def test_is_valid():
     for v in valid:
         assert_equals(Location.is_valid(v), True)
 
     for v in invalid:
         assert_equals(Location.is_valid(v), False)
+
 
 def test_dict():
     assert_equals("tag://org/course/category/name", Location(input_dict).url())
@@ -75,6 +77,7 @@ def test_dict():
     input_dict['revision'] = 'revision'
     assert_equals("tag://org/course/category/name@revision", Location(input_dict).url())
     assert_equals(input_dict, Location(input_dict).dict())
+
 
 def test_list():
     assert_equals("tag://org/course/category/name", Location(input_list).url())
@@ -115,19 +118,20 @@ def test_equality():
     )
 
 # All the cleaning functions should do the same thing with these
-general_pairs = [ ('',''),
-                  (' ', '_'),
-                  ('abc,', 'abc_'),
-                  ('ab    fg!@//\\aj', 'ab_fg_aj'),
-                  (u"ab\xA9", "ab_"),  # no unicode allowed for now
-                  ]
+general_pairs = [('', ''),
+                 (' ', '_'),
+                 ('abc,', 'abc_'),
+                 ('ab    fg!@//\\aj', 'ab_fg_aj'),
+                 (u"ab\xA9", "ab_"),  # no unicode allowed for now
+                 ]
+
 
 def test_clean():
     pairs = general_pairs + [
         ('a:b', 'a_b'),  # no colons in non-name components
-        ('a-b', 'a-b'),  # dashes ok 
+        ('a-b', 'a-b'),  # dashes ok
         ('a.b', 'a.b'),  # dot ok
-        ]
+    ]
     for input, output in pairs:
         assert_equals(Location.clean(input), output)
 
@@ -137,17 +141,17 @@ def test_clean_for_url_name():
         ('a:b', 'a:b'),  # colons ok in names
         ('a-b', 'a-b'),  # dashes ok in names
         ('a.b', 'a.b'),  # dot ok in names
-        ]
+    ]
     for input, output in pairs:
         assert_equals(Location.clean_for_url_name(input), output)
 
 
 def test_clean_for_html():
     pairs = general_pairs + [
-              ("a:b", "a_b"),   # no colons for html use
-              ("a-b", "a-b"),   # dashes ok (though need to be replaced in various use locations. ugh.)
-              ('a.b', 'a_b'),   # no dots.
-              ]
+        ("a:b", "a_b"),   # no colons for html use
+        ("a-b", "a-b"),   # dashes ok (though need to be replaced in various use locations. ugh.)
+        ('a.b', 'a_b'),   # no dots.
+    ]
     for input, output in pairs:
         assert_equals(Location.clean_for_html(input), output)
 

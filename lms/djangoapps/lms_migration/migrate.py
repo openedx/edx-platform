@@ -22,28 +22,31 @@ log = logging.getLogger("mitx.lms_migrate")
 LOCAL_DEBUG = True
 ALLOWED_IPS = settings.LMS_MIGRATION_ALLOWED_IPS
 
+
 def escape(s):
     """escape HTML special characters in string"""
-    return str(s).replace('<','&lt;').replace('>','&gt;')
+    return str(s).replace('<', '&lt;').replace('>', '&gt;')
+
 
 def getip(request):
     '''
     Extract IP address of requester from header, even if behind proxy
     '''
-    ip = request.META.get('HTTP_X_REAL_IP','')	# nginx reverse proxy
+    ip = request.META.get('HTTP_X_REAL_IP', '')  	# nginx reverse proxy
     if not ip:
-        ip = request.META.get('REMOTE_ADDR','None')
+        ip = request.META.get('REMOTE_ADDR', 'None')
     return ip
 
 
 def get_commit_id(course):
-    return course.metadata.get('GIT_COMMIT_ID','No commit id')
+    return course.metadata.get('GIT_COMMIT_ID', 'No commit id')
     # getattr(def_ms.courses[reload_dir], 'GIT_COMMIT_ID','No commit id')
 
 
-def set_commit_id(course,commit_id):
+def set_commit_id(course, commit_id):
     course.metadata['GIT_COMMIT_ID'] = commit_id
     # setattr(def_ms.courses[reload_dir], 'GIT_COMMIT_ID', new_commit_id)
+
 
 def manage_modulestores(request, reload_dir=None, commit_id=None):
     '''
@@ -65,7 +68,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
         html += '<h3>IP address: %s <h3>' % ip
         html += '<h3>User: %s </h3>' % request.user
         html += '<h3>My pid: %s</h3>' % os.getpid()
-        log.debug('request from ip=%s, user=%s' % (ip,request.user))
+        log.debug('request from ip=%s, user=%s' % (ip, request.user))
 
     if not (ip in ALLOWED_IPS or 'any' in ALLOWED_IPS):
         if request.user and request.user.is_staff:
@@ -89,7 +92,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
             log.debug('commit_id="%s"' % commit_id)
             log.debug('current_commit_id="%s"' % current_commit_id)
 
-            if (commit_id is not None) and (commit_id==current_commit_id):
+            if (commit_id is not None) and (commit_id == current_commit_id):
                 html += "<h2>Already at commit id %s for %s</h2>" % (commit_id, reload_dir)
                 track.views.server_track(request,
                                          'reload %s skipped already at %s (pid=%s)' % (reload_dir,
@@ -100,7 +103,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
             else:
                 html += '<h2>Reloaded course directory "%s"</h2>' % reload_dir
                 def_ms.try_load_course(reload_dir)
-                gdir = settings.DATA_DIR / reload_dir 
+                gdir = settings.DATA_DIR / reload_dir
                 new_commit_id = os.popen('cd %s; git log -n 1 | head -1' % gdir).read().strip().split(' ')[1]
                 set_commit_id(def_ms.courses[reload_dir], new_commit_id)
                 html += '<p>commit_id=%s</p>' % new_commit_id
@@ -121,21 +124,21 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
 
     #----------------------------------------
 
-    dumpfields = ['definition','location','metadata']
+    dumpfields = ['definition', 'location', 'metadata']
 
     for cdir, course in def_ms.courses.items():
         html += '<hr width="100%"/>'
-        html += '<h2>Course: %s (%s)</h2>' % (course.display_name,cdir)
+        html += '<h2>Course: %s (%s)</h2>' % (course.display_name_with_default, cdir)
 
         html += '<p>commit_id=%s</p>' % get_commit_id(course)
 
         for field in dumpfields:
-            data = getattr(course,field)
+            data = getattr(course, field)
             html += '<h3>%s</h3>' % field
-            if type(data)==dict:
+            if type(data) == dict:
                 html += '<ul>'
-                for k,v in data.items():
-                    html += '<li>%s:%s</li>' % (escape(k),escape(v))
+                for k, v in data.items():
+                    html += '<li>%s:%s</li>' % (escape(k), escape(v))
                 html += '</ul>'
             else:
                 html += '<ul><li>%s</li></ul>' % escape(data)
@@ -159,6 +162,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
     html += "</body></html>"
     return HttpResponse(html)
 
+
 @csrf_exempt
 def gitreload(request, reload_dir=None):
     '''
@@ -172,8 +176,8 @@ def gitreload(request, reload_dir=None):
     html += '<h3>IP address: %s ' % ip
     html += '<h3>User: %s ' % request.user
 
-    ALLOWED_IPS = []	# allow none by default
-    if hasattr(settings,'ALLOWED_GITRELOAD_IPS'):	# allow override in settings
+    ALLOWED_IPS = []  	# allow none by default
+    if hasattr(settings, 'ALLOWED_GITRELOAD_IPS'):  	# allow override in settings
         ALLOWED_IPS = settings.ALLOWED_GITRELOAD_IPS
 
     if not (ip in ALLOWED_IPS or 'any' in ALLOWED_IPS):
@@ -182,9 +186,9 @@ def gitreload(request, reload_dir=None):
         else:
             html += 'Permission denied'
             html += "</body></html>"
-            log.debug('request denied from %s, ALLOWED_IPS=%s' % (ip,ALLOWED_IPS))
-            return HttpResponse(html)    
-        
+            log.debug('request denied from %s, ALLOWED_IPS=%s' % (ip, ALLOWED_IPS))
+            return HttpResponse(html)
+
     #----------------------------------------
     # see if request is from github (POST with JSON)
 
@@ -195,19 +199,19 @@ def gitreload(request, reload_dir=None):
         log.debug("gitargs=%s" % gitargs)
         reload_dir = gitargs['repository']['name']
         log.debug("github reload_dir=%s" % reload_dir)
-        gdir = settings.DATA_DIR / reload_dir 
+        gdir = settings.DATA_DIR / reload_dir
         if not os.path.exists(gdir):
             log.debug("====> ERROR in gitreload - no such directory %s" % reload_dir)
             return HttpResponse('Error')
         cmd = "cd %s; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml" % gdir
         log.debug(os.popen(cmd).read())
-        if hasattr(settings,'GITRELOAD_HOOK'):	# hit this hook after reload, if set
+        if hasattr(settings, 'GITRELOAD_HOOK'):  	# hit this hook after reload, if set
             gh = settings.GITRELOAD_HOOK
             if gh:
-                ghurl = '%s/%s' % (gh,reload_dir)
+                ghurl = '%s/%s' % (gh, reload_dir)
                 r = requests.get(ghurl)
                 log.debug("GITRELOAD_HOOK to %s: %s" % (ghurl, r.text))
-        
+
     #----------------------------------------
     # reload course if specified
 
@@ -220,4 +224,4 @@ def gitreload(request, reload_dir=None):
             def_ms.try_load_course(reload_dir)
             track.views.server_track(request, 'reloaded %s' % reload_dir, {}, page='migrate')
 
-    return HttpResponse(html)    
+    return HttpResponse(html)

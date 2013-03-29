@@ -1,17 +1,13 @@
-from django.contrib.auth.models import User
-from django.test import TestCase
-from student.models import CourseEnrollment, \
-                           replicate_enrollment_save, \
-                           replicate_enrollment_delete, \
-                           update_user_information, \
-                           replicate_user_save
-                           
-from django.db.models.signals import m2m_changed, pre_delete, pre_save, post_delete, post_save
-from django.dispatch.dispatcher import _make_id
 import string
 import random
-from .permissions import has_permission
-from .models import Role, Permission
+
+from django.contrib.auth.models import User
+from django.test import TestCase
+
+from student.models import CourseEnrollment
+from django_comment_client.permissions import has_permission
+from django_comment_client.models import Role
+
 
 class PermissionsTestCase(TestCase):
     def random_str(self, length=15, chars=string.ascii_uppercase + string.digits):

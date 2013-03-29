@@ -7,12 +7,13 @@ from collections import namedtuple, defaultdict
 
 from mitxmako.shortcuts import render_to_string
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
-from django.views.decorators.csrf import requires_csrf_token, csrf_protect
+from django.views.decorators.csrf import requires_csrf_token
 
-from models import CourseSoftware
-from models import get_courses_licenses, get_or_create_license, get_license
+from licenses.models import CourseSoftware
+from licenses.models import get_courses_licenses, get_or_create_license, get_license
 
 
 log = logging.getLogger("mitx.licenses")
@@ -44,6 +45,7 @@ def get_licenses_by_course(user, courses):
     return data_by_course
 
 
+@login_required
 @requires_csrf_token
 def user_software_license(request):
     if request.method != 'POST' or not request.is_ajax():
@@ -65,19 +67,21 @@ def user_software_license(request):
     try:
         software = CourseSoftware.objects.get(name=software_name,
                                               course_id=course_id)
-        print software
     except CourseSoftware.DoesNotExist:
         raise Http404
 
-    user = User.objects.get(id=user_id)
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        raise Http404
 
     if generate:
-        license = get_or_create_license(user, software)
+        software_license = get_or_create_license(user, software)
     else:
-        license = get_license(user, software)
+        software_license = get_license(user, software)
 
-    if license:
-        response = {'serial': license.serial}
+    if software_license:
+        response = {'serial': software_license.serial}
     else:
         response = {'error': 'No serial number found'}
 

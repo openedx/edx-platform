@@ -1,6 +1,3 @@
-
-
-
 var SequenceNav = function($element) {
 	var _this = this;
 	var $element = $element;
@@ -44,7 +41,7 @@ var SequenceNav = function($element) {
 
 		var leftPercent = clamp(-left / padding, 0, 1);
 		$leftShadow.css('opacity', leftPercent);
-	
+
 		var rightPercent = clamp((maxScroll + left) / padding, 0, 1);
 		$rightShadow.css('opacity', rightPercent);
 	};
@@ -95,5 +92,5 @@ var SequenceNav = function($element) {
 	$(window).bind('resize', updateWidths);
 	setTimeout(function() {
 		checkPosition();
-	}, 200);	
-}
+	}, 200);
+};

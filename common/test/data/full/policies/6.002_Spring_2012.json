@@ -1,0 +1,17 @@
+{
+    "course/6.002_Spring_2012": {
+        "graceperiod": "1 day 12 hours 59 minutes 59 seconds",
+        "start": "2012-09-21T12:00",
+        "display_name": "Testing",
+        "xqa_key": "5HapHs6tHhu1iN1ZX5JGNYKRkXrXh7NC",
+        "tabs": [
+          {"type": "courseware"},
+          {"type": "course_info", "name": "Course Info"},
+          {"type": "static_tab", "url_slug": "syllabus", "name": "Syllabus"},
+          {"type": "static_tab", "url_slug": "resources", "name": "Resources"},
+          {"type": "discussion", "name": "Discussion"},
+          {"type": "wiki", "name": "Wiki"},
+          {"type": "progress", "name": "Progress"}
+        ]
+    }
+}

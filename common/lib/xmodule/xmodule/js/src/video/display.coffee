@@ -2,7 +2,9 @@ class @Video
   constructor: (element) ->
     @el = $(element).find('.video')
     @id = @el.attr('id').replace(/video_/, '')
-    @caption_data_dir = @el.data('caption-data-dir')
+    @start = @el.data('start')
+    @end = @el.data('end')
+    @caption_asset_path = @el.data('caption-asset-path')
     @show_captions = @el.data('show-captions') == "true"
     window.player = null
     @el = $("#video_#{@id}")
@@ -17,7 +19,7 @@ class @Video
       @embed()
     else
       window.onYouTubePlayerAPIReady = =>
-        $('.course-content .video').each ->
+        @el.each ->
           $(this).data('video').embed()
 
   youtubeId: (speed)->

@@ -47,8 +47,8 @@
     <section class="highlighted-courses">
       <h2>Explore free courses from <span class="edx">edX</span> universities</h2>
 
-      <section class="university-partners">
-        <ol class="partners partners-primary">
+      <section class="university-partners university-partners2x6">
+        <ol class="partners">
           <li class="partner mit">
             <a href="${reverse('university_profile', args=['MITx'])}">
               <img src="${static.url('images/university/mit/mit.png')}" />
@@ -65,7 +65,7 @@
               </div>
             </a>
           </li>
-          <li class="partner last">
+          <li class="partner">
             <a href="${reverse('university_profile', args=['BerkeleyX'])}">
               <img src="${static.url('images/university/berkeley/berkeley.png')}" />
               <div class="name">
@@ -73,11 +73,6 @@
               </div>
             </a>
           </li>
-        </ol>
-
-        <hr />
-
-        <ol class="partners">
           <li class="partner">
             <a href="${reverse('university_profile', args=['UTx'])}">
               <img src="${static.url('images/university/ut/ut-rollover_350x150.png')}" />
@@ -87,6 +82,27 @@
             </a>
           </li>
           <li class="partner">
+            <a href="${reverse('university_profile', args=['McGillX'])}">
+              <img src="${static.url('images/university/mcgill/mcgill.png')}" />
+              <div class="name">
+                <span>McGillX</span>
+              </div>
+            </a>
+          </li>
+          <li class="partner">
+            <a href="${reverse('university_profile', args=['ANUx'])}">
+              <img src="${static.url('images/university/anu/anu.png')}" />
+              <div class="name">
+                <span>ANUx</span>
+              </div>
+            </a>
+          </li>
+        </ol>
+
+        <hr />
+
+        <ol class="partners">
+          <li class="partner">
             <a href="${reverse('university_profile', args=['WellesleyX'])}">
               <img src="${static.url('images/university/wellesley/wellesley-rollover_350x150.png')}" />
               <div class="name">
@@ -94,7 +110,7 @@
               </div>
             </a>
           </li>
-          <li class="partner last">
+          <li class="partner">
             <a href="${reverse('university_profile', args=['GeorgetownX'])}">
               <img src="${static.url('images/university/georgetown/georgetown-rollover_350x150.png')}" />
               <div class="name">
@@ -102,25 +118,49 @@
               </div>
             </a>
           </li>
+          <li class="partner">
+            <a href="${reverse('university_profile', args=['TorontoX'])}">
+              <img src="${static.url('images/university/toronto/toronto.png')}" />
+              <div class="name">
+                <span>University of TorontoX</span>
+              </div>
+            </a>
+          </li>
+          <li class="partner">
+            <a href="${reverse('university_profile', args=['EPFLx'])}">
+              <img src="${static.url('images/university/epfl/epfl.png')}" />
+              <div class="name">
+                <span>EPFLx</span>
+              </div>
+            </a>
+          </li>
+          <li class="partner">
+            <a href="${reverse('university_profile', args=['DelftX'])}">
+              <img src="${static.url('images/university/delft/delft.png')}" />
+              <div class="name">
+                <span>DelftX</span>
+              </div>
+            </a>
+          </li>
+          <li class="partner">
+            <a href="${reverse('university_profile', args=['RiceX'])}">
+              <img src="${static.url('images/university/rice/rice.png')}" />
+              <div class="name">
+                <span>RiceX</span>
+              </div>
+            </a>
+          </li>
         </ol>
       </section>
 
       <section class="courses">
-        <section class='university-column'>
-          %for course in universities['MITx']:
-            <%include file="course.html" args="course=course" />
+          <ul class="courses-listing">
+          %for course in courses:
+            <li class="courses-listing-item">
+              <%include file="course.html" args="course=course" />
+            </li>
           %endfor
-        </section>
-        <section class='university-column'>
-          %for course in universities['HarvardX']:
-            <%include file="course.html" args="course=course" />
-          %endfor
-        </section>
-        <section class='university-column last'>
-          %for course in universities['BerkeleyX']:
-            <%include file="course.html" args="course=course" />
-          %endfor
-        </section>
+          </ul>
       </section>
     </section>
   </section>
@@ -129,6 +169,7 @@
     <section class="more-info">
       <header>
         <h2><span class="edx">edX</span> News &amp; Announcements</h2>
+        <a class="action action-mediakit" href="${reverse('media-kit')}"> <span class="org-name">edX</span> MEDIA KIT</a>
       </header>
       <section class="news">
         <section class="blog-posts">
@@ -171,7 +212,7 @@
 
 <section id="video-modal" class="modal home-page-video-modal video-modal">
   <div class="inner-wrapper">
-    <iframe width="640" height="360" src="http://www.youtube.com/embed/IlNU60ZKj3I?showinfo=0" frameborder="0" allowfullscreen></iframe>
+    <iframe width="640" height="360" src="http://www.youtube.com/embed/XNaiOGxWeto?showinfo=0" frameborder="0" allowfullscreen></iframe>
   </div>
 </section>
 

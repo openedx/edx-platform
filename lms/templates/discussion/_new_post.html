@@ -9,7 +9,7 @@
 </%def>
 
 <%def name="render_entry(entries, entry)">
-    <li><a href="#" class="topic" data-discussion_id="${entries[entry]['id']}">${entry}</a></li>
+    <li><a href="#" class="topic" data-discussion_id="${entries[entry]['id']}" cohorted = "${entries[entry]['id'] in cohorted_commentables}">${entry}</a></li>
 </%def>
 
 <%def name="render_category(categories, category)">
@@ -21,13 +21,14 @@
     </li>
 </%def>
 
+
 <article class="new-post-article">
-    <div class="inner-wrapper">        
+    <div class="inner-wrapper">
         <form class="new-post-form">
             <div class="left-column">
                 <label>Create new post about:</label>
                 <div class="form-topic-drop">
-                    <a href="#" class="topic_dropdown_button">All<span class="drop-arrow">▾</span></a>
+                    <a href="#" class="topic_dropdown_button">Show All Discussions<span class="drop-arrow">▾</span></a>
                     <div class="topic_menu_wrapper">
                         <div class="topic_menu_search">
                             <input type="text" class="form-topic-drop-search-input" placeholder="filter topics">
@@ -40,10 +41,25 @@
                 <div class="options">
                     <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">follow this post</label>
                     <br>
-                    % if course.metadata.get("allow_anonymous", True):
+                    % if course.allow_anonymous:
                         <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous"><label for="new-post-anonymous">post anonymously</label>
-                    %elif course.metadata.get("allow_anonymous_to_peers", False):
+                    %elif course.allow_anonymous_to_peers:
                         <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">post anonymously to classmates</label>
+                    %endif
+                    %if is_course_cohorted and is_moderator:
+                    <div class="form-group-label choose-cohort">
+                        Make visible to:
+                        <select class="group-filter-select new-post-group" name = "group_id">
+                            <option value="">All Groups</option>
+                            %for c in cohorts:
+                                <option value="${c.id}"
+                                %if user_cohort and str(user_cohort) == str(c.id):
+                                    selected
+                                %endif
+                                >${c.name}</option>
+                            %endfor
+                        </select>
+                    </div>
                     %endif
                 </div>
             </div>

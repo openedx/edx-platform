@@ -23,26 +23,37 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('-n', '--noop',
-            action='store_true',
-            dest='noop',
-            default=False,
-            help="Don't add certificate requests to the queue"),
+                    action='store_true',
+                    dest='noop',
+                    default=False,
+                    help="Don't add certificate requests to the queue"),
         make_option('-c', '--course',
-            metavar='COURSE_ID',
-            dest='course',
-            default=False,
-            help='Grade and generate certificates for a specific course'),
+                    metavar='COURSE_ID',
+                    dest='course',
+                    default=False,
+                    help='Grade and generate certificates '
+                    'for a specific course'),
+        make_option('-f', '--force-gen',
+                    metavar='STATUS',
+                    dest='force',
+                    default=False,
+                    help='Will generate new certificates for only those users '
+                    'whose entry in the certificate table matches STATUS. '
+                    'STATUS can be generating, unavailable, deleted, error '
+                    'or notpassing.'),
 
-        )
+    )
 
     def handle(self, *args, **options):
 
         # Will only generate a certificate if the current
-        # status is in this state
+        # status is in the unavailable state, can be set
+        # to something else with the force flag
 
-        VALID_STATUSES = [
-                 CertificateStatuses.unavailable
-        ]
+        if options['force']:
+            valid_statuses = getattr(CertificateStatuses, options['force'])
+        else:
+            valid_statuses = [CertificateStatuses.unavailable]
 
         # Print update after this many students
 
@@ -54,8 +65,8 @@ class Command(BaseCommand):
             # Find all courses that have ended
             ended_courses = []
             for course_id in [course  # all courses in COURSE_LISTINGS
-                    for sub in settings.COURSE_LISTINGS
-                        for course in settings.COURSE_LISTINGS[sub]]:
+                              for sub in settings.COURSE_LISTINGS
+                              for course in settings.COURSE_LISTINGS[sub]]:
                 course_loc = CourseDescriptor.id_to_location(course_id)
                 course = modulestore().get_instance(course_id, course_loc)
                 if course.has_ended():
@@ -64,8 +75,8 @@ class Command(BaseCommand):
         for course_id in ended_courses:
             print "Fetching enrolled students for {0}".format(course_id)
             enrolled_students = User.objects.filter(
-                    courseenrollment__course_id=course_id).prefetch_related(
-                            "groups").order_by('username')
+                courseenrollment__course_id=course_id).prefetch_related(
+                    "groups").order_by('username')
             xq = XQueueCertInterface()
             total = enrolled_students.count()
             count = 0
@@ -81,11 +92,11 @@ class Command(BaseCommand):
                     hours, remainder = divmod(timeleft.seconds, 3600)
                     minutes, seconds = divmod(remainder, 60)
                     print "{0}/{1} completed ~{2:02}:{3:02}m remaining".format(
-                            count, total, hours, minutes)
+                        count, total, hours, minutes)
                     start = datetime.datetime.now()
 
                 if certificate_status_for_student(
-                     student, course_id)['status'] in VALID_STATUSES:
+                        student, course_id)['status'] in valid_statuses:
                     if not options['noop']:
                         # Add the certificate request to the queue
                         ret = xq.add_cert(student, course_id)

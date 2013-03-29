@@ -64,7 +64,7 @@ def path_to_location(modulestore, course_id, location):
             # isn't found so we don't have to do it explicitly.  Call this
             # first to make sure the location is there (even if it's a course, and
             # we would otherwise immediately exit).
-            parents = modulestore.get_parent_locations(loc)
+            parents = modulestore.get_parent_locations(loc, course_id)
 
             # print 'Processing loc={0}, path={1}'.format(loc, path)
             if loc.category == "course":
@@ -80,6 +80,9 @@ def path_to_location(modulestore, course_id, location):
 
         # If we're here, there is no path
         return None
+
+    if not modulestore.has_item(location):
+        raise ItemNotFoundError
 
     path = find_path_to_course()
     if path is None:
@@ -101,14 +104,14 @@ def path_to_location(modulestore, course_id, location):
     # module nested in more than one positional module will work.
     if n > 3:
         position_list = []
-        for path_index in range(2, n-1):
+        for path_index in range(2, n - 1):
             category = path[path_index].category
             if  category == 'sequential' or category == 'videosequence':
                 section_desc = modulestore.get_instance(course_id, path[path_index])
                 child_locs = [c.location for c in section_desc.get_children()]
                 # positions are 1-indexed, and should be strings to be consistent with
                 # url parsing.
-                position_list.append(str(child_locs.index(path[path_index+1]) + 1))
+                position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
         position = "_".join(position_list)
 
     return (course_id, chapter, section, position)

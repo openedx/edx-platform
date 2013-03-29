@@ -1,0 +1,116 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="title">Advanced Settings</%block>
+<%block name="bodyclass">is-signedin course advanced settings</%block>
+
+<%namespace name='static' file='static_content.html'/>
+<%!
+from contentstore import utils
+%>
+
+<%block name="jsextra">
+
+<script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
+<script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
+<script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
+<script type="text/javascript" src="${static.url('js/models/settings/advanced.js')}"></script>
+<script type="text/javascript" src="${static.url('js/views/settings/advanced_view.js')}"></script>
+
+<script type="text/javascript">
+$(document).ready(function () {
+
+    // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
+    var advancedModel = new CMS.Models.Settings.Advanced(${advanced_dict | n}, {parse: true});
+    advancedModel.url = "${reverse('course_advanced_settings_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
+
+    var editor = new CMS.Views.Settings.Advanced({
+      el: $('.settings-advanced'),
+      model: advancedModel
+      });
+
+editor.render();
+
+});
+
+</script>
+</%block>
+
+<%block name="content">
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <header class="page">
+      <span class="title-sub">Settings</span>
+      <h1 class="title-1">Advanced Settings</h1>
+    </header>
+
+    <article class="content-primary" role="main">
+      <form id="settings_advanced" class="settings-advanced" method="post" action="">
+
+        <div class="message message-status confirm">
+          Your policy changes have been saved.
+        </div>
+
+        <div class="message message-status error">
+          There was an error saving your information. Please see below.
+        </div>
+
+        <section class="group-settings advanced-policies">
+          <header>
+            <h2 class="title-2">Manual Policy Definition</h2>
+            <span class="tip">Manually Edit Course Policy Values (JSON Key / Value pairs)</span>
+          </header>
+
+          <p class="instructions"><strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.</p>
+
+          <ul class="list-input course-advanced-policy-list enum">
+              
+          </ul>
+        </section>
+      </form>
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">How will these settings be used?</h3>
+        <p>Manual policies are JSON-based key and value pairs that give you control over specific course settings that edX Studio will use when displaying and running your course.</p>
+
+        <p>Any policies you modify here will override any other information you've defined elsewhere in Studio. With this in mind, please be very careful and do not edit policies that you are unfamiliar with (both their purpose and their syntax).</p>
+      </div>
+
+      <div class="bit">
+      % if context_course:
+      <% ctx_loc = context_course.location %>
+      <%! from django.core.urlresolvers import reverse %>
+        <h3 class="title-3">Other Course Settings</h3>
+        <nav class="nav-related">
+          <ul>
+            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Details &amp; Schedule</a></li>
+            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+          </ul>
+        </nav>
+      % endif
+      </div>
+    </aside>
+  </section>
+</div>
+
+<!-- notification: change has been made and a save is needed -->
+<div class="wrapper wrapper-notification wrapper-notification-warning">
+  <div class="notification warning">
+    <div class="copy">
+      <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+
+      <p><strong>Note: </strong>Your changes will not take effect until you <strong>save your
+      progress</strong>. Take care with policy value formatting, as validation is <strong>not implemented</strong>.</p>
+    </div>
+
+    <div class="actions">
+      <ul>
+        <li><a href="#" class="save-button">Save</a></li>
+        <li><a href="#" class="cancel-button">Cancel</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+</%block>

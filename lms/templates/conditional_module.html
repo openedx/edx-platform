@@ -1,0 +1,19 @@
+<%
+from django.core.urlresolvers import reverse
+
+# course_id = module.location.course_id
+def get_course_id(module):
+    return module.location.org +'/' + module.location.course +'/' + \
+                module.system.ajax_url.split('/')[4]
+
+def _message(reqm, message):
+    return message.format(link="<a href={url}>{url_name}</a>".format(
+        url = reverse('jump_to', kwargs=dict(course_id=get_course_id(reqm),
+                        location=reqm.location.url())),
+        url_name = reqm.display_name_with_default))
+%>
+% if message:
+	% for reqm in module.required_modules:
+		<p>${_message(reqm, message)}</p>
+	% endfor
+% endif

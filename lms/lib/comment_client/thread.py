@@ -1,7 +1,8 @@
-from utils import *
+from .utils import *
 
 import models
 import settings
+
 
 class Thread(models.Model):
 
@@ -10,12 +11,12 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'read', 'abuse_flaggers'
+        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers'
     ]
 
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'tags', 'user_id', 'commentable_id'
+        'closed', 'tags', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned'
     ]
 
     initializable_fields = updatable_fields
@@ -66,7 +67,7 @@ class Thread(models.Model):
     # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
-        request_params = { 
+        request_params = {
                             'recursive': kwargs.get('recursive'),
                             'user_id': kwargs.get('user_id'),
                             'mark_as_read': kwargs.get('mark_as_read', True),
@@ -99,11 +100,29 @@ class Thread(models.Model):
             raise CommentClientError("Can flag/unflag for threads or comments")
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
-        voteable.update_attributes(request)          
+        voteable.update_attributes(request)    
+    
+    def pin(self, user, thread_id):
+        url = _url_for_pin_thread(thread_id)
+        params = {'user_id': user.id}
+        request = perform_request('put', url, params)
+        self.update_attributes(request)    
+
+    def un_pin(self, user, thread_id):
+        url = _url_for_un_pin_thread(thread_id)
+        params = {'user_id': user.id}
+        request = perform_request('put', url, params)
+        self.update_attributes(request)   
         
 def _url_for_flag_abuse_thread(thread_id):
     return "{prefix}/threads/{thread_id}/abuse_flags".format(prefix=settings.PREFIX, thread_id=thread_id)      
        
 def _url_for_unflag_abuse_thread(thread_id):
     return "{prefix}/threads/{thread_id}/abuse_unflags".format(prefix=settings.PREFIX, thread_id=thread_id)      
+        
+def _url_for_pin_thread(thread_id):
+    return "{prefix}/threads/{thread_id}/pin".format(prefix=settings.PREFIX, thread_id=thread_id)      
+       
+def _url_for_un_pin_thread(thread_id):
+    return "{prefix}/threads/{thread_id}/unpin".format(prefix=settings.PREFIX, thread_id=thread_id)      
        

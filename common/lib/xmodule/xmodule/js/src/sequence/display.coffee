@@ -56,7 +56,7 @@ class @Sequence
       element.removeClass('progress-none')
              .removeClass('progress-some')
              .removeClass('progress-done')
-      
+
       switch progress
         when 'none' then element.addClass('progress-none')
         when 'in_progress' then element.addClass('progress-some')
@@ -64,6 +64,11 @@ class @Sequence
 
   toggleArrows: =>
     @$('.sequence-nav-buttons a').unbind('click')
+
+    if @contents.length == 0
+      @$('.sequence-nav-buttons .prev a').addClass('disabled')
+      @$('.sequence-nav-buttons .next a').addClass('disabled')
+      return
 
     if @position == 1
       @$('.sequence-nav-buttons .prev a').addClass('disabled')
@@ -84,7 +89,7 @@ class @Sequence
 
       @mark_active new_position
       @$('#seq_content').html @contents.eq(new_position - 1).text()
-      XModule.loadModules('display', @$('#seq_content'))
+      XModule.loadModules(@$('#seq_content'))
 
       MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
@@ -105,8 +110,8 @@ class @Sequence
 
     if (1 <= new_position) and (new_position <= @num_contents)
       Logger.log "seq_goto", old: @position, new: new_position, id: @id
-    
-      # On Sequence chage, destroy any existing polling thread 
+
+      # On Sequence chage, destroy any existing polling thread
       #   for queued submissions, see ../capa/display.coffee
       if window.queuePollerID
         window.clearTimeout(window.queuePollerID)

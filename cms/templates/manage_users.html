@@ -1,38 +1,129 @@
 <%inherit file="base.html" />
-<%block name="title">Course Editor Manager</%block>
-<%include file="widgets/header.html"/>
+<%block name="title">Course Team Settings</%block>
+<%block name="bodyclass">is-signedin course users settings team</%block>
+
 
 <%block name="content">
-<section class="main-container">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions has-subtitle">
+    <div class="title">
+      <span class="title-sub">Course Settings</span>
+      <h1 class="title-1">Course Team</h1>
+    </div>
 
-  <h2>Course Editors</h2>
-  <ul>
-    % for user in editors:
-    <li>${user.email} (${user.username})</li>
-    % endfor
-  </ul>
+    <nav class="nav-actions">
+      <h3 class="sr">Page Actions</h3>
+      <ul>
+        %if allow_actions:
+        <li class="nav-item">
+          <a href="#" class="button new-button new-user-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New User</a>
+        </li>
+        %endif
+      </ul>
+    </nav>
+  </header>
+</div>
 
-  <form action="add_user" id="addEditorsForm">
-    <label>email:&nbsp;</label><input type="text" name="email" placeholder="email@example.com..." />
-    <input type="submit" value="add editor" />
-  </form>
-  <div id="result"></div>
+<div class="main-wrapper">
+  <div class="inner-wrapper">
 
-<script>
-  $("#addEditorsForm").submit(function(event) {
-  event.preventDefault();
-  var $form = $(this),
-  email = $form.find('input[name="email"]').val(),
-  url = $form.attr('action');
-  $.post(url, {email:email},
-  function(data) {
-  if(data['Status'] != 'OK')
-  $("#result").empty().append(data['ErrMsg']);
-  else
-  location.reload();
-  });
+    <div class="details">
+      <p>The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional course staff below, if you are the course instructor. Please note that they must have already registered and verified their account.</p>
+    </div>
+
+    <article class="user-overview">           
+      %if allow_actions:
+      <form class="new-user-form">
+        <div id="result"></div>
+        <div class="form-elements">
+          <label>email: </label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
+          <input type="submit" value="Add User" id="add_user" class="add-button" />
+          <input type="button" value="Cancel" class="cancel-button" />
+        </div>
+      </form>
+      %endif
+      <div>
+        <ol class="user-list">
+          % for user in staff:
+          <li>
+            <span class="user-name">${user.username}</span>
+            <span class="user-email">${user.email}</span>
+            %if allow_actions :
+            <div class="item-actions">
+              %if request_user_id != user.id:
+              <a href="#" class="delete-button remove-user" data-id="${user.email}"><span class="delete-icon"></span></a>
+              %endif
+            </div>
+            %endif
+          </li>
+          % endfor
+        </ol>
+      </div>
+    </article>
+  </div>
+</div>
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+  var $newUserForm;
+
+  function showNewUserForm(e) {
+    e.preventDefault();
+    $newUserForm.slideDown(150);
+    $newUserForm.find('.email-input').focus();
+  }
+
+  function hideNewUserForm(e) {
+    e.preventDefault();
+    $newUserForm.slideUp(150);
+    $('#result').hide();
+    $('#email').val('');
+  }
+
+  function checkForCancel(e) {
+    if(e.which == 27) {
+      e.data.$cancelButton.click();
+    }
+  }
+
+  function addUser(e) {
+    e.preventDefault();
+
+    $.ajax({
+      url: '${add_user_postback_url}',
+      type: 'POST',
+      dataType: 'json',
+      contentType: 'application/json',
+      data:JSON.stringify({ 'email': $('#email').val()}),
+    }).done(function(data) {
+      if (data.ErrMsg != undefined)
+        $('#result').show().empty().append(data.ErrMsg);
+      else
+        location.reload();
+    });
+  }
+
+  $(document).ready(function() {
+    $newUserForm = $('.new-user-form');
+    var $cancelButton = $newUserForm.find('.cancel-button');    
+    $newUserForm.bind('submit', addUser);
+    $cancelButton.bind('click', hideNewUserForm);
+
+    $('.new-user-button').bind('click', showNewUserForm);
+    $('body').bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
+
+    $('.remove-user').click(function() {
+      $.ajax({
+        url: '${remove_user_postback_url}',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data:JSON.stringify({ 'email': $(this).data('id')}),          
+        }).done(function() {
+          location.reload();
+        })
+    });
   });
 </script>
-
-</section>
 </%block>

@@ -1,0 +1,65 @@
+.open-ended-problems,
+.combined-notifications
+{
+    padding: 40px;
+    .problem-list
+    {
+        table-layout: auto;
+        margin-top: 10px;
+        width:70%;
+        td, th
+        {
+            padding: 7px;
+        }
+    }
+    .notification-container
+    {
+        margin: 30px 0px;
+    }
+
+    .notification
+    {
+        margin: 10px;
+        width: 30%;
+        @include inline-block;
+        vertical-align: top;
+        .notification-link
+        {
+            display:block;
+            height: 9em;
+            padding: 10px;
+            border: 1px solid black;
+            text-align: center;
+            p
+            {
+                font-size: .9em;
+                text-align: center;
+            }
+        }
+        .notification-title 
+        {
+            text-transform: uppercase;
+            background: $blue;
+            color: white;
+            padding: 5px 0px;
+            font-size: 1.1em;
+        }
+        .notification-link:hover
+        {
+            background-color: #eee;
+        }
+        .notification-description
+        {
+            padding-top:5%;
+        }
+        .alert-message 
+        {
+            img
+            {
+                vertical-align: baseline;
+            }
+        }
+        @include clearfix;
+    }
+
+}

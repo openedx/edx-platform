@@ -15,7 +15,6 @@ Contents:
    common-lib.rst
    djangoapps.rst
 
-
 Indices and tables
 ==================
 

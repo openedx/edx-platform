@@ -8,7 +8,6 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 from .common import *
-from .logsettings import get_logger_config
 import os
 from path import path
 
@@ -23,7 +22,7 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 WIKI_ENABLED = True
 
 # Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
+SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
@@ -44,12 +43,6 @@ STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
 COURSES_ROOT = TEST_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
-LOGGING = get_logger_config(TEST_ROOT / "log",
-                            logging_env="dev",
-                            tracking_filename="tracking.log",
-                            dev_env=True,
-                            debug=True)
-
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # Where the content data is checked out.  This may not exist on jenkins.
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
@@ -63,11 +56,12 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5   # seconds
 
 
 # Don't rely on a real staff grading backend
 MOCK_STAFF_GRADING = True
+MOCK_PEER_GRADING = True
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
@@ -121,7 +115,14 @@ CACHES = {
         'KEY_PREFIX': 'general',
         'VERSION': 4,
         'KEY_FUNCTION': 'util.memcache.safe_key',
-    }
+    },
+
+    'mongo_metadata_inheritance': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': '/var/tmp/mongo_metadata_inheritance',
+        'TIMEOUT': 300,
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    } 
 }
 
 # Dummy secret key for dev
@@ -130,7 +131,14 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 ################################## OPENID ######################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
+
+OPENID_CREATE_USERS = False
+OPENID_UPDATE_DETAILS_FROM_SREG = True
+OPENID_USE_AS_ADMIN_LOGIN = False
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
+
+INSTALLED_APPS += ('external_auth',)
+INSTALLED_APPS += ('django_openid_auth',)
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

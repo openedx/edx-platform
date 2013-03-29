@@ -2,6 +2,8 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from lxml import etree
 from mako.template import Template
+from xmodule.modulestore.django import modulestore
+import logging
 
 
 class CustomTagModule(XModule):
@@ -26,11 +28,6 @@ class CustomTagModule(XModule):
         More information given in <a href="/book/234">the text</a>
     """
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-
     def get_html(self):
         return self.descriptor.rendered_html
 
@@ -38,9 +35,9 @@ class CustomTagModule(XModule):
 class CustomTagDescriptor(RawDescriptor):
     """ Descriptor for custom tags.  Loads the template when created."""
     module_class = CustomTagModule
+    template_dir_name = 'customtag'
 
-    @staticmethod
-    def render_template(system, xml_data):
+    def render_template(self, system, xml_data):
         '''Render the template, given the definition xml_data'''
         xmltree = etree.fromstring(xml_data)
         if 'impl' in xmltree.attrib:
@@ -56,15 +53,19 @@ class CustomTagDescriptor(RawDescriptor):
                                 .format(location))
 
         params = dict(xmltree.items())
-        with system.resources_fs.open('custom_tags/{name}'
-                                   .format(name=template_name)) as template:
-            return Template(template.read().decode('utf-8')).render(**params)
+
+        # cdodge: look up the template as a module
+        template_loc = self.location._replace(category='custom_tag_template', name=template_name)
+
+        template_module = modulestore().get_instance(system.course_id, template_loc)
+        template_module_data = template_module.data
+        template = Template(template_module_data)
+        return template.render(**params)
 
 
-    def __init__(self, system, definition, **kwargs):
-        '''Render and save the template for this descriptor instance'''
-        super(CustomTagDescriptor, self).__init__(system, definition, **kwargs)
-        self.rendered_html = self.render_template(system, definition['data'])
+    @property
+    def rendered_html(self):
+        return self.render_template(self.system, self.data)
 
     def export_to_file(self):
         """
@@ -72,4 +73,3 @@ class CustomTagDescriptor(RawDescriptor):
         to export them in a file with yet another layer of indirection.
         """
         return False
-

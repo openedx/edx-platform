@@ -8,7 +8,7 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 from .common import *
-from .logsettings import get_logger_config
+from logsettings import get_logger_config
 
 DEBUG = True
 TEMPLATE_DEBUG = True
@@ -21,6 +21,8 @@ MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
 MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
+
 
 
 WIKI_ENABLED = True
@@ -56,6 +58,13 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    },
+
+    'mongo_metadata_inheritance': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/mongo_metadata_inheritance',
+        'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
@@ -100,15 +109,47 @@ SUBDOMAIN_BRANDING = {
     'harvard': 'HarvardX',
 }
 
+# List of `university` landing pages to display, even though they may not
+# have an actual course with that org set
+VIRTUAL_UNIVERSITIES = []
+
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
-################################# Staff grading config  #####################
+############################## Course static files ##########################
+if os.path.isdir(DATA_DIR):
+    # Add the full course repo if there is no static directory
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir)
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir) and
+            not os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
+    # Otherwise, add only the static directory from the course dir
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir / 'static')
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
 
-STAFF_GRADING_INTERFACE = {
-    'url': 'http://127.0.0.1:3033/staff_grading',
-    'username': 'lms',
-    'password': 'abcd',
-    }
+
+################################# mitx revision string  #####################
+
+MITX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
+
+################################# Open ended grading config  #####################
+
+OPEN_ENDED_GRADING_INTERFACE = {
+    'url' : 'http://127.0.0.1:3033/',
+    'username' : 'lms',
+    'password' : 'abcd',
+    'staff_grading' : 'staff_grading',
+    'peer_grading' : 'peer_grading',
+    'grading_controller' : 'grading_controller'
+}
 
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
@@ -129,7 +170,7 @@ INSTALLED_APPS += ('django_openid_auth',)
 
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
-OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'	# TODO: accept more endpoints
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'  	# TODO: accept more endpoints
 OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
@@ -183,3 +224,8 @@ PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.for
 MITX_FEATURES['ENABLE_PEARSON_HACK_TEST'] = True
 PEARSON_TEST_USER = "pearsontest"
 PEARSON_TEST_PASSWORD = "12345"
+
+########################## ANALYTICS TESTING ########################
+
+ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
+ANALYTICS_API_KEY = ""

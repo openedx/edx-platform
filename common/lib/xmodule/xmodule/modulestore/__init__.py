@@ -23,6 +23,15 @@ URL_RE = re.compile("""
     (@(?P<revision>[^/]+))?
     """, re.VERBOSE)
 
+MISSING_SLASH_URL_RE = re.compile("""
+    (?P<tag>[^:]+):/
+    (?P<org>[^/]+)/
+    (?P<course>[^/]+)/
+    (?P<category>[^/]+)/
+    (?P<name>[^@]+)
+    (@(?P<revision>[^/]+))?
+    """, re.VERBOSE)
+
 # TODO (cpennington): We should decide whether we want to expand the
 # list of valid characters in a location
 INVALID_CHARS = re.compile(r"[^\w.-]")
@@ -61,6 +70,17 @@ class Location(_LocationBase):
         Return value, made into a form legal for locations
         """
         return Location._clean(value, INVALID_CHARS)
+
+
+    @staticmethod
+    def clean_keeping_underscores(value):
+        """
+        Return value, replacing INVALID_CHARS, but not collapsing multiple '_' chars.
+        This for cleaning asset names, as the YouTube ID's may have underscores in them, and we need the
+        transcript asset name to match. In the future we may want to change the behavior of _clean.
+        """
+        return INVALID_CHARS.sub('_', value)
+
 
     @staticmethod
     def clean_for_url_name(value):
@@ -153,7 +173,7 @@ class Location(_LocationBase):
             def check(val, regexp):
                 if val is not None and regexp.search(val) is not None:
                     log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
-                    raise InvalidLocationError(location)
+                    raise InvalidLocationError("Invalid characters in '%s'." % (val))
 
             list_ = list(list_)
             for val in list_[:4] + [list_[5]]:
@@ -164,12 +184,16 @@ class Location(_LocationBase):
         if isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
-                log.debug('location is instance of %s but no URL match' % basestring)
-                raise InvalidLocationError(location)
-            else:
-                groups = match.groupdict()
-                check_dict(groups)
-                return _LocationBase.__new__(_cls, **groups)
+                # cdodge:
+                # check for a dropped slash near the i4x:// element of the location string. This can happen with some
+                # redirects (e.g. edx.org -> www.edx.org which I think happens in Nginx)
+                match = MISSING_SLASH_URL_RE.match(location)
+                if match is None:
+                    log.debug('location is instance of %s but no URL match' % basestring)
+                    raise InvalidLocationError(location)    
+            groups = match.groupdict()
+            check_dict(groups)
+            return _LocationBase.__new__(_cls, **groups)
         elif isinstance(location, (list, tuple)):
             if len(location) not in (5, 6):
                 log.debug('location has wrong length')
@@ -240,11 +264,15 @@ class ModuleStore(object):
     An abstract interface for a database backend that stores XModuleDescriptor
     instances
     """
+    def has_item(self, location):
+        """
+        Returns True if location exists in this ModuleStore.
+        """
+        raise NotImplementedError
+
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the item with the most
-        recent revision
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
@@ -261,7 +289,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def get_instance(self, course_id, location):
+    def get_instance(self, course_id, location, depth=0):
         """
         Get an instance of this location, with policy for course_id applied.
         TODO (vshnayder): this may want to live outside the modulestore eventually
@@ -280,7 +308,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def get_items(self, location, depth=0):
+    def get_items(self, location, course_id=None, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -332,10 +360,25 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
+    def delete_item(self, location):
+        """
+        Delete an item from this modulestore
+
+        location: Something that can be passed to Location
+        """
+        raise NotImplementedError
+
     def get_courses(self):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
         in this modulestore.
+        '''
+        course_filter = Location("i4x", category="course")
+        return self.get_items(course_filter)
+
+    def get_course(self, course_id):
+        '''
+        Look for a specific course id.  Returns the course descriptor, or None if not found.
         '''
         raise NotImplementedError
 
@@ -345,9 +388,9 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
-    def get_parent_locations(self, location):
-        '''Find all locations that are the parents of this location.  Needed
-        for path_to_location().
+    def get_parent_locations(self, location, course_id):
+        '''Find all locations that are the parents of this location in this
+        course.  Needed for path_to_location().
 
         returns an iterable of things that can be passed to Location.
         '''
@@ -370,6 +413,7 @@ class ModuleStore(object):
         return courses
 
 
+
 class ModuleStoreBase(ModuleStore):
     '''
     Implement interface functionality that can be shared.
@@ -379,6 +423,7 @@ class ModuleStoreBase(ModuleStore):
         Set up the error-tracking logic.
         '''
         self._location_errors = {}    # location -> ErrorLog
+        self.metadata_inheritance_cache = None
 
     def _get_errorlog(self, location):
         """

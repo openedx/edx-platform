@@ -20,12 +20,7 @@ Longer TODO:
 """
 import sys
 import os
-import tempfile
-import glob2
-import errno
-import hashlib
-from collections import defaultdict
-import socket
+from xmodule.static_content import write_module_styles, write_module_js
 
 from path import path
 
@@ -33,6 +28,8 @@ from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
+ENABLE_JASMINE = False
+
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
@@ -42,11 +39,11 @@ DISCUSSION_SETTINGS = {
 
 # Features
 MITX_FEATURES = {
-    'SAMPLE' : False,
-    'USE_DJANGO_PIPELINE' : True,
-    'DISPLAY_HISTOGRAMS_TO_STAFF' : True,
-    'REROUTE_ACTIVATION_EMAIL' : False,		# nonempty string = address for all activation emails
-    'DEBUG_LEVEL' : 255,				# 0 = lowest level, least verbose, 255 = max level, most verbose
+    'SAMPLE': False,
+    'USE_DJANGO_PIPELINE': True,
+    'DISPLAY_HISTOGRAMS_TO_STAFF': True,
+    'REROUTE_ACTIVATION_EMAIL': False,		# nonempty string = address for all activation emails
+    'DEBUG_LEVEL': 0,				# 0 = lowest level, least verbose, 255 = max level, most verbose
 
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
@@ -55,20 +52,20 @@ MITX_FEATURES = {
     # When True, will only publicly list courses by the subdomain. Expects you
     # to define COURSE_LISTINGS, a dictionary mapping subdomains to lists of
     # course_ids (see dev_int.py for an example)
-    'SUBDOMAIN_COURSE_LISTINGS' : False,
+    'SUBDOMAIN_COURSE_LISTINGS': False,
 
     # When True, will override certain branding with university specific values
     # Expects a SUBDOMAIN_BRANDING dictionary that maps the subdomain to the
     # university to use for branding purposes
     'SUBDOMAIN_BRANDING': False,
 
-    'FORCE_UNIVERSITY_DOMAIN': False,	# set this to the university domain to use, as an override to HTTP_HOST
+    'FORCE_UNIVERSITY_DOMAIN': False,  	# set this to the university domain to use, as an override to HTTP_HOST
                                         # set to None to do no university selection
 
-    'ENABLE_TEXTBOOK' : True,
+    'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
 
-    'ENABLE_PSYCHOMETRICS': False,	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
+    'ENABLE_PSYCHOMETRICS': False,  	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
@@ -76,11 +73,23 @@ MITX_FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
+    'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
+
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
-    'AUTH_USE_MIT_CERTIFICATES' : False,
+    'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
+
+    # analytics experiments
+    'ENABLE_INSTRUCTOR_ANALYTICS': False,
+
+    # Flip to True when the YouTube iframe API breaks (again)
+    'USE_YOUTUBE_OBJECT_API': False,
+
+    # Give a UI to show a student's submission history in a problem by the
+    # Staff Debug tool.
+    'ENABLE_STUDENT_HISTORY_VIEW': True
 }
 
 # Used for A/B testing
@@ -90,7 +99,7 @@ DEFAULT_GROUPS = []
 GENERATE_PROFILE_SCORES = False
 
 # Used with XQueue
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5   # seconds
 
 
 ############################# SET PATH INFORMATION #############################
@@ -130,7 +139,8 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
-MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
+from tempdir import mkdtemp_clean
+MAKO_MODULE_DIR = mkdtemp_clean('mako')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'templates',
@@ -151,8 +161,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
-    'django.contrib.auth.context_processors.auth', #this is required for admin
-    'django.core.context_processors.csrf', #necessary for csrf protection
+    'django.contrib.auth.context_processors.auth',   # this is required for admin
+    'django.core.context_processors.csrf',   # necessary for csrf protection
 
     # Added for django-wiki
     'django.core.context_processors.media',
@@ -162,7 +172,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'course_wiki.course_nav.context_processor',
 )
 
-STUDENT_FILEUPLOAD_MAX_SIZE = 4*1000*1000 # 4 MB
+STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000   # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
 # FIXME:
@@ -172,7 +182,7 @@ LIB_URL = '/static/js/'
 
 # Dev machines shouldn't need the book
 # BOOK_URL = '/static/book/'
-BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/' # For AWS deploys
+BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'   # For AWS deploys
 # RSS_URL = r'lms/templates/feed.rss'
 # PRESS_URL = r''
 RSS_TIMEOUT = 600
@@ -187,6 +197,9 @@ DEBUG_TRACK_LOG = False
 
 MITX_ROOT_URL = ''
 
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
+LOGIN_URL = MITX_ROOT_URL + '/accounts/login'
+
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
 COURSE_TITLE = "Circuits and Electronics"
@@ -194,15 +207,14 @@ COURSE_TITLE = "Circuits and Electronics"
 ### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
-QUICKEDIT = False
 
 WIKI_ENABLED = False
 
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
-                                          'title'  :  'Circuits and Electronics',
+COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number': '6.002x',
+                                          'title': 'Circuits and Electronics',
                                           'xmlpath': '6002x/',
                                           'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
                                           }
@@ -227,6 +239,7 @@ MODULESTORE = {
         }
     }
 }
+CONTENTSTORE = None
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
@@ -262,28 +275,10 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 ]
-if os.path.isdir(DATA_DIR):
-    # Add the full course repo if there is no static directory
-    STATICFILES_DIRS += [
-        # TODO (cpennington): When courses are stored in a database, this
-        # should no longer be added to STATICFILES
-        (course_dir, DATA_DIR / course_dir)
-        for course_dir in os.listdir(DATA_DIR)
-        if (os.path.isdir(DATA_DIR / course_dir) and
-            not os.path.isdir(DATA_DIR / course_dir / 'static'))
-    ]
-    # Otherwise, add only the static directory from the course dir
-    STATICFILES_DIRS += [
-        # TODO (cpennington): When courses are stored in a database, this
-        # should no longer be added to STATICFILES
-        (course_dir, DATA_DIR / course_dir / 'static')
-        for course_dir in os.listdir(DATA_DIR)
-        if (os.path.isdir(DATA_DIR / course_dir / 'static'))
-    ]
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York' # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en' # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'America/New_York'   # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'en'   # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
 USE_L10N = True
 
@@ -304,7 +299,7 @@ ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 # setting is, I'm just bumping the expiration time to something absurd (100
 # years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
 # in the global settings.py
-AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60 # 10 years
+AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60   # 10 years
 
 ################################# SIMPLEWIKI ###################################
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
@@ -313,8 +308,8 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 ################################# WIKI ###################################
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
-WIKI_SHOW_MAX_CHILDREN = 0 # We don't use the little menu that shows children of an article in the breadcrumb
-WIKI_ANONYMOUS = False # Don't allow anonymous access until the styling is figured out
+WIKI_SHOW_MAX_CHILDREN = 0   # We don't use the little menu that shows children of an article in the breadcrumb
+WIKI_ANONYMOUS = False   # Don't allow anonymous access until the styling is figured out
 WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.is_staff or user.is_superuser
 WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
 
@@ -322,12 +317,29 @@ WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
 
-################################# Staff grading config  #####################
+################################# Pearson TestCenter config  ################
 
-STAFF_GRADING_INTERFACE = None
-# Used for testing, debugging
+PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
+# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+
+################################# open ended grading config  #####################
+
+#By setting up the default settings with an incorrect user name and password,
+# will get an error when attempting to connect
+OPEN_ENDED_GRADING_INTERFACE = {
+    'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
+    'username': 'incorrect_user',
+    'password': 'incorrect_pass',
+    'staff_grading' : 'staff_grading',
+    'peer_grading' : 'peer_grading',
+    'grading_controller' : 'grading_controller'
+    }
+
+# Used for testing, debugging peer grading
+MOCK_PEER_GRADING = False
+
+# Used for testing, debugging staff grading
 MOCK_STAFF_GRADING = False
-
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -351,6 +363,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'contentserver.middleware.StaticContentServer',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -376,15 +389,55 @@ MIDDLEWARE_CLASSES = (
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
+from xmodule.hidden_module import HiddenDescriptor
+from rooted_paths import rooted_glob, remove_root
+
+write_module_styles(PROJECT_ROOT / 'static/sass/module', [HiddenDescriptor])
+module_js = remove_root(
+    PROJECT_ROOT / 'static',
+    write_module_js(PROJECT_ROOT / 'static/coffee/module', [HiddenDescriptor])
+)
+
+courseware_js = (
+    [
+        'coffee/src/' + pth + '.coffee'
+        for pth in ['courseware', 'histogram', 'navigation', 'time']
+    ] +
+    sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.coffee'))
+)
+
+# 'js/vendor/RequireJS.js' - Require JS wrapper.
+# See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
+main_vendor_js = [
+  'js/vendor/RequireJS.js',
+  'js/vendor/json2.js',
+  'js/vendor/jquery.min.js',
+  'js/vendor/jquery-ui.min.js',
+  'js/vendor/jquery.cookie.js',
+  'js/vendor/jquery.qtip.min.js',
+  'js/vendor/swfobject/swfobject.js',
+  'js/vendor/jquery.ba-bbq.min.js',
+]
+
+discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
+staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.coffee'))
+open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.coffee'))
+
 PIPELINE_CSS = {
     'application': {
         'source_filenames': ['sass/application.scss'],
         'output_filename': 'css/lms-application.css',
     },
     'course': {
-      'source_filenames': ['js/vendor/CodeMirror/codemirror.css', 'css/vendor/jquery.treeview.css', 'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css', 'css/vendor/jquery.qtip.min.css', 'sass/course.scss'],
-      'output_filename': 'css/lms-course.css',
-      },
+        'source_filenames': [
+            'js/vendor/CodeMirror/codemirror.css',
+            'css/vendor/jquery.treeview.css',
+            'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
+            'css/vendor/jquery.qtip.min.css',
+            'sass/course.scss'
+        ],
+        'output_filename': 'css/lms-course.css',
+    },
     'ie-fixes': {
         'source_filenames': ['sass/ie.scss'],
         'output_filename': 'css/lms-ie.css',
@@ -392,106 +445,15 @@ PIPELINE_CSS = {
 }
 
 PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss', 'sass/course.scss']
-
-courseware_only_js = [
-    PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee'
-    for pth
-    in ['courseware', 'histogram', 'navigation', 'time']
-]
-courseware_only_js += [
-    pth for pth
-    in glob2.glob(PROJECT_ROOT / 'static/coffee/src/modules/**/*.coffee')
-]
-
-main_vendor_js = [
-  'js/vendor/json2.js',
-  'js/vendor/jquery.min.js',
-  'js/vendor/jquery-ui.min.js',
-  'js/vendor/jquery.cookie.js',
-  'js/vendor/jquery.qtip.min.js',
-  'js/vendor/swfobject/swfobject.js',
-]
-
-discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/**/*.coffee'))
-
-staff_grading_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/staff_grading/**/*.coffee'))
-
-
-# Load javascript from all of the available xmodules, and
-# prep it for use in pipeline js
-from xmodule.x_module import XModuleDescriptor
-from xmodule.hidden_module import HiddenDescriptor
-js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
-css_file_dir = PROJECT_ROOT / "static" / "sass" / "module"
-module_styles_path = css_file_dir / "_module-styles.scss"
-
-for dir_ in (js_file_dir, css_file_dir):
-    try:
-        os.makedirs(dir_)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST:
-            pass
-        else:
-            raise
-
-js_fragments = set()
-css_fragments = defaultdict(set)
-for _, descriptor in XModuleDescriptor.load_classes() + [(None, HiddenDescriptor)]:
-    module_js = descriptor.module_class.get_javascript()
-    for filetype in ('coffee', 'js'):
-        for idx, fragment in enumerate(module_js.get(filetype, [])):
-            js_fragments.add((idx, filetype, fragment))
-
-    module_css = descriptor.module_class.get_css()
-    for filetype in ('sass', 'scss', 'css'):
-        for idx, fragment in enumerate(module_css.get(filetype, [])):
-            css_fragments[idx, filetype, fragment].add(descriptor.module_class.__name__)
-
-module_js_sources = []
-for idx, filetype, fragment in sorted(js_fragments):
-    path = js_file_dir / "{idx}-{hash}.{type}".format(
-        idx=idx,
-        hash=hashlib.md5(fragment).hexdigest(),
-        type=filetype)
-    with open(path, 'w') as js_file:
-        js_file.write(fragment)
-    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
-
-css_imports = defaultdict(set)
-for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
-    fragment_name = "{idx}-{hash}.{type}".format(
-        idx=idx,
-        hash=hashlib.md5(fragment).hexdigest(),
-        type=filetype)
-    # Prepend _ so that sass just includes the files into a single file
-    with open(css_file_dir / '_' + fragment_name, 'w') as js_file:
-        js_file.write(fragment)
-
-    for class_ in classes:
-        css_imports[class_].add(fragment_name)
-
-with open(module_styles_path, 'w') as module_styles:
-    for class_, fragment_names in css_imports.items():
-        imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
-        module_styles.write(""".xmodule_{class_} {{ {imports} }}""".format(
-            class_=class_, imports=imports
-        ))
-
 PIPELINE_JS = {
     'application': {
-        # Application will contain all paths not in courseware_only_js or
-        # discussion_js or staff_grading_js
-        'source_filenames': [
-            pth.replace(COMMON_ROOT / 'static/', '')
-            for pth
-            in sorted(glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee'))
-        ] + [
-            pth.replace(PROJECT_ROOT / 'static/', '')
-            for pth in sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee'))\
-            if (pth not in courseware_only_js and
-                pth not in discussion_js and
-                pth not in staff_grading_js)
-        ] + [
+
+        # Application will contain all paths not in courseware_only_js
+        'source_filenames': sorted(
+            set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.coffee') +
+                rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.coffee')) -
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js)
+        ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
@@ -501,7 +463,7 @@ PIPELINE_JS = {
         'output_filename': 'js/lms-application.js'
     },
     'courseware': {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in courseware_only_js],
+        'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js'
     },
     'main_vendor': {
@@ -509,22 +471,21 @@ PIPELINE_JS = {
         'output_filename': 'js/lms-main_vendor.js',
     },
     'module-js': {
-        'source_filenames': module_js_sources,
+        'source_filenames': module_js,
         'output_filename': 'js/lms-modules.js',
     },
-    'spec': {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
-        'output_filename': 'js/lms-spec.js'
-    },
-    'discussion' : {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in discussion_js],
+    'discussion': {
+        'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js'
     },
-    'staff_grading' : {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in staff_grading_js],
+    'staff_grading': {
+        'source_filenames': staff_grading_js,
         'output_filename': 'js/staff_grading.js'
+    },
+    'open_ended': {
+        'source_filenames': open_ended_js,
+        'output_filename': 'js/open_ended.js'
     }
-
 }
 
 PIPELINE_DISABLE_WRAPPER = True
@@ -584,6 +545,7 @@ INSTALLED_APPS = (
     # For asset pipelining
     'pipeline',
     'staticfiles',
+    'static_replace',
 
     # Our courseware
     'circuit',
@@ -597,13 +559,15 @@ INSTALLED_APPS = (
     'util',
     'certificates',
     'instructor',
+    'open_ended_grading',
     'psychometrics',
     'licenses',
+    'course_groups',
 
     #For the wiki
-    'wiki', # The new django-wiki from benjaoming
+    'wiki',   # The new django-wiki from benjaoming
     'django_notify',
-    'course_wiki', # Our customizations
+    'course_wiki',   # Our customizations
     'mptt',
     'sekizai',
     #'wiki.plugins.attachments',
@@ -611,8 +575,10 @@ INSTALLED_APPS = (
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
+    # foldit integration
+    'foldit',
+
     # For testing
-    'django_jasmine',
     'django.contrib.admin',   # only used in DEBUG mode
 
     # Discussion forums

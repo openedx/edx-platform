@@ -1,0 +1,752 @@
+"""
+A Self Assessment module that allows students to write open-ended responses,
+submit, then see a rubric and rate themselves.  Persists student supplied
+hints, answers, and assessment judgment (currently only correct/incorrect).
+Parses xml definition file--see below for exact format.
+"""
+
+import json
+import logging
+from lxml import etree
+import capa.xqueue_interface as xqueue_interface
+
+from xmodule.capa_module import ComplexEncoder
+from xmodule.editing_module import EditingDescriptor
+from xmodule.progress import Progress
+from xmodule.stringify import stringify_children
+from xmodule.xml_module import XmlDescriptor
+from capa.util import *
+import openendedchild
+
+from numpy import median
+
+from datetime import datetime
+
+from .combined_open_ended_rubric import CombinedOpenEndedRubric
+
+log = logging.getLogger("mitx.courseware")
+
+
+class OpenEndedModule(openendedchild.OpenEndedChild):
+    """
+    The open ended module supports all external open ended grader problems.
+    Sample XML file:
+    <openended min_score_to_attempt="1" max_score_to_attempt="1">
+        <openendedparam>
+            <initial_display>Enter essay here.</initial_display>
+            <answer_display>This is the answer.</answer_display>
+            <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+        </openendedparam>
+    </openended>
+    """
+
+    TEMPLATE_DIR = "combinedopenended/openended"
+
+    def setup_response(self, system, location, definition, descriptor):
+        """
+        Sets up the response type.
+        @param system: Modulesystem object
+        @param location: The location of the problem
+        @param definition: The xml definition of the problem
+        @param descriptor: The OpenEndedDescriptor associated with this
+        @return: None
+        """
+        oeparam = definition['oeparam']
+
+        self.url = definition.get('url', None)
+        self.queue_name = definition.get('queuename', self.DEFAULT_QUEUE)
+        self.message_queue_name = definition.get('message-queuename', self.DEFAULT_MESSAGE_QUEUE)
+
+        #This is needed to attach feedback to specific responses later
+        self.submission_id = None
+        self.grader_id = None
+
+        error_message = "No {0} found in problem xml for open ended problem. Contact the learning sciences group for assistance."
+        if oeparam is None:
+            #This is a staff_facing_error
+            raise ValueError(error_message.format('oeparam'))
+        if self.child_prompt is None:
+            raise ValueError(error_message.format('prompt'))
+        if self.child_rubric is None:
+            raise ValueError(error_message.format('rubric'))
+
+        self._parse(oeparam, self.child_prompt, self.child_rubric, system)
+
+        if self.child_created == True and self.child_state == self.ASSESSING:
+            self.child_created = False
+            self.send_to_grader(self.latest_answer(), system)
+            self.child_created = False
+
+    def _parse(self, oeparam, prompt, rubric, system):
+        '''
+        Parse OpenEndedResponse XML:
+            self.initial_display
+            self.payload - dict containing keys --
+            'grader' : path to grader settings file, 'problem_id' : id of the problem
+
+            self.answer - What to display when show answer is clicked
+        '''
+        # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
+        prompt_string = stringify_children(prompt)
+        rubric_string = stringify_children(rubric)
+        self.child_prompt = prompt_string
+        self.child_rubric = rubric_string
+
+        grader_payload = oeparam.find('grader_payload')
+        grader_payload = grader_payload.text if grader_payload is not None else ''
+
+        #Update grader payload with student id.  If grader payload not json, error.
+        try:
+            parsed_grader_payload = json.loads(grader_payload)
+            # NOTE: self.system.location is valid because the capa_module
+            # __init__ adds it (easiest way to get problem location into
+            # response types)
+        except TypeError, ValueError:
+            #This is a dev_facing_error
+            log.exception(
+                "Grader payload from external open ended grading server is not a json object! Object: {0}".format(
+                    grader_payload))
+
+        self.initial_display = find_with_default(oeparam, 'initial_display', '')
+        self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
+
+        parsed_grader_payload.update({
+            'location': self.location_string,
+            'course_id': system.course_id,
+            'prompt': prompt_string,
+            'rubric': rubric_string,
+            'initial_display': self.initial_display,
+            'answer': self.answer,
+            'problem_id': self.display_name,
+            'skip_basic_checks': self.skip_basic_checks,
+        })
+        updated_grader_payload = json.dumps(parsed_grader_payload)
+
+        self.payload = {'grader_payload': updated_grader_payload}
+
+    def skip_post_assessment(self, get, system):
+        """
+        Ajax function that allows one to skip the post assessment phase
+        @param get: AJAX dictionary
+        @param system: ModuleSystem
+        @return: Success indicator
+        """
+        self.child_state = self.DONE
+        return {'success': True}
+
+    def message_post(self, get, system):
+        """
+        Handles a student message post (a reaction to the grade they received from an open ended grader type)
+        Returns a boolean success/fail and an error message
+        """
+
+        event_info = dict()
+        event_info['problem_id'] = self.location_string
+        event_info['student_id'] = system.anonymous_student_id
+        event_info['survey_responses'] = get
+
+        survey_responses = event_info['survey_responses']
+        for tag in ['feedback', 'submission_id', 'grader_id', 'score']:
+            if tag not in survey_responses:
+                #This is a student_facing_error
+                return {'success': False,
+                        'msg': "Could not find needed tag {0} in the survey responses.  Please try submitting again.".format(
+                            tag)}
+        try:
+            submission_id = int(survey_responses['submission_id'])
+            grader_id = int(survey_responses['grader_id'])
+            feedback = str(survey_responses['feedback'].encode('ascii', 'ignore'))
+            score = int(survey_responses['score'])
+        except:
+            #This is a dev_facing_error
+            error_message = ("Could not parse submission id, grader id, "
+                             "or feedback from message_post ajax call.  Here is the message data: {0}".format(
+                survey_responses))
+            log.exception(error_message)
+            #This is a student_facing_error
+            return {'success': False, 'msg': "There was an error saving your feedback.  Please contact course staff."}
+
+        qinterface = system.xqueue['interface']
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        anonymous_student_id = system.anonymous_student_id
+        queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
+                                                 anonymous_student_id +
+                                                 str(len(self.child_history)))
+
+        xheader = xqueue_interface.make_xheader(
+            lms_callback_url=system.xqueue['construct_callback'](),
+            lms_key=queuekey,
+            queue_name=self.message_queue_name
+        )
+
+        student_info = {'anonymous_student_id': anonymous_student_id,
+                        'submission_time': qtime,
+        }
+        contents = {
+            'feedback': feedback,
+            'submission_id': submission_id,
+            'grader_id': grader_id,
+            'score': score,
+            'student_info': json.dumps(student_info),
+        }
+
+        (error, msg) = qinterface.send_to_queue(header=xheader,
+                                                body=json.dumps(contents))
+
+        #Convert error to a success value
+        success = True
+        if error:
+            success = False
+
+        self.child_state = self.DONE
+
+        #This is a student_facing_message
+        return {'success': success, 'msg': "Successfully submitted your feedback."}
+
+    def send_to_grader(self, submission, system):
+        """
+        Send a given submission to the grader, via the xqueue
+        @param submission: The student submission to send to the grader
+        @param system: Modulesystem
+        @return: Boolean true (not useful right now)
+        """
+
+        # Prepare xqueue request
+        #------------------------------------------------------------
+
+        qinterface = system.xqueue['interface']
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+
+        anonymous_student_id = system.anonymous_student_id
+
+        # Generate header
+        queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
+                                                 anonymous_student_id +
+                                                 str(len(self.child_history)))
+
+        xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['construct_callback'](),
+                                                lms_key=queuekey,
+                                                queue_name=self.queue_name)
+
+        contents = self.payload.copy()
+
+        # Metadata related to the student submission revealed to the external grader
+        student_info = {'anonymous_student_id': anonymous_student_id,
+                        'submission_time': qtime,
+        }
+
+        #Update contents with student response and student info
+        contents.update({
+            'student_info': json.dumps(student_info),
+            'student_response': submission,
+            'max_score': self.max_score(),
+        })
+
+        # Submit request. When successful, 'msg' is the prior length of the queue
+        (error, msg) = qinterface.send_to_queue(header=xheader,
+                                                body=json.dumps(contents))
+
+        # State associated with the queueing request
+        queuestate = {'key': queuekey,
+                      'time': qtime, }
+        return True
+
+    def _update_score(self, score_msg, queuekey, system):
+        """
+        Called by xqueue to update the score
+        @param score_msg: The message from xqueue
+        @param queuekey: The key sent by xqueue
+        @param system: Modulesystem
+        @return: Boolean True (not useful currently)
+        """
+        new_score_msg = self._parse_score_msg(score_msg, system)
+        if not new_score_msg['valid']:
+            new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
+
+        self.record_latest_score(new_score_msg['score'])
+        self.record_latest_post_assessment(score_msg)
+        self.child_state = self.POST_ASSESSMENT
+
+        return True
+
+    def get_answers(self):
+        """
+        Gets and shows the answer for this problem.
+        @return: Answer html
+        """
+        anshtml = '<span class="openended-answer"><pre><code>{0}</code></pre></span>'.format(self.answer)
+        return {self.answer_id: anshtml}
+
+    def get_initial_display(self):
+        """
+        Gets and shows the initial display for the input box.
+        @return: Initial display html
+        """
+        return {self.answer_id: self.initial_display}
+
+    def _convert_longform_feedback_to_html(self, response_items):
+        """
+        Take in a dictionary, and return html strings for display to student.
+        Input:
+            response_items: Dictionary with keys success, feedback.
+                if success is True, feedback should be a dictionary, with keys for
+                   types of feedback, and the corresponding feedback values.
+                if success is False, feedback is actually an error string.
+
+                NOTE: this will need to change when we integrate peer grading, because
+                that will have more complex feedback.
+
+        Output:
+            String -- html that can be displayincorrect-icon.pnged to the student.
+        """
+
+        # We want to display available feedback in a particular order.
+        # This dictionary specifies which goes first--lower first.
+        priorities = {# These go at the start of the feedback
+                      'spelling': 0,
+                      'grammar': 1,
+                      # needs to be after all the other feedback
+                      'markup_text': 3}
+        do_not_render = ['topicality', 'prompt-overlap']
+
+        default_priority = 2
+
+        def get_priority(elt):
+            """
+            Args:
+                elt: a tuple of feedback-type, feedback
+            Returns:
+                the priority for this feedback type
+            """
+            return priorities.get(elt[0], default_priority)
+
+        def encode_values(feedback_type, value):
+            feedback_type = str(feedback_type).encode('ascii', 'ignore')
+            if not isinstance(value, basestring):
+                value = str(value)
+            value = value.encode('ascii', 'ignore')
+            return feedback_type, value
+
+        def format_feedback(feedback_type, value):
+            feedback_type, value = encode_values(feedback_type, value)
+            feedback = """
+            <div class="{feedback_type}">
+            {value}
+            </div>
+            """.format(feedback_type=feedback_type, value=value)
+            return feedback
+
+        def format_feedback_hidden(feedback_type, value):
+            feedback_type, value = encode_values(feedback_type, value)
+            feedback = """
+            <input class="{feedback_type}" type="hidden" value="{value}" />
+            """.format(feedback_type=feedback_type, value=value)
+            return feedback
+
+        # TODO (vshnayder): design and document the details of this format so
+        # that we can do proper escaping here (e.g. are the graders allowed to
+        # include HTML?)
+
+        for tag in ['success', 'feedback', 'submission_id', 'grader_id']:
+            if tag not in response_items:
+                #This is a student_facing_error
+                return format_feedback('errors', 'Error getting feedback from grader.')
+
+        feedback_items = response_items['feedback']
+        try:
+            feedback = json.loads(feedback_items)
+        except (TypeError, ValueError):
+            #This is a dev_facing_error
+            log.exception("feedback_items from external open ended grader have invalid json {0}".format(feedback_items))
+            #This is a student_facing_error
+            return format_feedback('errors', 'Error getting feedback from grader.')
+
+        if response_items['success']:
+            if len(feedback) == 0:
+                #This is a student_facing_error
+                return format_feedback('errors', 'No feedback available from grader.')
+
+            for tag in do_not_render:
+                if tag in feedback:
+                    feedback.pop(tag)
+
+            feedback_lst = sorted(feedback.items(), key=get_priority)
+            feedback_list_part1 = u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
+        else:
+            #This is a student_facing_error
+            feedback_list_part1 = format_feedback('errors', response_items['feedback'])
+
+        feedback_list_part2 = (u"\n".join([format_feedback_hidden(feedback_type, value)
+                                           for feedback_type, value in response_items.items()
+                                           if feedback_type in ['submission_id', 'grader_id']]))
+
+        return u"\n".join([feedback_list_part1, feedback_list_part2])
+
+    def _format_feedback(self, response_items, system):
+        """
+        Input:
+            Dictionary called feedback.  Must contain keys seen below.
+        Output:
+            Return error message or feedback template
+        """
+
+        rubric_feedback = ""
+        feedback = self._convert_longform_feedback_to_html(response_items)
+        rubric_scores = []
+        if response_items['rubric_scores_complete'] == True:
+            rubric_renderer = CombinedOpenEndedRubric(system, True)
+            rubric_dict = rubric_renderer.render_rubric(response_items['rubric_xml'])
+            success = rubric_dict['success']
+            rubric_feedback = rubric_dict['html']
+            rubric_scores = rubric_dict['rubric_scores']
+
+        if not response_items['success']:
+            return system.render_template("{0}/open_ended_error.html".format(self.TEMPLATE_DIR),
+                                          {'errors': feedback})
+
+        feedback_template = system.render_template("{0}/open_ended_feedback.html".format(self.TEMPLATE_DIR), {
+            'grader_type': response_items['grader_type'],
+            'score': "{0} / {1}".format(response_items['score'], self.max_score()),
+            'feedback': feedback,
+            'rubric_feedback': rubric_feedback
+        })
+
+        return feedback_template, rubric_scores
+
+    def _parse_score_msg(self, score_msg, system, join_feedback=True):
+        """
+         Grader reply is a JSON-dump of the following dict
+           { 'correct': True/False,
+             'score': Numeric value (floating point is okay) to assign to answer
+             'msg': grader_msg
+             'feedback' : feedback from grader
+             'grader_type': what type of grader resulted in this score
+             'grader_id': id of the grader
+             'submission_id' : id of the submission
+             'success': whether or not this submission was successful
+             'rubric_scores': a list of rubric scores
+             'rubric_scores_complete': boolean if rubric scores are complete
+             'rubric_xml': the xml of the rubric in string format
+             }
+
+        Returns (valid_score_msg, correct, score, msg):
+            valid_score_msg: Flag indicating valid score_msg format (Boolean)
+            correct:         Correctness of submission (Boolean)
+            score:           Points to be assigned (numeric, can be float)
+        """
+        fail = {
+            'valid': False,
+            'score': 0,
+            'feedback': '',
+            'rubric_scores': [[0]],
+            'grader_types': [''],
+            'feedback_items': [''],
+            'feedback_dicts': [{}],
+            'grader_ids': [0],
+            'submission_ids': [0],
+        }
+        try:
+            score_result = json.loads(score_msg)
+        except (TypeError, ValueError):
+            #This is a dev_facing_error
+            error_message = ("External open ended grader message should be a JSON-serialized dict."
+                             " Received score_msg = {0}".format(score_msg))
+            log.error(error_message)
+            fail['feedback'] = error_message
+            return fail
+
+        if not isinstance(score_result, dict):
+            #This is a dev_facing_error
+            error_message = ("External open ended grader message should be a JSON-serialized dict."
+                             " Received score_result = {0}".format(score_result))
+            log.error(error_message)
+            fail['feedback'] = error_message
+            return fail
+
+        for tag in ['score', 'feedback', 'grader_type', 'success', 'grader_id', 'submission_id']:
+            if tag not in score_result:
+                #This is a dev_facing_error
+                error_message = ("External open ended grader message is missing required tag: {0}"
+                                 .format(tag))
+                log.error(error_message)
+                fail['feedback'] = error_message
+                return fail
+                #This is to support peer grading
+        if isinstance(score_result['score'], list):
+            feedback_items = []
+            rubric_scores = []
+            grader_types = []
+            feedback_dicts = []
+            grader_ids = []
+            submission_ids = []
+            for i in xrange(0, len(score_result['score'])):
+                new_score_result = {
+                    'score': score_result['score'][i],
+                    'feedback': score_result['feedback'][i],
+                    'grader_type': score_result['grader_type'],
+                    'success': score_result['success'],
+                    'grader_id': score_result['grader_id'][i],
+                    'submission_id': score_result['submission_id'],
+                    'rubric_scores_complete': score_result['rubric_scores_complete'][i],
+                    'rubric_xml': score_result['rubric_xml'][i],
+                }
+                feedback_template, rubric_score = self._format_feedback(new_score_result, system)
+                feedback_items.append(feedback_template)
+                rubric_scores.append(rubric_score)
+                grader_types.append(score_result['grader_type'])
+                try:
+                    feedback_dict = json.loads(score_result['feedback'][i])
+                except:
+                    pass
+                feedback_dicts.append(feedback_dict)
+                grader_ids.append(score_result['grader_id'][i])
+                submission_ids.append(score_result['submission_id'])
+            if join_feedback:
+                feedback = "".join(feedback_items)
+            else:
+                feedback = feedback_items
+            score = int(median(score_result['score']))
+        else:
+            #This is for instructor and ML grading
+            feedback, rubric_score = self._format_feedback(score_result, system)
+            score = score_result['score']
+            rubric_scores = [rubric_score]
+            grader_types = [score_result['grader_type']]
+            feedback_items = [feedback]
+            try:
+                feedback_dict = json.loads(score_result['feedback'])
+            except:
+                pass
+            feedback_dicts = [feedback_dict]
+            grader_ids = [score_result['grader_id']]
+            submission_ids = [score_result['submission_id']]
+
+        self.submission_id = score_result['submission_id']
+        self.grader_id = score_result['grader_id']
+
+        return {
+            'valid': True,
+            'score': score,
+            'feedback': feedback,
+            'rubric_scores': rubric_scores,
+            'grader_types': grader_types,
+            'feedback_items': feedback_items,
+            'feedback_dicts': feedback_dicts,
+            'grader_ids': grader_ids,
+            'submission_ids': submission_ids,
+        }
+
+    def latest_post_assessment(self, system, short_feedback=False, join_feedback=True):
+        """
+        Gets the latest feedback, parses, and returns
+        @param short_feedback: If the long feedback is wanted or not
+        @return: Returns formatted feedback
+        """
+        if not self.child_history:
+            return ""
+
+        feedback_dict = self._parse_score_msg(self.child_history[-1].get('post_assessment', ""), system,
+                                              join_feedback=join_feedback)
+        if not short_feedback:
+            return feedback_dict['feedback'] if feedback_dict['valid'] else ''
+        if feedback_dict['valid']:
+            short_feedback = self._convert_longform_feedback_to_html(
+                json.loads(self.child_history[-1].get('post_assessment', "")))
+        return short_feedback if feedback_dict['valid'] else ''
+
+    def format_feedback_with_evaluation(self, system, feedback):
+        """
+        Renders a given html feedback into an evaluation template
+        @param feedback: HTML feedback
+        @return: Rendered html
+        """
+        context = {'msg': feedback, 'id': "1", 'rows': 50, 'cols': 50}
+        html = system.render_template('{0}/open_ended_evaluation.html'.format(self.TEMPLATE_DIR), context)
+        return html
+
+    def handle_ajax(self, dispatch, get, system):
+        '''
+        This is called by courseware.module_render, to handle an AJAX call.
+        "get" is request.POST.
+
+        Returns a json dictionary:
+        { 'progress_changed' : True/False,
+          'progress' : 'none'/'in_progress'/'done',
+          <other request-specific values here > }
+        '''
+        handlers = {
+            'save_answer': self.save_answer,
+            'score_update': self.update_score,
+            'save_post_assessment': self.message_post,
+            'skip_post_assessment': self.skip_post_assessment,
+            'check_for_score': self.check_for_score,
+        }
+
+        if dispatch not in handlers:
+            #This is a dev_facing_error
+            log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
+            #This is a dev_facing_error
+            return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
+
+        before = self.get_progress()
+        d = handlers[dispatch](get, system)
+        after = self.get_progress()
+        d.update({
+            'progress_changed': after != before,
+            'progress_status': Progress.to_js_status_str(after),
+        })
+        return json.dumps(d, cls=ComplexEncoder)
+
+    def check_for_score(self, get, system):
+        """
+        Checks to see if a score has been received yet.
+        @param get: AJAX get dictionary
+        @param system: Modulesystem (needed to align with other ajax functions)
+        @return: Returns the current state
+        """
+        state = self.child_state
+        return {'state': state}
+
+    def save_answer(self, get, system):
+        """
+        Saves a student answer
+        @param get: AJAX get dictionary
+        @param system: modulesystem
+        @return: Success indicator
+        """
+        # Once we close the problem, we should not allow students
+        # to save answers
+        closed, msg = self.check_if_closed()
+        if closed:
+            return msg
+
+        if self.child_state != self.INITIAL:
+            return self.out_of_sync_error(get)
+
+        # add new history element with answer and empty score and hint.
+        success, get = self.append_image_to_student_answer(get)
+        error_message = ""
+        if success:
+            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
+            if allowed_to_submit:
+                get['student_answer'] = OpenEndedModule.sanitize_html(get['student_answer'])
+                self.new_history_entry(get['student_answer'])
+                self.send_to_grader(get['student_answer'], system)
+                self.change_state(self.ASSESSING)
+            else:
+                #Error message already defined
+                success = False
+        else:
+            #This is a student_facing_error
+            error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
+
+        return {
+            'success': success,
+            'error': error_message,
+            'student_response': get['student_answer']
+        }
+
+    def update_score(self, get, system):
+        """
+        Updates the current score via ajax.  Called by xqueue.
+        Input: AJAX get dictionary, modulesystem
+        Output: None
+        """
+        queuekey = get['queuekey']
+        score_msg = get['xqueue_body']
+        #TODO: Remove need for cmap
+        self._update_score(score_msg, queuekey, system)
+
+        return dict()  # No AJAX return is needed
+
+    def get_html(self, system):
+        """
+        Gets the HTML for this problem and renders it
+        Input: Modulesystem object
+        Output: Rendered HTML
+        """
+        #set context variables and render template
+        eta_string = None
+        if self.child_state != self.INITIAL:
+            latest = self.latest_answer()
+            previous_answer = latest if latest is not None else self.initial_display
+            post_assessment = self.latest_post_assessment(system)
+            score = self.latest_score()
+            correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
+            if self.child_state == self.ASSESSING:
+                eta_string = self.get_eta()
+        else:
+            post_assessment = ""
+            correct = ""
+            previous_answer = self.initial_display
+
+        context = {
+            'prompt': self.child_prompt,
+            'previous_answer': previous_answer,
+            'state': self.child_state,
+            'allow_reset': self._allow_reset(),
+            'rows': 30,
+            'cols': 80,
+            'id': 'open_ended',
+            'msg': post_assessment,
+            'child_type': 'openended',
+            'correct': correct,
+            'accept_file_upload': self.accept_file_upload,
+            'eta_message': eta_string,
+        }
+        html = system.render_template('{0}/open_ended.html'.format(self.TEMPLATE_DIR), context)
+        return html
+
+
+class OpenEndedDescriptor():
+    """
+    Module for adding open ended response questions to courses
+    """
+    mako_template = "widgets/html-edit.html"
+    module_class = OpenEndedModule
+    filename_extension = "xml"
+
+    stores_state = True
+    has_score = True
+    template_dir_name = "openended"
+
+    def __init__(self, system):
+        self.system =system
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        """
+        Pull out the open ended parameters into a dictionary.
+
+        Returns:
+        {
+        'oeparam': 'some-html'
+        }
+        """
+        for child in ['openendedparam']:
+            if len(xml_object.xpath(child)) != 1:
+                #This is a staff_facing_error
+                raise ValueError(
+                    "Open Ended definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
+                        child))
+
+        def parse(k):
+            """Assumes that xml_object has child k"""
+            return xml_object.xpath(k)[0]
+
+        return {'oeparam': parse('openendedparam')}
+
+
+    def definition_to_xml(self, resource_fs):
+        '''Return an xml element representing this definition.'''
+        elt = etree.Element('openended')
+
+        def add_child(k):
+            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_node = etree.fromstring(child_str)
+            elt.append(child_node)
+
+        for child in ['openendedparam']:
+            add_child(child)
+
+        return elt

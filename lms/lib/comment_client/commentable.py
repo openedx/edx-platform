@@ -1,7 +1,8 @@
-from utils import *
+from .utils import *
 
 import models
 import settings
+
 
 class Commentable(models.Model):
 
