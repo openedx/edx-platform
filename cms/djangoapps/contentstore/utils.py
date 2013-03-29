@@ -210,3 +210,19 @@ def add_open_ended_panel_tab(course):
         course_tabs.append(OPEN_ENDED_PANEL)
         changed = True
     return changed, course_tabs
+
+def remove_open_ended_panel_tab(course):
+    """
+    Used to remove the open ended panel tab from a course if it exists.
+    @param course: A course object from the modulestore.
+    @return: Boolean indicating whether or not a tab was added and a list of tabs for the course.
+    """
+    #Copy course tabs
+    course_tabs = copy.copy(course.tabs)
+    changed = False
+    #Check to see if open ended panel is defined in the course
+    if OPEN_ENDED_PANEL in course_tabs:
+        #Add panel to the tabs if it is not defined
+        course_tabs = [ct for ct in course_tabs if ct!=OPEN_ENDED_PANEL]
+        changed = True
+    return changed, course_tabs
