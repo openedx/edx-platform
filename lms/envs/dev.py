@@ -113,6 +113,9 @@ SUBDOMAIN_BRANDING = {
 # have an actual course with that org set
 VIRTUAL_UNIVERSITIES = []
 
+# Organization that contain other organizations
+META_UNIVERSITIES = {'UTx': ['UTAustinX']}
+
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
 ############################## Course static files ##########################

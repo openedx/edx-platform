@@ -1,5 +1,7 @@
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from lettuce import world, step
-from common import *
 from terrain.steps import reload_the_page
 from selenium.webdriver.common.keys import Keys
 import time
@@ -25,9 +27,9 @@ DEFAULT_TIME = "12:00am"
 def test_i_select_schedule_and_details(step):
     expand_icon_css = 'li.nav-course-settings i.icon-expand'
     if world.browser.is_element_present_by_css(expand_icon_css):
-        css_click(expand_icon_css)
+        world.css_click(expand_icon_css)
     link_css = 'li.nav-course-settings-schedule a'
-    css_click(link_css)
+    world.css_click(link_css)
 
 
 @step('I have set course dates$')
@@ -97,9 +99,9 @@ def test_i_clear_the_course_start_date(step):
 
 @step('I receive a warning about course start date$')
 def test_i_receive_a_warning_about_course_start_date(step):
-    assert_css_with_text('.message-error', 'The course must have an assigned start date.')
-    assert_true('error' in css_find(COURSE_START_DATE_CSS).first._element.get_attribute('class'))
-    assert_true('error' in css_find(COURSE_START_TIME_CSS).first._element.get_attribute('class'))
+    assert_true(world.css_has_text('.message-error', 'The course must have an assigned start date.'))
+    assert_true('error' in world.css_find(COURSE_START_DATE_CSS).first._element.get_attribute('class'))
+    assert_true('error' in world.css_find(COURSE_START_TIME_CSS).first._element.get_attribute('class'))
 
 
 @step('The previously set start date is shown on refresh$')
@@ -124,9 +126,9 @@ def test_i_have_entered_a_new_course_start_date(step):
 
 @step('The warning about course start date goes away$')
 def test_the_warning_about_course_start_date_goes_away(step):
-    assert_equal(0, len(css_find('.message-error')))
-    assert_false('error' in css_find(COURSE_START_DATE_CSS).first._element.get_attribute('class'))
-    assert_false('error' in css_find(COURSE_START_TIME_CSS).first._element.get_attribute('class'))
+    assert_equal(0, len(world.css_find('.message-error')))
+    assert_false('error' in world.css_find(COURSE_START_DATE_CSS).first._element.get_attribute('class'))
+    assert_false('error' in world.css_find(COURSE_START_TIME_CSS).first._element.get_attribute('class'))
 
 
 @step('My new course start date is shown on refresh$')
@@ -142,8 +144,8 @@ def set_date_or_time(css, date_or_time):
     """
     Sets date or time field.
     """
-    css_fill(css, date_or_time)
-    e = css_find(css).first
+    world.css_fill(css, date_or_time)
+    e = world.css_find(css).first
     # hit Enter to apply the changes
     e._element.send_keys(Keys.ENTER)
 
@@ -152,7 +154,7 @@ def verify_date_or_time(css, date_or_time):
     """
     Verifies date or time field.
     """
-    assert_equal(date_or_time, css_find(css).first.value)
+    assert_equal(date_or_time, world.css_find(css).first.value)
 
 
 def pause():
