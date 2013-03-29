@@ -208,19 +208,14 @@ def course_index(request, org, course, name):
 @login_required
 def edit_subsection(request, location):
     # check that we have permissions to edit this item
-    if not has_access(request.user, location):
+    course = get_course_for_item(location)
+    if not has_access(request.user, course.location):
         raise PermissionDenied()
 
-    item = modulestore().get_item(location)
+    item = modulestore().get_item(location, depth=1)
 
-    # TODO: we need a smarter way to figure out what course an item is in
-    for course in modulestore().get_courses():
-        if (course.location.org == item.location.org and
-            course.location.course == item.location.course):
-            break
-
-    lms_link = get_lms_link_for_item(location)
-    preview_link = get_lms_link_for_item(location, preview=True)
+    lms_link = get_lms_link_for_item(location, course_id=course.location.course_id)
+    preview_link = get_lms_link_for_item(location, course_id=course.location.course_id, preview=True)
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
@@ -277,19 +272,13 @@ def edit_unit(request, location):
 
     id: A Location URL
     """
-    # check that we have permissions to edit this item
-    if not has_access(request.user, location):
+    course = get_course_for_item(location)
+    if not has_access(request.user, course.location):
         raise PermissionDenied()
 
-    item = modulestore().get_item(location)
+    item = modulestore().get_item(location, depth=1)
 
-    # TODO: we need a smarter way to figure out what course an item is in
-    for course in modulestore().get_courses():
-        if (course.location.org == item.location.org and
-            course.location.course == item.location.course):
-            break
-
-    lms_link = get_lms_link_for_item(item.location)
+    lms_link = get_lms_link_for_item(item.location, course_id=course.location.course_id)
 
     component_templates = defaultdict(list)
 
