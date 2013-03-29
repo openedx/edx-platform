@@ -66,21 +66,20 @@ class CorrectMap(object):
 
     def set_dict(self, correct_map):
         '''
-        Set internal dict of CorrectMap to provided correct_map dict.
+        Set internal dict of CorrectMap to provided correct_map dict
 
-        correct_map is saved by LMS as a plaintext JSON dump of the correctmap
-        dict. This means that when the definition of CorrectMap (e.g. its
-        properties) are altered, an existing correct_map dict will not coincide
-        with the newest CorrectMap format as defined by self.set.
+        correct_map is saved by LMS as a plaintext JSON dump of the correctmap dict. This
+        means that when the definition of CorrectMap (e.g. its properties) are altered,
+        an existing correct_map dict will not coincide with the newest CorrectMap format as
+        defined by self.set.
 
-        For graceful migration, feed the contents of each correct map to
-        self.set, rather than making a direct copy of the given correct_map
-        dict. This way, the common keys between the incoming correct_map dict
-        and the new CorrectMap instance will be written, while mismatched keys
-        will be gracefully ignored.
+        For graceful migration, feed the contents of each correct map to self.set, rather than
+        making a direct copy of the given correct_map dict. This way, the common keys between
+        the incoming correct_map dict and the new CorrectMap instance will be written, while
+        mismatched keys will be gracefully ignored.
 
-        Special migration case: If correct_map is a one-level dict, then
-        convert it to the new dict of dicts format.
+        Special migration case:
+            If correct_map is a one-level dict, then convert it to the new dict of dicts format.
 
         '''
         # empty current dict
