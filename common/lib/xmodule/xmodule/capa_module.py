@@ -93,7 +93,7 @@ class CapaFields(object):
     rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
-    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.student_state, default={})
+    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.student_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
