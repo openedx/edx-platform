@@ -52,7 +52,8 @@ from auth.authz import is_user_in_course_group_role, get_users_in_course_group_b
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
 from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, \
-    get_date_display, UnitState, get_course_for_item, get_url_reverse
+    get_date_display, UnitState, get_course_for_item, get_url_reverse, add_open_ended_panel_tab, \
+    remove_open_ended_panel_tab
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from contentstore.course_info_model import get_course_updates, \
@@ -73,7 +74,8 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-ADVANCED_COMPONENT_TYPES = ['annotatable', 'combinedopenended', 'peergrading']
+OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
+ADVANCED_COMPONENT_TYPES = ['annotatable'] + OPEN_ENDED_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -1262,15 +1264,48 @@ def course_advanced_updates(request, org, course, name):
     location = get_location_and_verify_access(request, org, course, name)
 
     real_method = get_request_method(request)
-        
+
     if real_method == 'GET':
         return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
     elif real_method == 'DELETE':
-        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))), mimetype="application/json")
+        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))),
+                            mimetype="application/json")
     elif real_method == 'POST' or real_method == 'PUT':
         # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
-        return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
-
+        request_body = json.loads(request.body)
+        #Whether or not to filter the tabs key out of the settings metadata
+        filter_tabs = True
+        #Check to see if the user instantiated any advanced components.  This is a hack to add the open ended panel tab
+        #to a course automatically if the user has indicated that they want to edit the combinedopenended or peergrading
+        #module, and to remove it if they have removed the open ended elements.
+        if ADVANCED_COMPONENT_POLICY_KEY in request_body:
+            #Check to see if the user instantiated any open ended components
+            found_oe_type = False
+            #Get the course so that we can scrape current tabs
+            course_module = modulestore().get_item(location)
+            for oe_type in OPEN_ENDED_COMPONENT_TYPES:
+                if oe_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
+                    #Add an open ended tab to the course if needed
+                    changed, new_tabs = add_open_ended_panel_tab(course_module)
+                    #If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
+                    if changed:
+                        request_body.update({'tabs': new_tabs})
+                        #Indicate that tabs should not be filtered out of the metadata
+                        filter_tabs = False
+                    #Set this flag to avoid the open ended tab removal code below.
+                    found_oe_type = True
+                    break
+            #If we did not find an open ended module type in the advanced settings,
+            # we may need to remove the open ended tab from the course.
+            if not found_oe_type:
+                #Remove open ended tab to the course if needed
+                changed, new_tabs = remove_open_ended_panel_tab(course_module)
+                if changed:
+                    request_body.update({'tabs': new_tabs})
+                    #Indicate that tabs should not be filtered out of the metadata
+                    filter_tabs = False
+        response_json = json.dumps(CourseMetadata.update_from_json(location, request_body, filter_tabs=filter_tabs))
+        return HttpResponse(response_json, mimetype="application/json")
 
 @ensure_csrf_cookie
 @login_required
