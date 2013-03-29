@@ -353,10 +353,14 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     </openended>'''
     definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
     full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
-    descriptor = Mock()
+    descriptor = Mock(data=full_definition)
+    test_system = test_system()
+    combinedoe_container = CombinedOpenEndedModule(test_system,
+                                                   location,
+                                                   descriptor,
+                                                   model_data={'data': full_definition, 'weight' : '1'})
 
     def setUp(self):
-        self.test_system = test_system()
         # TODO: this constructor call is definitely wrong, but neither branch
         # of the merge matches the module constructor.  Someone (Vik?) should fix this.
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
@@ -395,12 +399,10 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(max_score, 1)
 
     def test_container_get_max_score(self):
-        definition = self.full_definition
-        descriptor = Mock(data=definition)
-        combinedoe_container = CombinedOpenEndedModule(self.test_system,
-                                                       self.location,
-                                                       descriptor,
-                                                       model_data={'data': definition})
         #The progress view requires that this function be exposed
-        max_score = combinedoe_container.max_score()
+        max_score = self.combinedoe_container.max_score()
         self.assertEqual(max_score, None)
+
+    def test_container_weight(self):
+        weight = self.combinedoe_container.weight
+        self.assertEqual(weight,1)
