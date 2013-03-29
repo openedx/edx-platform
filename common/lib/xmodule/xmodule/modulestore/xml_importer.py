@@ -356,20 +356,22 @@ def remap_namespace(module, target_location_namespace):
 
     return module
 
-def validate_no_non_editable_metadata(module_store, course_id, category):
+def validate_no_non_editable_metadata(module_store, course_id, category, allowed=[]):
     '''
     Assert that there is no metadata within a particular category that we can't support editing
+    However we always allow display_name and 'xml_attribtues'
     '''
+    allowed = allowed + ['xml_attributes', 'display_name']
+
     err_cnt = 0
     for module_loc in module_store.modules[course_id]:
         module = module_store.modules[course_id][module_loc]
         if module.location.category == category:
             my_metadata = dict(own_metadata(module))
             for key in my_metadata.keys():
-                if key != 'xml_attributes' and key != 'display_name':
+                if key not in allowed:
                     err_cnt = err_cnt + 1
-                    print 'ERROR: found metadata on {0}. Metadata: {1} = {2}'.format(
-                        module.location.url(), key, my_metadata[key])
+                    print ': found metadata on {0}. Studio will not support editing this piece of metadata, so it is not allowed. Metadata: {1} = {2}'. format(module.location.url(), key, my_metadata[key])
 
     return err_cnt
 
@@ -461,8 +463,10 @@ def perform_xlint(data_dir, course_dirs,
         # don't allow metadata on verticals, since we can't edit them in studio
         err_cnt += validate_no_non_editable_metadata(module_store, course_id, "vertical")
         # don't allow metadata on chapters, since we can't edit them in studio
-        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "chapter")
-        
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "chapter",['start'])
+        # don't allow metadata on sequences that we can't edit
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "sequential",
+            ['due','format','start','graded'])
 
         # check for a presence of a course marketing video
         location_elements = course_id.split('/')
