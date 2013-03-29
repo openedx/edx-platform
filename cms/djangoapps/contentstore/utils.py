@@ -128,7 +128,7 @@ class UnitState(object):
     public = 'public'
 
 
-def compute_unit_state(unit, subsection=None):
+def compute_unit_state(unit):
     """
     Returns whether this unit is 'draft', 'public', or 'private'.
 
