@@ -3,7 +3,6 @@ import unittest
 import threading
 import json
 import urllib
-import urlparse
 import time
 from mock_xqueue_server import MockXQueueServer, MockXQueueRequestHandler
 
@@ -33,7 +32,7 @@ class MockXQueueServerTest(unittest.TestCase):
         server_port = 8034
         self.server_url = 'http://127.0.0.1:%d' % server_port
         self.server = MockXQueueServer(server_port,
-                                {'correct': True, 'score': 1, 'msg': ''})
+                                       {'correct': True, 'score': 1, 'msg': ''})
 
         # Start the server in a separate daemon thread
         server_thread = threading.Thread(target=self.server.serve_forever)
@@ -55,18 +54,18 @@ class MockXQueueServerTest(unittest.TestCase):
         callback_url = 'http://127.0.0.1:8000/test_callback'
 
         grade_header = json.dumps({'lms_callback_url': callback_url,
-                                    'lms_key': 'test_queuekey',
-                                    'queue_name': 'test_queue'})
+                                   'lms_key': 'test_queuekey',
+                                   'queue_name': 'test_queue'})
 
         grade_body = json.dumps({'student_info': 'test',
                                 'grader_payload': 'test',
                                 'student_response': 'test'})
 
         grade_request = {'xqueue_header': grade_header,
-                        'xqueue_body': grade_body}
+                         'xqueue_body': grade_body}
 
         response_handle = urllib.urlopen(self.server_url + '/xqueue/submit',
-                                urllib.urlencode(grade_request))
+                                         urllib.urlencode(grade_request))
 
         response_dict = json.loads(response_handle.read())
 
@@ -78,8 +77,8 @@ class MockXQueueServerTest(unittest.TestCase):
 
         # Expect that the server tries to post back the grading info
         xqueue_body = json.dumps({'correct': True, 'score': 1,
-                                    'msg': '<div></div>'})
+                                  'msg': '<div></div>'})
         expected_callback_dict = {'xqueue_header': grade_header,
-                                'xqueue_body': xqueue_body}
+                                  'xqueue_body': xqueue_body}
         MockXQueueRequestHandler.post_to_url.assert_called_with(callback_url,
-                                                        expected_callback_dict)
+                                                                expected_callback_dict)

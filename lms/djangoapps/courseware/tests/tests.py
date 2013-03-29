@@ -127,11 +127,11 @@ class LoginEnrollmentTestCase(TestCase):
         e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
         if not (e_scheme or e_netloc):
             expected_url = urlunsplit(('http', 'testserver',
-                                    e_path, e_query, e_fragment))
+                                       e_path, e_query, e_fragment))
 
         self.assertEqual(url, expected_url,
-                "Response redirected to '%s', expected '%s'" %
-                    (url, expected_url))
+                         "Response redirected to '%s', expected '%s'" %
+                         (url, expected_url))
 
     def setup_viewtest_user(self):
         '''create a user account, activate, and log in'''
@@ -219,7 +219,7 @@ class LoginEnrollmentTestCase(TestCase):
         """Try to enroll.  Return bool success instead of asserting it."""
         data = self._enroll(course)
         print ('Enrollment in %s result: %s'
-                % (course.location.url(), str(data)))
+               % (course.location.url(), str(data)))
         return data['success']
 
     def enroll(self, course):
@@ -287,12 +287,11 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         self.enroll(course)
         course_id = course.id
 
-
         # Search for items in the course
         # None is treated as a wildcard
         course_loc = course.location
-        location_query = Location(course_loc.tag, course_loc.org, 
-                                course_loc.course, None, None, None)
+        location_query = Location(course_loc.tag, course_loc.org,
+                                  course_loc.course, None, None, None)
 
         items = module_store.get_items(location_query)
 
@@ -301,22 +300,21 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         else:
             descriptor = random.choice(items)
 
-
         # We have ancillary course information now as modules
         # and we can't simply use 'jump_to' to view them
         if descriptor.location.category == 'about':
             self._assert_loads('about_course',
-                                {'course_id': course_id},
-                                descriptor)
+                               {'course_id': course_id},
+                               descriptor)
 
         elif descriptor.location.category == 'static_tab':
             kwargs = {'course_id': course_id,
-                    'tab_slug': descriptor.location.name}
+                      'tab_slug': descriptor.location.name}
             self._assert_loads('static_tab', kwargs, descriptor)
 
         elif descriptor.location.category == 'course_info':
             self._assert_loads('info', {'course_id': course_id},
-                                descriptor)
+                               descriptor)
 
         elif descriptor.location.category == 'custom_tag_template':
             pass
@@ -324,16 +322,15 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         else:
 
             kwargs = {'course_id': course_id,
-                   'location': descriptor.location.url()}
+                      'location': descriptor.location.url()}
 
             self._assert_loads('jump_to', kwargs, descriptor,
-                                expect_redirect=True,
-                                check_content=True)
-
+                               expect_redirect=True,
+                               check_content=True)
 
     def _assert_loads(self, django_url, kwargs, descriptor,
-                        expect_redirect=False,
-                        check_content=False):
+                      expect_redirect=False,
+                      check_content=False):
         '''
         Assert that the url loads correctly.
         If expect_redirect, then also check that we were redirected.
@@ -346,7 +343,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
         if response.status_code != 200:
             self.fail('Status %d for page %s' %
-                    (response.status_code, descriptor.location.url()))
+                      (response.status_code, descriptor.location.url()))
 
         if expect_redirect:
             self.assertEqual(response.redirect_chain[0][1], 302)
@@ -368,9 +365,9 @@ class TestCoursesLoadTestCase_XmlModulestore(PageLoaderTestCase):
     def test_toy_course_loads(self):
         module_class = 'xmodule.hidden_module.HiddenDescriptor'
         module_store = XMLModuleStore(TEST_DATA_DIR,
-                                  default_class=module_class,
-                                  course_dirs=['toy'],
-                                  load_error_modules=True)
+                                      default_class=module_class,
+                                      course_dirs=['toy'],
+                                      load_error_modules=True)
 
         self.check_random_page_loads(module_store)
 
@@ -388,7 +385,6 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
         module_store = modulestore()
         import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
         self.check_random_page_loads(module_store)
-
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
@@ -419,7 +415,7 @@ class TestNavigation(LoginEnrollmentTestCase):
 
         # First request should redirect to ToyVideos
         resp = self.client.get(reverse('courseware',
-                                kwargs={'course_id': self.toy.id}))
+                               kwargs={'course_id': self.toy.id}))
 
         # Don't use no-follow, because state should
         # only be saved once we actually hit the section
@@ -431,11 +427,11 @@ class TestNavigation(LoginEnrollmentTestCase):
         # Hitting the couseware tab again should
         # redirect to the first chapter: 'Overview'
         resp = self.client.get(reverse('courseware',
-                                kwargs={'course_id': self.toy.id}))
+                               kwargs={'course_id': self.toy.id}))
 
         self.assertRedirectsNoFollow(resp, reverse('courseware_chapter',
-                                       kwargs={'course_id': self.toy.id,
-                                                'chapter': 'Overview'}))
+                                      kwargs={'course_id': self.toy.id,
+                                               'chapter': 'Overview'}))
 
         # Now we directly navigate to a section in a different chapter
         self.check_for_get_code(200, reverse('courseware_section',
@@ -445,11 +441,11 @@ class TestNavigation(LoginEnrollmentTestCase):
 
         # And now hitting the courseware tab should redirect to 'secret:magic'
         resp = self.client.get(reverse('courseware',
-                                kwargs={'course_id': self.toy.id}))
+                               kwargs={'course_id': self.toy.id}))
 
         self.assertRedirectsNoFollow(resp, reverse('courseware_chapter',
-                                           kwargs={'course_id': self.toy.id,
-                                               'chapter': 'secret:magic'}))
+                                     kwargs={'course_id': self.toy.id,
+                                             'chapter': 'secret:magic'}))
 
 
 @override_settings(MODULESTORE=TEST_DATA_DRAFT_MONGO_MODULESTORE)
@@ -459,7 +455,7 @@ class TestDraftModuleStore(TestCase):
 
         # fix was to allow get_items() to take the course_id parameter
         store.get_items(Location(None, None, 'vertical', None, None),
-                            course_id='abc', depth=0)
+                        course_id='abc', depth=0)
 
         # test success is just getting through the above statement.
         # The bug was that 'course_id' argument was
@@ -497,21 +493,21 @@ class TestViewAuth(LoginEnrollmentTestCase):
         self.login(self.student, self.password)
         # shouldn't work before enroll
         response = self.client.get(reverse('courseware',
-                                    kwargs={'course_id': self.toy.id}))
+                                   kwargs={'course_id': self.toy.id}))
 
         self.assertRedirectsNoFollow(response,
-                                    reverse('about_course',
-                                            args=[self.toy.id]))
+                                     reverse('about_course',
+                                             args=[self.toy.id]))
         self.enroll(self.toy)
         self.enroll(self.full)
         # should work now -- redirect to first page
         response = self.client.get(reverse('courseware',
-                                        kwargs={'course_id': self.toy.id}))
+                                   kwargs={'course_id': self.toy.id}))
         self.assertRedirectsNoFollow(response,
-                                    reverse('courseware_section',
-                                            kwargs={'course_id': self.toy.id,
-                                                 'chapter': 'Overview',
-                                                 'section': 'Toy_Videos'}))
+                                     reverse('courseware_section',
+                                             kwargs={'course_id': self.toy.id,
+                                                     'chapter': 'Overview',
+                                                     'section': 'Toy_Videos'}))
 
         def instructor_urls(course):
             "list of urls that only instructors/staff should be able to see"
@@ -521,8 +517,8 @@ class TestViewAuth(LoginEnrollmentTestCase):
                 'grade_summary',)]
 
             urls.append(reverse('student_progress',
-                            kwargs={'course_id': course.id,
-                                    'student_id': get_user(self.student).id}))
+                                kwargs={'course_id': course.id,
+                                        'student_id': get_user(self.student).id}))
             return urls
 
         # Randomly sample an instructor page
@@ -634,7 +630,7 @@ class TestViewAuth(LoginEnrollmentTestCase):
         def instructor_urls(course):
             """list of urls that only instructors/staff should be able to see"""
             urls = reverse_urls(['instructor_dashboard',
-                                    'gradebook', 'grade_summary'], course)
+                                 'gradebook', 'grade_summary'], course)
             return urls
 
         def check_non_staff(course):
@@ -642,9 +638,9 @@ class TestViewAuth(LoginEnrollmentTestCase):
             print '=== Checking non-staff access for {0}'.format(course.id)
 
             # Randomly sample a dark url
-            url = random.choice( instructor_urls(course) +
-                                    dark_student_urls(course) +
-                                    reverse_urls(['courseware'], course))
+            url = random.choice(instructor_urls(course) +
+                                dark_student_urls(course) +
+                                reverse_urls(['courseware'], course))
             print 'checking for 404 on {0}'.format(url)
             self.check_for_get_code(404, url)
 
@@ -671,7 +667,7 @@ class TestViewAuth(LoginEnrollmentTestCase):
             # to make access checking smarter and understand both the effective
             # user (the student), and the requesting user (the prof)
             url = reverse('student_progress',
-                        kwargs={'course_id': course.id,
+                          kwargs={'course_id': course.id,
                                   'student_id': get_user(self.student).id})
             print 'checking for 404 on view-as-student: {0}'.format(url)
             self.check_for_get_code(404, url)
@@ -828,7 +824,7 @@ class TestCourseGrader(LoginEnrollmentTestCase):
             self.graded_course.id, self.student_user, self.graded_course)
 
         fake_request = self.factory.get(reverse('progress',
-                                kwargs={'course_id': self.graded_course.id}))
+                                        kwargs={'course_id': self.graded_course.id}))
 
         return grades.grade(self.student_user, fake_request,
                             self.graded_course, model_data_cache)
@@ -843,7 +839,7 @@ class TestCourseGrader(LoginEnrollmentTestCase):
             self.graded_course.id, self.student_user, self.graded_course)
 
         fake_request = self.factory.get(reverse('progress',
-                                kwargs={'course_id': self.graded_course.id}))
+                                        kwargs={'course_id': self.graded_course.id}))
 
         progress_summary = grades.progress_summary(self.student_user,
                                                    fake_request,

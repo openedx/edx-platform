@@ -32,7 +32,7 @@ class ModuleStoreTestCase(TestCase):
 
         # This query means: every item in the collection
         # that is not a template
-        query = { "_id.course": { "$ne": "templates" }}
+        query = {"_id.course": {"$ne": "templates"}}
 
         # Remove everything except templates
         modulestore.collection.remove(query)
@@ -47,7 +47,7 @@ class ModuleStoreTestCase(TestCase):
         modulestore = xmodule.modulestore.django.modulestore()
 
         # Count the number of templates
-        query = { "_id.course": "templates"}
+        query = {"_id.course": "templates"}
         num_templates = modulestore.collection.find(query).count()
 
         if num_templates < 1:
@@ -96,7 +96,7 @@ class ModuleStoreTestCase(TestCase):
         ModuleStoreTestCase.load_templates_if_necessary()
 
         # Call superclass implementation
-        TestCase._pre_setup(self)
+        super(ModuleStoreTestCase, self)._pre_setup()
 
     def _post_teardown(self):
         '''
@@ -106,7 +106,7 @@ class ModuleStoreTestCase(TestCase):
         ModuleStoreTestCase.flush_mongo_except_templates()
 
         # Call superclass implementation
-        TestCase._post_teardown(self)
+        super(ModuleStoreTestCase, self)._post_teardown()
 
 
 def parse_json(response):
