@@ -389,7 +389,7 @@ class MongoModuleStore(ModuleStoreBase):
                 data[Location(item['location'])] = item
 
             if depth == 0:
-                break;
+                break
 
             # Load all children by id. See
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
