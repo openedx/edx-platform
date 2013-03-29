@@ -859,3 +859,62 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the module has created a new dummy problem with the error
         self.assertNotEqual(original_problem, module.lcp)
+
+
+    def test_random_seed_no_change(self):
+        rerandomize_options = ['never', 'per_student', 'always', 'onreset']
+
+        for rerandomize in rerandomize_options:
+            module = CapaFactory.create(rerandomize=rerandomize)
+
+            # Get the seed
+            # module.seed isn't set until the problem is checked/saved,
+            # so we access the capa problem seed directly
+            seed = module.lcp.seed
+            self.assertTrue(seed is not None)
+
+            if rerandomize == 'never':
+                self.assertEqual(seed, 1)
+
+            # Check the problem
+            get_request_dict = { CapaFactory.input_key(): '3.14'}
+            module.check_problem(get_request_dict)
+
+            # Expect that the seed is the same 
+            self.assertEqual(seed, module.seed)
+
+            # Save the problem
+            module.save_problem(get_request_dict)
+
+            # Expect that the seed is the same
+            self.assertEqual(seed, module.seed)
+
+    def test_random_seed_with_reset(self):
+        rerandomize_options = ['never', 'per_student', 'always', 'onreset']
+
+        for rerandomize in rerandomize_options:
+            module = CapaFactory.create(rerandomize=rerandomize)
+
+            # Get the seed
+            seed = module.lcp.seed
+
+            # Reset the problem
+            module.reset_problem({})
+
+            # We do NOT want the seed to reset if rerandomize
+            # is set to 'never' -- it should still be 1
+            # The seed also stays the same if we're randomizing
+            # 'per_student': the same student should see the same problem
+            if rerandomize in ['never', 'per_student']:
+                self.assertEqual(seed, module.seed)
+
+            # Otherwise, we expect the seed to change
+            # to another valid seed
+            else:
+                
+                # After we save, the seed is stored in the module
+                get_request_dict = { CapaFactory.input_key(): '3.14'}
+                module.save_problem(get_request_dict)
+
+                self.assertEqual(seed, module.seed)
+                self.assertTrue(module.seed is not None)
