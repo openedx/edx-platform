@@ -142,4 +142,4 @@ DEBUG_TOOLBAR_CONFIG = {
 
 # To see stacktraces for MongoDB queries, set this to True.
 # Stacktraces slow down page loads drastically (for pages with lots of queries).
-DEBUG_TOOLBAR_MONGO_STACKTRACES = False
+DEBUG_TOOLBAR_MONGO_STACKTRACES = True

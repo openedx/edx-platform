@@ -58,6 +58,10 @@ MODULESTORE = {
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
         'OPTIONS': modulestore_options
+    },
+    'draft': {
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'OPTIONS': modulestore_options
     }
 }
 
