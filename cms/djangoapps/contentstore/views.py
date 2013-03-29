@@ -1274,11 +1274,12 @@ def course_advanced_updates(request, org, course, name):
     location = get_location_and_verify_access(request, org, course, name)
 
     real_method = get_request_method(request)
-        
+
     if real_method == 'GET':
         return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
     elif real_method == 'DELETE':
-        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))), mimetype="application/json")
+        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))),
+                            mimetype="application/json")
     elif real_method == 'POST' or real_method == 'PUT':
         # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
         request_body = json.loads(request.body)
@@ -1297,7 +1298,7 @@ def course_advanced_updates(request, org, course, name):
                     changed, new_tabs = add_open_ended_panel_tab(course_module)
                     #If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
                     if changed:
-                        request_body.update({'tabs' : new_tabs})
+                        request_body.update({'tabs': new_tabs})
                         #Indicate that tabs should not be filtered out of the metadata
                         filter_tabs = False
                     break
