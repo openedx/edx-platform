@@ -128,7 +128,9 @@ if Backbone?
         type: "POST"
         success: (response, textStatus) =>
           if textStatus == 'success'
-            @model.set('pinned', true)      
+            @model.set('pinned', true)
+        error: =>
+          $('.admin-pin').text("Pinning not currently available")
        
     unPin: ->
       url = @model.urlFor("unPinThread")

@@ -6,15 +6,16 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
 from tempdir import mkdtemp_clean
+from datetime import timedelta
 import json
 from fs.osfs import OSFS
 import copy
 from json import loads
 
 from django.contrib.auth.models import User
-from cms.djangoapps.contentstore.utils import get_modulestore
+from contentstore.utils import get_modulestore
 
-from utils import ModuleStoreTestCase, parse_json
+from .utils import ModuleStoreTestCase, parse_json
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import Location
@@ -25,6 +26,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.inheritance import own_metadata
 
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -35,6 +37,14 @@ TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
+class MongoCollectionFindWrapper(object):
+    def __init__(self, original):
+        self.original = original
+        self.counter = 0
+
+    def find(self, query, *args, **kwargs):
+        self.counter = self.counter+1
+        return self.original(query, *args, **kwargs)
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
@@ -99,6 +109,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertEqual(reverse_tabs, course_tabs)
 
+    def test_import_polls(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        module_store = modulestore('direct')
+        found = False
+
+        item = None
+        items = module_store.get_items(['i4x', 'edX', 'full', 'poll_question', None, None])
+        found = len(items) > 0
+
+        self.assertTrue(found)
+        # check that there's actually content in the 'question' field
+        self.assertGreater(len(items[0].question),0)
+
     def test_delete(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
@@ -109,10 +133,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter','Week_1', None]))
 
         # make sure the parent no longer points to the child object which was deleted
-        self.assertTrue(sequential.location.url() in chapter.definition['children'])
+        self.assertTrue(sequential.location.url() in chapter.children)
 
-        self.client.post(reverse('delete_item'), 
-            json.dumps({'id': sequential.location.url(), 'delete_children':'true', 'delete_all_versions':'true'}), 
+        self.client.post(reverse('delete_item'),
+            json.dumps({'id': sequential.location.url(), 'delete_children': 'true', 'delete_all_versions': 'true'}),
             "application/json")
 
         found = False
@@ -127,9 +151,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter','Week_1', None]))
 
         # make sure the parent no longer points to the child object which was deleted
-        self.assertFalse(sequential.location.url() in chapter.definition['children'])
-
-        
+        self.assertFalse(sequential.location.url() in chapter.children)
 
     def test_about_overrides(self):
         '''
@@ -139,11 +161,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
         module_store = modulestore('direct')
         effort = module_store.get_item(Location(['i4x', 'edX', 'full', 'about', 'effort', None]))
-        self.assertEqual(effort.definition['data'], '6 hours')
+        self.assertEqual(effort.data, '6 hours')
 
         # this one should be in a non-override folder
         effort = module_store.get_item(Location(['i4x', 'edX', 'full', 'about', 'end_date', None]))
-        self.assertEqual(effort.definition['data'], 'TBD')
+        self.assertEqual(effort.data, 'TBD')
 
     def test_remove_hide_progress_tab(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -153,7 +175,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
         course = module_store.get_item(source_location)
-        self.assertNotIn('hide_progress_tab', course.metadata)
+        self.assertFalse(course.hide_progress_tab)
 
     def test_clone_course(self):
 
@@ -190,6 +212,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
             self.assertEqual(resp.status_code, 200)
+
+    def test_bad_contentstore_request(self):
+        resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
+        self.assertEqual(resp.status_code, 400)
 
     def test_delete_course(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -246,7 +272,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # compare what's on disk compared to what we have in our course
         with fs.open('grading_policy.json', 'r') as grading_policy:
             on_disk = loads(grading_policy.read())
-            self.assertEqual(on_disk, course.definition['data']['grading_policy'])
+            self.assertEqual(on_disk, course.grading_policy)
 
         #check for policy.json
         self.assertTrue(fs.exists('policy.json'))
@@ -255,7 +281,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         with fs.open('policy.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
             self.assertIn('course/6.002_Spring_2012', on_disk)
-            self.assertEqual(on_disk['course/6.002_Spring_2012'], course.metadata)
+            self.assertEqual(on_disk['course/6.002_Spring_2012'], own_metadata(course))
 
         # remove old course
         delete_course(module_store, content_store, location)
@@ -291,6 +317,28 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # note, we know the link it should be because that's what in the 'full' course in the test data
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
 
+    def test_prefetch_children(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        module_store = modulestore('direct')
+        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        wrapper = MongoCollectionFindWrapper(module_store.collection.find)
+        module_store.collection.find = wrapper.find
+        course = module_store.get_item(location, depth=2)
+
+        # make sure we haven't done too many round trips to DB
+        # note we say 4 round trips here for 1) the course, 2 & 3) for the chapters and sequentials, and
+        # 4) because of the RT due to calculating the inherited metadata
+        self.assertEqual(wrapper.counter, 4)
+
+        # make sure we pre-fetched a known sequential which should be at depth=2
+        self.assertTrue(Location(['i4x', 'edX', 'full', 'sequential',
+            'Administrivia_and_Circuit_Elements', None]) in course.system.module_data)
+
+        # make sure we don't have a specific vertical which should be at depth=3
+        self.assertFalse(Location(['i4x', 'edX', 'full', 'vertical', 'vertical_58',
+            None]) in course.system.module_data)
+
     def test_export_course_with_unknown_metadata(self):
         module_store = modulestore('direct')
         content_store = contentstore()
@@ -302,10 +350,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         course = module_store.get_item(location)
 
+        metadata = own_metadata(course)
         # add a bool piece of unknown metadata so we can verify we don't throw an exception
-        course.metadata['new_metadata'] = True
+        metadata['new_metadata'] = True
 
-        module_store.update_metadata(location, course.metadata)
+        module_store.update_metadata(location, metadata)
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
@@ -473,21 +522,20 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")
         context = problem.get_context()
         self.assertIn('markdown', context, "markdown is missing from context")
-        self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
 
     def test_import_metadata_with_attempts_empty_string(self):
         import_from_xml(modulestore(), 'common/test/data/', ['simple'])
         module_store = modulestore('direct')
         did_load_item = False
-        try:       
+        try:
             module_store.get_item(Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None]))
             did_load_item = True
         except ItemNotFoundError:
             pass
 
         # make sure we found the item (e.g. it didn't error while loading)
-        self.assertTrue(did_load_item)   
+        self.assertTrue(did_load_item)
 
     def test_metadata_inheritance(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -499,8 +547,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # let's assert on the metadata_inheritance on an existing vertical
         for vertical in verticals:
-            self.assertIn('xqa_key', vertical.metadata)
-            self.assertEqual(course.metadata['xqa_key'], vertical.metadata['xqa_key'])
+            self.assertEqual(course.lms.xqa_key, vertical.lms.xqa_key)
 
         self.assertGreater(len(verticals), 0)
 
@@ -510,36 +557,33 @@ class ContentStoreTest(ModuleStoreTestCase):
         # crate a new module and add it as a child to a vertical
         module_store.clone_item(source_template_location, new_component_location)
         parent = verticals[0]
-        module_store.update_children(parent.location, parent.definition.get('children', []) + [new_component_location.url()])
+        module_store.update_children(parent.location, parent.children + [new_component_location.url()])
 
         # flush the cache
-        module_store.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
         new_module = module_store.get_item(new_component_location)
 
         # check for grace period definition which should be defined at the course level
-        self.assertIn('graceperiod', new_module.metadata)
+        self.assertEqual(parent.lms.graceperiod, new_module.lms.graceperiod)
 
-        self.assertEqual(parent.metadata['graceperiod'], new_module.metadata['graceperiod'])
-
-        self.assertEqual(course.metadata['xqa_key'], new_module.metadata['xqa_key'])
+        self.assertEqual(course.lms.xqa_key, new_module.lms.xqa_key)
 
         #
         # now let's define an override at the leaf node level
         #
-        new_module.metadata['graceperiod'] = '1 day'
-        module_store.update_metadata(new_module.location, new_module.metadata)
+        new_module.lms.graceperiod = timedelta(1)
+        module_store.update_metadata(new_module.location, own_metadata(new_module))
 
         # flush the cache and refetch
-        module_store.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
         new_module = module_store.get_item(new_component_location)
 
-        self.assertIn('graceperiod', new_module.metadata)
-        self.assertEqual('1 day', new_module.metadata['graceperiod'])
+        self.assertEqual(timedelta(1), new_module.lms.graceperiod)
 
 
 class TemplateTestCase(ModuleStoreTestCase):
 
-    def test_template_cleanup(self):        
+    def test_template_cleanup(self):
         module_store = modulestore('direct')
 
         # insert a bogus template in the store
@@ -562,4 +606,3 @@ class TemplateTestCase(ModuleStoreTestCase):
             asserted = True
 
         self.assertTrue(asserted)
-

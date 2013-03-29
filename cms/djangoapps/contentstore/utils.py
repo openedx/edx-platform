@@ -2,6 +2,7 @@ from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from django.core.urlresolvers import reverse
 import copy
 
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
@@ -40,10 +41,10 @@ def get_course_location_for_item(location):
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)
         if found_cnt == 0:
-            raise BaseException('Could not find course at {0}'.format(course_search_location))
+            raise Exception('Could not find course at {0}'.format(course_search_location))
 
         if found_cnt > 1:
-            raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+            raise Exception('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
 
         location = courses[0].location
 
@@ -137,7 +138,7 @@ def compute_unit_state(unit):
     'private' content is editabled and not visible in the LMS
     """
 
-    if unit.metadata.get('is_draft', False):
+    if unit.cms.is_draft:
         try:
             modulestore('direct').get_item(unit.location)
             return UnitState.draft
@@ -160,6 +161,38 @@ def update_item(location, value):
     else:
         get_modulestore(location).update_item(location, value)
 
+
+def get_url_reverse(course_page_name, course_module):
+    """
+    Returns the course URL link to the specified location. This value is suitable to use as an href link.
+
+    course_page_name should correspond to an attribute in CoursePageNames (for example, 'ManageUsers'
+    or 'SettingsDetails'), or else it will simply be returned. This method passes back unknown values of
+    course_page_names so that it can also be used for absolute (known) URLs.
+
+    course_module is used to obtain the location, org, course, and name properties for a course, if
+    course_page_name corresponds to an attribute in CoursePageNames.
+    """
+    url_name = getattr(CoursePageNames, course_page_name, None)
+    ctx_loc = course_module.location
+
+    if CoursePageNames.ManageUsers == url_name:
+        return reverse(url_name, kwargs={"location": ctx_loc})
+    elif url_name in [CoursePageNames.SettingsDetails, CoursePageNames.SettingsGrading,
+                      CoursePageNames.CourseOutline, CoursePageNames.Checklists]:
+        return reverse(url_name, kwargs={'org': ctx_loc.org, 'course': ctx_loc.course, 'name': ctx_loc.name})
+    else:
+        return course_page_name
+
+
+class CoursePageNames:
+    """ Constants for pages that are recognized by get_url_reverse method. """
+    ManageUsers = "manage_users"
+    SettingsDetails = "settings_details"
+    SettingsGrading = "settings_grading"
+    CourseOutline = "course_index"
+    Checklists = "checklists"
+
 def add_open_ended_panel_tab(course):
     """
     Used to add the open ended panel tab to a course if it does not exist.
@@ -175,4 +208,3 @@ def add_open_ended_panel_tab(course):
         course_tabs.append(OPEN_ENDED_PANEL)
         changed = True
     return changed, course_tabs
-

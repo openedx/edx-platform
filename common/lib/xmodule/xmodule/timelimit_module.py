@@ -9,35 +9,31 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
+from xblock.core import Float, String, Boolean, Scope
 
 
 log = logging.getLogger(__name__)
 
-class TimeLimitModule(XModule):
-    ''' 
+
+class TimeLimitFields(object):
+    beginning_at = Float(help="The time this timer was started", scope=Scope.student_state)
+    ending_at = Float(help="The time this timer will end", scope=Scope.student_state)
+    accomodation_code = String(help="A code indicating accommodations to be given the student", scope=Scope.student_state)
+    time_expired_redirect_url = String(help="Url to redirect users to after the timelimit has expired", scope=Scope.settings)
+    duration = Float(help="The length of this timer", scope=Scope.settings)
+    suppress_toplevel_navigation = Boolean(help="Whether the toplevel navigation should be suppressed when viewing this module", scope=Scope.settings)
+
+
+class TimeLimitModule(TimeLimitFields, XModule):
+    '''
     Wrapper module which imposes a time constraint for the completion of its child.
     '''
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None,
-                 shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
 
         self.rendered = False
-        self.beginning_at = None
-        self.ending_at = None
-        self.accommodation_code = None
-        
-        if instance_state is not None:
-            state = json.loads(instance_state)
 
-            if 'beginning_at' in state:
-                self.beginning_at = state['beginning_at']
-            if 'ending_at' in state:
-                self.ending_at = state['ending_at']
-            if 'accommodation_code' in state:
-                self.accommodation_code = state['accommodation_code']
-                
     # For a timed activity, we are only interested here
     # in time-related accommodations, and these should be disjoint.
     # (For proctored exams, it is possible to have multiple accommodations
@@ -50,7 +46,7 @@ class TimeLimitModule(XModule):
                     )
 
     def _get_accommodated_duration(self, duration):
-        ''' 
+        '''
         Get duration for activity, as adjusted for accommodations.
         Input and output are expressed in seconds.
         '''
@@ -70,34 +66,24 @@ class TimeLimitModule(XModule):
     @property
     def has_begun(self):
         return self.beginning_at is not None
-    
-    @property    
+
+    @property
     def has_ended(self):
         if not self.ending_at:
             return False
         return self.ending_at < time()
-        
+
     def begin(self, duration):
-        ''' 
+        '''
         Sets the starting time and ending time for the activity,
         based on the duration provided (in seconds).
         '''
         self.beginning_at = time()
         modified_duration = self._get_accommodated_duration(duration)
         self.ending_at = self.beginning_at + modified_duration
-        
+
     def get_remaining_time_in_ms(self):
         return int((self.ending_at - time()) * 1000)
-
-    def get_instance_state(self):
-        state = {}
-        if self.beginning_at:
-            state['beginning_at'] = self.beginning_at
-        if self.ending_at:
-            state['ending_at'] = self.ending_at
-        if self.accommodation_code:
-            state['accommodation_code'] = self.accommodation_code
-        return json.dumps(state)
 
     def get_html(self):
         self.render()
@@ -133,12 +119,12 @@ class TimeLimitModule(XModule):
         else:
             return "other"
 
-class TimeLimitDescriptor(XMLEditingDescriptor, XmlDescriptor):
+class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
 
     module_class = TimeLimitModule
 
     # For remembering when a student started, and when they should end
-    stores_state = True 
+    stores_state = True
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -151,7 +137,7 @@ class TimeLimitDescriptor(XMLEditingDescriptor, XmlDescriptor):
                 if system.error_tracker is not None:
                     system.error_tracker("ERROR: " + str(e))
                 continue
-        return {'children': children}
+        return {}, children
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('timelimit')

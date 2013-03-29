@@ -29,7 +29,14 @@ log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
-system = ModuleSystem(None, None, None, render_to_string, None)
+system = ModuleSystem(
+    ajax_url=None,
+    track_function=None,
+    get_module = None,
+    render_template=render_to_string,
+    replace_urls = None,
+    xblock_model_data= {}
+)
 controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
 
 """
@@ -104,7 +111,7 @@ def peer_grading(request, course_id):
         #Get the peer grading modules currently in the course
         items = modulestore().get_items(['i4x', None, course_id_parts[1], 'peergrading', None])
         #See if any of the modules are centralized modules (ie display info from multiple problems)
-        items = [i for i in items if i.metadata.get("use_for_single_location", True) in false_dict]
+        items = [i for i in items if getattr(i,"use_for_single_location", True) in false_dict]
         #Get the first one
         item_location = items[0].location
         #Generate a url for the first module and redirect the user to it

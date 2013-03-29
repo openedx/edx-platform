@@ -101,6 +101,12 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     cacheModel.save(fieldName, newVal);
                 }
             }
+            else {
+                // Clear date (note that this clears the time as well, as date and time are linked).
+                // Note also that the validation logic prevents us from clearing the start date
+                // (start date is required by the back end).
+                cacheModel.save(fieldName, null);
+            }
         };
 
         // instrument as date and time pickers

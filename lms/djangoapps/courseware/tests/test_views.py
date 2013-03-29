@@ -19,7 +19,7 @@ from xmodule.modulestore.exceptions import InvalidLocationError,\
 import courseware.views as views
 from xmodule.modulestore import Location
 
-from factories import UserFactory
+from .factories import UserFactory
 
 
 class Stub():
@@ -107,7 +107,7 @@ class ViewsTestCase(TestCase):
         mock_module.position = 3
         mock_module.get_display_items.return_value = []
         self.assertRaises(Http404, views.redirect_to_course_position,
-                          mock_module, True)
+                          mock_module)
 
     def test_registered_for_course(self):
         self.assertFalse(views.registered_for_course('Basketweaving', None))

@@ -21,6 +21,8 @@ MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
 MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
+
 
 
 WIKI_ENABLED = True
@@ -56,6 +58,13 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    },
+
+    'mongo_metadata_inheritance': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/mongo_metadata_inheritance',
+        'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
@@ -103,6 +112,9 @@ SUBDOMAIN_BRANDING = {
 # List of `university` landing pages to display, even though they may not
 # have an actual course with that org set
 VIRTUAL_UNIVERSITIES = []
+
+# Organization that contain other organizations
+META_UNIVERSITIES = {'UTx': ['UTAustinX']}
 
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
@@ -215,3 +227,8 @@ PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.for
 MITX_FEATURES['ENABLE_PEARSON_HACK_TEST'] = True
 PEARSON_TEST_USER = "pearsontest"
 PEARSON_TEST_PASSWORD = "12345"
+
+########################## ANALYTICS TESTING ########################
+
+ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
+ANALYTICS_API_KEY = ""

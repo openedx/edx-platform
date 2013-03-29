@@ -23,6 +23,7 @@ import xml.sax.saxutils as saxutils
 
 from . import test_system
 from capa import inputtypes
+from mock import ANY
 
 # just a handy shortcut
 lookup_tag = inputtypes.registry.get_class_for_tag
@@ -300,6 +301,98 @@ class CodeInputTest(unittest.TestCase):
 
         self.assertEqual(context, expected)
 
+class MatlabTest(unittest.TestCase):
+    '''
+    Test Matlab input types
+    '''
+    def setUp(self):
+        self.rows = '10'
+        self.cols = '80'
+        self.tabsize = '4'
+        self.mode = ""
+        self.payload = "payload"
+        self.linenumbers = 'true'
+        self.xml = """<matlabinput id="prob_1_2"
+            rows="{r}" cols="{c}" 
+            tabsize="{tabsize}" mode="{m}"
+            linenumbers="{ln}">
+                <plot_payload>
+                    {payload}
+                </plot_payload>
+            </matlabinput>""".format(r = self.rows,
+                                c = self.cols,
+                                tabsize = self.tabsize,
+                                m = self.mode,
+                                payload = self.payload,
+                                ln = self.linenumbers)
+        elt = etree.fromstring(self.xml)
+        state = {'value': 'print "good evening"',
+                 'status': 'incomplete',
+                 'feedback': {'message': '3'}, }
+
+        self.input_class = lookup_tag('matlabinput')
+        self.the_input = self.input_class(test_system, elt, state)
+
+
+    def test_rendering(self):
+        context = self.the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': 'print "good evening"',
+                   'status': 'queued',
+                   'msg': self.input_class.submitted_msg,
+                   'mode': self.mode,
+                   'rows': self.rows,
+                   'cols': self.cols,
+                   'queue_msg': '',
+                   'linenumbers': 'true',
+                   'hidden': '',
+                   'tabsize': int(self.tabsize),
+                   'queue_len': '3',
+                   }
+
+        self.assertEqual(context, expected)
+
+
+    def test_rendering_with_state(self):
+        state = {'value': 'print "good evening"',
+                 'status': 'incomplete',
+                 'input_state': {'queue_msg': 'message'},
+                 'feedback': {'message': '3'}, }
+        elt = etree.fromstring(self.xml)
+
+        input_class = lookup_tag('matlabinput')
+        the_input = self.input_class(test_system, elt, state)
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': 'print "good evening"',
+                   'status': 'queued',
+                   'msg': self.input_class.submitted_msg,
+                   'mode': self.mode,
+                   'rows': self.rows,
+                   'cols': self.cols,
+                   'queue_msg': 'message',
+                   'linenumbers': 'true',
+                   'hidden': '',
+                   'tabsize': int(self.tabsize),
+                   'queue_len': '3',
+                   }
+
+        self.assertEqual(context, expected)
+
+    def test_plot_data(self):
+        get = {'submission': 'x = 1234;'}
+        response = self.the_input.handle_ajax("plot", get)
+
+        test_system.xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
+        
+        self.assertTrue(response['success'])
+        self.assertTrue(self.the_input.input_state['queuekey'] is not None)
+        self.assertEqual(self.the_input.input_state['queuestate'], 'queued')
+
+
+
 
 class SchematicTest(unittest.TestCase):
     '''
@@ -557,14 +650,14 @@ class DragAndDropTest(unittest.TestCase):
                         "target_outline": "false",
                         "base_image": "/static/images/about_1.png",
                         "draggables": [
-{"can_reuse": "", "label": "Label 1", "id": "1", "icon": ""},
-{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/static/images/cc.jpg", },
-{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/static/images/arrow-left.png", "can_reuse": ""},
-{"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "can_reuse": ""},
-{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/static/images/mute.png", "can_reuse": ""},
-{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/static/images/spinner.gif", "can_reuse": ""},
-{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/static/images/volume.png", "can_reuse": ""},
-{"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "can_reuse": ""}],
+{"can_reuse": "", "label": "Label 1", "id": "1", "icon": "", "target_fields": []},
+{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/static/images/cc.jpg", "target_fields": []},
+{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/static/images/arrow-left.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/static/images/mute.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/static/images/spinner.gif", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/static/images/volume.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "can_reuse": "", "target_fields": []}],
                         "one_per_target": "True",
                         "targets": [
                 {"y": "90", "x": "210", "id": "t1", "w": "90", "h": "90"},

@@ -4,22 +4,22 @@ Tests for open ended grading interfaces
 django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open_ended_grading
 """
 
-from django.test import TestCase
-from open_ended_grading import staff_grading_service
-from xmodule.open_ended_grading_classes import peer_grading_service
-from xmodule import peer_grading_module
+import json
+from mock import MagicMock
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
+from mitxmako.shortcuts import render_to_string
 
-from courseware.access import _course_staff_group_name
-import courseware.tests.tests as ct
+from xmodule.open_ended_grading_classes import peer_grading_service
+from xmodule import peer_grading_module
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
-from nose import SkipTest
-from mock import patch, Mock, MagicMock
-import json
 from xmodule.x_module import ModuleSystem
-from mitxmako.shortcuts import render_to_string
+
+from open_ended_grading import staff_grading_service
+from courseware.access import _course_staff_group_name
+from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE, get_user
 
 import logging
 
@@ -30,8 +30,8 @@ from django.http import QueryDict
 from xmodule.tests import test_util_open_ended
 
 
-@override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
-class TestStaffGradingService(ct.PageLoader):
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestStaffGradingService(LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
@@ -56,7 +56,7 @@ class TestStaffGradingService(ct.PageLoader):
         def make_instructor(course):
             group_name = _course_staff_group_name(course.location)
             g = Group.objects.create(name=group_name)
-            g.user_set.add(ct.user(self.instructor))
+            g.user_set.add(get_user(self.instructor))
 
         make_instructor(self.toy)
 
@@ -126,8 +126,8 @@ class TestStaffGradingService(ct.PageLoader):
         self.assertIsNotNone(d['problem_list'])
 
 
-@override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
-class TestPeerGradingService(ct.PageLoader):
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestPeerGradingService(LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
@@ -149,15 +149,21 @@ class TestPeerGradingService(ct.PageLoader):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-
+        model_data = {'data': "<peergrading/>"}
         self.mock_service = peer_grading_service.MockPeerGradingService()
-        self.system = ModuleSystem(location, None, None, render_to_string, None,
-                                   s3_interface=test_util_open_ended.S3_INTERFACE,
-                                   open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
+        self.system = ModuleSystem(
+            ajax_url=location,
+            track_function=None,
+            get_module=None,
+            render_template=render_to_string,
+            replace_urls=None,
+            xblock_model_data={},
+            s3_interface=test_util_open_ended.S3_INTERFACE,
+            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
         )
-        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system)
-        self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, "<peergrading/>",
-                                                                 self.descriptor)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, location, model_data)
+        model_data = {}
+        self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, self.descriptor, model_data)
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 

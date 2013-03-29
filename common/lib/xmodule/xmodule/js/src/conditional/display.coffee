@@ -1,26 +1,35 @@
 class @Conditional
 
-  constructor: (element) ->
+  constructor: (element, callerElId) ->
     @el = $(element).find('.conditional-wrapper')
-    @id = @el.data('problem-id')
-    @element_id = @el.attr('id')
+
+    @callerElId = callerElId
+
+    if callerElId isnt undefined
+      dependencies = @el.data('depends')
+      if (typeof dependencies is 'string') and (dependencies.length > 0) and (dependencies.indexOf(callerElId) is -1)
+        return
+
     @url = @el.data('url')
-    @render()
+    @render(element)
 
-  $: (selector) ->
-    $(selector, @el)
-
-  updateProgress: (response) =>
-    if response.progress_changed
-        @el.attr progress: response.progress_status
-        @el.trigger('progressChanged')
-
-  render: (content) ->
-    if content
-      @el.html(content)
-      XModule.loadModules(@el)
-    else
+  render: (element) ->
       $.postWithPrefix "#{@url}/conditional_get", (response) =>
-        @el.html(response.html)
-        XModule.loadModules(@el)
+        @el.html ''
+        @el.append(i) for i in response.html
 
+        parentEl = $(element).parent()
+        parentId = parentEl.attr 'id'
+
+        if response.message is false
+          if parentId.indexOf('vert') is 0
+            parentEl.hide()
+          else
+            $(element).hide()
+        else
+          if parentId.indexOf('vert') is 0
+            parentEl.show()
+          else
+            $(element).show()
+
+        XModule.loadModules @el

@@ -12,6 +12,8 @@
  *    }
  */
 
+/* Commented out the following that was messing up the CSS in sequential and had no use anyway when jsmolcalc is running inside edX platform.
+
 body, table td, select, button {
   font-family: Arial Unicode MS, Arial, sans-serif;
   font-size: small;
@@ -41,6 +43,7 @@ a:hover {
 select {
   background: white;
 }
+*/
 
 /**
  * The reference theme can be used to determine when this style sheet has

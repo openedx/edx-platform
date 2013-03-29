@@ -22,7 +22,7 @@ from numpy import median
 
 from datetime import datetime
 
-from combined_open_ended_rubric import CombinedOpenEndedRubric
+from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
 log = logging.getLogger("mitx.courseware")
 
@@ -65,17 +65,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if oeparam is None:
             #This is a staff_facing_error
             raise ValueError(error_message.format('oeparam'))
-        if self.prompt is None:
+        if self.child_prompt is None:
             raise ValueError(error_message.format('prompt'))
-        if self.rubric is None:
+        if self.child_rubric is None:
             raise ValueError(error_message.format('rubric'))
 
-        self._parse(oeparam, self.prompt, self.rubric, system)
+        self._parse(oeparam, self.child_prompt, self.child_rubric, system)
 
-        if self.created == True and self.state == self.ASSESSING:
-            self.created = False
+        if self.child_created == True and self.child_state == self.ASSESSING:
+            self.child_created = False
             self.send_to_grader(self.latest_answer(), system)
-            self.created = False
+            self.child_created = False
 
     def _parse(self, oeparam, prompt, rubric, system):
         '''
@@ -89,8 +89,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
         prompt_string = stringify_children(prompt)
         rubric_string = stringify_children(rubric)
-        self.prompt = prompt_string
-        self.rubric = rubric_string
+        self.child_prompt = prompt_string
+        self.child_rubric = rubric_string
 
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
@@ -131,7 +131,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @param system: ModuleSystem
         @return: Success indicator
         """
-        self.state = self.DONE
+        self.child_state = self.DONE
         return {'success': True}
 
     def message_post(self, get, system):
@@ -171,10 +171,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         anonymous_student_id = system.anonymous_student_id
         queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
-                                                 str(len(self.history)))
+                                                 str(len(self.child_history)))
 
         xheader = xqueue_interface.make_xheader(
-            lms_callback_url=system.xqueue['callback_url'],
+            lms_callback_url=system.xqueue['construct_callback'](),
             lms_key=queuekey,
             queue_name=self.message_queue_name
         )
@@ -198,7 +198,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if error:
             success = False
 
-        self.state = self.DONE
+        self.child_state = self.DONE
 
         #This is a student_facing_message
         return {'success': success, 'msg': "Successfully submitted your feedback."}
@@ -222,9 +222,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         # Generate header
         queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
-                                                 str(len(self.history)))
+                                                 str(len(self.child_history)))
 
-        xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['callback_url'],
+        xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['construct_callback'](),
                                                 lms_key=queuekey,
                                                 queue_name=self.queue_name)
 
@@ -265,7 +265,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         self.record_latest_score(new_score_msg['score'])
         self.record_latest_post_assessment(score_msg)
-        self.state = self.POST_ASSESSMENT
+        self.child_state = self.POST_ASSESSMENT
 
         return True
 
@@ -542,16 +542,16 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @param short_feedback: If the long feedback is wanted or not
         @return: Returns formatted feedback
         """
-        if not self.history:
+        if not self.child_history:
             return ""
 
-        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""), system,
+        feedback_dict = self._parse_score_msg(self.child_history[-1].get('post_assessment', ""), system,
                                               join_feedback=join_feedback)
         if not short_feedback:
             return feedback_dict['feedback'] if feedback_dict['valid'] else ''
         if feedback_dict['valid']:
             short_feedback = self._convert_longform_feedback_to_html(
-                json.loads(self.history[-1].get('post_assessment', "")))
+                json.loads(self.child_history[-1].get('post_assessment', "")))
         return short_feedback if feedback_dict['valid'] else ''
 
     def format_feedback_with_evaluation(self, system, feedback):
@@ -604,7 +604,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @param system: Modulesystem (needed to align with other ajax functions)
         @return: Returns the current state
         """
-        state = self.state
+        state = self.child_state
         return {'state': state}
 
     def save_answer(self, get, system):
@@ -620,7 +620,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if closed:
             return msg
 
-        if self.state != self.INITIAL:
+        if self.child_state != self.INITIAL:
             return self.out_of_sync_error(get)
 
         # add new history element with answer and empty score and hint.
@@ -667,13 +667,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         #set context variables and render template
         eta_string = None
-        if self.state != self.INITIAL:
+        if self.child_state != self.INITIAL:
             latest = self.latest_answer()
             previous_answer = latest if latest is not None else self.initial_display
             post_assessment = self.latest_post_assessment(system)
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
-            if self.state == self.ASSESSING:
+            if self.child_state == self.ASSESSING:
                 eta_string = self.get_eta()
         else:
             post_assessment = ""
@@ -681,9 +681,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             previous_answer = self.initial_display
 
         context = {
-            'prompt': self.prompt,
+            'prompt': self.child_prompt,
             'previous_answer': previous_answer,
-            'state': self.state,
+            'state': self.child_state,
             'allow_reset': self._allow_reset(),
             'rows': 30,
             'cols': 80,
@@ -698,7 +698,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return html
 
 
-class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
+class OpenEndedDescriptor():
     """
     Module for adding open ended response questions to courses
     """
@@ -709,6 +709,9 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "openended"
+
+    def __init__(self, system):
+        self.system =system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -731,7 +734,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return xml_object.xpath(k)[0]
 
-        return {'oeparam': parse('openendedparam'), }
+        return {'oeparam': parse('openendedparam')}
 
 
     def definition_to_xml(self, resource_fs):

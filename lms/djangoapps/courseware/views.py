@@ -21,8 +21,9 @@ from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
-from courseware.models import StudentModule, StudentModuleCache, StudentModuleHistory
-from module_render import toc_for_course, get_module, get_instance_module, get_module_for_descriptor
+from courseware.model_data import ModelDataCache
+from .module_render import toc_for_course, get_module_for_descriptor, get_module
+from courseware.models import StudentModule, StudentModuleHistory
 
 from django_comment_client.utils import get_discussion_title
 
@@ -38,7 +39,6 @@ import comment_client
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
-
 
 
 def user_groups(user):
@@ -76,7 +76,7 @@ def courses(request):
     return render_to_response("courseware/courses.html", {'courses': courses})
 
 
-def render_accordion(request, course, chapter, section):
+def render_accordion(request, course, chapter, section, model_data_cache):
     ''' Draws navigation bar. Takes current position in accordion as
         parameter.
 
@@ -88,7 +88,7 @@ def render_accordion(request, course, chapter, section):
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
-    toc = toc_for_course(user, request, course, chapter, section)
+    toc = toc_for_course(user, request, course, chapter, section, model_data_cache)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
@@ -99,16 +99,21 @@ def render_accordion(request, course, chapter, section):
 def get_current_child(xmodule):
     """
     Get the xmodule.position's display item of an xmodule that has a position and
-    children.  Returns None if the xmodule doesn't have a position, or if there
-    are no children.  Otherwise, if position is out of bounds, returns the first child.
+    children.  If xmodule has no position or is out of bounds, return the first child.
+    Returns None only if there are no children at all.
     """
     if not hasattr(xmodule, 'position'):
         return None
 
+    if xmodule.position is None:
+        pos = 0
+    else:
+        # position is 1-indexed.
+        pos = xmodule.position - 1
+
     children = xmodule.get_display_items()
-    # position is 1-indexed.
-    if 0 <= xmodule.position - 1 < len(children):
-        child = children[xmodule.position - 1]
+    if 0 <= pos < len(children):
+        child = children[pos]
     elif len(children) > 0:
         # Something is wrong.  Default to first child
         child = children[0]
@@ -117,113 +122,113 @@ def get_current_child(xmodule):
     return child
 
 
-def redirect_to_course_position(course_module, first_time):
+def redirect_to_course_position(course_module):
     """
-    Load the course state for the user, and return a redirect to the
-    appropriate place in the course: either the first element if there
-    is no state, or their previous place if there is.
+    Return a redirect to the user's current place in the course.
 
-    If this is the user's first time, send them to the first section instead.
+    If this is the user's first time, redirects to COURSE/CHAPTER/SECTION.
+    If this isn't the users's first time, redirects to COURSE/CHAPTER,
+    and the view will find the current section and display a message
+    about reusing the stored position.
+
+    If there is no current position in the course or chapter, then selects
+    the first child.
+
     """
-    course_id = course_module.descriptor.id
+    urlargs = {'course_id': course_module.descriptor.id}
     chapter = get_current_child(course_module)
     if chapter is None:
         # oops.  Something bad has happened.
-        raise Http404
-    if not first_time:
-        return redirect(reverse('courseware_chapter', kwargs={'course_id': course_id,
-                                                              'chapter': chapter.url_name}))
+        raise Http404("No chapter found when loading current position in course")
+
+    urlargs['chapter'] = chapter.url_name
+    if course_module.position is not None:
+        return redirect(reverse('courseware_chapter', kwargs=urlargs))
+
     # Relying on default of returning first child
     section = get_current_child(chapter)
-    return redirect(reverse('courseware_section', kwargs={'course_id': course_id,
-                                                          'chapter': chapter.url_name,
-                                                          'section': section.url_name}))
+    if section is None:
+        raise Http404("No section found when loading current position in course")
+
+    urlargs['section'] = section.url_name
+    return redirect(reverse('courseware_section', kwargs=urlargs))
 
 
-def save_child_position(seq_module, child_name, instance_module):
+def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
-    instance_module: the StudentModule object for the seq_module
     """
-    for i, c in enumerate(seq_module.get_display_items()):
+    for position, c in enumerate(seq_module.get_display_items(), start=1):
         if c.url_name == child_name:
-            # Position is 1-indexed
-            position = i + 1
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
-                instance_module.state = seq_module.get_instance_state()
-                instance_module.save()
+
 
 def check_for_active_timelimit_module(request, course_id, course):
     '''
     Looks for a timing module for the given user and course that is currently active.
     If found, returns a context dict with timer-related values to enable display of time remaining.
-    ''' 
+    '''
     context = {}
+
+    # TODO (cpennington): Once we can query the course structure, replace this with such a query
     timelimit_student_modules = StudentModule.objects.filter(student=request.user, course_id=course_id, module_type='timelimit')
     if timelimit_student_modules:
-        for timelimit_student_module in timelimit_student_modules: 
+        for timelimit_student_module in timelimit_student_modules:
             # get the corresponding section_descriptor for the given StudentModel entry:
             module_state_key = timelimit_student_module.module_state_key
             timelimit_descriptor = modulestore().get_instance(course_id, Location(module_state_key))
-            timelimit_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course.id, request.user, 
+            timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course.id, request.user,
                                                                                      timelimit_descriptor, depth=None)
-            timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor, 
-                                                     timelimit_module_cache, course.id, position=None)
+            timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
+                                                         timelimit_module_cache, course.id, position=None)
             if timelimit_module is not None and timelimit_module.category == 'timelimit' and \
                     timelimit_module.has_begun and not timelimit_module.has_ended:
                 location = timelimit_module.location
                 # determine where to go when the timer expires:
-                if 'time_expired_redirect_url' not in timelimit_descriptor.metadata:
-                    raise Http404("No {0} metadata at this location: {1} ".format('time_expired_redirect_url', location))
-                time_expired_redirect_url = timelimit_descriptor.metadata.get('time_expired_redirect_url')
-                context['time_expired_redirect_url'] = time_expired_redirect_url
+                if timelimit_descriptor.time_expired_redirect_url is None:
+                    raise Http404("no time_expired_redirect_url specified at this location: {} ".format(timelimit_module.location))
+                context['time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
                 # Fetch the remaining time relative to the end time as stored in the module when it was started.
                 # This value should be in milliseconds.
                 remaining_time = timelimit_module.get_remaining_time_in_ms()
                 context['timer_expiration_duration'] = remaining_time
-                if 'suppress_toplevel_navigation' in timelimit_descriptor.metadata:
-                    context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata['suppress_toplevel_navigation']
-                return_url = reverse('jump_to', kwargs={'course_id':course_id, 'location':location})
+                context['suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
+                return_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
                 context['timer_navigation_return_url'] = return_url
     return context
 
-def update_timelimit_module(user, course_id, student_module_cache, timelimit_descriptor, timelimit_module):
+
+def update_timelimit_module(user, course_id, model_data_cache, timelimit_descriptor, timelimit_module):
     '''
     Updates the state of the provided timing module, starting it if it hasn't begun.
     Returns dict with timer-related values to enable display of time remaining.
     Returns 'timer_expiration_duration' in dict if timer is still active, and not if timer has expired.
-    ''' 
+    '''
     context = {}
     # determine where to go when the exam ends:
-    if 'time_expired_redirect_url' not in timelimit_descriptor.metadata: 
-        raise Http404("No {0} metadata at this location: {1} ".format('time_expired_redirect_url', timelimit_module.location))
-    time_expired_redirect_url = timelimit_descriptor.metadata.get('time_expired_redirect_url')
-    context['time_expired_redirect_url'] = time_expired_redirect_url
+    if timelimit_descriptor.time_expired_redirect_url is None:
+        raise Http404("No time_expired_redirect_url specified at this location: {} ".format(timelimit_module.location))
+    context['time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
 
     if not timelimit_module.has_ended:
         if not timelimit_module.has_begun:
             # user has not started the exam, so start it now.
-            if 'duration' not in timelimit_descriptor.metadata:
-                raise Http404("No {0} metadata at this location: {1} ".format('duration', timelimit_module.location))
+            if timelimit_descriptor.duration is None:
+                raise Http404("No duration specified at this location: {} ".format(timelimit_module.location))
             # The user may have an accommodation that has been granted to them.
             # This accommodation information should already be stored in the module's state.
-            duration = int(timelimit_descriptor.metadata.get('duration'))
-            timelimit_module.begin(duration)
-            # we have changed state, so we need to persist the change:
-            instance_module = get_instance_module(course_id, user, timelimit_module, student_module_cache)
-            instance_module.state = timelimit_module.get_instance_state()
-            instance_module.save()
-            
+            timelimit_module.begin(timelimit_descriptor.duration)
+
         # the exam has been started, either because the student is returning to the
         # exam page, or because they have just visited it.  Fetch the remaining time relative to the
         # end time as stored in the module when it was started.
         context['timer_expiration_duration'] = timelimit_module.get_remaining_time_in_ms()
         # also use the timed module to determine whether top-level navigation is visible:
-        if 'suppress_toplevel_navigation' in timelimit_descriptor.metadata:
-            context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata['suppress_toplevel_navigation']
+        context['suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
     return context
+
 
 @login_required
 @ensure_csrf_cookie
@@ -262,26 +267,22 @@ def index(request, course_id, chapter=None, section=None,
         return redirect(reverse('about_course', args=[course.id]))
 
     try:
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             course.id, user, course, depth=2)
 
-        # Has this student been in this course before?
-        first_time = student_module_cache.lookup(course_id, 'course', course.location.url()) is None
-
-        # Load the module for the course
-        course_module = get_module_for_descriptor(user, request, course, student_module_cache, course.id)
+        course_module = get_module_for_descriptor(user, request, course, model_data_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
                         ' far, should have gotten a course module for this user')
             return redirect(reverse('about_course', args=[course.id]))
 
         if chapter is None:
-            return redirect_to_course_position(course_module, first_time)
+            return redirect_to_course_position(course_module)
 
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(request, course, chapter, section),
-            'COURSE_TITLE': course.title,
+            'accordion': render_accordion(request, course, chapter, section, model_data_cache),
+            'COURSE_TITLE': course.display_name_with_default,
             'course': course,
             'init': '',
             'content': '',
@@ -291,8 +292,7 @@ def index(request, course_id, chapter=None, section=None,
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
-            instance_module = get_instance_module(course_id, user, course_module, student_module_cache)
-            save_child_position(course_module, chapter, instance_module)
+            save_child_position(course_module, chapter)
         else:
             raise Http404('No chapter descriptor found with name {}'.format(chapter))
 
@@ -313,23 +313,23 @@ def index(request, course_id, chapter=None, section=None,
 
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
-            section_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-                course.id, user, section_descriptor, depth=None)
+            section_model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+                course_id, user, section_descriptor, depth=None)
+            section_module = get_module(request.user, request,
+                                section_descriptor.location,
+                                section_model_data_cache, course_id, position, depth=None)
 
-            section_module = get_module(user, request, section_descriptor.location,
-                section_module_cache, course.id, position=position, depth=None)
             if section_module is None:
                 # User may be trying to be clever and access something
                 # they don't have access to.
                 raise Http404
 
             # Save where we are in the chapter
-            instance_module = get_instance_module(course_id, user, chapter_module, student_module_cache)
-            save_child_position(chapter_module, section, instance_module)
+            save_child_position(chapter_module, section)
 
-            # check here if this section *is* a timed module.  
+            # check here if this section *is* a timed module.
             if section_module.category == 'timelimit':
-                timer_context = update_timelimit_module(user, course_id, student_module_cache, 
+                timer_context = update_timelimit_module(user, course_id, student_module_cache,
                                                         section_descriptor, section_module)
                 if 'timer_expiration_duration' in timer_context:
                     context.update(timer_context)
@@ -337,10 +337,10 @@ def index(request, course_id, chapter=None, section=None,
                     # if there is no expiration defined, then we know the timer has expired:
                     return HttpResponseRedirect(timer_context['time_expired_redirect_url'])
             else:
-                # check here if this page is within a course that has an active timed module running.  If so, then 
+                # check here if this page is within a course that has an active timed module running.  If so, then
                 # add in the appropriate timer information to the rendering context:
                 context.update(check_for_active_timelimit_module(request, course_id, course))
-                
+
             context['content'] = section_module.get_html()
         else:
             # section is none, so display a message
@@ -453,7 +453,11 @@ def static_tab(request, course_id, tab_slug):
     if tab is None:
         raise Http404
 
-    contents = tabs.get_static_tab_contents(request, None, course, tab)
+    contents = tabs.get_static_tab_contents(
+        request,
+        course,
+        tab
+    )
     if contents is None:
         raise Http404
 
@@ -518,6 +522,12 @@ def static_university_profile(request, org_id):
     """
     Return the profile for the particular org_id that does not have any courses.
     """
+    # Redirect to the properly capitalized org_id
+    last_path = request.path.split('/')[-1]
+    if last_path != org_id:
+        return redirect('static_university_profile', org_id=org_id)
+
+    # Render template
     template_file = "university_profile/{0}.html".format(org_id).lower()
     context = dict(courses=[], org_id=org_id)
     return render_to_response(template_file, context)
@@ -529,17 +539,28 @@ def university_profile(request, org_id):
     """
     Return the profile for the particular org_id.  404 if it's not valid.
     """
+    virtual_orgs_ids = settings.VIRTUAL_UNIVERSITIES
+    meta_orgs = getattr(settings, 'META_UNIVERSITIES', {})
+
+    # Get all the ids associated with this organization
     all_courses = modulestore().get_courses()
-    valid_org_ids = set(c.org for c in all_courses).union(settings.VIRTUAL_UNIVERSITIES)
-    if org_id not in valid_org_ids:
+    valid_orgs_ids = set(c.org for c in all_courses)
+    valid_orgs_ids.update(virtual_orgs_ids + meta_orgs.keys())
+
+    if org_id not in valid_orgs_ids:
         raise Http404("University Profile not found for {0}".format(org_id))
 
-    # Only grab courses for this org...
-    courses = get_courses_by_university(request.user,
-                                        domain=request.META.get('HTTP_HOST'))[org_id]
-    courses = sort_by_announcement(courses)
+    # Grab all courses for this organization(s)
+    org_ids = set([org_id] + meta_orgs.get(org_id, []))
+    org_courses = []
+    domain = request.META.get('HTTP_HOST')
+    for key in org_ids:
+        cs = get_courses_by_university(request.user, domain=domain)[key]
+        org_courses.extend(cs)
 
-    context = dict(courses=courses, org_id=org_id)
+    org_courses = sort_by_announcement(org_courses)
+
+    context = dict(courses=org_courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
     return render_to_response(template_file, context)
@@ -594,12 +615,12 @@ def progress(request, course_id, student_id=None):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
         course_id, student, course, depth=None)
 
     courseware_summary = grades.progress_summary(student, request, course,
-                                                 student_module_cache)
-    grade_summary = grades.grade(student, request, course, student_module_cache)
+                                                 model_data_cache)
+    grade_summary = grades.grade(student, request, course, model_data_cache)
 
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)
@@ -617,9 +638,9 @@ def progress(request, course_id, student_id=None):
 
 @login_required
 def submission_history(request, course_id, student_username, location):
-    """Render an HTML fragment (meant for inclusion elsewhere) that renders a 
+    """Render an HTML fragment (meant for inclusion elsewhere) that renders a
     history of all state changes made by this user for this problem location.
-    Right now this only works for problems because that's all 
+    Right now this only works for problems because that's all
     StudentModuleHistory records.
     """
     course = get_course_with_access(request.user, course_id, 'load')

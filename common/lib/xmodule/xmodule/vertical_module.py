@@ -8,11 +8,15 @@ from pkg_resources import resource_string
 class_priority = ['video', 'problem']
 
 
-class VerticalModule(XModule):
+class VerticalFields(object):
+    has_children = True
+
+
+class VerticalModule(VerticalFields, XModule):
     ''' Layout module for laying out submodules vertically.'''
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
         self.contents = None
 
     def get_html(self):
@@ -42,7 +46,7 @@ class VerticalModule(XModule):
         return new_class
 
 
-class VerticalDescriptor(SequenceDescriptor):
+class VerticalDescriptor(VerticalFields, SequenceDescriptor):
     module_class = VerticalModule
 
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
