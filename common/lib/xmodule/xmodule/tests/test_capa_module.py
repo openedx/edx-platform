@@ -838,6 +838,19 @@ class CapaModuleTest(unittest.TestCase):
         # Assert that the encapsulated html contains the original html
         self.assertTrue(html in html_encapsulated)
 
+    def test_input_state_consistency(self):
+        module1 = CapaFactory.create()
+        module2 = CapaFactory.create()
+
+        # check to make sure that the input_state and the keys have the same values
+        module1.set_state_from_lcp()
+        self.assertEqual(module1.lcp.inputs.keys(),module1.input_state.keys())
+
+        module2.set_state_from_lcp()
+
+        intersection = set(module2.input_state.keys()).intersection(set(module1.input_state.keys()))
+        self.assertEqual(len(intersection), 0)
+
     def test_get_problem_html_error(self):
         """
         In production, when an error occurs with the problem HTML
