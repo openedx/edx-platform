@@ -81,11 +81,10 @@ $(document).ready(function () {
     });
 
     // general link management - smooth scrolling page links
-    $('a[rel*="view"]').bind('click', smoothScrollLink);
+    $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
     // tender feedback window scrolling
     $('a.show-tender').bind('click', smoothScrollTop);
-
 
     // toggling overview section details
     $(function () {

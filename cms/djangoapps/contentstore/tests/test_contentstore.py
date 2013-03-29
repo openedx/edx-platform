@@ -211,7 +211,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             new_loc = descriptor.location._replace(org='MITx', course='999')
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
-            self.assertEqual(resp.status_code, 200)    
+            self.assertEqual(resp.status_code, 200)
+
+    def test_bad_contentstore_request(self):
+        resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
+        self.assertEqual(resp.status_code, 400)
 
     def test_delete_course(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -328,11 +332,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(wrapper.counter, 4)
 
         # make sure we pre-fetched a known sequential which should be at depth=2
-        self.assertTrue(Location(['i4x', 'edX', 'full', 'sequential', 
+        self.assertTrue(Location(['i4x', 'edX', 'full', 'sequential',
             'Administrivia_and_Circuit_Elements', None]) in course.system.module_data)
 
         # make sure we don't have a specific vertical which should be at depth=3
-        self.assertFalse(Location(['i4x', 'edX', 'full', 'vertical', 'vertical_58', 
+        self.assertFalse(Location(['i4x', 'edX', 'full', 'vertical', 'vertical_58',
             None]) in course.system.module_data)
 
     def test_export_course_with_unknown_metadata(self):
@@ -556,7 +560,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         module_store.update_children(parent.location, parent.children + [new_component_location.url()])
 
         # flush the cache
-        module_store.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
         new_module = module_store.get_item(new_component_location)
 
         # check for grace period definition which should be defined at the course level
@@ -571,7 +575,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         module_store.update_metadata(new_module.location, own_metadata(new_module))
 
         # flush the cache and refetch
-        module_store.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
         new_module = module_store.get_item(new_component_location)
 
         self.assertEqual(timedelta(1), new_module.lms.graceperiod)

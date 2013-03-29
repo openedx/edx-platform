@@ -14,7 +14,6 @@ class Date(ModelType):
     '''
     Date fields know how to parse and produce json (iso) compatible formats.
     '''
-    # NB: these are copies of util.converters.*
     def from_json(self, field):
         """
         Parse an optional metadata key containing a time: if present, complain
