@@ -897,7 +897,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
         progress_summary = grades.progress_summary(self.student_user,
                                                    fake_request,
-                                                   self.graded_course,
+                                                   self.course,
                                                    model_data_cache)
         return progress_summary
 
