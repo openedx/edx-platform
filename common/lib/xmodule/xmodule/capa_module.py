@@ -755,7 +755,7 @@ class CapaModule(CapaFields, XModule):
         self.system.track_function('save_problem_check', event_info)
 
         if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
-            self.system.psychometrics_handler(self.get_instance_state())
+            self.system.psychometrics_handler(self.get_state_for_lcp())
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
