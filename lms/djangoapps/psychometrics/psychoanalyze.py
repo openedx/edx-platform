@@ -246,13 +246,16 @@ def generate_plots_for_problem(problem):
         yset['ydat'] = ydat
 
         if len(ydat) > 3:         # try to fit to logistic function if enough data points
-            cfp = curve_fit(func_2pl, xdat, ydat, [1.0, max_attempts / 2.0])
-            yset['fitparam'] = cfp
-            yset['fitpts'] = func_2pl(np.array(xdat), *cfp[0])
-            yset['fiterr'] = [yd - yf for (yd, yf) in zip(ydat, yset['fitpts'])]
-            fitx = np.linspace(xdat[0], xdat[-1], 100)
-            yset['fitx'] = fitx
-            yset['fity'] = func_2pl(np.array(fitx), *cfp[0])
+            try:
+                cfp = curve_fit(func_2pl, xdat, ydat, [1.0, max_attempts / 2.0])
+                yset['fitparam'] = cfp
+                yset['fitpts'] = func_2pl(np.array(xdat), *cfp[0])
+                yset['fiterr'] = [yd - yf for (yd, yf) in zip(ydat, yset['fitpts'])]
+                fitx = np.linspace(xdat[0], xdat[-1], 100)
+                yset['fitx'] = fitx
+                yset['fity'] = func_2pl(np.array(fitx), *cfp[0])
+            except Exception as err:
+                log.debug('Error in psychoanalyze curve fitting: %s' % err)
 
         dataset['grade_%d' % grade] = yset
 
