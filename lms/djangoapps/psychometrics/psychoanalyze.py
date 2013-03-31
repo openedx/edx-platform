@@ -329,7 +329,11 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
             return
 
         pmd.done = done
-        pmd.attempts = state['attempts']
+        try:
+            pmd.attempts = state.get('attempts',0)
+        except:
+            log.exception("no attempts for %s (state=%s)" % (sm,sm.state))
+
         try:
             checktimes = eval(pmd.checktimes)                   # update log of attempt timestamps
         except:
