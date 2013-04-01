@@ -112,6 +112,10 @@ CACHE_TIMEOUT = 0
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
+################################ PIPELINE #################################
+
+PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+
 ################################ DEBUG TOOLBAR #################################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
 MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
@@ -142,4 +146,4 @@ DEBUG_TOOLBAR_CONFIG = {
 
 # To see stacktraces for MongoDB queries, set this to True.
 # Stacktraces slow down page loads drastically (for pages with lots of queries).
-DEBUG_TOOLBAR_MONGO_STACKTRACES = False
+DEBUG_TOOLBAR_MONGO_STACKTRACES = True

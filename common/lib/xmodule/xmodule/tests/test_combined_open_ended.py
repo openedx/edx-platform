@@ -5,11 +5,15 @@ import unittest
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
+from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 
 from xmodule.modulestore import Location
 from lxml import etree
 import capa.xqueue_interface as xqueue_interface
 from datetime import datetime
+import logging
+
+log = logging.getLogger(__name__)
 
 from . import test_system
 
@@ -57,7 +61,7 @@ class OpenEndedChildTest(unittest.TestCase):
     def setUp(self):
         self.test_system = test_system()
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
-                                            self.definition, self.descriptor, self.static_data, self.metadata)
+                                             self.definition, self.descriptor, self.static_data, self.metadata)
 
 
     def test_latest_answer_empty(self):
@@ -183,10 +187,12 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.test_system.location = self.location
         self.mock_xqueue = MagicMock()
         self.mock_xqueue.send_to_queue.return_value = (None, "Message")
+
         def constructed_callback(dispatch="score_update"):
             return dispatch
-        
-        self.test_system.xqueue = {'interface': self.mock_xqueue, 'construct_callback': constructed_callback, 'default_queuename': 'testqueue',
+
+        self.test_system.xqueue = {'interface': self.mock_xqueue, 'construct_callback': constructed_callback,
+                                   'default_queuename': 'testqueue',
                                    'waittime': 1}
         self.openendedmodule = OpenEndedModule(self.test_system, self.location,
                                                self.definition, self.descriptor, self.static_data, self.metadata)
@@ -281,7 +287,18 @@ class OpenEndedModuleTest(unittest.TestCase):
 class CombinedOpenEndedModuleTest(unittest.TestCase):
     location = Location(["i4x", "edX", "open_ended", "combinedopenended",
                          "SampleQuestion"])
-
+    definition_template = """
+                    <combinedopenended attempts="10000">
+                    {rubric}
+                    {prompt}
+                    <task>
+                    {task1}
+                    </task>
+                    <task>
+                    {task2}
+                    </task>
+                    </combinedopenended>
+                    """
     prompt = "<prompt>This is a question prompt</prompt>"
     rubric = '''<rubric><rubric>
         <category>
@@ -335,10 +352,15 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
            </openendedparam>
     </openended>'''
     definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
-    descriptor = Mock()
+    full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
+    descriptor = Mock(data=full_definition)
+    test_system = test_system()
+    combinedoe_container = CombinedOpenEndedModule(test_system,
+                                                   location,
+                                                   descriptor,
+                                                   model_data={'data': full_definition, 'weight' : '1'})
 
     def setUp(self):
-        self.test_system = test_system()
         # TODO: this constructor call is definitely wrong, but neither branch
         # of the merge matches the module constructor.  Someone (Vik?) should fix this.
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
@@ -368,3 +390,19 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         changed = self.combinedoe.update_task_states()
 
         self.assertTrue(changed)
+
+    def test_get_max_score(self):
+        changed = self.combinedoe.update_task_states()
+        self.combinedoe.state = "done"
+        self.combinedoe.is_scored = True
+        max_score = self.combinedoe.max_score()
+        self.assertEqual(max_score, 1)
+
+    def test_container_get_max_score(self):
+        #The progress view requires that this function be exposed
+        max_score = self.combinedoe_container.max_score()
+        self.assertEqual(max_score, None)
+
+    def test_container_weight(self):
+        weight = self.combinedoe_container.weight
+        self.assertEqual(weight,1)

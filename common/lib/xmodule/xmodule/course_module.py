@@ -635,8 +635,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def start_date_text(self):
+        def try_parse_iso_8601(text):
+            try:
+                result = datetime.strptime(text, "%Y-%m-%dT%H:%M")
+                result = result.strftime("%b %d, %Y")
+            except ValueError:
+                result = text.title()
+
+            return result
+
         if isinstance(self.advertised_start, basestring):
-            return self.advertised_start
+            return try_parse_iso_8601(self.advertised_start)
         elif self.advertised_start is None and self.start is None:
             return 'TBD'
         else:

@@ -8,9 +8,10 @@ from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
 from requests.auth import HTTPBasicAuth
@@ -22,7 +23,7 @@ from .models import StudentModule
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import unique_id_for_user
 from xmodule.errortracker import exc_info_to_str
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
@@ -208,9 +209,6 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
               'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
              }
 
-    def get_or_default(key, default):
-        getattr(settings, key, default)
-
     #This is a hacky way to pass settings to the combined open ended xmodule
     #It needs an S3 interface to upload images to S3
     #It needs the open ended grading interface in order to get peer grading to be done
@@ -226,11 +224,10 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         open_ended_grading_interface['mock_staff_grading'] = settings.MOCK_STAFF_GRADING
         if is_descriptor_combined_open_ended:
             s3_interface = {
-                'access_key' : get_or_default('AWS_ACCESS_KEY_ID',''),
-                'secret_access_key' : get_or_default('AWS_SECRET_ACCESS_KEY',''),
-                'storage_bucket_name' : get_or_default('AWS_STORAGE_BUCKET_NAME','')
+                'access_key' : getattr(settings,'AWS_ACCESS_KEY_ID',''),
+                'secret_access_key' : getattr(settings,'AWS_SECRET_ACCESS_KEY',''),
+                'storage_bucket_name' : getattr(settings,'AWS_STORAGE_BUCKET_NAME','openended')
             }
-
 
     def inner_get_module(descriptor):
         """
@@ -412,6 +409,9 @@ def modx_dispatch(request, dispatch, location, course_id):
     if not Location.is_valid(location):
         raise Http404("Invalid location")
 
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
     # Check for submitted files and basic file size checks
     p = request.POST.copy()
     if request.FILES:
@@ -443,9 +443,19 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, p)
+
+    # If we can't find the module, respond with a 404
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
+
+    # For XModule-specific errors, we respond with 400
+    except ProcessingError:
+        log.warning("Module encountered an error while prcessing AJAX call",
+                    exc_info=True)
+        return HttpResponseBadRequest()
+
+    # If any other error occurred, re-raise it to trigger a 500 response
     except:
         log.exception("error processing ajax call")
         raise

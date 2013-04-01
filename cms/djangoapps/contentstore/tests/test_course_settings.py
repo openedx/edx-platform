@@ -1,8 +1,6 @@
 import datetime
 import json
 import copy
-from util import converters
-from util.converters import jsdate_to_time
 
 from django.contrib.auth.models import User
 from django.test.client import Client
@@ -15,69 +13,13 @@ from models.settings.course_details import (CourseDetails,
 from models.settings.course_grading import CourseGradingModel
 from contentstore.utils import get_modulestore
 
-from django.test import TestCase
 from .utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.django import modulestore
-import time
-
-
-# YYYY-MM-DDThh:mm:ss.s+/-HH:MM
-class ConvertersTestCase(TestCase):
-    @staticmethod
-    def struct_to_datetime(struct_time):
-        return datetime.datetime(struct_time.tm_year, struct_time.tm_mon,
-            struct_time.tm_mday, struct_time.tm_hour,
-            struct_time.tm_min, struct_time.tm_sec, tzinfo=UTC())
-
-    def compare_dates(self, date1, date2, expected_delta):
-        dt1 = ConvertersTestCase.struct_to_datetime(date1)
-        dt2 = ConvertersTestCase.struct_to_datetime(date2)
-        self.assertEqual(dt1 - dt2, expected_delta, str(date1) + "-"
-            + str(date2) + "!=" + str(expected_delta))
-
-    def test_iso_to_struct(self):
-        '''Test conversion from iso compatible date strings to struct_time'''
-        self.compare_dates(converters.jsdate_to_time("2013-01-01"),
-            converters.jsdate_to_time("2012-12-31"),
-            datetime.timedelta(days=1))
-        self.compare_dates(converters.jsdate_to_time("2013-01-01T00"),
-            converters.jsdate_to_time("2012-12-31T23"),
-            datetime.timedelta(hours=1))
-        self.compare_dates(converters.jsdate_to_time("2013-01-01T00:00"),
-            converters.jsdate_to_time("2012-12-31T23:59"),
-            datetime.timedelta(minutes=1))
-        self.compare_dates(converters.jsdate_to_time("2013-01-01T00:00:00"),
-            converters.jsdate_to_time("2012-12-31T23:59:59"),
-            datetime.timedelta(seconds=1))
-        self.compare_dates(converters.jsdate_to_time("2013-01-01T00:00:00Z"),
-            converters.jsdate_to_time("2012-12-31T23:59:59Z"),
-            datetime.timedelta(seconds=1))
-        self.compare_dates(
-            converters.jsdate_to_time("2012-12-31T23:00:01-01:00"),
-            converters.jsdate_to_time("2013-01-01T00:00:00+01:00"),
-            datetime.timedelta(hours=1, seconds=1))
-
-    def test_struct_to_iso(self):
-        '''
-        Test converting time reprs to iso dates
-        '''
-        self.assertEqual(
-            converters.time_to_isodate(
-                time.strptime("2012-12-31T23:59:59Z", "%Y-%m-%dT%H:%M:%SZ")),
-            "2012-12-31T23:59:59Z")
-        self.assertEqual(
-            converters.time_to_isodate(
-                jsdate_to_time("2012-12-31T23:59:59Z")),
-            "2012-12-31T23:59:59Z")
-        self.assertEqual(
-            converters.time_to_isodate(
-                jsdate_to_time("2012-12-31T23:00:01-01:00")),
-            "2013-01-01T00:00:01Z")
-
+from xmodule.fields import Date
 
 class CourseTestCase(ModuleStoreTestCase):
     def setUp(self):
@@ -206,17 +148,24 @@ class CourseDetailsViewTest(CourseTestCase):
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
 
+    @staticmethod
+    def struct_to_datetime(struct_time):
+        return datetime.datetime(struct_time.tm_year, struct_time.tm_mon,
+            struct_time.tm_mday, struct_time.tm_hour,
+            struct_time.tm_min, struct_time.tm_sec, tzinfo=UTC())
+
     def compare_date_fields(self, details, encoded, context, field):
         if details[field] is not None:
+            date = Date()
             if field in encoded and encoded[field] is not None:
-                encoded_encoded = jsdate_to_time(encoded[field])
-                dt1 = ConvertersTestCase.struct_to_datetime(encoded_encoded)
+                encoded_encoded = date.from_json(encoded[field])
+                dt1 = CourseDetailsViewTest.struct_to_datetime(encoded_encoded)
 
                 if isinstance(details[field], datetime.datetime):
                     dt2 = details[field]
                 else:
-                    details_encoded = jsdate_to_time(details[field])
-                    dt2 = ConvertersTestCase.struct_to_datetime(details_encoded)
+                    details_encoded = date.from_json(details[field])
+                    dt2 = CourseDetailsViewTest.struct_to_datetime(details_encoded)
 
                 expected_delta = datetime.timedelta(0)
                 self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)

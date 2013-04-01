@@ -4,7 +4,7 @@ from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata
 from xblock.core import Scope
 from xmodule.course_module import CourseDescriptor
-
+import copy
 
 class CourseMetadata(object):
     '''
@@ -39,7 +39,7 @@ class CourseMetadata(object):
         return course
 
     @classmethod
-    def update_from_json(cls, course_location, jsondict):
+    def update_from_json(cls, course_location, jsondict, filter_tabs=True):
         """
         Decode the json into CourseMetadata and save any changed attrs to the db.
 
@@ -48,10 +48,16 @@ class CourseMetadata(object):
         descriptor = get_modulestore(course_location).get_item(course_location)
 
         dirty = False
+		
+        #Copy the filtered list to avoid permanently changing the class attribute
+        filtered_list = copy.copy(cls.FILTERED_LIST)
+        #Don't filter on the tab attribute if filter_tabs is False
+        if not filter_tabs:
+            filtered_list.remove("tabs")
 
         for k, v in jsondict.iteritems():
             # should it be an error if one of the filtered list items is in the payload?
-            if k in cls.FILTERED_LIST:
+            if k in filtered_list:
                 continue
 
             if hasattr(descriptor, k) and getattr(descriptor, k) != v:
