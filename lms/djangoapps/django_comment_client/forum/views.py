@@ -242,10 +242,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
     try:
       thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
 
-        #patch for backward compatibility with comments service
-        if not 'pinned' in thread.attributes:
-            thread['pinned'] = False
-
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
       log.error("Error loading single thread.")
       raise Http404
