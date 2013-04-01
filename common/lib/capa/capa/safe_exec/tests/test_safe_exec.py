@@ -56,3 +56,37 @@ class TestSafeExec(unittest.TestCase):
             "import constant; a = constant.THE_CONST",
             g, python_path=[pylib]
         )
+
+
+class DictCache(object):
+    """A cache implementation over a simple dict, for testing."""
+
+    def __init__(self, d):
+        self.cache = d
+
+    def get(self, key):
+        return self.cache.get(key)
+
+    def set(self, key, value):
+        self.cache[key] = value
+
+
+class TestSafeExecCaching(unittest.TestCase):
+    """Test that caching works on safe_exec."""
+
+    def test_cache_miss_then_hit(self):
+        g = {}
+        cache = {}
+
+        # Cache miss
+        safe_exec("a = int(math.pi)", g, cache=DictCache(cache))
+        self.assertEqual(g['a'], 3)
+        # A result has been cached
+        self.assertEqual(cache.values(), [{'a': 3}])
+
+        # Fiddle with the cache, then try it again.
+        cache[cache.keys()[0]] = {'a': 17}
+
+        g = {}
+        safe_exec("a = int(math.pi)", g, cache=DictCache(cache))
+        self.assertEqual(g['a'], 17)
