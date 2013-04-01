@@ -6,13 +6,12 @@ from lxml import etree
 from datetime import datetime
 from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
-from .stringify import stringify_children
 from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from .timeinfo import TimeInfo
 from xblock.core import Object, Integer, Boolean, String, Scope
+from .fields import Date
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
 
@@ -31,7 +30,7 @@ class PeerGradingFields(object):
     use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.", default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
     link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION, scope=Scope.settings)
     is_graded = Boolean(help="Whether or not this module is scored.",default=IS_GRADED, scope=Scope.settings)
-    display_due_date_string = String(help="Due date that should be displayed.", default=None, scope=Scope.settings)
+    due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
     max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE, scope=Scope.settings)
     student_data_for_location = Object(help="Student data for a given peer grading problem.", default=json.dumps({}),scope=Scope.student_state)
@@ -72,7 +71,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 self._model_data['due'] = due_date
 
         try:
-            self.timeinfo = TimeInfo(self.display_due_date_string, self.grace_period_string)
+            self.timeinfo = TimeInfo(self.due_date, self.grace_period_string)
         except:
             log.error("Error parsing due date information in location {0}".format(location))
             raise

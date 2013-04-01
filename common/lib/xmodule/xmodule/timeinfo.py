@@ -1,7 +1,5 @@
-import dateutil
-import dateutil.parser
-import datetime
 from .timeparse import parse_timedelta
+from xmodule.util.date_utils import time_to_datetime
 
 import logging
 log = logging.getLogger(__name__)
@@ -9,7 +7,7 @@ log = logging.getLogger(__name__)
 class TimeInfo(object):
     """
     This is a simple object that calculates and stores datetime information for an XModule
-    based on the due date string and the grace period string
+    based on the due date and the grace period string
 
     So far it parses out three different pieces of time information:
         self.display_due_date - the 'official' due date that gets displayed to students
@@ -17,13 +15,10 @@ class TimeInfo(object):
         self.close_date - the real due date
 
     """
-    def __init__(self, display_due_date_string, grace_period_string):
-        if display_due_date_string is not None:
-            try:
-                self.display_due_date = dateutil.parser.parse(display_due_date_string)
-            except ValueError:
-                log.error("Could not parse due date {0}".format(display_due_date_string))
-                raise
+    def __init__(self, due_date, grace_period_string):
+        if due_date is not None:
+            self.display_due_date = time_to_datetime(due_date)
+
         else:
             self.display_due_date = None
 

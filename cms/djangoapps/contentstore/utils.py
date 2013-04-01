@@ -147,10 +147,6 @@ def compute_unit_state(unit):
         return UnitState.public
 
 
-def get_date_display(date):
-    return date.strftime("%d %B, %Y at %I:%M %p")
-
-
 def update_item(location, value):
     """
     If value is None, delete the db entry. Otherwise, update it using the correct modulestore.

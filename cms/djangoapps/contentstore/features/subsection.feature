@@ -31,7 +31,7 @@ Feature: Create Subsection
     Then I see the correct dates
     And I reload the page
     Then I see the correct dates
-    
+
     @skip-phantom
     Scenario: Delete a subsection
     Given I have opened a new course section in Studio

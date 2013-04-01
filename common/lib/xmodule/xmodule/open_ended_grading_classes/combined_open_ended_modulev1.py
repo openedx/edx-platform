@@ -143,11 +143,11 @@ class CombinedOpenEndedV1Module():
         self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
         self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
-        display_due_date_string = self.instance_state.get('due', None)
+        due_date = self.instance_state.get('due', None)
 
         grace_period_string = self.instance_state.get('graceperiod', None)
         try:
-            self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)
+            self.timeinfo = TimeInfo(due_date, grace_period_string)
         except:
             log.error("Error parsing due date information in location {0}".format(location))
             raise

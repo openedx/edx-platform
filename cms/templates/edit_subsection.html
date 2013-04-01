@@ -4,6 +4,7 @@
    import dateutil.parser
    import logging
    from datetime import datetime
+   from xmodule.util.date_utils import get_time_struct_display
 %>
 
 <%! from django.core.urlresolvers import reverse %>
@@ -66,12 +67,8 @@
       <a href="#" class="set-date">Set a due date</a>
       <div class="datepair date-setter">
         <p class="date-description">
-          <%
-              # due date uses it own formatting for stringifying the date. As with capa_module.py, there's a utility module available for us to use
-             due_date = dateutil.parser.parse(subsection.lms.due) if subsection.lms.due else None
-          %>
-          <input type="text" id="due_date" name="due_date" value="${due_date.strftime('%m/%d/%Y') if due_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-          <input type="text" id="due_time" name="due_time" value="${due_date.strftime('%H:%M') if due_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+          <input type="text" id="due_date" name="due_date" value="${get_time_struct_display(subsection.lms.due, '%m/%d/%Y')}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+          <input type="text" id="due_time" name="due_time" value="${get_time_struct_display(subsection.lms.due, '%H:%M')}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
           <a href="#" class="remove-date">Remove due date</a>
         </p>
       </div>

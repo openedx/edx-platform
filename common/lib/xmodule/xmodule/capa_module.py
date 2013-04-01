@@ -1,14 +1,11 @@
 import cgi
 import datetime
-import dateutil
-import dateutil.parser
 import hashlib
 import json
 import logging
 import traceback
 import sys
 
-from lxml import etree
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
@@ -18,8 +15,9 @@ from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError
-from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float
-from .fields import Timedelta
+from xblock.core import Integer, Scope, String, Boolean, Object, Float
+from .fields import Timedelta, Date
+from xmodule.util.date_utils import time_to_datetime
 
 log = logging.getLogger("mitx.courseware")
 
@@ -86,7 +84,7 @@ class ComplexEncoder(json.JSONEncoder):
 class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
     max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
-    due = String(help="Date that this problem is due by", scope=Scope.settings)
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
@@ -124,10 +122,7 @@ class CapaModule(CapaFields, XModule):
     def __init__(self, system, location, descriptor, model_data):
         XModule.__init__(self, system, location, descriptor, model_data)
 
-        if self.due:
-            due_date = dateutil.parser.parse(self.due)
-        else:
-            due_date = None
+        due_date = time_to_datetime(self.due)
 
         if self.graceperiod is not None and due_date:
             self.close_date = due_date + self.graceperiod

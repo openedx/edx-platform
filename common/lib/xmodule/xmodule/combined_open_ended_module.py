@@ -1,4 +1,3 @@
-import json
 import logging
 from lxml import etree
 
@@ -6,9 +5,10 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float, List
+from xblock.core import Integer, Scope, String, Boolean, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
+from .fields import Date
 
 log = logging.getLogger("mitx.courseware")
 
@@ -63,7 +63,7 @@ class CombinedOpenEndedFields(object):
                                  scope=Scope.settings)
     skip_spelling_checks = Boolean(help="Whether or not to skip initial spelling checks.", default=True,
                                    scope=Scope.settings)
-    due = String(help="Date that this problem is due by", default=None, scope=Scope.settings)
+    due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
                          scope=Scope.settings)
     max_score = Integer(help="Maximum score for the problem.", default=1, scope=Scope.settings)

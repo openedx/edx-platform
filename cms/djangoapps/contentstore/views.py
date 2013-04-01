@@ -6,7 +6,6 @@ import sys
 import time
 import tarfile
 import shutil
-from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
 from path import path
@@ -47,12 +46,13 @@ from functools import partial
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.util.date_utils import get_default_time_display
 
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
 from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, \
-    get_date_display, UnitState, get_course_for_item, get_url_reverse
+    UnitState, get_course_for_item, get_url_reverse
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from contentstore.course_info_model import get_course_updates, \
@@ -253,6 +253,12 @@ def edit_subsection(request, location):
             can_view_live = True
             break
 
+    # item.lms.start is a struct_time using GMT
+    # item.lms.due is a String, 'March 20 17:00'
+
+    # edit_subsection.html, due is converted to dateutil.parser.parse(item.lms.due) = {datetime} 2013-03-20 17:00:00
+    #parsed_due_date = dateutil.parser.parse(item.lms.due)
+
     return render_to_response('edit_subsection.html',
         {'subsection': item,
          'context_course': course,
@@ -374,7 +380,7 @@ def edit_unit(request, location):
         'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
-        'release_date': get_date_display(datetime.fromtimestamp(time.mktime(containing_subsection.lms.start))) if containing_subsection.lms.start is not None else None,
+        'release_date': get_default_time_display(containing_subsection.lms.start) if containing_subsection.lms.start is not None else None,
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
@@ -830,7 +836,7 @@ def upload_asset(request, org, course, coursename):
     readback = contentstore().find(content.location)
 
     response_payload = {'displayname': content.name,
-        'uploadDate': get_date_display(readback.last_modified_at),
+        'uploadDate': get_default_time_display(readback.last_modified_at.timetuple()),
         'url': StaticContent.get_url_path_from_location(content.location),
         'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
         'msg': 'Upload completed'
@@ -1402,7 +1408,7 @@ def asset_index(request, org, course, name):
         id = asset['_id']
         display_info = {}
         display_info['displayname'] = asset['displayname']
-        display_info['uploadDate'] = get_date_display(asset['uploadDate'])
+        display_info['uploadDate'] = get_default_time_display(asset['uploadDate'].timetuple())
 
         asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
