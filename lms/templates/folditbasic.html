@@ -1,8 +1,8 @@
 <%!
-from xmodule.util.date_utils import get_time_struct_display
+from xmodule.util.date_utils import get_default_time_display
 %>
 <div class="folditbasic">
-<p><strong>Due:</strong> ${due}
+<p><strong>Due:</strong> ${get_default_time_display(due)}
 
 <p>
   <strong>Status:</strong>
@@ -23,7 +23,7 @@ from xmodule.util.date_utils import get_time_struct_display
   % for puzzle in completed:
   <tr>
     <td>${'{0}-{1}'.format(puzzle['set'], puzzle['subset'])}</td>
-    <td>${get_time_struct_display(puzzle['created'], '%Y-%m-%d %H:%M')}</td>
+    <td>${puzzle['created'].strftime('%Y-%m-%d %H:%M')}</td>
   </tr>
   % endfor
 </table>
