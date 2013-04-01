@@ -190,6 +190,7 @@ function goto( mode)
     <input type="submit" name="action" value="Export CSV file of grades for assignment">
     </li>
     </ul>
+    <hr width="40%" style="align:left">
 
   %endif
 
@@ -202,6 +203,8 @@ function goto( mode)
     %if instructor_access:
     <p> You may also delete the entire state of a student for a problem:
     <input type="submit" name="action" value="Delete student state for problem">  </p>
+    <p>To delete the state of other XBlocks specify modulename/urlname, eg
+       <tt>combinedopenended/Humanities_SA_Peer</tt></p>
     %endif
 
  %endif
