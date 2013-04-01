@@ -171,9 +171,7 @@ class CapaModule(CapaFields, XModule):
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
 
-        # Ensure that the module state matches the state of the
-        # capa problem
-        self.set_state_from_lcp()
+            self.set_state_from_lcp()
 
     def new_lcp(self, state, text=None):
         if text is None:
