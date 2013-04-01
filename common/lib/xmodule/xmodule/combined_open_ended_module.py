@@ -9,11 +9,12 @@ from xblock.core import Integer, Scope, String, Boolean, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
 from .fields import Date
+from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
 
 log = logging.getLogger("mitx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
-                          "skip_spelling_checks", "due", "graceperiod", "max_score"]
+                          "skip_spelling_checks", "due", "graceperiod"]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
                          "student_attempts", "ready_to_reset"]
@@ -66,9 +67,9 @@ class CombinedOpenEndedFields(object):
     due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
                          scope=Scope.settings)
-    max_score = Integer(help="Maximum score for the problem.", default=1, scope=Scope.settings)
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
+    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
@@ -118,7 +119,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
 
         Sample file:
-        <combinedopenended attempts="10000" max_score="1">
+        <combinedopenended attempts="10000">
             <rubric>
                 Blah blah rubric.
             </rubric>
@@ -190,8 +191,8 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     def get_score(self):
         return self.child_module.get_score()
 
-    #def max_score(self):
-    #    return self.child_module.max_score()
+    def max_score(self):
+        return self.child_module.max_score()
 
     def get_progress(self):
         return self.child_module.get_progress()

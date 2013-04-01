@@ -14,7 +14,7 @@ from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.core import Integer, Scope, String, Boolean, Object, Float
 from .fields import Timedelta, Date
 from xmodule.util.date_utils import time_to_datetime
@@ -91,7 +91,7 @@ class CapaFields(object):
     rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
-    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.student_state, default={})
+    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.student_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
@@ -449,7 +449,14 @@ class CapaModule(CapaFields, XModule):
             return 'Error'
 
         before = self.get_progress()
-        d = handlers[dispatch](get)
+
+        try:
+            d = handlers[dispatch](get)
+
+        except Exception as err:
+            _, _, traceback_obj = sys.exc_info()
+            raise ProcessingError, err.message, traceback_obj
+
         after = self.get_progress()
         d.update({
             'progress_changed': after != before,
@@ -571,7 +578,7 @@ class CapaModule(CapaFields, XModule):
         # save any state changes that may occur
         self.set_state_from_lcp()
         return response
-        
+
 
     def get_answer(self, get):
         '''
@@ -720,9 +727,24 @@ class CapaModule(CapaFields, XModule):
         try:
             correct_map = self.lcp.grade_answers(answers)
             self.set_state_from_lcp()
-        except StudentInputError as inst:
-            log.exception("StudentInputError in capa_module:problem_check")
-            return {'success': inst.message}
+
+        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
+            log.warning("StudentInputError in capa_module:problem_check",
+                        exc_info=True)
+
+            # If the user is a staff member, include
+            # the full exception, including traceback,
+            # in the response
+            if self.system.user_is_staff:
+                msg = "Staff debug info: %s" % traceback.format_exc()
+
+            # Otherwise, display just an error message,
+            # without a stack trace
+            else:
+                msg = "Error: %s" % str(inst.message)
+
+            return {'success': msg}
+
         except Exception, err:
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
@@ -773,7 +795,7 @@ class CapaModule(CapaFields, XModule):
         event_info['answers'] = answers
 
         # Too late. Cannot submit
-        if self.closed() and not self.max_attempts ==0:
+        if self.closed() and not self.max_attempts == 0:
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
@@ -793,7 +815,7 @@ class CapaModule(CapaFields, XModule):
 
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"
-        if not self.max_attempts ==0:
+        if not self.max_attempts == 0:
             msg += " but not graded. Hit 'Check' to grade them."
         return {'success': True,
                 'msg': msg}
