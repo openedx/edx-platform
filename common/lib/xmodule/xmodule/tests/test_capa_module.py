@@ -862,9 +862,9 @@ class CapaModuleTest(unittest.TestCase):
 
 
     def test_random_seed_no_change(self):
-        rerandomize_options = ['never', 'per_student', 'always', 'onreset']
 
-        for rerandomize in rerandomize_options:
+        # Run the test for each possible rerandomize value
+        for rerandomize in ['never', 'per_student', 'always', 'onreset']:
             module = CapaFactory.create(rerandomize=rerandomize)
 
             # Get the seed
@@ -873,6 +873,8 @@ class CapaModuleTest(unittest.TestCase):
             seed = module.lcp.seed
             self.assertTrue(seed is not None)
 
+            # If we're not rerandomizing, the seed is always set
+            # to the same value (1)
             if rerandomize == 'never':
                 self.assertEqual(seed, 1)
 
@@ -897,12 +899,15 @@ class CapaModuleTest(unittest.TestCase):
             '''
 
             # Simulate submitting an attempt
+            # We need to do this, or reset_problem() will
+            # fail with a complaint that we haven't submitted
+            # the problem yet.
             module.done = True
 
             # Reset the problem
             module.reset_problem({})
 
-            # Get return the seed
+            # Return the seed
             return module.seed
 
         def _retry_and_check(num_tries, test_func):
@@ -925,6 +930,8 @@ class CapaModuleTest(unittest.TestCase):
             module = CapaFactory.create(rerandomize=rerandomize)
 
             # Get the seed
+            # module.seed isn't set until we check/save/reset the problem,
+            # so we access the capa problem seed directly
             seed = module.lcp.seed
 
             # We do NOT want the seed to reset if rerandomize
