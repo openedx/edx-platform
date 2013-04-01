@@ -53,10 +53,17 @@
 
     <div class="wrapper-view wrapper">
         <%include file="widgets/header.html" />
+        
         <div class="wrapper-main wrapper">
-            <%block name="content"></%block>            
+            <%block name="content"></%block>
+            % if user.is_authenticated():
+            <%include file="widgets/sock.html" />          
+            % endif
         </div>
-        <%include file="widgets/footer.html" />
+        
+        <div class="wrapper-bottom wrapper">
+            <%include file="widgets/footer.html" />                
+        </div>
     </div>
 
     <%include file="widgets/tender.html" />

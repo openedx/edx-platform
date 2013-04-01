@@ -3,13 +3,10 @@
 
 .wrapper-footer {
   @include box-shadow(inset 0 1px 2px $shadow-d1);
-  margin: ($baseline*1.5) 0 0 0;
-  padding: $baseline;
-  position: absolute;
-  bottom: 0;
+  position: relative;
   width: 100%;
-  height: $footer-primary-height;
-  background: $gray-l3;
+  padding: $baseline;
+  background: $gray-l4;
 
   footer.primary {
     @include clearfix();
@@ -55,8 +52,6 @@
           .ss-icon {
             @include transition(top .25s ease-in-out .25s);
             @include font-size(15);
-            position: relative;
-            top: 0;
             display: inline-block;
             vertical-align: middle;
             margin-right: ($baseline/4);
@@ -67,133 +62,15 @@
             color: $gray-d2;
 
             .ss-icon {
-              top: -($baseline/10);
               color: $gray-d2;
             }
           }
-        }
-      }
-    }
-  }
 
-  // sock - additional help
-  .sock {
-    @include clearfix();
-    @extend .t-copy-sub2;
-    max-width: $fg-max-width;
-    min-width: $fg-min-width;
-    width: flex-grid(12);
-    margin: 0 auto $baseline auto;
-    border-bottom: 1px solid $gray-l2;
-    padding-bottom: $baseline;
-
-    header {
-
-      .title {
-        @extend .t-title-3;
-      }
-
-      .ss-icon {
-        @extend .t-icon;
-        @extend .icon-inline;
-      }
-    }
-
-    // shared elements
-    .support, .feedback {
-      @include box-sizing(border-box);
-
-      .title {
-
-      }
-
-      .copy {
-        margin: 0 0 $baseline 0;
-      }
-
-      .list-actions {
-        @include clearfix();
-
-        .action-item {
-          float: left;
-          margin-right: ($baseline/2);
-
-          &:last-child {
-            margin-right: 0;
-          }
-
-          .action {
-            display: block;
-
-            .ss-icon {
-              @include font-size(15);
-              @extend .t-icon;
-              @extend .icon-inline;
-            }
-
-            &:hover, &:active {
-
-              .ss-icon {
-              }
-            }
-          }
-
-          .tip {
-            @extend .sr;
+          &.is-active {
+            color: $gray-d2;
           }
         }
-
-        .action-primary {
-          @include gray-button;
-          @include transition(all .15s);
-          @include font-size(13);
-          font-weight: 500;
-          padding: ($baseline/4) ($baseline/2);
-          text-align: center;
-        }
       }
     }
-
-    // studio support content
-    .support {
-      width: flex-grid(8,12);
-      float: left;
-      margin-right: flex-gutter();
-
-      .action-item {
-        width: flexgrid(4,8);
-      }
-    }
-
-    // studio feedback content
-    .feedback {
-      width: flex-grid(4,12);
-      float: left;
-
-      .action-item {
-        width: flexgrid(4,4);
-      }
-    }
-  }
-}
-
-
-// js-enabled styling
-.js .wrapper-footer {
-  @include transition(height 2s ease-in-out);
-  height: $footer-primary-height;
-  overflow: hidden;
-
-  .sock {
-    display: none;
-  }
-}
-
-  // expanded view
-.js.footer-is-expanded .wrapper-footer {
-  height: ($footer-primary-height*4);
-
-  .sock {
-    display: block;
   }
 }

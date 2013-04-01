@@ -1,49 +1,5 @@
 <%! from django.core.urlresolvers import reverse %>
-
-<div class="wrapper-footer wrapper">
-  <section class="sock">
-    <header>
-      <h2 class="title"><i class="ss-icon ss-symbolicons-block icon-help">&#xEE11;</i> edX Studio Help</h2>
-    </header>
-    
-    <div class="support">
-      <h3 class="sr title">Studio Support</h3>
-      
-      <div class="copy">
-         <p>Need help getting started with Studio? Want to know how to manage a particular part of your course using Studio? Take advantage of our documentation, help forums, as well as our edX101 introduction course for course authors.</p>
-      </div>
-      
-    <ul class="list-actions">
-      <li class="action-item">
-        <a href="" class="action action-primary"><i class="ss-icon ss-symbolicons-block icon-download">&#xEB02;</i> Download Studio Documentation</a>
-        <span class="tip">How to use Studio to build your course</span>
-      </li>
-      <li class="action-item">
-        <a href="http://help.edge.edx.org/" rel="external" class="action action-primary"><i class="ss-icon ss-symbolicons-block icon-help">&#xEE11;</i> Studio Help Center</a>
-        <span class="tip"><i class="ss-icon ss-symbolicons-block icon-help">&#xEE11;</i> Studio Help Center</span>
-      </li>
-      <li class="action-item">
-        <a href="" class="action action-primary"><i class="ss-icon ss-symbolicons-block icon-enroll">&#x1F393;</i> Enroll in edX101</a>
-        <span class="tip">How to use Studio to build your course</span>
-      </li>
-    </ul>
-    </div>
-    
-    <div class="feedback">
-      <h3 class="sr title">Share Feedback on Studio</h3>
-      
-      <div class="copy">
-         <p>Have questions or thoughts about using Studio? We're here to help and listen to feedback you want to share.</p>
-      </div>
-      
-      <ul class="list-actions">
-        <li class="action-item">
-          <a href="" class="action action-primary"><i class="ss-icon ss-symbolicons-block icon-feedback">&#xE398;</i> Share Studio Feedback</a>
-        </li>
-      </ul>
-    </div>
-  </section>
-  
+<div class="wrapper-footer wrapper">  
   <footer class="primary" role="contentinfo">
     <div class="colophon">
       <p>&copy; 2013 <a href="http://www.edx.org" rel="external">edX</a>. All rights reserved.</p>
@@ -57,13 +13,9 @@
         <li class="nav-item nav-peripheral-pp">
           <a href="#">Privacy Policy</a>
         </li> -->
-        
-        <li class="nav-item nav-peripheral-help">
-          <a class="show-support" href=""><i class="ss-icon ss-symbolicons-block icon-help">&#xEE11;</i> edX Studio Help</a>
-        </li>
         % if user.is_authenticated():
         <li class="nav-item nav-peripheral-feedback">
-          <a class="show-tender" href="http://help.edge.edx.org/discussion/new" title="Use our feedback tool, Tender, to share your feedback"><i class="ss-icon ss-symbolicons-block icon-feedback">&#xE398;</i> Contact Us</a>
+          <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to share your feedback"><i class="ss-icon ss-symbolicons-block icon-feedback">&#xE398;</i> Contact Us</a>
         </li>
         % endif    
       </ol>

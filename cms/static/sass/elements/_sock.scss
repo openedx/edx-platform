@@ -1,0 +1,152 @@
+// studio - elements - support sock
+// ====================
+
+.wrapper-sock {
+  @include transition(background 0.25s ease-in-out);
+  @include clearfix();
+  position: relative;
+  width: 100%;
+  margin: ($baseline*2.5) 0;
+  padding: 0 $baseline;
+  border-top: 1px solid $gray-l4;
+
+  // actions
+  .list-cta {
+    position: relative;
+    top: -($baseline);
+    margin: 0 auto;
+    text-align: center;
+
+    .cta-show-sock {
+      @extend .btn-secondary-gray;
+      @extend .t-action3;
+      background: $gray-l5;
+      padding: ($baseline/2) $baseline;
+
+      .icon {
+        @include font-size(17);
+      }
+    }
+  }
+
+  // sock - additional help
+  .sock {
+    @include clearfix();
+    @extend .t-copy-sub2;
+    display: none;
+    opacity: 0.0;
+    pointer-events: none;
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    color: $gray-l3;
+
+    // support body
+    header {
+
+      .title {
+        @extend .t-title-3;
+        margin-bottom: ($baseline/2);
+      }
+
+      .ss-icon {
+        @extend .t-icon;
+        @extend .icon-inline;
+      }
+    }
+
+    // shared elements
+    .support, .feedback {
+      @include box-sizing(border-box);
+
+      .title {
+        @extend .t-title-3;
+        color: $white;
+      }
+
+      .copy {
+        margin: 0 0 $baseline 0;
+      }
+
+      .list-actions {
+        @include clearfix();
+
+        .action-item {
+          float: left;
+          margin-right: ($baseline/2);
+
+          &:last-child {
+            margin-right: 0;
+          }
+
+          .action {
+            display: block;
+
+            .icon {
+              @include font-size(18);
+            }
+
+            &:hover, &:active {
+
+            }
+          }
+
+          .tip {
+            @extend .sr;
+          }
+        }
+
+        .action-primary {
+          @extend .btn-primary-blue;
+          @extend .t-action3;
+        }
+      }
+    }
+
+    // studio support content
+    .support {
+      width: flex-grid(8,12);
+      float: left;
+      margin-right: flex-gutter();
+
+      .action-item {
+        width: flexgrid(4,8);
+      }
+    }
+
+    // studio feedback content
+    .feedback {
+      width: flex-grid(4,12);
+      float: left;
+
+      .action-item {
+        width: flexgrid(4,4);
+      }
+    }
+  }
+}
+
+// case: sock content is shown
+.sock-is-shown {
+
+  .wrapper-sock {
+    @include linear-gradient($gray-d4 0%, $gray-d3 2%, $gray-d3 98%, $gray-d4 100%);
+    border-bottom: 1px solid $white;
+    border-top: 1px solid $white;
+    padding-bottom: ($baseline*2);
+    padding-top: ($baseline*2);
+
+    .cta-show-sock {
+      display: none;
+      opacity: 0.0;
+      pointer-events: none;
+    }
+
+    .sock {
+      display: block;
+      opacity: 1.0;
+      pointer-events: auto;
+    }
+  }
+}

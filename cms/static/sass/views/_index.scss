@@ -296,8 +296,7 @@ body.index {
     // call to action content
     .wrapper-content-cta {
       position: relative;
-      padding-bottom: ($footer-primary-height*2);
-      padding-top: ($baseline*2);
+      padding: ($baseline*2) 0;
       background: $white;
     }
 

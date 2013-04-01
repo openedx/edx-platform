@@ -87,7 +87,7 @@ $(document).ready(function () {
     $('a.show-tender').bind('click', smoothScrollTop);
 
     // toggling footer additional support
-    $('.show-support').bind('click', toggleSupport);
+    $('.cta-show-sock').bind('click', toggleSock);
 
     // toggling overview section details
     $(function () {
@@ -458,9 +458,17 @@ function onKeyUp(e) {
     }
 }
 
-function toggleSupport(e) {
+function toggleSock(e) {
    e.preventDefault();
-   $body.toggleClass('footer-is-expanded');
+   $body.toggleClass('sock-is-shown');
+
+   $.smoothScroll({ 
+       offset: -200, 
+       easing: 'swing', 
+       speed: 1000,
+       scrollElement: null,
+       scrollTarget: $('.wrapper-sock')
+   });
 }
 
 function toggleSubmodules(e) {

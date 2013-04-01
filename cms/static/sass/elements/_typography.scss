@@ -7,18 +7,16 @@
 }
 
 .t-title-1 {
-  @include font-size(32);
+  @include font-size(36);
 }
 
 .t-title-2 {
   @include font-size(24);
-  margin: 0 0 ($baseline/2) 0;
   font-weight: 600;
 }
 
 .t-title-3 {
   @include font-size(16);
-  margin: 0 0 ($baseline/2) 0;
   font-weight: 600;
 }
 
@@ -60,18 +58,23 @@
 // ====================
 
 // actions/labels
-.t-action {
+.t-action1 {
   @include font-size(14);
   font-weight: 600;
 }
 
-.t-action-primary {
-  @include font-size(14);
-  font-weight: 600;
-}
-
-.t-action-primary-s {
+.t-action2 {
   @include font-size(13);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.t-action3 {
+  @include font-size(13);
+}
+
+.t-action4 {
+  @include font-size(12);
 }
 
 // ====================
