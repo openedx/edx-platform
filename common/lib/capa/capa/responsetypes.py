@@ -2,7 +2,8 @@
 # File:   courseware/capa/responsetypes.py
 #
 '''
-Problem response evaluation.  Handles checking of student responses, of a variety of types.
+Problem response evaluation.  Handles checking of 
+student responses, of a variety of types.
 
 Used by capa_problem.py
 '''
@@ -10,7 +11,6 @@ Used by capa_problem.py
 # standard library imports
 import abc
 import cgi
-import hashlib
 import inspect
 import json
 import logging
@@ -34,7 +34,10 @@ from .correctmap import CorrectMap
 from datetime import datetime
 from .util import *
 from lxml import etree
-from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
+
+# uses Beautiful Soup!!! FIXME?
+from lxml.html.soupparser import fromstring as fromstring_bs     
+
 import xqueue_interface
 
 log = logging.getLogger(__name__)
@@ -243,13 +246,17 @@ class LoncapaResponse(object):
         # hint specified by function?
         hintfn = hintgroup.get('hintfn')
         if hintfn:
-            # Hint is determined by a function defined in the <script> context; evaluate
-            # that function to obtain list of hint, hintmode for each answer_id.
+            # Hint is determined by a function defined 
+            # in the <script> context; evaluate
+            # that function to obtain list of hint, 
+            # hintmode for each answer_id.
 
-            # The function should take arguments (answer_ids, student_answers, new_cmap, old_cmap)
+            # The function should take arguments 
+            # (answer_ids, student_answers, new_cmap, old_cmap)
             # and it should modify new_cmap as appropriate.
 
-            # We may extend this in the future to add another argument which provides a
+            # We may extend this in the future to add 
+            # another argument which provides a
             # callback procedure to a social hint generation system.
             if not hintfn in self.context:
                 msg = 'missing specified hint function %s in script context' % hintfn
@@ -267,7 +274,8 @@ class LoncapaResponse(object):
                 raise ResponseError(msg)
             return
 
-        # hint specified by conditions and text dependent on conditions (a-la Loncapa design)
+        # hint specified by conditions and text dependent 
+        # on conditions (a-la Loncapa design)
         # see http://help.loncapa.org/cgi-bin/fom?file=291
         #
         # Example:
@@ -275,10 +283,12 @@ class LoncapaResponse(object):
         # <formularesponse samples="x@-5:5#11" id="11" answer="$answer">
         #   <textline size="25" />
         #   <hintgroup>
-        #     <formulahint samples="x@-5:5#11" answer="$wrongans" name="inversegrad"></formulahint>
+        #     <formulahint samples="x@-5:5#11" answer="$wrongans" 
+        #                   name="inversegrad"></formulahint>
         #     <hintpart on="inversegrad">
         #       <text>You have inverted the slope in the question.  The slope is
-        #             (y2-y1)/(x2 - x1) you have the slope as (x2-x1)/(y2-y1).</text>
+        #             (y2-y1)/(x2 - x1) you have the slope 
+        #               as (x2-x1)/(y2-y1).</text>
         #     </hintpart>
         #   </hintgroup>
         # </formularesponse>
@@ -533,7 +543,8 @@ class JavascriptResponse(LoncapaResponse):
             points = self.get_max_score()
         else:
             points = 0
-        return CorrectMap(self.answer_id, correctness, npoints=points, msg=evaluation)
+        return CorrectMap(self.answer_id, correctness, 
+                        npoints=points, msg=evaluation)
 
     def run_grader(self, submission):
         if submission is None or submission == '':
@@ -953,7 +964,8 @@ def sympy_check2():
 
         log.debug('answer_ids=%s' % self.answer_ids)
 
-        # the <answer>...</answer> stanza should be local to the current <customresponse>.
+        # the <answer>...</answer> stanza should be 
+        # local to the current <customresponse>.
         # So try looking there first.
         self.code = None
         answer = None
@@ -962,7 +974,8 @@ def sympy_check2():
         except IndexError:
             # print "xml = ",etree.tostring(xml,pretty_print=True)
 
-            # if we have a "cfn" attribute then look for the function specified by cfn, in
+            # if we have a "cfn" attribute then look for the 
+            # function specified by cfn, in
             # the problem context ie the comparison function is defined in the
             # <script>...</script> stanza instead
             cfn = xml.get('cfn')
@@ -973,8 +986,8 @@ def sympy_check2():
                 else:
                     msg = "%s: can't find cfn %s in context" % (
                         unicode(self), cfn)
-                    msg += "\nSee XML source line %s" % getattr(self.xml, 'sourceline',
-                                                                '<unavailable>')
+                    msg += ("\nSee XML source line %s" % 
+                            getattr(self.xml, 'sourceline', '<unavailable>'))
                     raise LoncapaProblemError(msg)
 
         if not self.code:
@@ -1010,14 +1023,17 @@ def sympy_check2():
             log.error(msg)
             raise Exception(msg)
 
-        # global variable in context which holds the Presentation MathML from dynamic math input
+        # global variable in context which holds the 
+        # Presentation MathML from dynamic math input
         # ordered list of dynamath responses
         dynamath = [student_answers.get(k + '_dynamath', None) for k in idset]
 
         # if there is only one box, and it's empty, then don't evaluate
         if len(idset) == 1 and not submission[0]:
-            # default to no error message on empty answer (to be consistent with other
-            # responsetypes) but allow author to still have the old behavior by setting
+            # default to no error message on empty answer 
+            # (to be consistent with other
+            # responsetypes) but allow author to still 
+            # have the old behavior by setting
             # empty_answer_err attribute
             msg = ('<span class="inline-error">No answer entered!</span>'
                    if self.xml.get('empty_answer_err') else '')
@@ -1092,7 +1108,8 @@ def sympy_check2():
             try:
                 answer_given = submission[0] if (
                     len(idset) == 1) else submission
-                # handle variable number of arguments in check function, for backwards compatibility
+                # handle variable number of arguments in check function, 
+                # for backwards compatibility
                 # with various Tutor2 check functions
                 args = [self.expect, answer_given,
                         student_answers, self.answer_ids[0]]
@@ -1124,7 +1141,8 @@ def sympy_check2():
                     msg = ret.get('msg', None)
                     msg = self.clean_message_html(msg)
 
-                    # If there is only one input, apply the message to that input
+                    # If there is only one input, apply the message to 
+                    # that input
                     # Otherwise, apply the message to the whole problem
                     if len(idset) > 1:
                         overall_message = msg
@@ -1137,7 +1155,8 @@ def sympy_check2():
                 #  'input_list': [{ 'ok': BOOLEAN, 'msg': STRING }, ...] }
                 #
                 # This allows the function to return an 'overall message'
-                # that applies to the entire problem, as well as correct/incorrect
+                # that applies to the entire problem, as well as 
+                # correct/incorrect
                 # status and messages for individual inputs
                 elif 'input_list' in ret:
                     overall_message = ret.get('overall_message', '')
@@ -1370,7 +1389,8 @@ class CodeResponse(LoncapaResponse):
 
         tests = self.xml.get('tests')
 
-        # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
+        # Extract 'answer' and 'initial_display' from XML. 
+        # Note that the code to be exec'ed here is:
         #   (1) Internal edX code, i.e. NOT student submissions, and
         #   (2) The code should only define the strings 'initial_display', 'answer',
         #           'preamble', 'test_program'
@@ -1391,7 +1411,8 @@ class CodeResponse(LoncapaResponse):
                       " 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
             raise Exception(err)
 
-        # Finally, make the ExternalResponse input XML format conform to the generic
+        # Finally, make the ExternalResponse input XML format 
+        # conform to the generic
         # exteral grader interface
         #   The XML tagging of grader_payload is pyxserver-specific
         grader_payload = '<pyxserver>'
@@ -1500,7 +1521,8 @@ class CodeResponse(LoncapaResponse):
         # TODO: Find out how this is used elsewhere, if any
         self.context['correct'] = correctness
 
-        # Replace 'oldcmap' with new grading results if queuekey matches.  If queuekey
+        # Replace 'oldcmap' with new grading results if queuekey matches.  
+        # If queuekey
         # does not match, we keep waiting for the score_msg whose key actually
         # matches
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):

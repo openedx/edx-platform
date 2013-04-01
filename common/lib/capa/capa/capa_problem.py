@@ -32,6 +32,8 @@ from copy import deepcopy
 
 import chem
 import chem.miller
+import chem.chemcalc
+import chem.chemtools
 import verifiers
 import verifiers.draganddrop
 
@@ -67,6 +69,9 @@ global_context = {'random': random,
                   'scipy': scipy,
                   'calc': calc,
                   'eia': eia,
+                  'chemcalc': chem.chemcalc,
+                  'chemtools': chem.chemtools,
+                  'miller': chem.miller,
                   'draganddrop': verifiers.draganddrop}
 
 # These should be removed from HTML output, including all subelements
