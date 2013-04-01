@@ -3,8 +3,8 @@
 // VideoQualityControl module.
 define(
 'videoalpha/display/video_quality_control.js',
-['videoalpha/display/bind.js'],
-function (bind) {
+[],
+function () {
 
     // VideoQualityControl() function - what this module "exports".
     return function (state) {
@@ -29,8 +29,8 @@ function (bind) {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoQualityControl.onQualityChange = bind(onQualityChange, state);
-        state.videoQualityControl.toggleQuality   = bind(toggleQuality, state);
+        state.videoQualityControl.onQualityChange = onQualityChange.bind(state);
+        state.videoQualityControl.toggleQuality   = toggleQuality.bind(state);
     }
 
     // function renderElements(state)
@@ -92,7 +92,7 @@ function (bind) {
             newQuality = 'hd720';
         }
 
-        this.trigger(['videoPlayer', 'handlePlaybackQualityChange'], newQuality, 'method');
+        this.trigger(['videoPlayer', 'handlePlaybackQualityChange'], newQuality);
     }
 
 });

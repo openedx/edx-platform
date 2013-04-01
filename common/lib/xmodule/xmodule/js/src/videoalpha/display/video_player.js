@@ -3,11 +3,8 @@
 // VideoPlayer module.
 define(
 'videoalpha/display/video_player.js',
-[
-    'videoalpha/display/html5_video.js',
-    'videoalpha/display/bind.js'
-],
-function (HTML5Video, bind) {
+['videoalpha/display/html5_video.js'],
+function (HTML5Video) {
 
     // VideoPlayer() function - what this module "exports".
     return function (state) {
@@ -27,24 +24,24 @@ function (HTML5Video, bind) {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoPlayer.pause                       = bind(pause, state);
-        state.videoPlayer.play                        = bind(play, state);
-        state.videoPlayer.update                      = bind(update, state);
-        state.videoPlayer.onSpeedChange               = bind(onSpeedChange, state);
-        state.videoPlayer.onSeek                      = bind(onSeek, state);
-        state.videoPlayer.onEnded                     = bind(onEnded, state);
-        state.videoPlayer.onPause                     = bind(onPause, state);
-        state.videoPlayer.onPlay                      = bind(onPlay, state);
-        state.videoPlayer.onUnstarted                 = bind(onUnstarted, state);
-        state.videoPlayer.handlePlaybackQualityChange = bind(handlePlaybackQualityChange, state);
-        state.videoPlayer.onPlaybackQualityChange     = bind(onPlaybackQualityChange, state);
-        state.videoPlayer.onStateChange               = bind(onStateChange, state);
-        state.videoPlayer.onReady                     = bind(onReady, state);
-        state.videoPlayer.updatePlayTime              = bind(updatePlayTime, state);
-        state.videoPlayer.isPlaying                   = bind(isPlaying, state);
-        state.videoPlayer.log                         = bind(log, state);
-        state.videoPlayer.duration                    = bind(duration, state);
-        state.videoPlayer.onVolumeChange              = bind(onVolumeChange, state);
+        state.videoPlayer.pause                       = pause.bind(state);
+        state.videoPlayer.play                        = play.bind(state);
+        state.videoPlayer.update                      = update.bind(state);
+        state.videoPlayer.onSpeedChange               = onSpeedChange.bind(state);
+        state.videoPlayer.onSeek                      = onSeek.bind(state);
+        state.videoPlayer.onEnded                     = onEnded.bind(state);
+        state.videoPlayer.onPause                     = onPause.bind(state);
+        state.videoPlayer.onPlay                      = onPlay.bind(state);
+        state.videoPlayer.onUnstarted                 = onUnstarted.bind(state);
+        state.videoPlayer.handlePlaybackQualityChange = handlePlaybackQualityChange.bind(state);
+        state.videoPlayer.onPlaybackQualityChange     = onPlaybackQualityChange.bind(state);
+        state.videoPlayer.onStateChange               = onStateChange.bind(state);
+        state.videoPlayer.onReady                     = onReady.bind(state);
+        state.videoPlayer.updatePlayTime              = updatePlayTime.bind(state);
+        state.videoPlayer.isPlaying                   = isPlaying.bind(state);
+        state.videoPlayer.log                         = log.bind(state);
+        state.videoPlayer.duration                    = duration.bind(state);
+        state.videoPlayer.onVolumeChange              = onVolumeChange.bind(state);
     }
 
     // function renderElements(state)
@@ -171,7 +168,7 @@ function (HTML5Video, bind) {
     function update() {
         this.videoPlayer.currentTime = this.videoPlayer.player.getCurrentTime();
 
-        if (isFinite(this.videoPlayer.currentTime) === true) {
+        if (isFinite(this.videoPlayer.currentTime)) {
             this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
         }
     }
@@ -214,7 +211,7 @@ function (HTML5Video, bind) {
     }
 
     function onEnded() {
-        this.trigger(['videoControl','pause'], null, 'method');
+        this.trigger(['videoControl','pause'], null);
     }
 
     function onPause() {
@@ -223,7 +220,7 @@ function (HTML5Video, bind) {
         clearInterval(this.videoPlayer.updateInterval);
         delete this.videoPlayer.updateInterval;
 
-        this.trigger(['videoControl','pause'], null, 'method');
+        this.trigger(['videoControl','pause'], null);
     }
 
     function onPlay() {
@@ -233,7 +230,7 @@ function (HTML5Video, bind) {
             this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
         }
 
-        this.trigger(['videoControl','play'], null, 'method');
+        this.trigger(['videoControl','play'], null);
     }
 
     function onUnstarted() { }
@@ -247,7 +244,7 @@ function (HTML5Video, bind) {
 
         quality = this.videoPlayer.player.getPlaybackQuality();
 
-        this.trigger(['videoQualityControl', 'onQualityChange'], quality, 'method');
+        this.trigger(['videoQualityControl', 'onQualityChange'], quality);
     }
 
     function onReady() {
@@ -274,7 +271,7 @@ function (HTML5Video, bind) {
                     _this.speeds.push(value.toFixed(2).replace(/\.00$/, '.0'));
                 });
 
-                this.trigger(['videoSpeedControl', 'reRender'], {'newSpeeds': this.speeds, 'currentSpeed': this.speed}, 'method');
+                this.trigger(['videoSpeedControl', 'reRender'], {'newSpeeds': this.speeds, 'currentSpeed': this.speed});
 
                 this.setSpeed($.cookie('video_speed'));
             }
@@ -311,9 +308,9 @@ function (HTML5Video, bind) {
 
         duration = this.videoPlayer.duration();
 
-        this.trigger(['videoProgressSlider', 'updatePlayTime'], {'time': time, 'duration': duration}, 'method');
-        this.trigger(['videoControl', 'updateVcrVidTime'], {'time': time, 'duration': duration}, 'method');
-        this.trigger(['videoCaption', 'updatePlayTime'], time, 'method');
+        this.trigger(['videoProgressSlider', 'updatePlayTime'], {'time': time, 'duration': duration});
+        this.trigger(['videoControl', 'updateVcrVidTime'], {'time': time, 'duration': duration});
+        this.trigger(['videoCaption', 'updatePlayTime'], time);
     }
 
     function isPlaying() {
@@ -324,7 +321,7 @@ function (HTML5Video, bind) {
         var duration;
 
         duration = this.videoPlayer.player.getDuration();
-        if (isFinite(duration) === false) {
+        if (!isFinite(duration)) {
             duration = this.getDuration();
         }
 

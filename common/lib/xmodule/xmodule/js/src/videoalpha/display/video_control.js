@@ -3,8 +3,8 @@
 // VideoControl module.
 define(
 'videoalpha/display/video_control.js',
-['videoalpha/display/bind.js'],
-function (bind) {
+[],
+function () {
 
     // VideoControl() function - what this module "exports".
     return function (state) {
@@ -24,14 +24,14 @@ function (bind) {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoControl.showControls     = bind(showControls, state);
-        state.videoControl.hideControls     = bind(hideControls, state);
-        state.videoControl.play             = bind(play, state);
-        state.videoControl.pause            = bind(pause, state);
-        state.videoControl.togglePlayback   = bind(togglePlayback, state);
-        state.videoControl.toggleFullScreen = bind(toggleFullScreen, state);
-        state.videoControl.exitFullScreen   = bind(exitFullScreen, state);
-        state.videoControl.updateVcrVidTime = bind(updateVcrVidTime, state);
+        state.videoControl.showControls     = showControls.bind(state);
+        state.videoControl.hideControls     = hideControls.bind(state);
+        state.videoControl.play             = play.bind(state);
+        state.videoControl.pause            = pause.bind(state);
+        state.videoControl.togglePlayback   = togglePlayback.bind(state);
+        state.videoControl.toggleFullScreen = toggleFullScreen.bind(state);
+        state.videoControl.exitFullScreen   = exitFullScreen.bind(state);
+        state.videoControl.updateVcrVidTime = updateVcrVidTime.bind(state);
     }
 
     // function renderElements(state)
@@ -41,7 +41,7 @@ function (bind) {
     //     way - you don't have to do repeated jQuery element selects.
     function renderElements(state) {
         var el, qTipConfig;
-
+        // REFACTOR move templates and css to one file- to python part
         el = $(
             '<div class="slider"></div>' +
             '<div>' +
@@ -82,8 +82,12 @@ function (bind) {
             state.videoControl.play();
         }
 
-        state.controlHideTimeout = setTimeout(state.videoControl.hideControls, 3000);
-        state.el.find('.video-roof').on('mousemove', state.videoControl.showControls);
+        if (state.videoType === 'html5') {
+            state.videoControl.fadeOutTimeout = 1400;
+
+            state.videoControl.el.addClass('html5');
+            state.controlHideTimeout = setTimeout(state.videoControl.hideControls, state.videoControl.fadeOutTimeout);
+        }
     }
 
     // function bindHandlers(state)
@@ -93,6 +97,10 @@ function (bind) {
         state.videoControl.playPauseEl.on('click', state.videoControl.togglePlayback);
         state.videoControl.fullScreenEl.on('click', state.videoControl.toggleFullScreen);
         $(document).on('keyup', state.videoControl.exitFullScreen);
+
+        if (state.videoType === 'html5') {
+            state.el.on('mousemove', state.videoControl.showControls)
+        }
     }
 
     // ***************************************************************
@@ -100,61 +108,32 @@ function (bind) {
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
-
+    // REFACTOR document
     function showControls(event) {
-        var elPosition, elWidth, elHeight;
-
-        normalize(event);
-
-        elPosition = this.el.position();
-        elWidth = this.el.width();
-        elHeight = this.el.height();
-
-        if (
-            (event.pageX < elPosition.left) ||
-            (event.pageX > elPosition.left + elWidth) ||
-            (event.pageY < elPosition.top) ||
-            (event.pageY > elPosition.top + elHeight)
-        ) {
-            return;
-        }
-
-        if (this.controlState === 'invisible') {
-            this.videoControl.el.show();
-            this.controlState = 'visible';
-            this.controlHideTimeout = setTimeout(this.videoControl.hideControls, 3000);
-        }/* else if (this.controlState === 'hiding') {
-            this.videoControl.el.stop(true, false);
-            this.videoControl.el.show();
-            this.controlState = 'visible';
-            this.controlHideTimeout = setTimeout(this.videoControl.hideControls, 3000);
-        }*/ else if (this.controlState === 'visible') {
-            clearTimeout(this.controlHideTimeout);
-            this.controlHideTimeout = setTimeout(this.videoControl.hideControls, 3000);
-        }
-
-        this.controlShowLock = false;
-
-        if (this.videoPlayer && this.videoPlayer.player) {
-            (function (event, _this) {
-                var c1;
-                c1 = 0;
-                _this.el.find('#' + _this.id).children().each(function (index, value) {
-                    $(value).trigger(event);
-                    c1 += 1;
-                });
-            }(event, this));
-        }
-
-        return;
-
-        function normalize(event) {
-            if(!event.offsetX) {
-                event.offsetX = (event.pageX - $(event.target).offset().left);
-                event.offsetY = (event.pageY - $(event.target).offset().top);
+        if (!this.controlShowLock) {
+            if (!this.captionsHidden) {
+                return;
             }
 
-            return event;
+            this.controlShowLock = true;
+
+            // Refactor: separate UI state in object. No code duplication.
+            if (this.controlState === 'invisible') {
+                this.videoControl.el.show();
+                this.controlState = 'visible';
+                this.controlHideTimeout = setTimeout(this.videoControl.hideControls, this.videoControl.fadeOutTimeout);
+            } else if (this.controlState === 'hiding') {
+                this.videoControl.el.stop(true, false);
+                this.videoControl.el.css('opacity', 1);
+                this.videoControl.el.show();
+                this.controlState = 'visible';
+                this.controlHideTimeout = setTimeout(this.videoControl.hideControls, this.videoControl.fadeOutTimeout);
+            } else if (this.controlState === 'visible') {
+                clearTimeout(this.controlHideTimeout);
+                this.controlHideTimeout = setTimeout(this.videoControl.hideControls, this.videoControl.fadeOutTimeout);
+            }
+
+            this.controlShowLock = false;
         }
     }
 
@@ -162,6 +141,11 @@ function (bind) {
         var _this;
 
         this.controlHideTimeout = null;
+
+        if (!this.captionsHidden) {
+            return;
+        }
+
         this.controlState = 'hiding';
 
         _this = this;
@@ -185,16 +169,16 @@ function (bind) {
         event.preventDefault();
 
         if (this.videoControl.playPauseState === 'playing') {
-            this.trigger(['videoPlayer', 'pause'], null, 'method');
+            this.trigger(['videoPlayer', 'pause'], null);
         } else { // if (this.videoControl.playPauseState === 'paused') {
-            this.trigger(['videoPlayer', 'play'], null, 'method');
+            this.trigger(['videoPlayer', 'play'], null);
         }
     }
 
     function toggleFullScreen(event) {
         event.preventDefault();
 
-        if (this.videoControl.fullScreenState === true) {
+        if (this.videoControl.fullScreenState) {
             this.videoControl.fullScreenState = false;
             this.el.removeClass('fullscreen');
             this.videoControl.fullScreenEl.attr('title', 'Fill browser');
@@ -204,11 +188,11 @@ function (bind) {
             this.videoControl.fullScreenEl.attr('title', 'Exit fill browser');
         }
 
-        this.trigger(['videoCaption', 'resize'], null, 'method');
+        this.trigger(['videoCaption', 'resize'], null);
     }
 
     function exitFullScreen(event) {
-        if ((this.el.hasClass('fullscreen') === true) && (event.keyCode === 27)) {
+        if ((this.el.hasClass('fullscreen')) && (event.keyCode === 27)) {
             this.videoControl.toggleFullScreen(event);
         }
     }

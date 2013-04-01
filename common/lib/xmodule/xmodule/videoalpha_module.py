@@ -69,7 +69,6 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
 
     js = {
         'js': [
-            resource_string(__name__, 'js/src/videoalpha/display/bind.js'),
             resource_string(__name__, 'js/src/videoalpha/display/initialize.js'),
             resource_string(__name__, 'js/src/videoalpha/display/html5_video.js'),
             resource_string(__name__, 'js/src/videoalpha/display/video_player.js'),

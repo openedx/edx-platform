@@ -3,8 +3,8 @@
 // VideoVolumeControl module.
 define(
 'videoalpha/display/video_volume_control.js',
-['videoalpha/display/bind.js'],
-function (bind) {
+[],
+function () {
 
     // VideoVolumeControl() function - what this module "exports".
     return function (state) {
@@ -24,8 +24,8 @@ function (bind) {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoVolumeControl.onChange = bind(onChange, state);
-        state.videoVolumeControl.toggleMute = bind(toggleMute, state);
+        state.videoVolumeControl.onChange = onChange.bind(state);
+        state.videoVolumeControl.toggleMute = toggleMute.bind(state);
     }
 
     // function renderElements(state)
@@ -54,7 +54,7 @@ function (bind) {
         state.videoVolumeControl.currentVolume = parseInt($.cookie('video_player_volume_level'), 10);
         state.videoVolumeControl.previousVolume = 100;
         if (
-            (isFinite(state.videoVolumeControl.currentVolume) === false) ||
+            (!isFinite(state.videoVolumeControl.currentVolume)) ||
             (state.videoVolumeControl.currentVolume < 0) ||
             (state.videoVolumeControl.currentVolume > 100)
         ) {
@@ -104,7 +104,7 @@ function (bind) {
             'path': '/'
         });
 
-        this.trigger(['videoPlayer', 'onVolumeChange'], ui.value, 'method');
+        this.trigger(['videoPlayer', 'onVolumeChange'], ui.value);
     }
 
     function toggleMute(event) {

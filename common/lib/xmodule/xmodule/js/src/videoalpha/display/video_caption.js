@@ -3,8 +3,8 @@
 // VideoCaption module.
 define(
 'videoalpha/display/video_caption.js',
-['videoalpha/display/bind.js'],
-function (bind) {
+[],
+function () {
 
     // VideoCaption() function - what this module "exports".
     return function (state) {
@@ -24,23 +24,25 @@ function (bind) {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoCaption.resize              = bind(resize, state);
-        state.videoCaption.toggle              = bind(toggle, state);
-        state.videoCaption.onMouseEnter        = bind(onMouseEnter, state);
-        state.videoCaption.onMouseLeave        = bind(onMouseLeave, state);
-        state.videoCaption.onMovement          = bind(onMovement, state);
-        state.videoCaption.renderCaption       = bind(renderCaption, state);
-        state.videoCaption.captionHeight       = bind(captionHeight, state);
-        state.videoCaption.topSpacingHeight    = bind(topSpacingHeight, state);
-        state.videoCaption.bottomSpacingHeight = bind(bottomSpacingHeight, state);
-        state.videoCaption.scrollCaption       = bind(scrollCaption, state);
-        state.videoCaption.search              = bind(search, state);
-        state.videoCaption.play                = bind(play, state);
-        state.videoCaption.pause               = bind(pause, state);
-        state.videoCaption.seekPlayer          = bind(seekPlayer, state);
-        state.videoCaption.hideCaptions        = bind(hideCaptions, state);
-        state.videoCaption.calculateOffset     = bind(calculateOffset, state);
-        state.videoCaption.updatePlayTime      = bind(updatePlayTime, state);
+        state.videoCaption.autoShowCaptions    = autoShowCaptions.bind(state);
+        state.videoCaption.autoHideCaptions    = autoHideCaptions.bind(state);
+        state.videoCaption.resize              = resize.bind(state);
+        state.videoCaption.toggle              = toggle.bind(state);
+        state.videoCaption.onMouseEnter        = onMouseEnter.bind(state);
+        state.videoCaption.onMouseLeave        = onMouseLeave.bind(state);
+        state.videoCaption.onMovement          = onMovement.bind(state);
+        state.videoCaption.renderCaption       = renderCaption.bind(state);
+        state.videoCaption.captionHeight       = captionHeight.bind(state);
+        state.videoCaption.topSpacingHeight    = topSpacingHeight.bind(state);
+        state.videoCaption.bottomSpacingHeight = bottomSpacingHeight.bind(state);
+        state.videoCaption.scrollCaption       = scrollCaption.bind(state);
+        state.videoCaption.search              = search.bind(state);
+        state.videoCaption.play                = play.bind(state);
+        state.videoCaption.pause               = pause.bind(state);
+        state.videoCaption.seekPlayer          = seekPlayer.bind(state);
+        state.videoCaption.hideCaptions        = hideCaptions.bind(state);
+        state.videoCaption.calculateOffset     = calculateOffset.bind(state);
+        state.videoCaption.updatePlayTime      = updatePlayTime.bind(state);
     }
 
     // function renderElements(state)
@@ -64,6 +66,13 @@ function (bind) {
         });
 
         fetchCaption(state);
+
+        if (state.videoType === 'html5') {
+            state.videoCaption.fadeOutTimeout = 1400;
+
+            state.videoCaption.subtitlesEl.addClass('html5');
+            state.captionHideTimeout = setTimeout(state.videoCaption.autoHideCaptions, state.videoCaption.fadeOutTimeout);
+        }
     }
 
     // function bindHandlers(state)
@@ -85,6 +94,10 @@ function (bind) {
             'DOMMouseScroll',
             state.videoCaption.onMovement
         );
+
+        if (state.videoType === 'html5') {
+            state.el.on('mousemove', state.videoCaption.autoShowCaptions)
+        }
     }
 
     function fetchCaption(state) {
@@ -106,10 +119,6 @@ function (bind) {
     }
 
     function captionURL(state) {
-        console.log('We are inside captionURL() function.');
-        console.log('state.config.caption_asset_path = "' + state.config.caption_asset_path + '".');
-        console.log('state.youtubeId("1.0") = "' + state.youtubeId('1.0') + '".');
-
         return '' + state.config.caption_asset_path + state.youtubeId('1.0') + '.srt.sjson';
     }
 
@@ -118,6 +127,51 @@ function (bind) {
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+
+    function autoShowCaptions(event) {
+        if (!this.captionsShowLock) {
+            if (!this.captionsHidden) {
+                return;
+            }
+
+            this.captionsShowLock = true;
+
+            if (this.captionState === 'invisible') {
+                this.videoCaption.subtitlesEl.show();
+                this.captionState = 'visible';
+                this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
+            } else if (this.captionState === 'hiding') {
+                this.videoCaption.subtitlesEl.stop(true, false);
+                this.videoCaption.subtitlesEl.css('opacity', 1);
+                this.videoCaption.subtitlesEl.show();
+                this.captionState = 'visible';
+                this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
+            } else if (this.captionState === 'visible') {
+                clearTimeout(this.captionHideTimeout);
+                this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
+            }
+
+            this.captionsShowLock = false;
+        }
+    }
+
+    function autoHideCaptions() {
+        var _this;
+
+        this.captionHideTimeout = null;
+
+        if (!this.captionsHidden) {
+            return;
+        }
+
+        this.captionState = 'hiding';
+
+        _this = this;
+
+        this.videoCaption.subtitlesEl.fadeOut(1000, function () {
+            _this.captionState = 'invisible';
+        });
+    }
 
     function resize() {
         this.videoCaption.subtitlesEl.css({
@@ -254,7 +308,7 @@ function (bind) {
         event.preventDefault();
         time = Math.round(Time.convert($(event.target).data('start'), '1.0', this.speed) / 1000);
 
-        this.trigger(['videoPlayer', 'onSeek'], time, 'method');
+        this.trigger(['videoPlayer', 'onSeek'], time);
     }
 
     function calculateOffset(element) {
@@ -281,9 +335,11 @@ function (bind) {
 
     function hideCaptions(hide_captions) {
         if (hide_captions) {
+            this.captionsHidden = true;
             this.videoCaption.hideSubtitlesEl.attr('title', 'Turn on captions');
             this.el.addClass('closed');
         } else {
+            this.captionsHidden = false;
             this.videoCaption.hideSubtitlesEl.attr('title', 'Turn off captions');
             this.el.removeClass('closed');
             this.videoCaption.scrollCaption();

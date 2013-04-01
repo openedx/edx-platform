@@ -10,8 +10,8 @@ mind, or whether to act, and in acting, to live."
 // VideoProgressSlider module.
 define(
 'videoalpha/display/video_progress_slider.js',
-['videoalpha/display/bind.js'],
-function (bind) {
+[],
+function () {
 
     // VideoProgressSlider() function - what this module "exports".
     return function (state) {
@@ -31,11 +31,11 @@ function (bind) {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoProgressSlider.onSlide        = bind(onSlide, state);
-        state.videoProgressSlider.onChange       = bind(onChange, state);
-        state.videoProgressSlider.onStop         = bind(onStop, state);
-        state.videoProgressSlider.updateTooltip  = bind(updateTooltip, state);
-        state.videoProgressSlider.updatePlayTime = bind(updatePlayTime, state);
+        state.videoProgressSlider.onSlide        = onSlide.bind(state);
+        state.videoProgressSlider.onChange       = onChange.bind(state);
+        state.videoProgressSlider.onStop         = onStop.bind(state);
+        state.videoProgressSlider.updateTooltip  = updateTooltip.bind(state);
+        state.videoProgressSlider.updatePlayTime = updatePlayTime.bind(state);
     }
 
     // function renderElements(state)
@@ -98,7 +98,7 @@ function (bind) {
         this.videoProgressSlider.frozen = true;
         this.videoProgressSlider.updateTooltip(ui.value);
 
-        this.trigger(['videoPlayer', 'onSeek'], ui.value, 'method');
+        this.trigger(['videoPlayer', 'onSeek'], ui.value);
     }
 
     function onChange(event, ui) {
@@ -112,7 +112,7 @@ function (bind) {
 
         this.videoProgressSlider.frozen = true;
 
-        this.trigger(['videoPlayer', 'onSeek'], ui.value, 'method');
+        this.trigger(['videoPlayer', 'onSeek'], ui.value);
 
         setTimeout(function() {
             _this.videoProgressSlider.frozen = false;

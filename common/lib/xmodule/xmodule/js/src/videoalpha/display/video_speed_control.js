@@ -3,8 +3,8 @@
 // VideoSpeedControl module.
 define(
 'videoalpha/display/video_speed_control.js',
-['videoalpha/display/bind.js'],
-function (bind) {
+[],
+function () {
 
     // VideoSpeedControl() function - what this module "exports".
     return function (state) {
@@ -24,9 +24,9 @@ function (bind) {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoSpeedControl.changeVideoSpeed = bind(changeVideoSpeed, state);
-        state.videoSpeedControl.setSpeed = bind(setSpeed, state);
-        state.videoSpeedControl.reRender = bind(reRender, state);
+        state.videoSpeedControl.changeVideoSpeed = changeVideoSpeed.bind(state);
+        state.videoSpeedControl.setSpeed = setSpeed.bind(state);
+        state.videoSpeedControl.reRender = reRender.bind(state);
     }
 
     // function renderElements(state)
@@ -113,7 +113,7 @@ function (bind) {
                 parseFloat(this.videoSpeedControl.currentSpeed).toFixed(2).replace(/\.00$/, '.0')
             );
 
-            this.trigger(['videoPlayer', 'onSpeedChange'], this.videoSpeedControl.currentSpeed, 'method');
+            this.trigger(['videoPlayer', 'onSpeedChange'], this.videoSpeedControl.currentSpeed);
         }
     }
 

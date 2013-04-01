@@ -1,16 +1,31 @@
+/**
+ * @file Initialize module works with the JSON config, and sets up various settings, parameters,
+ * variables. After all setup actions are performed, it invokes the video player to play the
+ * specified video. This module must be invoked first. It provides several functions which do not
+ * fit in with other modules.
+ *
+ * @external VideoPlayer
+ *
+ * @module Initialize
+ */
+
 (function (requirejs, require, define) {
 
-// Initialize module.
 define(
 'videoalpha/display/initialize.js',
-[
-    'videoalpha/display/bind.js',
-    'videoalpha/display/video_player.js'
-],
-function (bind, VideoPlayer) {
+['videoalpha/display/video_player.js'],
+function (VideoPlayer) {
 
-    // Initialize() function - what this module "exports".
+    /**
+     * @function
+     *
+     * Initialize module exports this function.
+     *
+     * @param {Object} state A place for all properties, and methods of Video Alpha.
+     * @param {DOM element} element Container of the entire Video Alpha DOM element.
+     */
     return function (state, element) {
+        checkForNativeFunctions();
         makeFunctionsPublic(state);
         renderElements(state, element);
     };
@@ -19,15 +34,19 @@ function (bind, VideoPlayer) {
     // Private functions start here.
     // ***************************************************************
 
-    // function makeFunctionsPublic(state)
-    //
-    //     Functions which will be accessible via 'state' object. When called, these functions will
-    //     get the 'state' object as a context.
+    /**
+     * @function makeFunctionsPublic
+     *
+     * Functions which will be accessible via 'state' object. When called, these functions will get the 'state'
+     * object as a context.
+     *
+     * @param {Object} state A place for all properties, and methods of Video Alpha.
+     */
     function makeFunctionsPublic(state) {
-        state.setSpeed    = bind(setSpeed, state);
-        state.youtubeId   = bind(youtubeId, state);
-        state.getDuration = bind(getDuration, state);
-        state.trigger     = bind(trigger, state);
+        state.setSpeed    = setSpeed.bind(state);
+        state.youtubeId   = youtubeId.bind(state);
+        state.getDuration = getDuration.bind(state);
+        state.trigger     = trigger.bind(state);
     }
 
     // function renderElements(state)
@@ -36,6 +55,8 @@ function (bind, VideoPlayer) {
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function renderElements(state, element) {
+        var onPlayerReadyFunc;
+
         // The parent element of the video, and the ID.
         state.el = $(element).find('.videoalpha');
         state.id = state.el.attr('id').replace(/video_/, '');
@@ -50,8 +71,7 @@ function (bind, VideoPlayer) {
 
             'caption_data_dir':   state.el.data('caption-data-dir'),
             'caption_asset_path': state.el.data('caption-asset-path'),
-            'show_captions':      (state.el.data('show-captions').toString() === 'true'),
-
+            'show_captions':      (state.el.data('show-captions').toString().toLowerCase === 'true'),
             'youtubeStreams':     state.el.data('streams'),
 
             'sub':                state.el.data('sub'),
@@ -61,7 +81,7 @@ function (bind, VideoPlayer) {
         };
 
         // Try to parse YouTube stream ID's. If
-        if (parseYoutubeStreams(state, state.config.youtubeStreams) === true) {
+        if (parseYoutubeStreams(state, state.config.youtubeStreams)) {
             state.videoType = 'youtube';
 
             fetchMetadata(state);
@@ -74,12 +94,14 @@ function (bind, VideoPlayer) {
 
             parseVideoSources(
                 state,
-                state.config.mp4Source,
-                state.config.webmSource,
-                state.config.oggSource
+                {
+                    'mp4': state.config.mp4Source,
+                    'webm': state.config.webmSource,
+                    'ogg': state.config.oggSource
+                }
             );
 
-            if ((typeof state.config.sub !== 'string') || (state.config.sub.length === 0)) {
+            if (!state.config.sub.length) {
                 state.config.sub = '';
                 state.config.show_captions = false;
             }
@@ -108,7 +130,7 @@ function (bind, VideoPlayer) {
         //     state.hide_captions = true | false
         //
         // represents the user's choice of having the subtitles shown or hidden. This choice is stored in cookies.
-        if (state.config.show_captions === true) {
+        if (state.config.show_captions) {
             state.hide_captions = ($.cookie('hide_captions') === 'true');
         } else {
             state.hide_captions = true;
@@ -141,6 +163,8 @@ function (bind, VideoPlayer) {
         // Possible value are: 'visible', 'hiding', and 'invisible'.
         state.controlState = 'visible';
         state.controlHideTimeout = null;
+        state.captionState = 'visible';
+        state.captionHideTimeout = null;
 
         // Launch embedding of actual video content, or set it up so that it will be done as soon as the
         // appropriate video player (YouTube or stand alone HTML5) is loaded, and can handle embedding.
@@ -152,17 +176,10 @@ function (bind, VideoPlayer) {
             ((state.videoType === 'youtube') && (window.YT) && (window.YT.Player)) ||
             (state.videoType === 'html5')
         ) {
-            embed(state);
+            VideoPlayer(state);
         } else {
-            if (state.videoType === 'youtube') {
-                window.onYouTubePlayerAPIReady = function() {
-                    embed(state);
-                };
-            } else { // if (state.videoType === 'html5') {
-                window.onHTML5PlayerAPIReady = function() {
-                    embed(state);
-                };
-            }
+            onPlayerReadyFunc = (state.videoType === 'youtube') ? 'onYouTubePlayerAPIReady' : 'onHTML5PlayerAPIReady';
+            window[onPlayerReadyFunc] = VideoPlayer.bind(window, state);
         }
     }
 
@@ -176,8 +193,10 @@ function (bind, VideoPlayer) {
     //     @return
     //         false: We don't have YouTube video IDs to work with; most likely we have HTML5 video sources.
     //         true: Parsing of YouTube video IDs went OK, and we can proceed onwards to play YouTube videos.
+
+
     function parseYoutubeStreams(state, youtubeStreams) {
-        if ((typeof youtubeStreams !== 'string') || (youtubeStreams.length === 0)) {
+        if (!youtubeStreams.length) {
             return false;
         }
 
@@ -199,18 +218,14 @@ function (bind, VideoPlayer) {
     //
     //     Take the HTML5 sources (URLs of videos), and make them available explictly for each type
     //     of video format (mp4, webm, ogg).
-    function parseVideoSources(state, mp4Source, webmSource, oggSource) {
+    function parseVideoSources(state, sources) {
         state.html5Sources = { 'mp4': null, 'webm': null, 'ogg': null };
 
-        if ((typeof mp4Source === 'string') && (mp4Source.length > 0)) {
-            state.html5Sources.mp4 = mp4Source;
-        }
-        if ((typeof webmSource === 'string') && (webmSource.length > 0)) {
-            state.html5Sources.webm = webmSource;
-        }
-        if ((typeof oggSource === 'string') && (oggSource.length > 0)) {
-            state.html5Sources.ogg = oggSource;
-        }
+        $.each(sources, function (name, source) {
+            if (source.length) {
+                state.html5Sources[name] = source;
+            }
+        });
     }
 
     // function fetchMetadata(state)
@@ -239,12 +254,38 @@ function (bind, VideoPlayer) {
         state.setSpeed($.cookie('video_speed'));
     }
 
-    // function embed(state)
-    //
-    //     This function is called when the current type of video player API becomes available.
-    //     It instantiates the core video module.
-    function embed(state) {
-        VideoPlayer(state);
+    function checkForNativeFunctions() {
+        // The bind function is a recent addition to ECMA-262, 5th edition; as such it may not be present in all
+        // browsers. You can partially work around this by inserting the following code at the beginning of your
+        // scripts, allowing use of much of the functionality of bind() in implementations that do not natively support
+        // it.
+        //
+        // https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/bind
+        if (!Function.prototype.bind) {
+            Function.prototype.bind = function (oThis) {
+                var aArgs, fToBind, fNOP, fBound;
+
+                if (typeof this !== 'function') {
+                    // closest thing possible to the ECMAScript 5 internal IsCallable function
+                    throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+                }
+
+                aArgs = Array.prototype.slice.call(arguments, 1);
+                fToBind = this;
+                fNOP = function () {};
+                fBound = function () {
+                    return fToBind.apply(
+                        this instanceof fNOP && oThis ? this : oThis,
+                        aArgs.concat(Array.prototype.slice.call(arguments))
+                    );
+                };
+
+                fNOP.prototype = this.prototype;
+                fBound.prototype = new fNOP();
+
+                return fBound;
+            };
+        }
     }
 
     // ***************************************************************
@@ -260,7 +301,7 @@ function (bind, VideoPlayer) {
             this.speed = '1.0';
         }
 
-        if (updateCookie !== false) {
+        if (updateCookie) {
             $.cookie('video_speed', this.speed, {
                 'expires': 3650,
                 'path': '/'
@@ -281,7 +322,8 @@ function (bind, VideoPlayer) {
      *     'event'
      *     'method'
      *
-     * Based on this parameter, this function can be used in two ways.
+     *  The default value (if @callType and @eventName are not specified) is 'method'. Based on this parameter, this
+     *  function can be used in two ways.
      *
      *
      *
@@ -337,16 +379,20 @@ function (bind, VideoPlayer) {
         // object/function to trigger/invoke. If the 'objChain' chain of object is
         // incorrect (one of the link is non-existent), then the loop will immediately
         // exit.
-        while (objChain.length > 0) {
+        while (objChain.length) {
             i = objChain.shift();
 
-            if (tmpObj.hasOwnProperty(i) === true) {
+            if (tmpObj.hasOwnProperty(i)) {
                 tmpObj = tmpObj[i];
             } else {
                 // An incorrect object chain was specified.
 
                 return false;
             }
+        }
+
+        if ((typeof callType === 'undefined') && (typeof eventName === 'undefined')) {
+            callType = 'method';
         }
 
         // Based on the type, either trigger, or invoke.
