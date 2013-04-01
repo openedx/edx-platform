@@ -905,6 +905,66 @@ class CustomResponseTest(ResponseTest):
             problem.grade_answers({'1_2_1': '42'})
 
 
+    def test_module_imports_inline(self):
+        '''
+        Check that the correct modules are available to custom
+        response scripts
+        '''
+
+        for module_name in ['random', 'numpy', 'math', 'scipy', 
+                            'calc', 'eia', 'chemcalc', 'chemtools',
+                            'miller', 'draganddrop']:
+
+            # Create a script that checks that the name is defined
+            # If the name is not defined, then the script
+            # will raise an exception
+            script = textwrap.dedent('''
+            correct[0] = 'correct'
+            assert('%s' in globals())''' % module_name)
+             
+            # Create the problem
+            problem = self.build_problem(answer=script)
+
+            # Expect that we can grade an answer without 
+            # getting an exception
+            try:
+                problem.grade_answers({'1_2_1': '42'})
+
+            except ResponseError:
+                self.fail("Could not use name '%s' in custom response" 
+                            % module_name)
+        
+    def test_module_imports_function(self):
+        '''
+        Check that the correct modules are available to custom
+        response scripts
+        '''
+
+        for module_name in ['random', 'numpy', 'math', 'scipy', 
+                            'calc', 'eia', 'chemcalc', 'chemtools',
+                            'miller', 'draganddrop']:
+
+            # Create a script that checks that the name is defined
+            # If the name is not defined, then the script
+            # will raise an exception
+            script = textwrap.dedent('''
+            def check_func(expect, answer_given):
+                assert('%s' in globals())
+                return True''' % module_name)
+             
+            # Create the problem
+            problem = self.build_problem(script=script, cfn="check_func")
+
+            # Expect that we can grade an answer without 
+            # getting an exception
+            try:
+                problem.grade_answers({'1_2_1': '42'})
+
+            except ResponseError:
+                self.fail("Could not use name '%s' in custom response" 
+                            % module_name)
+
+
 class SchematicResponseTest(ResponseTest):
     from response_xml_factory import SchematicResponseXMLFactory
     xml_factory_class = SchematicResponseXMLFactory
