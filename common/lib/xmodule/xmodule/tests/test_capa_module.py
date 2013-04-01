@@ -890,31 +890,60 @@ class CapaModuleTest(unittest.TestCase):
             self.assertEqual(seed, module.seed)
 
     def test_random_seed_with_reset(self):
-        rerandomize_options = ['never', 'per_student', 'always', 'onreset']
+        
+        def _reset_and_get_seed(module):
+            '''
+            Reset the XModule and return the module's seed
+            '''
 
-        for rerandomize in rerandomize_options:
+            # Simulate submitting an attempt
+            module.done = True
+
+            # Reset the problem
+            module.reset_problem({})
+
+            # Get return the seed
+            return module.seed
+
+        def _retry_and_check(num_tries, test_func):
+            '''
+            Returns True if *test_func* was successful
+            (returned True) within *num_tries* attempts
+
+            *test_func* must be a function 
+            of the form test_func() -> bool
+            '''
+            success = False
+            for i in range(num_tries):
+                if test_func() is True:
+                    success = True
+                    break
+            return success
+
+        # Run the test for each possible rerandomize value
+        for rerandomize in ['never', 'per_student', 'always', 'onreset']:
             module = CapaFactory.create(rerandomize=rerandomize)
 
             # Get the seed
             seed = module.lcp.seed
-
-            # Reset the problem
-            module.reset_problem({})
 
             # We do NOT want the seed to reset if rerandomize
             # is set to 'never' -- it should still be 1
             # The seed also stays the same if we're randomizing
             # 'per_student': the same student should see the same problem
             if rerandomize in ['never', 'per_student']:
-                self.assertEqual(seed, module.seed)
+                self.assertEqual(seed, _reset_and_get_seed(module))
 
             # Otherwise, we expect the seed to change
             # to another valid seed
             else:
-                
-                # After we save, the seed is stored in the module
-                get_request_dict = { CapaFactory.input_key(): '3.14'}
-                module.save_problem(get_request_dict)
 
-                self.assertEqual(seed, module.seed)
-                self.assertTrue(module.seed is not None)
+                # Since there's a small chance we might get the
+                # same seed again, give it 5 chances
+                # to generate a different seed
+                success = _retry_and_check(5, 
+                                lambda: _reset_and_get_seed(module) != seed)
+                
+                self.assertTrue(module.seed != None)
+                msg = 'Could not get a new seed from reset after 5 tries'
+                self.assertTrue(success, msg)
