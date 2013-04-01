@@ -361,7 +361,7 @@ def validate_no_non_editable_metadata(module_store, course_id, category, allowed
     Assert that there is no metadata within a particular category that we can't support editing
     However we always allow display_name and 'xml_attribtues'
     '''
-    allowed = allowed + ['xml_attributes', 'display_name']
+    _allowed = allowed + ['xml_attributes', 'display_name']
 
     err_cnt = 0
     for module_loc in module_store.modules[course_id]:
@@ -369,7 +369,7 @@ def validate_no_non_editable_metadata(module_store, course_id, category, allowed
         if module.location.category == category:
             my_metadata = dict(own_metadata(module))
             for key in my_metadata.keys():
-                if key not in allowed:
+                if key not in _allowed:
                     err_cnt = err_cnt + 1
                     print ': found metadata on {0}. Studio will not support editing this piece of metadata, so it is not allowed. Metadata: {1} = {2}'. format(module.location.url(), key, my_metadata[key])
 
