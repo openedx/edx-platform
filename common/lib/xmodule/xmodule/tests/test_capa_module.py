@@ -868,9 +868,7 @@ class CapaModuleTest(unittest.TestCase):
             module = CapaFactory.create(rerandomize=rerandomize)
 
             # Get the seed
-            # module.seed isn't set until the problem is checked/saved,
-            # so we access the capa problem seed directly
-            seed = module.lcp.seed
+            seed = module.seed
             self.assertTrue(seed is not None)
 
             # If we're not rerandomizing, the seed is always set
@@ -930,9 +928,7 @@ class CapaModuleTest(unittest.TestCase):
             module = CapaFactory.create(rerandomize=rerandomize)
 
             # Get the seed
-            # module.seed isn't set until we check/save/reset the problem,
-            # so we access the capa problem seed directly
-            seed = module.lcp.seed
+            seed = module.seed
 
             # We do NOT want the seed to reset if rerandomize
             # is set to 'never' -- it should still be 1
