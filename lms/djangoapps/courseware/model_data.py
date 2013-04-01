@@ -241,9 +241,10 @@ class ModelDataCache(object):
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
                 student=self.user,
-                module_type=key.block_scope_id.category,
                 module_state_key=key.block_scope_id.url(),
-                defaults={'state': json.dumps({})},
+                defaults={'state': json.dumps({}),
+                          'module_type': key.block_scope_id.category,
+                         },
             )
         elif key.scope == Scope.content:
             field_object, _ = XModuleContentField.objects.get_or_create(
