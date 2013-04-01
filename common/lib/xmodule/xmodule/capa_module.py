@@ -9,7 +9,8 @@ import sys
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
-from capa.responsetypes import StudentInputError
+from capa.responsetypes import StudentInputError,\
+    ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.x_module import XModule
