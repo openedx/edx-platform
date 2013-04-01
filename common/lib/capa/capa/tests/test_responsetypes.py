@@ -13,6 +13,8 @@ import textwrap
 from . import test_system
 
 import capa.capa_problem as lcp
+from capa.responsetypes import LoncapaProblemError, \
+                            StudentInputError, ResponseError
 from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat
@@ -864,7 +866,7 @@ class CustomResponseTest(ResponseTest):
         # Message is interpreted as an "overall message"
         self.assertEqual(correct_map.get_overall_message(), 'Message text')
 
-    def test_script_exception(self):
+    def test_script_exception_function(self):
 
         # Construct a script that will raise an exception
         script = textwrap.dedent("""
@@ -875,7 +877,17 @@ class CustomResponseTest(ResponseTest):
         problem = self.build_problem(script=script, cfn="check_func")
 
         # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(Exception):
+        with self.assertRaises(ResponseError):
+            problem.grade_answers({'1_2_1': '42'})
+
+    def test_script_exception_inline(self):
+
+        # Construct a script that will raise an exception
+        script = 'raise Exception("Test")'
+        problem = self.build_problem(answer=script)
+
+        # Expect that an exception gets raised when we check the answer
+        with self.assertRaises(ResponseError):
             problem.grade_answers({'1_2_1': '42'})
 
     def test_invalid_dict_exception(self):
@@ -889,7 +901,7 @@ class CustomResponseTest(ResponseTest):
         problem = self.build_problem(script=script, cfn="check_func")
 
         # Expect that an exception gets raised when we check the answer
-        with self.assertRaises(Exception):
+        with self.assertRaises(ResponseError):
             problem.grade_answers({'1_2_1': '42'})
 
 
@@ -921,6 +933,18 @@ class SchematicResponseTest(ResponseTest):
         # (That is, our script verifies that the context
         # is what we expect)
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+
+    def test_script_exception(self):
+
+        # Construct a script that will raise an exception
+        script = "raise Exception('test')"
+        problem = self.build_problem(answer=script)
+
+        # Expect that an exception gets raised when we check the answer
+        with self.assertRaises(ResponseError):
+            submission_dict = {'test': 'test'}
+            input_dict = {'1_2_1': json.dumps(submission_dict)}
+            problem.grade_answers(input_dict)
 
 
 class AnnotationResponseTest(ResponseTest):
