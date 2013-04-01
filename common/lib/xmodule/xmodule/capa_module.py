@@ -151,6 +151,16 @@ class CapaModule(CapaFields, XModule):
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
             self.lcp = self.new_lcp(self.get_state_for_lcp())
+
+            # At this point, we need to persist the randomization seed
+            # so that when the problem is re-loaded (to check/view/save)
+            # it stays the same.
+            # However, we do not want to write to the database
+            # every time the module is loaded.
+            # So we set the seed ONLY when there is not one set already
+            if self.seed is None:
+                self.seed = self.lcp.seed
+
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
