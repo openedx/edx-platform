@@ -8,6 +8,7 @@ from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -299,6 +300,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
                           course_id=course_id,
                           open_ended_grading_interface=open_ended_grading_interface,
                           s3_interface=s3_interface,
+                          cache=cache,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)

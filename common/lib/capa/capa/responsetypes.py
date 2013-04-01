@@ -938,7 +938,7 @@ class CustomResponse(LoncapaResponse):
                             'ans': ans,
                         }
                         globals_dict.update(kwargs)
-                        safe_exec.safe_exec(code, globals_dict)
+                        safe_exec.safe_exec(code, globals_dict, cache=self.system.cache)
                         return globals_dict['cfn_return']
                     return check_function
 
@@ -1055,7 +1055,7 @@ class CustomResponse(LoncapaResponse):
         # exec the check function
         if isinstance(self.code, basestring):
             try:
-                safe_exec.safe_exec(self.code, self.context)
+                safe_exec.safe_exec(self.code, self.context, cache=self.system.cache)
             except Exception as err:
                 self._handle_exec_exception(err)
 
@@ -1783,7 +1783,7 @@ class SchematicResponse(LoncapaResponse):
             json.loads(student_answers[k]) for k in sorted(self.answer_ids)
         ]
         self.context.update({'submission': submission})
-        safe_exec.safe_exec(self.code, self.context)
+        safe_exec.safe_exec(self.code, self.context, cache=self.system.cache)
         cmap = CorrectMap()
         cmap.set_dict(dict(zip(sorted(self.answer_ids), self.context['correct'])))
         return cmap
