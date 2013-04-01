@@ -62,7 +62,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
               <p>
                 ${section['format']}
 
-                %if 'due' in section and section['due']!="":
+                %if 'due' in section and section['due']:
                   <em>
                   due ${get_default_time_display(section['due'])}
                   </em>
