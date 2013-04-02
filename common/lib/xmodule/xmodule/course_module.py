@@ -544,7 +544,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         except (ValueError, AttributeError):
             start = time_to_datetime(self.start)
 
-        now = time_to_datetime(time.gmtime())
+        now = datetime.utcnow()
 
         return announcement, start, now
 
