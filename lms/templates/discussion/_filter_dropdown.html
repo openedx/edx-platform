@@ -33,6 +33,14 @@
                 <span class="board-name" data-discussion_id='#all'>Show All Discussions</span>
             </a>
         </li>
+        %if flag_moderator:
+        <li>
+            <a href="#">
+                <span class="board-name" data-discussion_id='#flagged'>Show Flagged Discussions</span>
+            </a>
+        </li>
+        
+        %endif
         <li>
             <a href="#">
                 <span class="board-name" data-discussion_id='#following'>Following</span>

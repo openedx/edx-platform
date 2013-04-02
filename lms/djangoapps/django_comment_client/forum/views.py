@@ -42,7 +42,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         'course_id': course_id,
         'user_id': request.user.id,
     }
-
+    
     if not request.GET.get('sort_key'):
         # If the user did not select a sort key, use their last used sort key
         cc_user = cc.User.from_django_user(request.user)
@@ -79,7 +79,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                               strip_none(extract(request.GET,
                                                  ['page', 'sort_key',
                                                   'sort_order', 'text',
-                                                  'tags', 'commentable_ids'])))
+                                                  'tags', 'commentable_ids', 'flagged'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
 
@@ -218,6 +218,7 @@ def forum_form_discussion(request, course_id):
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'thread_pages': query_params['num_pages'],
             'user_info': saxutils.escape(json.dumps(user_info), escapedict),
+            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course_id': course.id,
             'category_map': category_map,

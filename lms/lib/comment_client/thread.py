@@ -33,6 +33,7 @@ class Thread(models.Model):
                           'course_id': query_params['course_id'],
                           'recursive': False}
         params = merge_dict(default_params, strip_blank(strip_none(query_params)))
+        
         if query_params.get('text') or query_params.get('tags') or query_params.get('commentable_ids'):
             url = cls.url(action='search')
         else:
@@ -55,6 +56,7 @@ class Thread(models.Model):
 
     @classmethod
     def url(cls, action, params={}):
+        
         if action in ['get_all', 'post']:
             return cls.url_for_threads(params)
         elif action == 'search':
