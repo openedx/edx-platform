@@ -4,7 +4,7 @@
 .wrapper-footer {
   position: relative;
   width: 100%;
-  margin: ($baseline*1.5) 0 $baseline 0;
+  margin: 0 0 $baseline 0;
   padding: $baseline;
 
   footer.primary {
@@ -14,8 +14,6 @@
     min-width: $fg-min-width;
     width: flex-grid(12);
     margin: 0 auto;
-    border-top: 1px solid $gray-l4;
-    padding: $baseline 0 0 0;
     color: $gray-l1;
 
     .colophon {

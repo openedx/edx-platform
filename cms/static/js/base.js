@@ -460,15 +460,29 @@ function onKeyUp(e) {
 
 function toggleSock(e) {
    e.preventDefault();
-   $body.toggleClass('sock-is-shown');
+
+   var $btnLabel = $(this).find('.copy');
+   var $sock = $('.wrapper-sock');
+   var $sockContent = $sock.find('.wrapper-inner');
+
+   $sock.toggleClass('is-shown');
+   $sockContent.toggle('fast');
 
    $.smoothScroll({ 
        offset: -200, 
        easing: 'swing', 
        speed: 1000,
        scrollElement: null,
-       scrollTarget: $('.wrapper-sock')
+       scrollTarget: $sock
    });
+
+   if($sock.hasClass('is-shown')) {
+    $btnLabel.text('Hide Studio Help');
+   }
+
+   else {
+    $btnLabel.text('Looking for Help with Studio?');
+   }
 }
 
 function toggleSubmodules(e) {
