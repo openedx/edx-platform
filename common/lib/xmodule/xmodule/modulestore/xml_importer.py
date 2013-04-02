@@ -356,12 +356,12 @@ def remap_namespace(module, target_location_namespace):
 
     return module
 
-def validate_no_non_editable_metadata(module_store, course_id, category, allowed=[]):
+def validate_no_non_editable_metadata(module_store, course_id, category, allowed=None):
     '''
     Assert that there is no metadata within a particular category that we can't support editing
-    However we always allow display_name and 'xml_attribtues'
+    However we always allow 'display_name' and 'xml_attribtues'
     '''
-    _allowed = allowed + ['xml_attributes', 'display_name']
+    _allowed = (allowed if allowed is not None else []) + ['xml_attributes', 'display_name']
 
     err_cnt = 0
     for module_loc in module_store.modules[course_id]:
