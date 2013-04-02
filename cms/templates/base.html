@@ -51,21 +51,15 @@
           document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
     </script>
 
-    <div class="wrapper-view wrapper">
-        <%include file="widgets/header.html" />
-        
-        <div class="wrapper-main wrapper">
-            <%block name="content"></%block>
-            % if user.is_authenticated():
-            <%include file="widgets/sock.html" />          
-            % endif
-        </div>
-        
-        <div class="wrapper-bottom wrapper">
-            <%include file="widgets/footer.html" />                
-        </div>
-    </div>
-
+    <%include file="widgets/header.html" />
+    
+    <%block name="content"></%block>
+    
+    % if user.is_authenticated():
+    <%include file="widgets/sock.html" />
+    % endif
+    
+    <%include file="widgets/footer.html" />
     <%include file="widgets/tender.html" />
     <%block name="jsextra"></%block>
   </body>

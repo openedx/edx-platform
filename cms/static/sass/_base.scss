@@ -50,27 +50,8 @@ h1 {
 
 // ====================
 
-// layout - overall view
-.wrapper-view {
-  min-height: 100%;
-  position: relative;
-}
-
-.wrapper-main {
-  background: $gray-l5;
-  margin: ($baseline*1.5) 0 0 0;
-  padding-bottom: $bottom-height;
-}
-
-.wrapper-bottom {
-  position: absolute;
-  bottom: 0;
-  height: $bottom-height;
-}
-
 // layout - basic page header
 .wrapper-mast {
-  margin: 0;
   padding: 0 $baseline;
   position: relative;
   
@@ -81,7 +62,7 @@ h1 {
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
-    margin: 0 auto $baseline auto;
+    margin: ($baseline*1.5) auto $baseline auto;
     color: $gray-d2;
   }
 
