@@ -6,6 +6,7 @@ forums, and to the cohort admin views.
 from django.contrib.auth.models import User
 from django.http import Http404
 import logging
+import random
 
 from courseware import courses
 from student.models import get_user_by_username_or_email
@@ -13,6 +14,24 @@ from .models import CourseUserGroup
 
 log = logging.getLogger(__name__)
 
+
+# tl;dr: global state is bad.  capa reseeds random every time a problem is loaded.  Even
+# if and when that's fixed, it's a good idea to have a local generator to avoid any other
+# code that messes with the global random module.
+_local_random = None
+
+def local_random():
+    """
+    Get the local random number generator.  In a function so that we don't run
+    random.Random() at import time.
+    """
+    # ironic, isn't it?
+    global _local_random
+    
+    if _local_random is None:
+        _local_random = random.Random()
+
+    return _local_random
 
 def is_course_cohorted(course_id):
     """
@@ -65,6 +84,22 @@ def is_commentable_cohorted(course_id, commentable_id):
     return ans
 
 
+def get_cohorted_commentables(course_id):
+    """
+    Given a course_id return a list of strings representing cohorted commentables
+    """
+
+    course = courses.get_course_by_id(course_id)
+
+    if not course.is_cohorted:
+        # this is the easy case :)
+        ans = []
+    else:
+        ans = course.cohorted_discussions
+
+    return ans
+
+
 def get_cohort(user, course_id):
     """
     Given a django User and a course_id, return the user's cohort in that
@@ -96,8 +131,31 @@ def get_cohort(user, course_id):
                                             group_type=CourseUserGroup.COHORT,
                                             users__id=user.id)
     except CourseUserGroup.DoesNotExist:
-        # TODO: add auto-cohorting logic here once we know what that will be.
+        # Didn't find the group.  We'll go on to create one if needed.
+        pass
+
+    if not course.auto_cohort:
         return None
+
+    choices = course.auto_cohort_groups
+    n = len(choices)
+    if n == 0:
+        # Nowhere to put user
+        log.warning("Course %s is auto-cohorted, but there are no"
+                    " auto_cohort_groups specified",
+                    course_id)
+        return None
+
+    # Put user in a random group, creating it if needed
+    group_name = local_random().choice(choices)
+
+    group, created = CourseUserGroup.objects.get_or_create(
+        course_id=course_id,
+        group_type=CourseUserGroup.COHORT,
+        name=group_name)
+
+    user.course_groups.add(group)
+    return group
 
 
 def get_course_cohorts(course_id):

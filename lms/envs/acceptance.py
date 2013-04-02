@@ -8,16 +8,32 @@ from .test import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
-# Show the courses that are in the data directory
-COURSES_ROOT = ENV_ROOT / "data"
-DATA_DIR = COURSES_ROOT
+# Use the mongo store for acceptance tests
+modulestore_options = {
+    'default_class': 'xmodule.raw_module.RawDescriptor',
+    'host': 'localhost',
+    'db': 'test_xmodule',
+    'collection': 'modulestore',
+    'fs_root': GITHUB_REPO_ROOT,
+    'render_template': 'mitxmako.shortcuts.render_to_string',
+}
+
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': DATA_DIR,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        }
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': modulestore_options
+    },
+    'direct': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': modulestore_options
+    }
+}
+
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db': 'test_xcontent',
     }
 }
 
@@ -32,10 +48,22 @@ DATABASES = {
     }
 }
 
+# Set up XQueue information so that the lms will send
+# requests to a mock XQueue server running locally
+XQUEUE_PORT = 8027
+XQUEUE_INTERFACE = {
+    "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
+    "django_auth": {
+        "username": "lms",
+        "password": "***REMOVED***"
+    },
+    "basic_auth": ('anant', 'agarwal'),
+}
+
 # Do not display the YouTube videos in the browser while running the
 # acceptance tests. This makes them faster and more reliable
 MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('portal',)  # dummy app covers the home page, login, registration, and course enrollment
+LETTUCE_APPS = ('courseware',)

@@ -2,10 +2,19 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Export</%block>
-<%block name="bodyclass">export</%block>
+<%block name="title">Course Export</%block>
+<%block name="bodyclass">is-signedin course tools export</%block>
 
 <%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-subtitle">
+    <div class="title">
+      <span class="title-sub">Tools</span>
+      <h1 class="title-1">Course Export</h1>
+    </div>
+  </header>
+</div>
+
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <article class="export-overview">

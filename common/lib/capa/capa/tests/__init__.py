@@ -2,7 +2,7 @@ import fs
 import fs.osfs
 import os
 
-from mock import Mock
+from mock import Mock, MagicMock
 
 import xml.sax.saxutils as saxutils
 
@@ -16,6 +16,11 @@ def tst_render_template(template, context):
     """
     return '<div>{0}</div>'.format(saxutils.escape(repr(context)))
 
+def calledback_url(dispatch = 'score_update'):
+    return dispatch
+
+xqueue_interface = MagicMock()
+xqueue_interface.send_to_queue.return_value = (0, 'Success!')
 
 test_system = Mock(
     ajax_url='courses/course_id/modx/a_location',
@@ -26,7 +31,7 @@ test_system = Mock(
     user=Mock(),
     filestore=fs.osfs.OSFS(os.path.join(TEST_DIR, "test_files")),
     debug=True,
-    xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10},
+    xqueue={'interface': xqueue_interface, 'construct_callback': calledback_url, 'default_queuename': 'testqueue', 'waittime': 10},
     node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
     anonymous_student_id='student'
 )

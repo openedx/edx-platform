@@ -1,0 +1,10 @@
+<section>
+    <div class="grader-feedback">
+        ${rubric_feedback | n}
+        % if grader_type=="PE":
+            <div class="result-output">
+                ${ feedback | n}
+            </div>
+        % endif
+    </div>
+</section>

@@ -1,14 +1,69 @@
 class @Rubric
   constructor: () ->
 
+  @initialize: (location) ->
+    $('.rubric').data("location", location) 
+    $('input[class="score-selection"]').change @tracking_callback
+    # set up the hotkeys
+    $(window).unbind('keydown', @keypress_callback)
+    $(window).keydown @keypress_callback
+    # display the 'current' carat
+    @categories = $('.rubric-category')
+    @category = $(@categories.first())
+    @category.prepend('> ')
+    @category_index = 0
+    
+    
+  @keypress_callback: (event) =>
+    # don't try to do this when user is typing in a text input
+    if $(event.target).is('input, textarea')
+      return
+    # for when we select via top row
+    if event.which >= 48 and event.which <= 57
+      selected = event.which - 48
+    # for when we select via numpad
+    else if event.which >= 96 and event.which <= 105
+      selected = event.which - 96
+    # we don't want to do anything since we haven't pressed a number
+    else
+      return
+
+    # if we actually have a current category (not past the end)
+    if(@category_index <= @categories.length)
+      # find the valid selections for this category
+      inputs = $("input[name='score-selection-#{@category_index}']")
+      max_score = inputs.length - 1
+
+      if selected > max_score or selected < 0
+        return
+      inputs.filter("input[value=#{selected}]").click()
+
+      # move to the next category
+      old_category_text = @category.html().substring(5)
+      @category.html(old_category_text)
+      @category_index++
+      @category = $(@categories[@category_index])
+      @category.prepend('> ')
+    
+  @tracking_callback: (event) ->
+    target_selection = $(event.target).val()
+    # chop off the beginning of the name so that we can get the number of the category
+    category = $(event.target).data("category")
+    location = $('.rubric').data('location')
+    # probably want the original problem location as well
+
+    data = {location: location, selection: target_selection, category: category}
+    Logger.log 'rubric_select', data
+
+
   # finds the scores for each rubric category
   @get_score_list: () =>
     # find the number of categories:
-    num_categories = $('table.rubric tr').length
+    num_categories = $('.rubric-category').length
 
     score_lst = []
     # get the score for each one
-    for i in [0..(num_categories-2)]
+    for i in [0..(num_categories-1)]
       score = $("input[name='score-selection-#{i}']:checked").val()
       score_lst.push(score)
 
@@ -23,9 +78,8 @@ class @Rubric
 
   @check_complete: () ->
      # check to see whether or not any categories have not been scored
-    num_categories = $('table.rubric tr').length
-    # -2 because we want to skip the header
-    for i in [0..(num_categories-2)]
+    num_categories = $('.rubric-category').length
+    for i in [0..(num_categories-1)]
       score = $("input[name='score-selection-#{i}']:checked").val()
       if score == undefined
         return false
@@ -35,6 +89,7 @@ class @CombinedOpenEnded
   constructor: (element) ->
     @element=element
     @reinitialize(element)
+    $(window).keydown @keydown_handler
 
   reinitialize: (element) ->
     @wrapper=$(element).find('section.xmodule_CombinedOpenEndedModule')
@@ -46,15 +101,22 @@ class @CombinedOpenEnded
     @task_count = @el.data('task-count')
     @task_number = @el.data('task-number')
     @accept_file_upload = @el.data('accept-file-upload')
+    @location = @el.data('location')
+    # set up handlers for click tracking
+    Rubric.initialize(@location)
 
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
     @reset_button.click @reset
     @next_problem_button = @$('.next-step-button')
     @next_problem_button.click @next_problem
+    @status_container = @$('.status-elements')
 
     @show_results_button=@$('.show-results-button')
     @show_results_button.click @show_results
+
+    @question_header = @$('.question-header')
+    @question_header.click @collapse_question
 
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
     Collapsible.setCollapsibles(@el)
@@ -62,12 +124,16 @@ class @CombinedOpenEnded
     @submit_evaluation_button.click @message_post
 
     @results_container = $('.result-container')
+    @combined_rubric_container = $('.combined-rubric-container')
+
+    @legend_container= $('.legend-container')
+    @show_legend_current()
 
     # Where to put the rubric once we load it
     @el = $(element).find('section.open-ended-child')
     @errors_area = @$('.error')
     @answer_area = @$('textarea.answer')
-
+    @prompt_container = @$('.prompt')
     @rubric_wrapper = @$('.rubric-wrapper')
     @hint_wrapper = @$('.hint-wrapper')
     @message_wrapper = @$('.message-wrapper')
@@ -82,10 +148,21 @@ class @CombinedOpenEnded
     @can_upload_files = false
     @open_ended_child= @$('.open-ended-child')
 
+    @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
+
+    if @task_number>1
+      @prompt_hide()
+    else if @task_number==1 and @child_state!='initial'
+      @prompt_hide()
+
     @find_assessment_elements()
     @find_hint_elements()
 
     @rebind()
+
+    if @task_number>1
+      @show_combined_rubric_current()
+      @show_results_current()
 
   # locally scoped jquery.
   $: (selector) ->
@@ -100,9 +177,12 @@ class @CombinedOpenEnded
         @submit_evaluation_button = $('.submit-evaluation-button')
         @submit_evaluation_button.click @message_post
         Collapsible.setCollapsibles(@results_container)
+        # make sure we still have click tracking
+        $('.evaluation-response a').click @log_feedback_click
+        $('input[name="evaluation-score"]').change @log_feedback_selection
 
   show_results: (event) =>
-    status_item = $(event.target).parent().parent()
+    status_item = $(event.target).parent()
     status_number = status_item.data('status-number')
     data = {'task_number' : status_number}
     $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
@@ -115,8 +195,28 @@ class @CombinedOpenEnded
       else
         @gentle_alert response.error
 
+  show_combined_rubric_current: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_combined_rubric", data, (response) =>
+      if response.success
+        @combined_rubric_container.after(response.html).remove()
+        @combined_rubric_container= $('div.combined_rubric_container')
+
+  show_status_current: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_status", data, (response) =>
+      if response.success
+        @status_container.after(response.html).remove()
+        @status_container= $('.status-elements')
+
+  show_legend_current: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_legend", data, (response) =>
+      if response.success
+        @legend_container.after(response.html).remove()
+        @legend_container= $('.legend-container')
+
   message_post: (event)=>
-    Logger.log 'message_post', @answers
     external_grader_message=$(event.target).parent().parent().parent()
     evaluation_scoring = $(event.target).parent()
 
@@ -145,6 +245,7 @@ class @CombinedOpenEnded
         $('section.evaluation').slideToggle()
         @message_wrapper.html(response.message_html)
 
+
     $.ajaxWithPrefix("#{@ajax_url}/save_post_assessment", settings)
 
 
@@ -156,6 +257,11 @@ class @CombinedOpenEnded
     @next_problem_button.hide()
     @hide_file_upload()
     @hint_area.attr('disabled', false)
+    if @task_number>1 or @child_state!='initial'
+      @show_status_current()
+
+    if @task_number==1 and @child_state=='assessing'
+      @prompt_hide()
     if @child_state == 'done'
       @rubric_wrapper.hide()
     if @child_type=="openended"
@@ -241,6 +347,7 @@ class @CombinedOpenEnded
           if response.success
             @rubric_wrapper.html(response.rubric_html)
             @rubric_wrapper.show()
+            Rubric.initialize(@location)
             @answer_area.html(response.student_response)
             @child_state = 'assessing'
             @find_assessment_elements()
@@ -251,13 +358,19 @@ class @CombinedOpenEnded
       $.ajaxWithPrefix("#{@ajax_url}/save_answer",settings)
 
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
+
+  keydown_handler: (e) =>
+    # only do anything when the key pressed is the 'enter' key
+    if e.which == 13 && @child_state == 'assessing' && Rubric.check_complete()
+      @save_assessment(e)
 
   save_assessment: (event) =>
     event.preventDefault()
     if @child_state == 'assessing' && Rubric.check_complete()
       checked_assessment = Rubric.get_total_score()
-      data = {'assessment' : checked_assessment}
+      score_list = Rubric.get_score_list()
+      data = {'assessment' : checked_assessment, 'score_list' : score_list}
       $.postWithPrefix "#{@ajax_url}/save_assessment", data, (response) =>
         if response.success
           @child_state = response.state
@@ -267,13 +380,12 @@ class @CombinedOpenEnded
             @find_hint_elements()
           else if @child_state == 'done'
             @rubric_wrapper.hide()
-            @message_wrapper.html(response.message_html)
 
           @rebind()
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   save_hint:  (event) =>
     event.preventDefault()
@@ -288,7 +400,7 @@ class @CombinedOpenEnded
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   skip_post_assessment: =>
     if @child_state == 'post_assessment'
@@ -300,7 +412,7 @@ class @CombinedOpenEnded
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   reset: (event) =>
     event.preventDefault()
@@ -320,7 +432,7 @@ class @CombinedOpenEnded
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   next_problem: =>
     if @child_state == 'done'
@@ -343,7 +455,7 @@ class @CombinedOpenEnded
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   gentle_alert: (msg) =>
     if @el.find('.open-ended-alert').length
@@ -362,18 +474,18 @@ class @CombinedOpenEnded
     $.postWithPrefix "#{@ajax_url}/check_for_score", (response) =>
       if response.state == "done" or response.state=="post_assessment"
         delete window.queuePollerID
-        location.reload()
+        @reload()
       else
         window.queuePollerID = window.setTimeout(@poll, 10000)
 
   setup_file_upload: =>
-    if window.File and window.FileReader and window.FileList and window.Blob
-        if @accept_file_upload == "True"
-          @can_upload_files = true
-          @file_upload_area.html('<input type="file" class="file-upload-box">')
-          @file_upload_area.show()
-    else
-      @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
+    if @accept_file_upload == "True"
+      if window.File and window.FileReader and window.FileList and window.Blob
+        @can_upload_files = true
+        @file_upload_area.html('<input type="file" class="file-upload-box">')
+        @file_upload_area.show()
+      else
+        @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
 
   hide_file_upload: =>
     if @accept_file_upload == "True"
@@ -390,3 +502,40 @@ class @CombinedOpenEnded
   # wrap this so that it can be mocked
   reload: ->
     location.reload()
+
+  collapse_question: () =>
+    @prompt_container.slideToggle()
+    @prompt_container.toggleClass('open')
+    if @question_header.text() == "(Hide)"
+      new_text = "(Show)"
+      Logger.log 'oe_hide_question', {location: @location}
+    else
+      Logger.log 'oe_show_question', {location: @location}
+      new_text = "(Hide)"
+    @question_header.text(new_text)
+
+  prompt_show: () =>
+    if @prompt_container.is(":hidden")==true
+      @prompt_container.slideToggle()
+      @prompt_container.toggleClass('open')
+      @question_header.text("(Hide)")
+
+  prompt_hide: () =>
+    if @prompt_container.is(":visible")==true
+      @prompt_container.slideToggle()
+      @prompt_container.toggleClass('open')
+      @question_header.text("(Show)")
+
+  log_feedback_click: (event) ->
+    link_text = $(event.target).html()
+    if link_text == 'See full feedback'
+      Logger.log 'oe_show_full_feedback', {}
+    else if link_text == 'Respond to Feedback'
+      Logger.log 'oe_show_respond_to_feedback', {}
+    else
+      generated_event_type = link_text.toLowerCase().replace(" ","_")
+      Logger.log "oe_" + generated_event_type, {}
+
+  log_feedback_selection: (event) ->
+    target_selection = $(event.target).val()
+    Logger.log 'oe_feedback_response_selected', {value: target_selection}

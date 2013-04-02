@@ -120,8 +120,8 @@ default_options = {
 }
 
 task :predjango do
-    sh("find . -type f -name '*.pyc' -delete")
-    sh('pip install -q --upgrade --no-deps -r local-requirements.txt')
+    sh("find . -type f -name *.pyc -delete")
+    sh('pip install -q --no-index -r local-requirements.txt')
 end
 
 task :clean_test_files do
@@ -140,12 +140,8 @@ end
 
     desc "Run pylint on all #{system} code"
     task "pylint_#{system}" => report_dir do
-        Dir["#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
-            if File.exists? "#{app}/setup.py"
-                pythonpath_prefix = "PYTHONPATH=#{app}"
-            else
-                pythonpath_prefix = "PYTHONPATH=#{File.dirname(app)}"
-            end
+        Dir["#{system}/*.py", "#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
+            pythonpath_prefix = "PYTHONPATH=#{system}:#{system}/djangoapps:#{system}/lib:common/djangoapps:common/lib"
             app = File.basename(app)
             if app =~ /.py$/
                 app = app.gsub('.py', '')
@@ -183,6 +179,12 @@ end
 
 TEST_TASK_DIRS = []
 
+task :fastlms do
+    # this is >2 times faster that rake [lms], and does not need web, good for local dev
+    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
+    sh("#{django_admin} runserver --traceback --settings=lms.envs.dev   --pythonpath=.")
+end
+
 [:lms, :cms].each do |system|
     report_dir = report_dir_path(system)
 
@@ -196,6 +198,8 @@ TEST_TASK_DIRS = []
         args.with_defaults(:stop_on_failure => 'true')
         run_tests(system, report_dir, args.stop_on_failure)
     end
+
+    task :fasttest => "fasttest_#{system}"
 
     TEST_TASK_DIRS << system
 
@@ -415,7 +419,10 @@ end
 namespace :cms do
   desc "Delete existing MongoDB based course"
   task :delete_course do
-    if ENV['LOC']
+
+    if ENV['LOC'] and ENV['COMMIT']
+        sh(django_admin(:cms, :dev, :delete_course, ENV['LOC'], ENV['COMMIT']))
+    elsif ENV['LOC']
       sh(django_admin(:cms, :dev, :delete_course, ENV['LOC']))
     else
       raise "You must pass in a LOC parameter"
@@ -434,6 +441,13 @@ namespace :cms do
       raise "Please specify a DATA_DIR variable that point to your data directory.\n" +
         "Example: \`rake cms:import DATA_DIR=../data\`"
     end
+  end
+end
+
+namespace :cms do
+  desc "Imports all the templates from the code pack"
+  task :update_templates do
+    sh(django_admin(:cms, :dev, :update_templates))
   end
 end
 
@@ -473,16 +487,30 @@ task :autodeploy_properties do
     end
 end
 
+
+# --- Develop and public documentation ---
 desc "Invoke sphinx 'make build' to generate docs."
-task :builddocs do
-    Dir.chdir('docs') do
+task :builddocs, [:options] do |t, args|
+    if args.options == 'pub'
+        path = "doc/public"
+    else
+        path = "docs"
+    end
+
+    Dir.chdir(path) do
         sh('make html')
     end
 end
 
 desc "Show docs in browser (mac and ubuntu)."
-task :showdocs do
-    Dir.chdir('docs/build/html') do
+task :showdocs, [:options] do |t, args|
+    if args.options == 'pub'
+        path = "doc/public"
+    else
+        path = "docs"
+    end
+
+    Dir.chdir("#{path}/build/html") do
         if RUBY_PLATFORM.include? 'darwin'  #  mac os
             sh('open index.html')
         elsif RUBY_PLATFORM.include? 'linux'  # make more ubuntu specific?
@@ -490,12 +518,13 @@ task :showdocs do
         else
             raise "\nUndefined how to run browser on your machine.
 Please use 'rake builddocs' and then manually open
-'mitx/docs/build/html/index.html."
+'mitx/#{path}/build/html/index.html."
         end
     end
 end
 
 desc "Build docs and show them in browser"
-task :doc => :builddocs do
-    Rake::Task["showdocs"].invoke
+task :doc, [:options] =>  :builddocs do |t, args|
+    Rake::Task["showdocs"].invoke(args.options)
 end
+# --- Develop and public documentation ---

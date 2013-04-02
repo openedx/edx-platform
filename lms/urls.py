@@ -2,6 +2,10 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
+
+from . import one_time_startup
+
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -65,10 +69,25 @@ urlpatterns = ('',
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^university_profile/UTx$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id': 'UTx'}),
-    url(r'^university_profile/WellesleyX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
-    url(r'^university_profile/GeorgetownX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id': 'GeorgetownX'}),
-    url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile', name="university_profile"),
+    url(r'^(?i)university_profile/WellesleyX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
+    url(r'^(?i)university_profile/GeorgetownX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'GeorgetownX'}),
+    url(r'^(?i)university_profile/McGillX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'McGillX'}),
+    url(r'^(?i)university_profile/TorontoX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'TorontoX'}),
+    url(r'^(?i)university_profile/RiceX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'RiceX'}),
+    url(r'^(?i)university_profile/ANUx$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'ANUx'}),
+    url(r'^(?i)university_profile/DelftX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'DelftX'}),
+    url(r'^(?i)university_profile/EPFLx$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'EPFLx'}),
+
+    url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile',
+        name="university_profile"),
 
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
     url(r'^404$', 'static_template_view.views.render',
@@ -128,11 +147,16 @@ urlpatterns = ('',
     url(r'^press/eric-lander-secret-of-life$', 'static_template_view.views.render',
         {'template': 'press_releases/eric_lander_secret_of_life.html'},
         name="press/eric-lander-secret-of-life"),
-
+    url(r'^press/edx-expands-internationally$', 'static_template_view.views.render',
+        {'template': 'press_releases/edx_expands_internationally.html'},
+        name="press/edx-expands-internationally"),
+    url(r'^press/xblock_announcement$', 'static_template_view.views.render',
+        {'template': 'press_releases/xblock_announcement.html'},
+        name="press/xblock-announcement"),
 
     # Should this always update to point to the latest press release?
     (r'^pressrelease$', 'django.views.generic.simple.redirect_to',
-     {'url': '/press/eric-lander-secret-of-life'}),
+     {'url': '/press/xblock-announcement'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
@@ -183,14 +207,6 @@ if settings.COURSEWARE_ENABLED:
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
 
-        # TODO (vshnayder): This is a hack.  It creates a direct connection from
-        # the LMS to capa functionality, and really wants to go through the
-        # input types system so that previews can be context-specific.
-        # Unfortunately, we don't have time to think through the right way to do
-        # that (and implement it), and it's not a terrible thing to provide a
-        # generic chemical-equation rendering service.
-        url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
-            name='preview_chemcalc'),
 
         # Software Licenses
 
@@ -233,6 +249,26 @@ if settings.COURSEWARE_ENABLED:
             'staticbook.views.index'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book-shifted/(?P<page>[^/]*)$',
             'staticbook.views.index_shifted'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/$',
+            'staticbook.views.pdf_index', name="pdf_book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
+            'staticbook.views.pdf_index'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
+            'staticbook.views.pdf_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<page>[^/]*)$',
+            'staticbook.views.pdf_index'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/$',
+            'staticbook.views.html_index', name="html_book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
+            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<anchor_id>[^/]*)/$',
+            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/(?P<anchor_id>[^/]*)/$',
+            'staticbook.views.html_index'),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
             'courseware.views.index', name="courseware"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/$',
@@ -241,6 +277,7 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.index', name="courseware_section"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$',
             'courseware.views.index', name="courseware_position"),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress$',
             'courseware.views.progress', name="progress"),
         # Takes optional student_id for instructor use--shows profile as that student sees it.
@@ -307,7 +344,6 @@ if settings.COURSEWARE_ENABLED:
 
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
-
         urlpatterns += (
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
                 'courseware.views.news', name="news"),
@@ -319,6 +355,14 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>[^/]+)/$',
         'courseware.views.static_tab', name="static_tab"),
         )
+
+    if settings.MITX_FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
+        urlpatterns += (
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/submission_history/(?P<student_username>[^/]*)/(?P<location>.*?)$',
+                'courseware.views.submission_history',
+                name='submission_history'),
+        )
+
 
 if settings.ENABLE_JASMINE:
     urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)

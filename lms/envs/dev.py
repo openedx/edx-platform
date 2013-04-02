@@ -21,6 +21,8 @@ MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
 MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
+
 
 
 WIKI_ENABLED = True
@@ -56,6 +58,13 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    },
+
+    'mongo_metadata_inheritance': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/mongo_metadata_inheritance',
+        'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
@@ -104,6 +113,9 @@ SUBDOMAIN_BRANDING = {
 # have an actual course with that org set
 VIRTUAL_UNIVERSITIES = []
 
+# Organization that contain other organizations
+META_UNIVERSITIES = {'UTx': ['UTAustinX']}
+
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
 ############################## Course static files ##########################
@@ -131,21 +143,17 @@ if os.path.isdir(DATA_DIR):
 
 MITX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
 
-################################# Staff grading config  #####################
+################################# Open ended grading config  #####################
 
-STAFF_GRADING_INTERFACE = {
-    'url': 'http://127.0.0.1:3033/staff_grading',
-    'username': 'lms',
-    'password': 'abcd',
-    }
+OPEN_ENDED_GRADING_INTERFACE = {
+    'url' : 'http://127.0.0.1:3033/',
+    'username' : 'lms',
+    'password' : 'abcd',
+    'staff_grading' : 'staff_grading',
+    'peer_grading' : 'peer_grading',
+    'grading_controller' : 'grading_controller'
+}
 
-################################# Peer grading config  #####################
-
-PEER_GRADING_INTERFACE = {
-    'url': 'http://127.0.0.1:3033/peer_grading',
-    'username': 'lms',
-    'password': 'abcd',
-    }
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
@@ -213,9 +221,14 @@ FILE_UPLOAD_HANDLERS = (
 
 ########################### PIPELINE #################################
 
-PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 ########################## PEARSON TESTING ###########################
 MITX_FEATURES['ENABLE_PEARSON_HACK_TEST'] = True
 PEARSON_TEST_USER = "pearsontest"
 PEARSON_TEST_PASSWORD = "12345"
+
+########################## ANALYTICS TESTING ########################
+
+ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
+ANALYTICS_API_KEY = ""

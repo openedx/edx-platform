@@ -1,46 +1,25 @@
 import datetime
-import time
 import json
-import calendar
 import copy
-from util import converters
-from util.converters import jsdate_to_time
 
 from django.contrib.auth.models import User
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 
-import xmodule
 from xmodule.modulestore import Location
-from cms.djangoapps.models.settings.course_details import (CourseDetails,
+from models.settings.course_details import (CourseDetails,
                                                     CourseSettingsEncoder)
-from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.djangoapps.contentstore.utils import get_modulestore
+from models.settings.course_grading import CourseGradingModel
+from contentstore.utils import get_modulestore
 
-from django.test import TestCase
-from utils import ModuleStoreTestCase
+from .utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-
-# YYYY-MM-DDThh:mm:ss.s+/-HH:MM
-class ConvertersTestCase(TestCase):
-    @staticmethod
-    def struct_to_datetime(struct_time):
-        return datetime.datetime(struct_time.tm_year, struct_time.tm_mon, struct_time.tm_mday, struct_time.tm_hour,
-                                 struct_time.tm_min, struct_time.tm_sec, tzinfo=UTC())
-
-    def compare_dates(self, date1, date2, expected_delta):
-        dt1 = ConvertersTestCase.struct_to_datetime(date1)
-        dt2 = ConvertersTestCase.struct_to_datetime(date2)
-        self.assertEqual(dt1 - dt2, expected_delta, str(date1) + "-" + str(date2) + "!=" + str(expected_delta))
-
-    def test_iso_to_struct(self):
-        self.compare_dates(converters.jsdate_to_time("2013-01-01"), converters.jsdate_to_time("2012-12-31"), datetime.timedelta(days=1))
-        self.compare_dates(converters.jsdate_to_time("2013-01-01T00"), converters.jsdate_to_time("2012-12-31T23"), datetime.timedelta(hours=1))
-        self.compare_dates(converters.jsdate_to_time("2013-01-01T00:00"), converters.jsdate_to_time("2012-12-31T23:59"), datetime.timedelta(minutes=1))
-        self.compare_dates(converters.jsdate_to_time("2013-01-01T00:00:00"), converters.jsdate_to_time("2012-12-31T23:59:59"), datetime.timedelta(seconds=1))
-
+from models.settings.course_metadata import CourseMetadata
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.django import modulestore
+from xmodule.fields import Date
 
 class CourseTestCase(ModuleStoreTestCase):
     def setUp(self):
@@ -103,7 +82,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
 
     def test_update_and_fetch(self):
-        ## NOTE: I couldn't figure out how to validly test time setting w/ all the conversions
+        # # NOTE: I couldn't figure out how to validly test time setting w/ all the conversions
         jsondetails = CourseDetails.fetch(self.course_location)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
@@ -143,10 +122,6 @@ class CourseDetailsViewTest(CourseTestCase):
     def test_update_and_fetch(self):
         details = CourseDetails.fetch(self.course_location)
 
-        resp = self.client.get(reverse('course_settings', kwargs={'org': self.course_location.org, 'course': self.course_location.course,
-                                                                  'name': self.course_location.name}))
-        self.assertContains(resp, '<li><a href="#" class="is-shown" data-section="details">Course Details</a></li>', status_code=200, html=True)
-
         # resp s/b json from here on
         url = reverse('course_settings', kwargs={'org': self.course_location.org, 'course': self.course_location.course,
                                                  'name': self.course_location.name, 'section': 'details'})
@@ -173,19 +148,26 @@ class CourseDetailsViewTest(CourseTestCase):
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
 
+    @staticmethod
+    def struct_to_datetime(struct_time):
+        return datetime.datetime(struct_time.tm_year, struct_time.tm_mon,
+            struct_time.tm_mday, struct_time.tm_hour,
+            struct_time.tm_min, struct_time.tm_sec, tzinfo=UTC())
+
     def compare_date_fields(self, details, encoded, context, field):
         if details[field] is not None:
+            date = Date()
             if field in encoded and encoded[field] is not None:
-                encoded_encoded = jsdate_to_time(encoded[field])
-                dt1 = ConvertersTestCase.struct_to_datetime(encoded_encoded)
+                encoded_encoded = date.from_json(encoded[field])
+                dt1 = CourseDetailsViewTest.struct_to_datetime(encoded_encoded)
 
                 if isinstance(details[field], datetime.datetime):
                     dt2 = details[field]
                 else:
-                    details_encoded = jsdate_to_time(details[field])
-                    dt2 = ConvertersTestCase.struct_to_datetime(details_encoded)
+                    details_encoded = date.from_json(details[field])
+                    dt2 = CourseDetailsViewTest.struct_to_datetime(details_encoded)
 
-                expected_delta =  datetime.timedelta(0)
+                expected_delta = datetime.timedelta(0)
                 self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
@@ -249,8 +231,9 @@ class CourseGradingTest(CourseTestCase):
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "cutoff add D")
 
-        test_grader.grace_period = {'hours' :  4, 'minutes' : 5, 'seconds': 0}
+        test_grader.grace_period = {'hours': 4, 'minutes': 5, 'seconds': 0}
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
+        print test_grader.grace_period, altered_grader.grace_period
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "4 hour grace period")
 
     def test_update_grader_from_json(self):
@@ -265,3 +248,64 @@ class CourseGradingTest(CourseTestCase):
         test_grader.graders[1]['drop_count'] = test_grader.graders[1].get('drop_count') + 1
         altered_grader = CourseGradingModel.update_grader_from_json(test_grader.course_location, test_grader.graders[1])
         self.assertDictEqual(test_grader.graders[1], altered_grader, "drop_count[1] + 2")
+
+class CourseMetadataEditingTest(CourseTestCase):
+    def setUp(self):
+        CourseTestCase.setUp(self)
+        # add in the full class too
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        self.fullcourse_location = Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None])
+
+
+    def test_fetch_initial_fields(self):
+        test_model = CourseMetadata.fetch(self.course_location)
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+
+        test_model = CourseMetadata.fetch(self.fullcourse_location)
+        self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
+        self.assertIn('display_name', test_model, 'full missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Testing', "not expected value")
+        self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
+        self.assertIn('showanswer', test_model, 'showanswer field ')
+        self.assertIn('xqa_key', test_model, 'xqa_key field ')
+
+    def test_update_from_json(self):
+        test_model = CourseMetadata.update_from_json(self.course_location,
+            { "advertised_start" : "start A",
+              "testcenter_info" : { "c" : "test" },
+              "days_early_for_beta" : 2})
+        self.update_check(test_model)
+        # try fresh fetch to ensure persistence
+        test_model = CourseMetadata.fetch(self.course_location)
+        self.update_check(test_model)
+        # now change some of the existing metadata
+        test_model = CourseMetadata.update_from_json(self.course_location,
+            { "advertised_start" : "start B",
+              "display_name" : "jolly roger"})
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'jolly roger', "not expected value")
+        self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
+        self.assertEqual(test_model['advertised_start'], 'start B', "advertised_start not expected value")
+
+    def update_check(self, test_model):
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertIn('advertised_start', test_model, 'Missing new advertised_start metadata field')
+        self.assertEqual(test_model['advertised_start'], 'start A', "advertised_start not expected value")
+        self.assertIn('testcenter_info', test_model, 'Missing testcenter_info metadata field')
+        self.assertDictEqual(test_model['testcenter_info'], { "c" : "test" }, "testcenter_info not expected value")
+        self.assertIn('days_early_for_beta', test_model, 'Missing days_early_for_beta metadata field')
+        self.assertEqual(test_model['days_early_for_beta'], 2, "days_early_for_beta not expected value")
+
+
+    def test_delete_key(self):
+        test_model = CourseMetadata.delete_key(self.fullcourse_location, { 'deleteKeys' : ['doesnt_exist', 'showanswer', 'xqa_key']})
+        # ensure no harm
+        self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
+        self.assertIn('display_name', test_model, 'full missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Testing', "not expected value")
+        self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
+        # check for deletion effectiveness
+        self.assertEqual('closed', test_model['showanswer'], 'showanswer field still in')
+        self.assertEqual(None, test_model['xqa_key'], 'xqa_key field still in')

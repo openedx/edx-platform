@@ -1,8 +1,9 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name="units" file="widgets/units.html" />
-<%block name="bodyclass">unit</%block>
-<%block name="title">CMS Unit</%block>
+<%block name="title">Individual Unit</%block>
+<%block name="bodyclass">is-signedin course unit</%block>
+
 <%block name="jsextra">
   <script type='text/javascript'>
   $(document).ready(function() {
@@ -13,12 +14,20 @@
         state: '${unit_state}'
       })
     });
-  
+
+    $(document).ready(function() {
+      $('body').addClass('js');
+
+      // tabs
+      $('.tab-group').tabs();
+    });
+
     $('.new-component-template').each(function(){
         $emptyEditor = $(this).find('.empty');
         $(this).prepend($emptyEditor);
       });
     });
+
   </script>
 
 </%block>
@@ -31,16 +40,16 @@
         This unit was originally published on ${published_date}.
         % endif
         </p>
-        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">Preview the published version</a>
+        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">View the Live Version</a>
       </div>
       <div class="main-column">
         <article class="unit-body window">
-          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p>
+          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
           <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>
             % endfor
-            <li class="new-component-item adding">              
+            <li class="new-component-item adding">
               <div class="new-component">
                 <h5>Add New Component</h5>
                 <ul class="new-component-type">
@@ -56,38 +65,66 @@
               </div>
                 % for type, templates in sorted(component_templates.items()):
                 <div class="new-component-templates new-component-${type}">
-                    <h3 class="title">Select <span class="type">${type}</span> component type:</h3>
+                    % if type == "problem":
+                    <div class="tab-group tabs">
+                            <ul class="problem-type-tabs nav-tabs">
+                              <li class="current">
+                                <a class="link-tab" href="#tab1">Common Problem Types</a>
+                              </li>
+                              <li>
+                                <a class="link-tab" href="#tab2">Advanced</a>
+                              </li>
+                            </ul>
+                    % endif
+                        <div class="tab current" id="tab1">
+                          <ul class="new-component-template">
+                              % for name, location, has_markdown, is_empty in templates:
+                                % if has_markdown or type != "problem":
+                                    % if is_empty:
+                                      <li class="editor-md empty">
+                                        <a href="#" data-location="${location}">
+                                          <span class="name"> ${name}</span>
+                                        </a>
+                                      </li>
 
-                    <ul class="new-component-template">
-                        % for name, location, has_markdown, is_empty in templates:
+                                    % else:
+                                      <li class="editor-md">
+                                        <a href="#" data-location="${location}">
+                                          <span class="name"> ${name}</span>
+                                        </a>
+                                      </li>
+                                    % endif
+                                % endif
 
-                          % if is_empty:
-                            <li class="editor-md empty">
-                              <a href="#" data-location="${location}">
-                                <span class="name"><i class="ss-icon ss-symbolicons-block">&#xE714;</i> ${name}</span>
-                                <span class="editor-indicator">Simple <span class="sr">Editor</span></span>
-                              </a>
-                            </li>
+                              %endfor
+                          </ul>
+                        </div>
+                    % if type == "problem":
+                            <div class="tab" id="tab2">
+                              <ul class="new-component-template">
+                                  % for name, location, has_markdown, is_empty in templates:
+                                    % if not has_markdown:
+                                        % if is_empty:
+                                          <li class="editor-manual empty">
+                                            <a href="#" data-location="${location}">
+                                              <span class="name">${name}</span>
+                                            </a>
+                                          </li>
 
-                          % elif has_markdown:
-                            <li class="editor-md">
-                              <a href="#" data-location="${location}">
-                                <span class="name"><i class="ss-icon ss-symbolicons-block">&#xE714;</i> ${name}</span>
-                                <span class="editor-indicator">Simple <span class="sr">Editor</span></span>
-                              </a>
-                            </li>
+                                        % else:
+                                          <li class="editor-manual">
+                                            <a href="#" data-location="${location}">
+                                              <span class="name"> ${name}</span>
+                                            </a>
 
-                          % else:
-                            <li class="editor-manual">
-                              <a href="#" data-location="${location}">
-                                <span class="name"><i class="ss-icon ss-symbolicons-block">&#x1F527;</i> ${name}</span>
-                                <span class="editor-indicator">Advanced <span class="sr">Editor</span></span>
-                              </a>
-                            </li>
-                          % endif
-
-                        %endfor
-                    </ul>
+                                          </li>
+                                        % endif
+                                    % endif
+                                  % endfor
+                              </ul>
+                            </div>
+                    </div>
+                    % endif
                     <a href="#" class="cancel-button">Cancel</a>
                 </div>
                 % endfor
@@ -110,13 +147,13 @@
             <div class="row published-alert">
               <p class="edit-draft-message">This unit has been published. To make changes, you must <a href="#" class="create-draft">edit a draft</a>.</p>
               <p class="publish-draft-message">This is a draft of the published unit. To update the live version, you must <a href="#" class="publish-draft">replace it with this draft</a>.</p>
-            </div>            
+            </div>
             <div class="row status">
-              <p>This unit is scheduled to be released to <strong>students</strong> 
+              <p>This unit is scheduled to be released to <strong>students</strong>
               % if release_date is not None:
                   on <strong>${release_date}</strong>
-              % endif 
-              with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name}"</a></p>
+              % endif
+              with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name_with_default}"</a></p>
             </div>
             <div class="row unit-actions">
               <a href="#" class="delete-draft delete-button">Delete Draft</a>
@@ -131,18 +168,18 @@
             <div><input type="text" class="url" value="/courseware/${section.url_name}/${subsection.url_name}" disabled /></div>
             <ol>
               <li>
-                <a href="#" class="section-item">${section.display_name}</a>
+                <a href="#" class="section-item">${section.display_name_with_default}</a>
                 <ol>
                   <li>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}" class="section-item">
                       <span class="folder-icon"></span>
-                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
+                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                     </a>
                     ${units.enum_units(subsection, actions=False, selected=unit.location)}
                   </li>
                 </ol>
               </li>
-            </ol>            
+            </ol>
           </div>
         </div>
       </div>

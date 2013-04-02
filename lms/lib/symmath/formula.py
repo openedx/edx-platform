@@ -70,10 +70,19 @@ StrPrinter._print_hat = _print_hat
 
 
 def to_latex(x):
-    if x == None: return ''
+    if x is None: return ''
     # LatexPrinter._print_dot = _print_dot
     xs = latex(x)
     xs = xs.replace(r'\XI', 'XI')	 # workaround for strange greek
+
+    # substitute back into latex form for scripts
+    # literally something of the form
+    # 'scriptN' becomes '\\mathcal{N}'
+    # note: can't use something akin to the _print_hat method above because we sometimes get 'script(N)__B' or more complicated terms
+    xs = re.sub(r'script([a-zA-Z0-9]+)',
+                '\\mathcal{\\1}',
+                xs)
+
     #return '<math>%s{}{}</math>' % (xs[1:-1])
     if xs[0] == '$':
         return '[mathjax]%s[/mathjax]<br>' % (xs[1:-1])	 # for sympy v6
@@ -106,6 +115,7 @@ def my_sympify(expr, normphase=False, matrix=False, abcsym=False, do_qubit=False
                   'i': sympy.I,			# lowercase i is also sqrt(-1)
                   'Q': sympy.Symbol('Q'),	 # otherwise it is a sympy "ask key"
                   'I': sympy.Symbol('I'),	 # otherwise it is sqrt(-1)
+                  'N': sympy.Symbol('N'),	 # or it is some kind of sympy function
                   #'X':sympy.sympify('Matrix([[0,1],[1,0]])'),
                   #'Y':sympy.sympify('Matrix([[0,-I],[I,0]])'),
                   #'Z':sympy.sympify('Matrix([[1,0],[0,-1]])'),
@@ -247,6 +257,127 @@ class formula(object):
                 fix_hat(k)
         fix_hat(xml)
 
+        def flatten_pmathml(xml):
+            ''' Give the text version of certain PMathML elements
+
+            Sometimes MathML will be given with each letter separated (it
+            doesn't know if its implicit multiplication or what). From an xml
+            node, find the (text only) variable name it represents. So it takes
+            <mrow>
+              <mi>m</mi>
+              <mi>a</mi>
+              <mi>x</mi>
+            </mrow>
+            and returns 'max', for easier use later on.
+            '''
+            tag = gettag(xml)
+            if tag == 'mn': return xml.text
+            elif tag == 'mi': return xml.text
+            elif tag == 'mrow': return ''.join([flatten_pmathml(y) for y in xml])
+            raise Exception, '[flatten_pmathml] unknown tag %s' % tag
+
+        def fix_mathvariant(parent):
+            '''Fix certain kinds of math variants
+
+            Literally replace <mstyle mathvariant="script"><mi>N</mi></mstyle>
+            with 'scriptN'. There have been problems using script_N or script(N)
+            '''
+            for child in parent:
+                if (gettag(child) == 'mstyle' and child.get('mathvariant') == 'script'):
+                    newchild = etree.Element('mi')
+                    newchild.text = 'script%s' % flatten_pmathml(child[0])
+                    parent.replace(child, newchild)
+                fix_mathvariant(child)
+        fix_mathvariant(xml)
+
+
+        # find "tagged" superscripts
+        # they have the character \u200b in the superscript
+        # replace them with a__b so snuggle doesn't get confused
+        def fix_superscripts(xml):
+            ''' Look for and replace sup elements with 'X__Y' or 'X_Y__Z'
+
+            In the javascript, variables with '__X' in them had an invisible
+            character inserted into the sup (to distinguish from powers)
+            E.g. normal:
+            <msubsup>
+              <mi>a</mi>
+              <mi>b</mi>
+              <mi>c</mi>
+            </msubsup>
+            to be interpreted '(a_b)^c' (nothing done by this method)
+
+            And modified:
+            <msubsup>
+              <mi>b</mi>
+              <mi>x</mi>
+              <mrow>
+                <mo>&#x200B;</mo>
+                <mi>d</mi>
+              </mrow>
+            </msubsup>
+            to be interpreted 'a_b__c'
+
+            also:
+            <msup>
+              <mi>x</mi>
+              <mrow>
+                <mo>&#x200B;</mo>
+                <mi>B</mi>
+              </mrow>
+            </msup>
+            to be 'x__B'
+            '''
+            for k in xml:
+                tag = gettag(k)
+
+                # match things like the last example--
+                # the second item in msub is an mrow with the first
+                # character equal to \u200b
+                if (tag == 'msup' and
+                    len(k) == 2 and gettag(k[1]) == 'mrow' and
+                    gettag(k[1][0]) == 'mo' and k[1][0].text == u'\u200b'): # whew
+
+                    # replace the msup with 'X__Y'
+                    k[1].remove(k[1][0])
+                    newk = etree.Element('mi')
+                    newk.text = '%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]))
+                    xml.replace(k, newk)
+
+                # match things like the middle example-
+                # the third item in msubsup is an mrow with the first
+                # character equal to \u200b
+                if (tag == 'msubsup' and
+                    len(k) == 3 and gettag(k[2]) == 'mrow' and
+                    gettag(k[2][0]) == 'mo' and k[2][0].text == u'\u200b'): # whew
+
+                    # replace the msubsup with 'X_Y__Z'
+                    k[2].remove(k[2][0])
+                    newk = etree.Element('mi')
+                    newk.text = '%s_%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]), flatten_pmathml(k[2]))
+                    xml.replace(k, newk)
+
+                fix_superscripts(k)
+        fix_superscripts(xml)
+
+        # Snuggle returns an error when it sees an <msubsup>
+        # replace such elements with an <msup>, except the first element is of
+        # the form a_b. I.e. map a_b^c => (a_b)^c
+        def fix_msubsup(parent):
+            for child in parent:
+                # fix msubsup
+                if (gettag(child) == 'msubsup' and len(child) == 3):
+                    newchild = etree.Element('msup')
+                    newbase = etree.Element('mi')
+                    newbase.text = '%s_%s' % (flatten_pmathml(child[0]), flatten_pmathml(child[1]))
+                    newexp = child[2]
+                    newchild.append(newbase)
+                    newchild.append(newexp)
+                    parent.replace(child, newchild)
+
+                fix_msubsup(child)
+        fix_msubsup(xml)
+
         self.xml = xml
         return self.xml
 
@@ -257,6 +388,7 @@ class formula(object):
         try:
             xml = self.preprocess_pmathml(self.expr)
         except Exception, err:
+            log.warning('Err %s while preprocessing; expr=%s' % (err, self.expr))
             return "<html>Error! Cannot process pmathml</html>"
         pmathml = etree.tostring(xml, pretty_print=True)
         self.the_pmathml = pmathml
@@ -278,7 +410,7 @@ class formula(object):
 
         if self.the_sympy: return self.the_sympy
 
-        if xml == None:	 # root
+        if xml is None:	 # root
             if not self.is_mathml():
                 return my_sympify(self.expr)
             if self.is_presentation_mathml():

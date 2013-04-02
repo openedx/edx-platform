@@ -14,12 +14,18 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from pkg_resources import resource_string
+from xblock.core import String, Scope
 
 
 log = logging.getLogger(__name__)
 
 
-class GraphicalSliderToolModule(XModule):
+class GraphicalSliderToolFields(object):
+    render = String(scope=Scope.content)
+    configuration = String(scope=Scope.content)
+
+
+class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
     ''' Graphical-Slider-Tool Module
     '''
 
@@ -43,15 +49,6 @@ class GraphicalSliderToolModule(XModule):
     }
     js_module_name = "GraphicalSliderTool"
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None,
-                 shared_state=None, **kwargs):
-        """
-        For XML file format please look at documentation. TODO - receive
-        information where to store XML documentation.
-        """
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-
     def get_html(self):
         """ Renders parameters to template. """
 
@@ -60,14 +57,14 @@ class GraphicalSliderToolModule(XModule):
         self.html_class = self.location.category
         self.configuration_json = self.build_configuration_json()
         params = {
-                  'gst_html': self.substitute_controls(self.definition['render']),
+                  'gst_html': self.substitute_controls(self.render),
                   'element_id': self.html_id,
                   'element_class': self.html_class,
                   'configuration_json': self.configuration_json
                   }
-        self.content = self.system.render_template(
+        content = self.system.render_template(
                         'graphical_slider_tool.html', params)
-        return self.content
+        return content
 
     def substitute_controls(self, html_string):
         """ Substitutes control elements (slider, textbox and plot) in
@@ -139,10 +136,10 @@ class GraphicalSliderToolModule(XModule):
         # <root> added for interface compatibility with xmltodict.parse
         # class added for javascript's part purposes
         return json.dumps(xmltodict.parse('<root class="' + self.html_class +
-                '">' + self.definition['configuration'] + '</root>'))
+                '">' + self.configuration + '</root>'))
 
 
-class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
+class GraphicalSliderToolDescriptor(GraphicalSliderToolFields, MakoModuleDescriptor, XmlDescriptor):
     module_class = GraphicalSliderToolModule
     template_dir_name = 'graphical_slider_tool'
 
@@ -177,14 +174,14 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
         return {
                     'render': parse('render'),
                     'configuration': parse('configuration')
-                }
+                }, []
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
         xml_object = etree.Element('graphical_slider_tool')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
             child_node = etree.fromstring(child_str)
             xml_object.append(child_node)
 

@@ -13,7 +13,7 @@ import sys
 import string
 import re
 import traceback
-from formula import *
+from .formula import *
 import logging
 
 log = logging.getLogger(__name__)
@@ -149,6 +149,12 @@ def make_error_message(msg):
     msg = '<div class="capa_alert">%s</div>' % msg
     return msg
 
+def is_within_tolerance(expected, actual, tolerance):
+    if expected == 0:
+        return (abs(actual) < tolerance)
+    else:
+        return (abs(abs(actual - expected) / expected) < tolerance)
+
 #-----------------------------------------------------------------------------
 # Check function interface, which takes pmathml input
 #
@@ -215,16 +221,16 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         fans = None
 
     # do a numerical comparison if both expected and answer are numbers
-    if (hasattr(fexpect, 'is_number') and fexpect.is_number and fans
+    if (hasattr(fexpect, 'is_number') and fexpect.is_number 
         and hasattr(fans, 'is_number') and fans.is_number):
-        if abs(abs(fans - fexpect) / fexpect) < threshold:
+        if is_within_tolerance(fexpect, fans, threshold):
             return {'ok': True, 'msg': msg}
         else:
             msg += '<p>You entered: %s</p>' % to_latex(fans)
             return {'ok': False, 'msg': msg}
 
     if do_numerical:		# numerical answer expected - force numerical comparison
-        if abs(abs(fans - fexpect) / fexpect) < threshold:
+        if is_within_tolerance(fexpect, fans, threshold):
             return {'ok': True, 'msg': msg}
         else:
             msg += '<p>You entered: %s (note that a numerical answer is expected)</p>' % to_latex(fans)
@@ -319,53 +325,3 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         msg += '<hr>'
 
     return {'ok': False, 'msg': msg, 'ex': fexpect, 'got': fsym}
-
-#-----------------------------------------------------------------------------
-# tests
-
-
-def sctest1():
-    x = "1/2*(1+(k_e* Q* q)/(m *g *h^2))"
-    y = '''
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-  <mstyle displaystyle="true">
-    <mfrac>
-      <mn>1</mn>
-      <mn>2</mn>
-    </mfrac>
-    <mrow>
-      <mo>(</mo>
-      <mn>1</mn>
-      <mo>+</mo>
-      <mfrac>
-        <mrow>
-          <msub>
-            <mi>k</mi>
-            <mi>e</mi>
-          </msub>
-          <mo>⋅</mo>
-          <mi>Q</mi>
-          <mo>⋅</mo>
-          <mi>q</mi>
-        </mrow>
-        <mrow>
-          <mi>m</mi>
-          <mo>⋅</mo>
-          <mrow>
-            <mi>g</mi>
-            <mo>⋅</mo>
-          </mrow>
-          <msup>
-            <mi>h</mi>
-            <mn>2</mn>
-          </msup>
-        </mrow>
-      </mfrac>
-      <mo>)</mo>
-    </mrow>
-  </mstyle>
-</math>
-'''.strip()
-    z = "1/2(1+(k_e* Q* q)/(m *g *h^2))"
-    r = sympy_check2(x, z, {'a': z, 'a_fromjs': y}, 'a')
-    return r

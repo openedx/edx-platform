@@ -56,6 +56,9 @@ class ConditionalModuleTest(unittest.TestCase):
         '''Get a dummy system'''
         return DummySystem(load_error_modules)
 
+    def setUp(self):
+        self.test_system = test_system()
+
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
         print "Importing {0}".format(name)
@@ -70,52 +73,51 @@ class ConditionalModuleTest(unittest.TestCase):
         """Make sure that conditional module works"""
 
         print "Starting import"
-        course = self.get_course('conditional')
+        course = self.get_course('conditional_and_poll')
 
         print "Course: ", course
         print "id: ", course.id
-
-        instance_states = dict(problem=None)
-        shared_state = None
 
         def inner_get_module(descriptor):
             if isinstance(descriptor, Location):
                 location = descriptor
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
             location = descriptor.location
-            instance_state = instance_states.get(location.category, None)
-            print "inner_get_module, location=%s, inst_state=%s" % (location, instance_state)
-            return descriptor.xmodule_constructor(test_system)(instance_state, shared_state)
+            return descriptor.xmodule(self.test_system)
 
-        location = Location(["i4x", "edX", "cond_test", "conditional", "condone"])
+        # edx - HarvardX
+        # cond_test - ER22x
+        location = Location(["i4x", "HarvardX", "ER22x", "conditional", "condone"])
 
         def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
             return text
-        test_system.replace_urls = replace_urls
-        test_system.get_module = inner_get_module
+        self.test_system.replace_urls = replace_urls
+        self.test_system.get_module = inner_get_module
 
         module = inner_get_module(location)
         print "module: ", module
-        print "module definition: ", module.definition
+        print "module.conditions_map: ", module.conditions_map
         print "module children: ", module.get_children()
         print "module display items (children): ", module.get_display_items()
 
         html = module.get_html()
         print "html type: ", type(html)
         print "html: ", html
-        html_expect = "{'ajax_url': 'courses/course_id/modx/a_location', 'element_id': 'i4x-edX-cond_test-conditional-condone', 'id': 'i4x://edX/cond_test/conditional/condone'}"
+        html_expect = "{'ajax_url': 'courses/course_id/modx/a_location', 'element_id': 'i4x-HarvardX-ER22x-conditional-condone', 'id': 'i4x://HarvardX/ER22x/conditional/condone', 'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'}"
         self.assertEqual(html, html_expect)
 
         gdi =  module.get_display_items()
         print "gdi=", gdi
 
         ajax = json.loads(module.handle_ajax('', ''))
-        self.assertTrue('xmodule.conditional_module' in ajax['html'])
         print "ajax: ", ajax
+        html = ajax['html']
+        self.assertFalse(any(['This is a secret' in item for item in html]))
 
         # now change state of the capa problem to make it completed
-        instance_states['problem'] = json.dumps({'attempts': 1})
+        inner_get_module(Location('i4x://HarvardX/ER22x/problem/choiceprob')).attempts = 1
 
         ajax = json.loads(module.handle_ajax('', ''))
-        self.assertTrue('This is a secret' in ajax['html'])
         print "post-attempt ajax: ", ajax
+        html = ajax['html']
+        self.assertTrue(any(['This is a secret' in item for item in html]))

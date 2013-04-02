@@ -1,11 +1,18 @@
 import unittest
+import logging
 import time
-from mock import Mock
+from mock import Mock, MagicMock, patch
+
+from django.conf import settings
 from django.test import TestCase
 
+from xmodule.course_module import CourseDescriptor
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import Location
-from factories import CourseEnrollmentAllowedFactory
+from xmodule.timeparse import parse_time
+from xmodule.x_module import XModule, XModuleDescriptor
 import courseware.access as access
+from .factories import CourseEnrollmentAllowedFactory
 
 
 class AccessTestCase(TestCase):
@@ -81,7 +88,6 @@ class AccessTestCase(TestCase):
         yesterday = time.gmtime(time.time() - 86400)
         tomorrow = time.gmtime(time.time() + 86400)
         c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow)
-        c.metadata.get = 'is_public'
 
         # User can enroll if it is between the start and end dates
         self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
@@ -92,7 +98,6 @@ class AccessTestCase(TestCase):
         u.is_authenticated.return_value = True
 
         c = Mock(enrollment_start=tomorrow, enrollment_end=tomorrow, id='edX/test/2012_Fall')
-        c.metadata.get = 'is_public'
 
         allowed = CourseEnrollmentAllowedFactory(email=u.email, course_id=c.id)
 
@@ -103,7 +108,6 @@ class AccessTestCase(TestCase):
         u.is_authenticated.return_value = True
 
         c = Mock(enrollment_start=tomorrow, enrollment_end=tomorrow, id='edX/test/Whenever')
-        c.metadata.get = 'is_public'
         self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
 
         # TODO:

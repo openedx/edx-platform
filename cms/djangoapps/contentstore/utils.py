@@ -1,10 +1,15 @@
+import logging
 from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from django.core.urlresolvers import reverse
+import copy
 
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
+#In order to instantiate an open ended tab automatically, need to have this data
+OPEN_ENDED_PANEL = {"name" : "Open Ended Panel", "type" : "open_ended"}
 
 def get_modulestore(location):
     """
@@ -39,10 +44,10 @@ def get_course_location_for_item(location):
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)
         if found_cnt == 0:
-            raise BaseException('Could not find course at {0}'.format(course_search_location))
+            raise Exception('Could not find course at {0}'.format(course_search_location))
 
         if found_cnt > 1:
-            raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+            raise Exception('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
 
         location = courses[0].location
 
@@ -75,12 +80,20 @@ def get_course_for_item(location):
     return courses[0]
 
 
-def get_lms_link_for_item(location, preview=False):
+def get_lms_link_for_item(location, preview=False, course_id=None):
+    if course_id is None:
+        course_id = get_course_id(location)
+
     if settings.LMS_BASE is not None:
-        lms_link = "//{preview}{lms_base}/courses/{course_id}/jump_to/{location}".format(
-            preview='preview.' if preview else '',
-            lms_base=settings.LMS_BASE,
-            course_id=get_course_id(location),
+        if preview:
+            lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE',
+                'preview.' + settings.LMS_BASE)
+        else:
+            lms_base = settings.LMS_BASE
+     
+        lms_link = "//{lms_base}/courses/{course_id}/jump_to/{location}".format(
+            lms_base=lms_base,
+            course_id=course_id,
             location=Location(location)
         )
     else:
@@ -128,7 +141,7 @@ def compute_unit_state(unit):
     'private' content is editabled and not visible in the LMS
     """
 
-    if unit.metadata.get('is_draft', False):
+    if getattr(unit, 'is_draft', False):
         try:
             modulestore('direct').get_item(unit.location)
             return UnitState.draft
@@ -150,3 +163,67 @@ def update_item(location, value):
         get_modulestore(location).delete_item(location)
     else:
         get_modulestore(location).update_item(location, value)
+
+
+def get_url_reverse(course_page_name, course_module):
+    """
+    Returns the course URL link to the specified location. This value is suitable to use as an href link.
+
+    course_page_name should correspond to an attribute in CoursePageNames (for example, 'ManageUsers'
+    or 'SettingsDetails'), or else it will simply be returned. This method passes back unknown values of
+    course_page_names so that it can also be used for absolute (known) URLs.
+
+    course_module is used to obtain the location, org, course, and name properties for a course, if
+    course_page_name corresponds to an attribute in CoursePageNames.
+    """
+    url_name = getattr(CoursePageNames, course_page_name, None)
+    ctx_loc = course_module.location
+
+    if CoursePageNames.ManageUsers == url_name:
+        return reverse(url_name, kwargs={"location": ctx_loc})
+    elif url_name in [CoursePageNames.SettingsDetails, CoursePageNames.SettingsGrading,
+                      CoursePageNames.CourseOutline, CoursePageNames.Checklists]:
+        return reverse(url_name, kwargs={'org': ctx_loc.org, 'course': ctx_loc.course, 'name': ctx_loc.name})
+    else:
+        return course_page_name
+
+
+class CoursePageNames:
+    """ Constants for pages that are recognized by get_url_reverse method. """
+    ManageUsers = "manage_users"
+    SettingsDetails = "settings_details"
+    SettingsGrading = "settings_grading"
+    CourseOutline = "course_index"
+    Checklists = "checklists"
+
+def add_open_ended_panel_tab(course):
+    """
+    Used to add the open ended panel tab to a course if it does not exist.
+    @param course: A course object from the modulestore.
+    @return: Boolean indicating whether or not a tab was added and a list of tabs for the course.
+    """
+    #Copy course tabs
+    course_tabs = copy.copy(course.tabs)
+    changed = False
+    #Check to see if open ended panel is defined in the course
+    if OPEN_ENDED_PANEL not in course_tabs:
+        #Add panel to the tabs if it is not defined
+        course_tabs.append(OPEN_ENDED_PANEL)
+        changed = True
+    return changed, course_tabs
+
+def remove_open_ended_panel_tab(course):
+    """
+    Used to remove the open ended panel tab from a course if it exists.
+    @param course: A course object from the modulestore.
+    @return: Boolean indicating whether or not a tab was added and a list of tabs for the course.
+    """
+    #Copy course tabs
+    course_tabs = copy.copy(course.tabs)
+    changed = False
+    #Check to see if open ended panel is defined in the course
+    if OPEN_ENDED_PANEL in course_tabs:
+        #Add panel to the tabs if it is not defined
+        course_tabs = [ct for ct in course_tabs if ct!=OPEN_ENDED_PANEL]
+        changed = True
+    return changed, course_tabs

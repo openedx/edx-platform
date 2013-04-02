@@ -15,10 +15,10 @@ def get_module_info(store, location, parent_location=None, rewrite_static_links=
         template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])
         module = store.clone_item(template_location, location)
 
-    data = module.definition['data']
+    data = module.data
     if rewrite_static_links:
         data = replace_static_urls(
-            module.definition['data'],
+            module.data,
             None,
             course_namespace=Location([
                 module.location.tag,
@@ -32,7 +32,8 @@ def get_module_info(store, location, parent_location=None, rewrite_static_links=
     return {
         'id': module.location.url(),
         'data': data,
-        'metadata': module.metadata
+        # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
+        'metadata': module._model_data._kvs._metadata
     }
 
 
@@ -70,23 +71,23 @@ def set_module_info(store, location, post_data):
     # 'apply' the submitted metadata, so we don't end up deleting system metadata
     if post_data.get('metadata') is not None:
         posted_metadata = post_data['metadata']
-        
+
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
-        for metadata_key in posted_metadata.keys():
-        
+        for metadata_key, value in posted_metadata.items():
+
             # let's strip out any metadata fields from the postback which have been identified as system metadata
             # and therefore should not be user-editable, so we should accept them back from the client
             if metadata_key in module.system_metadata_fields:
                 del posted_metadata[metadata_key]
             elif posted_metadata[metadata_key] is None:
                 # remove both from passed in collection as well as the collection read in from the modulestore
-                if metadata_key in module.metadata:
-                    del module.metadata[metadata_key]
+                if metadata_key in module._model_data:
+                    del module._model_data[metadata_key]
                 del posted_metadata[metadata_key]
-        
-        # overlay the new metadata over the modulestore sourced collection to support partial updates
-        module.metadata.update(posted_metadata)
-        
+            else:
+                module._model_data[metadata_key] = value
+
         # commit to datastore
-        store.update_metadata(location, module.metadata)
+        # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
+        store.update_metadata(location, module._model_data._kvs._metadata)

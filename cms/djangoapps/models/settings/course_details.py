@@ -1,13 +1,13 @@
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
 import time
 from contentstore.utils import get_modulestore
-from util.converters import jsdate_to_time, time_to_date
-from cms.djangoapps.models.settings import course_grading
-from cms.djangoapps.contentstore.utils import update_item
+from models.settings import course_grading
+from contentstore.utils import update_item
+from xmodule.fields import Date
 import re
 import logging
 
@@ -43,25 +43,25 @@ class CourseDetails(object):
 
         temploc = course_location._replace(category='about', name='syllabus')
         try:
-            course.syllabus = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.syllabus = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = temploc._replace(name='overview')
         try:
-            course.overview = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.overview = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = temploc._replace(name='effort')
         try:
-            course.effort = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.effort = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = temploc._replace(name='video')
         try:
-            raw_video = get_modulestore(temploc).get_item(temploc).definition['data']
+            raw_video = get_modulestore(temploc).get_item(temploc).data
             course.intro_video = CourseDetails.parse_video_tag(raw_video)
         except ItemNotFoundError:
             pass
@@ -80,8 +80,14 @@ class CourseDetails(object):
 
         dirty = False
 
+        # In the descriptor's setter, the date is converted to JSON using Date's to_json method.
+        # Calling to_json on something that is already JSON doesn't work. Since reaching directly
+        # into the model is nasty, convert the JSON Date to a Python date, which is what the
+        # setter expects as input.
+        date = Date()
+
         if 'start_date' in jsondict:
-            converted = jsdate_to_time(jsondict['start_date'])
+            converted = date.from_json(jsondict['start_date'])
         else:
             converted = None
         if converted != descriptor.start:
@@ -89,7 +95,7 @@ class CourseDetails(object):
             descriptor.start = converted
 
         if 'end_date' in jsondict:
-            converted = jsdate_to_time(jsondict['end_date'])
+            converted = date.from_json(jsondict['end_date'])
         else:
             converted = None
 
@@ -98,7 +104,7 @@ class CourseDetails(object):
             descriptor.end = converted
 
         if 'enrollment_start' in jsondict:
-            converted = jsdate_to_time(jsondict['enrollment_start'])
+            converted = date.from_json(jsondict['enrollment_start'])
         else:
             converted = None
 
@@ -107,7 +113,7 @@ class CourseDetails(object):
             descriptor.enrollment_start = converted
 
         if 'enrollment_end' in jsondict:
-            converted = jsdate_to_time(jsondict['enrollment_end'])
+            converted = date.from_json(jsondict['enrollment_end'])
         else:
             converted = None
 
@@ -116,7 +122,7 @@ class CourseDetails(object):
             descriptor.enrollment_end = converted
 
         if dirty:
-            get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
+            get_modulestore(course_location).update_metadata(course_location, own_metadata(descriptor))
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
@@ -132,7 +138,6 @@ class CourseDetails(object):
         temploc = temploc._replace(name='video')
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
         update_item(temploc, recomposed_video_tag)
-
 
         # Could just generate and return a course obj w/o doing any db reads, but I put the reads in as a means to confirm
         # it persisted correctly
@@ -178,6 +183,6 @@ class CourseSettingsEncoder(json.JSONEncoder):
         elif isinstance(obj, Location):
             return obj.dict()
         elif isinstance(obj, time.struct_time):
-            return time_to_date(obj)
+            return Date().to_json(obj)
         else:
             return JSONEncoder.default(self, obj)

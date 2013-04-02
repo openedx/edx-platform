@@ -14,7 +14,7 @@ from courseware.access import has_access
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
-from models import Revision, Article, Namespace, CreateArticleForm, RevisionFormWithTitle, RevisionForm
+from .models import Revision, Article, Namespace, CreateArticleForm, RevisionFormWithTitle, RevisionForm
 import wiki_settings
 
 
@@ -236,7 +236,7 @@ def history(request, article_path, page=1, course_id=None):
 
     page_size = 10
 
-    if page == None:
+    if page is None:
         page = 1
     try:
         p = int(page)
@@ -310,7 +310,7 @@ def revision_feed(request, page=1, namespace=None, course_id=None):
 
     page_size = 10
 
-    if page == None:
+    if page is None:
         page = 1
     try:
         p = int(page)

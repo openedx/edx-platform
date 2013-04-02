@@ -40,8 +40,16 @@ section.problem {
     @include clearfix;
 
     label.choicegroup_correct{
-      text:after{
+      &:after{
         content: url('../images/correct-icon.png');
+        margin-left:15px
+      }
+    }
+
+    label.choicegroup_incorrect{
+      &:after{
+        content: url('../images/incorrect-icon.png');
+        margin-left:15px;
       }
     }
 
@@ -52,6 +60,7 @@ section.problem {
     .indicator_container {
       float: left;
       width: 25px;
+      height: 1px;
       margin-right: 15px;
     }
 
@@ -69,7 +78,7 @@ section.problem {
     }
 
     text {
-      display: block;
+      display: inline;
       margin-left: 25px;
     }
   }
@@ -227,6 +236,15 @@ section.problem {
         background: url('../images/correct-icon.png') center center no-repeat;
         height: 20px;
         position: relative;
+        top: 3px;
+        width: 25px;
+      }
+
+      &.partially-correct {
+        @include inline-block();
+        background: url('../images/partially-correct-icon.png') center center no-repeat;
+        height: 20px;
+        position: relative;
         top: 6px;
         width: 25px;
       }
@@ -237,7 +255,7 @@ section.problem {
         height: 20px;
         width: 20px;
         position: relative;
-        top: 6px;
+        top: 3px;
       }
     }
 
@@ -801,5 +819,92 @@ section.problem {
       input[class='score-selection'] {
         display: none; 
       }
+  }
+
+  .annotation-input {
+    $yellow: rgba(255,255,10,0.3);
+
+    border: 1px solid #ccc;
+    border-radius: 1em;
+    margin: 0 0 1em 0;
+
+    .annotation-header {
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      padding: .5em 1em;
+    }
+    .annotation-body { padding: .5em 1em; }
+    a.annotation-return {
+      float: right;
+      font: inherit;
+      font-weight: normal;
+    }
+    a.annotation-return:after { content: " \2191" }
+
+    .block, ul.tags {
+      margin: .5em 0;
+      padding: 0;
+    }
+    .block-highlight {
+      padding: .5em;
+      color:  #333;
+      font-style: normal;
+      background-color: $yellow;
+      border: 1px solid darken($yellow, 10%);
+    }
+    .block-comment { font-style: italic; }
+
+    ul.tags {
+      display: block;
+      list-style-type: none;
+      margin-left: 1em;
+      li {
+        display: block;
+        margin: 1em 0 0 0;
+        position: relative;
+        .tag {
+          display: inline-block;
+          cursor: pointer;
+          border: 1px solid rgb(102,102,102);
+          margin-left: 40px;
+          &.selected {
+            background-color: $yellow;
+          }
+        }
+        .tag-status {
+          position: absolute;
+          left: 0;
+        }
+        .tag-status, .tag { padding: .25em .5em; }
+      }
+    }
+    textarea.comment { 
+      $num-lines-to-show: 5;
+      $line-height: 1.4em;
+      $padding: .2em;
+      width: 100%; 
+      padding: $padding (2 * $padding);
+      line-height: $line-height;
+      height: ($num-lines-to-show * $line-height) + (2*$padding) - (($line-height - 1)/2);
+    }
+    .answer-annotation { display: block; margin: 0; }
+
+    /* for debugging the input value field. enable the debug flag on the inputtype */
+    .debug-value {
+        color: #fff;
+        padding: 1em;
+        margin: 1em 0;
+        background-color: #999;
+        border: 1px solid #000;
+        input[type="text"] { width: 100%; }
+        pre { background-color: #CCC; color: #000; }
+        &:before {
+          display: block;
+          content: "debug input value";
+          text-transform: uppercase;
+          font-weight: bold;
+          font-size: 1.5em;
+        }
+    }
   }
 }

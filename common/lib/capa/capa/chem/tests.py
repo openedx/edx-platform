@@ -2,7 +2,7 @@ import codecs
 from fractions import Fraction
 import unittest
 
-from chemcalc import (compare_chemical_expression, divide_chemical_expression,
+from .chemcalc import (compare_chemical_expression, divide_chemical_expression,
                       render_to_html, chemical_equations_equal)
 
 import miller
@@ -277,7 +277,6 @@ class Test_Render_Equations(unittest.TestCase):
 
     def test_render9(self):
         s = "5[Ni(NH3)4]^2+ + 5/2SO4^2-"
-        #import ipdb; ipdb.set_trace()
         out = render_to_html(s)
         correct = u'<span class="math">5[Ni(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>+<sup>5</sup>&frasl;<sub>2</sub>SO<sub>4</sub><sup>2-</sup></span>'
         log(out + ' ------- ' + correct, 'html')

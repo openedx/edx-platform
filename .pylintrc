@@ -12,7 +12,7 @@ profile=no
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS
+ignore=CVS, migrations
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -33,7 +33,16 @@ load-plugins=
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
-disable=E1102,W0142
+disable=
+# W0141: Used builtin function 'map'
+# W0142: Used * or ** magic
+# R0201: Method could be a function
+# R0901: Too many ancestors
+# R0902: Too many instance attributes
+# R0903: Too few public methods (1/2)
+# R0904: Too many public methods
+# R0913: Too many arguments
+    W0141,W0142,R0201,R0901,R0902,R0903,R0904,R0913
 
 
 [REPORTS]
@@ -43,7 +52,7 @@ disable=E1102,W0142
 output-format=text
 
 # Include message's id in output
-include-ids=no
+include-ids=yes
 
 # Put messages in a separate file for each module / package specified on the
 # command line instead of printing them on stdout. Reports (if any) will be
@@ -97,7 +106,7 @@ bad-functions=map,filter,apply,input
 module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
 
 # Regular expression which should only match correct module level names
-const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__)|log|urlpatterns)$
 
 # Regular expression which should only match correct class names
 class-rgx=[A-Z_][a-zA-Z0-9]+$
@@ -106,7 +115,7 @@ class-rgx=[A-Z_][a-zA-Z0-9]+$
 function-rgx=[a-z_][a-z0-9_]{2,30}$
 
 # Regular expression which should only match correct method names
-method-rgx=[a-z_][a-z0-9_]{2,30}$
+method-rgx=([a-z_][a-z0-9_]{2,60}|setUp|set[Uu]pClass|tearDown|tear[Dd]ownClass|assert[A-Z]\w*)$
 
 # Regular expression which should only match correct instance attribute names
 attr-rgx=[a-z_][a-z0-9_]{2,30}$
@@ -129,7 +138,7 @@ bad-names=foo,bar,baz,toto,tutu,tata
 
 # Regular expression which should only match functions or classes name which do
 # not require a docstring
-no-docstring-rgx=__.*__
+no-docstring-rgx=(__.*__|test_.*)
 
 
 [MISCELLANEOUS]

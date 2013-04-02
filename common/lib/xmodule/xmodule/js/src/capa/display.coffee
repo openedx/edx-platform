@@ -41,6 +41,11 @@ class @Problem
         @el.attr progress: response.progress_status
         @el.trigger('progressChanged')
 
+  forceUpdate: (response) =>
+    @el.attr progress: response.progress_status
+    @el.trigger('progressChanged')
+    
+
   queueing: =>
     @queued_items = @$(".xqueue")
     @num_queued_items = @queued_items.length
@@ -71,10 +76,29 @@ class @Problem
       
       @num_queued_items = @new_queued_items.length
       if @num_queued_items == 0 
+        @forceUpdate response
         delete window.queuePollerID
       else
         # TODO: Some logic to dynamically adjust polling rate based on queuelen
         window.queuePollerID = window.setTimeout(@poll, 1000)
+
+
+  # Use this if you want to make an ajax call on the input type object 
+  # static method so you don't have to instantiate a Problem in order to use it
+  # Input:
+  #   url: the AJAX url of the problem 
+  #   input_id: the input_id of the input you would like to make the call on
+  #     NOTE: the id is the ${id} part of "input_${id}" during rendering 
+  #           If this function is passed the entire prefixed id, the backend may have trouble
+  #           finding the correct input
+  #   dispatch: string that indicates how this data should be handled by the inputtype
+  #   callback: the function that will be called once the AJAX call has been completed.
+  #             It will be passed a response object
+  @inputAjax: (url, input_id, dispatch, data, callback) ->
+    data['dispatch'] = dispatch
+    data['input_id'] = input_id
+    $.postWithPrefix "#{url}/input_ajax", data, callback
+    
 
   render: (content) ->
     if content
@@ -262,9 +286,8 @@ class @Problem
   save: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
-      if response.success
-        saveMessage = "Your answers have been saved but not graded. Hit 'Check' to grade them."
-        @gentle_alert saveMessage
+      saveMessage = response.msg
+      @gentle_alert saveMessage
       @updateProgress response
 
   refreshMath: (event, element) =>

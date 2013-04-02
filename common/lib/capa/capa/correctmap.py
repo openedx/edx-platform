@@ -27,6 +27,7 @@ class CorrectMap(object):
         self.cmap = dict()
         self.items = self.cmap.items
         self.keys = self.cmap.keys
+        self.overall_message = ""
         self.set(*args, **kwargs)
 
     def __getitem__(self, *args, **kwargs):
@@ -46,7 +47,7 @@ class CorrectMap(object):
             queuestate=None, **kwargs):
 
         if answer_id is not None:
-            self.cmap[answer_id] = {'correctness': correctness,
+            self.cmap[str(answer_id)] = {'correctness': correctness,
                                     'npoints': npoints,
                                     'msg': msg,
                                     'hint': hint,
@@ -79,22 +80,23 @@ class CorrectMap(object):
 
         Special migration case:
             If correct_map is a one-level dict, then convert it to the new dict of dicts format.
-        '''
-        if correct_map and not (type(correct_map[correct_map.keys()[0]]) == dict):
-            # empty current dict
-            self.__init__()
 
-            # create new dict entries
+        '''
+        # empty current dict
+        self.__init__()
+
+        # create new dict entries
+        if correct_map and not isinstance(correct_map.values()[0], dict):
+            # special migration
             for k in correct_map:
-                self.set(k, correct_map[k])
+                self.set(k, correctness=correct_map[k])
         else:
-            self.__init__()
             for k in correct_map:
                 self.set(k, **correct_map[k])
 
     def is_correct(self, answer_id):
         if answer_id in self.cmap:
-            return self.cmap[answer_id]['correctness'] == 'correct'
+            return self.cmap[answer_id]['correctness'] in ['correct', 'partially-correct']
         return None
 
     def is_queued(self, answer_id):
@@ -104,9 +106,13 @@ class CorrectMap(object):
         return self.is_queued(answer_id) and self.cmap[answer_id]['queuestate']['key'] == test_key
 
     def get_queuetime_str(self, answer_id):
-        return self.cmap[answer_id]['queuestate']['time']
+        if self.cmap[answer_id]['queuestate']:
+            return self.cmap[answer_id]['queuestate']['time']
+        else:
+            return None
 
     def get_npoints(self, answer_id):
+        """Return the number of points for an answer, used for partial credit."""
         npoints = self.get_property(answer_id, 'npoints')
         if npoints is not None:
             return npoints
@@ -153,3 +159,15 @@ class CorrectMap(object):
         if not isinstance(other_cmap, CorrectMap):
             raise Exception('CorrectMap.update called with invalid argument %s' % other_cmap)
         self.cmap.update(other_cmap.get_dict())
+        self.set_overall_message(other_cmap.get_overall_message())
+
+
+    def set_overall_message(self, message_str):
+        """ Set a message that applies to the question as a whole,
+            rather than to individual inputs. """
+        self.overall_message = str(message_str) if message_str else ""
+
+    def get_overall_message(self):
+        """ Retrieve a message that applies to the question as a whole.
+        If no message is available, returns the empty string """
+        return self.overall_message

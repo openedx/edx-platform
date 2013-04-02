@@ -9,6 +9,7 @@ if Backbone?
       "click .browse-topic-drop-search-input": "ignoreClick"
       "click .post-list .list-item a": "threadSelected"
       "click .post-list .more-pages a": "loadMorePages"
+      "change .cohort-options": "chooseCohort"
       'keyup .browse-topic-drop-search-input': DiscussionFilter.filterDrop
 
     initialize: ->
@@ -128,10 +129,20 @@ if Backbone?
       switch @mode
         when 'search'
           options.search_text = @current_search
+          if @group_id
+            options.group_id = @group_id          
         when 'followed'
           options.user_id = window.user.id
+          options.group_id = "all"
         when 'commentables'
           options.commentable_ids = @discussionIds
+          if @group_id
+            options.group_id = @group_id
+        when 'all'
+          if @group_id
+            options.group_id = @group_id
+        
+    
       @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
 
     renderThread: (thread) =>
@@ -263,13 +274,25 @@ if Backbone?
         if discussionId == "#all"
           @discussionIds = ""
           @$(".post-search-field").val("")
+          @$('.cohort').show()                    
           @retrieveAllThreads()
         else if discussionId == "#following"
           @retrieveFollowed(event)
+          @$('.cohort').hide()
         else
           discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
-          @retrieveDiscussions(discussionIds)
-
+          
+          if $(event.target).attr('cohorted') == "True"
+            @retrieveDiscussions(discussionIds, "function(){$('.cohort').show();}")
+          else
+            @retrieveDiscussions(discussionIds, "function(){$('.cohort').hide();}")
+    
+    chooseCohort: (event) ->
+      @group_id = @$('.cohort-options :selected').val()
+      @collection.current_page = 0
+      @collection.reset()
+      @loadMorePages(event)
+      
     retrieveDiscussion: (discussion_id, callback=null) ->
       url = DiscussionUtil.urlFor("retrieve_discussion", discussion_id)
       DiscussionUtil.safeAjax

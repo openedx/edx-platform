@@ -169,6 +169,12 @@ body.discussion {
         }
       }
 
+      .form-group-label {
+        display: block;
+        padding-top: 5px;
+        color:#fff;
+      }
+
       .topic_dropdown_button {
         position: relative;
         z-index: 1000;
@@ -181,7 +187,7 @@ body.discussion {
         .drop-arrow {
           float: right;
           color: #999;
-          line-height: 36px;
+          line-height: 37px;
         }
       }
 
@@ -971,7 +977,8 @@ body.discussion {
   }
 
   .sort-bar {
-    height: 27px;
+    height: auto;
+    min-height: 27px;
     border-bottom: 1px solid #a3a3a3;
     @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
     background-color: #aeaeae;
@@ -1019,6 +1026,18 @@ body.discussion {
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 1px rgba(0, 0, 0, .2) inset;
       }
 
+    }
+    .group-filter-label {
+      width: 40px;
+      margin-left:10px;
+    }
+
+    .group-filter-select {
+      margin: 5px 0px 5px 5px;
+      width: 80px;
+      font-size:10px;
+      background: transparent;
+      border-color: #ccc;
     }
   }
 
@@ -1327,6 +1346,8 @@ body.discussion {
       margin-left: 40px;
     }
 
+
+
     .post-tools {
       @include clearfix;
       margin-top: 15px;
@@ -1356,6 +1377,8 @@ body.discussion {
   .responses li header {
     margin-bottom: 20px;
   }
+
+  
 
   .responses {
     list-style: none;
@@ -2411,4 +2434,47 @@ body.discussion {
 
 .discussion-user-threads {
   @extend .discussion-module
+}
+
+
+.group-visibility-label {
+    font-size: 12px;
+    color:#000;
+    font-style: italic;
+    background-color:#fff;
+  }
+
+.discussion-pin {
+      font-size: 12px;
+      float:right;
+      padding-right: 5px;
+      font-style: italic; 
+    }  
+    
+.notpinned .icon
+{
+  display: inline-block; 
+  width: 10px; 
+  height: 14px;
+  padding-right: 3px;
+  background: transparent url('../images/unpinned.png') no-repeat 0 0; 
+}
+
+.pinned .icon
+{
+  display: inline-block; 
+  width: 10px; 
+  height: 14px; 
+  padding-right: 3px;
+  background: transparent url('../images/pinned.png') no-repeat 0 0; 
+}
+
+.pinned span {
+  color: #B82066;
+  font-style: italic;
+}
+
+.notpinned span {
+  color: #888;
+  font-style: italic;
 }

@@ -39,6 +39,8 @@ if Backbone?
           url = DiscussionUtil.urlFor 'threads'
         when 'followed'
           url = DiscussionUtil.urlFor 'followed_threads', options.user_id
+      if options['group_id']
+        data['group_id'] = options['group_id']
       data['sort_key'] = sort_options.sort_key || 'date'
       data['sort_order'] = sort_options.sort_order || 'desc'
       DiscussionUtil.safeAjax
@@ -56,10 +58,31 @@ if Backbone?
           @current_page = response.page
 
     sortByDate: (thread) ->
-      thread.get("created_at")
+        #   
+        #The comment client asks each thread for a value by which to sort the collection
+        #and calls this sort routine regardless of the order returned from the LMS/comments service
+        #so, this takes advantage of this per-thread value and returns tomorrow's date
+        #for pinned threads, ensuring that they appear first, (which is the intent of pinned threads)
+        #
+        if thread.get('pinned')
+          #use tomorrow's date
+          today = new Date();
+          new Date(today.getTime() + (24 * 60 * 60 * 1000));
+        else
+          thread.get("created_at")
+
 
     sortByDateRecentFirst: (thread) ->
-      -(new Date(thread.get("created_at")).getTime())
+        #
+        #Same as above
+        #but negative to flip the order (newest first)
+        #
+        if thread.get('pinned')
+          #use tomorrow's date
+          today = new Date();
+          -(new Date(today.getTime() + (24 * 60 * 60 * 1000)));
+        else
+          -(new Date(thread.get("created_at")).getTime())
       #return String.fromCharCode.apply(String,
       #  _.map(thread.get("created_at").split(""),
       #        ((c) -> return 0xffff - c.charChodeAt()))

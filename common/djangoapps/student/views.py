@@ -44,9 +44,8 @@ from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
-from courseware.models import StudentModuleCache
 from courseware.views import get_module_for_descriptor, jump_to
-from courseware.module_render import get_instance_module
+from courseware.model_data import ModelDataCache
 
 from statsd import statsd
 
@@ -115,7 +114,7 @@ def get_date_for_press(publish_date):
 
 def press(request):
     json_articles = cache.get("student_press_json_articles")
-    if json_articles == None:
+    if json_articles is None:
         if hasattr(settings, 'RSS_URL'):
             content = urllib.urlopen(settings.PRESS_URL).read()
             json_articles = json.loads(content)
@@ -301,7 +300,7 @@ def change_enrollment(request):
     action = request.POST.get("enrollment_action", "")
 
     course_id = request.POST.get("course_id", None)
-    if course_id == None:
+    if course_id is None:
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'There was an error receiving the course id.'}))
 
@@ -312,13 +311,13 @@ def change_enrollment(request):
             course = course_from_id(course_id)
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
-                      .format(user.username, enrollment.course_id))
+                      .format(user.username, course_id))
             return {'success': False, 'error': 'The course requested does not exist.'}
 
         if not has_access(user, course, 'enroll'):
             return {'success': False,
                     'error': 'enrollment in {} not allowed at this time'
-                    .format(course.display_name)}
+                    .format(course.display_name_with_default)}
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
@@ -326,7 +325,12 @@ def change_enrollment(request):
                               "course:{0}".format(course_num),
                               "run:{0}".format(run)])
 
-        enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        try:
+            enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        except IntegrityError:
+            # If we've already created this enrollment in a separate transaction,
+            # then just continue
+            pass
         return {'success': True}
 
     elif action == "unenroll":
@@ -370,14 +374,14 @@ def login_user(request, error=""):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
-        log.warning("Login failed - Unknown user email: {0}".format(email))
+        log.warning(u"Login failed - Unknown user email: {0}".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': 'Email or password is incorrect.'}))  # TODO: User error message
 
     username = user.username
     user = authenticate(username=username, password=password)
     if user is None:
-        log.warning("Login failed - password for {0} is invalid".format(email))
+        log.warning(u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': 'Email or password is incorrect.'}))
 
@@ -385,7 +389,7 @@ def login_user(request, error=""):
         try:
             login(request, user)
             if request.POST.get('remember') == 'true':
-                request.session.set_expiry(None)  # or change to 604800 for 7 days
+                request.session.set_expiry(604800)
                 log.debug("Setting user session to never expire")
             else:
                 request.session.set_expiry(0)
@@ -393,7 +397,7 @@ def login_user(request, error=""):
             log.critical("Login failed - Could not create session. Is memcached running?")
             log.exception(e)
 
-        log.info("Login success - {0} ({1})".format(username, email))
+        log.info(u"Login success - {0} ({1})".format(username, email))
 
         try_change_enrollment(request)
 
@@ -401,7 +405,7 @@ def login_user(request, error=""):
 
         return HttpResponse(json.dumps({'success': True}))
 
-    log.warning("Login failed - Account not active for user {0}, resending activation".format(username))
+    log.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
     not_activated_msg = "This account has not been activated. We have " + \
@@ -554,7 +558,7 @@ def create_account(request, post_override=None):
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
-        js['value'] = "Username should only consist of A-Z and 0-9.".format(field=a)
+        js['value'] = "Username should only consist of A-Z and 0-9, with no spaces.".format(field=a)
         js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
@@ -1071,14 +1075,14 @@ def accept_name_change(request):
 
 @csrf_exempt
 def test_center_login(request):
-    # errors are returned by navigating to the error_url, adding a query parameter named "code" 
+    # errors are returned by navigating to the error_url, adding a query parameter named "code"
     # which contains the error code describing the exceptional condition.
     def makeErrorURL(error_url, error_code):
         log.error("generating error URL with error code {}".format(error_code))
         return "{}?code={}".format(error_url, error_code);
-     
+
     # get provided error URL, which will be used as a known prefix for returning error messages to the
-    # Pearson shell.  
+    # Pearson shell.
     error_url = request.POST.get("errorURL")
 
     # TODO: check that the parameters have not been tampered with, by comparing the code provided by Pearson
@@ -1089,12 +1093,12 @@ def test_center_login(request):
 
     # calculate SHA for query string
     # TODO: figure out how to get the original query string, so we can hash it and compare.
-    
-    
+
+
     if 'clientCandidateID' not in request.POST:
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientCandidateID"));
     client_candidate_id = request.POST.get("clientCandidateID")
-    
+
     # TODO: check remaining parameters, and maybe at least log if they're not matching
     # expected values....
     # registration_id = request.POST.get("registrationID")
@@ -1108,12 +1112,12 @@ def test_center_login(request):
         return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"));
 
     # find testcenter_registration that matches the provided exam code:
-    # Note that we could rely in future on either the registrationId or the exam code, 
-    # or possibly both.  But for now we know what to do with an ExamSeriesCode, 
+    # Note that we could rely in future on either the registrationId or the exam code,
+    # or possibly both.  But for now we know what to do with an ExamSeriesCode,
     # while we currently have no record of RegistrationID values at all.
     if 'vueExamSeriesCode' not in request.POST:
-        # we are not allowed to make up a new error code, according to Pearson, 
-        # so instead of "missingExamSeriesCode", we use a valid one that is 
+        # we are not allowed to make up a new error code, according to Pearson,
+        # so instead of "missingExamSeriesCode", we use a valid one that is
         # inaccurate but at least distinct.  (Sigh.)
         log.error("missing exam series code for cand ID {}".format(client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingPartnerID"));
@@ -1127,11 +1131,11 @@ def test_center_login(request):
     if not registrations:
         log.error("not able to find exam registration for exam {} and cand ID {}".format(exam_series_code, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "noTestsAssigned"));
-    
+
     # TODO: figure out what to do if there are more than one registrations....
     # for now, just take the first...
     registration = registrations[0]
-    
+
     course_id = registration.course_id
     course = course_from_id(course_id)  # assume it will be found....
     if not course:
@@ -1149,19 +1153,19 @@ def test_center_login(request):
     if not timelimit_descriptor:
         log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
-        
-    timelimit_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id, testcenteruser.user, 
-                                                                                 timelimit_descriptor, depth=None)
-    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor, 
+
+    timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
+                                                                             timelimit_descriptor, depth=None)
+    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
                                                  timelimit_module_cache, course_id, position=None)
     if not timelimit_module.category == 'timelimit':
         log.error("cand {} on exam {} for course {}: non-timelimit module at location {}".format(client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
-        
+
     if timelimit_module and timelimit_module.has_ended:
         log.warning("cand {} on exam {} for course {}: test already over at {}".format(client_candidate_id, exam_series_code, course_id, timelimit_module.ending_at))
         return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"));
-    
+
     # check if we need to provide an accommodation:
     time_accommodation_mapping = {'ET12ET' : 'ADDHALFTIME',
                                   'ET30MN' : 'ADD30MIN',
@@ -1174,27 +1178,24 @@ def test_center_login(request):
     # special, hard-coded client ID used by Pearson shell for testing:
     if client_candidate_id == "edX003671291147":
         time_accommodation_code = 'TESTING'
-        
+
     if time_accommodation_code:
         timelimit_module.accommodation_code = time_accommodation_code
-        instance_module = get_instance_module(course_id, testcenteruser.user, timelimit_module, timelimit_module_cache)
-        instance_module.state = timelimit_module.get_instance_state()
-        instance_module.save()
         log.info("cand {} on exam {} for course {}: receiving accommodation {}".format(client_candidate_id, exam_series_code, course_id, time_accommodation_code))
-        
+
     # UGLY HACK!!!
-    # Login assumes that authentication has occurred, and that there is a 
+    # Login assumes that authentication has occurred, and that there is a
     # backend annotation on the user object, indicating which backend
     # against which the user was authenticated.  We're authenticating here
     # against the registration entry, and assuming that the request given
     # this information is correct, we allow the user to be logged in
     # without a password.  This could all be formalized in a backend object
-    # that does the above checking.  
+    # that does the above checking.
     # TODO: (brian) create a backend class to do this.
-    # testcenteruser.user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)    
-    testcenteruser.user.backend = "%s.%s" % ("TestcenterAuthenticationModule", "TestcenterAuthenticationClass")    
+    # testcenteruser.user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+    testcenteruser.user.backend = "%s.%s" % ("TestcenterAuthenticationModule", "TestcenterAuthenticationClass")
     login(request, testcenteruser.user)
-    
+
     # And start the test:
     return jump_to(request, course_id, location)
 
@@ -1203,7 +1204,7 @@ def _get_news(top=None):
     "Return the n top news items on settings.RSS_URL"
 
     feed_data = cache.get("students_index_rss_feed_data")
-    if feed_data == None:
+    if feed_data is None:
         if hasattr(settings, 'RSS_URL'):
             feed_data = urllib.urlopen(settings.RSS_URL).read()
         else:

@@ -3,6 +3,7 @@ if Backbone?
 
     events:
       "click .discussion-vote": "toggleVote"
+      "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
       "click .action-edit": "edit"
       "click .action-delete": "delete"
@@ -24,6 +25,7 @@ if Backbone?
       @delegateEvents()
       @renderDogear()
       @renderVoted()
+      @renderPinned()
       @renderAttrs()
       @$("span.timeago").timeago()
       @convertMath()
@@ -41,8 +43,20 @@ if Backbone?
       else
         @$("[data-role=discussion-vote]").removeClass("is-cast")
 
+    renderPinned: =>
+      if @model.get("pinned")
+        @$("[data-role=thread-pin]").addClass("pinned")  
+        @$("[data-role=thread-pin]").removeClass("notpinned")  
+        @$(".discussion-pin .pin-label").html("Pinned")
+      else
+        @$("[data-role=thread-pin]").removeClass("pinned")  
+        @$("[data-role=thread-pin]").addClass("notpinned")  
+        @$(".discussion-pin .pin-label").html("Pin Thread")
+
+
     updateModelDetails: =>
       @renderVoted()
+      @renderPinned()
       @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"])
 
     convertMath: ->
@@ -99,6 +113,36 @@ if Backbone?
     delete: (event) ->
       @trigger "thread:delete", event
 
+    togglePin: (event) ->
+      event.preventDefault()
+      if @model.get('pinned')
+        @unPin()
+      else
+        @pin()
+      
+    pin: ->
+      url = @model.urlFor("pinThread")
+      DiscussionUtil.safeAjax
+        $elem: @$(".discussion-pin")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set('pinned', true)
+        error: =>
+          $('.admin-pin').text("Pinning not currently available")
+       
+    unPin: ->
+      url = @model.urlFor("unPinThread")
+      DiscussionUtil.safeAjax
+        $elem: @$(".discussion-pin")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set('pinned', false)
+
+
     toggleClosed: (event) ->
       $elem = $(event.target)
       url = @model.urlFor('close')
@@ -137,3 +181,5 @@ if Backbone?
       if @model.get('username')?
         params = $.extend(params, user:{username: @model.username, user_url: @model.user_url})
       Mustache.render(@template, params)
+
+     

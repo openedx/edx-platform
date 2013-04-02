@@ -16,7 +16,6 @@ This is used by capa_module.
 from __future__ import division
 
 from datetime import datetime
-import json
 import logging
 import math
 import numpy
@@ -29,20 +28,21 @@ import sys
 
 from lxml import etree
 from xml.sax.saxutils import unescape
+from copy import deepcopy
 
 import chem
+import chem.miller
 import chem.chemcalc
 import chem.chemtools
-import chem.miller
 import verifiers
 import verifiers.draganddrop
 
 import calc
-from correctmap import CorrectMap
+from .correctmap import CorrectMap
 import eia
 import inputtypes
 import customrender
-from util import contextualize_text, convert_files_to_filenames
+from .util import contextualize_text, convert_files_to_filenames
 import xqueue_interface
 
 # to be replaced with auto-registering
@@ -77,7 +77,7 @@ global_context = {'random': random,
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam", "openendedrubric"]
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 #-----------------------------------------------------------------------------
 # main class for this module
@@ -96,8 +96,13 @@ class LoncapaProblem(object):
 
          - problem_text (string): xml defining the problem
          - id           (string): identifier for this problem; often a filename (no spaces)
-         - state        (dict): student state
-         - seed         (int): random number generator seed (int)
+         - seed         (int): random number generator seed (int) 
+         - state        (dict): containing the following keys:
+                                - 'seed' - (int) random number generator seed
+                                - 'student_answers' - (dict) maps input id to the stored answer for that input
+                                - 'correct_map' (CorrectMap) a map of each input to their 'correctness'
+                                - 'done' - (bool) indicates whether or not this problem is considered done
+                                - 'input_state' - (dict) maps input_id to a dictionary that holds the state for that input
          - system       (ModuleSystem): ModuleSystem instance which provides OS,
                                         rendering, and user context
 
@@ -107,21 +112,25 @@ class LoncapaProblem(object):
         self.do_reset()
         self.problem_id = id
         self.system = system
-        self.seed = seed
+        if self.system is None:
+            raise Exception()
 
-        if state:
-            if 'seed' in state:
-                self.seed = state['seed']
-            if 'student_answers' in state:
-                self.student_answers = state['student_answers']
-            if 'correct_map' in state:
-                self.correct_map.set_dict(state['correct_map'])
-            if 'done' in state:
-                self.done = state['done']
+        state = state if state else {}
 
-        # TODO: Does this deplete the Linux entropy pool? Is this fast enough?
-        if not self.seed:
+        # Set seed according to the following priority:
+        #       1. Contained in problem's state
+        #       2. Passed into capa_problem via constructor
+        #       3. Assign from the OS's random number generator
+        self.seed = state.get('seed', seed)
+        if self.seed is None:
             self.seed = struct.unpack('i', os.urandom(4))[0]
+        self.student_answers = state.get('student_answers', {})
+        if 'correct_map' in state:
+            self.correct_map.set_dict(state['correct_map'])
+        self.done = state.get('done', False)
+        self.input_state = state.get('input_state', {})
+
+
 
         # Convert startouttext and endouttext to proper <text></text>
         problem_text = re.sub("startouttext\s*/", "text", problem_text)
@@ -145,6 +154,13 @@ class LoncapaProblem(object):
 
         if not self.student_answers:  # True when student_answers is an empty dict
             self.set_initial_display()
+
+        # dictionary of InputType objects associated with this problem
+        #   input_id string -> InputType object
+        self.inputs = {}
+
+        self.extracted_tree = self._extract_html(self.tree)
+
 
     def do_reset(self):
         '''
@@ -178,6 +194,7 @@ class LoncapaProblem(object):
         return {'seed': self.seed,
                 'student_answers': self.student_answers,
                 'correct_map': self.correct_map.get_dict(),
+                'input_state': self.input_state,
                 'done': self.done}
 
     def get_max_score(self):
@@ -226,6 +243,20 @@ class LoncapaProblem(object):
                 responder.update_score(score_msg, cmap, queuekey)
         self.correct_map.set_dict(cmap.get_dict())
         return cmap
+
+    def ungraded_response(self, xqueue_msg, queuekey):
+        '''
+        Handle any responses from the xqueue that do not contain grades
+        Will try to pass the queue message to all inputtypes that can handle ungraded responses 
+
+        Does not return any value
+        '''
+        # check against each inputtype
+        for the_input in self.inputs.values():
+            # if the input type has an ungraded function, pass in the values
+            if hasattr(the_input, 'ungraded_response'):
+                the_input.ungraded_response(xqueue_msg, queuekey)
+
 
     def is_queued(self):
         '''
@@ -324,7 +355,27 @@ class LoncapaProblem(object):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        return contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        return html
+
+
+    def handle_input_ajax(self, get):
+        '''
+        InputTypes can support specialized AJAX calls. Find the correct input and pass along the correct data
+
+        Also, parse out the dispatch from the get so that it can be passed onto the input type nicely
+        '''
+
+        # pull out the id
+        input_id = get['input_id']
+        if self.inputs[input_id]:
+            dispatch = get['dispatch']
+            return self.inputs[input_id].handle_ajax(dispatch, get)
+        else:
+            log.warning("Could not find matching input for id: %s" % input_id)
+            return {}
+
+
 
     # ======= Private Methods Below ========
 
@@ -458,6 +509,8 @@ class LoncapaProblem(object):
             finally:
                 sys.path = original_path
 
+
+
     def _extract_html(self, problemtree):  # private
         '''
         Main (private) function which converts Problem XML tree to HTML.
@@ -471,7 +524,7 @@ class LoncapaProblem(object):
         if (problemtree.tag == 'script' and problemtree.get('type')
             and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
-            return problemtree
+            return deepcopy(problemtree)
 
         if problemtree.tag in html_problem_semantics:
             return
@@ -484,8 +537,9 @@ class LoncapaProblem(object):
             msg = ''
             hint = ''
             hintmode = None
+            input_id = problemtree.get('id')
             if problemid in self.correct_map:
-                pid = problemtree.get('id')
+                pid = input_id
                 status = self.correct_map.get_correctness(pid)
                 msg = self.correct_map.get_msg(pid)
                 hint = self.correct_map.get_hint(pid)
@@ -494,23 +548,29 @@ class LoncapaProblem(object):
             value = ""
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
-
+            
+            if input_id not in self.input_state:
+                self.input_state[input_id] = {}
+                
             # do the rendering
-
             state = {'value': value,
                    'status': status,
-                   'id': problemtree.get('id'),
+                   'id': input_id,
+                   'input_state': self.input_state[input_id],
                    'feedback': {'message': msg,
                                 'hint': hint,
                                 'hintmode': hintmode, }}
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
-            the_input = input_type_cls(self.system, problemtree, state)
-            return the_input.get_html()
+            # save the input type so that we can make ajax calls on it if we need to
+            self.inputs[input_id] = input_type_cls(self.system, problemtree, state)
+            return self.inputs[input_id].get_html()
 
         # let each Response render itself
         if problemtree in self.responders:
-            return self.responders[problemtree].render_html(self._extract_html)
+            overall_msg = self.correct_map.get_overall_message()
+            return self.responders[problemtree].render_html(self._extract_html,
+                                                response_msg=overall_msg)
 
         # let each custom renderer render itself:
         if problemtree.tag in customrender.registry.registered_tags():

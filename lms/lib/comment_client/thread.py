@@ -1,4 +1,4 @@
-from utils import *
+from .utils import *
 
 import models
 import settings
@@ -11,12 +11,12 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'read', 'group_id'
+        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned'
     ]
 
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'tags', 'user_id', 'commentable_id', 'group_id'
+        'closed', 'tags', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned'
     ]
 
     initializable_fields = updatable_fields
@@ -79,3 +79,23 @@ class Thread(models.Model):
 
         response = perform_request('get', url, request_params)
         self.update_attributes(**response)
+        
+    def pin(self, user, thread_id):
+        url = _url_for_pin_thread(thread_id)
+        params = {'user_id': user.id}
+        request = perform_request('put', url, params)
+        self.update_attributes(request)    
+
+    def un_pin(self, user, thread_id):
+        url = _url_for_un_pin_thread(thread_id)
+        params = {'user_id': user.id}
+        request = perform_request('put', url, params)
+        self.update_attributes(request)    
+        
+        
+def _url_for_pin_thread(thread_id):
+    return "{prefix}/threads/{thread_id}/pin".format(prefix=settings.PREFIX, thread_id=thread_id)      
+       
+def _url_for_un_pin_thread(thread_id):
+    return "{prefix}/threads/{thread_id}/unpin".format(prefix=settings.PREFIX, thread_id=thread_id)      
+       

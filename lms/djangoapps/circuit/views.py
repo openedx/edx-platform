@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 
-from models import ServerCircuit
+from .models import ServerCircuit
 
 
 def circuit_line(circuit):

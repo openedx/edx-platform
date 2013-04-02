@@ -1,5 +1,9 @@
 div.book-wrapper {
   @extend .table-wrapper;
+  display: table;
+  table-layout:  fixed;
+  padding: 1em 8em; 
+
 
   #open_close_accordion {
     display: none;
@@ -11,7 +15,9 @@ div.book-wrapper {
     @include box-sizing(border-box);
     padding: 10px 0;
     border-radius: 3px 0 0 3px;
-    border-right: 1px solid #ccc;
+    border: 1px solid #ccc;
+    border-right: none;
+    width: 250px;
 
     ul#booknav {
       font-size: em(14);
@@ -86,6 +92,8 @@ div.book-wrapper {
 
   section.book {
     @extend .content;
+    padding: 0;
+    width:76%;
 
     nav {
       @extend .clearfix;
@@ -102,6 +110,7 @@ div.book-wrapper {
           position: absolute;
           height: 100%;
           width: flex-grid(2, 8);
+          z-index: 1;
 
           a {
             background-color: rgba(#000, .7);
@@ -151,11 +160,25 @@ div.book-wrapper {
 
     section.page {
       border: 1px solid $border-color;
+      background-color: #fff;
       position: relative;
       text-align: center;
+      padding: lh();
+      margin-right:10%;
+      border-radius: 0 3px 3px 0;
 
       img {
         max-width: 100%;
+      }
+
+      div {
+        text-align: left;
+      	line-height: 1.6em;
+      	margin: 5px;
+	
+	.Paragraph, h2 {
+	   margin-top: 10px;
+	}	   
       }
     }
   }

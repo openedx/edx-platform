@@ -49,7 +49,7 @@ def course_wiki_redirect(request, course_id):
     if not course_slug:
         log.exception("This course is improperly configured. The slug cannot be empty.")
         valid_slug = False
-    if re.match('^[-\w\.]+$', course_slug) == None:
+    if re.match('^[-\w\.]+$', course_slug) is None:
         log.exception("This course is improperly configured. The slug can only contain letters, numbers, periods or hyphens.")
         valid_slug = False
 
@@ -95,7 +95,7 @@ def course_wiki_redirect(request, course_id):
             root,
             course_slug,
             title=course_slug,
-            content="This is the wiki for **{0}**'s _{1}_.".format(course.org, course.title),
+            content="This is the wiki for **{0}**'s _{1}_.".format(course.org, course.display_name_with_default),
             user_message="Course page automatically created.",
             user=None,
             ip_address=None,

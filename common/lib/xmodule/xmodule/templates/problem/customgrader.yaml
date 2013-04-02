@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Custom Grader
+    display_name: Custom Python-Evaluated Input
     rerandomize: never
     showanswer: always
     weight: ""
@@ -8,7 +8,7 @@ metadata:
 data: |
   <problem>
   <p>
-  A custom response problem accepts one or more lines of text input from the
+  A custom python-evaluated input problem accepts one or more lines of text input from the
   student, and evaluates the inputs for correctness based on evaluation using a 
   python script embedded within the problem.
   </p>
