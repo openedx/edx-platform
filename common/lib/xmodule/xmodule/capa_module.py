@@ -83,7 +83,7 @@ class ComplexEncoder(json.JSONEncoder):
 
 
 class CapaFields(object):
-    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
+    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
     max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
@@ -91,12 +91,12 @@ class CapaFields(object):
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
     rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
-    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
-    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.student_state)
-    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
-    done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
+    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
+    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
+    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
+    done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
-    seed = StringyInteger(help="Random seed for this student", scope=Scope.student_state)
+    seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
