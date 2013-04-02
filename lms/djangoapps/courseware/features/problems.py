@@ -2,6 +2,8 @@
 Steps for problem.feature lettuce tests
 '''
 
+#pylint: disable=C0111
+#pylint: disable=W0621
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -339,7 +341,7 @@ def assert_answer_mark(step, problem_type, correctness):
 
     # At least one of the correct selectors should be present
     for sel in selector_dict[problem_type]:
-        has_expected = world.browser.is_element_present_by_css(sel, wait_time=4)
+        has_expected = world.is_css_present(sel)
 
         # As soon as we find the selector, break out of the loop
         if has_expected:
@@ -366,7 +368,7 @@ def inputfield(problem_type, choice=None, input_num=1):
 
 
     # If the input element doesn't exist, fail immediately
-    assert(world.browser.is_element_present_by_css(sel, wait_time=4))
+    assert world.is_css_present(sel)
 
     # Retrieve the input element
     return world.browser.find_by_css(sel)
