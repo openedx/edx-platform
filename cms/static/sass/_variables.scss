@@ -22,6 +22,7 @@ $black-t0: rgba(0,0,0,0.125);
 $black-t1: rgba(0,0,0,0.25);
 $black-t2: rgba(0,0,0,0.50);
 $black-t3: rgba(0,0,0,0.75);
+
 $white: rgb(255,255,255);
 $white-t0: rgba(255,255,255,0.125);
 $white-t1: rgba(255,255,255,0.25);
@@ -34,6 +35,7 @@ $gray-l2: tint($gray,40%);
 $gray-l3: tint($gray,60%);
 $gray-l4: tint($gray,80%);
 $gray-l5: tint($gray,90%);
+$gray-l6: tint($gray,95%);
 $gray-d1: shade($gray,20%);
 $gray-d2: shade($gray,40%);
 $gray-d3: shade($gray,60%);

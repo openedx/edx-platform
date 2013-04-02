@@ -1,3 +1,6 @@
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from lettuce import step, world
 from django.contrib.auth.models import User
 
@@ -28,9 +31,7 @@ def i_should_see_the_login_error_message(step, msg):
 
 @step(u'click the dropdown arrow$')
 def click_the_dropdown(step):
-    css = ".dropdown"
-    e = world.browser.find_by_css(css)
-    e.click()
+    world.css_click('.dropdown')
 
 #### helper functions
 
