@@ -1580,7 +1580,8 @@ def import_course(request, org, course, name):
                 shutil.move(r / fname, course_dir)
 
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-            [course_subdir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace=Location(location))
+            [course_subdir], load_error_modules=False, static_content_store=contentstore(), 
+            target_location_namespace=Location(location), draft_store=modulestore())
 
         # we can blow this away when we're done importing.
         shutil.rmtree(course_dir)

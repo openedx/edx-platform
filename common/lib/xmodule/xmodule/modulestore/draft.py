@@ -106,7 +106,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         return wrap_draft(super(DraftModuleStore, self).clone_item(source, as_draft(location)))
 
-    def update_item(self, location, data):
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data
@@ -115,9 +115,13 @@ class DraftModuleStore(ModuleStoreBase):
         data: A nested dictionary of problem data
         """
         draft_loc = as_draft(location)
-        draft_item = self.get_item(location)
-        if not getattr(draft_item, 'is_draft', False):
-            self.clone_item(location, draft_loc)
+        try:
+            draft_item = self.get_item(location)
+            if not getattr(draft_item, 'is_draft', False):
+               self.clone_item(location, draft_loc)
+        except ItemNotFoundError, e:
+            if not allow_not_found:
+                raise e
 
         return super(DraftModuleStore, self).update_item(draft_loc, data)
 

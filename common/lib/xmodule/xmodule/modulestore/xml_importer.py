@@ -6,11 +6,13 @@ from path import path
 
 from xblock.core import Scope
 
-from .xml import XMLModuleStore
+from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from .exceptions import DuplicateItemError
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 from .inheritance import own_metadata
+from xmodule.errortracker import make_error_tracker
+from collections import defaultdict
 
 log = logging.getLogger(__name__)
 
@@ -175,7 +177,8 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
 
 def import_from_xml(store, data_dir, course_dirs=None,
                     default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True, static_content_store=None, target_location_namespace=None, verbose=False):
+                    load_error_modules=True, static_content_store=None, target_location_namespace=None, 
+                    verbose=False, draft_store=None):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
@@ -190,7 +193,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
     """
 
-    module_store = XMLModuleStore(
+    xml_module_store = XMLModuleStore(
         data_dir,
         default_class=default_class,
         course_dirs=course_dirs,
@@ -201,7 +204,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
     # to enumerate the entire collection of course modules. It will be left as a TBD to implement that
     # method on XmlModuleStore.
     course_items = []
-    for course_id in module_store.modules.keys():
+    for course_id in xml_module_store.modules.keys():
 
         if target_location_namespace is not None:
             pseudo_course_id = '/'.join([target_location_namespace.org, target_location_namespace.course])
@@ -222,7 +225,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
             # Quick scan to get course module as we need some info from there. Also we need to make sure that the
             # course module is committed first into the store
-            for module in module_store.modules[course_id].itervalues():
+            for module in xml_module_store.modules[course_id].itervalues():
                 if module.category == 'course':
                     course_data_path = path(data_dir) / module.data_dir
                     course_location = module.location
@@ -239,11 +242,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                             {"type": "discussion", "name": "Discussion"},
                             {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
-
-                    if hasattr(module, 'data'):
-                        store.update_item(module.location, module.data)
-                    store.update_children(module.location, module.children)
-                    store.update_metadata(module.location, dict(own_metadata(module)))
+                    import_module(module, store, course_data_path, static_content_store)
 
                     # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
                     # so let's make sure we import in case there are no other references to it in the modules
@@ -257,11 +256,11 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 _namespace_rename = target_location_namespace if target_location_namespace is not None else course_location
 
                 # first pass to find everything in /static/
-                import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store,
+                import_static_content(xml_module_store.modules[course_id], course_location, course_data_path, static_content_store,
                     _namespace_rename, subpath='static', verbose=verbose)
 
             # finally loop through all the modules
-            for module in module_store.modules[course_id].itervalues():
+            for module in xml_module_store.modules[course_id].itervalues():
 
                 if module.category == 'course':
                     # we've already saved the course module up at the top of the loop
@@ -275,49 +274,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 if verbose:
                     log.debug('importing module location {0}'.format(module.location))
 
-                content = {}
-                for field in module.fields:
-                    if field.scope != Scope.content:
-                        continue
-                    try:
-                        content[field.name] = module._model_data[field.name]
-                    except KeyError:
-                        # Ignore any missing keys in _model_data
-                        pass
-     
-                if 'data' in content:
-                    module_data = content['data']
+                import_module(module, store, course_data_path, static_content_store)
 
-                    # cdodge: now go through any link references to '/static/' and make sure we've imported
-                    # it as a StaticContent asset
-                    try:
-                        remap_dict = {}
-
-                        # use the rewrite_links as a utility means to enumerate through all links
-                        # in the module data. We use that to load that reference into our asset store
-                        # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
-                        # do the rewrites natively in that code.
-                        # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
-                        # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
-                        # no good, so we have to do this kludge
-                        if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                            lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path,
-                                static_content_store, link, remap_dict))                     
-
-                            for key in remap_dict.keys():
-                                module_data = module_data.replace(key, remap_dict[key])
-
-                    except Exception, e:
-                        logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
-
-                store.update_item(module.location, content)
-
-                if hasattr(module, 'children') and module.children != []:
-                    store.update_children(module.location, module.children)
-
-                # NOTE: It's important to use own_metadata here to avoid writing
-                # inherited metadata everywhere.
-                store.update_metadata(module.location, dict(own_metadata(module)))
         finally:
             # turn back on all write signalling
             if pseudo_course_id  in store.ignore_write_events_on_courses:
@@ -326,13 +284,110 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     target_location_namespace is not None else course_location)
 
         # now import any 'draft' items
-        import_course_draft(store, course_data_path, target_location_namespace)
+        if draft_store is not None:
+            import_course_draft(xml_module_store, draft_store, course_data_path, static_content_store, target_location_namespace)
 
-    return module_store, course_items
+    return xml_module_store, course_items
+
+def import_module(module, store, course_data_path, static_content_store, allow_not_found=False):
+    content = {}
+    for field in module.fields:
+        if field.scope != Scope.content:
+            continue
+        try:
+            content[field.name] = module._model_data[field.name]
+        except KeyError:
+            # Ignore any missing keys in _model_data
+            pass
+
+    if 'data' in content:
+        module_data = content['data']
+
+        # cdodge: now go through any link references to '/static/' and make sure we've imported
+        # it as a StaticContent asset
+        try:
+            remap_dict = {}
+
+            # use the rewrite_links as a utility means to enumerate through all links
+            # in the module data. We use that to load that reference into our asset store
+            # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
+            # do the rewrites natively in that code.
+            # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
+            # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
+            # no good, so we have to do this kludge
+            if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
+                lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path,
+                    static_content_store, link, remap_dict))                     
+
+                for key in remap_dict.keys():
+                    module_data = module_data.replace(key, remap_dict[key])
+
+        except Exception, e:
+            logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
+
+    if allow_not_found:
+        store.update_item(module.location, content, allow_not_found=allow_not_found)
+    else:
+        store.update_item(module.location, content)
+
+    if hasattr(module, 'children') and module.children != []:
+        store.update_children(module.location, module.children)
+
+    # NOTE: It's important to use own_metadata here to avoid writing
+    # inherited metadata everywhere.
+    store.update_metadata(module.location, dict(own_metadata(module)))    
 
 
-def import_course_draft(store, course_data_path, target_location_namespace):
-    pass
+def import_course_draft(xml_module_store, store, course_data_path, static_content_store, target_location_namespace):
+    '''
+    This will import all the content inside of the 'drafts' folder, if it exists
+    NOTE: This is not a full course import, basically in our current application only verticals (and downwards)
+    can be in draft. Therefore, we need to use slightly different call points into the import process_xml
+    as we can't simply call XMLModuleStore() constructor (like we do for importing public content)
+    '''
+    draft_dir = course_data_path + "/drafts"
+    if not os.path.exists(draft_dir):
+        return
+
+    # create a new 'System' object which will manage the importing
+    errorlog = make_error_tracker()
+    system = ImportSystem(
+        xml_module_store,
+        target_location_namespace.course_id,
+        draft_dir,
+        {},
+        errorlog.tracker,
+        ParentTracker(),
+        None,
+    )
+
+    # now walk the /vertical directory where each file in there will be a draft copy of the Vertical
+    for dirname, dirnames, filenames in os.walk(draft_dir + "/vertical"):
+        for filename in filenames:
+            module_path = os.path.join(dirname, filename)
+            with open(module_path) as f:
+                try:
+                    xml = f.read().decode('utf-8')
+                    descriptor = system.process_xml(xml)
+
+                    def _import_module(module):
+                        module.location = module.location._replace(revision='draft')
+                        import_module(module, store, course_data_path, static_content_store, allow_not_found=True)
+                        for child in module.get_children():
+                            _import_module(child)
+
+                    # HACK: since we are doing partial imports of drafts
+                    # the vertical doesn't have the 'url-name' set in the attributes (they are normally in the parent
+                    # object, aka sequential), so we have to replace the location.name with the XML filename 
+                    # that is part of the pack
+                    fn, fileExtension = os.path.splitext(filename)
+                    descriptor.location = descriptor.location._replace(name=fn)
+
+                    _import_module(descriptor)
+
+                except Exception, e:
+                    logging.exception('There was an error. {0}'.format(unicode(e)))
+                    pass
 
 
 def remap_namespace(module, target_location_namespace):
