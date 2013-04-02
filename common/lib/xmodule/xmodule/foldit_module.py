@@ -18,7 +18,7 @@ class FolditFields(object):
     # default to what Spring_7012x uses
     required_level = Integer(default=4, scope=Scope.settings)
     required_sublevel = Integer(default=5, scope=Scope.settings)
-    due = Date(help="Date that this problem is due by", scope=Scope.settings, default='')
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
 
     show_basic_score = String(scope=Scope.settings, default='false')
     show_leaderboard = String(scope=Scope.settings, default='false')
