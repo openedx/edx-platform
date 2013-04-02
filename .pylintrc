@@ -34,6 +34,7 @@ load-plugins=
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
 disable=
+# C0301: Line too long
 # W0141: Used builtin function 'map'
 # W0142: Used * or ** magic
 # R0201: Method could be a function
@@ -42,7 +43,7 @@ disable=
 # R0903: Too few public methods (1/2)
 # R0904: Too many public methods
 # R0913: Too many arguments
-    W0141,W0142,R0201,R0901,R0902,R0903,R0904,R0913
+    C0301,W0141,W0142,R0201,R0901,R0902,R0903,R0904,R0913
 
 
 [REPORTS]
