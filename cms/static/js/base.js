@@ -83,6 +83,8 @@ $(document).ready(function () {
     // general link management - smooth scrolling page links
     $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
+    // tender feedback window scrolling
+    $('a.show-tender').bind('click', smoothScrollTop);
 
     // toggling overview section details
     $(function () {
@@ -157,6 +159,18 @@ function smoothScrollLink(e) {
         speed: 1000,
         scrollElement: null,
         scrollTarget: $(this).attr('href')
+    });
+}
+
+function smoothScrollTop(e) {
+    (e).preventDefault();
+
+    $.smoothScroll({ 
+        offset: -200, 
+        easing: 'swing', 
+        speed: 1000,
+        scrollElement: null,
+        scrollTarget: $('#view-top')
     });
 }
 
