@@ -302,6 +302,16 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         root_dir = path(mkdtemp_clean())
 
+        # now create a private vertical
+        private_vertical = draft_store.clone_item(vertical.location, 
+            Location(['i4x', 'edX', 'full', 'vertical', 'a_private_vertical', None]))
+
+        # add private to list of children
+        sequential = module_store.get_item(Location(['i4x', 'edX', 'full', 
+            'sequential', 'Administrivia_and_Circuit_Elements', None]))
+        module_store.update_children(sequential.location, sequential.children + [private_vertical.location.url()])
+
+
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
         # export out to a tempdir
@@ -356,6 +366,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertTrue(hasattr(vertical, 'is_draft'))
         for child in vertical.get_children():
             self.assertTrue(hasattr(child, 'is_draft'))
+
+        # verify that we have the private vertical
+        test_private_vertical = draft_store.get_item(Location(['i4x', 'edX', 'full', 
+            'vertical', 'vertical_66', None]))
+
+        self.assertTrue(hasattr(test_private_vertical, 'is_draft'))
 
         shutil.rmtree(root_dir)
 
