@@ -9,7 +9,7 @@
   width: 100%;
 
   .wrapper-inner {
-    @include linear-gradient($gray-d3 0%, $gray-d3 94%, $black 100%);
+    @include linear-gradient($gray-d3 0%, $gray-d3 98%, $black 100%);
     @extend .depth0;
     display: none;
     width: 100% !important;
