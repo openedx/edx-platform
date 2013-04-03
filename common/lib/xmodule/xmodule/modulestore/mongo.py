@@ -3,7 +3,6 @@ import sys
 import logging
 import copy
 
-from bson.son import SON
 from collections import namedtuple
 from fs.osfs import OSFS
 from itertools import repeat
@@ -20,7 +19,7 @@ from xmodule.error_module import ErrorDescriptor
 from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from xblock.core import Scope
 
-from . import ModuleStoreBase, Location
+from . import ModuleStoreBase, Location, namedtuple_to_son
 from .draft import DraftModuleStore
 from .exceptions import (ItemNotFoundError,
                          DuplicateItemError)
@@ -207,16 +206,6 @@ def location_to_query(location, wildcard=True):
     return query
 
 
-def namedtuple_to_son(ntuple, prefix=''):
-    """
-    Converts a namedtuple into a SON object with the same key order
-    """
-    son = SON()
-    for idx, field_name in enumerate(ntuple._fields):
-        son[prefix + field_name] = ntuple[idx]
-    return son
-
-
 metadata_cache_key = attrgetter('org', 'course')
 
 
@@ -388,6 +377,13 @@ class MongoModuleStore(ModuleStoreBase):
         item['location'] = item['_id']
         del item['_id']
 
+    def _query_children_for_cache_children(self, items):
+        # first get non-draft in a round-trip
+        query = {
+            '_id': {'$in': [namedtuple_to_son(Location(item)) for item in items]}
+        }
+        return list(self.collection.find(query))
+
     def _cache_children(self, items, depth=0):
         """
         Returns a dictionary mapping Location -> item data, populated with json data
@@ -412,13 +408,10 @@ class MongoModuleStore(ModuleStoreBase):
             # Load all children by id. See
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
+            to_process = []
             if children:
-                query = {
-                    '_id': {'$in': [namedtuple_to_son(Location(child)) for child in children]}
-                }
-                to_process = self.collection.find(query)
-            else:
-                to_process = []
+                to_process = self._query_children_for_cache_children(children)
+
             # If depth is None, then we just recurse until we hit all the descendents
             if depth is not None:
                 depth -= 1

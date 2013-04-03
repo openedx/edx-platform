@@ -1,25 +1,24 @@
 import cgi
 import datetime
-import dateutil
-import dateutil.parser
 import hashlib
 import json
 import logging
 import traceback
 import sys
 
-from lxml import etree
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
-from capa.responsetypes import StudentInputError
+from capa.responsetypes import StudentInputError,\
+    ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.exceptions import NotFoundError
-from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float
-from .fields import Timedelta
+from xmodule.exceptions import NotFoundError, ProcessingError
+from xblock.core import Integer, Scope, String, Boolean, Object, Float
+from .fields import Timedelta, Date
+from xmodule.util.date_utils import time_to_datetime
 
 log = logging.getLogger("mitx.courseware")
 
@@ -86,14 +85,14 @@ class ComplexEncoder(json.JSONEncoder):
 class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
     max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
-    due = String(help="Date that this problem is due by", scope=Scope.settings)
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
     rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
-    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.student_state, default={})
+    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.student_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
@@ -124,10 +123,7 @@ class CapaModule(CapaFields, XModule):
     def __init__(self, system, location, descriptor, model_data):
         XModule.__init__(self, system, location, descriptor, model_data)
 
-        if self.due:
-            due_date = dateutil.parser.parse(self.due)
-        else:
-            due_date = None
+        due_date = time_to_datetime(self.due)
 
         if self.graceperiod is not None and due_date:
             self.close_date = due_date + self.graceperiod
@@ -150,6 +146,16 @@ class CapaModule(CapaFields, XModule):
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
             self.lcp = self.new_lcp(self.get_state_for_lcp())
+
+            # At this point, we need to persist the randomization seed
+            # so that when the problem is re-loaded (to check/view/save)
+            # it stays the same.
+            # However, we do not want to write to the database
+            # every time the module is loaded.
+            # So we set the seed ONLY when there is not one set already
+            if self.seed is None:
+                self.seed = self.lcp.seed
+
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
@@ -454,7 +460,14 @@ class CapaModule(CapaFields, XModule):
             return 'Error'
 
         before = self.get_progress()
-        d = handlers[dispatch](get)
+
+        try:
+            d = handlers[dispatch](get)
+
+        except Exception as err:
+            _, _, traceback_obj = sys.exc_info()
+            raise ProcessingError, err.message, traceback_obj
+
         after = self.get_progress()
         d.update({
             'progress_changed': after != before,
@@ -576,7 +589,7 @@ class CapaModule(CapaFields, XModule):
         # save any state changes that may occur
         self.set_state_from_lcp()
         return response
-        
+
 
     def get_answer(self, get):
         '''
@@ -725,9 +738,24 @@ class CapaModule(CapaFields, XModule):
         try:
             correct_map = self.lcp.grade_answers(answers)
             self.set_state_from_lcp()
-        except StudentInputError as inst:
-            log.exception("StudentInputError in capa_module:problem_check")
-            return {'success': inst.message}
+
+        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
+            log.warning("StudentInputError in capa_module:problem_check",
+                        exc_info=True)
+
+            # If the user is a staff member, include
+            # the full exception, including traceback,
+            # in the response
+            if self.system.user_is_staff:
+                msg = "Staff debug info: %s" % traceback.format_exc()
+
+            # Otherwise, display just an error message,
+            # without a stack trace
+            else:
+                msg = "Error: %s" % str(inst.message)
+
+            return {'success': msg}
+
         except Exception, err:
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
@@ -778,7 +806,7 @@ class CapaModule(CapaFields, XModule):
         event_info['answers'] = answers
 
         # Too late. Cannot submit
-        if self.closed() and not self.max_attempts ==0:
+        if self.closed() and not self.max_attempts == 0:
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
@@ -798,7 +826,7 @@ class CapaModule(CapaFields, XModule):
 
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"
-        if not self.max_attempts ==0:
+        if not self.max_attempts == 0:
             msg += " but not graded. Hit 'Check' to grade them."
         return {'success': True,
                 'msg': msg}

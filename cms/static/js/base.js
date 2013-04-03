@@ -4,6 +4,9 @@ var $modalCover;
 var $newComponentItem;
 var $changedInput;
 var $spinner;
+var $newComponentTypePicker;
+var $newComponentTemplatePickers;
+var $newComponentButton;
 
 $(document).ready(function () {
     $body = $('body');
@@ -83,6 +86,8 @@ $(document).ready(function () {
     // general link management - smooth scrolling page links
     $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
+    // tender feedback window scrolling
+    $('a.show-tender').bind('click', smoothScrollTop);
 
     // toggling overview section details
     $(function () {
@@ -160,6 +165,18 @@ function smoothScrollLink(e) {
     });
 }
 
+function smoothScrollTop(e) {
+    (e).preventDefault();
+
+    $.smoothScroll({ 
+        offset: -200, 
+        easing: 'swing', 
+        speed: 1000,
+        scrollElement: null,
+        scrollTarget: $('#view-top')
+    });
+}
+
 function linkNewWindow(e) {
     window.open($(e.target).attr('href'));
     e.preventDefault();
@@ -228,7 +245,7 @@ function syncReleaseDate(e) {
     $("#start_time").val("");
 }
 
-function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
+function getEdxTimeFromDateTimeVals(date_val, time_val) {
     var edxTimeStr = null;
 
     if (date_val != '') {
@@ -237,20 +254,17 @@ function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
 
         // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
         var date = Date.parse(date_val + " " + time_val);
-        if (format == null)
-            format = 'yyyy-MM-ddTHH:mm';
-
-        edxTimeStr = date.toString(format);
+        edxTimeStr = date.toString('yyyy-MM-ddTHH:mm');
     }
 
     return edxTimeStr;
 }
 
-function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
+function getEdxTimeFromDateTimeInputs(date_id, time_id) {
     var input_date = $('#' + date_id).val();
     var input_time = $('#' + time_id).val();
 
-    return getEdxTimeFromDateTimeVals(input_date, input_time, format);
+    return getEdxTimeFromDateTimeVals(input_date, input_time);
 }
 
 function autosaveInput(e) {
@@ -291,10 +305,8 @@ function saveSubsection() {
     }
 
     // Piece back together the date/time UI elements into one date/time string
-    // NOTE: our various "date/time" metadata elements don't always utilize the same formatting string
-    // so make sure we're passing back the correct format
     metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
-    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time', 'MMMM dd HH:mm');
+    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time');
 
     $.ajax({
         url: "/save_item",
@@ -316,8 +328,8 @@ function saveSubsection() {
 function createNewUnit(e) {
     e.preventDefault();
 
-    parent = $(this).data('parent');
-    template = $(this).data('template');
+    var parent = $(this).data('parent');
+    var template = $(this).data('template');
 
     $.post('/clone_item',
         {'parent_location': parent,

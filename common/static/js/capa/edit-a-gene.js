@@ -12,22 +12,49 @@
         }
     }
     
-    //NOTE:
-    // Genex uses six global functions:
-    // genexSetDNASequence (exported from GWT)
-    // genexSetClickEvent (exported from GWT)
-    // genexSetKeyEvent (exported from GWT)
-    // genexSetProblemNumber (exported from GWT)
+    // NOTE:
+    // Genex uses 8 global functions, all prefixed with genex:
+    // 6 are exported from GWT:
+    // genexSetInitialDNASequence
+    // genexSetDNASequence
+    // genexGetDNASequence
+    // genexSetClickEvent
+    // genexSetKeyEvent
+    // genexSetProblemNumber
     //
     // It calls genexIsReady with a deferred command when it has finished 
     // initialization and has drawn itself
-    // genexStoreAnswer(answer) is called when the GWT [Store Answer] button
-    // is clicked
+    // genexStoreAnswer(answer) is called each time the DNA sequence changes
+    // through user interaction
+    
+    //Genex does not call the following function
+    genexGetInputField = function() {
+        var problem = $('#genex_container').parents('.problem');
+        return problem.find('input[type="hidden"][name!="genex_dna_sequence"][name!="genex_problem_number"]');
+    };     
     
     genexIsReady = function() {
-        //Load DNA sequence
-        var dna_sequence = $('#dna_sequence').val();
-        genexSetDNASequence(dna_sequence);
+        var input_field = genexGetInputField();
+        var genex_saved_state = input_field.val();
+        var genex_initial_dna_sequence;
+        var genex_dna_sequence;
+        
+        //Get the sequence from xml file
+        genex_initial_dna_sequence = $('#genex_dna_sequence').val();
+        //Call this function to set the value used by reset button
+        genexSetInitialDNASequence(genex_initial_dna_sequence);
+        
+        if (genex_saved_state === '') {
+            //Load DNA sequence from xml file 
+            genex_dna_sequence = genex_initial_dna_sequence;
+        }
+        else {
+            //Load DNA sequence from saved value
+            genex_saved_state = JSON.parse(genex_saved_state);
+            genex_dna_sequence = genex_saved_state.genex_dna_sequence;
+        }
+        
+        genexSetDNASequence(genex_dna_sequence);
         //Now load mouse and keyboard handlers
         genexSetClickEvent();
         genexSetKeyEvent();
@@ -35,10 +62,9 @@
         var genex_problem_number = $('#genex_problem_number').val();
         genexSetProblemNumber(genex_problem_number);    
     };
-    genexStoreAnswer = function(ans) {
-        var problem = $('#genex_container').parents('.problem');
-        var input_field = problem.find('input[type="hidden"][name!="dna_sequence"][name!="genex_problem_number"]');
-        input_field.val(ans);
+    genexStoreAnswer = function(answer) {
+        var input_field = genexGetInputField();
+        var value = {'genex_dna_sequence': genexGetDNASequence(), 'genex_answer': answer};
+        input_field.val(JSON.stringify(value));
     };
 }).call(this);
-

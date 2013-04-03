@@ -1,4 +1,5 @@
 <%! from django.core.urlresolvers import reverse %>
+<%! from xmodule.util.date_utils import get_default_time_display %>
 
 <%def name="make_chapter(chapter)">
   <div class="chapter">
@@ -10,7 +11,7 @@
           <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
             <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
               <p>${section['display_name']}</p>
-              <p class="subtitle">${section['format']} ${"due " + section['due'] if 'due' in section and section['due'] != '' else ''}</p>
+              <p class="subtitle">${section['format']} ${"due " + get_default_time_display(section['due']) if section.get('due') is not None else ''}</p>
             </a>
           </li>
       % endfor
