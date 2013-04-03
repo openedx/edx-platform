@@ -1071,10 +1071,7 @@ class CustomResponse(LoncapaResponse):
             try:
                 ret = fn(self.expect, answer_given, **kwargs)
             except Exception as err:
-                log.error("oops in customresponse (cfn) error %s" % err)
-                # print "context = ",self.context
-                log.error(traceback.format_exc())
-                raise Exception("oops in customresponse (cfn) error %s" % err)
+                self._handle_exec_exception(err)
             log.debug(
                 "[courseware.capa.responsetypes.customresponse.get_score] ret = %s",
                 ret
@@ -1783,7 +1780,11 @@ class SchematicResponse(LoncapaResponse):
             json.loads(student_answers[k]) for k in sorted(self.answer_ids)
         ]
         self.context.update({'submission': submission})
-        safe_exec.safe_exec(self.code, self.context, cache=self.system.cache)
+        try:
+            safe_exec.safe_exec(self.code, self.context, cache=self.system.cache)
+        except Exception as err:
+            msg = 'Error %s in evaluating SchematicResponse' % err
+            raise ResponseError(msg)
         cmap = CorrectMap()
         cmap.set_dict(dict(zip(sorted(self.answer_ids), self.context['correct'])))
         return cmap
