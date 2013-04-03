@@ -276,16 +276,18 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 import_module(module, store, course_data_path, static_content_store)
 
+            # now import any 'draft' items
+            if draft_store is not None:
+                import_course_draft(xml_module_store, draft_store, course_data_path, 
+                    static_content_store, target_location_namespace if target_location_namespace is not None 
+                    else course_location)
+
         finally:
             # turn back on all write signalling
             if pseudo_course_id  in store.ignore_write_events_on_courses:
                 store.ignore_write_events_on_courses.remove(pseudo_course_id)
                 store.refresh_cached_metadata_inheritance_tree(target_location_namespace if 
                     target_location_namespace is not None else course_location)
-
-        # now import any 'draft' items
-        if draft_store is not None:
-            import_course_draft(xml_module_store, draft_store, course_data_path, static_content_store, target_location_namespace)
 
     return xml_module_store, course_items
 

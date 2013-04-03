@@ -11,6 +11,7 @@ import json
 from fs.osfs import OSFS
 import copy
 from json import loads
+import traceback
 
 from django.contrib.auth.models import User
 from contentstore.utils import get_modulestore
@@ -284,17 +285,27 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_export_course(self):
         module_store = modulestore('direct')
+        draft_store = modulestore('draft')
         content_store = contentstore()
 
         import_from_xml(module_store, 'common/test/data/', ['full'])
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        # get a vertical (and components in it) to put into 'draft'
+        vertical = module_store.get_item(Location(['i4x', 'edX', 'full', 
+            'vertical', 'vertical_66', None]), depth=1)
+
+        draft_store.clone_item(vertical.location, vertical.location)
+
+        for child in vertical.get_children():
+            draft_store.clone_item(child.location, child.location)            
 
         root_dir = path(mkdtemp_clean())
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
         # export out to a tempdir
-        export_to_xml(module_store, content_store, location, root_dir, 'test_export')
+        export_to_xml(module_store, content_store, location, root_dir, 'test_export', draft_modulestore=draft_store)
 
         # check for static tabs
         self.verify_content_existence(module_store, root_dir, location, 'tabs', 'static_tab', '.html')
@@ -328,14 +339,23 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         delete_course(module_store, content_store, location)
 
         # reimport
-        import_from_xml(module_store, root_dir, ['test_export'])
+        import_from_xml(module_store, root_dir, ['test_export'], draft_store=draft_store)
 
         items = module_store.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
         self.assertGreater(len(items), 0)
         for descriptor in items:
             print "Checking {0}....".format(descriptor.location.url())
-            resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+            non_draft_loc = descriptor.location._replace(revision=None)
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': non_draft_loc.url()}))
             self.assertEqual(resp.status_code, 200)
+
+        # verify that we have the content in the draft store as well
+        vertical = draft_store.get_item(Location(['i4x', 'edX', 'full', 
+            'vertical', 'vertical_66', None]), depth=1)    
+            
+        self.assertTrue(hasattr(vertical, 'is_draft'))
+        for child in vertical.get_children():
+            self.assertTrue(hasattr(child, 'is_draft'))
 
         shutil.rmtree(root_dir)
 
@@ -404,7 +424,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         try:
             export_to_xml(module_store, content_store, location, root_dir, 'test_export')
             exported = True
-        except Exception:
+        except Exception,e:
+            print 'Exception thrown: {0}'.format(traceback.format_exc())
             pass
 
         self.assertTrue(exported)

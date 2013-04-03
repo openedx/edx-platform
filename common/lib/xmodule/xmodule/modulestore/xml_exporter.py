@@ -54,13 +54,14 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
   # NOTE: this code assumes that verticals are the top most draftable container
   # should we change the application, then this assumption will no longer
   # be valid
-  draft_items = draft_modulestore.get_items([None, course_location.org, course_location.course,
-    'vertical', None, 'draft'])
+  if draft_modulestore is not None:
+    draft_items = draft_modulestore.get_items([None, course_location.org, course_location.course,
+      'vertical', None, 'draft'])
   
-  if len(draft_items)>0:
-    draft_course_dir = export_fs.makeopendir('drafts')
-    for draft_item in draft_items:
-      draft_item.export_to_xml(draft_course_dir)
+    if len(draft_items)>0:
+      draft_course_dir = export_fs.makeopendir('drafts')
+      for draft_item in draft_items:
+        draft_item.export_to_xml(draft_course_dir)
 
 
 def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):
