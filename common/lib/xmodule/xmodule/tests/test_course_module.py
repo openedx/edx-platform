@@ -1,11 +1,14 @@
 import unittest
 from time import strptime
+import datetime
 
 from fs.memoryfs import MemoryFS
 
 from mock import Mock, patch
 
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+import xmodule.course_module
+from xmodule.util.date_utils import time_to_datetime
 
 
 ORG = 'test_org'
@@ -39,6 +42,17 @@ class DummySystem(ImportSystem):
 
 class IsNewCourseTestCase(unittest.TestCase):
     """Make sure the property is_new works on courses"""
+
+    def setUp(self):
+        # Needed for test_is_newish
+        datetime_patcher = patch.object(
+            xmodule.course_module, 'datetime',
+            Mock(wraps=datetime.datetime)
+        )
+        mocked_datetime = datetime_patcher.start()
+        mocked_datetime.utcnow.return_value = time_to_datetime(NOW)
+        self.addCleanup(datetime_patcher.stop)
+
     @staticmethod
     def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None):
         """Get a dummy course"""
@@ -126,10 +140,7 @@ class IsNewCourseTestCase(unittest.TestCase):
             print "Checking start=%s advertised=%s" % (s[0], s[1])
             self.assertEqual(d.start_date_text, s[2])
 
-    @patch('xmodule.course_module.time.gmtime')
-    def test_is_newish(self, gmtime_mock):
-        gmtime_mock.return_value = NOW
-
+    def test_is_newish(self):
         descriptor = self.get_dummy_course(start='2012-12-02T12:00', is_new=True)
         assert(descriptor.is_newish is True)
 
