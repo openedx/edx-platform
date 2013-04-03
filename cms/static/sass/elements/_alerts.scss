@@ -307,7 +307,7 @@
     right: ($baseline);
     border: 4px solid $black;
     border-bottom: none;
-    padding: ($baseline/2) $baseline;
+    padding: $baseline;
 
     .notification {
       @include box-sizing(border-box);
