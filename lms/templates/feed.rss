@@ -13,7 +13,7 @@
     <updated>2012-12-19T14:00:00-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/stanford-to-work-with-edx')}"/>
     <title>Stanford University to Collaborate with edX on Development of Non-Profit Open Source edX Platform</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/stanford-logo_240x135.png')}&quot; /&gt;
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/stanford-university_240x135.png')}&quot; /&gt;
         &lt;p&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
