@@ -34,6 +34,7 @@ MITX_FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
     'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
+    'STUDIO_NPS_SURVEY': True, 
 }
 ENABLE_JASMINE = False
 
