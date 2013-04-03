@@ -481,6 +481,10 @@
 // login
 .view-login {
 
+  header.global  .nav-courseware .cta-login {
+    display: none;
+  }
+
   .introduction {
     padding: 0;
 
