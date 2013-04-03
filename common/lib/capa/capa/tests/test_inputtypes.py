@@ -361,7 +361,6 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
-        input_class = lookup_tag('matlabinput')
         the_input = self.input_class(test_system, elt, state)
         context = the_input._get_render_context()
 
@@ -388,7 +387,6 @@ class MatlabTest(unittest.TestCase):
                  }
         elt = etree.fromstring(self.xml)
 
-        input_class = lookup_tag('matlabinput')
         the_input = self.input_class(test_system, elt, state)
         context = the_input._get_render_context()
         expected = {'id': 'prob_1_2',

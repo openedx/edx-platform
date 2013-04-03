@@ -655,11 +655,11 @@ class MatlabInput(CodeInput):
         # Check if problem has been queued
         self.queuename = 'matlab'
         self.queue_msg = ''
-        if 'queue_msg' in self.input_state and self.status in ['queued','incomplete', 'unsubmitted']:
+        if 'queue_msg' in self.input_state and self.status in ['queued', 'incomplete', 'unsubmitted']:
             self.queue_msg = self.input_state['queue_msg']
-        if 'queued' in self.input_state and self.input_state['queuestate'] is not None:
+        if 'queuestate' in self.input_state and self.input_state['queuestate'] == 'queued':
             self.status = 'queued'
-            self.queue_len = 1
+            self.queue_len = '1'
             self.msg = self.plot_submitted_msg
 
 
