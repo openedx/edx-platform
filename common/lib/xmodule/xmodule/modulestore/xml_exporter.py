@@ -55,13 +55,23 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
   # should we change the application, then this assumption will no longer
   # be valid
   if draft_modulestore is not None:
-    draft_items = draft_modulestore.get_items([None, course_location.org, course_location.course,
+    draft_verticals = draft_modulestore.get_items([None, course_location.org, course_location.course,
       'vertical', None, 'draft'])
   
-    if len(draft_items)>0:
+    if len(draft_verticals)>0:
+      # now we have to go find every parent for each module and export from that point. We have
+      # to initiate the export from the sequence since we need the child pointers to private
+      # verticals. These will get filtered out from the export of the non-draft store.
+      sequential_locs = []
+      for draft_vertical in draft_verticals:
+        parent_locs = draft_modulestore.get_parent_locations(draft_vertical.location, course.location.course_id)
+        if parent_locs[0] not in sequential_locs:
+          sequential_locs.append(parent_locs[0])
+
       draft_course_dir = export_fs.makeopendir('drafts')
-      for draft_item in draft_items:
-        draft_item.export_to_xml(draft_course_dir)
+      for sequential_loc in sequential_locs:
+        sequential = draft_modulestore.get_item(sequential_loc)
+        sequential.export_to_xml(draft_course_dir)
 
 
 def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):

@@ -364,7 +364,7 @@ def import_course_draft(xml_module_store, store, course_data_path, static_conten
     )
 
     # now walk the /vertical directory where each file in there will be a draft copy of the Vertical
-    for dirname, dirnames, filenames in os.walk(draft_dir + "/vertical"):
+    for dirname, dirnames, filenames in os.walk(draft_dir + "/sequential"):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
             with open(module_path) as f:
@@ -373,7 +373,8 @@ def import_course_draft(xml_module_store, store, course_data_path, static_conten
                     descriptor = system.process_xml(xml)
 
                     def _import_module(module):
-                        module.location = module.location._replace(revision='draft')
+                        if module.location.category != 'sequential':
+                            module.location = module.location._replace(revision='draft')
                         import_module(module, store, course_data_path, static_content_store, allow_not_found=True)
                         for child in module.get_children():
                             _import_module(child)

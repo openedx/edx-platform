@@ -309,8 +309,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # add private to list of children
         sequential = module_store.get_item(Location(['i4x', 'edX', 'full', 
             'sequential', 'Administrivia_and_Circuit_Elements', None]))
-        module_store.update_children(sequential.location, sequential.children + [private_vertical.location.url()])
+        private_location_no_draft = private_vertical.location._replace(revision=None)
+        module_store.update_children(sequential.location, sequential.children + 
+            [private_location_no_draft.url()])
 
+        # read back the sequential, to make sure we have a pointer to 
+        sequential = module_store.get_item(Location(['i4x', 'edX', 'full', 
+            'sequential', 'Administrivia_and_Circuit_Elements', None]))  
+            
+        self.assertIn(private_location_no_draft.url(), sequential.children)
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
@@ -354,10 +361,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         items = module_store.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
         self.assertGreater(len(items), 0)
         for descriptor in items:
-            print "Checking {0}....".format(descriptor.location.url())
-            non_draft_loc = descriptor.location._replace(revision=None)
-            resp = self.client.get(reverse('edit_unit', kwargs={'location': non_draft_loc.url()}))
-            self.assertEqual(resp.status_code, 200)
+            # don't try to look at private verticals. Right now we're running
+            # the service in non-draft aware
+            if hasattr(descriptor, 'is_draft'):
+                print "Checking {0}....".format(descriptor.location.url())
+                resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+                self.assertEqual(resp.status_code, 200)
 
         # verify that we have the content in the draft store as well
         vertical = draft_store.get_item(Location(['i4x', 'edX', 'full', 
