@@ -9,6 +9,9 @@ from xmodule.modulestore.django import _MODULESTORES, modulestore
 from xmodule.templates import update_templates
 from auth.authz import get_user_by_email
 
+from selenium.webdriver.common.keys import Keys
+import time
+
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -140,3 +143,14 @@ def add_subsection(name='Subsection One'):
     save_css = 'input.new-subsection-name-save'
     world.css_fill(name_css, name)
     world.css_click(save_css)
+
+
+def set_date_and_time(date_css, desired_date, time_css, desired_time):
+    world.css_fill(date_css, desired_date)
+    # hit TAB to get to the time field
+    e = world.css_find(date_css).first
+    e._element.send_keys(Keys.TAB)
+    world.css_fill(time_css, desired_time)
+    e = world.css_find(time_css).first
+    e._element.send_keys(Keys.TAB)
+    time.sleep(float(1))    
