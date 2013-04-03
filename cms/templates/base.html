@@ -23,18 +23,6 @@
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-symbolicons-block.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
 
-    <!-- start Qualaroo -->
-    <script type="text/javascript">
-        % if user.is_authenticated():
-            var _kiq = _kiq || [];
-            _kiq.push(['identify', "${ user.email }" ]);
-        % endif
-    </script>
-
-    <!-- Qualaroo for edx.org -->
-    <script type="text/javascript" src="//s3.amazonaws.com/ki.js/48221/9SN.js" async="true"></script>
-    <!-- end Qualaroo -->
-
     <%block name="header_extras"></%block>
   </head>
 
@@ -70,6 +58,8 @@
 
     <%block name="jsextra"></%block>
   </body>
+
+  <%include file="widgets/qualaroo.html" />
 </html>
 
 
