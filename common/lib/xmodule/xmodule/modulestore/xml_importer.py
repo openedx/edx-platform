@@ -356,6 +356,26 @@ def remap_namespace(module, target_location_namespace):
 
     return module
 
+def validate_no_non_editable_metadata(module_store, course_id, category, allowed=None):
+    '''
+    Assert that there is no metadata within a particular category that we can't support editing
+    However we always allow 'display_name' and 'xml_attribtues'
+    '''
+    _allowed = (allowed if allowed is not None else []) + ['xml_attributes', 'display_name']
+
+    err_cnt = 0
+    for module_loc in module_store.modules[course_id]:
+        module = module_store.modules[course_id][module_loc]
+        if module.location.category == category:
+            my_metadata = dict(own_metadata(module))
+            for key in my_metadata.keys():
+                if key not in _allowed:
+                    err_cnt = err_cnt + 1
+                    print ': found metadata on {0}. Studio will not support editing this piece of metadata, so it is not allowed. Metadata: {1} = {2}'. format(module.location.url(), key, my_metadata[key])
+
+    return err_cnt
+
+
 def validate_category_hierarchy(module_store, course_id, parent_category, expected_child_category):
     err_cnt = 0
 
@@ -440,6 +460,13 @@ def perform_xlint(data_dir, course_dirs,
         err_cnt += validate_category_hierarchy(module_store, course_id, "chapter", "sequential")
         # constrain that sequentials only have 'verticals'
         err_cnt += validate_category_hierarchy(module_store, course_id, "sequential", "vertical")
+        # don't allow metadata on verticals, since we can't edit them in studio
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "vertical")
+        # don't allow metadata on chapters, since we can't edit them in studio
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "chapter",['start'])
+        # don't allow metadata on sequences that we can't edit
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "sequential",
+            ['due','format','start','graded'])
 
         # check for a presence of a course marketing video
         location_elements = course_id.split('/')
@@ -456,3 +483,5 @@ def perform_xlint(data_dir, course_dirs,
         print "This course can be imported, but some errors may occur during the run of the course. It is recommend that you fix your courseware before importing"
     else:
         print "This course can be imported successfully."
+
+    return err_cnt
