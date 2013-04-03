@@ -21,7 +21,7 @@ class Command(BaseCommand):
     The fix here is to remove the "input_state" entry in the StudentModule objects of any problems that
     contain them.  No problem is yet making use of this, and the code should do the right thing if it's
     missing (by recreating an empty dict for its value).
-    
+
     To narrow down the set of problems that might need fixing, the StudentModule
     objects to be checked is filtered down to those:
 
@@ -30,15 +30,15 @@ class Command(BaseCommand):
         modified > '2013-03-28 22:00:00' (the problem must have been visited after the bug was introduced
                                           on Prod and Edge)
         state like '%input_state%' (the problem must have "input_state" set).
-        
-    This filtering is done on the production database replica, so that the larger select queries don't lock 
+
+    This filtering is done on the production database replica, so that the larger select queries don't lock
     the real production database.  The list of id values for Student Modules is written to a file, and the
     file is passed into this command.  The sql file passed to mysql contains:
-    
-        select sm.id from courseware_studentmodule sm 
-            where sm.modified > "2013-03-28 22:00:00" 
-                and sm.created < "2013-03-29 16:30:00" 
-                and sm.state like "%input_state%" 
+
+        select sm.id from courseware_studentmodule sm
+            where sm.modified > "2013-03-28 22:00:00"
+                and sm.created < "2013-03-29 16:30:00"
+                and sm.state like "%input_state%"
                 and sm.module_type = 'problem';
 
     '''
@@ -53,56 +53,29 @@ class Command(BaseCommand):
                     action='store_true',
                     dest='save_changes',
                     default=False,
-                    help='Persist the changes that were encountered.  If not set, no changes are saved.'), 
-        make_option('--idlist',
-                    action='store',
-                    dest='idlist_path',
-                    help='Path containing id values of StudentModule objects to clean (one per line).'), 
+                    help='Persist the changes that were encountered.  If not set, no changes are saved.'),
     )
-
-# DON'T DO THIS:
-#    def fix_studentmodules(self, save_changes):
-#        '''Identify the list of StudentModule objects that might need fixing, and then fix each one'''
-#        modules = StudentModule.objects.filter(modified__gt='2013-03-28 22:00:00',
-#                                               created__lt='2013-03-29 16:30:00',
-#                                               state__contains='input_state')
-#
-#        for module in modules:
-#            self.remove_studentmodule_input_state(module, save_changes)
-#
-#        LOG.info("Finished student modules:  updating {0} of {1} modules".format(self.num_changed, self.num_visited))
-#
-#        hist_modules = StudentModuleHistory.objects.filter(created__gt='2013-03-28 22:00:00',
-#                                                           created__lt='2013-03-29 16:30:00',
-#                                                           state__contains='input_state')
-#
-#        for hist_module in hist_modules:
-#            self.remove_studentmodulehistory_input_state(hist_module, save_changes)
-#
-#        LOG.info("Finished student history modules:  updating {0} of {1} modules".format(self.num_hist_changed, self.num_hist_visited))
 
     def fix_studentmodules_in_list(self, save_changes, idlist_path):
         '''Read in the list of StudentModule objects that might need fixing, and then fix each one'''
-        
+
         # open file and read id values from it:
         for line in open(idlist_path, 'r'):
             student_module_id = line.strip()
+            # skip the header, if present:
             if student_module_id == 'id':
                 continue
             try:
                 module = StudentModule.objects.get(id=student_module_id)
-            except:
+            except StudentModule.DoesNotExist:
                 LOG.error("Unable to find student module with id = {0}: skipping... ".format(student_module_id))
                 continue
             self.remove_studentmodule_input_state(module, save_changes)
 
-            hist_modules = StudentModuleHistory.objects.filter(student_module_id = student_module_id)
+            hist_modules = StudentModuleHistory.objects.filter(student_module_id=student_module_id)
             for hist_module in hist_modules:
                 self.remove_studentmodulehistory_input_state(hist_module, save_changes)
 
-        LOG.info("Finished student modules:  updating {0} of {1} modules".format(self.num_changed, self.num_visited))
-        LOG.info("Finished student history modules:  updating {0} of {1} modules".format(self.num_hist_changed, self.num_hist_visited))
-    
     @transaction.autocommit
     def remove_studentmodule_input_state(self, module, save_changes):
         ''' Fix the grade assigned to a StudentModule'''
@@ -164,6 +137,7 @@ class Command(BaseCommand):
         LOG.info("Starting run:  reading from idlist file {0}; save_changes = {1}".format(idlist_path, save_changes))
 
         self.fix_studentmodules_in_list(save_changes, idlist_path)
-            
+
         LOG.info("Finished run:  updating {0} of {1} student modules".format(self.num_changed, self.num_visited))
-        LOG.info("Finished run:  updating {0} of {1} student history modules".format(self.num_hist_changed, self.num_hist_visited))
+        LOG.info("Finished run:  updating {0} of {1} student history modules".format(self.num_hist_changed,
+                                                                                     self.num_hist_visited))
