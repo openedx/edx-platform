@@ -1,12 +1,21 @@
 #pylint: disable=C0111
 #pylint: disable=W0621
 
+# Disable the "wildcard import" warning so we can bring in all methods from
+# course helpers and ui helpers
+#pylint: disable=W0401
+
+# Disable the "Unused import %s from wildcard import" warning
+#pylint: disable=W0614
+
+# Disable the "unused argument" warning because lettuce uses "step"
+#pylint: disable=W0613
+
 from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
 from lettuce.django import django_url
 from nose.tools import assert_equals, assert_in
-import time
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -123,11 +132,6 @@ def i_am_logged_in(step):
     world.create_user('robot')
     world.log_in('robot', 'test')
     world.browser.visit(django_url('/'))
-
-
-@step('I am not logged in$')
-def i_am_not_logged_in(step):
-    world.browser.cookies.delete()
 
 
 @step(u'I am an edX user$')
