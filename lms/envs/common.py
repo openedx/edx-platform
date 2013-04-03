@@ -101,6 +101,9 @@ MITX_FEATURES = {
     # Turn on a page that lets staff enter Python code to be run in the
     # sandbox, for testing whether it's enabled properly.
     'ENABLE_DEBUG_RUN_PYTHON': False,
+
+    # Enable URL that shows information about the status of variuous services
+    'ENABLE_SERVICE_STATUS': False,
 }
 
 # Used for A/B testing

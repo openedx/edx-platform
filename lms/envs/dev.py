@@ -22,7 +22,7 @@ MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses i
 MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
-
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 WIKI_ENABLED = True
 

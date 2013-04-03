@@ -126,3 +126,5 @@ SEGMENT_IO_KEY = '***REMOVED***'
 
 # disable NPS survey in test mode
 MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
+
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True

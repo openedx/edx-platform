@@ -357,6 +357,11 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
         url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
     )
 
+if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
+    urlpatterns += (
+        url(r'^status/', include('service_status.urls')),
+    )
+
 # FoldIt views
 urlpatterns += (
     # The path is hardcoded into their app...

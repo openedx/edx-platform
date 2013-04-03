@@ -156,5 +156,8 @@ DEBUG_TOOLBAR_MONGO_STACKTRACES = True
 # disable NPS survey in dev mode
 MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
 
+# Enable URL that shows information about the status of variuous services
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+
 # segment-io key for dev
 SEGMENT_IO_KEY = 'mty8edrrsg'

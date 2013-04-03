@@ -34,6 +34,9 @@ MITX_FEATURES = {
     'STAFF_EMAIL': '',			# email address for staff (eg to request course creation)
     'STUDIO_NPS_SURVEY': True,
     'SEGMENT_IO': True,
+
+    # Enable URL that shows information about the status of variuous services
+    'ENABLE_SERVICE_STATUS': False,
 }
 ENABLE_JASMINE = False
 
