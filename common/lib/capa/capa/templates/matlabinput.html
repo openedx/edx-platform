@@ -1,0 +1,117 @@
+<section id="textbox_${id}" class="textbox">
+  <textarea rows="${rows}" cols="${cols}" name="input_${id}" id="input_${id}"
+       % if hidden:
+      	    style="display:none;"
+       % endif
+  >${value|h}</textarea>
+
+  <div class="grader-status">
+    % if status == 'unsubmitted':
+      <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
+    % elif status == 'correct':
+      <span class="correct" id="status_${id}">Correct</span>
+    % elif status == 'incorrect':
+      <span class="incorrect" id="status_${id}">Incorrect</span>
+    % elif status == 'queued':
+      <span class="processing" id="status_${id}">Queued</span>
+      <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
+    % endif
+
+    % if hidden:
+      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+    % endif
+
+    <p class="debug">${status}</p>
+  </div>
+
+  <span id="answer_${id}"></span>
+
+  <div class="external-grader-message">
+    ${msg|n}
+  </div>
+  <div class="external-grader-message">
+    ${queue_msg|n}
+  </div>
+
+  <div class="plot-button">
+      <input type="button" class="save" name="plot-button" id="plot_${id}" value="Plot" />
+  </div>
+
+  <script>
+    // Note: We need to make the area follow the CodeMirror for this to work.
+    $(function(){
+      var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), {
+        % if linenumbers == 'true':
+        lineNumbers: true,
+        % endif
+        mode: "matlab",
+        matchBrackets: true,
+        lineWrapping: true,
+        indentUnit: "${tabsize}",
+        tabSize: "${tabsize}",
+        indentWithTabs: false,
+        extraKeys: {
+            "Tab": function(cm) {
+                cm.replaceSelection("${' '*tabsize}", "end");
+            }
+        },
+        smartIndent: false
+      });
+
+      $("#textbox_${id}").find('.CodeMirror-scroll').height(${int(13.5*eval(rows))});
+
+      var gentle_alert = function (parent_elt, msg) {
+          if($(parent_elt).find('.capa_alert').length) {
+              $(parent_elt).find('.capa_alert').remove();
+          }
+          var alert_elem = "<div>" + msg + "</div>";
+          alert_elem = $(alert_elem).addClass('capa_alert');
+          $(parent_elt).find('.action').after(alert_elem);
+          $(parent_elt).find('.capa_alert').css({opacity: 0}).animate({opacity: 1}, 700);
+      }
+      
+
+      // hook up the plot button
+      var plot = function(event) {
+          var problem_elt = $(event.target).closest('.problems-wrapper');
+          url = $(event.target).closest('.problems-wrapper').data('url');
+          input_id = "${id}";
+
+          // save the codemirror text to the textarea
+          cm.save();
+          var input = $("#input_${id}");
+          // pull out the coded text
+          submission = input.val();
+
+          answer = input.serialize();
+
+          // setup callback for after we send information to plot
+          var plot_callback = function(response) {
+              if(response.success) {
+                  window.location.reload();
+              }
+              else {
+                  gentle_alert(problem_elt, msg);
+              }
+          }
+
+          var save_callback = function(response) { 
+                  if(response.success) {
+                      // send information to the problem's plot functionality
+                      Problem.inputAjax(url, input_id, 'plot', 
+                        {'submission': submission}, plot_callback);
+                  }
+                  else {
+                      gentle_alert(problem_elt, msg);
+                  }
+          }
+
+          // save the answer
+          $.postWithPrefix(url + '/problem_save', answer, save_callback);
+
+      }
+      $('#plot_${id}').click(plot);
+
+    });
+  </script>
+</section>

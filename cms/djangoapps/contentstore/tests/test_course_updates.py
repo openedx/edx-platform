@@ -1,12 +1,13 @@
+'''unit tests for course_info views and models.'''
 from contentstore.tests.test_course_settings import CourseTestCase
 from django.core.urlresolvers import reverse
 import json
-from webob.exc import HTTPServerError
-from django.http import HttpResponseBadRequest
 
 
 class CourseUpdateTest(CourseTestCase):
+    '''The do all and end all of unit test cases.'''
     def test_course_update(self):
+        '''Go through each interface and ensure it works.'''
         # first get the update to force the creation
         url = reverse('course_info',
             kwargs={'org': self.course_location.org,
@@ -18,9 +19,10 @@ class CourseUpdateTest(CourseTestCase):
         content = init_content + '</iframe>'
         payload = {'content': content,
                    'date': 'January 8, 2013'}
-        url = reverse('course_info_json', kwargs={'org': self.course_location.org,
-            'course': self.course_location.course,
-            'provided_id': ''})
+        url = reverse('course_info_json',
+            kwargs={'org': self.course_location.org,
+                'course': self.course_location.course,
+                'provided_id': ''})
 
         resp = self.client.post(url, json.dumps(payload), "application/json")
 
@@ -90,13 +92,21 @@ class CourseUpdateTest(CourseTestCase):
             'course': self.course_location.course,
             'provided_id': ''})
 
-        resp = self.client.post(url, json.dumps(payload), "application/json")
-
-        payload = json.loads(resp.content)
-
         self.assertContains(
             self.client.post(url, json.dumps(payload), "application/json"),
             '<garbage')
+
+        # set to valid html which would break an xml parser
+        content = "<p><br><br></p>"
+        payload = {'content': content,
+                   'date': 'January 11, 2013'}
+        url = reverse('course_info_json', kwargs={'org': self.course_location.org,
+            'course': self.course_location.course,
+            'provided_id': ''})
+
+        resp = self.client.post(url, json.dumps(payload), "application/json")
+        payload = json.loads(resp.content)
+        self.assertHTMLEqual(content, json.loads(resp.content)['content'])
 
         # now try to delete a non-existent update
         url = reverse('course_info_json', kwargs={'org': self.course_location.org,

@@ -51,7 +51,7 @@ class LmsNamespace(Namespace):
     )
 
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
-    due = String(help="Date that this problem is due by", scope=Scope.settings, default='')
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
     source_file = String(help="DO NOT USE", scope=Scope.settings)
     xqa_key = String(help="DO NOT USE", scope=Scope.settings)
     ispublic = Boolean(help="Whether this course is open to the public, or only to admins", scope=Scope.settings)

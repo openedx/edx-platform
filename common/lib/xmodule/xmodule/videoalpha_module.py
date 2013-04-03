@@ -131,7 +131,7 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
         else:
             # VS[compat]
             # cdodge: filesystem static content support.
-            caption_asset_path = "/static/{0}/subs/".format(getattr(self, 'data_dir', None))
+            caption_asset_path = "/static/subs/"
 
         return self.system.render_template('videoalpha.html', {
             'youtube_streams': self.youtube_streams,

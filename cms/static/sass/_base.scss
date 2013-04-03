@@ -274,7 +274,7 @@ p, ul, ol, dl {
       color: $gray-l2;
     }
 
-    .title, .title-1 {
+    .title-1 {
       @include font-size(32);
       margin: 0;
       padding: 0;
@@ -331,30 +331,38 @@ p, ul, ol, dl {
     color: $gray-d3;
   }
 
-  > section {
-    margin: 0 0 ($baseline*2) 0;
+  .title-1 {
 
-    &:last-child {
-      margin-bottom: 0;
+  }
+
+  .title-2 {
+    @include font-size(24);
+    margin: 0 0 ($baseline/2) 0;
+    font-weight: 600;
+  }
+
+  .title-3 {
+    @include font-size(16);
+    margin: 0 0 ($baseline/2) 0;
+    font-weight: 600;
+  }
+
+  header {
+    @include clearfix();
+
+    .title-2 {
+      width: flex-grid(5, 12);
+      margin: 0 flex-gutter() 0 0;
+      float: left;
     }
 
-    header {
-      @include clearfix();
-
-      .title-2 {
-        width: flex-grid(5, 12);
-        margin: 0 flex-gutter() 0 0;
-        float: left;
-      }
-
-      .tip {
-        @include font-size(13);
-        width: flex-grid(7, 12);
-        float: right;
-        margin-top: ($baseline/2);
-        text-align: right;
-        color: $gray-l2;
-      }
+    .tip {
+      @include font-size(13);
+      width: flex-grid(7, 12);
+      float: right;
+      margin-top: ($baseline/2);
+      text-align: right;
+      color: $gray-l2;
     }
   }
 }
@@ -394,7 +402,8 @@ p, ul, ol, dl {
       }
     }
 
-    .nav-related {
+    // navigation
+    .nav-related, .nav-page {
 
       .nav-item {
         margin-bottom: ($baseline/4);
@@ -710,7 +719,7 @@ hr.divide {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 99999;
+  z-index: 10000;
   padding: 0 10px;
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.85);
@@ -756,6 +765,10 @@ hr.divide {
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
   word-wrap: break-word;
+}
+
+hr.divider {
+  @extend .sr;
 }
 
 // ====================

@@ -19,12 +19,8 @@ log = logging.getLogger("mitx.courseware")
 # attempts specified in xml definition overrides this.
 MAX_ATTEMPTS = 1
 
-# Set maximum available number of points.
-# Overriden by max_score specified in xml.
-MAX_SCORE = 1
-
 #The highest score allowed for the overall xmodule and for each rubric point
-MAX_SCORE_ALLOWED = 3
+MAX_SCORE_ALLOWED = 50
 
 #If true, default behavior is to score module as a practice problem.  Otherwise, no grade at all is shown in progress
 #Metadata overrides this.
@@ -88,7 +84,7 @@ class CombinedOpenEndedV1Module():
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
 
         Sample file:
-        <combinedopenended attempts="10000" max_score="1">
+        <combinedopenended attempts="10000">
             <rubric>
                 Blah blah rubric.
             </rubric>
@@ -143,23 +139,19 @@ class CombinedOpenEndedV1Module():
         self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
         self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
-        display_due_date_string = self.instance_state.get('due', None)
+        due_date = self.instance_state.get('due', None)
 
         grace_period_string = self.instance_state.get('graceperiod', None)
         try:
-            self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)
+            self.timeinfo = TimeInfo(due_date, grace_period_string)
         except:
             log.error("Error parsing due date information in location {0}".format(location))
             raise
         self.display_due_date = self.timeinfo.display_due_date
 
-        # Used for progress / grading.  Currently get credit just for
-        # completion (doesn't matter if you self-assessed correct/incorrect).
-        self._max_score = self.instance_state.get('max_score', MAX_SCORE)
-
         self.rubric_renderer = CombinedOpenEndedRubric(system, True)
         rubric_string = stringify_children(definition['rubric'])
-        self.rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED, self._max_score)
+        self._max_score = self.rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED)
 
         #Static data is passed to the child modules to render
         self.static_data = {
@@ -363,7 +355,15 @@ class CombinedOpenEndedV1Module():
         """
         self.update_task_states()
         html = self.current_task.get_html(self.system)
-        return_html = rewrite_links(html, self.rewrite_content_links)
+        return_html = html
+        try:
+            #Without try except block, get this error:
+            # File "/home/vik/mitx_all/mitx/common/lib/xmodule/xmodule/x_module.py", line 263, in rewrite_content_links
+            # if link.startswith(XASSET_SRCREF_PREFIX):
+            # Placing try except so that if the error is fixed, this code will start working again.
+            return_html = rewrite_links(html, self.rewrite_content_links)
+        except:
+            pass
         return return_html
 
     def get_current_attributes(self, task_number):
@@ -782,7 +782,7 @@ class CombinedOpenEndedV1Descriptor():
     template_dir_name = "combinedopenended"
 
     def __init__(self, system):
-        self.system =system
+        self.system = system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

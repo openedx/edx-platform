@@ -73,6 +73,9 @@ class Command(BaseCommand):
                     ended_courses.append(course_id)
 
         for course_id in ended_courses:
+            # prefetch all chapters/sequentials by saying depth=2
+            course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+
             print "Fetching enrolled students for {0}".format(course_id)
             enrolled_students = User.objects.filter(
                 courseenrollment__course_id=course_id).prefetch_related(
@@ -99,6 +102,6 @@ class Command(BaseCommand):
                         student, course_id)['status'] in valid_statuses:
                     if not options['noop']:
                         # Add the certificate request to the queue
-                        ret = xq.add_cert(student, course_id)
+                        ret = xq.add_cert(student, course_id, course=course)
                         if ret == 'generating':
                             print '{0} - {1}'.format(student, ret)

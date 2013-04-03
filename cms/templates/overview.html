@@ -1,9 +1,7 @@
 <%inherit file="base.html" />
 <%!
-   from time import mktime
-   import dateutil.parser
    import logging
-   from datetime import datetime
+   from xmodule.util.date_utils import get_time_struct_display
 %>
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">Course Outline</%block>
@@ -163,11 +161,10 @@
               </h3>
               <div class="section-published-date">
                 <%
-                  start_date = datetime.fromtimestamp(mktime(section.lms.start)) if section.lms.start is not None else None
-                  start_date_str = start_date.strftime('%m/%d/%Y') if start_date is not None else ''
-                  start_time_str = start_date.strftime('%H:%M') if start_date is not None else ''
+                  start_date_str = get_time_struct_display(section.lms.start, '%m/%d/%Y')
+                  start_time_str = get_time_struct_display(section.lms.start, '%I:%M %p')
                 %>
-                %if start_date is None:
+                %if section.lms.start is None:
                   <span class="published-status">This section has not been released.</span>
                   <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">Schedule</a>
                 %else:
@@ -200,7 +197,7 @@
                     </a>
                   </div>
 
-                  <div class="gradable-status" data-initial-status="${subsection.lms.format if section.lms.format is not None else 'Not Graded'}">
+                  <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else 'Not Graded'}">
                   </div>
 
                   <div class="item-actions">

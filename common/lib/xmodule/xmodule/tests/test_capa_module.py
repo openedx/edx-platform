@@ -7,6 +7,8 @@ import random
 
 import xmodule
 import capa
+from capa.responsetypes import StudentInputError, \
+                                LoncapaProblemError, ResponseError
 from xmodule.capa_module import CapaModule
 from xmodule.modulestore import Location
 from lxml import etree
@@ -407,7 +409,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_html.return_value = "Test HTML"
 
             # Check the problem
-            get_request_dict = { CapaFactory.input_key(): '3.14'}
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
             result = module.check_problem(get_request_dict)
 
         # Expect that the problem is marked correct
@@ -428,7 +430,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_is_correct.return_value = False
 
             # Check the problem
-            get_request_dict = { CapaFactory.input_key(): '0'}
+            get_request_dict = {CapaFactory.input_key(): '0'}
             result = module.check_problem(get_request_dict)
 
         # Expect that the problem is marked correct
@@ -446,7 +448,7 @@ class CapaModuleTest(unittest.TestCase):
         with patch('xmodule.capa_module.CapaModule.closed') as mock_closed:
             mock_closed.return_value = True
             with self.assertRaises(xmodule.exceptions.NotFoundError):
-                get_request_dict = { CapaFactory.input_key(): '3.14'}
+                get_request_dict = {CapaFactory.input_key(): '3.14'}
                 module.check_problem(get_request_dict)
 
         # Expect that number of attempts NOT incremented
@@ -492,7 +494,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_is_queued.return_value = True
             mock_get_queuetime.return_value = datetime.datetime.now()
 
-            get_request_dict = { CapaFactory.input_key(): '3.14'}
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
             result = module.check_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
@@ -502,21 +504,61 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(module.attempts, 1)
 
 
-    def test_check_problem_student_input_error(self):
-        module = CapaFactory.create(attempts=1)
+    def test_check_problem_error(self):
 
-        # Simulate a student input exception
-        with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
-            mock_grade.side_effect = capa.responsetypes.StudentInputError('test error')
+        # Try each exception that capa_module should handle
+        for exception_class in [StudentInputError, 
+                                LoncapaProblemError, 
+                                ResponseError]:
 
-            get_request_dict = { CapaFactory.input_key(): '3.14'}
-            result = module.check_problem(get_request_dict)
+            # Create the module
+            module = CapaFactory.create(attempts=1)
+
+            # Ensure that the user is NOT staff
+            module.system.user_is_staff = False
+
+            # Simulate answering a problem that raises the exception
+            with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+                mock_grade.side_effect = exception_class('test error')
+
+                get_request_dict = {CapaFactory.input_key(): '3.14'}
+                result = module.check_problem(get_request_dict)
+
+            # Expect an AJAX alert message in 'success'
+            expected_msg = 'Error: test error'
+            self.assertEqual(expected_msg, result['success'])
+
+            # Expect that the number of attempts is NOT incremented
+            self.assertEqual(module.attempts, 1)
+
+    def test_check_problem_error_with_staff_user(self):
+        
+        # Try each exception that capa module should handle
+        for exception_class in [StudentInputError, 
+                                LoncapaProblemError,
+                                ResponseError]:
+
+            # Create the module
+            module = CapaFactory.create(attempts=1)
+
+            # Ensure that the user IS staff
+            module.system.user_is_staff = True
+
+            # Simulate answering a problem that raises an exception
+            with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+                mock_grade.side_effect = exception_class('test error')
+
+                get_request_dict = {CapaFactory.input_key(): '3.14'}
+                result = module.check_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
             self.assertTrue('test error' in result['success'])
 
-        # Expect that the number of attempts is NOT incremented
-        self.assertEqual(module.attempts, 1)
+            # We DO include traceback information for staff users
+            self.assertTrue('Traceback' in result['success'])
+
+            # Expect that the number of attempts is NOT incremented
+            self.assertEqual(module.attempts, 1)
 
 
     def test_reset_problem(self):
@@ -573,11 +615,11 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(done=False)
 
         # Save the problem
-        get_request_dict = { CapaFactory.input_key(): '3.14'}
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
         result = module.save_problem(get_request_dict)
 
         # Expect that answers are saved to the problem
-        expected_answers = { CapaFactory.answer_key(): '3.14'}
+        expected_answers = {CapaFactory.answer_key(): '3.14'}
         self.assertEqual(module.lcp.student_answers, expected_answers)
 
         # Expect that the result is success
@@ -592,7 +634,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_closed.return_value = True
 
             # Try to save the problem
-            get_request_dict = { CapaFactory.input_key(): '3.14'}
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
             result = module.save_problem(get_request_dict)
 
         # Expect that the result is failure
@@ -603,7 +645,7 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(rerandomize='always', done=True)
 
         # Try to save
-        get_request_dict = { CapaFactory.input_key(): '3.14'}
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
         result = module.save_problem(get_request_dict)
 
         # Expect that we cannot save
@@ -614,7 +656,7 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(rerandomize='never', done=True)
 
         # Try to save
-        get_request_dict = { CapaFactory.input_key(): '3.14'}
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
         result = module.save_problem(get_request_dict)
 
         # Expect that we succeed
@@ -626,7 +668,7 @@ class CapaModuleTest(unittest.TestCase):
         # Just in case, we also check what happens if we have
         # more attempts than allowed.
         attempts = random.randint(1, 10)
-        module = CapaFactory.create(attempts=attempts -1, max_attempts=attempts)
+        module = CapaFactory.create(attempts=attempts - 1, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Final Check")
 
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
@@ -636,14 +678,14 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(module.check_button_name(), "Final Check")
 
         # Otherwise, button name is "Check"
-        module = CapaFactory.create(attempts=attempts -2, max_attempts=attempts)
+        module = CapaFactory.create(attempts=attempts - 2, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Check")
 
-        module = CapaFactory.create(attempts=attempts -3, max_attempts=attempts)
+        module = CapaFactory.create(attempts=attempts - 3, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Check")
 
         # If no limit on attempts, then always show "Check"
-        module = CapaFactory.create(attempts=attempts -3)
+        module = CapaFactory.create(attempts=attempts - 3)
         self.assertEqual(module.check_button_name(), "Check")
 
         module = CapaFactory.create(attempts=0)
@@ -859,3 +901,97 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the module has created a new dummy problem with the error
         self.assertNotEqual(original_problem, module.lcp)
+
+
+    def test_random_seed_no_change(self):
+
+        # Run the test for each possible rerandomize value
+        for rerandomize in ['never', 'per_student', 'always', 'onreset']:
+            module = CapaFactory.create(rerandomize=rerandomize)
+
+            # Get the seed
+            # By this point, the module should have persisted the seed
+            seed = module.seed
+            self.assertTrue(seed is not None)
+
+            # If we're not rerandomizing, the seed is always set
+            # to the same value (1)
+            if rerandomize == 'never':
+                self.assertEqual(seed, 1)
+
+            # Check the problem
+            get_request_dict = { CapaFactory.input_key(): '3.14'}
+            module.check_problem(get_request_dict)
+
+            # Expect that the seed is the same 
+            self.assertEqual(seed, module.seed)
+
+            # Save the problem
+            module.save_problem(get_request_dict)
+
+            # Expect that the seed is the same
+            self.assertEqual(seed, module.seed)
+
+    def test_random_seed_with_reset(self):
+        
+        def _reset_and_get_seed(module):
+            '''
+            Reset the XModule and return the module's seed
+            '''
+
+            # Simulate submitting an attempt
+            # We need to do this, or reset_problem() will
+            # fail with a complaint that we haven't submitted
+            # the problem yet.
+            module.done = True
+
+            # Reset the problem
+            module.reset_problem({})
+
+            # Return the seed
+            return module.seed
+
+        def _retry_and_check(num_tries, test_func):
+            '''
+            Returns True if *test_func* was successful
+            (returned True) within *num_tries* attempts
+
+            *test_func* must be a function 
+            of the form test_func() -> bool
+            '''
+            success = False
+            for i in range(num_tries):
+                if test_func() is True:
+                    success = True
+                    break
+            return success
+
+        # Run the test for each possible rerandomize value
+        for rerandomize in ['never', 'per_student', 'always', 'onreset']:
+            module = CapaFactory.create(rerandomize=rerandomize)
+
+            # Get the seed
+            # By this point, the module should have persisted the seed
+            seed = module.seed
+            self.assertTrue(seed is not None)
+
+            # We do NOT want the seed to reset if rerandomize
+            # is set to 'never' -- it should still be 1
+            # The seed also stays the same if we're randomizing
+            # 'per_student': the same student should see the same problem
+            if rerandomize in ['never', 'per_student']:
+                self.assertEqual(seed, _reset_and_get_seed(module))
+
+            # Otherwise, we expect the seed to change
+            # to another valid seed
+            else:
+
+                # Since there's a small chance we might get the
+                # same seed again, give it 5 chances
+                # to generate a different seed
+                success = _retry_and_check(5, 
+                                lambda: _reset_and_get_seed(module) != seed)
+                
+                self.assertTrue(module.seed != None)
+                msg = 'Could not get a new seed from reset after 5 tries'
+                self.assertTrue(success, msg)

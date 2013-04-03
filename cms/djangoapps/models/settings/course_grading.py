@@ -1,7 +1,5 @@
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
-import re
-from util import converters
 from datetime import timedelta
 
 

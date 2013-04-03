@@ -4,6 +4,9 @@ var $modalCover;
 var $newComponentItem;
 var $changedInput;
 var $spinner;
+var $newComponentTypePicker;
+var $newComponentTemplatePickers;
+var $newComponentButton;
 
 $(document).ready(function () {
     $body = $('body');
@@ -13,10 +16,6 @@ $(document).ready(function () {
     // pipelining (note, this doesn't happen on local runtimes). So if we set it on window, when we can access it from other
     // scopes (namely the course-info tab)
     window.$modalCover = $modalCover;
-
-    // Control whether template caching in local memory occurs (see template_loader.js). Caching screws up development but may
-    // be a good optimization in production (it works fairly well)
-    window.cachetemplates = false;
 
     $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
@@ -101,16 +100,19 @@ $(document).ready(function () {
     });
 
     // general link management - new window/tab
-    $('a[rel="external"]').attr('title', 'This link will open in a new browser window/tab').click(function (e) {
-        window.open($(this).attr('href'));
-        e.preventDefault();
-    });
+    $('a[rel="external"]').attr('title', 'This link will open in a new browser window/tab').bind('click', linkNewWindow);
 
     // general link management - lean modal window
     $('a[rel="modal"]').attr('title', 'This link will open in a modal window').leanModal({overlay: 0.50, closeButton: '.action-modal-close' });
     $('.action-modal-close').click(function (e) {
         (e).preventDefault();
     });
+
+    // general link management - smooth scrolling page links
+    $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
+
+    // tender feedback window scrolling
+    $('a.show-tender').bind('click', smoothScrollTop);
 
     // toggling overview section details
     $(function () {
@@ -120,9 +122,9 @@ $(document).ready(function () {
     });
     $('.toggle-button-sections').bind('click', toggleSections);
 
-    // autosave when a field is updated on the subsection page
-    $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
-    $('.subsection-display-name-input, .unit-subtitle, .policy-list-name, .policy-list-value').each(function (i) {
+    // autosave when leaving input field
+    $body.on('change', '.subsection-display-name-input', saveSubsection);
+    $('.subsection-display-name-input').each(function () {
         this.val = $(this).val();
     });
     $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
@@ -138,11 +140,6 @@ $(document).ready(function () {
     // add new/delete subsection
     $('.new-subsection-item').bind('click', addNewSubsection);
     $('.delete-subsection-button').bind('click', deleteSubsection);
-    // add/remove policy metadata button click handlers
-    $('.add-policy-data').bind('click', addPolicyMetadata);
-    $('.remove-policy-data').bind('click', removePolicyMetadata);
-    $body.on('click', '.policy-list-element .save-button', savePolicyMetadata);
-    $body.on('click', '.policy-list-element .cancel-button', cancelPolicyMetadata);
 
     $('.sync-date').bind('click', syncReleaseDate);
 
@@ -181,10 +178,39 @@ $(document).ready(function () {
     });
 });
 
-// function collapseAll(e) {
-//     $('.branch').addClass('collapsed');
-//     $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
-// }
+function smoothScrollLink(e) {
+    (e).preventDefault();
+
+    $.smoothScroll({ 
+        offset: -200, 
+        easing: 'swing', 
+        speed: 1000,
+        scrollElement: null,
+        scrollTarget: $(this).attr('href')
+    });
+}
+
+function smoothScrollTop(e) {
+    (e).preventDefault();
+
+    $.smoothScroll({ 
+        offset: -200, 
+        easing: 'swing', 
+        speed: 1000,
+        scrollElement: null,
+        scrollTarget: $('#view-top')
+    });
+}
+
+function linkNewWindow(e) {
+    window.open($(e.target).attr('href'));
+    e.preventDefault();
+}
+
+// On AWS instances, base.js gets wrapped in a separate scope as part of Django static
+// pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
+// when we can access it from other scopes (namely the checklists)
+window.cmsLinkNewWindow = linkNewWindow;
 
 function toggleSections(e) {
     e.preventDefault();
@@ -244,57 +270,7 @@ function syncReleaseDate(e) {
     $("#start_time").val("");
 }
 
-function addPolicyMetadata(e) {
-    e.preventDefault();
-    var template = $('#add-new-policy-element-template > li');
-    var newNode = template.clone();
-    var _parent_el = $(this).parent('ol:.policy-list');
-    newNode.insertBefore('.add-policy-data');
-    $('.remove-policy-data').bind('click', removePolicyMetadata);
-    newNode.find('.policy-list-name').focus();
-}
-
-function savePolicyMetadata(e) {
-    e.preventDefault();
-
-    var $policyElement = $(this).parents('.policy-list-element');
-    saveSubsection()
-    $policyElement.removeClass('new-policy-list-element');
-    $policyElement.find('.policy-list-name').attr('disabled', 'disabled');
-    $policyElement.removeClass('editing');
-}
-
-function cancelPolicyMetadata(e) {
-    e.preventDefault();
-
-    var $policyElement = $(this).parents('.policy-list-element');
-    if (!$policyElement.hasClass('editing')) {
-        $policyElement.remove();
-    } else {
-        $policyElement.removeClass('new-policy-list-element');
-        $policyElement.find('.policy-list-name').val($policyElement.data('currentValues')[0]);
-        $policyElement.find('.policy-list-value').val($policyElement.data('currentValues')[1]);
-    }
-    $policyElement.removeClass('editing');
-}
-
-function removePolicyMetadata(e) {
-    e.preventDefault();
-
-    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!'))
-        return;
-
-    policy_name = $(this).data('policy-name');
-    var _parent_el = $(this).parent('li:.policy-list-element');
-    if ($(_parent_el).hasClass("new-policy-list-element")) {
-        _parent_el.remove();
-    } else {
-        _parent_el.appendTo("#policy-to-delete");
-    }
-    saveSubsection()
-}
-
-function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
+function getEdxTimeFromDateTimeVals(date_val, time_val) {
     var edxTimeStr = null;
 
     if (date_val != '') {
@@ -302,49 +278,22 @@ function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
             time_val = '00:00';
 
         // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
-        date = Date.parse(date_val + " " + time_val);
-        if (format == null)
-            format = 'yyyy-MM-ddTHH:mm';
-
-        edxTimeStr = date.toString(format);
+        var date = Date.parse(date_val + " " + time_val);
+        edxTimeStr = date.toString('yyyy-MM-ddTHH:mm');
     }
 
     return edxTimeStr;
 }
 
-function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
+function getEdxTimeFromDateTimeInputs(date_id, time_id) {
     var input_date = $('#' + date_id).val();
     var input_time = $('#' + time_id).val();
 
-    return getEdxTimeFromDateTimeVals(input_date, input_time, format);
-}
-
-function checkForNewValue(e) {
-    if ($(this).parents('.new-policy-list-element')[0]) {
-        return;
-    }
-
-    if (this.val) {
-        this.hasChanged = this.val != $(this).val();
-    } else {
-        this.hasChanged = false;
-    }
-
-    this.val = $(this).val();
-    if (this.hasChanged) {
-        if (this.saveTimer) {
-            clearTimeout(this.saveTimer);
-        }
-
-        this.saveTimer = setTimeout(function () {
-            $changedInput = $(e.target);
-            saveSubsection();
-            this.saveTimer = null;
-        }, 500);
-    }
+    return getEdxTimeFromDateTimeVals(input_date, input_time);
 }
 
 function autosaveInput(e) {
+    var self = this;
     if (this.saveTimer) {
         clearTimeout(this.saveTimer);
     }
@@ -352,11 +301,12 @@ function autosaveInput(e) {
     this.saveTimer = setTimeout(function () {
         $changedInput = $(e.target);
         saveSubsection();
-        this.saveTimer = null;
+        self.saveTimer = null;
     }, 500);
 }
 
 function saveSubsection() {
+    // Spinner is no longer used by subsection name, but is still used by date and time pickers on the right.
     if ($changedInput && !$changedInput.hasClass('no-spinner')) {
         $spinner.css({
             'position': 'absolute',
@@ -379,25 +329,9 @@ function saveSubsection() {
         metadata[$(el).data("metadata-name")] = el.value;
     }
 
-    // now add 'free-formed' metadata which are presented to the user as dual input fields (name/value)
-    $('ol.policy-list > li.policy-list-element').each(function (i, element) {
-        var name = $(element).children('.policy-list-name').val();
-        metadata[name] = $(element).children('.policy-list-value').val();
-    });
-
-    // now add any 'removed' policy metadata which is stored in a separate hidden div
-    // 'null' presented to the server means 'remove'
-    $("#policy-to-delete > li.policy-list-element").each(function (i, element) {
-        var name = $(element).children('.policy-list-name').val();
-        if (name != "")
-            metadata[name] = null;
-    });
-
     // Piece back together the date/time UI elements into one date/time string
-    // NOTE: our various "date/time" metadata elements don't always utilize the same formatting string
-    // so make sure we're passing back the correct format
     metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
-    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time', 'MMMM dd HH:mm');
+    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time');
 
     $.ajax({
         url: "/save_item",
@@ -407,6 +341,7 @@ function saveSubsection() {
         data: JSON.stringify({ 'id': id, 'metadata': metadata}),
         success: function () {
             $spinner.delay(500).fadeOut(150);
+            $changedInput = null;
         },
         error: function () {
             showToastMessage('There has been an error while saving your changes.');
@@ -418,8 +353,8 @@ function saveSubsection() {
 function createNewUnit(e) {
     e.preventDefault();
 
-    parent = $(this).data('parent');
-    template = $(this).data('template');
+    var parent = $(this).data('parent');
+    var template = $(this).data('template');
 
     $.post('/clone_item',
         {'parent_location': parent,

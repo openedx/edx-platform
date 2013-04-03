@@ -16,7 +16,6 @@ This is used by capa_module.
 from __future__ import division
 
 from datetime import datetime
-import json
 import logging
 import math
 import numpy
@@ -32,9 +31,9 @@ from xml.sax.saxutils import unescape
 from copy import deepcopy
 
 import chem
+import chem.miller
 import chem.chemcalc
 import chem.chemtools
-import chem.miller
 import verifiers
 import verifiers.draganddrop
 
@@ -97,8 +96,13 @@ class LoncapaProblem(object):
 
          - problem_text (string): xml defining the problem
          - id           (string): identifier for this problem; often a filename (no spaces)
-         - state        (dict): student state
-         - seed         (int): random number generator seed (int)
+         - seed         (int): random number generator seed (int) 
+         - state        (dict): containing the following keys:
+                                - 'seed' - (int) random number generator seed
+                                - 'student_answers' - (dict) maps input id to the stored answer for that input
+                                - 'correct_map' (CorrectMap) a map of each input to their 'correctness'
+                                - 'done' - (bool) indicates whether or not this problem is considered done
+                                - 'input_state' - (dict) maps input_id to a dictionary that holds the state for that input
          - system       (ModuleSystem): ModuleSystem instance which provides OS,
                                         rendering, and user context
 
@@ -110,21 +114,23 @@ class LoncapaProblem(object):
         self.system = system
         if self.system is None:
             raise Exception()
-        self.seed = seed
 
-        if state:
-            if 'seed' in state:
-                self.seed = state['seed']
-            if 'student_answers' in state:
-                self.student_answers = state['student_answers']
-            if 'correct_map' in state:
-                self.correct_map.set_dict(state['correct_map'])
-            if 'done' in state:
-                self.done = state['done']
+        state = state if state else {}
 
-        # TODO: Does this deplete the Linux entropy pool? Is this fast enough?
-        if not self.seed:
+        # Set seed according to the following priority:
+        #       1. Contained in problem's state
+        #       2. Passed into capa_problem via constructor
+        #       3. Assign from the OS's random number generator
+        self.seed = state.get('seed', seed)
+        if self.seed is None:
             self.seed = struct.unpack('i', os.urandom(4))[0]
+        self.student_answers = state.get('student_answers', {})
+        if 'correct_map' in state:
+            self.correct_map.set_dict(state['correct_map'])
+        self.done = state.get('done', False)
+        self.input_state = state.get('input_state', {})
+
+
 
         # Convert startouttext and endouttext to proper <text></text>
         problem_text = re.sub("startouttext\s*/", "text", problem_text)
@@ -188,6 +194,7 @@ class LoncapaProblem(object):
         return {'seed': self.seed,
                 'student_answers': self.student_answers,
                 'correct_map': self.correct_map.get_dict(),
+                'input_state': self.input_state,
                 'done': self.done}
 
     def get_max_score(self):
@@ -236,6 +243,20 @@ class LoncapaProblem(object):
                 responder.update_score(score_msg, cmap, queuekey)
         self.correct_map.set_dict(cmap.get_dict())
         return cmap
+
+    def ungraded_response(self, xqueue_msg, queuekey):
+        '''
+        Handle any responses from the xqueue that do not contain grades
+        Will try to pass the queue message to all inputtypes that can handle ungraded responses 
+
+        Does not return any value
+        '''
+        # check against each inputtype
+        for the_input in self.inputs.values():
+            # if the input type has an ungraded function, pass in the values
+            if hasattr(the_input, 'ungraded_response'):
+                the_input.ungraded_response(xqueue_msg, queuekey)
+
 
     def is_queued(self):
         '''
@@ -351,7 +372,7 @@ class LoncapaProblem(object):
             dispatch = get['dispatch']
             return self.inputs[input_id].handle_ajax(dispatch, get)
         else:
-            log.warning("Could not find matching input for id: %s" % problem_id)
+            log.warning("Could not find matching input for id: %s" % input_id)
             return {}
 
 
@@ -527,11 +548,15 @@ class LoncapaProblem(object):
             value = ""
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
-
+            
+            if input_id not in self.input_state:
+                self.input_state[input_id] = {}
+                
             # do the rendering
             state = {'value': value,
                    'status': status,
                    'id': input_id,
+                   'input_state': self.input_state[input_id],
                    'feedback': {'message': msg,
                                 'hint': hint,
                                 'hintmode': hintmode, }}

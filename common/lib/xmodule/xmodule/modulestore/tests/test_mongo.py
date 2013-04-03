@@ -1,6 +1,7 @@
 import pymongo
 
-from nose.tools import assert_equals, assert_raises, assert_not_equals, with_setup
+from mock import Mock
+from nose.tools import assert_equals, assert_raises, assert_not_equals, with_setup, assert_false
 from pprint import pprint
 
 from xmodule.modulestore import Location
