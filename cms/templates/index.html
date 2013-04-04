@@ -46,6 +46,8 @@
           <li class="nav-item">
             % if not disable_course_creation:
               <a href="#" class="button new-button new-course-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Course</a>
+	    % elif settings.MITX_FEATURES.get('STAFF_EMAIL',''):
+	      <a href="mailto:${settings.MITX_FEATURES.get('STAFF_EMAIL','')}">Email staff to create course</a>
             % endif
           </li>
         </ul>
