@@ -38,7 +38,7 @@ class PeerGradingFields(object):
     max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE,
                         scope=Scope.settings)
     student_data_for_location = Object(help="Student data for a given peer grading problem.", default=json.dumps({}),
-                                       scope=Scope.student_state)
+                                       scope=Scope.user_state)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
 
 
