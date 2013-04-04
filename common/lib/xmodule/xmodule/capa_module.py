@@ -108,11 +108,10 @@ class CapaModule(CapaFields, XModule):
     '''
     icon_class = 'problem'
 
-
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                    ],
+                     ],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
                  resource_string(__name__, 'js/src/capa/schematic.js')
                  ]}
@@ -367,11 +366,11 @@ class CapaModule(CapaFields, XModule):
             self.set_state_from_lcp()
 
             # Prepend a scary warning to the student
-            warning  = '<div class="capa_reset">'\
-                       '<h2>Warning: The problem has been reset to its initial state!</h2>'\
-                       'The problem\'s state was corrupted by an invalid submission. ' \
-                       'The submission consisted of:'\
-                       '<ul>'
+            warning = '<div class="capa_reset">'\
+                      '<h2>Warning: The problem has been reset to its initial state!</h2>'\
+                      'The problem\'s state was corrupted by an invalid submission. ' \
+                      'The submission consisted of:'\
+                      '<ul>'
             for student_answer in student_answers.values():
                 if student_answer != '':
                     warning += '<li>' + cgi.escape(student_answer) + '</li>'
@@ -388,7 +387,6 @@ class CapaModule(CapaFields, XModule):
 
         return html
 
-
     def get_problem_html(self, encapsulate=True):
         '''Return html for the problem.  Adds check, reset, save buttons
         as necessary based on the problem config and state.'''
@@ -400,7 +398,6 @@ class CapaModule(CapaFields, XModule):
         # then generate an error message instead.
         except Exception, err:
             html = self.handle_problem_html_error(err)
-
 
         # The convention is to pass the name of the check button
         # if we want to show a check button, and False otherwise
@@ -454,7 +451,7 @@ class CapaModule(CapaFields, XModule):
             'score_update': self.update_score,
             'input_ajax': self.handle_input_ajax,
             'ungraded_response': self.handle_ungraded_response
-            }
+        }
 
         if dispatch not in handlers:
             return 'Error'
@@ -472,7 +469,7 @@ class CapaModule(CapaFields, XModule):
         d.update({
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
-            })
+        })
         return json.dumps(d, cls=ComplexEncoder)
 
     def is_past_due(self):
@@ -535,7 +532,6 @@ class CapaModule(CapaFields, XModule):
 
         return False
 
-
     def update_score(self, get):
         """
         Delivers grading response (e.g. from asynchronous code checking) to
@@ -589,7 +585,6 @@ class CapaModule(CapaFields, XModule):
         # save any state changes that may occur
         self.set_state_from_lcp()
         return response
-
 
     def get_answer(self, get):
         '''
@@ -699,7 +694,6 @@ class CapaModule(CapaFields, XModule):
             'value': score['score'],
             'max_value': score['total'],
         })
-
 
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and

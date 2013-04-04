@@ -15,7 +15,6 @@ from scipy.optimize import curve_fit
 from django.conf import settings
 from django.db.models import Sum, Max
 from psychometrics.models import *
-from xmodule.modulestore import Location
 
 log = logging.getLogger("mitx.psychometrics")
 
@@ -292,7 +291,7 @@ def generate_plots_for_problem(problem):
                           'info': '',
                           'data': jsdata,
                           'cmd': '[%s], %s' % (','.join(jsplots), axisopts),
-                })
+                          })
 
     #log.debug('plots = %s' % plots)
     return msg, plots
@@ -333,9 +332,9 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
 
         pmd.done = done
         try:
-            pmd.attempts = state.get('attempts',0)
+            pmd.attempts = state.get('attempts', 0)
         except:
-            log.exception("no attempts for %s (state=%s)" % (sm,sm.state))
+            log.exception("no attempts for %s (state=%s)" % (sm, sm.state))
 
         try:
             checktimes = eval(pmd.checktimes)                   # update log of attempt timestamps
