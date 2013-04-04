@@ -67,7 +67,7 @@
       <article class="my-classes">
         % if user.is_active:
         <ul class="class-list">
-          %for course, url, lms_link in courses:
+          %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower()):
           <li>
             <a class="class-link" href="${url}" class="class-name">
               <span class="class-name">${course}</span>
