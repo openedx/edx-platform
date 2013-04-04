@@ -38,9 +38,10 @@ class Command(BaseCommand):
         # we've had a bug where the xml_attributes field can we rewritten as a string rather than a dict
         def _check_xml_attributes_field(module):
             err_cnt = 0
-            if hasattr(module, 'xml_attributes') and (isinstance(module, str) or isinstance(module, unicode)):
-                print 'module = {0} has xml_attributes as a string. It should be a dict'.format(module.location.url())
-                err_cnt = err_cnt + 1
+            if hasattr(module, 'xml_attributes'):
+                if isinstance(module.xml_attributes, str) or isinstance(module.xml_attributes, unicode):
+                    print 'module = {0} has xml_attributes as a string. It should be a dict'.format(module.location.url())
+                    err_cnt = err_cnt + 1
             for child in module.get_children():
                 err_cnt = err_cnt + _check_xml_attributes_field(child)
             return err_cnt
