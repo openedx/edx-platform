@@ -119,5 +119,5 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
 
-# segment-io key for dev
-SEGMENT_IO_KEY = 'mty8edrrsg'
+# dummy segment-io key
+SEGMENT_IO_KEY = '***REMOVED***'
