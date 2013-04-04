@@ -19,12 +19,12 @@ class Command(BaseCommand):
 
         loc = CourseDescriptor.id_to_location(loc_str)
      
-        ms = modulestore()
+        modulestore = modulestore()
         
         # setup a request cache so we don't throttle the DB with all the metadata inheritance requests
-        ms.request_cache = RequestCache.get_request_cache()
+        modulestore.request_cache = RequestCache.get_request_cache()
 
-        course = ms.get_item(loc, depth=3)
+        course = modulestore.get_item(loc, depth=3)
 
         err_cnt = 0
         def _xlint_metadata(module):
