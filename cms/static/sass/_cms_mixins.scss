@@ -185,14 +185,14 @@
 // button - grey dark
 @mixin dark-grey-button {
 	@include button;
-	border: 1px solid #1c1e20;
+	border: 1px solid $gray-d2;
 	border-radius: 3px;
-	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0)) $extraDarkGrey;
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0)) $gray-d1;
 	box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
 	color: $white;
 
 	&:hover {
-		background-color: #595f64;
+		background-color: $gray-d4;
 		color: $white;
 	}
 }

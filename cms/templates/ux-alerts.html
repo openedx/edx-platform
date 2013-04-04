@@ -25,6 +25,18 @@
         $(this.hash).addClass('is-fleeting');
     });
 
+    $('.hide-banner').click(function(e) {
+        (e).preventDefault();          
+        $('.wrapper-banner').removeClass('is-hiding');
+        $(this.hash).addClass('is-hiding');
+    });
+
+    $('.show-banner').click(function(e) {
+        (e).preventDefault();          
+        $('.wrapper-banner').removeClass('is-shown');
+        $(this.hash).addClass('is-shown');
+    });
+
     $('.hide-alert').click(function(e) {
         (e).preventDefault();          
         $('.wrapper-alert').removeClass('is-hiding');
@@ -57,7 +69,7 @@
   <header class="mast has-actions has-subtitle">
     <div class="title">
       <span class="title-sub">UX Design</span>
-      <h1 class="title-1">Alerts &amp; Notifications</h1>
+      <h1 class="title-1">System Notifications</h1>
     </div>
   </header>
 </div>
@@ -65,6 +77,22 @@
 <div class="wrapper-content wrapper">
   <section class="content">
     <article class="content-primary" role="main">
+      <section>
+        <header>
+          <h2 class="title-2">Banners</h2>
+          <span class="tip">app/global-level or view specific information</span>
+        </header>
+
+        <p>In Studio, banners are meant to communicate larger app and system-level status messages as well as static view specific information</p>
+
+        <h3 class="title-3">Different Static Examples of Banners</h3>
+        <p>Note: banners will probably never been shown based on click or page action and will primarily be loaded along with a pageload and initial display</p>
+
+        <ul>
+          <li><a href="#banner-view" class="show-banner">Show View-level Banner</a></li>
+        </ul>
+      </section>
+
       <section>
         <header>
           <h2 class="title-2">Alerts</h2>
@@ -162,7 +190,7 @@
 
     <div class="copy">
       <h2 class="title title-3">You are editing a draft</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
 
     <nav class="nav-actions">
@@ -186,7 +214,7 @@
 
     <div class="copy">
       <h2 class="title title-3">A Newer Version of This Exists</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
 
     <nav class="nav-actions">
@@ -210,7 +238,7 @@
 
     <div class="copy">
       <h2 class="title title-3">Your changes have been saved</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
     </div>
   </div>
 </div>
@@ -222,7 +250,7 @@
 
     <div class="copy">
       <h2 class="title title-3">Your changes have been saved</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
     </div>
 
     <a href="#" rel="view" class="action action-alert-close">
@@ -239,7 +267,7 @@
 
     <div class="copy">
       <h2 class="title title-3">X Has been removed</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
   </div>
 </div>
@@ -251,7 +279,7 @@
 
     <div class="copy">
       <h2 class="title title-3">We're sorry, there was a error with Studio</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
   </div>
 </div>
@@ -263,7 +291,7 @@
 
     <div class="copy">
       <h2 class="title title-3">There was an error in your submission</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
     </div>
 
     <nav class="nav-actions">
@@ -284,7 +312,7 @@
 
     <div class="copy">
       <h2 class="title title-3">Studio will be unavailable this weekend</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
 
     <nav class="nav-actions">
@@ -308,7 +336,7 @@
 
     <div class="copy">
       <h2 class="title title-3">Studio will be unavailable this weekend</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
   </div>
 </div>
@@ -320,7 +348,7 @@
 
     <div class="copy">
       <h2 class="title title-3">Your Studio account has been created, but needs to be activated</h2>
-      <p>Donec sed odio dui. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum. Curabitur blandit tempus porttitor.</p>
+      <p class="message">Donec sed odio dui. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum. Curabitur blandit tempus porttitor.</p>
     </div>
 
     <nav class="nav-actions">
@@ -346,7 +374,7 @@
     
     <div class="copy">
       <h2 class="title title-3">You've Made Some Changes</h2>
-      <p>Your changes will not take effect until you <strong>save your progress</strong>.</p>
+      <p class="message">Your changes will not take effect until you <strong>save your progress</strong>.</p>
     </div>
 
     <nav class="nav-actions">
@@ -370,7 +398,7 @@
     
     <div class="copy">
       <h2 class="title title-3">A Newer Version of This Exists</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
 
     <nav class="nav-actions">
@@ -394,7 +422,7 @@
     
     <div class="copy">
       <h2 class="title title-3">Are You Sure You Want to Edit That?</h2>
-      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
 
     <nav class="nav-actions">
@@ -440,7 +468,7 @@
     
     <div class="copy">
       <h2 class="title title-3">Fun Fact:</h2>
-      <p>Using the checkmark will allow you make a subsection gradable as an assignment, which counts towards a student's total grade</p>
+      <p class="message">Using the checkmark will allow you make a subsection gradable as an assignment, which counts towards a student's total grade</p>
     </div>
 
     <a href="#" rel="view" class="action action-notification-close">
@@ -457,7 +485,7 @@
   <div class="prompt confirm">
     <div class="copy">
       <h2 class="title title-3">Delete "Introduction &amp; Overview"?</h2>
-      <p>Deleting a section cannot be undone and its contents cannot be recovered.</p>
+      <p class="message">Deleting a section cannot be undone and its contents cannot be recovered.</p>
     </div>
 
     <nav class="nav-actions">
@@ -479,7 +507,7 @@
   <div class="prompt warning">
     <div class="copy">
       <h2 class="title title-3">Use Advanced Problem Editor?</h2>
-      <p>If you proceed, you cannot edit this problem using the simple problem editor.</p>
+      <p class="message">If you proceed, you cannot edit this problem using the simple problem editor.</p>
     </div>
 
     <nav class="nav-actions">
@@ -501,7 +529,7 @@
   <div class="prompt error">
     <div class="copy">
       <h2 class="title title-3">There Were Errors in Your Submission</h2>
-      <p>Please correct the errors noted on the page and try again.</p>
+      <p class="message">Please correct the errors noted on the page and try again.</p>
     </div>
 
     <nav class="nav-actions">
@@ -509,6 +537,27 @@
       <ul>
         <li class="nav-item">
           <a href="#" class="action-primary action-proceed">Correct errors &amp; try again</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+</%block>
+
+<%block name="view_banners">
+<!-- banner - view - coursenote -->
+<div class="wrapper wrapper-banner wrapper-banner-view wrapper-banner-view-coursenote" id="banner-view">
+  <div class="banner coursenote has-actions actions-are-hidden">
+    <div class="copy">
+      <h2 class="title title-3 sr">Share Your Course</h2>
+      <p class="message">Students can enroll in $COURSENAME at: <a href="" rel="lms" class="link-course">http://edge.edx.org/org/courseno/coursename</a></p>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Banner Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="action-primary">Send an invitation</a>
         </li>
       </ul>
     </nav>

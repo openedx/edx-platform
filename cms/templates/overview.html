@@ -217,3 +217,24 @@
   </div>
   <footer></footer>
 </%block>
+
+<%block name="view_banners">
+<!-- banner - view - coursenote -->
+<div class="wrapper wrapper-banner wrapper-banner-view wrapper-banner-view-coursenote is-shown" id="banner-coursenote">
+  <div class="banner coursenote has-actions actions-are-hidden">
+    <div class="copy">
+      <h2 class="title title-3 sr">Share Your Course</h2>
+      <p>Students can enroll in ${context_course.display_name_with_default} at: <a href="http://edge.edx.org/org/courseno/coursename" rel="lms" class="link-course">http://edge.edx.org/org/courseno/coursename</a></p>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Banner Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="action-primary">Send an invitation</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+</%block>
