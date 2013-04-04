@@ -19,12 +19,12 @@ class Command(BaseCommand):
 
         loc = CourseDescriptor.id_to_location(loc_str)
      
-        modulestore = modulestore()
+        store = modulestore()
         
         # setup a request cache so we don't throttle the DB with all the metadata inheritance requests
-        modulestore.request_cache = RequestCache.get_request_cache()
+        store.request_cache = RequestCache.get_request_cache()
 
-        course = modulestore.get_item(loc, depth=3)
+        course = store.get_item(loc, depth=3)
 
         err_cnt = 0
         def _xlint_metadata(module):
@@ -61,7 +61,7 @@ class Command(BaseCommand):
         discussion_items =_get_discussion_items(course)
 
         # now query all discussion items via get_items() and compare with the tree-traversal
-        queried_discussion_items = ms.get_items(['i4x', course.location.org, course.location.course, 
+        queried_discussion_items = store.get_items(['i4x', course.location.org, course.location.course, 
             'discussion', None, None])
 
         for item in queried_discussion_items:
