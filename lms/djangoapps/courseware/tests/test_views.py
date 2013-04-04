@@ -1,25 +1,18 @@
-import logging
-from mock import MagicMock, patch
+from mock import MagicMock
 import datetime
-import factory
-import unittest
-import os
 
 from django.test import TestCase
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.conf import settings
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 
 from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore, _MODULESTORES
-from xmodule.modulestore.exceptions import InvalidLocationError,\
-                                ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.django import modulestore
+
 import courseware.views as views
 from xmodule.modulestore import Location
-
-from .factories import UserFactory
 
 
 class Stub():
@@ -55,7 +48,6 @@ class TestJumpTo(TestCase):
     def test_jumpto_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
         jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location)
-        expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
@@ -124,3 +116,26 @@ class ViewsTestCase(TestCase):
                                 request, 'bar', ())
         self.assertRaisesRegexp(Http404, 'No data*', views.jump_to, request,
                                 'dummy', self.location)
+
+    def test_no_end_on_about_page(self):
+        # Toy course has no course end date or about/end_date blob
+        self.verify_end_date(self.course_id)
+
+    def test_no_end_about_blob(self):
+        # test_end has a course end date, no end_date HTML blob
+        self.verify_end_date('edX/test_end/2012_Fall', "Sep 17, 2015")
+
+    def test_about_blob_end_date(self):
+        # test_about_blob_end_date has both a course end date, and an end_date HTML blob
+        # HTML blob wins
+        self.verify_end_date('edX/test_about_blob_end_date/2012_Fall', "Learning never ends")
+
+    def verify_end_date(self, course_id, expected_end_text=None):
+        request = self.request_factory.get('foo')
+        request.user = self.user
+        result = views.course_about(request, course_id)
+        if expected_end_text is not None:
+            self.assertContains(result, "Classes End")
+            self.assertContains(result, expected_end_text)
+        else:
+            self.assertNotContains(result, "Classes End")
