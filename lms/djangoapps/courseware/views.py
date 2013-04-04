@@ -630,6 +630,7 @@ def progress(request, course_id, student_id=None):
                'courseware_summary': courseware_summary,
                'grade_summary': grade_summary,
                'staff_access': staff_access,
+               'student': student,
                }
     context.update()
 
@@ -663,13 +664,13 @@ def submission_history(request, course_id, student_username, location):
                             .format(student_username, location))
 
     history_entries = StudentModuleHistory.objects \
-                      .filter(student_module=student_module).order_by('-created')
+                      .filter(student_module=student_module).order_by('-id')
 
     # If no history records exist, let's force a save to get history started.
     if not history_entries:
         student_module.save()
         history_entries = StudentModuleHistory.objects \
-                          .filter(student_module=student_module).order_by('-created')
+                          .filter(student_module=student_module).order_by('-id')
 
     context = {
         'history_entries': history_entries,

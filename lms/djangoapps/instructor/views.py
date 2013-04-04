@@ -229,9 +229,11 @@ def instructor_dashboard(request, course_id):
 
         if student_to_reset is not None:
             # find the module in question
+            if '/' not in problem_to_reset:				# allow state of modules other than problem to be reset
+                problem_to_reset = "problem/" + problem_to_reset	# but problem is the default
             try:
                 (org, course_name, run) = course_id.split("/")
-                module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_reset
+                module_state_key = "i4x://" + org + "/" + course_name + "/" + problem_to_reset
                 module_to_reset = StudentModule.objects.get(student_id=student_to_reset.id,
                                                           course_id=course_id,
                                                           module_state_key=module_state_key)

@@ -165,7 +165,7 @@ class XModuleSettingsField(models.Model):
 
 class XModuleStudentPrefsField(models.Model):
     """
-    Stores data set in the Scope.student_preferences scope by an xmodule field
+    Stores data set in the Scope.preferences scope by an xmodule field
     """
 
     class Meta:
@@ -199,7 +199,7 @@ class XModuleStudentPrefsField(models.Model):
 
 class XModuleStudentInfoField(models.Model):
     """
-    Stores data set in the Scope.student_preferences scope by an xmodule field
+    Stores data set in the Scope.preferences scope by an xmodule field
     """
 
     class Meta:

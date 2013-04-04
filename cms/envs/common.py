@@ -35,6 +35,7 @@ MITX_FEATURES = {
     'AUTH_USE_MIT_CERTIFICATES': False,
     'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
     'STAFF_EMAIL': '',			# email address for staff (eg to request course creation)
+    'STUDIO_NPS_SURVEY': True, 
 }
 ENABLE_JASMINE = False
 

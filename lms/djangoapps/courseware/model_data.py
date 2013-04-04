@@ -134,7 +134,7 @@ class ModelDataCache(object):
         """
         if scope in (Scope.children, Scope.parent):
             return []
-        elif scope == Scope.student_state:
+        elif scope == Scope.user_state:
             return self._chunked_query(
                 StudentModule,
                 'module_state_key__in',
@@ -159,7 +159,7 @@ class ModelDataCache(object):
                 ),
                 field_name__in=set(field.name for field in fields),
             )
-        elif scope == Scope.student_preferences:
+        elif scope == Scope.preferences:
             return self._chunked_query(
                 XModuleStudentPrefsField,
                 'module_type__in',
@@ -167,7 +167,7 @@ class ModelDataCache(object):
                 student=self.user.pk,
                 field_name__in=set(field.name for field in fields),
             )
-        elif scope == Scope.student_info:
+        elif scope == Scope.user_info:
             return self._query(
                 XModuleStudentInfoField,
                 student=self.user.pk,
@@ -190,15 +190,15 @@ class ModelDataCache(object):
         """
         Return the key used in the ModelDataCache for the specified KeyValueStore key
         """
-        if key.scope == Scope.student_state:
+        if key.scope == Scope.user_state:
             return (key.scope, key.block_scope_id.url())
         elif key.scope == Scope.content:
             return (key.scope, key.block_scope_id.url(), key.field_name)
         elif key.scope == Scope.settings:
             return (key.scope, '%s-%s' % (self.course_id, key.block_scope_id.url()), key.field_name)
-        elif key.scope == Scope.student_preferences:
+        elif key.scope == Scope.preferences:
             return (key.scope, key.block_scope_id, key.field_name)
-        elif key.scope == Scope.student_info:
+        elif key.scope == Scope.user_info:
             return (key.scope, key.field_name)
 
     def _cache_key_from_field_object(self, scope, field_object):
@@ -206,15 +206,15 @@ class ModelDataCache(object):
         Return the key used in the ModelDataCache for the specified scope and
         field
         """
-        if scope == Scope.student_state:
+        if scope == Scope.user_state:
             return (scope, field_object.module_state_key)
         elif scope == Scope.content:
             return (scope, field_object.definition_id, field_object.field_name)
         elif scope == Scope.settings:
             return (scope, field_object.usage_id, field_object.field_name)
-        elif scope == Scope.student_preferences:
+        elif scope == Scope.preferences:
             return (scope, field_object.module_type, field_object.field_name)
-        elif scope == Scope.student_info:
+        elif scope == Scope.user_info:
             return (scope, field_object.field_name)
 
     def find(self, key):
@@ -237,7 +237,7 @@ class ModelDataCache(object):
         if field_object is not None:
             return field_object
 
-        if key.scope == Scope.student_state:
+        if key.scope == Scope.user_state:
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
                 student=self.user,
@@ -255,13 +255,13 @@ class ModelDataCache(object):
                 field_name=key.field_name,
                 usage_id='%s-%s' % (self.course_id, key.block_scope_id.url()),
             )
-        elif key.scope == Scope.student_preferences:
+        elif key.scope == Scope.preferences:
             field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
                 field_name=key.field_name,
                 module_type=key.block_scope_id,
                 student=self.user,
             )
-        elif key.scope == Scope.student_info:
+        elif key.scope == Scope.user_info:
             field_object, _ = XModuleStudentInfoField.objects.get_or_create(
                 field_name=key.field_name,
                 student=self.user,
@@ -281,12 +281,12 @@ class LmsKeyValueStore(KeyValueStore):
     If the scope to write to is not one of the 5 named scopes:
         Scope.content
         Scope.settings
-        Scope.student_state
-        Scope.student_preferences
-        Scope.student_info
+        Scope.user_state
+        Scope.preferences
+        Scope.user_info
     then an InvalidScopeError will be raised.
 
-    Data for Scope.student_state is stored as StudentModule objects via the django orm.
+    Data for Scope.user_state is stored as StudentModule objects via the django orm.
 
     Data for the other scopes is stored in individual objects that are named for the
     scope involved and have the field name as a key
@@ -297,9 +297,9 @@ class LmsKeyValueStore(KeyValueStore):
     _allowed_scopes = (
         Scope.content,
         Scope.settings,
-        Scope.student_state,
-        Scope.student_preferences,
-        Scope.student_info,
+        Scope.user_state,
+        Scope.preferences,
+        Scope.user_info,
         Scope.children,
     )
 
@@ -321,7 +321,7 @@ class LmsKeyValueStore(KeyValueStore):
         if field_object is None:
             raise KeyError(key.field_name)
 
-        if key.scope == Scope.student_state:
+        if key.scope == Scope.user_state:
             return json.loads(field_object.state)[key.field_name]
         else:
             return json.loads(field_object.value)
@@ -335,7 +335,7 @@ class LmsKeyValueStore(KeyValueStore):
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key.scope)
 
-        if key.scope == Scope.student_state:
+        if key.scope == Scope.user_state:
             state = json.loads(field_object.state)
             state[key.field_name] = value
             field_object.state = json.dumps(state)
@@ -355,7 +355,7 @@ class LmsKeyValueStore(KeyValueStore):
         if field_object is None:
             raise KeyError(key.field_name)
 
-        if key.scope == Scope.student_state:
+        if key.scope == Scope.user_state:
             state = json.loads(field_object.state)
             del state[key.field_name]
             field_object.state = json.dumps(state)
@@ -377,7 +377,7 @@ class LmsKeyValueStore(KeyValueStore):
         if field_object is None:
             return False
 
-        if key.scope == Scope.student_state:
+        if key.scope == Scope.user_state:
             return key.field_name in json.loads(field_object.state)
         else:
             return True

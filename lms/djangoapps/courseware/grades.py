@@ -13,7 +13,6 @@ from xblock.core import Scope
 from .module_render import get_module, get_module_for_descriptor
 from xmodule import graders
 from xmodule.capa_module import CapaModule
-from xmodule.course_module import CourseDescriptor
 from xmodule.graders import Score
 from .models import StudentModule
 
@@ -43,7 +42,6 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
         else:
             return descriptor.get_children()
 
-
     stack = [descriptor]
 
     while len(stack) > 0:
@@ -66,7 +64,7 @@ def yield_problems(request, course, student):
     ).values_list('module_state_key', flat=True))
 
     sections_to_list = []
-    for section_format, sections in grading_context['graded_sections'].iteritems():
+    for _, sections in grading_context['graded_sections'].iteritems():
         for section in sections:
 
             section_descriptor = section['section_descriptor']
@@ -123,7 +121,7 @@ def answer_distributions(request, course):
 
 def grade(student, request, course, model_data_cache=None, keep_raw_scores=False):
     """
-    This grades a student as quickly as possible. It retuns the
+    This grades a student as quickly as possible. It returns the
     output from the course grader, augmented with the final letter
     grade. The keys in the output are:
 
@@ -158,10 +156,16 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             for moduledescriptor in section['xmoduledescriptors']:
+                # some problems have state that is updated independently of interaction
+                # with the LMS, so they need to always be scored. (E.g. foldit.)
+                if moduledescriptor.always_recalculate_grades:
+                    should_grade_section = True
+                    break
+
                 # Create a fake key to pull out a StudentModule object from the ModelDataCache
 
                 key = LmsKeyValueStore.Key(
-                    Scope.student_state,
+                    Scope.user_state,
                     student.id,
                     moduledescriptor.location,
                     None
@@ -174,7 +178,8 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                 scores = []
 
                 def create_module(descriptor):
-                    # TODO: We need the request to pass into here. If we could forgo that, our arguments
+                    '''creates an XModule instance given a descriptor'''
+                    # TODO: We need the request to pass into here. If we could forego that, our arguments
                     # would be simpler
                     return get_module_for_descriptor(student, request, descriptor, model_data_cache, course.id)
 
@@ -197,18 +202,18 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
 
                     scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
 
-                section_total, graded_total = graders.aggregate_scores(scores, section_name)
+                _, graded_total = graders.aggregate_scores(scores, section_name)
                 if keep_raw_scores:
                     raw_scores += scores
             else:
-                section_total = Score(0.0, 1.0, False, section_name)
                 graded_total = Score(0.0, 1.0, True, section_name)
 
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
             else:
-                log.exception("Unable to grade a section with a total possible score of zero. " + str(section_descriptor.location))
+                log.exception("Unable to grade a section with a total possible score of zero. " +
+                              str(section_descriptor.location))
 
         totaled_scores[section_format] = format_scores
 
@@ -274,12 +279,9 @@ def progress_summary(student, request, course, model_data_cache):
 
     """
 
-
-    # TODO: We need the request to pass into here. If we could forgo that, our arguments
+    # TODO: We need the request to pass into here. If we could forego that, our arguments
     # would be simpler
-    course_module = get_module(student, request,
-                                course.location, model_data_cache,
-                                course.id, depth=None)
+    course_module = get_module(student, request, course.location, model_data_cache, course.id, depth=None)
     if not course_module:
         # This student must not have access to the course.
         return None
@@ -310,20 +312,19 @@ def progress_summary(student, request, course, model_data_cache):
                 if correct is None and total is None:
                     continue
 
-                scores.append(Score(correct, total, graded,
-                    module_descriptor.display_name_with_default))
+                scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
 
             scores.reverse()
-            section_total, graded_total = graders.aggregate_scores(
+            section_total, _ = graders.aggregate_scores(
                 scores, section_module.display_name_with_default)
 
-            format = section_module.lms.format if section_module.lms.format is not None else ''
+            module_format = section_module.lms.format if section_module.lms.format is not None else ''
             sections.append({
                 'display_name': section_module.display_name_with_default,
                 'url_name': section_module.url_name,
                 'scores': scores,
                 'section_total': section_total,
-                'format': format,
+                'format': module_format,
                 'due': section_module.lms.due,
                 'graded': graded,
             })
@@ -353,11 +354,13 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
     if not user.is_authenticated():
         return (None, None)
 
+    # some problems have state that is updated independently of interaction
+    # with the LMS, so they need to always be scored. (E.g. foldit.)
     if problem_descriptor.always_recalculate_grades:
         problem = module_creator(problem_descriptor)
-        d = problem.get_score()
-        if d is not None:
-            return (d['score'], d['total'])
+        score = problem.get_score()
+        if score is not None:
+            return (score['score'], score['total'])
         else:
             return (None, None)
 
@@ -367,7 +370,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
 
     # Create a fake KeyValueStore key to pull out the StudentModule
     key = LmsKeyValueStore.Key(
-        Scope.student_state,
+        Scope.user_state,
         user.id,
         problem_descriptor.location,
         None
@@ -394,7 +397,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
         if total is None:
             return (None, None)
 
-    #Now we re-weight the problem, if specified
+    # Now we re-weight the problem, if specified
     weight = problem_descriptor.weight
     if weight is not None:
         if total == 0:

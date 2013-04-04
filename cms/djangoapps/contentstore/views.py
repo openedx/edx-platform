@@ -6,7 +6,6 @@ import sys
 import time
 import tarfile
 import shutil
-from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
 from path import path
@@ -42,17 +41,18 @@ from xmodule.modulestore.mongo import MongoUsage
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, ProcessingError
 from functools import partial
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.util.date_utils import get_default_time_display
 
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
 from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, \
-    get_date_display, UnitState, get_course_for_item, get_url_reverse, add_open_ended_panel_tab, \
+    UnitState, get_course_for_item, get_url_reverse, add_open_ended_panel_tab, \
     remove_open_ended_panel_tab
 
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -365,7 +365,7 @@ def edit_unit(request, location):
         'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
-        'release_date': get_date_display(datetime.fromtimestamp(time.mktime(containing_subsection.lms.start))) if containing_subsection.lms.start is not None else None,
+        'release_date': get_default_time_display(containing_subsection.lms.start) if containing_subsection.lms.start is not None else None,
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
@@ -439,9 +439,16 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, request.POST)
+
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
+
+    except ProcessingError:
+        log.warning("Module raised an error while processing AJAX request",
+                    exc_info=True)
+        return HttpResponseBadRequest()
+
     except:
         log.exception("error processing ajax call")
         raise
@@ -821,7 +828,7 @@ def upload_asset(request, org, course, coursename):
     readback = contentstore().find(content.location)
 
     response_payload = {'displayname': content.name,
-        'uploadDate': get_date_display(readback.last_modified_at),
+        'uploadDate': get_default_time_display(readback.last_modified_at.timetuple()),
         'url': StaticContent.get_url_path_from_location(content.location),
         'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
         'msg': 'Upload completed'
@@ -1426,7 +1433,7 @@ def asset_index(request, org, course, name):
         id = asset['_id']
         display_info = {}
         display_info['displayname'] = asset['displayname']
-        display_info['uploadDate'] = get_date_display(asset['uploadDate'])
+        display_info['uploadDate'] = get_default_time_display(asset['uploadDate'].timetuple())
 
         asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)

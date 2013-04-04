@@ -1,6 +1,7 @@
-// studio - elements - JQUI calendar
+// studio - elements - vendor overrides
 // ====================
 
+// JQUI calendar
 .ui-datepicker {
   border-color: $darkGrey;
   border-radius: 2px;
@@ -8,6 +9,7 @@
   font-family: $sans-serif;
   font-size: 12px;
   @include box-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
+  z-index: 100000 !important;
 
   .ui-widget-header {
     background: $darkGrey;
@@ -53,4 +55,11 @@
     border-color: $orange;
     color: #fff;
   }
+}
+
+// ====================
+
+// JQUI timepicker
+.ui-timepicker-list {
+  z-index: 100000 !important;
 }
