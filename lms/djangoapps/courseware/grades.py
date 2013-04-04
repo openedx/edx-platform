@@ -165,7 +165,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                 # Create a fake key to pull out a StudentModule object from the ModelDataCache
 
                 key = LmsKeyValueStore.Key(
-                    Scope.student_state,
+                    Scope.user_state,
                     student.id,
                     moduledescriptor.location,
                     None
@@ -370,7 +370,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
 
     # Create a fake KeyValueStore key to pull out the StudentModule
     key = LmsKeyValueStore.Key(
-        Scope.student_state,
+        Scope.user_state,
         user.id,
         problem_descriptor.location,
         None
