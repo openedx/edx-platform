@@ -123,15 +123,15 @@ class ViewsTestCase(TestCase):
 
     def test_no_end_about_blob(self):
         # test_end has a course end date, no end_date HTML blob
-        self.verify_end_date('edX/test_end/2012_Fall', "Sep 17, 2015")
+        self.verify_end_date("edX/test_end/2012_Fall", "Sep 17, 2015")
 
     def test_about_blob_end_date(self):
-        # test_about_blob_end_date has both a course end date, and an end_date HTML blob
+        # test_about_blob_end_date has both a course end date and an end_date HTML blob.
         # HTML blob wins
-        self.verify_end_date('edX/test_about_blob_end_date/2012_Fall', "Learning never ends")
+        self.verify_end_date("edX/test_about_blob_end_date/2012_Fall", "Learning never ends")
 
     def verify_end_date(self, course_id, expected_end_text=None):
-        request = self.request_factory.get('foo')
+        request = self.request_factory.get("foo")
         request.user = self.user
         result = views.course_about(request, course_id)
         if expected_end_text is not None:
