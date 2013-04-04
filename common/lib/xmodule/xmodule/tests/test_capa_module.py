@@ -844,7 +844,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # check to make sure that the input_state and the keys have the same values
         module1.set_state_from_lcp()
-        self.assertEqual(module1.lcp.inputs.keys(),module1.input_state.keys())
+        self.assertEqual(module1.lcp.inputs.keys(), module1.input_state.keys())
 
         module2.set_state_from_lcp()
 
