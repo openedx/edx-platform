@@ -110,7 +110,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         };
 
         // instrument as date and time pickers
-        timefield.timepicker();
+        timefield.timepicker({'timeFormat' : 'H:i'});
         datefield.datepicker();
 
         // Using the change event causes savefield to be triggered twice, but it is necessary
