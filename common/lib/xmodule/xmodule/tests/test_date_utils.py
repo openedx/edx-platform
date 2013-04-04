@@ -15,7 +15,7 @@ def test_get_time_struct_display():
 def test_get_default_time_display():
     assert_equals("", date_utils.get_default_time_display(None))
     test_time = time.struct_time((1992, 3, 12, 15, 3, 30, 1, 71, 0))
-    assert_equals("Mar 12, 1992 at 03:03 PM",
+    assert_equals("Mar 12, 1992 at 15:03 UTC",
         date_utils.get_default_time_display(test_time))
 
 

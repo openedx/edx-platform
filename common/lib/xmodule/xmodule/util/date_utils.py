@@ -6,11 +6,11 @@ def get_default_time_display(time_struct):
     """
     Converts a time struct to a string representation. This is the default
     representation used in Studio and LMS.
-    It is of the form "Apr 09, 2013 at 04:00 PM".
+    It is of the form "Apr 09, 2013 at 16:00 UTC".
 
     If None is passed in, an empty string will be returned.
     """
-    return get_time_struct_display(time_struct, "%b %d, %Y at %I:%M %p")
+    return get_time_struct_display(time_struct, "%b %d, %Y at %H:%M UTC")
 
 
 def get_time_struct_display(time_struct, format):

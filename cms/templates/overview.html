@@ -162,7 +162,7 @@
               <div class="section-published-date">
                 <%
                   start_date_str = get_time_struct_display(section.lms.start, '%m/%d/%Y')
-                  start_time_str = get_time_struct_display(section.lms.start, '%I:%M %p')
+                  start_time_str = get_time_struct_display(section.lms.start, '%H:%M UTC')
                 %>
                 %if section.lms.start is None:
                   <span class="published-status">This section has not been released.</span>

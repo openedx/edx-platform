@@ -43,7 +43,7 @@
             <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default}, which is unset.
             % else:
             <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default} –
-                ${get_time_struct_display(parent_item.lms.start, '%m/%d/%Y at %I:%M %p')}.
+                ${get_time_struct_display(parent_item.lms.start, '%m/%d/%Y at %H:%M UTC')}.
             % endif
             <a href="#" class="sync-date no-spinner">Sync to ${parent_item.display_name_with_default}.</a></p>
         % endif
