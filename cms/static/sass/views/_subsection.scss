@@ -8,6 +8,32 @@ body.course.subsection {
       padding: 10px 20px;
     }
 
+    .datepair {
+
+      .field {
+        display: inline-block;
+        margin-right: ($baseline/4);
+        width: 45%;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        label, input {
+          display: block;
+          text-align: left;
+        }
+
+        input {
+          width: 100%;
+        }
+
+        label {
+          margin-bottom: ($baseline/4);
+        }
+      }
+    }
+
     .unit-actions {
       border-bottom: none;
       padding-bottom: 0;
