@@ -630,6 +630,7 @@ def progress(request, course_id, student_id=None):
                'courseware_summary': courseware_summary,
                'grade_summary': grade_summary,
                'staff_access': staff_access,
+               'student': student,
                }
     context.update()
 
