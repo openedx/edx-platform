@@ -331,6 +331,12 @@ function createNewUnit(e) {
     var parent = $(this).data('parent');
     var template = $(this).data('template');
 
+    analytics.track('Created a Unit', {
+        'course': course_location_analytics,
+        'parent_location': parent
+    });
+
+
     $.post('/clone_item',
         {'parent_location': parent,
             'template': template,
@@ -362,6 +368,12 @@ function _deleteItem($el) {
         return;
 
     var id = $el.data('id');
+
+    analytics.track('Deleted an Item', {
+        'course': course_location_analytics,
+        'id': id
+    });
+
 
     $.post('/delete_item',
         {'id': id, 'delete_children': true, 'delete_all_versions': true},
@@ -425,6 +437,11 @@ function displayFinishedUpload(xhr) {
     var template = $('#new-asset-element').html();
     var html = Mustache.to_html(template, resp);
     $('table > tbody').prepend(html);
+
+    analytics.track('Uploaded a File', {
+        'course': course_location_analytics,
+        'asset_url': resp.url
+    });
 
 }
 
@@ -555,6 +572,11 @@ function saveNewSection(e) {
     var template = $saveButton.data('template');
     var display_name = $(this).find('.new-section-name').val();
 
+    analytics.track('Created a Section', {
+        'course': course_location_analytics,
+        'display_name': display_name
+    });
+
     $.post('/clone_item', {
             'parent_location': parent,
             'template': template,
@@ -599,6 +621,12 @@ function saveNewCourse(e) {
         alert('You must specify all fields in order to create a new course.');
         return;
     }
+
+    analytics.track('Created a Course', {
+        'org': org,
+        'number': number,
+        'display_name': display_name
+    });
 
     $.post('/create_new_course', {
             'template': template,
@@ -646,8 +674,13 @@ function saveNewSubsection(e) {
 
     var parent = $(this).find('.new-subsection-name-save').data('parent');
     var template = $(this).find('.new-subsection-name-save').data('template');
-
     var display_name = $(this).find('.new-subsection-name-input').val();
+
+    analytics.track('Created a Subsection', {
+        'course': course_location_analytics,
+        'display_name': display_name
+    });
+
 
     $.post('/clone_item', {
             'parent_location': parent,
@@ -702,6 +735,13 @@ function saveEditSectionName(e) {
         return;
     }
 
+    analytics.track('Edited Section Name', {
+        'course': course_location_analytics,
+        'display_name': display_name,
+        'id': id
+    });
+
+
     var $_this = $(this);
     // call into server to commit the new order
     $.ajax({
@@ -740,6 +780,12 @@ function saveSetSectionScheduleDate(e) {
     var start = getEdxTimeFromDateTimeVals(input_date, input_time);
 
     var id = $modal.attr('data-id');
+
+    analytics.track('Edited Section Release Date', {
+        'course': course_location_analytics,
+        'id': id,
+        'start': start
+    });
 
     // call into server to commit the new order
     $.ajax({
