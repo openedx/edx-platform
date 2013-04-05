@@ -36,6 +36,7 @@ MITX_FEATURES = {
     'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
     'STAFF_EMAIL': '',			# email address for staff (eg to request course creation)
     'STUDIO_NPS_SURVEY': True, 
+    'SEGMENT_IO': True,
 }
 ENABLE_JASMINE = False
 

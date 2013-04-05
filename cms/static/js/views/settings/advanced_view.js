@@ -137,6 +137,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             success : function() {
                 self.render();
                 self.showMessage(self.successful_changes);
+                analytics.track('Saved Advanced Settings', {
+                    'course': course_location_analytics
+                });
+
             },
             error : CMS.ServerError
         });
