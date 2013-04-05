@@ -153,13 +153,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         found = False
 
-        item = None
         items = module_store.get_items(['i4x', 'edX', 'full', 'poll_question', None, None])
         found = len(items) > 0
 
         self.assertTrue(found)
         # check that there's actually content in the 'question' field
-        self.assertGreater(len(items[0].question),0)
+        self.assertGreater(len(items[0].question), 0)
 
     def test_xlint_fails(self):
         err_cnt = perform_xlint('common/test/data', ['full'])
@@ -172,14 +171,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         sequential = module_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
 
-        chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter','Week_1', None]))
+        chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
 
         # make sure the parent no longer points to the child object which was deleted
         self.assertTrue(sequential.location.url() in chapter.children)
 
         self.client.post(reverse('delete_item'),
             json.dumps({'id': sequential.location.url(), 'delete_children': 'true', 'delete_all_versions': 'true'}),
-            "application/json")
+                    "application/json")
 
         found = False
         try:
@@ -190,7 +189,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertFalse(found)
 
-        chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter','Week_1', None]))
+        chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
 
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)
@@ -213,7 +212,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
         module_store = modulestore('direct')
-        content_store = contentstore()
 
         source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
         course = module_store.get_item(source_location)
@@ -226,7 +224,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
-            }
+        }
 
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
@@ -292,31 +290,31 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
         # get a vertical (and components in it) to put into 'draft'
-        vertical = module_store.get_item(Location(['i4x', 'edX', 'full', 
-            'vertical', 'vertical_66', None]), depth=1)
+        vertical = module_store.get_item(Location(['i4x', 'edX', 'full',
+                                         'vertical', 'vertical_66', None]), depth=1)
 
         draft_store.clone_item(vertical.location, vertical.location)
 
         for child in vertical.get_children():
-            draft_store.clone_item(child.location, child.location)            
+            draft_store.clone_item(child.location, child.location)           
 
         root_dir = path(mkdtemp_clean())
 
         # now create a private vertical
-        private_vertical = draft_store.clone_item(vertical.location, 
-            Location(['i4x', 'edX', 'full', 'vertical', 'a_private_vertical', None]))
+        private_vertical = draft_store.clone_item(vertical.location,
+                                                  Location(['i4x', 'edX', 'full', 'vertical', 'a_private_vertical', None]))
 
         # add private to list of children
-        sequential = module_store.get_item(Location(['i4x', 'edX', 'full', 
-            'sequential', 'Administrivia_and_Circuit_Elements', None]))
+        sequential = module_store.get_item(Location(['i4x', 'edX', 'full',
+                                           'sequential', 'Administrivia_and_Circuit_Elements', None]))
         private_location_no_draft = private_vertical.location._replace(revision=None)
-        module_store.update_children(sequential.location, sequential.children + 
-            [private_location_no_draft.url()])
+        module_store.update_children(sequential.location, sequential.children +
+                                     [private_location_no_draft.url()])
 
         # read back the sequential, to make sure we have a pointer to 
-        sequential = module_store.get_item(Location(['i4x', 'edX', 'full', 
-            'sequential', 'Administrivia_and_Circuit_Elements', None]))  
-            
+        sequential = module_store.get_item(Location(['i4x', 'edX', 'full',
+                                                     'sequential', 'Administrivia_and_Circuit_Elements', None]))
+
         self.assertIn(private_location_no_draft.url(), sequential.children)
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
@@ -363,30 +361,29 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         for descriptor in items:
             # don't try to look at private verticals. Right now we're running
             # the service in non-draft aware
-            if hasattr(descriptor, 'is_draft'):
+            if getattr(descriptor, 'is_draft', False):
                 print "Checking {0}....".format(descriptor.location.url())
                 resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
                 self.assertEqual(resp.status_code, 200)
 
         # verify that we have the content in the draft store as well
-        vertical = draft_store.get_item(Location(['i4x', 'edX', 'full', 
-            'vertical', 'vertical_66', None]), depth=1)    
-            
-        self.assertTrue(hasattr(vertical, 'is_draft'))
+        vertical = draft_store.get_item(Location(['i4x', 'edX', 'full',
+                                                  'vertical', 'vertical_66', None]), depth=1)
+
+        self.assertTrue(getattr(vertical, 'is_draft', False))
         for child in vertical.get_children():
-            self.assertTrue(hasattr(child, 'is_draft'))
+            self.assertTrue(getattr(child, 'is_draft', False))
 
         # verify that we have the private vertical
-        test_private_vertical = draft_store.get_item(Location(['i4x', 'edX', 'full', 
-            'vertical', 'vertical_66', None]))
+        test_private_vertical = draft_store.get_item(Location(['i4x', 'edX', 'full',
+                                                               'vertical', 'vertical_66', None]))
 
-        self.assertTrue(hasattr(test_private_vertical, 'is_draft'))
+        self.assertTrue(getattr(test_private_vertical, 'is_draft', False))
 
         shutil.rmtree(root_dir)
 
     def test_course_handouts_rewrites(self):
         module_store = modulestore('direct')
-        content_store = contentstore()
 
         # import a test course
         import_from_xml(module_store, 'common/test/data/', ['full'])
@@ -419,11 +416,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # make sure we pre-fetched a known sequential which should be at depth=2
         self.assertTrue(Location(['i4x', 'edX', 'full', 'sequential',
-            'Administrivia_and_Circuit_Elements', None]) in course.system.module_data)
+                                  'Administrivia_and_Circuit_Elements', None]) in course.system.module_data)
 
         # make sure we don't have a specific vertical which should be at depth=3
-        self.assertFalse(Location(['i4x', 'edX', 'full', 'vertical', 'vertical_58',
-            None]) in course.system.module_data)
+        self.assertFalse(Location(['i4x', 'edX', 'full', 'vertical', 'vertical_58', None])
+                         in course.system.module_data)
 
     def test_export_course_with_unknown_metadata(self):
         module_store = modulestore('direct')
@@ -449,11 +446,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         try:
             export_to_xml(module_store, content_store, location, root_dir, 'test_export')
             exported = True
-        except Exception,e:
+        except Exception:
             print 'Exception thrown: {0}'.format(traceback.format_exc())
             pass
 
         self.assertTrue(exported)
+
 
 class ContentStoreTest(ModuleStoreTestCase):
     """
@@ -489,7 +487,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
-            }
+        }
 
     def test_create_course(self):
         """Test new course creation - happy path"""
@@ -516,7 +514,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(data['ErrMsg'],
-            'There is already a course defined with the same organization and course number.')
+                         'There is already a course defined with the same organization and course number.')
 
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
@@ -526,7 +524,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(data['ErrMsg'],
-            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
+                         "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
 
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""
@@ -562,10 +560,10 @@ class ContentStoreTest(ModuleStoreTestCase):
         CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         data = {
-                'org': 'MITx',
-                'course': '999',
-                'name': Location.clean('Robot Super Course'),
-                }
+            'org': 'MITx',
+            'course': '999',
+            'name': Location.clean('Robot Super Course'),
+        }
 
         resp = self.client.get(reverse('course_index', kwargs=data))
         self.assertContains(resp,
@@ -581,7 +579,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
             'template': 'i4x://edx/templates/chapter/Empty',
             'display_name': 'Section One',
-            }
+        }
 
         resp = self.client.post(reverse('clone_item'), section_data)
 
@@ -597,7 +595,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         problem_data = {
             'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
             'template': 'i4x://edx/templates/problem/Blank_Common_Problem'
-            }
+        }
 
         resp = self.client.post(reverse('clone_item'), problem_data)
 
