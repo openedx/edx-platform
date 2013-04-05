@@ -104,20 +104,6 @@
 </%block>
 
 <%block name="content">
-  <div class="edit-subsection-publish-settings">
-    <div class="settings">
-      <h3>Section Release Date</h3>
-      <div class="picker datepair">
-        <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-        <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-        <div class="description">
-          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
-        </div>
-      </div>
-      <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
-    </div>
-  </div>
-
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
       <div class="title">
@@ -216,25 +202,18 @@
     </div>
   </div>
   <footer></footer>
-</%block>
 
-<%block name="view_banners">
-<!-- banner - view - coursenote -->
-<div class="wrapper wrapper-banner wrapper-banner-view wrapper-banner-view-coursenote is-shown" id="banner-coursenote">
-  <div class="banner coursenote has-actions actions-are-hidden">
-    <div class="copy">
-      <h2 class="title title-3 sr">Share Your Course</h2>
-      <p>Students can enroll in ${context_course.display_name_with_default} at: <a href="http://edge.edx.org/org/courseno/coursename" rel="lms" class="link-course">http://edge.edx.org/org/courseno/coursename</a></p>
+  <div class="edit-subsection-publish-settings">
+    <div class="settings">
+      <h3>Section Release Date</h3>
+      <div class="picker datepair">
+        <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+        <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+        <div class="description">
+          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
+        </div>
+      </div>
+      <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
     </div>
-
-    <nav class="nav-actions">
-      <h3 class="sr">Banner Actions</h3>
-      <ul>
-        <li class="nav-item">
-          <a href="#" class="action-primary">Send an invitation</a>
-        </li>
-      </ul>
-    </nav>
   </div>
-</div>
 </%block>

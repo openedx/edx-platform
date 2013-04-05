@@ -35,6 +35,10 @@ class CMS.Views.UnitEdit extends Backbone.View
     @$('.components').sortable(
       handle: '.drag-handle'
       update: (event, ui) =>
+        analytics.track "Reordered Components",
+          course: course_location_analytics
+          id: unit_location_analytics
+
         payload = children : @components()
         options = success : => @model.unset('children')
         @model.save(payload, options)
@@ -89,6 +93,11 @@ class CMS.Views.UnitEdit extends Backbone.View
       $(event.currentTarget).data('location')
     )
 
+    analytics.track "Added a Component",
+      course: course_location_analytics
+      unit_id: unit_location_analytics
+      type: $(event.currentTarget).data('location')
+
     @closeNewComponent(event)
 
   components: => @$('.component').map((idx, el) -> $(el).data('id')).get()
@@ -111,6 +120,11 @@ class CMS.Views.UnitEdit extends Backbone.View
     $.post('/delete_item', {
       id: $component.data('id')
     }, =>
+      analytics.track "Deleted a Component",
+        course: course_location_analytics
+        unit_id: unit_location_analytics
+        id: $component.data('id')
+
       $component.remove()
       # b/c we don't vigilantly keep children up to date
       # get rid of it before it hurts someone
@@ -129,6 +143,10 @@ class CMS.Views.UnitEdit extends Backbone.View
       id: @$el.data('id')
       delete_children: true
     }, =>
+      analytics.track "Deleted Draft",
+        course: course_location_analytics
+        unit_id: unit_location_analytics
+
       window.location.reload()
     )
 
@@ -138,6 +156,10 @@ class CMS.Views.UnitEdit extends Backbone.View
     $.post('/create_draft', {
       id: @$el.data('id')
     }, =>
+      analytics.track "Created Draft",
+        course: course_location_analytics
+        unit_id: unit_location_analytics
+
       @model.set('state', 'draft')
     )
 
@@ -148,20 +170,31 @@ class CMS.Views.UnitEdit extends Backbone.View
     $.post('/publish_draft', {
       id: @$el.data('id')
     }, =>
+      analytics.track "Published Draft",
+        course: course_location_analytics
+        unit_id: unit_location_analytics
+
       @model.set('state', 'public')
     )
 
   setVisibility: (event) ->
     if @$('.visibility-select').val() == 'private'
       target_url = '/unpublish_unit'
+      visibility = "private"
     else
       target_url = '/publish_draft'
+      visibility = "public"
 
     @wait(true)
 
     $.post(target_url, {
       id: @$el.data('id')
     }, =>
+      analytics.track "Set Unit Visibility",
+        course: course_location_analytics
+        unit_id: unit_location_analytics
+        visibility: visibility
+
       @model.set('state', @$('.visibility-select').val())
     )
 
@@ -193,6 +226,11 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     @model.save(metadata: metadata)
     # Update name shown in the right-hand side location summary.
     $('.unit-location .editing .unit-name').html(metadata.display_name)
+    analytics.track "Edited Unit Name",
+      course: course_location_analytics
+      unit_id: unit_location_analytics
+      display_name: metadata.display_name
+
 
 class CMS.Views.UnitEdit.LocationState extends Backbone.View
   initialize: =>
