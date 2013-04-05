@@ -364,7 +364,7 @@ def import_course_draft(xml_module_store, store, course_data_path, static_conten
     )
 
     # now walk the /vertical directory where each file in there will be a draft copy of the Vertical
-    for dirname, dirnames, filenames in os.walk(draft_dir + "/sequential"):
+    for dirname, dirnames, filenames in os.walk(draft_dir + "/vertical"):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
             with open(module_path) as f:
@@ -373,8 +373,30 @@ def import_course_draft(xml_module_store, store, course_data_path, static_conten
                     descriptor = system.process_xml(xml)
 
                     def _import_module(module):
-                        if module.location.category != 'sequential':
-                            module.location = module.location._replace(revision='draft')
+                        module.location = module.location._replace(revision='draft')
+                        # make sure our parent has us in its list of children
+                        # this is to make sure private only verticals show up in the list of children since
+                        # they would have been filtered out from the non-draft store export
+                        if module.location.category == 'vertical':
+                            module.location = module.location._replace(revision=None)
+                            sequential_url = module.xml_attributes['parent_sequential_url']
+                            index = int(module.xml_attributes['index_in_children_list'])
+
+                            seq_location = Location(sequential_url)
+
+                            # IMPORTANT: Be sure to update the sequential in the NEW namespace
+                            seq_location = seq_location._replace(org=target_location_namespace.org,
+                                                                 course=target_location_namespace.course
+                                                                 )
+                            sequential = store.get_item(seq_location)
+
+                            if module.location.url() not in sequential.children:
+                                sequential.children.insert(index, module.location.url())
+                                store.update_children(sequential.location, sequential.children)
+
+                            del module.xml_attributes['parent_sequential_url']
+                            del module.xml_attributes['index_in_children_list']
+
                         import_module(module, store, course_data_path, static_content_store, allow_not_found=True)
                         for child in module.get_children():
                             _import_module(child)
@@ -401,20 +423,20 @@ def remap_namespace(module, target_location_namespace):
     # the caller passed in
     if module.location.category != 'course':
         module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-            course=target_location_namespace.course)
+                                                   course=target_location_namespace.course)
     else:
         module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-            course=target_location_namespace.course, name=target_location_namespace.name)
+                                                   course=target_location_namespace.course, name=target_location_namespace.name)
 
     # then remap children pointers since they too will be re-namespaced
-    if hasattr(module,'children'):
+    if hasattr(module, 'children'):
         children_locs = module.children
         if children_locs is not None and children_locs != []:
             new_locs = []
             for child in children_locs:
                 child_loc = Location(child)
                 new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                    course=target_location_namespace.course)
+                                                   course=target_location_namespace.course)
 
                 new_locs.append(new_child_loc.url())
 
@@ -429,7 +451,7 @@ def allowed_metadata_by_category(category):
         'vertical': [],
         'chapter': ['start'],
         'sequential': ['due', 'format', 'start', 'graded']
-    }.get(category,['*'])
+    }.get(category, ['*'])
 
 
 def check_module_metadata_editability(module):
