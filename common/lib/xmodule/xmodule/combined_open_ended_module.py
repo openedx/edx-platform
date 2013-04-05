@@ -219,4 +219,5 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
 
     stores_state = True
     has_score = True
+    always_recalculate_grades=True
     template_dir_name = "combinedopenended"
