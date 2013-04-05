@@ -242,13 +242,12 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     try:
       thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
-
+      thread['show_any_flag'] = cached_has_permission(request.user, 'openclose_thread', course.id) and thread['abuse_flaggers'] and len(thread['abuse_flaggers']) > 0
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
       log.error("Error loading single thread.")
       raise Http404
 
     if request.is_ajax():
-
         courseware_context = get_courseware_context(thread, course)
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
@@ -321,6 +320,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'thread_pages': query_params['num_pages'],
             'is_course_cohorted': is_course_cohorted(course_id),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
+            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id),
             'cohorts': cohorts,
             'user_cohort': get_cohort_id(request.user, course_id),
             'cohorted_commentables': cohorted_commentables

@@ -1,5 +1,4 @@
 from .utils import *
-
 import models
 import settings
 
@@ -11,7 +10,8 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers'
+        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers',
+        'show_any_flag'
     ]
 
     updatable_fields = [
@@ -93,7 +93,7 @@ class Thread(models.Model):
         request = perform_request('put', url, params)
         voteable.update_attributes(request)    
         
-    def unFlagAbuse(self, user, voteable):
+    def unFlagAbuse(self, user, voteable, removeAll):
         if voteable.type == 'thread':
             url = _url_for_unflag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
@@ -101,6 +101,10 @@ class Thread(models.Model):
         else:
             raise CommentClientError("Can flag/unflag for threads or comments")
         params = {'user_id': user.id}
+        #if you're an admin, when you unflag, remove ALL flags
+        if removeAll:
+            params['all'] = True
+         
         request = perform_request('put', url, params)
         voteable.update_attributes(request)    
     

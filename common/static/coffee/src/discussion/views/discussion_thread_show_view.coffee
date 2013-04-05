@@ -46,7 +46,7 @@ if Backbone?
         @$("[data-role=discussion-vote]").removeClass("is-cast")
         
     renderFlagged: =>
-      if window.user.id in @model.get("abuse_flaggers")
+      if window.user.id in @model.get("abuse_flaggers")  or @model.get("show_any_flag")
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")

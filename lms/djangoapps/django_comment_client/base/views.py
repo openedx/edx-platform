@@ -295,8 +295,10 @@ def flag_abuse_for_thread(request, course_id, thread_id):
 
 def un_flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
+    
     thread = cc.Thread.find(thread_id)
-    thread.unFlagAbuse(user,thread)
+    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id)
+    thread.unFlagAbuse(user,thread,removeAll)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 def flag_abuse_for_comment(request, course_id, comment_id):
