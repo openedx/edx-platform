@@ -1,6 +1,7 @@
-// studio - elements - JQUI calendar
+// studio - elements - vendor overrides
 // ====================
 
+// JQUI calendar
 .ui-datepicker {
   border-color: $darkGrey;
   border-radius: 2px;
@@ -54,4 +55,11 @@
     border-color: $orange;
     color: #fff;
   }
+}
+
+// ====================
+
+// JQUI timepicker
+.ui-timepicker-list {
+  z-index: 100000 !important;
 }

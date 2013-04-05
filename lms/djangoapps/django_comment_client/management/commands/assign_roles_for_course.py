@@ -6,7 +6,8 @@ Enrollments.
 """
 from django.core.management.base import BaseCommand, CommandError
 
-from student.models import CourseEnrollment, assign_default_role
+from student.models import CourseEnrollment
+from django_comment_client.models import assign_default_role
 
 
 class Command(BaseCommand):

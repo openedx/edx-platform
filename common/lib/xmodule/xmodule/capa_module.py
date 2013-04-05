@@ -83,7 +83,7 @@ class ComplexEncoder(json.JSONEncoder):
 
 
 class CapaFields(object):
-    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
+    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
     max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
@@ -91,12 +91,12 @@ class CapaFields(object):
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
     rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
-    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
-    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.student_state)
-    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
-    done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
+    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
+    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
+    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
+    done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
-    seed = StringyInteger(help="Random seed for this student", scope=Scope.student_state)
+    seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
@@ -108,11 +108,10 @@ class CapaModule(CapaFields, XModule):
     '''
     icon_class = 'problem'
 
-
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                    ],
+                     ],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
                  resource_string(__name__, 'js/src/capa/schematic.js')
                  ]}
@@ -367,11 +366,11 @@ class CapaModule(CapaFields, XModule):
             self.set_state_from_lcp()
 
             # Prepend a scary warning to the student
-            warning  = '<div class="capa_reset">'\
-                       '<h2>Warning: The problem has been reset to its initial state!</h2>'\
-                       'The problem\'s state was corrupted by an invalid submission. ' \
-                       'The submission consisted of:'\
-                       '<ul>'
+            warning = '<div class="capa_reset">'\
+                      '<h2>Warning: The problem has been reset to its initial state!</h2>'\
+                      'The problem\'s state was corrupted by an invalid submission. ' \
+                      'The submission consisted of:'\
+                      '<ul>'
             for student_answer in student_answers.values():
                 if student_answer != '':
                     warning += '<li>' + cgi.escape(student_answer) + '</li>'
@@ -388,7 +387,6 @@ class CapaModule(CapaFields, XModule):
 
         return html
 
-
     def get_problem_html(self, encapsulate=True):
         '''Return html for the problem.  Adds check, reset, save buttons
         as necessary based on the problem config and state.'''
@@ -400,7 +398,6 @@ class CapaModule(CapaFields, XModule):
         # then generate an error message instead.
         except Exception, err:
             html = self.handle_problem_html_error(err)
-
 
         # The convention is to pass the name of the check button
         # if we want to show a check button, and False otherwise
@@ -454,7 +451,7 @@ class CapaModule(CapaFields, XModule):
             'score_update': self.update_score,
             'input_ajax': self.handle_input_ajax,
             'ungraded_response': self.handle_ungraded_response
-            }
+        }
 
         if dispatch not in handlers:
             return 'Error'
@@ -472,7 +469,7 @@ class CapaModule(CapaFields, XModule):
         d.update({
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
-            })
+        })
         return json.dumps(d, cls=ComplexEncoder)
 
     def is_past_due(self):
@@ -535,7 +532,6 @@ class CapaModule(CapaFields, XModule):
 
         return False
 
-
     def update_score(self, get):
         """
         Delivers grading response (e.g. from asynchronous code checking) to
@@ -589,7 +585,6 @@ class CapaModule(CapaFields, XModule):
         # save any state changes that may occur
         self.set_state_from_lcp()
         return response
-
 
     def get_answer(self, get):
         '''
@@ -700,7 +695,6 @@ class CapaModule(CapaFields, XModule):
             'max_value': score['total'],
         })
 
-
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and
             returns a map of correct/incorrect answers:
@@ -783,7 +777,7 @@ class CapaModule(CapaFields, XModule):
         self.system.track_function('save_problem_check', event_info)
 
         if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
-            self.system.psychometrics_handler(self.get_instance_state())
+            self.system.psychometrics_handler(self.get_state_for_lcp())
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)

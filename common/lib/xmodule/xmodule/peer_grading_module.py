@@ -37,8 +37,8 @@ class PeerGradingFields(object):
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
     max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE,
                         scope=Scope.settings)
-    student_data_for_location = Object(help="Student data for a given peer grading problem.", default=json.dumps({}),
-                                       scope=Scope.student_state)
+    student_data_for_location = Object(help="Student data for a given peer grading problem.",
+                                       scope=Scope.user_state)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
 
 
@@ -577,4 +577,5 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
 
     stores_state = True
     has_score = True
+    always_recalculate_grades=True
     template_dir_name = "peer_grading"
