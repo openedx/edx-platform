@@ -21,7 +21,7 @@ from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import Scope, String, Object, Boolean, List
+from xblock.core import Scope, String, Object, Boolean, List, Integer
 
 log = logging.getLogger(__name__)
 
@@ -29,12 +29,13 @@ log = logging.getLogger(__name__)
 class WordCloudFields(object):
     # Name of poll to use in links to this poll
     display_name = String(help="Display name for this module", scope=Scope.settings)
+    num_inputs = Integer(help="Number of inputs", scope=Scope.settings)
 
     submitted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
     student_words= List(help="Student answer", scope=Scope.student_state, default=[])
     all_words = Object(help="All possible words from other students", scope=Scope.content)
     top_words = Object(help="Top N words for word cloud", scope=Scope.content)
-    top_low_border = Int(help="Number to distinguish top from all words", scope=Scope.content)
+    top_low_border = Integer(help="Number to distinguish top from all words", scope=Scope.content)
 
 class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Module"""
@@ -44,8 +45,8 @@ class WordCloudModule(WordCloudFields, XModule):
              resource_string(__name__, 'js/src/word_cloud/word_cloud.js'),
              resource_string(__name__, 'js/src/word_cloud/word_cloud_main.js')]
          }
-    css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
-    js_module_name = "Word_Cloud"
+    # css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
+    js_module_name = "WordCloud"
 
     Number_of_top_words = 250
 
@@ -103,7 +104,7 @@ class WordCloudModule(WordCloudFields, XModule):
                                })
         elif dispatch == 'get_state':
             return json.dumps({'student_answers': self.student_answers,
-                               'top_words': self.top_words)
+                               'top_words': self.top_words
                                })
         else:  # return error message
             return json.dumps({'error': 'Unknown Command!'})
@@ -132,7 +133,6 @@ class WordCloudModule(WordCloudFields, XModule):
         return self.content
 
 
-
 class WordCloudDescriptor(WordCloudFields, MakoModuleDescriptor, XmlDescriptor):
     _tag_name = 'word_cloud'
 
@@ -159,8 +159,9 @@ class WordCloudDescriptor(WordCloudFields, MakoModuleDescriptor, XmlDescriptor):
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
-        poll_str = '<{tag_name}/>'.format(tag_name=self._tag_name)
-        xml_object = etree.fromstring(poll_str)
+        xml_str = '<{tag_name} />'.format(tag_name=self._tag_name)
+        xml_object = etree.fromstring(xml_str)
         xml_object.set('display_name', self.display_name)
+        xml_object.set('num_inputs', self.num_inputs)
 
         return xml_object
