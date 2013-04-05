@@ -76,6 +76,11 @@ class Command(BaseCommand):
             for hist_module in hist_modules:
                 self.remove_studentmodulehistory_input_state(hist_module, save_changes)
 
+            if self.num_visited % 1000 == 0:
+                LOG.info(" Progress: updated {0} of {1} student modules".format(self.num_changed, self.num_visited))
+                LOG.info(" Progress: updated {0} of {1} student history modules".format(self.num_hist_changed,
+                                                                                        self.num_hist_visited))
+
     @transaction.autocommit
     def remove_studentmodule_input_state(self, module, save_changes):
         ''' Fix the grade assigned to a StudentModule'''

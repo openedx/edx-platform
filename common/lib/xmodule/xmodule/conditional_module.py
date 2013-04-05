@@ -125,7 +125,8 @@ class ConditionalModule(ConditionalFields, XModule):
         an AJAX call.
         """
         if not self.is_condition_satisfied():
-            message = self.descriptor.xml_attributes.get('message')
+            defmsg = "{link} must be attempted before this will become visible."
+            message = self.descriptor.xml_attributes.get('message', defmsg)
             context = {'module': self,
                        'message': message}
             html = self.system.render_template('conditional_module.html',

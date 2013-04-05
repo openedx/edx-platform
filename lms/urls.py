@@ -153,6 +153,9 @@ urlpatterns = ('',
     url(r'^press/xblock_announcement$', 'static_template_view.views.render',
         {'template': 'press_releases/xblock_announcement.html'},
         name="press/xblock-announcement"),
+    url(r'^press/stanford-to-work-with-edx$', 'static_template_view.views.render',
+        {'template': 'press_releases/stanford_announcement.html'},
+        name="press/stanford-to-work-with-edx"),
 
     # Should this always update to point to the latest press release?
     (r'^pressrelease$', 'django.views.generic.simple.redirect_to',

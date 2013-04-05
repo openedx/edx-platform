@@ -422,22 +422,44 @@ def remap_namespace(module, target_location_namespace):
 
     return module
 
-def validate_no_non_editable_metadata(module_store, course_id, category, allowed=None):
+
+def allowed_metadata_by_category(category):
+    # should this be in the descriptors?!?
+    return {
+        'vertical': [],
+        'chapter': ['start'],
+        'sequential': ['due', 'format', 'start', 'graded']
+    }.get(category,['*'])
+
+
+def check_module_metadata_editability(module):
     '''
-    Assert that there is no metadata within a particular category that we can't support editing
+    Assert that there is no metadata within a particular module that we can't support editing
     However we always allow 'display_name' and 'xml_attribtues'
     '''
-    _allowed = (allowed if allowed is not None else []) + ['xml_attributes', 'display_name']
+    allowed = allowed_metadata_by_category(module.location.category)
+    if '*' in allowed:
+        # everything is allowed
+        return 0
 
+    allowed = allowed + ['xml_attributes', 'display_name']
+    err_cnt = 0
+    my_metadata = dict(own_metadata(module))
+    illegal_keys = set(own_metadata(module).keys()) - set(allowed)
+
+    if len(illegal_keys) > 0:
+        err_cnt = err_cnt + 1
+        print ': found non-editable metadata on {0}. These metadata keys are not supported = {1}'. format(module.location.url(), illegal_keys)
+
+    return err_cnt
+
+
+def validate_no_non_editable_metadata(module_store, course_id, category):
     err_cnt = 0
     for module_loc in module_store.modules[course_id]:
         module = module_store.modules[course_id][module_loc]
         if module.location.category == category:
-            my_metadata = dict(own_metadata(module))
-            for key in my_metadata.keys():
-                if key not in _allowed:
-                    err_cnt = err_cnt + 1
-                    print ': found metadata on {0}. Studio will not support editing this piece of metadata, so it is not allowed. Metadata: {1} = {2}'. format(module.location.url(), key, my_metadata[key])
+            err_cnt = err_cnt + check_module_metadata_editability(module)
 
     return err_cnt
 
@@ -529,10 +551,9 @@ def perform_xlint(data_dir, course_dirs,
         # don't allow metadata on verticals, since we can't edit them in studio
         err_cnt += validate_no_non_editable_metadata(module_store, course_id, "vertical")
         # don't allow metadata on chapters, since we can't edit them in studio
-        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "chapter",['start'])
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "chapter")
         # don't allow metadata on sequences that we can't edit
-        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "sequential",
-            ['due','format','start','graded'])
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "sequential")
 
         # check for a presence of a course marketing video
         location_elements = course_id.split('/')
