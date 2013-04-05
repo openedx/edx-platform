@@ -409,8 +409,8 @@ def safe_content(content):
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
-        'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
-        'show_any_flag'
+        'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers'
+        
     ]
 
     if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):

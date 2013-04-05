@@ -109,7 +109,7 @@ if Backbone?
      
     toggleFlagAbuse: (event) ->
       event.preventDefault()
-      if window.user.id in @model.get("abuse_flaggers")
+      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isStaff(@model.get("user_id")) and @model.get("abuse_flaggers").length > 0)
         @unFlagAbuse()
       else
         @flagAbuse()

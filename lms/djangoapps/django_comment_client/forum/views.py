@@ -96,7 +96,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         #patch for backward compatibility to comments service
         if not 'pinned' in thread:
             thread['pinned'] = False
-
+        
     query_params['page'] = page
     query_params['num_pages'] = num_pages
 
@@ -242,7 +242,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     try:
       thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
-      thread['show_any_flag'] = cached_has_permission(request.user, 'openclose_thread', course.id) and thread['abuse_flaggers'] and len(thread['abuse_flaggers']) > 0
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
       log.error("Error loading single thread.")
       raise Http404
