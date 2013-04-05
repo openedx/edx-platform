@@ -1,0 +1,9 @@
+<sequential>
+    <vertical>
+        <word_cloud display_name="cloud" num_inputs="5">
+            <html>
+                Some text
+            </html>
+        </word_cloud>
+    </vertical>
+</sequential>

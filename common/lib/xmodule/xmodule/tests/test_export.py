@@ -123,3 +123,6 @@ class RoundTripTestCase(unittest.TestCase):
     def test_exam_registration_roundtrip(self):
         # Test exam_registration xmodule to see if it exports correctly
         self.check_export_roundtrip(DATA_DIR, "test_exam_registration")
+
+    def test_word_cloud_roundtrip(self):
+        self.check_export_roundtrip(DATA_DIR, "word_cloud")
