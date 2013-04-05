@@ -69,44 +69,22 @@ urlpatterns = ('',
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^university_profile/UTx$', 'courseware.views.static_university_profile',
-        name="static_university_profile", kwargs={'org_id': 'UTx'}),
-    url(r'^university_profile/WellesleyX$', 'courseware.views.static_university_profile',
+    url(r'^(?i)university_profile/WellesleyX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
-    url(r'^university_profile/GeorgetownX$', 'courseware.views.static_university_profile',
+    url(r'^(?i)university_profile/GeorgetownX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'GeorgetownX'}),
-
-    # Dan accidentally sent out a press release with lower case urls for McGill, Toronto,
-    # Rice, ANU, Delft, and EPFL.  Hence the redirects.
-    url(r'^university_profile/McGillX$', 'courseware.views.static_university_profile',
+    url(r'^(?i)university_profile/McGillX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'McGillX'}),
-    url(r'^university_profile/mcgillx$',
-        RedirectView.as_view(url='/university_profile/McGillX')),
-
-    url(r'^university_profile/TorontoX$', 'courseware.views.static_university_profile',
+    url(r'^(?i)university_profile/TorontoX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'TorontoX'}),
-    url(r'^university_profile/torontox$',
-        RedirectView.as_view(url='/university_profile/TorontoX')),
-
-    url(r'^university_profile/RiceX$', 'courseware.views.static_university_profile',
+    url(r'^(?i)university_profile/RiceX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'RiceX'}),
-    url(r'^university_profile/ricex$',
-        RedirectView.as_view(url='/university_profile/RiceX')),
-
-    url(r'^university_profile/ANUx$', 'courseware.views.static_university_profile',
+    url(r'^(?i)university_profile/ANUx$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'ANUx'}),
-    url(r'^university_profile/anux$',
-        RedirectView.as_view(url='/university_profile/ANUx')),
-
-    url(r'^university_profile/DelftX$', 'courseware.views.static_university_profile',
+    url(r'^(?i)university_profile/DelftX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'DelftX'}),
-    url(r'^university_profile/delftx$',
-        RedirectView.as_view(url='/university_profile/DelftX')),
-
-    url(r'^university_profile/EPFLx$', 'courseware.views.static_university_profile',
+    url(r'^(?i)university_profile/EPFLx$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'EPFLx'}),
-    url(r'^university_profile/epflx$',
-        RedirectView.as_view(url='/university_profile/EPFLx')),
 
     url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile',
         name="university_profile"),
@@ -175,6 +153,9 @@ urlpatterns = ('',
     url(r'^press/xblock_announcement$', 'static_template_view.views.render',
         {'template': 'press_releases/xblock_announcement.html'},
         name="press/xblock-announcement"),
+    url(r'^press/stanford-to-work-with-edx$', 'static_template_view.views.render',
+        {'template': 'press_releases/stanford_announcement.html'},
+        name="press/stanford-to-work-with-edx"),
 
     # Should this always update to point to the latest press release?
     (r'^pressrelease$', 'django.views.generic.simple.redirect_to',

@@ -1,11 +1,14 @@
 import unittest
 from time import strptime
+import datetime
 
 from fs.memoryfs import MemoryFS
 
 from mock import Mock, patch
 
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+import xmodule.course_module
+from xmodule.util.date_utils import time_to_datetime
 
 
 ORG = 'test_org'
@@ -39,8 +42,19 @@ class DummySystem(ImportSystem):
 
 class IsNewCourseTestCase(unittest.TestCase):
     """Make sure the property is_new works on courses"""
+
+    def setUp(self):
+        # Needed for test_is_newish
+        datetime_patcher = patch.object(
+            xmodule.course_module, 'datetime',
+            Mock(wraps=datetime.datetime)
+        )
+        mocked_datetime = datetime_patcher.start()
+        mocked_datetime.utcnow.return_value = time_to_datetime(NOW)
+        self.addCleanup(datetime_patcher.stop)
+
     @staticmethod
-    def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None):
+    def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None, end=None):
         """Get a dummy course"""
 
         system = DummySystem(load_error_modules=True)
@@ -51,6 +65,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         is_new = to_attrb('is_new', is_new)
         announcement = to_attrb('announcement', announcement)
         advertised_start = to_attrb('advertised_start', advertised_start)
+        end = to_attrb('end', end)
 
         start_xml = '''
          <course org="{org}" course="{course}"
@@ -58,13 +73,14 @@ class IsNewCourseTestCase(unittest.TestCase):
                 start="{start}"
                 {announcement}
                 {is_new}
-                {advertised_start}>
+                {advertised_start}
+                {end}>
             <chapter url="hi" url_name="ch" display_name="CH">
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
          </course>
          '''.format(org=ORG, course=COURSE, start=start, is_new=is_new,
-                    announcement=announcement, advertised_start=advertised_start)
+                    announcement=announcement, advertised_start=advertised_start, end=end)
 
         return system.process_xml(start_xml)
 
@@ -126,10 +142,7 @@ class IsNewCourseTestCase(unittest.TestCase):
             print "Checking start=%s advertised=%s" % (s[0], s[1])
             self.assertEqual(d.start_date_text, s[2])
 
-    @patch('xmodule.course_module.time.gmtime')
-    def test_is_newish(self, gmtime_mock):
-        gmtime_mock.return_value = NOW
-
+    def test_is_newish(self):
         descriptor = self.get_dummy_course(start='2012-12-02T12:00', is_new=True)
         assert(descriptor.is_newish is True)
 
@@ -150,3 +163,11 @@ class IsNewCourseTestCase(unittest.TestCase):
 
         descriptor = self.get_dummy_course(start='2012-12-31T12:00')
         assert(descriptor.is_newish is True)
+
+    def test_end_date_text(self):
+        # No end date set, returns empty string.
+        d = self.get_dummy_course('2012-12-02T12:00')
+        self.assertEqual('', d.end_date_text)
+
+        d = self.get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
+        self.assertEqual('Sep 04, 2014', d.end_date_text)

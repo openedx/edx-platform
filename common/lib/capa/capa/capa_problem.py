@@ -32,6 +32,8 @@ from copy import deepcopy
 
 import chem
 import chem.miller
+import chem.chemcalc
+import chem.chemtools
 import verifiers
 import verifiers.draganddrop
 
@@ -67,6 +69,9 @@ global_context = {'random': random,
                   'scipy': scipy,
                   'calc': calc,
                   'eia': eia,
+                  'chemcalc': chem.chemcalc,
+                  'chemtools': chem.chemtools,
+                  'miller': chem.miller,
                   'draganddrop': verifiers.draganddrop}
 
 # These should be removed from HTML output, including all subelements
@@ -118,7 +123,7 @@ class LoncapaProblem(object):
         #       3. Assign from the OS's random number generator
         self.seed = state.get('seed', seed)
         if self.seed is None:
-            self.seed = struct.unpack('i', os.urandom(4))
+            self.seed = struct.unpack('i', os.urandom(4))[0]
         self.student_answers = state.get('student_answers', {})
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])

@@ -58,6 +58,10 @@ MODULESTORE = {
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
         'OPTIONS': modulestore_options
+    },
+    'draft': {
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'OPTIONS': modulestore_options
     }
 }
 
@@ -114,3 +118,6 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
+
+# dummy segment-io key
+SEGMENT_IO_KEY = '***REMOVED***'

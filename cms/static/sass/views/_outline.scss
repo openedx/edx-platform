@@ -26,7 +26,7 @@ body.course.outline {
           position: relative;
           top: -4px;
           right: 50px;
-          width: 145px;
+          width: 100px;
 
           .status-label {
             position: absolute;
@@ -62,7 +62,7 @@ body.course.outline {
                 opacity: 0.0;
                 position: absolute;
                 top: -1px;
-                left: 5px;
+                right: 0;
                 margin: 0;
                 padding: 8px 12px;
                 background: $white;
@@ -160,7 +160,7 @@ body.course.outline {
       .section-published-date {
           position: absolute;
           top: 19px;
-          right: 90px;
+          right: 80px;
           padding: 4px 10px;
           border-radius: 3px;
           background: $lightGrey;
@@ -271,8 +271,6 @@ body.course.outline {
 
           .section-published-date {
             float: right;
-            width: 265px;
-            margin-right: 220px;                              
             @include border-radius(3px);
             background: $lightGrey;
 

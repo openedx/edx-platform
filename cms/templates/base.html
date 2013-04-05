@@ -23,6 +23,8 @@
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-symbolicons-block.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
 
+    <%include file="widgets/segment-io.html" />
+
     <%block name="header_extras"></%block>
   </head>
 
@@ -55,9 +57,11 @@
 
     <%block name="content"></%block>
     <%include file="widgets/footer.html" />
-
+    <%include file="widgets/tender.html" />
     <%block name="jsextra"></%block>
   </body>
+
+  <%include file="widgets/qualaroo.html" />
 </html>
 
 

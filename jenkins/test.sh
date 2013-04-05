@@ -43,13 +43,15 @@ rake pep8 > pep8.log || cat pep8.log
 rake pylint > pylint.log || cat pylint.log
 
 TESTS_FAILED=0
+
+# Run the python unit tests
 rake test_cms[false] || TESTS_FAILED=1
 rake test_lms[false] || TESTS_FAILED=1
 rake test_common/lib/capa || TESTS_FAILED=1
 rake test_common/lib/xmodule || TESTS_FAILED=1
-# Don't run the lms jasmine tests for now because
-# they mostly all fail anyhow
-# rake phantomjs_jasmine_lms || true
+
+# Run the jaavascript unit tests
+rake phantomjs_jasmine_lms || TESTS_FAILED=1
 rake phantomjs_jasmine_cms || TESTS_FAILED=1
 rake phantomjs_jasmine_common/lib/xmodule || TESTS_FAILED=1
 

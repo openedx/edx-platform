@@ -14,6 +14,7 @@ from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
+from xmodule.util.date_utils import time_to_datetime
 import json
 
 from xblock.core import Scope, List, String, Object, Boolean
@@ -533,19 +534,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def _sorting_dates(self):
         # utility function to get datetime objects for dates used to
         # compute the is_new flag and the sorting_score
-        def to_datetime(timestamp):
-            return datetime(*timestamp[:6])
 
         announcement = self.announcement
         if announcement is not None:
-            announcement = to_datetime(announcement)
+            announcement = time_to_datetime(announcement)
 
         try:
             start = dateutil.parser.parse(self.advertised_start)
         except (ValueError, AttributeError):
-            start = to_datetime(self.start)
+            start = time_to_datetime(self.start)
 
-        now = to_datetime(time.gmtime())
+        now = datetime.utcnow()
 
         return announcement, start, now
 
@@ -653,7 +652,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def end_date_text(self):
-        return time.strftime("%b %d, %Y", self.end)
+        """
+        Returns the end date for the course formatted as a string.
+
+        If the course does not have an end date set (course.end is None), an empty string will be returned.
+        """
+        return '' if self.end is None else time.strftime("%b %d, %Y", self.end)
 
     @property
     def forum_posts_allowed(self):

@@ -124,17 +124,17 @@ class TestTOC(TestCase):
 
         expected = ([{'active': True, 'sections':
                       [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
-                        'format': u'Lecture Sequence', 'due': '', 'active': False},
+                        'format': u'Lecture Sequence', 'due': None, 'active': False},
                        {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
-                        'format': '', 'due': '', 'active': False},
+                        'format': '', 'due': None, 'active': False},
                        {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
-                        'format': '', 'due': '', 'active': False},
+                        'format': '', 'due': None, 'active': False},
                        {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
-                        'format': '', 'due': '', 'active': False}],
+                        'format': '', 'due': None, 'active': False}],
                       'url_name': 'Overview', 'display_name': u'Overview'},
                      {'active': False, 'sections':
                       [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
-                        'format': '', 'due': '', 'active': False}],
+                        'format': '', 'due': None, 'active': False}],
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
@@ -151,17 +151,17 @@ class TestTOC(TestCase):
 
         expected = ([{'active': True, 'sections':
                       [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
-                        'format': u'Lecture Sequence', 'due': '', 'active': False},
+                        'format': u'Lecture Sequence', 'due': None, 'active': False},
                        {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
-                        'format': '', 'due': '', 'active': True},
+                        'format': '', 'due': None, 'active': True},
                        {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
-                        'format': '', 'due': '', 'active': False},
+                        'format': '', 'due': None, 'active': False},
                        {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
-                        'format': '', 'due': '', 'active': False}],
+                        'format': '', 'due': None, 'active': False}],
                       'url_name': 'Overview', 'display_name': u'Overview'},
                      {'active': False, 'sections':
                       [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
-                        'format': '', 'due': '', 'active': False}],
+                        'format': '', 'due': None, 'active': False}],
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, model_data_cache)

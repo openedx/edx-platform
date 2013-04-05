@@ -6,6 +6,7 @@ metadata:
     link_to_location: None
     is_graded: False
     max_grade: 1
+    weight: ""
 data: |
   <peergrading>
   </peergrading>

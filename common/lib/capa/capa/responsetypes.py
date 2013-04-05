@@ -17,6 +17,7 @@ import logging
 import numbers
 import numpy
 import os
+import sys
 import random
 import re
 import requests
@@ -52,12 +53,17 @@ class LoncapaProblemError(Exception):
 
 class ResponseError(Exception):
     '''
-    Error for failure in processing a response
+    Error for failure in processing a response, including
+    exceptions that occur when executing a custom script.
     '''
     pass
 
 
 class StudentInputError(Exception):
+    '''
+    Error for an invalid student input.
+    For example, submitting a string when the problem expects a number
+    '''
     pass
 
 #-----------------------------------------------------------------------------
@@ -833,7 +839,7 @@ class NumericalResponse(LoncapaResponse):
             import sys
             type, value, traceback = sys.exc_info()
 
-            raise StudentInputError, ("Invalid input: could not interpret '%s' as a number" %
+            raise StudentInputError, ("Could not interpret '%s' as a number" %
                                       cgi.escape(student_answer)), traceback
 
         if correct:
@@ -1072,13 +1078,10 @@ def sympy_check2():
                 correct = self.context['correct']
                 messages = self.context['messages']
                 overall_message = self.context['overall_message']
+
             except Exception as err:
-                print "oops in customresponse (code) error %s" % err
-                print "context = ", self.context
-                print traceback.format_exc()
-                # Notify student
-                raise StudentInputError(
-                    "Error: Problem could not be evaluated with your input")
+                self._handle_exec_exception(err)
+
         else:
             # self.code is not a string; assume its a function
 
@@ -1105,13 +1108,9 @@ def sympy_check2():
                     nargs, args, kwargs))
 
                 ret = fn(*args[:nargs], **kwargs)
+
             except Exception as err:
-                log.error("oops in customresponse (cfn) error %s" % err)
-                # print "context = ",self.context
-                log.error(traceback.format_exc())
-                raise Exception("oops in customresponse (cfn) error %s" % err)
-            log.debug(
-                "[courseware.capa.responsetypes.customresponse.get_score] ret = %s" % ret)
+                self._handle_exec_exception(err)
 
             if type(ret) == dict:
 
@@ -1147,9 +1146,9 @@ def sympy_check2():
                     correct = []
                     messages = []
                     for input_dict in input_list:
-                        correct.append('correct' 
+                        correct.append('correct'
                                 if input_dict['ok'] else 'incorrect')
-                        msg = (self.clean_message_html(input_dict['msg']) 
+                        msg = (self.clean_message_html(input_dict['msg'])
                                 if 'msg' in input_dict else None)
                         messages.append(msg)
 
@@ -1157,7 +1156,7 @@ def sympy_check2():
                 # Raise an exception
                 else:
                     log.error(traceback.format_exc())
-                    raise Exception(
+                    raise ResponseError(
                         "CustomResponse: check function returned an invalid dict")
 
             # The check function can return a boolean value,
@@ -1174,7 +1173,7 @@ def sympy_check2():
         correct_map.set_overall_message(overall_message)
 
         for k in range(len(idset)):
-            npoints = (self.maxpoints[idset[k]] 
+            npoints = (self.maxpoints[idset[k]]
                     if correct[k] == 'correct' else 0)
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
@@ -1226,6 +1225,22 @@ def sympy_check2():
         if self.expect:
             return {self.answer_ids[0]: self.expect}
         return self.default_answer_map
+
+    def _handle_exec_exception(self, err):
+        '''
+        Handle an exception raised during the execution of
+        custom Python code.
+
+        Raises a ResponseError
+        '''
+
+        # Log the error if we are debugging
+        msg = 'Error occurred while evaluating CustomResponse'
+        log.warning(msg, exc_info=True)
+
+        # Notify student with a student input error
+        _, _, traceback_obj = sys.exc_info()
+        raise ResponseError, err.message, traceback_obj
 
 #-----------------------------------------------------------------------------
 
@@ -1901,7 +1916,14 @@ class SchematicResponse(LoncapaResponse):
         submission = [json.loads(student_answers[
                                  k]) for k in sorted(self.answer_ids)]
         self.context.update({'submission': submission})
-        exec self.code in global_context, self.context
+
+        try:
+            exec self.code in global_context, self.context
+
+        except Exception as err:
+            _, _, traceback_obj = sys.exc_info()
+            raise ResponseError, ResponseError(err.message), traceback_obj
+
         cmap = CorrectMap()
         cmap.set_dict(dict(zip(sorted(
             self.answer_ids), self.context['correct'])))
@@ -2106,7 +2128,7 @@ class AnnotationResponse(LoncapaResponse):
             option_scoring = dict([(option['id'], {
                     'correctness': choices.get(option['choice']),
                     'points': scoring.get(option['choice'])
-                }) for option in self._find_options(inputfield) ])
+                }) for option in self._find_options(inputfield)])
 
             scoring_map[inputfield.get('id')] = option_scoring
 

@@ -16,6 +16,18 @@ def i_have_opened_a_new_course_section(step):
     add_section()
 
 
+@step('I have added a new subsection$')
+def i_have_added_a_new_subsection(step):
+    add_subsection()
+
+
+@step('I have opened a new subsection in Studio$')
+def i_have_opened_a_new_subsection(step):
+    step.given('I have opened a new course section in Studio')
+    step.given('I have added a new subsection')
+    world.css_click('span.subsection-name-value')
+
+
 @step('I click the New Subsection link')
 def i_click_the_new_subsection_link(step):
     world.css_click('a.new-subsection-item')
@@ -43,9 +55,20 @@ def i_see_complete_subsection_name_with_quote_in_editor(step):
     assert_equal(world.css_find(css).value, 'Subsection With "Quote"')
 
 
-@step('I have added a new subsection$')
-def i_have_added_a_new_subsection(step):
-    add_subsection()
+@step('I have set a release date and due date in different years$')
+def test_have_set_dates_in_different_years(step):
+    set_date_and_time('input#start_date', '12/25/2011', 'input#start_time', '3:00am')
+    world.css_click('.set-date')
+    # Use a year in the past so that current year will always be different.
+    set_date_and_time('input#due_date', '01/02/2012', 'input#due_time', '4:00am')
+
+
+@step('I see the correct dates$')
+def i_see_the_correct_dates(step):
+    assert_equal('12/25/2011', world.css_find('input#start_date').first.value)
+    assert_equal('3:00am', world.css_find('input#start_time').first.value)
+    assert_equal('01/02/2012', world.css_find('input#due_date').first.value)
+    assert_equal('4:00am', world.css_find('input#due_time').first.value)
 
 
 @step('I mark it as Homework$')
