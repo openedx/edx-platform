@@ -16,7 +16,6 @@ from django.utils import simplejson
 from django_comment_client.models import Role
 from django_comment_client.permissions import check_permissions_by_view
 from xmodule.modulestore.exceptions import NoPathToItem
-from cache_toolbox.discussion_cache import get_discussion_cache_entry
 
 from mitxmako import middleware
 import pystache_custom as pystache

@@ -329,7 +329,7 @@ class MongoModuleStore(ModuleStoreBase):
         '''
         key = metadata_cache_key(location)
         tree = {}
-        
+
         if not force_refresh:
             # see if we are first in the request cache (if present)
             if self.request_cache is not None and key in self.request_cache.data.get('metadata_inheritance', {}):
@@ -344,7 +344,7 @@ class MongoModuleStore(ModuleStoreBase):
         if not tree:
             # if not in subsystem, or we are on force refresh, then we have to compute
             tree = self.compute_metadata_inheritance_tree(location)
-            
+
             # now write out computed tree to caching subsystem (e.g. memcached), if available
             if self.metadata_inheritance_cache_subsystem is not None:
                 self.metadata_inheritance_cache_subsystem.set(key, tree)
@@ -578,11 +578,8 @@ class MongoModuleStore(ModuleStoreBase):
 
     def fire_updated_modulestore_signal(self, course_id, location):
         if self.modulestore_update_signal is not None:
-            self.modulestore_update_signal.send(None,
-                modulestore = self,
-                course_id = course_id,
-                location = location
-            )
+            self.modulestore_update_signal.send(self, modulestore=self, course_id=course_id,
+                                                location=location)
 
     def get_course_for_item(self, location, depth=0):
         '''
@@ -682,8 +679,7 @@ class MongoModuleStore(ModuleStoreBase):
         self._update_single_item(location, {'metadata': metadata})
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(loc)
-        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))   
-
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
     def delete_item(self, location):
         """
@@ -707,7 +703,7 @@ class MongoModuleStore(ModuleStoreBase):
             safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(Location(location))
-        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))   
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this
