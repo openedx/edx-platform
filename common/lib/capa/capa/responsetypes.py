@@ -22,6 +22,7 @@ import random
 import re
 import requests
 import subprocess
+import textwrap
 import traceback
 import xml.sax.saxutils as saxutils
 
@@ -30,7 +31,7 @@ from shapely.geometry import Point, MultiPoint
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
-from .correctmap import CorrectMap
+from . import correctmap
 from datetime import datetime
 from .util import *
 from lxml import etree
@@ -40,6 +41,10 @@ import xqueue_interface
 import safe_exec
 
 log = logging.getLogger(__name__)
+
+
+CorrectMap = correctmap.CorrectMap
+CORRECTMAP_PY = None
 
 
 #-----------------------------------------------------------------------------
@@ -253,20 +258,41 @@ class LoncapaResponse(object):
 
             # We may extend this in the future to add another argument which provides a
             # callback procedure to a social hint generation system.
-            if not hintfn in self.context:
-                msg = 'missing specified hint function %s in script context' % hintfn
-                msg += "\nSee XML source line %s" % getattr(
-                    self.xml, 'sourceline', '<unavailable>')
-                raise LoncapaProblemError(msg)
+
+            global CORRECTMAP_PY
+            if CORRECTMAP_PY is None:
+                # We need the CorrectMap code for hint functions. No, this is not great.
+                CORRECTMAP_PY = inspect.getsource(correctmap)
+
+            code = (
+                CORRECTMAP_PY + "\n" +
+                self.context['script_code'] + "\n" +
+                textwrap.dedent("""
+                    new_cmap = CorrectMap()
+                    new_cmap.set_dict(new_cmap_dict)
+                    old_cmap = CorrectMap()
+                    old_cmap.set_dict(old_cmap_dict)
+                    {hintfn}(answer_ids, student_answers, new_cmap, old_cmap)
+                    new_cmap_dict.update(new_cmap.get_dict())
+                    old_cmap_dict.update(old_cmap.get_dict())
+                    """).format(hintfn=hintfn)
+            )
+            globals_dict = {
+                'answer_ids': self.answer_ids,
+                'student_answers': student_answers,
+                'new_cmap_dict': new_cmap.get_dict(),
+                'old_cmap_dict': old_cmap.get_dict(),
+            }
 
             try:
-                self.context[hintfn](
-                    self.answer_ids, student_answers, new_cmap, old_cmap)
+                safe_exec.safe_exec(code, globals_dict)
             except Exception as err:
                 msg = 'Error %s in evaluating hint function %s' % (err, hintfn)
                 msg += "\nSee XML source line %s" % getattr(
                     self.xml, 'sourceline', '<unavailable>')
                 raise ResponseError(msg)
+
+            new_cmap.set_dict(globals_dict['new_cmap_dict'])
             return
 
         # hint specified by conditions and text dependent on conditions (a-la Loncapa design)

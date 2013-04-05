@@ -552,6 +552,22 @@ class StringResponseTest(ResponseTest):
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_hint('1_2_1'), "")
 
+    def test_computed_hints(self):
+        problem = self.build_problem(
+            answer="Michigan",
+            hintfn="gimme_a_hint",
+            script = textwrap.dedent("""
+                def gimme_a_hint(answer_ids, student_answers, new_cmap, old_cmap):
+                    aid = answer_ids[0]
+                    answer = student_answers[aid]
+                    new_cmap.set_hint_and_mode(aid, answer+"??", "always")
+            """)
+        )
+
+        input_dict = {'1_2_1': 'Hello'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'), "Hello??")
+
 
 class CodeResponseTest(ResponseTest):
     from response_xml_factory import CodeResponseXMLFactory

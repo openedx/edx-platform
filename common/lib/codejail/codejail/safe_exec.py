@@ -1,6 +1,7 @@
 """Safe execution of untrusted Python code."""
 
 import json
+import logging
 import os.path
 import shutil
 import sys
@@ -8,6 +9,8 @@ import textwrap
 
 from codejail import jailpy
 from codejail.util import temp_directory, change_directory
+
+log = logging.getLogger(__name__)
 
 
 def safe_exec(code, globals_dict, files=None, python_path=None):
@@ -78,10 +81,9 @@ def safe_exec(code, globals_dict, files=None, python_path=None):
 
     # Turn this on to see what's being executed.
     if 0:
-        print "--{:-<40}".format(" jailed ")
-        print jailed_code
-        print "--{:-<40}".format(" exec ")
-        print code
+        log.debug("Jailed code: %s", jailed_code)
+        log.debug("Exec: %s", code)
+        log.debug("Stdin: %s", stdin)
 
     res = jailpy.jailpy(jailed_code, stdin=stdin, files=files)
     if res.status != 0:

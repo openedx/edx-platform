@@ -667,12 +667,16 @@ class StringResponseXMLFactory(ResponseXMLFactory):
                 Where *hint_prompt* is the string for which we show the hint,
                 *hint_name* is an internal identifier for the hint,
                 and *hint_text* is the text we show for the hint.
+
+            *hintfn*: The name of a function in the script to use for hints.
+
         """
         # Retrieve the **kwargs
         answer = kwargs.get("answer", None)
         case_sensitive = kwargs.get("case_sensitive", True)
         hint_list = kwargs.get('hints', None)
-        assert(answer)
+        hint_fn = kwargs.get('hintfn', None)
+        assert answer
 
         # Create the <stringresponse> element
         response_element = etree.Element("stringresponse")
@@ -684,18 +688,24 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         response_element.set("type", "cs" if case_sensitive else "ci")
 
         # Add the hints if specified
-        if hint_list:
+        if hint_list or hint_fn:
             hintgroup_element = etree.SubElement(response_element, "hintgroup")
-            for (hint_prompt, hint_name, hint_text) in hint_list:
-                stringhint_element = etree.SubElement(hintgroup_element, "stringhint")
-                stringhint_element.set("answer", str(hint_prompt))
-                stringhint_element.set("name", str(hint_name))
+            if hint_list:
+                assert not hint_fn
+                for (hint_prompt, hint_name, hint_text) in hint_list:
+                    stringhint_element = etree.SubElement(hintgroup_element, "stringhint")
+                    stringhint_element.set("answer", str(hint_prompt))
+                    stringhint_element.set("name", str(hint_name))
 
-                hintpart_element = etree.SubElement(hintgroup_element, "hintpart")
-                hintpart_element.set("on", str(hint_name))
+                    hintpart_element = etree.SubElement(hintgroup_element, "hintpart")
+                    hintpart_element.set("on", str(hint_name))
 
-                hint_text_element = etree.SubElement(hintpart_element, "text")
-                hint_text_element.text = str(hint_text)
+                    hint_text_element = etree.SubElement(hintpart_element, "text")
+                    hint_text_element.text = str(hint_text)
+
+            if hint_fn:
+                assert not hint_list
+                hintgroup_element.set("hintfn", hint_fn)
 
         return response_element
 
