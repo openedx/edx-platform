@@ -139,4 +139,8 @@ if Backbone?
           if textStatus == 'success'
             temp_array = _.clone(@model.get('abuse_flaggers'));
             temp_array.pop(window.user.id)
+            # if you're an admin, clear this
+            if DiscussionUtil.isStaff(@model.get("user_id"))
+                temp_array = []
+
             @model.set('abuse_flaggers', temp_array)         

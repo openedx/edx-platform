@@ -309,8 +309,9 @@ def flag_abuse_for_comment(request, course_id, comment_id):
 
 def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
+    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id)
     comment = cc.Comment.find(comment_id)
-    comment.unFlagAbuse(user,comment)
+    comment.unFlagAbuse(user,comment, removeAll)
     return JsonResponse(utils.safe_content(comment.to_dict()))
 
 @require_POST
