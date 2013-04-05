@@ -652,7 +652,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def end_date_text(self):
-        return time.strftime("%b %d, %Y", self.end)
+        """
+        Returns the end date for the course formatted as a string.
+
+        If the course does not have an end date set (course.end is None), an empty string will be returned.
+        """
+        return '' if self.end is None else time.strftime("%b %d, %Y", self.end)
 
     @property
     def forum_posts_allowed(self):

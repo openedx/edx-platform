@@ -54,7 +54,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         self.addCleanup(datetime_patcher.stop)
 
     @staticmethod
-    def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None):
+    def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None, end=None):
         """Get a dummy course"""
 
         system = DummySystem(load_error_modules=True)
@@ -65,6 +65,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         is_new = to_attrb('is_new', is_new)
         announcement = to_attrb('announcement', announcement)
         advertised_start = to_attrb('advertised_start', advertised_start)
+        end = to_attrb('end', end)
 
         start_xml = '''
          <course org="{org}" course="{course}"
@@ -72,13 +73,14 @@ class IsNewCourseTestCase(unittest.TestCase):
                 start="{start}"
                 {announcement}
                 {is_new}
-                {advertised_start}>
+                {advertised_start}
+                {end}>
             <chapter url="hi" url_name="ch" display_name="CH">
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
          </course>
          '''.format(org=ORG, course=COURSE, start=start, is_new=is_new,
-                    announcement=announcement, advertised_start=advertised_start)
+                    announcement=announcement, advertised_start=advertised_start, end=end)
 
         return system.process_xml(start_xml)
 
@@ -161,3 +163,11 @@ class IsNewCourseTestCase(unittest.TestCase):
 
         descriptor = self.get_dummy_course(start='2012-12-31T12:00')
         assert(descriptor.is_newish is True)
+
+    def test_end_date_text(self):
+        # No end date set, returns empty string.
+        d = self.get_dummy_course('2012-12-02T12:00')
+        self.assertEqual('', d.end_date_text)
+
+        d = self.get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
+        self.assertEqual('Sep 04, 2014', d.end_date_text)
