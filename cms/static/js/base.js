@@ -161,7 +161,7 @@ function smoothScrollLink(e) {
         easing: 'swing', 
         speed: 1000,
         scrollElement: null,
-        scrollTarget: $(this).attr('href'),
+        scrollTarget: $(this).attr('href')
     });
 }
 
@@ -459,30 +459,30 @@ function onKeyUp(e) {
 }
 
 function toggleSock(e) {
-   e.preventDefault();
+    e.preventDefault();
 
-   var $btnLabel = $(this).find('.copy');
-   var $sock = $('.wrapper-sock');
-   var $sockContent = $sock.find('.wrapper-inner');
+    var $btnLabel = $(this).find('.copy');
+    var $sock = $('.wrapper-sock');
+    var $sockContent = $sock.find('.wrapper-inner');
 
-   $sock.toggleClass('is-shown');
-   $sockContent.toggle('fast');
+    $sock.toggleClass('is-shown');
+    $sockContent.toggle('fast');
 
-   $.smoothScroll({ 
+    $.smoothScroll({ 
        offset: -200, 
        easing: 'swing', 
        speed: 1000,
        scrollElement: null,
        scrollTarget: $sock
-   });
+    });
 
-   if($sock.hasClass('is-shown')) {
-    $btnLabel.text('Hide Studio Help');
-   }
+    if($sock.hasClass('is-shown')) {
+        $btnLabel.text('Hide Studio Help');
+    }
 
-   else {
-    $btnLabel.text('Looking for Help with Studio?');
-   }
+    else {
+        $btnLabel.text('Looking for Help with Studio?');
+    }
 }
 
 function toggleSubmodules(e) {
