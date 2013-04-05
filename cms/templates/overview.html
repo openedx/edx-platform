@@ -104,27 +104,6 @@
 </%block>
 
 <%block name="content">
-  <div class="edit-subsection-publish-settings">
-    <div class="settings">
-      <h3>Section Release Date</h3>
-      <div class="picker datepair">
-        <div class="field field-start-date">
-          <label for="">Release Day</label>
-          <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-        </div>
-        <div class="field field-start-time">
-          <label for="">Release Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
-          <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-        </div>
-
-        <div class="description">
-          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
-        </div>
-      </div>
-      <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
-    </div>
-  </div>
-
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
       <div class="title">
@@ -228,8 +207,15 @@
     <div class="settings">
       <h3>Section Release Date</h3>
       <div class="picker datepair">
-        <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-        <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+        <div class="field field-start-date">
+          <label for="">Release Day</label>
+          <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+        </div>
+        <div class="field field-start-time">
+          <label for="">Release Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
+          <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+        </div>
+
         <div class="description">
           <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
         </div>
