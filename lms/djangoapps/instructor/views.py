@@ -41,7 +41,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
-import xmodule.graders as graders
+import xmodule.graders as xmgraders
 import track.views
 
 from .offline_gradecalc import student_grades, offline_grades_available
@@ -1137,7 +1137,7 @@ def dump_grading_context(course):
     
     msg += '%s\n' % course.grader.__class__
     graders = {}
-    if isinstance(course.grader, graders.WeightedSubsectionsGrader)
+    if isinstance(course.grader, xmgraders.WeightedSubsectionsGrader):
         msg += '\n'
         msg += "Graded sections:\n"
         for subgrader, category, weight in course.grader.sections:
