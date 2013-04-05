@@ -578,6 +578,19 @@ class ContentStoreTest(ModuleStoreTestCase):
         # make sure we found the item (e.g. it didn't error while loading)
         self.assertTrue(did_load_item)
 
+    def test_forum_id_generation(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        module_store = modulestore('direct')
+        new_component_location = Location('i4x', 'edX', 'full', 'discussion', 'new_component')
+        source_template_location = Location('i4x', 'edx', 'templates', 'discussion', 'Discussion_Tag')
+
+        # crate a new module and add it as a child to a vertical
+        module_store.clone_item(source_template_location, new_component_location)
+
+        new_discussion_item = module_store.get_item(new_component_location)
+
+        self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
+
     def test_metadata_inheritance(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
