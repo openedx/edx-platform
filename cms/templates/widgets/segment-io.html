@@ -18,4 +18,15 @@
   % endif
 </script>
 <!-- end Segment.io -->
+% else:
+<!-- dummy segment.io -->
+<script type="text/javascript">
+  %if context_course:
+  var course_location_analytics = "${context_course.location}";
+  %endif
+  var analytics = {
+    track: function() { return; }
+  };
+</script>
+<!-- end dummy segment.io -->
 % endif
