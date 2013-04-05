@@ -379,10 +379,11 @@ def check_module_metadata_editability(module):
     allowed = allowed + ['xml_attributes', 'display_name']
     err_cnt = 0
     my_metadata = dict(own_metadata(module))
-    for key in my_metadata.keys():
-        if key not in allowed:
-            err_cnt = err_cnt + 1
-            print ': found metadata on {0}. Studio will not support editing this piece of metadata, so it is not allowed. Metadata: {1} = {2}'. format(module.location.url(), key, my_metadata[key])
+    illegal_keys = set(own_metadata(module).keys()) - set(allowed)
+
+    if len(illegal_keys) > 0:
+        err_cnt = err_cnt + 1
+        print ': found non-editable metadata on {0}. These metadata keys are not supported = {1}'. format(module.location.url(), illegal_keys)
 
     return err_cnt
 
