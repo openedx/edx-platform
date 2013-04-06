@@ -537,6 +537,7 @@ class MongoModuleStore(ModuleStoreBase):
         Clone a new item that is a copy of the item at the location `source`
         and writes it to `location`
         """
+        item = None
         try:
             source_item = self.collection.find_one(location_to_query(source))
 
@@ -568,13 +569,14 @@ class MongoModuleStore(ModuleStoreBase):
                 course.tabs = existing_tabs
                 self.update_metadata(course.location, course._model_data._kvs._metadata)
 
-            return item
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(location)
 
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(Location(location))
         self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
+
+        return item
 
     def fire_updated_modulestore_signal(self, course_id, location):
         if self.modulestore_update_signal is not None:

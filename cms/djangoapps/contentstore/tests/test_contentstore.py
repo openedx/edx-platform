@@ -13,6 +13,7 @@ import copy
 from json import loads
 
 from django.contrib.auth.models import User
+from django.dispatch import Signal
 from contentstore.utils import get_modulestore
 
 from .utils import ModuleStoreTestCase, parse_json
@@ -590,6 +591,32 @@ class ContentStoreTest(ModuleStoreTestCase):
         new_discussion_item = module_store.get_item(new_component_location)
 
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
+
+    def test_update_modulestore_signal_did_fire(self):
+
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        module_store = modulestore('direct')
+
+        try:
+            module_store.modulestore_update_signal = Signal(providing_args=['modulestore', 'course_id', 'location'])
+
+            self.got_signal = False
+
+            def _signal_hander(modulestore=None, course_id=None, location=None, **kwargs):
+                self.got_signal = True
+
+            module_store.modulestore_update_signal.connect(_signal_hander)
+
+            new_component_location = Location('i4x', 'edX', 'full', 'html', 'new_component')
+            source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Blank_HTML_Page')
+
+            # crate a new module
+            module_store.clone_item(source_template_location, new_component_location)
+
+        finally:
+            module_store.modulestore_update_signal = None
+
+        self.assertTrue(self.got_signal)
 
     def test_metadata_inheritance(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
