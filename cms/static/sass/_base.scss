@@ -22,7 +22,7 @@ body, input {
 a {
   text-decoration: none;
   color: $blue;
-  @include transition(color .15s);
+  @include transition(color 0.25s ease-in-out);
 
   &:hover {
     color: #cb9c40;
@@ -52,7 +52,6 @@ h1 {
 
 // layout - basic page header
 .wrapper-mast {
-  margin: 0;
   padding: 0 $baseline;
   position: relative;
   
@@ -63,7 +62,7 @@ h1 {
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
-    margin: 0 auto $baseline auto;
+    margin: ($baseline*1.5) auto $baseline auto;
     color: $gray-d2;
   }
 
@@ -272,19 +271,17 @@ h1 {
   }
 
   .title-1 {
-
+    @extend .t-title-1;
   }
 
   .title-2 {
-    @include font-size(24);
+    @extend .t-title-2;
     margin: 0 0 ($baseline/2) 0;
-    font-weight: 600;
   }
 
   .title-3 {
-    @include font-size(16);
+    @extend .t-title-3;
     margin: 0 0 ($baseline/2) 0;
-    font-weight: 600;
   }
 
   .title-4 {
@@ -351,7 +348,7 @@ h1 {
 // layout - grandfathered
 .main-wrapper {
   position: relative;
-  margin: 40px;
+  margin: 0 ($baseline*2);
 }
 
 .inner-wrapper {

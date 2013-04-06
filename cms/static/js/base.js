@@ -37,10 +37,10 @@ $(document).ready(function () {
         $(this).select();
     });
 
+    $('body').addClass('js');
+
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
-
-    $('body').addClass('js');
 
     // lean/simple modal
     $('a[rel*=modal]').leanModal({overlay : 0.80, closeButton: '.action-modal-close' });
@@ -88,6 +88,9 @@ $(document).ready(function () {
 
     // tender feedback window scrolling
     $('a.show-tender').bind('click', smoothScrollTop);
+
+    // toggling footer additional support
+    $('.cta-show-sock').bind('click', toggleSock);
 
     // toggling overview section details
     $(function () {
@@ -467,6 +470,33 @@ function hideModal(e) {
 function onKeyUp(e) {
     if (e.which == 87) {
         $body.toggleClass('show-wip hide-wip');
+    }
+}
+
+function toggleSock(e) {
+    e.preventDefault();
+
+    var $btnLabel = $(this).find('.copy');
+    var $sock = $('.wrapper-sock');
+    var $sockContent = $sock.find('.wrapper-inner');
+
+    $sock.toggleClass('is-shown');
+    $sockContent.toggle('fast');
+
+    $.smoothScroll({ 
+       offset: -200, 
+       easing: 'swing', 
+       speed: 1000,
+       scrollElement: null,
+       scrollTarget: $sock
+    });
+
+    if($sock.hasClass('is-shown')) {
+        $btnLabel.text('Hide Studio Help');
+    }
+
+    else {
+        $btnLabel.text('Looking for Help with Studio?');
     }
 }
 

@@ -29,9 +29,7 @@
   </head>
 
   <body class="<%block name='bodyclass'></%block> hide-wip">
-    <%include file="widgets/header.html" />
     <%include file="courseware_vendor_js.html"/>
-
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
@@ -55,7 +53,14 @@
           document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
     </script>
 
+    <%include file="widgets/header.html" />
+    
     <%block name="content"></%block>
+    
+    % if user.is_authenticated():
+    <%include file="widgets/sock.html" />
+    % endif
+    
     <%include file="widgets/footer.html" />
     <%include file="widgets/tender.html" />
     <%block name="jsextra"></%block>
@@ -63,5 +68,3 @@
 
   <%include file="widgets/qualaroo.html" />
 </html>
-
-
