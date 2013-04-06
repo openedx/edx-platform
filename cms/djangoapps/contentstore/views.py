@@ -13,6 +13,7 @@ from xmodule.modulestore.xml_exporter import export_to_xml
 from tempfile import mkdtemp
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
+from util.forum_util import seed_permissions_roles
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
@@ -1507,6 +1508,9 @@ def create_new_course(request):
     initialize_course_tabs(new_course)
 
     create_all_course_groups(request.user, new_course.location)
+
+    # provision the forum
+    seed_permissions_roles(new_course.location.course_id)
 
     return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
