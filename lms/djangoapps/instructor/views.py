@@ -1157,7 +1157,7 @@ def dump_grading_context(course):
         msg += "--> Section %s:\n" % (gs)
         for sec in gsvals:
             s = sec['section_descriptor']
-            format = getattr(s, 'format', None)
+            format = getattr(s.lms, 'format', None)
             aname = ''
             if format in graders:
                 g = graders[format]
