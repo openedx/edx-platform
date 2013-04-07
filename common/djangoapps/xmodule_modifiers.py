@@ -109,7 +109,7 @@ def add_histogram(get_html, module, user):
         render_histogram = len(histogram) > 0
 
         if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
-            [filepath, filename] = module.descriptor.xml_attributes.get('filename', ['', None])
+            [filepath, filename] = getattr(module.descriptor, 'xml_attributes', {}).get('filename', ['', None])
             osfs = module.system.filestore
             if filename is not None and osfs.exists(filename):
                 # if original, unmangled filename exists then use it (github
@@ -137,7 +137,7 @@ def add_histogram(get_html, module, user):
 
         staff_context = {'fields': [(field.name, getattr(module, field.name)) for field in module.fields],
                          'lms_fields': [(field.name, getattr(module.lms, field.name)) for field in module.lms.fields],
-                         'xml_attributes' : module.descriptor.xml_attributes,
+                         'xml_attributes' : getattr(module.descriptor, 'xml_attributes', {}),
                          'location': module.location,
                          'xqa_key': module.lms.xqa_key,
                          'source_file': source_file,
