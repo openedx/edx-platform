@@ -19,6 +19,13 @@
       </sequential>
     </section>
     <video name="Lost Video" youtube="1.0:TBvX7HzxexQ"/>
+    <sequential format="Lecture Sequence">
+        <vertical url_name='test_verical'>
+            <html url_name='test_html'>
+                Foobar
+            </html>
+        </vertical>
+    </sequential>
   </chapter>
 
 </course>

@@ -1,5 +1,6 @@
 from .x_module import XModuleDescriptor, DescriptorSystem
-from .modulestore.inheritance import own_metadata
+from .modulestore.inheritance import own_metadata, INHERITABLE_METADATA
+from xblock.core import Scope
 
 
 class MakoDescriptorSystem(DescriptorSystem):
@@ -45,9 +46,15 @@ class MakoModuleDescriptor(XModuleDescriptor):
     @property
     def editable_metadata_fields(self):
         fields = {}
-        for field, value in own_metadata(self).items():
-            if field in self.system_metadata_fields:
+        for field in self.fields + self.lms.fields:
+            if field.scope != Scope.settings:
                 continue
 
-            fields[field] = value
+            if field.name in self.system_metadata_fields:
+                continue
+
+            if field.name in self._model_data:
+                fields[field.name] = self._model_data[field.name]
+            elif field.name in self._inherited_metadata:
+                fields[field.name] = self._inherited_metadata[field.name]
         return fields
