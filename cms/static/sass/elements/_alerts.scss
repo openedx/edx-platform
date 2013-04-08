@@ -2,7 +2,7 @@
 // ====================
 
 // shared
-.wrapper-notification, .wrapper-alert, .prompt, .wrapper-banner {
+.wrapper-notification, .wrapper-alert, .prompt {
   @include box-sizing(border-box);
 
   .copy {
@@ -29,7 +29,7 @@
   }
 }
 
-.alert, .notification, .prompt, .banner {
+.alert, .notification, .prompt {
 
   // types - confirm
   &.confirm {
@@ -601,134 +601,6 @@
 
 // ====================
 
-// banners
-.wrapper-banner {
-  width: 100%;
-  padding: $baseline;
-
-  .banner {
-    @include box-sizing(border-box);
-    @include clearfix();
-    margin: 0 auto;
-    width: flex-grid(12);
-    max-width: $fg-max-width;
-    min-width: $fg-min-width;
-
-    .icon, .copy {
-      float: left;
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    .icon {
-      @include transition (color 0.5s ease-in-out);
-      @include font-size(18);
-      width: flex-grid(1, 12);
-      margin-right: flex-gutter();
-      text-align: right;
-    }
-
-    .copy {
-      @include font-size(13);
-      width: flex-grid(10, 12);
-
-
-      .title {
-        margin-bottom: 0;
-      }
-    }
-
-    // with actions
-    &.has-actions {
-
-      .copy {
-        width: flex-grid(8, 12);
-        margin-right: flex-gutter();
-      }
-
-      .nav-actions {
-        width: flex-grid(4, 12);
-        float: right;
-        margin-top: ($baseline/2);
-        text-align: right;
-
-        .nav-item {
-          display: inline-block;
-          vertical-align: middle;
-          margin-right: ($baseline/2);
-
-          &:last-child {
-            margin-right: 0;
-          }
-
-          .action-primary {
-
-          }
-
-          .action-secondary {
-            @include font-size(13);
-          }
-        }
-      }
-    }
-
-    // has hidden actions
-    &.actions-are-hidden {
-
-      .nav-actions {
-        @include transition(opacity 0.25s ease-in-out);
-        opacity: 0.0;
-      }
-
-      &:hover {
-
-        .nav-actions {
-          opacity: 1.0;
-        }
-      }
-    }
-  }
-}
-
-// view banner
-.wrapper-banner-view {
-  @include linear-gradient($gray-l2 0%, $gray-l4 2%, $gray-l4 98%, $gray-l2 100%);
-  margin-bottom: $baseline;
-
-  .banner {
-
-    .copy {
-      margin-top: ($baseline/4);
-      color: $gray-d2;
-    }
-
-    &.has-actions {
-
-      .nav-actions {
-        margin-top: 0;
-
-        .action-primary {
-          @include dark-grey-button();
-          @include font-size(12);
-        }
-      }
-    }
-  }
-}
-
-// view banner - course note
-.banner.coursenote {
-
-  .copy {
-
-    .link-course {
-      margin-left: ($baseline/4);
-    }
-  }
-}
-
-// ====================
-
 // js enabled
 .js {
 
@@ -785,15 +657,6 @@
 
     &.is-fleeting {
       @include anim-notificationsSlideUpDown(2s);
-    }
-  }
-
-  // banner showing/hiding
-  .wrapper-banner {
-    display: none;
-
-    &.is-shown {
-      display: block;
     }
   }
 }
