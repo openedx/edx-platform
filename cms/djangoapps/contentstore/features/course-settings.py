@@ -18,8 +18,8 @@ COURSE_END_TIME_CSS = "#course-end-time"
 ENROLLMENT_START_TIME_CSS = "#course-enrollment-start-time"
 ENROLLMENT_END_TIME_CSS = "#course-enrollment-end-time"
 
-DUMMY_TIME = "3:30pm"
-DEFAULT_TIME = "12:00am"
+DUMMY_TIME = "15:30"
+DEFAULT_TIME = "00:00"
 
 
 ############### ACTIONS ####################

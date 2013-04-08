@@ -62,6 +62,12 @@ table {
 	border-spacing: 0;
 }
 
+abbr[title] {
+	border-bottom: none;
+	text-decoration: none;
+	cursor: help;
+}
+
 // ====================
 
 // grandfathered styles
