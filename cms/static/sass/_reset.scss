@@ -1,6 +1,7 @@
 // studio - utilities - reset
 // ====================
 
+// not ready for this yet, but this should be done as things get cleaner
 // * {
 // 	@include box-sizing(border-box);
 // }
@@ -24,6 +25,10 @@ time, mark, audio, video {
 	font-size: 100%;
 	font: inherit;
 	vertical-align: baseline;
+}
+
+html,body {
+  height: 100%;
 }
 
 article, aside, details, figcaption, figure, 
@@ -55,6 +60,12 @@ del {
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
+}
+
+abbr[title] {
+	border-bottom: none;
+	text-decoration: none;
+	cursor: help;
 }
 
 // ====================

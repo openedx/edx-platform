@@ -180,6 +180,7 @@ class CourseFields(object):
     has_children = True
     checklists = List(scope=Scope.settings)
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
+    show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
 
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows

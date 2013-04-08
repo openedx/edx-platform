@@ -37,10 +37,10 @@ $(document).ready(function () {
         $(this).select();
     });
 
+    $('body').addClass('js');
+
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
-
-    $('body').addClass('js');
 
     // lean/simple modal
     $('a[rel*=modal]').leanModal({overlay : 0.80, closeButton: '.action-modal-close' });
@@ -88,6 +88,9 @@ $(document).ready(function () {
 
     // tender feedback window scrolling
     $('a.show-tender').bind('click', smoothScrollTop);
+
+    // toggling footer additional support
+    $('.cta-show-sock').bind('click', toggleSock);
 
     // toggling overview section details
     $(function () {
@@ -470,6 +473,33 @@ function onKeyUp(e) {
     }
 }
 
+function toggleSock(e) {
+    e.preventDefault();
+
+    var $btnLabel = $(this).find('.copy');
+    var $sock = $('.wrapper-sock');
+    var $sockContent = $sock.find('.wrapper-inner');
+
+    $sock.toggleClass('is-shown');
+    $sockContent.toggle('fast');
+
+    $.smoothScroll({ 
+       offset: -200, 
+       easing: 'swing', 
+       speed: 1000,
+       scrollElement: null,
+       scrollTarget: $sock
+    });
+
+    if($sock.hasClass('is-shown')) {
+        $btnLabel.text('Hide Studio Help');
+    }
+
+    else {
+        $btnLabel.text('Looking for Help with Studio?');
+    }
+}
+
 function toggleSubmodules(e) {
     e.preventDefault();
     $(this).toggleClass('expand').toggleClass('collapse');
@@ -796,7 +826,7 @@ function saveSetSectionScheduleDate(e) {
         data: JSON.stringify({ 'id': id, 'metadata': {'start': start}})
     }).success(function () {
             var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-            $thisSection.find('.section-published-date').html('<span class="published-status"><strong>Will Release:</strong> ' + input_date + ' at ' + input_time + '</span><a href="#" class="edit-button" data-date="' + input_date + '" data-time="' + input_time + '" data-id="' + id + '">Edit</a>');
+            $thisSection.find('.section-published-date').html('<span class="published-status"><strong>Will Release:</strong> ' + input_date + ' at ' + input_time + ' UTC</span><a href="#" class="edit-button" data-date="' + input_date + '" data-time="' + input_time + '" data-id="' + id + '">Edit</a>');
             $thisSection.find('.section-published-date').animate({
                 'background-color': 'rgb(182,37,104)'
             }, 300).animate({

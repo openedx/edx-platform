@@ -2,7 +2,7 @@ from datetime import datetime
 
 from . import ModuleStoreBase, Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
-import logging
+from .inheritance import own_metadata
 
 DRAFT = 'draft'
 
@@ -118,7 +118,7 @@ class DraftModuleStore(ModuleStoreBase):
         try:
             draft_item = self.get_item(location)
             if not getattr(draft_item, 'is_draft', False):
-               self.clone_item(location, draft_loc)
+                self.clone_item(location, draft_loc)
         except ItemNotFoundError, e:
             if not allow_not_found:
                 raise e
@@ -167,7 +167,6 @@ class DraftModuleStore(ModuleStoreBase):
         """
         return super(DraftModuleStore, self).delete_item(as_draft(location))
 
-
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
@@ -186,8 +185,7 @@ class DraftModuleStore(ModuleStoreBase):
         draft.cms.published_by = published_by_id
         super(DraftModuleStore, self).update_item(location, draft._model_data._kvs._data)
         super(DraftModuleStore, self).update_children(location, draft._model_data._kvs._children)
-        super(DraftModuleStore, self).update_metadata(location, draft._model_data._kvs._metadata)
-
+        super(DraftModuleStore, self).update_metadata(location, own_metadata(draft))
         self.delete_item(location)
 
     def unpublish(self, location):
@@ -226,6 +224,6 @@ class DraftModuleStore(ModuleStoreBase):
 
         # convert the dict - which is used for look ups - back into a list
         for key, value in to_process_dict.iteritems():
-            queried_children.append(value)  
+            queried_children.append(value)
 
         return queried_children

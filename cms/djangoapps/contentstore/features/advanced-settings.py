@@ -51,6 +51,11 @@ def edit_the_value_of_a_policy_key(step):
     e._element.send_keys(Keys.TAB, Keys.END, Keys.ARROW_LEFT, ' ', 'X')
 
 
+@step(u'I edit the value of a policy key and save$')
+def edit_the_value_of_a_policy_key(step):
+    change_display_name_value(step, '"foo"')
+
+
 @step('I create a JSON object as a value$')
 def create_JSON_object(step):
     change_display_name_value(step, '{"key": "value", "key_2": "value_2"}')
@@ -96,7 +101,7 @@ def the_policy_key_value_is_unchanged(step):
 
 @step(u'the policy key value is changed$')
 def the_policy_key_value_is_changed(step):
-    assert_equal(get_display_name_value(), '"Robot Super Course X"')
+    assert_equal(get_display_name_value(), '"foo"')
 
 
 ############# HELPERS ###############

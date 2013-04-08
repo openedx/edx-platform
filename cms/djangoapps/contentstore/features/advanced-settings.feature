@@ -21,8 +21,7 @@ Feature: Advanced (manual) course policy
 
   Scenario: Test editing key value
     Given I am on the Advanced Course Settings page in Studio
-    When I edit the value of a policy key
-    And I press the "Save" notification button
+    When I edit the value of a policy key and save
     Then the policy key value is changed
     And I reload the page
     Then the policy key value is changed

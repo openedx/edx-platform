@@ -38,7 +38,7 @@ def i_click_the_edit_link_for_the_release_date(step):
 @step('I save a new section release date$')
 def i_save_a_new_section_release_date(step):
     set_date_and_time('input.start-date.date.hasDatepicker', '12/25/2013',
-        'input.start-time.time.ui-timepicker-input', '12:00am')
+        'input.start-time.time.ui-timepicker-input', '00:00')
     world.browser.click_link_by_text('Save')
 
 
@@ -105,7 +105,7 @@ def the_section_release_date_picker_not_visible(step):
 def the_section_release_date_is_updated(step):
     css = 'span.published-status'
     status_text = world.css_text(css)
-    assert_equal(status_text, 'Will Release: 12/25/2013 at 12:00am')
+    assert_equal(status_text, 'Will Release: 12/25/2013 at 00:00 UTC')
 
 
 ############ HELPER METHODS ###################
