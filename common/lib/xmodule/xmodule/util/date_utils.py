@@ -2,15 +2,18 @@ import time
 import datetime
 
 
-def get_default_time_display(time_struct):
+def get_default_time_display(time_struct, display_timezone=True):
     """
     Converts a time struct to a string representation. This is the default
     representation used in Studio and LMS.
-    It is of the form "Apr 09, 2013 at 16:00 UTC".
+    It is of the form "Apr 09, 2013 at 16:00" or "Apr 09, 2013 at 16:00 UTC"
+    depending on the value of display_timezone.
 
-    If None is passed in, an empty string will be returned.
+    If None is passed in for time_struct, an empty string will be returned.
+    The default value of display_timezone is True.
     """
-    return get_time_struct_display(time_struct, "%b %d, %Y at %H:%M UTC")
+    timezone = " UTC" if display_timezone else ""
+    return get_time_struct_display(time_struct, "%b %d, %Y at %H:%M") + timezone
 
 
 def get_time_struct_display(time_struct, format):

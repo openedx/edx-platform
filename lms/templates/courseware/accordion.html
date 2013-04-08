@@ -11,7 +11,7 @@
           <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
             <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
               <p>${section['display_name']}</p>
-              <p class="subtitle">${section['format']} ${"due " + get_default_time_display(section['due']) if section.get('due') is not None else ''}</p>
+              <p class="subtitle">${section['format']} ${"due " + get_default_time_display(section['due'], display_timezone) if section.get('due') is not None else ''}</p>
             </a>
           </li>
       % endfor
