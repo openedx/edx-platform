@@ -327,10 +327,10 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
         except Exception, e:
             logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
 
-    if allow_not_found:
-        store.update_item(module.location, content, allow_not_found=allow_not_found)
-    else:
-        store.update_item(module.location, content)
+        if allow_not_found:
+            store.update_item(module.location, module_data, allow_not_found=allow_not_found)
+        else:
+            store.update_item(module.location, module_data)
 
     if hasattr(module, 'children') and module.children != []:
         store.update_children(module.location, module.children)
