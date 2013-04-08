@@ -1,5 +1,5 @@
 from .x_module import XModuleDescriptor, DescriptorSystem
-from .modulestore.inheritance import own_metadata, INHERITABLE_METADATA
+from .modulestore.inheritance import own_metadata
 from xblock.core import Scope
 
 
