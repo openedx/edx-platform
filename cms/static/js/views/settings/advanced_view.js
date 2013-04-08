@@ -117,15 +117,17 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         }
     },
     showSaveCancelButtons: function(event) {
-        if (!this.buttonsVisible) {
+        if (!this.notificationBarShowing) {
             this.$el.find(".message-status").removeClass("is-shown");
             $('.wrapper-notification').removeClass('is-hiding').addClass('is-shown');
-            this.buttonsVisible = true;
+            this.notificationBarShowing = true;
         }
     },
     hideSaveCancelButtons: function() {
-        $('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
-        this.buttonsVisible = false;
+        if (this.notificationBarShowing) {
+            $('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
+            this.notificationBarShowing = false;
+        }
     },
     saveView : function(event) {
         // TODO one last verification scan:
