@@ -120,8 +120,10 @@ def howitworks(request):
     else:
         return render_to_response('howitworks.html', {})
 
+
 def ux_alerts(request):
     return render_to_response('ux-alerts.html', {})
+
 
 # ==== Views for any logged-in user ==================================
 

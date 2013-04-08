@@ -99,7 +99,6 @@ urlpatterns = ('',
 
 # User creation and updating views
 urlpatterns += (
-    url(r'^ux-alerts$', 'contentstore.views.ux_alerts', name='ux-alerts'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)$', 'contentstore.views.get_checklists', name='checklists'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)/update(/)?(?P<checklist_index>.+)?.*$',
         'contentstore.views.update_checklist', name='checklists_updates'),
@@ -117,6 +116,8 @@ urlpatterns += (
 
     url(r'^logout$', 'student.views.logout_user', name='logout'),
 
+    # static/proof-of-concept views
+    url(r'^ux-alerts$', 'contentstore.views.ux_alerts', name='ux-alerts')
     )
 
 if settings.ENABLE_JASMINE:

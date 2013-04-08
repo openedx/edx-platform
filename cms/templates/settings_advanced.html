@@ -42,13 +42,17 @@ editor.render();
 </%block>
 
 <%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-subtitle">
+    <div class="title">
+      <span class="title-sub">Settings</span>
+      <h1 class="title-1">Schedule &amp; Details</h1>
+    </div>
+  </header>
+</div>
+
 <div class="wrapper-content wrapper">
   <section class="content">
-    <header class="page">
-      <span class="title-sub">Settings</span>
-      <h1 class="title-1">Advanced Settings</h1>
-    </header>
-
     <article class="content-primary" role="main">
       <form id="settings_advanced" class="settings-advanced" method="post" action="">
 
@@ -69,7 +73,7 @@ editor.render();
           <p class="instructions"><strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.</p>
 
           <ul class="list-input course-advanced-policy-list enum">
-              
+
           </ul>
         </section>
       </form>
@@ -107,7 +111,7 @@ editor.render();
 <div class="wrapper wrapper-notification wrapper-notification-warning">
   <div class="notification warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
-    
+
     <div class="copy">
       <h2 class="title title-3">You've Made Some Changes</h2>
       <p>Your changes will not take effect until you <strong>save your progress</strong>. Take care with key and value formatting, as validation is <strong>not implemented</strong>.</p>

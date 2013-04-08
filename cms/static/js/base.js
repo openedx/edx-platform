@@ -48,31 +48,6 @@ $(document).ready(function () {
         (e).preventDefault();
     });
 
-    // alert and notifications - manual close
-    $('.action-alert-close, .alert.has-actions .nav-actions a').click(function(e) {
-        (e).preventDefault();
-        console.log('closing alert');
-        $(this).closest('.wrapper-alert').removeClass('is-shown');
-    });
-
-    // alert and notifications - manual & action-based close
-    $('.action-notification-close').click(function(e) {
-        (e).preventDefault();
-        $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
-    });
-
-    // prompt pop
-    $('.action-prompt').click(function(e){
-        (e).preventDefault();
-        $body.toggleClass('prompt-is-shown');
-    });
-
-    // prompt close
-    $('.prompt .action-cancel, .prompt .action-proceed').click(function(e) {
-        (e).preventDefault();
-        $body.removeClass('prompt-is-shown');
-    });
-
     // nav - dropdown related
     $body.click(function (e) {
         $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
@@ -184,9 +159,9 @@ $(document).ready(function () {
 function smoothScrollLink(e) {
     (e).preventDefault();
 
-    $.smoothScroll({ 
-        offset: -200, 
-        easing: 'swing', 
+    $.smoothScroll({
+        offset: -200,
+        easing: 'swing',
         speed: 1000,
         scrollElement: null,
         scrollTarget: $(this).attr('href')
@@ -196,9 +171,9 @@ function smoothScrollLink(e) {
 function smoothScrollTop(e) {
     (e).preventDefault();
 
-    $.smoothScroll({ 
-        offset: -200, 
-        easing: 'swing', 
+    $.smoothScroll({
+        offset: -200,
+        easing: 'swing',
         speed: 1000,
         scrollElement: null,
         scrollTarget: $('#view-top')
@@ -508,9 +483,9 @@ function toggleSock(e) {
     $sock.toggleClass('is-shown');
     $sockContent.toggle('fast');
 
-    $.smoothScroll({ 
-       offset: -200, 
-       easing: 'swing', 
+    $.smoothScroll({
+       offset: -200,
+       easing: 'swing',
        speed: 1000,
        scrollElement: null,
        scrollTarget: $sock

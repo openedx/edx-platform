@@ -6,45 +6,70 @@
 <script type="text/javascript">
   // notifications - demo
   $(document).ready(function() {
-    
+
+    // alert and notifications - manual close
+    $('.action-alert-close, .alert.has-actions .nav-actions a').click(function(e) {
+        (e).preventDefault();
+        console.log('closing alert');
+        $(this).closest('.wrapper-alert').removeClass('is-shown');
+    });
+
+    // alert and notifications - manual & action-based close
+    $('.action-notification-close').click(function(e) {
+        (e).preventDefault();
+        $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
+    });
+
+    // prompt pop
+    $('.action-prompt').click(function(e){
+        (e).preventDefault();
+        $body.toggleClass('prompt-is-shown');
+    });
+
+    // prompt close
+    $('.prompt .action-cancel, .prompt .action-proceed').click(function(e) {
+        (e).preventDefault();
+        $body.removeClass('prompt-is-shown');
+    });
+
     $('.hide-notification').click(function(e) {
-        (e).preventDefault();          
+        (e).preventDefault();
         $('.wrapper-notification').removeClass('is-hiding is-shown');
         $(this.hash).addClass('is-hiding');
     });
 
     $('.show-notification').click(function(e) {
-        (e).preventDefault();          
+        (e).preventDefault();
         $('.wrapper-notification').removeClass('is-shown is-hiding');
         $(this.hash).addClass('is-shown');
     });
 
     $('.show-notification-fleeting').click(function(e) {
-        (e).preventDefault();          
+        (e).preventDefault();
         $('.wrapper-notification').removeClass('is-fleeting');
         $(this.hash).addClass('is-fleeting');
     });
 
     $('.hide-banner').click(function(e) {
-        (e).preventDefault();          
+        (e).preventDefault();
         $('.wrapper-banner').removeClass('is-hiding');
         $(this.hash).addClass('is-hiding');
     });
 
     $('.show-banner').click(function(e) {
-        (e).preventDefault();          
+        (e).preventDefault();
         $('.wrapper-banner').removeClass('is-shown');
         $(this.hash).addClass('is-shown');
     });
 
     $('.hide-alert').click(function(e) {
-        (e).preventDefault();          
+        (e).preventDefault();
         $('.wrapper-alert').removeClass('is-hiding');
         $(this.hash).addClass('is-hiding');
     });
 
     $('.show-alert').click(function(e) {
-        (e).preventDefault();          
+        (e).preventDefault();
         $('.wrapper-alert').removeClass('is-shown');
         $(this.hash).addClass('is-shown');
     });
@@ -56,7 +81,7 @@
 
     $('.show-prompt').click(function(e) {
         (e).preventDefault();
-        $body.toggleClass('prompt-is-shown');      
+        $body.toggleClass('prompt-is-shown');
         $('.wrapper-prompt').removeClass('is-shown');
         $(this.hash).addClass('is-shown');
     });
@@ -371,7 +396,7 @@
 <div class="wrapper wrapper-notification wrapper-notification-change" id="notification-change">
   <div class="notification change has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-change">&#x1F4DD;</i>
-    
+
     <div class="copy">
       <h2 class="title title-3">You've Made Some Changes</h2>
       <p class="message">Your changes will not take effect until you <strong>save your progress</strong>.</p>
@@ -395,7 +420,7 @@
 <div class="wrapper wrapper-notification wrapper-notification-warning" id="notification-version">
   <div class="notification warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
-    
+
     <div class="copy">
       <h2 class="title title-3">A Newer Version of This Exists</h2>
       <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
@@ -419,7 +444,7 @@
 <div class="wrapper wrapper-notification wrapper-notification-warning" id="notification-dangerous">
   <div class="notification warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
-    
+
     <div class="copy">
       <h2 class="title title-3">Are You Sure You Want to Edit That?</h2>
       <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
@@ -443,7 +468,7 @@
 <div class="wrapper wrapper-notification wrapper-notification-status wrapper-notification-saving" id="notification-saving">
   <div class="notification saving">
     <i class="ss-icon ss-symbolicons-block icon icon-saving">&#x2699;</i>
-    
+
     <div class="copy">
       <h2 class="title title-3">Saving &hellip;</h2>
     </div>
@@ -454,7 +479,7 @@
 <div class="wrapper wrapper-notification wrapper-notification-confirmation" id="notification-confirmation">
   <div class="notification confirmation">
     <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
-    
+
     <div class="copy">
       <h2 class="title title-3"><a href="#">Your Section</a> Has Been Created</h2>
     </div>
@@ -465,7 +490,7 @@
 <div class="wrapper wrapper-notification wrapper-notification-help" id="notification-help">
   <div class="notification help">
     <i class="ss-icon ss-symbolicons-block icon icon-help">&#x2753;</i>
-    
+
     <div class="copy">
       <h2 class="title title-3">Fun Fact:</h2>
       <p class="message">Using the checkmark will allow you make a subsection gradable as an assignment, which counts towards a student's total grade</p>
