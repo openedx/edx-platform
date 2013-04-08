@@ -94,7 +94,7 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token']),
-                    ('display_timezone', course.display_timezone)] + template_imports.items())
+                    ('show_timezone', course.show_timezone)] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 
 
