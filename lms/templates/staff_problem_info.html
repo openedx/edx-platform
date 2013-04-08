@@ -1,15 +1,17 @@
 ## The JS for this is defined in xqa_interface.html
 ${module_content}
-%if location.category in ['problem','video','html']:
+%if location.category in ['problem','video','html','combinedopenended']:
 %  if edit_link:
 <div>
-	<a href="${edit_link}">Edit</a> /
-	<a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
+    <a href="${edit_link}">Edit</a>
+    % if xqa_key:
+        / <a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
         'location': '${location}',
         'xqa_key': '${xqa_key}',
         'category': '${category}',
         'user': '${user}'
      })" id="${element_id}_xqa_log">QA</a>
+    % endif
 </div>
 %  endif
 <div><a href="#${element_id}_debug" id="${element_id}_trig">Staff Debug Info</a></div>
@@ -58,6 +60,12 @@ location = ${location | h}
 <table>
   <tr><th>edX Fields</th></tr>
   %for name, field in lms_fields:
+  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+  %endfor
+</table>
+<table>
+  <tr><th>XML attributes</th></tr>
+  %for name, field in xml_attributes.items():
   <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>
