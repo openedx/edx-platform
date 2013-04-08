@@ -12,7 +12,7 @@ def get_default_time_display(time_struct, display_timezone=True):
     If None is passed in for time_struct, an empty string will be returned.
     The default value of display_timezone is True.
     """
-    timezone = " UTC" if display_timezone else ""
+    timezone = "" if time_struct is None or not display_timezone else " UTC"
     return get_time_struct_display(time_struct, "%b %d, %Y at %H:%M") + timezone
 
 
