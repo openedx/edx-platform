@@ -284,7 +284,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     except KeyError:
                         # Ignore any missing keys in _model_data
                         pass
-     
+
                 if 'data' in content:
                     module_data = content['data']
 
@@ -301,16 +301,18 @@ def import_from_xml(store, data_dir, course_dirs=None,
                         # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
                         # no good, so we have to do this kludge
                         if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                            lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path,
-                                static_content_store, link, remap_dict))                     
+                            lxml_rewrite_links(module_data,
+                                               lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
 
                             for key in remap_dict.keys():
                                 module_data = module_data.replace(key, remap_dict[key])
 
-                    except Exception, e:
+                    except Exception:
                         logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
+                else:
+                    module_data = content
 
-                store.update_item(module.location, content)
+                store.update_item(module.location, module_data)
 
                 if hasattr(module, 'children') and module.children != []:
                     store.update_children(module.location, module.children)
