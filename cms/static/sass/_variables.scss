@@ -113,7 +113,7 @@ $green-u1: desaturate($green,15%);
 $green-u2: desaturate($green,30%);
 $green-u3: desaturate($green,45%);
 
-$yellow: rgb(231, 214, 143);
+$yellow: rgb(237, 189, 60);
 $yellow-l1: tint($yellow,20%);
 $yellow-l2: tint($yellow,40%);
 $yellow-l3: tint($yellow,60%);
@@ -149,7 +149,12 @@ $orange-u3: desaturate($orange,45%);
 
 $shadow: rgba(0,0,0,0.2);
 $shadow-l1: rgba(0,0,0,0.1);
+$shadow-l2: rgba(0,0,0,0.05);
 $shadow-d1: rgba(0,0,0,0.4);
+
+
+// specific UI
+$notification-height: ($baseline*10);
 
 // colors - inherited 
 $baseFontColor: $gray-d2;

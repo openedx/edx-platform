@@ -32,7 +32,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 
         var listEle$ = this.$el.find('.course-advanced-policy-list');
         listEle$.empty();
-        
+
         // b/c we've deleted all old fields, clear the map and repopulate
         this.fieldToSelectorMap = {};
         this.selectorToField = {};
@@ -101,13 +101,13 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         });
     },
     showMessage: function (type) {
-        this.$el.find(".message-status").removeClass("is-shown");
+        $(".wrapper-alert").removeClass("is-shown");
         if (type) {
             if (type === this.error_saving) {
-                this.$el.find(".message-status.error").addClass("is-shown");
+                $(".wrapper-alert-error").addClass("is-shown").attr('aria-hidden','false');
             }
             else if (type === this.successful_changes) {
-                this.$el.find(".message-status.confirm").addClass("is-shown");
+                $(".wrapper-alert-confirmation").addClass("is-shown").attr('aria-hidden','false');
                 this.hideSaveCancelButtons();
             }
         }
@@ -117,17 +117,20 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         }
     },
     showSaveCancelButtons: function(event) {
-        if (!this.buttonsVisible) {
+        if (!this.notificationBarShowing) {
             this.$el.find(".message-status").removeClass("is-shown");
-            $('.wrapper-notification').addClass('is-shown');
-            this.buttonsVisible = true;
+            $('.wrapper-notification').removeClass('is-hiding').addClass('is-shown').attr('aria-hidden','false');
+            this.notificationBarShowing = true;
         }
     },
     hideSaveCancelButtons: function() {
-        $('.wrapper-notification').removeClass('is-shown');
-        this.buttonsVisible = false;
+        if (this.notificationBarShowing) {
+            $('.wrapper-notification').removeClass('is-shown').addClass('is-hiding').attr('aria-hidden','true');
+            this.notificationBarShowing = false;
+        }
     },
     saveView : function(event) {
+        smoothScrollTop(event);
         // TODO one last verification scan:
         //    call validateKey on each to ensure proper format
         //    check for dupes
@@ -146,6 +149,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         });
     },
     revertView : function(event) {
+        event.preventDefault();
         var self = event.data;
         self.model.deleteKeys = [];
         self.model.clear({silent : true});
@@ -158,7 +162,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var newKeyId = _.uniqueId('policy_key_'),
         newEle = this.template({ key : key, value : JSON.stringify(value, null, 4),
             keyUniqueId: newKeyId, valueUniqueId: _.uniqueId('policy_value_')});
-        
+
         this.fieldToSelectorMap[key] = newKeyId;
         this.selectorToField[newKeyId] = key;
         return newEle;
