@@ -121,6 +121,7 @@ def howitworks(request):
         return render_to_response('howitworks.html', {})
 
 
+# static/proof-of-concept views
 def ux_alerts(request):
     return render_to_response('ux-alerts.html', {})
 
