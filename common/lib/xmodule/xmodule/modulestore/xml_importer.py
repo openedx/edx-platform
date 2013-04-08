@@ -301,9 +301,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
                         # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
                         # no good, so we have to do this kludge
                         if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                            lxml_rewrite_links(module_data, lambda link:
-                                               verify_content_links(module, course_data_path,
-                                               static_content_store, link, remap_dict))
+                            lxml_rewrite_links(module_data,
+                                               lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
 
                             for key in remap_dict.keys():
                                 module_data = module_data.replace(key, remap_dict[key])
