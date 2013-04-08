@@ -64,7 +64,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
                 %if section.get('due') is not None:
                   <em>
-                  due ${get_default_time_display(section['due'])}
+                  due ${get_default_time_display(section['due'], course.show_timezone)}
                   </em>
                 %endif
               </p>

@@ -12,7 +12,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
-#from django.views.decorators.csrf import ensure_csrf_cookie
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 
@@ -67,9 +66,9 @@ def user_groups(user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def courses(request):
-    '''
+    """
     Render "find courses" page.  The course selection work is done in courseware.courses.
-    '''
+    """
     courses = get_courses(request.user, request.META.get('HTTP_HOST'))
     courses = sort_by_announcement(courses)
 
@@ -77,14 +76,16 @@ def courses(request):
 
 
 def render_accordion(request, course, chapter, section, model_data_cache):
-    ''' Draws navigation bar. Takes current position in accordion as
-        parameter.
+    """
+    Draws navigation bar. Takes current position in accordion as
+    parameter.
 
-        If chapter and section are '' or None, renders a default accordion.
+    If chapter and section are '' or None, renders a default accordion.
 
-        course, chapter, and section are the url_names.
+    course, chapter, and section are the url_names.
 
-        Returns the html string'''
+    Returns the html string
+    """
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
@@ -92,7 +93,8 @@ def render_accordion(request, course, chapter, section, model_data_cache):
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
-                    ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
+                    ('csrf', csrf(request)['csrf_token']),
+                    ('show_timezone', course.show_timezone)] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 
 
@@ -166,10 +168,10 @@ def save_child_position(seq_module, child_name):
 
 
 def check_for_active_timelimit_module(request, course_id, course):
-    '''
+    """
     Looks for a timing module for the given user and course that is currently active.
     If found, returns a context dict with timer-related values to enable display of time remaining.
-    '''
+    """
     context = {}
 
     # TODO (cpennington): Once we can query the course structure, replace this with such a query
@@ -201,11 +203,11 @@ def check_for_active_timelimit_module(request, course_id, course):
 
 
 def update_timelimit_module(user, course_id, model_data_cache, timelimit_descriptor, timelimit_module):
-    '''
+    """
     Updates the state of the provided timing module, starting it if it hasn't begun.
     Returns dict with timer-related values to enable display of time remaining.
     Returns 'timer_expiration_duration' in dict if timer is still active, and not if timer has expired.
-    '''
+    """
     context = {}
     # determine where to go when the exam ends:
     if timelimit_descriptor.time_expired_redirect_url is None:
@@ -391,14 +393,14 @@ def index(request, course_id, chapter=None, section=None,
 
 @ensure_csrf_cookie
 def jump_to(request, course_id, location):
-    '''
+    """
     Show the page that contains a specific location.
 
     If the location is invalid or not in any class, return a 404.
 
     Otherwise, delegates to the index view to figure out whether this user
     has access, and what they should see.
-    '''
+    """
     # Complain if the location isn't valid
     try:
         location = Location(location)
@@ -486,7 +488,9 @@ def syllabus(request, course_id):
 
 
 def registered_for_course(course, user):
-    '''Return CourseEnrollment if user is registered for course, else False'''
+    """
+    Return CourseEnrollment if user is registered for course, else False
+    """
     if user is None:
         return False
     if user.is_authenticated():

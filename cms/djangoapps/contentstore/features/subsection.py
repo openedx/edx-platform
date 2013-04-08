@@ -57,18 +57,18 @@ def i_see_complete_subsection_name_with_quote_in_editor(step):
 
 @step('I have set a release date and due date in different years$')
 def test_have_set_dates_in_different_years(step):
-    set_date_and_time('input#start_date', '12/25/2011', 'input#start_time', '3:00am')
+    set_date_and_time('input#start_date', '12/25/2011', 'input#start_time', '03:00')
     world.css_click('.set-date')
     # Use a year in the past so that current year will always be different.
-    set_date_and_time('input#due_date', '01/02/2012', 'input#due_time', '4:00am')
+    set_date_and_time('input#due_date', '01/02/2012', 'input#due_time', '04:00')
 
 
 @step('I see the correct dates$')
 def i_see_the_correct_dates(step):
     assert_equal('12/25/2011', world.css_find('input#start_date').first.value)
-    assert_equal('3:00am', world.css_find('input#start_time').first.value)
+    assert_equal('03:00', world.css_find('input#start_time').first.value)
     assert_equal('01/02/2012', world.css_find('input#due_date').first.value)
-    assert_equal('4:00am', world.css_find('input#due_time').first.value)
+    assert_equal('04:00', world.css_find('input#due_time').first.value)
 
 
 @step('I mark it as Homework$')

@@ -826,7 +826,7 @@ function saveSetSectionScheduleDate(e) {
         data: JSON.stringify({ 'id': id, 'metadata': {'start': start}})
     }).success(function () {
             var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-            $thisSection.find('.section-published-date').html('<span class="published-status"><strong>Will Release:</strong> ' + input_date + ' at ' + input_time + '</span><a href="#" class="edit-button" data-date="' + input_date + '" data-time="' + input_time + '" data-id="' + id + '">Edit</a>');
+            $thisSection.find('.section-published-date').html('<span class="published-status"><strong>Will Release:</strong> ' + input_date + ' at ' + input_time + ' UTC</span><a href="#" class="edit-button" data-date="' + input_date + '" data-time="' + input_time + '" data-id="' + id + '">Edit</a>');
             $thisSection.find('.section-published-date').animate({
                 'background-color': 'rgb(182,37,104)'
             }, 300).animate({
