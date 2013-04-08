@@ -309,6 +309,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                     except Exception:
                         logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
+                else:
+                    module_data = content
 
                 store.update_item(module.location, module_data)
 
