@@ -232,6 +232,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
         self._grading_policy = {}
+
         self.set_grading_policy(self.grading_policy)
 
         self.test_center_exams = []

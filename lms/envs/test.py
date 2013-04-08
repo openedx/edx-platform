@@ -122,7 +122,7 @@ CACHES = {
         'LOCATION': '/var/tmp/mongo_metadata_inheritance',
         'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
-    } 
+    }
 }
 
 # Dummy secret key for dev
