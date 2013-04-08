@@ -92,6 +92,69 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         return cnt
 
+    def test_draft_metadata(self):
+        '''
+        This verifies a bug we had where inherited metadata was getting written to the
+        module as 'own-metadata' when publishing. Also verifies the metadata inheritance is
+        properly computed
+        '''
+        store = modulestore()
+        draft_store = modulestore('draft')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        course = draft_store.get_item(Location(['i4x', 'edX', 'simple',
+                                               'course', '2012_Fall', None]), depth=None)
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertEqual(html_module.lms.graceperiod, course.lms.graceperiod)
+        self.assertNotIn('graceperiod', own_metadata(html_module))
+
+        draft_store.clone_item(html_module.location, html_module.location)
+
+        # refetch to check metadata
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertEqual(html_module.lms.graceperiod, course.lms.graceperiod)
+        self.assertNotIn('graceperiod', own_metadata(html_module))
+
+        # publish module
+        draft_store.publish(html_module.location, 0)
+
+        # refetch to check metadata
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertEqual(html_module.lms.graceperiod, course.lms.graceperiod)
+        self.assertNotIn('graceperiod', own_metadata(html_module))
+
+        # put back in draft and change metadata and see if it's now marked as 'own_metadata'
+        draft_store.clone_item(html_module.location, html_module.location)
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        new_graceperiod = timedelta(**{'hours': 1})
+
+        self.assertNotIn('graceperiod', own_metadata(html_module))
+        html_module.lms.graceperiod = new_graceperiod
+        self.assertIn('graceperiod', own_metadata(html_module))
+        self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
+
+        draft_store.update_metadata(html_module.location, own_metadata(html_module))
+
+        # read back to make sure it reads as 'own-metadata'
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertIn('graceperiod', own_metadata(html_module))
+        self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
+
+        # republish
+        draft_store.publish(html_module.location, 0)
+
+        # and re-read and verify 'own-metadata'
+        draft_store.clone_item(html_module.location, html_module.location)
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertIn('graceperiod', own_metadata(html_module))
+        self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
+
     def test_get_depth_with_drafts(self):
         import_from_xml(modulestore(), 'common/test/data/', ['simple'])
 
