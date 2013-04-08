@@ -48,17 +48,9 @@ $(document).ready(function () {
         (e).preventDefault();
     });
 
-    // alerts - manual close
-    $('.action-alert-close, .alert.has-actions .nav-actions a').click(function(e) {
-        (e).preventDefault();
-        $(this).closest('.wrapper-alert').removeClass('is-shown');
-    });
-
-    // notifications - manual & action-based close
-    $('.action-notification-close').click(function(e) {
-        (e).preventDefault();
-        $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
-    });
+    // alerts/notifications - manual close
+    $('.action-alert-close, .alert.has-actions .nav-actions a').bind('click', hideAlert);
+    $('.action-notification-close').bind('click', hideNotification);
 
     // nav - dropdown related
     $body.click(function (e) {
@@ -548,6 +540,17 @@ function removeDateSetter(e) {
     // clear out the values
     $block.find('.date').val('');
     $block.find('.time').val('');
+}
+
+
+function hideNotification(e) {
+    (e).preventDefault();
+    $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
+}
+
+function hideAlert(e) {
+    (e).preventDefault();
+    $(this).closest('.wrapper-alert').removeClass('is-shown');
 }
 
 function showToastMessage(message, $button, lifespan) {
