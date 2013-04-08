@@ -23,7 +23,7 @@ django_debug_toolbar
 django_nose==1.1
 dogapi==1.2.1
 dogstatsd-python==0.2.1
-factory_boy
+factory_boy==1.3.0
 feedparser==5.1.3
 fs==0.4.0
 GitPython==0.3.2.RC1
