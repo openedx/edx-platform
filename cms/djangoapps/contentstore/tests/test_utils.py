@@ -3,7 +3,7 @@ from contentstore import utils
 import mock
 from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from .utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LMSLinksTestCase(TestCase):

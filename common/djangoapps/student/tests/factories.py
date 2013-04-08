@@ -2,7 +2,7 @@ from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment)
 from django.contrib.auth.models import Group
 from datetime import datetime
-from factory import Factory, SubFactory
+from factory import Factory, SubFactory, post_generation
 from uuid import uuid4
 
 
@@ -43,6 +43,17 @@ class UserFactory(Factory):
     is_superuser = False
     last_login = datetime(2012, 1, 1)
     date_joined = datetime(2011, 1, 1)
+
+    @post_generation
+    def set_password(self, create, extracted, **kwargs):
+        self._raw_password = self.password
+        self.set_password(self.password)
+        if create:
+            self.save()
+
+
+class AdminFactory(UserFactory):
+    is_staff = True
 
 
 class CourseEnrollmentFactory(Factory):

@@ -1,6 +1,7 @@
 import factory
 from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed)
+from courseware.models import StudentModule
 from django.contrib.auth.models import Group
 from datetime import datetime
 import uuid
@@ -47,3 +48,15 @@ class CourseEnrollmentAllowedFactory(factory.Factory):
 
     email = 'test@edx.org'
     course_id = 'edX/test/2012_Fall'
+
+
+class StudentModuleFactory(factory.Factory):
+    FACTORY_FOR = StudentModule
+
+    module_type = "problem"
+    student = factory.SubFactory(UserFactory)
+    course_id = "MITx/999/Robot_Super_Course"
+    state = None
+    grade = None
+    max_grade = None
+    done = 'na'

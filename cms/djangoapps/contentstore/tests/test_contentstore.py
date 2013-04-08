@@ -15,8 +15,9 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from django.dispatch import Signal
 from contentstore.utils import get_modulestore
+from contentstore.tests.utils import parse_json
 
-from .utils import ModuleStoreTestCase, parse_json
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import Location
