@@ -628,6 +628,113 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertIn('markdown', context, "markdown is missing from context")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
 
+    def test_cms_imported_course_walkthrough(self):
+        """
+        Import and walk through some common URL endpoints. This just verifies non-500 and no other
+        correct behavior, so it is not a deep test
+        """
+        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+        loc = Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None])
+        resp = self.client.get(reverse('course_index',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+
+        self.assertEqual(200, resp.status_code)
+        self.assertContains(resp, 'Chapter 2')
+
+        # go to various pages
+
+        # import page
+        resp = self.client.get(reverse('import_course',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # export page
+        resp = self.client.get(reverse('export_course',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # manage users
+        resp = self.client.get(reverse('manage_users',
+                                       kwargs={'location': loc.url()}))
+        self.assertEqual(200, resp.status_code)
+
+        # course info
+        resp = self.client.get(reverse('course_info',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # settings_details
+        resp = self.client.get(reverse('settings_details',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # settings_details
+        resp = self.client.get(reverse('settings_grading',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # static_pages
+        resp = self.client.get(reverse('static_pages',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'coursename': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # static_pages
+        resp = self.client.get(reverse('asset_index',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # go look at a subsection page
+        subsection_location = loc._replace(category='sequential', name='test_sequence')
+        resp = self.client.get(reverse('edit_subsection',
+                                       kwargs={'location': subsection_location.url()}))
+        self.assertEqual(200, resp.status_code)
+
+        # go look at the Edit page
+        unit_location = loc._replace(category='vertical', name='test_vertical')
+        resp = self.client.get(reverse('edit_unit',
+                                       kwargs={'location': unit_location.url()}))
+        self.assertEqual(200, resp.status_code)
+
+        # delete a component
+        del_loc = loc._replace(category='html', name='test_html')
+        resp = self.client.post(reverse('delete_item'),
+                                json.dumps({'id': del_loc.url()}), "application/json")
+        self.assertEqual(200, resp.status_code)
+
+        # delete a unit
+        del_loc = loc._replace(category='vertical', name='test_vertical')
+        resp = self.client.post(reverse('delete_item'),
+                                json.dumps({'id': del_loc.url()}), "application/json")
+        self.assertEqual(200, resp.status_code)
+
+        # delete a unit
+        del_loc = loc._replace(category='sequential', name='test_sequence')
+        resp = self.client.post(reverse('delete_item'),
+                                json.dumps({'id': del_loc.url()}), "application/json")
+        self.assertEqual(200, resp.status_code)
+
+        # delete a chapter
+        del_loc = loc._replace(category='chapter', name='chapter_2')
+        resp = self.client.post(reverse('delete_item'),
+                                json.dumps({'id': del_loc.url()}), "application/json")
+        self.assertEqual(200, resp.status_code)
+
     def test_import_metadata_with_attempts_empty_string(self):
         import_from_xml(modulestore(), 'common/test/data/', ['simple'])
         module_store = modulestore('direct')
