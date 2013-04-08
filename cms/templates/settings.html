@@ -67,20 +67,6 @@ from contentstore import utils
             <span class="tip">The nuts and bolts of your course</span>
           </header>
 
-          <div class="note note-promotion note-promotion-courseURL">
-            <h3 class="title">Your Course's Live URL</h3>
-            <div class="copy">
-              <p>Students can enroll in and access ${context_course.display_name_with_default} at: <a rel="external" href="${utils.get_lms_link_for_about_page(course_location)}" />${utils.get_lms_link_for_about_page(course_location)}</a></p>
-            </div>
-
-            <ul class="list-actions">
-              <li class="action-item">
-                <a href="" class="action action-primary"><i class="ss-icon icon ss-symbolicons-block icon icon-inline icon-announcement">&#xEC00;</i> Download Studio Documentation</a>
-                <span class="tip">How to use Studio to build your course</span>
-              </li>
-            </ul>
-          </div>
-
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
               <label for="course-organization">Organization</label>
@@ -97,6 +83,19 @@ from contentstore import utils
               <input title="This field is disabled: this information cannot be changed." type="text" class="long" id="course-name" value="[Course Name]" readonly />
             </li>
           </ol>
+
+          <div class="note note-promotion note-promotion-courseURL has-actions">
+            <h3 class="title">Course URL (for student enrollment and access)</h3>
+            <div class="copy">
+              <p><a class="link-courseURL" rel="external" href="${utils.get_lms_link_for_about_page(course_location)}" />${utils.get_lms_link_for_about_page(course_location)}</a></p>
+            </div>
+
+            <ul class="list-actions">
+              <li class="action-item">
+                <a title="Send a note to students via email" href="mailto:john.doe@gmail.com?Subject=Enroll%20in%20COURSENAME&body=Hi,%20COURSENAME,%20provided%20by%20edX,%20is%20almost%20ready%20to%20begin.%20Please%20enroll%20for%20this%20course%20at%20${utils.get_lms_link_for_about_page(course_location)}." class="action action-primary"><i class="ss-icon icon ss-symbolicons-standard icon icon-inline icon-announcement">&#x2709;</i> Send an invitation to your students</a>
+              </li>
+            </ul>
+          </div>
         </section>
 
         <hr class="divide" />

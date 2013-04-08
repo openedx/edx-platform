@@ -147,7 +147,7 @@ body.course.settings {
         }
 
         label {
-          @include font-size(14);
+          @extend .t-copy-sub1;
           @include transition(color, 0.15s, ease-in-out);
           margin: 0 0 ($baseline/4) 0;
           font-weight: 400;
@@ -243,9 +243,28 @@ body.course.settings {
 
       .list-input {
         @include clearfix();
+        padding: 0 ($baseline/2);
 
         .field {
           margin-bottom: 0;
+        }
+      }
+
+      // course details that should appear more like content than elements to change
+      .field.is-not-editable {
+
+        label {
+
+        }
+
+        input, textarea {
+          @extend .t-copy-lead1;
+          @include box-shadow(none);
+          border: none;
+          background: none;
+          padding: 0;
+          margin: 0;
+          font-weight: 600;
         }
       }
 
@@ -264,6 +283,52 @@ body.course.settings {
       #field-course-name {
         float: left;
         width: flex-grid(5, 9);
+      }
+
+      // course link note
+      .note-promotion-courseURL {
+        @include box-shadow(0 1px 1px $shadow-l1);
+        @include border-radius(($baseline/5));
+        margin-top: ($baseline*1.5);
+        border: 1px solid $gray-l3;
+        padding: ($baseline/2) 0 0 0;
+
+        .title {
+          @extend .t-copy-sub1;
+          margin: 0 0 ($baseline/10) 0;
+          padding: 0 ($baseline/2);
+        }
+
+        .copy {
+          padding: 0 ($baseline/2) ($baseline/2) ($baseline/2);
+
+          .link-courseURL {
+            @extend .t-copy-lead1;
+
+            &:hover {
+
+            }
+          }
+        }
+
+        .list-actions {
+          @include box-shadow(inset 0 1px 1px $shadow-l1);
+          border-top: 1px solid $gray-l4;
+          padding:  ($baseline/2);
+          background: $gray-l5;
+
+          .action-primary {
+            @include blue-button();
+            @include font-size(13);
+
+            .icon {
+              @extend .t-icon;
+              @include font-size(16);
+              display: inline-block;
+              vertical-align: middle;
+            }
+          }
+        }
       }
     }
 
