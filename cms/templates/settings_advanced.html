@@ -108,13 +108,13 @@ editor.render();
 
 <%block name="view_notifications">
 <!-- notification: change has been made and a save is needed -->
-<div class="wrapper wrapper-notification wrapper-notification-warning">
+<div class="wrapper wrapper-notification wrapper-notification-warning" aria-hidden="true" role="dialog" aria-labelledby="notification-changesMade-title" aria-describedby="notification-changesMade-description">
   <div class="notification warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
     <div class="copy">
-      <h2 class="title title-3">You've Made Some Changes</h2>
-      <p>Your changes will not take effect until you <strong>save your progress</strong>. Take care with key and value formatting, as validation is <strong>not implemented</strong>.</p>
+      <h2 class="title title-3" id="notification-changesMade-title">You've Made Some Changes</h2>
+      <p id="notification-changesMade-description">Your changes will not take effect until you <strong>save your progress</strong>. Take care with key and value formatting, as validation is <strong>not implemented</strong>.</p>
     </div>
 
     <nav class="nav-actions">
@@ -134,7 +134,7 @@ editor.render();
 
 <%block name="view_alerts">
 <!-- alert: save confirmed with close -->
-<div class="wrapper wrapper-alert wrapper-alert-confirmation">
+<div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
   <div class="alert confirmation">
     <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
 
@@ -151,7 +151,7 @@ editor.render();
 </div>
 
 <!-- alert: error -->
-<div class="wrapper wrapper-alert wrapper-alert-error">
+<div class="wrapper wrapper-alert wrapper-alert-error" role="status">
   <div class="alert error">
     <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
 

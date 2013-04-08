@@ -545,7 +545,7 @@ function removeDateSetter(e) {
 
 function hideNotification(e) {
     (e).preventDefault();
-    $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
+    $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding').attr('aria-hidden','true');
 }
 
 function hideAlert(e) {

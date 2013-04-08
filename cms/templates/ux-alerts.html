@@ -24,42 +24,32 @@
     $('.action-prompt').click(function(e){
         (e).preventDefault();
         $body.toggleClass('prompt-is-shown');
+        $(this).closest('.wrapper-prompt').attr('aria-hidden','false');
     });
 
     // prompt close
     $('.prompt .action-cancel, .prompt .action-proceed').click(function(e) {
         (e).preventDefault();
         $body.removeClass('prompt-is-shown');
+        $(this).closest('.wrapper-prompt').attr('aria-hidden','true');
     });
 
     $('.hide-notification').click(function(e) {
         (e).preventDefault();
-        $('.wrapper-notification').removeClass('is-hiding is-shown');
-        $(this.hash).addClass('is-hiding');
+        $('.wrapper-notification').removeClass('is-hiding is-shown').attr('aria-hidden','true');
+        $(this.hash).addClass('is-hiding').attr('aria-hidden','true');
     });
 
     $('.show-notification').click(function(e) {
         (e).preventDefault();
         $('.wrapper-notification').removeClass('is-shown is-hiding');
-        $(this.hash).addClass('is-shown');
+        $(this.hash).addClass('is-shown').attr('aria-hidden','false');
     });
 
     $('.show-notification-fleeting').click(function(e) {
         (e).preventDefault();
-        $('.wrapper-notification').removeClass('is-fleeting');
-        $(this.hash).addClass('is-fleeting');
-    });
-
-    $('.hide-banner').click(function(e) {
-        (e).preventDefault();
-        $('.wrapper-banner').removeClass('is-hiding');
-        $(this.hash).addClass('is-hiding');
-    });
-
-    $('.show-banner').click(function(e) {
-        (e).preventDefault();
-        $('.wrapper-banner').removeClass('is-shown');
-        $(this.hash).addClass('is-shown');
+        $('.wrapper-notification').removeClass('is-fleeting').attr('aria-hidden','true');
+        $(this.hash).addClass('is-fleeting').attr('aria-hidden','false');
     });
 
     $('.hide-alert').click(function(e) {
@@ -83,7 +73,7 @@
         (e).preventDefault();
         $body.toggleClass('prompt-is-shown');
         $('.wrapper-prompt').removeClass('is-shown');
-        $(this.hash).addClass('is-shown');
+        $(this.hash).addClass('is-shown').attr('aria-hidden','false');
     });
   });
 </script>
@@ -377,7 +367,7 @@
 
 <%block name="view_notifications">
 <!-- notification: change has been made and a save is needed -->
-<div class="wrapper wrapper-notification wrapper-notification-change" id="notification-change">
+<div class="wrapper wrapper-notification wrapper-notification-change" id="notification-change" role="status">
   <div class="notification change has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-change">&#x1F4DD;</i>
 
@@ -401,13 +391,13 @@
 </div>
 
 <!-- notification: newer version exists -->
-<div class="wrapper wrapper-notification wrapper-notification-warning" id="notification-version">
+<div class="wrapper wrapper-notification wrapper-notification-warning" id="notification-version" aria-hidden="true" role="dialog" aria-labelledby="notification-warning-title" aria-describedby="notification-warning-description">
   <div class="notification warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
     <div class="copy">
-      <h2 class="title title-3">A Newer Version of This Exists</h2>
-      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <h2 class="title title-3" id="notification-warning-title">A Newer Version of This Exists</h2>
+      <p class="message" id="notification-warning-description">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
 
     <nav class="nav-actions">
@@ -425,13 +415,13 @@
 </div>
 
 <!-- notification: warning about editing something dangerous -->
-<div class="wrapper wrapper-notification wrapper-notification-warning" id="notification-dangerous">
+<div class="wrapper wrapper-notification wrapper-notification-warning" id="notification-dangerous" aria-hidden="true" role="dialog" aria-labelledby="notification-dangerous-title" aria-describedby="notification-dangerous-description">
   <div class="notification warning has-actions">
     <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
     <div class="copy">
-      <h2 class="title title-3">Are You Sure You Want to Edit That?</h2>
-      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      <h2 class="title title-3" id="notification-dangerous-title">Are You Sure You Want to Edit That?</h2>
+      <p class="message" id="notification-dangerous-description">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
 
     <nav class="nav-actions">
@@ -454,7 +444,7 @@
     <i class="ss-icon ss-symbolicons-block icon icon-saving">&#x2699;</i>
 
     <div class="copy">
-      <h2 class="title title-3">Saving &hellip;</h2>
+      <h2 class="title title-3" role="status">Saving &hellip;</h2>
     </div>
   </div>
 </div>
@@ -465,7 +455,7 @@
     <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
 
     <div class="copy">
-      <h2 class="title title-3"><a href="#">Your Section</a> Has Been Created</h2>
+      <h2 class="title title-3" role="status"><a href="#">Your Section</a> Has Been Created</h2>
     </div>
   </div>
 </div>
@@ -490,11 +480,11 @@
 
 <%block name="view_prompts">
 <!-- prompt - confirm deletion -->
-<div class="wrapper wrapper-prompt wrapper-prompt-confirm" id="prompt-confirm">
+<div class="wrapper wrapper-prompt wrapper-prompt-confirm" id="prompt-confirm" aria-hidden="true" role="dialog" aria-labelledby="prompt-confirm-sectionDelete-title" aria-describedby="prompt-confirm-sectionDelete-description">
   <div class="prompt confirm">
     <div class="copy">
-      <h2 class="title title-3">Delete "Introduction &amp; Overview"?</h2>
-      <p class="message">Deleting a section cannot be undone and its contents cannot be recovered.</p>
+      <h2 class="title title-3" id="prompt-confirm-sectionDelete-title">Delete "Introduction &amp; Overview"?</h2>
+      <p class="message" id="prompt-confirm-sectionDelete-description">Deleting a section cannot be undone and its contents cannot be recovered.</p>
     </div>
 
     <nav class="nav-actions">
@@ -512,11 +502,11 @@
 </div>
 
 <!-- prompt - warning -->
-<div class="wrapper wrapper-prompt wrapper-prompt-warning" id="prompt-warning">
+<div class="wrapper wrapper-prompt wrapper-prompt-warning" id="prompt-warning" aria-hidden="true" role="dialog" aria-labelledby="prompt-warning-useAdvanced-title" aria-describedby="prompt-warning-useAdvanced-description">
   <div class="prompt warning">
     <div class="copy">
-      <h2 class="title title-3">Use Advanced Problem Editor?</h2>
-      <p class="message">If you proceed, you cannot edit this problem using the simple problem editor.</p>
+      <h2 class="title title-3" id="prompt-warning-useAdvanced-title">Use Advanced Problem Editor?</h2>
+      <p class="message" id="prompt-warning-useAdvanced-description">If you proceed, you cannot edit this problem using the simple problem editor.</p>
     </div>
 
     <nav class="nav-actions">
@@ -534,11 +524,11 @@
 </div>
 
 <!-- prompt - error -->
-<div class="wrapper wrapper-prompt wrapper-prompt-error" id="prompt-error">
+<div class="wrapper wrapper-prompt wrapper-prompt-error" id="prompt-error" aria-hidden="true" role="dialog" aria-labelledby="prompt-errorUser-title" aria-describedby="prompt-errorUser-description">
   <div class="prompt error">
     <div class="copy">
-      <h2 class="title title-3">There Were Errors in Your Submission</h2>
-      <p class="message">Please correct the errors noted on the page and try again.</p>
+      <h2 class="title title-3" id="prompt-errorUser-title">There Were Errors in Your Submission</h2>
+      <p class="message" id="prompt-errorUser-description">Please correct the errors noted on the page and try again.</p>
     </div>
 
     <nav class="nav-actions">

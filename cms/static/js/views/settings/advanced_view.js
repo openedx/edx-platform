@@ -104,10 +104,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         $(".wrapper-alert").removeClass("is-shown");
         if (type) {
             if (type === this.error_saving) {
-                $(".wrapper-alert-error").addClass("is-shown");
+                $(".wrapper-alert-error").addClass("is-shown").attr('aria-hidden','false');
             }
             else if (type === this.successful_changes) {
-                $(".wrapper-alert-confirmation").addClass("is-shown");
+                $(".wrapper-alert-confirmation").addClass("is-shown").attr('aria-hidden','false');
                 this.hideSaveCancelButtons();
             }
         }
@@ -119,13 +119,13 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     showSaveCancelButtons: function(event) {
         if (!this.notificationBarShowing) {
             this.$el.find(".message-status").removeClass("is-shown");
-            $('.wrapper-notification').removeClass('is-hiding').addClass('is-shown');
+            $('.wrapper-notification').removeClass('is-hiding').addClass('is-shown').attr('aria-hidden','false');
             this.notificationBarShowing = true;
         }
     },
     hideSaveCancelButtons: function() {
         if (this.notificationBarShowing) {
-            $('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
+            $('.wrapper-notification').removeClass('is-shown').addClass('is-hiding').attr('aria-hidden','true');
             this.notificationBarShowing = false;
         }
     },
