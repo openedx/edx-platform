@@ -382,7 +382,7 @@ class ImportTestCase(BaseCourseTestCase):
 
             self.assertEqual(len(video.url_name), len('video_') + 12)
 
-    def test_poll_and_conditional_xmodule(self):
+    def test_poll_and_conditional_import(self):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['conditional_and_poll'])
 
         course = modulestore.get_courses()[0]
@@ -422,6 +422,22 @@ class ImportTestCase(BaseCourseTestCase):
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
         self.assertEqual(gst_sample.render, render_string_from_sample_gst_xml)
+
+    def test_word_cloud_import(self):
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['word_cloud'])
+
+        course = modulestore.get_courses()[0]
+        chapters = course.get_children()
+        ch1 = chapters[0]
+        sections = ch1.get_children()
+
+        self.assertEqual(len(sections), 1)
+
+        location = course.location
+        location = Location(location.tag, location.org, location.course,
+            'sequential', 'Problem_Demos')
+        module = modulestore.get_instance(course.id, location)
+        self.assertEqual(len(module.children), 2)
 
     def test_cohort_config(self):
         """
