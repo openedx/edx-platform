@@ -3,6 +3,20 @@
     class="${element_class}"
     data-ajax-url="${ajax_url}"
 >
+
+    <section id="input-cloud-section">
+        % for row in range(num_inputs):
+            <input class="input-cloud" type="text" size="40" />
+        % endfor
+
+        <section class="action">
+            <input class="save" type="button" value="Save" />
+        </section>
+    </section>
+
+    <section id="result-cloud-section" style="display: none;">
+    </section>
+
     <!-- Hidden field to read configuration JSON from. -->
     <div class="${element_class}_div" id="${element_id}_json" style="display: none;">${configuration_json}</div>
 </section>

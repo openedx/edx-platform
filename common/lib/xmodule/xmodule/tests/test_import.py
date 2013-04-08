@@ -437,7 +437,7 @@ class ImportTestCase(BaseCourseTestCase):
         location = Location(location.tag, location.org, location.course,
             'sequential', 'Problem_Demos')
         module = modulestore.get_instance(course.id, location)
-        self.assertEqual(len(module.children), 2)
+        self.assertEqual(len(module.children), 1)
 
     def test_cohort_config(self):
         """
