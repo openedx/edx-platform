@@ -48,6 +48,18 @@ $(document).ready(function () {
         (e).preventDefault();
     });
 
+    // alerts - manual close
+    $('.action-alert-close, .alert.has-actions .nav-actions a').click(function(e) {
+        (e).preventDefault();
+        $(this).closest('.wrapper-alert').removeClass('is-shown');
+    });
+
+    // notifications - manual & action-based close
+    $('.action-notification-close').click(function(e) {
+        (e).preventDefault();
+        $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding');
+    });
+
     // nav - dropdown related
     $body.click(function (e) {
         $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
