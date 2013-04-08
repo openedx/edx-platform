@@ -4,7 +4,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-from contentstore import utils 
+from contentstore import utils
 %>
 
 
@@ -13,17 +13,17 @@ from contentstore import utils
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
   <script src="${static.url('js/vendor/date.js')}"></script>
-  
+
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
-  
+
   <script type="text/javascript">
     $(document).ready(function(){
-      
+
       // hilighting labels when fields are focused in
       $("form :input").focus(function() {
         $("label[for='" + this.id + "']").addClass("is-focused");
@@ -32,18 +32,18 @@ from contentstore import utils
         });
       var model = new CMS.Models.Settings.CourseDetails();
       model.urlRoot = '${details_url}';
-      model.fetch({success : 
+      model.fetch({success :
           function(model) {
               var editor = new CMS.Views.Settings.Details({
                   el: $('.settings-details'),
                   model: model
                 });
-                
+
               editor.render();
           }
       });
     });
-      
+
   </script>
 </%block>
 
@@ -62,10 +62,24 @@ from contentstore import utils
     <article class="content-primary" role="main">
       <form id="settings_details" class="settings-details" method="post" action="">
         <section class="group-settings basic">
-              <header>
+          <header>
             <h2 class="title-2">Basic Information</h2>
             <span class="tip">The nuts and bolts of your course</span>
-              </header>
+          </header>
+
+          <div class="note note-promotion note-promotion-courseURL">
+            <h3 class="title">Your Course's Live URL</h3>
+            <div class="copy">
+              <p>Students can enroll in and access ${context_course.display_name_with_default} at: <a rel="external" href="${utils.get_lms_link_for_about_page(course_location)}" />${utils.get_lms_link_for_about_page(course_location)}</a></p>
+            </div>
+
+            <ul class="list-actions">
+              <li class="action-item">
+                <a href="" class="action action-primary"><i class="ss-icon icon ss-symbolicons-block icon icon-inline icon-announcement">&#xEC00;</i> Download Studio Documentation</a>
+                <span class="tip">How to use Studio to build your course</span>
+              </li>
+            </ul>
+          </div>
 
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
@@ -83,45 +97,44 @@ from contentstore import utils
               <input title="This field is disabled: this information cannot be changed." type="text" class="long" id="course-name" value="[Course Name]" readonly />
             </li>
           </ol>
-          <span class="tip tip-stacked">These are used in <a rel="external" href="${utils.get_lms_link_for_about_page(course_location)}" />your course URL</a>, and cannot be changed</span>
         </section>
 
-            <hr class="divide" />
+        <hr class="divide" />
 
         <section class="group-settings schedule">
-              <header>
+          <header>
             <h2 class="title-2">Course Schedule</h2>
             <span class="tip">Important steps and segments of your course</span>
-              </header>
+          </header>
 
           <ol class="list-input">
             <li class="field-group field-group-course-start" id="course-start">
               <div class="field date" id="field-course-start-date">
                 <label for="course-start-date">Course Start Date</label>
                 <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                      <span class="tip tip-stacked">First day the course begins</span>          
-                    </div>
+                <span class="tip tip-stacked">First day the course begins</span>
+              </div>
 
               <div class="field time" id="field-course-start-time">
                 <label for="course-start-time">Course Start Time</label>
                 <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off" />
-                      <span class="tip tip-stacked" id="timezone"></span>          
-                    </div>
+                <span class="tip tip-stacked" id="timezone"></span>
+              </div>
             </li>
 
             <li class="field-group field-group-course-end" id="course-end">
               <div class="field date" id="field-course-end-date">
                 <label for="course-end-date">Course End Date</label>
                 <input type="text" class="end-date date end" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">Last day your course is active</span>              
-                    </div>
+                <span class="tip tip-stacked">Last day your course is active</span>
+              </div>
 
               <div class="field time" id="field-course-end-time">
                 <label for="course-end-time">Course End Time</label>
                 <input type="text" class="time end" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off" />
-                      <span class="tip tip-stacked" id="timezone"></span>          
-                    </div>
-            </li>           
+                <span class="tip tip-stacked" id="timezone"></span>
+              </div>
+            </li>
           </ol>
 
           <ol class="list-input">
@@ -129,33 +142,33 @@ from contentstore import utils
               <div class="field date" id="field-enrollment-start-date">
                 <label for="course-enrollment-start-date">Enrollment Start Date</label>
                 <input type="text" class="start-date date start" id="course-enrollment-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                      <span class="tip tip-stacked">First day students can enroll</span>          
-                    </div>
+                <span class="tip tip-stacked">First day students can enroll</span>
+              </div>
 
               <div class="field time" id="field-enrollment-start-time">
                 <label for="course-enrollment-start-time">Enrollment Start Time</label>
                 <input type="text" class="time start" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off" />
-                      <span class="tip tip-stacked" id="timezone"></span>           
-                    </div>
+                <span class="tip tip-stacked" id="timezone"></span>
+              </div>
             </li>
 
             <li class="field-group field-group-enrollment-end" id="enrollment-end">
               <div class="field date" id="field-enrollment-end-date">
                 <label for="course-enrollment-end-date">Enrollment End Date</label>
                 <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                      <span class="tip tip-stacked">Last day students can enroll</span>          
-                    </div>
+                <span class="tip tip-stacked">Last day students can enroll</span>
+              </div>
 
               <div class="field time" id="field-enrollment-end-time">
                 <label for="course-enrollment-end-time">Enrollment End Time</label>
                 <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
-                      <span class="tip tip-stacked" id="timezone"></span>           
-                    </div>
-            </li> 
+                <span class="tip tip-stacked" id="timezone"></span>
+              </div>
+            </li>
           </ol>
         </section>
 
-            <hr class="divide" />
+        <hr class="divide" />
 
         <section class="group-settings marketing">
           <header>
@@ -172,40 +185,39 @@ from contentstore import utils
 
             <li class="field video" id="field-course-introduction-video">
               <label for="course-overview">Course Introduction Video</label>
-                  <div class="input input-existing">
-                    <div class="current current-course-introduction-video">
+              <div class="input input-existing">
+                <div class="current current-course-introduction-video">
                   <iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>
-
-                    </div>
+                </div>
                 <div class="actions">
                   <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span> Delete Current Video</a>
                 </div>
-                  </div>
+              </div>
 
-                  <div class="input">
+              <div class="input">
                 <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
                 <span class="tip tip-stacked">Enter your YouTube video's ID (along with any restriction parameters)</span>
-                  </div>
+              </div>
             </li>
           </ol>
         </section>
 
-            <hr class="divide" />
+        <hr class="divide" />
 
         <section class="group-settings requirements">
-              <header>
+          <header>
             <h2 class="title-2">Requirements</h2>
             <span class="tip">Expectations of the students taking this course</span>
-              </header>
+          </header>
 
           <ol class="list-input">
             <li class="field text" id="field-course-effort">
               <label for="course-effort">Hours of Effort per Week</label>
               <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
-                    <span class="tip tip-inline">Time spent on all course work</span>
-                    </li>
-                      </ol>
-            </section>
+              <span class="tip tip-inline">Time spent on all course work</span>
+            </li>
+          </ol>
+        </section>
       </form>
     </article>
 
@@ -215,7 +227,7 @@ from contentstore import utils
         <p>Your course's schedule settings determine when students can enroll in and begin a course as well as when the course.</p>
 
         <p>Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.</p>
-                </div>
+      </div>
 
       <div class="bit">
       % if context_course:

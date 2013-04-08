@@ -161,7 +161,7 @@ body.course.settings {
           @include placeholder($gray-l4);
           @include font-size(16);
           @include size(100%,100%);
-          padding: ($baseline/2);       
+          padding: ($baseline/2);
 
           &.long {
           }
@@ -212,7 +212,7 @@ body.course.settings {
           padding: $baseline;
 
           &:last-child {
-            padding-bottom: $baseline; 
+            padding-bottom: $baseline;
           }
 
           .actions {
@@ -238,22 +238,6 @@ body.course.settings {
       }
     }
 
-    // not editable fields
-    .field.is-not-editable {
-     
-      & label.is-focused {
-       color: $gray-d2;
-      }
-    }
-
-    // field with error
-    .field.error {
-
-      input, textarea {
-        border-color: $red;
-      }
-    }
-     
     // specific fields - basic
     &.basic {
 
@@ -322,7 +306,7 @@ body.course.settings {
         }
       }
     }
-    
+
     // specific fields - overview
     #field-course-overview {
 
@@ -468,7 +452,7 @@ body.course.settings {
               }
             }
           }
-          
+
           .grade-specific-bar {
             height: 50px !important;
           }
@@ -479,7 +463,7 @@ body.course.settings {
             li {
               position: absolute;
               top: 0;
-              height: 50px;     
+              height: 50px;
               text-align: right;
               @include border-radius(2px);
 
@@ -600,8 +584,8 @@ body.course.settings {
         }
 
         #field-course-grading-assignment-shortname,
-        #field-course-grading-assignment-totalassignments, 
-        #field-course-grading-assignment-gradeweight, 
+        #field-course-grading-assignment-totalassignments,
+        #field-course-grading-assignment-gradeweight,
         #field-course-grading-assignment-droppable {
           width: flex-grid(2, 6);
         }

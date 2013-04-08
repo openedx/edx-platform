@@ -30,7 +30,49 @@ textarea.text {
   }
 }
 
-// forms - specific
+// ====================
+
+// forms - fields - not editable
+.field.is-not-editable {
+
+  & label.is-focused {
+   color: $gray-d2;
+  }
+
+  input, textarea {
+    pointer-events: none;
+  }
+}
+
+// ====================
+
+// field with error
+.field.error {
+
+  input, textarea {
+    border-color: $red;
+  }
+}
+
+// ====================
+
+// forms - additional UI
+form {
+
+  .note {
+    @include box-sizing(border-box);
+    padding: $baseline;
+    background: $gray-l4;
+  }
+
+  .note-promotion {
+
+  }
+}
+
+// ====================
+
+// forms - grandfathered
 input.search {
   padding: 6px 15px 8px 30px;
   @include box-sizing(border-box);
