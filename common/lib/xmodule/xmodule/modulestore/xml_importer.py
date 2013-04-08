@@ -302,6 +302,7 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
             # Ignore any missing keys in _model_data
             pass
 
+    module_data = {}
     if 'data' in content:
         module_data = content['data']
 
@@ -324,13 +325,15 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
                 for key in remap_dict.keys():
                     module_data = module_data.replace(key, remap_dict[key])
 
-        except Exception, e:
+        except Exception:
             logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
+    else:
+        module_data = content
 
-        if allow_not_found:
-            store.update_item(module.location, module_data, allow_not_found=allow_not_found)
-        else:
-            store.update_item(module.location, module_data)
+    if allow_not_found:
+        store.update_item(module.location, module_data, allow_not_found=allow_not_found)
+    else:
+        store.update_item(module.location, module_data)
 
     if hasattr(module, 'children') and module.children != []:
         store.update_children(module.location, module.children)
