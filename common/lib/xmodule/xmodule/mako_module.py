@@ -46,15 +46,9 @@ class MakoModuleDescriptor(XModuleDescriptor):
     @property
     def editable_metadata_fields(self):
         fields = {}
-        for field in self.fields + self.lms.fields:
-            if field.scope != Scope.settings:
+        for field, value in own_metadata(self).items():
+            if field in self.system_metadata_fields:
                 continue
 
-            if field.name in self.system_metadata_fields:
-                continue
-
-            if field.name in self._model_data:
-                fields[field.name] = self._model_data[field.name]
-            elif field.name in self._inherited_metadata:
-                fields[field.name] = self._inherited_metadata[field.name]
+            fields[field] = value
         return fields
