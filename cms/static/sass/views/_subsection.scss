@@ -1,0 +1,403 @@
+// studio - views - course subsection
+// ====================
+
+body.course.subsection {
+
+  .main-wrapper {
+    margin-top: ($baseline*2);
+  }
+
+  .unit-settings {
+    .window-contents {
+      padding: 10px 20px;
+    }
+
+    .datepair {
+
+      .field {
+        display: inline-block;
+        margin-right: ($baseline/4);
+        width: 45%;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        label, input {
+          display: block;
+          text-align: left;
+        }
+
+        input {
+          width: 100%;
+        }
+
+        label {
+          margin-bottom: ($baseline/4);
+        }
+      }
+    }
+
+    .unit-actions {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .published-alert {
+      display: none;
+      padding: 10px;
+      border: 1px solid #edbd3c;
+      border-radius: 3px;
+      background: #fbf6e1;
+      font-size: 14px;
+      line-height: 1.4;
+
+      div {
+        margin-top: 15px;
+      }
+    }
+
+    input[type="radio"] {
+        margin-right: 7px;
+    }
+
+    .status {
+      font-size: 12px;
+
+      strong {
+        font-weight: 700;
+      }
+    }
+
+    .preview-button, .view-button {
+      @include white-button;
+      margin-bottom: 10px;
+    }
+
+    .publish-button {
+      @include orange-button;
+    }
+
+    .delete-button {
+      @include blue-button;
+    }
+
+    .delete-draft {
+      display: inline-block;
+    }
+
+    .delete-button,
+    .preview-button,
+    .publish-button,
+    .view-button {
+      font-size: 11px;
+      margin-top: 10px;
+      padding: 6px 15px 8px;
+    }
+  }
+
+  .unit-history {
+    &.collapsed {
+      h4 {
+        border-bottom: none;
+        border-radius: 3px;
+      }
+
+      .window-contents {
+        display: none;
+      }
+    }
+
+    ol {
+      border: 1px solid #ced2db;
+
+      li {
+        display: block;
+        padding: 6px 8px 8px 10px;
+        background: #edf1f5;
+        font-size: 12px;
+
+        &:hover {
+          background: #fffcf1;
+
+          .item-actions {
+            display: block;
+          }
+        }
+
+        &.checked {
+          background: #d1dae3;
+        }
+
+        .item-actions {
+          display: none;
+        }
+
+        input[type="radio"] {
+          margin-right: 7px;
+        }
+      }
+    }
+  }
+
+  .unit-location {
+    .url {
+      width: 100%;
+      margin-bottom: 10px;
+      @include box-shadow(none);
+    }
+
+    .draft-tag,
+    .hidden-tag,
+    .private-tag,
+    .has-new-draft-tag {
+      font-size: 8px;
+    }
+
+    .window-contents > ol {
+      @include tree-view;
+
+      .section-item {
+        display: inline-block;
+        width: 100%;
+        font-size: 11px;
+        padding: 2px 8px 4px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        @include box-sizing(border-box);
+      }
+
+      ol {
+        .section-item {
+          padding-left: 20px;
+        }
+
+        .new-unit-item {
+          margin-left: 20px;
+        }
+      }
+
+      ol ol {
+        .section-item {
+          padding-left: 34px;
+        }
+
+        .new-unit-item {
+          margin: 0 0 10px 41px;
+        }
+      }
+    }
+  }
+
+  .subsection-body {
+    padding: 32px 40px;
+    @include clearfix;
+
+    > div {
+      margin-bottom: 40px;
+    }
+
+    input {
+      font-size: 14px;
+    }
+
+    .sortable-unit-list {
+      ol {
+        @include tree-view;
+      }
+    }
+  }
+
+  .subsection-name-input {
+    label {
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      font-size: 20px;
+    }
+  }
+
+  .scheduled-date-input,
+  .due-date-input {
+    @include clearfix;
+
+    .date-input,
+    .time-input {
+      display: inline-block;
+      width: 100px;
+    }
+
+    .inherits-check {
+      label {
+        font-size: 13px;
+      }
+    }
+
+    .notice {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #999;
+    }
+  }
+
+  .due-date-input {
+    label {
+      display: inline-block !important;
+      margin-right: 10px;
+    }
+
+    a {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .date-setter {
+      @include clearfix;
+      display: none;
+    }
+
+    .remove-date {
+      display: block;
+      margin-top: ($baseline/4);
+    }
+  }
+
+  .row.visibility {
+    label {
+      display: inline-block !important;
+      margin-right: 10px;
+      line-height: 21px;
+    }
+
+    a {
+      display: inline-block;
+      height: 31px;
+      margin-right: 8px;
+      vertical-align: middle;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 31px;
+      text-transform: uppercase;
+    }
+
+    .large-toggle {
+      width: 41px;
+      background: url(../img/large-toggles.png) no-repeat;
+      background-position: 0 -50px;
+
+      .hidden {
+        background-position: 0 -5px;
+      }
+    }
+  }
+
+  .gradable {
+
+    label {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .gradable-status {
+      position: relative;
+      top: -4px;
+      display: inline-block;
+      margin-left: 10px;
+      width: 65%;
+
+      .status-label {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        color: $blue;
+        border: none;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .menu-toggle {
+        z-index: 100;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 20px;
+        background: transparent;
+
+        &:hover, &.is-active {
+                color: $blue;
+        }
+      }
+
+      .menu {
+        z-index: 1;
+        position: absolute;
+        top: -12px;
+        left: -7px;
+        display: none;
+        width: 100%;
+        margin: 0;
+        padding: 8px 12px;
+        opacity: 0.0;
+        background: $white;
+        border: 1px solid $mediumGrey;
+        font-size: 12px;
+        @include border-radius(4px);
+        @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
+        @include transition(opacity .15s);
+
+
+        li {
+          margin-bottom: 3px;
+          padding-bottom: 3px;
+          border-bottom: 1px solid $lightGrey;
+
+          &:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border: none;
+          }
+        }
+
+        a {
+
+          &.is-selected {
+            font-weight: bold;
+          }
+        }
+      }
+
+      // dropdown state
+      &.is-active {
+
+        .menu {
+          z-index: 10000;
+          display: block;
+          opacity: 1.0;
+        }
+
+        .menu-toggle {
+          z-index: 1000;
+        }
+      }
+
+      // set state
+      &.is-set {
+
+        .menu-toggle {
+          color: $blue;
+        }
+
+        .status-label {
+          display: block;
+          color: $blue;
+        }
+      }
+    }
+  }
+}

@@ -1,9 +1,7 @@
 <%inherit file="base.html" />
 <%!
-   from time import mktime
-   import dateutil.parser
    import logging
-   from datetime import datetime
+   from xmodule.util.date_utils import get_time_struct_display
 %>
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">Course Outline</%block>
@@ -106,20 +104,6 @@
 </%block>
 
 <%block name="content">
-  <div class="edit-subsection-publish-settings">
-    <div class="settings">
-      <h3>Section Release Date</h3>
-      <div class="picker datepair">
-        <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-        <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-        <div class="description">
-          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
-        </div>
-      </div>
-      <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
-    </div>
-  </div>
-
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
       <div class="title">
@@ -163,15 +147,14 @@
               </h3>
               <div class="section-published-date">
                 <%
-                  start_date = datetime.fromtimestamp(mktime(section.lms.start)) if section.lms.start is not None else None
-                  start_date_str = start_date.strftime('%m/%d/%Y') if start_date is not None else ''
-                  start_time_str = start_date.strftime('%H:%M') if start_date is not None else ''
+                  start_date_str = get_time_struct_display(section.lms.start, '%m/%d/%Y')
+                  start_time_str = get_time_struct_display(section.lms.start, '%H:%M')
                 %>
-                %if start_date is None:
+                %if section.lms.start is None:
                   <span class="published-status">This section has not been released.</span>
                   <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">Schedule</a>
                 %else:
-                  <span class="published-status"><strong>Will Release:</strong> ${start_date_str} at ${start_time_str}</span>
+                  <span class="published-status"><strong>Will Release:</strong> ${get_time_struct_display(section.lms.start, '%m/%d/%Y at %H:%M UTC')}</span>
                   <a href="#" class="edit-button" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}">Edit</a>
                 %endif
               </div>
@@ -200,7 +183,7 @@
                     </a>
                   </div>
 
-                  <div class="gradable-status" data-initial-status="${subsection.lms.format if section.lms.format is not None else 'Not Graded'}">
+                  <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else 'Not Graded'}">
                   </div>
 
                   <div class="item-actions">
@@ -219,4 +202,25 @@
     </div>
   </div>
   <footer></footer>
+
+  <div class="edit-subsection-publish-settings">
+    <div class="settings">
+      <h3>Section Release Date</h3>
+      <div class="picker datepair">
+        <div class="field field-start-date">
+          <label for="">Release Day</label>
+          <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+        </div>
+        <div class="field field-start-time">
+          <label for="">Release Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
+          <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+        </div>
+
+        <div class="description">
+          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
+        </div>
+      </div>
+      <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
+    </div>
+  </div>
 </%block>

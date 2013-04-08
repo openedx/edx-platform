@@ -23,13 +23,13 @@
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-symbolicons-block.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
 
+    <%include file="widgets/segment-io.html" />
+
     <%block name="header_extras"></%block>
   </head>
 
   <body class="<%block name='bodyclass'></%block> hide-wip">
-    <%include file="widgets/header.html" />
     <%include file="courseware_vendor_js.html"/>
-
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
@@ -45,6 +45,7 @@
     <script src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>
     <script src="${static.url('js/vendor/jquery.tablednd.js')}"></script>
     <script src="${static.url('js/vendor/jquery.form.js')}"></script>
+    <script src="${static.url('js/vendor/jquery.smooth-scroll.min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/htmlmixed.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
     <script type="text/javascript">
@@ -52,11 +53,18 @@
           document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
     </script>
 
+    <%include file="widgets/header.html" />
+    
     <%block name="content"></%block>
+    
+    % if user.is_authenticated():
+    <%include file="widgets/sock.html" />
+    % endif
+    
     <%include file="widgets/footer.html" />
-
+    <%include file="widgets/tender.html" />
     <%block name="jsextra"></%block>
   </body>
+
+  <%include file="widgets/qualaroo.html" />
 </html>
-
-

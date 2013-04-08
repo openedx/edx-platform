@@ -4,6 +4,8 @@ import mimetypes
 from lxml.html import rewrite_links as lxml_rewrite_links
 from path import path
 
+from xblock.core import Scope
+
 from .xml import XMLModuleStore
 from .exceptions import DuplicateItemError
 from xmodule.modulestore import Location
@@ -201,100 +203,129 @@ def import_from_xml(store, data_dir, course_dirs=None,
     course_items = []
     for course_id in module_store.modules.keys():
 
-        course_data_path = None
-        course_location = None
+        if target_location_namespace is not None:
+            pseudo_course_id = '/'.join([target_location_namespace.org, target_location_namespace.course])
+        else:
+            course_id_components = course_id.split('/')
+            pseudo_course_id = '/'.join([course_id_components[0], course_id_components[1]])
 
-        if verbose:
-            log.debug("Scanning {0} for course module...".format(course_id))
+        try:
+            # turn off all write signalling while importing as this is a high volume operation
+            if pseudo_course_id not in store.ignore_write_events_on_courses:
+                store.ignore_write_events_on_courses.append(pseudo_course_id)
 
-        # Quick scan to get course module as we need some info from there. Also we need to make sure that the
-        # course module is committed first into the store
-        for module in module_store.modules[course_id].itervalues():
-            if module.category == 'course':
-                course_data_path = path(data_dir) / module.data_dir
-                course_location = module.location
-
-                module = remap_namespace(module, target_location_namespace)
-
-                # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
-                # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
-                # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
-                # if there is *any* tabs - then there at least needs to be some predefined ones
-                if module.tabs is None or len(module.tabs) == 0:
-                    module.tabs = [{"type": "courseware"},
-                        {"type": "course_info", "name": "Course Info"}, 
-                        {"type": "discussion", "name": "Discussion"},
-                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
-
-
-                if hasattr(module, 'data'):
-                    store.update_item(module.location, module.data)
-                store.update_children(module.location, module.children)
-                store.update_metadata(module.location, dict(own_metadata(module)))
-
-                # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
-                # so let's make sure we import in case there are no other references to it in the modules
-                verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
-
-                course_items.append(module)
-
-
-        # then import all the static content
-        if static_content_store is not None:
-            _namespace_rename = target_location_namespace if target_location_namespace is not None else course_location
-
-            # first pass to find everything in /static/
-            import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store,
-                _namespace_rename, subpath='static', verbose=verbose)
-
-        # finally loop through all the modules
-        for module in module_store.modules[course_id].itervalues():
-
-            if module.category == 'course':
-                # we've already saved the course module up at the top of the loop
-                # so just skip over it in the inner loop
-                continue
-
-            # remap module to the new namespace
-            if target_location_namespace is not None:
-                module = remap_namespace(module, target_location_namespace)
+            course_data_path = None
+            course_location = None
 
             if verbose:
-                log.debug('importing module location {0}'.format(module.location))
+                log.debug("Scanning {0} for course module...".format(course_id))
 
-            if hasattr(module, 'data'):
-                module_data = module.data
+            # Quick scan to get course module as we need some info from there. Also we need to make sure that the
+            # course module is committed first into the store
+            for module in module_store.modules[course_id].itervalues():
+                if module.category == 'course':
+                    course_data_path = path(data_dir) / module.data_dir
+                    course_location = module.location
 
-                # cdodge: now go through any link references to '/static/' and make sure we've imported
-                # it as a StaticContent asset
-                try:
-                    remap_dict = {}
+                    module = remap_namespace(module, target_location_namespace)
 
-                    # use the rewrite_links as a utility means to enumerate through all links
-                    # in the module data. We use that to load that reference into our asset store
-                    # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
-                    # do the rewrites natively in that code.
-                    # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
-                    # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
-                    # no good, so we have to do this kludge
-                    if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                        lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path,
-                            static_content_store, link, remap_dict))                     
+                    # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
+                    # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
+                    # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
+                    # if there is *any* tabs - then there at least needs to be some predefined ones
+                    if module.tabs is None or len(module.tabs) == 0:
+                        module.tabs = [{"type": "courseware"},
+                            {"type": "course_info", "name": "Course Info"}, 
+                            {"type": "discussion", "name": "Discussion"},
+                            {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
-                        for key in remap_dict.keys():
-                            module_data = module_data.replace(key, remap_dict[key])
 
-                except Exception, e:
-                    logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
+                    if hasattr(module, 'data'):
+                        store.update_item(module.location, module.data)
+                    store.update_children(module.location, module.children)
+                    store.update_metadata(module.location, dict(own_metadata(module)))
+
+                    # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
+                    # so let's make sure we import in case there are no other references to it in the modules
+                    verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
+
+                    course_items.append(module)
+
+
+            # then import all the static content
+            if static_content_store is not None:
+                _namespace_rename = target_location_namespace if target_location_namespace is not None else course_location
+
+                # first pass to find everything in /static/
+                import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store,
+                    _namespace_rename, subpath='static', verbose=verbose)
+
+            # finally loop through all the modules
+            for module in module_store.modules[course_id].itervalues():
+
+                if module.category == 'course':
+                    # we've already saved the course module up at the top of the loop
+                    # so just skip over it in the inner loop
+                    continue
+
+                # remap module to the new namespace
+                if target_location_namespace is not None:
+                    module = remap_namespace(module, target_location_namespace)
+
+                if verbose:
+                    log.debug('importing module location {0}'.format(module.location))
+
+                content = {}
+                for field in module.fields:
+                    if field.scope != Scope.content:
+                        continue
+                    try:
+                        content[field.name] = module._model_data[field.name]
+                    except KeyError:
+                        # Ignore any missing keys in _model_data
+                        pass
+
+                if 'data' in content:
+                    module_data = content['data']
+
+                    # cdodge: now go through any link references to '/static/' and make sure we've imported
+                    # it as a StaticContent asset
+                    try:
+                        remap_dict = {}
+
+                        # use the rewrite_links as a utility means to enumerate through all links
+                        # in the module data. We use that to load that reference into our asset store
+                        # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
+                        # do the rewrites natively in that code.
+                        # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
+                        # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
+                        # no good, so we have to do this kludge
+                        if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
+                            lxml_rewrite_links(module_data,
+                                               lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
+
+                            for key in remap_dict.keys():
+                                module_data = module_data.replace(key, remap_dict[key])
+
+                    except Exception:
+                        logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
+                else:
+                    module_data = content
 
                 store.update_item(module.location, module_data)
 
-            if hasattr(module, 'children') and module.children != []:
-                store.update_children(module.location, module.children)
+                if hasattr(module, 'children') and module.children != []:
+                    store.update_children(module.location, module.children)
 
-            # NOTE: It's important to use own_metadata here to avoid writing
-            # inherited metadata everywhere.
-            store.update_metadata(module.location, dict(own_metadata(module)))
+                # NOTE: It's important to use own_metadata here to avoid writing
+                # inherited metadata everywhere.
+                store.update_metadata(module.location, dict(own_metadata(module)))
+        finally:
+            # turn back on all write signalling
+            if pseudo_course_id  in store.ignore_write_events_on_courses:
+                store.ignore_write_events_on_courses.remove(pseudo_course_id)
+                store.refresh_cached_metadata_inheritance_tree(target_location_namespace if 
+                    target_location_namespace is not None else course_location)
 
     return module_store, course_items
 
@@ -326,6 +357,48 @@ def remap_namespace(module, target_location_namespace):
             module.children = new_locs
 
     return module
+
+
+def allowed_metadata_by_category(category):
+    # should this be in the descriptors?!?
+    return {
+        'vertical': [],
+        'chapter': ['start'],
+        'sequential': ['due', 'format', 'start', 'graded']
+    }.get(category,['*'])
+
+
+def check_module_metadata_editability(module):
+    '''
+    Assert that there is no metadata within a particular module that we can't support editing
+    However we always allow 'display_name' and 'xml_attribtues'
+    '''
+    allowed = allowed_metadata_by_category(module.location.category)
+    if '*' in allowed:
+        # everything is allowed
+        return 0
+
+    allowed = allowed + ['xml_attributes', 'display_name']
+    err_cnt = 0
+    my_metadata = dict(own_metadata(module))
+    illegal_keys = set(own_metadata(module).keys()) - set(allowed)
+
+    if len(illegal_keys) > 0:
+        err_cnt = err_cnt + 1
+        print ': found non-editable metadata on {0}. These metadata keys are not supported = {1}'. format(module.location.url(), illegal_keys)
+
+    return err_cnt
+
+
+def validate_no_non_editable_metadata(module_store, course_id, category):
+    err_cnt = 0
+    for module_loc in module_store.modules[course_id]:
+        module = module_store.modules[course_id][module_loc]
+        if module.location.category == category:
+            err_cnt = err_cnt + check_module_metadata_editability(module)
+
+    return err_cnt
+
 
 def validate_category_hierarchy(module_store, course_id, parent_category, expected_child_category):
     err_cnt = 0
@@ -411,6 +484,12 @@ def perform_xlint(data_dir, course_dirs,
         err_cnt += validate_category_hierarchy(module_store, course_id, "chapter", "sequential")
         # constrain that sequentials only have 'verticals'
         err_cnt += validate_category_hierarchy(module_store, course_id, "sequential", "vertical")
+        # don't allow metadata on verticals, since we can't edit them in studio
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "vertical")
+        # don't allow metadata on chapters, since we can't edit them in studio
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "chapter")
+        # don't allow metadata on sequences that we can't edit
+        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "sequential")
 
         # check for a presence of a course marketing video
         location_elements = course_id.split('/')
@@ -427,3 +506,5 @@ def perform_xlint(data_dir, course_dirs,
         print "This course can be imported, but some errors may occur during the run of the course. It is recommend that you fix your courseware before importing"
     else:
         print "This course can be imported successfully."
+
+    return err_cnt

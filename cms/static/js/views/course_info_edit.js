@@ -107,6 +107,11 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         // push change to display, hide the editor, submit the change        
         targetModel.save({}, {error : CMS.ServerError});
         this.closeEditor(this);
+
+        analytics.track('Saved Course Update', {
+            'course': course_location_analytics,
+            'date': this.dateEntry(event).val() 
+        });
     },
     
     onCancel: function(event) {
@@ -142,8 +147,16 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
 
     onDelete: function(event) {
         event.preventDefault();
-        // TODO ask for confirmation
-        // remove the dom element and delete the model
+
+        if (!confirm('Are you sure you want to delete this update? This action cannot be undone.')) {
+            return;
+        }
+
+        analytics.track('Deleted Course Update', {
+            'course': course_location_analytics,
+            'date': this.dateEntry(event).val() 
+        });
+
         var targetModel = this.eventModel(event);
         this.modelDom(event).remove();
         var cacheThis = this;
@@ -281,6 +294,11 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
         this.model.save({}, {error: CMS.ServerError});
         this.$form.hide();
         this.closeEditor(this);
+
+        analytics.track('Saved Course Handouts', {
+            'course': course_location_analytics
+        });
+
     },
 
     onCancel: function(event) {

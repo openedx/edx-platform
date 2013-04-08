@@ -15,7 +15,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   $component_editor: => @$el.find('.component-editor')
 
   loadDisplay: ->
-       XModule.loadModule(@$el.find('.xmodule_display'))
+    XModule.loadModule(@$el.find('.xmodule_display'))
 
   loadEdit: ->
     if not @module
@@ -55,6 +55,11 @@ class CMS.Views.ModuleEdit extends Backbone.View
   clickSaveButton: (event) =>
     event.preventDefault()
     data = @module.save()
+
+    analytics.track "Saved Module",
+      course: course_location_analytics
+      id: _this.model.id
+
     data.metadata = _.extend(data.metadata || {}, @metadata())
     @hideModal()
     @model.save(data).done( =>

@@ -174,7 +174,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                                                  str(len(self.child_history)))
 
         xheader = xqueue_interface.make_xheader(
-            lms_callback_url=system.xqueue['callback_url'],
+            lms_callback_url=system.xqueue['construct_callback'](),
             lms_key=queuekey,
             queue_name=self.message_queue_name
         )
@@ -224,7 +224,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                                                  anonymous_student_id +
                                                  str(len(self.child_history)))
 
-        xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['callback_url'],
+        xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['construct_callback'](),
                                                 lms_key=queuekey,
                                                 queue_name=self.queue_name)
 

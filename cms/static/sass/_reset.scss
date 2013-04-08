@@ -1,3 +1,11 @@
+// studio - utilities - reset
+// ====================
+
+// not ready for this yet, but this should be done as things get cleaner
+// * {
+// 	@include box-sizing(border-box);
+// }
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -18,7 +26,11 @@ time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 }
-/* HTML5 display-role reset for older browsers */
+
+html,body {
+  height: 100%;
+}
+
 article, aside, details, figcaption, figure, 
 footer, header, hgroup, menu, nav, section {
 	display: block;
@@ -38,12 +50,6 @@ q:before, q:after {
 	content: none;
 }
 
-/* remember to define visible focus styles! 
-:focus {
-	outline: ?????;
-} */
-
-/* remember to highlight inserts somehow! */
 ins {
 	text-decoration: none;
 }
@@ -56,10 +62,17 @@ table {
 	border-spacing: 0;
 }
 
-/* Reset styles to remove ui-lightness jquery ui theme 
-from the tabs component (used in the add component problem tab menu) 
-*/
+abbr[title] {
+	border-bottom: none;
+	text-decoration: none;
+	cursor: help;
+}
 
+// ====================
+
+// grandfathered styles
+
+// reset styles to remove ui-lightness jquery ui theme from the tabs component (used in the add component problem tab menu)
 .ui-tabs {
 	padding: 0;
 	white-space: normal;
@@ -118,10 +131,7 @@ from the tabs component (used in the add component problem tab menu)
 	padding: 0;
 }
 
-/* reapplying the tab styles from unit.scss after 
-removing jquery ui ui-lightness styling 
-*/
-
+// reapplying the tab styles from unit.scss after removing jquery ui ui-lightness styling 
 .problem-type-tabs {
 	border:none;
 	list-style-type: none;
@@ -146,26 +156,4 @@ removing jquery ui ui-lightness styling
 			border: 0px;
 		}
 	}
-/*
-	li {
-		float:left;
-		display:inline-block;
-		text-align:center;
-		width: auto;
-		//@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-		//background-color: tint($lightBluishGrey, 20%);
-		//@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
-		opacity:.8;
-
-		&:hover {
-		  opacity:1;
-		}
-
-		&.current {
-		  border: 0px;
-		  //@include active;
-		  opacity:1;
-		}
-	}
-*/
 }

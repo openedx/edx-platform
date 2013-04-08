@@ -1,0 +1,61 @@
+<% var allChecked = itemsChecked == items.length; %>
+<section
+    <% if (allChecked) { %>
+    class="course-checklist is-completed"
+    <% } else { %>
+    class="course-checklist"
+    <% } %>
+    id="<%= 'course-checklist' + checklistIndex %>">
+    <% var widthPercentage = 'width:' + percentChecked + '%;'; %>
+    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value" style="<%= widthPercentage %>">
+        <span class="int"><%= percentChecked %></span>% of checklist completed</span></span>
+    <header>
+        <h3 class="checklist-title title-2 is-selectable" title="Collapse/Expand this Checklist">
+            <i class="ss-icon ss-symbolicons-standard icon-arrow ui-toggle-expansion">&#x25BE;</i>
+            <%= checklistShortDescription %></h3>
+              <span class="checklist-status status">
+                Tasks Completed: <span class="status-count"><%= itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
+                <i class="ss-icon ss-symbolicons-standard icon-confirm">&#x2713;</i>
+              </span>
+    </header>
+
+    <ul class="list list-tasks">
+        <% var taskIndex = 0; %>
+        <% _.each(items, function(item) { %>
+            <% var checked = item['is_checked']; %>
+            <li
+            <% if (checked) { %>
+            class="task is-completed"
+            <% } else { %>
+            class="task"
+            <% } %>
+            >
+                <% var taskId = 'course-checklist' + checklistIndex + '-task' + taskIndex; %>
+                <input type="checkbox" class="task-input" data-checklist="<%= checklistIndex %>" data-task="<%= taskIndex %>"
+                name="<%= taskId %>" id="<%= taskId %>"
+                <% if (checked) { %>
+                checked="checked"
+                <% } %>
+                >
+                <label class="task-details" for="<%= taskId %>">
+                    <h4 class="task-name title title-3"><%= item['short_description'] %></h4>
+                    <p class="task-description"><%= item['long_description'] %></p>
+                </label>
+
+                <% if (item['action_text'] !== '' && item['action_url'] !== '') { %>
+                <ul class="list-actions task-actions">
+                    <li class="action-item">
+                        <a href="<%= item['action_url'] %>" class="action action-primary"
+                        <% if (item['action_external']) { %>
+                        rel="external" title="This link will open in a new browser window/tab"
+                        <% } %>
+                        ><%= item['action_text'] %></a>
+                    </li>
+                </ul>
+                <% } %>
+            </li>
+
+        <% taskIndex+=1; }) %>
+
+    </ul>
+</section>

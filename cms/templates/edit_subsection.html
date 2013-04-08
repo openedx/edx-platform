@@ -1,9 +1,7 @@
 <%inherit file="base.html" />
 <%!
-   from time import mktime
-   import dateutil.parser
    import logging
-   from datetime import datetime
+   from xmodule.util.date_utils import get_time_struct_display
 %>
 
 <%! from django.core.urlresolvers import reverse %>
@@ -13,7 +11,6 @@
 
 <%namespace name="units" file="widgets/units.html" />
 <%namespace name='static' file='static_content.html'/>
-<%namespace name='datetime' module='datetime'/>
 
 <%block name="content">
 <div class="main-wrapper">
@@ -31,37 +28,27 @@
       </article>
     </div>
 
-    <div id="policy-to-delete" style="display:none">
-    </div>
-
-    <div id="add-new-policy-element-template" style="display:none">
-           <li class="policy-list-element new-policy-list-element">
-             <input type="text" class="policy-list-name" autocomplete="off" size="15"/>:&nbsp;<input type="text" class="policy-list-value" size=40 autocomplete="off"/>
-             <a href="#" class="save-button">Save</a>
-             <a href="#" class="cancel-button">Cancel</a>
-             <a href="#" class="delete-icon remove-policy-data"></a>
-           </li>
-    </div>
-
     <div class="sidebar">
       <div class="unit-settings window id-holder" data-id="${subsection.location}">
     <h4 class="header">Subsection Settings</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
-        <label>Release date:<!-- <span class="description">Determines when this subsection and the units within it will be released publicly.</span>--></label>
         <div class="datepair" data-language="javascript">
-            <%
-                start_date = datetime.fromtimestamp(mktime(subsection.lms.start)) if subsection.lms.start is not None else None
-                parent_start_date = datetime.fromtimestamp(mktime(parent_item.lms.start)) if parent_item.lms.start is not None else None
-            %>
-          <input type="text" id="start_date" name="start_date" value="${start_date.strftime('%m/%d/%Y') if start_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-          <input type="text" id="start_time" name="start_time" value="${start_date.strftime('%H:%M') if start_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+          <div class="field field-start-date">
+            <label for="start_date">Release Day</label>
+            <input type="text" id="start_date" name="start_date" value="${get_time_struct_display(subsection.lms.start, '%m/%d/%Y')}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+          </div>
+          <div class="field field-start-time">
+            <label for="start_time">Release Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
+            <input type="text" id="start_time" name="start_time" value="${get_time_struct_display(subsection.lms.start, '%H:%M')}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+          </div>
         </div>
         % if subsection.lms.start != parent_item.lms.start and subsection.lms.start:
-            % if parent_start_date is None:
+            % if parent_item.lms.start is None:
             <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default}, which is unset.
             % else:
-            <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default} – ${parent_start_date.strftime('%m/%d/%Y')} at ${parent_start_date.strftime('%H:%M')}.
+            <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default} –
+                ${get_time_struct_display(parent_item.lms.start, '%m/%d/%Y at %H:%M UTC')}.
             % endif
             <a href="#" class="sync-date no-spinner">Sync to ${parent_item.display_name_with_default}.</a></p>
         % endif
@@ -74,18 +61,17 @@
     </div>
 
     <div class="due-date-input row">
-      <label>Due date:</label>
       <a href="#" class="set-date">Set a due date</a>
       <div class="datepair date-setter">
-        <p class="date-description">
-          <%
-              # due date uses it own formatting for stringifying the date. As with capa_module.py, there's a utility module available for us to use
-             due_date = dateutil.parser.parse(subsection.lms.due) if subsection.lms.due else None
-          %>
-          <input type="text" id="due_date" name="due_date" value="${due_date.strftime('%m/%d/%Y') if due_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-          <input type="text" id="due_time" name="due_time" value="${due_date.strftime('%H:%M') if due_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-          <a href="#" class="remove-date">Remove due date</a>
-        </p>
+        <div class="field field-start-date">
+          <label for="due_date">Due Day</label>
+          <input type="text" id="due_date" name="due_date" value="${get_time_struct_display(subsection.lms.due, '%m/%d/%Y')}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+        </div>
+        <div class="field field-start-time">
+          <label for="due_time">Due Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
+          <input type="text" id="due_time" name="due_time" value="${get_time_struct_display(subsection.lms.due, '%H:%M')}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+        </div>
+        <a href="#" class="remove-date">Remove due date</a>
       </div>
     </div>
     <div class="row unit-actions">

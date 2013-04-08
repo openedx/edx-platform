@@ -40,8 +40,21 @@ class ConditionalModule(ConditionalFields, XModule):
             poll_answer - map to `poll_answer` module attribute
             voted - map to `voted` module attribute
 
-        <conditional> tag attributes:
-            sources - location id of modules, separated by ';'
+        <show> tag attributes:
+            sources - location id of required modules, separated by ';'
+
+        You can add you own rules for <conditional> tag, like
+        "completed", "attempted" etc. To do that yo must extend
+        `ConditionalModule.conditions_map` variable and add pair:
+            my_attr: my_property/my_method
+
+        After that you can use it:
+            <conditional my_attr="some value" ...>
+                ...
+            </conditional>
+
+        And my_property/my_method will be called for required modules.
+
     """
 
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
@@ -112,7 +125,8 @@ class ConditionalModule(ConditionalFields, XModule):
         an AJAX call.
         """
         if not self.is_condition_satisfied():
-            message = self.descriptor.xml_attributes.get('message')
+            defmsg = "{link} must be attempted before this will become visible."
+            message = self.descriptor.xml_attributes.get('message', defmsg)
             context = {'module': self,
                        'message': message}
             html = self.system.render_template('conditional_module.html',

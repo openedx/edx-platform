@@ -1,7 +1,7 @@
-// studio base styling
+// studio - base styling
 // ====================
 
-// basic reset
+// basic setup
 html {
   font-size: 62.5%;
   overflow-y: scroll;
@@ -9,7 +9,7 @@ html {
 
 body {
   @include font-size(16);
-  min-width: 980px;
+  min-width: $fg-min-width;
   background: $gray-l5;
   line-height: 1.6;
   color: $baseFontColor;
@@ -22,7 +22,7 @@ body, input {
 a {
   text-decoration: none;
   color: $blue;
-  @include transition(color .15s);
+  @include transition(color 0.25s ease-in-out);
 
   &:hover {
     color: #cb9c40;
@@ -52,7 +52,6 @@ h1 {
 
 // layout - basic page header
 .wrapper-mast {
-  margin: 0;
   padding: 0 $baseline;
   position: relative;
   
@@ -63,7 +62,7 @@ h1 {
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
-    margin: 0 auto $baseline auto;
+    margin: ($baseline*1.5) auto $baseline auto;
     color: $gray-d2;
   }
 
@@ -214,7 +213,7 @@ h1 {
       color: $gray-l2;
     }
 
-    .title, .title-1 {
+    .title-1 {
       @include font-size(32);
       margin: 0;
       padding: 0;
@@ -272,19 +271,17 @@ h1 {
   }
 
   .title-1 {
-
+    @extend .t-title-1;
   }
 
   .title-2 {
-    @include font-size(24);
+    @extend .t-title-2;
     margin: 0 0 ($baseline/2) 0;
-    font-weight: 600;
   }
 
   .title-3 {
-    @include font-size(16);
-    margin: 0 0 ($baseline/4) 0;
-    font-weight: 500;
+    @extend .t-title-3;
+    margin: 0 0 ($baseline/2) 0;
   }
 
   .title-4 {
@@ -327,7 +324,8 @@ h1 {
       }
     }
 
-    .nav-related {
+    // navigation
+    .nav-related, .nav-page {
 
       .nav-item {
         margin-bottom: ($baseline/4);
@@ -350,10 +348,11 @@ h1 {
 // layout - grandfathered
 .main-wrapper {
   position: relative;
-  margin: 0 40px;
+  margin: 0 ($baseline*2);
 }
 
 .inner-wrapper {
+  @include clearfix();
   position: relative;
   max-width: 1280px;
   margin: auto;
@@ -361,6 +360,12 @@ h1 {
   > article {
     clear: both;
   }
+}
+
+.main-column {
+  clear: both;
+  float: left;
+  width: 70%;
 }
 
 .sidebar {
@@ -374,109 +379,6 @@ h1 {
 
 .right {
   float: right;
-}
-
-// ====================
-
-// forms
-input[type="text"],
-input[type="email"],
-input[type="password"],
-textarea.text {
-  padding: 6px 8px 8px;
-  @include box-sizing(border-box);
-  border: 1px solid $mediumGrey;
-  border-radius: 2px;
-  @include linear-gradient($lightGrey, tint($lightGrey, 90%));
-  background-color: $lightGrey;
-  @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
-  font-family: 'Open Sans', sans-serif;
-  font-size: 11px;
-  color: $baseFontColor;
-  outline: 0;
-
-  &::-webkit-input-placeholder,
-  &:-moz-placeholder,
-  &:-ms-input-placeholder {
-      color: #979faf;
-  }
-
-  &:focus {
-    @include linear-gradient($paleYellow, tint($paleYellow, 90%));
-    outline: 0;
-  }
-
-  &[disabled] {
-    border-color: $gray-l4;
-    color: $gray-l2;
-  }
-
-  &[readonly] {
-    border-color: $gray-l4;
-    color: $gray-l1;
-
-    &:focus {
-      @include linear-gradient($lightGrey, tint($lightGrey, 90%));
-      outline: 0;
-    }
-  }
-}
-
-// forms - specific
-input.search {
-  padding: 6px 15px 8px 30px;
-  @include box-sizing(border-box);
-  border: 1px solid $darkGrey;
-  border-radius: 20px;
-  background: url(../img/search-icon.png) no-repeat 8px 7px #edf1f5;
-  font-family: 'Open Sans', sans-serif;
-  color: $baseFontColor;
-  outline: 0;
-
-  &::-webkit-input-placeholder {
-      color: #979faf;
-  }
-}
-
-label {
-  font-size: 12px;
-}
-
-code {
-  padding: 0 4px;
-  border-radius: 3px;
-  background: #eee;
-  font-family: Monaco, monospace;
-}
-
-.CodeMirror {
-  font-size: 13px;
-  border: 1px solid $darkGrey;
-  background: #fff;
-}
-
-.text-editor {
-  width: 100%;
-  min-height: 80px;
-  padding: 10px;
-  @include box-sizing(border-box);
-  border: 1px solid $mediumGrey;
-  @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
-  background-color:  #edf1f5;
-  @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.1) inset);
-  font-family: Monaco, monospace;
-}
-
-// ====================
-
-// UI - chrome
-.window {
-  @include clearfix();
-  @include border-radius(3px);
-  @include box-shadow(0 1px 1px $shadow-l1);
-  margin-bottom: $baseline;
-  border: 1px solid $gray-l2;
-  background: $white;
 }
 
 // ====================
@@ -739,7 +641,7 @@ hr.divide {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 99999;
+  z-index: 10000;
   padding: 0 10px;
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.85);
@@ -785,6 +687,10 @@ hr.divide {
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
   word-wrap: break-word;
+}
+
+hr.divider {
+  @extend .sr;
 }
 
 // ====================
@@ -860,15 +766,5 @@ body.hide-wip {
 
   .wip-box {
     display: none;
-  }
-}
-
-// ====================
-
-// needed fudges for now
-body.dashboard {
-
-  .my-classes {
-    margin-top: $baseline;
   }
 }

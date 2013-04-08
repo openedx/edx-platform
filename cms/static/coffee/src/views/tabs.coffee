@@ -28,6 +28,10 @@ class CMS.Views.TabsEdit extends Backbone.View
     @$('.component').each((idx, element) =>
         tabs.push($(element).data('id'))
     )
+
+    analytics.track "Reordered Static Pages",
+      course: course_location_analytics
+
     $.ajax({
       type:'POST',
       url: '/reorder_static_tabs', 
@@ -56,10 +60,18 @@ class CMS.Views.TabsEdit extends Backbone.View
       'i4x://edx/templates/static_tab/Empty'
     )
 
+    analytics.track "Added Static Page",
+      course: course_location_analytics
+
   deleteTab: (event) =>
     if not confirm 'Are you sure you want to delete this component? This action cannot be undone.'
       return
     $component = $(event.currentTarget).parents('.component')
+
+    analytics.track "Deleted Static Page",
+      course: course_location_analytics
+      id: $component.data('id')
+
     $.post('/delete_item', {
       id: $component.data('id')
     }, =>

@@ -3,10 +3,10 @@ Feature: All the high level tabs should work
   As a student
   I want to navigate through the high level tabs
 
-Scenario: I can navigate to all high -level tabs in a course
+Scenario: I can navigate to all high - level tabs in a course
         Given: I am registered for the course "6.002x"
         And The course "6.002x" has extra tab "Custom Tab"
-        And I log in
+        And I am logged in
         And I click on View Courseware
         When I click on the "<TabName>" tab
         Then the page title should contain "<PageTitle>"

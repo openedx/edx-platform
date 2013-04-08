@@ -1,25 +1,23 @@
 import logging
 from cStringIO import StringIO
-from math import exp, erf
+from math import exp
 from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
 import time
 from datetime import datetime
 
+import dateutil.parser
+
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
-from datetime import datetime
+from xmodule.util.date_utils import time_to_datetime
 import json
-import logging
-import requests
-import time
-import copy
 
-from xblock.core import Scope, ModelType, List, String, Object, Boolean
+from xblock.core import Scope, List, String, Object, Boolean
 from .fields import Date
 
 
@@ -29,36 +27,37 @@ log = logging.getLogger(__name__)
 class StringOrDate(Date):
     def from_json(self, value):
         """
-        Parse an optional metadata key containing a time: if present, complain
-        if it doesn't parse.
-        Return None if not present or invalid.
+        Parse an optional metadata key containing a time or a string:
+        if present, assume it's a string if it doesn't parse.
         """
-        if value is None:
-            return None
-
         try:
-            return time.strptime(value, self.time_format)
+            result = super(StringOrDate, self).from_json(value)
         except ValueError:
             return value
+        if result is None:
+            return value
+        else:
+            return result
 
     def to_json(self, value):
         """
-        Convert a time struct to a string
+        Convert a time struct or string to a string.
         """
-        if value is None:
-            return None
-
         try:
-            return time.strftime(self.time_format, value)
-        except (ValueError, TypeError):
+            result = super(StringOrDate, self).to_json(value)
+        except:
             return value
-
+        if result is None:
+            return value
+        else:
+            return result
 
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
 
 _cached_toc = {}
+
 
 class Textbook(object):
     def __init__(self, title, book_url):
@@ -154,7 +153,7 @@ class CourseFields(object):
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
-    advertised_start = StringOrDate(help="Date that this course is advertised to start", scope=Scope.settings)
+    advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
     grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", scope=Scope.settings)
@@ -179,8 +178,9 @@ class CourseFields(object):
     allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
     advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
     has_children = True
-
+    checklists = List(scope=Scope.settings)
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
+    show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
 
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
@@ -367,7 +367,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             textbooks.append((textbook.get('title'), textbook.get('book_url')))
             xml_object.remove(textbook)
 
-        #Load the wiki tag if it exists
+        # Load the wiki tag if it exists
         wiki_slug = None
         wiki_tag = xml_object.find("wiki")
         if wiki_tag is not None:
@@ -535,17 +535,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def _sorting_dates(self):
         # utility function to get datetime objects for dates used to
         # compute the is_new flag and the sorting_score
-        def to_datetime(timestamp):
-            return datetime(*timestamp[:6])
 
         announcement = self.announcement
         if announcement is not None:
-            announcement = to_datetime(announcement)
-        if self.advertised_start is None or isinstance(self.advertised_start, basestring):
-            start = to_datetime(self.start)
-        else:
-            start = to_datetime(self.advertised_start)
-        now = to_datetime(time.gmtime())
+            announcement = time_to_datetime(announcement)
+
+        try:
+            start = dateutil.parser.parse(self.advertised_start)
+        except (ValueError, AttributeError):
+            start = time_to_datetime(self.start)
+
+        now = datetime.utcnow()
 
         return announcement, start, now
 
@@ -635,8 +635,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def start_date_text(self):
+        def try_parse_iso_8601(text):
+            try:
+                result = datetime.strptime(text, "%Y-%m-%dT%H:%M")
+                result = result.strftime("%b %d, %Y")
+            except ValueError:
+                result = text.title()
+
+            return result
+
         if isinstance(self.advertised_start, basestring):
-            return self.advertised_start
+            return try_parse_iso_8601(self.advertised_start)
         elif self.advertised_start is None and self.start is None:
             return 'TBD'
         else:
@@ -644,7 +653,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def end_date_text(self):
-        return time.strftime("%b %d, %Y", self.end)
+        """
+        Returns the end date for the course formatted as a string.
+
+        If the course does not have an end date set (course.end is None), an empty string will be returned.
+        """
+        return '' if self.end is None else time.strftime("%b %d, %Y", self.end)
 
     @property
     def forum_posts_allowed(self):
@@ -675,7 +689,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # *end* of the same day, not the same time.  It's going to be used as the
             # end of the exam overall, so we don't want the exam to disappear too soon.
             # It's also used optionally as the registration end date, so time matters there too.
-            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')   # or self.first_eligible_appointment_date
+            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')  # or self.first_eligible_appointment_date
             if self.last_eligible_appointment_date is None:
                 raise ValueError("Last appointment date must be specified")
             self.registration_start_date = self._try_parse_time('Registration_Start_Date') or time.gmtime(0)

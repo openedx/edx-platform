@@ -1,6 +1,6 @@
 <%inherit file="base.html" />
 
-<%block name="title">Courses</%block>
+<%block name="title">My Courses</%block>
 <%block name="bodyclass">is-signedin index dashboard</%block>
 
 <%block name="header_extras">
@@ -46,6 +46,8 @@
           <li class="nav-item">
             % if not disable_course_creation:
               <a href="#" class="button new-button new-course-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Course</a>
+	    % elif settings.MITX_FEATURES.get('STAFF_EMAIL',''):
+	      <a href="mailto:${settings.MITX_FEATURES.get('STAFF_EMAIL','')}">Email staff to create course</a>
             % endif
           </li>
         </ul>
@@ -67,7 +69,7 @@
       <article class="my-classes">
         % if user.is_active:
         <ul class="class-list">
-          %for course, url, lms_link in courses:
+          %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
           <li>
             <a class="class-link" href="${url}" class="class-name">
               <span class="class-name">${course}</span>

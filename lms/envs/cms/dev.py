@@ -9,6 +9,7 @@ MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = False
 SUBDOMAIN_BRANDING['edge'] = 'edge'
 SUBDOMAIN_BRANDING['preview.edge'] = 'edge'
 VIRTUAL_UNIVERSITIES = ['edge']
+META_UNIVERSITIES = {}
 
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',

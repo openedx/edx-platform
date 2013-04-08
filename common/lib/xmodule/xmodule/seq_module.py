@@ -23,7 +23,7 @@ class SequenceFields(object):
 
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
-    position = Integer(help="Last tab viewed in this sequence", scope=Scope.student_state)
+    position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
 
 
 class SequenceModule(SequenceFields, XModule):

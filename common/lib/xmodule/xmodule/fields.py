@@ -4,27 +4,36 @@ import re
 
 from datetime import timedelta
 from xblock.core import ModelType
+import datetime
+import dateutil.parser
 
 log = logging.getLogger(__name__)
 
 
 class Date(ModelType):
-    time_format = "%Y-%m-%dT%H:%M"
-
-    def from_json(self, value):
+    '''
+    Date fields know how to parse and produce json (iso) compatible formats.
+    '''
+    def from_json(self, field):
         """
         Parse an optional metadata key containing a time: if present, complain
         if it doesn't parse.
         Return None if not present or invalid.
         """
-        if value is None:
+        if field is None:
+            return field
+        elif field is "":
             return None
-
-        try:
-            return time.strptime(value, self.time_format)
-        except ValueError as e:
-            msg = "Field {0} has bad value '{1}': '{2}'".format(
-                self._name, value, e)
+        elif isinstance(field, basestring):
+            d = dateutil.parser.parse(field)
+            return d.utctimetuple()
+        elif isinstance(field, (int, long, float)):
+            return time.gmtime(field / 1000)
+        elif isinstance(field, time.struct_time):
+            return field
+        else:
+            msg = "Field {0} has bad value '{1}'".format(
+                self._name, field)
             log.warning(msg)
             return None
 
@@ -34,8 +43,11 @@ class Date(ModelType):
         """
         if value is None:
             return None
-
-        return time.strftime(self.time_format, value)
+        if isinstance(value, time.struct_time):
+            # struct_times are always utc
+            return time.strftime('%Y-%m-%dT%H:%M:%SZ', value)
+        elif isinstance(value, datetime.datetime):
+            return value.isoformat() + 'Z'
 
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
