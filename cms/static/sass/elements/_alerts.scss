@@ -780,7 +780,7 @@
     }
 
     &.is-hiding {
-      @include anim-notificationsSlideDown(1s);
+      @include anim-notificationsSlideDown(0.25s);
     }
 
     &.is-fleeting {
