@@ -48,13 +48,12 @@ WordCloudMain.prototype = {
     inputSection = this.wordCloudEl.find('#input-cloud-section');
     resultSection = this.wordCloudEl.find('#result-cloud-section');
 
-    resultSection.text('TODO: Word cloud canvas');
     inputSection.hide();
     resultSection.show();
 
     words = response.top_words;
 
-    d3.layout.cloud().size([5, 5])
+    d3.layout.cloud().size([500, 500])
         .words(words)
         .rotate(function () {
             return ~~(Math.random() * 2) * 90;
@@ -74,7 +73,7 @@ WordCloudMain.prototype = {
             .attr('width', 500)
             .attr('height', 500)
             .append('g')
-            // .attr('transform', 'translate(125,125)')
+            .attr('transform', 'translate(125,125)')
             .selectAll('text')
             .data(words)
             .enter().append('text')
