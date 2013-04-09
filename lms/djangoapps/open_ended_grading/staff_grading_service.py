@@ -310,19 +310,22 @@ def save_grade(request, course_id):
 
     if request.method != 'POST':
         raise Http404
-
-    required = set(['score', 'feedback', 'submission_id', 'location', 'submission_flagged', 'rubric_scores[]'])
-    actual = set(request.POST.keys())
+    p = request.POST
+    required = set(['score', 'feedback', 'submission_id', 'location', 'submission_flagged'])
+    skipped = 'skipped' in p
+    if not skipped:
+        required|=set(['rubric_scores[]'])
+    actual = set(p.keys())
     missing = required - actual
     if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
 
     grader_id = unique_id_for_user(request.user)
-    p = request.POST
+
 
     location = p['location']
-    skipped = 'skipped' in p
+
 
     try:
         result_json = staff_grading_service().save_grade(course_id,
