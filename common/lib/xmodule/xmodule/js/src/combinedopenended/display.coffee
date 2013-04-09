@@ -322,6 +322,7 @@ class @CombinedOpenEnded
   save_answer: (event) =>
     event.preventDefault()
     max_filesize = 2*1000*1000 #2MB
+    pre_can_upload_files = @can_upload_files
     if @child_state == 'initial'
       files = ""
       if @can_upload_files == true
@@ -353,6 +354,7 @@ class @CombinedOpenEnded
             @find_assessment_elements()
             @rebind()
           else
+            @can_upload_files = pre_can_upload_files
             @gentle_alert response.error
 
       $.ajaxWithPrefix("#{@ajax_url}/save_answer",settings)
