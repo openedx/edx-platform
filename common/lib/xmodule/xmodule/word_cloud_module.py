@@ -11,6 +11,7 @@ Stunent can change his answer.
 import cgi
 import json
 import logging
+import re
 from copy import deepcopy
 from collections import OrderedDict
 
@@ -29,14 +30,14 @@ log = logging.getLogger(__name__)
 class WordCloudFields(object):
     # Name of poll to use in links to this poll
     display_name = String(help="Display name for this module", scope=Scope.settings)
-    num_inputs = Integer(help="Number of inputs", scope=Scope.settings)
+    num_inputs = Integer(help="Number of inputs", scope=Scope.settings, default=5)
+    num_top_words = Integer(help="Number of inputs", scope=Scope.settings, default=250)
 
     submitted = Boolean(help="Whether this student has posted words to the cloud", scope=Scope.student_state, default=False)
     student_words= List(help="Student answer", scope=Scope.student_state, default=[])
 
     all_words = Object(help="All possible words from other students", scope=Scope.content)
     top_words = Object(help="Top N words for word cloud", scope=Scope.content)
-    top_low_border = Integer(help="Number to distinguish top from all words", scope=Scope.content)
 
 class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Module"""
@@ -49,7 +50,37 @@ class WordCloudModule(WordCloudFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
     js_module_name = "WordCloud"
 
-    number_of_top_words = 250
+    def get_state_json(self):
+        if self.submitted:
+            return json.dumps({
+                'status': 'success',
+                'student_words': self.student_words,
+                'top_words': self.prepare_words(self.top_words)
+            })
+        else:
+            return json.dumps({})
+
+    def good_word(self, word):
+        return word.strip().lower()
+
+        # TODO: use or remove
+        # real_words = re.findall('\w+', word)
+        # if real_words:
+        #     return real_words[0].lower()
+
+    def prepare_words(self, words):
+        """Convert words dictionary more handy for client."""
+        return [{'text': word, 'size': count} for
+            word, count in words.iteritems()]
+
+    def top_dict(self, dict_obj, amount):
+        return dict(
+            sorted(
+                dict_obj.iteritems(),
+                key=lambda x: x[1],
+                reverse=True
+            )[:amount]
+        )
 
     def handle_ajax(self, dispatch, get):
         """Ajax handler.
@@ -62,68 +93,53 @@ class WordCloudModule(WordCloudFields, XModule):
             json string
         """
         if dispatch == 'submit':
-            student_words_from_client = json.loads(get.lists()[0][0])['data']
+            if self.submitted:
+                return json.dumps({
+                    'status': 'fail',
+                    'error': 'You have already post your data.'
+                })
 
-            # self.all_words[word] -= 1
+            # Student words from client.
+            raw_student_words = json.loads(get.lists()[0][0])['data']
+            student_words = filter(None, map(self.good_word, raw_student_words))
+
+            if not student_words:
+                return json.dumps({
+                    'status': 'fail',
+                    'error': 'Empty students words.'
+                })
+
+            self.student_words = student_words
+
             # FIXME: fix this, when xblock will support mutable types.
             # Now we use this hack.
             # speed issues
             temp_all_words = self.all_words
-            temp_top_words = self.top_words
 
-            # if self.submitted:
+            self.submitted = True
 
-            #     for word in self.student_words:
-            #         temp_all_words[word] -= 1
+            # Save in all_words.
+            for word in self.student_words:
+                if word in temp_all_words:
+                    temp_all_words[word] += 1
+                else:
+                    temp_all_words[word] = 1
 
-            #         if word in temp_top_words:
-            #             temp_top_words -= 1
+            # Update top_words
+            self.top_words = self.top_dict(temp_all_words,
+                int(self.num_top_words))
 
-            # else:
-            #     self.submitted = True
+            self.all_words = temp_all_words
 
-            # self.student_words = student_words_from_client
+            return self.get_state_json()
 
-            # question_words = {}
-
-            # for word in self.student_words:
-            #     temp_all_words[word] += 1
-
-            #     if word in temp_top_words:
-            #         temp_top_words += 1
-            #     else:
-            #         if temp_all_words[word] > top_low_border:
-            #             question_words[word] = temp_all_words[word]
-
-
-            # self.all_words = temp_all_words
-            # self.top_words = self.update_top_words(question_words, temp_top_words)
-
-
-            # return json.dumps({'student_words': self.student_words,
-            #                    'top_words': self.top_words,
-            #                    })
-
-            return json.dumps({'student_words': ['aa', 'bb'], 'top_words': ['aa', 'bb', 'RRR'], 'status': 'success'})
         elif dispatch == 'get_state':
-            return json.dumps({'student_answers': self.student_answers,
-                               'top_words': self.top_words,
-                               'status': 'success'
-                               })
-        else:  # return error message
-            return json.dumps({'error': 'Unknown Command!'})
-
-
-    def update_top_words(question_words, top_words):
-
-        for word, number in question_words:
-            for top_word, top_number in top_words[:]:
-                if top_number < number:
-                    del top_words[top_word]
-                    top_words[word] - number
-                    break
-
-        return top_words
+            return self.get_state_json()
+        else:
+            return json.dumps({
+                    'status': 'fail',
+                    'error': 'Unknown Command!'
+                })
 
     def get_html(self):
         """Renders parameters to template."""
@@ -131,7 +147,7 @@ class WordCloudModule(WordCloudFields, XModule):
                   'element_id': self.location.html_id(),
                   'element_class': self.location.category,
                   'ajax_url': self.system.ajax_url,
-                  'configuration_json': json.dumps({}),
+                  'configuration_json': self.get_state_json(),
                   'num_inputs': int(self.num_inputs),
                   }
         self.content = self.system.render_template('word_cloud.html', params)

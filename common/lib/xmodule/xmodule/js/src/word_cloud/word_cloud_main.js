@@ -29,16 +29,15 @@ WordCloudMain.prototype = {
                     console.log('Bad response!');
                     return;
             }
-            console.log('success! response = ');
-            console.log(response);
-            _this.showWordCloud();
+            _this.showWordCloud(response);
         }
     );
 
 }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
-'showWordCloud': function(){
-    console.log('Show word cloud.');
+'showWordCloud': function(response){
+    console.log('Show word cloud with next:');
+    console.log(response);
     
     inputSection = this.wordCloudEl.find('#input-cloud-section');
     resultSection = this.wordCloudEl.find('#result-cloud-section');
