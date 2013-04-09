@@ -273,7 +273,7 @@
       input, textarea {
         width: 100%;
         margin: 0;
-        padding: $baseline ($baseline*.75);         
+        padding: $baseline ($baseline*.75);
 
         &.long {
           width: 100%;
@@ -338,7 +338,7 @@
       &.is-focused {
 
         label {
-          color: $m-blue-s1;          
+          color: $m-blue-s1;
         }
 
         .tip {
@@ -464,7 +464,7 @@
     padding: 0 $baseline/4;
   }
 
-  #register-form, #login-form {
+  #register-form, #login-form, #passwordreset-form {
 
     .status.message {
       display: none;
@@ -512,9 +512,26 @@
 
 // password reset
 .view-passwordreset {
+  background: $m-gray-l2;
+
+  header.global {
+
+    h1 {
+      float: none;
+    }
+  }
 
   .introduction {
+    width: auto;
+    padding: 0;
 
+    header h1 {
+      margin: 0;
+    }
+  }
+
+  .content {
+    margin-top: 0;
   }
 }
 
@@ -586,7 +603,7 @@
           width: 100%;
         }
       }
-    } 
+    }
   }
 
   .modal-form-error {
