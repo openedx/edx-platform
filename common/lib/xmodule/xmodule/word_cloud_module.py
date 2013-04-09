@@ -11,13 +11,11 @@ Stunent can change his answer.
 import json
 import logging
 import re
-from collections import OrderedDict
 
 from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
-from xmodule.stringify import stringify_children
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xblock.core import Scope, String, Object, Boolean, List, Integer
@@ -51,6 +49,7 @@ class WordCloudModule(WordCloudFields, XModule):
     js_module_name = "WordCloud"
 
     def get_state_json(self):
+        """Return success json answer for client."""
         if self.submitted:
             return json.dumps({
                 'status': 'success',
@@ -65,6 +64,7 @@ class WordCloudModule(WordCloudFields, XModule):
             return json.dumps({})
 
     def good_word(self, word):
+        """Convert raw word to suitable word."""
         return word.strip().lower()
 
         # TODO: use or remove
@@ -78,6 +78,7 @@ class WordCloudModule(WordCloudFields, XModule):
             word, count in words.iteritems()]
 
     def top_dict(self, dict_obj, amount):
+        """Return new dict: top of dict using dict value."""
         return dict(
             sorted(
                 dict_obj.iteritems(),
@@ -129,10 +130,11 @@ class WordCloudModule(WordCloudFields, XModule):
                 else:
                     temp_all_words[word] = 1
 
-            # Update top_words
+            # Update top_words.
             self.top_words = self.top_dict(temp_all_words,
                 int(self.num_top_words))
 
+            # Save all_words in database.
             self.all_words = temp_all_words
 
             return self.get_state_json()
