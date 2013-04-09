@@ -90,6 +90,8 @@ VIEW_PERMISSIONS = {
     'vote_for_thread'   :       [['vote', 'is_open']],
     'flag_abuse_for_thread':    [['vote', 'is_open']],
     'un_flag_abuse_for_thread':    [['vote', 'is_open']],
+    'flag_abuse_for_comment':    [['vote', 'is_open']],
+    'un_flag_abuse_for_comment':    [['vote', 'is_open']],
     'undo_vote_for_thread':     [['unvote', 'is_open']],
     'pin_thread':    ['create_comment'],
     'un_pin_thread':    ['create_comment'],
