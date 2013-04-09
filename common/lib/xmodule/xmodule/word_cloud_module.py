@@ -29,8 +29,8 @@ class WordCloudFields(object):
     num_inputs = Integer(help="Number of inputs", scope=Scope.settings, default=5)
     num_top_words = Integer(help="Number of inputs", scope=Scope.settings, default=250)
 
-    submitted = Boolean(help="Whether this student has posted words to the cloud", scope=Scope.student_state, default=False)
-    student_words= List(help="Student answer", scope=Scope.student_state, default=[])
+    submitted = Boolean(help="Whether this student has posted words to the cloud", scope=Scope.user_state, default=False)
+    student_words= List(help="Student answer", scope=Scope.user_state, default=[])
 
     all_words = Object(help="All possible words from other students", scope=Scope.content)
     top_words = Object(help="Top N words for word cloud", scope=Scope.content)
@@ -57,7 +57,7 @@ class WordCloudModule(WordCloudFields, XModule):
                     word:self.all_words[word] for
                         word in self.student_words
                     },
-                'total_count': sum(self.all_words.values())
+                'total_count': sum(self.all_words.values()),
                 'top_words': self.prepare_words(self.top_words)
             })
         else:
@@ -140,9 +140,9 @@ class WordCloudModule(WordCloudFields, XModule):
             return self.get_state_json()
         else:
             return json.dumps({
-                    'status': 'fail',
-                    'error': 'Unknown Command!'
-                })
+                'status': 'fail',
+                'error': 'Unknown Command!'
+            })
 
     def get_html(self):
         """Renders parameters to template."""

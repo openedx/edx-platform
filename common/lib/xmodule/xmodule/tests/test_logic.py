@@ -3,8 +3,11 @@
 import json
 import unittest
 
+from django.http import QueryDict
+
 from xmodule.poll_module import PollDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
+from xmodule.word_cloud_module import WordCloudDescriptor
 
 
 class LogicTest(unittest.TestCase):
@@ -64,3 +67,23 @@ class ConditionalModuleTest(LogicTest):
         html = response['html']
 
         self.assertEqual(html, [])
+
+
+class WordCloudModuleTest(LogicTest):
+    descriptor_class = WordCloudDescriptor
+    raw_model_data = {
+        'all_words': {'Yes': 1, 'Dont_know': 0, 'No': 0},
+        'top_words': {'Yes': 1, 'Dont_know': 0, 'No': 0},
+        'submitted': False,
+        'student_words': ['mom', 'dad', 'cat']
+    }
+
+    def test_bad_ajax_request(self):
+        response = self.ajax_request('bad_dispatch', {})
+        self.assertDictEqual(response, {
+                    'status': 'fail',
+                    'error': 'Unknown Command!'
+                })
+
+    # def test_good_ajax_request(self):
+    #     response = self.ajax_request('submit', {})
