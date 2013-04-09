@@ -91,7 +91,7 @@ MODULESTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': PROJECT_ROOT / "db" / "mitx.db",
+        'NAME': TEST_ROOT / 'db' / 'mitx.db'
     },
 
 }

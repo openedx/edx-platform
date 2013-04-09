@@ -76,7 +76,7 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "cms.db",
+        'NAME': TEST_ROOT / "db" / "cms.db",
     },
 }
 
