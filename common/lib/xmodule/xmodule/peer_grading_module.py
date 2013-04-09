@@ -15,6 +15,7 @@ from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
 from xmodule.fields import Date
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
+from open_ended_grading_classes import combined_open_ended_rubric
 
 log = logging.getLogger(__name__)
 
@@ -394,7 +395,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         except etree.XMLSyntaxError:
             #This is a dev_facing_error
             log.exception("Cannot parse rubric string. Raw string: {0}"
-            .format(rubric))
+            .format(""))
             #This is a student_facing_error
             return {'success': False,
                     'error': 'Error displaying submission.  Please notify course staff.'}
@@ -434,12 +435,16 @@ class PeerGradingModule(PeerGradingFields, XModule):
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
                                                            submission_key, score, feedback, rubric_scores)
+            log.debug("RESPONSE RESPONSE : {0}".format(response))
+            if 'actual_rubric' in response:
+                rubric_renderer = combined_open_ended_rubric.CombinedOpenEndedRubric(self.system, True)
+                response['actual_rubric'] = rubric_renderer.render_rubric(response['actual_rubric'])['html']
             return response
         except GradingServiceError:
             #This is a dev_facing_error
             log.exception(
                 "Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(
-                    location, submission_id, submission_key, grader_id))
+                    location, submission_key, grader_id))
             #This is a student_facing_error
             return self._err_response('There was an error saving your score.  Please notify course staff.')
 

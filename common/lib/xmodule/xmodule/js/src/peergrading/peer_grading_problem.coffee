@@ -443,7 +443,6 @@ class @PeerGradingProblem
     calibration_wrapper = $('.calibration-feedback-wrapper')
     calibration_wrapper.html("<p>The score you gave was: #{@grade}. The actual score is: #{response.actual_score}</p>")
 
-
     score = parseInt(@grade)
     actual_score = parseInt(response.actual_score)
 
@@ -451,6 +450,9 @@ class @PeerGradingProblem
       calibration_wrapper.append("<p>Your score matches the actual score!</p>")
     else
       calibration_wrapper.append("<p>You may want to review the rubric again.</p>")
+
+    if response.actual_rubric != undefined
+      calibration_wrapper.append("<div>Instructor Scored Rubric: #{response.actual_rubric}</div>")
 
     # disable score selection and submission from the grading interface
     $("input[name='score-selection']").attr('disabled', true)
