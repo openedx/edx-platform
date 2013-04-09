@@ -178,8 +178,16 @@ class PeerGradingModule(PeerGradingFields, XModule):
         pass
 
     def get_score(self):
+        max_score = None
+        score = None
+        score_dict = {
+            'score': score,
+            'total': max_score,
+            }
         if self.use_for_single_location not in TRUE_DICT or self.is_graded not in TRUE_DICT:
-            return None
+            return score_dict
+
+
 
         try:
             count_graded = self.student_data_for_location['count_graded']
@@ -198,10 +206,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 #Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
-        score_dict = {
-            'score': int(count_graded >= count_required and count_graded>0) * int(self.weight),
-            'total': self.max_grade * int(self.weight),
-        }
+        try:
+            score = int(count_graded >= count_required and count_graded>0) * float(self.weight)
+            total = self.max_grade * float(self.weight)
+            score_dict['score'] = score
+            score_dict['total'] = total
+        except:
+            pass
 
         return score_dict
 

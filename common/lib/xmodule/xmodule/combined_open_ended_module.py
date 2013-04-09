@@ -14,7 +14,7 @@ from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
 log = logging.getLogger("mitx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
-                          "skip_spelling_checks", "due", "graceperiod"]
+                          "skip_spelling_checks", "due", "graceperiod", "weight"]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
                          "student_attempts", "ready_to_reset"]

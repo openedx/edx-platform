@@ -131,6 +131,7 @@ class CombinedOpenEndedV1Module():
         self.state = instance_state.get('state', self.INITIAL)
 
         self.student_attempts = instance_state.get('student_attempts', 0)
+        self.weight = instance_state.get('weight', 1)
 
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.ready_to_reset = instance_state.get('ready_to_reset', False)
@@ -736,13 +737,17 @@ class CombinedOpenEndedV1Module():
         max_score = None
         score = None
         if self.check_if_done_and_scored():
-            last_response = self.get_last_response(self.current_task_number)
-            max_score = last_response['max_score']
-            score = last_response['score']
+            scores = []
+            for i in xrange(0,self.current_task_number):
+                last_response = self.get_last_response(i)
+                max_score = last_response['max_score'] * float(self.weight)
+                score = last_response['score'] * float(self.weight)
+                scores.append(score)
+            score = max(scores)
 
         score_dict = {
-            'score': score,
-            'total': max_score,
+            'score': score ,
+            'total': max_score ,
         }
 
         return score_dict
