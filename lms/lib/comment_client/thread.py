@@ -99,7 +99,7 @@ class Thread(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_unflag_comment(voteable.id)
         else:
-            raise CommentClientError("Can flag/unflag for threads or comments")
+            raise CommentClientError("Can only flag/unflag for threads or comments")
         params = {'user_id': user.id}
         #if you're an admin, when you unflag, remove ALL flags
         if removeAll:

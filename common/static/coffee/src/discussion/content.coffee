@@ -144,7 +144,13 @@ if Backbone?
       else
         @get("body")
 
-    display_tigetCommentsCount: ->
+    display_title: ->
+      if @has("highlighted_title")
+        String(@get("highlighted_title")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
+      else
+        @get("title")
+
+    comment_count: ->
       count = 0
       @get('comments').each (comment) ->
         count += comment.getCommentsCount() + 1

@@ -293,6 +293,9 @@ def flag_abuse_for_thread(request, course_id, thread_id):
     thread.flagAbuse(user,thread)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
+@require_POST
+@login_required
+@permitted
 def un_flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     
@@ -301,12 +304,18 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     thread.unFlagAbuse(user,thread,removeAll)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
+@require_POST
+@login_required
+@permitted
 def flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     comment.flagAbuse(user,comment)
     return JsonResponse(utils.safe_content(comment.to_dict()))
 
+@require_POST
+@login_required
+@permitted
 def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     removeAll = cached_has_permission(request.user, 'openclose_thread', course_id)
