@@ -417,13 +417,16 @@ class CombinedOpenEndedV1Module():
             else:
                 last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
             last_post_assessment = last_post_evaluation
-            rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
-            rubric_scores = rubric_data['rubric_scores']
-            grader_types = rubric_data['grader_types']
-            feedback_items = rubric_data['feedback_items']
-            feedback_dicts = rubric_data['feedback_dicts']
-            grader_ids = rubric_data['grader_ids']
-            submission_ids = rubric_data['submission_ids']
+            try:
+                rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
+            except:
+                rubric_data = {}
+            rubric_scores = rubric_data.get('rubric_scores')
+            grader_types = rubric_data.get('grader_types')
+            feedback_items = rubric_data.get('feedback_items')
+            feedback_dicts = rubric_data.get('feedback_dicts')
+            grader_ids = rubric_data.get('grader_ids')
+            submission_ids = rubric_data.get('submission_ids')
         elif task_type == "selfassessment":
             rubric_scores = last_post_assessment
             grader_types = ['SA']
@@ -441,7 +444,7 @@ class CombinedOpenEndedV1Module():
             human_state = task.HUMAN_NAMES[state]
         else:
             human_state = state
-        if len(grader_types) > 0:
+        if grader_types is not None and len(grader_types) > 0:
             grader_type = grader_types[0]
         else:
             grader_type = "IN"
