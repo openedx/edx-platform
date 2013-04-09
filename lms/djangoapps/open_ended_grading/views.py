@@ -27,8 +27,6 @@ from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
 
-template_imports = {'urllib': urllib}
-
 system = ModuleSystem(
     ajax_url=None,
     track_function=None,

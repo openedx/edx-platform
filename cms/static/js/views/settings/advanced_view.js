@@ -130,7 +130,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         }
     },
     saveView : function(event) {
-        smoothScrollTop(event);
+        window.CmsUtils.smoothScrollTop(event);
         // TODO one last verification scan:
         //    call validateKey on each to ensure proper format
         //    check for dupes
