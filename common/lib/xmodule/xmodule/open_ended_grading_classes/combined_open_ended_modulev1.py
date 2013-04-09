@@ -738,7 +738,7 @@ class CombinedOpenEndedV1Module():
         score = None
         if self.check_if_done_and_scored():
             scores = []
-            for i in xrange(0,self.current_task_number):
+            for i in xrange(0, self.current_task_number):
                 last_response = self.get_last_response(i)
                 try:
                     max_score = last_response['max_score'] * float(self.weight)
@@ -746,7 +746,7 @@ class CombinedOpenEndedV1Module():
                     scores.append(score)
                 except:
                     pass
-            if len(scores)>0:
+            if len(scores) > 0:
                 score = max(scores)
 
         score_dict = {
