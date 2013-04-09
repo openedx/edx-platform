@@ -740,14 +740,18 @@ class CombinedOpenEndedV1Module():
             scores = []
             for i in xrange(0,self.current_task_number):
                 last_response = self.get_last_response(i)
-                max_score = last_response['max_score'] * float(self.weight)
-                score = last_response['score'] * float(self.weight)
-                scores.append(score)
-            score = max(scores)
+                try:
+                    max_score = last_response['max_score'] * float(self.weight)
+                    score = last_response['score'] * float(self.weight)
+                    scores.append(score)
+                except:
+                    pass
+            if len(scores)>0:
+                score = max(scores)
 
         score_dict = {
-            'score': score ,
-            'total': max_score ,
+            'score': score,
+            'total': max_score,
         }
 
         return score_dict

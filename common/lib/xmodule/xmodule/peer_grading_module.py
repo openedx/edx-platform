@@ -183,11 +183,9 @@ class PeerGradingModule(PeerGradingFields, XModule):
         score_dict = {
             'score': score,
             'total': max_score,
-            }
+        }
         if self.use_for_single_location not in TRUE_DICT or self.is_graded not in TRUE_DICT:
             return score_dict
-
-
 
         try:
             count_graded = self.student_data_for_location['count_graded']
@@ -207,7 +205,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 self.student_data_for_location = response
 
         try:
-            score = int(count_graded >= count_required and count_graded>0) * float(self.weight)
+            score = int(count_graded >= count_required and count_graded > 0) * float(self.weight)
             total = self.max_grade * float(self.weight)
             score_dict['score'] = score
             score_dict['total'] = total
@@ -588,5 +586,5 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
 
     stores_state = True
     has_score = True
-    always_recalculate_grades=True
+    always_recalculate_grades = True
     template_dir_name = "peer_grading"
