@@ -8,11 +8,9 @@ If student have answered - words he entered and cloud.
 Stunent can change his answer.
 """
 
-import cgi
 import json
 import logging
 import re
-from copy import deepcopy
 from collections import OrderedDict
 
 from lxml import etree
@@ -56,7 +54,11 @@ class WordCloudModule(WordCloudFields, XModule):
         if self.submitted:
             return json.dumps({
                 'status': 'success',
-                'student_words': self.student_words,
+                'student_words': {
+                    word:self.all_words[word] for
+                        word in self.student_words
+                    },
+                'total_count': sum(self.all_words.values())
                 'top_words': self.prepare_words(self.top_words)
             })
         else:
@@ -133,9 +135,6 @@ class WordCloudModule(WordCloudFields, XModule):
 
             self.all_words = temp_all_words
 
-            return self.get_state_json()
-
-        elif dispatch == 'get_state':
             return self.get_state_json()
         else:
             return json.dumps({
