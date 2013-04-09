@@ -26,6 +26,8 @@
   zoom: 1;
 }
 
+/* Commented out the following that was messing up the CSS in sequential and had no use anyway when jsme is running inside edX platform.
+
 body {
 	font-family: arial,sans-serif;
 }
@@ -45,6 +47,7 @@ a:visited {
 a:active {
 	color:#ff0000;
 }
+*/
 
 /*** Button ***/
 

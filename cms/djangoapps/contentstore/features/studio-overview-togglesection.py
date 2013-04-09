@@ -1,5 +1,7 @@
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from lettuce import world, step
-from terrain.factories import *
 from common import *
 from nose.tools import assert_true, assert_false, assert_equal
 
@@ -9,16 +11,16 @@ logger = getLogger(__name__)
 
 @step(u'I have a course with no sections$')
 def have_a_course(step):
-    clear_courses()
-    course = CourseFactory.create()
+    world.clear_courses()
+    course = world.CourseFactory.create()
 
 
 @step(u'I have a course with 1 section$')
 def have_a_course_with_1_section(step):
-    clear_courses()
-    course = CourseFactory.create()
-    section = ItemFactory.create(parent_location=course.location)
-    subsection1 = ItemFactory.create(
+    world.clear_courses()
+    course = world.CourseFactory.create()
+    section = world.ItemFactory.create(parent_location=course.location)
+    subsection1 = world.ItemFactory.create(
         parent_location=section.location,
         template='i4x://edx/templates/sequential/Empty',
         display_name='Subsection One',)
@@ -26,21 +28,21 @@ def have_a_course_with_1_section(step):
 
 @step(u'I have a course with multiple sections$')
 def have_a_course_with_two_sections(step):
-    clear_courses()
-    course = CourseFactory.create()
-    section = ItemFactory.create(parent_location=course.location)
-    subsection1 = ItemFactory.create(
+    world.clear_courses()
+    course = world.CourseFactory.create()
+    section = world.ItemFactory.create(parent_location=course.location)
+    subsection1 = world.ItemFactory.create(
         parent_location=section.location,
         template='i4x://edx/templates/sequential/Empty',
         display_name='Subsection One',)
-    section2 = ItemFactory.create(
+    section2 = world.ItemFactory.create(
         parent_location=course.location,
         display_name='Section Two',)
-    subsection2 = ItemFactory.create(
+    subsection2 = world.ItemFactory.create(
         parent_location=section2.location,
         template='i4x://edx/templates/sequential/Empty',
         display_name='Subsection Alpha',)
-    subsection3 = ItemFactory.create(
+    subsection3 = world.ItemFactory.create(
         parent_location=section2.location,
         template='i4x://edx/templates/sequential/Empty',
         display_name='Subsection Beta',)
@@ -50,7 +52,7 @@ def have_a_course_with_two_sections(step):
 def navigate_to_the_course_overview_page(step):
     log_into_studio(is_staff=True)
     course_locator = '.class-name'
-    css_click(course_locator)
+    world.css_click(course_locator)
 
 
 @step(u'I navigate to the courseware page of a course with multiple sections')
@@ -67,44 +69,44 @@ def i_add_a_section(step):
 @step(u'I click the "([^"]*)" link$')
 def i_click_the_text_span(step, text):
     span_locator = '.toggle-button-sections span'
-    assert_true(world.browser.is_element_present_by_css(span_locator, 5))
+    assert_true(world.browser.is_element_present_by_css(span_locator))
     # first make sure that the expand/collapse text is the one you expected
     assert_equal(world.browser.find_by_css(span_locator).value, text)
-    css_click(span_locator)
+    world.css_click(span_locator)
 
 
 @step(u'I collapse the first section$')
 def i_collapse_a_section(step):
     collapse_locator = 'section.courseware-section a.collapse'
-    css_click(collapse_locator)
+    world.css_click(collapse_locator)
 
 
 @step(u'I expand the first section$')
 def i_expand_a_section(step):
     expand_locator = 'section.courseware-section a.expand'
-    css_click(expand_locator)
+    world.css_click(expand_locator)
 
 
 @step(u'I see the "([^"]*)" link$')
 def i_see_the_span_with_text(step, text):
     span_locator = '.toggle-button-sections span'
-    assert_true(world.browser.is_element_present_by_css(span_locator, 5))
-    assert_equal(world.browser.find_by_css(span_locator).value, text)
-    assert_true(world.browser.find_by_css(span_locator).visible)
+    assert_true(world.is_css_present(span_locator))
+    assert_equal(world.css_find(span_locator).value, text)
+    assert_true(world.css_visible(span_locator))
 
 
 @step(u'I do not see the "([^"]*)" link$')
 def i_do_not_see_the_span_with_text(step, text):
     # Note that the span will exist on the page but not be visible
     span_locator = '.toggle-button-sections span'
-    assert_true(world.browser.is_element_present_by_css(span_locator))
-    assert_false(world.browser.find_by_css(span_locator).visible)
+    assert_true(world.is_css_present(span_locator))
+    assert_false(world.css_visible(span_locator))
 
 
 @step(u'all sections are expanded$')
 def all_sections_are_expanded(step):
     subsection_locator = 'div.subsection-list'
-    subsections = world.browser.find_by_css(subsection_locator)
+    subsections = world.css_find(subsection_locator)
     for s in subsections:
         assert_true(s.visible)
 
@@ -112,6 +114,6 @@ def all_sections_are_expanded(step):
 @step(u'all sections are collapsed$')
 def all_sections_are_expanded(step):
     subsection_locator = 'div.subsection-list'
-    subsections = world.browser.find_by_css(subsection_locator)
+    subsections = world.css_find(subsection_locator)
     for s in subsections:
         assert_false(s.visible)

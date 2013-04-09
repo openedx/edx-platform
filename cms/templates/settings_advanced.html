@@ -19,6 +19,12 @@ from contentstore import utils
 <script type="text/javascript">
 $(document).ready(function () {
 
+    $("form :input").focus(function() {
+      $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
+    });
+
     // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
     var advancedModel = new CMS.Models.Settings.Advanced(${advanced_dict | n}, {parse: true});
     advancedModel.url = "${reverse('course_advanced_settings_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
@@ -36,13 +42,17 @@ editor.render();
 </%block>
 
 <%block name="content">
-<div class="wrapper-content wrapper">
-  <section class="content">
-    <header class="page">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-subtitle">
+    <div class="title">
       <span class="title-sub">Settings</span>
       <h1 class="title-1">Advanced Settings</h1>
-    </header>
+    </div>
+  </header>
+</div>
 
+<div class="wrapper-content wrapper">
+  <section class="content">
     <article class="content-primary" role="main">
       <form id="settings_advanced" class="settings-advanced" method="post" action="">
 
@@ -63,7 +73,7 @@ editor.render();
           <p class="instructions"><strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.</p>
 
           <ul class="list-input course-advanced-policy-list enum">
-              
+
           </ul>
         </section>
       </form>
@@ -94,22 +104,60 @@ editor.render();
     </aside>
   </section>
 </div>
+</%block>
 
+<%block name="view_notifications">
 <!-- notification: change has been made and a save is needed -->
-<div class="wrapper wrapper-notification wrapper-notification-warning">
-  <div class="notification warning">
-    <div class="copy">
-      <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+<div class="wrapper wrapper-notification wrapper-notification-warning" aria-hidden="true" role="dialog" aria-labelledby="notification-changesMade-title" aria-describedby="notification-changesMade-description">
+  <div class="notification warning has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
-      <p><strong>Note: </strong>Your changes will not take effect until you <strong>save your
-      progress</strong>. Take care with policy value formatting, as validation is <strong>not implemented</strong>.</p>
+    <div class="copy">
+      <h2 class="title title-3" id="notification-changesMade-title">You've Made Some Changes</h2>
+      <p id="notification-changesMade-description">Your changes will not take effect until you <strong>save your progress</strong>. Take care with key and value formatting, as validation is <strong>not implemented</strong>.</p>
     </div>
 
-    <div class="actions">
+    <nav class="nav-actions">
+      <h3 class="sr">Notification Actions</h3>
       <ul>
-        <li><a href="#" class="save-button">Save</a></li>
-        <li><a href="#" class="cancel-button">Cancel</a></li>
+        <li class="nav-item">
+          <a href="" class="action-primary save-button">Save Changes</a>
+        </li>
+        <li class="nav-item">
+          <a href="" class="action-secondary cancel-button">Cancel</a>
+        </li>
       </ul>
+    </nav>
+  </div>
+</div>
+</%block>
+
+<%block name="view_alerts">
+<!-- alert: save confirmed with close -->
+<div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
+  <div class="alert confirmation">
+    <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">Your policy changes have been saved.</h2>
+      <p>Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.</p>
+    </div>
+
+    <a href="" rel="view" class="action action-alert-close">
+      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
+      <span class="label">close alert</span>
+    </a>
+  </div>
+</div>
+
+<!-- alert: error -->
+<div class="wrapper wrapper-alert wrapper-alert-error" role="status">
+  <div class="alert error">
+    <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">There was an error saving your information</h2>
+      <p>Please see the error below and correct it to ensure there are no problems in rendering your course.</p>
     </div>
   </div>
 </div>

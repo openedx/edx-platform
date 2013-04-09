@@ -13,6 +13,8 @@
     from django.core.urlresolvers import reverse
 %>
 
+<%! from xmodule.util.date_utils import get_default_time_display %>
+
 <%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
@@ -29,7 +31,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
     <section class="course-info">
       <header>
-        <h1>Course Progress</h1>
+        <h1>Course Progress for Student '${student.username}' (${student.email})</h1>
       </header>
 
       %if not course.disable_progress_graph:
@@ -60,9 +62,9 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
               <p>
                 ${section['format']}
 
-                %if 'due' in section and section['due']!="":
+                %if section.get('due') is not None:
                   <em>
-                  due ${section['due']}
+                  due ${get_default_time_display(section['due'], course.show_timezone)}
                   </em>
                 %endif
               </p>

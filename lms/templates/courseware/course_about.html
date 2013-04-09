@@ -144,10 +144,20 @@
           <li><div class="icon course-number"></div><p>Course Number</p><span class="course-number">${course.number}</span></li>
           <li><div class="icon start"></div><p>Classes Start</p><span class="start-date">${course.start_date_text}</span></li>
 
-          ## End date should come from course.xml, but this is a quick hack
-          % if get_course_about_section(course, "end_date"):
-            <li><div class="icon end"></div><p>Classes End</p><span class="final-date">${get_course_about_section(course, "end_date")}</span></li>
-          % endif
+            ## We plan to ditch end_date (which is not stored in course metadata),
+            ## but for backwards compatibility, show about/end_date blob if it exists.
+            % if get_course_about_section(course, "end_date") or course.end:
+            <li>
+                <div class="icon end"></div>
+                <p>Classes End</p><span class="final-date">
+                % if get_course_about_section(course, "end_date"):
+                    ${get_course_about_section(course, "end_date")}
+                % else:
+                    ${course.end_date_text}
+                % endif
+                </span>
+            </li>
+            % endif
 
           % if get_course_about_section(course, "effort"):
             <li><div class="icon effort"></div><p>Estimated Effort</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>

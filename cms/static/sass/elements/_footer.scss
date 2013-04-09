@@ -1,0 +1,75 @@
+// studio - elements - global footer
+// ====================
+
+.wrapper-footer {
+  position: relative;
+  width: 100%;
+  margin: 0 0 $baseline 0;
+  padding: $baseline;
+
+  footer.primary {
+    @include clearfix();
+    @include font-size(13);
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    color: $gray-l1;
+
+    .colophon {
+      width: flex-grid(4, 12);
+      float: left;
+      margin-right: flex-gutter(2);
+    }
+
+    a {
+      color: $gray;
+
+      &:hover, &:active {
+        color: $gray-d2;
+      }
+    }
+
+    .nav-peripheral {
+      width: flex-grid(6, 12);
+      float: right;
+      text-align: right;
+
+      .nav-item {
+        display: inline-block;
+        margin-right: ($baseline/2);
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        a {
+          @include border-radius(2px);
+          padding: ($baseline/2) ($baseline*0.75);
+          background: transparent;
+
+          .ss-icon {
+            @include transition(top .25s ease-in-out .25s);
+            @include font-size(15);
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: ($baseline/4);
+            color: $gray-l1;
+          }
+
+          &:hover, &:active {
+            color: $gray-d2;
+
+            .ss-icon {
+              color: $gray-d2;
+            }
+          }
+
+          &.is-active {
+            color: $gray-d2;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,7 @@
+// studio - utilities - mixins and extends
+// ====================
+
+// mixins - utility
 @mixin clearfix {
 	&:after {
 		content: '';
@@ -8,19 +12,20 @@
 	}
 }
 
+// mixins - grandfathered
 @mixin button {
 	display: inline-block;
-	padding: 4px 20px 6px;
-	font-size: 14px;
+	padding: ($baseline/5) $baseline ($baseline/4);
+	@include font-size(14);
 	font-weight: 700;
 	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
 	@include transition(background-color .15s, box-shadow .15s);
 
 	&.disabled {
-		border: 1px solid $lightGrey !important;
+		border: 1px solid $gray-l1 !important;
 		border-radius: 3px !important;
-		background: $lightGrey !important;
-		color: $darkGrey !important;
+		background: $gray-l1 !important;
+		color: $gray-d1 !important;
 		pointer-events: none;
 		cursor: none;
 		&:hover {
@@ -33,32 +38,111 @@
 	}
 }
 
-@mixin blue-button {
+@mixin green-button {
 	@include button;
-	border: 1px solid #437fbf;
+	border: 1px solid $green-d1;
 	border-radius: 3px;
 	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-	background-color: $blue;
-	color: #fff;
+	background-color: $green;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+	color: $white;
 
-	&:hover, &.active {
-		background-color: #62aaf5;
-		color: #fff;
+	&:hover {
+		background-color: $green-s1;
+		color: $white;
+	}
+
+	&.disabled {
+		border: 1px solid $green-l3 !important;
+		background: $green-l3 !important;
+		color: $white !important;
+		@include box-shadow(none);
 	}
 }
 
-@mixin green-button {
-  @include button;
-  border: 1px solid #0d7011;
-  border-radius: 3px;
-  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-  background-color: $green;
-  color: #fff;
+@mixin blue-button {
+	@include button;
+	border: 1px solid $blue-d1;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $blue;
+	color: $white;
 
-  &:hover {
-  background-color: #129416;
-  color: #fff;
-  }
+	&:hover, &.active {
+		background-color: $blue-s2;
+		color: $white;
+	}
+
+	&.disabled {
+		border: 1px solid $blue-l3 !important;
+		background: $blue-l3 !important;
+		color: $white !important;
+		@include box-shadow(none);
+	}
+}
+
+@mixin red-button {
+	@include button;
+	border: 1px solid $red-d1;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $red;
+	color: $white;
+
+	&:hover, &.active {
+		background-color: $red-s1;
+		color: $white;
+	}
+
+	&.disabled {
+		border: 1px solid $red-l3 !important;
+		background: $red-l3 !important;
+		color: $white !important;
+		@include box-shadow(none);
+	}
+}
+
+@mixin pink-button {
+	@include button;
+	border: 1px solid $pink-d1;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $pink;
+	color: $white;
+
+	&:hover, &.active {
+		background-color: $pink-s1;
+		color: $white;
+	}
+
+	&.disabled {
+		border: 1px solid $pink-l3 !important;
+		background: $pink-l3 !important;
+		color: $white !important;
+		@include box-shadow(none);
+	}
+}
+
+@mixin orange-button {
+	@include button;
+	border: 1px solid $orange-d1;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
+	background-color: $orange;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+	color: $gray-d2;
+
+	&:hover {
+		background-color: $orange-s2;
+		color: $gray-d2;
+	}
+
+	&.disabled {
+		border: 1px solid $orange-l3 !important;
+		background: $orange-l2 !important;
+		color: $gray-l1 !important;
+		@include box-shadow(none);
+	}
 }
 
 @mixin white-button {
@@ -77,24 +161,9 @@
   }
 }
 
-@mixin orange-button {
-	@include button;
-	border: 1px solid #bda046;
-	border-radius: 3px;
-	@include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
-	background-color: #edbd3c;
-	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-	color: #3c3c3c;
-
-	&:hover {
-		background-color: #ffcd46;
-		color: #3c3c3c;
-	}
-}
-
 @mixin grey-button {
 	@include button;
-	border: 1px solid $darkGrey;
+	border: 1px solid $gray-d2;
 	border-radius: 3px;
 	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
 	background-color: #d1dae3;
@@ -107,39 +176,32 @@
 	}
 }
 
-@mixin green-button {
+@mixin gray-button {
 	@include button;
-	border: 1px solid $darkGreen;
+	border: 1px solid $gray-d1;
 	border-radius: 3px;
-	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-	background-color: $green;
-	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-	color: #fff;
+	@include linear-gradient(top, $white-t1, rgba(255, 255, 255, 0));
+	background-color: $gray-d2;
+	@include box-shadow(0 1px 0 $white-t1 inset);
+	color: $gray-l3;
 
 	&:hover {
-		background-color: $brightGreen;
-		color: #fff;
-	}
-
-	&.disabled {
-		border: 1px solid $disabledGreen !important;
-		background: $disabledGreen !important;
-		color: #fff !important;
-		@include box-shadow(none);
+		background-color: $gray-d3;
+		color: $white;
 	}
 }
 
 @mixin dark-grey-button {
 	@include button;
-	border: 1px solid #1c1e20;
+	border: 1px solid $gray-d2;
 	border-radius: 3px;
-	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0)) $extraDarkGrey;
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0)) $gray-d1;
 	box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
-	color: #fff;
+	color: $white;
 
 	&:hover {
-		background-color: #595f64;
-		color: #fff;
+		background-color: $gray-d4;
+		color: $white;
 	}
 }
 
@@ -160,7 +222,7 @@
 	}
 
 	textarea {
-		min-height: 80px;		
+		min-height: 80px;
 	}
 
 	h5 {
@@ -205,7 +267,7 @@
 	.section-item {
 		position: relative;
 		display: block;
-		padding: 6px 8px 8px 16px;			
+		padding: 6px 8px 8px 16px;
 		background: #edf1f5;
 		font-size: 13px;
 
@@ -276,20 +338,100 @@
 	}
 }
 
-@mixin sr-text {
-  border: 0; 
-  clip: rect(0 0 0 0); 
-  height: 1px; 
-  margin: -1px; 
-  overflow: hidden; 
-  padding: 0; 
-  position: absolute; 
-  width: 1px;
-}
+// ====================
 
+// sunsetted mixins
 @mixin active {
 	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
 	background-color: rgba(255, 255, 255, .3);
 	@include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
+
+// ====================
+
+// extends - buttons
+.btn {
+  @include box-sizing(border-box);
+  @include transition(color 0.25s ease-in-out, border-color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
+  display: inline-block;
+  cursor: pointer;
+
+  &:hover, &:active {
+
+  }
+
+  &.disabled, &[disabled] {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .icon-inline {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+  }
+}
+
+// pill button
+.btn-pill {
+	@include border-radius($baseline/5);
+}
+
+.btn-rounded {
+	@include border-radius($baseline/2);
+}
+
+// primary button
+.btn-primary {
+  @extend .btn;
+  @extend .btn-pill;
+  padding:($baseline/2) $baseline;
+  border-width: 1px;
+  border-style: solid;
+  line-height: 1.5em;
+  text-align: center;
+
+  &:hover, &:active {
+    @include box-shadow(0 2px 1px $shadow-l1);
+  }
+
+  &.current, &.active {
+  	@include box-shadow(inset 1px 1px 2px $shadow-d1);
+
+  	&:hover, &:active {
+  		@include box-shadow(inset 1px 1px 1px $shadow-d1);
+  	}
+  }
+}
+
+// secondary button
+.btn-secondary {
+	@extend .btn;
+	@extend .btn-pill;
+	border-width: 1px;
+  border-style: solid;
+	padding:($baseline/2) $baseline;
+  background: transparent;
+  line-height: 1.5em;
+  text-align: center;
+
+	&:hover, &:active {
+
+	}
+
+	&.current, &.active {
+
+	}
+}
+
+// ====================
+
+// extends - depth levels
+.depth0 { z-index: 0; }
+.depth1 { z-index: 10; }
+.depth2 { z-index: 100; }
+.depth3 { z-index: 1000; }
+.depth4 { z-index: 10000; }
+.depth5 { z-index: 100000; }

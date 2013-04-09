@@ -1,0 +1,106 @@
+// studio - views - course import
+// ====================
+
+body.course.import {
+  
+  .import-overview {
+    @extend .window;
+    @include clearfix;
+    padding: 30px 40px;
+  }
+
+  .description {
+    float: left;
+    width: 62%;
+    margin-right: 3%;
+    font-size: 14px;
+
+    h2 {
+      font-weight: 700;
+      font-size: 19px;
+      margin-bottom: 20px;
+    }
+
+    strong {
+      font-weight: 700;
+    }
+
+    p + p {
+      margin-top: 20px;
+    }
+  }
+
+  .import-form {
+    float: left;
+    width: 35%;
+    padding: 25px 30px 35px;
+    @include box-sizing(border-box);
+    border: 1px solid $mediumGrey;
+    border-radius: 3px;
+    background: $lightGrey;
+    text-align: center;
+
+    h2 {
+      margin-bottom: 30px;
+      font-size: 26px;
+      font-weight: 300;
+    }
+
+    .file-name-block,
+    .error-block {
+      display: none;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+
+    .error-block {
+      color: $error-red;
+    }
+
+    .choose-file-button {
+      @include blue-button;
+      padding: 10px 50px 11px;
+      font-size: 17px;
+    }
+
+    .choose-file-button-inline {
+      display: block;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .submit-button {
+      @include orange-button;
+      display: none;
+      max-width: 100%;
+      padding: 8px 20px 10px;
+      white-space: normal;
+    }
+  }
+
+  .progress-bar {
+    display: none;
+    width: 350px;
+    height: 30px;
+    margin: 30px auto 10px;
+    border: 1px solid $blue;
+
+    &.loaded {
+      border-color: #66b93d;
+
+      .progress-fill {
+        background: #66b93d;
+      }
+    }
+  }
+
+  .progress-fill {
+    width: 0%;
+    height: 30px;
+    background: $blue;
+    color: #fff;
+    line-height: 48px;
+  }
+}

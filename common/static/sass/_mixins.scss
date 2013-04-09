@@ -1,17 +1,24 @@
+// studio - utilities - mixins and extends
+// ====================
+
 // font-sizing
 @function em($pxval, $base: 16) {
   @return #{$pxval / $base}em;
 }
 
-@mixin font-size($sizeValue: 1.6){
+@mixin font-size($sizeValue: 16){
   font-size: $sizeValue + px;
   font-size: ($sizeValue/10) + rem;
 }
+
+// ====================
 
 // line-height
 @function lh($amount: 1) {
   @return $body-line-height * $amount;
 }
+
+// ====================
 
 // image-replacement hidden text
 @mixin text-hide() {
@@ -32,6 +39,8 @@
   width: 1px;
 }
 
+// ====================
+
 // vertical and horizontal centering
 @mixin vertically-and-horizontally-centered ($height, $width) {
   left: 50%;
@@ -43,6 +52,8 @@
   top: 150px;
 }
 
+// ====================
+
 // sizing
 @mixin size($width: $baseline, $height: $baseline) {
   height: $height;
@@ -52,6 +63,8 @@
 @mixin square($size: $baseline) {
   @include size($size);
 }
+
+// ====================
 
 // placeholder styling
 @mixin placeholder($color) {
@@ -64,4 +77,106 @@
   :-ms-input-placeholder {  
      color: $color; 
   }
+}
+
+// ====================
+
+// extends - visual
+.faded-hr-divider {
+  @include background-image(linear-gradient(180deg, rgba(200,200,200, 0) 0%,
+                                                    rgba(200,200,200, 1) 50%,
+                                                    rgba(200,200,200, 0)));
+  height: 1px;
+  width: 100%;
+}
+
+.faded-hr-divider-medium {
+  @include background-image(linear-gradient(180deg, rgba(240,240,240, 0) 0%,
+                                                    rgba(240,240,240, 1) 50%,
+                                                    rgba(240,240,240, 0)));
+  height: 1px;
+  width: 100%;
+}
+
+.faded-hr-divider-light {
+  @include background-image(linear-gradient(180deg, rgba(255,255,255, 0) 0%,
+                                                    rgba(255,255,255, 0.8) 50%,
+                                                    rgba(255,255,255, 0)));
+  height: 1px;
+  width: 100%;
+}
+
+.faded-vertical-divider {
+  @include background-image(linear-gradient(90deg, rgba(200,200,200, 0) 0%,
+                                                    rgba(200,200,200, 1) 50%,
+                                                    rgba(200,200,200, 0)));
+  height: 100%;
+  width: 1px;
+}
+
+.faded-vertical-divider-light {
+  @include background-image(linear-gradient(90deg, rgba(255,255,255, 0) 0%,
+                                                    rgba(255,255,255, 0.6) 50%,
+                                                    rgba(255,255,255, 0)));
+  height: 100%;
+  width: 1px;
+}
+
+.vertical-divider {
+  @extend .faded-vertical-divider;
+  position: relative;
+
+  &::after {
+    @extend .faded-vertical-divider-light;
+    content: "";
+    display: block;
+    position: absolute;
+    left: 1px;
+  }
+}
+
+.horizontal-divider {
+  border: none;
+  @extend .faded-hr-divider;
+  position: relative;
+
+  &::after {
+    @extend .faded-hr-divider-light;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 1px;
+  }
+}
+
+.fade-right-hr-divider {
+  @include background-image(linear-gradient(180deg, rgba(200,200,200, 0) 0%,
+                                                    rgba(200,200,200, 1)));
+  border: none;
+}
+
+.fade-left-hr-divider {
+  @include background-image(linear-gradient(180deg, rgba(200,200,200, 1) 0%,
+                                                    rgba(200,200,200, 0)));
+  border: none;
+}
+
+// extends - ui
+.window {
+  @include clearfix();
+  @include border-radius(3px);
+  @include box-shadow(0 1px 1px $shadow-l1);
+  margin-bottom: $baseline;
+  border: 1px solid $gray-l2;
+  background: $white;
+}
+
+.elem-d1 {
+  @include clearfix();
+  @include box-sizing(border-box);
+}
+
+.elem-d2 {
+  @include clearfix();
+  @include box-sizing(border-box);
 }

@@ -156,6 +156,7 @@ function goto( mode)
 
     <p>
     <input type="submit" name="action" value="Download CSV of answer distributions">
+    <input type="submit" name="action" value="Dump description of graded assignments configuration">
     </p>
     <hr width="40%" style="align:left">
 
@@ -190,6 +191,7 @@ function goto( mode)
     <input type="submit" name="action" value="Export CSV file of grades for assignment">
     </li>
     </ul>
+    <hr width="40%" style="align:left">
 
   %endif
 
@@ -197,11 +199,13 @@ function goto( mode)
     <p>edX email address or their username: </p>
     <p><input type="text" name="unique_student_identifier">  <input type="submit" name="action" value="Get link to student's progress page"></p>
     <p>and, if you want to reset the number of attempts for a problem, the urlname of that problem</p>
-    <p> <input type="text" name="problem_to_reset"> <input type="submit" name="action" value="Reset student's attempts">  </p>
+    <p> <input type="text" name="problem_to_reset" size="60"> <input type="submit" name="action" value="Reset student's attempts">  </p>
 
     %if instructor_access:
     <p> You may also delete the entire state of a student for a problem:
     <input type="submit" name="action" value="Delete student state for problem">  </p>
+    <p>To delete the state of other XBlocks specify modulename/urlname, eg
+       <tt>combinedopenended/Humanities_SA_Peer</tt></p>
     %endif
 
  %endif

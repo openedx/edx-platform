@@ -113,6 +113,9 @@ SUBDOMAIN_BRANDING = {
 # have an actual course with that org set
 VIRTUAL_UNIVERSITIES = []
 
+# Organization that contain other organizations
+META_UNIVERSITIES = {'UTx': ['UTAustinX']}
+
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
 ############################## Course static files ##########################
@@ -218,7 +221,7 @@ FILE_UPLOAD_HANDLERS = (
 
 ########################### PIPELINE #################################
 
-PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 ########################## PEARSON TESTING ###########################
 MITX_FEATURES['ENABLE_PEARSON_HACK_TEST'] = True

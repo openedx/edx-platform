@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from path import path
 import unittest
 from fs.memoryfs import MemoryFS
 
 from lxml import etree
 from mock import Mock, patch
-from collections import defaultdict
 
-from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
 from xmodule.xml_module import is_pointer_tag
-from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import compute_inherited_metadata
+from xmodule.fields import Date
 
 from .test_export import DATA_DIR
 
@@ -137,7 +133,7 @@ class ImportTestCase(BaseCourseTestCase):
             - inherited metadata doesn't leak to children.
         """
         system = self.get_system()
-        v = '1 hour'
+        v = 'March 20 17:00'
         url_name = 'test1'
         start_xml = '''
         <course org="{org}" course="{course}"
@@ -150,11 +146,11 @@ class ImportTestCase(BaseCourseTestCase):
         compute_inherited_metadata(descriptor)
 
         print descriptor, descriptor._model_data
-        self.assertEqual(descriptor.lms.due, v)
+        self.assertEqual(descriptor.lms.due, Date().from_json(v))
 
         # Check that the child inherits due correctly
         child = descriptor.get_children()[0]
-        self.assertEqual(child.lms.due, v)
+        self.assertEqual(child.lms.due, Date().from_json(v))
 
         # Now export and check things
         resource_fs = MemoryFS()

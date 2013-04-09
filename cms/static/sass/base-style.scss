@@ -1,39 +1,58 @@
+// studio - css architecture
+// ====================
+
+// bourbon libs and resets
 @import 'bourbon/bourbon';
 @import 'bourbon/addons/button';
-@import 'vendor/normalize';
-@import 'keyframes';
-
-@import 'reset';
-@import 'mixins';
-
-@import "fonts";
 @import "variables";
-@import "cms_mixins";
-@import "extends";
-@import "base";
-@import "header";
-@import "footer";
-@import "dashboard";
-@import "courseware";
-@import "subsection";
-@import "unit";
-@import "assets";
-@import "static-pages";
-@import "users";
-@import "import";
-@import "export";
-@import "settings";
-@import "course-info";
-@import "landing";
-@import "graphics";
-@import "modal";
-@import "alerts";
-@import "login";
-@import "account";
-@import "index";
-@import 'jquery-ui-calendar';
+@import 'vendor/normalize';
+@import 'reset';
 
-@import 'content-types';
+// utilities
+@import 'variables';
+@import 'mixins';
+@import 'cms_mixins';
 
+// assets
+@import 'assets/fonts';
+@import 'assets/graphics';
+@import 'assets/keyframes';
+
+// base
+@import 'base';
+
+// elements
+@import 'elements/typography';
+@import 'elements/icons';
+@import 'elements/controls';
+@import 'elements/navigation';
+@import 'elements/header';
+@import 'elements/footer';
+@import 'elements/sock';
+@import 'elements/forms';
+@import 'elements/modal';
+@import 'elements/alerts';
+@import 'elements/vendor';
+@import 'elements/tender-widget';
+
+// specific views
+@import 'views/account';
+@import 'views/assets';
+@import 'views/updates';
+@import 'views/dashboard';
+@import 'views/export';
+@import 'views/index';
+@import 'views/import';
+@import 'views/outline';
+@import 'views/settings';
+@import 'views/static-pages';
+@import 'views/subsection';
+@import 'views/unit';
+@import 'views/users';
+@import 'views/checklists';
+
+@import 'assets/content-types';
+
+// xblock-related
 @import 'module/module-styles.scss';
 @import 'descriptor/module-styles.scss';
