@@ -30,7 +30,7 @@ ASSUMED_IMPORTS=[
     ("draganddrop", "verifiers.draganddrop"),
 ]
 
-# We'll need the code from lazymod.py for use in jailpy, so read it now.
+# We'll need the code from lazymod.py for use in safe_exec, so read it now.
 lazymod_py_file = lazymod.__file__
 if lazymod_py_file.endswith("c"):
     lazymod_py_file = lazymod_py_file[:-1]

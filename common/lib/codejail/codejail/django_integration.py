@@ -3,7 +3,7 @@
 from django.core.exceptions import MiddlewareNotUsed
 from django.conf import settings
 
-import codejail.jailpy
+import codejail.jail_code
 
 
 class ConfigureCodeJailMiddleware(object):
@@ -13,5 +13,5 @@ class ConfigureCodeJailMiddleware(object):
         python_bin = settings.CODE_JAIL.get('python_bin')
         if python_bin:
             user = settings.CODE_JAIL['user']
-            codejail.jailpy.configure(python_bin, user=user)
+            codejail.jail_code.configure("python", python_bin, user=user)
         raise MiddlewareNotUsed

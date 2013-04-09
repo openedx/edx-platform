@@ -7,7 +7,7 @@ import shutil
 import sys
 import textwrap
 
-from codejail import jailpy
+from codejail import jail_code
 from codejail.util import temp_directory, change_directory
 
 log = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ def safe_exec(code, globals_dict, files=None, python_path=None):
         log.debug("Exec: %s", code)
         log.debug("Stdin: %s", stdin)
 
-    res = jailpy.jailpy(jailed_code, stdin=stdin, files=files)
+    res = jail_code.jail_code("python", jailed_code, stdin=stdin, files=files)
     if res.status != 0:
         raise Exception("Couldn't execute jailed code: %s" % res.stderr)
     globals_dict.update(json.loads(res.stdout))
@@ -144,5 +144,5 @@ def not_safe_exec(code, globals_dict, files=None, python_path=None):
 
 # Running Python code in the sandbox makes it difficult to debug.
 # Change 0 to 1 to run the code directly.
-if 0 or not jailpy.is_configured():
+if 0 or not jail_code.is_configured("python"):
     safe_exec = not_safe_exec

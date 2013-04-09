@@ -19,39 +19,49 @@ log = logging.getLogger(__name__)
 
 # TODO: limit too much stdout data?
 
-# Configure the Python command
+# Configure the commands
 
-PYTHON_CMD = None
+# COMMANDS is a map from an abstract command name to a list of command-line
+# pieces, such as subprocess.Popen wants.
+COMMANDS = {}
 
 
-def configure(python_bin, user=None):
-    """Configure the jailpy module."""
-    global PYTHON_CMD
-    PYTHON_CMD = []
+def configure(command, bin_path, user=None):
+    """Configure a command for jail_code to use.
+
+    `command` is the abstract command you're configuring, such as "python" or
+    "node".  `bin_path` is the path to the binary.  `user`, if provided, is
+    the user name to run the command under.
+
+    """
+    cmd_argv = []
     if user:
-        PYTHON_CMD.extend(['sudo', '-u', 'sandbox'])
-    PYTHON_CMD.extend([python_bin, '-E'])
+        cmd_argv.extend(['sudo', '-u', 'sandbox'])
+    cmd_argv.extend([bin_path, '-E'])
+    COMMANDS[command] = cmd_argv
 
 
-def is_configured():
-    return bool(PYTHON_CMD)
+def is_configured(command):
+    return command in COMMANDS
 
 # By default, look where our current Python is, and maybe there's a
 # python-sandbox alongside.  Only do this if running in a virtualenv.
 if hasattr(sys, 'real_prefix'):
     if os.path.isdir(sys.prefix + "-sandbox"):
-        configure(sys.prefix + "-sandbox/bin/python", "sandbox")
+        configure("python", sys.prefix + "-sandbox/bin/python", "sandbox")
 
 
 class JailResult(object):
-    """A passive object for us to return from jailpy."""
+    """A passive object for us to return from jail_code."""
     def __init__(self):
         self.stdout = self.stderr = self.status = None
 
 
-def jailpy(code, files=None, argv=None, stdin=None):
-    """
-    Run Python code in a jailed subprocess.
+def jail_code(command, code, files=None, argv=None, stdin=None):
+    """Run code in a jailed subprocess.
+
+    `command` is an abstract command ("python", "node", ...) that must have
+    been configured using `configure`.
 
     `code` is a string containing the Python code to run.
 
@@ -64,8 +74,8 @@ def jailpy(code, files=None, argv=None, stdin=None):
         .status: return status of the process: an int, 0 for successful
 
     """
-    if not PYTHON_CMD:
-        raise Exception("jailpy needs to be configured")
+    if not is_configured(command):
+        raise Exception("jail_code needs to be configured for %r" % command)
 
     with temp_directory(delete_when_done=True) as tmpdir:
 
@@ -83,7 +93,7 @@ def jailpy(code, files=None, argv=None, stdin=None):
         with open(os.path.join(tmpdir, "jailed_code.py"), "w") as jailed:
             jailed.write(code)
 
-        cmd = PYTHON_CMD + ['jailed_code.py'] + (argv or [])
+        cmd = COMMANDS[command] + ['jailed_code.py'] + (argv or [])
 
         subproc = subprocess.Popen(
             cmd, preexec_fn=set_process_limits, cwd=tmpdir,

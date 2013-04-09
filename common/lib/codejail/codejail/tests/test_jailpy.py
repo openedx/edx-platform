@@ -1,20 +1,24 @@
-"""Test jailpy.py"""
+"""Test jail_code.py"""
 
 import os.path
 import textwrap
 import unittest
 from nose.plugins.skip import SkipTest
 
-from codejail.jailpy import jailpy, is_configured
+from codejail.jail_code import jail_code, is_configured
 
 dedent = textwrap.dedent
 
 
-class JailPyHelpers(object):
-    """Assert helpers for jailpy tests."""
+def jailpy(*args, **kwargs):
+    return jail_code("python", *args, **kwargs)
+
+
+class JailCodeHelpers(object):
+    """Assert helpers for jail_code tests."""
     def setUp(self):
-        super(JailPyHelpers, self).setUp()
-        if not is_configured():
+        super(JailCodeHelpers, self).setUp()
+        if not is_configured("python"):
             raise SkipTest
 
     def assertResultOk(self, res):
@@ -22,7 +26,7 @@ class JailPyHelpers(object):
         self.assertEqual(res.status, 0)
 
 
-class TestFeatures(JailPyHelpers, unittest.TestCase):
+class TestFeatures(JailCodeHelpers, unittest.TestCase):
     def test_hello_world(self):
         res = jailpy("print 'Hello, world!'")
         self.assertResultOk(res)
@@ -64,7 +68,7 @@ class TestFeatures(JailPyHelpers, unittest.TestCase):
         self.assertEqual(res.stdout, 'Look: Hello there.\n\n')
 
 
-class TestLimits(JailPyHelpers, unittest.TestCase):
+class TestLimits(JailCodeHelpers, unittest.TestCase):
     def test_cant_use_too_much_memory(self):
         res = jailpy("print sum(range(100000000))")
         self.assertNotEqual(res.status, 0)
@@ -114,7 +118,7 @@ class TestLimits(JailPyHelpers, unittest.TestCase):
     # TODO: fork
 
 
-class TestMalware(JailPyHelpers, unittest.TestCase):
+class TestMalware(JailCodeHelpers, unittest.TestCase):
     def test_crash_cpython(self):
         # http://nedbatchelder.com/blog/201206/eval_really_is_dangerous.html
         res = jailpy(dedent("""\
