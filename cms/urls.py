@@ -116,6 +116,8 @@ urlpatterns += (
 
     url(r'^logout$', 'student.views.logout_user', name='logout'),
 
+    # static/proof-of-concept views
+    url(r'^ux-alerts$', 'contentstore.views.ux_alerts', name='ux-alerts')
     )
 
 if settings.ENABLE_JASMINE:

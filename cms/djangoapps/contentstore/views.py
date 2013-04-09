@@ -6,7 +6,6 @@ import sys
 import time
 import tarfile
 import shutil
-from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
 from path import path
@@ -42,17 +41,19 @@ from xmodule.modulestore.mongo import MongoUsage
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, ProcessingError
 from functools import partial
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.util.date_utils import get_default_time_display
 
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
 from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, \
-    get_date_display, UnitState, get_course_for_item, get_url_reverse
+    UnitState, get_course_for_item, get_url_reverse, add_open_ended_panel_tab, \
+    remove_open_ended_panel_tab
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from contentstore.course_info_model import get_course_updates, \
@@ -73,7 +74,8 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-ADVANCED_COMPONENT_TYPES = ['annotatable', 'combinedopenended', 'peergrading']
+OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
+ADVANCED_COMPONENT_TYPES = ['annotatable'] + OPEN_ENDED_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -117,6 +119,12 @@ def howitworks(request):
         return index(request)
     else:
         return render_to_response('howitworks.html', {})
+
+
+# static/proof-of-concept views
+def ux_alerts(request):
+    return render_to_response('ux-alerts.html', {})
+
 
 # ==== Views for any logged-in user ==================================
 
@@ -188,7 +196,7 @@ def course_index(request, org, course, name):
         'coursename': name
     })
 
-    course = modulestore().get_item(location)
+    course = modulestore().get_item(location, depth=3)
     sections = course.get_children()
 
     return render_to_response('overview.html', {
@@ -208,19 +216,14 @@ def course_index(request, org, course, name):
 @login_required
 def edit_subsection(request, location):
     # check that we have permissions to edit this item
-    if not has_access(request.user, location):
+    course = get_course_for_item(location)
+    if not has_access(request.user, course.location):
         raise PermissionDenied()
 
-    item = modulestore().get_item(location)
+    item = modulestore().get_item(location, depth=1)
 
-    # TODO: we need a smarter way to figure out what course an item is in
-    for course in modulestore().get_courses():
-        if (course.location.org == item.location.org and
-            course.location.course == item.location.course):
-            break
-
-    lms_link = get_lms_link_for_item(location)
-    preview_link = get_lms_link_for_item(location, preview=True)
+    lms_link = get_lms_link_for_item(location, course_id=course.location.course_id)
+    preview_link = get_lms_link_for_item(location, course_id=course.location.course_id, preview=True)
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
@@ -277,19 +280,13 @@ def edit_unit(request, location):
 
     id: A Location URL
     """
-    # check that we have permissions to edit this item
-    if not has_access(request.user, location):
+    course = get_course_for_item(location)
+    if not has_access(request.user, course.location):
         raise PermissionDenied()
 
-    item = modulestore().get_item(location)
+    item = modulestore().get_item(location, depth=1)
 
-    # TODO: we need a smarter way to figure out what course an item is in
-    for course in modulestore().get_courses():
-        if (course.location.org == item.location.org and
-            course.location.course == item.location.course):
-            break
-
-    lms_link = get_lms_link_for_item(item.location)
+    lms_link = get_lms_link_for_item(item.location, course_id=course.location.course_id)
 
     component_templates = defaultdict(list)
 
@@ -374,7 +371,7 @@ def edit_unit(request, location):
         'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
-        'release_date': get_date_display(datetime.fromtimestamp(time.mktime(containing_subsection.lms.start))) if containing_subsection.lms.start is not None else None,
+        'release_date': get_default_time_display(containing_subsection.lms.start) if containing_subsection.lms.start is not None else None,
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
@@ -448,9 +445,16 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, request.POST)
+
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
+
+    except ProcessingError:
+        log.warning("Module raised an error while processing AJAX request",
+                    exc_info=True)
+        return HttpResponseBadRequest()
+
     except:
         log.exception("error processing ajax call")
         raise
@@ -830,7 +834,7 @@ def upload_asset(request, org, course, coursename):
     readback = contentstore().find(content.location)
 
     response_payload = {'displayname': content.name,
-        'uploadDate': get_date_display(readback.last_modified_at),
+        'uploadDate': get_default_time_display(readback.last_modified_at.timetuple()),
         'url': StaticContent.get_url_path_from_location(content.location),
         'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
         'msg': 'Upload completed'
@@ -1273,15 +1277,48 @@ def course_advanced_updates(request, org, course, name):
     location = get_location_and_verify_access(request, org, course, name)
 
     real_method = get_request_method(request)
-        
+
     if real_method == 'GET':
         return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
     elif real_method == 'DELETE':
-        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))), mimetype="application/json")
+        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))),
+                            mimetype="application/json")
     elif real_method == 'POST' or real_method == 'PUT':
         # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
-        return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
-
+        request_body = json.loads(request.body)
+        #Whether or not to filter the tabs key out of the settings metadata
+        filter_tabs = True
+        #Check to see if the user instantiated any advanced components.  This is a hack to add the open ended panel tab
+        #to a course automatically if the user has indicated that they want to edit the combinedopenended or peergrading
+        #module, and to remove it if they have removed the open ended elements.
+        if ADVANCED_COMPONENT_POLICY_KEY in request_body:
+            #Check to see if the user instantiated any open ended components
+            found_oe_type = False
+            #Get the course so that we can scrape current tabs
+            course_module = modulestore().get_item(location)
+            for oe_type in OPEN_ENDED_COMPONENT_TYPES:
+                if oe_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
+                    #Add an open ended tab to the course if needed
+                    changed, new_tabs = add_open_ended_panel_tab(course_module)
+                    #If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
+                    if changed:
+                        request_body.update({'tabs': new_tabs})
+                        #Indicate that tabs should not be filtered out of the metadata
+                        filter_tabs = False
+                    #Set this flag to avoid the open ended tab removal code below.
+                    found_oe_type = True
+                    break
+            #If we did not find an open ended module type in the advanced settings,
+            # we may need to remove the open ended tab from the course.
+            if not found_oe_type:
+                #Remove open ended tab to the course if needed
+                changed, new_tabs = remove_open_ended_panel_tab(course_module)
+                if changed:
+                    request_body.update({'tabs': new_tabs})
+                    #Indicate that tabs should not be filtered out of the metadata
+                    filter_tabs = False
+        response_json = json.dumps(CourseMetadata.update_from_json(location, request_body, filter_tabs=filter_tabs))
+        return HttpResponse(response_json, mimetype="application/json")
 
 @ensure_csrf_cookie
 @login_required
@@ -1402,7 +1439,7 @@ def asset_index(request, org, course, name):
         id = asset['_id']
         display_info = {}
         display_info['displayname'] = asset['displayname']
-        display_info['uploadDate'] = get_date_display(asset['uploadDate'])
+        display_info['uploadDate'] = get_default_time_display(asset['uploadDate'].timetuple())
 
         asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)

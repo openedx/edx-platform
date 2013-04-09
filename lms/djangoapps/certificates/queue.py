@@ -115,7 +115,7 @@ class XQueueCertInterface(object):
 
         raise NotImplementedError
 
-    def add_cert(self, student, course_id):
+    def add_cert(self, student, course_id, course=None):
         """
 
         Arguments:
@@ -151,9 +151,12 @@ class XQueueCertInterface(object):
 
         if cert_status in VALID_STATUSES:
             # grade the student
-            course = courses.get_course_by_id(course_id)
-            profile = UserProfile.objects.get(user=student)
 
+            # re-use the course passed in optionally so we don't have to re-fetch everything
+            # for every student
+            if course is None:
+                course = courses.get_course_by_id(course_id)
+            profile = UserProfile.objects.get(user=student)
 
             cert, created = GeneratedCertificate.objects.get_or_create(
                    user=student, course_id=course_id)

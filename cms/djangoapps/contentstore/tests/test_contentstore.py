@@ -25,7 +25,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.modulestore.inheritance import own_metadata
 
 from xmodule.capa_module import CapaDescriptor
@@ -85,6 +85,106 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
 
+    def _get_draft_counts(self, item):
+        cnt = 1 if getattr(item, 'is_draft', False) else 0
+        for child in item.get_children():
+            cnt = cnt + self._get_draft_counts(child)
+
+        return cnt
+
+    def test_draft_metadata(self):
+        '''
+        This verifies a bug we had where inherited metadata was getting written to the
+        module as 'own-metadata' when publishing. Also verifies the metadata inheritance is
+        properly computed
+        '''
+        store = modulestore()
+        draft_store = modulestore('draft')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        course = draft_store.get_item(Location(['i4x', 'edX', 'simple',
+                                               'course', '2012_Fall', None]), depth=None)
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertEqual(html_module.lms.graceperiod, course.lms.graceperiod)
+        self.assertNotIn('graceperiod', own_metadata(html_module))
+
+        draft_store.clone_item(html_module.location, html_module.location)
+
+        # refetch to check metadata
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertEqual(html_module.lms.graceperiod, course.lms.graceperiod)
+        self.assertNotIn('graceperiod', own_metadata(html_module))
+
+        # publish module
+        draft_store.publish(html_module.location, 0)
+
+        # refetch to check metadata
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertEqual(html_module.lms.graceperiod, course.lms.graceperiod)
+        self.assertNotIn('graceperiod', own_metadata(html_module))
+
+        # put back in draft and change metadata and see if it's now marked as 'own_metadata'
+        draft_store.clone_item(html_module.location, html_module.location)
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        new_graceperiod = timedelta(**{'hours': 1})
+
+        self.assertNotIn('graceperiod', own_metadata(html_module))
+        html_module.lms.graceperiod = new_graceperiod
+        self.assertIn('graceperiod', own_metadata(html_module))
+        self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
+
+        draft_store.update_metadata(html_module.location, own_metadata(html_module))
+
+        # read back to make sure it reads as 'own-metadata'
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertIn('graceperiod', own_metadata(html_module))
+        self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
+
+        # republish
+        draft_store.publish(html_module.location, 0)
+
+        # and re-read and verify 'own-metadata'
+        draft_store.clone_item(html_module.location, html_module.location)
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        self.assertIn('graceperiod', own_metadata(html_module))
+        self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
+
+    def test_get_depth_with_drafts(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+
+        course = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple', 
+            'course', '2012_Fall', None]), depth=None)
+
+        # make sure no draft items have been returned
+        num_drafts = self._get_draft_counts(course)
+        self.assertEqual(num_drafts, 0)
+
+        problem = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple', 
+            'problem', 'ps01-simple', None]))
+
+        # put into draft
+        modulestore('draft').clone_item(problem.location, problem.location)
+
+        # make sure we can query that item and verify that it is a draft
+        draft_problem = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple', 
+            'problem', 'ps01-simple', None]))
+        self.assertTrue(getattr(draft_problem,'is_draft', False))
+
+        #now requery with depth
+        course = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple', 
+            'course', '2012_Fall', None]), depth=None)
+
+        # make sure just one draft item have been returned
+        num_drafts = self._get_draft_counts(course)
+        self.assertEqual(num_drafts, 1)       
+
+
     def test_static_tab_reordering(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
@@ -122,6 +222,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertTrue(found)
         # check that there's actually content in the 'question' field
         self.assertGreater(len(items[0].question),0)
+
+    def test_xlint_fails(self):
+        err_cnt = perform_xlint('common/test/data', ['full'])
+        self.assertGreater(err_cnt, 0)
 
     def test_delete(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -523,6 +627,113 @@ class ContentStoreTest(ModuleStoreTestCase):
         context = problem.get_context()
         self.assertIn('markdown', context, "markdown is missing from context")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
+
+    def test_cms_imported_course_walkthrough(self):
+        """
+        Import and walk through some common URL endpoints. This just verifies non-500 and no other
+        correct behavior, so it is not a deep test
+        """
+        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+        loc = Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None])
+        resp = self.client.get(reverse('course_index',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+
+        self.assertEqual(200, resp.status_code)
+        self.assertContains(resp, 'Chapter 2')
+
+        # go to various pages
+
+        # import page
+        resp = self.client.get(reverse('import_course',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # export page
+        resp = self.client.get(reverse('export_course',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # manage users
+        resp = self.client.get(reverse('manage_users',
+                                       kwargs={'location': loc.url()}))
+        self.assertEqual(200, resp.status_code)
+
+        # course info
+        resp = self.client.get(reverse('course_info',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # settings_details
+        resp = self.client.get(reverse('settings_details',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # settings_details
+        resp = self.client.get(reverse('settings_grading',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # static_pages
+        resp = self.client.get(reverse('static_pages',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'coursename': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # static_pages
+        resp = self.client.get(reverse('asset_index',
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
+        self.assertEqual(200, resp.status_code)
+
+        # go look at a subsection page
+        subsection_location = loc._replace(category='sequential', name='test_sequence')
+        resp = self.client.get(reverse('edit_subsection',
+                                       kwargs={'location': subsection_location.url()}))
+        self.assertEqual(200, resp.status_code)
+
+        # go look at the Edit page
+        unit_location = loc._replace(category='vertical', name='test_vertical')
+        resp = self.client.get(reverse('edit_unit',
+                                       kwargs={'location': unit_location.url()}))
+        self.assertEqual(200, resp.status_code)
+
+        # delete a component
+        del_loc = loc._replace(category='html', name='test_html')
+        resp = self.client.post(reverse('delete_item'),
+                                json.dumps({'id': del_loc.url()}), "application/json")
+        self.assertEqual(200, resp.status_code)
+
+        # delete a unit
+        del_loc = loc._replace(category='vertical', name='test_vertical')
+        resp = self.client.post(reverse('delete_item'),
+                                json.dumps({'id': del_loc.url()}), "application/json")
+        self.assertEqual(200, resp.status_code)
+
+        # delete a unit
+        del_loc = loc._replace(category='sequential', name='test_sequence')
+        resp = self.client.post(reverse('delete_item'),
+                                json.dumps({'id': del_loc.url()}), "application/json")
+        self.assertEqual(200, resp.status_code)
+
+        # delete a chapter
+        del_loc = loc._replace(category='chapter', name='chapter_2')
+        resp = self.client.post(reverse('delete_item'),
+                                json.dumps({'id': del_loc.url()}), "application/json")
+        self.assertEqual(200, resp.status_code)
 
     def test_import_metadata_with_attempts_empty_string(self):
         import_from_xml(modulestore(), 'common/test/data/', ['simple'])

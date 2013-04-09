@@ -17,6 +17,21 @@ Feature: Create Subsection
     And I click to edit the subsection name
     Then I see the complete subsection name with a quote in the editor
 
+    Scenario: Assign grading type to a subsection and verify it is still shown after refresh (bug #258)
+    Given I have opened a new course section in Studio
+    And I have added a new subsection
+    And I mark it as Homework
+    Then I see it marked as Homework
+    And I reload the page
+    Then I see it marked as Homework
+
+    Scenario: Set a due date in a different year (bug #256)
+    Given I have opened a new subsection in Studio
+    And I have set a release date and due date in different years
+    Then I see the correct dates
+    And I reload the page
+    Then I see the correct dates
+
     @skip-phantom
     Scenario: Delete a subsection
     Given I have opened a new course section in Studio
@@ -25,3 +40,5 @@ Feature: Create Subsection
     When I press the "subsection" delete icon
     And I confirm the alert
     Then the subsection does not exist
+   
+

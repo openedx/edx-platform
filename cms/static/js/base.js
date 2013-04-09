@@ -4,6 +4,9 @@ var $modalCover;
 var $newComponentItem;
 var $changedInput;
 var $spinner;
+var $newComponentTypePicker;
+var $newComponentTemplatePickers;
+var $newComponentButton;
 
 $(document).ready(function () {
     $body = $('body');
@@ -34,16 +37,20 @@ $(document).ready(function () {
         $(this).select();
     });
 
+    $('body').addClass('js');
+
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
-
-    $('body').addClass('js');
 
     // lean/simple modal
     $('a[rel*=modal]').leanModal({overlay : 0.80, closeButton: '.action-modal-close' });
     $('a.action-modal-close').click(function(e){
         (e).preventDefault();
     });
+
+    // alerts/notifications - manual close
+    $('.action-alert-close, .alert.has-actions .nav-actions a').bind('click', hideAlert);
+    $('.action-notification-close').bind('click', hideNotification);
 
     // nav - dropdown related
     $body.click(function (e) {
@@ -83,6 +90,11 @@ $(document).ready(function () {
     // general link management - smooth scrolling page links
     $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
+    // tender feedback window scrolling
+    $('a.show-tender').bind('click', smoothScrollTop);
+
+    // toggling footer additional support
+    $('.cta-show-sock').bind('click', toggleSock);
 
     // toggling overview section details
     $(function () {
@@ -151,12 +163,24 @@ $(document).ready(function () {
 function smoothScrollLink(e) {
     (e).preventDefault();
 
-    $.smoothScroll({ 
-        offset: -200, 
-        easing: 'swing', 
+    $.smoothScroll({
+        offset: -200,
+        easing: 'swing',
         speed: 1000,
         scrollElement: null,
         scrollTarget: $(this).attr('href')
+    });
+}
+
+function smoothScrollTop(e) {
+    (e).preventDefault();
+
+    $.smoothScroll({
+        offset: -200,
+        easing: 'swing',
+        speed: 1000,
+        scrollElement: null,
+        scrollTarget: $('#view-top')
     });
 }
 
@@ -228,7 +252,7 @@ function syncReleaseDate(e) {
     $("#start_time").val("");
 }
 
-function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
+function getEdxTimeFromDateTimeVals(date_val, time_val) {
     var edxTimeStr = null;
 
     if (date_val != '') {
@@ -237,20 +261,17 @@ function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
 
         // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
         var date = Date.parse(date_val + " " + time_val);
-        if (format == null)
-            format = 'yyyy-MM-ddTHH:mm';
-
-        edxTimeStr = date.toString(format);
+        edxTimeStr = date.toString('yyyy-MM-ddTHH:mm');
     }
 
     return edxTimeStr;
 }
 
-function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
+function getEdxTimeFromDateTimeInputs(date_id, time_id) {
     var input_date = $('#' + date_id).val();
     var input_time = $('#' + time_id).val();
 
-    return getEdxTimeFromDateTimeVals(input_date, input_time, format);
+    return getEdxTimeFromDateTimeVals(input_date, input_time);
 }
 
 function autosaveInput(e) {
@@ -291,10 +312,8 @@ function saveSubsection() {
     }
 
     // Piece back together the date/time UI elements into one date/time string
-    // NOTE: our various "date/time" metadata elements don't always utilize the same formatting string
-    // so make sure we're passing back the correct format
     metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
-    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time', 'MMMM dd HH:mm');
+    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time');
 
     $.ajax({
         url: "/save_item",
@@ -316,8 +335,14 @@ function saveSubsection() {
 function createNewUnit(e) {
     e.preventDefault();
 
-    parent = $(this).data('parent');
-    template = $(this).data('template');
+    var parent = $(this).data('parent');
+    var template = $(this).data('template');
+
+    analytics.track('Created a Unit', {
+        'course': course_location_analytics,
+        'parent_location': parent
+    });
+
 
     $.post('/clone_item',
         {'parent_location': parent,
@@ -350,6 +375,12 @@ function _deleteItem($el) {
         return;
 
     var id = $el.data('id');
+
+    analytics.track('Deleted an Item', {
+        'course': course_location_analytics,
+        'id': id
+    });
+
 
     $.post('/delete_item',
         {'id': id, 'delete_children': true, 'delete_all_versions': true},
@@ -414,6 +445,11 @@ function displayFinishedUpload(xhr) {
     var html = Mustache.to_html(template, resp);
     $('table > tbody').prepend(html);
 
+    analytics.track('Uploaded a File', {
+        'course': course_location_analytics,
+        'asset_url': resp.url
+    });
+
 }
 
 function markAsLoaded() {
@@ -438,6 +474,33 @@ function hideModal(e) {
 function onKeyUp(e) {
     if (e.which == 87) {
         $body.toggleClass('show-wip hide-wip');
+    }
+}
+
+function toggleSock(e) {
+    e.preventDefault();
+
+    var $btnLabel = $(this).find('.copy');
+    var $sock = $('.wrapper-sock');
+    var $sockContent = $sock.find('.wrapper-inner');
+
+    $sock.toggleClass('is-shown');
+    $sockContent.toggle('fast');
+
+    $.smoothScroll({
+       offset: -200,
+       easing: 'swing',
+       speed: 1000,
+       scrollElement: null,
+       scrollTarget: $sock
+    });
+
+    if($sock.hasClass('is-shown')) {
+        $btnLabel.text('Hide Studio Help');
+    }
+
+    else {
+        $btnLabel.text('Looking for Help with Studio?');
     }
 }
 
@@ -477,6 +540,17 @@ function removeDateSetter(e) {
     // clear out the values
     $block.find('.date').val('');
     $block.find('.time').val('');
+}
+
+
+function hideNotification(e) {
+    (e).preventDefault();
+    $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding').attr('aria-hidden','true');
+}
+
+function hideAlert(e) {
+    (e).preventDefault();
+    $(this).closest('.wrapper-alert').removeClass('is-shown');
 }
 
 function showToastMessage(message, $button, lifespan) {
@@ -543,6 +617,11 @@ function saveNewSection(e) {
     var template = $saveButton.data('template');
     var display_name = $(this).find('.new-section-name').val();
 
+    analytics.track('Created a Section', {
+        'course': course_location_analytics,
+        'display_name': display_name
+    });
+
     $.post('/clone_item', {
             'parent_location': parent,
             'template': template,
@@ -587,6 +666,12 @@ function saveNewCourse(e) {
         alert('You must specify all fields in order to create a new course.');
         return;
     }
+
+    analytics.track('Created a Course', {
+        'org': org,
+        'number': number,
+        'display_name': display_name
+    });
 
     $.post('/create_new_course', {
             'template': template,
@@ -634,8 +719,13 @@ function saveNewSubsection(e) {
 
     var parent = $(this).find('.new-subsection-name-save').data('parent');
     var template = $(this).find('.new-subsection-name-save').data('template');
-
     var display_name = $(this).find('.new-subsection-name-input').val();
+
+    analytics.track('Created a Subsection', {
+        'course': course_location_analytics,
+        'display_name': display_name
+    });
+
 
     $.post('/clone_item', {
             'parent_location': parent,
@@ -690,6 +780,13 @@ function saveEditSectionName(e) {
         return;
     }
 
+    analytics.track('Edited Section Name', {
+        'course': course_location_analytics,
+        'display_name': display_name,
+        'id': id
+    });
+
+
     var $_this = $(this);
     // call into server to commit the new order
     $.ajax({
@@ -729,6 +826,12 @@ function saveSetSectionScheduleDate(e) {
 
     var id = $modal.attr('data-id');
 
+    analytics.track('Edited Section Release Date', {
+        'course': course_location_analytics,
+        'id': id,
+        'start': start
+    });
+
     // call into server to commit the new order
     $.ajax({
         url: "/save_item",
@@ -738,7 +841,7 @@ function saveSetSectionScheduleDate(e) {
         data: JSON.stringify({ 'id': id, 'metadata': {'start': start}})
     }).success(function () {
             var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-            $thisSection.find('.section-published-date').html('<span class="published-status"><strong>Will Release:</strong> ' + input_date + ' at ' + input_time + '</span><a href="#" class="edit-button" data-date="' + input_date + '" data-time="' + input_time + '" data-id="' + id + '">Edit</a>');
+            $thisSection.find('.section-published-date').html('<span class="published-status"><strong>Will Release:</strong> ' + input_date + ' at ' + input_time + ' UTC</span><a href="#" class="edit-button" data-date="' + input_date + '" data-time="' + input_time + '" data-id="' + id + '">Edit</a>');
             $thisSection.find('.section-published-date').animate({
                 'background-color': 'rgb(182,37,104)'
             }, 300).animate({
