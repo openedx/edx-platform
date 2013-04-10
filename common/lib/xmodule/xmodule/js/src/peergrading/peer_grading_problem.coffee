@@ -459,6 +459,7 @@ class @PeerGradingProblem
 
     if response.actual_rubric != undefined
       calibration_wrapper.append("<div>Instructor Scored Rubric: #{response.actual_rubric}</div>")
+    if response.actual_feedback!=undefined
       calibration_wrapper.append("<div>Instructor Feedback: #{response.actual_feedback}</div>")
 
     # disable score selection and submission from the grading interface

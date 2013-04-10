@@ -435,7 +435,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
                                                            submission_key, score, feedback, rubric_scores)
-            log.debug("RESPONSE RESPONSE : {0}".format(response))
             if 'actual_rubric' in response:
                 rubric_renderer = combined_open_ended_rubric.CombinedOpenEndedRubric(self.system, True)
                 response['actual_rubric'] = rubric_renderer.render_rubric(response['actual_rubric'])['html']
