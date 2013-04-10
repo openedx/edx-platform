@@ -323,6 +323,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         's3_interface': test_util_open_ended.S3_INTERFACE,
         'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
         'skip_basic_checks': False,
+        'is_graded' : True,
     }
 
     oeparam = etree.XML('''
@@ -369,7 +370,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                     self.descriptor,
                                                     static_data=self.static_data,
                                                     metadata=self.metadata,
-                                                    instance_state={})
+                                                    instance_state=self.static_data)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
@@ -406,3 +407,10 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     def test_container_weight(self):
         weight = self.combinedoe_container.weight
         self.assertEqual(weight,1)
+
+    def test_get_score(self):
+        score_dict = self.combinedoe.get_score()
+        self.assertEqual(score_dict['score'], None)
+        self.assertEqual(score_dict['total'], None)
+
+
