@@ -90,6 +90,7 @@ class @CombinedOpenEnded
     @element=element
     @reinitialize(element)
     $(window).keydown @keydown_handler
+    $(window).keyup @keyup_handler
 
   reinitialize: (element) ->
     @wrapper=$(element).find('section.xmodule_CombinedOpenEndedModule')
@@ -104,6 +105,7 @@ class @CombinedOpenEnded
     @location = @el.data('location')
     # set up handlers for click tracking
     Rubric.initialize(@location)
+    @is_ctrl = false
 
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
@@ -362,10 +364,15 @@ class @CombinedOpenEnded
     else
       @errors_area.html(@out_of_sync_message)
 
-  keydown_handler: (e) =>
-    # only do anything when the key pressed is the 'enter' key
-    if e.which == 13 && @child_state == 'assessing' && Rubric.check_complete()
-      @save_assessment(e)
+  keydown_handler: (event) =>
+    if event.which == 17 && @is_ctrl==false
+      @is_ctrl=true
+    else if @is_ctrl==true && event.which == 13 && @child_state == 'assessing' && Rubric.check_complete()
+      @save_assessment(event)
+
+  keyup_handler: (event) =>
+    if event.which == 17 && @is_ctrl==true
+      @is_ctrl=false
 
   save_assessment: (event) =>
     event.preventDefault()
