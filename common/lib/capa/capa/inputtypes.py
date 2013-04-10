@@ -483,6 +483,7 @@ class TextLine(InputTypeBase):
             Attribute('dojs', None, render=False),
             Attribute('preprocessorClassName', None, render=False),
             Attribute('preprocessorSrc', None, render=False),
+            Attribute('trailing_text', ''),
         ]
 
     def setup(self):
