@@ -6,24 +6,27 @@ define('WordCloudMain', ['logme'], function (logme) {
 WordCloudMain.prototype = {
 
 'submitAnswer': function () {
-    var _this, sendData;
+    var _this, data;
 
-    sendData = {
-        'data': []
+    data = {
+        'student_words': [] 
     };
 
     _this = this;
 
     console.log('submit answer');
     this.wordCloudEl.find('input.input-cloud').each(function(index, value){
-        sendData.data.push($(value).val());
+        data.student_words.push($(value).val());
     });
 
     // Send the data to the server as an AJAX request. Attach a callback that will
     // be fired on server's response.
-    $.postWithPrefix(
-        _this.ajax_url + '/' + 'submit', JSON.stringify(sendData),
-        function (response) {
+    ajaxSettings = {
+        "data": JSON.stringify(data),
+        "type": "POST",
+        "contentType": 'application/json; charset=utf-8',
+        "dataType": 'json',
+        "success": function (response) {
             if (
                 (response.hasOwnProperty('status') !== true) ||
                 (typeof response.status !== 'string') ||
@@ -33,6 +36,11 @@ WordCloudMain.prototype = {
             }
             _this.showWordCloud(response);
         }
+    };
+
+    $.ajaxWithPrefix(
+        _this.ajax_url + '/' + 'submit',
+        ajaxSettings
     );
 
 }, // End-of: 'submitAnswer': function (answer, answerEl) {
