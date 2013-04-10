@@ -30,6 +30,8 @@
 
     (function() {
       $(document).delegate('#login-form', 'ajax:success', function(data, json, xhr) {
+        $(this).find('.form-actions #submit').addClass('is-disabled');
+
         if(json.success) {
           $('.message.submission-error').removeClass('is-shown');
           toggleSubmitButton();
