@@ -20,12 +20,9 @@ WordCloudMain.prototype = {
 
     // Send the data to the server as an AJAX request. Attach a callback that will
     // be fired on server's response.
-    ajaxSettings = {
-        "data": JSON.stringify(data),
-        "type": "POST",
-        "contentType": 'application/json; charset=utf-8',
-        "dataType": 'json',
-        "success": function (response) {
+    $.postWithPrefix(
+        _this.ajax_url + '/' + 'submit', $.param(data),
+        function (response) {
             if (
                 (response.hasOwnProperty('status') !== true) ||
                 (typeof response.status !== 'string') ||
@@ -35,11 +32,6 @@ WordCloudMain.prototype = {
             }
             _this.showWordCloud(response);
         }
-    };
-
-    $.ajaxWithPrefix(
-        _this.ajax_url + '/' + 'submit',
-        ajaxSettings
     );
 
 }, // End-of: 'submitAnswer': function (answer, answerEl) {
