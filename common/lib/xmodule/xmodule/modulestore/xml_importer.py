@@ -7,18 +7,16 @@ from path import path
 from xblock.core import Scope
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
-from .exceptions import DuplicateItemError
 from xmodule.modulestore import Location
-from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
+from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
-from collections import defaultdict
 
 log = logging.getLogger(__name__)
 
 
 def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace,
-    subpath='static', verbose=False):
+                          subpath='static', verbose=False):
 
     remap_dict = {}
 
@@ -109,10 +107,10 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
         # the caller passed in
         if module.location.category != 'course':
             module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                course=target_location_namespace.course)
+                                                       course=target_location_namespace.course)
         else:
             module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                course=target_location_namespace.course, name=target_location_namespace.name)
+                                                       course=target_location_namespace.course, name=target_location_namespace.name)
 
         # then remap children pointers since they too will be re-namespaced
         if module.has_children:
@@ -121,7 +119,7 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
             for child in children_locs:
                 child_loc = Location(child)
                 new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                    course=target_location_namespace.course)
+                                                   course=target_location_namespace.course)
 
                 new_locs.append(new_child_loc.url())
 
@@ -141,8 +139,7 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
             # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
             # no good, so we have to do this kludge
             if isinstance(module.data, str) or isinstance(module.data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                lxml_rewrite_links(module.data, lambda link: verify_content_links(module, course_data_path,
-                    static_content_store, link, remap_dict))
+                lxml_rewrite_links(module.data, lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
 
                 for key in remap_dict.keys():
                     module.data = module.data.replace(key, remap_dict[key])
@@ -165,9 +162,9 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
     # if there is *any* tabs - then there at least needs to be some predefined ones
     if module.tabs is None or len(module.tabs) == 0:
         module.tabs = [{"type": "courseware"},
-            {"type": "course_info", "name": "Course Info"},
-            {"type": "discussion", "name": "Discussion"},
-            {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
+                       {"type": "course_info", "name": "Course Info"},
+                       {"type": "discussion", "name": "Discussion"},
+                       {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
     # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
     # so let's make sure we import in case there are no other references to it in the modules
@@ -177,7 +174,7 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
 
 def import_from_xml(store, data_dir, course_dirs=None,
                     default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True, static_content_store=None, target_location_namespace=None, 
+                    load_error_modules=True, static_content_store=None, target_location_namespace=None,
                     verbose=False, draft_store=None):
     """
     Import the specified xml data_dir into the "store" modulestore,
@@ -238,9 +235,9 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     # if there is *any* tabs - then there at least needs to be some predefined ones
                     if module.tabs is None or len(module.tabs) == 0:
                         module.tabs = [{"type": "courseware"},
-                            {"type": "course_info", "name": "Course Info"}, 
-                            {"type": "discussion", "name": "Discussion"},
-                            {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
+                                       {"type": "course_info", "name": "Course Info"},
+                                       {"type": "discussion", "name": "Discussion"},
+                                       {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
                     import_module(module, store, course_data_path, static_content_store)
 
@@ -250,14 +247,13 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                     course_items.append(module)
 
-
             # then import all the static content
             if static_content_store is not None:
                 _namespace_rename = target_location_namespace if target_location_namespace is not None else course_location
 
                 # first pass to find everything in /static/
                 import_static_content(xml_module_store.modules[course_id], course_location, course_data_path, static_content_store,
-                    _namespace_rename, subpath='static', verbose=verbose)
+                                      _namespace_rename, subpath='static', verbose=verbose)
 
             # finally loop through all the modules
             for module in xml_module_store.modules[course_id].itervalues():
@@ -278,18 +274,19 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
             # now import any 'draft' items
             if draft_store is not None:
-                import_course_draft(xml_module_store, draft_store, course_data_path, 
-                    static_content_store, target_location_namespace if target_location_namespace is not None 
-                    else course_location)
+                import_course_draft(xml_module_store, draft_store, course_data_path,
+                                    static_content_store, target_location_namespace if target_location_namespace is not None
+                                    else course_location)
 
         finally:
             # turn back on all write signalling
-            if pseudo_course_id  in store.ignore_write_events_on_courses:
+            if pseudo_course_id in store.ignore_write_events_on_courses:
                 store.ignore_write_events_on_courses.remove(pseudo_course_id)
-                store.refresh_cached_metadata_inheritance_tree(target_location_namespace if 
-                    target_location_namespace is not None else course_location)
+                store.refresh_cached_metadata_inheritance_tree(target_location_namespace if
+                                                               target_location_namespace is not None else course_location)
 
     return xml_module_store, course_items
+
 
 def import_module(module, store, course_data_path, static_content_store, allow_not_found=False):
     content = {}
@@ -319,8 +316,7 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
             # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
             # no good, so we have to do this kludge
             if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path,
-                    static_content_store, link, remap_dict))                     
+                lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))                     
 
                 for key in remap_dict.keys():
                     module_data = module_data.replace(key, remap_dict[key])
@@ -340,7 +336,7 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
 
     # NOTE: It's important to use own_metadata here to avoid writing
     # inherited metadata everywhere.
-    store.update_metadata(module.location, dict(own_metadata(module)))    
+    store.update_metadata(module.location, dict(own_metadata(module)))
 
 
 def import_course_draft(xml_module_store, store, course_data_path, static_content_store, target_location_namespace):
@@ -406,7 +402,7 @@ def import_course_draft(xml_module_store, store, course_data_path, static_conten
 
                     # HACK: since we are doing partial imports of drafts
                     # the vertical doesn't have the 'url-name' set in the attributes (they are normally in the parent
-                    # object, aka sequential), so we have to replace the location.name with the XML filename 
+                    # object, aka sequential), so we have to replace the location.name with the XML filename
                     # that is part of the pack
                     fn, fileExtension = os.path.splitext(filename)
                     descriptor.location = descriptor.location._replace(name=fn)
@@ -469,7 +465,6 @@ def check_module_metadata_editability(module):
 
     allowed = allowed + ['xml_attributes', 'display_name']
     err_cnt = 0
-    my_metadata = dict(own_metadata(module))
     illegal_keys = set(own_metadata(module).keys()) - set(allowed)
 
     if len(illegal_keys) > 0:
@@ -512,7 +507,7 @@ def validate_data_source_path_existence(path, is_err=True, extra_msg=None):
     _cnt = 0
     if not os.path.exists(path):
         print ("{0}: Expected folder at {1}. {2}".format('ERROR' if is_err == True else 'WARNING', path, extra_msg if
-            extra_msg is not None else ''))
+               extra_msg is not None else ''))
         _cnt = 1
     return _cnt
 
@@ -524,13 +519,13 @@ def validate_data_source_paths(data_dir, course_dir):
     warn_cnt = 0
     err_cnt += validate_data_source_path_existence(course_path / 'static')
     warn_cnt += validate_data_source_path_existence(course_path / 'static/subs', is_err=False,
-        extra_msg='Video captions (if they are used) will not work unless they are static/subs.')
+                                                    extra_msg='Video captions (if they are used) will not work unless they are static/subs.')
     return err_cnt, warn_cnt
 
 
 def perform_xlint(data_dir, course_dirs,
-                    default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True):
+                  default_class='xmodule.raw_module.RawDescriptor',
+                  load_error_modules=True):
     err_cnt = 0
     warn_cnt = 0
 
@@ -585,7 +580,6 @@ def perform_xlint(data_dir, course_dirs,
         if Location(['i4x', location_elements[0], location_elements[1], 'about', 'video', None]) not in module_store.modules[course_id]:
             print "WARN: Missing course marketing video. It is recommended that every course have a marketing video."
             warn_cnt += 1
-
 
     print "\n\n------------------------------------------\nVALIDATION SUMMARY: {0} Errors   {1} Warnings\n".format(err_cnt, warn_cnt)
 
