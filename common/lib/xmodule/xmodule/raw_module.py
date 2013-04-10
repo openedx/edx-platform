@@ -1,5 +1,5 @@
 from lxml import etree
-from xmodule.editing_module import XMLEditingDescriptor, MetadataOnlyEditingDescriptor
+from xmodule.editing_module import XMLEditingDescriptor
 from xmodule.xml_module import XmlDescriptor
 import logging
 import sys
@@ -29,6 +29,6 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
             line, offset = err.position
             msg = ("Unable to create xml for problem {loc}. "
                    "Context: '{context}'".format(
-                    context=lines[line - 1][offset - 40:offset + 40],
-                    loc=self.location))
+                   context=lines[line - 1][offset - 40:offset + 40],
+                   loc=self.location))
             raise Exception, msg, sys.exc_info()[2]

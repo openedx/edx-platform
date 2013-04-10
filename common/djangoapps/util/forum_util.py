@@ -1,4 +1,5 @@
-from django_comment_client.models import Permission, Role
+from django_comment_client.models import Role
+
 
 def seed_permissions_roles(course_id):
     administrator_role = Role.objects.get_or_create(name="Administrator", course_id=course_id)[0]
@@ -7,12 +8,12 @@ def seed_permissions_roles(course_id):
     student_role = Role.objects.get_or_create(name="Student", course_id=course_id)[0]
 
     for per in ["vote", "update_thread", "follow_thread", "unfollow_thread",
-                   "update_comment", "create_sub_comment", "unvote", "create_thread",
-                   "follow_commentable", "unfollow_commentable", "create_comment", ]:
+                "update_comment", "create_sub_comment", "unvote", "create_thread",
+                "follow_commentable", "unfollow_commentable", "create_comment", ]:
         student_role.add_permission(per)
 
     for per in ["edit_content", "delete_thread", "openclose_thread",
-                    "endorse_comment", "delete_comment", "see_all_cohorts"]:
+                "endorse_comment", "delete_comment", "see_all_cohorts"]:
         moderator_role.add_permission(per)
 
     for per in ["manage_moderator"]:
