@@ -36,8 +36,10 @@
 
     (function() {
      $(document).delegate('#register-form', 'ajax:success', function(data, json, xhr) {
+        $(this).find('.form-actions #submit').addClass('is-disabled');
+
        if(json.success) {
-        $('.message.submission-error').removeClass('is-shown'); 
+        $('.message.submission-error').removeClass('is-shown');
         toggleSubmitButton();
         location.href="${reverse('dashboard')}";
        } else {
@@ -52,13 +54,14 @@
     function toggleSubmitButton(e) {
       var $msgError = $('form .status.submission-error');
       var $submitButton = $('form .form-actions #submit').prop('disabled', true);
+      var $submitButtonCopy = $submitButton.html();
 
       if(!$msgError.hasClass('is-shown')) {
-        $submitButton.prop('disabled', true);
+        $submitButton.prop('disabled', true).html('Processing your registration &hellip;');
       }
 
       else {
-        $submitButton.prop('disabled', false);
+        $submitButton.prop('disabled', false).html($submitButtonCopy);
       }
     }
   </script>
@@ -77,7 +80,7 @@
     </header>
 
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account">
-      
+
       <!-- status messages -->
       <div role="alert" class="status message">
         <h3 class="message-title">We're sorry, edX enrollment is not available in your region</h3>
@@ -91,7 +94,7 @@
 
       <p class="instructions">
         Please complete the following fields to register for an edX account. <br />
-        Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>. 
+        Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
@@ -102,7 +105,7 @@
         <ol class="list-input">
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />              
+            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />
           </li>
           <li class="field required password" id="field-password">
             <label for="password">Password</label>
