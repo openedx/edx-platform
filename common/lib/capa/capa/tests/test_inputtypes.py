@@ -182,6 +182,7 @@ class TextLineTest(unittest.TestCase):
                     'hidden': False,
                     'inline': False,
                     'do_math': False,
+                    'trailing_text': '',
                     'preprocessor': None}
         self.assertEqual(context, expected)
 
@@ -209,9 +210,34 @@ class TextLineTest(unittest.TestCase):
                     'msg': '',
                     'hidden': False,
                     'inline': False,
+                    'trailing_text': '',
                     'do_math': True,
                     'preprocessor': {'class_name': preprocessorClass,
                                      'script_src': script}}
+        self.assertEqual(context, expected)
+
+    def test_trailing_text_rendering(self):
+        size = "42"
+        trailing_text = 'm/s'
+        xml_str = """<textline id="prob_1_2" size="{size}" trailing_text="{tt}"/>""".format(size=size, tt=trailing_text)
+
+        element = etree.fromstring(xml_str)
+
+        state = {'value': 'BumbleBee', }
+        the_input = lookup_tag('textline')(test_system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': 'BumbleBee',
+                    'status': 'unanswered',
+                    'size': size,
+                    'msg': '',
+                    'hidden': False,
+                    'inline': False,
+                    'do_math': False,
+                    'trailing_text': trailing_text,
+                    'preprocessor': None}
         self.assertEqual(context, expected)
 
 
