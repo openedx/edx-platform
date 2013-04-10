@@ -27,7 +27,7 @@ class WordCloudFields(object):
     # Name of poll to use in links to this poll
     display_name = String(help="Display name for this module", scope=Scope.settings)
     num_inputs = Integer(help="Number of inputs", scope=Scope.settings, default=5)
-    num_top_words = Integer(help="TODO", scope=Scope.settings, default=250)
+    num_top_words = Integer(help="Number of max words, which will be displayed.", scope=Scope.settings, default=250)
 
     submitted = Boolean(help="Whether this student has posted words to the cloud", scope=Scope.user_state, default=False)
     student_words= List(help="Student answer", scope=Scope.user_state, default=[])
@@ -53,6 +53,7 @@ class WordCloudModule(WordCloudFields, XModule):
         if self.submitted:
             return json.dumps({
                 'status': 'success',
+                'submitted': True,
                 'student_words': {
                     word:self.all_words[word] for
                         word in self.student_words
@@ -61,7 +62,13 @@ class WordCloudModule(WordCloudFields, XModule):
                 'top_words': self.prepare_words(self.top_words)
             })
         else:
-            return json.dumps({})
+            return json.dumps({
+                'status': 'success',
+                'submitted': False,
+                'student_words': {},
+                'total_count': 0,
+                'top_words': {}
+            })
 
     def good_word(self, word):
         """Convert raw word to suitable word."""
@@ -102,7 +109,6 @@ class WordCloudModule(WordCloudFields, XModule):
                 })
 
             # Student words from client.
-
             raw_student_words = post.getlist('student_words[]')
             student_words = filter(None, map(self.good_word, raw_student_words))
 
@@ -141,6 +147,7 @@ class WordCloudModule(WordCloudFields, XModule):
                   'ajax_url': self.system.ajax_url,
                   'configuration_json': self.get_state(),
                   'num_inputs': int(self.num_inputs),
+                  'submitted': self.submitted
                   }
         self.content = self.system.render_template('word_cloud.html', params)
         return self.content

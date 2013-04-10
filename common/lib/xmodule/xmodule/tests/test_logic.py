@@ -72,18 +72,21 @@ class ConditionalModuleTest(LogicTest):
 class WordCloudModuleTest(LogicTest):
     descriptor_class = WordCloudDescriptor
     raw_model_data = {
-        'all_words': {'Yes': 1, 'Dont_know': 0, 'No': 0},
-        'top_words': {'Yes': 1, 'Dont_know': 0, 'No': 0},
+        'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
+        'top_words': {'cat': 10, 'dog': 5, 'dad': 2},
         'submitted': False,
         'student_words': ['mom', 'dad', 'cat']
     }
 
     def test_bad_ajax_request(self):
+
+        # TODO: move top global test.
         response = self.ajax_request('bad_dispatch', {})
         self.assertDictEqual(response, {
-                    'status': 'fail',
-                    'error': 'Unknown Command!'
-                })
+            'status': 'fail',
+            'error': 'Unknown Command!'
+        })
 
+    # TODO
     # def test_good_ajax_request(self):
     #     response = self.ajax_request('submit', {})

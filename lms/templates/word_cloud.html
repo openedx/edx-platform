@@ -6,7 +6,12 @@
 
     <section id="input-cloud-section">
         % for row in range(num_inputs):
-            <input class="input-cloud" type="text" size="40" />
+            <input
+                class="input-cloud"
+                ${'style="display: none;"' if submitted else ''}
+                type="text"
+                size="40"
+            />
         % endfor
 
         <section class="action">

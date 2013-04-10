@@ -149,7 +149,7 @@ function WordCloudMain(el) {
         return;
     }
 
-    if (this.configJson.hasOwnProperty('status') && this.configJson.status === 'success') {
+    if (this.configJson.submitted) {
         this.showWordCloud(this.configJson);
 
         return;
