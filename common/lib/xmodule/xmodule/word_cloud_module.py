@@ -27,7 +27,7 @@ class WordCloudFields(object):
     # Name of poll to use in links to this poll
     display_name = String(help="Display name for this module", scope=Scope.settings)
     num_inputs = Integer(help="Number of inputs", scope=Scope.settings, default=5)
-    num_top_words = Integer(help="Number of inputs", scope=Scope.settings, default=250)
+    num_top_words = Integer(help="TODO", scope=Scope.settings, default=250)
 
     submitted = Boolean(help="Whether this student has posted words to the cloud", scope=Scope.user_state, default=False)
     student_words= List(help="Student answer", scope=Scope.user_state, default=[])
@@ -48,7 +48,7 @@ class WordCloudModule(WordCloudFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
     js_module_name = "WordCloud"
 
-    def get_state_json(self):
+    def get_state(self):
         """Return success json answer for client."""
         if self.submitted:
             return json.dumps({
@@ -57,7 +57,7 @@ class WordCloudModule(WordCloudFields, XModule):
                     word:self.all_words[word] for
                         word in self.student_words
                     },
-                'total_count': sum(self.all_words.values()),
+                'total_count': sum(self.all_words.itervalues()),
                 'top_words': self.prepare_words(self.top_words)
             })
         else:
@@ -67,52 +67,44 @@ class WordCloudModule(WordCloudFields, XModule):
         """Convert raw word to suitable word."""
         return word.strip().lower()
 
-        # TODO: use or remove
-        # real_words = re.findall('\w+', word)
-        # if real_words:
-        #     return real_words[0].lower()
-
     def prepare_words(self, words):
-        """Convert words dictionary more handy for client."""
+        """Convert words dictionary for client API."""
         return [{'text': word, 'size': count} for
             word, count in words.iteritems()]
 
     def top_dict(self, dict_obj, amount):
         """Return new dict: top of dict using dict value."""
+        # TODO: optimize this - don't use sorting.
         return dict(
             sorted(
-                dict_obj.iteritems(),
+                dict_obj.items(),
                 key=lambda x: x[1],
                 reverse=True
             )[:amount]
         )
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, post):
         """Ajax handler.
 
         Args:
             dispatch: string request slug
-            get: dict request get parameters
+            post: dict request get parameters
 
         Returns:
             json string
         """
         if dispatch == 'submit':
             if self.submitted:
+                # TODO: error standart.
                 return json.dumps({
                     'status': 'fail',
-                    'error': 'You have already post your data.'
+                    'error': 'You have already posted your data.'
                 })
 
             # Student words from client.
-            raw_student_words = json.loads(get.lists()[0][0])['data']
-            student_words = filter(None, map(self.good_word, raw_student_words))
 
-            if not student_words:
-                return json.dumps({
-                    'status': 'fail',
-                    'error': 'Empty students words.'
-                })
+            raw_student_words = post.getlist('student_words[]')
+            student_words = filter(None, map(self.good_word, raw_student_words))
 
             self.student_words = student_words
 
@@ -125,10 +117,7 @@ class WordCloudModule(WordCloudFields, XModule):
 
             # Save in all_words.
             for word in self.student_words:
-                if word in temp_all_words:
-                    temp_all_words[word] += 1
-                else:
-                    temp_all_words[word] = 1
+                temp_all_words[word] = temp_all_words.get(word, 0) + 1
 
             # Update top_words.
             self.top_words = self.top_dict(temp_all_words,
@@ -137,7 +126,7 @@ class WordCloudModule(WordCloudFields, XModule):
             # Save all_words in database.
             self.all_words = temp_all_words
 
-            return self.get_state_json()
+            return self.get_state()
         else:
             return json.dumps({
                 'status': 'fail',
@@ -150,7 +139,7 @@ class WordCloudModule(WordCloudFields, XModule):
                   'element_id': self.location.html_id(),
                   'element_class': self.location.category,
                   'ajax_url': self.system.ajax_url,
-                  'configuration_json': self.get_state_json(),
+                  'configuration_json': self.get_state(),
                   'num_inputs': int(self.num_inputs),
                   }
         self.content = self.system.render_template('word_cloud.html', params)
