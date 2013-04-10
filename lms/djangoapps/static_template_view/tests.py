@@ -51,3 +51,11 @@ class SimpleTest(TestCase):
         response = self.client.get("/press/this-shouldnt-work")
         self.assertEqual(response.status_code, 404)
 
+        # can someone do something fishy?  no.
+        response = self.client.get("/press/../homework.html")
+        self.assertEqual(response.status_code, 404)
+
+        # "." in is ascii 2E 
+        response = self.client.get("/press/%2E%2E/homework.html")
+        self.assertEqual(response.status_code, 404)
+

@@ -117,7 +117,7 @@ urlpatterns = ('',
         {'template': 'honor.html'}, name="honor"),
 
     #Press releases
-    url(r'^press/([^/]+)$', 'static_template_view.views.render_press_release', name='press_release'),
+    url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
 
     # Favicon
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
