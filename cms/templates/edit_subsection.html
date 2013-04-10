@@ -33,17 +33,22 @@
     <h4 class="header">Subsection Settings</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
-        <label>Release date:<!-- <span class="description">Determines when this subsection and the units within it will be released publicly.</span>--></label>
         <div class="datepair" data-language="javascript">
-          <input type="text" id="start_date" name="start_date" value="${get_time_struct_display(subsection.lms.start, '%m/%d/%Y')}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-          <input type="text" id="start_time" name="start_time" value="${get_time_struct_display(subsection.lms.start, '%H:%M')}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+          <div class="field field-start-date">
+            <label for="start_date">Release Day</label>
+            <input type="text" id="start_date" name="start_date" value="${get_time_struct_display(subsection.lms.start, '%m/%d/%Y')}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+          </div>
+          <div class="field field-start-time">
+            <label for="start_time">Release Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
+            <input type="text" id="start_time" name="start_time" value="${get_time_struct_display(subsection.lms.start, '%H:%M')}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+          </div>
         </div>
         % if subsection.lms.start != parent_item.lms.start and subsection.lms.start:
             % if parent_item.lms.start is None:
             <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default}, which is unset.
             % else:
             <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default} –
-                ${get_time_struct_display(parent_item.lms.start, '%m/%d/%Y at %I:%M %p')}.
+                ${get_time_struct_display(parent_item.lms.start, '%m/%d/%Y at %H:%M UTC')}.
             % endif
             <a href="#" class="sync-date no-spinner">Sync to ${parent_item.display_name_with_default}.</a></p>
         % endif
@@ -56,14 +61,17 @@
     </div>
 
     <div class="due-date-input row">
-      <label>Due date:</label>
       <a href="#" class="set-date">Set a due date</a>
       <div class="datepair date-setter">
-        <p class="date-description">
+        <div class="field field-start-date">
+          <label for="due_date">Due Day</label>
           <input type="text" id="due_date" name="due_date" value="${get_time_struct_display(subsection.lms.due, '%m/%d/%Y')}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+        </div>
+        <div class="field field-start-time">
+          <label for="due_time">Due Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
           <input type="text" id="due_time" name="due_time" value="${get_time_struct_display(subsection.lms.due, '%H:%M')}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-          <a href="#" class="remove-date">Remove due date</a>
-        </p>
+        </div>
+        <a href="#" class="remove-date">Remove due date</a>
       </div>
     </div>
     <div class="row unit-actions">

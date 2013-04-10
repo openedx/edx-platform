@@ -176,7 +176,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
                 module = class_(self, location, model_data)
                 if self.cached_metadata is not None:
-                    metadata_to_inherit = self.cached_metadata.get(location.url(), {})
+                    # parent container pointers don't differentiate between draft and non-draft
+                    # so when we do the lookup, we should do so with a non-draft location
+                    non_draft_loc = location._replace(revision=None)
+                    metadata_to_inherit = self.cached_metadata.get(non_draft_loc.url(), {})
                     inherit_metadata(module, metadata_to_inherit)
                 return module
             except:
@@ -260,11 +263,11 @@ class MongoModuleStore(ModuleStoreBase):
 
         # get all collections in the course, this query should not return any leaf nodes
         # note this is a bit ugly as when we add new categories of containers, we have to add it here
-        query = {
-                    '_id.org': location.org,
-                    '_id.course': location.course,
-                    '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical']}
-                }
+        query = {'_id.org': location.org,
+                 '_id.course': location.course,
+                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical',
+                                          'wrapper', 'problemset', 'conditional']}
+                 }
         # we just want the Location, children, and inheritable metadata
         record_filter = {'_id': 1, 'definition.children': 1}
 
@@ -282,6 +285,17 @@ class MongoModuleStore(ModuleStoreBase):
         # now go through the results and order them by the location url
         for result in resultset:
             location = Location(result['_id'])
+            # We need to collate between draft and non-draft
+            # i.e. draft verticals can have children which are not in non-draft versions
+            location = location._replace(revision=None)
+            location_url = location.url()
+            if location_url in results_by_url:
+                existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
+                additional_children = result.get('definition', {}).get('children', [])
+                total_children = existing_children + additional_children
+                if 'definition' not in results_by_url[location_url]:
+                    results_by_url[location_url]['definition'] = {}
+                results_by_url[location_url]['definition']['children'] = total_children
             results_by_url[location.url()] = result
             if location.category == 'course':
                 root = location.url()
@@ -293,17 +307,12 @@ class MongoModuleStore(ModuleStoreBase):
             """
             Helper method for computing inherited metadata for a specific location url
             """
-            my_metadata = {}
             # check for presence of metadata key. Note that a given module may not yet be fully formed.
             # example: update_item -> update_children -> update_metadata sequence on new item create
             # if we get called here without update_metadata called first then 'metadata' hasn't been set
             # as we're not fully transactional at the DB layer. Same comment applies to below key name
             # check
             my_metadata = results_by_url[url].get('metadata', {})
-            for key in my_metadata.keys():
-                if key not in INHERITABLE_METADATA:
-                    del my_metadata[key]
-            results_by_url[url]['metadata'] = my_metadata
 
             # go through all the children and recurse, but only if we have
             # in the result set. Remember results will not contain leaf nodes
