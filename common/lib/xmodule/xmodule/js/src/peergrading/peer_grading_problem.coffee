@@ -161,6 +161,7 @@ class @PeerGradingProblem
   constructor: (backend) ->
     @prompt_wrapper = $('.prompt-wrapper')
     @backend = backend
+    @is_ctrl = false
 
 
     # get the location of the problem
@@ -212,6 +213,7 @@ class @PeerGradingProblem
     @answer_unknown_checkbox = $('.answer-unknown-checkbox')
 
     $(window).keydown @keydown_handler
+    $(window).keyup @keyup_handler
 
     @collapse_question()
 
@@ -338,13 +340,17 @@ class @PeerGradingProblem
       @grade = Rubric.get_total_score()
 
   keydown_handler: (event) =>
-    if event.which == 13 && @submit_button.is(':visible')
+    if event.which == 17 && @is_ctrl==false
+      @is_ctrl=true
+    else if event.which == 13 && @submit_button.is(':visible') && @is_ctrl==true
       if @calibration
         @submit_calibration_essay()
       else
         @submit_grade()
 
-
+  keyup_handler: (event) =>
+    if event.which == 17 && @is_ctrl==true
+      @is_ctrl=false
 
 
   ##########
