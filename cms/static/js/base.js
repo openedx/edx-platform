@@ -1,3 +1,5 @@
+if (!window.CmsUtils) window.CmsUtils = {};
+
 var $body;
 var $modal;
 var $modalCover;
@@ -48,6 +50,10 @@ $(document).ready(function () {
         (e).preventDefault();
     });
 
+    // alerts/notifications - manual close
+    $('.action-alert-close, .alert.has-actions .nav-actions a').bind('click', hideAlert);
+    $('.action-notification-close').bind('click', hideNotification);
+
     // nav - dropdown related
     $body.click(function (e) {
         $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
@@ -87,7 +93,7 @@ $(document).ready(function () {
     $('a[rel*="view"][href^="#"]').bind('click', smoothScrollLink);
 
     // tender feedback window scrolling
-    $('a.show-tender').bind('click', smoothScrollTop);
+    $('a.show-tender').bind('click', window.CmsUtils.smoothScrollTop);
 
     // toggling footer additional support
     $('.cta-show-sock').bind('click', toggleSock);
@@ -159,21 +165,24 @@ $(document).ready(function () {
 function smoothScrollLink(e) {
     (e).preventDefault();
 
-    $.smoothScroll({ 
-        offset: -200, 
-        easing: 'swing', 
+    $.smoothScroll({
+        offset: -200,
+        easing: 'swing',
         speed: 1000,
         scrollElement: null,
         scrollTarget: $(this).attr('href')
     });
 }
 
-function smoothScrollTop(e) {
+// On AWS instances, this base.js gets wrapped in a separate scope as part of Django static
+// pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
+//  when we can access it from other scopes (namely Course Advanced Settings).
+window.CmsUtils.smoothScrollTop = function (e) {
     (e).preventDefault();
 
-    $.smoothScroll({ 
-        offset: -200, 
-        easing: 'swing', 
+    $.smoothScroll({
+        offset: -200,
+        easing: 'swing',
         speed: 1000,
         scrollElement: null,
         scrollTarget: $('#view-top')
@@ -483,9 +492,9 @@ function toggleSock(e) {
     $sock.toggleClass('is-shown');
     $sockContent.toggle('fast');
 
-    $.smoothScroll({ 
-       offset: -200, 
-       easing: 'swing', 
+    $.smoothScroll({
+       offset: -200,
+       easing: 'swing',
        speed: 1000,
        scrollElement: null,
        scrollTarget: $sock
@@ -536,6 +545,17 @@ function removeDateSetter(e) {
     // clear out the values
     $block.find('.date').val('');
     $block.find('.time').val('');
+}
+
+
+function hideNotification(e) {
+    (e).preventDefault();
+    $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding').attr('aria-hidden','true');
+}
+
+function hideAlert(e) {
+    (e).preventDefault();
+    $(this).closest('.wrapper-alert').removeClass('is-shown');
 }
 
 function showToastMessage(message, $button, lifespan) {

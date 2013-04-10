@@ -199,8 +199,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 self.student_data_for_location = response
 
         score_dict = {
-            'score': int(count_graded >= count_required),
-            'total': self.max_grade,
+            'score': int(count_graded >= count_required and count_graded>0) * int(self.weight),
+            'total': self.max_grade * int(self.weight),
         }
 
         return score_dict

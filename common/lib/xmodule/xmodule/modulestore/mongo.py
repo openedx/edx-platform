@@ -258,11 +258,11 @@ class MongoModuleStore(ModuleStoreBase):
 
         # get all collections in the course, this query should not return any leaf nodes
         # note this is a bit ugly as when we add new categories of containers, we have to add it here
-        query = {
-                    '_id.org': location.org,
-                    '_id.course': location.course,
-                    '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical']}
-                }
+        query = {'_id.org': location.org,
+                 '_id.course': location.course,
+                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical',
+                                          'wrapper', 'problemset', 'conditional']}
+                 }
         # we just want the Location, children, and inheritable metadata
         record_filter = {'_id': 1, 'definition.children': 1}
 

@@ -26,9 +26,9 @@
     // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
     // but we really should change that behavior.
     if (!window.graderTypes) {
-	    window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
-	    window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
-	    window.graderTypes.reset(${course_graders|n});
+      window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
+      window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
+      window.graderTypes.reset(${course_graders|n});
     }
 
     $(".gradable-status").each(function(index, ele) {
