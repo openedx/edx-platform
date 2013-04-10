@@ -14,7 +14,6 @@ WordCloudMain.prototype = {
 
     _this = this;
 
-    console.log('submit answer');
     this.wordCloudEl.find('input.input-cloud').each(function(index, value){
         data.student_words.push($(value).val());
     });
@@ -31,8 +30,8 @@ WordCloudMain.prototype = {
                 (response.hasOwnProperty('status') !== true) ||
                 (typeof response.status !== 'string') ||
                 (response.status.toLowerCase() !== 'success')) {
-                    console.log('Bad response!');
-                    return;
+
+                return;
             }
             _this.showWordCloud(response);
         }
@@ -48,18 +47,24 @@ WordCloudMain.prototype = {
 'showWordCloud': function(response){
     var words,
         _this = this,
-        fill = d3.scale.category20();
+        fill = d3.scale.category20(),
+        maxSize, minSize;
 
-    console.log('Show word cloud with next:');
-    console.log(response);
-
-    inputSection = this.wordCloudEl.find('#input-cloud-section');
-    resultSection = this.wordCloudEl.find('#result-cloud-section');
-
-    inputSection.hide();
-    resultSection.show();
+    this.wordCloudEl.find('#input-cloud-section').hide();
 
     words = response.top_words;
+
+    maxSize = 0;
+    minSize = 10000;
+
+    $.each(words, function (index, word) {
+        if (word.size > maxSize) {
+            maxSize = word.size;
+        }
+        if (word.size < minSize) {
+            minSize = word.size;
+        }
+    });
 
     d3.layout.cloud().size([500, 500])
         .words(words)
@@ -68,7 +73,15 @@ WordCloudMain.prototype = {
         })
         .font('Impact')
         .fontSize(function (d) {
-            return d.size;
+            var size;
+
+            size = (d.size / maxSize) * 140;
+
+            if (size < 20) {
+                return 0;
+            }
+
+            return size;
         })
         .on('end', draw)
         .start();
@@ -77,11 +90,24 @@ WordCloudMain.prototype = {
     return;
 
     function draw(words) {
-        d3.select('.word_cloud_d3_' + _this.hash).append('svg')
+        var el;
+
+        $('#word_cloud_d3_' + _this.hash).remove();
+
+        el = $(
+            '<div ' +
+                'id="' + 'word_cloud_d3_' + _this.hash + '" ' +
+                'style="display: block; width: 500px; height: 500px; margin-left: auto; margin-right: auto;" ' +
+            '></div>'
+        );
+        _this.wordCloudEl.append(el);
+
+        d3.select('#word_cloud_d3_' + _this.hash).append('svg')
             .attr('width', 500)
             .attr('height', 500)
+            .attr('id', 'word_cloud_d3_' + _this.hash)
             .append('g')
-            .attr('transform', 'translate(125,125)')
+            .attr('transform', 'translate(190,250)')
             .selectAll('text')
             .data(words)
             .enter().append('text')
