@@ -27,7 +27,7 @@ COMMANDS = {}
 
 
 def configure(command, bin_path, user=None):
-    """Configure a command for jail_code to use.
+    """Configure a command for `jail_code` to use.
 
     `command` is the abstract command you're configuring, such as "python" or
     "node".  `bin_path` is the path to the binary.  `user`, if provided, is
@@ -37,11 +37,22 @@ def configure(command, bin_path, user=None):
     cmd_argv = []
     if user:
         cmd_argv.extend(['sudo', '-u', 'sandbox'])
-    cmd_argv.extend([bin_path, '-E'])
+    cmd_argv.append(bin_path)
+
+    # Command-specific arguments
+    if command == "python":
+        cmd_argv.append('-E')
+
     COMMANDS[command] = cmd_argv
 
 
 def is_configured(command):
+    """Has `jail_code` been configured for `command`?
+
+    Returns true if the abstract command `command` has been configured for use
+    in the `jail_code` function.
+
+    """
     return command in COMMANDS
 
 # By default, look where our current Python is, and maybe there's a
