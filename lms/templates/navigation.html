@@ -45,12 +45,16 @@ site_status_msg = get_site_status_msg(course_id)
     % endif
 
     % if user.is_authenticated():
+
     <ol class="left nav-global authenticated">
       <li class="nav-global-01">
-        <a href="${reverse('courses')}">Find Courses</a>
+        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+            <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('COURSES')}">Find Courses</a>
+        % else:
+            <a href="${reverse('courses')}">Find Courses</a>
+        % endif
       </li>
     </ol>
-
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
@@ -69,18 +73,20 @@ site_status_msg = get_site_status_msg(course_id)
 
     % else:
     <ol class="left nav-global">
+      % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
       <li class="nav-global-01">
-        <a href="#">How it Works</a>
+        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('HOW_IT_WORKS')}">How it Works</a>
       </li>
       <li class="nav-global-02">
-        <a href="${reverse('courses')}">Courses</a>
+        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('COURSES')}">Courses</a>
       </li>
       <li class="nav-global-03">
-        <a href="#">Schools</a>
+        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('SCHOOLS')}">Schools</a>
       </li>
+      % endif
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
       <li class="nav-global-04">
-        <a class="cta cta-register" href="#">Register Now</a>
+        <a class="cta cta-register" href="/register">Register Now</a>
       </li>
       % endif
     </ol>
@@ -88,7 +94,7 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="right nav-courseware">
     <li class="nav-courseware-01">
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-      <a class="cta cta-login" href="#">Log in</a>
+      <a class="cta cta-login" href="/login">Log in</a>
       % endif
     </li>
     </ol>
