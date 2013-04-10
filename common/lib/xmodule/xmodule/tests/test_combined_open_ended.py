@@ -354,7 +354,11 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     </openended>'''
     definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
     full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
+    definition_oe = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml2, task_xml2]}
+    definition_sa = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml1]}
     descriptor = Mock(data=full_definition)
+    descriptor_oe = Mock(data=definition_oe)
+    descriptor_sa = Mock(data=definition_sa)
     test_system = test_system()
     combinedoe_container = CombinedOpenEndedModule(test_system,
                                                    location,
@@ -371,6 +375,20 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                     static_data=self.static_data,
                                                     metadata=self.metadata,
                                                     instance_state=self.static_data)
+        self.combinedoe_oe = CombinedOpenEndedV1Module(self.test_system,
+                                                    self.location,
+                                                    self.definition_oe,
+                                                    self.descriptor_oe,
+                                                    static_data=self.static_data,
+                                                    metadata=self.metadata,
+                                                    instance_state=self.static_data)
+        self.combinedoe_sa = CombinedOpenEndedV1Module(self.test_system,
+                                                     self.location,
+                                                     self.definition_sa,
+                                                     self.descriptor_sa,
+                                                     static_data=self.static_data,
+                                                     metadata=self.metadata,
+                                                     instance_state=self.static_data)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
@@ -412,5 +430,14 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         score_dict = self.combinedoe.get_score()
         self.assertEqual(score_dict['score'], None)
         self.assertEqual(score_dict['total'], None)
+
+    def test_open_ended_task_order(self):
+        changed = self.combinedoe_oe.update_task_states()
+        self.assertFalse(changed)
+
+    def test_self_assessment_task_order(self):
+        changed = self.combinedoe_sa.update_task_states()
+        self.assertFalse(changed)
+
 
 
