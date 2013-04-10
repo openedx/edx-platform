@@ -491,8 +491,10 @@ class @CombinedOpenEnded
     if @accept_file_upload == "True"
       if window.File and window.FileReader and window.FileList and window.Blob
         @can_upload_files = true
-        @file_upload_area.html('<input type="file" class="file-upload-box">')
+        @file_upload_area.html('<input type="file" class="file-upload-box"><img class="file-upload-preview" src="#" alt="Uploaded image" />')
         @file_upload_area.show()
+        $('.file-upload-preview').hide()
+        $('.file-upload-box').change @preview_image
       else
         @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
 
@@ -548,3 +550,11 @@ class @CombinedOpenEnded
   log_feedback_selection: (event) ->
     target_selection = $(event.target).val()
     Logger.log 'oe_feedback_response_selected', {value: target_selection}
+
+  preview_image: () =>
+    if $('.file-upload-box')[0].files && $('.file-upload-box')[0].files[0]
+      reader = new FileReader()
+      reader.onload = (e) =>
+        $('.file-upload-preview').attr('src', e.target.result).width(150).height(150)
+        $('.file-upload-preview').show()
+      reader.readAsDataURL($('.file-upload-box')[0].files[0])
