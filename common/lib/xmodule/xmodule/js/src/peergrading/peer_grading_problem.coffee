@@ -184,6 +184,7 @@ class @PeerGradingProblem
     @grading_message.hide()
     @question_header = $('.question-header')
     @question_header.click @collapse_question
+    @flag_submission_confirmation = $('.flag-submission-confirmation')
 
     @grading_wrapper =$('.grading-wrapper')
     @calibration_feedback_panel = $('.calibration-feedback')
@@ -235,9 +236,13 @@ class @PeerGradingProblem
       @calibration_interstitial_page.hide()
       @is_calibrated_check()
 
+    @flag_student_checkbox.click =>
+      @flag_box_checked()
+
     @calibration_feedback_button.hide()
     @calibration_feedback_panel.hide()
     @error_container.hide()
+    @flag_submission_confirmation.hide()
 
     @is_calibrated_check()
 
@@ -284,6 +289,10 @@ class @PeerGradingProblem
   #  Callbacks for various events
   #
   ##########
+
+  flag_box_checked: () =>
+    if @flag_student_checkbox.is(':checked')
+      $( ".flag-submission-confirmation" ).dialog()
 
   # called after we perform an is_student_calibrated check
   calibration_check_callback: (response) =>
