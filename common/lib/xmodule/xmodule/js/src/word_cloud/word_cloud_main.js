@@ -90,7 +90,7 @@ WordCloudMain.prototype = {
                 'style="display: block; width: 500px; height: auto; margin-left: auto; margin-right: auto;" ' +
             '></div>'
         );
-        el.append('<h3>Your words</h3>');
+        el.append('<h3>Your words:</h3>');
         $.each(response.student_words, function (index, value) {
             if (firstWord === false) {
                 firstWord = true;
