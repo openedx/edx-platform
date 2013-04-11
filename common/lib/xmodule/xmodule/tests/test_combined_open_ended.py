@@ -354,15 +354,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     </openended>'''
     definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
     full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
-    definition_oe = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml2, task_xml2]}
-    definition_sa = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml1]}
-    definition_sa_only = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1]}
-    definition_oe_only = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml2]}
     descriptor = Mock(data=full_definition)
-    descriptor_oe = Mock(data=definition_oe)
-    descriptor_sa = Mock(data=definition_sa)
-    descriptor_oe_only = Mock(data=definition_oe)
-    descriptor_sa_only = Mock(data=definition_sa)
     test_system = test_system()
     combinedoe_container = CombinedOpenEndedModule(test_system,
                                                    location,
@@ -413,6 +405,10 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
 
     def test_container_weight(self):
         weight = self.combinedoe_container.weight
+        self.assertEqual(weight,1)
+
+    def test_container_child_weight(self):
+        weight = self.combinedoe_container.child_module.weight
         self.assertEqual(weight,1)
 
     def test_get_score(self):
