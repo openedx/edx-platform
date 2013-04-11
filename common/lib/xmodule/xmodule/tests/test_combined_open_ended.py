@@ -420,51 +420,24 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(score_dict['score'], None)
         self.assertEqual(score_dict['total'], None)
 
-    def test_open_ended_task_order(self):
-        combinedoe_oe = CombinedOpenEndedV1Module(self.test_system,
-                                                       self.location,
-                                                       self.definition_oe,
-                                                       self.descriptor_oe,
-                                                       static_data=self.static_data,
-                                                       metadata=self.metadata,
-                                                       instance_state=self.static_data)
-        changed = combinedoe_oe.update_task_states()
-        self.assertFalse(changed)
-
-    def test_self_assessment_task_order(self):
-        combinedoe_sa = CombinedOpenEndedV1Module(self.test_system,
-                                                       self.location,
-                                                       self.definition_sa,
-                                                       self.descriptor_sa,
-                                                       static_data=self.static_data,
-                                                       metadata=self.metadata,
-                                                       instance_state=self.static_data)
-
-        changed = combinedoe_sa.update_task_states()
-        self.assertFalse(changed)
-
-    def test_open_ended_only_task_order(self):
-        combinedoe_oe = CombinedOpenEndedV1Module(self.test_system,
+    def test_alternate_orderings(self):
+        t1 = self.task_xml1
+        t2 = self.task_xml2
+        xml_to_test = [[t1], [t2], [t1,t1], [t1,t2], [t2,t2], [t2,t1], [t1,t2,t1]]
+        for xml in xml_to_test:
+            definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric), 'task_xml': xml}
+            descriptor = Mock(data=definition)
+            combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                       self.location,
-                                                      self.definition_oe_only,
-                                                      self.descriptor_oe_only,
+                                                      definition,
+                                                      descriptor,
                                                       static_data=self.static_data,
                                                       metadata=self.metadata,
                                                       instance_state=self.static_data)
-        changed = combinedoe_oe.update_task_states()
-        self.assertFalse(changed)
 
-    def test_self_assessment_only_task_order(self):
-        combinedoe_sa = CombinedOpenEndedV1Module(self.test_system,
-                                                  self.location,
-                                                  self.definition_sa_only,
-                                                  self.descriptor_sa_only,
-                                                  static_data=self.static_data,
-                                                  metadata=self.metadata,
-                                                  instance_state=self.static_data)
+            changed = combinedoe.update_task_states()
+            self.assertFalse(changed)
 
-        changed = combinedoe_sa.update_task_states()
-        self.assertFalse(changed)
 
 
 
