@@ -8,10 +8,14 @@ from tempfile import NamedTemporaryFile
 from factory import Factory, SubFactory
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from licenses.models import CourseSoftware, UserLicense
 from courseware.tests.tests import LoginEnrollmentTestCase, get_user
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 COURSE_1 = 'edX/toy/2012_Fall'
 
@@ -130,20 +134,24 @@ class LicenseTestCase(LoginEnrollmentTestCase):
         self.assertEqual(302, response.status_code)
 
 
-class CommandTest(TestCase):
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class CommandTest(ModuleStoreTestCase):
     '''Test management command for importing serial numbers'''
+    def setUp(self):
+        course = CourseFactory.create()
+        self.course_id = course.id
 
     def test_import_serial_numbers(self):
         size = 20
 
         log.debug('Adding one set of serials for {0}'.format(SOFTWARE_1))
         with generate_serials_file(size) as temp_file:
-            args = [COURSE_1, SOFTWARE_1, temp_file.name]
+            args = [self.course_id, SOFTWARE_1, temp_file.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('Adding one set of serials for {0}'.format(SOFTWARE_2))
         with generate_serials_file(size) as temp_file:
-            args = [COURSE_1, SOFTWARE_2, temp_file.name]
+            args = [self.course_id, SOFTWARE_2, temp_file.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('There should be only 2 course-software entries')
@@ -156,7 +164,7 @@ class CommandTest(TestCase):
 
         log.debug('Adding more serial numbers to {0}'.format(SOFTWARE_1))
         with generate_serials_file(size) as temp_file:
-            args = [COURSE_1, SOFTWARE_1, temp_file.name]
+            args = [self.course_id, SOFTWARE_1, temp_file.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('There should be still only 2 course-software entries')
@@ -179,7 +187,7 @@ class CommandTest(TestCase):
         with NamedTemporaryFile() as tmpfile:
             tmpfile.write('\n'.join(known_serials))
             tmpfile.flush()
-            args = [COURSE_1, SOFTWARE_1, tmpfile.name]
+            args = [self.course_id, SOFTWARE_1, tmpfile.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('Check if we added only the new ones')
