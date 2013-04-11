@@ -6,13 +6,10 @@ define('WordCloudMain', ['logme'], function (logme) {
 WordCloudMain.prototype = {
 
 'submitAnswer': function () {
-    var _this, data;
-
-    data = {
-        'student_words': [] 
-    };
-
-    _this = this;
+    var _this = this,
+        data = {
+            'student_words': []
+        };
 
     this.wordCloudEl.find('input.input-cloud').each(function(index, value){
         data.student_words.push($(value).val());
@@ -23,13 +20,12 @@ WordCloudMain.prototype = {
     $.postWithPrefix(
         _this.ajax_url + '/' + 'submit', $.param(data),
         function (response) {
-            if (
-                (response.hasOwnProperty('status') !== true) ||
-                (typeof response.status !== 'string') ||
-                (response.status.toLowerCase() !== 'success')) {
+            if (response.status !== 'success') {
+                logme('ERROR: ' + response.error);
 
                 return;
             }
+
             _this.showWordCloud(response);
         }
     );
@@ -43,6 +39,8 @@ WordCloudMain.prototype = {
         maxSize, minSize;
 
     this.wordCloudEl.find('#input-cloud-section').hide();
+
+    console.log('response: ', response);
 
     words = response.top_words;
 
@@ -67,7 +65,7 @@ WordCloudMain.prototype = {
         .fontSize(function (d) {
             var size;
 
-            size = (d.size / maxSize) * 140;
+            size = (d.size / maxSize) * 100;
 
             if (size < 20) {
                 return 0;
@@ -82,22 +80,32 @@ WordCloudMain.prototype = {
     return;
 
     function draw(words) {
-        var el;
+        var el, firstWord = false;
 
         $('#word_cloud_d3_' + _this.hash).remove();
 
         el = $(
             '<div ' +
                 'id="' + 'word_cloud_d3_' + _this.hash + '" ' +
-                'style="display: block; width: 500px; height: 500px; margin-left: auto; margin-right: auto;" ' +
+                'style="display: block; width: 500px; height: auto; margin-left: auto; margin-right: auto;" ' +
             '></div>'
         );
+        el.append('<h3>Your words</h3>');
+        $.each(response.student_words, function (index, value) {
+            if (firstWord === false) {
+                firstWord = true;
+            } else {
+                el.append(', ');
+            }
+
+            el.append(index + ': ' + (100.0 * (value / response.total_count)) + ' %');
+        });
+        el.append('<br /><br /><h3>Overall number of words: ' + response.total_count + '</h3><br />');
         _this.wordCloudEl.append(el);
 
         d3.select('#word_cloud_d3_' + _this.hash).append('svg')
             .attr('width', 500)
             .attr('height', 500)
-            .attr('id', 'word_cloud_d3_' + _this.hash)
             .append('g')
             .attr('transform', 'translate(190,250)')
             .selectAll('text')
@@ -125,7 +133,7 @@ WordCloudMain.prototype = {
 return WordCloudMain;
 
 function WordCloudMain(el) {
-    var _this;
+    var _this = this;
 
     this.wordCloudEl = $(el).find('.word_cloud');
     if (this.wordCloudEl.length !== 1) {
@@ -135,9 +143,9 @@ function WordCloudMain(el) {
         return;
     }
 
+    // Later on used to create a unique DOM element.
     hash += 1;
     this.hash = hash;
-    this.wordCloudEl.addClass('word_cloud_d3_' + this.hash);
 
     this.configJson = null;
     try {
@@ -160,7 +168,6 @@ function WordCloudMain(el) {
     // Get the URL to which we will post the users words.
     this.ajax_url = this.wordCloudEl.data('ajax-url');
 
-    _this = this;
     this.inputSaveEl.on('click', function () {
         _this.submitAnswer();
     });
