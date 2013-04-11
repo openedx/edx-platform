@@ -1,10 +1,8 @@
-import mock
 import unittest
 import threading
 import json
-import urllib
 import urllib2
-from mock_cs_server import MockCommentServiceServer, MockCommentServiceRequestHandler
+from mock_cs_server import MockCommentServiceServer
 from nose.plugins.skip import SkipTest
 
 
@@ -18,7 +16,7 @@ class MockCommentServiceServerTest(unittest.TestCase):
         # This is a test of the test setup,
         # so it does not need to run as part of the unit test suite
         # You can re-enable it by commenting out the line below
-        # raise SkipTest
+        raise SkipTest
 
         # Create the server
         server_port = 4567

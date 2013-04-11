@@ -1,6 +1,5 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import json
-import urlparse
 from logging import getLogger
 logger = getLogger(__name__)
 
