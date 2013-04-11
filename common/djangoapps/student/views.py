@@ -658,7 +658,31 @@ def create_account(request, post_override=None):
     statsd.increment("common.student.account_created")
 
     js = {'success': True}
-    return HttpResponse(json.dumps(js), mimetype="application/json")
+    HttpResponse(json.dumps(js), mimetype="application/json")
+
+    response = HttpResponse(json.dumps({'success': True}))
+
+    # set the login cookie for the edx marketing site
+    # we want this cookie to be accessed via javascript
+    # so httponly is set to None
+
+    if request.session.get_expire_at_browser_close():
+        max_age = None
+        expires = None
+    else:
+        max_age = request.session.get_expiry_age()
+        expires_time = time.time() + max_age
+        expires = cookie_date(expires_time)
+
+
+    response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
+                        'true', max_age=max_age,
+                        expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                        path='/',
+                        secure=None,
+                        httponly=None)
+    return response
+
 
 
 def exam_registration_info(user, course):
