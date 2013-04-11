@@ -52,15 +52,13 @@ class ModuleStoreTestCase(TestCase):
         # Use a uuid to differentiate
         # the mongo collections on jenkins.
         cls.orig_modulestore = copy.deepcopy(settings.MODULESTORE)
-        test_modulestore = cls.orig_modulestore
-        if 'direct' not in test_modulestore:
-            test_modulestore['direct'] = test_modulestore['default']
+        if 'direct' not in settings.MODULESTORE:
+            settings.MODULESTORE['direct'] = settings.MODULESTORE['default']
 
-        test_modulestore['default']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
-        test_modulestore['direct']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
-        xmodule.modulestore.django._MODULESTORES = {}
+        settings.MODULESTORE['default']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
+        settings.MODULESTORE['direct']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
+        xmodule.modulestore.django._MODULESTORES.clear()
 
-        settings.MODULESTORE = test_modulestore
         print settings.MODULESTORE
 
         TestCase.setUpClass()
@@ -74,6 +72,8 @@ class ModuleStoreTestCase(TestCase):
         # Clean up by dropping the collection
         modulestore = xmodule.modulestore.django.modulestore()
         modulestore.collection.drop()
+
+        xmodule.modulestore.django._MODULESTORES.clear()
 
         # Restore the original modulestore settings
         settings.MODULESTORE = cls.orig_modulestore
