@@ -3,6 +3,7 @@ from pkg_resources import resource_string, resource_listdir
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
+from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.core import String, Scope
 
 
@@ -28,7 +29,7 @@ class DiscussionModule(DiscussionFields, XModule):
         return self.system.render_template('discussion/_discussion_module.html', context)
 
 
-class DiscussionDescriptor(DiscussionFields, RawDescriptor):
+class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):
     module_class = DiscussionModule
     template_dir_name = "discussion"
 

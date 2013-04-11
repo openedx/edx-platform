@@ -11,6 +11,7 @@ DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_ta
 #In order to instantiate an open ended tab automatically, need to have this data
 OPEN_ENDED_PANEL = {"name" : "Open Ended Panel", "type" : "open_ended"}
 
+
 def get_modulestore(location):
     """
     Returns the correct modulestore to use for modifying the specified location

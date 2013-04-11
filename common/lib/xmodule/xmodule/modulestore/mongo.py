@@ -9,6 +9,7 @@ from itertools import repeat
 from path import path
 from datetime import datetime
 from operator import attrgetter
+from uuid import uuid4
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -30,6 +31,10 @@ log = logging.getLogger(__name__)
 # there is only one revision for each item. Once we start versioning inside the CMS,
 # that assumption will have to change
 
+def get_course_id_no_run(location):
+    '''
+    '''
+    return "/".join([location.org, location.course])
 
 class MongoKeyValueStore(KeyValueStore):
     """
@@ -333,7 +338,7 @@ class MongoModuleStore(ModuleStoreBase):
         '''
         key = metadata_cache_key(location)
         tree = {}
-        
+
         if not force_refresh:
             # see if we are first in the request cache (if present)
             if self.request_cache is not None and key in self.request_cache.data.get('metadata_inheritance', {}):
@@ -348,7 +353,7 @@ class MongoModuleStore(ModuleStoreBase):
         if not tree:
             # if not in subsystem, or we are on force refresh, then we have to compute
             tree = self.compute_metadata_inheritance_tree(location)
-            
+
             # now write out computed tree to caching subsystem (e.g. memcached), if available
             if self.metadata_inheritance_cache_subsystem is not None:
                 self.metadata_inheritance_cache_subsystem.set(key, tree)
@@ -541,8 +546,15 @@ class MongoModuleStore(ModuleStoreBase):
         Clone a new item that is a copy of the item at the location `source`
         and writes it to `location`
         """
+        item = None
         try:
             source_item = self.collection.find_one(location_to_query(source))
+
+            # allow for some programmatically generated substitutions in metadata, e.g. Discussion_id's should be auto-generated
+            for key in source_item['metadata'].keys():
+                if source_item['metadata'][key] == '$$GUID$$':
+                    source_item['metadata'][key] = uuid4().hex
+
             source_item['_id'] = Location(location).dict()
             self.collection.insert(
                 source_item,
@@ -566,12 +578,19 @@ class MongoModuleStore(ModuleStoreBase):
                 course.tabs = existing_tabs
                 self.update_metadata(course.location, course._model_data._kvs._metadata)
 
-            return item
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(location)
 
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(Location(location))
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
+
+        return item
+
+    def fire_updated_modulestore_signal(self, course_id, location):
+        if self.modulestore_update_signal is not None:
+            self.modulestore_update_signal.send(self, modulestore=self, course_id=course_id,
+                                                location=location)
 
     def get_course_for_item(self, location, depth=0):
         '''
@@ -643,6 +662,8 @@ class MongoModuleStore(ModuleStoreBase):
         self._update_single_item(location, {'definition.children': children})
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(Location(location))
+        # fire signal that we've written to DB
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
     def update_metadata(self, location, metadata):
         """
@@ -669,6 +690,7 @@ class MongoModuleStore(ModuleStoreBase):
         self._update_single_item(location, {'metadata': metadata})
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(loc)
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
     def delete_item(self, location):
         """
@@ -692,6 +714,7 @@ class MongoModuleStore(ModuleStoreBase):
             safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(Location(location))
+        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this
