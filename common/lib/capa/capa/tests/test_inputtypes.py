@@ -1,6 +1,5 @@
-# coding='utf-8'
 """
-feature Tests of input types.
+Tests of input types.
 
 TODO:
 - refactor: so much repetive code (have factory methods that build xml elements directly, etc)
@@ -21,7 +20,6 @@ import json
 from lxml import etree
 import unittest
 import xml.sax.saxutils as saxutils
-import unicodedata as ud
 
 from . import test_system
 from capa import inputtypes
@@ -220,87 +218,40 @@ class TextLineTest(unittest.TestCase):
 
     def test_trailing_text_rendering(self):
         size = "42"
-        trailing_text = 'm/s'
-        xml_str = """<textline id="prob_1_2" 
-                        size="{size}" 
-                        trailing_text="{tt}"
-                        />""".format(size=size, tt=trailing_text)
+        # store (xml_text, expected)
+        trailing_text = []
+        # standard trailing text
+        trailing_text.append(('m/s', 'm/s'))
+        # unicode trailing text
+        trailing_text.append((u'\xc3', u'\xc3'))
+        # html escaped trailing text
+        # this is the only one we expect to change
+        trailing_text.append(('a &lt; b','a < b'))
 
-        element = etree.fromstring(xml_str)
+        for xml_text, expected_text in trailing_text:
+            xml_str = u"""<textline id="prob_1_2" 
+                            size="{size}" 
+                            trailing_text="{tt}"
+                            />""".format(size=size, tt=xml_text)
 
-        state = {'value': 'BumbleBee', }
-        the_input = lookup_tag('textline')(test_system, element, state)
+            element = etree.fromstring(xml_str)
 
-        context = the_input._get_render_context()
+            state = {'value': 'BumbleBee', }
+            the_input = lookup_tag('textline')(test_system, element, state)
 
-        expected = {'id': 'prob_1_2',
-                    'value': 'BumbleBee',
-                    'status': 'unanswered',
-                    'size': size,
-                    'msg': '',
-                    'hidden': False,
-                    'inline': False,
-                    'do_math': False,
-                    'trailing_text': trailing_text,
-                    'preprocessor': None}
-        self.assertEqual(context, expected)
+            context = the_input._get_render_context()
 
-
-    def test_trailing_unicode(self):
-        size = "42"
-        trailing_text = u'\xc3'
-        print trailing_text
-        xml_str = u"""<textline id="prob_1_2" 
-                         size="{size}" 
-                         trailing_text="{tt}"
-                         />""".format(size=size, tt=trailing_text)
-
-        element = etree.fromstring(xml_str)
-
-        state = {'value': 'BumbleBee', }
-        the_input = lookup_tag('textline')(test_system, element, state)
-
-        context = the_input._get_render_context()
-
-        expected = {'id': 'prob_1_2',
-                    'value': 'BumbleBee',
-                    'status': 'unanswered',
-                    'size': size,
-                    'msg': '',
-                    'hidden': False,
-                    'inline': False,
-                    'do_math': False,
-                    'trailing_text': trailing_text,
-                    'preprocessor': None}
-        self.assertEqual(context, expected)
-
-
-    def test_trailing_text_special_characters(self):
-        size = "42"
-        trailing_text = 'a &lt; b'
-        xml_str = """<textline id="prob_1_2" 
-                        size="{size}" 
-                        trailing_text="{tt}"
-                        />""".format(size=size, tt=trailing_text)
-
-        element = etree.fromstring(xml_str)
-
-        state = {'value': 'BumbleBee', }
-        the_input = lookup_tag('textline')(test_system, element, state)
-
-        context = the_input._get_render_context()
-
-        expected = {'id': 'prob_1_2',
-                    'value': 'BumbleBee',
-                    'status': 'unanswered',
-                    'size': size,
-                    'msg': '',
-                    'hidden': False,
-                    'inline': False,
-                    'do_math': False,
-                    'trailing_text': 'a < b',
-                    'preprocessor': None}
-        self.assertEqual(context, expected)
+            expected = {'id': 'prob_1_2',
+                        'value': 'BumbleBee',
+                        'status': 'unanswered',
+                        'size': size,
+                        'msg': '',
+                        'hidden': False,
+                        'inline': False,
+                        'do_math': False,
+                        'trailing_text': expected_text,
+                        'preprocessor': None}
+            self.assertEqual(context, expected)
 
 
 class FileSubmissionTest(unittest.TestCase):

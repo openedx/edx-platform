@@ -457,17 +457,21 @@ class TextLine(InputTypeBase):
     """
     A text line input.  Can do math preview if "math"="1" is specified.
 
-    If "trailing_text" is set to a value, then the textline will be shown with the value after the text input,
-    and before the checkmark or any input-specific feedback. HTML will not work, but properly escaped HTML characters will.
-    This feature is useful if you would like to specify a specific type of units for the text input.
+    If "trailing_text" is set to a value, then the textline will be shown with 
+    the value after the text input, and before the checkmark or any input-specific 
+    feedback. HTML will not work, but properly escaped HTML characters will. This 
+    feature is useful if you would like to specify a specific type of units for the 
+    text input.
 
-    If the hidden attribute is specified, the textline is hidden and the input id is stored in a div with name equal
-    to the value of the hidden attribute.  This is used e.g. for embedding simulations turned into questions.
+    If the hidden attribute is specified, the textline is hidden and the input id 
+    is stored in a div with name equal to the value of the hidden attribute.  This 
+    is used e.g. for embedding simulations turned into questions.
 
     Example:
         <texline math="1" trailing_text="m/s" />
 
-    This example will render out a text line with a math preview and the text 'm/s' after the end of the text line.
+    This example will render out a text line with a math preview and the text 'm/s' 
+    after the end of the text line.
     """
 
     template = "textline.html"
