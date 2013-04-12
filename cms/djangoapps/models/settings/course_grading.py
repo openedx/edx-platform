@@ -45,14 +45,13 @@ class CourseGradingModel(object):
 
         # return empty model
         else:
-            return {
-                    "id": index,
+            return {"id": index,
                     "type": "",
                     "min_count": 0,
                     "drop_count": 0,
                     "short_label": None,
                     "weight": 0
-                }
+                    }
 
     @staticmethod
     def fetch_cutoffs(course_location):
@@ -95,7 +94,6 @@ class CourseGradingModel(object):
 
         return CourseGradingModel.fetch(course_location)
 
-
     @staticmethod
     def update_grader_from_json(course_location, grader):
         """
@@ -136,7 +134,6 @@ class CourseGradingModel(object):
         get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
 
         return cutoffs
-
 
     @staticmethod
     def update_grace_period_from_json(course_location, graceperiodjson):
@@ -210,8 +207,7 @@ class CourseGradingModel(object):
             location = Location(location)
 
         descriptor = get_modulestore(location).get_item(location)
-        return {
-                "graderType": descriptor.lms.format if descriptor.lms.format is not None else 'Not Graded',
+        return {"graderType": descriptor.lms.format if descriptor.lms.format is not None else 'Not Graded',
                 "location": location,
                 "id": 99   # just an arbitrary value to
                 }
@@ -230,7 +226,6 @@ class CourseGradingModel(object):
             del descriptor.lms.graded
 
         get_modulestore(location).update_metadata(location, descriptor._model_data._kvs._metadata)
-
 
     @staticmethod
     def convert_set_grace_period(descriptor):
@@ -262,13 +257,12 @@ class CourseGradingModel(object):
     @staticmethod
     def parse_grader(json_grader):
         # manual to clear out kruft
-        result = {
-                    "type": json_grader["type"],
-                    "min_count": int(json_grader.get('min_count', 0)),
-                    "drop_count": int(json_grader.get('drop_count', 0)),
-                    "short_label": json_grader.get('short_label', None),
-                    "weight": float(json_grader.get('weight', 0)) / 100.0
-                }
+        result = {"type": json_grader["type"],
+                  "min_count": int(json_grader.get('min_count', 0)),
+                  "drop_count": int(json_grader.get('drop_count', 0)),
+                  "short_label": json_grader.get('short_label', None),
+                  "weight": float(json_grader.get('weight', 0)) / 100.0
+                  }
 
         return result
 
