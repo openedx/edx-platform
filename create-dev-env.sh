@@ -92,6 +92,7 @@ clone_repos() {
     fi
 }
 
+
 ### START
 
 PROG=${0##*/}
@@ -99,9 +100,9 @@ PROG=${0##*/}
 # Adjust this to wherever you'd like to place the codebase
 BASE="${PROJECT_HOME:-$HOME}/mitx_all"
 
-# Use a sensible default (~/.virtualenv) for your Python virtualenvs
+# Use a sensible default (~/.virtualenvs) for your Python virtualenvs
 # unless you've already got one set up with virtualenvwrapper.
-PYTHON_DIR=${WORKON_HOME:-"$HOME/.virtualenv"}
+PYTHON_DIR=${WORKON_HOME:-"$HOME/.virtualenvs"}
 
 # RVM defaults its install to ~/.rvm, but use the overridden rvm_path
 # if that's what's preferred.
@@ -116,7 +117,14 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
-# TODO: test for an existing virtualenv
+# If in an existing virtualenv, bail
+if [[ "x$VIRTUAL_ENV" != "x" ]]; then
+    envname=`basename $VIRTUAL_ENV`
+    error "Looks like you're already in the \"$envname\" virtual env."
+    error "Run \`deactivate\` and then re-run this script."
+    usage
+    exit 1
+fi
 
 # Read arguments
 ARGS=$(getopt "cvhs" "$*")
@@ -281,8 +289,6 @@ fi
 # See `rvm requirements` for more information.
 case `uname -s` in
     Darwin)
-        # TODO (Nate): test to see if CC is already set to gcc or something
-        #              similar first (not clang).
         export CC=gcc
         ;;
 esac
