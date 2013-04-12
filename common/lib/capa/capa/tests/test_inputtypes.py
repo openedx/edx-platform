@@ -182,6 +182,7 @@ class TextLineTest(unittest.TestCase):
                     'hidden': False,
                     'inline': False,
                     'do_math': False,
+                    'trailing_text': '',
                     'preprocessor': None}
         self.assertEqual(context, expected)
 
@@ -209,10 +210,48 @@ class TextLineTest(unittest.TestCase):
                     'msg': '',
                     'hidden': False,
                     'inline': False,
+                    'trailing_text': '',
                     'do_math': True,
                     'preprocessor': {'class_name': preprocessorClass,
                                      'script_src': script}}
         self.assertEqual(context, expected)
+
+    def test_trailing_text_rendering(self):
+        size = "42"
+        # store (xml_text, expected)
+        trailing_text = []
+        # standard trailing text
+        trailing_text.append(('m/s', 'm/s'))
+        # unicode trailing text
+        trailing_text.append((u'\xc3', u'\xc3'))
+        # html escaped trailing text
+        # this is the only one we expect to change
+        trailing_text.append(('a &lt; b','a < b'))
+
+        for xml_text, expected_text in trailing_text:
+            xml_str = u"""<textline id="prob_1_2" 
+                            size="{size}" 
+                            trailing_text="{tt}"
+                            />""".format(size=size, tt=xml_text)
+
+            element = etree.fromstring(xml_str)
+
+            state = {'value': 'BumbleBee', }
+            the_input = lookup_tag('textline')(test_system, element, state)
+
+            context = the_input._get_render_context()
+
+            expected = {'id': 'prob_1_2',
+                        'value': 'BumbleBee',
+                        'status': 'unanswered',
+                        'size': size,
+                        'msg': '',
+                        'hidden': False,
+                        'inline': False,
+                        'do_math': False,
+                        'trailing_text': expected_text,
+                        'preprocessor': None}
+            self.assertEqual(context, expected)
 
 
 class FileSubmissionTest(unittest.TestCase):
