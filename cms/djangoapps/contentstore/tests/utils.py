@@ -2,8 +2,6 @@
 Utilities for contentstore tests
 '''
 
-#pylint: disable=W0603
-
 import json
 
 from student.models import Registration

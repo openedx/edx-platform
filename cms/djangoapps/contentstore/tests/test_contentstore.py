@@ -49,6 +49,7 @@ class MongoCollectionFindWrapper(object):
         self.counter = self.counter+1
         return self.original(query, *args, **kwargs)
 
+
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
@@ -188,27 +189,33 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_get_depth_with_drafts(self):
         import_from_xml(modulestore(), 'common/test/data/', ['simple'])
 
-        course = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple',
-                                                         'course', '2012_Fall', None]), depth=None)
+        course = modulestore('draft').get_item(
+            Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
+            depth=None
+        )
 
         # make sure no draft items have been returned
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 0)
 
-        problem = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple',
-                                                          'problem', 'ps01-simple', None]))
+        problem = modulestore('draft').get_item(
+            Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None])
+        )
 
         # put into draft
         modulestore('draft').clone_item(problem.location, problem.location)
 
         # make sure we can query that item and verify that it is a draft
-        draft_problem = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple',
-                                                                'problem', 'ps01-simple', None]))
+        draft_problem = modulestore('draft').get_item(
+            Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None])
+        )
         self.assertTrue(getattr(draft_problem, 'is_draft', False))
 
         #now requery with depth
-        course = modulestore('draft').get_item(Location(['i4x', 'edX', 'simple',
-                                                         'course', '2012_Fall', None]), depth=None)
+        course = modulestore('draft').get_item(
+            Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
+            depth=None
+        )
 
         # make sure just one draft item have been returned
         num_drafts = self._get_draft_counts(course)
@@ -267,10 +274,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # make sure the parent no longer points to the child object which was deleted
         self.assertTrue(sequential.location.url() in chapter.children)
 
-        self.client.post(reverse('delete_item'),
-                         json.dumps({'id': sequential.location.url(), 'delete_children': 'true',
-                                     'delete_all_versions': 'true'}),
-                         "application/json")
+        self.client.post(
+            reverse('delete_item'),
+            json.dumps({'id': sequential.location.url(), 'delete_children': 'true', 'delete_all_versions': 'true'}),
+            "application/json"
+        )
 
         found = False
         try:
@@ -534,15 +542,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
         # export out to a tempdir
-        exported = False
-        try:
-            export_to_xml(module_store, content_store, location, root_dir, 'test_export')
-            exported = True
-        except Exception:
-            print 'Exception thrown: {0}'.format(traceback.format_exc())
-            pass
-
-        self.assertTrue(exported)
+        export_to_xml(module_store, content_store, location, root_dir, 'test_export')
 
 
 class ContentStoreTest(ModuleStoreTestCase):
@@ -622,10 +622,12 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test viewing the index page with no courses"""
         # Create a course so there is something to view
         resp = self.client.get(reverse('index'))
-        self.assertContains(resp,
-                            '<h1 class="title-1">My Courses</h1>',
-                            status_code=200,
-                            html=True)
+        self.assertContains(
+            resp,
+            '<h1 class="title-1">My Courses</h1>',
+            status_code=200,
+            html=True
+        )
 
     def test_course_factory(self):
         """Test that the course factory works correctly."""
@@ -642,10 +644,12 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test viewing the index page with an existing course"""
         CourseFactory.create(display_name='Robot Super Educational Course')
         resp = self.client.get(reverse('index'))
-        self.assertContains(resp,
-                            '<span class="class-name">Robot Super Educational Course</span>',
-                            status_code=200,
-                            html=True)
+        self.assertContains(
+            resp,
+            '<span class="class-name">Robot Super Educational Course</span>',
+            status_code=200,
+            html=True
+        )
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
@@ -658,10 +662,12 @@ class ContentStoreTest(ModuleStoreTestCase):
         }
 
         resp = self.client.get(reverse('course_index', kwargs=data))
-        self.assertContains(resp,
-                            '<article class="courseware-overview" data-course-id="i4x://MITx/999/course/Robot_Super_Course">',
-                            status_code=200,
-                            html=True)
+        self.assertContains(
+            resp,
+            '<article class="courseware-overview" data-course-id="i4x://MITx/999/course/Robot_Super_Course">',
+            status_code=200,
+            html=True
+        )
 
     def test_clone_item(self):
         """Test cloning an item. E.g. creating a new section"""
@@ -677,7 +683,10 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertRegexpMatches(data['id'], '^i4x:\/\/MITx\/999\/chapter\/([0-9]|[a-f]){32}$')
+        self.assertRegexpMatches(
+            data['id'],
+            r"^i4x://MITx/999/chapter/([0-9]|[a-f]){32}$"
+        )
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""

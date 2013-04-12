@@ -30,7 +30,7 @@ class LMSLinksTestCase(TestCase):
 
 class UrlReverseTestCase(ModuleStoreTestCase):
     """ Tests for get_url_reverse """
-    def test_CoursePageNames(self):
+    def test_course_page_names(self):
         """ Test the defined course pages. """
         course = CourseFactory.create(org='mitX', number='666', display_name='URL Reverse Course')
 
@@ -70,4 +70,3 @@ class UrlReverseTestCase(ModuleStoreTestCase):
             'https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about',
             utils.get_url_reverse('https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about', course)
         )
-        

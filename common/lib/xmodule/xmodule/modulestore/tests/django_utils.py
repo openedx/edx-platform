@@ -7,6 +7,7 @@ from django.conf import settings
 import xmodule.modulestore.django
 from xmodule.templates import update_templates
 
+
 class ModuleStoreTestCase(TestCase):
     """ Subclass for any test case that uses the mongodb
     module store. This populates a uniquely named modulestore
