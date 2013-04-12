@@ -34,16 +34,42 @@ def django_admin(system, env, command, *args)
     return "#{django_admin} #{command} --traceback --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
 end
 
+# Runs Process.spawn, and kills the process at the end of the rake process
+# Expects the same arguments as Process.spawn
+def background_process(*command)
+    pid = Process.spawn(*command, :pgroup => true)
+
+    at_exit do
+        puts "Ending process and children"
+        pgid = Process.getpgid(pid)
+        begin
+            Timeout.timeout(5) do
+                puts "Terminating process group #{pgid}"
+                Process.kill(:SIGTERM, -pgid)
+                puts "Waiting on process group #{pgid}"
+                Process.wait(-pgid)
+                puts "Done waiting on process group #{pgid}"
+            end
+        rescue Timeout::Error
+            puts "Killing process group #{pgid}"
+            Process.kill(:SIGKILL, -pgid)
+            puts "Waiting on process group #{pgid}"
+            Process.wait(-pgid)
+            puts "Done waiting on process group #{pgid}"
+        end
+    end
+end
+
 def django_for_jasmine(system, django_reload)
     if !django_reload
         reload_arg = '--noreload'
     end
 
     port = 10000 + rand(40000)
-    django_pid = fork do
-        exec(*django_admin(system, 'jasmine', 'runserver', '-v', '0', port.to_s, reload_arg).split(' '))
-    end
     jasmine_url = "http://localhost:#{port}/_jasmine/"
+
+    background_process(*django_admin(system, 'jasmine', 'runserver', '-v', '0', port.to_s, reload_arg).split(' '))
+
     up = false
     start_time = Time.now
     until up do
@@ -61,16 +87,7 @@ def django_for_jasmine(system, django_reload)
             sleep(0.5)
         end
     end
-    begin
-        yield jasmine_url
-    ensure
-        if django_reload
-            Process.kill(:SIGKILL, -Process.getpgid(django_pid))
-        else
-            Process.kill(:SIGKILL, django_pid)
-        end
-        Process.wait(django_pid)
-    end
+    yield jasmine_url
 end
 
 def template_jasmine_runner(lib)
@@ -100,6 +117,25 @@ end
 
 def report_dir_path(dir)
     return File.join(REPORT_DIR, dir.to_s)
+end
+
+def compile_assets(watch=false)
+    coffee_cmd = "coffee #{watch ? '--watch' : ''} --compile */static"
+    sass_cmd = "sass --style compressed --require ./common/static/sass/bourbon/lib/bourbon.rb #{watch ? '--watch' : '--update'} */static"
+
+    if watch
+        background_process(coffee_cmd)
+        background_process(sass_cmd)
+    else
+        coffee_pid = Process.spawn(coffee_cmd)
+        puts "Waiting for coffee to complete (pid #{coffee_pid})"
+        Process.wait(coffee_pid)
+        puts "Coffee completed"
+        sass_pid = Process.spawn(sass_cmd)
+        puts "Waiting for sass to complete (pid #{sass_pid})"
+        Process.wait(sass_pid)
+        puts "Sass completed"
+    end
 end
 
 task :default => [:test, :pep8, :pylint]
@@ -182,7 +218,7 @@ end
 
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}", [:stop_on_failure] => ["clean_test_files", "#{system}:collectstatic:test", "fasttest_#{system}"]
+    task "test_#{system}", [:stop_on_failure] => ["clean_test_files", "#{system}:collect_assets:test", "fasttest_#{system}"]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
@@ -201,6 +237,7 @@ end
         desc
     task system, [:env, :options] => [:predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
+        compile_assets(watch=true)
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
 
@@ -213,8 +250,9 @@ end
         end
 
         desc "Run collectstatic in the specified environment"
-        task "#{system}:collectstatic:#{env}" => :predjango do
-            sh("#{django_admin(system, env, 'collectstatic', '--noinput')} > /tmp/collectstatic.out") do |ok, status|
+        task "#{system}:collect_assets:#{env}" do
+            compile_assets()
+            sh("#{django_admin(system, env, 'collectstatic', '--noinput')} > /dev/null") do |ok, status|
                 if !ok
                     abort "collectstatic failed!"
                 end
