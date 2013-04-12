@@ -211,7 +211,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     template_dir_name = 'course'
 
-
     def __init__(self, *args, **kwargs):
         super(CourseDescriptor, self).__init__(*args, **kwargs)
 
@@ -421,7 +420,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         policy['GRADE_CUTOFFS'] = value
         self.grading_policy = policy
 
-
     @property
     def lowest_passing_grade(self):
         return min(self._grading_policy['GRADE_CUTOFFS'].values())
@@ -460,7 +458,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         else:
             return self.cohort_config.get("auto_cohort_groups", [])
 
-
     @property
     def top_level_discussion_topic_ids(self):
         """
@@ -468,7 +465,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         topics = self.discussion_topics
         return [d["id"] for d in topics.values()]
-
 
     @property
     def cohorted_discussions(self):
@@ -482,8 +478,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return set()
 
         return set(config.get("cohorted_discussions", []))
-
-
 
     @property
     def is_newish(self):
@@ -585,7 +579,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     yield module_descriptor
 
         for c in self.get_children():
-            sections = []
             for s in c.get_children():
                 if s.lms.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
@@ -601,8 +594,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     all_descriptors.append(s)
 
         return {'graded_sections': graded_sections,
-                 'all_descriptors': all_descriptors, }
-
+                'all_descriptors': all_descriptors, }
 
     @staticmethod
     def make_id(org, course, url_name):

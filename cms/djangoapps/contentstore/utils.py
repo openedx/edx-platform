@@ -1,4 +1,3 @@
-import logging
 from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -9,7 +8,7 @@ import copy
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
 #In order to instantiate an open ended tab automatically, need to have this data
-OPEN_ENDED_PANEL = {"name" : "Open Ended Panel", "type" : "open_ended"}
+OPEN_ENDED_PANEL = {"name": "Open Ended Panel", "type": "open_ended"}
 
 
 def get_modulestore(location):
@@ -87,11 +86,10 @@ def get_lms_link_for_item(location, preview=False, course_id=None):
 
     if settings.LMS_BASE is not None:
         if preview:
-            lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE',
-                'preview.' + settings.LMS_BASE)
+            lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE', 'preview.' + settings.LMS_BASE)
         else:
             lms_base = settings.LMS_BASE
-     
+
         lms_link = "//{lms_base}/courses/{course_id}/jump_to/{location}".format(
             lms_base=lms_base,
             course_id=course_id,
@@ -193,6 +191,7 @@ class CoursePageNames:
     CourseOutline = "course_index"
     Checklists = "checklists"
 
+
 def add_open_ended_panel_tab(course):
     """
     Used to add the open ended panel tab to a course if it does not exist.
@@ -209,6 +208,7 @@ def add_open_ended_panel_tab(course):
         changed = True
     return changed, course_tabs
 
+
 def remove_open_ended_panel_tab(course):
     """
     Used to remove the open ended panel tab from a course if it exists.
@@ -221,6 +221,6 @@ def remove_open_ended_panel_tab(course):
     #Check to see if open ended panel is defined in the course
     if OPEN_ENDED_PANEL in course_tabs:
         #Add panel to the tabs if it is not defined
-        course_tabs = [ct for ct in course_tabs if ct!=OPEN_ENDED_PANEL]
+        course_tabs = [ct for ct in course_tabs if ct != OPEN_ENDED_PANEL]
         changed = True
     return changed, course_tabs

@@ -14,9 +14,6 @@ from tempfile import mkdtemp
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
 
-# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
-from PIL import Image
-
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
 from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
@@ -244,8 +241,7 @@ def edit_subsection(request, location):
         (field.name, field.read_from(item))
         for field
         in item.fields
-        if field.name not in ['display_name', 'start', 'due', 'format'] and
-            field.scope == Scope.settings
+        if field.name not in ['display_name', 'start', 'due', 'format'] and field.scope == Scope.settings
     )
 
     can_view_live = False
@@ -257,18 +253,18 @@ def edit_subsection(request, location):
             break
 
     return render_to_response('edit_subsection.html',
-        {'subsection': item,
-         'context_course': course,
-         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
-         'lms_link': lms_link,
-         'preview_link': preview_link,
-         'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
-         'parent_location': course.location,
-         'parent_item': parent,
-         'policy_metadata': policy_metadata,
-         'subsection_units': subsection_units,
-         'can_view_live': can_view_live
-        })
+                              {'subsection': item,
+                               'context_course': course,
+                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+                               'lms_link': lms_link,
+                               'preview_link': preview_link,
+                               'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+                               'parent_location': course.location,
+                               'parent_item': parent,
+                               'policy_metadata': policy_metadata,
+                               'subsection_units': subsection_units,
+                               'can_view_live': can_view_live
+                               })
 
 
 @login_required
@@ -347,7 +343,7 @@ def edit_unit(request, location):
         index = index + 1
 
     preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE',
-        'preview.' + settings.LMS_BASE)
+                                                  'preview.' + settings.LMS_BASE)
 
     preview_lms_link = '//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
             preview_lms_base=preview_lms_base,
@@ -623,7 +619,6 @@ def delete_item(request):
 
     store = get_modulestore(item_loc)
 
-
     # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
     # if item.location.revision=None, then delete both draft and published version
     # if caller wants to only delete the draft than the caller should put item.location.revision='draft'
@@ -665,7 +660,7 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
-    store = get_modulestore(Location(item_location));
+    store = get_modulestore(Location(item_location))
 
     if request.POST.get('data') is not None:
         data = request.POST['data']
@@ -800,7 +795,7 @@ def upload_asset(request, org, course, coursename):
     # Does the course actually exist?!? Get anything from it to prove its existance
 
     try:
-        item = modulestore().get_item(location)
+        modulestore().get_item(location)
     except:
         # no return it as a Bad Request response
         logging.error('Could not find course' + location)
@@ -834,24 +829,22 @@ def upload_asset(request, org, course, coursename):
     readback = contentstore().find(content.location)
 
     response_payload = {'displayname': content.name,
-        'uploadDate': get_default_time_display(readback.last_modified_at.timetuple()),
-        'url': StaticContent.get_url_path_from_location(content.location),
-        'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
-        'msg': 'Upload completed'
-        }
+                        'uploadDate': get_default_time_display(readback.last_modified_at.timetuple()),
+                        'url': StaticContent.get_url_path_from_location(content.location),
+                        'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
+                        'msg': 'Upload completed'
+                        }
 
     response = HttpResponse(json.dumps(response_payload))
     response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
-
-'''
-This view will return all CMS users who are editors for the specified course
-'''
 @login_required
 @ensure_csrf_cookie
 def manage_users(request, location):
-
+    '''
+    This view will return all CMS users who are editors for the specified course
+    '''
     # check that logged in user has permissions to this item
     if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=STAFF_ROLE_NAME):
         raise PermissionDenied()
@@ -878,14 +871,14 @@ def create_json_response(errmsg=None):
     return resp
 
 
-'''
-This POST-back view will add a user - specified by email - to the list of editors for
-the specified course
-'''
 @expect_json
 @login_required
 @ensure_csrf_cookie
 def add_user(request, location):
+    '''
+    This POST-back view will add a user - specified by email - to the list of editors for
+    the specified course
+    '''
     email = request.POST["email"]
 
     if email == '':
@@ -911,14 +904,15 @@ def add_user(request, location):
     return create_json_response()
 
 
-'''
-This POST-back view will remove a user - specified by email - from the list of editors for
-the specified course
-'''
 @expect_json
 @login_required
 @ensure_csrf_cookie
 def remove_user(request, location):
+    '''
+    This POST-back view will remove a user - specified by email - from the list of editors for
+    the specified course
+    '''
+
     email = request.POST["email"]
 
     # check that logged in user has admin permissions on this course
@@ -993,12 +987,11 @@ def reorder_static_tabs(request):
     for tab in course.tabs:
         if tab['type'] == 'static_tab':
             reordered_tabs.append({'type': 'static_tab',
-                'name': tab_items[static_tab_idx].display_name,
-                'url_slug': tab_items[static_tab_idx].location.name})
+                                   'name': tab_items[static_tab_idx].display_name,
+                                   'url_slug': tab_items[static_tab_idx].location.name})
             static_tab_idx += 1
         else:
             reordered_tabs.append(tab)
-
 
     # OK, re-assemble the static tabs in the new order
     course.tabs = reordered_tabs
@@ -1011,7 +1004,6 @@ def reorder_static_tabs(request):
 def edit_tabs(request, org, course, coursename):
     location = ['i4x', org, course, 'course', coursename]
     course_item = modulestore().get_item(location)
-    static_tabs_loc = Location('i4x', org, course, 'static_tab', None)
 
     # check that logged in user has permissions to this item
     if not has_access(request.user, location):
@@ -1040,7 +1032,7 @@ def edit_tabs(request, org, course, coursename):
         'active_tab': 'pages',
         'context_course': course_item,
         'components': components
-        })
+    })
 
 
 def not_found(request):
@@ -1102,21 +1094,21 @@ def course_info_updates(request, org, course, provided_id=None):
 
     if request.method == 'GET':
         return HttpResponse(json.dumps(get_course_updates(location)),
-            mimetype="application/json")
+                            mimetype="application/json")
     elif real_method == 'DELETE':
         try:
             return HttpResponse(json.dumps(delete_course_update(location,
-                request.POST, provided_id)), mimetype="application/json")
+                                request.POST, provided_id)), mimetype="application/json")
         except:
             return HttpResponseBadRequest("Failed to delete",
-                content_type="text/plain")
+                                          content_type="text/plain")
     elif request.method == 'POST':
         try:
             return HttpResponse(json.dumps(update_course_updates(location,
-                request.POST, provided_id)), mimetype="application/json")
+                                request.POST, provided_id)), mimetype="application/json")
         except:
             return HttpResponseBadRequest("Failed to save",
-                content_type="text/plain")
+                                          content_type="text/plain")
 
 
 @expect_json
@@ -1184,7 +1176,7 @@ def course_config_graders_page(request, org, course, name):
 
     return render_to_response('settings_graders.html', {
         'context_course': course_module,
-        'course_location' : location,
+        'course_location': location,
         'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 
@@ -1203,8 +1195,8 @@ def course_config_advanced_page(request, org, course, name):
 
     return render_to_response('settings_advanced.html', {
         'context_course': course_module,
-        'course_location' : location,
-        'advanced_dict' : json.dumps(CourseMetadata.fetch(location)),
+        'course_location': location,
+        'advanced_dict': json.dumps(CourseMetadata.fetch(location)),
     })
 
 
@@ -1225,7 +1217,8 @@ def course_settings_updates(request, org, course, name, section):
         manager = CourseDetails
     elif section == 'grading':
         manager = CourseGradingModel
-    else: return
+    else:
+        return
 
     if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
@@ -1320,6 +1313,7 @@ def course_advanced_updates(request, org, course, name):
         response_json = json.dumps(CourseMetadata.update_from_json(location, request_body, filter_tabs=filter_tabs))
         return HttpResponse(response_json, mimetype="application/json")
 
+
 @ensure_csrf_cookie
 @login_required
 def get_checklists(request, org, course, name):
@@ -1345,10 +1339,10 @@ def get_checklists(request, org, course, name):
     if copied or modified:
         modulestore.update_metadata(location, own_metadata(course_module))
     return render_to_response('checklists.html',
-        {
-            'context_course': course_module,
-            'checklists': checklists
-        })
+                              {
+                                  'context_course': course_module,
+                                  'checklists': checklists
+                              })
 
 
 @ensure_csrf_cookie
@@ -1433,7 +1427,6 @@ def asset_index(request, org, course, name):
     # sort in reverse upload date order
     assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
 
-    thumbnails = contentstore().get_all_content_thumbnails_for_course(course_reference)
     asset_display = []
     for asset in assets:
         id = asset['_id']
@@ -1527,10 +1520,10 @@ def initialize_course_tabs(course):
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.
     course.tabs = [{"type": "courseware"},
-        {"type": "course_info", "name": "Course Info"},
-        {"type": "discussion", "name": "Discussion"},
-        {"type": "wiki", "name": "Wiki"},
-        {"type": "progress", "name": "Progress"}]
+                   {"type": "course_info", "name": "Course Info"},
+                   {"type": "discussion", "name": "Discussion"},
+                   {"type": "wiki", "name": "Wiki"},
+                   {"type": "progress", "name": "Progress"}]
 
     modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
 
@@ -1586,8 +1579,10 @@ def import_course(request, org, course, name):
                 shutil.move(r / fname, course_dir)
 
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-            [course_subdir], load_error_modules=False, static_content_store=contentstore(), 
-            target_location_namespace=Location(location), draft_store=modulestore())
+                                                     [course_subdir], load_error_modules=False,
+                                                     static_content_store=contentstore(),
+                                                     target_location_namespace=Location(location),
+                                                     draft_store=modulestore())
 
         # we can blow this away when we're done importing.
         shutil.rmtree(course_dir)

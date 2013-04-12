@@ -9,8 +9,9 @@ INHERITABLE_METADATA = (
     # intended to be set per-course, but can be overridden in for specific
     # elements.  Can be a float.
     'days_early_for_beta',
-    'giturl'	# for git edit link
+    'giturl'  # for git edit link
 )
+
 
 def compute_inherited_metadata(descriptor):
     """Given a descriptor, traverse all of its descendants and do metadata
