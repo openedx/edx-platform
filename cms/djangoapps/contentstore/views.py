@@ -1586,7 +1586,8 @@ def import_course(request, org, course, name):
                 shutil.move(r / fname, course_dir)
 
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-            [course_subdir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace=Location(location))
+            [course_subdir], load_error_modules=False, static_content_store=contentstore(), 
+            target_location_namespace=Location(location), draft_store=modulestore())
 
         # we can blow this away when we're done importing.
         shutil.rmtree(course_dir)
@@ -1620,8 +1621,8 @@ def generate_export_course(request, org, course, name):
 
     logging.debug('root = {0}'.format(root_dir))
 
-    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name)
-    # filename = root_dir / name + '.tar.gz'
+    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
+    #filename = root_dir / name + '.tar.gz'
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
     tf = tarfile.open(name=export_file.name, mode='w:gz')

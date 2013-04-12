@@ -225,7 +225,6 @@ function toggleSections(e) {
 function editSectionPublishDate(e) {
     e.preventDefault();
     $modal = $('.edit-subsection-publish-settings').show();
-    $modal = $('.edit-subsection-publish-settings').show();
     $modal.attr('data-id', $(this).attr('data-id'));
     $modal.find('.start-date').val($(this).attr('data-date'));
     $modal.find('.start-time').val($(this).attr('data-time'));
