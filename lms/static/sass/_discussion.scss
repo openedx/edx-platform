@@ -820,6 +820,7 @@ body.discussion {
       z-index: 50;
       width: 100%;
       height: 100%;
+      border-radius: 0 0 0 0;
       border: 1px solid transparent;
       text-align: center;
       overflow: hidden;
@@ -841,6 +842,9 @@ body.discussion {
       }
       .drop-arrow {
         font-size: 16px;
+      }
+      .drop-arrow {
+        font-size:16px;
       }
     }
 
@@ -874,6 +878,13 @@ body.discussion {
       .browse-topic-drop-menu {
         max-height: 400px;
         overflow-y: scroll;
+
+        .drop-menu-meta-category span,
+        .drop-menu-parent-category span {
+            margin: 10px 0; 
+            font-size: 14px;
+            font-weight: 700;
+        }
       }
 
 
@@ -926,14 +937,14 @@ body.discussion {
       li li {
         a {
           padding-left: 44px;
-          background: url(../images/nested-icon.png) no-repeat 22px 14px;
+          background: url(../images/nested-icon.png) no-repeat 22px 5px;
         }
       }
 
       li li li {
         a {
           padding-left: 68px;
-          background: url(../images/nested-icon.png) no-repeat 46px 14px;
+          background: url(../images/nested-icon.png) no-repeat 46px 5px;
         }
       }
     }
