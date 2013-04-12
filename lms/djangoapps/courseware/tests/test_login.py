@@ -1,3 +1,6 @@
+'''
+Tests for student activation and login
+'''
 from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse
@@ -71,10 +74,8 @@ class LoginTest(TestCase):
         response = self._login_response('test@edx.org', unicode_password)
         self._assert_response(response, success=False)
 
-    '''
-    Post the login info
-    '''
     def _login_response(self, email, password):
+        ''' Post the login info '''
         post_params = {'email': email, 'password': password}
         return self.client.post(self.url, post_params)
 
