@@ -11,7 +11,13 @@ dedent = textwrap.dedent
 
 
 def jailpy(*args, **kwargs):
+    """Run `jail_code` on Python."""
     return jail_code("python", *args, **kwargs)
+
+
+def file_here(fname):
+    """Return the full path to a file alongside this code."""
+    return os.path.join(os.path.dirname(__file__), fname)
 
 
 class JailCodeHelpers(object):
@@ -28,32 +34,32 @@ class JailCodeHelpers(object):
 
 class TestFeatures(JailCodeHelpers, unittest.TestCase):
     def test_hello_world(self):
-        res = jailpy("print 'Hello, world!'")
+        res = jailpy(code="print 'Hello, world!'")
         self.assertResultOk(res)
         self.assertEqual(res.stdout, 'Hello, world!\n')
 
     def test_argv(self):
         res = jailpy(
-                "import sys; print ':'.join(sys.argv[1:])",
+                code="import sys; print ':'.join(sys.argv[1:])",
                 argv=["Hello", "world", "-x"]
                 )
         self.assertResultOk(res)
         self.assertEqual(res.stdout, "Hello:world:-x\n")
 
     def test_ends_with_exception(self):
-        res = jailpy("""raise Exception('FAIL')""")
+        res = jailpy(code="""raise Exception('FAIL')""")
         self.assertNotEqual(res.status, 0)
         self.assertEqual(res.stdout, "")
         self.assertEqual(res.stderr, dedent("""\
             Traceback (most recent call last):
-              File "jailed_code.py", line 1, in <module>
+              File "jailed_code", line 1, in <module>
                 raise Exception('FAIL')
             Exception: FAIL
             """))
 
     def test_stdin_is_provided(self):
         res = jailpy(
-            "import json,sys; print sum(json.load(sys.stdin))",
+            code="import json,sys; print sum(json.load(sys.stdin))",
             stdin="[1, 2.5, 33]"
         )
         self.assertResultOk(res)
@@ -61,27 +67,35 @@ class TestFeatures(JailCodeHelpers, unittest.TestCase):
 
     def test_files_are_copied(self):
         res = jailpy(
-            "print 'Look:', open('hello.txt').read()",
-            files=[os.path.dirname(__file__) + "/hello.txt"]
+            code="print 'Look:', open('hello.txt').read()",
+            files=[file_here("hello.txt")]
         )
         self.assertResultOk(res)
         self.assertEqual(res.stdout, 'Look: Hello there.\n\n')
 
+    def test_executing_a_copied_file(self):
+        res = jailpy(
+            files=[file_here("doit.py")],
+            argv=["doit.py", "1", "2", "3"]
+        )
+        self.assertResultOk(res)
+        self.assertEqual(res.stdout, "This is doit.py!\nMy args are ['doit.py', '1', '2', '3']\n")
+
 
 class TestLimits(JailCodeHelpers, unittest.TestCase):
     def test_cant_use_too_much_memory(self):
-        res = jailpy("print sum(range(100000000))")
+        res = jailpy(code="print sum(range(100000000))")
         self.assertNotEqual(res.status, 0)
         self.assertEqual(res.stdout, "")
 
     def test_cant_use_too_much_cpu(self):
-        res = jailpy("print sum(xrange(100000000))")
+        res = jailpy(code="print sum(xrange(100000000))")
         self.assertNotEqual(res.status, 0)
         self.assertEqual(res.stdout, "")
 
     def test_cant_use_too_much_time(self):
         raise SkipTest  # TODO: test this once we can kill sleeping processes.
-        res = jailpy(dedent("""\
+        res = jailpy(code=dedent("""\
                 import time
                 time.sleep(5)
                 print 'Done!'
@@ -90,7 +104,7 @@ class TestLimits(JailCodeHelpers, unittest.TestCase):
         self.assertEqual(res.stdout, "")
 
     def test_cant_write_files(self):
-        res = jailpy(dedent("""\
+        res = jailpy(code=dedent("""\
                 print "Trying"
                 with open("mydata.txt", "w") as f:
                     f.write("hello")
@@ -102,7 +116,7 @@ class TestLimits(JailCodeHelpers, unittest.TestCase):
         self.assertIn("ermission denied", res.stderr)
 
     def test_cant_use_network(self):
-        res = jailpy(dedent("""\
+        res = jailpy(code=dedent("""\
                 import urllib
                 print "Reading google"
                 u = urllib.urlopen("http://google.com")
@@ -121,7 +135,7 @@ class TestLimits(JailCodeHelpers, unittest.TestCase):
 class TestMalware(JailCodeHelpers, unittest.TestCase):
     def test_crash_cpython(self):
         # http://nedbatchelder.com/blog/201206/eval_really_is_dangerous.html
-        res = jailpy(dedent("""\
+        res = jailpy(code=dedent("""\
             import new, sys
             crash_me = new.function(new.code(0,0,0,0,"KABOOM",(),(),(),"","",0,""), {})
             print "Here we go..."
@@ -134,7 +148,7 @@ class TestMalware(JailCodeHelpers, unittest.TestCase):
         self.assertEqual(res.stderr, "")
 
     def test_read_etc_passwd(self):
-        res = jailpy(dedent("""\
+        res = jailpy(code=dedent("""\
             bytes = len(open('/etc/passwd').read())
             print 'Gotcha', bytes
             """))
@@ -143,7 +157,7 @@ class TestMalware(JailCodeHelpers, unittest.TestCase):
         self.assertIn("ermission denied", res.stderr)
 
     def test_find_other_sandboxes(self):
-        res = jailpy(dedent("""
+        res = jailpy(code=dedent("""
             import os;
             places = [
                 "..", "/tmp", "/", "/home", "/etc",

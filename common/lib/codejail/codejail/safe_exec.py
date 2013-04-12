@@ -85,7 +85,7 @@ def safe_exec(code, globals_dict, files=None, python_path=None):
         log.debug("Exec: %s", code)
         log.debug("Stdin: %s", stdin)
 
-    res = jail_code.jail_code("python", jailed_code, stdin=stdin, files=files)
+    res = jail_code.jail_code("python", code=jailed_code, stdin=stdin, files=files)
     if res.status != 0:
         raise Exception("Couldn't execute jailed code: %s" % res.stderr)
     globals_dict.update(json.loads(res.stdout))

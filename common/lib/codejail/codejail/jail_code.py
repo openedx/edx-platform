@@ -68,15 +68,20 @@ class JailResult(object):
         self.stdout = self.stderr = self.status = None
 
 
-def jail_code(command, code, files=None, argv=None, stdin=None):
+def jail_code(command, code=None, files=None, argv=None, stdin=None):
     """Run code in a jailed subprocess.
 
     `command` is an abstract command ("python", "node", ...) that must have
     been configured using `configure`.
 
-    `code` is a string containing the Python code to run.
+    `code` is a string containing the code to run.  If no code is supplied,
+    then the code to run must be in one of the `files` copied, and must be
+    named in the `argv` list.
 
-    `files` is a list of file paths.
+    `files` is a list of file paths, they are all copied to the jailed
+    directory.
+
+    `argv` is the command-line arguments to supply.
 
     Return an object with:
 
@@ -92,6 +97,8 @@ def jail_code(command, code, files=None, argv=None, stdin=None):
 
         log.debug("Executing jailed code: %r", code)
 
+        argv = argv or []
+
         # All the supporting files are copied into our directory.
         for filename in files or ():
             if os.path.isfile(filename):
@@ -101,10 +108,13 @@ def jail_code(command, code, files=None, argv=None, stdin=None):
                 shutil.copytree(filename, dest)
 
         # Create the main file.
-        with open(os.path.join(tmpdir, "jailed_code.py"), "w") as jailed:
-            jailed.write(code)
+        if code:
+            with open(os.path.join(tmpdir, "jailed_code"), "w") as jailed:
+                jailed.write(code)
 
-        cmd = COMMANDS[command] + ['jailed_code.py'] + (argv or [])
+            argv = ["jailed_code"] + argv
+
+        cmd = COMMANDS[command] + argv
 
         subproc = subprocess.Popen(
             cmd, preexec_fn=set_process_limits, cwd=tmpdir,
