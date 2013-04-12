@@ -241,8 +241,7 @@ def edit_subsection(request, location):
         (field.name, field.read_from(item))
         for field
         in item.fields
-        if field.name not in ['display_name', 'start', 'due', 'format'] and
-        field.scope == Scope.settings
+        if field.name not in ['display_name', 'start', 'due', 'format'] and field.scope == Scope.settings
     )
 
     can_view_live = False
