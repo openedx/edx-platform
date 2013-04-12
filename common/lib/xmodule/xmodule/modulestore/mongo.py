@@ -205,7 +205,7 @@ def location_to_query(location, wildcard=True):
         for key, value in query.items():
             # don't allow wildcards on revision, since public is set as None, so
             # its ambiguous between None as a real value versus None=wildcard
-            if value is None and key != 'revision':
+            if value is None and key != '_id.revision':
                 del query[key]
 
     return query
