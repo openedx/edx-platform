@@ -94,6 +94,33 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         return cnt
 
+    def test_get_items(self):
+        '''
+        This verifies a bug we had where the None setting in get_items() meant 'wildcard'
+        Unfortunately, None = published for the revision field, so get_items() would return
+        both draft and non-draft copies.
+        '''
+        store = modulestore()
+        draft_store = modulestore('draft')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+
+        draft_store.clone_item(html_module.location, html_module.location)
+
+        # now query get_items() to get this location with revision=None, this should just
+        # return back a single item (not 2)
+
+        items = store.get_items(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        self.assertEqual(len(items), 1)
+        self.assertFalse(getattr(items[0], 'is_draft', False))
+
+        # now refetch from the draft store. Note that even though we pass
+        # None in the revision field, the draft store will replace that with 'draft'
+        items = draft_store.get_items(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        self.assertEqual(len(items), 1)
+        self.assertTrue(getattr(items[0], 'is_draft', False))
+
     def test_draft_metadata(self):
         '''
         This verifies a bug we had where inherited metadata was getting written to the
