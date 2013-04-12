@@ -60,6 +60,7 @@ class OptionInputTest(unittest.TestCase):
 
     def test_option_parsing(self):
         f = inputtypes.OptionInput.parse_options
+
         def check(input, options):
             """Take list of options, confirm that output is in the silly doubled format"""
             expected = [(o, o) for o in options]
@@ -118,7 +119,6 @@ class ChoiceGroupTest(unittest.TestCase):
 
     def test_checkboxgroup(self):
         self.check_group('checkboxgroup', 'checkbox', '[]')
-
 
 
 class JavascriptInputTest(unittest.TestCase):
@@ -186,7 +186,6 @@ class TextLineTest(unittest.TestCase):
                     'preprocessor': None}
         self.assertEqual(context, expected)
 
-
     def test_math_rendering(self):
         size = "42"
         preprocessorClass = "preParty"
@@ -226,11 +225,11 @@ class TextLineTest(unittest.TestCase):
         trailing_text.append((u'\xc3', u'\xc3'))
         # html escaped trailing text
         # this is the only one we expect to change
-        trailing_text.append(('a &lt; b','a < b'))
+        trailing_text.append(('a &lt; b', 'a < b'))
 
         for xml_text, expected_text in trailing_text:
-            xml_str = u"""<textline id="prob_1_2" 
-                            size="{size}" 
+            xml_str = u"""<textline id="prob_1_2"
+                            size="{size}"
                             trailing_text="{tt}"
                             />""".format(size=size, tt=xml_text)
 
@@ -269,7 +268,6 @@ class FileSubmissionTest(unittest.TestCase):
         />""".format(af=allowed_files,
                      rf=required_files,)
 
-
         element = etree.fromstring(xml_str)
 
         state = {'value': 'BumbleBee.py',
@@ -281,12 +279,12 @@ class FileSubmissionTest(unittest.TestCase):
         context = the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
-                   'status': 'queued',
-                   'msg': input_class.submitted_msg,
-                   'value': 'BumbleBee.py',
-                   'queue_len': '3',
-                   'allowed_files': '["runme.py", "nooooo.rb", "ohai.java"]',
-                   'required_files': '["cookies.py"]'}
+                    'status': 'queued',
+                    'msg': input_class.submitted_msg,
+                    'value': 'BumbleBee.py',
+                    'queue_len': '3',
+                    'allowed_files': '["runme.py", "nooooo.rb", "ohai.java"]',
+                    'required_files': '["cookies.py"]'}
 
         self.assertEqual(context, expected)
 
@@ -327,18 +325,18 @@ class CodeInputTest(unittest.TestCase):
 
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
-                   'status': 'queued',
-                   'msg': input_class.submitted_msg,
-                   'mode': mode,
-                   'linenumbers': linenumbers,
-                   'rows': rows,
-                   'cols': cols,
-                   'hidden': '',
-                   'tabsize': int(tabsize),
-                   'queue_len': '3',
-                   }
+                    'status': 'queued',
+                    'msg': input_class.submitted_msg,
+                    'mode': mode,
+                    'linenumbers': linenumbers,
+                    'rows': rows,
+                    'cols': cols,
+                    'hidden': '',
+                    'tabsize': int(tabsize),
+                    'queue_len': '3'}
 
         self.assertEqual(context, expected)
+
 
 class MatlabTest(unittest.TestCase):
     '''
@@ -352,18 +350,18 @@ class MatlabTest(unittest.TestCase):
         self.payload = "payload"
         self.linenumbers = 'true'
         self.xml = """<matlabinput id="prob_1_2"
-            rows="{r}" cols="{c}" 
+            rows="{r}" cols="{c}"
             tabsize="{tabsize}" mode="{m}"
             linenumbers="{ln}">
                 <plot_payload>
                     {payload}
                 </plot_payload>
-            </matlabinput>""".format(r = self.rows,
-                                c = self.cols,
-                                tabsize = self.tabsize,
-                                m = self.mode,
-                                payload = self.payload,
-                                ln = self.linenumbers)
+            </matlabinput>""".format(r=self.rows,
+                                     c=self.cols,
+                                     tabsize=self.tabsize,
+                                     m=self.mode,
+                                     payload=self.payload,
+                                     ln=self.linenumbers)
         elt = etree.fromstring(self.xml)
         state = {'value': 'print "good evening"',
                  'status': 'incomplete',
@@ -372,26 +370,23 @@ class MatlabTest(unittest.TestCase):
         self.input_class = lookup_tag('matlabinput')
         self.the_input = self.input_class(test_system, elt, state)
 
-
     def test_rendering(self):
         context = self.the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
-                   'status': 'queued',
-                   'msg': self.input_class.submitted_msg,
-                   'mode': self.mode,
-                   'rows': self.rows,
-                   'cols': self.cols,
-                   'queue_msg': '',
-                   'linenumbers': 'true',
-                   'hidden': '',
-                   'tabsize': int(self.tabsize),
-                   'queue_len': '3',
-                   }
+                    'status': 'queued',
+                    'msg': self.input_class.submitted_msg,
+                    'mode': self.mode,
+                    'rows': self.rows,
+                    'cols': self.cols,
+                    'queue_msg': '',
+                    'linenumbers': 'true',
+                    'hidden': '',
+                    'tabsize': int(self.tabsize),
+                    'queue_len': '3'}
 
         self.assertEqual(context, expected)
-
 
     def test_rendering_with_state(self):
         state = {'value': 'print "good evening"',
@@ -405,17 +400,16 @@ class MatlabTest(unittest.TestCase):
 
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
-                   'status': 'queued',
-                   'msg': self.input_class.submitted_msg,
-                   'mode': self.mode,
-                   'rows': self.rows,
-                   'cols': self.cols,
-                   'queue_msg': 'message',
-                   'linenumbers': 'true',
-                   'hidden': '',
-                   'tabsize': int(self.tabsize),
-                   'queue_len': '3',
-                   }
+                    'status': 'queued',
+                    'msg': self.input_class.submitted_msg,
+                    'mode': self.mode,
+                    'rows': self.rows,
+                    'cols': self.cols,
+                    'queue_msg': 'message',
+                    'linenumbers': 'true',
+                    'hidden': '',
+                    'tabsize': int(self.tabsize),
+                    'queue_len': '3'}
 
         self.assertEqual(context, expected)
 
@@ -430,17 +424,16 @@ class MatlabTest(unittest.TestCase):
         context = the_input._get_render_context()
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
-                   'status': 'queued',
-                   'msg': self.input_class.plot_submitted_msg,
-                   'mode': self.mode,
-                   'rows': self.rows,
-                   'cols': self.cols,
-                   'queue_msg': '',
-                   'linenumbers': 'true',
-                   'hidden': '',
-                   'tabsize': int(self.tabsize),
-                   'queue_len': '1',
-                   }
+                    'status': 'queued',
+                    'msg': self.input_class.plot_submitted_msg,
+                    'mode': self.mode,
+                    'rows': self.rows,
+                    'cols': self.cols,
+                    'queue_msg': '',
+                    'linenumbers': 'true',
+                    'hidden': '',
+                    'tabsize': int(self.tabsize),
+                    'queue_len': '1'}
 
         self.assertEqual(context, expected)
 
@@ -449,7 +442,7 @@ class MatlabTest(unittest.TestCase):
         response = self.the_input.handle_ajax("plot", get)
 
         test_system.xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
-        
+
         self.assertTrue(response['success'])
         self.assertTrue(self.the_input.input_state['queuekey'] is not None)
         self.assertEqual(self.the_input.input_state['queuestate'], 'queued')
@@ -491,9 +484,6 @@ class MatlabTest(unittest.TestCase):
         self.assertFalse('queue_msg' in input_state)
 
 
-
-
-
 class SchematicTest(unittest.TestCase):
     '''
     Check that schematic inputs work
@@ -506,7 +496,6 @@ class SchematicTest(unittest.TestCase):
         analyses = 'fast, slow, and pink'
         initial_value = 'two large batteries'
         submit_analyses = 'maybe'
-
 
         xml_str = """<schematic id="prob_1_2"
         height="{h}"
@@ -537,8 +526,7 @@ class SchematicTest(unittest.TestCase):
                     'height': height,
                     'parts': parts,
                     'analyses': analyses,
-                    'submit_analyses': submit_analyses,
-                   }
+                    'submit_analyses': submit_analyses}
 
         self.assertEqual(context, expected)
 
