@@ -200,7 +200,7 @@ body.discussion {
         z-index: 9999;
         width: 100%;
         @include box-sizing(border-box);
-        background: #737373;
+        background: #797979;
         border: 1px solid #333;
         box-shadow: 0 2px 50px rgba(0, 0, 0, .4);
       }
@@ -710,7 +710,7 @@ body.discussion {
     border-radius: 3px 0 0 0;
 
 
-    .browse,
+    .home, .browse,
     .search {
       position: relative;
       float: left;
@@ -723,9 +723,29 @@ body.discussion {
       &:hover {
         background-color: #e9e9e9;
       }
+    }
 
-      &.is-open {
-        width: 80%;
+    .home {
+      border-radius: 3px 0 0 0;
+      box-shadow: -1px 0 0 #aaa inset;
+      cursor: pointer;
+
+      .home-icon {
+        display: block;
+        position: absolute;
+        top: 30%;
+        left: 30%;
+        z-index: 100;
+        width: 25px;
+        height: 25px;
+        //margin-left: -17px;
+        background: url(../images/home-discussion-icon.png) no-repeat;
+        opacity: 1;
+        @include transition(none);
+      }
+
+      .home-btn {
+        //nothing here yet
       }
     }
 
@@ -734,6 +754,7 @@ body.discussion {
       box-shadow: -1px 0 0 #aaa inset;
 
       &.is-open {
+        width:60%;
         .browse-topic-drop-btn span {
           opacity: 1.0;
         }
@@ -774,6 +795,11 @@ body.discussion {
 
       &.is-open {
         cursor: auto;
+        width: 60%;
+
+        .home {
+          width:0%;
+        }
 
         .post-search {
           padding: 0 10px;
@@ -801,7 +827,7 @@ body.discussion {
       z-index: 50;
       width: 100%;
       height: 100%;
-      border-radius: 3px 0 0 0;
+      border-radius: 0 0 0 0;
       border: 1px solid transparent;
       text-align: center;
       overflow: hidden;
@@ -819,6 +845,9 @@ body.discussion {
         text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
         opacity: 0.0;
         @include transition(opacity .2s linear 0s);
+      }
+      .drop-arrow {
+        font-size:16px;
       }
     }
 
@@ -843,7 +872,7 @@ body.discussion {
       left: -1px;
       z-index: 9999;
       width: 100%;
-      background: #737373;
+      background: #797979;
       border: 1px solid #4b4b4b;
       border-left: none;
       border-radius: 0 0 3px 3px;
@@ -852,7 +881,15 @@ body.discussion {
       .browse-topic-drop-menu {
         max-height: 400px;
         overflow-y: scroll;
+
+        .drop-menu-meta-category span,
+        .drop-menu-parent-category span {
+            margin: 10px 0; 
+            font-size: 14px;
+            font-weight: 700;
+        }
       }
+
 
       ul {
         position: inline;
@@ -866,7 +903,7 @@ body.discussion {
         display: block;
         padding: 0 20px;
         border-top: 1px solid #5f5f5f;
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 700;
         line-height: 22px;
         color: #fff;
@@ -885,7 +922,7 @@ body.discussion {
         .board-name {
           float: left;
           width: 80%;
-          margin: 13px 0;
+          margin: 5px 0;
           color: #fff;
         }
 
@@ -903,14 +940,14 @@ body.discussion {
       li li {
         a {
           padding-left: 44px;
-          background: url(../images/nested-icon.png) no-repeat 22px 14px;
+          background: url(../images/nested-icon.png) no-repeat 22px 5px;
         }
       }
 
       li li li {
         a {
           padding-left: 68px;
-          background: url(../images/nested-icon.png) no-repeat 46px 14px;
+          background: url(../images/nested-icon.png) no-repeat 46px 5px;
         }
       }
     }
@@ -979,7 +1016,7 @@ body.discussion {
     min-height: 27px;
     border-bottom: 1px solid #a3a3a3;
     @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-    background-color: #aeaeae;
+    background-color: #aaaaaa;
     box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
 
     span,
@@ -1268,10 +1305,32 @@ body.discussion {
     }
   }
 
-  .blank-slate h1 {
-    margin-top: 195px;
-    text-align: center;
-    color: #ccc;
+  .blank-slate {
+    //nothing here
+    .section {
+      border-bottom: 1px solid #ccc;
+      margin-top: 15px;
+    }
+    .home-header {
+      //nothing here
+    }
+
+    .home-title {
+      font-size: 18px;
+      color: #000;
+      margin-bottom: 5px;
+    }
+    .home-description {
+      font-size: 12px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    .home-stats {
+      //nothing
+    }
+    .home-emailsettings {
+      //nothing here
+    }
   }
 
   .blank-slate,
