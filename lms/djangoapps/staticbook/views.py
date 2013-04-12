@@ -85,7 +85,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
 
 
 @login_required
-def html_index(request, course_id, book_index, chapter=None, anchor_id=None):
+def html_index(request, course_id, book_index, chapter=None):
     """
     Display an HTML textbook.
 
@@ -97,9 +97,6 @@ def html_index(request, course_id, book_index, chapter=None, anchor_id=None):
     chapter:  (optional) one-based index into the chapter array of textbook HTML files to display.
         Defaults to first chapter.  Specifying this assumes that there are separate HTML files for
         each chapter in a textbook.
-
-    anchor_id:  (optional) id of the anchor to display within the HTML.  Defaults to top of document.
-        (NOT IMPLEMENTED.)
     """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
@@ -131,5 +128,4 @@ def html_index(request, course_id, book_index, chapter=None, anchor_id=None):
                                'course': course,
                                'textbook': textbook,
                                'chapter': chapter,
-                               'anchor_id': anchor_id,
                                'staff_access': staff_access})

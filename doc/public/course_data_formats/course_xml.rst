@@ -635,7 +635,7 @@ HTML-based Textbooks
 Configuration
 -------------
 
-HTML-based textbooks are configured at the course level in the policy file.  The JSON markup consists of an array of maps, with each map corresponding to a separate textbook.  There are two styles to presenting HTML-based material.  The first way is as a single HTML on a tab, which requires only a tab title and a URL for configuration.  A second way permits the display of multiple HTMLs that should be displayed together on a single view. For this view, a side panel of links is available on the left, allowing selection of a particular HTML to view.  
+HTML-based textbooks are configured at the course level in the policy file.  The JSON markup consists of an array of maps, with each map corresponding to a separate textbook.  There are two styles to presenting HTML-based material.  The first way is as a single HTML on a tab, which requires only a tab title and a URL for configuration.  A second way permits the display of multiple HTML files that should be displayed together on a single view. For this view, a side panel of links is available on the left, allowing selection of a particular HTML to view.  
 
 .. code-block:: json
 
