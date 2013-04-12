@@ -1,5 +1,4 @@
-from lxml import etree
-from pkg_resources import resource_string, resource_listdir
+from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
@@ -16,11 +15,10 @@ class DiscussionFields(object):
 
 class DiscussionModule(DiscussionFields, XModule):
     js = {'coffee':
-            [resource_string(__name__, 'js/src/time.coffee'),
-            resource_string(__name__, 'js/src/discussion/display.coffee')]
-        }
+          [resource_string(__name__, 'js/src/time.coffee'),
+          resource_string(__name__, 'js/src/discussion/display.coffee')]
+          }
     js_module_name = "InlineDiscussion"
-
 
     def get_html(self):
         context = {
