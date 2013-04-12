@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse
-from factories import UserFactory, RegistrationFactory, UserProfileFactory
+from courseware.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
 import json
 
 
@@ -17,9 +17,7 @@ class LoginTest(TestCase):
         self.user.save()
 
         # Create a registration for the user
-        registration = RegistrationFactory(user=self.user)
-        registration.register(self.user)
-        registration.activate()
+        RegistrationFactory(user=self.user)
 
         # Create a profile for the user
         UserProfileFactory(user=self.user)
@@ -73,6 +71,9 @@ class LoginTest(TestCase):
         response = self._login_response('test@edx.org', unicode_password)
         self._assert_response(response, success=False)
 
+    '''
+    Post the login info
+    '''
     def _login_response(self, email, password):
         post_params = {'email': email, 'password': password}
         return self.client.post(self.url, post_params)
