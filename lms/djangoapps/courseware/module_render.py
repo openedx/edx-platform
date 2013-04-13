@@ -328,7 +328,6 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         return err_descriptor.xmodule(system)
 
     system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
-    log.debug('user_is_staff=%s' % system.user_is_staff)
     _get_html = module.get_html
 
     if wrap_xmodule_display == True:
