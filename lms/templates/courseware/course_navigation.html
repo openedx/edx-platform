@@ -27,14 +27,17 @@ def url_class(is_active):
           </li>
       % endfor
     <%block name="extratabs" />
-        %if staff_access and masquerade:
+        % if masquerade is not UNDEFINED:
+          % if staff_access and masquerade is not None:
 	  <li style="float:right"><a href="#" id="staffstatus">Staff view</a></li>
-	%endif
+	  % endif
+	% endif
     </ol>
   </div>
 </nav>
 
-%if staff_access and masquerade:
+% if masquerade is not UNDEFINED:
+  % if staff_access and masquerade is not None:
 <script type="text/javascript">
 masq = (function(){
     var el = $('#staffstatus');
@@ -61,4 +64,5 @@ masq = (function(){
     });
 }() );
 </script>
-%endif
+  % endif
+% endif
