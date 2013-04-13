@@ -20,6 +20,7 @@ from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
+from courseware.masquerade import setup_masquerade
 from courseware.model_data import ModelDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
@@ -267,6 +268,8 @@ def index(request, course_id, chapter=None, section=None,
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug('User %s tried to view course %s but is not enrolled' % (user, course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
+
+    masq = setup_masquerade(request, staff_access)
 
     try:
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(

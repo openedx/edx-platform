@@ -15,6 +15,7 @@ from xmodule.modulestore import Location
 from xmodule.x_module import XModule, XModuleDescriptor
 
 from student.models import CourseEnrollmentAllowed
+from masquerade import is_masquerading_as_student
 
 DEBUG_ACCESS = False
 
@@ -543,6 +544,10 @@ def _has_access_to_location(user, location, access_level, course_context):
     if user is None or (not user.is_authenticated()):
         debug("Deny: no user or anon user")
         return False
+
+    if is_masquerading_as_student(user):
+        return False
+
     if user.is_staff:
         debug("Allow: user.is_staff")
         return True

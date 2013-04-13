@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface
+from courseware.masquerade import setup_masquerade
 from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from .models import StudentModule
@@ -167,6 +168,10 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load', course_id):
         return None
+
+    # allow course staff to masquerade as student
+    if has_access(user, descriptor, 'staff', course_id):
+        setup_masquerade(request, True)
 
     # Setup system context for module instance
     ajax_url = reverse('modx_dispatch',
@@ -323,6 +328,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         return err_descriptor.xmodule(system)
 
     system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
+    log.debug('user_is_staff=%s' % system.user_is_staff)
     _get_html = module.get_html
 
     if wrap_xmodule_display == True:
