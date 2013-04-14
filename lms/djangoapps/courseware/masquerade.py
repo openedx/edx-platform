@@ -8,6 +8,7 @@ import json
 import logging
 
 from django.http import HttpResponse
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -37,6 +38,9 @@ def setup_masquerade(request, staff_access=False):
     Return string version of status of view (either 'staff' or 'student')
     '''
     if request.user is None:
+        return None
+
+    if not settings.MITX_FEATURES.get('ENABLE_MASQUERADE', False):
         return None
 
     if not staff_access:  # can masquerade only if user has staff access to course
