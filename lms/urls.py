@@ -345,7 +345,7 @@ if settings.COURSEWARE_ENABLED:
     # allow course staff to change to student view of courseware
     if settings.MITX_FEATURES.get('ENABLE_MASQUERADE'):
         urlpatterns += (
-            url(r'^masquerade/(?P<marg>.*)$','courseware.masquerade.handle_ajax', name="masquerate-switch"),
+            url(r'^masquerade/(?P<marg>.*)$','courseware.masquerade.handle_ajax', name="masquerade-switch"),
         )
         
 
