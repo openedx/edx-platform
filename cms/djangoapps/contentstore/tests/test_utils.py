@@ -70,3 +70,4 @@ class UrlReverseTestCase(ModuleStoreTestCase):
             'https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about',
             utils.get_url_reverse('https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about', course)
         )
+        

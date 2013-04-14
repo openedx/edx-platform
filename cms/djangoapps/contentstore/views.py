@@ -346,14 +346,14 @@ def edit_unit(request, location):
                                                   'preview.' + settings.LMS_BASE)
 
     preview_lms_link = '//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
-            preview_lms_base=preview_lms_base,
-            lms_base=settings.LMS_BASE,
-            org=course.location.org,
-            course=course.location.course,
-            course_name=course.location.name,
-            section=containing_section.location.name,
-            subsection=containing_subsection.location.name,
-            index=index)
+        preview_lms_base=preview_lms_base,
+        lms_base=settings.LMS_BASE,
+        org=course.location.org,
+        course=course.location.course,
+        course_name=course.location.name,
+        section=containing_section.location.name,
+        subsection=containing_subsection.location.name,
+        index=index)
 
     unit_state = compute_unit_state(item)
 
@@ -838,6 +838,7 @@ def upload_asset(request, org, course, coursename):
     response = HttpResponse(json.dumps(response_payload))
     response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
+
 
 @login_required
 @ensure_csrf_cookie
