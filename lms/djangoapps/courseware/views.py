@@ -292,6 +292,7 @@ def index(request, course_id, chapter=None, section=None,
             'init': '',
             'content': '',
             'staff_access': staff_access,
+            'masquerade': masq,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
