@@ -15,8 +15,9 @@ log = logging.getLogger(__name__)
 
 MASQ_KEY = 'masquerade_identity'
 
+
 def handle_ajax(request, marg):
-    if marg=='toggle':
+    if marg == 'toggle':
         status = request.session.get(MASQ_KEY, '')
         if status is None or status in ['', 'staff']:
             status = 'student'
@@ -37,7 +38,7 @@ def setup_masquerade(request, staff_access=False):
     if request.user is None:
         return None
 
-    if not staff_access:	# can masquerade only if user has staff access to course
+    if not staff_access:  # can masquerade only if user has staff access to course
         return None
 
     usertype = request.session.get(MASQ_KEY, '')
@@ -45,7 +46,7 @@ def setup_masquerade(request, staff_access=False):
         request.session[MASQ_KEY] = 'staff'
         usertype = 'staff'
 
-    if usertype=='student':
+    if usertype == 'student':
         request.user.masquerade_as_student = True
 
     return usertype
