@@ -15,7 +15,7 @@ from xmodule.modulestore import Location
 from xmodule.x_module import XModule, XModuleDescriptor
 
 from student.models import CourseEnrollmentAllowed
-from masquerade import is_masquerading_as_student
+from courseware.masquerade import is_masquerading_as_student
 
 DEBUG_ACCESS = False
 

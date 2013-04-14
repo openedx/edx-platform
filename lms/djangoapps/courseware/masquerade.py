@@ -1,14 +1,12 @@
-#---------------------------------------- Masequerade ----------------------------------------
-#
-# Allow course staff to see a student or staff view of courseware.
-# Which kind of view has been selected is stored in the session state.
+'''
+---------------------------------------- Masequerade ----------------------------------------
+Allow course staff to see a student or staff view of courseware.
+Which kind of view has been selected is stored in the session state.
+'''
 
 import json
 import logging
 
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 log = logging.getLogger(__name__)
@@ -17,6 +15,9 @@ MASQ_KEY = 'masquerade_identity'
 
 
 def handle_ajax(request, marg):
+    '''
+    Handle ajax call from "staff view" / "student view" toggle button
+    '''
     if marg == 'toggle':
         status = request.session.get(MASQ_KEY, '')
         if status is None or status in ['', 'staff']:
@@ -53,5 +54,8 @@ def setup_masquerade(request, staff_access=False):
 
 
 def is_masquerading_as_student(user):
+    '''
+    Return True if user is masquerading as a student, False otherwise
+    '''
     masq = getattr(user, 'masquerade_as_student', False)
     return masq
