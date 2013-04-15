@@ -133,6 +133,8 @@ class WordCloudModule(WordCloudFields, XModule):
             self.all_words = temp_all_words
 
             return self.get_state()
+        if dispatch == 'get_state':
+            return self.get_state()
         else:
             return json.dumps({
                 'status': 'fail',
