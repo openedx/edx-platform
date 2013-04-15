@@ -40,8 +40,6 @@ WordCloudMain.prototype = {
 
     this.wordCloudEl.find('#input-cloud-section').hide();
 
-    console.log('response: ', response);
-
     words = response.top_words;
 
     maxSize = 0;
@@ -63,13 +61,9 @@ WordCloudMain.prototype = {
         })
         .font('Impact')
         .fontSize(function (d) {
-            var size;
+            var size = (d.size / maxSize) * 100;
 
-            size = (d.size / maxSize) * 100;
-
-            if (size < 20) {
-                return 0;
-            }
+            size = size >= 15 ? size : 15;
 
             return size;
         })
@@ -147,26 +141,49 @@ function WordCloudMain(el) {
     hash += 1;
     this.hash = hash;
 
-    this.configJson = null;
-    try {
-        this.configJson = JSON.parse(this.wordCloudEl.find('.word_cloud_div').html());
-    } catch (err) {
-        logme('ERROR: Incorrect JSON config was given.');
-        logme(err.message);
-
-        return;
-    }
-
-    if (this.configJson.submitted) {
-        this.showWordCloud(this.configJson);
-
-        return;
-    }
-
-    this.inputSaveEl = $(el).find('input.save');
-
     // Get the URL to which we will post the users words.
     this.ajax_url = this.wordCloudEl.data('ajax-url');
+
+    // Hide WordCloud container before Ajax request done
+    this.wordCloudEl.hide();
+
+    // Retriveing response from the server as an AJAX request. Attach a callback that will
+    // be fired on server's response.
+    $.postWithPrefix(
+        _this.ajax_url + '/' + 'get_state', null,
+        function (response) {
+            if (response.status !== 'success') {
+                logme('ERROR: ' + response.error);
+
+                return;
+            }
+
+            _this.configJson = response;
+        }
+    )
+    .done(function(){
+    
+        // Show WordCloud container after Ajax request done    
+        _this.wordCloudEl.show();
+
+        try {
+            _this.configJson = _this.configJson || JSON.parse(_this.wordCloudEl.find('.word_cloud_div').html());
+        } catch (err) {
+            logme('ERROR: Incorrect JSON config was given.');
+            logme(err.message);
+
+            return;
+        }
+        
+        if (_this.configJson.submitted) {
+            _this.showWordCloud(_this.configJson);
+
+            return;
+        }
+
+    });
+
+    this.inputSaveEl = $(el).find('input.save');
 
     this.inputSaveEl.on('click', function () {
         _this.submitAnswer();
