@@ -378,7 +378,7 @@ end
 task :runserver => :lms
 
 desc "Run django-admin <action> against the specified system and environment"
-task "django-admin", [:action, :system, :env, :options] => [:predjango] do |t, args|
+task "django-admin", [:action, :system, :env, :options] do |t, args|
     args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
     sh(django_admin(args.system, args.env, args.action, args.options))
 end
