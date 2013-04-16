@@ -234,12 +234,14 @@ class @StaffGrading
       @submit_button.show()
 
   keydown_handler: (event) =>
+    #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
     if event.which == 17 && @is_ctrl==false
       @is_ctrl=true
     else if @is_ctrl==true && event.which == 13 && !@list_view && Rubric.check_complete()
       @submit_and_get_next()
 
   keyup_handler: (event) =>
+    #Handle keyup event when ctrl key is released
     if event.which == 17 && @is_ctrl==true
       @is_ctrl=false
 

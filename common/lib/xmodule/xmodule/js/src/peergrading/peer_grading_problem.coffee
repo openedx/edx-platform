@@ -361,6 +361,7 @@ class @PeerGradingProblem
       @grade = Rubric.get_total_score()
 
   keydown_handler: (event) =>
+    #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
     if event.which == 17 && @is_ctrl==false
       @is_ctrl=true
     else if event.which == 13 && @submit_button.is(':visible') && @is_ctrl==true
@@ -370,6 +371,7 @@ class @PeerGradingProblem
         @submit_grade()
 
   keyup_handler: (event) =>
+    #Handle keyup event when ctrl key is released
     if event.which == 17 && @is_ctrl==true
       @is_ctrl=false
 
