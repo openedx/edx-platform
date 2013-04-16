@@ -81,7 +81,6 @@ class WordCloudModule(WordCloudFields, XModule):
 
     def top_dict(self, dict_obj, amount):
         """Return new dict: top of dict using dict value."""
-        # TODO: optimize this - don't use sorting.
         return dict(
             sorted(
                 dict_obj.items(),
@@ -102,7 +101,6 @@ class WordCloudModule(WordCloudFields, XModule):
         """
         if dispatch == 'submit':
             if self.submitted:
-                # TODO: error standart.
                 return json.dumps({
                     'status': 'fail',
                     'error': 'You have already posted your data.'
