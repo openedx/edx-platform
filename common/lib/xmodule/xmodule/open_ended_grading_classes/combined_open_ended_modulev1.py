@@ -145,7 +145,7 @@ class CombinedOpenEndedV1Module():
         grace_period_string = self.instance_state.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(due_date, grace_period_string)
-        except:
+        except Exception:
             log.error("Error parsing due date information in location {0}".format(location))
             raise
         self.display_due_date = self.timeinfo.display_due_date
@@ -363,7 +363,7 @@ class CombinedOpenEndedV1Module():
             # if link.startswith(XASSET_SRCREF_PREFIX):
             # Placing try except so that if the error is fixed, this code will start working again.
             return_html = rewrite_links(html, self.rewrite_content_links)
-        except:
+        except Exception:
             pass
         return return_html
 
@@ -421,7 +421,7 @@ class CombinedOpenEndedV1Module():
             last_post_assessment = last_post_evaluation
             try:
                 rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
-            except:
+            except Exception:
                 log.debug("Could not parse rubric data from child history.  "
                           "Likely we have not yet initialized a previous step, so this is perfectly fine.")
                 rubric_data = {}
