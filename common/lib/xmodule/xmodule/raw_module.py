@@ -29,6 +29,6 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
             line, offset = err.position
             msg = ("Unable to create xml for problem {loc}. "
                    "Context: '{context}'".format(
-                    context=lines[line - 1][offset - 40:offset + 40],
-                    loc=self.location))
+                   context=lines[line - 1][offset - 40:offset + 40],
+                   loc=self.location))
             raise Exception, msg, sys.exc_info()[2]

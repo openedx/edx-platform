@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from django_comment_client.models import Permission, Role
+from django_comment_client.models import Role
 
 
 class Command(BaseCommand):
@@ -12,18 +12,19 @@ class Command(BaseCommand):
         if len(args) > 1:
             raise CommandError("Too many arguments")
         course_id = args[0]
+
         administrator_role = Role.objects.get_or_create(name="Administrator", course_id=course_id)[0]
         moderator_role = Role.objects.get_or_create(name="Moderator", course_id=course_id)[0]
         community_ta_role = Role.objects.get_or_create(name="Community TA", course_id=course_id)[0]
         student_role = Role.objects.get_or_create(name="Student", course_id=course_id)[0]
 
         for per in ["vote", "update_thread", "follow_thread", "unfollow_thread",
-                       "update_comment", "create_sub_comment", "unvote", "create_thread",
-                       "follow_commentable", "unfollow_commentable", "create_comment", ]:
+                    "update_comment", "create_sub_comment", "unvote", "create_thread",
+                    "follow_commentable", "unfollow_commentable", "create_comment", ]:
             student_role.add_permission(per)
 
         for per in ["edit_content", "delete_thread", "openclose_thread",
-                        "endorse_comment", "delete_comment", "see_all_cohorts"]:
+                    "endorse_comment", "delete_comment", "see_all_cohorts"]:
             moderator_role.add_permission(per)
 
         for per in ["manage_moderator"]:

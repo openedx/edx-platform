@@ -106,10 +106,10 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     icon_class = 'problem'
 
     js = {'coffee':
-              [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
-               resource_string(__name__, 'js/src/collapsible.coffee'),
-               resource_string(__name__, 'js/src/javascript_loader.coffee'),
-              ]}
+          [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
+           resource_string(__name__, 'js/src/collapsible.coffee'),
+           resource_string(__name__, 'js/src/javascript_loader.coffee'),
+           ]}
     js_module_name = "CombinedOpenEnded"
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
@@ -219,5 +219,5 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
 
     stores_state = True
     has_score = True
-    always_recalculate_grades=True
+    always_recalculate_grades = True
     template_dir_name = "combinedopenended"

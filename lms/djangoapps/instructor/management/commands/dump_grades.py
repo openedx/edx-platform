@@ -3,17 +3,12 @@
 # django management command: dump grades to csv files
 # for use by batch processes
 
-import os
-import sys
-import string
-import datetime
-import json
+import csv
 
-from instructor.views import *
+from instructor.views import get_student_grade_summary_data
 from courseware.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 
 
@@ -45,7 +40,7 @@ class Command(BaseCommand):
         request = self.DummyRequest()
         try:
             course = get_course_by_id(course_id)
-        except Exception as err:
+        except Exception:
             if course_id in modulestore().courses:
                 course = modulestore().courses[course_id]
             else:

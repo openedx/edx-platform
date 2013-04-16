@@ -6,6 +6,7 @@ from nose.tools import assert_true, assert_equal
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import StaleElementReferenceException
 
+
 ############### ACTIONS ####################
 @step('I select Checklists from the Tools menu$')
 def i_select_checklists(step):

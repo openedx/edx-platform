@@ -38,7 +38,7 @@ class ErrorModule(ErrorFields, XModule):
             'staff_access': True,
             'data': self.contents,
             'error': self.error_msg,
-            })
+        })
 
 
 class NonStaffErrorModule(ErrorFields, XModule):
@@ -51,7 +51,7 @@ class NonStaffErrorModule(ErrorFields, XModule):
             'staff_access': False,
             'data': "",
             'error': "",
-            })
+        })
 
 
 class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
