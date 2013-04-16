@@ -205,13 +205,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 #Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
-        try:
+        if self.weight is not None:
             score = int(count_graded >= count_required and count_graded > 0) * float(self.weight)
             total = self.max_grade * float(self.weight)
             score_dict['score'] = score
             score_dict['total'] = total
-        except:
-            pass
 
         return score_dict
 
