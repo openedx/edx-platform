@@ -413,8 +413,8 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
 
     def test_get_score(self):
         score_dict = self.combinedoe.get_score()
-        self.assertEqual(score_dict['score'], None)
-        self.assertEqual(score_dict['total'], None)
+        self.assertEqual(score_dict['score'], 0)
+        self.assertEqual(score_dict['total'], 1)
 
     def test_alternate_orderings(self):
         t1 = self.task_xml1
