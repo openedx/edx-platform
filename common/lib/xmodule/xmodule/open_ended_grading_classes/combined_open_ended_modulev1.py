@@ -739,10 +739,13 @@ class CombinedOpenEndedV1Module():
         max_score = None
         score = None
         if self.check_if_done_and_scored():
+            #Finds the maximum score of all student attempts and keeps it.
             scores = []
             for i in xrange(0, self.current_task_number):
                 last_response = self.get_last_response(i)
                 try:
+                    #This could fail if weight is not defined (is None), or if the last response does not have the needed data.
+                    #Neither is a critical issue, and that particular task score can be skipped for computation.
                     max_score = last_response['max_score'] * float(self.weight)
                     score = last_response['score'] * float(self.weight)
                     scores.append(score)
