@@ -313,6 +313,8 @@ def save_grade(request, course_id):
     p = request.POST
     required = set(['score', 'feedback', 'submission_id', 'location', 'submission_flagged'])
     skipped = 'skipped' in p
+    #If the instructor has skipped grading the submission, then there will not be any rubric scores.
+    #Only add in the rubric scores if the instructor has not skipped.
     if not skipped:
         required|=set(['rubric_scores[]'])
     actual = set(p.keys())

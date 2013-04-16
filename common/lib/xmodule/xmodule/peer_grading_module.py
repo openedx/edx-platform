@@ -392,8 +392,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError:
             #This is a dev_facing_error
-            log.exception("Cannot parse rubric string. Raw string: {0}"
-            .format(""))
+            log.exception("Cannot parse rubric string.")
             #This is a student_facing_error
             return {'success': False,
                     'error': 'Error displaying submission.  Please notify course staff.'}
@@ -440,7 +439,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         except GradingServiceError:
             #This is a dev_facing_error
             log.exception(
-                "Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(
+                "Error saving calibration grade, location: {0}, submission_key: {1}, grader_id: {2}".format(
                     location, submission_key, grader_id))
             #This is a student_facing_error
             return self._err_response('There was an error saving your score.  Please notify course staff.')
