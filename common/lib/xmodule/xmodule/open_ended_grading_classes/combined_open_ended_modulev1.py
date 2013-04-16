@@ -461,7 +461,7 @@ class CombinedOpenEndedV1Module():
         last_response_dict = {
             'response': last_response,
             'score': last_score,
-            'all_scores' : all_scores,
+            'all_scores': all_scores,
             'post_assessment': last_post_assessment,
             'type': task_type,
             'max_score': max_score,
@@ -750,7 +750,7 @@ class CombinedOpenEndedV1Module():
                 score = last_response.get('all_scores', None)
                 if score is not None:
                     #Convert none scores and weight scores properly
-                    for z in xrange(0,len(score)):
+                    for z in xrange(0, len(score)):
                         if score[z] is None:
                             score[z] = 0
                         score[z] *= float(self.weight)
