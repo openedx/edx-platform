@@ -249,8 +249,8 @@ end
             sh("echo 'import #{system}.envs.#{env}' | #{django_admin(system, env, 'shell')}")
         end
 
-        desc "Run collectstatic in the specified environment"
-        task "#{system}:collect_assets:#{env}" do
+        desc "Compile coffeescript and sass, and then run collectstatic in the specified environment"
+        task "#{system}:gather_assets:#{env}" do
             compile_assets()
             sh("#{django_admin(system, env, 'collectstatic', '--noinput')} > /dev/null") do |ok, status|
                 if !ok
