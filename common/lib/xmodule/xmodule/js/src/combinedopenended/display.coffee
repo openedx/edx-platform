@@ -553,10 +553,27 @@ class @CombinedOpenEnded
     target_selection = $(event.target).val()
     Logger.log 'oe_feedback_response_selected', {value: target_selection}
 
+  remove_attribute: (name) =>
+    if $('.file-upload-preview').attr(name)
+      $('.file-upload-preview')[0].removeAttribute(name)
+
   preview_image: () =>
     if $('.file-upload-box')[0].files && $('.file-upload-box')[0].files[0]
       reader = new FileReader()
       reader.onload = (e) =>
-        $('.file-upload-preview').attr('src', e.target.result).width(150).height(150)
+        max_dim = 150
+        @remove_attribute('src')
+        @remove_attribute('height')
+        @remove_attribute('width')
+        $('.file-upload-preview').attr('src', e.target.result)
+        height_px = $('.file-upload-preview')[0].height
+        width_px = $('.file-upload-preview')[0].width
+        scale_factor = 0
+        if height_px>width_px
+          scale_factor = height_px/max_dim
+        else
+          scale_factor = width_px/max_dim
+        $('.file-upload-preview')[0].width = width_px/scale_factor
+        $('.file-upload-preview')[0].height = height_px/scale_factor
         $('.file-upload-preview').show()
       reader.readAsDataURL($('.file-upload-box')[0].files[0])
