@@ -421,6 +421,8 @@ class CombinedOpenEndedV1Module():
             try:
                 rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
             except:
+                log.debug("Could not parse rubric data from child history.  "
+                          "Likely we have not yet initialized a previous step, so this is perfectly fine.")
                 rubric_data = {}
             rubric_scores = rubric_data.get('rubric_scores')
             grader_types = rubric_data.get('grader_types')
