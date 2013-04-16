@@ -386,6 +386,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         draft_store.clone_item(vertical.location, vertical.location)
 
+        # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
+        draft_store.clone_item(vertical.location, Location(['i4x', 'edX', 'full',
+                                                             'vertical', 'no_references', 'draft']))
+
         for child in vertical.get_children():
             draft_store.clone_item(child.location, child.location)
 
