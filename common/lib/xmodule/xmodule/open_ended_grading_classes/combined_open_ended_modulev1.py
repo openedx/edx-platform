@@ -403,6 +403,7 @@ class CombinedOpenEndedV1Module():
                                               self.static_data, instance_state=task_state)
         last_response = task.latest_answer()
         last_score = task.latest_score()
+        all_scores = task.all_scores()
         last_post_assessment = task.latest_post_assessment(self.system)
         last_post_feedback = ""
         feedback_dicts = [{}]
@@ -460,6 +461,7 @@ class CombinedOpenEndedV1Module():
         last_response_dict = {
             'response': last_response,
             'score': last_score,
+            'all_scores' : all_scores,
             'post_assessment': last_post_assessment,
             'type': task_type,
             'max_score': max_score,
@@ -738,21 +740,37 @@ class CombinedOpenEndedV1Module():
         """
         max_score = None
         score = None
-        if self.check_if_done_and_scored():
+        if self.is_scored and self.weight is not None:
             #Finds the maximum score of all student attempts and keeps it.
-            scores = []
-            for i in xrange(0, self.current_task_number):
+            score_mat = []
+            for i in xrange(0, len(self.task_states)):
+                #For each task, extract all student scores on that task (each attempt for each task)
                 last_response = self.get_last_response(i)
-                try:
-                    #This could fail if weight is not defined (is None), or if the last response does not have the needed data.
-                    #Neither is a critical issue, and that particular task score can be skipped for computation.
-                    max_score = last_response['max_score'] * float(self.weight)
-                    score = last_response['score'] * float(self.weight)
-                    scores.append(score)
-                except:
-                    pass
-            if len(scores) > 0:
+                max_score = last_response.get('max_score', None)
+                score = last_response.get('all_scores', None)
+                if score is not None:
+                    #Convert none scores and weight scores properly
+                    for z in xrange(0,len(score)):
+                        if score[z] is None:
+                            score[z] = 0
+                        score[z] *= float(self.weight)
+                    score_mat.append(score)
+
+            if len(score_mat) > 0:
+                #Currently, assume that the final step is the correct one, and that those are the final scores.
+                #This will change in the future, which is why the machinery above exists to extract all scores on all steps
+                #TODO: better final score handling.
+                scores = score_mat[-1]
                 score = max(scores)
+            else:
+                score = 0
+
+            if max_score is not None:
+                #Weight the max score if it is not None
+                max_score *= float(self.weight)
+            else:
+                #Without a max_score, we cannot have a score!
+                score = None
 
         score_dict = {
             'score': score,

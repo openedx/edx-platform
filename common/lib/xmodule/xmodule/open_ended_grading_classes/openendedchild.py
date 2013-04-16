@@ -162,6 +162,12 @@ class OpenEndedChild(object):
             return None
         return self.child_history[-1].get('score')
 
+    def all_scores(self):
+        """None if not available"""
+        if not self.child_history:
+            return None
+        return [self.child_history[i].get('score') for i in xrange(0,len(self.child_history))]
+
     def latest_post_assessment(self, system):
         """Empty string if not available"""
         if not self.child_history:
