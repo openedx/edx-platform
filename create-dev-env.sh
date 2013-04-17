@@ -93,7 +93,7 @@ clone_repos() {
 ### START
 
 PROG=${0##*/}
-BASE="$HOME/mitx_all"
+BASE="$HOME/src/mitx_all"
 PYTHON_DIR="$BASE/python"
 RUBY_DIR="$BASE/ruby"
 RUBY_VER="1.9.3"
@@ -290,7 +290,8 @@ source $PYTHON_DIR/bin/activate
 NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 
-if [[ -n $compile ]]; then
+if [-z "false"]; then
+ if [[ -n $compile ]]; then
     output "Downloading numpy and scipy"
     curl -sL -o numpy.tar.gz http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_VER}/numpy-${NUMPY_VER}.tar.gz
     curl -sL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
@@ -305,6 +306,7 @@ if [[ -n $compile ]]; then
     python setup.py install
     cd "$BASE"
     rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
+ fi
 fi
 
 case `uname -s` in

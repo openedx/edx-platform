@@ -94,7 +94,7 @@ urlpatterns = ('',
     # noop to squelch ajax errors
     url(r'^event$', 'contentstore.views.event', name='event'),
 
-    url(r'^heartbeat$', include('heartbeat.urls')),
+    url(r'^heartbeat$', include('heartbeat.urls'))
 )
 
 # User creation and updating views
@@ -117,6 +117,17 @@ urlpatterns += (
     url(r'^logout$', 'student.views.logout_user', name='logout'),
 
     )
+
+js_info_dict = {
+    'domain': 'djangojs',
+    'packages': ('cms',),
+    }
+
+urlpatterns += (
+    # Serve catalog of localized strings to be rendered by Javascript
+    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    )
+
 
 if settings.ENABLE_JASMINE:
     # # Jasmine
