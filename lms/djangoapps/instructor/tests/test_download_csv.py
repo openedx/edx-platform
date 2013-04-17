@@ -76,6 +76,3 @@ class TestInstructorDashboardGradeDownloadCSV(LoginEnrollmentTestCase):
 '''
 
         self.assertEqual(body, expected_body, msg)
-
-
-

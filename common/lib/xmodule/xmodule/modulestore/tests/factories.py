@@ -50,7 +50,6 @@ class XModuleCourseFactory(Factory):
         if data is not None:
             store.update_item(new_course.location, data)
 
-
         return new_course
 
 
