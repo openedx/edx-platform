@@ -1,0 +1,189 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Xml format of poll module [xmodule] &mdash; edX Data 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="edX Data 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="Xml format of conditional module [xmodule]" href="../conditional_module/conditional_module.html" />
+    <link rel="prev" title="XML format of graphical slider tool [xmodule]" href="../graphical_slider_tool/graphical_slider_tool.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../conditional_module/conditional_module.html" title="Xml format of conditional module [xmodule]"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../graphical_slider_tool/graphical_slider_tool.html" title="XML format of graphical slider tool [xmodule]"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">edX Data 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Xml format of poll module [xmodule]</a><ul>
+<li><a class="reference internal" href="#format-description">Format description</a><ul>
+<li><a class="reference internal" href="#poll-question-tag">poll_question tag</a></li>
+<li><a class="reference internal" href="#answer-tag">answer tag</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example">Example</a><ul>
+<li><a class="reference internal" href="#examples-of-poll">Examples of poll</a></li>
+<li><a class="reference internal" href="#examples-of-poll-with-unable-reset-functionality">Examples of poll with unable reset functionality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../graphical_slider_tool/graphical_slider_tool.html"
+                        title="previous chapter">XML format of graphical slider tool [xmodule]</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../conditional_module/conditional_module.html"
+                        title="next chapter">Xml format of conditional module [xmodule]</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/course_data_formats/poll_module/poll_module.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-poll_module">
+<span id="xml-format-of-poll-module-xmodule"></span><h1>Xml format of poll module [xmodule]<a class="headerlink" href="#module-poll_module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="format-description">
+<h2>Format description<a class="headerlink" href="#format-description" title="Permalink to this headline">¶</a></h2>
+<p>The main tag of Poll module input is:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;poll_question&gt;</span> ... <span class="nt">&lt;/poll_question&gt;</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">poll_question</span></tt> can include any number of the following tags:
+any xml and <tt class="docutils literal"><span class="pre">answer</span></tt> tag. All inner xml, except for <tt class="docutils literal"><span class="pre">answer</span></tt> tags, we call &#8220;question&#8221;.</p>
+<div class="section" id="poll-question-tag">
+<h3>poll_question tag<a class="headerlink" href="#poll-question-tag" title="Permalink to this headline">¶</a></h3>
+<p>Xmodule for creating poll functionality - voting system. The following attributes can
+be specified for this tag:</p>
+<div class="highlight-python"><pre>name - Name of xmodule.
+[display_name| AUTOGENERATE] - Display name of xmodule. When this attribute is not defined - display name autogenerate with some hash.
+[reset | False] - Can reset/revote many time (value = True/False)</pre>
+</div>
+</div>
+<div class="section" id="answer-tag">
+<h3>answer tag<a class="headerlink" href="#answer-tag" title="Permalink to this headline">¶</a></h3>
+<p>Define one of the possible answer for poll module. The following attributes can
+be specified for this tag:</p>
+<div class="highlight-python"><pre>id - unique identifier (using to identify the different answers)</pre>
+</div>
+<p>Inner text - Display text for answer choice.</p>
+</div>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="examples-of-poll">
+<h3>Examples of poll<a class="headerlink" href="#examples-of-poll" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;poll_question</span> <span class="na">name=</span><span class="s">&quot;second_question&quot;</span> <span class="na">display_name=</span><span class="s">&quot;Second question&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;h3&gt;</span>Age<span class="nt">&lt;/h3&gt;</span>
+    <span class="nt">&lt;p&gt;</span>How old are you?<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;answer</span> <span class="na">id=</span><span class="s">&quot;less18&quot;</span><span class="nt">&gt;</span><span class="ni">&amp;lt;</span> 18<span class="nt">&lt;/answer&gt;</span>
+    <span class="nt">&lt;answer</span> <span class="na">id=</span><span class="s">&quot;10_25&quot;</span><span class="nt">&gt;</span>from 10 to 25<span class="nt">&lt;/answer&gt;</span>
+    <span class="nt">&lt;answer</span> <span class="na">id=</span><span class="s">&quot;more25&quot;</span><span class="nt">&gt;</span><span class="ni">&amp;gt;</span> 25<span class="nt">&lt;/answer&gt;</span>
+<span class="nt">&lt;/poll_question&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="examples-of-poll-with-unable-reset-functionality">
+<h3>Examples of poll with unable reset functionality<a class="headerlink" href="#examples-of-poll-with-unable-reset-functionality" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;poll_question</span> <span class="na">name=</span><span class="s">&quot;first_question_with_reset&quot;</span> <span class="na">display_name=</span><span class="s">&quot;First question with reset&quot;</span>
+    <span class="na">reset=</span><span class="s">&quot;True&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;h3&gt;</span>Your gender<span class="nt">&lt;/h3&gt;</span>
+    <span class="nt">&lt;p&gt;</span>You are man or woman?<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;answer</span> <span class="na">id=</span><span class="s">&quot;man&quot;</span><span class="nt">&gt;</span>Man<span class="nt">&lt;/answer&gt;</span>
+    <span class="nt">&lt;answer</span> <span class="na">id=</span><span class="s">&quot;woman&quot;</span><span class="nt">&gt;</span>Woman<span class="nt">&lt;/answer&gt;</span>
+<span class="nt">&lt;/poll_question&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../conditional_module/conditional_module.html" title="Xml format of conditional module [xmodule]"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../graphical_slider_tool/graphical_slider_tool.html" title="XML format of graphical slider tool [xmodule]"
+             >previous</a> |</li>
+        <li><a href="../../index.html">edX Data 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, edX Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

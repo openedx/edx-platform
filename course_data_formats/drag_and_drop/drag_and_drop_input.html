@@ -58,7 +58,10 @@
 <li><a class="reference internal" href="#drag-and-drop-input-tag">drag_and_drop_input tag</a></li>
 <li><a class="reference internal" href="#draggable-tag">draggable tag</a></li>
 <li><a class="reference internal" href="#target-tag">target tag</a></li>
-<li><a class="reference internal" href="#correct-answer-format">correct answer format</a></li>
+<li><a class="reference internal" href="#targets-on-draggables">Targets on draggables</a></li>
+<li><a class="reference internal" href="#limitations-of-targets-on-draggables">Limitations of targets on draggables</a></li>
+<li><a class="reference internal" href="#correct-answer-format">Correct answer format</a></li>
+<li><a class="reference internal" href="#answer-format-for-targets-on-draggables">Answer format for targets on draggables</a></li>
 <li><a class="reference internal" href="#grading-logic">Grading logic</a><ul>
 <li><a class="reference internal" href="#set-and-number-cases">Set and &#8216;+number&#8217; cases</a></li>
 </ul>
@@ -69,6 +72,7 @@
 <li><a class="reference internal" href="#example">Example</a><ul>
 <li><a class="reference internal" href="#examples-of-draggables-that-can-t-be-reused">Examples of draggables that can&#8217;t be reused</a></li>
 <li><a class="reference internal" href="#draggables-can-be-reused">Draggables can be reused</a></li>
+<li><a class="reference internal" href="#examples-of-targets-on-draggables">Examples of targets on draggables</a></li>
 </ul>
 </li>
 </ul>
@@ -177,8 +181,48 @@ the slider.</p>
 <p>If no targets are provided, then a draggable can be dragged and placed anywhere
 on the base image.</p>
 </div>
+<div class="section" id="targets-on-draggables">
+<h3>Targets on draggables<a class="headerlink" href="#targets-on-draggables" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes it is not enough to have targets only on the base image, and all of the
+draggables on these targets. If a complex problem exists where a draggable must
+become itself a target (or many targets), then the following extended syntax
+can be used:</p>
+<div class="highlight-python"><pre>&lt;draggable {attribute list}&gt;
+    &lt;target {attribute list} /&gt;
+    &lt;target {attribute list} /&gt;
+    &lt;target {attribute list} /&gt;
+    ...
+&lt;/draggable&gt;</pre>
+</div>
+<p>The attribute list in the tags above (&#8216;draggable&#8217; and &#8216;target&#8217;) is the same as for
+normal &#8216;draggable&#8217; and &#8216;target&#8217; tags. The only difference is when you will be
+specifying inner target position coordinates. Using the &#8216;x&#8217; and &#8216;y&#8217; attributes you
+are setting the offset of the inner target from the upper-left corner of the
+parent draggable (that contains the inner target).</p>
+</div>
+<div class="section" id="limitations-of-targets-on-draggables">
+<h3>Limitations of targets on draggables<a class="headerlink" href="#limitations-of-targets-on-draggables" title="Permalink to this headline">¶</a></h3>
+<p>1.) Currently there is a limitation to the level of nesting of targets.</p>
+<p>Even though you can pile up a large number of draggables on targets that themselves
+are on draggables, the Drag and Drop instance will be graded only in the case if
+there is a maximum of two levels of targets. The first level are the &#8220;base&#8221; targets.
+They are attached to the base image. The second level are the targets defined on
+draggables.</p>
+<p>2.) Another limitation is that the target bounds are not checked against
+other targets.</p>
+<p>For now, it is the responsibility of the person who is constructing the course
+material to make sure that there is no overlapping of targets. It is also preferable
+that targets on draggables are smaller than the actual parent draggable. Technically
+this is not necessary, but from the usability perspective it is desirable.</p>
+<p>3.) You can have targets on draggables only in the case when there are base targets
+defined (base targets are attached to the base image).</p>
+<p>If you do not have base targets, then you can only have a single level of nesting
+(draggables on the base image). In this case the client side will be reporting (x,y)
+positions of each draggables on the base image.</p>
+</div>
 <div class="section" id="correct-answer-format">
-<h3>correct answer format<a class="headerlink" href="#correct-answer-format" title="Permalink to this headline">¶</a></h3>
+<h3>Correct answer format<a class="headerlink" href="#correct-answer-format" title="Permalink to this headline">¶</a></h3>
+<p>(NOTE: For specifying answers for targets on draggables please see next section.)</p>
 <p>There are two correct answer formats: short and long
 If short from correct answer is mapping of &#8216;draggable_id&#8217; to &#8216;target_id&#8217;:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">correct_answer</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;grass&#39;</span><span class="p">:</span>     <span class="p">[[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="mi">200</span><span class="p">],</span> <span class="s">&#39;ant&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">500</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">200</span><span class="p">]}</span>
@@ -269,7 +313,7 @@ must be dragged to with considering rule. Rule is string.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">And sometimes you want to allow drag only two &#8216;b&#8217; draggables, in these case you sould use &#8216;anyof+number&#8217; of &#8216;unordered_equal+number&#8217; rule:</p>
+<li><p class="first">And sometimes you want to allow drag only two &#8216;b&#8217; draggables, in these case you should use &#8216;anyof+number&#8217; of &#8216;unordered_equal+number&#8217; rule:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">correct_answer</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
         <span class="s">&#39;draggables&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">],</span>
@@ -293,6 +337,52 @@ must be dragged to with considering rule. Rule is string.</p>
 <p>In case if we have no multiple draggables per targets (one_per_target=&#8221;true&#8221;),
 for same number of draggables, anyof is equal to unordered_equal</p>
 <p>If we have can_reuse=true, than one must use only long form of correct answer.</p>
+</div>
+<div class="section" id="answer-format-for-targets-on-draggables">
+<h3>Answer format for targets on draggables<a class="headerlink" href="#answer-format-for-targets-on-draggables" title="Permalink to this headline">¶</a></h3>
+<p>As with the cases described above, an answer must provide precise positioning for
+each draggable (on which targets it must reside). In the case when a draggable must
+be placed on a target that itself is on a draggable, then the answer must contain
+the chain of target-draggable-target. It is best to understand this on an example.</p>
+<p>Suppose we have three draggables - &#8216;up&#8217;, &#8216;s&#8217;, and &#8216;p&#8217;. Draggables &#8216;s&#8217;, and &#8216;p&#8217; have targets
+on themselves. More specifically, &#8216;p&#8217; has three targets - &#8216;1&#8217;, &#8216;2&#8217;, and &#8216;3&#8217;. The first
+requirement is that &#8216;s&#8217;, and &#8216;p&#8217; are positioned on specific targets on the base image.
+The second requirement is that draggable &#8216;up&#8217; is positioned on specific targets of
+draggable &#8216;p&#8217;. Below is an excerpt from a problem.:</p>
+<div class="highlight-python"><pre>&lt;draggable id="up" icon="/static/images/images_list/lcao-mo/up.png" can_reuse="true" /&gt;
+
+&lt;draggable id="s" icon="/static/images/images_list/lcao-mo/orbital_single.png" label="s orbital" can_reuse="true" &gt;
+    &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+&lt;/draggable&gt;
+
+&lt;draggable id="p" icon="/static/images/images_list/lcao-mo/orbital_triple.png" can_reuse="true" label="p orbital" &gt;
+    &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+    &lt;target id="2" x="34" y="0" w="32" h="32"/&gt;
+    &lt;target id="3" x="68" y="0" w="32" h="32"/&gt;
+&lt;/draggable&gt;
+
+...
+
+correct_answer = [
+    {
+        'draggables': ['p'],
+        'targets': ['p-left-target', 'p-right-target'],
+        'rule': 'unordered_equal'
+    },
+    {
+        'draggables': ['s'],
+        'targets': ['s-left-target', 's-right-target'],
+        'rule': 'unordered_equal'
+    },
+    {
+        'draggables': ['up'],
+        'targets': ['p-left-target[p][1]', 'p-left-target[p][2]', 'p-right-target[p][2]', 'p-right-target[p][3]',],
+        'rule': 'unordered_equal'
+    }
+]</pre>
+</div>
+<p>Note that it is a requirement to specify rules for all draggables, even if some draggable gets included
+in more than one chain.</p>
 </div>
 <div class="section" id="grading-logic">
 <h3>Grading logic<a class="headerlink" href="#grading-logic" title="Permalink to this headline">¶</a></h3>
@@ -1284,6 +1374,273 @@ correct_answer = [
     'rule': 'anyof'
 }
 ]
+if draganddrop.grade(submission[0], correct_answer):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+]]&gt;&lt;/answer&gt;
+&lt;/customresponse&gt;
+
+&lt;/problem&gt;
+</pre>
+</div>
+</div>
+<div class="section" id="examples-of-targets-on-draggables">
+<h3>Examples of targets on draggables<a class="headerlink" href="#examples-of-targets-on-draggables" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>&lt;problem display_name="Drag and drop demos chem features: drag and drop icons or labels
+    to proper positions." attempts="10"&gt;
+
+&lt;customresponse&gt;
+    &lt;text&gt;
+        &lt;h4&gt;[Simple grading example: draggables on draggables]&lt;/h4&gt;&lt;br/&gt;
+        &lt;h4&gt;Describe carbon molecule in LCAO-MO.&lt;/h4&gt;&lt;br/&gt;
+        &lt;br/&gt;
+    &lt;/text&gt;
+
+    &lt;drag_and_drop_input img="/static/images/images_list/lcao-mo/lcao-mo.jpg" target_outline="true" &gt;
+
+        &lt;!-- filled bond --&gt;
+        &lt;draggable id="up_and_down" icon="/static/images/images_list/lcao-mo/u_d.png" can_reuse="true" /&gt;
+        &lt;!-- up bond --&gt;
+        &lt;draggable id="up"  icon="/static/images/images_list/lcao-mo/up.png" can_reuse="true" /&gt;
+
+        &lt;draggable id="s" icon="/static/images/images_list/lcao-mo/orbital_single.png" label="s orbital" can_reuse="true" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;draggable id="p" icon="/static/images/images_list/lcao-mo/orbital_triple.png" can_reuse="true" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+            &lt;target id="2" x="34" y="0" w="32" h="32"/&gt;
+            &lt;target id="3" x="68" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;!-- positions of electrons and electron pairs --&gt;
+        &lt;target id="s_l" x="130" y="360" w="32" h="32"/&gt;
+        &lt;target id="s_r" x="505" y="360" w="32" h="32"/&gt;
+        &lt;target id="p_l" x="80"  y="100" w="100" h="32"/&gt;
+        &lt;target id="p_r" x="465" y="100" w="100" h="32"/&gt;
+
+  &lt;/drag_and_drop_input&gt;
+
+    &lt;answer type="loncapa/python"&gt;&lt;![CDATA[
+correct_answer = [
+    {
+        'draggables': ['p'],
+        'targets': ['p_l', 'p_r'],
+        'rule': 'unordered_equal'
+    },
+    {
+        'draggables': ['s'],
+        'targets': ['s_l', 's_r'],
+        'rule': 'unordered_equal'
+    },
+    {
+      'draggables': ['up_and_down'],
+      'targets': [
+        's_l[s][1]', 's_r[s][1]'
+      ],
+      'rule': 'unordered_equal'
+    },
+    {
+      'draggables': ['up'],
+      'targets': [
+        'p_l[p][1]', 'p_l[p][3]', 'p_r[p][1]', 'p_r[p][3]'
+      ],
+      'rule': 'unordered_equal'
+    }
+]
+
+if draganddrop.grade(submission[0], correct_answer):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+]]&gt;&lt;/answer&gt;
+&lt;/customresponse&gt;
+
+&lt;customresponse&gt;
+    &lt;text&gt;
+        &lt;h4&gt;[Complex grading example: draggables on draggables]&lt;/h4&gt;&lt;br/&gt;
+        &lt;h4&gt;Describe carbon molecule in LCAO-MO.&lt;/h4&gt;
+        &lt;br/&gt;
+    &lt;/text&gt;
+
+    &lt;drag_and_drop_input img="/static/images/images_list/lcao-mo/lcao-mo-clean.jpg" target_outline="true" &gt;
+
+        &lt;!-- filled bond --&gt;
+        &lt;draggable id="up_and_down" icon="/static/images/images_list/lcao-mo/u_d.png" can_reuse="true" /&gt;
+        &lt;!-- up bond --&gt;
+        &lt;draggable id="up" icon="/static/images/images_list/lcao-mo/up.png" can_reuse="true" /&gt;
+
+        &lt;!-- images that should not be dragged --&gt;
+        &lt;draggable id="down" icon="/static/images/images_list/lcao-mo/d.png" can_reuse="true" /&gt;
+
+        &lt;draggable id="s" icon="/static/images/images_list/lcao-mo/orbital_single.png" label="s orbital" can_reuse="true" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;draggable id="p" icon="/static/images/images_list/lcao-mo/orbital_triple.png" can_reuse="true" label="p orbital" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+            &lt;target id="2" x="34" y="0" w="32" h="32"/&gt;
+            &lt;target id="3" x="68" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;draggable id="s-sigma" icon="/static/images/images_list/lcao-mo/orbital_single.png" label="s-sigma orbital" can_reuse="true" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;draggable id="s-sigma*" icon="/static/images/images_list/lcao-mo/orbital_single.png" label="s-sigma* orbital" can_reuse="true" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;draggable id="p-pi" icon="/static/images/images_list/lcao-mo/orbital_double.png" label="p-pi orbital" can_reuse="true" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+            &lt;target id="2" x="34" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;draggable id="p-sigma" icon="/static/images/images_list/lcao-mo/orbital_single.png" label="p-sigma orbital" can_reuse="true" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;draggable id="p-pi*" icon="/static/images/images_list/lcao-mo/orbital_double.png" label="p-pi* orbital" can_reuse="true" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+            &lt;target id="2" x="34" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;draggable id="p-sigma*" icon="/static/images/images_list/lcao-mo/orbital_single.png" label="p-sigma* orbital" can_reuse="true" &gt;
+            &lt;target id="1" x="0" y="0" w="32" h="32"/&gt;
+        &lt;/draggable&gt;
+
+        &lt;!-- positions of electrons and electron pairs --&gt;
+        &lt;target id="s-left-target" x="130" y="360" w="32" h="32"/&gt;
+        &lt;target id="s-right-target" x="505" y="360" w="32" h="32"/&gt;
+        &lt;target id="s-sigma-target" x="315" y="425" w="32" h="32"/&gt;
+        &lt;target id="s-sigma*-target" x="315" y="290" w="32" h="32"/&gt;
+        &lt;target id="p-left-target" x="80"  y="100" w="100" h="32"/&gt;
+        &lt;target id="p-right-target" x="480" y="100" w="100" h="32"/&gt;
+        &lt;target id="p-pi-target" x="300" y="220" w="66" h="32"/&gt;
+        &lt;target id="p-sigma-target" x="315" y="170" w="32" h="32"/&gt;
+        &lt;target id="p-pi*-target" x="300" y="40" w="66" h="32"/&gt;
+        &lt;target id="p-sigma*-target" x="315" y="0" w="32" h="32"/&gt;
+
+    &lt;/drag_and_drop_input&gt;
+
+    &lt;answer type="loncapa/python"&gt;&lt;![CDATA[
+correct_answer = [
+{'draggables': ['p'], 'targets': ['p-left-target', 'p-right-target'], 'rule': 'unordered_equal'},
+{'draggables': ['s'], 'targets': ['s-left-target', 's-right-target'], 'rule': 'unordered_equal'},
+{'draggables': ['s-sigma'], 'targets': ['s-sigma-target'], 'rule': 'exact'},
+{'draggables': ['s-sigma*'], 'targets': ['s-sigma*-target'], 'rule': 'exact'},
+{'draggables': ['p-pi'], 'targets': ['p-pi-target'], 'rule': 'exact'},
+{'draggables': ['p-sigma'], 'targets': ['p-sigma-target'], 'rule': 'exact'},
+{'draggables': ['p-pi*'], 'targets': ['p-pi*-target'], 'rule': 'exact'},
+{'draggables': ['p-sigma*'], 'targets': ['p-sigma*-target'], 'rule': 'exact'},
+{
+    'draggables': ['up_and_down'],
+    'targets': ['s-left-target[s][1]', 's-right-target[s][1]', 's-sigma-target[s-sigma][1]', 's-sigma*-target[s-sigma*][1]', 'p-pi-target[p-pi][1]', 'p-pi-target[p-pi][2]'],
+    'rule': 'unordered_equal'
+},
+{
+    'draggables': ['up'],
+    'targets': ['p-left-target[p][1]', 'p-left-target[p][2]', 'p-right-target[p][2]', 'p-right-target[p][3]',],
+    'rule': 'unordered_equal'
+}
+]
+
+if draganddrop.grade(submission[0], correct_answer):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+]]&gt;&lt;/answer&gt;
+&lt;/customresponse&gt;
+
+&lt;customresponse&gt;
+    &lt;text&gt;
+        &lt;h4&gt;[Complex grading example: no draggables on draggables]&lt;/h4&gt;&lt;br/&gt;
+        &lt;h4&gt;Describe carbon molecule in LCAO-MO.&lt;/h4&gt;
+        &lt;br/&gt;
+    &lt;/text&gt;
+
+    &lt;drag_and_drop_input img="/static/images/images_list/lcao-mo/lcao-mo.jpg" target_outline="true"&gt;
+
+        &lt;!-- filled bond --&gt;
+        &lt;draggable id="1" icon="/static/images/images_list/lcao-mo/u_d.png" can_reuse="true" /&gt;
+
+        &lt;!-- up bond --&gt;
+        &lt;draggable id="7"  icon="/static/images/images_list/lcao-mo/up.png" can_reuse="true" /&gt;
+
+        &lt;!-- sigma --&gt;
+        &lt;draggable id="11" icon="/static/images/images_list/lcao-mo/sigma.png" can_reuse="true" /&gt;
+
+        &lt;!-- sigma* --&gt;
+        &lt;draggable id="13" icon="/static/images/images_list/lcao-mo/sigma_s.png" can_reuse="true" /&gt;
+
+        &lt;!-- pi --&gt;
+        &lt;draggable id="15" icon="/static/images/images_list/lcao-mo/pi.png" can_reuse="true" /&gt;
+
+        &lt;!-- pi* --&gt;
+        &lt;draggable id="16" icon="/static/images/images_list/lcao-mo/pi_s.png" can_reuse="true" /&gt;
+
+        &lt;!-- images that should not be dragged --&gt;
+        &lt;draggable id="17" icon="/static/images/images_list/lcao-mo/d.png" can_reuse="true" /&gt;
+
+        &lt;!-- positions of electrons and electron pairs --&gt;
+        &lt;target id="s_left"       x="130" y="360"    w="32" h="32"/&gt;
+        &lt;target id="s_right"      x="505" y="360"    w="32" h="32"/&gt;
+        &lt;target id="s_sigma"      x="320" y="425"    w="32" h="32"/&gt;
+        &lt;target id="s_sigma_star" x="320" y="290"    w="32" h="32"/&gt;
+        &lt;target id="p_left_1"     x="80"  y="100"    w="32" h="32"/&gt;
+        &lt;target id="p_left_2"     x="125" y="100"    w="32" h="32"/&gt;
+        &lt;target id="p_left_3"     x="175" y="100"    w="32" h="32"/&gt;
+        &lt;target id="p_right_1"    x="465" y="100"    w="32" h="32"/&gt;
+        &lt;target id="p_right_2"    x="515" y="100"    w="32" h="32"/&gt;
+        &lt;target id="p_right_3"    x="560" y="100"    w="32" h="32"/&gt;
+        &lt;target id="p_pi_1"       x="290" y="220"    w="32" h="32"/&gt;
+        &lt;target id="p_pi_2"       x="335" y="220"    w="32" h="32"/&gt;
+        &lt;target id="p_sigma"      x="315" y="170"    w="32" h="32"/&gt;
+        &lt;target id="p_pi_star_1"  x="290" y="40"     w="32" h="32"/&gt;
+        &lt;target id="p_pi_star_2"  x="340" y="40"     w="32" h="32"/&gt;
+        &lt;target id="p_sigma_star" x="315" y="0"      w="32" h="32"/&gt;
+
+        &lt;!-- positions of names of energy levels --&gt;
+        &lt;target id="s_sigma_name"      x="400" y="425"  w="32" h="32"/&gt;
+        &lt;target id="s_sigma_star_name" x="400" y="290"  w="32" h="32"/&gt;
+        &lt;target id="p_pi_name"         x="400" y="220"  w="32" h="32"/&gt;
+        &lt;target id="p_sigma_name"      x="400" y="170"  w="32" h="32"/&gt;
+        &lt;target id="p_pi_star_name"    x="400" y="40"   w="32" h="32"/&gt;
+        &lt;target id="p_sigma_star_name" x="400" y="0"    w="32" h="32"/&gt;
+
+  &lt;/drag_and_drop_input&gt;
+
+    &lt;answer type="loncapa/python"&gt;&lt;![CDATA[
+correct_answer = [
+{
+  'draggables': ['1'],
+  'targets': [
+    's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
+  ],
+  'rule': 'exact'
+}, {
+  'draggables': ['7'],
+  'targets': ['p_left_1', 'p_left_2', 'p_right_2','p_right_3'],
+  'rule': 'exact'
+}, {
+  'draggables': ['11'],
+  'targets': ['s_sigma_name', 'p_sigma_name'],
+  'rule': 'exact'
+}, {
+  'draggables': ['13'],
+  'targets': ['s_sigma_star_name', 'p_sigma_star_name'],
+  'rule': 'exact'
+}, {
+  'draggables': ['15'],
+  'targets': ['p_pi_name'],
+  'rule': 'exact'
+}, {
+  'draggables': ['16'],
+  'targets': ['p_pi_star_name'],
+  'rule': 'exact'
+}]
+
 if draganddrop.grade(submission[0], correct_answer):
     correct = ['correct']
 else:

@@ -1,0 +1,201 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Xml format of conditional module [xmodule] &mdash; edX Data 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="edX Data 0.1 documentation" href="../../index.html" />
+    <link rel="next" title="CustomResponse XML and Python Script" href="../custom_response.html" />
+    <link rel="prev" title="Xml format of poll module [xmodule]" href="../poll_module/poll_module.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../custom_response.html" title="CustomResponse XML and Python Script"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../poll_module/poll_module.html" title="Xml format of poll module [xmodule]"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">edX Data 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Xml format of conditional module [xmodule]</a><ul>
+<li><a class="reference internal" href="#format-description">Format description</a><ul>
+<li><a class="reference internal" href="#conditional-tag">conditional tag</a></li>
+<li><a class="reference internal" href="#show-tag">show tag</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example">Example</a><ul>
+<li><a class="reference internal" href="#examples-of-conditional-depends-on-poll">Examples of conditional depends on poll</a></li>
+<li><a class="reference internal" href="#examples-of-conditional-depends-on-poll-use-show-tag">Examples of conditional depends on poll (use &lt;show&gt; tag)</a></li>
+<li><a class="reference internal" href="#examples-of-conditional-depends-on-problem">Examples of conditional depends on problem</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../poll_module/poll_module.html"
+                        title="previous chapter">Xml format of poll module [xmodule]</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../custom_response.html"
+                        title="next chapter">CustomResponse XML and Python Script</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/course_data_formats/conditional_module/conditional_module.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-conditional_module">
+<span id="xml-format-of-conditional-module-xmodule"></span><h1>Xml format of conditional module [xmodule]<a class="headerlink" href="#module-conditional_module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="format-description">
+<h2>Format description<a class="headerlink" href="#format-description" title="Permalink to this headline">¶</a></h2>
+<p>The main tag of Conditional module input is:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;conditional&gt;</span> ... <span class="nt">&lt;/conditional&gt;</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">conditional</span></tt> can include any number of any xmodule tags (<tt class="docutils literal"><span class="pre">html</span></tt>, <tt class="docutils literal"><span class="pre">video</span></tt>, <tt class="docutils literal"><span class="pre">poll</span></tt>, etc.) or <tt class="docutils literal"><span class="pre">show</span></tt> tags.</p>
+<div class="section" id="conditional-tag">
+<h3>conditional tag<a class="headerlink" href="#conditional-tag" title="Permalink to this headline">¶</a></h3>
+<p>The main container for a single instance of Conditional module. The following attributes can
+be specified for this tag:</p>
+<div class="highlight-python"><pre>sources - location id of required modules, separated by ';'
+[message | ""] - message for case, where one or more are not passed. Here you can use variable {link}, which generate link to required module.
+
+[completed] - map to `is_completed` module method
+[attempted] - map to `is_attempted` module method
+[poll_answer] - map to `poll_answer` module attribute
+[voted] - map to `voted` module attribute</pre>
+</div>
+</div>
+<div class="section" id="show-tag">
+<h3>show tag<a class="headerlink" href="#show-tag" title="Permalink to this headline">¶</a></h3>
+<p>Symlink to some set of xmodules. The following attributes can
+be specified for this tag:</p>
+<div class="highlight-python"><pre>sources - location id of modules, separated by ';'</pre>
+</div>
+</div>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="examples-of-conditional-depends-on-poll">
+<h3>Examples of conditional depends on poll<a class="headerlink" href="#examples-of-conditional-depends-on-poll" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;conditional</span> <span class="na">sources=</span><span class="s">&quot;i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset&quot;</span> <span class="na">poll_answer=</span><span class="s">&quot;man&quot;</span>
+<span class="na">message=</span><span class="s">&quot;{link} must be answered for this to become visible.&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;html&gt;</span>
+        <span class="nt">&lt;h2&gt;</span>You see this, cause your vote value for &quot;First question&quot; was &quot;man&quot;<span class="nt">&lt;/h2&gt;</span>
+    <span class="nt">&lt;/html&gt;</span>
+<span class="nt">&lt;/conditional&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="examples-of-conditional-depends-on-poll-use-show-tag">
+<h3>Examples of conditional depends on poll (use &lt;show&gt; tag)<a class="headerlink" href="#examples-of-conditional-depends-on-poll-use-show-tag" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;conditional</span> <span class="na">sources=</span><span class="s">&quot;i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset&quot;</span> <span class="na">poll_answer=</span><span class="s">&quot;man&quot;</span>
+<span class="na">message=</span><span class="s">&quot;{link} must be answered for this to become visible.&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;html&gt;</span>
+        <span class="nt">&lt;show</span> <span class="na">sources=</span><span class="s">&quot;i4x://MITx/0.000x/problem/test_1; i4x://MITx/0.000x/Video/Avi_resources; i4x://MITx/0.000x/problem/test_1&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/html&gt;</span>
+<span class="nt">&lt;/conditional&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="examples-of-conditional-depends-on-problem">
+<h3>Examples of conditional depends on problem<a class="headerlink" href="#examples-of-conditional-depends-on-problem" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;conditional</span> <span class="na">sources=</span><span class="s">&quot;i4x://MITx/0.000x/problem/Conditional:lec27_Q1&quot;</span> <span class="na">attempted=</span><span class="s">&quot;True&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;html</span> <span class="na">display_name=</span><span class="s">&quot;HTML for attempted problem&quot;</span><span class="nt">&gt;</span>You see this, cause &quot;lec27_Q1&quot; is attempted.<span class="nt">&lt;/html&gt;</span>
+<span class="nt">&lt;/conditional&gt;</span>
+<span class="nt">&lt;conditional</span> <span class="na">sources=</span><span class="s">&quot;i4x://MITx/0.000x/problem/Conditional:lec27_Q1&quot;</span> <span class="na">attempted=</span><span class="s">&quot;False&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;html</span> <span class="na">display_name=</span><span class="s">&quot;HTML for not attempted problem&quot;</span><span class="nt">&gt;</span>You see this, cause &quot;lec27_Q1&quot; is not attempted.<span class="nt">&lt;/html&gt;</span>
+<span class="nt">&lt;/conditional&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../custom_response.html" title="CustomResponse XML and Python Script"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../poll_module/poll_module.html" title="Xml format of poll module [xmodule]"
+             >previous</a> |</li>
+        <li><a href="../../index.html">edX Data 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, edX Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -92,6 +92,24 @@
 </li>
 <li><a class="reference internal" href="#static-links">Static links</a></li>
 <li><a class="reference internal" href="#tabs">Tabs</a></li>
+<li><a class="reference internal" href="#textbooks">Textbooks</a><ul>
+<li><a class="reference internal" href="#image-based-textbooks">Image-based Textbooks</a><ul>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#linking-from-content">Linking from Content</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#html-based-textbooks">HTML-based Textbooks</a><ul>
+<li><a class="reference internal" href="#id2">Configuration</a></li>
+<li><a class="reference internal" href="#id3">Linking from Content</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pdf-based-textbooks">PDF-based Textbooks</a><ul>
+<li><a class="reference internal" href="#id4">Configuration</a></li>
+<li><a class="reference internal" href="#id5">Linking from Content</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#other-file-locations-info-and-about">Other file locations (info and about)</a></li>
 <li><a class="reference internal" href="#tips-for-content-developers">Tips for content developers</a></li>
 </ul>
@@ -502,6 +520,12 @@
 </ul>
 </td>
 </tr>
+<tr class="row-even"><td><cite>pdf_textbooks</cite></td>
+<td>have pdf-based textbooks on tabs in the courseware.  See below for details on config.</td>
+</tr>
+<tr class="row-odd"><td><cite>html_textbooks</cite></td>
+<td>have html-based textbooks on tabs in the courseware.  See below for details on config.</td>
+</tr>
 </tbody>
 </table>
 </div></blockquote>
@@ -650,7 +674,9 @@
     "url_slug": "news",
     "name": "Exciting news"
   },
-  {"type": "textbooks"}
+  {"type": "textbooks"},
+  {"type": "html_textbooks"},
+  {"type": "pdf_textbooks"}
 ]</pre>
 </div>
 <ul class="simple">
@@ -658,6 +684,8 @@
 <li>The first two tabs must have types <cite>&#8220;courseware&#8221;</cite> and <cite>&#8220;course_info&#8221;</cite>, in that order, or the course will not load.</li>
 <li>The <cite>courseware</cite> tab never has a name attribute &#8211; it&#8217;s always rendered as &#8220;Courseware&#8221; for consistency between courses.</li>
 <li>The <cite>textbooks</cite> tab will actually generate one tab per textbook, using the textbook titles as names.</li>
+<li>The <cite>html_textbooks</cite> tab will actually generate one tab per html_textbook.  The tab name is found in the html textbook definition.</li>
+<li>The <cite>pdf_textbooks</cite> tab will actually generate one tab per pdf_textbook.  The tab name is found in the pdf textbook definition.</li>
 <li>For static tabs, the <cite>url_slug</cite> will be the url that points to the tab.  It can not be one of the existing courseware url types (even if those aren&#8217;t used in your course).  The static content will come from <cite>tabs/{course_url_name}/{url_slug}.html</cite>, or <cite>tabs/{url_slug}.html</cite> if that doesn&#8217;t exist.</li>
 <li>An Instructor tab will be automatically added at the end for course staff users.</li>
 </ul>
@@ -675,7 +703,7 @@
 <td>Parameter <cite>name</cite>.</td>
 </tr>
 <tr class="row-odd"><td><cite>wiki</cite></td>
-<td>arameter <cite>name</cite>.</td>
+<td>Parameter <cite>name</cite>.</td>
 </tr>
 <tr class="row-even"><td><cite>discussion</cite></td>
 <td>Parameter <cite>name</cite>.</td>
@@ -685,6 +713,12 @@
 </tr>
 <tr class="row-even"><td><cite>textbooks</cite></td>
 <td>No parameters&#8211;generates tab names from book titles.</td>
+</tr>
+<tr class="row-odd"><td><cite>html_textbooks</cite></td>
+<td>No parameters&#8211;generates tab names from html book definition.  (See discussion below for configuration.)</td>
+</tr>
+<tr class="row-even"><td><cite>pdf_textbooks</cite></td>
+<td>No parameters&#8211;generates tab names from pdf book definition.  (See discussion below for configuration.)</td>
 </tr>
 <tr class="row-odd"><td><cite>progress</cite></td>
 <td>Parameter <cite>name</cite>.</td>
@@ -697,6 +731,157 @@
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="textbooks">
+<h2>Textbooks<a class="headerlink" href="#textbooks" title="Permalink to this headline">¶</a></h2>
+<p>Support is currently provided for image-based, HTML-based and PDF-based textbooks. In addition to enabling the display of textbooks in tabs (see above), specific information about the location of textbook content must be configured.</p>
+<div class="section" id="image-based-textbooks">
+<h3>Image-based Textbooks<a class="headerlink" href="#image-based-textbooks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="configuration">
+<h4>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h4>
+<p>Image-based textbooks are configured at the course level in the XML markup.  Here is an example:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;course&gt;</span>
+  <span class="nt">&lt;textbook</span> <span class="na">title=</span><span class="s">&quot;Textbook 1&quot;</span> <span class="na">book_url=</span><span class="s">&quot;https://www.example.com/textbook_1/&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;textbook</span> <span class="na">title=</span><span class="s">&quot;Textbook 2&quot;</span> <span class="na">book_url=</span><span class="s">&quot;https://www.example.com/textbook_2/&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;chapter</span> <span class="na">url_name=</span><span class="s">&quot;Overview&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;chapter</span> <span class="na">url_name=</span><span class="s">&quot;First week&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/course&gt;</span>
+</pre></div>
+</div>
+<p>Each <cite>textbook</cite> element is displayed on a different tab.  The <cite>title</cite> attribute is used as the tab&#8217;s name, and the <cite>book_url</cite> attribute points to the remote directory that contains the images of the text.  Note the trailing slash on the end of the <cite>book_url</cite> attribute.</p>
+<p>The images must be stored in the same directory as the <cite>book_url</cite>, with filenames matching <cite>pXXX.png</cite>, where <cite>XXX</cite> is a three-digit number representing the page number (with leading zeroes as necessary).  Pages start at <cite>p001.png</cite>.</p>
+<p>Each textbook must also have its own table of contents.  This is read from the <cite>book_url</cite> location, by appending <cite>toc.xml</cite>.  This file contains a <cite>table_of_contents</cite> parent element, with <cite>entry</cite> elements nested below it.  Each <cite>entry</cite>  has attributes for <cite>name</cite>, <cite>page_label</cite>, and <cite>page</cite>, as well as an optional <cite>chapter</cite> attribute.  An arbitrary number of levels of nesting of <cite>entry</cite> elements within other <cite>entry</cite> elements is supported, but you&#8217;re likely to only want two levels.  The <cite>page</cite> represents the actual page to link to, while the <cite>page_label</cite> matches the displayed page number on that page.  Here&#8217;s an example:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;table_of_contents&gt;</span>
+  <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;1&quot;</span> <span class="na">page_label=</span><span class="s">&quot;i&quot;</span> <span class="na">name=</span><span class="s">&quot;Title&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;2&quot;</span> <span class="na">page_label=</span><span class="s">&quot;ii&quot;</span> <span class="na">name=</span><span class="s">&quot;Preamble&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;2&quot;</span> <span class="na">page_label=</span><span class="s">&quot;ii&quot;</span> <span class="na">name=</span><span class="s">&quot;Copyright&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;3&quot;</span> <span class="na">page_label=</span><span class="s">&quot;iii&quot;</span> <span class="na">name=</span><span class="s">&quot;Brief Contents&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;5&quot;</span> <span class="na">page_label=</span><span class="s">&quot;v&quot;</span> <span class="na">name=</span><span class="s">&quot;Contents&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;9&quot;</span> <span class="na">page_label=</span><span class="s">&quot;1&quot;</span> <span class="na">name=</span><span class="s">&quot;About the Authors&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;10&quot;</span> <span class="na">page_label=</span><span class="s">&quot;2&quot;</span> <span class="na">name=</span><span class="s">&quot;Acknowledgments&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;11&quot;</span> <span class="na">page_label=</span><span class="s">&quot;3&quot;</span> <span class="na">name=</span><span class="s">&quot;Dedication&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;12&quot;</span> <span class="na">page_label=</span><span class="s">&quot;4&quot;</span> <span class="na">name=</span><span class="s">&quot;Preface&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/entry&gt;</span>
+  <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;15&quot;</span> <span class="na">page_label=</span><span class="s">&quot;7&quot;</span> <span class="na">name=</span><span class="s">&quot;Introduction to edX&quot;</span> <span class="na">chapter=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;15&quot;</span> <span class="na">page_label=</span><span class="s">&quot;7&quot;</span> <span class="na">name=</span><span class="s">&quot;edX in the Modern World&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;18&quot;</span> <span class="na">page_label=</span><span class="s">&quot;10&quot;</span> <span class="na">name=</span><span class="s">&quot;The edX Method&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;18&quot;</span> <span class="na">page_label=</span><span class="s">&quot;10&quot;</span> <span class="na">name=</span><span class="s">&quot;A Description of edX&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;29&quot;</span> <span class="na">page_label=</span><span class="s">&quot;21&quot;</span> <span class="na">name=</span><span class="s">&quot;A Brief History of edX&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;51&quot;</span> <span class="na">page_label=</span><span class="s">&quot;43&quot;</span> <span class="na">name=</span><span class="s">&quot;Introduction to edX&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;56&quot;</span> <span class="na">page_label=</span><span class="s">&quot;48&quot;</span> <span class="na">name=</span><span class="s">&quot;Endnotes&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/entry&gt;</span>
+  <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;73&quot;</span> <span class="na">page_label=</span><span class="s">&quot;65&quot;</span> <span class="na">name=</span><span class="s">&quot;Art and Photo Credits&quot;</span> <span class="na">chapter=</span><span class="s">&quot;30&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;73&quot;</span> <span class="na">page_label=</span><span class="s">&quot;65&quot;</span> <span class="na">name=</span><span class="s">&quot;Molecular Models&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;73&quot;</span> <span class="na">page_label=</span><span class="s">&quot;65&quot;</span> <span class="na">name=</span><span class="s">&quot;Photo Credits&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/entry&gt;</span>
+  <span class="nt">&lt;entry</span> <span class="na">page=</span><span class="s">&quot;77&quot;</span> <span class="na">page_label=</span><span class="s">&quot;69&quot;</span> <span class="na">name=</span><span class="s">&quot;Index&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/table_of_contents&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="linking-from-content">
+<h4>Linking from Content<a class="headerlink" href="#linking-from-content" title="Permalink to this headline">¶</a></h4>
+<p>It is possible to add links to specific pages in a textbook by using a URL that encodes the index of the textbook and the page number.  The URL is of the form <cite>/course/book/${bookindex}/$page}</cite>.  If the page is omitted from the URL, the first page is assumed.</p>
+<p>You can use a <cite>customtag</cite> to create a template for such links.  For example, you can create a <cite>book</cite> template in the <cite>customtag</cite> directory, containing:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;/static/images/icons/textbook_icon.png&quot;</span><span class="nt">/&gt;</span> More information given in <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/course/book/${book}/${page}&quot;</span><span class="nt">&gt;</span>the text<span class="nt">&lt;/a&gt;</span>.
+</pre></div>
+</div>
+<p>The course content can then link to page 25 using the <cite>customtag</cite> element:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;customtag</span> <span class="na">book=</span><span class="s">&quot;0&quot;</span> <span class="na">page=</span><span class="s">&quot;25&quot;</span> <span class="na">impl=</span><span class="s">&quot;book&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="html-based-textbooks">
+<h3>HTML-based Textbooks<a class="headerlink" href="#html-based-textbooks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h4>Configuration<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>HTML-based textbooks are configured at the course level in the policy file.  The JSON markup consists of an array of maps, with each map corresponding to a separate textbook.  There are two styles to presenting HTML-based material.  The first way is as a single HTML on a tab, which requires only a tab title and a URL for configuration.  A second way permits the display of multiple HTML files that should be displayed together on a single view. For this view, a side panel of links is available on the left, allowing selection of a particular HTML to view.</p>
+<div class="highlight-json"><pre>"html_textbooks": [
+  {"tab_title": "Textbook 1",
+   "url": "https://www.example.com/thiscourse/book1/book1.html" },
+  {"tab_title": "Textbook 2",
+   "chapters": [
+       { "title": "Chapter 1", "url": "https://www.example.com/thiscourse/book2/Chapter1.html" },
+       { "title": "Chapter 2", "url": "https://www.example.com/thiscourse/book2/Chapter2.html" },
+       { "title": "Chapter 3", "url": "https://www.example.com/thiscourse/book2/Chapter3.html" },
+       { "title": "Chapter 4", "url": "https://www.example.com/thiscourse/book2/Chapter4.html" },
+       { "title": "Chapter 5", "url": "https://www.example.com/thiscourse/book2/Chapter5.html" },
+       { "title": "Chapter 6", "url": "https://www.example.com/thiscourse/book2/Chapter6.html" },
+       { "title": "Chapter 7", "url": "https://www.example.com/thiscourse/book2/Chapter7.html" }
+       ]
+  }
+]</pre>
+</div>
+<p>Some notes:</p>
+<ul class="simple">
+<li>It is not a good idea to include a top-level URL and chapter-level URLs in the same textbook configuration.</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h4>Linking from Content<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>It is possible to add links to specific pages in a textbook by using a URL that encodes the index of the textbook, the chapter (if chapters are used), and the page number.  For a book with no chapters, the URL is of the form <cite>/course/htmlbook/${bookindex}</cite>.  For a book with chapters, use <cite>/course/htmlbook/${bookindex}/chapter/${chapter}</cite> for a specific chapter, or <cite>/course/htmlbook/${bookindex}</cite> will default to the first chapter.</p>
+<p>For example, for the book with no chapters configured above, the textbook can be reached using the URL <cite>/course/htmlbook/0</cite>.  Reaching the third chapter of the second book is accomplished with <cite>/course/htmlbook/1/chapter/3</cite>.</p>
+<p>You can use a <cite>customtag</cite> to create a template for such links.  For example, you can create a <cite>htmlbook</cite> template in the <cite>customtag</cite> directory, containing:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;/static/images/icons/textbook_icon.png&quot;</span><span class="nt">/&gt;</span> More information given in <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/course/htmlbook/${book}&quot;</span><span class="nt">&gt;</span>the text<span class="nt">&lt;/a&gt;</span>.
+</pre></div>
+</div>
+<p>And a <cite>htmlchapter</cite> template containing:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;/static/images/icons/textbook_icon.png&quot;</span><span class="nt">/&gt;</span> More information given in <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/course/htmlbook/${book}/chapter/${chapter}&quot;</span><span class="nt">&gt;</span>the text<span class="nt">&lt;/a&gt;</span>.
+</pre></div>
+</div>
+<p>The example pages can then be linked using the <cite>customtag</cite> element:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;customtag</span> <span class="na">book=</span><span class="s">&quot;0&quot;</span> <span class="na">impl=</span><span class="s">&quot;htmlbook&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;customtag</span> <span class="na">book=</span><span class="s">&quot;1&quot;</span> <span class="na">chapter=</span><span class="s">&quot;3&quot;</span> <span class="na">impl=</span><span class="s">&quot;htmlchapter&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="pdf-based-textbooks">
+<h3>PDF-based Textbooks<a class="headerlink" href="#pdf-based-textbooks" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h4>Configuration<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>PDF-based textbooks are configured at the course level in the policy file.  The JSON markup consists of an array of maps, with each map corresponding to a separate textbook.  There are two styles to presenting PDF-based material.  The first way is as a single PDF on a tab, which requires only a tab title and a URL for configuration.  A second way permits the display of multiple PDFs that should be displayed together on a single view. For this view, a side panel of links is available on the left, allowing selection of a particular PDF to view.</p>
+<div class="highlight-json"><pre>"pdf_textbooks": [
+  {"tab_title": "Textbook 1",
+   "url": "https://www.example.com/thiscourse/book1/book1.pdf" },
+  {"tab_title": "Textbook 2",
+   "chapters": [
+       { "title": "Chapter 1", "url": "https://www.example.com/thiscourse/book2/Chapter1.pdf" },
+       { "title": "Chapter 2", "url": "https://www.example.com/thiscourse/book2/Chapter2.pdf" },
+       { "title": "Chapter 3", "url": "https://www.example.com/thiscourse/book2/Chapter3.pdf" },
+       { "title": "Chapter 4", "url": "https://www.example.com/thiscourse/book2/Chapter4.pdf" },
+       { "title": "Chapter 5", "url": "https://www.example.com/thiscourse/book2/Chapter5.pdf" },
+       { "title": "Chapter 6", "url": "https://www.example.com/thiscourse/book2/Chapter6.pdf" },
+       { "title": "Chapter 7", "url": "https://www.example.com/thiscourse/book2/Chapter7.pdf" }
+       ]
+  }
+]</pre>
+</div>
+<p>Some notes:</p>
+<ul class="simple">
+<li>It is not a good idea to include a top-level URL and chapter-level URLs in the same textbook configuration.</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h4>Linking from Content<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>It is possible to add links to specific pages in a textbook by using a URL that encodes the index of the textbook, the chapter (if chapters are used), and the page number.  For a book with no chapters, the URL is of the form <cite>/course/pdfbook/${bookindex}/$page}</cite>.  For a book with chapters, use <cite>/course/pdfbook/${bookindex}/chapter/${chapter}/${page}</cite>.  If the page is omitted from the URL, the first page is assumed.</p>
+<p>For example, for the book with no chapters configured above, page 25 can be reached using the URL <cite>/course/pdfbook/0/25</cite>.  Reaching page 19 in the third chapter of the second book is accomplished with <cite>/course/pdfbook/1/chapter/3/19</cite>.</p>
+<p>You can use a <cite>customtag</cite> to create a template for such links.  For example, you can create a <cite>pdfbook</cite> template in the <cite>customtag</cite> directory, containing:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;/static/images/icons/textbook_icon.png&quot;</span><span class="nt">/&gt;</span> More information given in <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/course/pdfbook/${book}/${page}&quot;</span><span class="nt">&gt;</span>the text<span class="nt">&lt;/a&gt;</span>.
+</pre></div>
+</div>
+<p>And a <cite>pdfchapter</cite> template containing:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;/static/images/icons/textbook_icon.png&quot;</span><span class="nt">/&gt;</span> More information given in <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/course/pdfbook/${book}/chapter/${chapter}/${page}&quot;</span><span class="nt">&gt;</span>the text<span class="nt">&lt;/a&gt;</span>.
+</pre></div>
+</div>
+<p>The example pages can then be linked using the <cite>customtag</cite> element:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;customtag</span> <span class="na">book=</span><span class="s">&quot;0&quot;</span> <span class="na">page=</span><span class="s">&quot;25&quot;</span> <span class="na">impl=</span><span class="s">&quot;pdfbook&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;customtag</span> <span class="na">book=</span><span class="s">&quot;1&quot;</span> <span class="na">chapter=</span><span class="s">&quot;3&quot;</span> <span class="na">page=</span><span class="s">&quot;19&quot;</span> <span class="na">impl=</span><span class="s">&quot;pdfchapter&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 <div class="section" id="other-file-locations-info-and-about">
 <h2>Other file locations (info and about)<a class="headerlink" href="#other-file-locations-info-and-about" title="Permalink to this headline">¶</a></h2>
