@@ -141,16 +141,20 @@ end
 
     desc "Run pylint on all #{system} code"
     task "pylint_#{system}" => report_dir do
-        Dir["#{system}/*.py", "#{system}/djangoapps/*", "#{system}/lib/*"].each do |app|
-            pythonpath_prefix = "PYTHONPATH=#{system}:#{system}/djangoapps:#{system}/lib:common/djangoapps:common/lib"
-            app = File.basename(app)
+        apps = Dir["#{system}/*.py", "#{system}/djangoapps/*", "#{system}/lib/*"].map do |app|
+            File.basename(app)
+        end.select do |app|
+            app !=~ /.pyc$/
+        end.map do |app|
             if app =~ /.py$/
-                app = app.gsub('.py', '')
-            elsif app =~ /.pyc$/
-                next
+                app.gsub('.py', '')
+            else
+                app
             end
-            sh("#{pythonpath_prefix} pylint --rcfile=.pylintrc -f parseable #{app} | tee #{report_dir}/#{app}.pylint.report")
         end
+
+        pythonpath_prefix = "PYTHONPATH=#{system}:#{system}/djangoapps:#{system}/lib:common/djangoapps:common/lib"
+        sh("#{pythonpath_prefix} pylint --rcfile=.pylintrc -f parseable #{apps.join(' ')} | tee #{report_dir}/pylint.report")
     end
     task :pylint => "pylint_#{system}"
 
