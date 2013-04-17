@@ -87,12 +87,12 @@ from contentstore import utils
           <div class="note note-promotion note-promotion-courseURL has-actions">
             <h3 class="title">Course Summary Page <span class="tip">(for student enrollment and access)</span></h3>
             <div class="copy">
-              <p><a class="link-courseURL" rel="external" href="${utils.get_lms_link_for_about_page(course_location)}" />${utils.get_lms_link_for_about_page(course_location)}</a></p>
+              <p><a class="link-courseURL" rel="external" href="http:${utils.get_lms_link_for_about_page(course_location)}" />http:${utils.get_lms_link_for_about_page(course_location)}</a></p>
             </div>
 
             <ul class="list-actions">
               <li class="action-item">
-                <a title="Send a note to students via email" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=Hi,%20${context_course.display_name_with_default},%20provided%20by%20edX,%20is%20almost%20ready%20to%20begin.%20Please%20enroll%20for%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}." class="action action-primary"><i class="ss-icon icon ss-symbolicons-standard icon icon-inline icon-announcement">&#x2709;</i> Send an invitation to your students</a>
+                <a title="Send a note to students via email" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=Hi,%20${context_course.display_name_with_default},%20provided%20by%20edX,%20is%20almost%20ready%20to%20begin.%20Please%20enroll%20for%20this%20course%20at%20http:${utils.get_lms_link_for_about_page(course_location)}." class="action action-primary"><i class="ss-icon icon ss-symbolicons-standard icon icon-inline icon-announcement">&#x2709;</i> Send an invitation to your students</a>
               </li>
             </ul>
           </div>
