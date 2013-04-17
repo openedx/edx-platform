@@ -1,5 +1,4 @@
 """Tests for the logic in input type mako templates."""
-#pylint: disable=R0904
 
 import unittest
 import capa
@@ -11,26 +10,22 @@ from mako.template import Template as MakoTemplate
 class TemplateTestCase(unittest.TestCase):
     """Utilitites for testing templates"""
 
-    # Allow us to pass an extra arg to setUp to configure
-    # the test case.  Also allow setUp as a valid method name.
-    #pylint: disable=W0221
-    #pylint: disable=C0103
-    def setUp(self, template_name):
-        """Load the template
+    # Subclasses override this to specify the file name of the template
+    # to be loaded from capa/templates.
+    # The template name should include the .html extension:
+    # for example: choicegroup.html
+    TEMPLATE_NAME = None
 
-        `template_name` is the file name of the template
-        to be loaded from capa/templates.
-        The template name should include the .html extension:
-        for example: choicegroup.html
-        """
+    def setUp(self):
+        """Load the template"""
         capa_path = capa.__path__[0]
-        self.template_path = os.path.join(capa_path, 'templates', template_name)
+        self.template_path = os.path.join(capa_path, 
+                                          'templates', 
+                                          self.TEMPLATE_NAME)
         template_file = open(self.template_path)
         self.template = MakoTemplate(template_file.read())
         template_file.close()
 
-    # Allow us to pass **context_dict to render_unicode()
-    #pylint: disable=W0142
     def render_to_xml(self, context_dict):
         """Render the template using the `context_dict` dict.
 
@@ -65,10 +60,8 @@ class TemplateTestCase(unittest.TestCase):
 class TestChoiceGroupTemplate(TemplateTestCase):
     """Test mako template for `<choicegroup>` input"""
 
-    # Allow us to pass an extra arg to setUp to configure
-    # the test case.  Also allow setUp as a valid method name.
-    #pylint: disable=W0221
-    #pylint: disable=C0103
+    TEMPLATE_NAME = 'choicegroup.html'
+
     def setUp(self):
         choices = [('1', 'choice 1'), ('2', 'choice 2'), ('3', 'choice 3')]
         self.context = {'id': '1',
@@ -77,7 +70,7 @@ class TestChoiceGroupTemplate(TemplateTestCase):
                         'input_type': 'checkbox',
                         'name_array_suffix': '1',
                         'value': '3'}
-        super(TestChoiceGroupTemplate, self).setUp('choicegroup.html')
+        super(TestChoiceGroupTemplate, self).setUp()
 
     def test_problem_marked_correct(self):
         """Test conditions under which the entire problem
