@@ -61,8 +61,8 @@ sphinx==1.1.3
 
 # Used for testing
 coverage==3.6
-factory_boy==1.3.0
-lettuce==0.2.15
+factory_boy==2.0.2
+lettuce==0.2.16
 mock==0.8.0
 nosexcover==1.0.7
 pep8==1.4.5
