@@ -313,14 +313,18 @@ There is an important split in demographic data gathered for the students who si
        - This student signed up before this information was collected
      * - `''` (blank)
        - User did not specify level of education.
+     * - `'p'`
+       - Doctorate
      * - `'p_se'`
-       - Doctorate in science or engineering
+       - Doctorate in science or engineering (no longer used)
      * - `'p_oth'`
-       - Doctorate in another field
+       - Doctorate in another field (no longer used)
      * - `'m'`
        - Master's or professional degree
      * - `'b'`
        - Bachelor's degree
+     * - `'a'`
+       - Associate's degree
      * - `'hs'`
        - Secondary/high school
      * - `'jhs'`
