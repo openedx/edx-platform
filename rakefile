@@ -48,10 +48,11 @@ def django_for_jasmine(system, django_reload)
         reload_arg = '--noreload'
     end
 
+    port = 10000 + rand(40000)
     django_pid = fork do
-        exec(*django_admin(system, 'jasmine', 'runserver', '-v', '0', "12345", reload_arg).split(' '))
+        exec(*django_admin(system, 'jasmine', 'runserver', '-v', '0', port.to_s, reload_arg).split(' '))
     end
-    jasmine_url = 'http://localhost:12345/_jasmine/'
+    jasmine_url = "http://localhost:#{port}/_jasmine/"
     up = false
     start_time = Time.now
     until up do
