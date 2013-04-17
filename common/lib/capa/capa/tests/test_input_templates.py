@@ -98,7 +98,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
                         'input_type': 'checkbox',
                         'name_array_suffix': '1',
                         'value': '3'}
-        super(TestChoiceGroupTemplate, self).setUp()
+        super(ChoiceGroupTemplateTest, self).setUp()
 
     def test_problem_marked_correct(self):
         """Test conditions under which the entire problem
@@ -298,16 +298,15 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
 class TextlineTemplateTest(TemplateTestCase):
     """Test mako template for `<textline>` input"""
 
-    # Allow us to pass an extra arg to setUp to configure
-    # the test case.
-    #pylint: disable=W0221
+    TEMPLATE_NAME = 'textline.html'
+
     def setUp(self):
         self.context = {'id': '1',
                         'status': 'correct',
                         'value': '3',
                         'preprocessor': None,
                         'trailing_text': None}
-        super(TextlineTemplateTest, self).setUp('textline.html')
+        super(TextlineTemplateTest, self).setUp()
 
     def test_section_class(self):
         cases = [ ({}, ' capa_inputtype '),
