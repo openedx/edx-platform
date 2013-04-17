@@ -94,7 +94,7 @@ urlpatterns = ('',
     # noop to squelch ajax errors
     url(r'^event$', 'contentstore.views.event', name='event'),
 
-    url(r'^heartbeat$', include('heartbeat.urls'))
+    url(r'^heartbeat$', include('heartbeat.urls')),
 )
 
 # User creation and updating views
