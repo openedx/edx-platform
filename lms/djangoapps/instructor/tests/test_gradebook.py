@@ -43,7 +43,10 @@ class TestGradebook(ModuleStoreTestCase):
             metadata={'graded': True, 'format': 'Homework'}
         )
 
-        self.users = [UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i) for i in xrange(USER_COUNT)]
+        self.users = [
+            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
+            for i in xrange(USER_COUNT)
+        ]
 
         for user in self.users:
             UserProfileFactory.create(user=user)
