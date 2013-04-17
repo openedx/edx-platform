@@ -269,7 +269,7 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     desc "Run tests for common lib #{lib}"
     task task_name => report_dir do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-        cmd = "nosetests #{lib} --logging-clear-handlers --with-xunit"
+        cmd = "nosetests #{lib}"
         sh(run_under_coverage(cmd, lib)) do |ok, res|
             $failed_tests += 1 unless ok
         end
