@@ -67,7 +67,7 @@ If if you aren't changing static files, can run `rake test` once, then run
 or
 
     rake fasttest_cms
-    
+
 xmodule can be tested independently, with this:
 
     rake test_common/lib/xmodule
@@ -90,7 +90,7 @@ To run a single nose test:
     nosetests common/lib/xmodule/xmodule/tests/test_stringify.py:test_stringify
 
 
-Very handy: if you uncomment the `--pdb` argument in `NOSE_ARGS` in `lms/envs/test.py`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out http://docs.python.org/library/pdb.html
+Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out http://docs.python.org/library/pdb.html
 
 
 ### Javascript Tests
@@ -105,7 +105,7 @@ To run the tests headless, you must install phantomjs (http://phantomjs.org/down
     rake phantomjs_jasmine_{lms,cms}
 
 If the `phantomjs` binary is not on the path, set the `PHANTOMJS_PATH` environment variable to point to it
-    
+
     PHANTOMJS_PATH=/path/to/phantomjs rake phantomjs_jasmine_{lms,cms}
 
 
@@ -126,7 +126,7 @@ When you connect to the LMS, you need to use the public ip.  Use `ifconfig` to f
 
 ## Content development
 
-If you change course content, while running the LMS in dev mode, it is unnecessary to restart to refresh the modulestore.  
+If you change course content, while running the LMS in dev mode, it is unnecessary to restart to refresh the modulestore.
 
 Instead, hit /migrate/modules to see a list of all modules loaded, and click on links (eg /migrate/reload/edx4edx) to reload a course.
 
