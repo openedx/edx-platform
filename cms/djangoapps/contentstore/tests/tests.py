@@ -1,7 +1,8 @@
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 
-from .utils import ModuleStoreTestCase, parse_json, user, registration
+from .utils import parse_json, user, registration
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):

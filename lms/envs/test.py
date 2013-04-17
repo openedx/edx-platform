@@ -91,7 +91,7 @@ MODULESTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': PROJECT_ROOT / "db" / "mitx.db",
+        'NAME': TEST_ROOT / 'db' / 'mitx.db'
     },
 
 }
@@ -122,7 +122,7 @@ CACHES = {
         'LOCATION': '/var/tmp/mongo_metadata_inheritance',
         'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
-    } 
+    }
 }
 
 # Dummy secret key for dev
