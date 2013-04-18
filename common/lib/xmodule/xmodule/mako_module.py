@@ -1,5 +1,7 @@
 from .x_module import XModuleDescriptor, DescriptorSystem
 from .modulestore.inheritance import own_metadata
+from xblock.core import Scope
+
 
 
 class MakoDescriptorSystem(DescriptorSystem):
@@ -44,10 +46,26 @@ class MakoModuleDescriptor(XModuleDescriptor):
     # cdodge: encapsulate a means to expose "editable" metadata fields (i.e. not internal system metadata)
     @property
     def editable_metadata_fields(self):
-        fields = {}
-        for field, value in own_metadata(self).items():
-            if field in self.system_metadata_fields:
+#        fields = {}
+#        for field, value in own_metadata(self).items():
+#            if field in self.system_metadata_fields:
+#                continue
+#
+#            fields[field] = value
+#        return fields
+        inherited_metadata = getattr(self, '_inherited_metadata', {})
+        metadata = {}
+        for field in self.fields:
+            # Only save metadata that wasn't inherited
+            if field.scope != Scope.settings or field.name in self.system_metadata_fields:
                 continue
 
-            fields[field] = value
-        return fields
+            if field.name in self._model_data:
+                metadata[field.name] = self._model_data[field.name]
+                if field.name in inherited_metadata and self._model_data.get(field.name) == inherited_metadata.get(
+                    field.name):
+                    metadata[field.name] = str(metadata[field.name]) + ' INHERITED'
+            else:
+                metadata[field.name] = str(getattr(self, field.name)) + ' DEFAULT'
+
+        return metadata
