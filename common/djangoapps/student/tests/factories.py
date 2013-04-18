@@ -46,9 +46,7 @@ class UserFactory(DjangoModelFactory):
     date_joined = datetime(2011, 1, 1)
 
 
-class AdminFactory(Factory):
-    FACTORY_FOR = User
-
+class AdminFactory(UserFactory):
     is_staff = True
 
 
