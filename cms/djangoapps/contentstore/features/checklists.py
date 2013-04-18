@@ -89,8 +89,6 @@ def i_am_brought_to_help_page_in_new_window(step):
     assert_equal('http://help.edge.edx.org/', world.browser.url)
 
 
-
-
 ############### HELPER METHODS ####################
 def verifyChecklist2Status(completed, total, percentage):
     def verify_count(driver):
@@ -107,9 +105,11 @@ def verifyChecklist2Status(completed, total, percentage):
 
 
 def toggleTask(checklist, task):
-    world.css_click('#course-checklist' + str(checklist) +'-task' + str(task))
+    world.css_click('#course-checklist' + str(checklist) + '-task' + str(task))
 
 
+# TODO: figure out a way to do this in phantom and firefox
+# For now we will mark the scenerios that use this method as skipped
 def clickActionLink(checklist, task, actionText):
     # toggle checklist item to make sure that the link button is showing
     toggleTask(checklist, task)
@@ -121,4 +121,3 @@ def clickActionLink(checklist, task, actionText):
 
     world.wait_for(verify_action_link_text)
     action_link.click()
-
