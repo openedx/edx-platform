@@ -122,7 +122,7 @@ def main():
     args = docopt(main.__doc__)
     root = path(args['<output_root>'])
 
-    root.rmtree()
+    root.rmtree(ignore_errors=True)
     write_descriptor_js(root / 'descriptors/js')
     write_descriptor_styles(root / 'descriptors/css')
     write_module_js(root / 'modules/js')
