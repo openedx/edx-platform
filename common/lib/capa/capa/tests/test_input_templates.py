@@ -7,9 +7,11 @@ from lxml import etree
 from mako.template import Template as MakoTemplate
 from mako import exceptions
 
+
 class TemplateError(Exception):
     """Error occurred while rendering a Mako template"""
     pass
+
 
 class TemplateTestCase(unittest.TestCase):
     """Utilitites for testing templates"""
@@ -23,8 +25,8 @@ class TemplateTestCase(unittest.TestCase):
     def setUp(self):
         """Load the template"""
         capa_path = capa.__path__[0]
-        self.template_path = os.path.join(capa_path, 
-                                          'templates', 
+        self.template_path = os.path.join(capa_path,
+                                          'templates',
                                           self.TEMPLATE_NAME)
         template_file = open(self.template_path)
         self.template = MakoTemplate(template_file.read())
@@ -309,11 +311,10 @@ class TextlineTemplateTest(TemplateTestCase):
         super(TextlineTemplateTest, self).setUp()
 
     def test_section_class(self):
-        cases = [ ({}, ' capa_inputtype '),
-                  ({'do_math': True}, 'text-input-dynamath capa_inputtype '),
-                  ({'inline': True}, ' capa_inputtype inline'),
-                  ({'do_math': True, 'inline': True}, 'text-input-dynamath capa_inputtype inline'),
-                ]
+        cases = [({}, ' capa_inputtype '),
+                 ({'do_math': True}, 'text-input-dynamath capa_inputtype '),
+                 ({'inline': True}, ' capa_inputtype inline'),
+                 ({'do_math': True, 'inline': True}, 'text-input-dynamath capa_inputtype inline'), ]
 
         for (context, css_class) in cases:
             base_context = self.context.copy()
@@ -336,9 +337,9 @@ class TextlineTemplateTest(TemplateTestCase):
             xpath = "//div[@class='%s ']" % div_class
             self.assert_has_xpath(xml, xpath, self.context)
 
-            # Expect that we get a <p> with class="status" 
+            # Expect that we get a <p> with class="status"
             # (used to by CSS to draw the green check / red x)
-            self.assert_has_text(xml, "//p[@class='status']", 
+            self.assert_has_text(xml, "//p[@class='status']",
                                  status_mark, exact=False)
 
     def test_hidden(self):
