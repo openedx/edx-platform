@@ -384,6 +384,7 @@ class MatlabTest(unittest.TestCase):
                     'linenumbers': 'true',
                     'hidden': '',
                     'tabsize': int(self.tabsize),
+                    'button_enabled': True,
                     'queue_len': '3'}
 
         self.assertEqual(context, expected)
@@ -409,9 +410,36 @@ class MatlabTest(unittest.TestCase):
                     'linenumbers': 'true',
                     'hidden': '',
                     'tabsize': int(self.tabsize),
+                    'button_enabled': True,
                     'queue_len': '3'}
 
         self.assertEqual(context, expected)
+
+    def test_rendering_when_completed(self):
+        for status in ['correct', 'incorrect']:
+            state = {'value': 'print "good evening"',
+                     'status': status,
+                     'input_state': {},
+                     }
+            elt = etree.fromstring(self.xml)
+
+            the_input = self.input_class(test_system, elt, state)
+            context = the_input._get_render_context()
+            expected = {'id': 'prob_1_2',
+                        'value': 'print "good evening"',
+                        'status': status,
+                        'msg': '',
+                        'mode': self.mode,
+                        'rows': self.rows,
+                        'cols': self.cols,
+                        'queue_msg': '',
+                        'linenumbers': 'true',
+                        'hidden': '',
+                        'tabsize': int(self.tabsize),
+                        'button_enabled': False,
+                        'queue_len': '0'}
+
+            self.assertEqual(context, expected)
 
     def test_rendering_while_queued(self):
         state = {'value': 'print "good evening"',
@@ -433,6 +461,7 @@ class MatlabTest(unittest.TestCase):
                     'linenumbers': 'true',
                     'hidden': '',
                     'tabsize': int(self.tabsize),
+                    'button_enabled': True,
                     'queue_len': '1'}
 
         self.assertEqual(context, expected)
@@ -446,6 +475,17 @@ class MatlabTest(unittest.TestCase):
         self.assertTrue(response['success'])
         self.assertTrue(self.the_input.input_state['queuekey'] is not None)
         self.assertEqual(self.the_input.input_state['queuestate'], 'queued')
+
+    def test_plot_data_failure(self):
+        get = {'submission': 'x = 1234;'}
+        error_message = 'Error message!'
+        test_system.xqueue['interface'].send_to_queue.return_value = (1, error_message)
+        response = self.the_input.handle_ajax("plot", get)
+        self.assertFalse(response['success'])
+        self.assertEqual(response['message'], error_message)
+        self.assertTrue('queuekey' not in self.the_input.input_state)
+        self.assertTrue('queuestate' not in self.the_input.input_state)
+        test_system.xqueue['interface'].send_to_queue.return_value = (0, 'Success!')
 
     def test_ungraded_response_success(self):
         queuekey = 'abcd'
@@ -583,7 +623,6 @@ class ImageInputTest(unittest.TestCase):
         self.check('[12 13 14]', 0, 0)
 
 
-
 class CrystallographyTest(unittest.TestCase):
     '''
     Check that crystallography inputs work
@@ -613,8 +652,7 @@ class CrystallographyTest(unittest.TestCase):
                     'status': 'unsubmitted',
                     'msg': '',
                     'width': width,
-                    'height': height,
-                   }
+                    'height': height}
 
         self.assertEqual(context, expected)
 
@@ -654,11 +692,9 @@ class VseprTest(unittest.TestCase):
                     'width': width,
                     'height': height,
                     'molecules': molecules,
-                    'geometries': geometries,
-                   }
+                    'geometries': geometries}
 
         self.assertEqual(context, expected)
-
 
 
 class ChemicalEquationTest(unittest.TestCase):
@@ -674,7 +710,6 @@ class ChemicalEquationTest(unittest.TestCase):
         state = {'value': 'H2OYeah', }
         self.the_input = lookup_tag('chemicalequationinput')(test_system, element, state)
 
-
     def test_rendering(self):
         ''' Verify that the render context matches the expected render context'''
         context = self.the_input._get_render_context()
@@ -688,19 +723,14 @@ class ChemicalEquationTest(unittest.TestCase):
                     }
         self.assertEqual(context, expected)
 
-    
     def test_chemcalc_ajax_sucess(self):
         ''' Verify that using the correct dispatch and valid data produces a valid response'''
-        
         data = {'formula': "H"}
         response = self.the_input.handle_ajax("preview_chemcalc", data)
 
         self.assertTrue('preview' in response)
         self.assertNotEqual(response['preview'], '')
         self.assertEqual(response['error'], "")
-
-
-    
 
 
 class DragAndDropTest(unittest.TestCase):
