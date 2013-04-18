@@ -29,9 +29,9 @@ def url_class(is_active):
     <%block name="extratabs" />
         % if masquerade is not UNDEFINED:
           % if staff_access and masquerade is not None:
-	  <li style="float:right"><a href="#" id="staffstatus">Staff view</a></li>
-	  % endif
-	% endif
+          <li style="float:right"><a href="#" id="staffstatus">Staff view</a></li>
+          % endif
+        % endif
     </ol>
   </div>
 </nav>
@@ -42,11 +42,11 @@ def url_class(is_active):
 masq = (function(){
     var el = $('#staffstatus');
     var setstat = function(status){
-	if (status=='student'){
-	    el.html('<font color="green">Student view</font>');
-	}else{
-	    el.html('<font color="red">Staff view</font>');
-	}
+        if (status=='student'){
+            el.html('<font color="green">Student view</font>');
+        }else{
+            el.html('<font color="red">Staff view</font>');
+        }
     }
     setstat('${masquerade}');
 
@@ -55,7 +55,7 @@ masq = (function(){
                  type: 'GET',
                  success: function(result){
                      setstat(result.status);
-		     location.reload();
+                     location.reload();
                  },
                  error: function() {
                      alert('Error: cannot connect to server');
