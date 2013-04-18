@@ -23,8 +23,8 @@ The following attributes can be specified for this tag::
 
    If you want to use the same word cloud (the same storage of words), you must use the same display_name value.
 
-Example
-=======
+Code Example
+============
 
 Examples of word_cloud without all attributes (all attributes get by default)
 -----------------------------------------------------------------------------
@@ -39,3 +39,9 @@ Examples of poll with all attributes
 .. code-block:: xml
 
     <word_cloud display_name="cloud" num_inputs="10" num_top_words="100" />
+
+Screenshots
+===========
+
+.. image:: word_cloud.png
+    :width: 50%
