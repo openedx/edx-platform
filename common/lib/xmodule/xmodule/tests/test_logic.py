@@ -3,8 +3,6 @@
 import json
 import unittest
 
-from django.http import QueryDict
-
 from xmodule.poll_module import PollDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
@@ -16,15 +14,18 @@ class LogicTest(unittest.TestCase):
     raw_model_data = {}
 
     def setUp(self):
-        class EmptyClass: pass
+        class EmptyClass:
+            pass
 
         self.system = None
         self.location = None
         self.descriptor = EmptyClass()
 
         self.xmodule_class = self.descriptor_class.module_class
-        self.xmodule = self.xmodule_class(self.system, self.location,
-            self.descriptor, self.raw_model_data)
+        self.xmodule = self.xmodule_class(
+            self.system, self.location,
+            self.descriptor, self.raw_model_data
+        )
 
     def ajax_request(self, dispatch, get):
         return json.loads(self.xmodule.handle_ajax(dispatch, get))

@@ -10,7 +10,6 @@ Stunent can change his answer.
 
 import json
 import logging
-import re
 
 from lxml import etree
 from pkg_resources import resource_string
@@ -30,21 +29,22 @@ class WordCloudFields(object):
     num_top_words = Integer(help="Number of max words, which will be displayed.", scope=Scope.settings, default=250)
 
     submitted = Boolean(help="Whether this student has posted words to the cloud", scope=Scope.user_state, default=False)
-    student_words= List(help="Student answer", scope=Scope.user_state, default=[])
+    student_words = List(help="Student answer", scope=Scope.user_state, default=[])
 
     all_words = Object(help="All possible words from other students", scope=Scope.content)
     top_words = Object(help="Top N words for word cloud", scope=Scope.content)
 
+
 class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Module"""
     js = {
-      'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
-      'js': [resource_string(__name__, 'js/src/word_cloud/logme.js'),
-             resource_string(__name__, 'js/src/word_cloud/d3.min.js'),
-             resource_string(__name__, 'js/src/word_cloud/d3.layout.cloud.js'),
-             resource_string(__name__, 'js/src/word_cloud/word_cloud.js'),
-             resource_string(__name__, 'js/src/word_cloud/word_cloud_main.js')]
-         }
+        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
+        'js': [resource_string(__name__, 'js/src/word_cloud/logme.js'),
+        resource_string(__name__, 'js/src/word_cloud/d3.min.js'),
+        resource_string(__name__, 'js/src/word_cloud/d3.layout.cloud.js'),
+        resource_string(__name__, 'js/src/word_cloud/word_cloud.js'),
+        resource_string(__name__, 'js/src/word_cloud/word_cloud_main.js')]
+    }
     css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
     js_module_name = "WordCloud"
 
@@ -55,9 +55,8 @@ class WordCloudModule(WordCloudFields, XModule):
                 'status': 'success',
                 'submitted': True,
                 'student_words': {
-                    word:self.all_words[word] for
-                        word in self.student_words
-                    },
+                    word: self.all_words[word] for word in self.student_words
+                },
                 'total_count': sum(self.all_words.itervalues()),
                 'top_words': self.prepare_words(self.top_words)
             })
@@ -76,8 +75,10 @@ class WordCloudModule(WordCloudFields, XModule):
 
     def prepare_words(self, words):
         """Convert words dictionary for client API."""
-        return [{'text': word, 'size': count} for
-            word, count in words.iteritems()]
+        return [
+            {'text': word, 'size': count} for
+            word, count in words.iteritems()
+        ]
 
     def top_dict(self, dict_obj, amount):
         """Return new dict: top of dict using dict value."""
@@ -124,8 +125,10 @@ class WordCloudModule(WordCloudFields, XModule):
                 temp_all_words[word] = temp_all_words.get(word, 0) + 1
 
             # Update top_words.
-            self.top_words = self.top_dict(temp_all_words,
-                int(self.num_top_words))
+            self.top_words = self.top_dict(
+                temp_all_words,
+                int(self.num_top_words)
+            )
 
             # Save all_words in database.
             self.all_words = temp_all_words
@@ -142,13 +145,13 @@ class WordCloudModule(WordCloudFields, XModule):
     def get_html(self):
         """Renders parameters to template."""
         params = {
-                  'element_id': self.location.html_id(),
-                  'element_class': self.location.category,
-                  'ajax_url': self.system.ajax_url,
-                  'configuration_json': self.get_state(),
-                  'num_inputs': int(self.num_inputs),
-                  'submitted': self.submitted
-                  }
+            'element_id': self.location.html_id(),
+            'element_class': self.location.category,
+            'ajax_url': self.system.ajax_url,
+            'configuration_json': self.get_state(),
+            'num_inputs': int(self.num_inputs),
+            'submitted': self.submitted
+        }
         self.content = self.system.render_template('word_cloud.html', params)
         return self.content
 

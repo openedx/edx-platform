@@ -162,7 +162,7 @@ function WordCloudMain(el) {
         }
     )
     .done(function(){
-    
+
         // Show WordCloud container after Ajax request done    
         _this.wordCloudEl.show();
 
@@ -174,7 +174,7 @@ function WordCloudMain(el) {
 
             return;
         }
-        
+
         if (_this.configJson.submitted) {
             _this.showWordCloud(_this.configJson);
 
