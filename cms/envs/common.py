@@ -20,11 +20,8 @@ Longer TODO:
 """
 
 import sys
-import os.path
-import os
 import lms.envs.common
 from path import path
-from xmodule.static_content import write_descriptor_styles, write_descriptor_js, write_module_js, write_module_styles
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -186,30 +183,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
-# Load javascript and css from all of the available descriptors, and
-# prep it for use in pipeline js
-from xmodule.raw_module import RawDescriptor
-from xmodule.error_module import ErrorDescriptor
-from rooted_paths import rooted_glob, remove_root
-
-write_descriptor_styles(PROJECT_ROOT / "static/sass/descriptor", [RawDescriptor, ErrorDescriptor])
-write_module_styles(PROJECT_ROOT / "static/sass/module", [RawDescriptor, ErrorDescriptor])
-
-descriptor_js = [path.replace('.coffee', '.js') for path in remove_root(
-    PROJECT_ROOT / 'static',
-    write_descriptor_js(
-        PROJECT_ROOT / "static/coffee/descriptor",
-        [RawDescriptor, ErrorDescriptor]
-    )
-)]
-
-module_js = [path.replace('.coffee', '.js') for path in remove_root(
-    PROJECT_ROOT / 'static',
-    write_module_js(
-        PROJECT_ROOT / "static/coffee/module",
-        [RawDescriptor, ErrorDescriptor]
-    )
-)]
+from rooted_paths import rooted_glob
 
 PIPELINE_CSS = {
     'base-style': {
@@ -217,7 +191,9 @@ PIPELINE_CSS = {
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
-            'sass/base-style.css'
+            'sass/base-style.css',
+            'xmodule/modules.css',
+            'xmodule/descriptor.css',
         ],
         'output_filename': 'css/cms-base-style.css',
     },
@@ -232,7 +208,10 @@ PIPELINE_JS = {
         'output_filename': 'js/cms-application.js',
     },
     'module-js': {
-        'source_filenames': descriptor_js + module_js,
+        'source_filenames': (
+            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
+            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js')
+        ),
         'output_filename': 'js/cms-modules.js',
     },
     'spec': {

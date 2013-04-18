@@ -20,7 +20,6 @@ Longer TODO:
 """
 import sys
 import os
-from xmodule.static_content import write_module_styles, write_module_js
 
 from path import path
 
@@ -390,15 +389,7 @@ MIDDLEWARE_CLASSES = (
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
-from xmodule.hidden_module import HiddenDescriptor
-from rooted_paths import rooted_glob, remove_root
-
-write_module_styles(PROJECT_ROOT / 'static/sass/module', [HiddenDescriptor])
-
-module_js = [path.replace('.coffee', '.js') for path in remove_root(
-    PROJECT_ROOT / 'static',
-    write_module_js(PROJECT_ROOT / 'static/coffee/module', [HiddenDescriptor])
-)]
+from rooted_paths import rooted_glob
 
 courseware_js = (
     [
@@ -436,7 +427,8 @@ PIPELINE_CSS = {
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
-            'sass/course.css'
+            'sass/course.css',
+            'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-course.css',
     },
@@ -472,7 +464,7 @@ PIPELINE_JS = {
         'output_filename': 'js/lms-main_vendor.js',
     },
     'module-js': {
-        'source_filenames': module_js,
+        'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
         'output_filename': 'js/lms-modules.js',
     },
     'discussion': {
