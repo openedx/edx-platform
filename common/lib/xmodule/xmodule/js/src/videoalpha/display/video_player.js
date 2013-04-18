@@ -249,6 +249,8 @@ function (HTML5Video) {
 
     function onReady() {
         var availablePlaybackRates, baseSpeedSubs, _this;
+        
+        // REFACTOR: Check if logic.
 
         availablePlaybackRates = this.videoPlayer.player.getAvailablePlaybackRates();
         if ((this.currentPlayerMode === 'html5') && (this.videoType === 'youtube')) {

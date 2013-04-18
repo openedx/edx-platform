@@ -34,14 +34,7 @@ function () {
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function renderElements(state) {
-        state.videoVolumeControl.el = $(
-            '<div class="volume">' +
-                '<a href="#"></a>' +
-                '<div class="volume-slider-container">' +
-                    '<div class="volume-slider"></div>' +
-                '</div>' +
-            '</div>'
-        );
+        state.videoVolumeControl.el = state.el.find('div.volume');
 
         state.videoVolumeControl.buttonEl = state.videoVolumeControl.el.find('a');
         state.videoVolumeControl.volumeSliderEl = state.videoVolumeControl.el.find('.volume-slider');
@@ -51,6 +44,7 @@ function () {
         // Figure out what the current volume is. Set it up so that muting/unmuting works correctly.
         // If no information about volume level could be retrieved, then we will use the default
         // 100 level (full volume).
+        // REFACTOR: Remove unnecessary checks.
         state.videoVolumeControl.currentVolume = parseInt($.cookie('video_player_volume_level'), 10);
         state.videoVolumeControl.previousVolume = 100;
         if (

@@ -97,7 +97,6 @@ function () {
     function onSlide(event, ui) {
         this.videoProgressSlider.frozen = true;
         this.videoProgressSlider.updateTooltip(ui.value);
-
         this.trigger(['videoPlayer', 'onSeek'], ui.value);
     }
 
@@ -106,9 +105,7 @@ function () {
     }
 
     function onStop(event, ui) {
-        var _this;
-
-        _this = this;
+        var _this = this;
 
         this.videoProgressSlider.frozen = true;
 
@@ -125,6 +122,7 @@ function () {
 
     function updatePlayTime(params) {
         if ((this.videoProgressSlider.slider) && (!this.videoProgressSlider.frozen)) {
+            // REFACTOR: Check if you can chain.
             this.videoProgressSlider.slider.slider('option', 'max', params.duration);
             this.videoProgressSlider.slider.slider('value', params.time);
         }

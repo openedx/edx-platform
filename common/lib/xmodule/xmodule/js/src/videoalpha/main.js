@@ -1,5 +1,7 @@
 (function (requirejs, require, define) {
 
+// REFACTOR. Build JS doc. Add docs on how to build docs.
+
 // Main module.
 require(
 [
@@ -49,7 +51,10 @@ function (
         VideoProgressSlider(state);
         VideoVolumeControl(state);
         VideoSpeedControl(state);
-        VideoCaption(state);
+
+        if (state.config.show_captions) {
+            VideoCaption(state);
+        }
     };
 });
 

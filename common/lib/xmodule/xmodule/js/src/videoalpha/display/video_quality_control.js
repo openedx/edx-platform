@@ -39,14 +39,12 @@ function () {
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function renderElements(state) {
-        state.videoQualityControl.el = $(
-            '<a href="#" class="quality_control" title="HD">HD</a>'
-        );
-        state.videoControl.secondaryControlsEl.append(state.videoQualityControl.el);
+        state.videoQualityControl.el = state.el.find('a.quality_control');
 
         state.videoQualityControl.quality = null;
 
         if (!onTouchBasedDevice()) {
+            // REFACTOR: Move qtip config to state.config
             state.videoQualityControl.el.qtip({
                 'position': {
                     'my': 'top right',
@@ -72,6 +70,7 @@ function () {
     function onQualityChange(value) {
         this.videoQualityControl.quality = value;
 
+        // refactor: Move constants to state.config.
         if ((value === 'hd720') || (value === 'hd1080') || (value === 'highres')) {
             this.videoQualityControl.el.addClass('active');
         } else {
@@ -86,6 +85,7 @@ function () {
 
         _ref = this.videoQualityControl.quality;
 
+        // refactor: Move constants to state.config.
         if ((_ref === 'hd720') || (_ref === 'hd1080') || (_ref === 'highres')) {
             newQuality = 'large';
         } else {

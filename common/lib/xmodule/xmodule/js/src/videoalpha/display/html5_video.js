@@ -17,9 +17,7 @@ define(
 'videoalpha/display/html5_video.js',
 [],
 function () {
-    var HTML5Video;
-
-    HTML5Video = {};
+    var HTML5Video = {};
 
     HTML5Video.Player = (function () {
         Player.prototype.callStateChangeCallback = function () {
@@ -129,9 +127,21 @@ function () {
             // If el is string, we assume it is an ID of a DOM element. Get the element, and check that the ID
             // really belongs to an element. If we didn't get a DOM element, return. At this stage, nothing will
             // break because other parts of the video player are waiting for 'onReady' callback to be called.
+            
+            // REFACTOR: Use .length === 0
+            
+               this.el = $(el);
+                // REFACTOR: Simplify chck.
+                if (this.el.length === 0) {
+                    return;
+                }
+            
+            
+            
+            
             if (typeof el === 'string') {
                 this.el = $(el);
-
+                // REFACTOR: Simplify chck.
                 if (this.el.length === 0) {
                     return;
                 }
@@ -140,7 +150,7 @@ function () {
             } else {
                 return;
             }
-
+            
             // A simple test to see that the 'config' is a normal object.
             if ($.isPlainObject(config)) {
                 this.config = config;
@@ -294,6 +304,7 @@ function () {
         }
     }());
 
+    // REFACTOR: Doc.
     HTML5Video.PlayerState = {
         'UNSTARTED': -1,
         'ENDED': 0,

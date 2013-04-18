@@ -64,20 +64,20 @@ function (VideoPlayer) {
         // We store all settings passed to us by the server in one place. These are "read only", so don't
         // modify them. All variable content lives in 'state' object.
         state.config = {
-            'element': element,
+            element: element,
 
-            'start':              state.el.data('start'),
-            'end':                state.el.data('end'),
+            start:              state.el.data('start'),
+            end:                state.el.data('end'),
 
-            'caption_data_dir':   state.el.data('caption-data-dir'),
-            'caption_asset_path': state.el.data('caption-asset-path'),
-            'show_captions':      (state.el.data('show-captions').toString().toLowerCase === 'true'),
-            'youtubeStreams':     state.el.data('streams'),
+            caption_data_dir:   state.el.data('caption-data-dir'),
+            caption_asset_path: state.el.data('caption-asset-path'),
+            show_captions:      (state.el.data('show-captions').toString().toLowerCase() === 'true'),
+            youtubeStreams:     state.el.data('streams'),
 
-            'sub':                state.el.data('sub'),
-            'mp4Source':          state.el.data('mp4-source'),
-            'webmSource':         state.el.data('webm-source'),
-            'oggSource':          state.el.data('ogg-source')
+            sub:                state.el.data('sub'),
+            mp4Source:          state.el.data('mp4-source'),
+            webmSource:         state.el.data('webm-source'),
+            oggSource:          state.el.data('ogg-source')
         };
 
         // Try to parse YouTube stream ID's. If
@@ -101,7 +101,7 @@ function (VideoPlayer) {
                 }
             );
 
-            if (!state.config.sub.length) {
+            if (!state.config.sub || !state.config.sub.length) {
                 state.config.sub = '';
                 state.config.show_captions = false;
             }
@@ -149,14 +149,14 @@ function (VideoPlayer) {
         // in a browser that doesn't fully support HTML5. When we have this setting in cookies, we can select
         // the proper mode from the start (not having to change mode later on).
         (function (currentPlayerMode) {
-            if ((currentPlayerMode !== 'html5') && (currentPlayerMode !== 'flash')) {
+            if ((currentPlayerMode === 'html5') || (currentPlayerMode === 'flash')) {
+                state.currentPlayerMode = currentPlayerMode;
+            } else {
                 $.cookie('current_player_mode', 'html5', {
                     'expires': 3650,
                     'path': '/'
                 });
                 state.currentPlayerMode = 'html5';
-            } else  {
-                state.currentPlayerMode = currentPlayerMode;
             }
         }($.cookie('current_player_mode')));
 
@@ -222,7 +222,7 @@ function (VideoPlayer) {
         state.html5Sources = { 'mp4': null, 'webm': null, 'ogg': null };
 
         $.each(sources, function (name, source) {
-            if (source.length) {
+            if (source && source.length) {
                 state.html5Sources[name] = source;
             }
         });
@@ -255,6 +255,14 @@ function (VideoPlayer) {
     }
 
     function checkForNativeFunctions() {
+        // REFACTOR:
+        // 1.) IE8 doc.
+        // 2.) Move to separate file.
+        // 3.) Write about a generic soluction system wide.
+        
+        // 
+        // IE browser supports Function.bind() only starting with version 8.
+        // 
         // The bind function is a recent addition to ECMA-262, 5th edition; as such it may not be present in all
         // browsers. You can partially work around this by inserting the following code at the beginning of your
         // scripts, allowing use of much of the functionality of bind() in implementations that do not natively support

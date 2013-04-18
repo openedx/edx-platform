@@ -519,7 +519,7 @@ div.videoalpha {
     }
 
     ol.subtitles.html5 {
-        background-color: rgba(243, 243, 243, 0.5);
+        background-color: rgba(243, 243, 243, 0.8);
         height: 380px;
         position: absolute;
         right: 0;
@@ -550,11 +550,21 @@ div.videoalpha {
       }
     }
 
+    article.video-wrapper div.video-player-pre, article.video-wrapper div.video-player-post {
+        height: 0px;
+    }
+
+    article.video-wrapper {
+        position: static;
+    }
+
     div.tc-wrapper {
       @include clearfix;
       display: table;
       width: 100%;
       height: 100%;
+
+      position: static;
 
       article.video-wrapper {
         width: 100%;
