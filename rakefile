@@ -37,7 +37,7 @@ end
 # Runs Process.spawn, and kills the process at the end of the rake process
 # Expects the same arguments as Process.spawn
 def background_process(*command)
-    pid = Process.spawn(*command, :pgroup => true)
+    pid = Process.spawn({}, *command, {:pgroup => true})
 
     at_exit do
         puts "Ending process and children"
