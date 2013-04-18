@@ -5,6 +5,12 @@ import capa
 import os.path
 from lxml import etree
 from mako.template import Template as MakoTemplate
+from mako import exceptions
+
+
+class TemplateError(Exception):
+    """Error occurred while rendering a Mako template"""
+    pass
 
 
 class TemplateTestCase(unittest.TestCase):
@@ -19,8 +25,8 @@ class TemplateTestCase(unittest.TestCase):
     def setUp(self):
         """Load the template"""
         capa_path = capa.__path__[0]
-        self.template_path = os.path.join(capa_path, 
-                                          'templates', 
+        self.template_path = os.path.join(capa_path,
+                                          'templates',
                                           self.TEMPLATE_NAME)
         template_file = open(self.template_path)
         self.template = MakoTemplate(template_file.read())
@@ -30,7 +36,11 @@ class TemplateTestCase(unittest.TestCase):
         """Render the template using the `context_dict` dict.
 
         Returns an `etree` XML element."""
-        xml_str = self.template.render_unicode(**context_dict)
+        try:
+            xml_str = self.template.render_unicode(**context_dict)
+        except:
+            raise TemplateError(exceptions.text_error_template().render())
+
         return etree.fromstring(xml_str)
 
     def assert_has_xpath(self, xml_root, xpath, context_dict, exact_num=1):
@@ -56,8 +66,28 @@ class TemplateTestCase(unittest.TestCase):
         """
         self.assert_has_xpath(xml_root, xpath, context_dict, exact_num=0)
 
+    def assert_has_text(self, xml_root, xpath, text, exact=True):
+        """Find the element at `xpath` in `xml_root` and assert
+        that its text is `text`.
 
-class TestChoiceGroupTemplate(TemplateTestCase):
+        `xml_root` is an etree XML element
+        `xpath` is an XPath string, such as `'/foo/bar'`
+        `text` is the expected text that the element should contain
+
+        If multiple elements are found, checks the first one.
+        If no elements are found, the assertion fails.
+        """
+        element_list = xml_root.xpath(xpath)
+        self.assertTrue(len(element_list) > 0,
+                        "Could not find element at '%s'" % str(xpath))
+
+        if exact:
+            self.assertEqual(text, element_list[0].text)
+        else:
+            self.assertIn(text, element_list[0].text)
+
+
+class ChoiceGroupTemplateTest(TemplateTestCase):
     """Test mako template for `<choicegroup>` input"""
 
     TEMPLATE_NAME = 'choicegroup.html'
@@ -70,7 +100,7 @@ class TestChoiceGroupTemplate(TemplateTestCase):
                         'input_type': 'checkbox',
                         'name_array_suffix': '1',
                         'value': '3'}
-        super(TestChoiceGroupTemplate, self).setUp()
+        super(ChoiceGroupTemplateTest, self).setUp()
 
     def test_problem_marked_correct(self):
         """Test conditions under which the entire problem
@@ -120,7 +150,7 @@ class TestChoiceGroupTemplate(TemplateTestCase):
                                  "//label[@class='choicegroup_correct']",
                                  self.context)
 
-    def test_problem_marked_unanswered(self):
+    def test_problem_marked_unsubmitted(self):
         """Test all conditions under which the entire problem
         (not a particular option) is marked unanswered"""
         conditions = [
@@ -234,10 +264,8 @@ class TestChoiceGroupTemplate(TemplateTestCase):
                                  self.context)
 
             # Expect to see the message
-            message_elements = xml.xpath("//div[@class='capa_alert']")
-            self.assertEqual(len(message_elements), 1)
-            self.assertEqual(message_elements[0].text,
-                             self.context['submitted_message'])
+            self.assert_has_text(xml, "//div[@class='capa_alert']",
+                                 self.context['submitted_message'])
 
     def test_no_message_before_submission(self):
         """Ensure that we don't show the `submitted_message`
@@ -267,3 +295,113 @@ class TestChoiceGroupTemplate(TemplateTestCase):
 
             # Expect that we do NOT see the message yet
             self.assert_no_xpath(xml, "//div[@class='capa_alert']", self.context)
+
+
+class TextlineTemplateTest(TemplateTestCase):
+    """Test mako template for `<textline>` input"""
+
+    TEMPLATE_NAME = 'textline.html'
+
+    def setUp(self):
+        self.context = {'id': '1',
+                        'status': 'correct',
+                        'value': '3',
+                        'preprocessor': None,
+                        'trailing_text': None}
+        super(TextlineTemplateTest, self).setUp()
+
+    def test_section_class(self):
+        cases = [({}, ' capa_inputtype '),
+                 ({'do_math': True}, 'text-input-dynamath capa_inputtype '),
+                 ({'inline': True}, ' capa_inputtype inline'),
+                 ({'do_math': True, 'inline': True}, 'text-input-dynamath capa_inputtype inline'), ]
+
+        for (context, css_class) in cases:
+            base_context = self.context.copy()
+            base_context.update(context)
+            xml = self.render_to_xml(base_context)
+            xpath = "//section[@class='%s']" % css_class
+            self.assert_has_xpath(xml, xpath, self.context)
+
+    def test_status(self):
+        cases = [('correct', 'correct', 'correct'),
+                 ('unsubmitted', 'unanswered', 'unanswered'),
+                 ('incorrect', 'incorrect', 'incorrect'),
+                 ('incomplete', 'incorrect', 'incomplete')]
+
+        for (context_status, div_class, status_mark) in cases:
+            self.context['status'] = context_status
+            xml = self.render_to_xml(self.context)
+
+            # Expect that we get a <div> with correct class
+            xpath = "//div[@class='%s ']" % div_class
+            self.assert_has_xpath(xml, xpath, self.context)
+
+            # Expect that we get a <p> with class="status"
+            # (used to by CSS to draw the green check / red x)
+            self.assert_has_text(xml, "//p[@class='status']",
+                                 status_mark, exact=False)
+
+    def test_hidden(self):
+        self.context['hidden'] = True
+        xml = self.render_to_xml(self.context)
+
+        xpath = "//div[@style='display:none;']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+        xpath = "//input[@style='display:none;']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+    def test_do_math(self):
+        self.context['do_math'] = True
+        xml = self.render_to_xml(self.context)
+
+        xpath = "//input[@class='math']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+        xpath = "//div[@class='equation']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+        xpath = "//textarea[@id='input_1_dynamath']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+    def test_size(self):
+        self.context['size'] = '20'
+        xml = self.render_to_xml(self.context)
+
+        xpath = "//input[@size='20']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+    def test_preprocessor(self):
+        self.context['preprocessor'] = {'class_name': 'test_class',
+                                        'script_src': 'test_script'}
+        xml = self.render_to_xml(self.context)
+
+        xpath = "//div[@class='text-input-dynamath_data' and @data-preprocessor='test_class']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+        xpath = "//div[@class='script_placeholder' and @data-src='test_script']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+    def test_do_inline(self):
+        cases = [('correct', 'correct'),
+                 ('unsubmitted', 'unanswered'),
+                 ('incorrect', 'incorrect'),
+                 ('incomplete', 'incorrect')]
+
+        self.context['inline'] = True
+
+        for (context_status, div_class) in cases:
+            self.context['status'] = context_status
+            xml = self.render_to_xml(self.context)
+
+            # Expect that we get a <div> with correct class
+            xpath = "//div[@class='%s inline']" % div_class
+            self.assert_has_xpath(xml, xpath, self.context)
+
+    def test_message(self):
+        self.context['msg'] = "Test message"
+        xml = self.render_to_xml(self.context)
+
+        xpath = "//span[@class='message']"
+        self.assert_has_text(xml, xpath, self.context['msg'])
