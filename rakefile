@@ -132,7 +132,7 @@ def compile_assets(watch=false)
     sass_cmd = "sass --style compressed " +
                      "--load-path ./common/static/sass " +
                      "--require ./common/static/sass/bourbon/lib/bourbon.rb " +
-                     "#{watch ? '--watch' : '--update'} */static"
+                     "#{watch ? '--watch' : '--update --force'} */static"
 
     [xmodule_cmd, coffee_cmd, sass_cmd].each do |cmd|
         if watch
@@ -245,6 +245,7 @@ end
         desc
     task system, [:env, :options] => [:predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
+        compile_assets(watch=false)
         compile_assets(watch=true)
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
