@@ -12,6 +12,7 @@ from courseware.courses import get_course_with_access
 from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted, 
                                    get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
+from django_comment_client.models import Role
 
 from django_comment_client.permissions import cached_has_permission
 from django_comment_client.utils import (merge_dict, extract, strip_none, get_courseware_context)
@@ -218,7 +219,7 @@ def forum_form_discussion(request, course_id):
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'thread_pages': query_params['num_pages'],
             'user_info': saxutils.escape(json.dumps(user_info), escapedict),
-            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id),
+            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, course, 'staff'),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course_id': course.id,
             'category_map': category_map,
@@ -301,6 +302,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
         cohorts = get_course_cohorts(course_id)
         cohorted_commentables = get_cohorted_commentables(course_id)
         user_cohort = get_cohort_id(request.user, course_id)
+        
+        
+       
 
         context = {
             'discussion_id': discussion_id,
