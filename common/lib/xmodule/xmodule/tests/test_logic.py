@@ -8,6 +8,15 @@ from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
 
 
+class PostData:
+    """Class which emulate postdata."""
+    def __init__(self, dict_data):
+        self.dict_data = dict_data
+
+    def getlist(self, key):
+        return self.dict_data.get(key)
+
+
 class LogicTest(unittest.TestCase):
     """Base class for testing xmodule logic."""
     descriptor_class = None
@@ -75,19 +84,33 @@ class WordCloudModuleTest(LogicTest):
     raw_model_data = {
         'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
         'top_words': {'cat': 10, 'dog': 5, 'dad': 2},
-        'submitted': False,
-        'student_words': ['mom', 'dad', 'cat']
+        'submitted': False
     }
 
     def test_bad_ajax_request(self):
 
-        # TODO: move top global test.
+        # TODO: move top global test. Formalize all Xmodule errors.
         response = self.ajax_request('bad_dispatch', {})
         self.assertDictEqual(response, {
             'status': 'fail',
             'error': 'Unknown Command!'
         })
 
-    # TODO
-    # def test_good_ajax_request(self):
-    #     response = self.ajax_request('submit', {})
+    def test_good_ajax_request(self):
+        post_data = PostData({'student_words[]': ['cat', 'cat', 'dog', 'sun']})
+        response = self.ajax_request('submit', post_data)
+        self.assertEqual(response['status'], 'success')
+        self.assertEqual(response['submitted'], True)
+        self.assertEqual(response['total_count'], 22)
+        self.assertDictEqual(
+            response['student_words'],
+            {'sun': 1, 'dog': 6, 'cat': 12}
+        )
+        self.assertListEqual(
+            response['top_words'],
+            [{'text': 'dad', 'size': 2},
+             {'text': 'sun', 'size': 1},
+             {'text': 'dog', 'size': 6},
+             {'text': 'mom', 'size': 1},
+             {'text': 'cat', 'size': 12}]
+        )
