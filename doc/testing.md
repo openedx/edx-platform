@@ -6,14 +6,12 @@ We maintain three kinds of tests: unit tests, integration tests,
 and acceptance tests.
 
 ### Unit Tests
-* As a rule of thumb, you should write at least one test for 
-every "branch" of code.
-If a function does X when A and does Y when NOT A, 
-then you need to write two tests: a test for A and a test for NOT A.
 
 * Each test case should be concise: setup, execute, check, and teardown.
 If you find yourself writing tests with many steps, consider refactoring 
 the unit under tests into smaller units, and then testing those individually.
+
+* As a rule of thumb, your unit tests should cover every code branch.
 
 * Mock or patch external dependencies.
 We use [voidspace mock](http://www.voidspace.org.uk/python/mock/).
@@ -87,7 +85,7 @@ because the `capa` package handles problem XML.
 
 Before running tests, ensure that you have all the dependencies.  You can install dependencies using:
 
-    pip install requirements.txt
+    pip install -r requirements.txt
 
 
 ## Running Python Unit tests
@@ -186,7 +184,7 @@ To test only a specific feature:
 **Troubleshooting**: If you get an error message that says something about harvest not being a command, you probably are missing a requirement.
 Try running:
 
-    pip install requirements.txt
+    pip install -r requirements.txt
 
 
 ## Viewing Test Coverage

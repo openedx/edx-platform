@@ -12,7 +12,6 @@ This will read the `Gemfile` and install all of the gems specified there.
 Run the following::
 
     pip install -r requirements.txt
-    pip install -r test-requirements.txt
 
 ### Binaries
 
