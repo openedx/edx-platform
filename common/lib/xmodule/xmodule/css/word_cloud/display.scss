@@ -1,3 +1,17 @@
 .input-cloud {
   margin: 5px;
 }
+
+.result_cloud_section {
+    display: none;
+    width: 0px;
+    height: 0px;
+}
+
+.result_cloud_section.active {
+    display: block;
+    width: 635px;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
