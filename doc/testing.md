@@ -150,9 +150,11 @@ If the `phantomjs` binary is not on the path, set the `PHANTOMJS_PATH` environme
 
     PHANTOMJS_PATH=/path/to/phantomjs rake phantomjs_jasmine_{lms,cms}
 
-Once you have run the `rake` command, you can 
-navigate to `http://localhost:12345/_jasmine/` to see the test results.
+Once you have run the `rake` command, your browser should open to 
+to `http://localhost/_jasmine/`, which displays the test results.
 
+**Troubleshooting**: If you get an error message while running the `rake` task,
+try running `bundle install` to install the required ruby gems.
 
 ### Running Acceptance Tests
 
