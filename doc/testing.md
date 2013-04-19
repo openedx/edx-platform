@@ -46,7 +46,10 @@ while **minimizing maintenance**.
 In practice, this usually means investing heavily 
 in unit tests, which tend to be the most robust to changes in the code base.  
 
-![Alt text](test_pyramid.png)
+![Test Pyramid](test_pyramid.png)
+
+The pyramid above shows the relative number of unit tests, integration tests,
+and acceptance tests.  Most of our tests are unit tests or integration tests.
 
 ## Test Locations
 
