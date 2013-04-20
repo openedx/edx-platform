@@ -11,7 +11,7 @@ The main tag of Word Cloud module input is:
 
 .. code-block:: xml
 
-    <word_cloud> ... </word_cloud>
+    <word_cloud />
 
 The following attributes can be specified for this tag::
 
