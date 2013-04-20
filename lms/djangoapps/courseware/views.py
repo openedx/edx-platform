@@ -90,6 +90,7 @@ def render_accordion(request, course, chapter, section, model_data_cache):
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    request.user = user	# keep just one instance of User
     toc = toc_for_course(user, request, course, chapter, section, model_data_cache)
 
     context = dict([('toc', toc),
@@ -261,6 +262,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    request.user = user	# keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
     staff_access = has_access(user, course, 'staff')
     registered = registered_for_course(course, user)

@@ -236,7 +236,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         don't have to hit the enrollments table on every module load.
         """
         # If start dates are off, can always load
-        if settings.MITX_FEATURES['DISABLE_START_DATES']:
+        if settings.MITX_FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
             debug("Allow: DISABLE_START_DATES")
             return True
 
