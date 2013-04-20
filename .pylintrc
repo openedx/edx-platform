@@ -34,10 +34,13 @@ load-plugins=
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
 disable=
+# Never going to use these
 # C0301: Line too long
-# C0302: Too many lines in module
-# W0141: Used builtin function 'map'
 # W0142: Used * or ** magic
+# W0141: Used builtin function 'map'
+
+# Might use these when the code is in better shape
+# C0302: Too many lines in module
 # R0201: Method could be a function
 # R0901: Too many ancestors
 # R0902: Too many instance attributes
@@ -96,7 +99,18 @@ zope=no
 # List of members which are set dynamically and missed by pylint inference
 # system, and so shouldn't trigger E0201 when accessed. Python regular
 # expressions are accepted.
-generated-members=REQUEST,acl_users,aq_parent,objects,DoesNotExist,can_read,can_write,get_url,size,content
+generated-members=
+    REQUEST,
+    acl_users,
+    aq_parent,
+    objects,
+    DoesNotExist,
+    can_read,
+    can_write,
+    get_url,
+    size,
+    content,
+    status_code
 
 
 [BASIC]

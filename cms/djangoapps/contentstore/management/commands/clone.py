@@ -5,7 +5,6 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import Location
 from xmodule.course_module import CourseDescriptor
 
 from auth.authz import _copy_course_group
@@ -16,8 +15,7 @@ from auth.authz import _copy_course_group
 
 
 class Command(BaseCommand):
-    help = \
-'''Clone a MongoDB backed course to another location'''
+    help = 'Clone a MongoDB backed course to another location'
 
     def handle(self, *args, **options):
         if len(args) != 2:

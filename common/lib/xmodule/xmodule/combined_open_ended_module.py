@@ -14,7 +14,7 @@ from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
 log = logging.getLogger("mitx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
-                          "skip_spelling_checks", "due", "graceperiod"]
+                          "skip_spelling_checks", "due", "graceperiod", "weight"]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
                          "student_attempts", "ready_to_reset"]
@@ -106,10 +106,10 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     icon_class = 'problem'
 
     js = {'coffee':
-          [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
-           resource_string(__name__, 'js/src/collapsible.coffee'),
-           resource_string(__name__, 'js/src/javascript_loader.coffee'),
-           ]}
+              [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
+               resource_string(__name__, 'js/src/collapsible.coffee'),
+               resource_string(__name__, 'js/src/javascript_loader.coffee'),
+              ]}
     js_module_name = "CombinedOpenEnded"
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}

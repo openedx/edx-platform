@@ -13,7 +13,6 @@ from path import path
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
-NOSE_ARGS = ['--with-xunit']
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 TEST_ROOT = path('test_root')
@@ -28,7 +27,7 @@ GITHUB_REPO_ROOT = TEST_ROOT / "data"
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 
 # Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
+SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
@@ -41,7 +40,7 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
-modulestore_options = {
+MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
@@ -53,15 +52,15 @@ modulestore_options = {
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
+        'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
+        'OPTIONS': MODULESTORE_OPTIONS
     },
     'draft': {
         'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
-        'OPTIONS': modulestore_options
+        'OPTIONS': MODULESTORE_OPTIONS
     }
 }
 
@@ -76,7 +75,7 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "cms.db",
+        'NAME': TEST_ROOT / "db" / "cms.db",
     },
 }
 
@@ -121,3 +120,7 @@ PASSWORD_HASHERS = (
 
 # dummy segment-io key
 SEGMENT_IO_KEY = '***REMOVED***'
+
+# disable NPS survey in test mode
+MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
+
