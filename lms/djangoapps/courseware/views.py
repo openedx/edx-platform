@@ -307,12 +307,18 @@ def index(request, course_id, chapter=None, section=None,
         chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
+            if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+                log.debug('staff masq as student: no chapter %s' % chapter)
+                return redirect(reverse('courseware', args=[course.id]))
             raise Http404
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
+                if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+                    log.debug('staff masq as student: no section %s' % section)
+                    return redirect(reverse('courseware', args=[course.id]))
                 raise Http404
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
