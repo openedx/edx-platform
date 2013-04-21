@@ -82,7 +82,7 @@ if Backbone?
       if window.user.voted(@model)
         @unvote()
       else
-        @vote()   
+        @vote()
 
     toggleFollowing: (event) ->
       $elem = $(event.target)
@@ -96,7 +96,7 @@ if Backbone?
       DiscussionUtil.safeAjax
         $elem: $elem
         url: url
-        type: "POST" 
+        type: "POST"
 
     vote: ->
       window.user.vote(@model)
