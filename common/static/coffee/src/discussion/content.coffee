@@ -156,7 +156,7 @@ if Backbone?
         count += comment.getCommentsCount() + 1
       count
 
-  class @Comments extends Backbtle: ->
+  class @Comments extends Backbone: ->
       if @has("highlighted_title")
         String(@get("highlighted_title")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
       else
