@@ -1,8 +1,10 @@
 class InvalidDefinitionError(Exception):
     pass
 
+
 class NotFoundError(Exception):
     pass
+
 
 class ProcessingError(Exception):
     '''

@@ -42,7 +42,13 @@ PROBLEM_FACTORY_DICT = {
             'choice_type': 'checkbox',
             'choices': [True, False, True, False, False],
             'choice_names': ['Choice 1', 'Choice 2', 'Choice 3', 'Choice 4']}},
-
+    'radio': {
+        'factory': ChoiceResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Choice 3',
+            'choice_type': 'radio',
+            'choices': [False, False, True, False],
+            'choice_names': ['Choice 1', 'Choice 2', 'Choice 3', 'Choice 4']}},
     'string': {
         'factory': StringResponseXMLFactory(),
         'kwargs': {
@@ -174,6 +180,12 @@ def answer_problem(step, problem_type, correctness):
         else:
             inputfield('checkbox', choice='choice_3').check()
 
+    elif problem_type == 'radio':
+        if correctness == 'correct':
+            inputfield('radio', choice='choice_2').check()
+        else:
+            inputfield('radio', choice='choice_1').check()
+
     elif problem_type == 'string':
         textvalue = 'correct string' if correctness == 'correct' \
                                     else 'incorrect'
@@ -252,6 +264,14 @@ def assert_problem_has_answer(step, problem_type, answer_class):
         else:
             assert_checked('checkbox', [])
 
+    elif problem_type == "radio":
+        if answer_class == 'correct':
+            assert_checked('radio', ['choice_2'])
+        elif answer_class == 'incorrect':
+            assert_checked('radio', ['choice_1'])
+        else:
+            assert_checked('radio', [])
+
     elif problem_type == 'string':
         if answer_class == 'blank':
             expected = ''
@@ -298,6 +318,7 @@ CORRECTNESS_SELECTORS = {
         'correct': {'drop down': ['span.correct'],
                        'multiple choice': ['label.choicegroup_correct'],
                         'checkbox': ['span.correct'],
+                        'radio': ['label.choicegroup_correct'],
                         'string': ['div.correct'],
                         'numerical': ['div.correct'],
                         'formula': ['div.correct'],
@@ -308,6 +329,8 @@ CORRECTNESS_SELECTORS = {
                        'multiple choice': ['label.choicegroup_incorrect',
                                             'span.incorrect'],
                         'checkbox': ['span.incorrect'],
+                        'radio': ['label.choicegroup_incorrect',
+                                  'span.incorrect'],
                         'string': ['div.incorrect'],
                         'numerical': ['div.incorrect'],
                         'formula': ['div.incorrect'],
@@ -317,6 +340,7 @@ CORRECTNESS_SELECTORS = {
         'unanswered': {'drop down': ['span.unanswered'],
                        'multiple choice': ['span.unanswered'],
                         'checkbox': ['span.unanswered'],
+                        'radio': ['span.unanswered'],
                         'string': ['div.unanswered'],
                         'numerical': ['div.unanswered'],
                         'formula': ['div.unanswered'],

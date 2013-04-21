@@ -10,7 +10,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
-from xblock.core import String, Scope, List
+from xblock.core import Scope, List
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
@@ -60,8 +60,7 @@ class ConditionalModule(ConditionalFields, XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/conditional/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
-
-                    ]}
+                     ]}
 
     js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
@@ -82,21 +81,24 @@ class ConditionalModule(ConditionalFields, XModule):
             xml_value = self.descriptor.xml_attributes.get(xml_attr)
             if xml_value:
                 return xml_value, attr_name
-        raise Exception('Error in conditional module: unknown condition "%s"'
-            % xml_attr)
+        raise Exception('Error in conditional module: unknown condition "%s"' % xml_attr)
 
     def is_condition_satisfied(self):
         self.required_modules = [self.system.get_module(descriptor) for
-            descriptor in self.descriptor.get_required_module_descriptors()]
+                                 descriptor in self.descriptor.get_required_module_descriptors()]
 
         xml_value, attr_name = self._get_condition()
 
         if xml_value and self.required_modules:
             for module in self.required_modules:
                 if not hasattr(module, attr_name):
-                    raise Exception('Error in conditional module: \
-                    required module {module} has no {module_attr}'.format(
-                        module=module, module_attr=attr_name))
+                    # We don't throw an exception here because it is possible for 
+                    # the descriptor of a required module to have a property but
+                    # for the resulting module to be a (flavor of) ErrorModule.
+                    # So just log and return false.
+                    log.warn('Error in conditional module: \
+                        required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
+                    return False
 
                 attr = getattr(module, attr_name)
                 if callable(attr):
@@ -111,7 +113,7 @@ class ConditionalModule(ConditionalFields, XModule):
     def get_html(self):
         # Calculate html ids of dependencies
         self.required_html_ids = [descriptor.location.html_id() for
-            descriptor in self.descriptor.get_required_module_descriptors()]
+                                  descriptor in self.descriptor.get_required_module_descriptors()]
 
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
@@ -130,7 +132,7 @@ class ConditionalModule(ConditionalFields, XModule):
             context = {'module': self,
                        'message': message}
             html = self.system.render_template('conditional_module.html',
-                context)
+                                               context)
             return json.dumps({'html': [html], 'message': bool(message)})
 
         html = [child.get_html() for child in self.get_display_items()]
@@ -139,16 +141,15 @@ class ConditionalModule(ConditionalFields, XModule):
 
     def get_icon_class(self):
         new_class = 'other'
-        if self.is_condition_satisfied():
-            # HACK: This shouldn't be hard-coded to two types
-            # OBSOLETE: This obsoletes 'type'
-            class_priority = ['video', 'problem']
+        # HACK: This shouldn't be hard-coded to two types
+        # OBSOLETE: This obsoletes 'type'
+        class_priority = ['video', 'problem']
 
-            child_classes = [self.system.get_module(child_descriptor).get_icon_class()
-                        for child_descriptor in self.descriptor.get_children()]
-            for c in class_priority:
-                if c in child_classes:
-                    new_class = c
+        child_classes = [self.system.get_module(child_descriptor).get_icon_class()
+                         for child_descriptor in self.descriptor.get_children()]
+        for c in class_priority:
+            if c in child_classes:
+                new_class = c
         return new_class
 
 
@@ -162,7 +163,6 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
 
     stores_state = True
     has_score = False
-
 
     @staticmethod
     def parse_sources(xml_element, system, return_descriptor=False):
