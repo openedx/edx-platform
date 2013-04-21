@@ -45,7 +45,7 @@ if Backbone?
         
         
     renderFlagged: =>
-      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isStaff(@model.get("user_id")) and @model.get("abuse_flaggers").length > 0)
+      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
       else

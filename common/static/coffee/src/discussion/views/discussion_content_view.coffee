@@ -109,7 +109,7 @@ if Backbone?
      
     toggleFlagAbuse: (event) ->
       event.preventDefault()
-      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isStaff(@model.get("user_id")) and @model.get("abuse_flaggers").length > 0)
+      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @unFlagAbuse()
       else
         @flagAbuse()
@@ -140,7 +140,7 @@ if Backbone?
             temp_array = _.clone(@model.get('abuse_flaggers'));
             temp_array.pop(window.user.id)
             # if you're an admin, clear this
-            if DiscussionUtil.isStaff(@model.get("user_id"))
+            if DiscussionUtil.isFlagModerator
                 temp_array = []
 
             @model.set('abuse_flaggers', temp_array)         

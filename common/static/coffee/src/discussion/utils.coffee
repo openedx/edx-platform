@@ -18,8 +18,12 @@ class @DiscussionUtil
   @loadRoles: (roles)->
     @roleIds = roles
 
+  @loadFlagModerator: (what)->
+    @isFlagModerator = what
+
   @loadRolesFromContainer: ->
     @loadRoles($("#discussion-container").data("roles"))
+    @loadFlagModerator($("#discussion-container").data("flag-moderator"))
 
   @isStaff: (user_id) ->
     staff = _.union(@roleIds['Staff'], @roleIds['Moderator'], @roleIds['Administrator'])

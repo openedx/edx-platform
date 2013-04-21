@@ -323,7 +323,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'thread_pages': query_params['num_pages'],
             'is_course_cohorted': is_course_cohorted(course_id),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
-            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id),
+            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, course, 'staff'),
             'cohorts': cohorts,
             'user_cohort': get_cohort_id(request.user, course_id),
             'cohorted_commentables': cohorted_commentables
