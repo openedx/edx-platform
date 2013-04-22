@@ -393,12 +393,31 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(len(sections), 1)
 
         location = course.location
-        location = Location(
+
+        conditional_location = Location(
             location.tag, location.org, location.course,
-            'sequential', 'Problem_Demos'
+            'conditional', 'condone'
         )
-        module = modulestore.get_instance(course.id, location)
-        self.assertEqual(len(module.children), 2)
+        module = modulestore.get_instance(course.id, conditional_location)
+        self.assertEqual(len(module.children), 1)
+
+        poll_location = Location(
+            location.tag, location.org, location.course,
+            'poll_question', 'first_poll'
+        )
+        module = modulestore.get_instance(course.id, poll_location)
+        self.assertEqual(len(module.get_children()), 0)
+        self.assertEqual(module.voted, False)
+        self.assertEqual(module.poll_answer, '')
+        self.assertEqual(module.poll_answers, {})
+        self.assertEqual(
+            module.answers,
+            [
+                {'text': u'Yes', 'id': 'Yes'},
+                {'text': u'No', 'id': 'No'},
+                {'text': u"Don't know", 'id': 'Dont_know'}
+            ]
+        )
 
     def test_error_on_import(self):
         '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorModule'''
@@ -437,10 +456,12 @@ class ImportTestCase(BaseCourseTestCase):
         location = course.location
         location = Location(
             location.tag, location.org, location.course,
-            'sequential', 'Problem_Demos'
+            'word_cloud', 'cloud1'
         )
         module = modulestore.get_instance(course.id, location)
-        self.assertEqual(len(module.children), 1)
+        self.assertEqual(len(module.get_children()), 0)
+        self.assertEqual(module.num_inputs, '5')
+        self.assertEqual(module.num_top_words, '250')
 
     def test_cohort_config(self):
         """

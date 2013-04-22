@@ -1,11 +1,9 @@
 """Word cloud is ungraded xblock used by students to
-generate and view word cloud..
+generate and view word cloud.
 
 On the client side we show:
-If student does not yet anwered - five text inputs.
+If student does not yet anwered - `num_inputs` numbers of text inputs.
 If student have answered - words he entered and cloud.
-
-Stunent can change his answer.
 """
 
 import json
@@ -108,6 +106,7 @@ class WordCloudModule(WordCloudFields, XModule):
                 })
 
             # Student words from client.
+            # FIXME: we must use raw JSON, not a post data (multipart/form-data)
             raw_student_words = post.getlist('student_words[]')
             student_words = filter(None, map(self.good_word, raw_student_words))
 
@@ -185,5 +184,6 @@ class WordCloudDescriptor(WordCloudFields, MakoModuleDescriptor, XmlDescriptor):
         xml_object = etree.fromstring(xml_str)
         xml_object.set('display_name', self.display_name)
         xml_object.set('num_inputs', self.num_inputs)
+        xml_object.set('num_top_words', self.num_top_words)
 
         return xml_object

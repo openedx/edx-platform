@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Test for Xmodule functional logic."""
 
 import json
 import unittest
@@ -89,7 +90,7 @@ class WordCloudModuleTest(LogicTest):
 
     def test_bad_ajax_request(self):
 
-        # TODO: move top global test. Formalize all Xmodule errors.
+        # TODO: move top global test. Formalize all our Xmodule errors.
         response = self.ajax_request('bad_dispatch', {})
         self.assertDictEqual(response, {
             'status': 'fail',
