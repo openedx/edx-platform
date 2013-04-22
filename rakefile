@@ -119,7 +119,7 @@ def report_dir_path(dir)
     return File.join(REPORT_DIR, dir.to_s)
 end
 
-def compile_assets(watch=false)
+def compile_assets(watch=false, debug=false)
     xmodule_cmd = 'xmodule_assets common/static/xmodule'
     if watch
         xmodule_cmd = "watchmedo shell-command \
@@ -129,7 +129,7 @@ def compile_assets(watch=false)
                        common/lib/xmodule"
     end
     coffee_cmd = "coffee #{watch ? '--watch' : ''} --compile */static"
-    sass_cmd = "sass --style compressed " +
+    sass_cmd = "sass #{debug ? '--debug-info' : '--style compressed'} " +
                      "--load-path ./common/static/sass " +
                      "--require ./common/static/sass/bourbon/lib/bourbon.rb " +
                      "#{watch ? '--watch' : '--update --force'} */static"
@@ -245,8 +245,8 @@ end
         desc
     task system, [:env, :options] => [:predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
-        compile_assets(watch=false)
-        compile_assets(watch=true)
+        compile_assets(watch=false, debug=true)
+        compile_assets(watch=true, debug=true)
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
 
