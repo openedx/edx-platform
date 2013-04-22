@@ -10,6 +10,7 @@ from collections import namedtuple
 
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import ErrorLog, make_error_tracker
+from bson.son import SON
 
 log = logging.getLogger('mitx.' + 'modulestore')
 
@@ -251,7 +252,6 @@ class Location(_LocationBase):
     def __repr__(self):
         return "Location%s" % repr(tuple(self))
 
-
     @property
     def course_id(self):
         """Return the ID of the Course that this item belongs to by looking
@@ -413,7 +413,6 @@ class ModuleStore(object):
         return courses
 
 
-
 class ModuleStoreBase(ModuleStore):
     '''
     Implement interface functionality that can be shared.
@@ -424,6 +423,7 @@ class ModuleStoreBase(ModuleStore):
         '''
         self._location_errors = {}    # location -> ErrorLog
         self.metadata_inheritance_cache = None
+        self.modulestore_update_signal = None  # can be set by runtime to route notifications of datastore changes
 
     def _get_errorlog(self, location):
         """
@@ -457,3 +457,13 @@ class ModuleStoreBase(ModuleStore):
             if c.id == course_id:
                 return c
         return None
+
+
+def namedtuple_to_son(namedtuple, prefix=''):
+    """
+    Converts a namedtuple into a SON object with the same key order
+    """
+    son = SON()
+    for idx, field_name in enumerate(namedtuple._fields):
+        son[prefix + field_name] = namedtuple[idx]
+    return son

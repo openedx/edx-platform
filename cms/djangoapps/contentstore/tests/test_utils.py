@@ -3,7 +3,7 @@ from contentstore import utils
 import mock
 from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from .utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LMSLinksTestCase(TestCase):
@@ -30,7 +30,7 @@ class LMSLinksTestCase(TestCase):
 
 class UrlReverseTestCase(ModuleStoreTestCase):
     """ Tests for get_url_reverse """
-    def test_CoursePageNames(self):
+    def test_course_page_names(self):
         """ Test the defined course pages. """
         course = CourseFactory.create(org='mitX', number='666', display_name='URL Reverse Course')
 

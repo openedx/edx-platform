@@ -24,7 +24,7 @@ $(function() {
 
 	$('.datepair input.time').each(function() {
 		var $this = $(this);
-		var opts = { 'showDuration': true, 'timeFormat': 'g:ia', 'scrollDefaultNow': true };
+		var opts = { 'showDuration': true, 'timeFormat': 'H:i', 'scrollDefaultNow': true };
 
 		if ($this.hasClass('start') || $this.hasClass('end')) {
 			opts.onSelect = doDatepair;

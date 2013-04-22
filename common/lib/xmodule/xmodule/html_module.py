@@ -118,8 +118,8 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
                 with system.resources_fs.open(filepath) as file:
                     html = file.read().decode('utf-8')
                     # Log a warning if we can't parse the file, but don't error
-                    if not check_html(html):
-                        msg = "Couldn't parse html in {0}.".format(filepath)
+                    if not check_html(html) and len(html) > 0:
+                        msg = "Couldn't parse html in {0}, content = {1}".format(filepath, html)
                         log.warning(msg)
                         system.error_tracker("Warning: " + msg)
 
@@ -156,7 +156,8 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
-            file.write(self.data.encode('utf-8'))
+            html_data = self.data.encode('utf-8')
+            file.write(html_data)
 
         # write out the relative name
         relname = path(pathname).basename()

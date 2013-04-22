@@ -1,6 +1,5 @@
 import logging
 from lxml import etree
-from dateutil import parser
 
 from pkg_resources import resource_string
 
@@ -8,6 +7,9 @@ from xmodule.editing_module import EditingDescriptor
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
 from xblock.core import Scope, Integer, String
+from .fields import Date
+from xmodule.util.date_utils import time_to_datetime
+
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +18,7 @@ class FolditFields(object):
     # default to what Spring_7012x uses
     required_level = Integer(default=4, scope=Scope.settings)
     required_sublevel = Integer(default=5, scope=Scope.settings)
-    due = String(help="Date that this problem is due by", scope=Scope.settings, default='')
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
 
     show_basic_score = String(scope=Scope.settings, default='false')
     show_leaderboard = String(scope=Scope.settings, default='false')
@@ -36,17 +38,8 @@ class FolditModule(FolditFields, XModule):
             required_sublevel="3"
             show_leaderboard="false"/>
         """
-        def parse_due_date():
-            """
-            Pull out the date, or None
-            """
-            s = self.due
-            if s:
-                return parser.parse(s)
-            else:
-                return None
 
-        self.due_time = parse_due_date()
+        self.due_time = time_to_datetime(self.due)
 
     def is_complete(self):
         """
@@ -114,7 +107,7 @@ class FolditModule(FolditFields, XModule):
             'show_leader': showleader,
             'folditbasic': self.get_basicpuzzles_html(),
             'folditchallenge': self.get_challenge_html()
-            }
+        }
 
         return self.system.render_template('foldit.html', context)
 
@@ -131,7 +124,7 @@ class FolditModule(FolditFields, XModule):
             'success': self.is_complete(),
             'goal_level': goal_level,
             'completed': self.completed_puzzles(),
-            }
+        }
         return self.system.render_template('folditbasic.html', context)
 
     def get_challenge_html(self):
@@ -156,7 +149,6 @@ class FolditModule(FolditFields, XModule):
         return 1
 
 
-
 class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):
     """
     Module for adding Foldit problems to courses
@@ -178,8 +170,8 @@ class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        return ({}, [])
+        return {}, []
 
-    def definition_to_xml(self):
+    def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('foldit')
         return xml_object

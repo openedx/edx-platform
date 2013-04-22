@@ -4,7 +4,7 @@
 body.signup, body.signin {
 
   .wrapper-content {
-    margin: 0;
+    margin: ($baseline*1.5) 0 0 0;
     padding: 0 $baseline;
     position: relative;
     width: 100%;
@@ -18,7 +18,7 @@ body.signup, body.signin {
     width: flex-grid(12);
     margin: 0 auto;
     color: $gray-d2;
-    
+
     header {
       position: relative;
       margin-bottom: $baseline;
@@ -71,7 +71,7 @@ body.signup, body.signin {
           @include blue-button;
           @include transition(all .15s);
           @include font-size(15);
-          display:block;
+          display: block;
           width: 100%;
           padding: ($baseline*0.75) ($baseline/2);
           font-weight: 600;
@@ -121,7 +121,7 @@ body.signup, body.signin {
             @include font-size(16);
             height: 100%;
             width: 100%;
-            padding: ($baseline/2);       
+            padding: ($baseline/2);
 
             &.long {
               width: 100%;
@@ -136,15 +136,15 @@ body.signup, body.signin {
             }
 
             :-moz-placeholder {
-               color: $gray-l3; 
+               color: $gray-l3;
             }
 
             ::-moz-placeholder {
-               color: $gray-l3;  
+               color: $gray-l3;
             }
 
-            :-ms-input-placeholder {  
-               color: $gray-l3; 
+            :-ms-input-placeholder {
+               color: $gray-l3;
             }
 
             &:focus {

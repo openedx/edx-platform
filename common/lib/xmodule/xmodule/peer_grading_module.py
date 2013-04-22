@@ -6,15 +6,16 @@ from lxml import etree
 from datetime import datetime
 from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
-from .stringify import stringify_children
 from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from .timeinfo import TimeInfo
 from xblock.core import Object, Integer, Boolean, String, Scope
+from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
+from xmodule.fields import Date
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
+from open_ended_grading_classes import combined_open_ended_rubric
 
 log = logging.getLogger(__name__)
 
@@ -28,13 +29,18 @@ EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please 
 
 
 class PeerGradingFields(object):
-    use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.", default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
-    link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION, scope=Scope.settings)
-    is_graded = Boolean(help="Whether or not this module is scored.",default=IS_GRADED, scope=Scope.settings)
-    display_due_date_string = String(help="Due date that should be displayed.", default=None, scope=Scope.settings)
+    use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.",
+                                      default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
+    link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION,
+                              scope=Scope.settings)
+    is_graded = Boolean(help="Whether or not this module is scored.", default=IS_GRADED, scope=Scope.settings)
+    due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
-    max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE, scope=Scope.settings)
-    student_data_for_location = Object(help="Student data for a given peer grading problem.", default=json.dumps({}),scope=Scope.student_state)
+    max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE,
+                        scope=Scope.settings)
+    student_data_for_location = Object(help="Student data for a given peer grading problem.",
+                                       scope=Scope.user_state)
+    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
 
 
 class PeerGradingModule(PeerGradingFields, XModule):
@@ -72,7 +78,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 self._model_data['due'] = due_date
 
         try:
-            self.timeinfo = TimeInfo(self.display_due_date_string, self.grace_period_string)
+            self.timeinfo = TimeInfo(self.due_date, self.grace_period_string)
         except:
             log.error("Error parsing due date information in location {0}".format(location))
             raise
@@ -173,8 +179,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
         pass
 
     def get_score(self):
+        max_score = None
+        score = None
+        score_dict = {
+            'score': score,
+            'total': max_score,
+        }
         if self.use_for_single_location not in TRUE_DICT or self.is_graded not in TRUE_DICT:
-            return None
+            return score_dict
 
         try:
             count_graded = self.student_data_for_location['count_graded']
@@ -193,10 +205,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 #Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
-        score_dict = {
-            'score': int(count_graded >= count_required),
-            'total': self.max_grade,
-        }
+        if self.weight is not None:
+            score = int(count_graded >= count_required and count_graded > 0) * float(self.weight)
+            total = self.max_grade * float(self.weight)
+            score_dict['score'] = score
+            score_dict['total'] = total
 
         return score_dict
 
@@ -379,8 +392,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError:
             #This is a dev_facing_error
-            log.exception("Cannot parse rubric string. Raw string: {0}"
-            .format(rubric))
+            log.exception("Cannot parse rubric string.")
             #This is a student_facing_error
             return {'success': False,
                     'error': 'Error displaying submission.  Please notify course staff.'}
@@ -420,12 +432,15 @@ class PeerGradingModule(PeerGradingFields, XModule):
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
                                                            submission_key, score, feedback, rubric_scores)
+            if 'actual_rubric' in response:
+                rubric_renderer = combined_open_ended_rubric.CombinedOpenEndedRubric(self.system, True)
+                response['actual_rubric'] = rubric_renderer.render_rubric(response['actual_rubric'])['html']
             return response
         except GradingServiceError:
             #This is a dev_facing_error
             log.exception(
-                "Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(
-                    location, submission_id, submission_key, grader_id))
+                "Error saving calibration grade, location: {0}, submission_key: {1}, grader_id: {2}".format(
+                    location, submission_key, grader_id))
             #This is a student_facing_error
             return self._err_response('There was an error saving your score.  Please notify course staff.')
 
@@ -572,4 +587,5 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
 
     stores_state = True
     has_score = True
+    always_recalculate_grades = True
     template_dir_name = "peer_grading"

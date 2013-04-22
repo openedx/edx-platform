@@ -8,12 +8,14 @@ Feature: Answer problems
         And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "correctly"
         Then My "<ProblemType>" answer is marked "correct"
+        And The "<ProblemType>" problem displays a "correct" answer
 
         Examples:
         | ProblemType       |
         | drop down         |
         | multiple choice   |
         | checkbox          |
+        | radio             |
         | string            |
         | numerical         |
         | formula           |
@@ -25,12 +27,14 @@ Feature: Answer problems
         And I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "incorrectly"
         Then My "<ProblemType>" answer is marked "incorrect"
+        And The "<ProblemType>" problem displays a "incorrect" answer
 
         Examples:
         | ProblemType       |
         | drop down         |
         | multiple choice   |
         | checkbox          |
+        | radio             |
         | string            |
         | numerical         |
         | formula           |
@@ -41,12 +45,14 @@ Feature: Answer problems
         Given I am viewing a "<ProblemType>" problem
         When I check a problem
         Then My "<ProblemType>" answer is marked "incorrect"
+        And The "<ProblemType>" problem displays a "blank" answer
 
         Examples:
         | ProblemType       |
         | drop down         |
         | multiple choice   |
         | checkbox          |
+        | radio             |
         | string            |
         | numerical         |
         | formula           |
@@ -58,6 +64,7 @@ Feature: Answer problems
         And I answer a "<ProblemType>" problem "<Correctness>ly"
         When I reset the problem
         Then My "<ProblemType>" answer is marked "unanswered"
+        And The "<ProblemType>" problem displays a "blank" answer
 
         Examples:
         | ProblemType       | Correctness   |
@@ -67,6 +74,8 @@ Feature: Answer problems
         | multiple choice   | incorrect     |
         | checkbox          | correct       |
         | checkbox          | incorrect     |
+        | radio             | correct       |
+        | radio             | incorrect     |
         | string            | correct       |
         | string            | incorrect     |
         | numerical         | correct       |

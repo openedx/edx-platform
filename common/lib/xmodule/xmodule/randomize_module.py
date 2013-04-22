@@ -10,7 +10,7 @@ log = logging.getLogger('mitx.' + __name__)
 
 
 class RandomizeFields(object):
-    choice = Integer(help="Which random child was chosen", scope=Scope.student_state)
+    choice = Integer(help="Which random child was chosen", scope=Scope.user_state)
 
 
 class RandomizeModule(RandomizeFields, XModule):

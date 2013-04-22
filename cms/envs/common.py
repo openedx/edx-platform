@@ -34,6 +34,9 @@ MITX_FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
     'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
+    'STAFF_EMAIL': '',			# email address for staff (eg to request course creation)
+    'STUDIO_NPS_SURVEY': True, 
+    'SEGMENT_IO': True,
 }
 ENABLE_JASMINE = False
 
@@ -113,6 +116,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'contentserver.middleware.StaticContentServer',
+    'request_cache.middleware.RequestCache',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -163,7 +167,7 @@ STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
 
 # This is how you would use the textbook images locally
-#    ("book", ENV_ROOT / "book_images")
+# ("book", ENV_ROOT / "book_images")
 ]
 
 # Locale/Internationalization

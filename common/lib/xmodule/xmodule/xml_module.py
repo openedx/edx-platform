@@ -102,6 +102,7 @@ class XmlDescriptor(XModuleDescriptor):
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
         'ispublic', 	# if True, then course is listed for all users; see
         'xqa_key',  	# for xqaa server access
+        'giturl',	# url of git server for origin of file
         # information about testcenter exams is a dict (of dicts), not a string,
         # so it cannot be easily exportable as a course element's attribute.
         'testcenter_info',
@@ -109,8 +110,7 @@ class XmlDescriptor(XModuleDescriptor):
         'name', 'slug')
 
     metadata_to_strip = ('data_dir',
-            # cdodge: @TODO: We need to figure out a way to export out 'tabs' and 'grading_policy' which is on the course
-            'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date',
+            'tabs', 'grading_policy', 'published_by', 'published_date',
             'discussion_blackouts', 'testcenter_info',
            # VS[compat] -- remove the below attrs once everything is in the CMS
            'course', 'org', 'url_name', 'filename',
@@ -134,7 +134,7 @@ class XmlDescriptor(XModuleDescriptor):
         'graded': bool_map,
         'hide_progress_tab': bool_map,
         'allow_anonymous': bool_map,
-        'allow_anonymous_to_peers': bool_map
+        'allow_anonymous_to_peers': bool_map,
     }
 
 
@@ -222,6 +222,7 @@ class XmlDescriptor(XModuleDescriptor):
         definition, children = cls.definition_from_xml(definition_xml, system)
         if definition_metadata:
             definition['definition_metadata'] = definition_metadata
+        definition['filename'] = [ filepath, filename ]     
 
         return definition, children
 
@@ -315,6 +316,7 @@ class XmlDescriptor(XModuleDescriptor):
         model_data['children'] = children
 
         model_data['xml_attributes'] = {}
+        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None]) # for git link
         for key, value in metadata.items():
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value

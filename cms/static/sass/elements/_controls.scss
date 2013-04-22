@@ -1,0 +1,143 @@
+// studio - elements - UI controls
+// ====================
+
+// gray primary button
+.btn-primary-gray {
+  @extend .btn-primary;
+  background: $gray-l1;
+  border-color: $gray-l2;
+  color: $white;
+
+  &:hover, &:active {
+    border-color: $gray-l1;
+    background: $gray;
+  }
+
+  &.current, &.active {
+    background: $gray-d1;
+    color: $gray-l1;
+
+    &:hover, &:active {
+      background: $gray-d1;
+    }
+  }
+}
+
+// blue primary button
+.btn-primary-blue {
+  @extend .btn-primary;
+  background: $blue;
+  border-color: $blue-s1;
+  color: $white;
+
+  &:hover, &:active {
+    background: $blue-s2;
+    border-color: $blue-s2;
+  }
+
+  &.current, &.active {
+    background: $blue-d1;
+    color: $blue-l4;
+    border-color: $blue-d2;
+
+    &:hover, &:active {
+      background: $blue-d1;
+    }
+  }
+}
+
+// green primary button
+.btn-primary-green {
+  @extend .btn-primary;
+  background: $green;
+  border-color: $green;
+  color: $white;
+
+  &:hover, &:active {
+    background: $green-s1;
+    border-color: $green-s1;
+  }
+
+  &.current, &.active {
+    background: $green-d1;
+    color: $green-l4;
+    border-color: $green-d2;
+
+    &:hover, &:active {
+      background: $green-d1;
+    }
+  }
+}
+
+// gray secondary button
+.btn-secondary-gray {
+  @extend .btn-secondary;
+  border-color: $gray-l3;
+  color: $gray-l1;
+
+  &:hover, &:active {
+    background: $gray-l3;
+    color: $gray-d2;
+  }
+
+  &.current, &.active {
+    background: $gray-d2;
+    color: $gray-l5;
+
+    &:hover, &:active {
+      background: $gray-d2;
+    }
+  }
+}
+
+// blue secondary button
+.btn-secondary-blue {
+  @extend .btn-secondary;
+  border-color: $blue-l3;
+  color: $blue;
+
+  &:hover, &:active {
+    background: $blue-l4;
+    color: $blue-s2;
+  }
+
+  &.current, &.active {
+    border-color: $blue-l3;
+    background: $blue-l3;
+    color: $blue-d1;
+
+    &:hover, &:active {
+
+    }
+  }
+}
+
+// green secondary button
+.btn-secondary-green {
+  @extend .btn-secondary;
+  border-color: $green-l4;
+  color: $green-l2;
+
+  &:hover, &:active {
+    background: $green-l4;
+    color: $green-s1;
+  }
+
+  &.current, &.active {
+    background: $green-s1;
+    color: $green-l4;
+
+    &:hover, &:active {
+      background: $green-s1;
+    }
+  }
+}
+
+// ====================
+
+// layout-based buttons
+
+// ====================
+
+// calls-to-action
+

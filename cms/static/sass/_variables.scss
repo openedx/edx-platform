@@ -22,6 +22,7 @@ $black-t0: rgba(0,0,0,0.125);
 $black-t1: rgba(0,0,0,0.25);
 $black-t2: rgba(0,0,0,0.50);
 $black-t3: rgba(0,0,0,0.75);
+
 $white: rgb(255,255,255);
 $white-t0: rgba(255,255,255,0.125);
 $white-t1: rgba(255,255,255,0.25);
@@ -56,6 +57,10 @@ $blue-s3: saturate($blue,45%);
 $blue-u1: desaturate($blue,15%);
 $blue-u2: desaturate($blue,30%);
 $blue-u3: desaturate($blue,45%);
+$blue-t0: rgba(85, 151, 221,0.125);
+$blue-t1: rgba(85, 151, 221,0.25);
+$blue-t2: rgba(85, 151, 221,0.50);
+$blue-t3: rgba(85, 151, 221,0.75);
 
 $pink: rgb(183, 37, 103);
 $pink-l1: tint($pink,20%);
@@ -108,7 +113,7 @@ $green-u1: desaturate($green,15%);
 $green-u2: desaturate($green,30%);
 $green-u3: desaturate($green,45%);
 
-$yellow: rgb(231, 214, 143);
+$yellow: rgb(237, 189, 60);
 $yellow-l1: tint($yellow,20%);
 $yellow-l2: tint($yellow,40%);
 $yellow-l3: tint($yellow,60%);
@@ -144,10 +149,15 @@ $orange-u3: desaturate($orange,45%);
 
 $shadow: rgba(0,0,0,0.2);
 $shadow-l1: rgba(0,0,0,0.1);
+$shadow-l2: rgba(0,0,0,0.05);
 $shadow-d1: rgba(0,0,0,0.4);
 
+
+// specific UI
+$notification-height: ($baseline*10);
+
 // colors - inherited 
-$baseFontColor: #3c3c3c;
+$baseFontColor: $gray-d2;
 $offBlack: #3c3c3c;
 $green: #108614;
 $lightGrey: #edf1f5;

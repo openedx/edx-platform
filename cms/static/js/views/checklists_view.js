@@ -77,11 +77,18 @@ CMS.Views.Checklists = Backbone.View.extend({
         var task_index = $checkbox.data('task');
         var model = this.collection.at(checklist_index);
         model.attributes.items[task_index].is_checked = $task.hasClass(completed);
+
         model.save({},
             {
                 success : function() {
                     var updatedTemplate = self.renderTemplate(model, checklist_index);
                     self.$el.find('#course-checklist'+checklist_index).first().replaceWith(updatedTemplate);
+
+                    analytics.track('Toggled a Checklist Task', {
+                        'course': course_location_analytics,
+                        'task': model.attributes.items[task_index].short_description,
+                        'state': model.attributes.items[task_index].is_checked
+                    });
                 },
                 error : CMS.ServerError
             });

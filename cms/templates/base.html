@@ -23,13 +23,13 @@
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-symbolicons-block.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
 
+    <%include file="widgets/segment-io.html" />
+
     <%block name="header_extras"></%block>
   </head>
 
   <body class="<%block name='bodyclass'></%block> hide-wip">
-    <%include file="widgets/header.html" />
     <%include file="courseware_vendor_js.html"/>
-
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
@@ -49,15 +49,32 @@
     <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/htmlmixed.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
     <script type="text/javascript">
-      document.write('\x3Cscript type="text/javascript" src="' +
-          document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
+    document.write('\x3Cscript type="text/javascript" src="' +
+      document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
     </script>
 
-    <%block name="content"></%block>
-    <%include file="widgets/footer.html" />
+    <!-- view -->
+    <div class="wrapper wrapper-view">
+      <%include file="widgets/header.html" />
 
+      <%block name="view_alerts"></%block>
+      <%block name="view_banners"></%block>
+
+      <%block name="content"></%block>
+
+      % if user.is_authenticated():
+      <%include file="widgets/sock.html" />
+      % endif
+
+      <%include file="widgets/footer.html" />
+      <%include file="widgets/tender.html" />
+
+      <%block name="view_notifications"></%block>
+    </div>
+
+    <%block name="view_prompts"></%block>
     <%block name="jsextra"></%block>
   </body>
+
+  <%include file="widgets/qualaroo.html" />
 </html>
-
-

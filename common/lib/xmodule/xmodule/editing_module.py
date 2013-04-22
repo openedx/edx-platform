@@ -41,6 +41,18 @@ class XMLEditingDescriptor(EditingDescriptor):
     js_module_name = "XMLEditingDescriptor"
 
 
+class MetadataOnlyEditingDescriptor(EditingDescriptor):
+    """
+    Module which only provides an editing interface for the metadata, it does
+    not expose a UI for editing the module data
+    """
+
+    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/metadata-only.coffee')]}
+    js_module_name = "MetadataOnlyEditingDescriptor"
+
+    mako_template = "widgets/metadata-only-edit.html"
+
+
 class JSONEditingDescriptor(EditingDescriptor):
     """
     Module that provides a raw editing view of its data as XML. It does not perform

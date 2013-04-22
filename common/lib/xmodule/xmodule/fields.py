@@ -14,7 +14,6 @@ class Date(ModelType):
     '''
     Date fields know how to parse and produce json (iso) compatible formats.
     '''
-    # NB: these are copies of util.converters.*
     def from_json(self, field):
         """
         Parse an optional metadata key containing a time: if present, complain
@@ -23,6 +22,8 @@ class Date(ModelType):
         """
         if field is None:
             return field
+        elif field is "":
+            return None
         elif isinstance(field, basestring):
             d = dateutil.parser.parse(field)
             return d.utctimetuple()
@@ -50,6 +51,8 @@ class Date(ModelType):
 
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+
+
 class Timedelta(ModelType):
     def from_json(self, time_str):
         """

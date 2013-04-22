@@ -1,15 +1,20 @@
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from lettuce import world, step
-from common import *
+from nose.tools import assert_true, assert_equal
 from terrain.steps import reload_the_page
+from selenium.common.exceptions import StaleElementReferenceException
+
 
 ############### ACTIONS ####################
 @step('I select Checklists from the Tools menu$')
 def i_select_checklists(step):
     expand_icon_css = 'li.nav-course-tools i.icon-expand'
     if world.browser.is_element_present_by_css(expand_icon_css):
-        css_click(expand_icon_css)
+        world.css_click(expand_icon_css)
     link_css = 'li.nav-course-tools-checklists a'
-    css_click(link_css)
+    world.css_click(link_css)
 
 
 @step('I have opened Checklists$')
@@ -20,7 +25,7 @@ def i_have_opened_checklists(step):
 
 @step('I see the four default edX checklists$')
 def i_see_default_checklists(step):
-    checklists = css_find('.checklist-title')
+    checklists = world.css_find('.checklist-title')
     assert_equal(4, len(checklists))
     assert_true(checklists[0].text.endswith('Getting Started With Studio'))
     assert_true(checklists[1].text.endswith('Draft a Rough Course Outline'))
@@ -58,7 +63,7 @@ def i_select_a_link_to_the_course_outline(step):
 
 @step('I am brought to the course outline page$')
 def i_am_brought_to_course_outline(step):
-    assert_equal('Course Outline', css_find('.outline .title-1')[0].text)
+    assert_equal('Course Outline', world.css_find('.outline .title-1')[0].text)
     assert_equal(1, len(world.browser.windows))
 
 
@@ -84,36 +89,35 @@ def i_am_brought_to_help_page_in_new_window(step):
     assert_equal('http://help.edge.edx.org/', world.browser.url)
 
 
-
-
 ############### HELPER METHODS ####################
 def verifyChecklist2Status(completed, total, percentage):
     def verify_count(driver):
         try:
-            statusCount = css_find('#course-checklist1 .status-count').first
+            statusCount = world.css_find('#course-checklist1 .status-count').first
             return statusCount.text == str(completed)
         except StaleElementReferenceException:
             return False
 
-    wait_for(verify_count)
-    assert_equal(str(total), css_find('#course-checklist1 .status-amount').first.text)
+    world.wait_for(verify_count)
+    assert_equal(str(total), world.css_find('#course-checklist1 .status-amount').first.text)
     # Would like to check the CSS width, but not sure how to do that.
-    assert_equal(str(percentage), css_find('#course-checklist1 .viz-checklist-status-value .int').first.text)
+    assert_equal(str(percentage), world.css_find('#course-checklist1 .viz-checklist-status-value .int').first.text)
 
 
 def toggleTask(checklist, task):
-    css_click('#course-checklist' + str(checklist) +'-task' + str(task))
+    world.css_click('#course-checklist' + str(checklist) + '-task' + str(task))
 
 
+# TODO: figure out a way to do this in phantom and firefox
+# For now we will mark the scenerios that use this method as skipped
 def clickActionLink(checklist, task, actionText):
     # toggle checklist item to make sure that the link button is showing
     toggleTask(checklist, task)
-    action_link = css_find('#course-checklist' + str(checklist) + ' a')[task]
+    action_link = world.css_find('#course-checklist' + str(checklist) + ' a')[task]
 
     # text will be empty initially, wait for it to populate
     def verify_action_link_text(driver):
         return action_link.text == actionText
 
-    wait_for(verify_action_link_text)
+    world.wait_for(verify_action_link_text)
     action_link.click()
-

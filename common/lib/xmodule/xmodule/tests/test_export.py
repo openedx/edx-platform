@@ -24,6 +24,11 @@ def strip_filenames(descriptor):
     """
     print "strip filename from {desc}".format(desc=descriptor.location.url())
     descriptor._model_data.pop('filename', None)
+    
+    if hasattr(descriptor, 'xml_attributes'):
+        if 'filename' in descriptor.xml_attributes:
+            del descriptor.xml_attributes['filename']
+
     for d in descriptor.get_children():
         strip_filenames(d)
 

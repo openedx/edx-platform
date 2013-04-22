@@ -2,15 +2,15 @@
 // ====================
 
 .wrapper-header {
-  margin: 0 0 ($baseline*1.5) 0;
+  margin: 0;
   padding: $baseline;
   border-bottom: 1px solid $gray;
-  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
+  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.2));
   background: $white;
   height: 76px;
   position: relative;
   width: 100%;
-  z-index: 10;
+  z-index: 1000;
 
   a {
     color: $baseFontColor;
@@ -132,7 +132,7 @@
 
 // specific elements - course nav
 .nav-course {
-  width: 335px;
+  width: 285px;
   margin-top: -($baseline/4);
   @include font-size(14);
 

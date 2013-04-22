@@ -1,3 +1,6 @@
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from lettuce import world, step
 from common import *
 
@@ -6,12 +9,12 @@ from common import *
 
 @step('There are no courses$')
 def no_courses(step):
-    clear_courses()
+    world.clear_courses()
 
 
 @step('I click the New Course button$')
 def i_click_new_course(step):
-    css_click('.new-course-button')
+    world.css_click('.new-course-button')
 
 
 @step('I fill in the new course information$')
@@ -27,7 +30,7 @@ def i_create_a_course(step):
 @step('I click the course link in My Courses$')
 def i_click_the_course_link_in_my_courses(step):
     course_css = 'span.class-name'
-    css_click(course_css)
+    world.css_click(course_css)
 
 ############ ASSERTIONS ###################
 
@@ -35,28 +38,28 @@ def i_click_the_course_link_in_my_courses(step):
 @step('the Courseware page has loaded in Studio$')
 def courseware_page_has_loaded_in_studio(step):
     course_title_css = 'span.course-title'
-    assert world.browser.is_element_present_by_css(course_title_css)
+    assert world.is_css_present(course_title_css)
 
 
 @step('I see the course listed in My Courses$')
 def i_see_the_course_in_my_courses(step):
     course_css = 'span.class-name'
-    assert_css_with_text(course_css, 'Robot Super Course')
+    assert world.css_has_text(course_css, 'Robot Super Course')
 
 
 @step('the course is loaded$')
 def course_is_loaded(step):
     class_css = 'a.class-name'
-    assert_css_with_text(class_css, 'Robot Super Course')
+    assert world.css_has_text(course_css, 'Robot Super Cousre')
 
 
 @step('I am on the "([^"]*)" tab$')
 def i_am_on_tab(step, tab_name):
     header_css = 'div.inner-wrapper h1'
-    assert_css_with_text(header_css, tab_name)
+    assert world.css_has_text(header_css, tab_name)
 
 
 @step('I see a link for adding a new section$')
 def i_see_new_section_link(step):
     link_css = 'a.new-courseware-section-button'
-    assert_css_with_text(link_css, '+ New Section')
+    assert world.css_has_text(link_css, '+ New Section')

@@ -4,6 +4,7 @@
 // bourbon libs and resets
 @import 'bourbon/bourbon';
 @import 'bourbon/addons/button';
+@import "variables";
 @import 'vendor/normalize';
 @import 'reset';
 
@@ -21,13 +22,18 @@
 @import 'base';
 
 // elements
+@import 'elements/typography';
+@import 'elements/icons';
+@import 'elements/controls';
+@import 'elements/navigation';
 @import 'elements/header';
 @import 'elements/footer';
-@import 'elements/navigation';
+@import 'elements/sock';
 @import 'elements/forms';
 @import 'elements/modal';
 @import 'elements/alerts';
-@import 'elements/jquery-ui-calendar';
+@import 'elements/vendor';
+@import 'elements/tender-widget';
 
 // specific views
 @import 'views/account';

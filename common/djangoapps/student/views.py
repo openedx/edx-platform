@@ -325,7 +325,12 @@ def change_enrollment(request):
                               "course:{0}".format(course_num),
                               "run:{0}".format(run)])
 
-        enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        try:
+            enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+        except IntegrityError:
+            # If we've already created this enrollment in a separate transaction,
+            # then just continue
+            pass
         return {'success': True}
 
     elif action == "unenroll":
@@ -369,14 +374,14 @@ def login_user(request, error=""):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
-        log.warning("Login failed - Unknown user email: {0}".format(email))
+        log.warning(u"Login failed - Unknown user email: {0}".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': 'Email or password is incorrect.'}))  # TODO: User error message
 
     username = user.username
     user = authenticate(username=username, password=password)
     if user is None:
-        log.warning("Login failed - password for {0} is invalid".format(email))
+        log.warning(u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': 'Email or password is incorrect.'}))
 
@@ -392,7 +397,7 @@ def login_user(request, error=""):
             log.critical("Login failed - Could not create session. Is memcached running?")
             log.exception(e)
 
-        log.info("Login success - {0} ({1})".format(username, email))
+        log.info(u"Login success - {0} ({1})".format(username, email))
 
         try_change_enrollment(request)
 
@@ -400,7 +405,7 @@ def login_user(request, error=""):
 
         return HttpResponse(json.dumps({'success': True}))
 
-    log.warning("Login failed - Account not active for user {0}, resending activation".format(username))
+    log.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
     not_activated_msg = "This account has not been activated. We have " + \
@@ -1074,7 +1079,7 @@ def test_center_login(request):
     # which contains the error code describing the exceptional condition.
     def makeErrorURL(error_url, error_code):
         log.error("generating error URL with error code {}".format(error_code))
-        return "{}?code={}".format(error_url, error_code);
+        return "{}?code={}".format(error_url, error_code)
 
     # get provided error URL, which will be used as a known prefix for returning error messages to the
     # Pearson shell.
@@ -1083,7 +1088,7 @@ def test_center_login(request):
     # TODO: check that the parameters have not been tampered with, by comparing the code provided by Pearson
     # with the code we calculate for the same parameters.
     if 'code' not in request.POST:
-        return HttpResponseRedirect(makeErrorURL(error_url, "missingSecurityCode"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingSecurityCode"))
     code = request.POST.get("code")
 
     # calculate SHA for query string
@@ -1091,7 +1096,7 @@ def test_center_login(request):
 
 
     if 'clientCandidateID' not in request.POST:
-        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientCandidateID"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientCandidateID"))
     client_candidate_id = request.POST.get("clientCandidateID")
 
     # TODO: check remaining parameters, and maybe at least log if they're not matching
@@ -1104,7 +1109,7 @@ def test_center_login(request):
         testcenteruser = TestCenterUser.objects.get(client_candidate_id=client_candidate_id)
     except TestCenterUser.DoesNotExist:
         log.error("not able to find demographics for cand ID {}".format(client_candidate_id))
-        return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"))
 
     # find testcenter_registration that matches the provided exam code:
     # Note that we could rely in future on either the registrationId or the exam code,
@@ -1115,7 +1120,7 @@ def test_center_login(request):
         # so instead of "missingExamSeriesCode", we use a valid one that is
         # inaccurate but at least distinct.  (Sigh.)
         log.error("missing exam series code for cand ID {}".format(client_candidate_id))
-        return HttpResponseRedirect(makeErrorURL(error_url, "missingPartnerID"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingPartnerID"))
     exam_series_code = request.POST.get('vueExamSeriesCode')
     # special case for supporting test user:
     if client_candidate_id == "edX003671291147" and exam_series_code != '6002x001':
@@ -1125,7 +1130,7 @@ def test_center_login(request):
     registrations = TestCenterRegistration.objects.filter(testcenter_user=testcenteruser, exam_series_code=exam_series_code)
     if not registrations:
         log.error("not able to find exam registration for exam {} and cand ID {}".format(exam_series_code, client_candidate_id))
-        return HttpResponseRedirect(makeErrorURL(error_url, "noTestsAssigned"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "noTestsAssigned"))
 
     # TODO: figure out what to do if there are more than one registrations....
     # for now, just take the first...
@@ -1135,11 +1140,11 @@ def test_center_login(request):
     course = course_from_id(course_id)  # assume it will be found....
     if not course:
         log.error("not able to find course from ID {} for cand ID {}".format(course_id, client_candidate_id))
-        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"))
     exam = course.get_test_center_exam(exam_series_code)
     if not exam:
         log.error("not able to find exam {} for course ID {} and cand ID {}".format(exam_series_code, course_id, client_candidate_id))
-        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"))
     location = exam.exam_url
     log.info("proceeding with test of cand {} on exam {} for course {}: URL = {}".format(client_candidate_id, exam_series_code, course_id, location))
 
@@ -1147,7 +1152,7 @@ def test_center_login(request):
     timelimit_descriptor = modulestore().get_instance(course_id, Location(location))
     if not timelimit_descriptor:
         log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
-        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
 
     timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
                                                                              timelimit_descriptor, depth=None)
@@ -1155,11 +1160,11 @@ def test_center_login(request):
                                                  timelimit_module_cache, course_id, position=None)
     if not timelimit_module.category == 'timelimit':
         log.error("cand {} on exam {} for course {}: non-timelimit module at location {}".format(client_candidate_id, exam_series_code, course_id, location))
-        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
 
     if timelimit_module and timelimit_module.has_ended:
         log.warning("cand {} on exam {} for course {}: test already over at {}".format(client_candidate_id, exam_series_code, course_id, timelimit_module.ending_at))
-        return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"))
 
     # check if we need to provide an accommodation:
     time_accommodation_mapping = {'ET12ET' : 'ADDHALFTIME',

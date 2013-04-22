@@ -1,11 +1,10 @@
 import logging
 
 from lxml import etree
-from pkg_resources import resource_string, resource_listdir
+from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.contentstore.content import StaticContent
 from xblock.core import Scope, String
 
 log = logging.getLogger(__name__)
@@ -20,12 +19,10 @@ class AnnotatableModule(AnnotatableFields, XModule):
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/html/display.coffee'),
                      resource_string(__name__, 'js/src/annotatable/display.coffee')],
-          'js': []
-         }
+          'js': []}
     js_module_name = "Annotatable"
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'annotatable'
-
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -49,11 +46,11 @@ class AnnotatableModule(AnnotatableFields, XModule):
 
         if color is not None:
             if color in self.highlight_colors:
-                cls.append('highlight-'+color)
+                cls.append('highlight-' + color)
             attr['_delete'] = highlight_key
         attr['value'] = ' '.join(cls)
 
-        return { 'class' : attr }
+        return {'class': attr}
 
     def _get_annotation_data_attr(self, index, el):
         """ Returns a dict in which the keys are the HTML data attributes
@@ -73,7 +70,7 @@ class AnnotatableModule(AnnotatableFields, XModule):
             if xml_key in el.attrib:
                 value = el.get(xml_key, '')
                 html_key = attrs_map[xml_key]
-                data_attrs[html_key] = { 'value': value, '_delete': xml_key }
+                data_attrs[html_key] = {'value': value, '_delete': xml_key}
 
         return data_attrs
 
@@ -90,7 +87,6 @@ class AnnotatableModule(AnnotatableFields, XModule):
             if '_delete' in attr[key] and attr[key]['_delete'] is not None:
                 delete_key = attr[key]['_delete']
                 del el.attrib[delete_key]
-
 
     def _render_content(self):
         """ Renders annotatable content with annotation spans and returns HTML. """
@@ -132,4 +128,3 @@ class AnnotatableDescriptor(AnnotatableFields, RawDescriptor):
     stores_state = True
     template_dir_name = "annotatable"
     mako_template = "widgets/raw-edit.html"
-
