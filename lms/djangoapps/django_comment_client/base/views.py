@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_with_access, get_course_by_id
 from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 
 from django_comment_client.utils import JsonResponse, JsonError, extract, get_courseware_context
@@ -299,9 +299,9 @@ def flag_abuse_for_thread(request, course_id, thread_id):
 @permitted
 def un_flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
-
+    course = get_course_by_id(course_id)
     thread = cc.Thread.find(thread_id)
-    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id)
+    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
     thread.unFlagAbuse(user, thread, removeAll)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
@@ -321,7 +321,8 @@ def flag_abuse_for_comment(request, course_id, comment_id):
 @permitted
 def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
-    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id)
+    course = get_course_by_id(course_id)
+    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, removeAll)
     return JsonResponse(utils.safe_content(comment.to_dict()))
