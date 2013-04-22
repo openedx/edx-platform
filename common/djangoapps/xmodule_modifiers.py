@@ -105,8 +105,12 @@ def add_histogram(get_html, module, user):
             return get_html()
 
         module_id = module.id
-        histogram = grade_histogram(module_id)
-        render_histogram = len(histogram) > 0
+        if module.descriptor.has_score:
+            histogram = grade_histogram(module_id)
+            render_histogram = len(histogram) > 0
+        else:
+            histogram = None
+            render_histogram = False
 
         if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
             [filepath, filename] = getattr(module.descriptor, 'xml_attributes', {}).get('filename', ['', None])
