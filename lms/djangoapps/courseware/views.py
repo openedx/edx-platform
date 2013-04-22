@@ -449,9 +449,10 @@ def course_info(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
+    masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
 
     return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
-            'course': course, 'staff_access': staff_access})
+            'course': course, 'staff_access': staff_access, 'masquerade': masq})
 
 
 @ensure_csrf_cookie
