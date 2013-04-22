@@ -78,6 +78,16 @@ if Backbone?
         if @getContent(id)
           @getContent(id).updateInfo(info)
       $.extend @contentInfos, infos
+
+    pinThread: ->
+      pinned = @get("pinned")
+      @set("pinned",pinned)
+      @trigger "change", @
+
+    unPinThread: ->
+      pinned = @get("pinned")
+      @set("pinned",pinned)
+      @trigger "change", @
     
     flagAbuse: ->
       temp_array = @get("abuse_flaggers")
@@ -128,16 +138,6 @@ if Backbone?
       @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
       @trigger "change", @
 
-    pinThread: ->
-      pinned = @get("pinned")
-      @set("pinned",pinned)
-      @trigger "change", @
-
-    unPinThread: ->
-      pinned = @get("pinned")
-      @set("pinned",pinned)
-      @trigger "change", @
-      
     display_body: ->
       if @has("highlighted_body")
         String(@get("highlighted_body")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
