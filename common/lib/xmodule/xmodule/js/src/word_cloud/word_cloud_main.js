@@ -16,43 +16,6 @@
 (function (requirejs, require, define) {
 define('WordCloudMain', ['logme'], function (logme) {
 
-    // To add compatible Object.keys support in older environments that do not natively support it.
-    //
-    // https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/keys#Compatibility
-    if (!Object.keys) {
-        Object.keys = (function () {
-            var hasOwnProperty = Object.prototype.hasOwnProperty,
-                hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
-                dontEnums = [
-                    'toString',
-                    'toLocaleString',
-                    'valueOf',
-                    'hasOwnProperty',
-                    'isPrototypeOf',
-                    'propertyIsEnumerable',
-                    'constructor'
-                ],
-                dontEnumsLength = dontEnums.length;
-
-            return function (obj) {
-                if (typeof obj !== 'object' && typeof obj !== 'function' || obj === null) throw new TypeError('Object.keys called on non-object');
-
-                var result = [];
-
-                for (var prop in obj) {
-                    if (hasOwnProperty.call(obj, prop)) result.push(prop);
-                }
-
-                if (hasDontEnumBug) {
-                    for (var i=0; i < dontEnumsLength; i++) {
-                        if (hasOwnProperty.call(obj, dontEnums[i])) result.push(dontEnums[i]);
-                    }
-                }
-                return result;
-            }
-        }());
-    };
-
     /**
      * @function WordCloudMain
      *
@@ -244,8 +207,11 @@ define('WordCloudMain', ['logme'], function (logme) {
             // Color words in different colors.
             fill = d3.scale.category20(),
 
+            // Will be populated by words the user enetered.
+            studentWordsKeys = [],
+
             // Comma separated string of user enetered words.
-            studentWordsStr = (Object.keys(response.student_words)).join(', '),
+            studentWordsStr,
 
             // By default we do not scale.
             scale = 1;
@@ -259,6 +225,11 @@ define('WordCloudMain', ['logme'], function (logme) {
                 this.height / Math.abs(bounds[0].y - this.height / 2)
             );
         }
+
+        $.each(response.student_words, function (word, stat) {
+            studentWordsKeys.push(word);
+        });
+        studentWordsStr = '' + studentWordsKeys.join(', ');
 
         this.wordCloudEl.find('.result_cloud_section').addClass('active');
 
