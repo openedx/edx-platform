@@ -185,6 +185,7 @@ class @StaffGrading
 
 
     $(window).keydown @keydown_handler
+    $(window).keyup @keyup_handler
     @question_header = $('.question-header')
     @question_header.click @collapse_question
     @collapse_question()
@@ -206,6 +207,7 @@ class @StaffGrading
     @num_pending = 0
     @score_lst = []
     @grade = null
+    @is_ctrl = false
 
     @problems = null
 
@@ -231,9 +233,17 @@ class @StaffGrading
       @state = state_graded
       @submit_button.show()
 
-  keydown_handler: (e) =>
-    if e.which == 13 && !@list_view && Rubric.check_complete()
+  keydown_handler: (event) =>
+    #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
+    if event.which == 17 && @is_ctrl==false
+      @is_ctrl=true
+    else if @is_ctrl==true && event.which == 13 && !@list_view && Rubric.check_complete()
       @submit_and_get_next()
+
+  keyup_handler: (event) =>
+    #Handle keyup event when ctrl key is released
+    if event.which == 17 && @is_ctrl==true
+      @is_ctrl=false
 
   set_button_text: (text) =>
     @action_button.attr('value', text)

@@ -36,3 +36,4 @@ DATABASES = {
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
 LETTUCE_SERVER_PORT = 8001
+LETTUCE_BROWSER = 'chrome'

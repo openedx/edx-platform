@@ -59,7 +59,7 @@ class Command(BaseCommand):
         discussion_items = _get_discussion_items(course)
 
         # now query all discussion items via get_items() and compare with the tree-traversal
-        queried_discussion_items = store.get_items(['i4x', course.location.org, course.location.course, 
+        queried_discussion_items = store.get_items(['i4x', course.location.org, course.location.course,
                                                     'discussion', None, None])
 
         for item in queried_discussion_items:

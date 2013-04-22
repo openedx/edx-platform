@@ -15,7 +15,7 @@
     // NOTE:
     // Genex uses 8 global functions, all prefixed with genex:
     // 6 are exported from GWT:
-    // genexSetInitialDNASequence
+    // genexSetDefaultDNASequence
     // genexSetDNASequence
     // genexGetDNASequence
     // genexSetClickEvent
@@ -36,32 +36,35 @@
     genexIsReady = function() {
         var input_field = genexGetInputField();
         var genex_saved_state = input_field.val();
-        var genex_initial_dna_sequence;
+        var genex_default_dna_sequence;
         var genex_dna_sequence;
         
-        //Get the sequence from xml file
-        genex_initial_dna_sequence = $('#genex_dna_sequence').val();
-        //Call this function to set the value used by reset button
-        genexSetInitialDNASequence(genex_initial_dna_sequence);
+        //Get the DNA sequence from xml file
+        genex_default_dna_sequence = $('#genex_dna_sequence').val();
+        //Set the default DNA
+        genexSetDefaultDNASequence(genex_default_dna_sequence);
         
+        //Now load problem
+        var genex_problem_number = $('#genex_problem_number').val();
+        genexSetProblemNumber(genex_problem_number);
+        
+        //Set the DNA sequence that is displayed
         if (genex_saved_state === '') {
             //Load DNA sequence from xml file 
-            genex_dna_sequence = genex_initial_dna_sequence;
+            genex_dna_sequence = genex_default_dna_sequence;
         }
         else {
             //Load DNA sequence from saved value
             genex_saved_state = JSON.parse(genex_saved_state);
             genex_dna_sequence = genex_saved_state.genex_dna_sequence;
         }
-        
         genexSetDNASequence(genex_dna_sequence);
+        
         //Now load mouse and keyboard handlers
         genexSetClickEvent();
         genexSetKeyEvent();
-        //Now load problem
-        var genex_problem_number = $('#genex_problem_number').val();
-        genexSetProblemNumber(genex_problem_number);    
     };
+    
     genexStoreAnswer = function(answer) {
         var input_field = genexGetInputField();
         var value = {'genex_dna_sequence': genexGetDNASequence(), 'genex_answer': answer};

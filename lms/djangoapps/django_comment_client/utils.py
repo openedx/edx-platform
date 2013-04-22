@@ -147,20 +147,7 @@ def sort_map_entries(category_map):
 
 
 def initialize_discussion_info(course):
-
     global _DISCUSSIONINFO
-
-    # only cache in-memory discussion information for 10 minutes
-    # this is because we need a short-term hack fix for
-    # mongo-backed courseware whereby new discussion modules can be added
-    # without LMS service restart
-
-    if _DISCUSSIONINFO[course.id]:
-        timestamp = _DISCUSSIONINFO[course.id].get('timestamp', datetime.now())
-        age = datetime.now() - timestamp
-        # expire every 5 minutes
-        if age.seconds < 300:
-            return
 
     course_id = course.id
 
@@ -168,7 +155,8 @@ def initialize_discussion_info(course):
     unexpanded_category_map = defaultdict(list)
 
     # get all discussion models within this course_id
-    all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course, 'discussion', None], course_id=course_id)
+    all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course,
+        'discussion', None], course_id=course_id)
 
     for module in all_modules:
         skip_module = False

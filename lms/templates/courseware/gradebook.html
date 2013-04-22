@@ -13,9 +13,12 @@
   <%static:css group='course'/>
 
   <style type="text/css">
-  .grade_A {color:green;}
-  .grade_B {color:Chocolate;}
-  .grade_C {color:DarkSlateGray;}
+  % for (grade, _), color in zip(ordered_grades, ['green', 'Chocolate']):
+  .grade_${grade} {color:${color};}
+  % endfor
+  % for (grade, _) in ordered_grades[2:]:
+  .grade_${grade} {color:DarkSlateGray;}
+  % endfor
   .grade_F {color:DimGray;}
   .grade_None {color:LightGray;}
   </style>
@@ -78,8 +81,8 @@
             letter_grade = 'None'
             if fraction > 0:
               letter_grade = 'F'
-              for grade in ['A', 'B', 'C']:
-                if fraction >= course.grade_cutoffs[grade]:
+              for (grade, cutoff) in ordered_grades:
+                if fraction >= cutoff:
                   letter_grade = grade
                   break
 
@@ -90,11 +93,11 @@
 
         <tbody>
           %for student in students:
-          <tr>          
+          <tr>
             %for section in student['grade_summary']['section_breakdown']:
               ${percent_data( section['percent'] )}
             %endfor
-            <td>${percent_data( student['grade_summary']['percent'])}</td>
+            ${percent_data( student['grade_summary']['percent'])}
           </tr>
           %endfor
         </tbody>

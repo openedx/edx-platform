@@ -150,13 +150,7 @@ if Backbone?
       else
         @get("title")
 
-    comment_count: ->
-      count = 0
-      @get('comments').each (comment) ->
-        count += comment.getCommentsCount() + 1
-      count
-
-  class @Comments extends Backbtle: ->
+  class @Comments extends Backbone: ->
       if @has("highlighted_title")
         String(@get("highlighted_title")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
       else
@@ -171,7 +165,6 @@ if Backbone?
 
     created_at_time: ->
       new Date(@get("created_at")).getTime()
-      
 
   class @Comment extends @Content
     urlMappers:
@@ -184,8 +177,6 @@ if Backbone?
       'delete': -> DiscussionUtil.urlFor('delete_comment', @id)
       'flagAbuse'   : -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
       'unFlagAbuse' : -> DiscussionUtil.urlFor("unFlagAbuse_#{@get('type')}", @id)
-
-
 
     getCommentsCount: ->
       count = 0

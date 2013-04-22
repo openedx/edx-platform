@@ -46,7 +46,7 @@ if Backbone?
         @$("[data-role=discussion-vote]").removeClass("is-cast")
         
     renderFlagged: =>
-      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isStaff(@model.get("user_id")) and @model.get("abuse_flaggers").length > 0)
+      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
@@ -82,7 +82,7 @@ if Backbone?
       if window.user.voted(@model)
         @unvote()
       else
-        @vote()   
+        @vote()
 
     toggleFollowing: (event) ->
       $elem = $(event.target)
@@ -96,7 +96,7 @@ if Backbone?
       DiscussionUtil.safeAjax
         $elem: $elem
         url: url
-        type: "POST" 
+        type: "POST"
 
     vote: ->
       window.user.vote(@model)

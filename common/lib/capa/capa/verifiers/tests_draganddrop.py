@@ -50,9 +50,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         correct_answer = [
             {
                 'draggables': ['p'],
-                'targets': [
-                    'p_l', 'p_r'
-                ],
+                'targets': ['p_l', 'p_r'],
                 'rule': 'anyof'
             },
             {
@@ -91,18 +89,18 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
                 'rule': 'unordered_equal'
             },
             {
-              'draggables': ['up_and_down'],
-              'targets': [
+                'draggables': ['up_and_down'],
+                'targets': [
                 's_l[s][1]', 's_r[s][1]'
-              ],
-              'rule': 'unordered_equal'
+                ],
+                'rule': 'unordered_equal'
             },
             {
-              'draggables': ['up'],
-              'targets': [
+                'draggables': ['up'],
+                'targets': [
                 'p_l[p][1]', 'p_l[p][3]', 'p_r[p][1]', 'p_r[p][3]'
-              ],
-              'rule': 'unordered_equal'
+                ],
+                'rule': 'unordered_equal'
             }
         ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
@@ -133,18 +131,18 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
                 'rule': 'unordered_equal'
             },
             {
-              'draggables': ['up_and_down'],
-              'targets': [
+                'draggables': ['up_and_down'],
+                'targets': [
                 's_l[s][1]', 's_r[s][1]'
-              ],
-              'rule': 'unordered_equal'
+                ],
+                'rule': 'unordered_equal'
             },
             {
-              'draggables': ['up'],
-              'targets': [
+                'draggables': ['up'],
+                'targets': [
                 'p_l[p][1]', 'p_l[p][3]', 'p_r[p][1]', 'p_r[p][3]'
-              ],
-              'rule': 'unordered_equal'
+                ],
+                'rule': 'unordered_equal'
             }
         ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
@@ -188,22 +186,21 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
                 'rule': 'unordered_equal'
             },
             {
-              'draggables': ['up_and_down'],
-              'targets': [
-                'left_side_tagret[molecule][s_target][s][1]',
-                'right_side_tagret[molecule][s_target][s][1]'
-              ],
-              'rule': 'unordered_equal'
+                'draggables': ['up_and_down'],
+                'targets': [
+                    'left_side_tagret[molecule][s_target][s][1]',
+                    'right_side_tagret[molecule][s_target][s][1]'
+                ],
+                'rule': 'unordered_equal'
             },
             {
-              'draggables': ['up'],
-              'targets': [
-                'left_side_tagret[molecule][p_target][p][1]',
-                'left_side_tagret[molecule][p_target][p][3]',
-                'right_side_tagret[molecule][p_target][p][1]',
-                'right_side_tagret[molecule][p_target][p][3]'
-              ],
-              'rule': 'unordered_equal'
+                'draggables': ['up'],
+                'targets': [
+                    'left_side_tagret[molecule][p_target][p][1]',
+                    'left_side_tagret[molecule][p_target][p][3]',
+                    'right_side_tagret[molecule][p_target][p][1]',
+                    'right_side_tagret[molecule][p_target][p][3]'],
+                'rule': 'unordered_equal'
             }
         ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
@@ -242,32 +239,32 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         # up, up_and_down
         correct_answer = [
             {
-              'draggables': ['triple_draggable'],
-              'targets': ['p_l', 'p_r'],
-              'rule': 'unordered_equal'
+                'draggables': ['triple_draggable'],
+                'targets': ['p_l', 'p_r'],
+                'rule': 'unordered_equal'
             },
             {
-              'draggables': ['double_draggable'],
-              'targets': ['p_pi', 'p_pi*'],
-              'rule': 'unordered_equal'
+                'draggables': ['double_draggable'],
+                'targets': ['p_pi', 'p_pi*'],
+                'rule': 'unordered_equal'
             },
             {
-              'draggables': ['single_draggable'],
-              'targets': ['s_l', 's_r', 's_sigma', 's_sigma*', 'p_sigma', 'p_sigma*'],
-              'rule': 'unordered_equal'
+                'draggables': ['single_draggable'],
+                'targets': ['s_l', 's_r', 's_sigma', 's_sigma*', 'p_sigma', 'p_sigma*'],
+                'rule': 'unordered_equal'
             },
             {
-              'draggables': ['up'],
-              'targets': ['p_l[triple_draggable][1]', 'p_l[triple_draggable][2]',
-              'p_r[triple_draggable][2]', 'p_r[triple_draggable][3]'],
-              'rule': 'unordered_equal'
+                'draggables': ['up'],
+                'targets': ['p_l[triple_draggable][1]', 'p_l[triple_draggable][2]',
+                'p_r[triple_draggable][2]', 'p_r[triple_draggable][3]'],
+                'rule': 'unordered_equal'
             },
             {
-              'draggables': ['up_and_down'],
-              'targets': ['s_l[single_draggable][1]', 's_r[single_draggable][1]',
-              's_sigma[single_draggable][1]', 's_sigma*[single_draggable][1]',
-              'p_pi[double_draggable][1]', 'p_pi[double_draggable][2]'],
-              'rule': 'unordered_equal'
+                'draggables': ['up_and_down'],
+                'targets': ['s_l[single_draggable][1]', 's_r[single_draggable][1]',
+                's_sigma[single_draggable][1]', 's_sigma*[single_draggable][1]',
+                'p_pi[double_draggable][1]', 'p_pi[double_draggable][2]'],
+                'rule': 'unordered_equal'
             },
 
         ]
@@ -290,7 +287,6 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         correct_answer = []
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
-
     def test_targets_false(self):
         user_input = '[{"1": "t1"}, \
         {"name_with_icon": "t2"}]'
@@ -300,46 +296,44 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
     def test_multiple_images_per_target_true(self):
         user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}, \
         {"2": "t1"}]'
-        correct_answer = {'1': 't1', 'name_with_icon': 't2',
-        '2': 't1'}
+        correct_answer = {'1': 't1', 'name_with_icon': 't2', '2': 't1'}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_multiple_images_per_target_false(self):
         user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}, \
         {"2": "t1"}]'
-        correct_answer = {'1': 't2', 'name_with_icon': 't2',
-        '2': 't1'}
+        correct_answer = {'1': 't2', 'name_with_icon': 't2', '2': 't1'}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_and_positions(self):
         user_input = '[{"1": [10,10]}, \
          {"name_with_icon": [[10,10],4]}]'
-        correct_answer = {'1':  [10, 10], 'name_with_icon': [[10, 10], 4]}
+        correct_answer = {'1': [10, 10], 'name_with_icon': [[10, 10], 4]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_position_and_targets(self):
         user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}]'
-        correct_answer = {'1':    't1', 'name_with_icon': 't2'}
+        correct_answer = {'1': 't1', 'name_with_icon': 't2'}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_exact(self):
         user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
-        correct_answer = {'1':   [10, 10], 'name_with_icon': [20, 20]}
+        correct_answer = {'1': [10, 10], 'name_with_icon': [20, 20]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_false(self):
         user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
-        correct_answer = {'1':   [25, 25], 'name_with_icon': [20, 20]}
+        correct_answer = {'1': [25, 25], 'name_with_icon': [20, 20]}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_true_in_radius(self):
         user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
-        correct_answer = {'1':   [14, 14], 'name_with_icon': [20, 20]}
+        correct_answer = {'1': [14, 14], 'name_with_icon': [20, 20]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_true_in_manual_radius(self):
         user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
-        correct_answer = {'1':   [[40, 10], 30], 'name_with_icon': [20, 20]}
+        correct_answer = {'1': [[40, 10], 30], 'name_with_icon': [20, 20]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_false_in_manual_radius(self):
@@ -349,7 +343,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_correct_answer_not_has_key_from_user_answer(self):
         user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}]'
-        correct_answer = {'3':   't3', 'name_with_icon': 't2'}
+        correct_answer = {'3': 't3', 'name_with_icon': 't2'}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_anywhere(self):
@@ -359,7 +353,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         user_input = '[{"ant":[610.5,57.449951171875]},\
             {"grass":[322.5,199.449951171875]}]'
 
-        correct_answer = {'grass':     [[300, 200], 200], 'ant': [[500, 0], 200]}
+        correct_answer = {'grass': [[300, 200], 200], 'ant': [[500, 0], 200]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_lcao_correct(self):
@@ -372,10 +366,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]'
 
         correct_answer = [{
-        'draggables': ['1', '2', '3', '4', '5', '6'],
-        'targets': [
-            's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
-        ],
+            'draggables': ['1', '2', '3', '4', '5', '6'],
+            'targets': [
+                's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
+            ],
             'rule': 'anyof'
         }, {
             'draggables': ['7', '8', '9', '10'],
@@ -411,9 +405,9 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]'
 
         correct_answer = [{
-        'draggables': ['1', '2', '3', '4', '5', '6'],
-        'targets': [
-            's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
+            'draggables': ['1', '2', '3', '4', '5', '6'],
+            'targets': [
+                's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
             ],
             'rule': 'anyof'
         }, {
@@ -446,21 +440,22 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"2":"target2"},{"1":"target3"},{"2":"target4"},{"2":"target5"}, \
         {"3":"target6"}]'
         correct_answer = [
-        {
-            'draggables': ['1'],
-            'targets': ['target1',  'target3'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['2'],
-            'targets': ['target2', 'target4', 'target5'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['3'],
-            'targets': ['target6'],
-            'rule': 'anyof'
-        }]
+            {
+                'draggables': ['1'],
+                'targets': ['target1', 'target3'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['2'],
+                'targets': ['target2', 'target4', 'target5'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['3'],
+                'targets': ['target6'],
+                'rule': 'anyof'
+            }
+        ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_reuse_draggable_with_mupliples(self):
@@ -469,21 +464,22 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"2":"target2"},{"1":"target1"},{"2":"target4"},{"2":"target4"}, \
         {"3":"target6"}]'
         correct_answer = [
-        {
-            'draggables': ['1'],
-            'targets': ['target1',  'target3'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['2'],
-            'targets': ['target2', 'target4'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['3'],
-            'targets': ['target6'],
-            'rule': 'anyof'
-        }]
+            {
+                'draggables': ['1'],
+                'targets': ['target1', 'target3'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['2'],
+                'targets': ['target2', 'target4'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['3'],
+                'targets': ['target6'],
+                'rule': 'anyof'
+            }
+        ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_reuse_many_draggable_with_mupliples(self):
@@ -493,26 +489,27 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"3":"target6"}, {"4": "target3"}, {"5": "target4"}, \
         {"5": "target5"}, {"6": "target2"}]'
         correct_answer = [
-        {
-            'draggables': ['1', '4'],
-            'targets': ['target1',  'target3'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['2', '6'],
-            'targets': ['target2', 'target4'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['5'],
-            'targets': ['target4', 'target5'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['3'],
-            'targets': ['target6'],
-            'rule': 'anyof'
-        }]
+            {
+                'draggables': ['1', '4'],
+                'targets': ['target1', 'target3'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['2', '6'],
+                'targets': ['target2', 'target4'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['5'],
+                'targets': ['target4', 'target5'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['3'],
+                'targets': ['target6'],
+                'rule': 'anyof'
+            }
+        ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_reuse_many_draggable_with_mupliples_wrong(self):
@@ -524,26 +521,26 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"3":"target6"}, {"4": "target3"}, {"5": "target4"}, \
         {"5": "target5"}, {"6": "target2"}]'
         correct_answer = [
-        {
-            'draggables': ['1', '4'],
-            'targets': ['target1',  'target3'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['2', '6'],
-            'targets': ['target2', 'target4'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['5'],
-            'targets': ['target4', 'target5'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['3'],
-            'targets': ['target6'],
-            'rule': 'anyof'
-        }]
+            {
+                'draggables': ['1', '4'],
+                'targets': ['target1', 'target3'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['2', '6'],
+                'targets': ['target2', 'target4'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['5'],
+                'targets': ['target4', 'target5'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['3'],
+                'targets': ['target6'],
+                'rule': 'anyof'
+            }]
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_false(self):
@@ -553,21 +550,22 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"c":"target6"}, {"a":"target7"},{"b":"target8"},{"c":"target9"}, \
          {"a":"target1"}]'
         correct_answer = [
-        {
-            'draggables': ['a'],
-            'targets': ['target1',  'target4', 'target7', 'target10'],
-            'rule': 'unordered_equal'
-        },
-        {
-            'draggables': ['b'],
-            'targets': ['target2', 'target5', 'target8'],
-            'rule': 'unordered_equal'
-        },
-        {
-            'draggables': ['c'],
-            'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unordered_equal'
-        }]
+            {
+                'draggables': ['a'],
+                'targets': ['target1', 'target4', 'target7', 'target10'],
+                'rule': 'unordered_equal'
+            },
+            {
+                'draggables': ['b'],
+                'targets': ['target2', 'target5', 'target8'],
+                'rule': 'unordered_equal'
+            },
+            {
+                'draggables': ['c'],
+                'targets': ['target3', 'target6', 'target9'],
+                'rule': 'unordered_equal'
+            }
+        ]
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_(self):
@@ -577,21 +575,22 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"c":"target6"}, {"a":"target7"},{"b":"target8"},{"c":"target9"}, \
          {"a":"target10"}]'
         correct_answer = [
-        {
-            'draggables': ['a'],
-            'targets': ['target1',  'target4', 'target7', 'target10'],
-            'rule': 'unordered_equal'
-        },
-        {
-            'draggables': ['b'],
-            'targets': ['target2', 'target5', 'target8'],
-            'rule': 'unordered_equal'
-        },
-        {
-            'draggables': ['c'],
-            'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unordered_equal'
-        }]
+            {
+                'draggables': ['a'],
+                'targets': ['target1', 'target4', 'target7', 'target10'],
+                'rule': 'unordered_equal'
+            },
+            {
+                'draggables': ['b'],
+                'targets': ['target2', 'target5', 'target8'],
+                'rule': 'unordered_equal'
+            },
+            {
+                'draggables': ['c'],
+                'targets': ['target3', 'target6', 'target9'],
+                'rule': 'unordered_equal'
+            }
+        ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_multiple(self):
@@ -601,21 +600,22 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"c":"target6"}, {"a":"target7"},{"b":"target8"},{"c":"target9"}, \
          {"a":"target1"}]'
         correct_answer = [
-        {
-            'draggables': ['a', 'a', 'a'],
-            'targets': ['target1',  'target4', 'target7', 'target10'],
-            'rule': 'anyof+number'
-        },
-        {
-            'draggables': ['b', 'b', 'b'],
-            'targets': ['target2', 'target5', 'target8'],
-            'rule': 'anyof+number'
-        },
-        {
-            'draggables': ['c', 'c', 'c'],
-            'targets': ['target3', 'target6', 'target9'],
-            'rule': 'anyof+number'
-        }]
+            {
+                'draggables': ['a', 'a', 'a'],
+                'targets': ['target1', 'target4', 'target7', 'target10'],
+                'rule': 'anyof+number'
+            },
+            {
+                'draggables': ['b', 'b', 'b'],
+                'targets': ['target2', 'target5', 'target8'],
+                'rule': 'anyof+number'
+            },
+            {
+                'draggables': ['c', 'c', 'c'],
+                'targets': ['target3', 'target6', 'target9'],
+                'rule': 'anyof+number'
+            }
+        ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_multiple_false(self):
@@ -625,21 +625,22 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"c":"target6"}, {"a":"target7"},{"b":"target8"},{"c":"target9"}, \
          {"a":"target1"}]'
         correct_answer = [
-        {
-            'draggables': ['a', 'a', 'a'],
-            'targets': ['target1',  'target4', 'target7', 'target10'],
-            'rule': 'anyof+number'
-        },
-        {
-            'draggables': ['b', 'b', 'b'],
-            'targets': ['target2', 'target5', 'target8'],
-            'rule': 'anyof+number'
-        },
-        {
-            'draggables': ['c', 'c', 'c'],
-            'targets': ['target3', 'target6', 'target9'],
-            'rule': 'anyof+number'
-        }]
+            {
+                'draggables': ['a', 'a', 'a'],
+                'targets': ['target1', 'target4', 'target7', 'target10'],
+                'rule': 'anyof+number'
+            },
+            {
+                'draggables': ['b', 'b', 'b'],
+                'targets': ['target2', 'target5', 'target8'],
+                'rule': 'anyof+number'
+            },
+            {
+                'draggables': ['c', 'c', 'c'],
+                'targets': ['target3', 'target6', 'target9'],
+                'rule': 'anyof+number'
+            }
+        ]
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_reused(self):
@@ -649,21 +650,22 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"c":"target6"}, {"b":"target8"},{"c":"target9"}, \
          {"a":"target10"}]'
         correct_answer = [
-        {
-            'draggables': ['a', 'a'],
-            'targets': ['target1',   'target10'],
-            'rule': 'unordered_equal+number'
-        },
-        {
-            'draggables': ['b', 'b', 'b'],
-            'targets': ['target2', 'target5', 'target8'],
-            'rule': 'unordered_equal+number'
-        },
-        {
-            'draggables': ['c', 'c', 'c'],
-            'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unordered_equal+number'
-        }]
+            {
+                'draggables': ['a', 'a'],
+                'targets': ['target1', 'target10'],
+                'rule': 'unordered_equal+number'
+            },
+            {
+                'draggables': ['b', 'b', 'b'],
+                'targets': ['target2', 'target5', 'target8'],
+                'rule': 'unordered_equal+number'
+            },
+            {
+                'draggables': ['c', 'c', 'c'],
+                'targets': ['target3', 'target6', 'target9'],
+                'rule': 'unordered_equal+number'
+            }
+        ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_reused_false(self):
@@ -673,21 +675,22 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"c":"target6"}, {"b":"target8"},{"c":"target9"}, \
          {"a":"target10"}]'
         correct_answer = [
-        {
-            'draggables': ['a', 'a'],
-            'targets': ['target1',   'target10'],
-            'rule': 'unordered_equal+number'
-        },
-        {
-            'draggables': ['b', 'b', 'b'],
-            'targets': ['target2', 'target5', 'target8'],
-            'rule': 'unordered_equal+number'
-        },
-        {
-            'draggables': ['c', 'c', 'c'],
-            'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unordered_equal+number'
-        }]
+            {
+                'draggables': ['a', 'a'],
+                'targets': ['target1', 'target10'],
+                'rule': 'unordered_equal+number'
+            },
+            {
+                'draggables': ['b', 'b', 'b'],
+                'targets': ['target2', 'target5', 'target8'],
+                'rule': 'unordered_equal+number'
+            },
+            {
+                'draggables': ['c', 'c', 'c'],
+                'targets': ['target3', 'target6', 'target9'],
+                'rule': 'unordered_equal+number'
+            }
+        ]
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_mixed_reuse_and_not_reuse(self):
@@ -696,16 +699,17 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"b":"target2"},{"c":"target3"}, {"a":"target4"},\
          {"a":"target5"}]'
         correct_answer = [
-        {
-            'draggables': ['a', 'b'],
-            'targets': ['target1',   'target2', 'target4', 'target5'],
-            'rule': 'anyof'
-        },
-        {
-            'draggables': ['c'],
-            'targets': ['target3'],
-            'rule': 'exact'
-        }]
+            {
+                'draggables': ['a', 'b'],
+                'targets': ['target1', 'target2', 'target4', 'target5'],
+                'rule': 'anyof'
+            },
+            {
+                'draggables': ['c'],
+                'targets': ['target3'],
+                'rule': 'exact'
+            }
+        ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_mixed_reuse_and_not_reuse_number(self):
@@ -713,16 +717,17 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         user_input = '[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"}, {"a":"target4"}]'
         correct_answer = [
-        {
-            'draggables': ['a', 'a', 'b'],
-            'targets': ['target1',   'target2', 'target4'],
-            'rule': 'anyof+number'
-        },
-        {
-            'draggables': ['c'],
-            'targets': ['target3'],
-            'rule': 'exact'
-        }]
+            {
+                'draggables': ['a', 'a', 'b'],
+                'targets': ['target1', 'target2', 'target4'],
+                'rule': 'anyof+number'
+            },
+            {
+                'draggables': ['c'],
+                'targets': ['target3'],
+                'rule': 'exact'
+            }
+        ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_mixed_reuse_and_not_reuse_number_false(self):
@@ -730,16 +735,17 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         user_input = '[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"}, {"a":"target4"}, {"a":"target10"}]'
         correct_answer = [
-        {
-            'draggables': ['a', 'a', 'b'],
-            'targets': ['target1',   'target2', 'target4', 'target10'],
-            'rule': 'anyof_number'
-        },
-        {
-            'draggables': ['c'],
-            'targets': ['target3'],
-            'rule': 'exact'
-        }]
+            {
+                'draggables': ['a', 'a', 'b'],
+                'targets': ['target1', 'target2', 'target4', 'target10'],
+                'rule': 'anyof_number'
+            },
+            {
+                'draggables': ['c'],
+                'targets': ['target3'],
+                'rule': 'exact'
+            }
+        ]
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_alternative_correct_answer(self):
@@ -747,9 +753,9 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"name_with_icon":"t1"},{"name_with_icon":"t1"},{"name4":"t1"}, \
         {"name4":"t1"}]'
         correct_answer = [
-        {'draggables': ['name4'], 'targets': ['t1', 't1'], 'rule': 'exact'},
-        {'draggables': ['name_with_icon'], 'targets': ['t1', 't1', 't1'],
-        'rule': 'exact'}
+            {'draggables': ['name4'], 'targets': ['t1', 't1'], 'rule': 'exact'},
+            {'draggables': ['name_with_icon'], 'targets': ['t1', 't1', 't1'],
+                'rule': 'exact'}
         ]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
@@ -783,8 +789,8 @@ class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
     def test_2a(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertTrue(dnd.compare_positions(correct=[[1, 1], [2, 3]],
-                                               user=[[2, 3], [1, 1]],
-                                               flag='exact'))
+                                              user=[[2, 3], [1, 1]],
+                                              flag='exact'))
 
     def test_2b(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
@@ -813,8 +819,8 @@ class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
     def test_6(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
         self.assertTrue(dnd.compare_positions(correct=["a", "b", "c"],
-                                               user=["a", "c", "b"],
-                                               flag='anyof'))
+                                              user=["a", "c", "b"],
+                                              flag='anyof'))
 
     def test_7(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
@@ -826,10 +832,9 @@ class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
 def suite():
 
     testcases = [Test_PositionsCompare,
-                   Test_DragAndDrop_Populate,
-                   Test_DragAndDrop_Grade,
-                   Test_DraAndDrop_Compare_Positions
-                 ]
+                 Test_DragAndDrop_Populate,
+                 Test_DragAndDrop_Grade,
+                 Test_DraAndDrop_Compare_Positions]
     suites = []
     for testcase in testcases:
         suites.append(unittest.TestLoader().loadTestsFromTestCase(testcase))

@@ -26,32 +26,22 @@
             // chapters, and it should be in-bounds.
             chapterToLoad = options.chapterNum;
         }
-        var anchorToLoad = null;
-        if (options.chapters) {
-            anchorToLoad = options.anchor_id;
-        }
 
-        loadUrl = function htmlViewLoadUrl(url, anchorId) {
+        loadUrl = function htmlViewLoadUrl(url) {
             // clear out previous load, if any:
             parentElement = document.getElementById('bookpage');
             while (parentElement.hasChildNodes())
                 parentElement.removeChild(parentElement.lastChild);
 	    // load new URL in:
             $('#bookpage').load(url);
+        };
 
-	    // if there is an anchor set, then go to that location:
-            if (anchorId != null) {
-		// TODO: add implementation....
-            } 
-
-        }; 
-
-        loadChapterUrl = function htmlViewLoadChapterUrl(chapterNum, anchorId) {
+        loadChapterUrl = function htmlViewLoadChapterUrl(chapterNum) {
             if (chapterNum < 1 || chapterNum > chapterUrls.length) {
                 return;
             }
             var chapterUrl = chapterUrls[chapterNum-1];
-            loadUrl(chapterUrl, anchorId);
+            loadUrl(chapterUrl);
         };
 
         // define navigation links for chapters:  
@@ -64,15 +54,15 @@
             };
             for (var index = 1; index <= chapterUrls.length; index += 1) {
                 $("#htmlchapter-" + index).click(loadChapterUrlHelper(index));
-            }   
+            }
         }
 
         // finally, load the appropriate url/page
         if (urlToLoad != null) {
-            loadUrl(urlToLoad, anchorToLoad);
+            loadUrl(urlToLoad);
         } else {
-            loadChapterUrl(chapterToLoad, anchorToLoad);
-        }       
+            loadChapterUrl(chapterToLoad);
+        }
 
     }
 })(jQuery);
@@ -91,9 +81,6 @@
         %endif
         %if chapter is not None:
             options.chapterNum = ${chapter};
-        %endif
-        %if anchor_id is not None:
-            options.anchor_id = ${anchor_id};
         %endif
 
         $('#outerContainer').myHTMLViewer(options);
