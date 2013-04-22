@@ -9,7 +9,6 @@ from tempdir import mkdtemp_clean
 from fs.osfs import OSFS
 import copy
 from json import loads
-import traceback
 from datetime import timedelta
 
 from django.contrib.auth.models import User
@@ -397,7 +396,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
         draft_store.clone_item(vertical.location, Location(['i4x', 'edX', 'full',
-                                                             'vertical', 'no_references', 'draft']))
+                                                            'vertical', 'no_references', 'draft']))
 
         for child in vertical.get_children():
             draft_store.clone_item(child.location, child.location)
@@ -477,6 +476,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertTrue(getattr(vertical, 'is_draft', False))
         for child in vertical.get_children():
             self.assertTrue(getattr(child, 'is_draft', False))
+
+        # make sure that we don't have a sequential that is in draft mode
+        sequential = draft_store.get_item(Location(['i4x', 'edX', 'full',
+                                                    'sequential', 'Administrivia_and_Circuit_Elements', None]))
+
+        self.assertFalse(getattr(sequential, 'is_draft', False))
 
         # verify that we have the private vertical
         test_private_vertical = draft_store.get_item(Location(['i4x', 'edX', 'full',
