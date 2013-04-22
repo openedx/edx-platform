@@ -119,7 +119,7 @@ def create_thread(request, course_id, commentable_id):
     #patch for backward compatibility to comments service
     if not 'pinned' in thread.attributes:
         thread['pinned'] = False
-    
+
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
@@ -174,7 +174,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
     if request.is_ajax():
-        return ajax_content_response(request, course_id,comment.to_dict(), 'discussion/ajax_create_comment.html')
+        return ajax_content_response(request, course_id, comment.to_dict(), 'discussion/ajax_create_comment.html')
     else:
         return JsonResponse(utils.safe_content(comment.to_dict()))
 
@@ -290,19 +290,21 @@ def vote_for_thread(request, course_id, thread_id, value):
 def flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.flagAbuse(user,thread)
+    thread.flagAbuse(user, thread)
     return JsonResponse(utils.safe_content(thread.to_dict()))
+
 
 @require_POST
 @login_required
 @permitted
 def un_flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
-    
+
     thread = cc.Thread.find(thread_id)
     removeAll = cached_has_permission(request.user, 'openclose_thread', course_id)
-    thread.unFlagAbuse(user,thread,removeAll)
+    thread.unFlagAbuse(user, thread, removeAll)
     return JsonResponse(utils.safe_content(thread.to_dict()))
+
 
 @require_POST
 @login_required
@@ -310,8 +312,9 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
 def flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
-    comment.flagAbuse(user,comment)
+    comment.flagAbuse(user, comment)
     return JsonResponse(utils.safe_content(comment.to_dict()))
+
 
 @require_POST
 @login_required
@@ -320,8 +323,9 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     removeAll = cached_has_permission(request.user, 'openclose_thread', course_id)
     comment = cc.Comment.find(comment_id)
-    comment.unFlagAbuse(user,comment, removeAll)
+    comment.unFlagAbuse(user, comment, removeAll)
     return JsonResponse(utils.safe_content(comment.to_dict()))
+
 
 @require_POST
 @login_required
@@ -332,19 +336,21 @@ def undo_vote_for_thread(request, course_id, thread_id):
     user.unvote(thread)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
+
 @require_POST
 @login_required
 @permitted
 def pin_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.pin(user,thread_id)
+    thread.pin(user, thread_id)
     return JsonResponse(utils.safe_content(thread.to_dict()))
+
 
 def un_pin_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.un_pin(user,thread_id)
+    thread.un_pin(user, thread_id)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 
@@ -491,16 +497,11 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         if not file_extension in cc_settings.ALLOWED_UPLOAD_FILE_TYPES:
             file_types = "', '".join(cc_settings.ALLOWED_UPLOAD_FILE_TYPES)
             msg = _("allowed file types are '%(file_types)s'") % \
-                    {'file_types': file_types}
+                {'file_types': file_types}
             raise exceptions.PermissionDenied(msg)
 
         # generate new file name
-        new_file_name = str(
-                            time.time()
-                        ).replace(
-                            '.',
-                            str(random.randint(0, 100000))
-                        ) + file_extension
+        new_file_name = str(time.time()).replace('.', str(random.randint(0, 100000))) + file_extension
 
         file_storage = get_storage_class()()
         # use default storage to store file
@@ -511,7 +512,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         if size > cc_settings.MAX_UPLOAD_FILE_SIZE:
             file_storage.delete(new_file_name)
             msg = _("maximum upload file size is %(file_size)sK") % \
-                    {'file_size': cc_settings.MAX_UPLOAD_FILE_SIZE}
+                {'file_size': cc_settings.MAX_UPLOAD_FILE_SIZE}
             raise exceptions.PermissionDenied(msg)
 
     except exceptions.PermissionDenied, e:
