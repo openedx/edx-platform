@@ -148,7 +148,6 @@ class WordCloudModule(WordCloudFields, XModule):
             'element_id': self.location.html_id(),
             'element_class': self.location.category,
             'ajax_url': self.system.ajax_url,
-            'configuration_json': self.get_state(),
             'num_inputs': int(self.num_inputs),
             'submitted': self.submitted
         }

@@ -15,6 +15,44 @@
 
 (function (requirejs, require, define) {
 define('WordCloudMain', ['logme'], function (logme) {
+
+    // To add compatible Object.keys support in older environments that do not natively support it.
+    //
+    // https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/keys#Compatibility
+    if (!Object.keys) {
+        Object.keys = (function () {
+            var hasOwnProperty = Object.prototype.hasOwnProperty,
+                hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
+                dontEnums = [
+                    'toString',
+                    'toLocaleString',
+                    'valueOf',
+                    'hasOwnProperty',
+                    'isPrototypeOf',
+                    'propertyIsEnumerable',
+                    'constructor'
+                ],
+                dontEnumsLength = dontEnums.length;
+
+            return function (obj) {
+                if (typeof obj !== 'object' && typeof obj !== 'function' || obj === null) throw new TypeError('Object.keys called on non-object');
+
+                var result = [];
+
+                for (var prop in obj) {
+                    if (hasOwnProperty.call(obj, prop)) result.push(prop);
+                }
+
+                if (hasDontEnumBug) {
+                    for (var i=0; i < dontEnumsLength; i++) {
+                        if (hasOwnProperty.call(obj, dontEnums[i])) result.push(dontEnums[i]);
+                    }
+                }
+                return result;
+            }
+        }());
+    };
+
     /**
      * @function WordCloudMain
      *
@@ -61,16 +99,7 @@ define('WordCloudMain', ['logme'], function (logme) {
             // Show WordCloud container after Ajax request done
             _this.wordCloudEl.show();
 
-            try {
-                _this.configJson = _this.configJson || JSON.parse(_this.wordCloudEl.find('.word_cloud_div').html());
-            } catch (err) {
-                logme('ERROR: Incorrect JSON config was given.');
-                logme(err.message);
-
-                return;
-            }
-
-            if (_this.configJson.submitted) {
+            if (_this.configJson && _this.configJson.submitted) {
                 _this.showWordCloud(_this.configJson);
 
                 return;
@@ -149,8 +178,10 @@ define('WordCloudMain', ['logme'], function (logme) {
         });
 
         // Find the longest word, and calculate the scale appropriately. This is
-        // required so that even long words fit into the drawing area and are
-        // not simply discarded.
+        // required so that even long words fit into the drawing area.
+        //
+        // This is a fix for: if the word is very long and/or big, it is discarded by
+        // for unknown reason.
         $.each(words, function (index, word) {
             var tempScaleFactor = 1.0,
                 size = ((word.size / maxSize) * maxFontSize);
@@ -207,30 +238,27 @@ define('WordCloudMain', ['logme'], function (logme) {
      * coordinate object contains two properties: 'x', and 'y'.
      */
     WordCloudMain.prototype.drawWordCloud = function (response, words, bounds) {
-        var firstWord = false, // The first word in the list of user enetered words does not get a leading comma.
-            fill = d3.scale.category20(), // Color words in different colors.
-            scale = bounds ? Math.min(
+        // The first word in the list of user enetered words does not get a leading comma.
+        var firstWord = false,
+
+            // Color words in different colors.
+            fill = d3.scale.category20(),
+
+            // Comma separated string of user enetered words.
+            studentWordsStr = (Object.keys(response.student_words)).join(', '),
+
+            // By default we do not scale.
+            scale = 1;
+
+        // If bounding rectangle is given, scale based on the bounding box of all the words.
+        if (bounds) {
+            scale = 0.5 * Math.min(
                 this.width / Math.abs(bounds[1].x - this.width / 2),
                 this.width / Math.abs(bounds[0].x - this.width / 2),
                 this.height / Math.abs(bounds[1].y - this.height / 2),
                 this.height / Math.abs(bounds[0].y - this.height / 2)
-            ) / 2 : 1, // Scale based on the bounding box of all the words.
-            studentWordsStr = '';
-
-        // Get the user his entered words.
-        $.each(response.student_words, function (index, value) {
-            if (firstWord === false) {
-                firstWord = true;
-            } else {
-                studentWordsStr += ', ';
-            }
-
-            // For now we do not show the percentages for each word the user has enetered.
-            // el.append(index + ': ' + (100.0 * (value / response.total_count)) + ' %');
-            //
-            // Only show the words.
-            studentWordsStr += '"' + index + '"';
-        });
+            );
+        }
 
         this.wordCloudEl.find('.result_cloud_section').addClass('active');
 
