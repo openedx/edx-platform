@@ -150,22 +150,6 @@ if Backbone?
       else
         @get("title")
 
-  class @Comments extends Backbone: ->
-      if @has("highlighted_title")
-        String(@get("highlighted_title")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
-      else
-        @get("title")
-
-    toJSON: ->
-      json_attributes = _.clone(@attributes)
-      _.extend(json_attributes, { title: @display_title(), body: @display_body() })
-
-    created_at_date: ->
-      new Date(@get("created_at"))
-
-    created_at_time: ->
-      new Date(@get("created_at")).getTime()
-
   class @Comment extends @Content
     urlMappers:
       'reply': -> DiscussionUtil.urlFor('create_sub_comment', @id)
