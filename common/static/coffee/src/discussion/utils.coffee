@@ -18,8 +18,12 @@ class @DiscussionUtil
   @loadRoles: (roles)->
     @roleIds = roles
 
+  @loadFlagModerator: (what)->
+    @isFlagModerator = what
+
   @loadRolesFromContainer: ->
     @loadRoles($("#discussion-container").data("roles"))
+    @loadFlagModerator($("#discussion-container").data("flag-moderator"))
 
   @isStaff: (user_id) ->
     staff = _.union(@roleIds['Staff'], @roleIds['Moderator'], @roleIds['Administrator'])
@@ -48,6 +52,10 @@ class @DiscussionUtil
       update_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/update"
       create_comment          : "/courses/#{$$course_id}/discussion/threads/#{param}/reply"
       delete_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
+      flagAbuse_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/flagAbuse"
+      unFlagAbuse_thread      : "/courses/#{$$course_id}/discussion/threads/#{param}/unFlagAbuse"
+      flagAbuse_comment       : "/courses/#{$$course_id}/discussion/comments/#{param}/flagAbuse"
+      unFlagAbuse_comment     : "/courses/#{$$course_id}/discussion/comments/#{param}/unFlagAbuse"
       upvote_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
       downvote_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
       pin_thread              : "/courses/#{$$course_id}/discussion/threads/#{param}/pin"   
@@ -72,7 +80,7 @@ class @DiscussionUtil
       permanent_link_thread   : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
       permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
       user_profile            : "/courses/#{$$course_id}/discussion/forum/users/#{param}"
-      followed_threads       : "/courses/#{$$course_id}/discussion/forum/users/#{param}/followed"
+      followed_threads        : "/courses/#{$$course_id}/discussion/forum/users/#{param}/followed"
       threads                 : "/courses/#{$$course_id}/discussion/forum"
     }[name]
 

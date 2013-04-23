@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 import logging
 import time
@@ -104,12 +105,12 @@ def filter_unstarted_categories(category_map):
     result_map = {}
 
     unfiltered_queue = [category_map]
-    filtered_queue   = [result_map]
+    filtered_queue = [result_map]
 
     while len(unfiltered_queue) > 0:
 
         unfiltered_map = unfiltered_queue.pop()
-        filtered_map   = filtered_queue.pop()
+        filtered_map = filtered_queue.pop()
 
         filtered_map["children"] = []
         filtered_map["entries"] = {}
@@ -174,8 +175,7 @@ def initialize_discussion_info(course):
         category = " / ".join([x.strip() for x in category.split("/")])
         last_category = category.split("/")[-1]
         discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
-        unexpanded_category_map[category].append({"title": title, "id": id,
-            "sort_key": sort_key, "start_date": module.lms.start})
+        unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": module.lms.start})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
@@ -202,9 +202,9 @@ def initialize_discussion_info(course):
         level = path[-1]
         if level not in node:
             node[level] = {"subcategories": defaultdict(dict),
-                            "entries": defaultdict(dict),
-                            "sort_key": level,
-                            "start_date": category_start_date}
+                           "entries": defaultdict(dict),
+                           "sort_key": level,
+                           "start_date": category_start_date}
         else:
             if node[level]["start_date"] > category_start_date:
                 node[level]["start_date"] = category_start_date
@@ -284,12 +284,12 @@ class QueryCountDebugMiddleware(object):
 
 def get_ability(course_id, content, user):
     return {
-            'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
-            'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
-            'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if content['type'] == 'comment' else False,
-            'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
-            'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
-            'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
+        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
+        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
+        'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if content['type'] == 'comment' else False,
+        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
+        'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
+        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
     }
 
 #TODO: RENAME
@@ -318,6 +318,7 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
     Get metadata for a thread and its children
     """
     infos = {}
+
     def annotate(content):
         infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, user_info)
         for child in content.get('children', []):
@@ -382,8 +383,8 @@ def get_courseware_context(content, course):
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
 
-        url = reverse('jump_to', kwargs={"course_id":course.location.course_id, 
-                                                    "location": location})
+        url = reverse('jump_to', kwargs={"course_id": course.location.course_id,
+                      "location": location})
 
         content_info = {"courseware_url": url, "courseware_title": title}
     return content_info
@@ -396,7 +397,8 @@ def safe_content(content):
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
-        'read', 'group_id', 'group_name', 'group_string', 'pinned'
+        'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers'
+
     ]
 
     if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):
