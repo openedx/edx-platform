@@ -42,8 +42,8 @@ BABEL_OUT = MSGS_DIR + '/mako.po'
 # These are the shell commands invoked by main()
 COMMANDS = {
     'babel_mako': 'pybabel extract -F %s -c "TRANSLATORS:" . -o %s' % (BABEL_CONFIG, BABEL_OUT),
-    'make_django': 'django-admin.py makemessages --all --extension html -l en',
-    'make_djangojs': 'django-admin.py makemessages --all -d djangojs --extension js -l en',
+    'make_django': 'django-admin.py makemessages --all --ignore=src/* --extension html -l en',
+    'make_djangojs': 'django-admin.py makemessages --all -d djangojs --ignore=src/* --extension js -l en',
     'msgcat' : 'msgcat -o merged.po django.po %s' % BABEL_OUT,
     'rename_django' : 'mv django.po django_old.po',
     'rename_merged' : 'mv merged.po django.po',
@@ -80,6 +80,15 @@ def main ():
     log = make_log()
     create_dir_if_necessary(LOCALE_DIR)
     log.info('Executing all commands from %s' % BASE_DIR)
+
+    remove_files = ['django.po', 'djangojs.po', 'nonesuch']
+    for filename in remove_files:
+        path = MSGS_DIR + '/' + filename
+        log.info('Deleting file %s' % path)
+        if not os.path.exists(path):
+            log.warn("File does not exist: %s" % path)
+        else:
+            os.remove(path)
 
     # Generate or update human-readable .po files from all source code.
     execute('babel_mako', log=log)

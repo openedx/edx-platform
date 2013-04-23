@@ -16,7 +16,7 @@
 #    mitx/conf/locale/vr/LC_MESSAGES/django.po
 
 import os, sys
-from pofile import PoFile
+import polib
 from dummy import Dummy
 
 # Dummy language 
@@ -28,23 +28,26 @@ from dummy import Dummy
 
 OUT_LANG = 'fr'
 
-def main (file):
-    '''
+def main(file):
+    """
     Takes a source po file, reads it, and writes out a new po file
     containing a dummy translation.
-    '''
-    pofile = PoFile(file)
+    """
+    if not os.path.exists(file):
+        raise IOError('File does not exist: %s' % file)
+    pofile = polib.pofile(file)
     converter = Dummy()
-    converter.init_msgs(pofile.msgs)
-    for msg in pofile.msgs:
+    converter.init_msgs(pofile.translated_entries())
+    for msg in pofile:
         converter.convert_msg(msg)
     new_file = new_filename(file, OUT_LANG)
     create_dir_if_necessary(new_file)
-    pofile.write(new_file)
+    pofile.save(new_file)
+    
 
 
-def new_filename (original_filename, new_lang):
-    '''Returns a filename derived from original_filename, using new_lang as the locale'''    
+def new_filename(original_filename, new_lang):
+    """Returns a filename derived from original_filename, using new_lang as the locale"""
     orig_dir = os.path.dirname(original_filename)
     msgs_dir = os.path.basename(orig_dir)
     orig_file = os.path.basename(original_filename)

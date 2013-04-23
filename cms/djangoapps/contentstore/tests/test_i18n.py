@@ -1,12 +1,12 @@
-# -*- coding: iso-8859-1 -*-
+from unittest import skip
 
-from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.test.client import Client
-from nose.tools import nottest
 
-class InternationalizationTest(TestCase):
+from .utils import ModuleStoreTestCase
+
+class InternationalizationTest(ModuleStoreTestCase):
     """
     Tests to validate Internationalization.
     """
@@ -52,6 +52,22 @@ class InternationalizationTest(TestCase):
             status_code=200,
             html=True)
 
+    def test_course_explicit_english(self):
+        """Test viewing the index page with no courses"""
+        # Create a course so there is something to view
+        self.client = Client()
+        self.client.login(username=self.uname, password=self.password)
+        
+        resp = self.client.get(reverse('index'),
+                               {},
+                               HTTP_ACCEPT_LANGUAGE='en'
+                               )
+
+        self.assertContains(resp,
+            '<h1 class="title-1">My Courses</h1>',
+            status_code=200,
+            html=True)        
+
 
     # ****
     # NOTE:
@@ -62,7 +78,7 @@ class InternationalizationTest(TestCase):
     # actual French at that time.
     
     # Test temporarily disable since it depends on creation of dummy strings
-    @nottest
+    @skip
     def test_course_with_accents (self):
         """Test viewing the index page with no courses"""
         # Create a course so there is something to view
@@ -75,7 +91,7 @@ class InternationalizationTest(TestCase):
                                )
 
         TEST_STRING = u'<h1 class="title-1">' \
-                      + u'My Çöürsés L#' \
+                      + u'My \xc7\xf6\xfcrs\xe9s L#' \
                       + u'</h1>'
         
         self.assertContains(resp,
