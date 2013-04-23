@@ -78,8 +78,8 @@ def _url_for_comment(comment_id):
 
 
 def _url_for_flag_abuse_comment(comment_id):
-    return "{prefix}/comments/{comment_id}/abuse_flags".format(prefix=settings.PREFIX, comment_id=comment_id)
+    return "{prefix}/comments/{comment_id}/abuse_flag".format(prefix=settings.PREFIX, comment_id=comment_id)
 
 
 def _url_for_unflag_abuse_comment(comment_id):
-    return "{prefix}/comments/{comment_id}/abuse_unflags".format(prefix=settings.PREFIX, comment_id=comment_id)
+    return "{prefix}/comments/{comment_id}/abuse_unflag".format(prefix=settings.PREFIX, comment_id=comment_id)
