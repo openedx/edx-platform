@@ -12,7 +12,6 @@ This will read the `Gemfile` and install all of the gems specified there.
 Run the following::
 
     pip install -r requirements.txt
-    pip install -r test-requirements.txt
 
 ### Binaries
 
@@ -52,77 +51,13 @@ or with additional options:
 
 *N.B.* You may have to escape the `[` characters, depending on your shell: `rake "lms[test,5000]"`
 
-## Running tests
-
-### Python Tests
-
-This runs all the tests (long, uses collectstatic):
-
-    rake test
-
-If if you aren't changing static files, can run `rake test` once, then run
-
-    rake fasttest_lms
-
-or
-
-    rake fasttest_cms
-
-xmodule can be tested independently, with this:
-
-    rake test_common/lib/xmodule
-
-To run a single django test class:
-
-    django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/courseware/tests/tests.py:TestViewAuth
-
-To run a single django test:
-
-    django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/courseware/tests/tests.py:TestViewAuth.test_dark_launch
-
-
-To run a single nose test file:
-
-    nosetests common/lib/xmodule/xmodule/tests/test_stringify.py
-
-To run a single nose test:
-
-    nosetests common/lib/xmodule/xmodule/tests/test_stringify.py:test_stringify
-
-
-Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out http://docs.python.org/library/pdb.html
-
-
-### Javascript Tests
-
-These commands start a development server with jasmine testing enabled, and launch your default browser
-pointing to those tests
-
-    rake browse_jasmine_{lms,cms}
-
-To run the tests headless, you must install phantomjs (http://phantomjs.org/download.html).
-
-    rake phantomjs_jasmine_{lms,cms}
-
-If the `phantomjs` binary is not on the path, set the `PHANTOMJS_PATH` environment variable to point to it
-
-    PHANTOMJS_PATH=/path/to/phantomjs rake phantomjs_jasmine_{lms,cms}
-
-
-## Getting More Information
-
-Run the following to see a list of all rake tasks available and their arguments
+To get a full list of available rake tasks, use:
 
     rake -T
 
-## Testing using queue servers
+## Running Tests
 
-When testing problems that use a queue server on AWS (e.g. sandbox-xqueue.edx.org), you'll need to run your server on your public IP, like so.
-
-`django-admin.py runserver --settings=lms.envs.dev --pythonpath=. 0.0.0.0:8000`
-
-When you connect to the LMS, you need to use the public ip.  Use `ifconfig` to figure out the numnber, and connect e.g. to `http://18.3.4.5:8000/`
-
+See `testing.md` for instructions on running the test suite.
 
 ## Content development
 
