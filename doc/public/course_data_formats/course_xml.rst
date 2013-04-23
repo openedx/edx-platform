@@ -387,7 +387,7 @@ Inherited
   When this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
 
 `showanswer`
-  When to show answer. Values: never, attempted, answered, closed. Default: closed. Optional.
+  When to show answer. Values: never, attempted, answered, closed, finished, past_due, always. Default: closed. Optional.
     - `never`: never show answer
     - `attempted`: show answer after first attempt
     - `answered` : this is slightly different from `attempted` -- resetting the problems makes "done" False, but leaves attempts unchanged.
