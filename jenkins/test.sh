@@ -38,6 +38,8 @@ source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
 pip install -q -r pre-requirements.txt
 yes w | pip install -q -r requirements.txt
 
+bundle install
+
 rake clobber
 rake pep8 > pep8.log || cat pep8.log
 rake pylint > pylint.log || cat pylint.log

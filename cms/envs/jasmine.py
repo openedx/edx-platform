@@ -27,7 +27,7 @@ PIPELINE_JS['js-test-source'] = {
 }
 
 PIPELINE_JS['spec'] = {
-    'source_filenames': sorted(rooted_glob(PROJECT_ROOT / 'static/', 'coffee/spec/**/*.coffee')),
+    'source_filenames': sorted(rooted_glob(PROJECT_ROOT / 'static/', 'coffee/spec/**/*.js')),
     'output_filename': 'js/cms-spec.js'
 }
 

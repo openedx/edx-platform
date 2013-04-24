@@ -45,17 +45,13 @@ class HTMLSnippet(object):
         # cdodge: We've moved the xmodule.coffee script from an outside directory into the xmodule area of common
         # this means we need to make sure that all xmodules include this dependency which had been previously implicitly
         # fulfilled in a different area of code
-        js = cls.js
+        coffee = cls.js.setdefault('coffee', [])
+        fragment = resource_string(__name__, 'js/src/xmodule.coffee')
 
-        if js is None:
-            js = {}
+        if fragment not in coffee:
+            coffee.insert(0, fragment)
 
-        if 'coffee' not in js:
-            js['coffee'] = []
-
-        js['coffee'].append(resource_string(__name__, 'js/src/xmodule.coffee'))
-
-        return js
+        return cls.js
 
     @classmethod
     def get_css(cls):
@@ -341,7 +337,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # cdodge: this is a list of metadata names which are 'system' metadata
     # and should not be edited by an end-user
 
-    system_metadata_fields = ['data_dir', 'published_date', 'published_by', 'is_draft', 
+    system_metadata_fields = ['data_dir', 'published_date', 'published_by', 'is_draft',
         'discussion_id', 'xml_attributes']
 
     # A list of descriptor attributes that must be equal for the descriptors to
