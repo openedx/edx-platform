@@ -31,3 +31,13 @@ cover_html/
 chromedriver.log
 /nbproject
 ghostdriver.log
+/cms/doc/en/getting_started/
+/conf/locale/en
+/conf/locale/fr
+create-dev-env.hack.sh
+distribute-0.6.36.tar.gz
+i18n/googleTranslate.hack.py
+i18n/mitx/conf/locale/fr/LC_MESSAGES/django.po
+i18n/split.py
+.gitignore
+

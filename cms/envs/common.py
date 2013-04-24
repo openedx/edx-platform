@@ -129,6 +129,9 @@ MIDDLEWARE_CLASSES = (
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
 
+    # Detects user-requested locale from 'accept-language' header in http request
+    'django.middleware.locale.LocaleMiddleware',
+
     'django.middleware.transaction.TransactionMiddleware'
 )
 
@@ -173,8 +176,12 @@ STATICFILES_DIRS = [
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'            # http://www.i18nguy.com/unicode/language-identifiers.html
+
 USE_I18N = True
 USE_L10N = True
+
+# Localization strings (e.g. django.po) are under this directory
+LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # mitx/conf/locale/
 
 # Tracking
 TRACK_MAX_EVENT = 10000

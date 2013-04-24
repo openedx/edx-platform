@@ -1,6 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="base.html" />
 
-<%block name="title">My Courses</%block>
+<%block name="title">${_("My Courses")}</%block>
 <%block name="bodyclass">is-signedin index dashboard</%block>
 
 <%block name="header_extras">
@@ -36,18 +38,18 @@
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions">
       <div  class="title">
-        <h1 class="title-1">My Courses</h1>
+        <h1 class="title-1">${_("My Courses")}</h1>
       </div>
 
       % if user.is_active:
       <nav class="nav-actions">
-        <h3 class="sr">Page Actions</h3>
+        <h3 class="sr">${_("Page Actions")}</h3>
         <ul>
           <li class="nav-item">
             % if not disable_course_creation:
-              <a href="#" class="button new-button new-course-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Course</a>
+              <a href="#" class="button new-button new-course-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> ${_("New Course")}</a>
 	    % elif settings.MITX_FEATURES.get('STAFF_EMAIL',''):
-	      <a href="mailto:${settings.MITX_FEATURES.get('STAFF_EMAIL','')}">Email staff to create course</a>
+	      <a href="mailto:${settings.MITX_FEATURES.get('STAFF_EMAIL','')}">${_("Email staff to create course")}</a>
             % endif
           </li>
         </ul>
@@ -59,7 +61,9 @@
   <div class="wrapper-content wrapper">
     <section class="content">
       <div class="introduction">
-        <p class="copy"><strong>Welcome, ${ user.username }</strong>. Here are all of the courses you are currently authoring in Studio:</p>
+        <p class="copy">
+          <strong>${_("Welcome, %(name)s") % dict(name= user.username)}</strong>.
+          ${_("Here are all of the courses you are currently authoring in Studio:")}</p>
       </div>
     </section>
   </div>
@@ -81,7 +85,7 @@
         % else:
           <div class='warn-msg'>
             <p>
-            In order to start authoring courses using edX Studio, please click on the activation link in your email.
+            ${_("In order to start authoring courses using edX Studio, please click on the activation link in your email.")}
             </p>
           </div>
         % endif

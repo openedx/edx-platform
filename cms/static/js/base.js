@@ -245,7 +245,7 @@ function showImportSubmit(e) {
         $('.submit-button').show();
         $('.progress').show();
     } else {
-        $('.error-block').html('File format not supported. Please upload a file with a <code>tar.gz</code> extension.').show();
+        $('.error-block').html(gettext('File format not supported. Please upload a file with a <code>tar.gz</code> extension.')).show();
     }
 }
 
@@ -406,7 +406,7 @@ function showFileSelectionMenu(e) {
 }
 
 function startUpload(e) {
-    $('.upload-modal h1').html('Uploading…');
+    $('.upload-modal h1').html(gettext('Uploading…'));
     $('.upload-modal .file-name').html($('.file-input').val().replace('C:\\fakepath\\', ''));
     $('.upload-modal .file-chooser').ajaxSubmit({
         beforeSend: resetUploadBar,
@@ -439,7 +439,7 @@ function displayFinishedUpload(xhr) {
     $('.upload-modal .embeddable').show();
     $('.upload-modal .file-name').hide();
     $('.upload-modal .progress-fill').html(resp.msg);
-    $('.upload-modal .choose-file-button').html('Load Another File').show();
+    $('.upload-modal .choose-file-button').html(gettext('Load Another File')).show();
     $('.upload-modal .progress-fill').width('100%');
 
     // see if this id already exists, if so, then user must have updated an existing piece of content
@@ -500,11 +500,11 @@ function toggleSock(e) {
     });
 
     if($sock.hasClass('is-shown')) {
-        $btnLabel.text('Hide Studio Help');
+        $btnLabel.text(gettext('Hide Studio Help'));
     }
 
     else {
-        $btnLabel.text('Looking for Help with Studio?');
+        $btnLabel.text(gettext('Looking for Help with Studio?'));
     }
 }
 
@@ -845,7 +845,15 @@ function saveSetSectionScheduleDate(e) {
         data: JSON.stringify({ 'id': id, 'metadata': {'start': start}})
     }).success(function () {
             var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-            $thisSection.find('.section-published-date').html('<span class="published-status"><strong>Will Release:</strong> ' + input_date + ' at ' + input_time + ' UTC</span><a href="#" class="edit-button" data-date="' + input_date + '" data-time="' + input_time + '" data-id="' + id + '">Edit</a>');
+  	    var format = gettext('<strong>Will Release:</strong> %(date)s at $(time)s UTC');
+            var willReleaseAt = interpolate(format, [input_date, input_time], true);
+            $thisSection.find('.section-published-date').html(
+	      '<span class="published-status">' + willReleaseAt + '</span>' +
+	      '<a href="#" class="edit-button" ' +
+		'" data-date="' + input_date +
+		'" data-time="' + input_time +
+		'" data-id="' + id + '">' +
+		gettext('Edit') + '</a>');
             $thisSection.find('.section-published-date').animate({
                 'background-color': 'rgb(182,37,104)'
             }, 300).animate({
