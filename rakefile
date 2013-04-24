@@ -245,8 +245,13 @@ end
         desc
     task system, [:env, :options] => [:predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
+
+        # Compile all assets first
         compile_assets(watch=false, debug=true)
+
+        # Listen for any changes to assets
         compile_assets(watch=true, debug=true)
+
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
 
