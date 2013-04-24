@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.test.client import Client
 
-from .utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 class InternationalizationTest(ModuleStoreTestCase):
     """
