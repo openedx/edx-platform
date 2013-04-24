@@ -668,6 +668,8 @@ class MatlabInput(CodeInput):
         # Check if problem has been queued
         self.queuename = 'matlab'
         self.queue_msg = ''
+        # this is only set if we don't have a graded response
+        # the graded response takes precedence
         if 'queue_msg' in self.input_state and self.status in ['queued', 'incomplete', 'unsubmitted']:
             self.queue_msg = self.input_state['queue_msg']
         if 'queuestate' in self.input_state and self.input_state['queuestate'] == 'queued':
@@ -712,11 +714,23 @@ class MatlabInput(CodeInput):
             self.input_state['queuestate'] = None
             self.input_state['queuekey'] = None
 
+    def button_enabled(self):
+        """ Return whether or not we want the 'Test Code' button visible
+
+        Right now, we only want this button to show up when a problem has not been
+        checked.
+        """
+        if self.status in ['correct', 'incorrect']:
+            return False
+        else:
+            return True
+
     def _extra_context(self):
         ''' Set up additional context variables'''
         extra_context = {
             'queue_len': str(self.queue_len),
-            'queue_msg': self.queue_msg
+            'queue_msg': self.queue_msg,
+            'button_enabled': self.button_enabled(),
         }
         return extra_context
 
@@ -766,10 +780,6 @@ class MatlabInput(CodeInput):
             lms_key=queuekey,
             queue_name=self.queuename)
 
-        # save the input state
-        self.input_state['queuekey'] = queuekey
-        self.input_state['queuestate'] = 'queued'
-
         # construct xqueue body
         student_info = {'anonymous_student_id': anonymous_student_id,
                         'submission_time': qtime}
@@ -779,6 +789,10 @@ class MatlabInput(CodeInput):
 
         (error, msg) = qinterface.send_to_queue(header=xheader,
                                                 body=json.dumps(contents))
+        # save the input state if successful
+        if error == 0:
+            self.input_state['queuekey'] = queuekey
+            self.input_state['queuestate'] = 'queued'
 
         return {'success': error == 0, 'message': msg}
 

@@ -274,7 +274,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
             # now import any 'draft' items
             if draft_store is not None:
-                import_course_draft(xml_module_store, draft_store, course_data_path,
+                import_course_draft(xml_module_store, store, draft_store, course_data_path,
                                     static_content_store, target_location_namespace if target_location_namespace is not None
                                     else course_location)
 
@@ -339,7 +339,7 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
     store.update_metadata(module.location, dict(own_metadata(module)))
 
 
-def import_course_draft(xml_module_store, store, course_data_path, static_content_store, target_location_namespace):
+def import_course_draft(xml_module_store, store, draft_store, course_data_path, static_content_store, target_location_namespace):
     '''
     This will import all the content inside of the 'drafts' folder, if it exists
     NOTE: This is not a full course import, basically in our current application only verticals (and downwards)
@@ -396,7 +396,7 @@ def import_course_draft(xml_module_store, store, course_data_path, static_conten
                             del module.xml_attributes['parent_sequential_url']
                             del module.xml_attributes['index_in_children_list']
 
-                        import_module(module, store, course_data_path, static_content_store, allow_not_found=True)
+                        import_module(module, draft_store, course_data_path, static_content_store, allow_not_found=True)
                         for child in module.get_children():
                             _import_module(child)
 

@@ -1,6 +1,8 @@
 from lettuce import before, after, world
 from splinter.browser import Browser
 from logging import getLogger
+from django.core.management import call_command
+from django.conf import settings
 
 # Let the LMS and CMS do their one-time setup
 # For example, setting up mongo caches
@@ -10,18 +12,14 @@ from cms import one_time_startup
 logger = getLogger(__name__)
 logger.info("Loading the lettuce acceptance testing terrain file...")
 
-from django.core.management import call_command
-
 
 @before.harvest
 def initial_setup(server):
     '''
     Launch the browser once before executing the tests
     '''
-    # Launch the browser app (choose one of these below)
-    world.browser = Browser('chrome')
-    # world.browser = Browser('phantomjs')
-    # world.browser = Browser('firefox')
+    browser_driver = getattr(settings, 'LETTUCE_BROWSER', 'chrome')
+    world.browser = Browser(browser_driver)
 
 
 @before.each_scenario
@@ -32,6 +30,15 @@ def reset_data(scenario):
     '''
     logger.debug("Flushing the test database...")
     call_command('flush', interactive=False)
+
+
+@after.each_scenario
+def screenshot_on_error(scenario):
+    '''
+    Save a screenshot to help with debugging
+    '''
+    if scenario.failed:
+        world.browser.driver.save_screenshot('/tmp/last_failed_scenario.png')
 
 
 @after.all
