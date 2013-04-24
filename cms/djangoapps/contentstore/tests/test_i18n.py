@@ -42,7 +42,6 @@ class InternationalizationTest(ModuleStoreTestCase):
 
     def test_course_plain_english(self):
         """Test viewing the index page with no courses"""
-        # Create a course so there is something to view
         self.client = Client()
         self.client.login(username=self.uname, password=self.password)
         
@@ -54,7 +53,6 @@ class InternationalizationTest(ModuleStoreTestCase):
 
     def test_course_explicit_english(self):
         """Test viewing the index page with no courses"""
-        # Create a course so there is something to view
         self.client = Client()
         self.client.login(username=self.uname, password=self.password)
         
@@ -81,7 +79,6 @@ class InternationalizationTest(ModuleStoreTestCase):
     @skip
     def test_course_with_accents (self):
         """Test viewing the index page with no courses"""
-        # Create a course so there is something to view
         self.client = Client()
         self.client.login(username=self.uname, password=self.password)
         
