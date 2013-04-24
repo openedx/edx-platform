@@ -227,7 +227,7 @@ define('WordCloudMain', ['logme'], function (logme) {
         }
 
         $.each(response.student_words, function (word, stat) {
-            studentWordsKeys.push(word);
+            studentWordsKeys.push('<strong>' + word + '</strong> (' + (100 * (stat / response.total_count)).toFixed(2) + '%)');
         });
         studentWordsStr = '' + studentWordsKeys.join(', ');
 
