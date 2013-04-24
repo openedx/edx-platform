@@ -230,7 +230,7 @@ end
 
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}", [:stop_on_failure] => ["clean_test_files", "#{system}:gather_assets:test", "fasttest_#{system}"]
+    task "test_#{system}", [:stop_on_failure] => ["clean_test_files", :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
