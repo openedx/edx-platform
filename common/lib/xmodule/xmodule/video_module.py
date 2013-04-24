@@ -20,8 +20,6 @@ log = logging.getLogger(__name__)
 class VideoFields(object):
     data = String(help="XML data for the problem", scope=Scope.content)
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
-    # display_name is used by the LMS on the sequential ribbon (displayed as a tooltip)
-    display_name = XModule.display_name
 
 
 class VideoModule(VideoFields, XModule):

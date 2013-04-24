@@ -19,8 +19,6 @@ log = logging.getLogger("mitx.courseware")
 
 class HtmlFields(object):
     data = String(help="Html contents to display for this module", scope=Scope.content)
-    # Used by the LMS on the sequential ribbon (displayed as a tooltip)
-    display_name = XModule.display_name
 
 
 class HtmlModule(HtmlFields, XModule):
