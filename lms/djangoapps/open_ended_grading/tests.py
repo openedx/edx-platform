@@ -97,7 +97,7 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         self.assertIsNotNone(d['rubric'])
 
 
-    def test_save_grade(self):
+    def save_grade_base(self,skip=False):
         self.login(self.instructor, self.password)
 
         url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
@@ -108,11 +108,19 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
                 'location': self.location,
                 'submission_flagged': "true",
                 'rubric_scores[]': ['1', '2']}
+        if skip:
+            data.update({'skipped' : True})
 
         r = self.check_for_post_code(200, url, data)
         d = json.loads(r.content)
         self.assertTrue(d['success'], str(d))
         self.assertEquals(d['submission_id'], self.mock_service.cnt)
+
+    def test_save_grade(self):
+        self.save_grade_base(skip=False)
+
+    def test_save_grade_skip(self):
+        self.save_grade_base(skip=True)
 
     def test_get_problem_list(self):
         self.login(self.instructor, self.password)

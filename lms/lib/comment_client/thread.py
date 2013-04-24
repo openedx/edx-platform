@@ -1,5 +1,4 @@
 from .utils import *
-
 import models
 import settings
 
@@ -11,7 +10,7 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned'
+        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers'
     ]
 
     updatable_fields = [
@@ -27,11 +26,13 @@ class Thread(models.Model):
 
     @classmethod
     def search(cls, query_params, *args, **kwargs):
+
         default_params = {'page': 1,
                           'per_page': 20,
                           'course_id': query_params['course_id'],
                           'recursive': False}
         params = merge_dict(default_params, strip_blank(strip_none(query_params)))
+
         if query_params.get('text') or query_params.get('tags') or query_params.get('commentable_ids'):
             url = cls.url(action='search')
         else:
@@ -54,6 +55,7 @@ class Thread(models.Model):
 
     @classmethod
     def url(cls, action, params={}):
+
         if action in ['get_all', 'post']:
             return cls.url_for_threads(params)
         elif action == 'search':
@@ -66,12 +68,11 @@ class Thread(models.Model):
     # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
-
         request_params = {
-                            'recursive': kwargs.get('recursive'),
-                            'user_id': kwargs.get('user_id'),
-                            'mark_as_read': kwargs.get('mark_as_read', True),
-                         }
+            'recursive': kwargs.get('recursive'),
+            'user_id': kwargs.get('user_id'),
+            'mark_as_read': kwargs.get('mark_as_read', True),
+        }
 
         # user_id may be none, in which case it shouldn't be part of the
         # request.
@@ -79,23 +80,57 @@ class Thread(models.Model):
 
         response = perform_request('get', url, request_params)
         self.update_attributes(**response)
-        
+
+    def flagAbuse(self, user, voteable):
+        if voteable.type == 'thread':
+            url = _url_for_flag_abuse_thread(voteable.id)
+        elif voteable.type == 'comment':
+            url = _url_for_flag_comment(voteable.id)
+        else:
+            raise CommentClientError("Can only flag/unflag threads or comments")
+        params = {'user_id': user.id}
+        request = perform_request('put', url, params)
+        voteable.update_attributes(request)
+
+    def unFlagAbuse(self, user, voteable, removeAll):
+        if voteable.type == 'thread':
+            url = _url_for_unflag_abuse_thread(voteable.id)
+        elif voteable.type == 'comment':
+            url = _url_for_unflag_comment(voteable.id)
+        else:
+            raise CommentClientError("Can only flag/unflag for threads or comments")
+        params = {'user_id': user.id}
+        #if you're an admin, when you unflag, remove ALL flags
+        if removeAll:
+            params['all'] = True
+
+        request = perform_request('put', url, params)
+        voteable.update_attributes(request)
+
     def pin(self, user, thread_id):
         url = _url_for_pin_thread(thread_id)
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
-        self.update_attributes(request)    
+        self.update_attributes(request)
 
     def un_pin(self, user, thread_id):
         url = _url_for_un_pin_thread(thread_id)
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
-        self.update_attributes(request)    
-        
-        
+        self.update_attributes(request)
+
+
+def _url_for_flag_abuse_thread(thread_id):
+    return "{prefix}/threads/{thread_id}/abuse_flag".format(prefix=settings.PREFIX, thread_id=thread_id)
+
+
+def _url_for_unflag_abuse_thread(thread_id):
+    return "{prefix}/threads/{thread_id}/abuse_unflag".format(prefix=settings.PREFIX, thread_id=thread_id)
+
+
 def _url_for_pin_thread(thread_id):
-    return "{prefix}/threads/{thread_id}/pin".format(prefix=settings.PREFIX, thread_id=thread_id)      
-       
+    return "{prefix}/threads/{thread_id}/pin".format(prefix=settings.PREFIX, thread_id=thread_id)
+
+
 def _url_for_un_pin_thread(thread_id):
-    return "{prefix}/threads/{thread_id}/unpin".format(prefix=settings.PREFIX, thread_id=thread_id)      
-       
+    return "{prefix}/threads/{thread_id}/unpin".format(prefix=settings.PREFIX, thread_id=thread_id)

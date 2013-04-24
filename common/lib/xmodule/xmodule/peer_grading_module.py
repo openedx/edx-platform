@@ -15,6 +15,7 @@ from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
 from xmodule.fields import Date
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
+from open_ended_grading_classes import combined_open_ended_rubric
 
 log = logging.getLogger(__name__)
 
@@ -178,8 +179,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
         pass
 
     def get_score(self):
+        max_score = None
+        score = None
+        score_dict = {
+            'score': score,
+            'total': max_score,
+        }
         if self.use_for_single_location not in TRUE_DICT or self.is_graded not in TRUE_DICT:
-            return None
+            return score_dict
 
         try:
             count_graded = self.student_data_for_location['count_graded']
@@ -198,10 +205,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 #Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
-        score_dict = {
-            'score': int(count_graded >= count_required),
-            'total': self.max_grade,
-        }
+        if self.weight is not None:
+            score = int(count_graded >= count_required and count_graded > 0) * float(self.weight)
+            total = self.max_grade * float(self.weight)
+            score_dict['score'] = score
+            score_dict['total'] = total
 
         return score_dict
 
@@ -384,8 +392,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError:
             #This is a dev_facing_error
-            log.exception("Cannot parse rubric string. Raw string: {0}"
-            .format(rubric))
+            log.exception("Cannot parse rubric string.")
             #This is a student_facing_error
             return {'success': False,
                     'error': 'Error displaying submission.  Please notify course staff.'}
@@ -425,12 +432,15 @@ class PeerGradingModule(PeerGradingFields, XModule):
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
                                                            submission_key, score, feedback, rubric_scores)
+            if 'actual_rubric' in response:
+                rubric_renderer = combined_open_ended_rubric.CombinedOpenEndedRubric(self.system, True)
+                response['actual_rubric'] = rubric_renderer.render_rubric(response['actual_rubric'])['html']
             return response
         except GradingServiceError:
             #This is a dev_facing_error
             log.exception(
-                "Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(
-                    location, submission_id, submission_key, grader_id))
+                "Error saving calibration grade, location: {0}, submission_key: {1}, grader_id: {2}".format(
+                    location, submission_key, grader_id))
             #This is a student_facing_error
             return self._err_response('There was an error saving your score.  Please notify course staff.')
 
@@ -577,5 +587,5 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
 
     stores_state = True
     has_score = True
-    always_recalculate_grades=True
+    always_recalculate_grades = True
     template_dir_name = "peer_grading"

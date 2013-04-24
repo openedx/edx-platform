@@ -9,9 +9,10 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted, 
+from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted,
                                    get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
+from django_comment_client.models import Role
 
 from django_comment_client.permissions import cached_has_permission
 from django_comment_client.utils import (merge_dict, extract, strip_none, get_courseware_context)
@@ -79,7 +80,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                               strip_none(extract(request.GET,
                                                  ['page', 'sort_key',
                                                   'sort_order', 'text',
-                                                  'tags', 'commentable_ids'])))
+                                                  'tags', 'commentable_ids', 'flagged'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
 
@@ -92,7 +93,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         else:
             thread['group_name'] = ""
             thread['group_string'] = "This post visible to everyone."
-    
+
         #patch for backward compatibility to comments service
         if not 'pinned' in thread:
             thread['pinned'] = False
@@ -108,7 +109,6 @@ def inline_discussion(request, course_id, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-
     course = get_course_with_access(request.user, course_id, 'load')
 
     try:
@@ -219,6 +219,7 @@ def forum_form_discussion(request, course_id):
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'thread_pages': query_params['num_pages'],
             'user_info': saxutils.escape(json.dumps(user_info), escapedict),
+            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, course, 'staff'),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course_id': course.id,
             'category_map': category_map,
@@ -230,7 +231,6 @@ def forum_form_discussion(request, course_id):
             'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
-
         return render_to_response('discussion/index.html', context)
 
 
@@ -242,19 +242,12 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     try:
         thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
-
-        #patch for backward compatibility with comments service
-        if not 'pinned' in thread.attributes:
-            thread['pinned'] = False
-
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         log.error("Error loading single thread.")
         raise Http404
 
     if request.is_ajax():
-
         courseware_context = get_courseware_context(thread, course)
-
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
@@ -326,6 +319,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'thread_pages': query_params['num_pages'],
             'is_course_cohorted': is_course_cohorted(course_id),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
+            'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, course, 'staff'),
             'cohorts': cohorts,
             'user_cohort': get_cohort_id(request.user, course_id),
             'cohorted_commentables': cohorted_commentables
@@ -413,7 +407,7 @@ def followed_threads(request, course_id, user_id):
                 'user_info': saxutils.escape(json.dumps(user_info), escapedict),
                 'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
                 #                'content': content,
-            }
+                }
 
             return render_to_response('discussion/user_profile.html', context)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):

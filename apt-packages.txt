@@ -22,5 +22,4 @@ libreadline6
 libreadline6-dev
 mongodb
 nodejs
-npm
 coffeescript

@@ -71,6 +71,8 @@ MITX_FEATURES = {
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
 
+    'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
+
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
     'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests

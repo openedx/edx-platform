@@ -117,51 +117,9 @@ urlpatterns = ('',
         {'template': 'honor.html'}, name="honor"),
 
     #Press releases
-    url(r'^press/mit-and-harvard-announce-edx$', 'static_template_view.views.render',
-        {'template': 'press_releases/MIT_and_Harvard_announce_edX.html'}, name="press/mit-and-harvard-announce-edx"),
-    url(r'^press/uc-berkeley-joins-edx$', 'static_template_view.views.render',
-        {'template': 'press_releases/UC_Berkeley_joins_edX.html'}, name="press/uc-berkeley-joins-edx"),
-    url(r'^press/edX-announces-proctored-exam-testing$', 'static_template_view.views.render',
-        {'template': 'press_releases/edX_announces_proctored_exam_testing.html'}, name="press/edX-announces-proctored-exam-testing"),
-    url(r'^press/elsevier-collaborates-with-edx$', 'static_template_view.views.render',
-        {'template': 'press_releases/Elsevier_collaborates_with_edX.html'}, name="press/elsevier-collaborates-with-edx"),
-    url(r'^press/ut-joins-edx$', 'static_template_view.views.render',
-        {'template': 'press_releases/UT_joins_edX.html'}, name="press/ut-joins-edx"),
-    url(r'^press/cengage-to-provide-book-content$', 'static_template_view.views.render',
-        {'template': 'press_releases/Cengage_to_provide_book_content.html'}, name="press/cengage-to-provide-book-content"),
-    url(r'^press/gates-foundation-announcement$', 'static_template_view.views.render',
-        {'template': 'press_releases/Gates_Foundation_announcement.html'}, name="press/gates-foundation-announcement"),
-    url(r'^press/wellesley-college-joins-edx$', 'static_template_view.views.render',
-        {'template': 'press_releases/Wellesley_College_joins_edX.html'}, name="press/wellesley-college-joins-edx"),
-    url(r'^press/georgetown-joins-edx$', 'static_template_view.views.render',
-        {'template': 'press_releases/Georgetown_joins_edX.html'}, name="press/georgetown-joins-edx"),
-    url(r'^press/spring-courses$', 'static_template_view.views.render',
-        {'template': 'press_releases/Spring_2013_course_announcements.html'},
-        name="press/spring-courses"),
-    url(r'^press/lewin-course-announcement$', 'static_template_view.views.render',
-        {'template': 'press_releases/Lewin_course_announcement.html'},
-        name="press/lewin-course-announcement"),
-    url(r'^press/bostonx-announcement$', 'static_template_view.views.render',
-        {'template': 'press_releases/bostonx_announcement.html'},
-        name="press/bostonx-announcement"),
-    url(r'^press/eric-lander-secret-of-life$', 'static_template_view.views.render',
-        {'template': 'press_releases/eric_lander_secret_of_life.html'},
-        name="press/eric-lander-secret-of-life"),
-    url(r'^press/edx-expands-internationally$', 'static_template_view.views.render',
-        {'template': 'press_releases/edx_expands_internationally.html'},
-        name="press/edx-expands-internationally"),
-    url(r'^press/xblock_announcement$', 'static_template_view.views.render',
-        {'template': 'press_releases/xblock_announcement.html'},
-        name="press/xblock-announcement"),
-    url(r'^press/stanford-to-work-with-edx$', 'static_template_view.views.render',
-        {'template': 'press_releases/stanford_announcement.html'},
-        name="press/stanford-to-work-with-edx"),
+    url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
 
-    # Should this always update to point to the latest press release?
-    (r'^pressrelease$', 'django.views.generic.simple.redirect_to',
-     {'url': '/press/xblock-announcement'}),
-
-
+    # Favicon
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
 
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
@@ -201,9 +159,6 @@ if settings.WIKI_ENABLED:
 
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
-        # Hook django-masquerade, allowing staff to view site as other users
-        url(r'^masquerade/', include('masquerade.urls')),
-
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
             'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
@@ -266,10 +221,6 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/$',
             'staticbook.views.html_index', name="html_book"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
-            'staticbook.views.html_index'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<anchor_id>[^/]*)/$',
-            'staticbook.views.html_index'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/(?P<anchor_id>[^/]*)/$',
             'staticbook.views.html_index'),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
@@ -344,6 +295,13 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
             'open_ended_grading.views.peer_grading', name='peer_grading'),
     )
+
+    # allow course staff to change to student view of courseware
+    if settings.MITX_FEATURES.get('ENABLE_MASQUERADE'):
+        urlpatterns += (
+            url(r'^masquerade/(?P<marg>.*)$','courseware.masquerade.handle_ajax', name="masquerade-switch"),
+        )
+        
 
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):

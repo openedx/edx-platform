@@ -95,6 +95,7 @@
 
 
 body.discussion {
+  
   .new-post-form-errors {
     display: none;
     background: $error-red;
@@ -1280,8 +1281,8 @@ body.discussion {
   .discussion-article {
     position: relative;
     padding: 40px;
-    min-height: 468px;
-
+    min-height: 468px;         
+    
     a {
       word-wrap: break-word;
     }
@@ -1334,6 +1335,9 @@ body.discussion {
         background-position: 0 0;
       }
     }
+    
+    
+    
   }
 
   .discussion-post {
@@ -2436,7 +2440,6 @@ body.discussion {
   @extend .discussion-module
 }
 
-
 .group-visibility-label {
     font-size: 12px;
     color:#000;
@@ -2449,6 +2452,15 @@ body.discussion {
       float:right;
       padding-right: 5px;
       font-style: italic; 
+    }  
+
+.discussion-pin-inline {
+      font-size: 12px;
+      float:right;
+      font-style: italic;
+      position: relative;
+      right:-20px;
+      top:-13px;
     }  
     
 .notpinned .icon
@@ -2475,6 +2487,46 @@ body.discussion {
 }
 
 .notpinned span {
+  color: #888;
+  font-style: italic;
+}
+
+.pinned-false
+{
+display:none;
+}
+
+.discussion-flag-abuse {
+      font-size: 12px;
+      float:right;
+      padding-right: 5px;
+      font-style: italic; 
+    }  
+    
+.notflagged .icon
+{
+  display: inline-block; 
+  width: 10px; 
+  height: 14px;
+  padding-right: 3px;
+  background: transparent url('../images/notflagged.png') no-repeat 0 0; 
+}
+
+.flagged .icon
+{
+  display: inline-block; 
+  width: 10px; 
+  height: 14px; 
+  padding-right: 3px;
+  background: transparent url('../images/flagged.png') no-repeat 0 0; 
+}
+
+.flagged span {
+  color: #B82066;
+  font-style: italic;
+}
+
+.notflagged span {
   color: #888;
   font-style: italic;
 }

@@ -276,6 +276,11 @@ if Backbone?
           @$(".post-search-field").val("")
           @$('.cohort').show()                    
           @retrieveAllThreads()
+        else if discussionId == "#flagged"
+          @discussionIds = ""
+          @$(".post-search-field").val("")
+          @$('.cohort').hide() 
+          @retrieveFlaggedThreads() 
         else if discussionId == "#following"
           @retrieveFollowed(event)
           @$('.cohort').hide()
@@ -319,6 +324,12 @@ if Backbone?
     retrieveFirstPage: (event)->
       @collection.current_page = 0
       @collection.reset()
+      @loadMorePages(event)
+
+    retrieveFlaggedThreads: (event)->
+      @collection.current_page = 0
+      @collection.reset()
+      @mode = 'flagged'
       @loadMorePages(event)
 
     sortThreads: (event) ->

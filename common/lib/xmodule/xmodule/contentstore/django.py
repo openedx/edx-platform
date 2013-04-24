@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 from importlib import import_module
-from os import environ
 
 from django.conf import settings
 
