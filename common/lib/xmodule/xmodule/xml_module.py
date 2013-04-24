@@ -155,7 +155,6 @@ class XmlDescriptor(XModuleDescriptor):
         Remove any attribute named in cls.metadata_attributes from the supplied
         xml_object
         """
-        #       TODO: change to use Fields definitions
         for attr in cls.metadata_attributes:
             if xml_object.get(attr) is not None:
                 del xml_object.attrib[attr]
