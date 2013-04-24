@@ -127,8 +127,6 @@ class TestLimits(JailCodeHelpers, unittest.TestCase):
         self.assertEqual(res.stdout, "Reading google\n")
         self.assertIn("IOError", res.stderr)
 
-    # TODO: write files
-    # TODO: read network
     # TODO: fork
 
 

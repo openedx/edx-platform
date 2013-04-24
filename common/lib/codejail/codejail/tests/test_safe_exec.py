@@ -65,6 +65,8 @@ class TestSafeExec(SafeExecTests, unittest.TestCase):
 class TestNotSafeExec(SafeExecTests, unittest.TestCase):
     """Run SafeExecTests, with not_safe_exec."""
     def setUp(self):
+        # If safe_exec is actually an alias to not_safe_exec, then there's no
+        # point running these tests.
         if safe_exec is not_safe_exec:
             raise SkipTest
 
