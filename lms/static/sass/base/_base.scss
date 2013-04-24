@@ -202,5 +202,62 @@ mark {
   }
 }
 
+.help-tab {
+  @include transform(rotate(-90deg));
+  @include transform-origin(0 0);
+  top: 50%;
+  left: 0;
+  position: fixed;
+  z-index: 99;
 
+  a:link, a:visited {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-top-style: none;
+    @include border-radius(0px 0px 10px 10px);
+    background: transparentize(#fff, 0.25);
+    color: transparentize(#333, 0.25);
+    font-weight: bold;
+    text-decoration: none;
+    padding: 6px 22px 11px;
+    display: inline-block;
 
+    &:hover {
+      color: #fff;
+      background: #1D9DD9;
+    }
+  }
+}
+
+.help-buttons {
+  padding: 10px 50px;
+
+  a:link, a:visited {
+    padding: 15px 0px;
+    text-align: center;
+    cursor: pointer;
+    background: #fff;
+    text-decoration: none;
+    display: block;
+    border: 1px solid #ccc;
+
+    &#feedback_link_problem {
+      border-bottom-style: none;
+      @include border-radius(10px 10px 0px 0px);
+    }
+
+    &#feedback_link_question {
+      border-top-style: none;
+      @include border-radius(0px 0px 10px 10px);
+    }
+
+    &:hover {
+      color: #fff;
+      background: #1D9DD9;
+    }
+  }
+}
+
+#feedback_form textarea[name="details"] {
+  height: 150px;
+}
