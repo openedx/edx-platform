@@ -159,9 +159,6 @@ if settings.WIKI_ENABLED:
 
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
-        # Hook django-masquerade, allowing staff to view site as other users
-        url(r'^masquerade/', include('masquerade.urls')),
-
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
             'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
@@ -298,6 +295,13 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
             'open_ended_grading.views.peer_grading', name='peer_grading'),
     )
+
+    # allow course staff to change to student view of courseware
+    if settings.MITX_FEATURES.get('ENABLE_MASQUERADE'):
+        urlpatterns += (
+            url(r'^masquerade/(?P<marg>.*)$','courseware.masquerade.handle_ajax', name="masquerade-switch"),
+        )
+        
 
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
