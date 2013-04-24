@@ -96,6 +96,7 @@ class CapaFields(object):
     input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
+    # display_name is used by the LMS on the sequential ribbon (displayed as a tooltip)
     display_name = XModule.display_name
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
