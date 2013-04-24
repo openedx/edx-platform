@@ -16,34 +16,11 @@ from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Integer, Scope, String, Boolean, Object, Float
-from .fields import Timedelta, Date
+from xblock.core import Scope, String, Boolean, Object
+from .fields import Timedelta, Date, StringyInteger, StringyFloat
 from xmodule.util.date_utils import time_to_datetime
 
 log = logging.getLogger("mitx.courseware")
-
-
-class StringyInteger(Integer):
-    """
-    A model type that converts from strings to integers when reading from json
-    """
-    def from_json(self, value):
-        try:
-            return int(value)
-        except:
-            return None
-
-
-# TODO: move to fields.py and remove duplicated code.
-class StringyFloat(Float):
-    """
-    A model type that converts from string to floats when reading from json
-    """
-    def from_json(self, value):
-        try:
-            return float(value)
-        except:
-            return None
 
 
 # Generated this many different variants of problems with rerandomize=per_student
