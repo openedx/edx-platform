@@ -194,6 +194,12 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %endif
+    <H2>Course-specific grade adjustment</h2>
+
+    <p>to regrade a problem for all students, input the urlname of that problem</p>
+    <p><input type="text" name="problem_to_regrade" size="60"> 
+       <input type="submit" name="action" value="Regrade ALL students' problem submissions">
+    </p>
 
     <H2>Student-specific grade inspection and adjustment</h2>
     <p>edX email address or their username: </p>
@@ -234,6 +240,7 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
+
   %if instructor_access:
     <hr width="40%" style="align:left">
     <p>
@@ -331,6 +338,10 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 
 %if modeflag.get('Data'):
+    <p>
+    <input type="submit" name="action" value="Test Celery">      
+    <p>
+
     <hr width="40%" style="align:left">
     <p>
     <input type="submit" name="action" value="Download CSV of all student profile data">

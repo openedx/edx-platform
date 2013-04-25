@@ -17,6 +17,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 class StudentModule(models.Model):
     """
     Keeps student state for a particular module in a particular course.
@@ -262,3 +263,20 @@ class OfflineComputedGradeLog(models.Model):
 
     def __unicode__(self):
         return "[OCGLog] %s: %s" % (self.course_id, self.created)
+
+
+class CourseTaskLog(models.Model):
+    """
+    Stores information about background tasks that have been submitted to
+    perform course-specific work.
+    Examples include grading and regrading.
+    """
+    course_id = models.CharField(max_length=255, db_index=True)
+    student = models.ForeignKey(User, null=True, db_index=True, related_name='+')  # optional: None = task applies to all students
+    task_name = models.CharField(max_length=50, db_index=True)
+    task_args = models.CharField(max_length=255, db_index=True)
+    task_id = models.CharField(max_length=255, db_index=True)  # max_length from celery_taskmeta
+    task_status = models.CharField(max_length=50, null=True, db_index=True)  # max_length from celery_taskmeta
+    requester = models.ForeignKey(User, db_index=True, related_name='+')
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
+    updated = models.DateTimeField(auto_now=True, db_index=True)

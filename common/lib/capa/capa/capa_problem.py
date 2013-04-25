@@ -270,7 +270,26 @@ class LoncapaProblem(object):
 
         # if answers include File objects, convert them to filenames.
         self.student_answers = convert_files_to_filenames(answers)
+        return self._grade_answers(answers)
 
+    def regrade_existing_answers(self):
+        '''
+        Regrade student responses.  Called by capa_module.regrade_problem.
+        '''
+        return self._grade_answers(None)
+
+    def _grade_answers(self, answers):
+        '''
+        Internal grading call used for checking new student answers and also
+        regrading existing student answers.
+
+        answers is a dict of all the entries from request.POST, but with the first part
+        of each key removed (the string before the first "_").
+
+        Thus, for example, input_ID123 -> ID123, and input_fromjs_ID123 -> fromjs_ID123
+
+        Calls the Response for each question in this problem, to do the actual grading.
+        '''
         # old CorrectMap
         oldcmap = self.correct_map
 
@@ -281,10 +300,11 @@ class LoncapaProblem(object):
         for responder in self.responders.values():
             # File objects are passed only if responsetype explicitly allows for file
             # submissions
-            if 'filesubmission' in responder.allowed_inputfields:
+            # TODO: figure out where to get file submissions when regrading.
+            if 'filesubmission' in responder.allowed_inputfields and answers is not None:
                 results = responder.evaluate_answers(answers, oldcmap)
             else:
-                results = responder.evaluate_answers(convert_files_to_filenames(answers), oldcmap)
+                results = responder.evaluate_answers(self.student_answers, oldcmap)
             newcmap.update(results)
         self.correct_map = newcmap
         # log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
