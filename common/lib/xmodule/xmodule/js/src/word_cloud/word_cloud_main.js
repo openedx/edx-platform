@@ -214,7 +214,13 @@ define('WordCloudMain', ['logme'], function (logme) {
             studentWordsStr,
 
             // By default we do not scale.
-            scale = 1;
+            scale = 1,
+
+            // Caсhing of DOM element
+            cloudSectionEl = this.wordCloudEl.find('.result_cloud_section'),
+
+            // Needed for caсhing of d3 group elements
+            groupEl;
 
         // If bounding rectangle is given, scale based on the bounding box of all the words.
         if (bounds) {
@@ -227,26 +233,47 @@ define('WordCloudMain', ['logme'], function (logme) {
         }
 
         $.each(response.student_words, function (word, stat) {
-            studentWordsKeys.push('<strong>' + word + '</strong> (' + (100 * (stat / response.total_count)).toFixed(2) + '%)');
+            var percent = (response.display_percents) ? ' ' + (Math.round(100 * (stat / response.total_count))) + '%' : '';
+
+            studentWordsKeys.push('<strong>' + word + '</strong>' + percent);
         });
         studentWordsStr = '' + studentWordsKeys.join(', ');
 
-        this.wordCloudEl.find('.result_cloud_section').addClass('active');
+        cloudSectionEl
+            .addClass('active')
+            .find('.your_words').html(studentWordsStr)
+            .find('.total_num_words').html(response.total_count);
 
-        this.wordCloudEl.find('.result_cloud_section').find('.your_words').html(studentWordsStr);
-        this.wordCloudEl.find('.result_cloud_section').find('.total_num_words').html(response.total_count);
-
-        $(this.wordCloudEl.find('.result_cloud_section').attr('id') + ' .word_cloud').empty();
+        $(cloudSectionEl.attr('id') + ' .word_cloud').empty();
 
         // Actual drawing of word cloud.
-        d3.select('#' + this.wordCloudEl.find('.result_cloud_section').attr('id') + ' .word_cloud').append('svg')
-            .attr('width', this.width)
-            .attr('height', this.height)
-            .append('g')
-            .attr('transform', 'translate(' + (0.5 * this.width) + ',' + (0.5 * this.height) + ')')
-            .selectAll('text')
-            .data(words)
-            .enter().append('text')
+        groupEl = d3.select('#' + cloudSectionEl.attr('id') + ' .word_cloud').append('svg')
+                .attr('width', this.width)
+                .attr('height', this.height)
+                .append('g')
+                .attr('transform', 'translate(' + (0.5 * this.width) + ',' + (0.5 * this.height) + ')')
+                .selectAll('text')
+                .data(words)
+                .enter().append('g');
+
+        groupEl
+            .append('title')
+            .text(function (d) {
+                var res = '';
+
+                $.each(response.top_words, function(index, value){
+                    if (value.text === d.text) {
+                        res = value.percent + '%';
+
+                        return;
+                    }
+                });
+
+                return res;
+            });
+
+        groupEl
+            .append('text')
             .style('font-size', function (d) {
                 return d.size + 'px';
             })
@@ -258,7 +285,7 @@ define('WordCloudMain', ['logme'], function (logme) {
             .attr('transform', function (d) {
                 return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')scale(' + scale + ')';
             })
-            .text(function (d) {
+            .text(function (d) {               
                 return d.text;
             });
     }; // End-of: WordCloudMain.prototype.drawWordCloud = function (words, bounds) {

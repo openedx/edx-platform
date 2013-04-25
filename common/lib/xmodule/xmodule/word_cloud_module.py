@@ -20,11 +20,17 @@ from xblock.core import Scope, String, Object, Boolean, List, Integer
 log = logging.getLogger(__name__)
 
 
+def pretty_bool(value):
+    BOOL_DICT = [True, "True", "true", "T", "t", "1"]
+    return value in BOOL_DICT
+
+
 class WordCloudFields(object):
     # Name of poll to use in links to this poll
     display_name = String(help="Display name for this module", scope=Scope.settings)
     num_inputs = Integer(help="Number of inputs", scope=Scope.settings, default=5)
     num_top_words = Integer(help="Number of max words, which will be displayed.", scope=Scope.settings, default=250)
+    display_percents = Boolean(help="Dispaly usage percents for each word.", scope=Scope.settings, default=True)
 
     submitted = Boolean(help="Whether this student has posted words to the cloud", scope=Scope.user_state, default=False)
     student_words = List(help="Student answer", scope=Scope.user_state, default=[])
@@ -49,19 +55,22 @@ class WordCloudModule(WordCloudFields, XModule):
     def get_state(self):
         """Return success json answer for client."""
         if self.submitted:
+            total_count = sum(self.all_words.itervalues())
             return json.dumps({
                 'status': 'success',
                 'submitted': True,
+                'display_percents': pretty_bool(self.display_percents),
                 'student_words': {
                     word: self.all_words[word] for word in self.student_words
                 },
-                'total_count': sum(self.all_words.itervalues()),
-                'top_words': self.prepare_words(self.top_words)
+                'total_count': total_count,
+                'top_words': self.prepare_words(self.top_words, total_count)
             })
         else:
             return json.dumps({
                 'status': 'success',
                 'submitted': False,
+                'display_percents': False,
                 'student_words': {},
                 'total_count': 0,
                 'top_words': {}
@@ -71,10 +80,10 @@ class WordCloudModule(WordCloudFields, XModule):
         """Convert raw word to suitable word."""
         return word.strip().lower()
 
-    def prepare_words(self, words):
+    def prepare_words(self, words, total_count):
         """Convert words dictionary for client API."""
         return [
-            {'text': word, 'size': count} for
+            {'text': word, 'size': count, 'percent': round(100 * (count / float(total_count)))} for
             word, count in words.iteritems()
         ]
 
@@ -185,5 +194,6 @@ class WordCloudDescriptor(WordCloudFields, MakoModuleDescriptor, XmlDescriptor):
         xml_object.set('display_name', self.display_name)
         xml_object.set('num_inputs', self.num_inputs)
         xml_object.set('num_top_words', self.num_top_words)
+        xml_object.set('display_percents', pretty_bool(self.display_percents))
 
         return xml_object
