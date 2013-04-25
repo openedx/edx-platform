@@ -18,6 +18,9 @@ class @DiscussionUtil
   @loadRoles: (roles)->
     @roleIds = roles
 
+  @loadFlagModerator: (what)->
+    @isFlagModerator = (what=="True")
+
   @loadRolesFromContainer: ->
     @loadRoles($("#discussion-container").data("roles"))
 
@@ -50,7 +53,7 @@ class @DiscussionUtil
       delete_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
       upvote_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
       downvote_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
-      pin_thread              : "/courses/#{$$course_id}/discussion/threads/#{param}/pin"   
+      pin_thread              : "/courses/#{$$course_id}/discussion/threads/#{param}/pin"
       un_pin_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/unpin"
       undo_vote_for_thread    : "/courses/#{$$course_id}/discussion/threads/#{param}/unvote"
       follow_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/follow"
