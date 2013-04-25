@@ -19,7 +19,7 @@ class @DiscussionUtil
     @roleIds = roles
 
   @loadFlagModerator: (what)->
-    @isFlagModerator = ((what=="True") or (what == "1"))
+    @isFlagModerator = ((what=="True") or (what == 1))
 
   @loadRolesFromContainer: ->
     @loadRoles($("#discussion-container").data("roles"))
