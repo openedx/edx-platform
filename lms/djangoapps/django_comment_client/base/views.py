@@ -27,6 +27,7 @@ from django_comment_client.utils import JsonResponse, JsonError, extract, get_co
 
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from django_comment_client.models import Role
+from courseware.access import has_access
 
 log = logging.getLogger(__name__)
 
