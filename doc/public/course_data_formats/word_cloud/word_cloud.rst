@@ -18,6 +18,7 @@ The following attributes can be specified for this tag::
     [display_name| AUTOGENERATE] – Display name of xmodule. When this attribute is not defined - display name autogenerate with some hash.
     [num_inputs| 5] – Number of inputs.
     [num_top_words| 250] – Number of max words, which will be displayed.
+    [display_percents| True] – Dispaly usage percents for each word.
 
 .. note::
 
