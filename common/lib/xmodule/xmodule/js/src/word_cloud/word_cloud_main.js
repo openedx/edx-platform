@@ -233,7 +233,7 @@ define('WordCloudMain', ['logme'], function (logme) {
         }
 
         $.each(response.student_words, function (word, stat) {
-            var percent = (response.display_percents) ? ' ' + (Math.round(100 * (stat / response.total_count))) + '%' : '';
+            var percent = (response.display_student_percents) ? ' ' + (Math.round(100 * (stat / response.total_count))) + '%' : '';
 
             studentWordsKeys.push('<strong>' + word + '</strong>' + percent);
         });
