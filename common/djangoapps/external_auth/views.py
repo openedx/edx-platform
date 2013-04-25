@@ -12,7 +12,7 @@ from external_auth.djangostore import DjangoOpenIDStore
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
 from django.contrib.auth.models import User
-from student.models import UserProfile
+from student.models import UserProfile, TestCenterUser, TestCenterRegistration
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.http import urlquote
@@ -34,6 +34,12 @@ from openid.server.trustroot import TrustRoot
 from openid.extensions import ax, sreg
 
 import student.views as student_views
+# Required for Pearson
+from courseware.views import get_module_for_descriptor, jump_to
+from courseware.model_data import ModelDataCache
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore import Location
 
 log = logging.getLogger("mitx.external_auth")
 
@@ -551,7 +557,7 @@ def provider_login(request):
                 'nickname': user.username,
                 'email': user.email,
                 'fullname': user.username
-                }
+            }
 
             # the request succeeded:
             return provider_respond(server, openid_request, response, results)
@@ -606,3 +612,140 @@ def provider_xrds(request):
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('xrds', request)
     return response
+
+
+#-------------------
+# Pearson
+#-------------------
+def course_from_id(course_id):
+    """Return the CourseDescriptor corresponding to this course_id"""
+    course_loc = CourseDescriptor.id_to_location(course_id)
+    return modulestore().get_instance(course_id, course_loc)
+
+
+@csrf_exempt
+def test_center_login(request):
+    ''' Log in students taking exams via Pearson
+
+    Takes a POST request that contains the following keys:
+        - code - a security code provided by  Pearson
+        - clientCandidateID
+        - registrationID
+        - exitURL - the url that we redirect to once we're done
+        - vueExamSeriesCode - a code that indicates the exam that we're using
+    '''
+    # errors are returned by navigating to the error_url, adding a query parameter named "code"
+    # which contains the error code describing the exceptional condition.
+    def makeErrorURL(error_url, error_code):
+        log.error("generating error URL with error code {}".format(error_code))
+        return "{}?code={}".format(error_url, error_code)
+
+    # get provided error URL, which will be used as a known prefix for returning error messages to the
+    # Pearson shell.
+    error_url = request.POST.get("errorURL")
+
+    # TODO: check that the parameters have not been tampered with, by comparing the code provided by Pearson
+    # with the code we calculate for the same parameters.
+    if 'code' not in request.POST:
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingSecurityCode"))
+    code = request.POST.get("code")
+
+    # calculate SHA for query string
+    # TODO: figure out how to get the original query string, so we can hash it and compare.
+
+    if 'clientCandidateID' not in request.POST:
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientCandidateID"))
+    client_candidate_id = request.POST.get("clientCandidateID")
+
+    # TODO: check remaining parameters, and maybe at least log if they're not matching
+    # expected values....
+    # registration_id = request.POST.get("registrationID")
+    # exit_url = request.POST.get("exitURL")
+
+    # find testcenter_user that matches the provided ID:
+    try:
+        testcenteruser = TestCenterUser.objects.get(client_candidate_id=client_candidate_id)
+    except TestCenterUser.DoesNotExist:
+        log.error("not able to find demographics for cand ID {}".format(client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"))
+
+    # find testcenter_registration that matches the provided exam code:
+    # Note that we could rely in future on either the registrationId or the exam code,
+    # or possibly both.  But for now we know what to do with an ExamSeriesCode,
+    # while we currently have no record of RegistrationID values at all.
+    if 'vueExamSeriesCode' not in request.POST:
+        # we are not allowed to make up a new error code, according to Pearson,
+        # so instead of "missingExamSeriesCode", we use a valid one that is
+        # inaccurate but at least distinct.  (Sigh.)
+        log.error("missing exam series code for cand ID {}".format(client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingPartnerID"))
+    exam_series_code = request.POST.get('vueExamSeriesCode')
+
+    registrations = TestCenterRegistration.objects.filter(testcenter_user=testcenteruser, exam_series_code=exam_series_code)
+    if not registrations:
+        log.error("not able to find exam registration for exam {} and cand ID {}".format(exam_series_code, client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "noTestsAssigned"))
+
+    # TODO: figure out what to do if there are more than one registrations....
+    # for now, just take the first...
+    registration = registrations[0]
+
+    course_id = registration.course_id
+    course = course_from_id(course_id)  # assume it will be found....
+    if not course:
+        log.error("not able to find course from ID {} for cand ID {}".format(course_id, client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"))
+    exam = course.get_test_center_exam(exam_series_code)
+    if not exam:
+        log.error("not able to find exam {} for course ID {} and cand ID {}".format(exam_series_code, course_id, client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"))
+    location = exam.exam_url
+    log.info("proceeding with test of cand {} on exam {} for course {}: URL = {}".format(client_candidate_id, exam_series_code, course_id, location))
+
+    # check if the test has already been taken
+    timelimit_descriptor = modulestore().get_instance(course_id, Location(location))
+    if not timelimit_descriptor:
+        log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
+
+    timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
+                                                                             timelimit_descriptor, depth=None)
+    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
+                                                 timelimit_module_cache, course_id, position=None)
+    if not timelimit_module.category == 'timelimit':
+        log.error("cand {} on exam {} for course {}: non-timelimit module at location {}".format(client_candidate_id, exam_series_code, course_id, location))
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
+
+    if timelimit_module and timelimit_module.has_ended:
+        log.warning("cand {} on exam {} for course {}: test already over at {}".format(client_candidate_id, exam_series_code, course_id, timelimit_module.ending_at))
+        return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"))
+
+    # check if we need to provide an accommodation:
+    time_accommodation_mapping = {'ET12ET': 'ADDHALFTIME',
+                                  'ET30MN': 'ADD30MIN',
+                                  'ETDBTM': 'ADDDOUBLE', }
+
+    time_accommodation_code = None
+    for code in registration.get_accommodation_codes():
+        if code in time_accommodation_mapping:
+            time_accommodation_code = time_accommodation_mapping[code]
+
+    if time_accommodation_code:
+        timelimit_module.accommodation_code = time_accommodation_code
+        log.info("cand {} on exam {} for course {}: receiving accommodation {}".format(client_candidate_id, exam_series_code, course_id, time_accommodation_code))
+
+    # UGLY HACK!!!
+    # Login assumes that authentication has occurred, and that there is a
+    # backend annotation on the user object, indicating which backend
+    # against which the user was authenticated.  We're authenticating here
+    # against the registration entry, and assuming that the request given
+    # this information is correct, we allow the user to be logged in
+    # without a password.  This could all be formalized in a backend object
+    # that does the above checking.
+    # TODO: (brian) create a backend class to do this.
+    # testcenteruser.user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+    testcenteruser.user.backend = "%s.%s" % ("TestcenterAuthenticationModule", "TestcenterAuthenticationClass")
+    login(request, testcenteruser.user)
+
+    # And start the test:
+    return jump_to(request, course_id, location)
