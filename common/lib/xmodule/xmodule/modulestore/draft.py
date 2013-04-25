@@ -4,6 +4,8 @@ from . import ModuleStoreBase, Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
 
+import logging
+
 DRAFT = 'draft'
 
 
@@ -159,13 +161,17 @@ class DraftModuleStore(ModuleStoreBase):
 
         return super(DraftModuleStore, self).update_metadata(draft_loc, metadata)
 
-    def delete_item(self, location):
+    def delete_item(self, location, delete_all_versions=False):
         """
         Delete an item from this modulestore
 
         location: Something that can be passed to Location
         """
-        return super(DraftModuleStore, self).delete_item(as_draft(location))
+        super(DraftModuleStore, self).delete_item(as_draft(location))
+        if delete_all_versions:
+            super(DraftModuleStore, self).delete_item(location)
+
+        return
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location.  Needed

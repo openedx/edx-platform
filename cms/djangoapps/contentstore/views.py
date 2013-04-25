@@ -624,16 +624,9 @@ def delete_item(request):
     # if caller wants to only delete the draft than the caller should put item.location.revision='draft'
 
     if delete_children:
-        _xmodule_recurse(item, lambda i: store.delete_item(i.location))
+        _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions))
     else:
-        store.delete_item(item.location)
-
-    # cdodge: this is a bit of a hack until I can talk with Cale about the
-    # semantics of delete_item whereby the store is draft aware. Right now calling
-    # delete_item on a vertical tries to delete the draft version leaving the
-    # requested delete to never occur
-    if item.location.revision is None and item.location.category == 'vertical' and delete_all_versions:
-        modulestore('direct').delete_item(item.location)
+        store.delete_item(item.location, delete_all_versions)
 
     # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
     if delete_all_versions:

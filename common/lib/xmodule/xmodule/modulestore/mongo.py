@@ -694,12 +694,14 @@ class MongoModuleStore(ModuleStoreBase):
         self.refresh_cached_metadata_inheritance_tree(loc)
         self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
-    def delete_item(self, location):
+    def delete_item(self, location, delete_all_versions=False):
         """
         Delete an item from this modulestore
 
         location: Something that can be passed to Location
+        delete_all_versions: is here because the DraftMongoModuleStore needs it and we need to keep the interface the same. It is unused.
         """
+        logging.debug('delete_all_versions = {0}'.format(delete_all_versions))
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
