@@ -88,32 +88,20 @@ if Backbone?
       pinned = @get("pinned")
       @set("pinned",pinned)
       @trigger "change", @
-    
-    flagAbuse: ->
-      temp_array = @get("abuse_flaggers")
-      temp_array.push(window.user.get('id'))
-      @set("abuse_flaggers",temp_array)
-      @trigger "change", @
 
-    unflagAbuse: ->
-      @get("abuse_flaggers").pop(window.user.get('id'))
-      @trigger "change", @
 
-    
   class @Thread extends @Content
     urlMappers:
-      'retrieve'    : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
-      'reply'       : -> DiscussionUtil.urlFor('create_comment', @id)
-      'unvote'      : -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
-      'upvote'      : -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
-      'downvote'    : -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
-      'close'       : -> DiscussionUtil.urlFor('openclose_thread', @id)
-      'update'      : -> DiscussionUtil.urlFor('update_thread', @id)
-      'delete'      : -> DiscussionUtil.urlFor('delete_thread', @id)
-      'follow'      : -> DiscussionUtil.urlFor('follow_thread', @id)
-      'unfollow'    : -> DiscussionUtil.urlFor('unfollow_thread', @id)
-      'flagAbuse'   : -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
-      'unFlagAbuse' : -> DiscussionUtil.urlFor("unFlagAbuse_#{@get('type')}", @id)
+      'retrieve' : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
+      'reply'    : -> DiscussionUtil.urlFor('create_comment', @id)
+      'unvote'   : -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
+      'upvote'   : -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
+      'downvote' : -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
+      'close'    : -> DiscussionUtil.urlFor('openclose_thread', @id)
+      'update'   : -> DiscussionUtil.urlFor('update_thread', @id)
+      'delete'   : -> DiscussionUtil.urlFor('delete_thread', @id)
+      'follow'   : -> DiscussionUtil.urlFor('follow_thread', @id)
+      'unfollow' : -> DiscussionUtil.urlFor('unfollow_thread', @id)
       'pinThread'   : -> DiscussionUtil.urlFor("pin_thread", @id)
       'unPinThread' : -> DiscussionUtil.urlFor("un_pin_thread", @id)
 
@@ -169,8 +157,6 @@ if Backbone?
       'endorse': -> DiscussionUtil.urlFor('endorse_comment', @id)
       'update': -> DiscussionUtil.urlFor('update_comment', @id)
       'delete': -> DiscussionUtil.urlFor('delete_comment', @id)
-      'flagAbuse'   : -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
-      'unFlagAbuse' : -> DiscussionUtil.urlFor("unFlagAbuse_#{@get('type')}", @id)
 
     getCommentsCount: ->
       count = 0
