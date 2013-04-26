@@ -1498,6 +1498,12 @@ def create_new_course(request):
 
     new_course = modulestore('direct').clone_item(template, dest_location)
 
+    # clone a default 'about' module as well
+
+    about_template_location = Location(['i4x', 'edx', 'templates', 'about', 'overview'])
+    dest_about_location = dest_location._replace(category='about', name='overview')
+    modulestore('direct').clone_item(about_template_location, dest_about_location)
+
     if display_name is not None:
         new_course.display_name = display_name
 
