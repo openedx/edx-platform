@@ -10,10 +10,14 @@ class TestExtract(TestCase):
     """
     Tests functionality of i18n/extract.py
     """
-    generated_files = ('django.po', 'djangojs.po', 'mako.po')
+    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
 
     def setUp(self):
-        self.start_time = datetime.now()
+        # Subtract 1 second to help comparisons with file-modify time succeed,
+        # since os.path.getmtime() is not millisecond-accurate
+        self.start_time = datetime.now() - timedelta(seconds=1)
+
+        # Run extraction script. Warning, this takes 1 minute or more
         extract.main()
 
     def get_files (self):
