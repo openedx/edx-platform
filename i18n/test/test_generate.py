@@ -1,10 +1,6 @@
-import os
-import string
-import polib
-import random
+import os, string, random
 from unittest import TestCase
 from datetime import datetime, timedelta
-
 
 import generate
 from execute import get_config, messages_dir, SOURCE_MSGS_DIR, SOURCE_LOCALE

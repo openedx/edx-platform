@@ -1,10 +1,12 @@
-import os
+import os, polib
 from unittest import TestCase
-from datetime import datetime
-import polib
+from datetime import datetime, timedelta
 
 import extract
 from execute import SOURCE_MSGS_DIR
+
+# Make sure setup runs only once
+SETUP_HAS_RUN = False
 
 class TestExtract(TestCase):
     """
@@ -13,11 +15,21 @@ class TestExtract(TestCase):
     generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
 
     def setUp(self):
+        global SETUP_HAS_RUN
+        
         # Subtract 1 second to help comparisons with file-modify time succeed,
         # since os.path.getmtime() is not millisecond-accurate
         self.start_time = datetime.now() - timedelta(seconds=1)
+        super(TestExtract, self).setUp()
+        if not SETUP_HAS_RUN:
+            self.run_main()
+            SETUP_HAS_RUN = True
 
+    def run_main(self):
         # Run extraction script. Warning, this takes 1 minute or more
+        print "***********************"
+        print "***********************"
+        print "***********************"
         extract.main()
 
     def get_files (self):
