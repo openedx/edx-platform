@@ -480,6 +480,20 @@ task :autodeploy_properties do
     end
 end
 
+# --- Internationalization tasks
+
+desc "Extract localizable strings from sources"
+task :extract_dev_strings do
+  sh(File.join(REPO_ROOT, "i18n", "extract.py"))
+end
+
+desc "Compile localizable strings from sources. With optional flag 'extract', will extract strings first."
+task :generate_i18n do
+  if ARGV.last.downcase == 'extract'
+    Rake::Task["extract_dev_strings"].execute
+  end
+  sh(File.join(REPO_ROOT, "i18n", "generate.py"))
+end
 
 # --- Develop and public documentation ---
 desc "Invoke sphinx 'make build' to generate docs."
