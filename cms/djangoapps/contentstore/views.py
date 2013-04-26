@@ -615,9 +615,11 @@ def delete_item(request):
     delete_children = request.POST.get('delete_children', False)
     delete_all_versions = request.POST.get('delete_all_versions', False)
 
-    item = modulestore().get_item(item_location)
+    logging.debug('delete_all_versions = {0}'.format(delete_all_versions))
 
-    store = get_modulestore(item_loc)
+    store = modulestore()
+
+    item = store.get_item(item_location)
 
     # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
     # if item.location.revision=None, then delete both draft and published version

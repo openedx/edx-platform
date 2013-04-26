@@ -15,6 +15,12 @@ def as_draft(location):
     """
     return Location(location)._replace(revision=DRAFT)
 
+def as_published(location):
+    """
+    Returns the Location that is the published version for `location`
+    """
+    return Location(location)._replace(revision=None)    
+
 
 def wrap_draft(item):
     """
@@ -169,7 +175,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         super(DraftModuleStore, self).delete_item(as_draft(location))
         if delete_all_versions:
-            super(DraftModuleStore, self).delete_item(location)
+            super(DraftModuleStore, self).delete_item(as_published(location))
 
         return
 
