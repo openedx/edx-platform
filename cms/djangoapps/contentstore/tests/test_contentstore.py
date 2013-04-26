@@ -274,17 +274,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # make sure the parent points to the child object which is to be deleted
         self.assertTrue(sequential.location.url() in chapter.children)
 
-        # get a vertical (and components in it) to put into 'draft'
-        vertical = direct_store.get_item(Location(['i4x', 'edX', 'full',
-                                         'vertical', 'vertical_66', None]))
-
-        private_item_location = vertical.location._replace(name='private_vertical')
-
-        draft_store.clone_item(vertical.location, private_item_location)
-
-        direct_store.update_children(sequential.location, sequential.children +
-                                     [private_item_location.url()])
-
         self.client.post(
             reverse('delete_item'),
             json.dumps({'id': sequential.location.url(), 'delete_children': 'true', 'delete_all_versions': 'true'}),
@@ -305,15 +294,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)
 
-        # make sure we can't look up the private vertical
-        found_private = False
-        try:
-            draft_store.get_item(private_item_location)
-            found_private = True
-        except ItemNotFoundError:
-            pass
-
-        self.assertFalse(found_private)
 
     def test_about_overrides(self):
         '''
