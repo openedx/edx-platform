@@ -158,16 +158,20 @@ default_options = {
     :cms => '8001',
 }
 
+desc "Install all prerequisites needed for the lms and cms"
 task :install_prereqs => [:install_node_prereqs, :install_ruby_prereqs, :install_python_prereqs]
 
+desc "Install all node prerequisites for the lms and cms"
 task :install_node_prereqs do
     sh('npm install')
 end
 
+desc "Install all ruby prerequisites for the lms and cms"
 task :install_ruby_prereqs do
     sh('bundle install')
 end
 
+desc "Install all python prerequisites for the lms and cms"
 task :install_python_prereqs do
     sh('pip install -r requirements.txt')
 end
