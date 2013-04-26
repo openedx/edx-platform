@@ -142,6 +142,9 @@ def compile_assets(watch=false, debug=false)
             puts "Waiting for `#{cmd}` to complete (pid #{pid})"
             Process.wait(pid)
             puts "Completed"
+            if !$?.exited? || $?.exitstatus != 0
+                abort "`#{cmd}` failed"
+            end
         end
     end
 end
