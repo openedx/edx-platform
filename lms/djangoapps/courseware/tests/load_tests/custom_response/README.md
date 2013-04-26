@@ -17,7 +17,11 @@ so you can still run the tests.
 
 This test simulates student submissions for a custom response problem.
 
-You can run the test using:
+First, clear the cache:
+
+   /etc/init.d/memcached restart 
+
+Then, run the test:
 
     multimech-run custom_response
 
