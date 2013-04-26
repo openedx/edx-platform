@@ -24,7 +24,9 @@ default_functions = {'sin': numpy.sin,
                      'arccos': numpy.arccos,
                      'arcsin': numpy.arcsin,
                      'arctan': numpy.arctan,
-                     'abs': numpy.abs
+                     'abs': numpy.abs,
+                     'fact': math.factorial,
+                     'factorial': math.factorial
                      }
 default_variables = {'j': numpy.complex(0, 1),
                      'e': numpy.e,
@@ -246,4 +248,9 @@ if __name__ == '__main__':
     print evaluator({}, {}, "5+1*j")
     print evaluator({}, {}, "j||1")
     print evaluator({}, {}, "e^(j*pi)")
-    print evaluator({}, {}, "5+7 QWSEKO")
+    print evaluator({}, {}, "fact(5)")
+    print evaluator({}, {}, "factorial(5)")
+    try:
+        print evaluator({}, {}, "5+7 QWSEKO")
+    except UndefinedVariable:
+        print "Successfully caught undefined variable"
