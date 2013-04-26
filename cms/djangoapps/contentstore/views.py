@@ -615,15 +615,9 @@ def delete_item(request):
     delete_children = request.POST.get('delete_children', False)
     delete_all_versions = request.POST.get('delete_all_versions', False)
 
-    logging.debug('delete_all_versions = {0}'.format(delete_all_versions))
-
     store = modulestore()
 
     item = store.get_item(item_location)
-
-    # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
-    # if item.location.revision=None, then delete both draft and published version
-    # if caller wants to only delete the draft than the caller should put item.location.revision='draft'
 
     if delete_children:
         _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions))
