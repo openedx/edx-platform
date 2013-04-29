@@ -1030,36 +1030,6 @@ def _do_enroll_students(course_id, students, overload=False, auto_enroll=False):
     return data
 
 
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def enroll_students(request, course_id):
-    """Allows a staff member to enroll students in a course.
-
-    This is a short-term hack for Berkeley courses launching fall
-    2012. In the long term, we would like functionality like this, but
-    we would like both the instructor and the student to agree. Right
-    now, this allows any instructor to add students to their course,
-    which we do not want.
-
-    It is poorly written and poorly tested, but it's designed to be
-    stripped out.
-    """
-
-    course = get_course_with_access(request.user, course_id, 'staff')
-    existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id=course_id)]
-
-    new_students = request.POST.get('new_students')
-    ret = _do_enroll_students(course, course_id, new_students)
-    added_students = ret['added']
-    rejected_students = ret['rejected']
-
-    return render_to_response("enroll_students.html", {'course': course_id,
-                                                       'existing_students': existing_students,
-                                                       'added_students': added_students,
-                                                       'rejected_students': rejected_students,
-                                                       'debug': new_students})
-
-
 #Unenrollment
 def _do_unenroll_students(course_id, students):
     """Do the actual work of un-enrolling multiple students, presented as a string
@@ -1072,7 +1042,7 @@ def _do_unenroll_students(course_id, students):
                 
         isok = False
         cea = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=student)
-        #Safe to get the first entry as there is a unique key on email + course_id
+        #Will be 0 or 1 records as there is a unique key on email + course_id
         if cea:
             cea[0].delete()
             status[student] = "un-enrolled"
@@ -1084,7 +1054,7 @@ def _do_unenroll_students(course_id, students):
             continue
 
         nce = CourseEnrollment.objects.filter(user=user, course_id=course_id)
-        #Safe to get the first entry as there is a unique key on user + course_id
+        #Will be 0 or 1 records as there is a unique key on user + course_id
         if nce:
             try:
                 nce[0].delete()

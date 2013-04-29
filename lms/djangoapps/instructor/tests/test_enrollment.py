@@ -103,7 +103,6 @@ class TestInstructorEnrollsStudent(LoginEnrollmentTestCase):
         self.activate_user(self.student1)
         
         self.student2 = 'test1_2@student.com'
-        self.password = 'bar'
         self.create_account('s1_2', self.student2, self.password)
         self.activate_user(self.student2)
         
@@ -146,7 +145,6 @@ class TestInstructorEnrollsStudent(LoginEnrollmentTestCase):
         self.activate_user(self.student)
         
         self.student = 'test2_2@student.com'
-        self.password = 'bar'
         self.create_account('s2_2', self.student, self.password)
         self.activate_user(self.student)        
         
