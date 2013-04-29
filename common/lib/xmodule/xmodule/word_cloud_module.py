@@ -93,7 +93,6 @@ class WordCloudModule(WordCloudFields, XModule):
             list_to_return.append({'text': word_tuple[0], 'size': word_tuple[1], 'percent': percent})
         return list_to_return
 
-
     def top_dict(self, dict_obj, amount):
         """Return new dict: top of dict using dict value."""
         return dict(
