@@ -121,7 +121,8 @@ def fix_metadata(po):
              'Language' : 'en',
              'Language-Team': 'translation team <translation_team@edx.org>',
              }
-    del po.metadata['Last-Translator']
+    if po.metadata.has_key('Last-Translator'):
+        del po.metadata['Last-Translator']
     po.metadata.update(fixes)
 
 def strip_key_strings(po):
