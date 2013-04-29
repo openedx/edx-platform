@@ -1,9 +1,15 @@
 <div class="wrapper wrapper-component-editor">
 	<div class="component-editor">
-	  <menu class="component-edit-modes">
-	  	  <a href="#" class="button cancel-button">Editor</a>
-	  	  <a href="#" class="button cancel-button">Settings</a>
-	  </menu>
+	  <div id="component-edit-menu">
+	  	<ul class="edit-modes-list">
+	  		<li id="edit-modes-tab1" class="tab" aria-controls="panel1" aria-selected="true" role="tab" tabindex="0">
+	  			<a href="#" class="button cancel-button">Editor</a>
+	  		</li>
+	  		<li id="edit-modes-tab2" class="tab" aria-controls="panel2" aria-selected="true" role="tab" tabindex="-1">
+	  			<a href="#" class="button cancel-button">Settings </a>
+	  		</li>
+	  	</ul>
+	  </div>
 	  <div class="module-editor">
 	    ${editor}
 	  </div>
