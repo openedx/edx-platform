@@ -16,33 +16,11 @@ from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Integer, Scope, String, Boolean, Object, Float
-from .fields import Timedelta, Date
+from xblock.core import Scope, String, Boolean, Object
+from .fields import Timedelta, Date, StringyInteger, StringyFloat
 from xmodule.util.date_utils import time_to_datetime
 
 log = logging.getLogger("mitx.courseware")
-
-
-class StringyInteger(Integer):
-    """
-    A model type that converts from strings to integers when reading from json
-    """
-    def from_json(self, value):
-        try:
-            return int(value)
-        except:
-            return None
-
-
-class StringyFloat(Float):
-    """
-    A model type that converts from string to floats when reading from json
-    """
-    def from_json(self, value):
-        try:
-            return float(value)
-        except:
-            return None
 
 
 # Generated this many different variants of problems with rerandomize=per_student
@@ -95,7 +73,6 @@ class CapaFields(object):
     input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
-    display_name = String(help="Display name for this module", scope=Scope.settings)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
     markdown = String(help="Markdown source of this module", scope=Scope.settings)

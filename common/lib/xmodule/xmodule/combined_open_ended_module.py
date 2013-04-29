@@ -8,8 +8,7 @@ from .x_module import XModule
 from xblock.core import Integer, Scope, String, Boolean, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date
-from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
+from .fields import Date, StringyFloat
 
 log = logging.getLogger("mitx.courseware")
 
