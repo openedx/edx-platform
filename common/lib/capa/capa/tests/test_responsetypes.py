@@ -7,6 +7,7 @@ from datetime import datetime
 import json
 from nose.plugins.skip import SkipTest
 import os
+import random
 import unittest
 import textwrap
 
@@ -14,7 +15,7 @@ from . import test_system
 
 import capa.capa_problem as lcp
 from capa.responsetypes import LoncapaProblemError, \
-                            StudentInputError, ResponseError
+    StudentInputError, ResponseError
 from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat
@@ -360,10 +361,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, '2*x', 'correct')
         self.assert_grade(problem, '3*x', 'incorrect')
 
-
     def test_parallel_resistors(self):
         """Test parallel resistors"""
-        sample_dict = {'R1': (10,10), 'R2': (2,2), 'R3': (5,5), 'R4': (1,1)}
+        sample_dict = {'R1': (10, 10), 'R2': (2, 2), 'R3': (5, 5), 'R4': (1, 1)}
 
         # Test problem
         problem = self.build_problem(sample_dict=sample_dict,
@@ -388,9 +388,9 @@ class FormulaResponseTest(ResponseTest):
 
         # Sample x in the range [-10,10]
         sample_dict = {'x': (-10, 10)}
-        default_variables = [('j', 2, 3), ('e', 2, 3), ('pi', 2, 3), ('c', 2, 3), ('T', 2, 3), 
-                             ('k', 2*10**23, 3*10**23), # note k = scipy.constants.k = 1.3806488e-23
-                             ('q', 2*10**19, 3*10**19)] # note k = scipy.constants.e = 1.602176565e-19
+        default_variables = [('j', 2, 3), ('e', 2, 3), ('pi', 2, 3), ('c', 2, 3), ('T', 2, 3),
+                             ('k', 2 * 10 ** 23, 3 * 10 ** 23),   # note k = scipy.constants.k = 1.3806488e-23
+                             ('q', 2 * 10 ** 19, 3 * 10 ** 19)]   # note k = scipy.constants.e = 1.602176565e-19
         for (var, cscalar, iscalar) in default_variables:
             # The expected solution is numerically equivalent to cscalar*var
             correct = '{0}*x*{1}'.format(cscalar, var)
@@ -399,30 +399,29 @@ class FormulaResponseTest(ResponseTest):
                                          num_samples=10,
                                          tolerance=0.01,
                                          answer=correct)
+
             # Expect that the inputs are graded correctly
-            
-            self.assert_grade(problem, correct, 'correct', 
+            self.assert_grade(problem, correct, 'correct',
                               msg="Failed on variable {0}; the given, correct answer was {1} but graded 'incorrect'".format(var, correct))
-            self.assert_grade(problem, incorrect, 'incorrect', 
+            self.assert_grade(problem, incorrect, 'incorrect',
                               msg="Failed on variable {0}; the given, incorrect answer was {1} but graded 'correct'".format(var, incorrect))
 
     def test_default_functions(self):
         """Test the default functions provided in common/lib/capa/capa/calc.py"""
-        # which are: sin, cos, tan, sqrt, log10, log2, ln, 
+        # which are: sin, cos, tan, sqrt, log10, log2, ln,
         # arccos, arcsin, arctan, abs,
         # fact, factorial
-        
-        import random
-        w = random.randint(3, 10)
-        sample_dict = {'x': (-10, 10), # Sample x in the range [-10,10]
-                       'y': (1, 10),   # Sample y in the range [1,10] - logs, arccos need positive inputs
-                       'z':(-1, 1),    # Sample z in the range [1,10] - for arcsin, arctan
-                       'w':(w,w)}      # Sample w is a random, positive integer - factorial needs a positive, integer input,
-                                       # and the way formularesponse is defined, we can only specify a float range
 
-        default_functions = [('sin', 2, 3, 'x'), ('cos', 2, 3, 'x'), ('tan', 2, 3, 'x'), ('sqrt', 2, 3, 'y'), ('log10', 2, 3, 'y'), 
-                             ('log2', 2, 3, 'y'), ('ln', 2, 3, 'y'), ('arccos', 2, 3, 'z'), ('arcsin', 2, 3, 'z'), ('arctan', 2, 3, 'x'), 
-                             ('abs', 2, 3, 'x'), ('fact', 2, 3, 'w'), ('factorial', 2, 3, 'w'),]
+        w = random.randint(3, 10)
+        sample_dict = {'x': (-10, 10),  # Sample x in the range [-10,10]
+                       'y': (1, 10),    # Sample y in the range [1,10] - logs, arccos need positive inputs
+                       'z': (-1, 1),    # Sample z in the range [1,10] - for arcsin, arctan
+                       'w': (w, w)}     # Sample w is a random, positive integer - factorial needs a positive, integer input,
+                                        # and the way formularesponse is defined, we can only specify a float range
+
+        default_functions = [('sin', 2, 3, 'x'), ('cos', 2, 3, 'x'), ('tan', 2, 3, 'x'), ('sqrt', 2, 3, 'y'), ('log10', 2, 3, 'y'),
+                             ('log2', 2, 3, 'y'), ('ln', 2, 3, 'y'), ('arccos', 2, 3, 'z'), ('arcsin', 2, 3, 'z'), ('arctan', 2, 3, 'x'),
+                             ('abs', 2, 3, 'x'), ('fact', 2, 3, 'w'), ('factorial', 2, 3, 'w')]
         for (func, cscalar, iscalar, var) in default_functions:
             print 'func is: {0}'.format(func)
             # The expected solution is numerically equivalent to cscalar*func(var)
@@ -432,15 +431,12 @@ class FormulaResponseTest(ResponseTest):
                                          num_samples=10,
                                          tolerance=0.01,
                                          answer=correct)
+
             # Expect that the inputs are graded correctly
-            
-            self.assert_grade(problem, correct, 'correct', 
+            self.assert_grade(problem, correct, 'correct',
                               msg="Failed on function {0}; the given, correct answer was {1} but graded 'incorrect'".format(func, correct))
-            self.assert_grade(problem, incorrect, 'incorrect', 
+            self.assert_grade(problem, incorrect, 'incorrect',
                               msg="Failed on function {0}; the given, incorrect answer was {1} but graded 'correct'".format(func, incorrect))
-
-
-
 
 
 class StringResponseTest(ResponseTest):
@@ -989,14 +985,13 @@ class CustomResponseTest(ResponseTest):
         with self.assertRaises(ResponseError):
             problem.grade_answers({'1_2_1': '42'})
 
-
     def test_module_imports_inline(self):
         '''
         Check that the correct modules are available to custom
         response scripts
         '''
 
-        for module_name in ['random', 'numpy', 'math', 'scipy', 
+        for module_name in ['random', 'numpy', 'math', 'scipy',
                             'calc', 'eia', 'chemcalc', 'chemtools',
                             'miller', 'draganddrop']:
 
@@ -1006,26 +1001,25 @@ class CustomResponseTest(ResponseTest):
             script = textwrap.dedent('''
             correct[0] = 'correct'
             assert('%s' in globals())''' % module_name)
-             
+
             # Create the problem
             problem = self.build_problem(answer=script)
 
-            # Expect that we can grade an answer without 
+            # Expect that we can grade an answer without
             # getting an exception
             try:
                 problem.grade_answers({'1_2_1': '42'})
 
             except ResponseError:
-                self.fail("Could not use name '%s' in custom response" 
-                            % module_name)
-        
+                self.fail("Could not use name '{0}s' in custom response".format(module_name))
+
     def test_module_imports_function(self):
         '''
         Check that the correct modules are available to custom
         response scripts
         '''
 
-        for module_name in ['random', 'numpy', 'math', 'scipy', 
+        for module_name in ['random', 'numpy', 'math', 'scipy',
                             'calc', 'eia', 'chemcalc', 'chemtools',
                             'miller', 'draganddrop']:
 
@@ -1036,18 +1030,17 @@ class CustomResponseTest(ResponseTest):
             def check_func(expect, answer_given):
                 assert('%s' in globals())
                 return True''' % module_name)
-             
+
             # Create the problem
             problem = self.build_problem(script=script, cfn="check_func")
 
-            # Expect that we can grade an answer without 
+            # Expect that we can grade an answer without
             # getting an exception
             try:
                 problem.grade_answers({'1_2_1': '42'})
 
             except ResponseError:
-                self.fail("Could not use name '%s' in custom response" 
-                            % module_name)
+                self.fail("Could not use name '{0}s' in custom response".format(module_name))
 
 
 class SchematicResponseTest(ResponseTest):
