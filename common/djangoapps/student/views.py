@@ -31,7 +31,7 @@ from student.models import (Registration, UserProfile, TestCenterUser, TestCente
                             TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
-                            get_testcenter_registration)
+                            get_testcenter_registration, CourseEnrollmentAllowed)
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
@@ -825,6 +825,15 @@ def activate_account(request, key):
         if not r[0].user.is_active:
             r[0].activate()
             already_active = False
+        
+        #Enroll student in any pending courses he/she may have if auto_enroll flag is set
+        student = request.user
+        ceas = CourseEnrollmentAllowed.objects.filter(email=student.email)
+        for cea in ceas:
+            if cea.auto_enroll:
+                course_id = cea.course_id
+                enrollment, created = CourseEnrollment.objects.get_or_create(user_id=student.id, course_id=course_id)
+        
         resp = render_to_response("registration/activation_complete.html", {'user_logged_in': user_logged_in, 'already_active': already_active})
         return resp
     if len(r) == 0:

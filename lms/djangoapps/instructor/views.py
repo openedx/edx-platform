@@ -539,35 +539,17 @@ def instructor_dashboard(request, course_id):
         datatable['data'] = [[x.email] for x in ceaset]
         datatable['title'] = action
 
-    elif action == 'Enroll student':
-
-        student = request.POST.get('enstudent', '')
-        ret = _do_enroll_students(course, course_id, student)
-        datatable = ret['datatable']
-
-    elif action == 'Un-enroll student':
-
-        student = request.POST.get('enstudent', '')
-        datatable = {}
-        isok = False
-        cea = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=student)
-        if cea:
-            cea.delete()
-            msg += "Un-enrolled student with email '%s'" % student
-            isok = True
-        try:
-            nce = CourseEnrollment.objects.get(user=User.objects.get(email=student), course_id=course_id)
-            nce.delete()
-            msg += "Un-enrolled student with email '%s'" % student
-        except Exception as err:
-            if not isok:
-                msg += "Error!  Failed to un-enroll student with email '%s'\n" % student
-                msg += str(err) + '\n'
-
     elif action == 'Enroll multiple students':
 
-        students = request.POST.get('enroll_multiple', '')
-        ret = _do_enroll_students(course, course_id, students)
+        students = request.POST.get('multiple_students', '')
+        auto_enroll = request.POST.get('auto_enroll', False) != False
+        ret = _do_enroll_students(course_id, students, auto_enroll=auto_enroll)
+        datatable = ret['datatable']
+
+    elif action == 'Unenroll multiple students':
+        
+        students = request.POST.get('multiple_students', '')
+        ret = _do_unenroll_students(course_id, students)
         datatable = ret['datatable']
 
     elif action == 'List sections available in remote gradebook':
@@ -985,17 +967,11 @@ def grade_summary(request, course_id):
 #-----------------------------------------------------------------------------
 # enrollment
 
-def _do_enroll_students(course, course_id, students, overload=False):
+def _do_enroll_students(course_id, students, overload=False, auto_enroll=False):
     """Do the actual work of enrolling multiple students, presented as a string
     of emails separated by commas or returns"""
 
-    new_students = split_by_comma_and_whitespace(students)
-    new_students = [str(s.strip()) for s in new_students]
-    new_students_lc = [x.lower() for x in new_students]
-
-    if '' in new_students:
-        new_students.remove('')
-
+    new_students = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in new_students)
 
     if overload:  	# delete all but staff
@@ -1015,13 +991,20 @@ def _do_enroll_students(course, course_id, students, overload=False):
         try:
             user = User.objects.get(email=student)
         except User.DoesNotExist:
-            # user not signed up yet, put in pending enrollment allowed table
-            if CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_id):
-                status[student] = 'user does not exist, enrollment already allowed, pending'
+            
+            #User not signed up yet, put in pending enrollment allowed table
+            cea = CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_id)
+            
+            #If enrollmentallowed already exists, update auto_enroll flag to however it was set in UI
+            #Will be 0 or 1 records as there is a unique key on email + course_id
+            if cea:
+                cea[0].auto_enroll = auto_enroll
+                cea[0].save()
+                status[student] = 'user does not exist, enrollment already allowed, pending with auto enrollment ' + ("off", "on")[auto_enroll]
                 continue
-            cea = CourseEnrollmentAllowed(email=student, course_id=course_id)
+            cea = CourseEnrollmentAllowed(email=student, course_id=course_id, auto_enroll=auto_enroll)
             cea.save()
-            status[student] = 'user does not exist, enrollment allowed, pending'
+            status[student] = 'user does not exist, enrollment allowed, pending with auto enrollment ' + ("off", "on")[auto_enroll]
             continue
 
         if CourseEnrollment.objects.filter(user=user, course_id=course_id):
@@ -1076,6 +1059,57 @@ def enroll_students(request, course_id):
                                                        'rejected_students': rejected_students,
                                                        'debug': new_students})
 
+
+#Unenrollment
+def _do_unenroll_students(course_id, students):
+    """Do the actual work of un-enrolling multiple students, presented as a string
+    of emails separated by commas or returns"""
+
+    old_students = get_and_clean_student_list(students)
+    status = dict([x, 'unprocessed'] for x in old_students)
+    
+    for student in old_students:
+                
+        isok = False
+        cea = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=student)
+        #Safe to get the first entry as there is a unique key on email + course_id
+        if cea:
+            cea[0].delete()
+            status[student] = "un-enrolled"
+            isok = True
+        
+        try:
+            user = User.objects.get(email=student)
+        except User.DoesNotExist:    
+            continue
+
+        nce = CourseEnrollment.objects.filter(user=user, course_id=course_id)
+        #Safe to get the first entry as there is a unique key on user + course_id
+        if nce:
+            try:
+                nce[0].delete()
+                status[student] = "un-enrolled"
+            except Exception as err:
+                if not isok:
+                    status[student] = "Error!  Failed to un-enroll"
+
+    datatable = {'header': ['StudentEmail', 'action']}
+    datatable['data'] = [[x, status[x]] for x in status]
+    datatable['title'] = 'Un-enrollment of students'
+    
+    data = dict(datatable=datatable)
+    return data
+
+def get_and_clean_student_list(students):
+    
+    students = split_by_comma_and_whitespace(students)
+    students = [str(s.strip()) for s in students]
+    students_lc = [x.lower() for x in students]
+
+    if '' in students:
+        students.remove('')
+
+    return students
 
 #-----------------------------------------------------------------------------
 # answer distribution

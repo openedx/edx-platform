@@ -662,6 +662,7 @@ class CourseEnrollmentAllowed(models.Model):
     """
     email = models.CharField(max_length=255, db_index=True)
     course_id = models.CharField(max_length=255, db_index=True)
+    auto_enroll = models.BooleanField(default=0)
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 

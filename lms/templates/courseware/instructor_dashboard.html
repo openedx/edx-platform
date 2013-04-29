@@ -296,9 +296,6 @@ function goto( mode)
     <p>
     <input type="submit" name="action" value="List enrolled students">
     <input type="submit" name="action" value="List students who may enroll but may not have yet signed up">
-    <p>
-    Student Email: <input type="text" name="enstudent"> <input type="submit" name="action" value="Un-enroll student">
-    <input type="submit" name="action" value="Enroll student">
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
@@ -320,9 +317,13 @@ function goto( mode)
 
   %endif
 
-  <p>Add students: enter emails, separated by new lines or commas;</p>
-  <textarea rows="6" cols="70" name="enroll_multiple"></textarea>
+  <p>Enroll or un-enroll one or many students: enter emails, separated by new lines or commas;</p>
+  <textarea rows="6" cols="70" name="multiple_students"></textarea>
+  <p>
+  <input type="checkbox" name="auto_enroll"> Auto-enroll students when they activate
   <input type="submit" name="action" value="Enroll multiple students">
+  <p>
+  <input type="submit" name="action" value="Unenroll multiple students">
 
 %endif
 
