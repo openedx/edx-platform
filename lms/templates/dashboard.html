@@ -59,14 +59,16 @@
       $("#unenroll_course_number").text( $(event.target).data("course-number") );
     });
 
-    $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
-      if(json.success) {
-        location.href="${reverse('dashboard')}";
+    $('#unenroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        location.href = "${reverse('dashboard')}";
+      } else if (xhr.status == 403) {
+        location.href = "${reverse('signin_user')}?course_id=" +
+          $("#unenroll_course_id").val() + "&enrollment_action=unenroll";
       } else {
-        if($('#unenroll_error').length == 0) {
-          $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
-        }
-        $('#unenroll_error').text(json.error).stop().css("display", "block");
+        $('#unenroll_error').html(
+          xhr.responseText ? xhr.responseText : "An error occurred. Please try again later."
+        ).stop().css("display", "block");
       }
     });
 
@@ -354,6 +356,8 @@
       <h2>Are you sure you want to unregister from <span id="unenroll_course_number"></span>?</h2>
       <hr/>
     </header>
+
+    <div id="unenroll_error" class="modal-form-error"></div>
 
     <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <input name="course_id" id="unenroll_course_id" type="hidden" />

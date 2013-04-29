@@ -20,7 +20,7 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
 from django.utils.http import cookie_date
@@ -216,14 +216,21 @@ def signin_user(request):
     """
     This view will display the non-modal login form
     """
-    context = {}
+    context = {
+        'course_id': request.GET.get('course_id'),
+        'enrollment_action': request.GET.get('enrollment_action')
+    }
     return render_to_response('login.html', context)
+
 
 def register_user(request):
     """
     This view will display the non-modal registration form
     """
-    context = {}
+    context = {
+        'course_id': request.GET.get('course_id'),
+        'enrollment_action': request.GET.get('enrollment_action')
+    }
     return render_to_response('register.html', context)
 
 
@@ -290,35 +297,47 @@ def try_change_enrollment(request):
     """
     if 'enrollment_action' in request.POST:
         try:
-            enrollment_output = change_enrollment(request)
+            enrollment_response = change_enrollment(request)
             # There isn't really a way to display the results to the user, so we just log it
             # We expect the enrollment to be a success, and will show up on the dashboard anyway
-            log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
+            log.info(
+                "Attempted to automatically enroll after login. Response code: {0}; response body: {1}".format(
+                    enrollment_response.status_code,
+                    enrollment_response.content
+                )
+            )
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
 
 
-@login_required
-def change_enrollment_view(request):
-    """Delegate to change_enrollment to actually do the work."""
-    return HttpResponse(json.dumps(change_enrollment(request)))
-
-
-
 def change_enrollment(request):
+    """
+    Modify the enrollment status for the logged-in user.
+
+    The request parameter must be a POST request (other methods return 405)
+    that specifies course_id and enrollment_action parameters. If course_id or
+    enrollment_action is not specified, if course_id is not valid, if
+    enrollment_action is something other than "enroll" or "unenroll", if
+    enrollment_action is "enroll" and enrollment is closed for the course, or
+    if enrollment_action is "unenroll" and the user is not enrolled in the
+    course, a 400 error will be returned. If the user is not logged in, 403
+    will be returned; it is important that only this case return 403 so the
+    front end can redirect the user to a registration or login page when this
+    happens. This function should only be called from an AJAX request or
+    as a post-login/registration helper, so the error messages in the responses
+    should never actually be user-visible.
+    """
     if request.method != "POST":
-        raise Http404
+        return HttpResponseNotAllowed(["POST"])
 
     user = request.user
     if not user.is_authenticated():
-        raise Http404
+        return HttpResponseForbidden()
 
-    action = request.POST.get("enrollment_action", "")
-
-    course_id = request.POST.get("course_id", None)
+    action = request.POST.get("enrollment_action")
+    course_id = request.POST.get("course_id")
     if course_id is None:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': 'There was an error receiving the course id.'}))
+        return HttpResponseBadRequest("Course id not specified")
 
     if action == "enroll":
         # Make sure the course exists
@@ -328,12 +347,10 @@ def change_enrollment(request):
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
                       .format(user.username, course_id))
-            return {'success': False, 'error': 'The course requested does not exist.'}
+            return HttpResponseBadRequest("Course id is invalid")
 
         if not has_access(user, course, 'enroll'):
-            return {'success': False,
-                    'error': 'enrollment in {} not allowed at this time'
-                    .format(course.display_name_with_default)}
+            return HttpResponseBadRequest("Enrollment is closed")
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
@@ -347,7 +364,7 @@ def change_enrollment(request):
             # If we've already created this enrollment in a separate transaction,
             # then just continue
             pass
-        return {'success': True}
+        return HttpResponse()
 
     elif action == "unenroll":
         try:
@@ -360,13 +377,11 @@ def change_enrollment(request):
                                   "course:{0}".format(course_num),
                                   "run:{0}".format(run)])
 
-            return {'success': True}
+            return HttpResponse()
         except CourseEnrollment.DoesNotExist:
-            return {'success': False, 'error': 'You are not enrolled for this course.'}
+            return HttpResponseBadRequest("You are not enrolled in this course")
     else:
-        return {'success': False, 'error': 'Invalid enrollment_action.'}
-
-    return {'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}
+        return HttpResponseBadRequest("Enrollment action is invalid")
 
 
 @ensure_csrf_cookie
