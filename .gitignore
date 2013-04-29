@@ -31,3 +31,4 @@ cover_html/
 chromedriver.log
 /nbproject
 ghostdriver.log
+node_modules
