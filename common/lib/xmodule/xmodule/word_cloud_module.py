@@ -79,7 +79,6 @@ class WordCloudModule(WordCloudFields, XModule):
         """Convert raw word to suitable word."""
         return word.strip().lower()
 
-
     def prepare_words(self, top_words, total_count):
         """Convert words dictionary for client API."""
         list_to_return = []
@@ -91,7 +90,7 @@ class WordCloudModule(WordCloudFields, XModule):
             else:
                 percent = round(100.0 * word_tuple[1] / total_count)
                 percents += percent
-            list_to_return.append({'text': word_tuple[0] , 'size': word_tuple[1], 'percent': percent})
+            list_to_return.append({'text': word_tuple[0], 'size': word_tuple[1], 'percent': percent})
         return list_to_return
 
 
