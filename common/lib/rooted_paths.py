@@ -8,7 +8,7 @@ def rooted_glob(root, glob):
 
     Uses glob2 globbing
     """
-    return remove_root(root, glob2.glob('{root}/{glob}'.format(root=root, glob=glob)))
+    return remove_root(root, sorted(glob2.glob('{root}/{glob}'.format(root=root, glob=glob))))
 
 
 def remove_root(root, paths):

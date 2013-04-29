@@ -37,7 +37,7 @@ xdescribe 'VideoPlayer', ->
         expect(window.VideoProgressSlider).toHaveBeenCalledWith el: $('.slider', @player.el)
 
       it 'create Youtube player', ->
-        expect(YT.Player).toHaveBeenCalledWith 'example'
+        expect(YT.Player).toHaveBeenCalledWith('example', {
           playerVars:
             controls: 0
             wmode: 'transparent'
@@ -48,6 +48,7 @@ xdescribe 'VideoPlayer', ->
           events:
             onReady: @player.onReady
             onStateChange: @player.onStateChange
+        })
 
       it 'bind to video control play event', ->
         expect($(@player.control)).toHandleWith 'play', @player.play
