@@ -265,7 +265,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
         direct_store = modulestore('direct')
-        draft_store = modulestore('draft')
 
         sequential = direct_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
 
@@ -282,14 +281,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         found = False
         try:
-            draft_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
+            direct_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
             found = True
         except ItemNotFoundError:
             pass
 
         self.assertFalse(found)
 
-        chapter = draft_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
+        chapter = direct_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
 
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)

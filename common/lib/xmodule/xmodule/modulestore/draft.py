@@ -4,8 +4,6 @@ from . import ModuleStoreBase, Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
 
-import logging
-
 DRAFT = 'draft'
 
 
