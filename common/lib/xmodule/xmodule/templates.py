@@ -20,8 +20,12 @@ from .x_module import XModuleDescriptor
 from .mako_module import MakoDescriptorSystem
 from .modulestore import Location
 from .modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 log = logging.getLogger(__name__)
+
+
+TEMPLATE_COURSEID = 'edx/templates/templates'
 
 
 def all_templates():
@@ -86,9 +90,9 @@ def update_templates():
                 ), exc_info=True)
                 continue
 
-            modulestore('direct').update_item(template_location, template.data)
-            modulestore('direct').update_children(template_location, template.children)
-            modulestore('direct').update_metadata(template_location, template.metadata)
+            modulestore('direct').update_item(TEMPLATE_COURSEID, template_location, template.data)
+            modulestore('direct').update_children(TEMPLATE_COURSEID, template_location, template.children)
+            modulestore('direct').update_metadata(TEMPLATE_COURSEID, template_location, template.metadata)
 
             # remove template from list of templates to delete
             templates_to_delete = [t for t in templates_to_delete if t.location != template_location]

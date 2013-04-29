@@ -1,5 +1,7 @@
 from xblock.core import Scope
 
+# TODO figure out how much of this should go into the xml modulestore class v be deleted
+
 # A list of metadata that this module can inherit from its parent module
 INHERITABLE_METADATA = (
     'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
@@ -43,6 +45,8 @@ def inherit_metadata(descriptor, model_data):
 
 
 def own_metadata(module):
+    # IN SPLIT MONGO this is just ['metadata'] as it keeps ['_inherited_metadata'] separate!
+    # FIXME move into kvs? will that work for xml mongo?
     """
     Return a dictionary that contains only non-inherited field keys,
     mapped to their values

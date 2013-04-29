@@ -125,10 +125,11 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         self._model_data = model_data
         self.system = system
-        self.location = Location(location)
+        # TODO ensure each caller passes correct type (removed coercion)
+        self.location = location
         self.descriptor = descriptor
-        self.url_name = self.location.name
-        self.category = self.location.category
+        self.category = category
+        self.definition_locator = definition_id
         self._loaded_children = None
 
     @property
@@ -210,7 +211,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         return self.icon_class
 
-    ### Functions used in the LMS
+    # ## Functions used in the LMS
 
     def get_score(self):
         """
@@ -340,9 +341,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
     # cdodge: this is a list of metadata names which are 'system' metadata
     # and should not be edited by an end-user
-
-    system_metadata_fields = ['data_dir', 'published_date', 'published_by', 'is_draft', 
-        'discussion_id', 'xml_attributes']
+    system_metadata_fields = ['data_dir', 'create_date', 'edited_by',
+        'previous_version', 'is_draft', 'discussion_id', 'xml_attributes']
 
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
@@ -371,29 +371,25 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
                  system,
+                 category,
                  location,
+                 definition_id,
                  model_data):
         """
-        Construct a new XModuleDescriptor. The only required arguments are the
-        system, used for interaction with external resources, and the
-        definition, which specifies all the data needed to edit and display the
-        problem (but none of the associated metadata that handles recordkeeping
-        around the problem).
-
-        This allows for maximal flexibility to add to the interface while
-        preserving backwards compatibility.
+        Construct a new XModuleDescriptor.
 
         system: A DescriptorSystem for interacting with external resources
 
-        location: Something Location-like that identifies this xmodule
+        location: a Locator
 
         model_data: A dictionary-like object that maps field names to values
             for those fields.
         """
         self.system = system
-        self.location = Location(location)
-        self.url_name = self.location.name
-        self.category = self.location.category
+        # TODO removed coercion to Location: verify all callers pass right obj
+        self.location = location
+        self.category = category
+        self.definition_locator = definition_id
         self._model_data = model_data
 
         self._child_instances = None
@@ -451,6 +447,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         system: Module system
         """
+        # TODO refactor for split mongo
         return self.module_class(
             system,
             self.location,

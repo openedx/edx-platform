@@ -5,6 +5,7 @@ Namespace defining common fields used by Studio for all blocks
 import datetime
 
 from xblock.core import Namespace, Boolean, Scope, ModelType, String
+from xmodule.fields import Date, DateTime
 
 
 class StringyBoolean(Boolean):
@@ -40,6 +41,15 @@ class CmsNamespace(Namespace):
     """
     Namespace with fields common to all blocks in Studio
     """
-    published_date = DateTuple(help="Date when the module was published", scope=Scope.settings)
-    published_by = String(help="Id of the user who published this module", scope=Scope.settings)
-    empty = StringyBoolean(help="Whether this is an empty template", scope=Scope.settings, default=False)
+    edited_on = DateTime(help="Date when the version was saved",
+        scope=Scope.content)
+    edited_by = String(help="Id of the user who last saved this module",
+        scope=Scope.content)
+    previous_version = String(help="The id of the previous version",
+        scope=Scope.content)
+    original_version = String(help="The id of the original version",
+        scope=Scope.content)
+    # TODO figure out how to more generally handle :-( Very kludgey to have an
+    # attr on all instances just to support the yaml
+    empty = StringyBoolean(help="Whether this is an empty template",
+        scope=Scope.settings, default=False)

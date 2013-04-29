@@ -39,8 +39,6 @@ def get_users_in_course_group_by_role(location, role):
 '''
 Create all permission groups for a new course and subscribe the caller into those roles
 '''
-
-
 def create_all_course_groups(creator, location):
     create_new_course_group(creator, location, INSTRUCTOR_ROLE_NAME)
     create_new_course_group(creator, location, STAFF_ROLE_NAME)
@@ -61,8 +59,6 @@ def create_new_course_group(creator, location, role):
 This is to be called only by either a command line code path or through a app which has already
 asserted permissions
 '''
-
-
 def _delete_course_group(location):
     # remove all memberships
     instructors = Group.objects.get(name=get_course_groupname_for_role(location, INSTRUCTOR_ROLE_NAME))
@@ -79,8 +75,6 @@ def _delete_course_group(location):
 This is to be called only by either a command line code path or through an app which has already
 asserted permissions to do this action
 '''
-
-
 def _copy_course_group(source, dest):
     instructors = Group.objects.get(name=get_course_groupname_for_role(source, INSTRUCTOR_ROLE_NAME))
     new_instructors_group = Group.objects.get(name=get_course_groupname_for_role(dest, INSTRUCTOR_ROLE_NAME))

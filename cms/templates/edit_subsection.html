@@ -119,6 +119,7 @@
 	        var gradeView = new CMS.Views.OverviewAssignmentGrader({
 	            el : ele,
 	            graders : window.graderTypes,
+                courseId : '${courseId | h}',
 	            hideSymbol : true
 	        });
 	    });
