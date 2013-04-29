@@ -1,4 +1,3 @@
-import logging
 from cStringIO import StringIO
 from math import exp
 from lxml import etree
@@ -19,6 +18,8 @@ import json
 
 from xblock.core import Scope, List, String, Object, Boolean
 from .fields import Date
+import logging
+from xmodule.fields import DateTime
 
 
 log = logging.getLogger(__name__)
@@ -147,14 +148,50 @@ class TextbookList(List):
 
 
 class CourseFields(object):
-    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course", scope=Scope.content)
+    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
+        default=[], scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
-    start = Date(help="Start time when this module is visible", scope=Scope.settings)
+    start = DateTime(help="Start time when this module is visible",
+        computed_default=lambda i: datetime.datetime.utcnow(),
+        scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
-    grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
+    grading_policy = Object(help="Grading policy definition for this class",
+        default={"GRADER": [
+                {
+                    "type": "Homework",
+                    "min_count": 12,
+                    "drop_count": 2,
+                    "short_label": "HW",
+                    "weight": 0.15
+                },
+                {
+                    "type": "Lab",
+                    "min_count": 12,
+                    "drop_count": 2,
+                    "weight": 0.15
+                },
+                {
+                    "type": "Midterm Exam",
+                    "short_label": "Midterm",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "weight": 0.3
+                },
+                {
+                    "type": "Final Exam",
+                    "short_label": "Final",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "weight": 0.4
+                }
+            ],
+            "GRADE_CUTOFFS": {
+                "Pass": 0.5
+            }},
+            scope=Scope.content)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", scope=Scope.settings)
     tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
@@ -212,25 +249,28 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     template_dir_name = 'course'
 
     def __init__(self, *args, **kwargs):
+        '''
+        Expects args of system, category, location, and model_data
+        '''
+        # TODO a lot of this is overkill for just retrieving the course. e.g.,
+        # to just show a dashboard of courses. Can we move it?
         super(CourseDescriptor, self).__init__(*args, **kwargs)
 
-        if self.wiki_slug is None:
-            self.wiki_slug = self.location.course
+#        if self.wiki_slug is None:
+#            # FIXME won't work
+#            self.wiki_slug = self.location.course
 
         msg = None
-        if self.start is None:
-            msg = "Course loaded without a valid start date. id = %s" % self.id
-            # hack it -- start in 1970
-            self.start = time.gmtime(0)
-            log.critical(msg)
-            self.system.error_tracker(msg)
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
 
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
         #   disable the syllabus content for courses that do not provide a syllabus
-        self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+        if self.system.resources_fs is None:
+            self.syllabus_present = False
+        else:
+            self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
         self._grading_policy = {}
 
         self.set_grading_policy(self.grading_policy)
@@ -249,42 +289,32 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     log.error(msg)
                     continue
 
-    def default_grading_policy(self):
-        """
-        Return a dict which is a copy of the default grading policy
-        """
-        return {"GRADER": [
-                {
-                    "type": "Homework",
-                    "min_count": 12,
-                    "drop_count": 2,
-                    "short_label": "HW",
-                    "weight": 0.15
-                },
-                {
-                    "type": "Lab",
-                    "min_count": 12,
-                    "drop_count": 2,
-                    "weight": 0.15
-                },
-                {
-                    "type": "Midterm Exam",
-                    "short_label": "Midterm",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "weight": 0.3
-                },
-                {
-                    "type": "Final Exam",
-                    "short_label": "Final",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "weight": 0.4
-                }
-            ],
-            "GRADE_CUTOFFS": {
-                "Pass": 0.5
-            }}
+        if self.tabs is None:
+            # When calling the various _tab methods, can omit the 'type':'blah' from the
+            # first arg, since that's only used for dispatch
+            tabs = []
+            tabs.append({'type': 'courseware'})
+            tabs.append({'type': 'course_info', 'name': 'Course Info'})
+
+            if self.syllabus_present:
+                tabs.append({'type': 'syllabus'})
+
+            tabs.append({'type': 'textbooks'})
+
+            # # If they have a discussion link specified, use that even if we feature
+            # # flag discussions off. Disabling that is mostly a server safety feature
+            # # at this point, and we don't need to worry about external sites.
+            if self.discussion_link:
+                tabs.append({'type': 'external_discussion', 'link': self.discussion_link})
+            else:
+                tabs.append({'type': 'discussion', 'name': 'Discussion'})
+
+            tabs.append({'type': 'wiki', 'name': 'Wiki'})
+
+            if not self.hide_progress_tab:
+                tabs.append({'type': 'progress', 'name': 'Progress'})
+
+            self.tabs = tabs
 
     def set_grading_policy(self, course_policy):
         """
@@ -295,7 +325,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             course_policy = {}
 
         # Load the global settings as a dictionary
-        grading_policy = self.default_grading_policy()
+        grading_policy = self.grading_policy
 
         # Override any global settings with the course settings
         grading_policy.update(course_policy)
@@ -364,7 +394,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
         for textbook in xml_object.findall("textbook"):
-            textbooks.append((textbook.get('title'), textbook.get('book_url')))
+            textbooks.append([textbook.get('title'), textbook.get('book_url')])
             xml_object.remove(textbook)
 
         # Load the wiki tag if it exists
@@ -392,7 +422,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return time.gmtime() > self.end
 
     def has_started(self):
-        return time.gmtime() > self.start
+        return datetime.datetime.utcnow() > self.start
 
     @property
     def grader(self):
@@ -538,7 +568,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         try:
             start = dateutil.parser.parse(self.advertised_start)
         except (ValueError, AttributeError):
-            start = time_to_datetime(self.start)
+            start = self.start
 
         now = datetime.utcnow()
 
@@ -640,6 +670,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         if isinstance(self.advertised_start, basestring):
             return try_parse_iso_8601(self.advertised_start)
         elif self.advertised_start is None and self.start is None:
+            # TODO this is an impossible state since the init function forces start to have a value
             return 'TBD'
         else:
             return time.strftime("%b %d, %Y", self.advertised_start or self.start)

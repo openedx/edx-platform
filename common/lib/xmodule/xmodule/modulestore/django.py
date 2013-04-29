@@ -25,22 +25,39 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
+def load_modulestore(settings):
+    class_ = load_function(settings['ENGINE'])
+
+    options = {}
+    options.update(settings['OPTIONS'])
+    for key in FUNCTION_KEYS:
+        if key in options:
+            options[key] = load_function(options[key])
+
+    return class_(**options)
+
+
 def modulestore(name='default'):
     global _MODULESTORES
 
     if name not in _MODULESTORES:
-        class_ = load_function(settings.MODULESTORE[name]['ENGINE'])
+        if settings.MODULESTORE[name]['ENGINE'] == 'xmodule.modulestore.comparison.ComparisonModuleStore':
+            stores = [load_modulestore(cfg) for cfg in settings.MODULESTORE[name]['stores']]
+            class_ = load_function(settings.MODULESTORE[name]['ENGINE'])
+            _MODULESTORES[name] = class_(*stores)
+        else:
+            class_ = load_function(settings.MODULESTORE[name]['ENGINE'])
 
-        options = {}
+            options = {}
 
-        options.update(settings.MODULESTORE[name]['OPTIONS'])
-        for key in FUNCTION_KEYS:
-            if key in options:
-                options[key] = load_function(options[key])
+            options.update(settings.MODULESTORE[name]['OPTIONS'])
+            for key in FUNCTION_KEYS:
+                if key in options:
+                    options[key] = load_function(options[key])
 
-        _MODULESTORES[name] = class_(
-            **options
-        )
+            _MODULESTORES[name] = class_(
+                **options
+            )
 
     return _MODULESTORES[name]
 

@@ -475,8 +475,8 @@ class MongoModuleStore(ModuleStoreBase):
         Returns a list of course descriptors.
         '''
         # TODO (vshnayder): Why do I have to specify i4x here?
-        course_filter = Location("i4x", category="course")
-        return self.get_items(course_filter)
+        course_filter = Location(category="course")
+        return (item for item in self.get_items(course_filter) if item.location.course != 'templates')
 
     def _find_one(self, location):
         '''Look for a given location in the collection.  If revision is not
@@ -641,7 +641,7 @@ class MongoModuleStore(ModuleStoreBase):
         if result['n'] == 0:
             raise ItemNotFoundError(location)
 
-    def update_item(self, location, data):
+    def update_item(self, course_id, location, data):
         """
         Set the data in the item specified by the location to
         data
@@ -718,7 +718,7 @@ class MongoModuleStore(ModuleStoreBase):
         self.refresh_cached_metadata_inheritance_tree(Location(location))
         self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
-    def get_parent_locations(self, location, course_id):
+    def get_parent_locations(self, course_id, location):
         '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
         '''
