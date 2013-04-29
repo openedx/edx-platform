@@ -264,13 +264,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_delete(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
-        module_store = modulestore('direct')
+        direct_store = modulestore('direct')
 
-        sequential = module_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
+        sequential = direct_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
 
-        chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
+        chapter = direct_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
 
-        # make sure the parent no longer points to the child object which was deleted
+        # make sure the parent points to the child object which is to be deleted
         self.assertTrue(sequential.location.url() in chapter.children)
 
         self.client.post(
@@ -281,17 +281,18 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         found = False
         try:
-            module_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
+            direct_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
             found = True
         except ItemNotFoundError:
             pass
 
         self.assertFalse(found)
 
-        chapter = module_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
+        chapter = direct_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
 
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)
+
 
     def test_about_overrides(self):
         '''
