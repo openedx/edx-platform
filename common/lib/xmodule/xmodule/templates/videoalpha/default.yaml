@@ -5,9 +5,9 @@ metadata:
     is_graded: False
     version: 1
 data: |
-  <videoalpha show_captions="true" from="00:00:02" to="00:00:03" sub="name_of_file" youtube="" >
-    <source src="http://techslides.com/demos/sample-videos/small.mp4"/>
-    <source src="http://techslides.com/demos/sample-videos/small.webm"/>
-    <source src="http://techslides.com/demos/sample-videos/small.ogv"/>
+  <videoalpha show_captions="true" from="00:00:59" to="00:01:02" sub="name_of_file" youtube="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" >
+    <source src="https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp4"/>
+    <source src="https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm"/>
+    <source src="https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv"/>
   </videoalpha>
 children: []
