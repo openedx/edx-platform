@@ -24,7 +24,9 @@ default_functions = {'sin': numpy.sin,
                      'arccos': numpy.arccos,
                      'arcsin': numpy.arcsin,
                      'arctan': numpy.arctan,
-                     'abs': numpy.abs
+                     'abs': numpy.abs,
+                     'fact': math.factorial,
+                     'factorial': math.factorial
                      }
 default_variables = {'j': numpy.complex(0, 1),
                      'e': numpy.e,
@@ -112,18 +114,18 @@ def evaluator(variables, functions, string, cs=False):
         return float('nan')
 
     ops = {"^": operator.pow,
-            "*": operator.mul,
-            "/": operator.truediv,
-            "+": operator.add,
-            "-": operator.sub,
-            }
+           "*": operator.mul,
+           "/": operator.truediv,
+           "+": operator.add,
+           "-": operator.sub,
+           }
     # We eliminated extreme ones, since they're rarely used, and potentially
     # confusing. They may also conflict with variables if we ever allow e.g.
     # 5R instead of 5*R
     suffixes = {'%': 0.01, 'k': 1e3, 'M': 1e6, 'G': 1e9,
-              'T': 1e12,  # 'P':1e15,'E':1e18,'Z':1e21,'Y':1e24,
-              'c': 1e-2, 'm': 1e-3, 'u': 1e-6,
-              'n': 1e-9, 'p': 1e-12}  # ,'f':1e-15,'a':1e-18,'z':1e-21,'y':1e-24}
+                'T': 1e12,  # 'P':1e15,'E':1e18,'Z':1e21,'Y':1e24,
+                'c': 1e-2, 'm': 1e-3, 'u': 1e-6,
+                'n': 1e-9, 'p': 1e-12}  # ,'f':1e-15,'a':1e-18,'z':1e-21,'y':1e-24}
 
     def super_float(text):
         ''' Like float, but with si extensions. 1k goes to 1000'''
@@ -246,4 +248,9 @@ if __name__ == '__main__':
     print evaluator({}, {}, "5+1*j")
     print evaluator({}, {}, "j||1")
     print evaluator({}, {}, "e^(j*pi)")
-    print evaluator({}, {}, "5+7 QWSEKO")
+    print evaluator({}, {}, "fact(5)")
+    print evaluator({}, {}, "factorial(5)")
+    try:
+        print evaluator({}, {}, "5+7 QWSEKO")
+    except UndefinedVariable:
+        print "Successfully caught undefined variable"
