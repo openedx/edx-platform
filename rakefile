@@ -330,6 +330,12 @@ task :migrate, [:env] do |t, args|
     sh(django_admin(:lms, args.env, 'migrate'))
 end
 
+desc "Run tests for the internationalization library"
+task :test_i18n do
+  test = File.join(REPO_ROOT, "i18n", "tests")
+  sh("nosetests #{test}")
+end
+
 Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     task_name = "test_#{lib}"
 
