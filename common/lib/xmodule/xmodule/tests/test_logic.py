@@ -109,9 +109,11 @@ class WordCloudModuleTest(LogicTest):
         )
         self.assertListEqual(
             response['top_words'],
-            [{'text': 'dad', 'size': 2},
-             {'text': 'sun', 'size': 1},
-             {'text': 'dog', 'size': 6},
-             {'text': 'mom', 'size': 1},
-             {'text': 'cat', 'size': 12}]
+            [{'text': 'dad', 'size': 2, 'percent': 9.0},
+             {'text': 'sun', 'size': 1, 'percent': 5.0},
+             {'text': 'dog', 'size': 6, 'percent': 27.0},
+             {'text': 'mom', 'size': 1, 'percent': 5.0},
+             {'text': 'cat', 'size': 12, 'percent': 54.0}]
         )
+
+        self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']) )
