@@ -68,7 +68,7 @@ def _write_styles(selector, output_root, classes):
                 css_fragments[idx, filetype, fragment].add(class_.__name__)
     css_imports = defaultdict(set)
     for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
-        fragment_name = "{idx}-{hash}.{type}".format(
+        fragment_name = "{idx:0=3d}-{hash}.{type}".format(
             idx=idx,
             hash=hashlib.md5(fragment).hexdigest(),
             type=filetype)
@@ -102,7 +102,7 @@ def _write_js(output_root, classes):
 
     module_js = []
     for idx, filetype, fragment in sorted(js_fragments):
-        path = output_root / "{idx}-{hash}.{type}".format(
+        path = output_root / "{idx:0=3d}-{hash}.{type}".format(
             idx=idx,
             hash=hashlib.md5(fragment).hexdigest(),
             type=filetype)

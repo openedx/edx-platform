@@ -40,6 +40,8 @@ yes w | pip install -q -r requirements.txt
 
 bundle install
 
+npm install
+
 rake clobber
 rake pep8 > pep8.log || cat pep8.log
 rake pylint > pylint.log || cat pylint.log
