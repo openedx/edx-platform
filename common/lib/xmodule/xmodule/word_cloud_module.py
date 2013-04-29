@@ -11,10 +11,9 @@ import logging
 
 from lxml import etree
 from pkg_resources import resource_string
-
+from xmodule.raw_module import RawDescriptor
 from xmodule.x_module import XModule
-from xmodule.mako_module import MakoModuleDescriptor
-from xmodule.xml_module import XmlDescriptor
+
 from xblock.core import Scope, String, Object, Boolean, List, Integer
 
 log = logging.getLogger(__name__)
