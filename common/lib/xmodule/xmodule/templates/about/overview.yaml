@@ -19,7 +19,7 @@ data: |
                   <h2>Course Staff</h2>
                   <article class="teacher">
                     <div class="teacher-image">
-                      <img src="/c4x/edX/edX101/asset/Placeholder_FacultyImage.jpg" align="left" style="margin:0 20 px 0">
+                      <img src="/static/images/pl-faculty.png" align="left" style="margin:0 20 px 0">
                     </div>
 
                     <h3>Staff member name</h3>
@@ -28,7 +28,7 @@ data: |
 
                   <article class="teacher">
                     <div class="teacher-image">
-                      <img src="/c4x/edX/edX101/asset/Placeholder_FacultyImage.jpg" align="left" style="margin:0 20 px 0">
+                      <img src="/static/images/pl-faculty.png" align="left" style="margin:0 20 px 0">
                     </div>
 
                     <h3>Staff member name</h3>
