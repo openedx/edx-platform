@@ -80,12 +80,21 @@ class WordCloudModule(WordCloudFields, XModule):
         """Convert raw word to suitable word."""
         return word.strip().lower()
 
-    def prepare_words(self, words, total_count):
+
+    def prepare_words(self, top_words, total_count):
         """Convert words dictionary for client API."""
-        return [
-            {'text': word, 'size': count, 'percent': round(100 * (count / float(total_count)))} for
-            word, count in words.iteritems()
-        ]
+        list_to_return = []
+        percents = 0
+        current_num_top_words = len(top_words)
+        for num, word_tuple in enumerate(top_words.iteritems()):
+            if num == current_num_top_words - 1:
+                percent = 100 - percents
+            else:
+                percent = round(100.0 * word_tuple[1] / total_count)
+                percents += percent
+            list_to_return.append({'text': word_tuple[0] , 'size': word_tuple[1], 'percent': percent})
+        return list_to_return
+
 
     def top_dict(self, dict_obj, amount):
         """Return new dict: top of dict using dict value."""
