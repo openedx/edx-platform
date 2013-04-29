@@ -22,15 +22,9 @@ class TestExtract(TestCase):
         self.start_time = datetime.now() - timedelta(seconds=1)
         super(TestExtract, self).setUp()
         if not SETUP_HAS_RUN:
-            self.run_main()
+            # Run extraction script. Warning, this takes 1 minute or more
+            extract.main()
             SETUP_HAS_RUN = True
-
-    def run_main(self):
-        # Run extraction script. Warning, this takes 1 minute or more
-        print "***********************"
-        print "***********************"
-        print "***********************"
-        extract.main()
 
     def get_files (self):
         """

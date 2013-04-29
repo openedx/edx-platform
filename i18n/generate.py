@@ -21,7 +21,7 @@ def merge(locale, target='django.po'):
     """
     For the given locale, merge django-partial.po, messages.po, mako.po -> django.po
     """
-    LOG.info('Merging locale=%s' % locale)
+    LOG.info('Merging locale={0}'.format(locale))
     locale_directory = messages_dir(locale)
     files_to_merge = ('django-partial.po', 'messages.po', 'mako.po')
     validate_files(locale_directory, files_to_merge)
@@ -45,7 +45,7 @@ def validate_files(dir, files_to_merge):
     for path in files_to_merge:
         pathname = os.path.join(dir, path)
         if not os.path.exists(pathname):
-            raise Exception("File not found: %s" % pathname)
+            raise Exception("File not found: {0}".format(pathname))
 
 def main ():
     configuration = get_config()
