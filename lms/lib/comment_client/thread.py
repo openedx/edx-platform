@@ -121,11 +121,11 @@ class Thread(models.Model):
 
 
 def _url_for_flag_abuse_thread(thread_id):
-    return "{prefix}/threads/{thread_id}/abuse_flags".format(prefix=settings.PREFIX, thread_id=thread_id)
+    return "{prefix}/threads/{thread_id}/abuse_flag".format(prefix=settings.PREFIX, thread_id=thread_id)
 
 
 def _url_for_unflag_abuse_thread(thread_id):
-    return "{prefix}/threads/{thread_id}/abuse_unflags".format(prefix=settings.PREFIX, thread_id=thread_id)
+    return "{prefix}/threads/{thread_id}/abuse_unflag".format(prefix=settings.PREFIX, thread_id=thread_id)
 
 
 def _url_for_pin_thread(thread_id):
