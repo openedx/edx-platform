@@ -423,6 +423,19 @@ body.course.unit {
       padding: 20px;
       border-radius: 2px 2px 0 0;
 
+      .component-edit-modes {
+        @include box-sizing(border-box);
+        list-style: none;
+        position: absolute;
+        width: 100%;
+        padding: 15px;
+        top: 0;
+        right: 0;
+        border-bottom: 1px solid $lightBluishGrey2;
+        background: $lightGrey;
+
+      }
+
       .metadata_edit {
         margin-bottom: 20px;
         font-size: 13px;
