@@ -516,6 +516,16 @@ task :generate_i18n do
   sh(File.join(REPO_ROOT, "i18n", "generate.py"))
 end
 
+desc "Simulate international translation by generating dummy strings corresponding to source strings."
+task :dummy_i18n do
+  source_files = Dir["#{REPO_ROOT}/conf/locale/en/LC_MESSAGES/*.po"]
+  dummy_locale = 'fr'
+  cmd = File.join(REPO_ROOT, "i18n", "make_dummy.py")
+  for file in source_files do
+    sh("#{cmd} #{file} #{dummy_locale}")
+  end
+end
+
 # --- Develop and public documentation ---
 desc "Invoke sphinx 'make build' to generate docs."
 task :builddocs, [:options] do |t, args|
