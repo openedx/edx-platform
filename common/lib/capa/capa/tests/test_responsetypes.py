@@ -39,9 +39,6 @@ class ResponseTest(unittest.TestCase):
         if msg is None:
             self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness)
         else:
-            if correct_map.get_correctness('1_2_1')!= expected_correctness:
-                print submission
-                print correct_map
             self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness, msg)
 
     def assert_answer_format(self, problem):
