@@ -22,8 +22,8 @@ data: |
                       <img src="/static/images/pl-faculty.png" align="left" style="margin:0 20 px 0">
                     </div>
 
-                    <h3>Staff member name</h3>
-                    <p>Biography of instructor/staff member</p>
+                    <h3>Staff Member #1</h3>
+                    <p>Biography of instructor/staff member #1</p>
                   </article>
 
                   <article class="teacher">
@@ -31,8 +31,8 @@ data: |
                       <img src="/static/images/pl-faculty.png" align="left" style="margin:0 20 px 0">
                     </div>
 
-                    <h3>Staff member name</h3>
-                    <p>Biography of instructor/staff member</p>
+                    <h3>Staff Member #2</h3>
+                    <p>Biography of instructor/staff member #2</p>
                   </article>
                 </section>
 
@@ -49,6 +49,5 @@ data: |
                       <p>Your answer would be displayed here.</p>
                     </article>
                   </section>
-                  <article class="response">
                 </section>
 children: []
