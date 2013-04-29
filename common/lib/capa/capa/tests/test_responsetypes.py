@@ -414,11 +414,15 @@ class FormulaResponseTest(ResponseTest):
         # which are: sin, cos, tan, sqrt, log10, log2, ln, 
         # arccos, arcsin, arctan, abs,
         # fact, factorial
-
-        # Sample x in the range [-10,10]
+        
         import random
         w = random.randint(3, 10)
-        sample_dict = {'x': (-10, 10), 'y': (1, 10), 'z':(-1, 1), 'w':(w,w)}
+        sample_dict = {'x': (-10, 10), # Sample x in the range [-10,10]
+                       'y': (1, 10),   # Sample y in the range [1,10] - logs, arccos need positive inputs
+                       'z':(-1, 1),    # Sample z in the range [1,10] - for arcsin, arctan
+                       'w':(w,w)}      # Sample w is a random, positive integer - factorial needs a positive, integer input,
+                                       # and the way formularesponse is defined, we can only specify a float range
+
         default_functions = [('sin', 2, 3, 'x'), ('cos', 2, 3, 'x'), ('tan', 2, 3, 'x'), ('sqrt', 2, 3, 'y'), ('log10', 2, 3, 'y'), 
                              ('log2', 2, 3, 'y'), ('ln', 2, 3, 'y'), ('arccos', 2, 3, 'z'), ('arcsin', 2, 3, 'z'), ('arctan', 2, 3, 'x'), 
                              ('abs', 2, 3, 'x'), ('fact', 2, 3, 'w'), ('factorial', 2, 3, 'w'),]
