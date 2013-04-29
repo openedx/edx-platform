@@ -2451,7 +2451,8 @@ body.discussion {
       font-size: 12px;
       float:right;
       padding-right: 5px;
-      font-style: italic; 
+      font-style: italic;
+      cursor:pointer; 
     }  
 
 .discussion-pin-inline {
@@ -2500,7 +2501,8 @@ display:none;
       font-size: 12px;
       float:right;
       padding-right: 5px;
-      font-style: italic; 
+      font-style: italic;
+      cursor:pointer;
     }  
     
 .notflagged .icon
