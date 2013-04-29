@@ -3,6 +3,7 @@
 from codejail.safe_exec import safe_exec as codejail_safe_exec
 from codejail.safe_exec import json_safe
 from . import lazymod
+from statsd import statsd
 
 import hashlib
 
@@ -46,6 +47,7 @@ for name, modname in ASSUMED_IMPORTS:
 LAZY_IMPORTS = "".join(LAZY_IMPORTS)
 
 
+@statsd.timed('capa.safe_exec.time')
 def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None):
     """Exec python code safely.
 
