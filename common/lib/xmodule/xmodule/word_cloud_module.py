@@ -172,37 +172,8 @@ class WordCloudModule(WordCloudFields, XModule):
         return self.content
 
 
-class WordCloudDescriptor(WordCloudFields, MakoModuleDescriptor, XmlDescriptor):
-    _tag_name = 'word_cloud'
+class WordCloudDescriptor(WordCloudFields, RawDescriptor):
 
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
     stores_state = True
-
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        """Pull out the data into dictionary.
-
-        Args:
-            xml_object: xml from file.
-            system: `system` object.
-
-        Returns:
-            (definition, children) - tuple
-
-        """
-        definition = {}
-        children = []
-
-        return (definition, children)
-
-    def definition_to_xml(self, resource_fs):
-        """Return an xml element representing to this definition."""
-        xml_str = '<{tag_name} />'.format(tag_name=self._tag_name)
-        xml_object = etree.fromstring(xml_str)
-        xml_object.set('display_name', self.display_name)
-        xml_object.set('num_inputs', self.num_inputs)
-        xml_object.set('num_top_words', self.num_top_words)
-        xml_object.set('display_student_percents', pretty_bool(self.display_student_percents))
-
-        return xml_object
