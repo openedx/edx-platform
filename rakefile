@@ -93,7 +93,7 @@ end
 def template_jasmine_runner(lib)
     coffee_files = Dir["#{lib}/**/js/**/*.coffee", "common/static/coffee/src/**/*.coffee"]
     if !coffee_files.empty?
-        sh("coffee -c #{coffee_files.join(' ')}")
+        sh("node_modules/.bin/coffee -c #{coffee_files.join(' ')}")
     end
     phantom_jasmine_path = File.expand_path("common/test/phantom-jasmine")
     common_js_root = File.expand_path("common/static/js")
@@ -128,7 +128,7 @@ def compile_assets(watch=false, debug=false)
                        --command='#{xmodule_cmd}' \
                        common/lib/xmodule"
     end
-    coffee_cmd = "coffee #{watch ? '--watch' : ''} --compile */static"
+    coffee_cmd = "node_modules/.bin/coffee #{watch ? '--watch' : ''} --compile */static"
     sass_cmd = "sass #{debug ? '--debug-info' : '--style compressed'} " +
                      "--load-path ./common/static/sass " +
                      "--require ./common/static/sass/bourbon/lib/bourbon.rb " +
@@ -142,6 +142,9 @@ def compile_assets(watch=false, debug=false)
             puts "Waiting for `#{cmd}` to complete (pid #{pid})"
             Process.wait(pid)
             puts "Completed"
+            if !$?.exited? || $?.exitstatus != 0
+                abort "`#{cmd}` failed"
+            end
         end
     end
 end
@@ -154,6 +157,24 @@ default_options = {
     :lms => '8000',
     :cms => '8001',
 }
+
+desc "Install all prerequisites needed for the lms and cms"
+task :install_prereqs => [:install_node_prereqs, :install_ruby_prereqs, :install_python_prereqs]
+
+desc "Install all node prerequisites for the lms and cms"
+task :install_node_prereqs do
+    sh('npm install')
+end
+
+desc "Install all ruby prerequisites for the lms and cms"
+task :install_ruby_prereqs do
+    sh('bundle install')
+end
+
+desc "Install all python prerequisites for the lms and cms"
+task :install_python_prereqs do
+    sh('pip install -r requirements.txt')
+end
 
 task :predjango do
     sh("find . -type f -name *.pyc -delete")
