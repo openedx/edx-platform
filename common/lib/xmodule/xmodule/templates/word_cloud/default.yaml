@@ -1,0 +1,7 @@
+---
+metadata:
+    display_name: Word cloud
+    version: 1
+data: |
+  <word_cloud display_name="cloud" num_inputs="5" num_top_words="250" display_student_percents="True" />
+children: []
