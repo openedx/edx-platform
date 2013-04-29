@@ -7,10 +7,24 @@
     % for field_name, field_value in editable_metadata_fields.items():
     <li>
       % if field_name == 'source_code':
-        <a href="#hls-modal-${hlskey}" style="color:yellow;" id="hls-trig-${hlskey}" >Edit High Level Source</a>
+        % if field_value['is_default'] is False:
+            <a href="#hls-modal-${hlskey}" style="color:yellow;" id="hls-trig-${hlskey}" >Edit High Level Source</a>
+        % endif
       % else:
-        <label>${field_name}:</label>
- 	      <input type='text' data-metadata-name='${field_name}' value='${field_value}' size='60' />
+        <label>${field_value['field'].display_name}:</label>
+ 	      <input type='text' data-metadata-name='${field_value["field"].display_name}' value='${field_value["field"].to_json(field_value["value"])}' size='60' />
+        % if False:
+            <label>Help: ${field_value['field'].help}</label>
+            <label>Type: ${type(field_value['field']).__name__}</label>
+            <label>Inherited: ${field_value['is_inherited']}</label>
+            <label>Default: ${field_value['is_default']}</label>
+            % if field_value['field'].values:
+              <label>Possible values:</label>
+              % for value in field_value['field'].values:
+                <label>${value}</label>
+              % endfor
+            % endif
+        % endif
       % endif
     </li>
     % endfor

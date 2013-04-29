@@ -1,5 +1,6 @@
-from .x_module import XModuleDescriptor, DescriptorSystem
-from .modulestore.inheritance import own_metadata
+from .x_module import XModuleDescriptor, DescriptorSystem, NonEditableSettingsScope
+from xblock.core import Scope
+from xblock.core import XBlock
 
 
 class MakoDescriptorSystem(DescriptorSystem):
@@ -34,20 +35,40 @@ class MakoModuleDescriptor(XModuleDescriptor):
         """
         return {
             'module': self,
-            'editable_metadata_fields': self.editable_metadata_fields,
+            'editable_metadata_fields': self.editable_metadata_fields
         }
 
     def get_html(self):
         return self.system.render_template(
             self.mako_template, self.get_context())
 
-    # cdodge: encapsulate a means to expose "editable" metadata fields (i.e. not internal system metadata)
     @property
     def editable_metadata_fields(self):
-        fields = {}
-        for field, value in own_metadata(self).items():
-            if field in self.system_metadata_fields:
+        inherited_metadata = getattr(self, '_inherited_metadata', {})
+        metadata = {}
+        for field in self.fields:
+
+            if field.scope != Scope.settings or isinstance(field.scope, NonEditableSettingsScope):
                 continue
 
-            fields[field] = value
-        return fields
+            # We are not allowing editing of xblock tag and name fields at this time (for any component).
+            if field == XBlock.tags or field == XBlock.name:
+                continue
+
+            inherited = False
+            default = False
+            value = getattr(self, field.name)
+            if field.name in self._model_data:
+                default = False
+                if field.name in inherited_metadata and self._model_data.get(field.name) == inherited_metadata.get(
+                    field.name):
+                    inherited = True
+            else:
+                default = True
+
+            metadata[field.name] = {'field' : field,
+                                    'value': value,
+                                    'is_inherited': inherited,
+                                    'is_default': default }
+
+        return metadata

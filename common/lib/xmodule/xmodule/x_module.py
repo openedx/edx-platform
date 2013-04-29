@@ -78,12 +78,18 @@ class HTMLSnippet(object):
                                   .format(self.__class__))
 
 
+class NonEditableSettingsScope(Scope):
+    pass
+
+
 class XModuleFields(object):
     display_name = String(
+        display_name="Display Name",
         help="Display name for this module",
         scope=Scope.settings,
-        default=None,
+        default=None
     )
+    nonEditableSettingsScope = NonEditableSettingsScope(user=Scope.settings.user, block=Scope.settings.block)
 
 
 class XModule(XModuleFields, HTMLSnippet, XBlock):
@@ -333,12 +339,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # It should respond to max_score() and grade(). It can be graded or ungraded
     # (like a practice problem).
     has_score = False
-
-    # cdodge: this is a list of metadata names which are 'system' metadata
-    # and should not be edited by an end-user
-
-    system_metadata_fields = ['data_dir', 'published_date', 'published_by', 'is_draft',
-        'discussion_id', 'xml_attributes']
 
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal

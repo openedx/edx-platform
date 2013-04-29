@@ -13,7 +13,7 @@ from capa.responsetypes import StudentInputError,\
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, XModuleFields
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.core import Scope, String, Boolean, Object
@@ -62,20 +62,26 @@ class ComplexEncoder(json.JSONEncoder):
 
 class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
-    max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
-    due = Date(help="Date that this problem is due by", scope=Scope.settings)
-    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
-    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
-    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
-    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    max_attempts = StringyInteger(display_name="Maximum Allowed Attempts",
+                                  help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    due = Date(help="Date that this problem is due by", scope=XModuleFields.nonEditableSettingsScope)
+    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted",
+                            scope=XModuleFields.nonEditableSettingsScope)
+    showanswer = String(display_name="Show Answer",
+                        help="When to show the problem answer to the student", scope=Scope.settings, default="closed",
+                        values=["answered", "always", "attempted", "closed", "never"])
+    force_save_button = Boolean(help="Whether to force the save button to appear on the page",
+                                scope=XModuleFields.nonEditableSettingsScope, default=False)
+    rerandomize = Randomization(display_name="Rerandomize", help="When to rerandomize the problem",
+        default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
     input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+    weight = StringyFloat(display_name="Problem Weight", help="How much to weight this problem by", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", scope=XModuleFields.nonEditableSettingsScope)
     source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.", scope=Scope.settings)
 
 
@@ -881,16 +887,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         _context.update({'markdown': self.markdown,
                          'enable_markdown': self.markdown is not None})
         return _context
-
-    @property
-    def editable_metadata_fields(self):
-        """Remove metadata from the editable fields since it has its own editor"""
-        subset = super(CapaDescriptor, self).editable_metadata_fields
-        if 'markdown' in subset:
-            del subset['markdown']
-        if 'empty' in subset:
-            del subset['empty']
-        return subset
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
