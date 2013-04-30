@@ -188,7 +188,7 @@ data: |
         <p>
     Include image by using the edXxml macro: </p>
         <p>
-          <img src="http://autoid.mit.edu/images/mit_dome.jpg"/>
+          <img src="/static/images/mit_dome.jpg"/>
         </p>
         <p>
           <h4>Example show/hide explanation</h4>
