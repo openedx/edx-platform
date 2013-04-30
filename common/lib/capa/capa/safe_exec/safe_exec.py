@@ -4,6 +4,8 @@ from codejail.safe_exec import safe_exec as codejail_safe_exec
 from codejail.safe_exec import json_safe
 from . import lazymod
 
+import hashlib
+
 # Establish the Python environment for Capa.
 # Capa assumes float-friendly division always.
 # The name "random" is a properly-seeded stand-in for the random module.
@@ -53,7 +55,10 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
     # Check the cache for a previous result.
     if cache:
         canonical_globals = sorted(json_safe(globals_dict).iteritems())
-        key = "safe_exec %r %s %r" % (random_seed, code, canonical_globals)
+        md5er = hashlib.md5()
+        md5er.update(code)
+        md5er.update(repr(canonical_globals))
+        key = "safe_exec %r %s" % (random_seed, md5er.hexdigest())
         cached = cache.get(key)
         if cached is not None:
             globals_dict.update(cached)

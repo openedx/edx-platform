@@ -65,9 +65,13 @@ class DictCache(object):
         self.cache = d
 
     def get(self, key):
+        # Actual cache implementations have limits on key length
+        assert len(key) <= 250
         return self.cache.get(key)
 
     def set(self, key, value):
+        # Actual cache implementations have limits on key length
+        assert len(key) <= 250
         self.cache[key] = value
 
 
@@ -90,3 +94,13 @@ class TestSafeExecCaching(unittest.TestCase):
         g = {}
         safe_exec("a = int(math.pi)", g, cache=DictCache(cache))
         self.assertEqual(g['a'], 17)
+
+    def test_cache_large_code_chunk(self):
+        # Caching used to die on memcache with more than 250 bytes of code.
+        # Check that it doesn't any more.
+        code = "a = 0\n" + ("a += 1\n" * 12345)
+
+        g = {}
+        cache = {}
+        safe_exec(code, g, cache=DictCache(cache))
+        self.assertEqual(g['a'], 12345)
