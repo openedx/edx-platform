@@ -24,12 +24,15 @@ def pretty_bool(value):
     return value in BOOL_DICT
 
 
-class WordCloudFields(object):
+class WordCloudDescriptorFields(object):
     # Name of poll to use in links to this poll
     display_name = String(help="Display name for this module", scope=Scope.settings)
     num_inputs = Integer(help="Number of inputs", scope=Scope.settings, default=5)
     num_top_words = Integer(help="Number of max words, which will be displayed.", scope=Scope.settings, default=250)
     display_student_percents = Boolean(help="Dispaly usage percents for each word.", scope=Scope.settings, default=True)
+
+
+class WordCloudFields(object):
 
     submitted = Boolean(help="Whether this student has posted words to the cloud", scope=Scope.user_state, default=False)
     student_words = List(help="Student answer", scope=Scope.user_state, default=[])
@@ -38,7 +41,7 @@ class WordCloudFields(object):
     top_words = Object(help="Top N words for word cloud", scope=Scope.content)
 
 
-class WordCloudModule(WordCloudFields, XModule):
+class WordCloudModule(WordCloudFields, WordCloudDescriptorFields, XModule):
     """WordCloud Module"""
     js = {
         'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
@@ -169,7 +172,7 @@ class WordCloudModule(WordCloudFields, XModule):
         return self.content
 
 
-class WordCloudDescriptor(WordCloudFields, RawDescriptor):
+class WordCloudDescriptor(WordCloudDescriptorFields, RawDescriptor):
 
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
