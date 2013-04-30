@@ -301,6 +301,7 @@ end
 
     desc "Open jasmine tests for #{system} in your default browser"
     task "browse_jasmine_#{system}" do
+        compile_assets()
         django_for_jasmine(system, true) do |jasmine_url|
             Launchy.open(jasmine_url)
             puts "Press ENTER to terminate".red
@@ -310,6 +311,7 @@ end
 
     desc "Use phantomjs to run jasmine tests for #{system} from the console"
     task "phantomjs_jasmine_#{system}" do
+        compile_assets()
         phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
         django_for_jasmine(system, false) do |jasmine_url|
             sh("#{phantomjs} common/test/phantom-jasmine/lib/run_jasmine_test.coffee #{jasmine_url}")
