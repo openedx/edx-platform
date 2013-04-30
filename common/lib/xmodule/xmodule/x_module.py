@@ -596,6 +596,12 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return [('{}', '{}')]
 
+    def xblock_kvs(self):
+        """
+        Use w/ caution. Really intended for use by the persistence layer.
+        """
+        return self._model_data._kvs
+
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
         eq = (self.__class__ == other.__class__ and
