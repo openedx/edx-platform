@@ -518,6 +518,26 @@ def course_about(request, course_id):
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link': show_courseware_link})
+@ensure_csrf_cookie
+@cache_if_anonymous
+def mktg_course_about(request, course_id):
+    course = get_course_with_access(request.user, course_id, 'see_exists')
+    registered = registered_for_course(course, request.user)
+
+    if has_access(request.user, course, 'load'):
+        course_target = reverse('info', args=[course.id])
+    else:
+        course_target = reverse('about_course', args=[course.id])
+
+    show_courseware_link = (has_access(request.user, course, 'load') or
+                            settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+
+    return render_to_response('courseware/mktg_course_about.html',
+                              {'course': course,
+                               'registered': registered,
+                               'course_target': course_target,
+                               'show_courseware_link': show_courseware_link})
+
 
 
 @ensure_csrf_cookie
