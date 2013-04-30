@@ -9,6 +9,110 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
   <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+ 
+%if course_tasks is not None:
+  <script type="text/javascript">
+
+(function() {
+
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  this.CourseTaskProgress = (function() {
+
+    function CourseTaskProgress(element) {
+      this.poll = __bind(this.poll, this);
+      this.queueing = __bind(this.queueing, this);
+      this.element = element;
+      this.reinitialize(element);
+      // start the work here
+      this.queueing();
+    }
+
+    CourseTaskProgress.prototype.reinitialize = function(element) {
+      this.entries = $(element).find('.task-progress-entry')
+    };
+
+    CourseTaskProgress.prototype.$ = function(selector) {
+      return $(selector, this.element);
+    };
+
+    CourseTaskProgress.prototype.queueing = function() {
+      if (window.queuePollerID) {
+        window.clearTimeout(window.queuePollerID);
+      }
+      return window.queuePollerID = window.setTimeout(this.poll, 1000);
+    };
+
+    CourseTaskProgress.prototype.poll = function() {
+      var _this = this;
+      // clear the array of entries to poll this time
+      this.task_ids = [];
+      // then go through the entries, update each,
+      // and decide if it should go onto the next list
+      this.entries.each(function(idx, element) {
+         var task_id = $(element).data('taskId');
+         _this.task_ids.push(task_id);
+      });
+      var ajax_url = '/course_task_log_status/';
+      // Note that the keyname here ends up with "[]" being appended
+      // in the POST parameter that shows up on the Django server.
+      var data = {'task_ids': this.task_ids };
+      // TODO: split callback out into a separate function defn.
+      $.post(ajax_url, data).done(function(response) {
+        // expect to receive a dict with an entry for each
+        // requested task_id.
+        // Each should indicate if it were in_progress.
+        // If none are, then delete the poller.
+        // If any are, add them to the list of entries to
+        // be requeried, and reset the timer to call this
+        // again.
+        // TODO: clean out _this.entries, and add back
+        // only those entries that are still pending.
+        var something_in_progress = false;
+        for (name in response) {
+          if (response.hasOwnProperty(name)) {
+            var task_id = name;
+            var task_dict = response[task_id];
+            // this should be a dict of properties for this task_id
+            var in_progress = task_dict.in_progress
+            if (in_progress === true) {
+              something_in_progress = true;
+            }
+            // find the corresponding entry, and update it:
+            selector = '[data-task-id="' + task_id + '"]';
+            entry = $(_this.element).find(selector);
+            var task_status_el = entry.find('.task-status');
+            task_status_el.text(task_dict.task_status)
+            var task_progress_el = entry.find('.task-progress');
+            var progress_value = task_dict.task_progress || '';
+            task_progress_el.text(progress_value);
+          }
+        }
+        if (something_in_progress) {
+          // TODO: set the refresh interval.  (And if it is disabled,
+          // then don't set the timeout at all.)
+          return window.queuePollerID = window.setTimeout(_this.poll, 1000);
+        } else {
+          delete window.queuePollerID;
+        }
+      });
+    };
+
+
+    return CourseTaskProgress;
+
+  })();
+
+}).call(this);
+
+    // once the page is rendered, create the progress object
+    var courseTaskProgress;
+    $(document).ready(function() {
+        courseTaskProgress = new CourseTaskProgress($('#task-progress-wrapper'));
+    });
+
+  </script>
+%endif
 
 </%block>
 
@@ -384,6 +488,43 @@ function goto( mode)
 %if msg:
     <p></p><p>${msg}</p>
 %endif
+##-----------------------------------------------------------------------------
+## Output tasks in progress
+
+%if course_tasks is not None:
+    <p>Pending Course Tasks</p>
+    <div id="task-progress-wrapper">
+      <table class="stat_table">
+        <tr>
+          <th>Task Name</th>
+          <th>Task Arg</th>
+          <th>Student</th>
+          <th>Task Id</th>
+          <th>Requester</th>
+          <th>Submitted</th>
+          <th>Last Update</th>
+          <th>Task Status</th>
+          <th>Task Progress</th>
+        </tr>
+      %for tasknum, course_task in enumerate(course_tasks):
+        <tr id="task-progress-entry-${tasknum}" class="task-progress-entry" data-task-id="${course_task.task_id}">
+          <td>${course_task.task_name}</td>
+          <td>${course_task.task_args}</td>
+          <td>${course_task.student}</td>
+          <td><div class="task-id">${course_task.task_id}</div></td>
+          <td>${course_task.requester}</td>
+          <td>${course_task.created}</td>
+          <td><div class="task-updated">${course_task.updated}</div></td>
+          <td><div class="task-status">${course_task.task_status}</div></td>
+          <td><div class="task-progress">unknown</div></td>
+        </tr>
+      %endfor
+      </table>
+    </div>
+  <br/>
+
+%endif
+
 ##-----------------------------------------------------------------------------
 
 %if modeflag.get('Analytics'):
