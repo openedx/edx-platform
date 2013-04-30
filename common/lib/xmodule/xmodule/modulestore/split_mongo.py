@@ -19,6 +19,7 @@ import re
 from xmodule.modulestore import inheritance
 import threading
 import datetime
+import copy
 
 
 log = logging.getLogger(__name__)
@@ -87,9 +88,15 @@ class SplitMongoKVS(KeyValueStore):
             Note, metadata may override and disagree w/ this b/c this says what the value
             should be if metadata is undefined for this field.
         """
-        self._definition = definition
-        self._children = children
-        self._metadata = metadata
+        # ensure kvs's don't share objects w/ others so that changes can't appear in separate ones
+        # the particular use case was that changes to kvs's were polluting caches. My thinking was
+        # that kvs's should be independent thus responsible for the isolation.
+        if isinstance(definition, DefinitionLazyLoader):
+            self._definition = definition
+        else:
+            self._definition = copy.copy(definition)
+        self._children = copy.copy(children)
+        self._metadata = copy.copy(metadata)
         self._inherited_metadata = _inherited_metadata
 
     def get(self, key):
@@ -193,6 +200,18 @@ class SplitMongoKVS(KeyValueStore):
         if isinstance(self._definition, DefinitionLazyLoader):
             self._definition = self._definition.fetch()
         return self._definition.get('data')
+
+    def get_own_metadata(self):
+        """
+        Get the metadata explicitly set on this element.
+        """
+        return self._metadata
+
+    def get_inherited_metadata(self):
+        """
+        Get the metadata set by the ancestors (which own metadata may override or not)
+        """
+        return self._inherited_metadata
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -310,12 +329,15 @@ class SplitMongoModuleStore(ModuleStoreBase):
             **kwargs
         ), db)
 
-        # TODO add caching of index & structures to thread_cache to prevent repeated fetches
+        # TODO add caching of structures to thread_cache to prevent repeated fetches (but not index b/c
+        # it changes w/o having a change in id)
         self.course_index = self.db[collection + '.active_versions']
         self.structures = self.db[collection + '.structures']
         self.definitions = self.db[collection + '.definitions']
         self.draft_aware = draft_aware
 
+        # ??? Code review question: those familiar w/ python threading. Should I instead
+        # use django cache? How should I expire entries?
         self.thread_cache = threading.local()
 
         if user is not None and password is not None:
@@ -424,6 +446,12 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self.thread_cache.course_cache[course_version_guid] = system
         return system
 
+    def _clear_cache(self):
+        """
+        Should only be used by testing or something which implements transactional boundary semantics
+        """
+        self.thread_cache.course_cache = {}
+
     def _lookup_course(self, course_locator, revision=None):
         '''
         Decode the locator into the right series of db access. Does not
@@ -432,6 +460,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         :param course_locator: any subclass of CourseLocator
         '''
+        # NOTE: if and when this uses cache, the update if changed logic will break if the cache
+        # holds the same objects as the descriptors!
         if (course_locator.version_guid is None and
             course_locator.course_id is None):
             raise InsufficientSpecificationError(course_locator)
@@ -761,6 +791,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
             else:
                 return new_def_data != old_definition['data']
 
+        # if this looks in cache rather than fresh fetches, then it will probably not detect
+        # actual change b/c the descriptor and cache probably point to the same objects
         old_definition = self.definitions.find_one({'_id': definition_locator.def_id})
         if old_definition is None:
             raise ItemNotFoundError(definition_locator.url())
@@ -772,9 +804,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
             old_definition['edited_on'] = datetime.datetime.utcnow()
             old_definition['previous_version'] = definition_locator.def_id
             new_id = self.definitions.insert(old_definition)
-            return DescriptorLocator(new_id)
+            return DescriptorLocator(new_id), True
         else:
-            return definition_locator
+            return definition_locator, False
 
     def _generate_block_id(self, course_blocks, category):
         """
@@ -852,22 +884,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
         the new version_guid from the locator in the returned object!
         """
         # find course_index entry if applicable and structures entry
-        if course_or_parent_locator.course_id is None:
-            index_entry = None
-        else:
-            index_entry = self.course_index.find_one({'_id': course_or_parent_locator.course_id})
-            if (course_or_parent_locator.version_guid is not None
-                and index_entry['draftVersion'] != course_or_parent_locator.version_guid
-                and not force):
-                raise NotDraftVersion(course_or_parent_locator,
-                    CourseLocator(course_id=index_entry['_id'], version_guid=index_entry['draftVersion']))
+        index_entry = self._get_index_if_valid(course_or_parent_locator, force)
         structure = self._lookup_course(course_or_parent_locator)
 
         # persist the definition if persisted != passed
         if (definition_locator is None or definition_locator.def_id is None):
             definition_locator = self.create_definition_from_data(new_def_data, category, user_id)
         elif new_def_data is not None:
-            definition_locator = self.update_definition_from_data(definition_locator, new_def_data, user_id)
+            definition_locator, _ = self.update_definition_from_data(definition_locator, new_def_data, user_id)
 
         # copy the structure and modify the new one
         new_structure = self._version_structure(structure, user_id)
@@ -1036,91 +1060,76 @@ class SplitMongoModuleStore(ModuleStoreBase):
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(location)
 
-    # TODO refactor
-    def update_item(self, course_id, location, data):
+    def update_item(self, descriptor, user_id, force=False):
         """
-        Set the data in the item specified by the location to
-        data
+        Save the descriptor's definition, metadata, & children references (i.e., it doesn't descend the tree).
+        Return the new descriptor (updated location).
 
-        course_id: The id of the course this item is in
-        location: Something that can be passed to BlockLocator
-        data: A nested dictionary of problem data
+        raises ItemNotFoundError if the location does not exist.
+
+        Creates a new course version. If the descriptor's location has a course_id, it moves the course head
+        pointer. If the version_guid of the descriptor points to a non-head version and there's been an intervening
+        change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
+        the course but leaves the head pointer where it is (this change will not be in the course head).
+
+        The implementation tries to detect which, if any changes, actually need to be saved and thus won't version
+        the definition, structure, nor course if they didn't change.
         """
+        # TODO question: by passing a descriptor, because descriptors are only instantiable from get_instance
+        # and ilk, we're necessitating a read, modify, call this, which reads, modifies, and persists. Is that ok?
+        original_structure = self._lookup_course(descriptor.location)
+        index_entry = self._get_index_if_valid(descriptor.location, force)
 
-        # See http://www.mongodb.org/display/DOCS/Updating for
-        # atomic update syntax
-        result = self.definitions.update(
-            {'_id': BlockLocator(location).dict()},
-            {'$set': {'definition.data': data}},
-            multi=False,
-            upsert=True,
-        )
-        if result['n'] == 0:
-            raise ItemNotFoundError(location)
-
-    # TODO refactor
-    def update_children(self, course_id, location, children):
-        """
-        Set the children for the item specified by the location to
-        children
-
-        course_id: The id of the course this item is in
-        location: Something that can be passed to BlockLocator
-        children: A list of child item identifiers
-        """
-        location = BlockLocator.ensure_fully_specified(location)
-        children = [BlockLocator(child).url() for child in children]
-
-        if children:
-            self.structures.update(
-                {'_id': course_id_to_mongo_key(course_id)},
-                {'$set': {'blocks.{loc}.children'.format(loc=location.mongo_key()): children}},
-                upsert=True,
-            )
-        else:
-            self.structures.update(
-                {'_id': course_id_to_mongo_key(course_id)},
-                {'$unset': {'blocks.{loc}.children'.format(loc=location.mongo_key()): ''}},
-                upsert=True,
-            )
-
-    # TODO refactor
-    def update_metadata(self, course_id, location, metadata):
-        """
-        Set the metadata for the item specified by the location to
-        metadata
-
-        location: Something that can be passed to BlockLocator
-        metadata: A nested dictionary of module metadata
-        """
-        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-        # if we add one then we need to also add it to the policy information (i.e. metadata)
-        # we should remove this once we can break this reference from the course to static tabs
-        loc = BlockLocator(location)
-        if loc.category == 'static_tab':
-            try:
-                course = self.get_instance(course_id, CourseDescriptor.id_to_location(course_id))
-                existing_tabs = course.tabs or []
-                for tab in existing_tabs:
-                    if tab.get('url_slug') == loc.name:
-                        tab['name'] = metadata.get('display_name')
+        descriptor.definition_locator, is_updated = self.update_definition_from_data(
+            descriptor.definition_locator, descriptor.xblock_kvs().get_data(), user_id)
+        # check children
+        original_entry = original_structure['blocks'][descriptor.location.block_id]
+        if (not is_updated and descriptor.has_children
+            and not self._lists_equal(original_entry['children'], descriptor.children)):
+            is_updated = True
+        # check metadata
+        if not is_updated:
+            original_metadata = original_entry['metadata']
+            original_keys = original_metadata.keys()
+            new_metadata = descriptor.xblock_kvs().get_own_metadata()
+            if len(new_metadata) != len(original_keys):
+                is_updated = True
+            else:
+                new_keys = new_metadata.keys()
+                for key in original_keys:
+                    if key not in new_keys or original_metadata[key] != new_metadata[key]:
+                        is_updated = True
                         break
-                course.tabs = existing_tabs
-                self.update_metadata(course.id, course.location, course.metadata)
-            except ItemNotFoundError:
-                log.info("No course found for course_id %s, unable to set static tab %s", course_id, location)
+        # if updated, rev the structure
+        if is_updated:
+            new_structure = self._version_structure(original_structure, user_id)
+            block_data = new_structure['blocks'][descriptor.location.block_id]
+            if descriptor.has_children:
+                block_data["children"] = descriptor.children
 
-        if metadata:
-            self.structures.update(
-                {'_id': course_id_to_mongo_key(course_id)},
-                {'$set': {'blocks.{loc}.metadata'.format(loc=location.mongo_key()): metadata}},
-                upsert=True,
-            )
+            block_data["definition"] = descriptor.definition_locator.def_id
+            block_data["metadata"] = descriptor.xblock_kvs().get_own_metadata()
+            new_id = self.structures.insert(new_structure)
+
+            # update the index entry if appropriate
+            if index_entry is not None and original_structure["_id"] == index_entry["draftVersion"]:
+                index_entry["draftVersion"] = new_id
+                self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
+
+            # fetch and return the new item--fetching is unnecessary but a good qc step
+            return self.get_instance(BlockLocator(descriptor.location, version_guid=new_id))
         else:
-            self.structures.update(
-                {'_id': course_id_to_mongo_key(course_id)},
-                {'$unset': {'blocks.{loc}.metadata'.format(loc=location.mongo_key()): ''}},
-            )
+            # nothing changed, just return the one sent in
+            return descriptor
+
+
+    # TODO remove all callers
+    def update_children(self, course_id, location, children):
+        raise NotImplementedError()
+
+    # TODO remove all callers
+    def update_metadata(self, course_id, location, metadata):
+        raise NotImplementedError()
 
     # TODO refactor
     def delete_item(self, course_id, location):
@@ -1247,6 +1256,41 @@ class SplitMongoModuleStore(ModuleStoreBase):
                         self._block_matches(target, criteria))
         else:
             return criteria == target
+
+    def _lists_equal(self, lista, listb):
+        """
+        The obvious function but local b/c I don't want some arcane method in the persistence layer
+        becoming the universal util
+        :param lista:
+        :param listb:
+        """
+        if len(lista) != len(listb):
+            return False
+        for idx in enumerate(lista):
+            if lista[idx] != listb[idx]:
+                return False
+        return True
+
+    def _get_index_if_valid(self, locator, force=False):
+        """
+        If the locator identifies a course and points to its draft (or plausibly its draft),
+        then return the index entry.
+
+        raises NotDraftVersion if not the right version
+
+        :param locator:
+        """
+        if locator.course_id is None:
+            return None
+        else:
+            index_entry = self.course_index.find_one({'_id': locator.course_id})
+            if (locator.version_guid is not None
+                and index_entry['draftVersion'] != locator.version_guid
+                and not force):
+                raise NotDraftVersion(locator,
+                    CourseLocator(course_id=index_entry['_id'], version_guid=index_entry['draftVersion']))
+            else:
+                return index_entry
 
     def _version_structure(self, structure, user_id):
         """

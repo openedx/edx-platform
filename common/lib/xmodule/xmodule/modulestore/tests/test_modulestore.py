@@ -15,7 +15,6 @@ from importlib import import_module
 import os
 import re
 from xblock.core import Scope
-import time
 
 
 class SplitModuleTest(unittest.TestCase):
@@ -445,6 +444,25 @@ class TestItemCrud(SplitModuleTest):
     """
     Test create update and delete of items
     """
+    # TODO do I need to test this case which I believe won't work:
+    #  1) fetch a course and some of its blocks
+    #  2) do a series of CRUD operations on those previously fetched elements
+    # The problem here will be that the version_guid of the items will be the version at time of fetch.
+    # Each separate save will change the head version; so, the 2nd piecemeal change will flag the version
+    # conflict. That is, if versions are v0..vn and start as v0 in initial fetch, the first CRUD op will
+    # say it's changing an object from v0, splitMongo will process it and make the current head v1, the next
+    # crud op will pass in its v0 element and splitMongo will flag the version conflict.
+    # What I don't know is how realistic this test is and whether to wrap the modulestore with a higher level
+    # transactional operation which manages the version change or make the threading cache reason out whether or
+    # not the changes are independent and additive and thus non-conflicting.
+    # A use case I expect is
+    # (client) change this metadata
+    # (server) done, here's the new info which, btw, updates the course version to v1
+    # (client) add these children to this other node (which says it came from v0 or
+    #          will the client have refreshed the version before doing the op?)
+    # In this case, having a server side transactional model won't help b/c the bug is a long-transaction on the
+    # on the client where it would be a mistake for the server to assume anything about client consistency. The best
+    # the server could do would be to see if the parent's children changed at all since v0.
     def test_create_minimal_item(self):
         """
         create_item(course_or_parent_locator, category, user, definition_locator=None, new_def_data=None,
@@ -530,6 +548,116 @@ class TestItemCrud(SplitModuleTest):
         another_history = modulestore().get_definition_history_info(another_module.definition_locator)
         self.assertEqual(another_history['previous_version'], 'problem12345_3_1')
     # TODO check that default fields are set
+
+    def test_update_metadata(self):
+        """
+        test updating an items metadata ensuring the definition doesn't version but the course does if it should
+        """
+        locator = BlockLocator(course_id="GreekHero", block_id="problem3_2")
+        problem = modulestore().get_instance(locator)
+        pre_def_id = problem.definition_locator.def_id
+        pre_version_guid = problem.location.version_guid
+        self.assertIsNotNone(pre_def_id)
+        self.assertIsNotNone(pre_version_guid)
+        premod_time = datetime.datetime.utcnow()
+        self.assertNotEqual(problem.max_attempts, 4, "Invalidates rest of test")
+
+        problem.max_attempts = 4
+        updated_problem = modulestore().update_item(problem, 'changeMaven')
+        # check that course version changed and course's previous is the other one
+        self.assertEqual(updated_problem.definition_locator.def_id, pre_def_id)
+        self.assertNotEqual(updated_problem.location.version_guid, pre_version_guid)
+        self.assertEqual(updated_problem.max_attempts, 4)
+        # refetch to ensure original didn't change
+        original_location = BlockLocator(version_guid=pre_version_guid,
+            block_id=problem.location.block_id)
+        problem = modulestore().get_instance(original_location)
+        self.assertNotEqual(problem.max_attempts, 4, "original changed")
+
+        current_course = modulestore().get_course(locator)
+        self.assertEqual(updated_problem.location.version_guid, current_course.location.version_guid)
+
+        history_info = modulestore().get_course_history_info(current_course.location)
+        self.assertEqual(history_info['previous_version'], pre_version_guid)
+        self.assertEqual(history_info['original_version'], "v12345d0")
+        self.assertEqual(history_info['edited_by'], "changeMaven")
+        self.assertGreaterEqual(history_info['edited_on'], premod_time)
+        self.assertLessEqual(history_info['edited_on'], datetime.datetime.utcnow())
+
+    def test_update_children(self):
+        """
+        test updating an item's children ensuring the definition doesn't version but the course does if it should
+        """
+        locator = BlockLocator(course_id="GreekHero", block_id="chapter3")
+        block = modulestore().get_instance(locator)
+        pre_def_id = block.definition_locator.def_id
+        pre_version_guid = block.location.version_guid
+
+        # reorder children
+        self.assertGreater(len(block.children), 0, "meaningless test")
+        moved_child = block.children.pop()
+        updated_problem = modulestore().update_item(block, 'childchanger')
+        # check that course version changed and course's previous is the other one
+        self.assertEqual(updated_problem.definition_locator.def_id, pre_def_id)
+        self.assertNotEqual(updated_problem.location.version_guid, pre_version_guid)
+        self.assertEqual(updated_problem.children, block.children)
+        self.assertNotIn(moved_child, updated_problem.children)
+        locator.block_id = "chapter1"
+        other_block = modulestore().get_instance(locator)
+        other_block.children.append(moved_child)
+        other_updated = modulestore().update_item(other_block, 'childchanger')
+        self.assertIn(moved_child, other_updated.children)
+
+    def test_update_definition(self):
+        """
+        test updating an item's definition: ensure it gets versioned as well as the course getting versioned
+        """
+        locator = BlockLocator(course_id="GreekHero", block_id="head12345")
+        block = modulestore().get_instance(locator)
+        pre_def_id = block.definition_locator.def_id
+        pre_version_guid = block.location.version_guid
+
+        block.grading_policy['GRADER'][0]['min_count'] = 13
+        updated_block = modulestore().update_item(block, 'definition_changer')
+
+        self.assertNotEqual(updated_block.definition_locator.def_id, pre_def_id)
+        self.assertNotEqual(updated_block.location.version_guid, pre_version_guid)
+        self.assertEqual(updated_block.grading_policy['GRADER'][0]['min_count'], 13)
+
+    def test_update_manifold(self):
+        """
+        Test updating metadata, children, and definition in a single call ensuring all the versioning occurs
+        """
+        # first add 2 children to the course for the update to manipulate
+        locator = BlockLocator(course_id="contender", block_id="head345679")
+        category = 'problem'
+        new_payload = "<problem>empty</problem>"
+        modulestore().create_item(locator, category, 'test_update_manifold',
+            metadata={'display_name': 'problem 1'}, new_def_data=new_payload)
+        another_payload = "<problem>not empty</problem>"
+        modulestore().create_item(locator, category, 'test_update_manifold',
+            metadata={'display_name': 'problem 2'},
+            definition_locator=DescriptorLocator("problem12345_3_1"),
+            new_def_data=another_payload)
+        # pylint: disable=W0212
+        modulestore()._clear_cache()
+
+        # now begin the test
+        block = modulestore().get_instance(locator)
+        pre_def_id = block.definition_locator.def_id
+        pre_version_guid = block.location.version_guid
+
+        self.assertNotEqual(block.grading_policy['GRADER'][0]['min_count'], 13)
+        block.grading_policy['GRADER'][0]['min_count'] = 13
+        block.children = block.children[1:] + [block.children[0]]
+        block.advertised_start = "Soon"
+
+        updated_block = modulestore().update_item(block, "test_update_manifold")
+        self.assertNotEqual(updated_block.definition_locator.def_id, pre_def_id)
+        self.assertNotEqual(updated_block.location.version_guid, pre_version_guid)
+        self.assertEqual(updated_block.grading_policy['GRADER'][0]['min_count'], 13)
+        self.assertEqual(updated_block.children[0], block.children[0])
+        self.assertEqual(updated_block.advertised_start, "Soon")
 
 
 class TestCourseCreation(SplitModuleTest):
