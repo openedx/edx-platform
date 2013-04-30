@@ -6,4 +6,4 @@
 # XBlock:
 # Might change frequently, so put it in local-requirements.txt,
 # but conceptually is an external package, so it is in a separate repo.
--e git+https://github.com/edx/XBlock.git@49181a1b#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@5ce6f70a#egg=XBlock
