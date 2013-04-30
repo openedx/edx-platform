@@ -1851,6 +1851,13 @@ class FormulaResponse(LoncapaResponse):
                     'formularesponse: undefined variable in given=%s' % given)
                 raise StudentInputError(
                     "Invalid input: " + uv.message + " not permitted in answer")
+            except ValueError as ve:
+                # This is thrown when fact() or factorial() is used in a formularesponse answer
+                #   that tests on negative and/or non-integer inputs
+                log.debug(
+                    'formularesponse: factorial function used in response that tests negative and/or non-integer inputs. given={0}'.format(given))
+                raise StudentInputError(
+                    "factorial function not permitted in answer for this problem. Provided answer was: {0}".format(given))
             except Exception as err:
                 # traceback.print_exc()
                 log.debug('formularesponse: error %s in formula' % err)
