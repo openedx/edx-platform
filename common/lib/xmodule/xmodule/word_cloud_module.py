@@ -174,3 +174,4 @@ class WordCloudDescriptor(WordCloudFields, RawDescriptor):
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
     stores_state = True
+    mako_template = "widgets/raw-edit.html"
