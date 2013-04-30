@@ -229,6 +229,17 @@
       <h3 class="sr">Registration Help</h3>
     </header>
 
+% if course_id and enrollment_action:
+    <div class="cta">
+      <h3>Already registered?</h3>
+      <p class="instructions">
+        <a href="${reverse('signin_user')}?course_id=${course_id | h}&enrollment_action=${enrollment_action | h}">
+          Click here to log in.
+        </a>
+      </p>
+    </div>
+% endif
+
     <div class="cta cta-welcome">
       <h3>Welcome to edX</h3>
       <p>Registering with edX gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list – we will update you as courses are added.</p>
