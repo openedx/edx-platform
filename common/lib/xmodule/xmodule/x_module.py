@@ -78,18 +78,12 @@ class HTMLSnippet(object):
                                   .format(self.__class__))
 
 
-class NonEditableSettingsScope(Scope):
-    pass
-
-
 class XModuleFields(object):
     display_name = String(
-        display_name="Display Name",
         help="Display name for this module",
         scope=Scope.settings,
         default=None
     )
-    nonEditableSettingsScope = NonEditableSettingsScope(user=Scope.settings.user, block=Scope.settings.block)
 
 
 class XModule(XModuleFields, HTMLSnippet, XBlock):

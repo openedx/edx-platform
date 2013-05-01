@@ -10,7 +10,7 @@ from xblock.core import Object
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.x_module import XModuleFields
+from .fields import NON_EDITABLE_SETTINGS_SCOPE
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class XmlDescriptor(XModuleDescriptor):
     """
 
     xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export",
-        default={}, scope=XModuleFields.nonEditableSettingsScope)
+        default={}, scope=NON_EDITABLE_SETTINGS_SCOPE)
 
     # Extension to append to filename paths
     filename_extension = 'xml'

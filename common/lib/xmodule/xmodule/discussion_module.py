@@ -1,17 +1,18 @@
 from pkg_resources import resource_string
 
-from xmodule.x_module import XModule, XModuleFields
+from .fields import NON_EDITABLE_SETTINGS_SCOPE
+from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.core import String, Scope
 
 
 class DiscussionFields(object):
-    discussion_id = String(scope=XModuleFields.nonEditableSettingsScope)
-    discussion_category = String(display_name="Category Name", scope=Scope.settings)
-    discussion_target = String(display_name="Subcategory Name", scope=Scope.settings)
+    discussion_id = String(scope=NON_EDITABLE_SETTINGS_SCOPE)
+    discussion_category = String(scope=Scope.settings)
+    discussion_target = String(scope=Scope.settings)
     # We may choose to enable this in the future, but while Kevin is investigating....
-    sort_key = String(scope=XModuleFields.nonEditableSettingsScope)
+    sort_key = String(scope=NON_EDITABLE_SETTINGS_SCOPE)
 
 
 class DiscussionModule(DiscussionFields, XModule):

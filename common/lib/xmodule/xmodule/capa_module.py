@@ -17,7 +17,7 @@ from xmodule.x_module import XModule, XModuleFields
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.core import Scope, String, Boolean, Object
-from .fields import Timedelta, Date, StringyInteger, StringyFloat
+from .fields import Timedelta, Date, StringyInteger, StringyFloat, NON_EDITABLE_SETTINGS_SCOPE
 from xmodule.util.date_utils import time_to_datetime
 
 log = logging.getLogger("mitx.courseware")
@@ -62,26 +62,23 @@ class ComplexEncoder(json.JSONEncoder):
 
 class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
-    max_attempts = StringyInteger(display_name="Maximum Allowed Attempts",
-                                  help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
-    due = Date(help="Date that this problem is due by", scope=XModuleFields.nonEditableSettingsScope)
+    max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    due = Date(help="Date that this problem is due by", scope=NON_EDITABLE_SETTINGS_SCOPE)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted",
-                            scope=XModuleFields.nonEditableSettingsScope)
-    showanswer = String(display_name="Show Answer",
-                        help="When to show the problem answer to the student", scope=Scope.settings, default="closed",
+                            scope=NON_EDITABLE_SETTINGS_SCOPE)
+    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed",
                         values=["answered", "always", "attempted", "closed", "never"])
     force_save_button = Boolean(help="Whether to force the save button to appear on the page",
-                                scope=XModuleFields.nonEditableSettingsScope, default=False)
-    rerandomize = Randomization(display_name="Rerandomize", help="When to rerandomize the problem",
-        default="always", scope=Scope.settings)
+                                scope=NON_EDITABLE_SETTINGS_SCOPE, default=False)
+    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
     input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
-    weight = StringyFloat(display_name="Problem Weight", help="How much to weight this problem by", scope=Scope.settings)
-    markdown = String(help="Markdown source of this module", scope=XModuleFields.nonEditableSettingsScope)
+    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", scope=NON_EDITABLE_SETTINGS_SCOPE)
     source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.", scope=Scope.settings)
 
 

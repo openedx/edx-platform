@@ -1,4 +1,5 @@
-from .x_module import XModuleDescriptor, DescriptorSystem, NonEditableSettingsScope
+from .x_module import XModuleDescriptor, DescriptorSystem
+from .fields import NonEditableSettingsScope
 from xblock.core import Scope
 from xblock.core import XBlock
 
