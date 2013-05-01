@@ -6,9 +6,8 @@ import json
 
 import mock
 
-from capa.capa_problem import LoncapaProblem
 from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
-from . import test_system
+from . import test_system, new_loncapa_problem
 
 class CapaHtmlRenderTest(unittest.TestCase):
 
@@ -20,7 +19,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         xml_str = "<problem> </problem>"
 
         # Create the problem
-        problem = LoncapaProblem(xml_str, '1', system=test_system)
+        problem = new_loncapa_problem(xml_str)
 
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
@@ -39,7 +38,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         """)
 
         # Create the problem
-        problem = LoncapaProblem(xml_str, '1', system=test_system)
+        problem = new_loncapa_problem(xml_str)
 
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
@@ -61,7 +60,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         """)
 
         # Create the problem
-        problem = LoncapaProblem(xml_str, '1', system=test_system)
+        problem = new_loncapa_problem(xml_str)
 
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
@@ -80,7 +79,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         """)
 
         # Create the problem
-        problem = LoncapaProblem(xml_str, '1', system=test_system)
+        problem = new_loncapa_problem(xml_str)
 
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
@@ -98,7 +97,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         """)
 
         # Create the problem
-        problem = LoncapaProblem(xml_str, '1', system=test_system)
+        problem = new_loncapa_problem(xml_str)
 
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
@@ -121,7 +120,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         test_system.render_template.return_value = "<div>Input Template Render</div>"
 
         # Create the problem and render the HTML
-        problem = LoncapaProblem(xml_str, '1', system=test_system)
+        problem = new_loncapa_problem(xml_str)
         rendered_html = etree.XML(problem.get_html())
 
         # Expect problem has been turned into a <div>
@@ -184,7 +183,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         xml_str = CustomResponseXMLFactory().build_xml(**kwargs)
 
         # Create the problem and render the html
-        problem = LoncapaProblem(xml_str, '1', system=test_system)
+        problem = new_loncapa_problem(xml_str)
 
         # Grade the problem
         correctmap = problem.grade_answers({'1_2_1': 'test'})
@@ -219,7 +218,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         """)
 
         # Create the problem and render the HTML
-        problem = LoncapaProblem(xml_str, '1', system=test_system)
+        problem = new_loncapa_problem(xml_str)
         rendered_html = etree.XML(problem.get_html())
 
         # Expect that the variable $test has been replaced with its value

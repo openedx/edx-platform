@@ -1,7 +1,7 @@
-import fs
 import fs.osfs
-import os
+import os, os.path
 
+from capa.capa_problem import LoncapaProblem
 from mock import Mock, MagicMock
 
 import xml.sax.saxutils as saxutils
@@ -36,3 +36,7 @@ test_system = Mock(
     anonymous_student_id='student',
     cache=None,
 )
+
+def new_loncapa_problem(xml):
+    """Construct a `LoncapaProblem` suitable for unit tests."""
+    return LoncapaProblem(xml, id='1', seed=723, system=test_system)

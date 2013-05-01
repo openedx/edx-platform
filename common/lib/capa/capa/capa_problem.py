@@ -17,9 +17,8 @@ from datetime import datetime
 import logging
 import math
 import numpy
-import os, os.path
+import os.path
 import re
-import struct
 import sys
 
 from lxml import etree
@@ -73,7 +72,7 @@ class LoncapaProblem(object):
 
          - problem_text (string): xml defining the problem
          - id           (string): identifier for this problem; often a filename (no spaces)
-         - seed         (int): random number generator seed (int) 
+         - seed         (int): random number generator seed (int)
          - state        (dict): containing the following keys:
                                 - 'seed' - (int) random number generator seed
                                 - 'student_answers' - (dict) maps input id to the stored answer for that input
@@ -92,22 +91,19 @@ class LoncapaProblem(object):
         if self.system is None:
             raise Exception()
 
-        state = state if state else {}
+        state = state or {}
 
         # Set seed according to the following priority:
         #       1. Contained in problem's state
         #       2. Passed into capa_problem via constructor
-        #       3. Assign from the OS's random number generator
         self.seed = state.get('seed', seed)
-        if self.seed is None:
-            self.seed = struct.unpack('i', os.urandom(4))[0]
+        assert self.seed is not None, "Seed must be provided for LoncapaProblem."
+
         self.student_answers = state.get('student_answers', {})
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])
         self.done = state.get('done', False)
         self.input_state = state.get('input_state', {})
-
-
 
         # Convert startouttext and endouttext to proper <text></text>
         problem_text = re.sub("startouttext\s*/", "text", problem_text)

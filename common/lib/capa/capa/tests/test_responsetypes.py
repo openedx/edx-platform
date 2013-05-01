@@ -12,9 +12,8 @@ import textwrap
 import mock
 import textwrap
 
-from . import test_system
+from . import new_loncapa_problem
 
-import capa.capa_problem as lcp
 from capa.responsetypes import LoncapaProblemError, \
     StudentInputError, ResponseError
 from capa.correctmap import CorrectMap
@@ -33,7 +32,7 @@ class ResponseTest(unittest.TestCase):
 
     def build_problem(self, **kwargs):
         xml = self.xml_factory.build_xml(**kwargs)
-        return lcp.LoncapaProblem(xml, '1', system=test_system)
+        return new_loncapa_problem(xml)
 
     def assert_grade(self, problem, submission, expected_correctness, msg=None):
         input_dict = {'1_2_1': submission}
