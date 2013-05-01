@@ -1,24 +1,42 @@
 <div class="wrapper wrapper-component-editor">
 	<div class="component-editor">
-	  <div id="component-edit-menu">
-	  	<ul class="edit-modes-list">
-	  		<li id="edit-modes-tab1" class="tab" aria-controls="panel1" aria-selected="true" role="tab" tabindex="0">
-	  			<a href="#" class="button cancel-button">Editor</a>
-	  		</li>
-	  		<li id="edit-modes-tab2" class="tab" aria-controls="panel2" aria-selected="false" role="tab" tabindex="-1">
-	  			<a href="#" class="button cancel-button">Settings </a>
-	  		</li>
-	  	</ul>
-	  </div>
-	  <div class=""
-	  <div class="module-editor">
-	    ${editor}
-	  </div>
-	  <div class="row module-actions">
-	  	<a href="#" class="save-button">Save</a>
-		<a href="#" class="cancel-button">Cancel</a>	  	
-	  </div>
-	</div>
+  		<div id="component-edit-menu">
+  			<h3 class="component-name">Name of Component</h3>
+  			<!--should this be a menu instead of OL -->
+  	  		<ol class="nav-edit-modes">
+  	  			<li id="editor-mode" class="tab" aria-controls="editor-tab" aria-selected="true" role="tab" tabindex="0">
+  	  				<a href="#" class="button cancel-button">Editor</a>
+	  			</li>
+	  			<li id="settings-mode" class="tab" aria-controls="settings-tab" aria-selected="false" role="tab" tabindex="-1">
+	  				<a href="#" class="button cancel-button">Settings </a>
+	  			</li>
+	  		</ol>
+		</div> <!-- Editor Header -->
+
+		<div class="component-edit-modes">
+			<div class="editor-wrapper" id="editor-tab">
+				${editor}
+			</div> <!-- Editor Wrapper-->
+
+			<table class="settings-wrapper" id="settings-tab">
+		  		<!-- eventually, import settings from separate file -->
+		  		<tr class="settings-row settings-header">
+		  			<th class="settings-label">Setting Label</th>
+		  			<th class="settings-input">Setting Input</th>
+		  			<th class="settings-help">Setting Help</th>
+		  		</tr>
+		  		<tr class="settings-row settings-header">
+		  			<td class="settings-label">Example Dropdown</td>
+		  			<td class="settings-input">Input/Form stuff to be children here. </td>
+		  			<td class="settings-help">Example Numerical Input</td>
+		  		</tr>	  	
+		  	</div> <!-- Settings Wrapper-->
+		</div>
+		<div class="row module-actions">
+	  		<a href="#" class="save-button">Save</a>
+	  		<a href="#" class="cancel-button">Cancel</a>	  	
+		</div> <!-- Module Actions-->
+  </div>
 </div>
 
 <div class="component-actions">

@@ -13,6 +13,10 @@ body.course.unit {
   }
   //end problem selector reqs
 
+
+  // Unit Page Main Column
+  // ====================
+
   .main-column {
     clear: both;
     float: left;
@@ -30,6 +34,9 @@ body.course.unit {
   }
 
   .unit-body {
+
+    // Unit Page Name
+    // ====================
 
     .unit-name-input {
       padding: 20px 40px;
@@ -73,6 +80,10 @@ body.course.unit {
       letter-spacing: 1px;
       text-transform: uppercase;
     }
+    
+    // Component List Meta
+    // ====================
+    // TODO: clean up organization of this page, to many levels/duplication
 
     .components {
 
@@ -81,8 +92,6 @@ body.course.unit {
         z-index: 10;
         margin: 20px 40px;
 
-
-
         .title {
           margin: 0 0 15px 0;
           color: $mediumGrey;
@@ -90,6 +99,9 @@ body.course.unit {
           .value {
           }
         }
+
+        // New Components
+        // ====================
 
         &.new-component-item {
           margin: 20px 0px;
@@ -355,6 +367,9 @@ body.course.unit {
       }
     }
 
+    // Component Drag and Drop, Non-Edit Module Rendering, Styling
+    // ====================
+
     .component {
       border: 1px solid $lightBluishGrey2;
       border-radius: 3px;
@@ -410,6 +425,9 @@ body.course.unit {
       }
     }
 
+    // Component Editing
+    // ====================
+
     .wrapper-component-editor {
       z-index: 9999;
       position: relative;
@@ -423,9 +441,11 @@ body.course.unit {
       padding: 20px;
       border-radius: 2px 2px 0 0;
 
-      .component-edit-modes {
+
+      // Edit Menu (Component Name, Mode-Editor, Mode-Settings)
+
+      .component-edit-menu {
         @include box-sizing(border-box);
-        list-style: none;
         position: absolute;
         width: 100%;
         padding: 15px;
@@ -434,8 +454,33 @@ body.course.unit {
         border-bottom: 1px solid $lightBluishGrey2;
         background: $lightGrey;
 
+        //Component Name
+        h3 {
+          //TO-DO ?
+        }
+
+        //Nav-Edit Modes
+        .nav-edit-modes {
+          //TODO
+
+          .tab {
+            display: inline;
+          }
+        }
       }
 
+      // Module Editors
+      .editor-wrapper{
+        //TO-DO ?
+      }
+
+      // Module Settings
+      .settings-wrapper{
+        //TO-DO ?
+      }
+
+      //OLD Meta-data Styling
+      //TO-DO port over old styling
       .metadata_edit {
         margin-bottom: 20px;
         font-size: 13px;
@@ -468,6 +513,9 @@ body.course.unit {
       }
     }
   }
+
+  // Unit Page Sidebar  
+  // ====================
 
   .unit-settings {
     .window-contents {
@@ -669,7 +717,9 @@ body.course.unit {
   }
 }
 
-// editing units from courseware
+// Editing Units from Courseware  
+// ====================
+
 body.unit {
 
   .component {
