@@ -49,20 +49,12 @@ MODULESTORE_OPTIONS = {
     'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
     'fs_root': GITHUB_REPO_ROOT,
     'render_template': 'mitxmako.shortcuts.render_to_string',
+    'draft_aware': True
 }
 
-draft_aware = copy.copy(MODULESTORE_OPTIONS)
-draft_aware['draft_aware'] = True
-
 MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-        'OPTIONS': draft_aware
-        },
-    'direct': {
-        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-        'OPTIONS': MODULESTORE_OPTIONS
-    }
+    'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+    'OPTIONS': MODULESTORE_OPTIONS
 }
 
 CONTENTSTORE = {
