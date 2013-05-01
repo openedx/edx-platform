@@ -86,7 +86,7 @@ class Dummy (Converter):
     def init_msgs(self, msgs):
         """
         Make sure the first msg in msgs has a plural property.
-        msgs is list of instances of pofile.Msg
+        msgs is list of instances of polib.POEntry
         """
         if len(msgs)==0:
             return
@@ -100,8 +100,8 @@ class Dummy (Converter):
 
     def convert_msg(self, msg):
         """
-        Takes one Msg object and converts it (adds a dummy translation to it)
-        msg is an instance of pofile.Msg
+        Takes one POEntry object and converts it (adds a dummy translation to it)
+        msg is an instance of polib.POEntry
         """
         source = msg.msgid
         if len(source)==0:
