@@ -338,6 +338,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         # ??? Code review question: those familiar w/ python threading. Should I instead
         # use django cache? How should I expire entries?
+        # _add_cache could use a lru mechanism to control the cache size?
         self.thread_cache = threading.local()
 
         if user is not None and password is not None:

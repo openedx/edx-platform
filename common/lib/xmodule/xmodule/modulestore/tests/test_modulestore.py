@@ -72,8 +72,11 @@ class SplitModuleTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        collection_prefix = cls.MODULESTORE['default']['OPTIONS']['collection'] + '.'
         for collection in ('active_versions', 'structures', 'definitions'):
-            modulestore().db.drop_collection('modulestore.' + collection)
+            modulestore().db.drop_collection(collection_prefix + collection)
+        # drop the modulestore to force re init
+        SplitModuleTest._MODULESTORES = {}
 
     def findByIdInResult(self, collection, _id):
         '''
@@ -438,6 +441,22 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(parents[0].block_id, 'head12345')
         parents = modulestore().get_parent_locations(locator, block_id='nosuchblock')
         self.assertEqual(len(parents), 0)
+
+    def test_get_children(self):
+        """
+        Test the existing get_children method on xdescriptors
+        """
+        locator = BlockLocator(course_id="GreekHero", block_id="head12345")
+        block = modulestore().get_instance(locator)
+        children = block.get_children()
+        expected_ids = [
+                    "chapter1", "chapter2", "chapter3"
+                ]
+        for child in children:
+            self.assertEqual(child.category, "chapter")
+            self.assertIn(child.location.block_id, expected_ids)
+            expected_ids.remove(child.location.block_id)
+        self.assertEqual(len(expected_ids), 0)
 
 
 class TestItemCrud(SplitModuleTest):
