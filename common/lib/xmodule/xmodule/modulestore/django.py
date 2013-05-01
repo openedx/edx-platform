@@ -25,11 +25,11 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def load_modulestore(settings):
-    class_ = load_function(settings['ENGINE'])
+def load_modulestore(config):
+    class_ = load_function(config['ENGINE'])
 
     options = {}
-    options.update(settings['OPTIONS'])
+    options.update(config['OPTIONS'])
     for key in FUNCTION_KEYS:
         if key in options:
             options[key] = load_function(options[key])

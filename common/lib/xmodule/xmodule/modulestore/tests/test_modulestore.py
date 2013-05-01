@@ -9,7 +9,6 @@ from xmodule.modulestore.locator import CourseLocator, BlockLocator, VersionTree
 import datetime
 import subprocess
 import unittest
-import copy
 import uuid
 from importlib import import_module
 import os
@@ -29,24 +28,16 @@ class SplitModuleTest(unittest.TestCase):
         'host': 'localhost',
         'db': 'test_xmodule',
         'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
-        'fs_root': ''
+        'fs_root': '',
+        'draft_aware': True
     }
-
-    draft_aware = copy.copy(modulestore_options)
-    draft_aware['draft_aware'] = True
 
     MODULESTORE = {
-        'default': {
-            'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-            'OPTIONS': draft_aware
-            },
-        'direct': {
-            'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-            'OPTIONS': modulestore_options
-        }
+        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'OPTIONS': modulestore_options
     }
 
-    _MODULESTORES = {}
+    modulestore = None
 
     @classmethod
     def setUpClass(cls):
@@ -54,8 +45,8 @@ class SplitModuleTest(unittest.TestCase):
         Loads the initial data into the db ensuring the collection name is
         unique.
         '''
-        dbname = cls.MODULESTORE['default']['OPTIONS']['db']
-        collection_prefix = cls.MODULESTORE['default']['OPTIONS']['collection']
+        dbname = cls.MODULESTORE['OPTIONS']['db']
+        collection_prefix = cls.MODULESTORE['OPTIONS']['collection']
         # TODO is it safe to assume mitx will be on the path?
         match = re.search(r'(.*?/mitx)(?:$|/)', os.getcwd())
         cwd = match.group(1) + '/'
@@ -72,11 +63,11 @@ class SplitModuleTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        collection_prefix = cls.MODULESTORE['default']['OPTIONS']['collection'] + '.'
+        collection_prefix = cls.MODULESTORE['OPTIONS']['collection'] + '.'
         for collection in ('active_versions', 'structures', 'definitions'):
             modulestore().db.drop_collection(collection_prefix + collection)
         # drop the modulestore to force re init
-        SplitModuleTest._MODULESTORES = {}
+        SplitModuleTest.modulestore = None
 
     def findByIdInResult(self, collection, _id):
         '''
@@ -113,19 +104,13 @@ class SplitModuleCourseTests(SplitModuleTest):
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.cms.edited_by, "testassist@edx.org",
             course.cms.edited_by)
+        self.assertEqual(course.cms.previous_version, "head12345_11")
+        self.assertEqual(course.cms.original_version, "head12345_10")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45},
             course.grade_cutoffs)
 
         # query w/ revision qualifier (both draft and published)
         courses_draft = modulestore().get_courses(revision='draft')
-        self.assertEqual(len(courses_draft), len(courses),
-            "Wrong number of courses")
-        for course in courses_draft:
-            self.assertIsNotNone(self.findByIdInResult(courses,
-                course.location.block_id),
-                "Cannot find {course.location.block_id}".format(
-                    course=course))
-        courses_draft = modulestore('default').get_courses()
         self.assertEqual(len(courses_draft), len(courses),
             "Wrong number of courses")
         for course in courses_draft:
@@ -148,10 +133,6 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertIsNone(course.advertised_start)
         self.assertEqual(len(course.children), 0,
             "children")
-        courses_direct = modulestore('direct').get_courses()
-        self.assertEqual(len(courses_direct), 1, len(courses_direct))
-        self.assertEqual(courses_direct[0].location,
-            courses_published[0].location)
 
         # query w/ search criteria
         courses = modulestore().get_courses(qualifiers={'org': 'testx'})
@@ -214,13 +195,8 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(course.location.course_id, "wonderful")
         self.assertEqual(course.location.version_guid, "v23456p")
 
-        locator = CourseLocator(course_id='wonderful')
-        course = modulestore().get_course(locator, revision='published')
-        self.assertEqual(course.location.course_id, "wonderful")
-        self.assertEqual(course.location.version_guid, "v23456p")
-
-        locator = CourseLocator(course_id='wonderful')
-        course = modulestore().get_course(locator, revision='draft')
+        locator = CourseLocator(course_id='wonderful', revision='draft')
+        course = modulestore().get_course(locator)
         self.assertEqual(course.location.version_guid, "v23456d")
 
         # Now negative testing
@@ -234,7 +210,7 @@ class SplitModuleCourseTests(SplitModuleTest):
 
     def test_course_successors(self):
         """
-        get_course_successors(course_locator, version_history_depth=1, revision=None)
+        get_course_successors(course_locator, version_history_depth=1)
         """
         locator = CourseLocator(version_guid="v12345d0")
         result = modulestore().get_course_successors(locator)
@@ -260,7 +236,7 @@ class SplitModuleItemTests(SplitModuleTest):
     '''
     def test_has_item(self):
         '''
-        has_item(BlockLocator, revision)
+        has_item(BlockLocator)
         '''
         # positive tests of various forms
         locator = BlockLocator(version_guid='v12345d1', block_id='head12345')
@@ -270,9 +246,9 @@ class SplitModuleItemTests(SplitModuleTest):
         locator = BlockLocator(course_id='GreekHero', block_id='head12345')
         self.assertTrue(modulestore().has_item(locator),
             "couldn't find in 12345")
-        self.assertTrue(modulestore().has_item(locator, revision='draft'),
+        self.assertTrue(modulestore().has_item(BlockLocator(locator, revision='draft')),
             "couldn't find in draft 12345")
-        self.assertFalse(modulestore().has_item(locator, revision='published'),
+        self.assertFalse(modulestore().has_item(BlockLocator(locator, revision='published')),
             "found in published 12345")
         locator.revision = 'draft'
         self.assertTrue(modulestore().has_item(locator),
@@ -285,7 +261,7 @@ class SplitModuleItemTests(SplitModuleTest):
 
         # in published course
         locator = BlockLocator(course_id="wonderful", block_id="head23456")
-        self.assertTrue(modulestore().has_item(locator, revision='published'),
+        self.assertTrue(modulestore().has_item(BlockLocator(locator, revision='published')),
             "couldn't find in 23456")
         locator.revision = 'published'
         self.assertTrue(modulestore().has_item(locator),
@@ -310,7 +286,7 @@ class SplitModuleItemTests(SplitModuleTest):
 
     def test_get_instance(self):
         '''
-        get_instance(blocklocator, revision)
+        get_instance(blocklocator)
         '''
         # positive tests of various forms
         locator = BlockLocator(version_guid='v12345d1', block_id='head12345')
@@ -333,11 +309,8 @@ class SplitModuleItemTests(SplitModuleTest):
             block.grade_cutoffs)
 
         # try to look up other revisions
-        self.assertIsInstance(
-            modulestore().get_instance(locator, revision='draft'),
-            CourseDescriptor)
         self.assertRaises(ItemNotFoundError,
-            modulestore().get_instance, locator, revision='published')
+            modulestore().get_instance, BlockLocator(locator, revision='published'))
         locator.revision = 'draft'
         self.assertIsInstance(modulestore().get_instance(locator),
             CourseDescriptor)
@@ -352,11 +325,7 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(block.cms.edited_by, "testassist@edx.org")
 
         # in published course
-        locator = BlockLocator(course_id="wonderful", block_id="head23456")
-        self.assertIsInstance(
-            modulestore().get_instance(locator, revision='published'),
-            CourseDescriptor)
-        locator.revision = 'published'
+        locator = BlockLocator(course_id="wonderful", block_id="head23456", revision='published')
         self.assertIsInstance(modulestore().get_instance(locator),
             CourseDescriptor)
 
@@ -859,25 +828,25 @@ class TestInheritance(SplitModuleTest):
 #===========================================
 # This mocks the django.modulestore() function and is intended purely to disentangle
 # the tests from django
-def modulestore(name='default'):
+def modulestore():
     def load_function(path):
         module_path, _, name = path.rpartition('.')
         return getattr(import_module(module_path), name)
 
-    if name not in SplitModuleTest._MODULESTORES:
-        class_ = load_function(SplitModuleTest.MODULESTORE[name]['ENGINE'])
+    if SplitModuleTest.modulestore is None:
+        class_ = load_function(SplitModuleTest.MODULESTORE['ENGINE'])
 
         options = {}
 
-        options.update(SplitModuleTest.MODULESTORE[name]['OPTIONS'])
+        options.update(SplitModuleTest.MODULESTORE['OPTIONS'])
         options['render_template'] = render_to_template_mock
 
-        SplitModuleTest._MODULESTORES[name] = class_(
-            **options
-        )
+        # pylint: disable=W0142
+        SplitModuleTest.modulestore = class_(**options)
 
-    return SplitModuleTest._MODULESTORES[name]
+    return SplitModuleTest.modulestore
 
 
+# pylint: disable=W0613
 def render_to_template_mock(*args):
     pass

@@ -453,7 +453,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         """
         self.thread_cache.course_cache = {}
 
-    def _lookup_course(self, course_locator, revision=None):
+    def _lookup_course(self, course_locator):
         '''
         Decode the locator into the right series of db access. Does not
         return the CourseDescriptor! It returns the actual db json from
@@ -472,8 +472,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             index = self.course_index.find_one({'_id': course_locator.course_id})
             if index is None:
                 raise ItemNotFoundError(course_locator)
-            if (self.wants_published(course_locator.revision)
-                or self.wants_published(revision)):
+            if self.wants_published(course_locator.revision):
                 version_guid = index['publishedVersion']
                 if version_guid is None:
                     raise ItemNotFoundError(course_locator)
@@ -529,27 +528,26 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 lazy=True))
         return result
 
-    def get_course(self, course_locator, revision=None):
+    def get_course(self, course_locator):
         '''
         Gets the course descriptor for the course identified by the locator
         which may or may not be a blockLocator.
 
         raises InsufficientSpecificationError
         '''
-        course_entry = self._lookup_course(course_locator, revision)
+        course_entry = self._lookup_course(course_locator)
         result = self._load_items(course_entry, [course_entry['root']], 0,
             lazy=True)
         return result[0]
 
-    def get_course_for_item(self, location, depth=0):
+    def get_course_for_item(self, location):
         '''
         Provided for backward compatibility. Is equivalent to calling get_course
         :param location:
-        :param depth:
         '''
         return self.get_course(location)
 
-    def has_item(self, block_location, revision=None):
+    def has_item(self, block_location):
         """
         Returns True if location exists in its course. Returns false if
         the course or the block w/in the course do not exist for the given version.
@@ -558,7 +556,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         if block_location.block_id is None:
             raise InsufficientSpecificationError(block_location)
         try:
-            course_structure = self._lookup_course(block_location, revision)
+            course_structure = self._lookup_course(block_location)
         except ItemNotFoundError:
             # this error only occurs if the course does not exist
             return False
@@ -583,7 +581,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         """
         raise NotImplementedError("SplitMongoModuleStores require course_ids. Use get_instance.")
 
-    def get_instance(self, location, revision=None, depth=0):
+    def get_instance(self, location, depth=0):
         """
         depth (int): An argument that some module stores may use to prefetch
             descendants of the queried modules for more efficient results later
@@ -593,14 +591,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
         raises InsufficientSpecificationError or ItemNotFoundError
         """
         location = BlockLocator.ensure_fully_specified(location)
-        course = self._lookup_course(location, revision)
+        course = self._lookup_course(location)
         items = self._load_items(course, [location.block_id], depth, lazy=True)
         if len(items) == 0:
             raise ItemNotFoundError(location)
         return items[0]
 
     # TODO should there be a Locator which wraps the qualifiers instead of arg?
-    def get_items(self, locator, qualifiers, revision=None):
+    def get_items(self, locator, qualifiers):
         '''
         Get all of the modules in the given course matching the qualifiers. The
         qualifiers should only be fields in the structures collection (sorry).
@@ -620,7 +618,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         :param qualifiers: a dict restricting which elements should match
         '''
         # TODO extend to only search a subdag of the course?
-        course = self._lookup_course(locator, revision)
+        course = self._lookup_course(locator)
         items = []
         for block_id, value in course['blocks'].iteritems():
             if self._block_matches(value, qualifiers):
@@ -631,7 +629,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return []
 
-    def get_parent_locations(self, locator, block_id=None, revision=None):
+    def get_parent_locations(self, locator, block_id=None):
         '''
         Return the locations (Locators w/ block_ids) for the parents of this location in this
         course. Could use get_items(location, {'children': block_id}) but this is slightly faster.
@@ -640,7 +638,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         '''
         if block_id is None:
             block_id = locator.block_id
-        course = self._lookup_course(locator, revision)
+        course = self._lookup_course(locator)
         items = []
         for parent_id, value in course['blocks'].iteritems():
             for child_id in value['children']:
@@ -704,7 +702,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             'edited_on': definition['edited_on']
         }
 
-    def get_course_successors(self, course_locator, version_history_depth=1, revision=None):
+    def get_course_successors(self, course_locator, version_history_depth=1):
         '''
         Find the version_history_depth next versions of this course. Return as a VersionTree
         Mostly makes sense when course_locator uses a version_guid, but because it finds all relevant
@@ -714,7 +712,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         if version_history_depth < 1:
             return None
         if course_locator.version_guid is None:
-            course = self._lookup_course(course_locator, revision)
+            course = self._lookup_course(course_locator)
             version_guid = course.version_guid
         else:
             version_guid = course_locator.version_guid
@@ -737,7 +735,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         return VersionTree(CourseLocator(course_locator, version_guid=version_guid), result)
 
 
-    def get_block_successors(self, block_locator, version_history_depth=1, revision=None):
+    def get_block_successors(self, block_locator, version_history_depth=1):
         '''
         Find the version_history_depth next versions of this block. Return as a VersionTree
         Mostly makes sense when course_locator uses a version_guid, but because it finds all relevant
@@ -746,7 +744,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # TODO implement
         pass
 
-    def get_definition_successors(self, definition_locator, version_history_depth=1, revision=None):
+    def get_definition_successors(self, definition_locator, version_history_depth=1):
         '''
         Find the version_history_depth next versions of this definition. Return as a VersionTree
         '''
