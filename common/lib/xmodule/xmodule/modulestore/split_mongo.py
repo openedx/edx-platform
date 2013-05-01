@@ -1122,7 +1122,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
             # nothing changed, just return the one sent in
             return descriptor
 
-
     # TODO remove all callers
     def update_children(self, course_id, location, children):
         raise NotImplementedError()
@@ -1130,6 +1129,34 @@ class SplitMongoModuleStore(ModuleStoreBase):
     # TODO remove all callers
     def update_metadata(self, course_id, location, metadata):
         raise NotImplementedError()
+
+    def update_course_index(self, course_locator, new_values_dict, update_versions=False):
+        """
+        Change the given course's index entry for the given fields. new_values_dict
+        should be a subset of the dict returned by get_course_index_info.
+        It cannot include '_id' (will raise IllegalArgument).
+        Provide update_versions=True if you intend this to update draftVersion or publishedVersion.
+        Note, this operation can be dangerous and break running courses.
+
+        If the dict includes either value and not update_versions, it will raise an exception.
+
+        If the dict includes edited_on or edited_by, it will raise an exception
+
+        Does not return anything useful.
+        """
+        # TODO how should this log the change? edited_on and edited_by for this entry
+        # has the semantic of who created the course and when; so, changing those will lose
+        # that information.
+        if '_id' in new_values_dict:
+            raise ValueError("Cannot override _id")
+        if 'edited_on' in new_values_dict or 'edited_by' in new_values_dict:
+            raise ValueError("Cannot set edited_on or edited_by")
+        if not update_versions and 'draftVersion' in new_values_dict:
+            raise ValueError("Cannot override draftVersion without setting update_versions")
+        if not update_versions and 'publishedVersion' in new_values_dict:
+            raise ValueError("Cannot override publishedVersion without setting update_versions")
+        self.course_index.update({'_id': course_locator.course_id},
+            {'$set': new_values_dict})
 
     # TODO refactor
     def delete_item(self, course_id, location):

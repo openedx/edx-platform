@@ -778,6 +778,42 @@ class TestCourseCreation(SplitModuleTest):
         self.assertDictEqual(new_draft.grading_policy['GRADE_CUTOFFS'],
             data_payload['grading_policy']['GRADE_CUTOFFS'])
 
+    def test_update_course_index(self):
+        """
+        Test changing the org, pretty id, etc of a course. Test that it doesn't allow changing the id, etc.
+        """
+        locator = CourseLocator(course_id="GreekHero")
+        modulestore().update_course_index(locator, {'org': 'funkyU'})
+        course_info = modulestore().get_course_index_info(locator)
+        self.assertEqual(course_info['org'], 'funkyU')
+
+        modulestore().update_course_index(locator, {'org': 'moreFunky', 'prettyid': 'Ancient Greek Demagods'})
+        course_info = modulestore().get_course_index_info(locator)
+        self.assertEqual(course_info['org'], 'moreFunky')
+        self.assertEqual(course_info['prettyid'], 'Ancient Greek Demagods')
+
+        self.assertRaises(ValueError, modulestore().update_course_index, locator, {'_id': 'funkygreeks'})
+
+        self.assertRaises(ValueError, modulestore().update_course_index, locator,
+            {'edited_on': datetime.datetime.utcnow()})
+        self.assertRaises(ValueError, modulestore().update_course_index, locator,
+            {'edited_by': 'sneak'})
+
+        self.assertRaises(ValueError, modulestore().update_course_index, locator,
+            {'draftVersion': 'v12345d1'})
+        self.assertRaises(ValueError, modulestore().update_course_index, locator,
+            {'publishedVersion': 'v12345d1'})
+
+        # an allowed but not necessarily recommended way to revert the draft version
+        modulestore().update_course_index(locator, {'draftVersion': 'v12345d1'}, update_versions=True)
+        course = modulestore().get_course(locator)
+        self.assertEqual(course.location.version_guid, "v12345d1")
+
+        # an allowed but not recommended way to publish a course
+        modulestore().update_course_index(locator, {'publishedVersion': 'v12345d1'}, update_versions=True)
+        course = modulestore().get_course(CourseLocator(locator, revision="published"))
+        self.assertEqual(course.location.version_guid, "v12345d1")
+
 
 class TestInheritance(SplitModuleTest):
     """
