@@ -13,7 +13,7 @@ from capa.responsetypes import StudentInputError,\
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
-from xmodule.x_module import XModule, XModuleFields
+from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.core import Scope, String, Boolean, Object
