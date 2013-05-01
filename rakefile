@@ -172,17 +172,17 @@ end
 
 desc "Install all python prerequisites for the lms and cms"
 task :install_python_prereqs do
-    sh('pip install -r requirements.txt')
+    sh('pip install -r requirements/base.txt')
     # Check for private-requirements.txt: used to install our libs as working dirs,
     # or personal-use tools.
-    if File.file?("private-requirements.txt")
-        sh('pip install -r private-requirements.txt')
+    if File.file?("requirements/private.txt")
+        sh('pip install -r requirements/private.txt')
     end
 end
 
 task :predjango do
     sh("find . -type f -name *.pyc -delete")
-    sh('pip install -q --no-index -r local-requirements.txt')
+    sh('pip install -q --no-index -r requirements/local.txt')
 end
 
 task :clean_test_files do

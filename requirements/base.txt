@@ -1,4 +1,5 @@
--r repo-requirements.txt
+-r repo.txt
+
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
 boto==2.6.0
