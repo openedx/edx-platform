@@ -120,7 +120,7 @@ class CourseLocator(Locator):
         return self.version_guid
 
 
-class BlockLocator(CourseLocator):
+class BlockUsageLocator(CourseLocator):
     '''
     Encodes a location.
 
@@ -150,7 +150,7 @@ class BlockLocator(CourseLocator):
     _URN_RE_ = re.compile("""
     (?P<tag>crx|cvx):?//?
     (?P<identifier>[^/@]+)(@(?P<revision>[^/]+))?/?
-    (?P<block_id>[^/]+)?
+    (?P<usage_id>[^/]+)?
     """, re.VERBOSE)
 
     def __init__(self, *structured_loc, **kwargs):
@@ -159,17 +159,17 @@ class BlockLocator(CourseLocator):
 
         first arg - Can be any of the following types:
             string: should be of the form
-                    crx/{course_id}[@{revision}]/block_id
-                    cvx/version_id/block_id
+                    crx/{course_id}[@{revision}]/usage_id
+                    cvx/version_id/usage_id
 
             dict or keywords: should be of the form {
                 'version_guid' : uniqueid mutually exclusive w/ course_id,
                 'course_id' : uniqueid alternative to version_guid,
-                'block_id' : guid,
+                'usage_id' : guid,
                 'revision': 'draft' | 'published' (optional only applies for
                     course_id),
             }
-            BlockLocator: another BlockLocator object
+            BlockUsageLocator: another BlockUsageLocator object
         """
         fields = {}
 
@@ -189,7 +189,7 @@ class BlockLocator(CourseLocator):
                 fields['course_id'] = urnfields['identifier']
                 if 'revision' in urnfields:
                     fields['revision'] = urnfields['revision']
-            fields['block_id'] = urnfields['block_id']
+            fields['usage_id'] = urnfields['usage_id']
 
         elif isinstance(structured_loc[0], dict):
             fields = structured_loc[0]
@@ -203,10 +203,10 @@ class BlockLocator(CourseLocator):
 
         fields.update(kwargs)
 
-        super(BlockLocator, self).__init__(fields)
+        super(BlockUsageLocator, self).__init__(fields)
         # TODO should it be an error if block is unspecified or is
         # ensure_fully_specified sufficient for this case?
-        self.block_id = fields.get('block_id')
+        self.usage_id = fields.get('usage_id')
 
     @staticmethod
     def ensure_fully_specified(location):
@@ -214,20 +214,20 @@ class BlockLocator(CourseLocator):
         Make sure location is valid, and fully specified.  Raises
         InvalidLocationError or InsufficientSpecificationError if not.
 
-        returns a BlockLocator object corresponding to location.
+        returns a BlockUsageLocator object corresponding to location.
         NOTE: this function is not as flexible as the class constructor. It
         does not accept kwargs nor overrides. Replace uses of this which intend
         it to only give an instance if the model is well-formed with
-        BlockLocator.ensure_fully_specified(BlockLocator(args..))
+        BlockUsageLocator.ensure_fully_specified(BlockUsageLocator(args..))
         '''
-        if isinstance(location, BlockLocator):
+        if isinstance(location, BlockUsageLocator):
             loc = location
         else:
-            loc = BlockLocator(location)
+            loc = BlockUsageLocator(location)
 
-        if not super(BlockLocator, loc)._ensure_fully_specified():
+        if not super(BlockUsageLocator, loc)._ensure_fully_specified():
             raise InsufficientSpecificationError(location)
-        if loc.block_id is None:
+        if loc.usage_id is None:
             raise InsufficientSpecificationError(location)
         return loc
 
@@ -236,17 +236,17 @@ class BlockLocator(CourseLocator):
         Return a new Location instance which is a copy of this one except for
         overrides in the arg list.
         '''
-        return BlockLocator(self, kwargs)
+        return BlockUsageLocator(self, kwargs)
 
     def url(self):
         """
         Return a string containing the URL for this location
         """
-        return (super(BlockLocator, self).url() + '/' +
-            (self.block_id or ''))
+        return (super(BlockUsageLocator, self).url() + '/' +
+            (self.usage_id or ''))
 
     def __repr__(self):
-        return "BlockLocator(%s)" % repr(self.__dict__)
+        return "BlockUsageLocator(%s)" % repr(self.__dict__)
 
 
 class DescriptorLocator(Locator):
