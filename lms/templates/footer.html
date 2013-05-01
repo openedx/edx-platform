@@ -6,6 +6,25 @@
   <footer>
     <div class="colophon">
       <nav class="nav-colophon">
+      % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+      <ol>
+          <li class="nav-colophon-01">
+              <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('ABOUT')}">About</a>
+          </li>
+          <li class="nav-colophon-02">
+            <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('JOBS')}">Jobs</a>
+          </li>
+          <li class="nav-colophon-03">
+            <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('PRESS')}">Press</a>
+          </li>
+          <li class="nav-colophon-04">
+            <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">FAQ</a>
+          </li>
+          <li class="nav-colophon-05">
+            <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('CONTACT')}">Contact</a>
+          </li>
+      </ol>
+      %else:
         <ol>
           <li class="nav-colophon-01">
             <a href="${reverse('about_edx')}">About</a>
@@ -28,6 +47,7 @@
           </li>
           % endif
         </ol>
+        %endif
       </nav>
 
       <div class="colophon-about">

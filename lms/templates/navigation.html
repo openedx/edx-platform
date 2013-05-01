@@ -38,7 +38,15 @@ site_status_msg = get_site_status_msg(course_id)
   <header class="global" aria-label="Global Navigation">
 % endif
   <nav>
-  <h1 class="logo"><a href="${reverse('root')}"><img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/></a></h1>
+
+  <h1 class="logo">
+% if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+      <a href="${settings.MKTG_URLS.get('ROOT')}">
+% else:
+      <a href="${reverse('root')}">
+%endif
+        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/>
+      </a></h1>
 
     % if course:
       <h2><span class="provider">${course.org}:</span> ${course.number} ${course.display_name_with_default}</h2>
@@ -65,7 +73,11 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="#" class="dropdown">&#9662</a>
         <ul class="dropdown-menu">
+        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+          <li><a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">Help</a></li>
+        %else:
           <li><a href="${reverse('help_edx')}">Help</a></li>
+        %endif
           <li><a href="${reverse('logout')}">Log Out</a></li>
         </ul>
       </li>
