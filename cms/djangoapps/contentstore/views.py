@@ -615,25 +615,14 @@ def delete_item(request):
     delete_children = request.POST.get('delete_children', False)
     delete_all_versions = request.POST.get('delete_all_versions', False)
 
-    item = modulestore().get_item(item_location)
+    store = modulestore()
 
-    store = get_modulestore(item_loc)
-
-    # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
-    # if item.location.revision=None, then delete both draft and published version
-    # if caller wants to only delete the draft than the caller should put item.location.revision='draft'
+    item = store.get_item(item_location)
 
     if delete_children:
-        _xmodule_recurse(item, lambda i: store.delete_item(i.location))
+        _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions))
     else:
-        store.delete_item(item.location)
-
-    # cdodge: this is a bit of a hack until I can talk with Cale about the
-    # semantics of delete_item whereby the store is draft aware. Right now calling
-    # delete_item on a vertical tries to delete the draft version leaving the
-    # requested delete to never occur
-    if item.location.revision is None and item.location.category == 'vertical' and delete_all_versions:
-        modulestore('direct').delete_item(item.location)
+        store.delete_item(item.location, delete_all_versions)
 
     # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
     if delete_all_versions:
@@ -1497,6 +1486,12 @@ def create_new_course(request):
         return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with the same organization and course number.'}))
 
     new_course = modulestore('direct').clone_item(template, dest_location)
+
+    # clone a default 'about' module as well
+
+    about_template_location = Location(['i4x', 'edx', 'templates', 'about', 'overview'])
+    dest_about_location = dest_location._replace(category='about', name='overview')
+    modulestore('direct').clone_item(about_template_location, dest_about_location)
 
     if display_name is not None:
         new_course.display_name = display_name

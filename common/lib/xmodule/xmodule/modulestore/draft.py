@@ -13,6 +13,12 @@ def as_draft(location):
     """
     return Location(location)._replace(revision=DRAFT)
 
+def as_published(location):
+    """
+    Returns the Location that is the published version for `location`
+    """
+    return Location(location)._replace(revision=None)    
+
 
 def wrap_draft(item):
     """
@@ -159,13 +165,17 @@ class DraftModuleStore(ModuleStoreBase):
 
         return super(DraftModuleStore, self).update_metadata(draft_loc, metadata)
 
-    def delete_item(self, location):
+    def delete_item(self, location, delete_all_versions=False):
         """
         Delete an item from this modulestore
 
         location: Something that can be passed to Location
         """
-        return super(DraftModuleStore, self).delete_item(as_draft(location))
+        super(DraftModuleStore, self).delete_item(as_draft(location))
+        if delete_all_versions:
+            super(DraftModuleStore, self).delete_item(as_published(location))
+
+        return
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location.  Needed
