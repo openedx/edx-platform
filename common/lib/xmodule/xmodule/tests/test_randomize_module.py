@@ -14,7 +14,6 @@ START = '2013-01-01T01:00:00'
 
 
 from .test_course_module import DummySystem as DummyImportSystem
-from . import test_system
 
 
 class RandomizeModuleTestCase(unittest.TestCase):
