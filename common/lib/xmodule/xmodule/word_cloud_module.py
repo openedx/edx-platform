@@ -24,7 +24,7 @@ def pretty_bool(value):
 
 
 class WordCloudDescriptorFields(object):
-    """Word Cloud fields from xml for descriptor."""
+    """Word Cloud Xfields for descriptor/xml."""
     display_name = String(
         help="Display name for this module",
         scope=Scope.settings
@@ -40,13 +40,14 @@ class WordCloudDescriptorFields(object):
         default=250
     )
     display_student_percents = Boolean(
-        help="Dispaly usage percents for each word.",
+        help="Display usage percents for each word?",
         scope=Scope.settings,
         default=True
     )
 
 
 class WordCloudFields(object):
+    """ XFields for word cloud """
     submitted = Boolean(
         help="Whether this student has posted words to the cloud.",
         scope=Scope.user_state,
@@ -58,11 +59,11 @@ class WordCloudFields(object):
         default=[]
     )
     all_words = Object(
-        help="All possible words from other students.",
+        help="All possible words from all students.",
         scope=Scope.content
     )
     top_words = Object(
-        help="Top N words for word cloud.",
+        help="Top num_top_words words for word cloud.",
         scope=Scope.content
     )
 
@@ -111,7 +112,22 @@ class WordCloudModule(WordCloudFields, WordCloudDescriptorFields, XModule):
         return word.strip().lower()
 
     def prepare_words(self, top_words, total_count):
-        """Convert words dictionary for client API."""
+        """Convert words dictionary for client API.
+
+        :param top_words: Top words dictionary
+        :type top_words: dict
+        :param total_count: Total number of words
+        :type total_count: int
+
+        :rtype: list of dicts. Every dict is 3 keys: text - actual word,
+        size - counter of word, percent - percent in top_words dataset.
+
+        Calculates corrected percents for every top word:
+
+        For every word except last, it calculates rounded percent.
+        For the last is 100 - sum of all other percents.
+
+        """
         list_to_return = []
         percents = 0
         for num, word_tuple in enumerate(top_words.iteritems()):
@@ -130,7 +146,15 @@ class WordCloudModule(WordCloudFields, WordCloudDescriptorFields, XModule):
         return list_to_return
 
     def top_dict(self, dict_obj, amount):
-        """Return new dict: top of dict using dict value."""
+        """Return top words from all words, filtered by number of
+        occurences
+
+        :param dict_obj: all words
+        :type dict_obj: dict
+        :param amount: number of words to be in top dict
+        :type amount: int
+        :rtype: dict
+        """
         return dict(
             sorted(
                 dict_obj.items(),
