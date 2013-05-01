@@ -10,7 +10,7 @@ from xmodule.x_module import XModuleDescriptor
 import logging
 import pymongo
 import sys
-from xmodule.modulestore.locator import BlockLocator, DescriptorLocator, CourseLocator, VersionTree
+from xmodule.modulestore.locator import BlockUsageLocator, DescriptorLocator, CourseLocator, VersionTree
 from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from collections import namedtuple
 from xblock.core import Scope
@@ -44,7 +44,7 @@ log = logging.getLogger(__name__)
 #==============================================================================
 
 
-# id is a BlockLocator, def_id is the definition's guid
+# id is a BlockUsageLocator, def_id is the definition's guid
 SplitMongoKVSid = namedtuple('SplitMongoKVSid', 'id, def_id')
 
 
@@ -257,13 +257,13 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             .get(course_entry.get('root')))
 
 
-    def _load_item(self, block_id):
+    def _load_item(self, usage_id):
         # TODO ensure all callers of system.load_item pass just the id
-        json_data = self.module_data.get(block_id)
+        json_data = self.module_data.get(usage_id)
         if json_data is None:
             # deeper than initial descendant fetch or doesn't exist
-            self.modulestore.cache_items(self, [block_id], lazy=self.lazy)
-            json_data = self.module_data.get(block_id)
+            self.modulestore.cache_items(self, [usage_id], lazy=self.lazy)
+            json_data = self.module_data.get(usage_id)
             if json_data is None:
                 raise ItemNotFoundError
 
@@ -281,8 +281,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 json_data.get('children', []),
                 metadata, json_data.get('_inherited_metadata'))
 
-            block_locator = BlockLocator(version_guid=self.course_entry['_id'],
-                block_id=block_id, course_id=self.course_entry.get('course_id'))
+            block_locator = BlockUsageLocator(version_guid=self.course_entry['_id'],
+                usage_id=usage_id, course_id=self.course_entry.get('course_id'))
             model_data = DbModel(kvs, class_, None,
                 SplitMongoKVSid(
                     # DbModel req's that these support .url()
@@ -298,8 +298,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             return ErrorDescriptor.from_json(
                 json_data,
                 self,
-                BlockLocator(version_guid=self.course_entry['_id'],
-                    block_id=block_id),
+                BlockUsageLocator(version_guid=self.course_entry['_id'],
+                    usage_id=usage_id),
                 error_msg=exc_info_to_str(sys.exc_info())
             )
 
@@ -362,19 +362,19 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self.error_tracker = error_tracker
         self.render_template = render_template
 
-    def cache_items(self, system, base_block_ids, depth=0, lazy=True):
+    def cache_items(self, system, base_usage_ids, depth=0, lazy=True):
         '''
         Handles caching of items once inheritance and any other one time
         per course per fetch operations are done.
         :param system: a CachingDescriptorSystem
-        :param base_block_ids: list of block_ids to fetch
+        :param base_usage_ids: list of usage_ids to fetch
         :param depth: how deep below these to prefetch
         :param lazy: whether to fetch definitions or use placeholders
         '''
         new_module_data = {}
-        for block_id in base_block_ids:
+        for usage_id in base_usage_ids:
             new_module_data = self.descendants(system.course_entry['blocks'],
-                block_id, depth, new_module_data)
+                usage_id, depth, new_module_data)
 
         # remove any which were already in module_data (not sure if there's a better way)
         for newkey in new_module_data.iterkeys():
@@ -401,7 +401,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         system.module_data.update(new_module_data)
         return system.module_data
 
-    def _load_items(self, course_entry, block_ids, depth=0, lazy=True):
+    def _load_items(self, course_entry, usage_ids, depth=0, lazy=True):
         '''
         Load & cache the given blocks from the course. Prefetch down to the
         given depth. Load the definitions into each block if lazy is False;
@@ -419,12 +419,12 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 self.render_template
             )
             self._add_cache(course_entry['_id'], system)
-            self.cache_items(system, block_ids, depth, lazy)
+            self.cache_items(system, usage_ids, depth, lazy)
         elif 'course_id' in course_entry:
             # HACK :-( if same version ref'd by more than one course in same thread, the
             # caching of the course_id on the entry may be wrong. Force it here.
             system.course_entry['course_id'] = course_entry['course_id']
-        return [system.load_item(block_id) for block_id in block_ids]
+        return [system.load_item(usage_id) for usage_id in usage_ids]
 
     def _get_cache(self, course_version_guid):
         """
@@ -553,7 +553,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         the course or the block w/in the course do not exist for the given version.
         raises InsufficientSpecificationError if the locator does not id a block
         """
-        if block_location.block_id is None:
+        if block_location.usage_id is None:
             raise InsufficientSpecificationError(block_location)
         try:
             course_structure = self._lookup_course(block_location)
@@ -561,7 +561,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             # this error only occurs if the course does not exist
             return False
 
-        return course_structure['blocks'].get(block_location.block_id) is not None
+        return course_structure['blocks'].get(block_location.usage_id) is not None
 
     def get_item(self, location, depth=0):
         """
@@ -590,9 +590,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
             descendants.
         raises InsufficientSpecificationError or ItemNotFoundError
         """
-        location = BlockLocator.ensure_fully_specified(location)
+        location = BlockUsageLocator.ensure_fully_specified(location)
         course = self._lookup_course(location)
-        items = self._load_items(course, [location.block_id], depth, lazy=True)
+        items = self._load_items(course, [location.usage_id], depth, lazy=True)
         if len(items) == 0:
             raise ItemNotFoundError(location)
         return items[0]
@@ -614,36 +614,36 @@ class SplitMongoModuleStore(ModuleStoreBase):
         look like mongo queries, it is all done in memory; so, you cannot
         try arbitrary queries.
 
-        :param locator: CourseLocator or BlockLocator restricting search scope
+        :param locator: CourseLocator or BlockUsageLocator restricting search scope
         :param qualifiers: a dict restricting which elements should match
         '''
         # TODO extend to only search a subdag of the course?
         course = self._lookup_course(locator)
         items = []
-        for block_id, value in course['blocks'].iteritems():
+        for usage_id, value in course['blocks'].iteritems():
             if self._block_matches(value, qualifiers):
-                items.append(block_id)
+                items.append(usage_id)
 
         if len(items) > 0:
             return self._load_items(course, items, 0, lazy=True)
         else:
             return []
 
-    def get_parent_locations(self, locator, block_id=None):
+    def get_parent_locations(self, locator, usage_id=None):
         '''
-        Return the locations (Locators w/ block_ids) for the parents of this location in this
-        course. Could use get_items(location, {'children': block_id}) but this is slightly faster.
-        NOTE: does not actually ensure block_id exists
-        If block_id is None, then the locator must specify the block_id
+        Return the locations (Locators w/ usage_ids) for the parents of this location in this
+        course. Could use get_items(location, {'children': usage_id}) but this is slightly faster.
+        NOTE: does not actually ensure usage_id exists
+        If usage_id is None, then the locator must specify the usage_id
         '''
-        if block_id is None:
-            block_id = locator.block_id
+        if usage_id is None:
+            usage_id = locator.usage_id
         course = self._lookup_course(locator)
         items = []
         for parent_id, value in course['blocks'].iteritems():
             for child_id in value['children']:
-                if block_id == child_id:
-                    items.append(BlockLocator(locator, block_id=parent_id))
+                if usage_id == child_id:
+                    items.append(BlockUsageLocator(locator, usage_id=parent_id))
         return items
 
     def get_course_index_info(self, course_locator):
@@ -807,7 +807,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return definition_locator, False
 
-    def _generate_block_id(self, course_blocks, category):
+    def _generate_usage_id(self, course_blocks, category):
         """
         Generate a somewhat readable block id unique w/in this course using the category
         :param course_blocks: the current list of blocks.
@@ -852,7 +852,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         Add a descriptor to persistence as the last child of the optional parent_location or just as an element
         of the course (if no parent provided). Return the resulting post saved version with populated locators.
 
-        If the locator is a BlockLocator, then it's assumed to be the parent. If it's a CourseLocator, then it's
+        If the locator is a BlockUsageLocator, then it's assumed to be the parent. If it's a CourseLocator, then it's
         merely the containing course.
 
         raises InsufficientSpecificationError if there is no course locator.
@@ -895,10 +895,10 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # copy the structure and modify the new one
         new_structure = self._version_structure(structure, user_id)
         # generate an id
-        new_block_id = self._generate_block_id(new_structure['blocks'], category)
-        if isinstance(course_or_parent_locator, BlockLocator) and course_or_parent_locator.block_id is not None:
-            new_structure['blocks'][course_or_parent_locator.block_id]['children'].append(new_block_id)
-        new_structure['blocks'][new_block_id] = {
+        new_usage_id = self._generate_usage_id(new_structure['blocks'], category)
+        if isinstance(course_or_parent_locator, BlockUsageLocator) and course_or_parent_locator.usage_id is not None:
+            new_structure['blocks'][course_or_parent_locator.usage_id]['children'].append(new_usage_id)
+        new_structure['blocks'][new_usage_id] = {
             "children": [],
             "category": category,
             "definition": definition_locator.def_id,
@@ -912,7 +912,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
 
         # fetch and return the new item--fetching is unnecessary but a good qc step
-        return self.get_instance(BlockLocator(course_or_parent_locator, block_id=new_block_id, version_guid=new_id))
+        return self.get_instance(BlockUsageLocator(course_or_parent_locator, usage_id=new_usage_id, version_guid=new_id))
 
     # TODO should this get the org from the user object?
     def create_course(self, org, prettyid, user_id, id_root=None, metadata=None, course_data=None,
@@ -1035,7 +1035,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # real data?
         try:
             source_item = self.get_instance(source_course_id, source)
-            source_item['_id'] = BlockLocator(location).dict()
+            source_item['_id'] = BlockUsageLocator(location).dict()
             self.update_item(dest_course_id, location, source_item)
 
             item = self.get_instance(dest_course_id, location)
@@ -1082,7 +1082,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         descriptor.definition_locator, is_updated = self.update_definition_from_data(
             descriptor.definition_locator, descriptor.xblock_kvs().get_data(), user_id)
         # check children
-        original_entry = original_structure['blocks'][descriptor.location.block_id]
+        original_entry = original_structure['blocks'][descriptor.location.usage_id]
         if (not is_updated and descriptor.has_children
             and not self._lists_equal(original_entry['children'], descriptor.children)):
             is_updated = True
@@ -1102,7 +1102,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # if updated, rev the structure
         if is_updated:
             new_structure = self._version_structure(original_structure, user_id)
-            block_data = new_structure['blocks'][descriptor.location.block_id]
+            block_data = new_structure['blocks'][descriptor.location.usage_id]
             if descriptor.has_children:
                 block_data["children"] = descriptor.children
 
@@ -1116,7 +1116,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
-            return self.get_instance(BlockLocator(descriptor.location, version_guid=new_id))
+            return self.get_instance(BlockUsageLocator(descriptor.location, version_guid=new_id))
         else:
             # nothing changed, just return the one sent in
             return descriptor
@@ -1162,7 +1162,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         """
         Delete an item from this modulestore
 
-        location: Something that can be passed to BlockLocator
+        location: Something that can be passed to BlockUsageLocator
         """
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
@@ -1173,7 +1173,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
             self.update_metadata(course.id, course.location, course.metadata)
 
-        self.definitions.remove({'_id': BlockLocator(location).dict()})
+        self.definitions.remove({'_id': BlockUsageLocator(location).dict()})
 
     # TODO refactor
     def get_errored_courses(self):
@@ -1210,24 +1210,24 @@ class SplitMongoModuleStore(ModuleStoreBase):
         for child in block.get('children', []):
             self.inherit_metadata(block_map, block_map[child], inheriting_metadata)
 
-    def descendants(self, block_map, block_id, depth, descendent_map):
+    def descendants(self, block_map, usage_id, depth, descendent_map):
         """
         adds block and its descendants out to depth to descendent_map
         Depth specifies the number of levels of descendants to return
         (0 => this usage only, 1 => this usage and its children, etc...)
         A depth of None returns all descendants
         """
-        if block_id not in block_map:
+        if usage_id not in block_map:
             return descendent_map
 
         # do I need to copy the entry or is the independence of the
         # find results sufficient?
-        if block_id not in descendent_map:
-            descendent_map[block_id] = block_map[block_id]
+        if usage_id not in descendent_map:
+            descendent_map[usage_id] = block_map[usage_id]
 
         if depth is None or depth > 0:
             depth = depth - 1 if depth is not None else None
-            for child in block_map[block_id].get('children', []):
+            for child in block_map[usage_id].get('children', []):
                 descendent_map = self.descendants(block_map, child, depth,
                     descendent_map)
 

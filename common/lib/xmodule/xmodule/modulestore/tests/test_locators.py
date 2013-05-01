@@ -4,7 +4,7 @@ Created on Mar 14, 2013
 @author: dmitchell
 '''
 from unittest import TestCase
-from xmodule.modulestore.locator import CourseLocator, BlockLocator
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import InvalidLocationError, \
     InsufficientSpecificationError
 
@@ -157,112 +157,112 @@ class LocatorTest(TestCase):
         '''
         Test constructor and property accessors.
         '''
-        self.assertIsInstance(BlockLocator(), BlockLocator,
+        self.assertIsInstance(BlockUsageLocator(), BlockUsageLocator,
             'empty constructor')
 
         # url inits
         testurn = 'edx://org/course/category/name'
-        self.assertRaises(InvalidLocationError, BlockLocator, testurn)
+        self.assertRaises(InvalidLocationError, BlockUsageLocator, testurn)
         testurn = 'unknown/versionid/blockid'
-        self.assertRaises(InvalidLocationError, BlockLocator, testurn)
+        self.assertRaises(InvalidLocationError, BlockUsageLocator, testurn)
 
         testurn = 'cvx/versionid'
-        testobj = BlockLocator(testurn)
+        testobj = BlockUsageLocator(testurn)
         self.check_block_locn_fields(testobj, testurn, 'versionid')
-        self.assertEqual(testobj, BlockLocator(testobj),
+        self.assertEqual(testobj, BlockUsageLocator(testobj),
             'initialization from another instance')
 
         testurn = 'cvx/versionid/'
-        testobj = BlockLocator(testurn)
+        testobj = BlockUsageLocator(testurn)
         self.check_block_locn_fields(testobj, testurn, 'versionid')
 
         testurn = 'cvx/versionid/blockid'
-        testobj = BlockLocator(testurn)
+        testobj = BlockUsageLocator(testurn)
         self.check_block_locn_fields(testobj, testurn, 'versionid',
             block='blockid')
 
         testurn = 'cvx/versionid/blockid/extraneousstuff?including=args'
-        testobj = BlockLocator(testurn)
+        testobj = BlockUsageLocator(testurn)
         self.check_block_locn_fields(testobj, testurn, 'versionid',
             block='blockid')
 
         testurn = 'cvx://versionid/blockid'
-        testobj = BlockLocator(testurn)
+        testobj = BlockUsageLocator(testurn)
         self.check_block_locn_fields(testobj, testurn, 'versionid',
             block='blockid')
 
         testurn = 'crx/courseid/blockid'
-        testobj = BlockLocator(testurn)
+        testobj = BlockUsageLocator(testurn)
         self.check_block_locn_fields(testobj, testurn, course_id='courseid',
             block='blockid')
 
         testurn = 'crx/courseid@revision/blockid'
-        testobj = BlockLocator(testurn)
+        testobj = BlockUsageLocator(testurn)
         self.check_block_locn_fields(testobj, testurn, course_id='courseid',
             revision='revision', block='blockid')
-        self.assertEqual(testobj, BlockLocator(testobj),
+        self.assertEqual(testobj, BlockUsageLocator(testobj),
             'run initialization from another instance')
 
         # arg list inits
-        testobj = BlockLocator(version_guid='versionid')
+        testobj = BlockUsageLocator(version_guid='versionid')
         self.check_block_locn_fields(testobj, 'versionid arg', 'versionid')
 
-        testobj = BlockLocator(version_guid='versionid', block_id='myblock')
+        testobj = BlockUsageLocator(version_guid='versionid', usage_id='myblock')
         self.check_block_locn_fields(testobj, 'versionid arg', 'versionid',
             block='myblock')
 
-        testobj = BlockLocator(course_id='courseid')
+        testobj = BlockUsageLocator(course_id='courseid')
         self.check_block_locn_fields(testobj, 'courseid arg',
             course_id='courseid')
 
-        testobj = BlockLocator(course_id='courseid', revision='rev')
+        testobj = BlockUsageLocator(course_id='courseid', revision='rev')
         self.check_block_locn_fields(testobj, 'rev arg',
             course_id='courseid',
             revision='rev')
         # ignores garbage
-        testobj = BlockLocator(course_id='courseid', revision='rev',
-            block_id='this_block', potato='spud')
+        testobj = BlockUsageLocator(course_id='courseid', revision='rev',
+            usage_id='this_block', potato='spud')
         self.check_block_locn_fields(testobj, 'extra keyword arg',
             course_id='courseid', block='this_block', revision='rev')
 
         # url w/ keyword override
         testurn = 'crx/courseid@revision/blockid'
-        testobj = BlockLocator(testurn, revision='rev')
+        testobj = BlockUsageLocator(testurn, revision='rev')
         self.check_block_locn_fields(testobj, 'rev override',
             course_id='courseid', block='blockid',
             revision='rev')
 
         # dict init w/ keyword overwrites
-        testobj = BlockLocator({"version_guid": 'versionid',
-            'block_id': 'dictblock'})
+        testobj = BlockUsageLocator({"version_guid": 'versionid',
+            'usage_id': 'dictblock'})
         self.check_block_locn_fields(testobj, 'versionid dict', 'versionid',
             block='dictblock')
 
-        testobj = BlockLocator({"course_id": 'courseid',
-            'block_id': 'dictblock'})
+        testobj = BlockUsageLocator({"course_id": 'courseid',
+            'usage_id': 'dictblock'})
         self.check_block_locn_fields(testobj, 'courseid dict',
             block='dictblock', course_id='courseid')
 
-        testobj = BlockLocator({"course_id": 'courseid', "revision": 'rev',
-            'block_id': 'dictblock'})
+        testobj = BlockUsageLocator({"course_id": 'courseid', "revision": 'rev',
+            'usage_id': 'dictblock'})
         self.check_block_locn_fields(testobj, 'rev dict',
             course_id='courseid', block='dictblock',
             revision='rev')
         # ignores garbage
-        testobj = BlockLocator({"course_id": 'courseid', "revision": 'rev',
-            'block_id': 'dictblock', "potato": 'spud'})
+        testobj = BlockUsageLocator({"course_id": 'courseid', "revision": 'rev',
+            'usage_id': 'dictblock', "potato": 'spud'})
         self.check_block_locn_fields(testobj, 'extra keyword dict',
             course_id='courseid', block='dictblock',
             revision='rev')
-        testobj = BlockLocator({"course_id": 'courseid', "revision": 'rev',
-            'block_id': 'dictblock'}, revision='alt', block_id='anotherblock')
+        testobj = BlockUsageLocator({"course_id": 'courseid', "revision": 'rev',
+            'usage_id': 'dictblock'}, revision='alt', usage_id='anotherblock')
         self.check_block_locn_fields(testobj, 'rev dict',
             course_id='courseid', block='anotherblock',
             revision='alt')
 
         # urn init w/ dict & keyword overwrites
-        testobj = BlockLocator('crx/notcourse@notthis/northis',
-            {"course_id": 'courseid'}, revision='alt', block_id='anotherblock')
+        testobj = BlockUsageLocator('crx/notcourse@notthis/northis',
+            {"course_id": 'courseid'}, revision='alt', usage_id='anotherblock')
         self.check_block_locn_fields(testobj, 'rev dict',
             course_id='courseid', block='anotherblock',
             revision='alt')
@@ -272,65 +272,65 @@ class LocatorTest(TestCase):
         Test constructor and property accessors.
         '''
         self.assertRaises(InsufficientSpecificationError,
-            BlockLocator.ensure_fully_specified, BlockLocator())
+            BlockUsageLocator.ensure_fully_specified, BlockUsageLocator())
 
         # url inits
         testurn = 'edx://org/course/category/name'
         self.assertRaises(InvalidLocationError,
-            BlockLocator.ensure_fully_specified, testurn)
+            BlockUsageLocator.ensure_fully_specified, testurn)
         testurn = 'unknown/versionid/blockid'
         self.assertRaises(InvalidLocationError,
-            BlockLocator.ensure_fully_specified, testurn)
+            BlockUsageLocator.ensure_fully_specified, testurn)
 
         testurn = 'cvx/versionid'
         self.assertRaises(InsufficientSpecificationError,
-            BlockLocator.ensure_fully_specified, testurn)
+            BlockUsageLocator.ensure_fully_specified, testurn)
 
         testurn = 'cvx/versionid/'
         self.assertRaises(InsufficientSpecificationError,
-            BlockLocator.ensure_fully_specified, testurn)
+            BlockUsageLocator.ensure_fully_specified, testurn)
 
         testurn = 'cvx/versionid/blockid'
-        self.assertIsInstance(BlockLocator.ensure_fully_specified(testurn),
-            BlockLocator, testurn)
+        self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
+            BlockUsageLocator, testurn)
 
         testurn = 'cvx/versionid/blockid/extraneousstuff?including=args'
-        self.assertIsInstance(BlockLocator.ensure_fully_specified(testurn),
-            BlockLocator, testurn)
+        self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
+            BlockUsageLocator, testurn)
 
         testurn = 'cvx://versionid/blockid'
-        self.assertIsInstance(BlockLocator.ensure_fully_specified(testurn),
-            BlockLocator, testurn)
+        self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
+            BlockUsageLocator, testurn)
 
         testurn = 'crx/courseid/blockid'
-        self.assertIsInstance(BlockLocator.ensure_fully_specified(testurn),
-            BlockLocator, testurn)
+        self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
+            BlockUsageLocator, testurn)
 
         testurn = 'crx/courseid@revision/blockid'
-        self.assertIsInstance(BlockLocator.ensure_fully_specified(testurn),
-            BlockLocator, testurn)
+        self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
+            BlockUsageLocator, testurn)
 
         # arg list inits
-        testobj = BlockLocator(version_guid='versionid')
+        testobj = BlockUsageLocator(version_guid='versionid')
         self.assertRaises(InsufficientSpecificationError,
-            BlockLocator.ensure_fully_specified, testobj)
+            BlockUsageLocator.ensure_fully_specified, testobj)
 
-        testobj = BlockLocator(version_guid='versionid', block_id='myblock')
-        self.assertIsInstance(BlockLocator.ensure_fully_specified(testurn),
-            BlockLocator, testurn)
+        testobj = BlockUsageLocator(version_guid='versionid', usage_id='myblock')
+        self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
+            BlockUsageLocator, testurn)
 
-        testobj = BlockLocator(course_id='courseid')
+        testobj = BlockUsageLocator(course_id='courseid')
         self.assertRaises(InsufficientSpecificationError,
-            BlockLocator.ensure_fully_specified, testobj)
+            BlockUsageLocator.ensure_fully_specified, testobj)
 
-        testobj = BlockLocator(course_id='courseid', revision='rev')
+        testobj = BlockUsageLocator(course_id='courseid', revision='rev')
         self.assertRaises(InsufficientSpecificationError,
-            BlockLocator.ensure_fully_specified, testobj)
+            BlockUsageLocator.ensure_fully_specified, testobj)
 
-        testobj = BlockLocator(course_id='courseid', revision='rev',
-            block_id='this_block')
-        self.assertIsInstance(BlockLocator.ensure_fully_specified(testurn),
-            BlockLocator, testurn)
+        testobj = BlockUsageLocator(course_id='courseid', revision='rev',
+            usage_id='this_block')
+        self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
+            BlockUsageLocator, testurn)
 
     def check_course_locn_fields(self, testobj, msg, version_guid=None,
             course_id=None, revision=None):
@@ -342,4 +342,4 @@ class LocatorTest(TestCase):
             course_id=None, revision=None, block=None):
         self.check_course_locn_fields(testobj, msg, version_guid, course_id,
             revision)
-        self.assertEqual(testobj.block_id, block, msg)
+        self.assertEqual(testobj.usage_id, block)
