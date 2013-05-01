@@ -19,22 +19,12 @@ modulestore_options = {
     'collection': 'modulestore',
     'fs_root': GITHUB_REPO_ROOT,
     'render_template': 'mitxmako.shortcuts.render_to_string',
+    'draft_aware': True
 }
 
-draft_aware = {
-    'draft_aware': True
-    }.update(modulestore_options)
-
 MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-        'OPTIONS': draft_aware
-        },
-        # dhm: I don't believe we want to distinguish default and direct anymore
-    'direct': {
-        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-        'OPTIONS': modulestore_options
-    }
+    'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+    'OPTIONS': modulestore_options
 }
 
 # cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
