@@ -20,7 +20,7 @@ PIPELINE_JS['js-test-source'] = {
     'source_filenames': sum([
         pipeline_group['source_filenames']
         for group_name, pipeline_group
-        in PIPELINE_JS.items()
+        in sorted(PIPELINE_JS.items(), key=lambda item: item[1].get('test_order', 1e100))
         if group_name != 'spec'
     ], []),
     'output_filename': 'js/cms-test-source.js'
