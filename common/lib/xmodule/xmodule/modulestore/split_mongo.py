@@ -276,7 +276,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             definition = json_data.get('definition', {})
             metadata = json_data.get('metadata', {})
 
-            # TODO handle author, date, previous_version, original_version
             kvs = SplitMongoKVS(definition,
                 json_data.get('children', []),
                 metadata, json_data.get('_inherited_metadata'))
@@ -294,7 +293,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             return module
         except:
             log.warning("Failed to load descriptor", exc_info=True)
-            # TODO get this to work w/ lazy loaded descriptors in json_data
             return ErrorDescriptor.from_json(
                 json_data,
                 self,
@@ -479,6 +477,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             else:
                 version_guid = index['draftVersion']
             if course_locator.version_guid is not None and version_guid != course_locator.version_guid:
+                # This may be a bit too touchy but it's hard to infer intent
                 raise VersionConflictError(course_locator, CourseLocator(course_locator, version_guid=version_guid))
         else:
             # TODO should this raise an exception if revision was provided?
@@ -579,7 +578,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             raise ItemNotFoundError(location)
         return items[0]
 
-    # TODO should there be a Locator which wraps the qualifiers instead of arg?
+    # TODO refactor this and get_courses to use a constructed query
     def get_items(self, locator, qualifiers):
         '''
         Get all of the modules in the given course matching the qualifiers. The
@@ -611,6 +610,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return []
 
+    # What's the use case for usage_id being separate?
     def get_parent_locations(self, locator, usage_id=None):
         '''
         Return the locations (Locators w/ usage_ids) for the parents of this location in this
@@ -734,7 +734,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
         pass
 
     # TODO is it an error to call create, update, or delete if self.draft_aware == False?
-    # TODO have create, update, delete update the cache w/ the new course version
     def create_definition_from_data(self, new_def_data, category, user_id):
         """
         Pull the definition fields out of descriptor and save to the db as a new definition
@@ -884,7 +883,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             "children": [],
             "category": category,
             "definition": definition_locator.def_id,
-            "metadata": metadata
+            "metadata": metadata if metadata else {}
             }
         new_id = self.structures.insert(new_structure)
 
@@ -930,7 +929,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             metadata = {}
         # work from inside out: definition, structure, index entry
         if draft_version is None:
-            # TODO create new definition and structure
+            # create new definition and structure
             definition_entry = {
                 'category': root_category,
                 'data': {},
@@ -1006,7 +1005,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         new_id = self.course_index.insert(index_entry)
         return self.get_course(CourseLocator(course_id=new_id))
 
-    # TODO refactor
+    # TODO refactor or remove
     def clone_item(self, source_course_id, dest_course_id, source, location):
         """
         Clone a new item that is a copy of the item at the location `source`
@@ -1103,11 +1102,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
             # nothing changed, just return the one sent in
             return descriptor
 
-    # TODO remove all callers
+    # TODO change all callers to update_item
     def update_children(self, course_id, location, children):
         raise NotImplementedError()
 
-    # TODO remove all callers
+    # TODO change all callers to update_item
     def update_metadata(self, course_id, location, metadata):
         raise NotImplementedError()
 
@@ -1139,25 +1138,52 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self.course_index.update({'_id': course_locator.course_id},
             {'$set': new_values_dict})
 
-    # TODO refactor
-    def delete_item(self, course_id, location):
+    def delete_item(self, usage_locator, user_id, force=False):
         """
-        Delete an item from this modulestore
+        Delete the tree rooted at block and any references w/in the course to the block
+        from a new version of the course structure.
 
-        location: Something that can be passed to BlockUsageLocator
+        returns CourseLocator for new version
+
+        raises ItemNotFoundError if the location does not exist.
+        raises ValueError if usage_locator points to the structure root
+
+        Creates a new course version. If the descriptor's location has a course_id, it moves the course head
+        pointer. If the version_guid of the descriptor points to a non-head version and there's been an intervening
+        change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
+        the course but leaves the head pointer where it is (this change will not be in the course head).
         """
-        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-        # if we add one then we need to also add it to the policy information (i.e. metadata)
-        # we should remove this once we can break this reference from the course to static tabs
-        if location.category == 'static_tab':
-            course = self.get_item(course_id, CourseDescriptor.id_to_location(course_id))
-            existing_tabs = course.tabs or []
-            course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
-            self.update_metadata(course.id, course.location, course.metadata)
+        BlockUsageLocator.ensure_fully_specified(usage_locator)
+        original_structure = self._lookup_course(usage_locator)
+        if original_structure['root'] == usage_locator.usage_id:
+            raise ValueError("Cannot delete the root of a course")
+        index_entry = self._get_index_if_valid(usage_locator, force)
+        new_structure = self._version_structure(original_structure, user_id)
+        new_blocks = new_structure['blocks']
+        parents = self.get_parent_locations(usage_locator)
+        for parent in parents:
+            new_blocks[parent.usage_id]['children'].remove(usage_locator.usage_id)
+        # remove subtree
+        def remove_subtree(usage_id):
+            for child in new_blocks[usage_id]['children']:
+                remove_subtree(child)
+            del new_blocks[usage_id]
+        remove_subtree(usage_locator.usage_id)
 
-        self.definitions.remove({'_id': BlockUsageLocator(location).dict()})
+        # update index if appropriate and structures
+        new_id = self.structures.insert(new_structure)
+        result = CourseLocator(version_guid=new_id)
 
-    # TODO refactor
+        # update the index entry if appropriate
+        if index_entry is not None and original_structure["_id"] == index_entry["draftVersion"]:
+            index_entry["draftVersion"] = new_id
+            self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
+            result.course_id = usage_locator.course_id
+            result.revision = usage_locator.revision
+
+        return result
+
+    # TODO remove all callers and then this
     def get_errored_courses(self):
         """
         This function doesn't make sense for the mongo modulestore, as structures

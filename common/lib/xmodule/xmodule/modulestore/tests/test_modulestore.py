@@ -653,6 +653,53 @@ class TestItemCrud(SplitModuleTest):
         self.assertEqual(updated_block.children[0], block.children[0])
         self.assertEqual(updated_block.advertised_start, "Soon")
 
+    def test_delete_item(self):
+        course = self.create_course_for_deletion()
+        self.assertRaises(ValueError, modulestore().delete_item, course.location, 'deleting_user')
+        reusable_location = BlockUsageLocator(course_id=course.location.course_id,
+            usage_id=course.location.usage_id)
+
+        # delete a leaf
+        problems = modulestore().get_items(reusable_location, {'category' : 'problem'})
+        new_course_loc = modulestore().delete_item(problems[0].location, 'deleting_user')
+        self.assertFalse(modulestore().has_item(BlockUsageLocator(reusable_location,
+            usage_id=problems[0].location.usage_id)))
+        locator = BlockUsageLocator(problems[0].location)
+        locator.course_id = None
+        self.assertTrue(modulestore().has_item(locator))
+        self.assertNotEqual(new_course_loc.version_guid, course.location.version_guid)
+
+        # delete a subtree
+        nodes = modulestore().get_items(reusable_location, {'category' : 'chapter'})
+        new_course_loc = modulestore().delete_item(nodes[0].location, 'deleting_user')
+        # check subtree
+        def check_subtree(node):
+            if node:
+                self.assertFalse(modulestore().has_item(BlockUsageLocator(reusable_location,
+                    usage_id=node.location.usage_id)))
+                locator = BlockUsageLocator(node.location)
+                locator.course_id = None
+                self.assertTrue(modulestore().has_item(locator))
+                if node.has_children:
+                    for sub in node.get_children():
+                        check_subtree(sub)
+        check_subtree(nodes[0])
+
+
+    def create_course_for_deletion(self):
+        course = modulestore().create_course('nihilx', 'deletion', 'deleting_user')
+        root = BlockUsageLocator(course_id=course.location.course_id, usage_id=course.location.usage_id)
+        for i in range(4):
+            self.create_subtree_for_deletion(root, ['chapter', 'vertical', 'problem'])
+        return modulestore().get_item(root)
+
+    def create_subtree_for_deletion(self, parent, category_queue):
+        if not category_queue:
+            return
+        node = modulestore().create_item(parent, category_queue[0], 'deleting_user')
+        node_loc = BlockUsageLocator(parent, usage_id=node.location.usage_id)
+        for i in range(4):
+            self.create_subtree_for_deletion(node_loc, category_queue[1:])
 
 class TestCourseCreation(SplitModuleTest):
     """

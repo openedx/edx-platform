@@ -20,7 +20,7 @@ class ModuleStore(object):
     An abstract interface for a database backend that stores XModuleDescriptor
     instances
     """
-    def has_item(self, course_id, location):
+    def has_item(self, location):
         """
         Returns True if location exists in this ModuleStore.
         """
@@ -64,7 +64,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def get_items(self, course_id, location, depth=0):
+    def get_items(self, locator, qualifiers):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -117,7 +117,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def delete_item(self, course_id, location):
+    def delete_item(self, usage_locator, user_id, force=False):
         """
         Delete an item from this modulestore
 
@@ -125,13 +125,13 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def get_courses(self, org=None, course=None, run=None):
+    def get_courses(self, qualifiers=None, revision=None):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
         in this modulestore.
 
-        If any of org, course, or run are not None, then the list of courses is
-        filtered to only match courses with those specified identifiers
+        The list of courses is
+        filtered to only match courses with those specified qualifiers and revisions.
         '''
         raise NotImplementedError
 
@@ -141,7 +141,7 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
-    def get_parent_locations(self, course_id, location):
+    def get_parent_locations(self, locator, usage_id=None):
         '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
 
