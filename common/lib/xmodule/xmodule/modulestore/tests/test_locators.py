@@ -11,7 +11,7 @@ from xmodule.modulestore.exceptions import InvalidLocationError, \
 
 class LocatorTest(TestCase):
 
-    def test_course_locator(self):
+    def test_course_urls(self):
         '''
         Test constructor and property accessors.
         '''
@@ -57,6 +57,7 @@ class LocatorTest(TestCase):
         self.assertEqual(testobj, CourseLocator(testobj),
             'run initialization from another instance')
 
+    def test_course_keyword_setters(self):
         # arg list inits
         testobj = CourseLocator(version_guid='versionid')
         self.check_course_locn_fields(testobj, 'versionid arg', 'versionid')
@@ -83,6 +84,7 @@ class LocatorTest(TestCase):
             course_id='courseid',
             revision='rev')
 
+    def test_course_dict(self):
         # dict init w/ keyword overwrites
         testobj = CourseLocator({"version_guid": 'versionid'})
         self.check_course_locn_fields(testobj, 'versionid dict', 'versionid')
@@ -203,6 +205,7 @@ class LocatorTest(TestCase):
         self.assertEqual(testobj, BlockUsageLocator(testobj),
             'run initialization from another instance')
 
+    def test_block_keyword_init(self):
         # arg list inits
         testobj = BlockUsageLocator(version_guid='versionid')
         self.check_block_locn_fields(testobj, 'versionid arg', 'versionid')
@@ -232,6 +235,7 @@ class LocatorTest(TestCase):
             course_id='courseid', block='blockid',
             revision='rev')
 
+    def test_block_keywords(self):
         # dict init w/ keyword overwrites
         testobj = BlockUsageLocator({"version_guid": 'versionid',
             'usage_id': 'dictblock'})
@@ -310,11 +314,13 @@ class LocatorTest(TestCase):
         self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
             BlockUsageLocator, testurn)
 
+    def test_ensure_fully_via_keyword(self):
         # arg list inits
         testobj = BlockUsageLocator(version_guid='versionid')
         self.assertRaises(InsufficientSpecificationError,
             BlockUsageLocator.ensure_fully_specified, testobj)
 
+        testurn = 'crx/courseid@revision/blockid'
         testobj = BlockUsageLocator(version_guid='versionid', usage_id='myblock')
         self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
             BlockUsageLocator, testurn)

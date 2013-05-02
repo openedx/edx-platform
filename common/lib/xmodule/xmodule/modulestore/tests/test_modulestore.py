@@ -109,7 +109,9 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45},
             course.grade_cutoffs)
 
+    def test_revision_requests(self):
         # query w/ revision qualifier (both draft and published)
+        courses = modulestore().get_courses()
         courses_draft = modulestore().get_courses(revision='draft')
         self.assertEqual(len(courses_draft), len(courses),
             "Wrong number of courses")
@@ -134,6 +136,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(course.children), 0,
             "children")
 
+    def test_search_qualifiers(self):
         # query w/ search criteria
         courses = modulestore().get_courses(qualifiers={'org': 'testx'})
         self.assertEqual(len(courses), 2)
@@ -199,6 +202,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         course = modulestore().get_course(locator)
         self.assertEqual(course.location.version_guid, "v23456d")
 
+    def test_get_course_negative(self):
         # Now negative testing
         self.assertRaises(InsufficientSpecificationError,
             modulestore().get_course, CourseLocator())
@@ -267,6 +271,7 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertTrue(modulestore().has_item(locator),
             "couldn't find in 23456")
 
+    def test_negative_has_item(self):
         # negative tests--not found
         # no such course or block
         locator = BlockUsageLocator(course_id="doesnotexist", usage_id="head23456")
@@ -315,6 +320,7 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertIsInstance(modulestore().get_instance(locator),
             CourseDescriptor)
 
+    def test_get_non_root(self):
         # not a course obj
         locator = BlockUsageLocator(course_id='GreekHero', usage_id='chapter1')
         block = modulestore().get_instance(locator)
