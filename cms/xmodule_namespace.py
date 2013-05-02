@@ -5,7 +5,7 @@ Namespace defining common fields used by Studio for all blocks
 import datetime
 
 from xblock.core import Namespace, Scope, ModelType, String
-from xmodule.fields import StringyBoolean
+from xmodule.fields import StringyBoolean, DateTime
 
 
 class DateTuple(ModelType):
