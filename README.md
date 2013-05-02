@@ -58,12 +58,12 @@ different virtual environments, and your problem is solved.
 
 Once again, each language has a different implementation. Python has
 [`virtualenv`](http://www.virtualenv.org/), Ruby has
-[`bundler`](http://gembundler.com/), and Node has
-[`nave`](https://github.com/isaacs/nave). For each language, decide
-if you want to use a virtual environment, or if you want to install all the
-language dependencies globally (and risk conflicts). I suggest you start with
-installing things globally until and unless things break; you can always
-switch over to a virtual environment later on.
+[`bundler`](http://gembundler.com/), and Node's virtual environment support
+is built into [`npm`](https://npmjs.org/), it's library management tool.
+For each language, decide if you want to use a virtual environment, or if you
+want to install all the language dependencies globally (and risk conflicts).
+I suggest you start with installing things globally until and unless things
+break; you can always switch over to a virtual environment later on.
 
 Language Packages
 -----------------
