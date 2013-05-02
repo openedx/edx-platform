@@ -502,6 +502,10 @@ class JavascriptResponse(LoncapaResponse):
         return tmp_env
 
     def call_node(self, args):
+        # Node.js code is un-sandboxed. If the XModuleSystem says we aren't
+        # allowed to run unsafe code, then stop now.
+        if not self.system.can_execute_unsafe_code:
+            raise LoncapaProblemError("Execution of unsafe Javascript code is not allowed.")
 
         subprocess_args = ["node"]
         subprocess_args.extend(args)

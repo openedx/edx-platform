@@ -12,7 +12,7 @@ import textwrap
 import mock
 import textwrap
 
-from . import new_loncapa_problem
+from . import new_loncapa_problem, test_system
 
 from capa.responsetypes import LoncapaProblemError, \
     StudentInputError, ResponseError
@@ -30,9 +30,9 @@ class ResponseTest(unittest.TestCase):
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
 
-    def build_problem(self, **kwargs):
+    def build_problem(self, system=None, **kwargs):
         xml = self.xml_factory.build_xml(**kwargs)
-        return new_loncapa_problem(xml)
+        return new_loncapa_problem(xml, system=system)
 
     def assert_grade(self, problem, submission, expected_correctness, msg=None):
         input_dict = {'1_2_1': submission}
@@ -746,15 +746,36 @@ class JavascriptResponseTest(ResponseTest):
         coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
         os.system("coffee -c %s" % (coffee_file_path))
 
-        problem = self.build_problem(generator_src="test_problem_generator.js",
-                                     grader_src="test_problem_grader.js",
-                                     display_class="TestProblemDisplay",
-                                     display_src="test_problem_display.js",
-                                     param_dict={'value': '4'})
+        system = test_system()
+        system.can_execute_unsafe_code = True
+        problem = self.build_problem(
+            system=system,
+            generator_src="test_problem_generator.js",
+            grader_src="test_problem_grader.js",
+            display_class="TestProblemDisplay",
+            display_src="test_problem_display.js",
+            param_dict={'value': '4'},
+        )
 
         # Test that we get graded correctly
         self.assert_grade(problem, json.dumps({0: 4}), "correct")
         self.assert_grade(problem, json.dumps({0: 5}), "incorrect")
+
+    def test_cant_execute_javascript(self):
+        # If the system says to disallow unsafe code execution, then making
+        # this problem will raise an exception.
+        system = test_system()
+        system.can_execute_unsafe_code = False
+
+        with self.assertRaises(LoncapaProblemError):
+            problem = self.build_problem(
+                system=system,
+                generator_src="test_problem_generator.js",
+                grader_src="test_problem_grader.js",
+                display_class="TestProblemDisplay",
+                display_src="test_problem_display.js",
+                param_dict={'value': '4'},
+            )
 
 
 class NumericalResponseTest(ResponseTest):

@@ -40,6 +40,7 @@ def test_system():
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         anonymous_student_id='student',
         cache=None,
+        can_execute_unsafe_code=False,
     )
     return the_system
 
