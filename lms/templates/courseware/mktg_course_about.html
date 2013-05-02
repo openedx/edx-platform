@@ -7,6 +7,11 @@
 
 <%inherit file="../mktg_iframe.html" />
 
+<%block name="title"><title>About ${course.number}</title></%block>
+
+<%block name="bodyclass">view-partial-mktgregister</%block>
+
+
 <%block name="headextra">
   <%include file="../google_analytics.html" />
 </%block>
@@ -53,46 +58,21 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-
-<%block name="title"><title>About ${course.number}</title></%block>
-
-<section class="course-info">
-  <header class="course-profile">
-    <div class="intro-inner-wrapper">
-        <div class="main-cta">
-        %if user.is_authenticated():
-            %if registered:
-	              %if show_courseware_link:
-                    <a href="${course_target}">
-                %endif
-                <span class="register disabled">You are registered for this course (${course.number})</span>
-                %if show_courseware_link:
-                    <strong>View Courseware</strong>
-                    </a>
-                %endif
-            %else:
-               <a href="#" class="register">Register for ${course.number}</a>
-	             <div id="register_message"></div>
-            %endif
+<%block name="content">
+  <ul class="list-actions register">
+    <li class="item">
+      %if user.is_authenticated():
+        %if registered:
+          <!-- signed in, registered -->
+          <a class="action action-register is-registered" href="${course_target}">Registered for <strong>${course.number}</strong></a>
         %else:
-            <a href="/login" class="register">Register for ${course.number}</a>
+        <!-- signed in, not registered -->
+           <a class="action action-register" href="[register path next view]">Register for <strong>${course.number}</strong></a>
         %endif
-        </div>
-
-  </header>
-</section>
-
-%if not registered:
-  <div style="display: none;">
-    <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
-      <fieldset class="enroll_fieldset">
-        <input name="course_id" type="hidden" value="${course.id}">
-        <input name="enrollment_action" type="hidden" value="enroll">
-      </fieldset>
-      <div class="submit">
-        <input name="submit" type="submit" value="enroll">
-      </div>
-    </form>
-  </div>
-%endif
-
+      %else:
+      <!-- not signed in -->
+        <a class="action action-register is-not-signedin" href="[signin view]">Register for <strong>${course.number}</strong></a>
+      %endif
+    </li>
+  </ul>
+</%block>

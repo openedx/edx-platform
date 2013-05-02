@@ -2,36 +2,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <%block name="title"><title>edX</title></%block>
+  <%block name="title"></%block>
 
   <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
+  <meta name="path_prefix" content="${MITX_ROOT_URL}" />
+  <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   <%static:css group='application'/>
-
   <%static:js group='main_vendor'/>
-  <%block name="headextra"/>
+
 
   <!--[if lt IE 9]>
-  <script src="${static.url('js/html5shiv.js')}"></script>
+    <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
   <!--[if lte IE 9]>
-  <%static:css group='ie-fixes'/>
+    <%static:css group='ie-fixes'/>
   <![endif]-->
-  <meta name="path_prefix" content="${MITX_ROOT_URL}">
-  <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
+
+  <%block name="headextra"/>
 
   % if not course:
   <%include file="google_analytics.html" />
   % endif
-
 </head>
 
-<body>
+<body class="<%block name='bodyclass'></%block>">
 
-  ${self.body()}
-  <%static:js group='application'/>
-  <%static:js group='module-js'/>
-  <%block name="js_extra"/>
+  <!-- view -->
+  <div class="wrapper wrapper-view">
+
+    <%block name="content"></%block>
+  </div>
+
+  <%block name="jsextra"></%block>
 </body>
 </html>

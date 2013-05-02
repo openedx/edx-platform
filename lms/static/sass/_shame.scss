@@ -1,0 +1,84 @@
+// edX LMS - shame
+// shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
+// ====================
+
+// marketing site - registration iframe band-aid (poor form enough to isolate out)
+.view-partial-mktgregister {
+
+  // dimensions needed for course about page on marketing site
+  .wrapper-view {
+    width: 301px; // taken from bad marketing grid
+    overflow: hidden;
+  }
+
+  // button elements - not a better place to put these, sadly
+  .btn {
+    display: block;
+    padding: $baseline/2 $baseline*2.5;
+    text-transform: lowercase;
+    color: $white;
+    letter-spacing: 0.1rem;
+    cursor: pointer;
+    text-align: center;
+    border: none !important;
+    text-shadow: none;
+    letter-spacing: 0.1rem;
+    font-size: 17px;
+    font-weight: 300;
+    box-shadow: 0 !important;
+
+    strong {
+      font-weight: 400;
+    }
+  }
+
+  .btn-primary {
+    @extend .btn;
+    @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
+
+    // no hover state conventions to follow from marketing :/
+    &:hover, &:active {
+
+    }
+  }
+
+  .btn-secondary {
+    @extend .btn;
+    @include linear-gradient($m-gray 5%, $m-gray-d1 95%);
+
+    // no hover state conventions to follow from marketing :/
+    &:hover, &:active {
+
+    }
+  }
+
+  // nav list
+  [class|="list"] {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .item {
+      margin: 0;
+    }
+  }
+
+  // register actions
+  .action {
+
+    // not registered (default)
+    &.action-register {
+      @extend .btn-primary;
+    }
+
+    // not signed in
+    &.is-not-signedin {
+      @extend .btn-primary;
+    }
+
+    // already registered
+    &.is-registered {
+      @extend .btn-secondary;
+    }
+  }
+}
