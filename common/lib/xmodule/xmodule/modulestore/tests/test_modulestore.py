@@ -5,7 +5,7 @@ Created on Mar 25, 2013
 '''
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DescriptorLocator
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DescriptionLocator
 import datetime
 import subprocess
 import unittest
@@ -501,7 +501,7 @@ class TestItemCrud(SplitModuleTest):
         category = 'chapter'
         new_module = modulestore().create_item(locator, category, 'user123',
             metadata={'display_name': 'new chapter'},
-            definition_locator=DescriptorLocator("chapter12345_2"))
+            definition_locator=DescriptionLocator("chapter12345_2"))
         # check that course version changed and course's previous is the other one
         self.assertNotEqual(new_module.location.version_guid, premod_course.location.version_guid)
         parent = modulestore().get_item(locator)
@@ -523,7 +523,7 @@ class TestItemCrud(SplitModuleTest):
         another_payload = "<problem>not empty</problem>"
         another_module = modulestore().create_item(locator, category, 'anotheruser',
             metadata={'display_name': 'problem 2'},
-            definition_locator=DescriptorLocator("problem12345_3_1"),
+            definition_locator=DescriptionLocator("problem12345_3_1"),
             new_def_data=another_payload)
         # check that course version changed and course's previous is the other one
         parent = modulestore().get_item(locator)
@@ -631,7 +631,7 @@ class TestItemCrud(SplitModuleTest):
         another_payload = "<problem>not empty</problem>"
         modulestore().create_item(locator, category, 'test_update_manifold',
             metadata={'display_name': 'problem 2'},
-            definition_locator=DescriptorLocator("problem12345_3_1"),
+            definition_locator=DescriptionLocator("problem12345_3_1"),
             new_def_data=another_payload)
         # pylint: disable=W0212
         modulestore()._clear_cache()

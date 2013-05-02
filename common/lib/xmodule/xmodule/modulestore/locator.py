@@ -249,17 +249,17 @@ class BlockUsageLocator(CourseLocator):
         return "BlockUsageLocator(%s)" % repr(self.__dict__)
 
 
-class DescriptorLocator(Locator):
+class DescriptionLocator(Locator):
     '''
     Container for how to locate a description
     '''
-    DESCRIPTOR_TAG = 'dx'
+    DESCRIPTION_TAG = 'dx'
 
     def __init__(self, def_id):
         self.def_id = def_id
 
     def url(self):
-        return self.DESCRIPTOR_TAG + '/' + self.def_id
+        return self.DESCRIPTION_TAG + '/' + self.def_id
 
     def version(self):
         return self.def_id

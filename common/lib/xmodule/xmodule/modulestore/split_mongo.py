@@ -10,7 +10,7 @@ from xmodule.x_module import XModuleDescriptor
 import logging
 import pymongo
 import sys
-from xmodule.modulestore.locator import BlockUsageLocator, DescriptorLocator, CourseLocator, VersionTree
+from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, CourseLocator, VersionTree
 from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from collections import namedtuple
 from xblock.core import Scope
@@ -62,7 +62,7 @@ class DefinitionLazyLoader(object):
         :param definition_locator: the id of the record in the above to fetch
         '''
         self.modulestore = modulestore
-        self.definition_locator = DescriptorLocator(definition_id)
+        self.definition_locator = DescriptionLocator(definition_id)
 
     def fetch(self):
         '''
@@ -748,7 +748,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             "previous_version": None,
             "original_version": None}
         new_id = self.definitions.insert(document)
-        definition_locator = DescriptorLocator(new_id)
+        definition_locator = DescriptionLocator(new_id)
         document['original_version'] = new_id
         self.definitions.update({'_id': new_id}, {'$set': {"original_version": new_id}})
         return definition_locator
@@ -784,7 +784,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             old_definition['edited_on'] = datetime.datetime.utcnow()
             old_definition['previous_version'] = definition_locator.def_id
             new_id = self.definitions.insert(old_definition)
-            return DescriptorLocator(new_id), True
+            return DescriptionLocator(new_id), True
         else:
             return definition_locator, False
 
@@ -1257,7 +1257,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         if isinstance(definition, DefinitionLazyLoader):
             return definition.definition_locator
         else:
-            return DescriptorLocator(definition['_id'])
+            return DescriptionLocator(definition['_id'])
 
     def _block_matches(self, value, qualifiers):
         '''
