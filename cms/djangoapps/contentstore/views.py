@@ -682,7 +682,6 @@ def save_item(request):
                     del existing_item._model_data[metadata_key]
                 del posted_metadata[metadata_key]
             else:
-                # TODO, in here check if value is the same before setting.
                 existing_item._model_data[metadata_key] = value
 
         # commit to datastore
