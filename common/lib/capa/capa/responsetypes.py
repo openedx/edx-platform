@@ -1783,7 +1783,7 @@ class FormulaResponse(LoncapaResponse):
     response_tag = 'formularesponse'
     hint_tag = 'formulahint'
     allowed_inputfields = ['textline']
-    required_attributes = ['answer']
+    required_attributes = ['answer', 'samples']
     max_inputfields = 1
 
     def setup_response(self):
