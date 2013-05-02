@@ -57,7 +57,7 @@ will be able to see and use those libraries. Incompatible dependencies? Use
 different virtual environments, and your problem is solved.
 
 Once again, each language has a different implementation. Python has
-[virtualenv](http://www.virtualenv.org/), Ruby has
+[`virtualenv`](http://www.virtualenv.org/), Ruby has
 [`bundler`](http://gembundler.com/), and Node has
 [`nave`](https://github.com/isaacs/nave). For each language, decide
 if you want to use a virtual environment, or if you want to install all the
