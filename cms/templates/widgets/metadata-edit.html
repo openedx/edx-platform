@@ -22,7 +22,7 @@
               value='${field_value["field"].to_json(field_value["value"])}'
             % endif
             size='60' />
-        ## Change to True to see all the information being passed through.
+        ## Change to False to see all the information being passed through.
         % if True:
             <label>Help: ${field_value['field'].help}</label>
             <label>Type: ${type(field_value['field']).__name__}</label>
