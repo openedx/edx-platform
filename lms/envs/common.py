@@ -251,6 +251,15 @@ CODE_JAIL = {
     'user': 'sandbox',
 }
 
+# Some courses are allowed to run unsafe code. This is a list of regexes, one
+# of them must match the course id for that course to run unsafe code.
+#
+# For example:
+#
+#   COURSES_WITH_UNSAFE_CODE = [
+#       r"Harvard/XY123.1/.*"
+#   ]
+COURSES_WITH_UNSAFE_CODE = []
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
