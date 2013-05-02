@@ -2453,6 +2453,13 @@ body.discussion {
       padding-right: 5px;
       font-style: italic;
       cursor:pointer; 
+      margin-right: 10px;
+      opacity:.8;
+
+      &:hover {
+        @include transition(opacity .2s);
+        opacity: 1;
+      }
     }  
 
 .discussion-pin-inline {
@@ -2462,6 +2469,11 @@ body.discussion {
       position: relative;
       right:-20px;
       top:-13px;
+      opacity:.6;
+
+      &:hover {
+        opacity: 1;
+      }
     }  
     
 .notpinned .icon
@@ -2503,6 +2515,13 @@ display:none;
       padding-right: 5px;
       font-style: italic;
       cursor:pointer;
+      opacity:.8;
+
+      &:hover {
+        @include transition(opacity .2s);
+        opacity: 1;
+      }
+
     }  
     
 .notflagged .icon
