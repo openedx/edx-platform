@@ -40,8 +40,8 @@
     % endfor
   </ul>
 
-  % if 'source_code' in editable_metadata_fields:
-  <%include file="source-edit.html" />
+  % if 'source_code' in editable_metadata_fields and not editable_metadata_fields['source_code']['is_default']:
+    <%include file="source-edit.html" />
   % endif
 
 </section>
