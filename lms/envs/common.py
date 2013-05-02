@@ -20,7 +20,6 @@ Longer TODO:
 """
 import sys
 import os
-from xmodule.static_content import write_module_styles, write_module_js
 
 from path import path
 
@@ -72,6 +71,8 @@ MITX_FEATURES = {
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
+
+    'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
@@ -392,21 +393,14 @@ MIDDLEWARE_CLASSES = (
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
-from xmodule.hidden_module import HiddenDescriptor
-from rooted_paths import rooted_glob, remove_root
-
-write_module_styles(PROJECT_ROOT / 'static/sass/module', [HiddenDescriptor])
-module_js = remove_root(
-    PROJECT_ROOT / 'static',
-    write_module_js(PROJECT_ROOT / 'static/coffee/module', [HiddenDescriptor])
-)
+from rooted_paths import rooted_glob
 
 courseware_js = (
     [
-        'coffee/src/' + pth + '.coffee'
+        'coffee/src/' + pth + '.js'
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
-    sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.coffee'))
+    sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
 # 'js/vendor/RequireJS.js' - Require JS wrapper.
@@ -422,13 +416,13 @@ main_vendor_js = [
   'js/vendor/jquery.ba-bbq.min.js',
 ]
 
-discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
-staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.coffee'))
-open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.coffee'))
+discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
+open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 
 PIPELINE_CSS = {
     'application': {
-        'source_filenames': ['sass/application.scss'],
+        'source_filenames': ['sass/application.css'],
         'output_filename': 'css/lms-application.css',
     },
     'course': {
@@ -437,24 +431,27 @@ PIPELINE_CSS = {
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
-            'sass/course.scss'
+            'sass/course.css',
+            'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-course.css',
     },
     'ie-fixes': {
-        'source_filenames': ['sass/ie.scss'],
+        'source_filenames': ['sass/ie.css'],
         'output_filename': 'css/lms-ie.css',
     },
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss', 'sass/course.scss']
+
+# test_order: Determines the position of this chunk of javascript on
+# the jasmine test page
 PIPELINE_JS = {
     'application': {
 
         # Application will contain all paths not in courseware_only_js
         'source_filenames': sorted(
-            set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.coffee') +
-                rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.coffee')) -
+            set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
+                rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
             set(courseware_js + discussion_js + staff_grading_js + open_ended_js)
         ) + [
             'js/form.ext.js',
@@ -463,31 +460,39 @@ PIPELINE_JS = {
             'js/sticky_filter.js',
             'js/query-params.js',
         ],
-        'output_filename': 'js/lms-application.js'
+        'output_filename': 'js/lms-application.js',
+
+        'test_order': 1,
     },
     'courseware': {
         'source_filenames': courseware_js,
-        'output_filename': 'js/lms-courseware.js'
+        'output_filename': 'js/lms-courseware.js',
+        'test_order': 2,
     },
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
+        'test_order': 0,
     },
     'module-js': {
-        'source_filenames': module_js,
+        'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
         'output_filename': 'js/lms-modules.js',
+        'test_order': 3,
     },
     'discussion': {
         'source_filenames': discussion_js,
-        'output_filename': 'js/discussion.js'
+        'output_filename': 'js/discussion.js',
+        'test_order': 4,
     },
     'staff_grading': {
         'source_filenames': staff_grading_js,
-        'output_filename': 'js/staff_grading.js'
+        'output_filename': 'js/staff_grading.js',
+        'test_order': 5,
     },
     'open_ended': {
         'source_filenames': open_ended_js,
-        'output_filename': 'js/open_ended.js'
+        'output_filename': 'js/open_ended.js',
+        'test_order': 6,
     }
 }
 
@@ -512,12 +517,6 @@ if os.path.isdir(DATA_DIR):
                 os.system("rm %s" % (js_dir / new_filename))
                 os.system("coffee -c %s" % (js_dir / filename))
 
-PIPELINE_COMPILERS = [
-    'pipeline.compilers.sass.SASSCompiler',
-    'pipeline.compilers.coffee.CoffeeScriptCompiler',
-]
-
-PIPELINE_SASS_ARGUMENTS = '-t compressed -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
@@ -528,8 +527,6 @@ STATICFILES_IGNORE_PATTERNS = (
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
-PIPELINE_SASS_BINARY = 'sass'
-PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
 
 # Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True

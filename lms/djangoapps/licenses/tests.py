@@ -5,13 +5,21 @@ import json
 from uuid import uuid4
 from random import shuffle
 from tempfile import NamedTemporaryFile
-from factory import Factory, SubFactory
+from factory import DjangoModelFactory, SubFactory
 
 from django.test import TestCase
+from django.test.client import Client
+from django.test.utils import override_settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
+from nose.tools import assert_true
+
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from licenses.models import CourseSoftware, UserLicense
-from courseware.tests.tests import LoginEnrollmentTestCase, get_user
+
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 COURSE_1 = 'edX/toy/2012_Fall'
 
@@ -23,7 +31,7 @@ SERIAL_1 = '123456abcde'
 log = logging.getLogger(__name__)
 
 
-class CourseSoftwareFactory(Factory):
+class CourseSoftwareFactory(DjangoModelFactory):
     '''Factory for generating CourseSoftware objects in database'''
     FACTORY_FOR = CourseSoftware
 
@@ -33,7 +41,7 @@ class CourseSoftwareFactory(Factory):
     course_id = COURSE_1
 
 
-class UserLicenseFactory(Factory):
+class UserLicenseFactory(DjangoModelFactory):
     '''
     Factory for generating UserLicense objects in database
 
@@ -42,19 +50,24 @@ class UserLicenseFactory(Factory):
     '''
     FACTORY_FOR = UserLicense
 
+    user = None
     software = SubFactory(CourseSoftwareFactory)
     serial = SERIAL_1
 
 
-class LicenseTestCase(LoginEnrollmentTestCase):
+class LicenseTestCase(TestCase):
     '''Tests for licenses.views'''
     def setUp(self):
         '''creates a user and logs in'''
-        self.setup_viewtest_user()
+        # self.setup_viewtest_user()
+        self.user = UserFactory(username='test',
+                                email='test@edx.org', password='test_password')
+        self.client = Client()
+        assert_true(self.client.login(username='test', password='test_password'))
         self.software = CourseSoftwareFactory()
 
     def test_get_license(self):
-        UserLicenseFactory(user=get_user(self.viewtest_email), software=self.software)
+        UserLicenseFactory(user=self.user, software=self.software)
         response = self.client.post(reverse('user_software_license'),
                                     {'software': SOFTWARE_1, 'generate': 'false'},
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -121,7 +134,7 @@ class LicenseTestCase(LoginEnrollmentTestCase):
         self.assertEqual(404, response.status_code)
 
     def test_get_license_without_login(self):
-        self.logout()
+        self.client.logout()
         response = self.client.post(reverse('user_software_license'),
                                     {'software': SOFTWARE_1, 'generate': 'false'},
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -130,20 +143,24 @@ class LicenseTestCase(LoginEnrollmentTestCase):
         self.assertEqual(302, response.status_code)
 
 
-class CommandTest(TestCase):
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class CommandTest(ModuleStoreTestCase):
     '''Test management command for importing serial numbers'''
+    def setUp(self):
+        course = CourseFactory.create()
+        self.course_id = course.id
 
     def test_import_serial_numbers(self):
         size = 20
 
         log.debug('Adding one set of serials for {0}'.format(SOFTWARE_1))
         with generate_serials_file(size) as temp_file:
-            args = [COURSE_1, SOFTWARE_1, temp_file.name]
+            args = [self.course_id, SOFTWARE_1, temp_file.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('Adding one set of serials for {0}'.format(SOFTWARE_2))
         with generate_serials_file(size) as temp_file:
-            args = [COURSE_1, SOFTWARE_2, temp_file.name]
+            args = [self.course_id, SOFTWARE_2, temp_file.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('There should be only 2 course-software entries')
@@ -156,7 +173,7 @@ class CommandTest(TestCase):
 
         log.debug('Adding more serial numbers to {0}'.format(SOFTWARE_1))
         with generate_serials_file(size) as temp_file:
-            args = [COURSE_1, SOFTWARE_1, temp_file.name]
+            args = [self.course_id, SOFTWARE_1, temp_file.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('There should be still only 2 course-software entries')
@@ -179,7 +196,7 @@ class CommandTest(TestCase):
         with NamedTemporaryFile() as tmpfile:
             tmpfile.write('\n'.join(known_serials))
             tmpfile.flush()
-            args = [COURSE_1, SOFTWARE_1, tmpfile.name]
+            args = [self.course_id, SOFTWARE_1, tmpfile.name]
             call_command('import_serial_numbers', *args)
 
         log.debug('Check if we added only the new ones')

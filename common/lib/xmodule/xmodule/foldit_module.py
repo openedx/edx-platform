@@ -107,7 +107,7 @@ class FolditModule(FolditFields, XModule):
             'show_leader': showleader,
             'folditbasic': self.get_basicpuzzles_html(),
             'folditchallenge': self.get_challenge_html()
-            }
+        }
 
         return self.system.render_template('foldit.html', context)
 
@@ -124,7 +124,7 @@ class FolditModule(FolditFields, XModule):
             'success': self.is_complete(),
             'goal_level': goal_level,
             'completed': self.completed_puzzles(),
-            }
+        }
         return self.system.render_template('folditbasic.html', context)
 
     def get_challenge_html(self):
@@ -147,7 +147,6 @@ class FolditModule(FolditFields, XModule):
 
     def max_score(self):
         return 1
-
 
 
 class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):

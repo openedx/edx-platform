@@ -4,13 +4,15 @@ setup(
     name="XModule",
     version="0.1",
     packages=find_packages(exclude=["tests"]),
-    install_requires=['distribute'],
+    install_requires=[
+        'distribute',
+        'docopt',
+        'capa',
+        'path.py',
+    ],
     package_data={
         'xmodule': ['js/module/*']
     },
-    requires=[
-        'capa',
-    ],
 
     # See http://guide.python-distribute.org/creation.html#entry-points
     # for a description of entry_points
@@ -50,6 +52,11 @@ setup(
             "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
             "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
             "foldit = xmodule.foldit_module:FolditDescriptor",
-         ]
+            "hidden = xmodule.hidden_module:HiddenDescriptor",
+            "raw = xmodule.raw_module:RawDescriptor",
+        ],
+        'console_scripts': [
+            'xmodule_assets = xmodule.static_content:main',
+        ]
     }
 )

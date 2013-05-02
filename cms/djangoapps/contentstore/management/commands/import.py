@@ -12,8 +12,7 @@ unnamed_modules = 0
 
 
 class Command(BaseCommand):
-    help = \
-'''Import the specified data directory into the default ModuleStore'''
+    help = 'Import the specified data directory into the default ModuleStore'
 
     def handle(self, *args, **options):
         if len(args) == 0:
@@ -28,4 +27,4 @@ class Command(BaseCommand):
             data=data_dir,
             courses=course_dirs)
         import_from_xml(modulestore('direct'), data_dir, course_dirs, load_error_modules=False,
-            static_content_store=contentstore(), verbose=True)
+                        static_content_store=contentstore(), verbose=True)

@@ -132,6 +132,8 @@ def i_am_logged_in(step):
     world.create_user('robot')
     world.log_in('robot', 'test')
     world.browser.visit(django_url('/'))
+    # You should not see the login link
+    assert_equals(world.browser.find_by_css('a#login'), [])
 
 
 @step(u'I am an edX user$')

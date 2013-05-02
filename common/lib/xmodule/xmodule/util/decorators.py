@@ -28,6 +28,7 @@ def lazyproperty(fn):
     """
 
     attr_name = '_lazy_' + fn.__name__
+
     @property
     def _lazyprop(self):
         if not hasattr(self, attr_name):

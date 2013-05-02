@@ -961,11 +961,14 @@ def gradebook(request, course_id):
                      }
                      for student in enrolled_students]
 
-    return render_to_response('courseware/gradebook.html', {'students': student_info,
-                                                 'course': course,
-                                                 'course_id': course_id,
-                                                 # Checked above
-                                                 'staff_access': True, })
+    return render_to_response('courseware/gradebook.html', {
+        'students': student_info,
+        'course': course,
+        'course_id': course_id,
+        # Checked above
+        'staff_access': True,
+        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
+    })
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

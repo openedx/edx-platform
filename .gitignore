@@ -8,6 +8,7 @@
 :2e#
 .AppleDouble
 database.sqlite
+private-requirements.txt
 courseware/static/js/mathjax/*
 flushdb.sh
 build
@@ -31,3 +32,4 @@ cover_html/
 chromedriver.log
 /nbproject
 ghostdriver.log
+node_modules

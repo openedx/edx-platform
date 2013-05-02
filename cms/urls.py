@@ -120,6 +120,17 @@ urlpatterns += (
     url(r'^ux-alerts$', 'contentstore.views.ux_alerts', name='ux-alerts')
     )
 
+js_info_dict = {
+    'domain': 'djangojs',
+    'packages': ('cms',),
+    }
+
+urlpatterns += (
+    # Serve catalog of localized strings to be rendered by Javascript
+    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    )
+
+
 if settings.ENABLE_JASMINE:
     # # Jasmine
     urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)

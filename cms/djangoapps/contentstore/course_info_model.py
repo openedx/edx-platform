@@ -97,8 +97,7 @@ def update_course_updates(location, update, passed_id=None):
         if (len(new_html_parsed) == 1):
             content = new_html_parsed[0].tail
         else:
-            content = "\n".join([html.tostring(ele)
-                for ele in new_html_parsed[1:]])
+            content = "\n".join([html.tostring(ele) for ele in new_html_parsed[1:]])
 
         return {"id": passed_id,
                 "date": update['date'],

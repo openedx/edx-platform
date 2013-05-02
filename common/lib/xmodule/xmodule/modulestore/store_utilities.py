@@ -1,4 +1,3 @@
-import logging
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore
@@ -14,10 +13,19 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
     if not modulestore.has_item(dest_location):
         raise Exception("An empty course at {0} must have already been created. Aborting...".format(dest_location))
 
-    # verify that the dest_location really is an empty course, which means only one
+    # verify that the dest_location really is an empty course, which means only one with an optional 'overview'
     dest_modules = modulestore.get_items([dest_location.tag, dest_location.org, dest_location.course, None, None, None])
 
-    if len(dest_modules) != 1:
+    basically_empty = True
+    for module in dest_modules:
+        if module.location.category == 'course' or (module.location.category == 'about'
+                                                    and module.location.name == 'overview'):
+            continue
+
+        basically_empty = False
+        break
+
+    if not basically_empty:
         raise Exception("Course at destination {0} is not an empty course. You can only clone into an empty course. Aborting...".format(dest_location))
 
     # check to see if the source course is actually there
@@ -33,11 +41,11 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
 
         if original_loc.category != 'course':
             module.location = module.location._replace(tag=dest_location.tag, org=dest_location.org,
-                course=dest_location.course)
+                                                       course=dest_location.course)
         else:
             # on the course module we also have to update the module name
             module.location = module.location._replace(tag=dest_location.tag, org=dest_location.org,
-                course=dest_location.course, name=dest_location.name)
+                                                       course=dest_location.course, name=dest_location.name)
 
         print "Cloning module {0} to {1}....".format(original_loc, module.location)
 
@@ -49,9 +57,9 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
             for child_loc_url in module.children:
                 child_loc = Location(child_loc_url)
                 child_loc = child_loc._replace(
-                  tag=dest_location.tag,
-                  org=dest_location.org,
-                  course=dest_location.course
+                    tag=dest_location.tag,
+                    org=dest_location.org,
+                    course=dest_location.course
                 )
                 new_children.append(child_loc.url())
 
@@ -67,7 +75,7 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
         thumb_loc = Location(thumb["_id"])
         content = contentstore.find(thumb_loc)
         content.location = content.location._replace(org=dest_location.org,
-                course=dest_location.course)
+                                                     course=dest_location.course)
 
         print "Cloning thumbnail {0} to {1}".format(thumb_loc, content.location)
 
@@ -80,12 +88,12 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
         asset_loc = Location(asset["_id"])
         content = contentstore.find(asset_loc)
         content.location = content.location._replace(org=dest_location.org,
-                course=dest_location.course)
+                                                     course=dest_location.course)
 
         # be sure to update the pointer to the thumbnail
         if content.thumbnail_location is not None:
             content.thumbnail_location = content.thumbnail_location._replace(org=dest_location.org,
-                course=dest_location.course)
+                                                                             course=dest_location.course)
 
         print "Cloning asset {0} to {1}".format(asset_loc, content.location)
 
@@ -94,7 +102,7 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
     return True
 
 
-def delete_course(modulestore, contentstore, source_location, commit = False):
+def delete_course(modulestore, contentstore, source_location, commit=False):
     # first check to see if the modulestore is Mongo backed
     if not isinstance(modulestore, MongoModuleStore):
         raise Exception("Expected a MongoModuleStore in the runtime. Aborting....")

@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface
+from courseware.masquerade import setup_masquerade
 from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from .models import StudentModule
@@ -163,6 +164,10 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     """
     Actually implement get_module.  See docstring there for details.
     """
+
+    # allow course staff to masquerade as student
+    if has_access(user, descriptor, 'staff', course_id):
+        setup_masquerade(request, True)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load', course_id):

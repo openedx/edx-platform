@@ -10,6 +10,8 @@ Feature: Course checklists
     Then I can check and uncheck tasks in a checklist
     And They are correctly selected after I reload the page
 
+  @skip-phantom
+  @skip-firefox
   Scenario: A task can link to a location within Studio
     Given I have opened Checklists
     When I select a link to the course outline
@@ -17,8 +19,9 @@ Feature: Course checklists
     And I press the browser back button
     Then I am brought back to the course outline in the correct state
 
+  @skip-phantom
+  @skip-firefox
   Scenario: A task can link to a location outside Studio
     Given I have opened Checklists
     When I select a link to help page
     Then I am brought to the help page in a new window
-

@@ -8,13 +8,12 @@ from .x_module import XModule
 from xblock.core import Integer, Scope, String, Boolean, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date
-from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
+from .fields import Date, StringyFloat
 
 log = logging.getLogger("mitx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
-                          "skip_spelling_checks", "due", "graceperiod"]
+                          "skip_spelling_checks", "due", "graceperiod", "weight"]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
                          "student_attempts", "ready_to_reset"]
@@ -219,5 +218,5 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
 
     stores_state = True
     has_score = True
-    always_recalculate_grades=True
+    always_recalculate_grades = True
     template_dir_name = "combinedopenended"

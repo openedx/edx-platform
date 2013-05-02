@@ -20,11 +20,8 @@ Longer TODO:
 """
 
 import sys
-import os.path
-import os
 import lms.envs.common
 from path import path
-from xmodule.static_content import write_descriptor_styles, write_descriptor_js, write_module_js, write_module_styles
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -35,7 +32,7 @@ MITX_FEATURES = {
     'AUTH_USE_MIT_CERTIFICATES': False,
     'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
     'STAFF_EMAIL': '',			# email address for staff (eg to request course creation)
-    'STUDIO_NPS_SURVEY': True, 
+    'STUDIO_NPS_SURVEY': True,
     'SEGMENT_IO': True,
 }
 ENABLE_JASMINE = False
@@ -129,6 +126,9 @@ MIDDLEWARE_CLASSES = (
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
 
+    # Detects user-requested locale from 'accept-language' header in http request
+    'django.middleware.locale.LocaleMiddleware',
+
     'django.middleware.transaction.TransactionMiddleware'
 )
 
@@ -167,14 +167,18 @@ STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
 
 # This is how you would use the textbook images locally
-#    ("book", ENV_ROOT / "book_images")
+# ("book", ENV_ROOT / "book_images")
 ]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'            # http://www.i18nguy.com/unicode/language-identifiers.html
+
 USE_I18N = True
 USE_L10N = True
+
+# Localization strings (e.g. django.po) are under this directory
+LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # mitx/conf/locale/
 
 # Tracking
 TRACK_MAX_EVENT = 10000
@@ -186,29 +190,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
-# Load javascript and css from all of the available descriptors, and
-# prep it for use in pipeline js
-from xmodule.raw_module import RawDescriptor
-from xmodule.error_module import ErrorDescriptor
-from rooted_paths import rooted_glob, remove_root
-
-write_descriptor_styles(PROJECT_ROOT / "static/sass/descriptor", [RawDescriptor, ErrorDescriptor])
-write_module_styles(PROJECT_ROOT / "static/sass/module", [RawDescriptor, ErrorDescriptor])
-
-descriptor_js = remove_root(
-    PROJECT_ROOT / 'static',
-    write_descriptor_js(
-        PROJECT_ROOT / "static/coffee/descriptor",
-        [RawDescriptor, ErrorDescriptor]
-    )
-)
-module_js = remove_root(
-    PROJECT_ROOT / 'static',
-    write_module_js(
-        PROJECT_ROOT / "static/coffee/module",
-        [RawDescriptor, ErrorDescriptor]
-    )
-)
+from rooted_paths import rooted_glob
 
 PIPELINE_CSS = {
     'base-style': {
@@ -216,38 +198,34 @@ PIPELINE_CSS = {
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
-            'sass/base-style.scss'
+            'sass/base-style.css',
+            'xmodule/modules.css',
+            'xmodule/descriptor.css',
         ],
         'output_filename': 'css/cms-base-style.css',
     },
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
-
+# test_order: Determines the position of this chunk of javascript on
+# the jasmine test page
 PIPELINE_JS = {
     'main': {
         'source_filenames': sorted(
-            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.coffee') +
-            rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.coffee')
+            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.js') +
+            rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.js')
         ) + ['js/hesitate.js', 'js/base.js'],
         'output_filename': 'js/cms-application.js',
+        'test_order': 0
     },
     'module-js': {
-        'source_filenames': descriptor_js + module_js,
+        'source_filenames': (
+            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
+            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js')
+        ),
         'output_filename': 'js/cms-modules.js',
+        'test_order': 1
     },
-    'spec': {
-        'source_filenames': sorted(rooted_glob(PROJECT_ROOT / 'static/', 'coffee/spec/**/*.coffee')),
-        'output_filename': 'js/cms-spec.js'
-    }
 }
-
-PIPELINE_COMPILERS = [
-    'pipeline.compilers.sass.SASSCompiler',
-    'pipeline.compilers.coffee.CoffeeScriptCompiler',
-]
-
-PIPELINE_SASS_ARGUMENTS = '-t compressed -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
@@ -260,11 +238,6 @@ STATICFILES_IGNORE_PATTERNS = (
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
-PIPELINE_SASS_BINARY = 'sass'
-PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
-
-# Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
-PIPELINE_COMPILE_INPLACE = True
 
 ############################ APPS #####################################
 

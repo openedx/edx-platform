@@ -7,7 +7,6 @@ from collections import namedtuple
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
-from datetime import datetime
 from operator import attrgetter
 from uuid import uuid4
 
@@ -31,10 +30,12 @@ log = logging.getLogger(__name__)
 # there is only one revision for each item. Once we start versioning inside the CMS,
 # that assumption will have to change
 
+
 def get_course_id_no_run(location):
     '''
     '''
     return "/".join([location.org, location.course])
+
 
 class MongoKeyValueStore(KeyValueStore):
     """
@@ -130,8 +131,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         render_template: a function for rendering templates, as per
             MakoDescriptorSystem
         """
-        super(CachingDescriptorSystem, self).__init__(
-                self.load_item, resources_fs, error_tracker, render_template)
+        super(CachingDescriptorSystem, self).__init__(self.load_item, resources_fs,
+                                                      error_tracker, render_template)
         self.modulestore = modulestore
         self.module_data = module_data
         self.default_class = default_class
@@ -139,7 +140,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         # define an attribute here as well, even though it's None
         self.course_id = None
         self.cached_metadata = cached_metadata
-
 
     def load_item(self, location):
         """
@@ -203,7 +203,9 @@ def location_to_query(location, wildcard=True):
 
     if wildcard:
         for key, value in query.items():
-            if value is None:
+            # don't allow wildcards on revision, since public is set as None, so
+            # its ambiguous between None as a real value versus None=wildcard
+            if value is None and key != '_id.revision':
                 del query[key]
 
     return query
@@ -221,7 +223,7 @@ class MongoModuleStore(ModuleStoreBase):
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, request_cache=None, 
+                 user=None, password=None, request_cache=None,
                  metadata_inheritance_cache_subsystem=None, **kwargs):
 
         ModuleStoreBase.__init__(self)
@@ -466,7 +468,7 @@ class MongoModuleStore(ModuleStoreBase):
         # if we are loading a course object, if we're not prefetching children (depth != 0) then don't
         # bother with the metadata inheritance
         return [self._load_item(item, data_cache,
-            apply_cached_metadata=(item['location']['category']!='course' or depth !=0)) for item in items]
+                apply_cached_metadata=(item['location']['category'] != 'course' or depth != 0)) for item in items]
 
     def get_courses(self):
         '''
@@ -692,11 +694,12 @@ class MongoModuleStore(ModuleStoreBase):
         self.refresh_cached_metadata_inheritance_tree(loc)
         self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
-    def delete_item(self, location):
+    def delete_item(self, location, delete_all_versions=False):
         """
         Delete an item from this modulestore
 
         location: Something that can be passed to Location
+        delete_all_versions: is here because the DraftMongoModuleStore needs it and we need to keep the interface the same. It is unused.
         """
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
@@ -708,10 +711,9 @@ class MongoModuleStore(ModuleStoreBase):
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
             self.update_metadata(course.location, own_metadata(course))
 
-        self.collection.remove({'_id': Location(location).dict()},
-            # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
-            # from overriding our default value set in the init method.
-            safe=self.collection.safe)
+        # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
+        # from overriding our default value set in the init method.
+        self.collection.remove({'_id': Location(location).dict()}, safe=self.collection.safe)
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(Location(location))
         self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
@@ -722,7 +724,7 @@ class MongoModuleStore(ModuleStoreBase):
         '''
         location = Location.ensure_fully_specified(location)
         items = self.collection.find({'definition.children': location.url()},
-                                    {'_id': True})
+                                     {'_id': True})
         return [i['_id'] for i in items]
 
     def get_errored_courses(self):
