@@ -15,7 +15,7 @@ that you understand what the script is doing, and why, by reading this document.
 Directory Hierarchy
 -------------------
 This code assumes that it is checked out in a directory that has three sibling
-directories: `data` (used for application data?), `db` (used to hold a
+directories: `data` (used for XML course data), `db` (used to hold a
 [sqlite](https://sqlite.org/) database), and `log` (used to hold logs). If you
 clone the repository into a directory called `edx` inside of a directory
 called `dev`, here's an example of how the directory hierarchy should look:
