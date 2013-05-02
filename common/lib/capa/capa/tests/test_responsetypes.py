@@ -747,7 +747,7 @@ class JavascriptResponseTest(ResponseTest):
         os.system("coffee -c %s" % (coffee_file_path))
 
         system = test_system()
-        system.can_execute_unsafe_code = True
+        system.can_execute_unsafe_code = lambda: True
         problem = self.build_problem(
             system=system,
             generator_src="test_problem_generator.js",
@@ -765,7 +765,7 @@ class JavascriptResponseTest(ResponseTest):
         # If the system says to disallow unsafe code execution, then making
         # this problem will raise an exception.
         system = test_system()
-        system.can_execute_unsafe_code = False
+        system.can_execute_unsafe_code = lambda: False
 
         with self.assertRaises(LoncapaProblemError):
             problem = self.build_problem(
