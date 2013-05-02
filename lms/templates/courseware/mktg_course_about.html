@@ -17,48 +17,46 @@
 </%block>
 
 <%block name="js_extra">
+  % if not registered:
+      %if user.is_authenticated():
+        ## If the user is authenticated, clicking the enroll button just submits a form
+        <script type="text/javascript">
+          (function() {
+            $('.register').click(function(e) {
+              (e).preventDefault();
+              $('#class_enroll_form').submit();
+            });
+
+            $(document).delegate('#class_enroll_form', 'ajax:success', function(data, json, xhr) {
+              if(json.success) {
+                location.href="${reverse('dashboard')}";
+              }else{
+              $('#register_message').html('<p class="inline-error">' + json.error + "</p>");
+              }
+            });
+          })(this)
+        </script>
+      %else:
+        ## If the user is not authenticated, clicking the enroll button pops up the register
+        ## field. We also slip in the registration fields into the login/register fields so
+        ## the user is automatically registered after logging in / registering
+        <script type="text/javascript">
+          (function() {
+           $(".register").click(function() {
+              if ($(".login_form .enroll_fieldset").length === 0) {
+                $(".login_form").append( $(".enroll_fieldset").first().clone() );
+              }
+              if ($(".register_form .enroll_fieldset").length === 0) {
+                $(".register_form").append( $(".enroll_fieldset").first().clone() );
+              }
+            });
+          })(this)
+        </script>
+      %endif
+    %endif
 </%block>
 
 <%block name="content">
-
-  % if not registered:
-    %if user.is_authenticated():
-      ## If the user is authenticated, clicking the enroll button just submits a form
-      <script type="text/javascript">
-      (function() {
-        $(".register").click(function(e) {
-          alert("herp derp");
-          e.preventDefault();
-          $("#class_enroll_form").submit();
-        });
-
-        $(document).delegate('#class_enroll_form', 'ajax:success', function(data, json, xhr) {
-          if(json.success) {
-            location.href="${reverse('dashboard')}";
-          }else{
-          $('#register_message').html('<p class="inline-error">' + json.error + "</p>");
-          }
-        });
-      })(this)
-      </script>
-    %else:
-      ## If the user is not authenticated, clicking the enroll button pops up the register
-      ## field. We also slip in the registration fields into the login/register fields so
-      ## the user is automatically registered after logging in / registering
-      <script type="text/javascript">
-      (function() {
-       $(".register").click(function() {
-          if ($(".login_form .enroll_fieldset").length === 0) {
-            $(".login_form").append( $(".enroll_fieldset").first().clone() );
-          }
-          if ($(".register_form .enroll_fieldset").length === 0) {
-            $(".register_form").append( $(".enroll_fieldset").first().clone() );
-          }
-        });
-      })(this)
-      </script>
-    %endif
-  %endif
 
   <script src="${static.url('js/course_info.js')}"></script>
 
@@ -71,7 +69,7 @@
           <a class="action action-register is-registered" href="${course_target}">Registered for <strong>${course.number}</strong></a>
         %else:
         <!-- signed in, not registered -->
-          <a href="#" class="action action-register register">Register for ${course.number}</a> <div id="register_message"></div>
+          <a href="" class="action action-register register">Register for ${course.number}</a> <div id="register_message"></div>
         %endif
       %else:
       <!-- not signed in -->
@@ -89,7 +87,9 @@
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">
-        <input name="submit" type="submit" value="enroll">
+
+        <button type="submit" name="class_enroll_form_submit" id="class_enroll_form-submit" value="enroll">Enroll</button>
+
       </div>
     </form>
   </div>
