@@ -35,6 +35,8 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
     return _metadata
 
+  getMetadata: ->
+
   cloneTemplate: (parent, template) ->
     $.post("/clone_item", {
       parent_location: parent

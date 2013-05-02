@@ -1,5 +1,6 @@
 <%
   import hashlib
+  from xmodule.fields import StringyInteger, StringyFloat
   hlskey = hashlib.md5(module.location.url()).hexdigest()
 %>
 <section class="metadata_edit">
@@ -12,8 +13,17 @@
         % endif
       % else:
         <label>${field_value['field'].display_name}:</label>
- 	      <input type='text' data-metadata-name='${field_value["field"].display_name}' value='${field_value["field"].to_json(field_value["value"])}' size='60' />
-        % if False:
+ 	      <input type='text' data-metadata-name='${field_value["field"].display_name}'
+            ## This is a hack to keep current behavior for weight and attempts (empty will parse OK as unset).
+            ## This hack will go away with our custom editors.
+            % if field_value["value"] == None and (isinstance(field_value["field"], StringyFloat) or isinstance(field_value["field"], StringyInteger)):
+              value = ''
+            % else:
+              value='${field_value["field"].to_json(field_value["value"])}'
+            % endif
+            size='60' />
+        ## Change to True to see all the information being passed through.
+        % if True:
             <label>Help: ${field_value['field'].help}</label>
             <label>Type: ${type(field_value['field']).__name__}</label>
             <label>Inherited: ${field_value['is_inherited']}</label>
