@@ -565,24 +565,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
     def get_item(self, location, depth=0):
         """
-        Returns an XModuleDescriptor instance for the item at location.
-
-        If any segment of the location is None except revision, raises
-            xmodule.modulestore.exceptions.InsufficientSpecificationError
-        If no object is found at that location, raises
-            xmodule.modulestore.exceptions.ItemNotFoundError
-
-        location: a Location object
-        depth (int): An argument that some module stores may use to prefetch
-            descendants of the queried modules for more efficient results later
-            in the request. The depth is counted in the number of
-            calls to get_children() to cache. None indicates to cache all
-            descendants.
-        """
-        raise NotImplementedError("SplitMongoModuleStores require course_ids. Use get_instance.")
-
-    def get_instance(self, location, depth=0):
-        """
         depth (int): An argument that some module stores may use to prefetch
             descendants of the queried modules for more efficient results later
             in the request. The depth is counted in the number of
@@ -912,7 +894,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
 
         # fetch and return the new item--fetching is unnecessary but a good qc step
-        return self.get_instance(BlockUsageLocator(course_or_parent_locator, usage_id=new_usage_id, version_guid=new_id))
+        return self.get_item(BlockUsageLocator(course_or_parent_locator, usage_id=new_usage_id, version_guid=new_id))
 
     # TODO should this get the org from the user object?
     def create_course(self, org, prettyid, user_id, id_root=None, metadata=None, course_data=None,
@@ -1034,11 +1016,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # not, can we not put the templates into the same db/collections as the
         # real data?
         try:
-            source_item = self.get_instance(source_course_id, source)
+            source_item = self.get_item(source_course_id, source)
             source_item['_id'] = BlockUsageLocator(location).dict()
             self.update_item(dest_course_id, location, source_item)
 
-            item = self.get_instance(dest_course_id, location)
+            item = self.get_item(dest_course_id, location)
 
             # VS[compat] cdodge: This is a hack because static_tabs also have
             # references from the course module, so if we add one then we need
@@ -1047,7 +1029,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             # course to static tabs
             if location.category == 'static_tab':
                 try:
-                    course = self.get_instance(dest_course_id, CourseDescriptor.id_to_location(dest_course_id))
+                    course = self.get_item(dest_course_id, CourseDescriptor.id_to_location(dest_course_id))
                     existing_tabs = course.tabs or []
                     existing_tabs.append({'type':'static_tab', 'name' : item.metadata.get('display_name'), 'url_slug' : item.location.name})
                     course.tabs = existing_tabs
@@ -1074,7 +1056,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         The implementation tries to detect which, if any changes, actually need to be saved and thus won't version
         the definition, structure, nor course if they didn't change.
         """
-        # TODO question: by passing a descriptor, because descriptors are only instantiable from get_instance
+        # TODO question: by passing a descriptor, because descriptors are only instantiable from get_item
         # and ilk, we're necessitating a read, modify, call this, which reads, modifies, and persists. Is that ok?
         original_structure = self._lookup_course(descriptor.location)
         index_entry = self._get_index_if_valid(descriptor.location, force)
@@ -1116,7 +1098,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
-            return self.get_instance(BlockUsageLocator(descriptor.location, version_guid=new_id))
+            return self.get_item(BlockUsageLocator(descriptor.location, version_guid=new_id))
         else:
             # nothing changed, just return the one sent in
             return descriptor
@@ -1168,7 +1150,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if location.category == 'static_tab':
-            course = self.get_instance(course_id, CourseDescriptor.id_to_location(course_id))
+            course = self.get_item(course_id, CourseDescriptor.id_to_location(course_id))
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
             self.update_metadata(course.id, course.location, course.metadata)
