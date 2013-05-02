@@ -249,6 +249,12 @@ CODE_JAIL = {
     'python_bin': None,
     # User to run as in the sandbox.
     'user': 'sandbox',
+
+    # Configurable limits.
+    'limits': {
+        # How many CPU seconds can jailed code use?
+        'CPU': 1,
+    },
 }
 
 # Some courses are allowed to run unsafe code. This is a list of regexes, one
