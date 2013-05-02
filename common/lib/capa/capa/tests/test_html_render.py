@@ -11,6 +11,10 @@ from . import test_system, new_loncapa_problem
 
 class CapaHtmlRenderTest(unittest.TestCase):
 
+    def setUp(self):
+        super(CapaHtmlRenderTest, self).setUp()
+        self.system = test_system()
+
     def test_blank_problem(self):
         """
         It's important that blank problems don't break, since that's
@@ -38,7 +42,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         """)
 
         # Create the problem
-        problem = new_loncapa_problem(xml_str)
+        problem = new_loncapa_problem(xml_str, system=self.system)
 
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
@@ -47,9 +51,6 @@ class CapaHtmlRenderTest(unittest.TestCase):
         test_element = rendered_html.find("test")
         self.assertEqual(test_element.tag, "test")
         self.assertEqual(test_element.text, "Test include")
-
-
-
 
     def test_process_outtext(self):
         # Generate some XML with <startouttext /> and <endouttext />
@@ -116,11 +117,12 @@ class CapaHtmlRenderTest(unittest.TestCase):
         xml_str = StringResponseXMLFactory().build_xml(**kwargs)
 
         # Mock out the template renderer
-        test_system.render_template = mock.Mock()
-        test_system.render_template.return_value = "<div>Input Template Render</div>"
+        the_system = test_system()
+        the_system.render_template = mock.Mock()
+        the_system.render_template.return_value = "<div>Input Template Render</div>"
 
         # Create the problem and render the HTML
-        problem = new_loncapa_problem(xml_str)
+        problem = new_loncapa_problem(xml_str, system=the_system)
         rendered_html = etree.XML(problem.get_html())
 
         # Expect problem has been turned into a <div>
@@ -165,7 +167,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
                 mock.call('textline.html', expected_textline_context),
                 mock.call('solutionspan.html', expected_solution_context)]
 
-        self.assertEqual(test_system.render_template.call_args_list,
+        self.assertEqual(the_system.render_template.call_args_list,
                             expected_calls)
 
 
@@ -226,7 +228,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         self.assertEqual(span_element.get('attr'), "TEST")
 
     def _create_test_file(self, path, content_str):
-        test_fp = test_system.filestore.open(path, "w")
+        test_fp = self.system.filestore.open(path, "w")
         test_fp.write(content_str)
         test_fp.close()
 

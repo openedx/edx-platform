@@ -33,15 +33,14 @@ def test_system():
     """
     Construct a test ModuleSystem instance.
 
-    By default, the render_template() method simply returns
-    the context it is passed as a string.
-    You can override this behavior by monkey patching:
+    By default, the render_template() method simply returns the context it is
+    passed as a string.  You can override this behavior by monkey patching::
 
-    system = test_system()
-    system.render_template = my_render_func
+        system = test_system()
+        system.render_template = my_render_func
 
-    where my_render_func is a function of the form
-    my_render_func(template, context)
+    where `my_render_func` is a function of the form my_render_func(template, context).
+
     """
     return ModuleSystem(
         ajax_url='courses/course_id/modx/a_location',
