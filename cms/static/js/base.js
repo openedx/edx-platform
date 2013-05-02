@@ -845,8 +845,11 @@ function saveSetSectionScheduleDate(e) {
         data: JSON.stringify({ 'id': id, 'metadata': {'start': start}})
     }).success(function () {
             var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-  	    var format = gettext('<strong>Will Release:</strong> %(date)s at $(time)s UTC');
-            var willReleaseAt = interpolate(format, [input_date, input_time], true);
+  	    var format = gettext('<strong>Will Release:</strong> %(date)s at %(time)s UTC');
+	    var willReleaseAt = interpolate(format,
+				            {'date': input_date,
+                                             'time': input_time},
+					    true);
             $thisSection.find('.section-published-date').html(
 	      '<span class="published-status">' + willReleaseAt + '</span>' +
 	      '<a href="#" class="edit-button" ' +
