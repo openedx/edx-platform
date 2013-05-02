@@ -5,6 +5,8 @@ import random
 import unittest
 
 from capa.safe_exec import safe_exec
+from codejail.safe_exec import SafeExecException
+
 
 class TestSafeExec(unittest.TestCase):
     def test_set_values(self):
@@ -57,6 +59,12 @@ class TestSafeExec(unittest.TestCase):
             g, python_path=[pylib]
         )
 
+    def test_raising_exceptions(self):
+        g = {}
+        with self.assertRaises(SafeExecException) as cm:
+            safe_exec("1/0", g)
+        self.assertIn("ZeroDivisionError", cm.exception.message)
+
 
 class DictCache(object):
     """A cache implementation over a simple dict, for testing."""
@@ -86,10 +94,10 @@ class TestSafeExecCaching(unittest.TestCase):
         safe_exec("a = int(math.pi)", g, cache=DictCache(cache))
         self.assertEqual(g['a'], 3)
         # A result has been cached
-        self.assertEqual(cache.values(), [{'a': 3}])
+        self.assertEqual(cache.values()[0], (None, {'a': 3}))
 
         # Fiddle with the cache, then try it again.
-        cache[cache.keys()[0]] = {'a': 17}
+        cache[cache.keys()[0]] = (None, {'a': 17})
 
         g = {}
         safe_exec("a = int(math.pi)", g, cache=DictCache(cache))
@@ -104,3 +112,32 @@ class TestSafeExecCaching(unittest.TestCase):
         cache = {}
         safe_exec(code, g, cache=DictCache(cache))
         self.assertEqual(g['a'], 12345)
+
+    def test_cache_exceptions(self):
+        # Used to be that running code that raised an exception didn't cache
+        # the result.  Check that now it does.
+        code = "1/0"
+        g = {}
+        cache = {}
+        with self.assertRaises(SafeExecException):
+            safe_exec(code, g, cache=DictCache(cache))
+
+        # The exception should be in the cache now.
+        self.assertEqual(len(cache), 1)
+        cache_exc_msg, cache_globals = cache.values()[0]
+        self.assertIn("ZeroDivisionError", cache_exc_msg)
+
+        # Change the value stored in the cache, the result should change.
+        cache[cache.keys()[0]] = ("Hey there!", {})
+
+        with self.assertRaises(SafeExecException):
+            safe_exec(code, g, cache=DictCache(cache))
+
+        self.assertEqual(len(cache), 1)
+        cache_exc_msg, cache_globals = cache.values()[0]
+        self.assertEqual("Hey there!", cache_exc_msg)
+
+        # Change it again, now no exception!
+        cache[cache.keys()[0]] = (None, {'a': 17})
+        safe_exec(code, g, cache=DictCache(cache))
+        self.assertEqual(g['a'], 17)

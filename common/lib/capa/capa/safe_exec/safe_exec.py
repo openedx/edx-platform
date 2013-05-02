@@ -1,7 +1,7 @@
 """Capa's specialized use of codejail.safe_exec."""
 
 from codejail.safe_exec import safe_exec as codejail_safe_exec
-from codejail.safe_exec import json_safe
+from codejail.safe_exec import json_safe, SafeExecException
 from . import lazymod
 from statsd import statsd
 
@@ -63,20 +63,34 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
         key = "safe_exec.%r.%s" % (random_seed, md5er.hexdigest())
         cached = cache.get(key)
         if cached is not None:
-            globals_dict.update(cached)
+            # We have a cached result.  The result is a pair: the exception
+            # message, if any, else None; and the resulting globals dictionary.
+            emsg, cleaned_results = cached
+            globals_dict.update(cleaned_results)
+            if emsg:
+                raise SafeExecException(emsg)
             return
 
     # Create the complete code we'll run.
     code_prolog = CODE_PROLOG % random_seed
 
     # Run the code!  Results are side effects in globals_dict.
-    codejail_safe_exec(
-        code_prolog + LAZY_IMPORTS + code, globals_dict,
-        python_path=python_path,
-    )
+    try:
+        codejail_safe_exec(
+            code_prolog + LAZY_IMPORTS + code, globals_dict,
+            python_path=python_path,
+        )
+    except SafeExecException as e:
+        emsg = e.message
+    else:
+        emsg = None
 
     # Put the result back in the cache.  This is complicated by the fact that
     # the globals dict might not be entirely serializable.
     if cache:
         cleaned_results = json_safe(globals_dict)
-        cache.set(key, cleaned_results)
+        cache.set(key, (emsg, cleaned_results))
+
+    # If an exception happened, raise it now.
+    if emsg:
+        raise e
