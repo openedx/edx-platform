@@ -81,6 +81,18 @@ the libraries like so:
     $ bundle install
     $ npm install
 
+Other Dependencies
+------------------
+You'll also need to install [MongoDB](http://www.mongodb.org/), since our
+application uses it in addition to sqlite. You can install it through your
+system package manager, and I suggest that you configure it to start
+automatically when you boot up your system, so that you never have to worry
+about it again. For Mac, use
+[`launchd`](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/launchd.8.html)
+(running `brew info mongodb` will give you some commands you can copy-paste.)
+For Linux, you can use [`upstart`](http://upstart.ubuntu.com/), `chkconfig`,
+or any other process management tool.
+
 Configuring Your Project
 ------------------------
 We use [`rake`](http://rake.rubyforge.org/) to execute common tasks in our
