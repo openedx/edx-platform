@@ -2498,11 +2498,13 @@ body.discussion {
 .pinned span {
   color: #B82066;
   font-style: italic;
+  cursor: default;
 }
 
 .notpinned span {
   color: #888;
   font-style: italic;
+  cursor: default;
 }
 
 .pinned-false
