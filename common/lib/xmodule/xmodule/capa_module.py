@@ -64,12 +64,10 @@ class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
     max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
-    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted",
-                            scope=Scope.settings)
+    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed",
                         values=["answered", "always", "attempted", "closed", "never"])
-    force_save_button = Boolean(help="Whether to force the save button to appear on the page",
-                                scope=Scope.settings, default=False)
+    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
     rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
