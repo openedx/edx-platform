@@ -14,7 +14,7 @@
 		</div> <!-- Editor Header -->
 
 		<div class="component-edit-modes">
-			<div class="editor-wrapper" id="editor-tab">
+			<div class="module-editor editor-wrapper" id="editor-tab">
 				${editor}
 				<!-- no longer are settings imported from metadata-edit.hmtl, ideally? -->
 			</div> <!-- Editor Wrapper-->
@@ -23,7 +23,7 @@
 		  		<!--is-set class applied when user sets value-->
 		  		<li class="settings-row is-set">
 		  			<label for="inputVariableHere">Setting Display Name Goes Here</label>
-		  			<input type="${type}" id="firstname"/> 
+		  			<input type="type1" id="firstname"/> 
 		  			<!--button clickable if is-set -->
 		  			<button type="button" name="setting-clear" value="Clear" class="setting-clear " data-tooltip="Clear">
 		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
@@ -33,7 +33,7 @@
 		  		<!--% showing second example mostly to see is-set style difference -->
 		  		<li class="settings-row">
 		  			<label for="setting-name-as-id">Setting Display Name Goes Here</label>
-		  			<input type="type" id="firstname"/> 
+		  			<input type="type2" id="firstname"/> 
 		  			<span class="settings-help">${helpstring}</span>
 		  		
 		  		<!--% showing dropdown example -->
@@ -47,7 +47,7 @@
 						<option value="displayName3">Open</option>
 						<option value="displayName4">Available</option>
 					</select> 
-		  			<span class="settings-help">${helpstring}</span>
+		  			<span class="settings-help">helpstring</span>
 		  		</li>
 		  		
 		  	</ul> <!-- Settings Wrapper-->
