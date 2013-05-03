@@ -502,15 +502,28 @@ body.course.unit {
           //SettingsLabel
           li > label {
             //Text all aligned left
+            display: inline-block;
             //this sets height of .settings-row to allow for long help strings. 
           }
 
           //SettingsInput
-          li > input {
+          li > input, li > select {
+            @include placeholder($gray-l4);
+            @include font-size(16);
+            @include size(100%,100%);
             width: 100px;
+            height: auto;
             //TO-DO
 
-            
+            &:focus {
+              //TO-DO
+            }
+          }
+
+          //SettingsClear
+          li > button {
+            border-radius: 20px; //maybe a % calc from input box height
+            margin-left: 15px;
           }
 
           //SettingsHelp

@@ -20,17 +20,36 @@
 			</div> <!-- Editor Wrapper-->
 			<ul class="settings-wrapper" id="settings-tab">
 		  		<!--% for type in sorted(something.keys()):-->
-		  		<li class="settings-row">
+		  		<!--is-set class applied when user sets value-->
+		  		<li class="settings-row is-set">
 		  			<label for="<%= ...settingLabel... %>">Setting Display Name Goes Here</label>
 		  			<input type="${type}" id="firstname"/> 
+		  			<!--button clickable if is-set -->
+		  			<button type="button" name="setting-clear" value="Clear" class="setting-clear " data-tooltip="Clear">
+		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+		  			</button>
 		  			<span class="settings-help">${helpstring}</span>
 		  		</li>
 		  		<!--% showing second example mostly to see is-set style difference -->
-		  		<li class="settings-row is-set">
+		  		<li class="settings-row">
 		  			<label for="setting-name-as-id">Setting Display Name Goes Here</label>
 		  			<input type="${type}" id="firstname"/> 
 		  			<span class="settings-help">${helpstring}</span>
-		  		</li>≈
+		  		
+		  		<!--% showing dropdown example -->
+		  		<li class="settings-row">
+		  			<label for="setting-name-as-id">Setting Display Name Goes Here</label>
+		  			<select name="${type}">
+		  				<!--% for all in available options -->
+						<option value="displayName1" selected>Closed</option>
+						<!--in case value already defaulted --> 
+						<option value="displayName2">NotClosed</option>
+						<option value="displayName3">Open</option>
+						<option value="displayName4">Available</option>
+					</select> 
+		  			<span class="settings-help">${helpstring}</span>
+		  		</li>
+		  		
 		  	</ul> <!-- Settings Wrapper-->
 		</div>
 		<div class="row module-actions">
