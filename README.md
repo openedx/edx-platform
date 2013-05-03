@@ -116,21 +116,27 @@ you're running `rake "django-admin[syncdb]"`.
 
 Run Your Project
 ----------------
-To *finally* get up and running, just run:
+edX has two components: Studio, the course authoring system; and the LMS
+(leaning management system) used by students. These two systems communicate
+through the MongoDB database, which stores course information.
+
+To run Studio, run:
 
     $ rake cms
 
-And `rake` will start up your Django project on the localhost, port 8001. To
-view your running project, type `127.0.0.1:8001` into your web browser, and
-you should see edX in all its glory!
+To run the LMS, run:
 
-If you need to run old XML-only LMS (which doesn't use the mongo database for
-course content), run this instead:
+    $ rake lms[cms.dev]
 
-    $ rake lms
+Studio runs on port 8001, while LMS runs on port 8000, so you can run both of
+these commands simultaneously, using two different terminal windows. To view
+Studio, visit `127.0.0.1:8001` in your web browser; to view the LMS, visit
+`127.0.0.1:8000`.
 
-And `rake` will start up the old project on localhost port 8000.
+There's also an older version of the LMS that saves its information in XML files
+in the `data` directory, instead of in Mongo. To run this older version, run:
 
+$ rake lms
 
 Further Documentation
 =====================
