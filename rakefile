@@ -17,7 +17,7 @@ PACKAGE_NAME = "edx-platform"
 COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
 BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '')
 
-PREREQS_MD5_DIR = File.join(REPO_ROOT, '.prereqs_cache')
+PREREQS_MD5_DIR = ENV["PREREQ_CACHE_DIR"] || File.join(REPO_ROOT, '.prereqs_cache')
 
 # Set up the clean and clobber tasks
 CLOBBER.include(BUILD_DIR, REPORT_DIR, 'test_root/*_repo', 'test_root/staticfiles', PREREQS_MD5_DIR)
@@ -117,35 +117,77 @@ def report_dir_path(dir)
     return File.join(REPORT_DIR, dir.to_s)
 end
 
-def compile_assets(watch=false, debug=false)
+def xmodule_cmd(watch=false, debug=false)
     xmodule_cmd = 'xmodule_assets common/static/xmodule'
     if watch
-        xmodule_cmd = "watchmedo shell-command \
-                       --patterns='*.js;*.coffee;*.sass;*.scss;*.css' \
-                       --recursive \
-                       --command='#{xmodule_cmd}' \
-                       common/lib/xmodule"
+        "watchmedo shell-command " +
+                   "--patterns='*.js;*.coffee;*.sass;*.scss;*.css' " +
+                   "--recursive " +
+                   "--command='#{xmodule_cmd}' " +
+                   "common/lib/xmodule"
+    else
+        xmodule_cmd
     end
-    coffee_cmd = "node_modules/.bin/coffee #{watch ? '--watch' : ''} --compile */static"
-    sass_cmd = "sass #{debug ? '--debug-info' : '--style compressed'} " +
-                     "--load-path ./common/static/sass " +
-                     "--require ./common/static/sass/bourbon/lib/bourbon.rb " +
-                     "#{watch ? '--watch' : '--update --force'} */static"
+end
 
-    [xmodule_cmd, coffee_cmd, sass_cmd].each do |cmd|
-        if watch
-            background_process(cmd)
-        else
-            pid = Process.spawn(cmd)
-            puts "Waiting for `#{cmd}` to complete (pid #{pid})"
-            Process.wait(pid)
-            puts "Completed"
-            if !$?.exited? || $?.exitstatus != 0
-                abort "`#{cmd}` failed"
+def coffee_cmd(watch=false, debug=false)
+    "node_modules/.bin/coffee #{watch ? '--watch' : ''} --compile */static"
+end
+
+def sass_cmd(watch=false, debug=false)
+    "sass #{debug ? '--debug-info' : '--style compressed'} " +
+          "--load-path ./common/static/sass " +
+          "--require ./common/static/sass/bourbon/lib/bourbon.rb " +
+          "#{watch ? '--watch' : '--update'} */static"
+end
+
+desc "Compile all assets"
+multitask :assets => 'assets:all'
+
+desc "Compile all assets in debug mode"
+multitask 'assets:debug'
+
+desc "Watch all assets for changes and automatically recompile"
+multitask 'assets:watch'
+
+namespace :assets do
+    [:xmodule, :coffee, :sass].each do |asset_type|
+        desc "Compile all #{asset_type} assets"
+        task asset_type do
+            cmd = send(asset_type.to_s + "_cmd", watch=false, debug=false)
+            sh(cmd)
+        end
+
+        multitask :all => asset_type
+        multitask :debug => "assets:#{asset_type}:debug"
+        multitask :watch => "assets:#{asset_type}:watch"
+
+        namespace asset_type do
+            desc "Compile all #{asset_type} assets in debug mode"
+            task :debug do
+                cmd = send(asset_type.to_s + "_cmd", watch=false, debug=true)
+                sh(cmd)
+            end
+
+            desc "Watch all #{asset_type} assets and compile on change"
+            task :watch do
+                cmd = send(asset_type.to_s + "_cmd", watch=true, debug=true)
+                background_process(cmd)
             end
         end
     end
+
+    # In watch mode, sass doesn't immediately compile out of date files,
+    # so force a recompile first
+    task "sass:watch" => "assets:sass:debug"
+
+    multitask :sass => [:install_ruby_prereqs, :xmodule]
+    multitask :coffee => [:install_node_prereqs, :xmodule]
+    multitask 'coffee:debug' => [:install_ruby_prereqs, 'xmodule:debug']
+    multitask 'sass:debug' => [:install_node_prereqs, 'xmodule:debug']
+    task :xmodule => :install_python_prereqs
 end
+
 
 directory PREREQS_MD5_DIR
 
@@ -294,15 +336,8 @@ end
         Start the #{system} locally with the specified environment (defaults to dev).
         Other useful environments are devplus (for dev testing with a real local database)
         desc
-    task system, [:env, :options] => [:install_prereqs, :predjango] do |t, args|
+    task system, [:env, :options] => [:install_prereqs, 'assets:watch', :predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
-
-        # Compile all assets first
-        compile_assets(watch=false, debug=true)
-
-        # Listen for any changes to assets
-        compile_assets(watch=true, debug=true)
-
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
 
@@ -315,8 +350,7 @@ end
         end
 
         desc "Compile coffeescript and sass, and then run collectstatic in the specified environment"
-        task "#{system}:gather_assets:#{env}" do
-            compile_assets()
+        task "#{system}:gather_assets:#{env}" => :assets do
             sh("#{django_admin(system, env, 'collectstatic', '--noinput')} > /dev/null") do |ok, status|
                 if !ok
                     abort "collectstatic failed!"
@@ -326,8 +360,7 @@ end
     end
 
     desc "Open jasmine tests for #{system} in your default browser"
-    task "browse_jasmine_#{system}" do
-        compile_assets()
+    task "browse_jasmine_#{system}" => :assets do
         django_for_jasmine(system, true) do |jasmine_url|
             Launchy.open(jasmine_url)
             puts "Press ENTER to terminate".red
@@ -336,8 +369,7 @@ end
     end
 
     desc "Use phantomjs to run jasmine tests for #{system} from the console"
-    task "phantomjs_jasmine_#{system}" do
-        compile_assets()
+    task "phantomjs_jasmine_#{system}" => :assets do
         phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
         django_for_jasmine(system, false) do |jasmine_url|
             sh("#{phantomjs} node_modules/phantom-jasmine/lib/run_jasmine_test.coffee #{jasmine_url}")
