@@ -513,7 +513,7 @@ end
 # Make sure config file with username/password exists
 # Returns boolean: returns true if file exists and is nonzero length
 def validate_transifex_config()
-  config_file = Dir.home + "/.transifexrc"
+  config_file = "#{Dir.home}/.transifexrc"
   if !File.file?(config_file) or File.size(config_file)==0
     raise "Cannot connect to Transifex, config file is missing or empty: #{config_file}\n" +
       "See http://help.transifex.com/features/client/#transifexrc\n"
