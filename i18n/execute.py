@@ -50,14 +50,29 @@ def execute (command, working_directory=BASE_DIR, log=LOG):
     """
     Executes shell command in a given working_directory.
     Command is a string to pass to the shell.
-    Output is logged to log.
+    The command is logged to log, output is ignored.
     """
-    log.info(command)
+    if log:
+        log.info(command)
     subprocess.call(command.split(' '), cwd=working_directory)
+
+
+def call(command, working_directory=BASE_DIR, log=LOG):
+    """
+    Executes shell command in a given working_directory.
+    Command is a string to pass to the shell.
+    Returns a tuple of two strings: (stdout, stderr)
+    """
+    if log:
+        log.info(command)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory)
+    out, err = p.communicate()
+    return (out, err)
+    
     
 def get_config():
     """Returns data found in config file, or returns None if file not found"""
-    config_path = os.path.abspath(CONFIG_FILENAME)
+    config_path = os.path.normpath(CONFIG_FILENAME)
     if not os.path.exists(config_path):
         log.warn("Configuration file cannot be found: %s" % \
                  os.path.relpath(config_path, BASE_DIR))

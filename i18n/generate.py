@@ -14,6 +14,8 @@
 """
 
 import os
+from polib import pofile
+
 from execute import execute, get_config, messages_dir, remove_file, \
      BASE_DIR, LOG, SOURCE_LOCALE
 
@@ -30,10 +32,22 @@ def merge(locale, target='django.po'):
     merge_cmd = 'msgcat -o merged.po ' + ' '.join(files_to_merge)
     execute(merge_cmd, working_directory=locale_directory)
 
-    # rename merged.po -> django.po (default)
+    # clean up redunancies in the metadata
     merged_filename = os.path.join(locale_directory, 'merged.po')
+    clean_metadata(merged_filename)
+
+    # rename merged.po -> django.po (default)
     django_filename = os.path.join(locale_directory, target)
     os.rename(merged_filename, django_filename) # can't overwrite file on Windows
+
+def clean_metadata(file):
+    """
+    Clean up redundancies in the metadata caused by merging.
+    This reads in a PO file and simply saves it back out again.
+    """
+    po = pofile(file)
+    po.save()
+    
 
 def validate_files(dir, files_to_merge):
     """

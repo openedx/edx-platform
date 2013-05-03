@@ -10,15 +10,15 @@
 #
 # $ ./make_dummy.py <sourcefile>
 #
-# $ ./make_dummy.py mitx/conf/locale/en/LC_MESSAGES/django.po
+# $ ./make_dummy.py ../conf/locale/en/LC_MESSAGES/django.po
 #
 # generates output to
-#    mitx/conf/locale/vr/LC_MESSAGES/django.po
+#    mitx/conf/locale/fr/LC_MESSAGES/django.po
 
 import os, sys
 import polib
 from dummy import Dummy
-from execute import create_dir_if_necessary
+from execute import get_logger, create_dir_if_necessary
 
 def main(file, locale):
     """
@@ -41,11 +41,11 @@ def new_filename(original_filename, new_locale):
     orig_dir = os.path.dirname(original_filename)
     msgs_dir = os.path.basename(orig_dir)
     orig_file = os.path.basename(original_filename)
-    return os.path.join(orig_dir,
-                        '/../..',
-                        new_locale,
-                        msgs_dir,
-                        orig_file)
+    return os.path.abspath(os.path.join(orig_dir,
+                                        '../..',
+                                        new_locale,
+                                        msgs_dir,
+                                        orig_file))
 
 
 # Dummy language 
@@ -60,7 +60,7 @@ DEFAULT_LOCALE = 'fr'
 if __name__ == '__main__':
     if len(sys.argv)<2:
         raise Exception("missing file argument")
-    if len(sys.argv)<2:
+    if len(sys.argv)<3:
         locale = DEFAULT_LOCALE
     else:
         locale = sys.argv[2]

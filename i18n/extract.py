@@ -79,6 +79,7 @@ def fix_header(po):
     """
     Replace default headers with edX headers
     """
+    po.metadata_is_fuzzy = []   # remove [u'fuzzy']
     header = po.header
     fixes = (
         ('SOME DESCRIPTIVE TITLE', 'edX translation file'),
@@ -119,10 +120,9 @@ def fix_metadata(po):
              'Report-Msgid-Bugs-To': 'translation_team@edx.org',
              'Project-Id-Version': '0.1a',
              'Language' : 'en',
+             'Last-Translator' : '',
              'Language-Team': 'translation team <translation_team@edx.org>',
              }
-    if po.metadata.has_key('Last-Translator'):
-        del po.metadata['Last-Translator']
     po.metadata.update(fixes)
 
 def strip_key_strings(po):

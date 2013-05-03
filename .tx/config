@@ -1,0 +1,26 @@
+[main]
+host = https://www.transifex.com
+
+[edx-studio.django-partial]
+file_filter = conf/locale/<lang>/LC_MESSAGES/django-partial.po
+source_file = conf/locale/en/LC_MESSAGES/django-partial.po
+source_lang = en
+type = PO
+
+[edx-studio.djangojs]
+file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs.po
+source_file = conf/locale/en/LC_MESSAGES/djangojs.po
+source_lang = en
+type = PO
+
+[edx-studio.mako]
+file_filter = conf/locale/<lang>/LC_MESSAGES/mako.po
+source_file = conf/locale/en/LC_MESSAGES/mako.po
+source_lang = en
+type = PO
+
+[edx-studio.messages]
+file_filter = conf/locale/<lang>/LC_MESSAGES/messages.po
+source_file = conf/locale/en/LC_MESSAGES/messages.po
+source_lang = en
+type = PO
