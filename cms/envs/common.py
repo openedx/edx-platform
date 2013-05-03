@@ -264,3 +264,7 @@ INSTALLED_APPS = (
     'staticfiles',
     'static_replace',
 )
+
+################# EDX MARKETING SITE ##################################
+
+EDXMKTG_COOKIE_NAME = 'edxloggedin'
