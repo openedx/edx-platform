@@ -10,12 +10,9 @@ require 'tempfile'
 REPO_ROOT = File.dirname(__FILE__)
 BUILD_DIR = File.join(REPO_ROOT, "build")
 REPORT_DIR = File.join(REPO_ROOT, "reports")
-LMS_REPORT_DIR = File.join(REPORT_DIR, "lms")
 
 # Packaging constants
-DEPLOY_DIR = "/opt/wwc"
 PACKAGE_NAME = "edx-platform"
-PKG_VERSION = "0.1"
 COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
 BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '')
 BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
@@ -552,7 +549,7 @@ namespace :i18n do
     task :transifex_config do
       config_file = "#{Dir.home}/.transifexrc"
       if !File.file?(config_file) or File.size(config_file)==0
-        msg ="Cannot connect to Transifex, config file is missing or empty: #{config_file}\n" 
+        msg ="Cannot connect to Transifex, config file is missing or empty: #{config_file}\n"
         msg += "See http://help.transifex.com/features/client/#transifexrc"
         abort(msg.red)
       end
