@@ -4,10 +4,10 @@
 
 // marketing site - registration iframe band-aid (poor form enough to isolate out)
 .view-partial-mktgregister {
+  background: transparent;
 
   // dimensions needed for course about page on marketing site
   .wrapper-view {
-    width: 301px; // taken from bad marketing grid
     overflow: hidden;
   }
 
@@ -16,7 +16,7 @@
     display: block;
     padding: $baseline/2 $baseline*2.5;
     text-transform: lowercase;
-    color: $white;
+    color: $white !important;
     letter-spacing: 0.1rem;
     cursor: pointer;
     text-align: center;
@@ -53,7 +53,7 @@
   }
 
   // nav list
-  [class|="list"] {
+  .list-actions {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -66,19 +66,20 @@
   // register actions
   .action {
 
-    // not registered (default)
-    &.action-register {
-      @extend .btn-primary;
-    }
+  }
 
-    // not signed in
-    &.is-not-signedin {
-      @extend .btn-primary;
-    }
+  // not registered (default)
+  .action-register {
+    @extend .btn-primary;
+  }
 
-    // already registered
-    &.is-registered {
-      @extend .btn-secondary;
-    }
+  // not signed in
+  .is-not-signedin {
+    @extend .btn-primary;
+  }
+
+  // already registered
+  .is-registered {
+    @extend .btn-secondary;
   }
 }
