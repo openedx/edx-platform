@@ -73,11 +73,14 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="#" class="dropdown">&#9662</a>
         <ul class="dropdown-menu">
+            <li>
         % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-          <li><a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">Help</a></li>
+          <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">
         %else:
-          <li><a href="${reverse('help_edx')}">Help</a></li>
+          <a href="${reverse('help_edx')}">
         %endif
+            Help
+          </a></li>
           <li><a href="${reverse('logout')}">Log Out</a></li>
         </ul>
       </li>

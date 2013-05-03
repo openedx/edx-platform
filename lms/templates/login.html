@@ -150,7 +150,15 @@
       <p><a href="${reverse('register_user')}">Sign up for edX today!</a></p>
 
       <h3>Need Help?</h3>
-      <p>Looking for help in logging in or with your edX account? <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">View our help section for answers to commonly asked questions</a></p>
+      <p>Looking for help in logging in or with your edX account?
+      % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+      <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">
+      %else:
+      <a href="${reverse('help_edx')}">
+      %endif
+          View our help section for answers to commonly asked questions.
+      </a></p>
+
     </div>
   </aside>
   </section>
