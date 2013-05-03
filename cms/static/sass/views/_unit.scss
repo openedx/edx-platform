@@ -438,9 +438,8 @@ body.course.unit {
       @include edit-box;
       @include box-shadow(none);
       display: none;
-      padding: 20px;
+      padding: 0;
       border-radius: 2px 2px 0 0;
-
 
       // Edit Menu (Component Name, Mode-Editor, Mode-Settings)
 
@@ -448,14 +447,14 @@ body.course.unit {
         @include box-sizing(border-box);
         position: absolute;
         width: 100%;
-        padding: 15px;
+        //padding: 15px;
         top: 0;
         right: 0;
         border-bottom: 1px solid $lightBluishGrey2;
-        background: $lightGrey;
+        background: $gray-l4;
 
         //Component Name
-        h3 {
+        h4 {
           //TO-DO 
           //determine proper h-level
         }
@@ -463,11 +462,11 @@ body.course.unit {
         //Nav-Edit Modes
         .nav-edit-modes {
           list-style: none;
-          //move to the right,
 
           li {
             //TO-DO
             //inherit button styling
+            float: right;
             //no idea what it currently inherits...
 
             &:hover {
