@@ -151,9 +151,11 @@ desc "Watch all assets for changes and automatically recompile"
 multitask 'assets:watch'
 
 namespace :assets do
-    [:xmodule, :coffee, :sass].each do |asset_type|
+    {:xmodule => :install_python_prereqs,
+     :coffee => :install_node_prereqs,
+     :sass => :install_ruby_prereqs}.each_pair do |asset_type, prereq_task|
         desc "Compile all #{asset_type} assets"
-        task asset_type do
+        task asset_type => prereq_task do
             cmd = send(asset_type.to_s + "_cmd", watch=false, debug=false)
             sh(cmd)
         end
@@ -164,13 +166,13 @@ namespace :assets do
 
         namespace asset_type do
             desc "Compile all #{asset_type} assets in debug mode"
-            task :debug do
+            task :debug => prereq_task do
                 cmd = send(asset_type.to_s + "_cmd", watch=false, debug=true)
                 sh(cmd)
             end
 
             desc "Watch all #{asset_type} assets and compile on change"
-            task :watch do
+            task :watch => prereq_task do
                 cmd = send(asset_type.to_s + "_cmd", watch=true, debug=true)
                 background_process(cmd)
             end
@@ -181,11 +183,10 @@ namespace :assets do
     # so force a recompile first
     task "sass:watch" => "assets:sass:debug"
 
-    multitask :sass => [:install_ruby_prereqs, :xmodule]
-    multitask :coffee => [:install_node_prereqs, :xmodule]
-    multitask 'coffee:debug' => [:install_ruby_prereqs, 'xmodule:debug']
-    multitask 'sass:debug' => [:install_node_prereqs, 'xmodule:debug']
-    task :xmodule => :install_python_prereqs
+    multitask :sass => 'assets:xmodule'
+    multitask 'sass:debug' => 'assets:xmodule:debug'
+    multitask :coffee => 'assets:xmodule'
+    multitask 'coffee:debug' => 'assets:xmodule:debug'
 end
 
 
