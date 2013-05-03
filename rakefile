@@ -510,6 +510,18 @@ end
 
 # --- Internationalization tasks
 
+# Make sure config file with username/password exists
+# Returns boolean: returns true if file exists and is nonzero length
+def validate_transifex_config()
+  config_file = Dir.home + "/.transifexrc"
+  if !File.file?(config_file) or File.size(config_file)==0
+    raise "Cannot connect to Transifex, config file is missing or empty: #{config_file}\n" +
+      "See http://help.transifex.com/features/client/#transifexrc\n"
+    return false
+  end
+  return true
+end
+
 namespace :i18n do
 
   desc "Extract localizable strings from sources"
@@ -538,12 +550,16 @@ namespace :i18n do
   namespace :transifex do
     desc "Push source strings to Transifex for translation"
     task :push do
-      sh("tx push -s")
+      if validate_transifex_config()
+        sh("tx push -s")
+      end
     end
 
-    desc "Pull transated strings from Transifex"
+    desc "Pull translated strings from Transifex"
     task :pull do
-      sh("tx pull")
+      if validate_transifex_config()
+        sh("tx pull")
+      end
     end
   end
 
