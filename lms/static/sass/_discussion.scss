@@ -2456,6 +2456,10 @@ body.discussion {
       margin-right: 10px;
       opacity:.8;
 
+      span {
+        cursor: pointer;
+      }
+
       &:hover {
         @include transition(opacity .2s);
         opacity: 1;
@@ -2469,7 +2473,6 @@ body.discussion {
       position: relative;
       right:-20px;
       top:-13px;
-      opacity:.6;
       margin-right:35px;
       margin-top:13px;
       opacity: 1;
@@ -2498,12 +2501,14 @@ body.discussion {
 .pinned span {
   color: #B82066;
   font-style: italic;
+  //cursor change is here since pins are read-only for inline discussions. 
   cursor: default;
 }
 
 .notpinned span {
   color: #888;
   font-style: italic;
+  //cursor change is here since pins are read-only for inline discussions. 
   cursor: default;
 }
 
