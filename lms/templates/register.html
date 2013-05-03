@@ -35,13 +35,20 @@
     });
 
     (function() {
-     $(document).delegate('#register-form', 'ajax:success', function(data, json, xhr) {
-        $(this).find('.form-actions #submit').addClass('is-disabled');
+      toggleSubmitButton(true);
 
-       if(json.success) {
-        $('.message.submission-error').removeClass('is-shown');
-        toggleSubmitButton();
-        location.href="${reverse('dashboard')}";
+      $('#register-form').on('submit', function() {
+        toggleSubmitButton(false);
+      });
+
+      $('#register-form').on('ajax:complete', function() {
+        toggleSubmitButton(true);
+      });
+
+      $('#register-form').on('ajax:success', function(event, json, xhr) {
+        if(json.success) {
+          $('.message.submission-error').removeClass('is-shown');
+          location.href="${reverse('dashboard')}";
        } else {
          $('.status.message.submission-error').addClass('is-shown');
          $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
@@ -51,17 +58,20 @@
       });
     })(this);
 
-    function toggleSubmitButton(e) {
-      var $msgError = $('form .status.submission-error');
-      var $submitButton = $('form .form-actions #submit').prop('disabled', true);
-      var $submitButtonCopy = $submitButton.html();
+    function toggleSubmitButton(enable) {
+      var $submitButton = $('form .form-actions #submit');
 
-      if(!$msgError.hasClass('is-shown')) {
-        $submitButton.prop('disabled', true).html('Processing your registration &hellip;');
+      if(enable) {
+        $submitButton.
+          removeClass('is-disabled').
+          removeProp('disabled').
+          html('Log into My edX Account <span class="orn-plus">+</span> Access My Courses');
       }
-
       else {
-        $submitButton.prop('disabled', false).html($submitButtonCopy);
+        $submitButton.
+          addClass('is-disabled').
+          prop('disabled', true).
+          html('Processing your account information &hellip;');
       }
     }
   </script>
