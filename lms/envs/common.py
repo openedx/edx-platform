@@ -440,6 +440,9 @@ PIPELINE_CSS = {
     },
 }
 
+
+# test_order: Determines the position of this chunk of javascript on
+# the jasmine test page
 PIPELINE_JS = {
     'application': {
 
@@ -455,31 +458,39 @@ PIPELINE_JS = {
             'js/sticky_filter.js',
             'js/query-params.js',
         ],
-        'output_filename': 'js/lms-application.js'
+        'output_filename': 'js/lms-application.js',
+
+        'test_order': 1,
     },
     'courseware': {
         'source_filenames': courseware_js,
-        'output_filename': 'js/lms-courseware.js'
+        'output_filename': 'js/lms-courseware.js',
+        'test_order': 2,
     },
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
+        'test_order': 0,
     },
     'module-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
         'output_filename': 'js/lms-modules.js',
+        'test_order': 3,
     },
     'discussion': {
         'source_filenames': discussion_js,
-        'output_filename': 'js/discussion.js'
+        'output_filename': 'js/discussion.js',
+        'test_order': 4,
     },
     'staff_grading': {
         'source_filenames': staff_grading_js,
-        'output_filename': 'js/staff_grading.js'
+        'output_filename': 'js/staff_grading.js',
+        'test_order': 5,
     },
     'open_ended': {
         'source_filenames': open_ended_js,
-        'output_filename': 'js/open_ended.js'
+        'output_filename': 'js/open_ended.js',
+        'test_order': 6,
     }
 }
 
