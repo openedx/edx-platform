@@ -124,6 +124,13 @@ And `rake` will start up your Django project on the localhost, port 8001. To
 view your running project, type `127.0.0.1:8001` into your web browser, and
 you should see edX in all its glory!
 
+If you need to run old XML-only LMS (which doesn't use the database), run this
+instead:
+
+    $ rake lms
+
+And `rake` will start up the old project on localhost port 8000.
+
 
 Further Documentation
 =====================
