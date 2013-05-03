@@ -1147,9 +1147,9 @@ def sympy_check2():
                     messages = []
                     for input_dict in input_list:
                         correct.append('correct'
-                                if input_dict['ok'] else 'incorrect')
+                                       if input_dict['ok'] else 'incorrect')
                         msg = (self.clean_message_html(input_dict['msg'])
-                                if 'msg' in input_dict else None)
+                               if 'msg' in input_dict else None)
                         messages.append(msg)
 
                 # Otherwise, we do not recognize the dictionary
@@ -1174,7 +1174,7 @@ def sympy_check2():
 
         for k in range(len(idset)):
             npoints = (self.maxpoints[idset[k]]
-                    if correct[k] == 'correct' else 0)
+                       if correct[k] == 'correct' else 0)
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
@@ -1851,6 +1851,19 @@ class FormulaResponse(LoncapaResponse):
                     'formularesponse: undefined variable in given=%s' % given)
                 raise StudentInputError(
                     "Invalid input: " + uv.message + " not permitted in answer")
+            except ValueError as ve:
+                if 'factorial' in ve.message:
+                    # This is thrown when fact() or factorial() is used in a formularesponse answer
+                    #   that tests on negative and/or non-integer inputs
+                    # ve.message will be: `factorial() only accepts integral values` or `factorial() not defined for negative values`
+                    log.debug(
+                        'formularesponse: factorial function used in response that tests negative and/or non-integer inputs. given={0}'.format(given))
+                    raise StudentInputError(
+                        "factorial function not permitted in answer for this problem. Provided answer was: {0}".format(given))
+                # If non-factorial related ValueError thrown, handle it the same as any other Exception
+                log.debug('formularesponse: error {0} in formula'.format(ve))
+                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
+                                        cgi.escape(given))
             except Exception as err:
                 # traceback.print_exc()
                 log.debug('formularesponse: error %s in formula' % err)
@@ -1983,7 +1996,6 @@ class ImageResponse(LoncapaResponse):
         self.ielements = self.inputfields
         self.answer_ids = [ie.get('id') for ie in self.ielements]
 
-
     def get_score(self, student_answers):
         correct_map = CorrectMap()
         expectedset = self.get_mapped_answers()
@@ -2052,7 +2064,7 @@ class ImageResponse(LoncapaResponse):
                 rectangles (dict) - a map of inputs to the defined rectangle for that input
                 regions (dict) - a map of inputs to the defined region for that input
         '''
-        answers =  (
+        answers = (
             dict([(ie.get('id'), ie.get(
                 'rectangle')) for ie in self.ielements]),
             dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
@@ -2074,8 +2086,6 @@ class ImageResponse(LoncapaResponse):
             answers[ie_id] = (ie.get('rectangle'), ie.get('regions'))
 
         return answers
-            
-
 
 #-----------------------------------------------------------------------------
 
