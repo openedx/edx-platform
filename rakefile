@@ -221,14 +221,14 @@ desc "Install all node prerequisites for the lms and cms"
 task :install_node_prereqs do
     when_changed('package.json') do
         sh('npm install')
-    end
+    end unless ENV['NO_PREREQ_INSTALL']
 end
 
 desc "Install all ruby prerequisites for the lms and cms"
 task :install_ruby_prereqs do
     when_changed('Gemfile') do
         sh('bundle install')
-    end
+    end unless ENV['NO_PREREQ_INSTALL']
 end
 
 desc "Install all python prerequisites for the lms and cms"
@@ -242,7 +242,7 @@ task :install_python_prereqs do
         if File.file?("requirements/private.txt")
             sh('pip install -r requirements/private.txt')
         end
-    end
+    end unless ENV['NO_PREREQ_INSTALL']
 end
 
 task :predjango do
