@@ -85,6 +85,7 @@
       <fieldset class="enroll_fieldset">
         <input name="course_id" type="hidden" value="${course.id}">
         <input name="enrollment_action" type="hidden" value="enroll">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
       </fieldset>
       <div class="submit">
 
