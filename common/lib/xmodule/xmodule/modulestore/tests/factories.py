@@ -1,156 +1,92 @@
-from factory import Factory, lazy_attribute_sequence, lazy_attribute
-from time import gmtime
-from uuid import uuid4
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.timeparse import stringify_time
-from xmodule.modulestore.inheritance import own_metadata
+from xmodule.course_module import CourseDescriptor
+from xmodule.x_module import XModuleDescriptor
+import factory
 
 
-class XModuleCourseFactory(Factory):
+# [dhm] I'm not sure why we're using factory_boy if we're not following its pattern. If anyone
+# assumes they can call build, it will completely fail, for example.
+# pylint: disable=W0232
+class CourseFactory(factory.Factory):
     """
-    Factory for XModule courses.
+    Create a new course (not a new version of a course, but a whole new index entry).
+
+    keywords:
+    * org: defaults to textX
+    * prettyid: defaults to 999
+    * display_name
+    * user_id
+    * data (optional) the data payload to save in the course item
+    * metadata (optional) the metadata payload. If display_name is in the metadata, that takes
+    precedence over any display_name provided directly.
     """
+    FACTORY_FOR = CourseDescriptor
 
-    ABSTRACT_FACTORY = True
+    org = 'testX'
+    prettyid = '999'
+    display_name = 'Robot Super Course'
+    user_id = "test_user"
+    data = None
+    metadata = None
 
+    # pylint: disable=W0613
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
 
-        template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
         org = kwargs.get('org')
-        number = kwargs.get('number')
+        prettyid = kwargs.get('prettyid')
         display_name = kwargs.get('display_name')
-        location = Location('i4x', org, number,
-                            'course', Location.clean(display_name))
-
-        try:
-            store = modulestore('direct')
-        except KeyError:
-            store = modulestore()
+        user_id = kwargs.get('user_id')
+        data = kwargs.get('data')
+        metadata = kwargs.get('metadata', {})
+        if 'display_name' not in metadata:
+            metadata['display_name'] = display_name
 
         # Write the data to the mongo datastore
-        new_course = store.clone_item(template, location)
-
-        # This metadata code was copied from cms/djangoapps/contentstore/views.py
-        if display_name is not None:
-            new_course.display_name = display_name
-
-        new_course.lms.start = gmtime()
-        new_course.tabs = [{"type": "courseware"},
-                           {"type": "course_info", "name": "Course Info"},
-                           {"type": "discussion", "name": "Discussion"},
-                           {"type": "wiki", "name": "Wiki"},
-                           {"type": "progress", "name": "Progress"}]
-
-        # Update the data in the mongo datastore
-        store.update_metadata(new_course.location.url(), own_metadata(new_course))
-
-        data = kwargs.get('data')
-        if data is not None:
-            store.update_item(new_course.location, data)
+        new_course = modulestore().create_course(org, prettyid, user_id, metadata=metadata,
+            course_data=data)
 
         return new_course
 
-
-class Course:
-    pass
-
-
-class CourseFactory(XModuleCourseFactory):
-    FACTORY_FOR = Course
-
-    template = 'i4x://edx/templates/course/Empty'
-    org = 'MITx'
-    number = '999'
-    display_name = 'Robot Super Course'
+    @classmethod
+    def _build(cls, target_class, *args, **kwargs):
+        raise NotImplementedError()
 
 
-class XModuleItemFactory(Factory):
-    """
-    Factory for XModule items.
-    """
+class ItemFactory(factory.Factory):
+    FACTORY_FOR = XModuleDescriptor
 
-    ABSTRACT_FACTORY = True
+    category = 'chapter'
+    user_id = 'test_user'
+    display_name = factory.LazyAttributeSequence(lambda o, n: "{} {}".format(o.category, n))
 
-    display_name = None
-
-    @lazy_attribute
-    def category(attr):
-        template = Location(attr.template)
-        return template.category
-
-    @lazy_attribute
-    def location(attr):
-        parent = Location(attr.parent_location)
-        dest_name = attr.display_name.replace(" ", "_") if attr.display_name is not None else uuid4().hex
-        return parent._replace(category=attr.category, name=dest_name)
-
+    # pylint: disable=W0613
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
         """
         Uses *kwargs*:
 
-        *parent_location* (required): the location of the parent module
-            (e.g. the parent course or section)
+        *parent_location* (required): the location of the course & possibly parent
 
-        *template* (required): the template to create the item from
-            (e.g. i4x://templates/section/Empty)
+        *category* (defaults to 'chapter')
 
         *data* (optional): the data for the item
-            (e.g. XML problem definition for a problem item)
+
+        definition_locator (optional): the DescriptorLocator for the definition this uses or branches
 
         *display_name* (optional): the display name of the item
 
-        *metadata* (optional): dictionary of metadata attributes
-
-        *target_class* is ignored
+        *metadata* (optional): dictionary of metadata attributes (display_name here takes
+        precedence over the above attr)
         """
-
-        DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
-
-        parent_location = Location(kwargs.get('parent_location'))
-        template = Location(kwargs.get('template'))
-        data = kwargs.get('data')
-        display_name = kwargs.get('display_name')
         metadata = kwargs.get('metadata', {})
+        if 'display_name' not in metadata and 'display_name' in kwargs:
+            metadata['display_name'] = kwargs['display_name']
 
-        store = modulestore('direct')
+        return modulestore().create_item(kwargs['parent_location'], kwargs['category'],
+            kwargs['user_id'], definition_locator=kwargs.get('definition_locator'),
+            new_def_data=kwargs.get('data'), metadata=metadata)
 
-        # This code was based off that in cms/djangoapps/contentstore/views.py
-        parent = store.get_item(parent_location)
-
-        new_item = store.clone_item(template, kwargs.get('location'))
-
-        # replace the display name with an optional parameter passed in from the caller
-        if display_name is not None:
-            new_item.display_name = display_name
-
-        # Add additional metadata or override current metadata
-        item_metadata = own_metadata(new_item)
-        item_metadata.update(metadata)
-        store.update_metadata(new_item.location.url(), item_metadata)
-
-        # replace the data with the optional *data* parameter
-        if data is not None:
-            store.update_item(new_item.location, data)
-
-        if new_item.location.category not in DETACHED_CATEGORIES:
-            store.update_children(parent_location, parent.children + [new_item.location.url()])
-
-        return new_item
-
-
-class Item:
-    pass
-
-
-class ItemFactory(XModuleItemFactory):
-    FACTORY_FOR = Item
-
-    parent_location = 'i4x://MITx/999/course/Robot_Super_Course'
-    template = 'i4x://edx/templates/chapter/Empty'
-
-    @lazy_attribute_sequence
-    def display_name(attr, n):
-        return "{} {}".format(attr.category.title(), n)
+    @classmethod
+    def _build(cls, target_class, *args, **kwargs):
+        raise NotImplementedError()
