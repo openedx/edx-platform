@@ -8,45 +8,25 @@
       <nav class="nav-colophon">
       <ol>
           <li class="nav-colophon-01">
-              % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-              <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('ABOUT')}">
-              %else:
-              <a href="${reverse('about_edx')}">
-              %endif
+              <a href="${marketing_link('ABOUT')}">
                   About
               </a>
           </li>
           <li class="nav-colophon-02">
-          % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-          <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('JOBS')}">
-          %else:
-          <a href="${reverse('jobs')}">
-          %endif
+          <a href="${marketing_link('JOBS')}">
               Jobs</a>
           </li>
           <li class="nav-colophon-03">
-          % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-          <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('PRESS')}">
-          %else:
-          <a href="${reverse('press')}">
-          %endif
+          <a href="${marketing_link('PRESS')}">
               Press</a>
           </li>
           <li class="nav-colophon-04">
-          % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-          <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">
-          %else:
-          <a href="${reverse('help_edx')}">
-          %endif
+          <a href="${marketing_link('FAQ')}">
               FAQ
           </a>
           </li>
           <li class="nav-colophon-05">
-          % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-          <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('CONTACT')}">
-          %else:
-          <a href="${reverse('contact')}">
-          %endif
+          <a href="${marketing_link('CONTACT')}">
               Contact
           </a>
           </li>

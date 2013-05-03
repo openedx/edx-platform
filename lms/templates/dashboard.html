@@ -326,11 +326,7 @@
     % else:
       <section class="empty-dashboard-message">
         <p>Looks like you haven't registered for any courses yet.</p>
-        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-            <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('COURSES')}">
-        %else:
-            <a href="${reverse('courses')}">
-        %endif
+            <a href="${marketing_link('COURSES')}">
                 Find courses now!
             </a>
       </section>

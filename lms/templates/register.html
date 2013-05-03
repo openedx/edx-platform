@@ -237,11 +237,7 @@
     <div class="cta cta-help">
       <h3>Need Help?</h3>
       <p>Need help in registering with edX? 
-        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">
-        %else:
-        <a href="${reverse('help_edx')}">
-        %endif
+        <a href="${marketing_link('FAQ')}">
             View our FAQs for answers to commonly asked questions.
         </a>.  Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.</p>
     </div>

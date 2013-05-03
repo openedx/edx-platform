@@ -56,11 +56,7 @@ site_status_msg = get_site_status_msg(course_id)
 
     <ol class="left nav-global authenticated">
       <li class="nav-global-01">
-        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-            <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('COURSES')}">Find Courses</a>
-        % else:
-            <a href="${reverse('courses')}">Find Courses</a>
-        % endif
+      <a href="${marketing_link('COURSES')}">Find Courses</a>
       </li>
     </ol>
     <ol class="user">
@@ -74,11 +70,7 @@ site_status_msg = get_site_status_msg(course_id)
         <a href="#" class="dropdown">&#9662</a>
         <ul class="dropdown-menu">
             <li>
-        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-          <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">
-        %else:
-          <a href="${reverse('help_edx')}">
-        %endif
+            <a href="${marketing_link('FAQ')}">
             Help
           </a></li>
           <li><a href="${reverse('logout')}">Log Out</a></li>
@@ -90,13 +82,13 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="left nav-global">
       % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
       <li class="nav-global-01">
-        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('HOW_IT_WORKS')}">How it Works</a>
+        <a href="${marketing_link('HOW_IT_WORKS')}">How it Works</a>
       </li>
       <li class="nav-global-02">
-        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('COURSES')}">Courses</a>
+        <a href="marketing_link('COURSES')}">Courses</a>
       </li>
       <li class="nav-global-03">
-        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('SCHOOLS')}">Schools</a>
+        <a href="${marketing_link('SCHOOLS')}">Schools</a>
       </li>
       % endif
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:

@@ -151,11 +151,7 @@
 
       <h3>Need Help?</h3>
       <p>Looking for help in logging in or with your edX account?
-      % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-      <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('FAQ')}">
-      %else:
-      <a href="${reverse('help_edx')}">
-      %endif
+      <a href="${marketing_link('FAQ')}">
           View our help section for answers to commonly asked questions.
       </a></p>
 
