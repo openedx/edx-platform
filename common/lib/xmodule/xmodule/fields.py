@@ -7,16 +7,9 @@ from xblock.core import ModelType
 import datetime
 import dateutil.parser
 
-from xblock.core import Integer, Float, Boolean, Scope
+from xblock.core import Integer, Float, Boolean
 
 log = logging.getLogger(__name__)
-
-
-class NonEditableSettingsScope(Scope):
-    pass
-
-# Same scope as Settings.scope, but not intended to be edited by users (in Studio).
-NON_EDITABLE_SETTINGS_SCOPE = NonEditableSettingsScope(user=Scope.settings.user, block=Scope.settings.block)
 
 
 class Date(ModelType):

@@ -17,7 +17,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.core import Scope, String, Boolean, Object
-from .fields import Timedelta, Date, StringyInteger, StringyFloat, NON_EDITABLE_SETTINGS_SCOPE
+from .fields import Timedelta, Date, StringyInteger, StringyFloat
 from xmodule.util.date_utils import time_to_datetime
 
 log = logging.getLogger("mitx.courseware")
@@ -63,13 +63,13 @@ class ComplexEncoder(json.JSONEncoder):
 class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
     max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
-    due = Date(help="Date that this problem is due by", scope=NON_EDITABLE_SETTINGS_SCOPE)
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted",
-                            scope=NON_EDITABLE_SETTINGS_SCOPE)
+                            scope=Scope.settings)
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed",
                         values=["answered", "always", "attempted", "closed", "never"])
     force_save_button = Boolean(help="Whether to force the save button to appear on the page",
-                                scope=NON_EDITABLE_SETTINGS_SCOPE, default=False)
+                                scope=Scope.settings, default=False)
     rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
@@ -78,7 +78,7 @@ class CapaFields(object):
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
-    markdown = String(help="Markdown source of this module", scope=NON_EDITABLE_SETTINGS_SCOPE)
+    markdown = String(help="Markdown source of this module", scope=Scope.settings)
     source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.", scope=Scope.settings)
 
 
@@ -894,3 +894,10 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
+                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown])
+        return non_editable_fields

@@ -6,11 +6,10 @@ import sys
 from collections import namedtuple
 from lxml import etree
 
-from xblock.core import Object
+from xblock.core import Object, Scope
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
-from .fields import NON_EDITABLE_SETTINGS_SCOPE
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +85,7 @@ class XmlDescriptor(XModuleDescriptor):
     """
 
     xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export",
-        default={}, scope=NON_EDITABLE_SETTINGS_SCOPE)
+        default={}, scope=Scope.settings)
 
     # Extension to append to filename paths
     filename_extension = 'xml'
@@ -420,3 +419,9 @@ class XmlDescriptor(XModuleDescriptor):
         """
         raise NotImplementedError(
             "%s does not implement definition_to_xml" % self.__class__.__name__)
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(XmlDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(XmlDescriptor.xml_attributes)
+        return non_editable_fields

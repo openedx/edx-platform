@@ -1,17 +1,17 @@
 from xmodule.x_module import XModuleFields
 from xblock.core import Scope, String, Object
-from xmodule.fields import Date, StringyInteger, NON_EDITABLE_SETTINGS_SCOPE
-from xmodule.mako_module import  MakoModuleDescriptor
+from xmodule.fields import Date, StringyInteger
+from xmodule.xml_module import XmlDescriptor
 import unittest
 from . import test_system
 from mock import Mock
 
 
 class TestFields(object):
-    # Will be returned by editable_metadata_fields because Scope.settings.
+    # Will be returned by editable_metadata_fields.
     max_attempts = StringyInteger(scope=Scope.settings)
-    # Will not be returned by editable_metadata_fields because declared as non-editable Scope.settings.
-    due = Date(scope=NON_EDITABLE_SETTINGS_SCOPE)
+    # Will not be returned by editable_metadata_fields because filtered out by non_editable_metadata_fields.
+    due = Date(scope=Scope.settings)
     # Will not be returned by editable_metadata_fields because is not Scope.settings.
     student_answers = Object(scope=Scope.user_state)
     # Will be returned, and can override the inherited value from XModule.
@@ -21,14 +21,15 @@ class TestFields(object):
 class EditableMetadataFieldsTest(unittest.TestCase):
 
     def test_display_name_field(self):
-        editable_fields = self.get_mako_editable_fields({})
+        editable_fields = self.get_xml_editable_fields({})
         # Tests that the xblock fields (currently tags and name) get filtered out.
-        self.assertEqual(1, len(editable_fields), "Expected only 1 editable field for mako descriptor.")
+        # Also tests that xml_attributes is filtered out of XmlDescriptor.
+        self.assertEqual(1, len(editable_fields), "Expected only 1 editable field for xml descriptor.")
         self.assert_display_name_default(editable_fields)
 
     def test_override_default(self):
         # Tests that is_default is correct when a value overrides the default.
-        editable_fields = self.get_mako_editable_fields({'display_name': 'foo'})
+        editable_fields = self.get_xml_editable_fields({'display_name': 'foo'})
         display_name = editable_fields['display_name']
         self.assertFalse(display_name['is_default'])
         self.assertEqual('foo', display_name['value'])
@@ -47,14 +48,19 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         self.assert_field_values(editable_fields, 'display_name', XModuleFields.display_name, False, True, 'inherited')
 
     # Start of helper methods
-    def get_mako_editable_fields(self, model_data):
+    def get_xml_editable_fields(self, model_data):
         system = test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        return MakoModuleDescriptor(system=system, location=None, model_data=model_data).editable_metadata_fields
+        return XmlDescriptor(system=system, location=None, model_data=model_data).editable_metadata_fields
 
     def get_module_editable_fields(self, model_data):
-        class TestModuleDescriptor(TestFields, MakoModuleDescriptor):
-            pass
+        class TestModuleDescriptor(TestFields, XmlDescriptor):
+
+            @property
+            def non_editable_metadata_fields(self):
+                non_editable_fields = super(TestModuleDescriptor, self).non_editable_metadata_fields
+                non_editable_fields.append(TestModuleDescriptor.due)
+                return non_editable_fields
 
         system = test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")

@@ -606,6 +606,48 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             model_data=self._model_data,
         ))
 
+    @property
+    def non_editable_metadata_fields(self):
+        """
+        Return the list of fields that should not be editable in Studio.
+
+        When overriding, be sure to append to the superclasses' list.
+        """
+        # We are not allowing editing of xblock tag and name fields at this time (for any component).
+        return [XBlock.tags, XBlock.name]
+
+    @property
+    def editable_metadata_fields(self):
+        """
+        Returns the metadata fields to be edited in Studio. These are fields with scope `Scope.settings`.
+
+        Can be limited by extending `non_editable_metadata_fields`.
+        """
+        inherited_metadata = getattr(self, '_inherited_metadata', {})
+        metadata = {}
+        for field in self.fields:
+
+            if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
+                continue
+
+            inherited = False
+            default = False
+            value = getattr(self, field.name)
+            if field.name in self._model_data:
+                default = False
+                if field.name in inherited_metadata:
+                    if self._model_data.get(field.name) == inherited_metadata.get(field.name):
+                        inherited = True
+            else:
+                default = True
+
+            metadata[field.name] = {'field': field,
+                                    'value': value,
+                                    'is_inherited': inherited,
+                                    'is_default': default}
+
+        return metadata
+
 
 class DescriptorSystem(object):
     def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
