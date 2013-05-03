@@ -36,3 +36,5 @@ chromedriver.log
 /nbproject
 ghostdriver.log
 node_modules
+.pip_download_cache/
+.prereqs_cache

@@ -5,6 +5,7 @@ require 'launchy'
 require 'colorize'
 require 'erb'
 require 'tempfile'
+require 'digest/md5'
 
 # Build Constants
 REPO_ROOT = File.dirname(__FILE__)
@@ -15,10 +16,11 @@ REPORT_DIR = File.join(REPO_ROOT, "reports")
 PACKAGE_NAME = "edx-platform"
 COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
 BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '')
-BUILD_NUMBER = (ENV["BUILD_NUMBER"] || "dev").chomp()
+
+PREREQS_MD5_DIR = File.join(REPO_ROOT, '.prereqs_cache')
 
 # Set up the clean and clobber tasks
-CLOBBER.include(BUILD_DIR, REPORT_DIR, 'test_root/*_repo', 'test_root/staticfiles')
+CLOBBER.include(BUILD_DIR, REPORT_DIR, 'test_root/*_repo', 'test_root/staticfiles', PREREQS_MD5_DIR)
 CLEAN.include("#{BUILD_DIR}/*.deb", "#{BUILD_DIR}/util")
 
 def select_executable(*cmds)
@@ -145,6 +147,21 @@ def compile_assets(watch=false, debug=false)
     end
 end
 
+directory PREREQS_MD5_DIR
+
+def when_changed(*files)
+    Rake::Task[PREREQS_MD5_DIR].invoke
+    cache_file = File.join(PREREQS_MD5_DIR, files.join('-').gsub(/\W+/, '-')) + '.md5'
+    digest = Digest::MD5.new()
+    Dir[*files].select{|file| File.file?(file)}.each do |file|
+        digest.file(file)
+    end
+    if !File.exists?(cache_file) or digest.hexdigest != File.read(cache_file)
+        yield
+        File.write(cache_file, digest.hexdigest)
+    end
+end
+
 task :default => [:test, :pep8, :pylint]
 
 directory REPORT_DIR
@@ -159,22 +176,29 @@ task :install_prereqs => [:install_node_prereqs, :install_ruby_prereqs, :install
 
 desc "Install all node prerequisites for the lms and cms"
 task :install_node_prereqs do
-    sh('npm install')
+    when_changed('package.json') do
+        sh('npm install')
+    end
 end
 
 desc "Install all ruby prerequisites for the lms and cms"
 task :install_ruby_prereqs do
-    sh('bundle install')
+    when_changed('Gemfile') do
+        sh('bundle install')
+    end
 end
 
 desc "Install all python prerequisites for the lms and cms"
 task :install_python_prereqs do
-    sh('pip install -r requirements/base.txt')
-    sh('pip install --exists-action w -r requirements/post.txt')
-    # Check for private-requirements.txt: used to install our libs as working dirs,
-    # or personal-use tools.
-    if File.file?("requirements/private.txt")
-        sh('pip install -r requirements/private.txt')
+    when_changed('requirements/**') do
+        ENV['PIP_DOWNLOAD_CACHE'] ||= '.pip_download_cache'
+        sh('pip install --exists-action w -r requirements/base.txt')
+        sh('pip install --exists-action w -r requirements/post.txt')
+        # Check for private-requirements.txt: used to install our libs as working dirs,
+        # or personal-use tools.
+        if File.file?("requirements/private.txt")
+            sh('pip install -r requirements/private.txt')
+        end
     end
 end
 
@@ -257,7 +281,7 @@ end
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
-    task "fasttest_#{system}", [:stop_on_failure] => [report_dir, :predjango] do |t, args|
+    task "fasttest_#{system}", [:stop_on_failure] => [report_dir, :install_prereqs, :predjango] do |t, args|
         args.with_defaults(:stop_on_failure => 'true')
         run_tests(system, report_dir, args.stop_on_failure)
     end
@@ -270,7 +294,7 @@ end
         Start the #{system} locally with the specified environment (defaults to dev).
         Other useful environments are devplus (for dev testing with a real local database)
         desc
-    task system, [:env, :options] => [:predjango] do |t, args|
+    task system, [:env, :options] => [:install_prereqs, :predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
 
         # Compile all assets first
