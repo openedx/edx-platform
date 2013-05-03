@@ -171,3 +171,7 @@ class IsNewCourseTestCase(unittest.TestCase):
 
         d = self.get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
         self.assertEqual('Sep 04, 2014', d.end_date_text)
+
+    def test_default_discussion_topics(self):
+        d = self.get_dummy_course('2012-12-02T12:00')
+        self.assertEqual({'General': {'id': 'i4x-test_org-test_course-course-test'}}, d.discussion_topics)
