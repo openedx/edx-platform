@@ -592,4 +592,6 @@ MKTG_URLS = {'ROOT': '',
              'JOBS': '/jobs',
              'PRESS': '/in-the-news',
              'FAQ': '/student-faq',
-             'CONTACT': '/contact'}
+             'CONTACT': '/contact',
+             'HOW_IT_WORKS': '/how-it-works',
+             'SCHOOLS': '/schools'}
