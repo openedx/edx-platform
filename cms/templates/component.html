@@ -1,36 +1,37 @@
 <div class="wrapper wrapper-component-editor">
 	<div class="component-editor">
   		<div id="component-edit-menu">
-  			<h3 class="component-name">Name of Component</h3>
-  			<!--should this be a menu instead of OL -->
-  	  		<ol class="nav-edit-modes">
-  	  			<li id="editor-mode" class="tab" aria-controls="editor-tab" aria-selected="true" role="tab" tabindex="0">
+  			<h3 class="component-name">Viewing: Name of Component</h3>
+  			<!--should this be a menubar/menu/tabbar instead of list? -->
+  	  		<ul class="nav-edit-modes">
+  	  			<li id="editor-mode" class="tab is-active" aria-controls="editor-tab" aria-selected="true" role="tab" tabindex="0">
   	  				<a href="#" class="button cancel-button">Editor</a>
 	  			</li>
 	  			<li id="settings-mode" class="tab" aria-controls="settings-tab" aria-selected="false" role="tab" tabindex="-1">
 	  				<a href="#" class="button cancel-button">Settings </a>
 	  			</li>
-	  		</ol>
+	  		</ul>
 		</div> <!-- Editor Header -->
 
 		<div class="component-edit-modes">
 			<div class="editor-wrapper" id="editor-tab">
 				${editor}
+				<!-- no longer are settings imported from metadata-edit.hmtl, ideally? -->
 			</div> <!-- Editor Wrapper-->
-
-			<table class="settings-wrapper" id="settings-tab">
-		  		<!-- eventually, import settings from separate file -->
-		  		<tr class="settings-row settings-header">
-		  			<th class="settings-label">Setting Label</th>
-		  			<th class="settings-input">Setting Input</th>
-		  			<th class="settings-help">Setting Help</th>
-		  		</tr>
-		  		<tr class="settings-row settings-header">
-		  			<td class="settings-label">Example Dropdown</td>
-		  			<td class="settings-input">Input/Form stuff to be children here. </td>
-		  			<td class="settings-help">Example Numerical Input</td>
-		  		</tr>	  	
-		  	</div> <!-- Settings Wrapper-->
+			<ul class="settings-wrapper" id="settings-tab">
+		  		<!--% for type in sorted(something.keys()):-->
+		  		<li class="settings-row">
+		  			<label for="<%= ...settingLabel... %>">Setting Display Name Goes Here</label>
+		  			<input type="${type}" id="firstname"/> 
+		  			<span class="settings-help">${helpstring}</span>
+		  		</li>
+		  		<!--% showing second example mostly to see is-set style difference -->
+		  		<li class="settings-row is-set">
+		  			<label for="setting-name-as-id">Setting Display Name Goes Here</label>
+		  			<input type="${type}" id="firstname"/> 
+		  			<span class="settings-help">${helpstring}</span>
+		  		</li>≈
+		  	</ul> <!-- Settings Wrapper-->
 		</div>
 		<div class="row module-actions">
 	  		<a href="#" class="save-button">Save</a>

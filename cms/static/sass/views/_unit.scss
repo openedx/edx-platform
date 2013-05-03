@@ -456,27 +456,69 @@ body.course.unit {
 
         //Component Name
         h3 {
-          //TO-DO ?
+          //TO-DO 
+          //determine proper h-level
         }
 
         //Nav-Edit Modes
         .nav-edit-modes {
-          //TODO
+          list-style: none;
+          //move to the right,
 
-          .tab {
-            display: inline;
+          li {
+            //TO-DO
+            //inherit button styling
+            //no idea what it currently inherits...
+
+            &:hover {
+              //TO-DO
+              //opacity change
+            }
+
+            &.is-active {
+              //TO-DO
+              //inherit button styling
+            }
           }
+
         }
       }
 
-      // Module Editors
+      // Editor Wrapper
       .editor-wrapper{
-        //TO-DO ?
+        //TO-DO 
       }
 
-      // Module Settings
+      // Settings Wrapper
       .settings-wrapper{
-        //TO-DO ?
+        //TO-DO 
+
+        .settings-row {
+          // general row sizing stuff
+          width: 100%;
+          padding: 10px;
+          border-bottom: 1px solid $gray;
+
+          //SettingsLabel
+          li > label {
+            //Text all aligned left
+            //this sets height of .settings-row to allow for long help strings. 
+          }
+
+          //SettingsInput
+          li > input {
+            width: 100px;
+            //TO-DO
+
+            
+          }
+
+          //SettingsHelp
+          li > span {
+            //Text all aligned left
+          }
+
+        }
       }
 
       //OLD Meta-data Styling
