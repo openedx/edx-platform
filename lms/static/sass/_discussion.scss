@@ -2475,19 +2475,21 @@ body.discussion {
         opacity: 1;
       }
     }  
-    
-.notpinned .icon
-{
-  display: inline-block; 
+
+.notpinned .icon {
+  display: block; 
+  float: left;
+  margin: 3px;
   width: 10px; 
   height: 14px;
   padding-right: 3px;
   background: transparent url('../images/unpinned.png') no-repeat 0 0; 
 }
 
-.pinned .icon
-{
-  display: inline-block; 
+.pinned .icon {
+  display: block; 
+  float: left;
+  margin: 3px;
   width: 10px; 
   height: 14px; 
   padding-right: 3px;
@@ -2526,7 +2528,9 @@ display:none;
     
 .notflagged .icon
 {
-  display: inline-block; 
+  display: block; 
+  float: left;
+  margin: 3px;
   width: 10px; 
   height: 14px;
   padding-right: 3px;
@@ -2535,7 +2539,9 @@ display:none;
 
 .flagged .icon
 {
-  display: inline-block; 
+  display: block; 
+  float: left;
+  margin: 3px;
   width: 10px; 
   height: 14px; 
   padding-right: 3px;
