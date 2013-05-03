@@ -99,11 +99,13 @@ We use [`rake`](http://rake.rubyforge.org/) to execute common tasks in our
 project. The `rake` tasks are defined in the `rakefile`, or you can run `rake -T`
 to view a summary.
 
-Before you run your project, you need to create a sqlite database and create
-tables in that database. Fortunately, `rake` will do it for you! Just run:
+Before you run your project, you need to create a sqlite database, create
+tables in that database, run database migrations, and populate templates for
+CMS templates. Fortunately, `rake` will do all of this for you! Just run:
 
     $ rake django-admin[syncdb]
     $ rake django-admin[migrate]
+    $ rake django-admin[update_templates]
 
 If you are running these commands using the [`zsh`](http://www.zsh.org/) shell,
 zsh will assume that you are doing
