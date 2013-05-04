@@ -434,6 +434,10 @@ body.course.unit {
       background: $lightBluishGrey2;
     }
 
+    .component-edit-menu {
+      background-color: pink;
+    }
+
     .component-editor {
       @include edit-box;
       @include box-shadow(none);
@@ -445,8 +449,6 @@ body.course.unit {
 
       .component-edit-menu {
         @include box-sizing(border-box);
-        position: absolute;
-        width: 100%;
         //padding: 15px;
         top: 0;
         right: 0;
@@ -494,40 +496,39 @@ body.course.unit {
 
         .settings-row {
           // general row sizing stuff
-          width: 100%;
+          background-color: $white;
           padding: 10px;
-          border-bottom: 1px solid $gray;
+          border-bottom: 1px solid $gray-l4;
 
-          //SettingsLabel
-          li > label {
-            //Text all aligned left
-            display: inline-block;
-            //this sets height of .settings-row to allow for long help strings. 
+          .setting-label {
+            font-weight: normal;  
+            display: inline;
+            position: relative;
+            left: 0;
+            width: 200px;
           }
 
-          //SettingsInput
-          li > input, li > select {
+          .setting-input {
             @include placeholder($gray-l4);
             @include font-size(16);
             @include size(100%,100%);
-            width: 100px;
+            width: 200px;
             height: auto;
             //TO-DO
 
-            &:focus {
+            //&:focus {
               //TO-DO
-            }
           }
 
-          //SettingsClear
-          li > button {
-            border-radius: 20px; //maybe a % calc from input box height
+          .setting-clear {
+            border-radius: 50%;
             margin-left: 15px;
           }
 
           //SettingsHelp
-          li > span {
-            //Text all aligned left
+          .setting-help {
+            @include font-size(14);
+            font-color: $gray-l6;
           }
 
         }
@@ -561,9 +562,17 @@ body.course.unit {
         font-weight: 700;
       }
 
-      .save-button {
-        margin-top: 10px;
+      // Module Actions
+      // ====================
+
+      .module-actions {
+        padding: 0 0 10px 10px;
+        box-shadow: 0 2px 1px rgba(182, 182, 182, 0.75) inset;
+        background-color: $gray-l4;
+
+        .save-button {
         margin: 15px 8px 0 0;
+        }
       }
     }
   }

@@ -22,24 +22,24 @@
 		  		<!--% for type in sorted(something.keys()):-->
 		  		<!--is-set class applied when user sets value-->
 		  		<li class="settings-row is-set">
-		  			<label for="inputVariableHere">Setting Display Name Goes Here</label>
-		  			<input type="type1" id="firstname"/> 
+		  			<label class="setting-label" for="inputVariableHere">Setting 1</label>
+		  			<input class="setting-input" type="type1" id="firstname"/> 
 		  			<!--button clickable if is-set -->
-		  			<button type="button" name="setting-clear" value="Clear" class="setting-clear " data-tooltip="Clear">
+		  			<button class="setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
 		  			</button>
-		  			<span class="settings-help">helpstring</span>
+		  			<span class="setting-help">helpstring</span>
 		  		</li>
 		  		<!--% showing second example mostly to see is-set style difference -->
 		  		<li class="settings-row">
-		  			<label for="setting-name-as-id">Setting Display Name Goes Here</label>
-		  			<input type="type2" id="firstname"/> 
-		  			<span class="settings-help">helpstring</span>
+		  			<label class="setting-label" for="setting-name-as-id">Setting 2</label>
+		  			<input class="setting-input" type="type2" id="firstname"/> 
+		  			<span class="setting-help">helpstring</span>
 		  		
 		  		<!--% showing dropdown example -->
 		  		<li class="settings-row">
-		  			<label for="setting-name-as-id">Setting Display Name Goes Here</label>
-		  			<select name="type">
+		  			<label class="setting-label" for="setting-name-as-id">Setting Display Name Goes Here</label>
+		  			<select class="setting-input" name="type">
 		  				<!--% for all in available options -->
 						<option value="displayName1" selected>Closed</option>
 						<!--in case value already defaulted --> 
@@ -47,7 +47,7 @@
 						<option value="displayName3">Open</option>
 						<option value="displayName4">Available</option>
 					</select> 
-		  			<span class="settings-help">helpstring</span>
+		  			<span class="setting-help">helpstring</span>
 		  		</li>
 		  		
 		  	</ul> <!-- Settings Wrapper-->
