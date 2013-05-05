@@ -434,10 +434,6 @@ body.course.unit {
       background: $lightBluishGrey2;
     }
 
-    .component-edit-menu {
-      background-color: pink;
-    }
-
     .component-editor {
       @include edit-box;
       @include box-shadow(none);
@@ -449,40 +445,50 @@ body.course.unit {
 
       .component-edit-menu {
         @include box-sizing(border-box);
-        //padding: 15px;
+        padding: 15px;
         top: 0;
         right: 0;
-        border-bottom: 1px solid $lightBluishGrey2;
-        box-shadow: 0 2px 1px rgba(182, 182, 182, 0.75) inset;
-        background-color: $white;
+        border-bottom: 1px solid $gray-l2;
+        background-color: $lightBluishGrey2;
+        box-shadow: 0 1px 2px rgba(182, 182, 182, 0.75) inset;
 
         //Component Name
-        h4 {
-          //TO-DO 
-          //determine proper h-level
+        .component-name {
+          width: 50%;
+          @include font-size(14);
+
+          em {
+            font-weight: 700;
+          }
         }
 
         //Nav-Edit Modes
         .nav-edit-modes {
           list-style: none;
+          right: 0;
+          top: 0;
+          position: absolute;
+          padding: 10px;
 
-          li {
-            //TO-DO
-            //inherit button styling
-            float: right;
-            //no idea what it currently inherits...
+          .mode {
+            display: inline-block;
 
-            &:hover {
-              //TO-DO
-              //opacity change
+            .inactive-mode {
+              display: none;
             }
 
-            &.is-active {
-              //TO-DO
-              //inherit button styling
+            .active-mode {
+              @include white-button;
+
+              &.is-set {
+                background-color: $lightBluishGrey2;
+                cursor: default;
+                linear-gradient: none;
+                @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .6) inset);
+
+              }
             }
           }
-
         }
       }
 
@@ -493,17 +499,37 @@ body.course.unit {
 
       // Settings Wrapper
       .settings-wrapper{
-        //doverflow-y: scroll;
+        overflow: auto;
+        max-height: 400px;
+        //TO-DO browser testing for scrollbar, especially styles below. 
+
+        &::-webkit-scrollbar {
+          -webkit-appearance: none;
+          width: 11px;
+          height: 11px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          border-radius: 8px;
+          border: 2px solid $lightBluishGrey2;
+          background-color: rgba(0, 0, 0, .5);
+        }
 
         .settings-row {
           // general row sizing stuff
-          background-color: $lightBluishGrey2;
+          background-color: $white;
           padding: 10px;
           border-bottom: 1px solid $gray-l2;
-          opacity: .8;
+          opacity: .6;
 
           &:hover {
             opacity: 1;
+          }
+
+          &.is-set {
+            opacity: .9;
+            background-color: $white;
+            font-weight: 200;
           }
 
           .setting-label {
@@ -512,6 +538,7 @@ body.course.unit {
             padding-left: 15px;
             position: relative;
             left: 0;
+            height: 50%;
             width: 100px;
           }
 
@@ -533,11 +560,6 @@ body.course.unit {
 
             &:active {
               background-color: #FFFCF1;
-            }
-
-            option {
-              line-height: 16px;
-
             }
           }
 
@@ -570,7 +592,7 @@ body.course.unit {
             @include font-size(12);
             font-color: $gray-l6;
             padding-left: 20px;
-            max-width: 50%;
+            max-width: 40%;
           }
 
         }

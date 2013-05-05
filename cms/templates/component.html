@@ -1,21 +1,24 @@
 <div class="wrapper wrapper-component-editor">
 	<div class="component-editor">
-  		<div id="component-edit-menu">
-  			<h3 class="component-name">Viewing: Name of Component</h3>
+  		<div class="component-edit-menu">
+  			<span class="component-name"><em>Editing:</em> Name of Component</span>
   			<!--should this be a menubar/menu/tabbar instead of list? -->
   	  		<ul class="nav-edit-modes">
-  	  			<li id="editor-mode" class="mode is-active" aria-controls="editor-tab" aria-selected="true" role="tab" tabindex="0">
-  	  				<a href="#" class="button cancel-button">Editor</a>
+  	  			<li id="editor-mode" class="mode" aria-controls="editor-tab" aria-selected="true" role="tab" tabindex="0">
+  	  				<a href="#" class="active-mode is-set">Editor</a>
 	  			</li>
 	  			<li id="settings-mode" class="mode" aria-controls="settings-tab" aria-selected="false" role="tab" tabindex="-1">
-	  				<a href="#" class="button cancel-button">Settings </a>
+	  				<a href="#" class="inactive-mode">Compiler </a>
+	  			</li>
+	  			<li id="settings-mode" class="mode" aria-controls="settings-tab" aria-selected="false" role="tab" tabindex="-1">
+	  				<a href="#" class="active-mode">Settings </a>
 	  			</li>
 	  		</ul>
 		</div> <!-- Editor Header -->
 
 		<div class="component-edit-modes">
 			<div class="module-editor editor-wrapper" id="editor-tab">
-				${editor}
+				<!--${editor} -->
 				<!-- no longer are settings imported from metadata-edit.hmtl, ideally? -->
 			</div> <!-- Editor Wrapper-->
 			<ul class="settings-wrapper" id="settings-tab">
@@ -37,7 +40,7 @@
 		  			<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
 		  			</button>
-		  			<span class="setting-help">helpstring helpstringhelpstringhelpstringhelpstringhel pstringhelpstringh elpstringhelpstrin sghelp stringhelp stringhelpstringhe lpstring helpstringhelpstringhelpstring</span>
+		  			<span class="setting-help">This is a more reasonable helpstring sentence that would alos wrap around. A second sentence in some cases may be necessary.</span>
 		  		
 		  		<!--% showing dropdown example -->
 		  		<li class="settings-row">
