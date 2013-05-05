@@ -453,7 +453,8 @@ body.course.unit {
         top: 0;
         right: 0;
         border-bottom: 1px solid $lightBluishGrey2;
-        background: $gray-l4;
+        box-shadow: 0 2px 1px rgba(182, 182, 182, 0.75) inset;
+        background-color: $white;
 
         //Component Name
         h4 {
@@ -492,43 +493,84 @@ body.course.unit {
 
       // Settings Wrapper
       .settings-wrapper{
-        //TO-DO 
+        //doverflow-y: scroll;
 
         .settings-row {
           // general row sizing stuff
-          background-color: $white;
+          background-color: $lightBluishGrey2;
           padding: 10px;
-          border-bottom: 1px solid $gray-l4;
+          border-bottom: 1px solid $gray-l2;
+          opacity: .8;
+
+          &:hover {
+            opacity: 1;
+          }
 
           .setting-label {
             font-weight: normal;  
-            display: inline;
+            display: inline-block;
+            padding-left: 15px;
             position: relative;
             left: 0;
-            width: 200px;
+            width: 100px;
           }
 
           .setting-input {
             @include placeholder($gray-l4);
-            @include font-size(16);
-            @include size(100%,100%);
+            border-radius: 2px;
             width: 200px;
             height: auto;
-            //TO-DO
+            border: 1px solid $gray-l2;
 
             //&:focus {
               //TO-DO
           }
 
+          select {
+            border: 1px solid $gray-l4;
+            background: none repeat scroll #F2F2F2;
+            padding: 5px;
+
+            &:active {
+              background-color: #FFFCF1;
+            }
+
+            option {
+              line-height: 16px;
+
+            }
+          }
+
           .setting-clear {
+            @include font-size(11);
+            color: $gray;
+            width: 25px;
+            height: 25px;
+            vertical-align: middle;
+            padding: 5px;
             border-radius: 50%;
-            margin-left: 15px;
+            margin-left: 10px;
+            box-shadow: none;
+            text-shadow: none;
+            border: 1px solid $gray-l4;
+
+            &:hover {
+              background-color: $blue-s3;
+              color: $white;
+            }
+
+            &.inactive {
+              visibility: hidden;
+            }
           }
 
           //SettingsHelp
           .setting-help {
-            @include font-size(14);
+            display: inline-block;
+            @include font-size(12);
             font-color: $gray-l6;
+            padding-left: 20px;
+            max-width: 50%;
           }
 
         }

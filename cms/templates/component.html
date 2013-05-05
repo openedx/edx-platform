@@ -4,10 +4,10 @@
   			<h3 class="component-name">Viewing: Name of Component</h3>
   			<!--should this be a menubar/menu/tabbar instead of list? -->
   	  		<ul class="nav-edit-modes">
-  	  			<li id="editor-mode" class="tab is-active" aria-controls="editor-tab" aria-selected="true" role="tab" tabindex="0">
+  	  			<li id="editor-mode" class="mode is-active" aria-controls="editor-tab" aria-selected="true" role="tab" tabindex="0">
   	  				<a href="#" class="button cancel-button">Editor</a>
 	  			</li>
-	  			<li id="settings-mode" class="tab" aria-controls="settings-tab" aria-selected="false" role="tab" tabindex="-1">
+	  			<li id="settings-mode" class="mode" aria-controls="settings-tab" aria-selected="false" role="tab" tabindex="-1">
 	  				<a href="#" class="button cancel-button">Settings </a>
 	  			</li>
 	  		</ul>
@@ -23,7 +23,7 @@
 		  		<!--is-set class applied when user sets value-->
 		  		<li class="settings-row is-set">
 		  			<label class="setting-label" for="inputVariableHere">Setting 1</label>
-		  			<input class="setting-input" type="type1" id="firstname"/> 
+		  			<input class="setting-input" type="text" id="firstname"/> 
 		  			<!--button clickable if is-set -->
 		  			<button class="setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
@@ -33,12 +33,15 @@
 		  		<!--% showing second example mostly to see is-set style difference -->
 		  		<li class="settings-row">
 		  			<label class="setting-label" for="setting-name-as-id">Setting 2</label>
-		  			<input class="setting-input" type="type2" id="firstname"/> 
-		  			<span class="setting-help">helpstring</span>
+		  			<input class="setting-input" type="text" id="firstname"/> 
+		  			<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+		  			</button>
+		  			<span class="setting-help">helpstring helpstringhelpstringhelpstringhelpstringhel pstringhelpstringh elpstringhelpstrin sghelp stringhelp stringhelpstringhe lpstring helpstringhelpstringhelpstring</span>
 		  		
 		  		<!--% showing dropdown example -->
 		  		<li class="settings-row">
-		  			<label class="setting-label" for="setting-name-as-id">Setting Display Name Goes Here</label>
+		  			<label class="setting-label" for="setting-name-as-id">Setting Display </label>
 		  			<select class="setting-input" name="type">
 		  				<!--% for all in available options -->
 						<option value="displayName1" selected>Closed</option>
@@ -47,6 +50,9 @@
 						<option value="displayName3">Open</option>
 						<option value="displayName4">Available</option>
 					</select> 
+					<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+		  			</button>
 		  			<span class="setting-help">helpstring</span>
 		  		</li>
 		  		
