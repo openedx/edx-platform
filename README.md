@@ -1,6 +1,6 @@
 This is edX, a platform for online higher education. The project is primarily
 written in [Python](http://python.org/), using the
-[Django](https://www.djangoproject.com/) framework. We also use some 
+[Django](https://www.djangoproject.com/) framework. We also use some
 [Ruby](http://www.ruby-lang.org/) and some [NodeJS](http://nodejs.org/).
 
 Installation
@@ -77,6 +77,7 @@ environment), and Node has a library installer called
 Once you've got your languages and virtual environments set up, install
 the libraries like so:
 
+    $ pip install -r pre-requirements.txt
     $ pip install -r requirements.txt
     $ bundle install
     $ npm install
