@@ -49,7 +49,6 @@ class TestGradebook(ModuleStoreTestCase):
         ]
 
         for user in self.users:
-            UserProfileFactory.create(user=user)
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
         for i in xrange(USER_COUNT-1):
