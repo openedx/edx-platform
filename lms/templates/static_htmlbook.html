@@ -31,11 +31,14 @@
             anchorToLoad = options.anchor_id;
         }
 
-        var onComplete = function(url) {
-            return function() {
-                $('#viewerContainer').trigger('notes:init', [url]);
-            }
-        };
+        var onComplete = function() {};
+        if(options.notesEnabled) {
+            onComplete = function(url) {
+                return function() {
+                    $('#viewerContainer').trigger('notes:init', [url]);
+                }
+            };
+        }
 
         loadUrl = function htmlViewLoadUrl(url, anchorId) {
             // clear out previous load, if any:
@@ -100,6 +103,11 @@
         %endif
         %if anchor_id is not UNDEFINED and anchor_id is not None:
             options.anchor_id = ${anchor_id};
+        %endif
+
+        options.notesEnabled = false;
+        %if notes_enabled is not UNDEFINED and notes_enabled:
+            options.notesEnabled = true;
         %endif
 
         $('#outerContainer').myHTMLViewer(options);

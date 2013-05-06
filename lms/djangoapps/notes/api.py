@@ -2,6 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.core.exceptions import ValidationError
 from notes.models import Note
+from notes.utils import notes_enabled_for_course
+from courseware.courses import get_course_with_access
 import json
 import logging
 
@@ -34,6 +36,11 @@ def api_request(request, course_id, **kwargs):
         Raises a 404 if the resource type doesn't exist, or if there is no action 
             method associated with the HTTP method.
     '''
+    course = get_course_with_access(request.user, course_id, 'load')
+    if not notes_enabled_for_course(course):
+        log.debug('Notes not enabled for course')
+        raise Http404
+
     resource_map = api_resource_map()
     resource_name = kwargs.pop('resource')
     resource = resource_map.get(resource_name)
