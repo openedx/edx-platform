@@ -6,28 +6,33 @@
   <footer>
     <div class="colophon">
       <nav class="nav-colophon">
-        <ol>
+      <ol>
           <li class="nav-colophon-01">
-            <a href="${reverse('about_edx')}">About</a>
+          <a href="${marketing_link('ABOUT')}">
+              About
+          </a>
           </li>
           <li class="nav-colophon-02">
-            <a href="${reverse('jobs')}">Jobs</a>
+          <a href="${marketing_link('JOBS')}">
+              Jobs
+          </a>
           </li>
           <li class="nav-colophon-03">
-            <a href="#">Press</a>
+          <a href="${marketing_link('PRESS')}">
+              Press
+          </a>
           </li>
           <li class="nav-colophon-04">
-            <a href="#">FAQ</a>
+          <a href="${marketing_link('FAQ')}">
+              FAQ
+          </a>
           </li>
           <li class="nav-colophon-05">
-            <a href="${reverse('contact')}">Contact</a>
+          <a href="${marketing_link('CONTACT')}">
+              Contact
+          </a>
           </li>
-          % if user.is_authenticated():
-          <li class="nav-colophon-06">
-            <a href="#">Help</a>
-          </li>
-          % endif
-        </ol>
+      </ol>
       </nav>
 
       <div class="colophon-about">

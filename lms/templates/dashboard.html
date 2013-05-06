@@ -328,7 +328,9 @@
     % else:
       <section class="empty-dashboard-message">
         <p>Looks like you haven't registered for any courses yet.</p>
-        <a href="${reverse('courses')}">Find courses now!</a>
+        <a href="${marketing_link('COURSES')}">
+            Find courses now!
+        </a>
       </section>
     % endif
 

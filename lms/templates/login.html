@@ -152,10 +152,14 @@
 
     <div class="cta cta-help">
       <h3>Not Enrolled?</h3>
-      <p><a href="#">Sign up for edX today!</a></p>
+      <p><a href="${reverse('register_user')}">Sign up for edX today!</a></p>
 
       <h3>Need Help?</h3>
-      <p>Looking for help in logging in or with your edX account? <a href="#">View our help section for answers to commonly asked questions</a></p>
+      <p>Looking for help in logging in or with your edX account?
+      <a href="${marketing_link('FAQ')}">
+          View our help section for answers to commonly asked questions.
+      </a></p>
+
     </div>
   </aside>
   </section>

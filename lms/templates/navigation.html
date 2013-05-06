@@ -38,7 +38,11 @@ site_status_msg = get_site_status_msg(course_id)
   <header class="global" aria-label="Global Navigation">
 % endif
   <nav>
-  <h1 class="logo"><a href="${reverse('root')}"><img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/></a></h1>
+
+  <h1 class="logo">
+      <a href="${marketing_link('ROOT')}">
+        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/>
+      </a></h1>
 
     % if course:
       <h2><span class="provider">${course.org}:</span> ${course.number} ${course.display_name_with_default}</h2>
@@ -48,11 +52,7 @@ site_status_msg = get_site_status_msg(course_id)
 
     <ol class="left nav-global authenticated">
       <li class="nav-global-01">
-        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-            <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('COURSES')}">Find Courses</a>
-        % else:
-            <a href="${reverse('courses')}">Find Courses</a>
-        % endif
+      <a href="${marketing_link('COURSES')}">Find Courses</a>
       </li>
     </ol>
     <ol class="user">
@@ -65,7 +65,10 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="#" class="dropdown">&#9662</a>
         <ul class="dropdown-menu">
-          <li><a href="${reverse('help_edx')}">Help</a></li>
+            <li>
+            <a href="${marketing_link('FAQ')}">
+            Help
+          </a></li>
           <li><a href="${reverse('logout')}">Log Out</a></li>
         </ul>
       </li>
@@ -75,13 +78,13 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="left nav-global">
       % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
       <li class="nav-global-01">
-        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('HOW_IT_WORKS')}">How it Works</a>
+        <a href="${marketing_link('HOW_IT_WORKS')}">How it Works</a>
       </li>
       <li class="nav-global-02">
-        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('COURSES')}">Courses</a>
+        <a href="marketing_link('COURSES')}">Courses</a>
       </li>
       <li class="nav-global-03">
-        <a href="${settings.MKTG_URLS.get('ROOT')}${settings.MKTG_URLS.get('SCHOOLS')}">Schools</a>
+        <a href="${marketing_link('SCHOOLS')}">Schools</a>
       </li>
       % endif
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:

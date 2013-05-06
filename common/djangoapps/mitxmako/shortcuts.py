@@ -17,6 +17,30 @@ from django.http import HttpResponse
 
 from . import middleware
 from django.conf import settings
+from django.core.urlresolvers import reverse
+
+
+def marketing_link(name):
+    """Returns the correct URL for a link to the marketing site
+    depending on if the marketing site is enabled
+
+    Since the marketing site is enabled by a setting, we have two
+    possible URLs for certain links. This function is to decides
+    which URL should be provided.
+    """
+
+    # link_map maps URLs from the marketing site to the old equivalent on
+    # the Django site
+    link_map = settings.MKTG_URL_LINK_MAP
+    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+        # special case for when we only want the root marketing URL
+        if name == 'ROOT':
+            return settings.MKTG_URLS.get('ROOT')
+        return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
+    elif name in link_map:
+        return reverse(link_map[name])
+    else:
+        return '#'
 
 
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
@@ -27,6 +51,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_dictionary = {}
     context_instance['settings'] = settings
     context_instance['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
+    context_instance['marketing_link'] = marketing_link
 
     # In various testing contexts, there might not be a current request context.
     if middleware.requestcontext is not None:

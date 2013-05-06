@@ -387,7 +387,7 @@ def change_enrollment(request):
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
 
-    return render_to_response('accounts_login.html', {'error': error})
+    return render_to_response('login.html', {'error': error})
 
 
 # Need different levels of logging
