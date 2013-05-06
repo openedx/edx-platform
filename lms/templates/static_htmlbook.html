@@ -98,7 +98,7 @@
         %if chapter is not None:
             options.chapterNum = ${chapter};
         %endif
-        %if anchor_id is not None:
+        %if anchor_id is not UNDEFINED and anchor_id is not None:
             options.anchor_id = ${anchor_id};
         %endif
 
