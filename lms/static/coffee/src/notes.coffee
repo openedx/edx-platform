@@ -1,5 +1,5 @@
 class StudentNotes
-    _debug: true
+    _debug: false
 
     targets: [] # holds elements with annotator() instances
 
