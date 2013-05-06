@@ -28,11 +28,8 @@ def marketing_link(name):
     possible URLs for certain links. This function is to decides
     which URL should be provided.
     """
-    link_map = {'ABOUT': 'about_edx',
-                'CONTACT': 'contact',
-                'FAQ': 'help_edx',
-                'COURSES': 'courses'}
 
+    link_map = settings.MKTG_URLS.get('LINK_MAP')
     if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
         return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
     elif name in link_map:

@@ -595,3 +595,7 @@ MKTG_URLS = {'ROOT': '',
              'CONTACT': '/contact',
              'HOW_IT_WORKS': '/how-it-works',
              'SCHOOLS': '/schools'}
+MKTG_URLS['LINK_MAP'] = {'ABOUT': 'about_edx',
+                         'CONTACT': 'contact',
+                         'FAQ': 'help_edx',
+                         'COURSES': 'courses'}
