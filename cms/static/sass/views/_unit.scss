@@ -481,10 +481,10 @@ body.course.unit {
               @include white-button;
 
               &.is-set {
-                background-color: $lightBluishGrey2;
+                background-color: $white;
                 cursor: default;
                 linear-gradient: none;
-                @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .6) inset);
+                @include box-shadow(0 0 1px 1px rgba(240, 240, 240, .1) inset);
 
               }
             }
@@ -518,24 +518,22 @@ body.course.unit {
         .settings-row {
           // general row sizing stuff
           background-color: $white;
-          padding: 10px;
+          padding: 10px 20px;
           border-bottom: 1px solid $gray-l2;
-          opacity: .6;
+          opacity: .8;
 
           &:hover {
             opacity: 1;
           }
 
           &.is-set {
-            opacity: .9;
+            opacity: 1;
             background-color: $white;
             font-weight: 200;
           }
 
           .setting-label {
-            font-weight: normal;  
-            display: inline-block;
-            padding-left: 15px;
+            font-weight: 500;
             position: relative;
             left: 0;
             height: 50%;
@@ -545,6 +543,7 @@ body.course.unit {
           .setting-input {
             @include placeholder($gray-l4);
             border-radius: 2px;
+            padding: 6px 8px 8px;
             width: 200px;
             height: auto;
             border: 1px solid $gray-l2;
@@ -578,7 +577,9 @@ body.course.unit {
 
             &:hover {
               background-color: $blue-s3;
+              border: 1px solid $blue-s3;
               color: $white;
+              @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15));
             }
 
             &.inactive {
@@ -588,11 +589,12 @@ body.course.unit {
 
           //SettingsHelp
           .setting-help {
+            @include clearfix;
             display: inline-block;
             @include font-size(12);
             font-color: $gray-l6;
             padding-left: 20px;
-            max-width: 40%;
+            width: 65%;
           }
 
         }
@@ -632,7 +634,7 @@ body.course.unit {
       .module-actions {
         padding: 0 0 10px 10px;
         box-shadow: 0 2px 1px rgba(182, 182, 182, 0.75) inset;
-        background-color: $gray-l4;
+        background-color: $gray-l6;
 
         .save-button {
         margin: 15px 8px 0 0;

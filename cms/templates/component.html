@@ -25,8 +25,8 @@
 		  		<!--% for type in sorted(something.keys()):-->
 		  		<!--is-set class applied when user sets value-->
 		  		<li class="settings-row is-set">
-		  			<label class="setting-label" for="inputVariableHere">Setting 1</label>
-		  			<input class="setting-input" type="text" id="firstname"/> 
+		  			<label class="setting-label" for="setting-id-1">Setting 1</label>
+		  			<input class="setting-input" type="text" id="setting-id-1"/> 
 		  			<!--button clickable if is-set -->
 		  			<button class="setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
@@ -35,17 +35,17 @@
 		  		</li>
 		  		<!--% showing second example mostly to see is-set style difference -->
 		  		<li class="settings-row">
-		  			<label class="setting-label" for="setting-name-as-id">Setting 2</label>
-		  			<input class="setting-input" type="text" id="firstname"/> 
+		  			<label class="setting-label" for="setting-id-2">Setting 2</label>
+		  			<input class="setting-input" type="text" id="setting-id-2"/> 
 		  			<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
 		  			</button>
-		  			<span class="setting-help">This is a more reasonable helpstring sentence that would alos wrap around. A second sentence in some cases may be necessary.</span>
+		  			<div class="setting-help">This is a more reasonable helpstring sentence that would alos wrap around. A second sentence in some cases may be necessary.</div>
 		  		
 		  		<!--% showing dropdown example -->
 		  		<li class="settings-row">
-		  			<label class="setting-label" for="setting-name-as-id">Setting Display </label>
-		  			<select class="setting-input" name="type">
+		  			<label class="setting-label" for="setting-id-3">Setting Display </label>
+		  			<select class="setting-input" id="setting-id-3" name="type">
 		  				<!--% for all in available options -->
 						<option value="displayName1" selected>Closed</option>
 						<!--in case value already defaulted --> 
