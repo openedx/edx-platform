@@ -118,7 +118,7 @@ you're running `rake "django-admin[syncdb]"`.
 Run Your Project
 ----------------
 edX has two components: Studio, the course authoring system; and the LMS
-(leaning management system) used by students. These two systems communicate
+(learning management system) used by students. These two systems communicate
 through the MongoDB database, which stores course information.
 
 To run Studio, run:
