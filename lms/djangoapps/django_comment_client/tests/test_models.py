@@ -1,5 +1,5 @@
-import django_comment_client.models as models
-import django_comment_common.permissions as permissions
+import django_comment_common.models as models
+import django_comment_client.permissions as permissions
 from django.test import TestCase
 
 
