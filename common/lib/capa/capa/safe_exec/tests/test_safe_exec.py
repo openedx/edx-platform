@@ -2,6 +2,7 @@
 
 import os.path
 import random
+import textwrap
 import unittest
 
 from capa.safe_exec import safe_exec
@@ -141,3 +142,71 @@ class TestSafeExecCaching(unittest.TestCase):
         cache[cache.keys()[0]] = (None, {'a': 17})
         safe_exec(code, g, cache=DictCache(cache))
         self.assertEqual(g['a'], 17)
+
+
+class TestRealProblems(unittest.TestCase):
+    def test_802x(self):
+        code = textwrap.dedent("""\
+            import math
+            import random
+            import numpy
+            e=1.602e-19 #C
+            me=9.1e-31  #kg
+            mp=1.672e-27 #kg
+            eps0=8.854e-12 #SI units
+            mu0=4e-7*math.pi #SI units
+
+            Rd1=random.randrange(1,30,1)
+            Rd2=random.randrange(30,50,1)
+            Rd3=random.randrange(50,70,1)
+            Rd4=random.randrange(70,100,1)
+            Rd5=random.randrange(100,120,1)
+
+            Vd1=random.randrange(1,20,1)
+            Vd2=random.randrange(20,40,1)
+            Vd3=random.randrange(40,60,1)
+
+            #R=[0,10,30,50,70,100] #Ohm
+            #V=[0,12,24,36] # Volt
+
+            R=[0,Rd1,Rd2,Rd3,Rd4,Rd5] #Ohms
+            V=[0,Vd1,Vd2,Vd3] #Volts
+            #here the currents IL and IR are defined as in figure ps3_p3_fig2
+            a=numpy.array([  [  R[1]+R[4]+R[5],R[4] ],[R[4], R[2]+R[3]+R[4] ] ])
+            b=numpy.array([V[1]-V[2],-V[3]-V[2]])
+            x=numpy.linalg.solve(a,b)
+            IL='%.2e' % x[0]
+            IR='%.2e' % x[1]
+            ILR='%.2e' % (x[0]+x[1])
+            def sign(x):
+                return abs(x)/x
+
+            RW="Rightwards"
+            LW="Leftwards"
+            UW="Upwards"
+            DW="Downwards"
+            I1='%.2e' % abs(x[0])
+            I1d=LW if sign(x[0])==1 else RW
+            I1not=LW if I1d==RW else RW
+            I2='%.2e' % abs(x[1])
+            I2d=RW if sign(x[1])==1 else LW
+            I2not=LW if I2d==RW else RW
+            I3='%.2e' % abs(x[1])
+            I3d=DW if sign(x[1])==1 else UW
+            I3not=DW if I3d==UW else UW
+            I4='%.2e' % abs(x[0]+x[1])
+            I4d=UW if sign(x[1]+x[0])==1 else DW
+            I4not=DW if I4d==UW else UW
+            I5='%.2e' % abs(x[0])
+            I5d=RW if sign(x[0])==1 else LW
+            I5not=LW if I5d==RW else RW
+            VAP=-x[0]*R[1]-(x[0]+x[1])*R[4]
+            VPN=-V[2]
+            VGD=+V[1]-x[0]*R[1]+V[3]+x[1]*R[2]
+            aVAP='%.2e' % VAP
+            aVPN='%.2e' % VPN
+            aVGD='%.2e' % VGD
+            """)
+        g = {}
+        safe_exec(code, g)
+        self.assertIn("aVAP", g)
