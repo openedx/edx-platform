@@ -1,4 +1,4 @@
 # Ignore .js files in this folder as they are compiled from coffeescript
 # For each of the xmodules subdirectories, add a .gitignore file that
-# will cover any .coffee -> .js files that get compiled.
+# will version any *.js file that is specifically written, not compiled.
 *.js
