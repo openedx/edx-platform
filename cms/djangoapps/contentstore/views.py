@@ -64,6 +64,8 @@ from contentstore.utils import get_modulestore
 from django.shortcuts import redirect
 from models.settings.course_metadata import CourseMetadata
 
+from django_comment_common.utils import seed_permissions_roles
+
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
 log = logging.getLogger(__name__)
@@ -1502,6 +1504,9 @@ def create_new_course(request):
     initialize_course_tabs(new_course)
 
     create_all_course_groups(request.user, new_course.location)
+
+    # seed the forums
+    seed_permissions_roles(new_course.location.course_id)
 
     return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
