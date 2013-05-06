@@ -9,7 +9,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import Group
 
 from django.core.urlresolvers import reverse
-from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, \
+from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, \
     FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT
 from django_comment_client.utils import has_forum_access
 
