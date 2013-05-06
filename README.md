@@ -56,7 +56,7 @@ into an isolated environment, only projects that live inside the environment
 will be able to see and use those libraries. Incompatible dependencies? Use
 different virtual environments, and your problem is solved.
 
-Once again, each language has a different implementation. Python has
+Remember, each language has a different implementation. Python has
 [`virtualenv`](http://www.virtualenv.org/), Ruby has
 [`bundler`](http://gembundler.com/), and Node's virtual environment support
 is built into [`npm`](https://npmjs.org/), its library management tool.
