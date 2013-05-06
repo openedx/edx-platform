@@ -1,0 +1,39 @@
+<%namespace name='static' file='static_content.html'/>
+<!DOCTYPE html>
+<html>
+<head>
+  <%block name="title"></%block>
+
+  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
+  <meta name="path_prefix" content="${MITX_ROOT_URL}" />
+  <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
+
+  <%static:css group='application'/>
+  <%static:js group='main_vendor'/>
+
+  <!--[if IE]>
+    <script src="${static.url('js/html5shiv.js')}"></script>
+  <![endif]-->
+
+  <!--[if lte IE 9]>
+    <%static:css group='ie-fixes'/>
+  <![endif]-->
+
+  <%block name="headextra"/>
+
+  % if not course:
+  <%include file="google_analytics.html" />
+  % endif
+</head>
+
+<body class="<%block name='bodyclass'></%block>">
+
+  <!-- view -->
+  <div class="wrapper wrapper-view">
+
+    <%block name="content"></%block>
+  </div>
+
+  <%block name="js_extra"></%block>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<%!
+  from django.core.urlresolvers import reverse
+  from courseware.courses import course_image_url, get_course_about_section
+  from courseware.access import has_access
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../mktg_iframe.html" />
+
+<%block name="title"><title>About ${course.number}</title></%block>
+
+<%block name="bodyclass">view-partial-mktgregister</%block>
+
+
+<%block name="headextra">
+  <%include file="../google_analytics.html" />
+</%block>
+
+<%block name="js_extra">
+  % if not registered:
+      %if user.is_authenticated():
+        ## If the user is authenticated, clicking the enroll button just submits a form
+        <script type="text/javascript">
+          (function() {
+            $('.register').click(function(e) {
+              (e).preventDefault();
+              $('#class_enroll_form').submit();
+            });
+
+            $(document).delegate('#class_enroll_form', 'ajax:success', function(data, json, xhr) {
+              if(json.success) {
+                location.href="${reverse('dashboard')}";
+              }else{
+              $('#register_message').html('<p class="inline-error">' + json.error + "</p>");
+              }
+            });
+          })(this)
+        </script>
+      %else:
+        ## If the user is not authenticated, clicking the enroll button pops up the register
+        ## field. We also slip in the registration fields into the login/register fields so
+        ## the user is automatically registered after logging in / registering
+        <script type="text/javascript">
+          (function() {
+           $(".register").click(function() {
+              if ($(".login_form .enroll_fieldset").length === 0) {
+                $(".login_form").append( $(".enroll_fieldset").first().clone() );
+              }
+              if ($(".register_form .enroll_fieldset").length === 0) {
+                $(".register_form").append( $(".enroll_fieldset").first().clone() );
+              }
+            });
+          })(this)
+        </script>
+      %endif
+    %endif
+</%block>
+
+<%block name="content">
+
+  <script src="${static.url('js/course_info.js')}"></script>
+
+
+  <ul class="list-actions register">
+    <li class="item">
+      %if user.is_authenticated():
+        %if registered:
+          <!-- signed in, registered -->
+          <a class="action action-register is-registered" href="${course_target}">Registered for <strong>${course.number}</strong></a>
+        %else:
+        <!-- signed in, not registered -->
+          <a href="" class="action action-register register">Register for ${course.number}</a> <div id="register_message"></div>
+        %endif
+      %else:
+      <!-- not signed in -->
+          <a class="action action-register is-not-signedin" href="${reverse('register_user')}">Register for <strong>${course.number}</strong></a>
+      %endif
+    </li>
+  </ul>
+
+
+%if not registered:
+  <div style="display: none;">
+    <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <fieldset class="enroll_fieldset">
+        <input name="course_id" type="hidden" value="${course.id}">
+        <input name="enrollment_action" type="hidden" value="enroll">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+      </fieldset>
+      <div class="submit">
+
+        <button type="submit" name="class_enroll_form_submit" id="class_enroll_form-submit" value="enroll">Enroll</button>
+
+      </div>
+    </form>
+  </div>
+%endif
+</%block>

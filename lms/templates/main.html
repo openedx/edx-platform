@@ -3,6 +3,15 @@
 <html>
 <head>
   <%block name="title"><title>edX</title></%block>
+  <script type="text/javascript">
+  /* immediately break out of an iframe if coming
+     from the marketing website */
+  (function(window) {
+    if (window.location !== window.top.location) {
+      window.top.location = window.location;
+    }
+  })(this);
+  </script>
 
   <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
 
