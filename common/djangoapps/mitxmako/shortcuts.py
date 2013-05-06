@@ -19,6 +19,7 @@ from . import middleware
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+
 def marketing_link(name):
     """Returns the correct URL for a link to the marketing site
     depending on if the marketing site is enabled
@@ -38,6 +39,7 @@ def marketing_link(name):
         return reverse(link_map[name])
     else:
         return ''
+
 
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_instance = Context(dictionary)

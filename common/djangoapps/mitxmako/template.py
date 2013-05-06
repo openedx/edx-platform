@@ -14,6 +14,7 @@
 
 from django.conf import settings
 from mako.template import Template as MakoTemplate
+from mitxmako.shortcuts import marketing_link
 
 from mitxmako import middleware
 
@@ -37,7 +38,6 @@ class Template(MakoTemplate):
             kwargs.update(overrides)
         super(Template, self).__init__(*args, **kwargs)
 
-
     def render(self, context_instance):
         """
         This takes a render call with a context (from Django) and translates
@@ -55,5 +55,6 @@ class Template(MakoTemplate):
         context_dictionary['settings'] = settings
         context_dictionary['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
         context_dictionary['django_context'] = context_instance
+        context_dictionary['marketing_link'] = marketing_link
 
         return super(Template, self).render_unicode(**context_dictionary)
