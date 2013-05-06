@@ -89,6 +89,16 @@ COMMENTS_SERVICE_URL = ENV_TOKENS.get("COMMENTS_SERVICE_URL", '')
 COMMENTS_SERVICE_KEY = ENV_TOKENS.get("COMMENTS_SERVICE_KEY", '')
 CERT_QUEUE = ENV_TOKENS.get("CERT_QUEUE", 'test-pull')
 
+for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
+    oldvalue = CODE_JAIL.get(name)
+    if isinstance(oldvalue, dict):
+        for subname, subvalue in value.items():
+            oldvalue[subname] = subvalue
+    else:
+        CODE_JAIL[name] = value
+
+COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
+
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 with open(ENV_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
