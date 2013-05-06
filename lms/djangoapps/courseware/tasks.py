@@ -1,36 +1,35 @@
 
 import json
-import logging
+#import logging
 from time import sleep
 from django.contrib.auth.models import User
-import mitxmako.middleware as middleware
-from django.http import HttpResponse
-# from django.http import HttpRequest
 from django.test.client import RequestFactory
 
 from celery import task, current_task
-from celery.result import AsyncResult
+from celery.signals import worker_ready
 from celery.utils.log import get_task_logger
+
+import mitxmako.middleware as middleware
 
 from courseware.models import StudentModule, CourseTaskLog
 from courseware.model_data import ModelDataCache
 from courseware.module_render import get_module
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+#from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 import track.views
 
 
 # define different loggers for use within tasks and on client side
-logger = get_task_logger(__name__)
-log = logging.getLogger(__name__)
+task_log = get_task_logger(__name__)
+# log = logging.getLogger(__name__)
 
 
 @task
 def waitawhile(value):
     for i in range(value):
         sleep(1)  # in seconds
-        logger.info('Waited {0} seconds...'.format(i))
+        task_log.info('Waited {0} seconds...'.format(i))
         current_task.update_state(state='PROGRESS',
                                   meta={'current': i, 'total': value})
 
@@ -41,19 +40,35 @@ def waitawhile(value):
 class UpdateProblemModuleStateError(Exception):
     pass
 
+#def get_module_descriptor(course_id, module_state_key):
+#    """Return module descriptor for requested module, or None if not found."""
+#    try:
+#        module_descriptor = modulestore().get_instance(course_id, module_state_key)
+#    except ItemNotFoundError:
+#        pass
+#    except InvalidLocationError:
+#        pass
+#    return module_descriptor
+#    except ItemNotFoundError:
+#        msg = "Couldn't find problem with that urlname."
+#    except InvalidLocationError:
+#        msg = "Couldn't find problem with that urlname."
+#    if module_descriptor is None:
+#        msg = "Couldn't find problem with that urlname."
+#    if not succeeded:
+#        current_task.update_state(
+#                                  meta={'attempted': num_attempted, 'updated': num_updated, 'total': num_total})
+# The task should still succeed, but should have metadata indicating
+# that the result of the successful task was a failure.  (It's not
+# the queue that failed, but the task put on the queue.)
 
-def _update_problem_module_state(request, course_id, problem_url, student, update_fcn, action_name, filter_fcn):
+
+def _update_problem_module_state(request, course_id, module_state_key, student, update_fcn, action_name, filter_fcn):
     '''
     Performs generic update by visiting StudentModule instances with the update_fcn provided
 
     If student is None, performs update on modules for all students on the specified problem
     '''
-    module_state_key = problem_url
-    # TODO: store this in the task state, not as a separate return value.
-    # (Unless that's not what the task state is intended to mean.  The task can successfully
-    # complete, as far as celery is concerned, but have an internal status of failed.)
-    succeeded = False
-
     # add hack so that mako templates will work on celery worker server:
     # The initialization of Make templating is usually done when Django is 
     # initialize middleware packages as part of processing a server request.
@@ -61,24 +76,11 @@ def _update_problem_module_state(request, course_id, problem_url, student, updat
     # called.  So we look for the result: the defining of the lookup paths
     # for templates.
     if 'main' not in middleware.lookup:
+        task_log.info("Initializing Mako middleware explicitly")
         middleware.MakoMiddleware()
 
-    # find the problem descriptor, if any:
-    try:
-        module_descriptor = modulestore().get_instance(course_id, module_state_key)
-        succeeded = True
-    except ItemNotFoundError:
-        msg = "Couldn't find problem with that urlname."
-    except InvalidLocationError:
-        msg = "Couldn't find problem with that urlname."
-    if module_descriptor is None:
-        msg = "Couldn't find problem with that urlname."
-#    if not succeeded:
-#        current_task.update_state(
-#                                  meta={'attempted': num_attempted, 'updated': num_updated, 'total': num_total})
-# The task should still succeed, but should have metadata indicating
-# that the result of the successful task was a failure.  (It's not
-# the queue that failed, but the task put on the queue.)
+    # find the problem descriptor:
+    module_descriptor = modulestore().get_instance(course_id, module_state_key)
 
     # find the module in question
     succeeded = False
@@ -97,54 +99,67 @@ def _update_problem_module_state(request, course_id, problem_url, student, updat
     num_updated = 0
     num_attempted = 0
     num_total = len(modules_to_update)  # TODO: make this more efficient.  Count()?
+
+    def get_task_progress():
+        progress = {'action_name': action_name,
+                    'attempted': num_attempted,
+                    'updated': num_updated,
+                    'total': num_total,
+                    }
+        return progress
+
+    task_log.info("Starting to process task {0}".format(current_task.request.id))
+
     for module_to_update in modules_to_update:
         num_attempted += 1
-#        try:
+        # There is no try here:  if there's an error, we let it throw, and the task will
+        # be marked as FAILED, with a stack trace.
         if update_fcn(request, module_to_update, module_descriptor):
+            # If the update_fcn returns true, then it performed some kind of work.
             num_updated += 1
-# if there's an error, just let it throw, and the task will
-# be marked as FAILED, with a stack trace.
-#        except UpdateProblemModuleStateError as e:
-            # something bad happened, so exit right away
-#            return (succeeded, e.message)
+
         # update task status:
-        current_task.update_state(state='PROGRESS',
-                                  meta={'attempted': num_attempted, 'updated': num_updated, 'total': num_total})
+        # TODO: decide on the frequency for updating this:
+        #  -- it may not make sense to do so every time through the loop
+        #  -- may depend on each iteration's duration
+        current_task.update_state(state='PROGRESS', meta=get_task_progress())
+        sleep(5)  # in seconds
 
-    # done with looping through all modules, so just return final statistics:
-    if student is not None:
-        if num_attempted == 0:
-            msg = "Unable to find submission to be {action} for student '{student}' and problem '{problem}'."
-        elif num_updated == 0:
-            msg = "Problem failed to be {action} for student '{student}' and problem '{problem}'!"
-        else:
-            succeeded = True
-            msg = "Problem successfully {action} for student '{student}' and problem '{problem}'"
-    elif num_attempted == 0:
-        msg = "Unable to find any students with submissions to be {action} for problem '{problem}'."
-    elif num_updated == 0:
-        msg = "Problem failed to be {action} for any of {attempted} students for problem '{problem}'!"
-    elif num_updated == num_attempted:
-        succeeded = True
-        msg = "Problem successfully {action} for {attempted} students for problem '{problem}'!"
-    elif num_updated < num_attempted:
-        msg = "Problem {action} for {updated} of {attempted} students for problem '{problem}'!"
+    # Done with looping through all modules, so just return final statistics:
+    # TODO: these messages should be rendered at the view level -- move them there!
+#    if student is not None:
+#        if num_attempted == 0:
+#            msg = "Unable to find submission to be {action} for student '{student}' and problem '{problem}'."
+#        elif num_updated == 0:
+#            msg = "Problem failed to be {action} for student '{student}' and problem '{problem}'!"
+#        else:
+#            succeeded = True
+#            msg = "Problem successfully {action} for student '{student}' and problem '{problem}'"
+#    elif num_attempted == 0:
+#        msg = "Unable to find any students with submissions to be {action} for problem '{problem}'."
+#    elif num_updated == 0:
+#        msg = "Problem failed to be {action} for any of {attempted} students for problem '{problem}'!"
+#    elif num_updated == num_attempted:
+#        succeeded = True
+#        msg = "Problem successfully {action} for {attempted} students for problem '{problem}'!"
+#    elif num_updated < num_attempted:
+#        msg = "Problem {action} for {updated} of {attempted} students for problem '{problem}'!"
+#
+#    # Update status in task result object itself:
+#    msg = msg.format(action=action_name, updated=num_updated, attempted=num_attempted, student=student, problem=module_state_key)
+    task_progress = get_task_progress() #  succeeded=succeeded, message=msg)
+    current_task.update_state(state='PROGRESS', meta=task_progress)
 
-    msg = msg.format(action=action_name, updated=num_updated, attempted=num_attempted, student=student, problem=module_state_key)
-    # update status in task result object itself:
-    current_task.update_state(state='DONE',
-                              meta={'attempted': num_attempted, 'updated': num_updated, 'total': num_total,
-                                    'succeeded': succeeded, 'message': msg})
+    # Update final progress in course task table as well:
+    # The actual task result state is updated by celery when this task completes, and thus
+    # clobbers any custom metadata.  So if we want any such status to persist, we have to
+    # write it to the CourseTaskLog instead.
+    task_log.info("Finished processing task, updating CourseTaskLog entry")
 
-    # and update status in course task table as well:
-    # TODO: figure out how this is legal.  The actual task result
-    # status is updated by celery when this task completes, and is
-    # presumably going to clobber this custom metadata.  So if we want
-    # any such status to persist, we have to write it to the CourseTaskLog instead.
-#    course_task_log_entry = CourseTaskLog.objects.get(task_id=current_task.id)
-#    course_task_log_entry.task_status = ...
+    course_task_log_entry = CourseTaskLog.objects.get(task_id=current_task.request.id)
+    course_task_log_entry.task_progress = json.dumps(task_progress)
+    course_task_log_entry.save()
 
-    # return (succeeded, msg)
     return succeeded
 
 
@@ -193,7 +208,7 @@ def _regrade_problem_module_state(request, module_to_regrade, module_descriptor)
         # and load something they shouldn't have access to.
         msg = "No module {loc} for student {student}--access denied?".format(loc=module_state_key,
                                                                              student=student)
-        log.debug(msg)
+        task_log.debug(msg)
         raise UpdateProblemModuleStateError(msg)
 
     if not hasattr(instance, 'regrade_problem'):
@@ -205,11 +220,11 @@ def _regrade_problem_module_state(request, module_to_regrade, module_descriptor)
     result = instance.regrade_problem()
     if 'success' not in result:
         # don't consider these fatal, but false means that the individual call didn't complete:
-        log.debug("error processing regrade call for problem {loc} and student {student}: "
+        task_log.debug("error processing regrade call for problem {loc} and student {student}: "
                  "unexpected response {msg}".format(msg=result, loc=module_state_key, student=student))
         return False
     elif result['success'] != 'correct' and result['success'] != 'incorrect':
-        log.debug("error processing regrade call for problem {loc} and student {student}: "
+        task_log.debug("error processing regrade call for problem {loc} and student {student}: "
                   "{msg}".format(msg=result['success'], loc=module_state_key, student=student))
         return False
     else:
@@ -245,7 +260,7 @@ def regrade_problem_for_student(request, course_id, problem_url, student_identif
                     'task_name': 'regrade',
                     'task_args': problem_url,
                     'task_id': task_id,
-                    'task_status': result.state,
+                    'task_state': result.state,
                     'requester': request.user}
 
     CourseTaskLog.objects.create(**tasklog_args)
@@ -253,9 +268,7 @@ def regrade_problem_for_student(request, course_id, problem_url, student_identif
 
 
 @task
-def _regrade_problem_for_all_students(request_environ, course_id, problem_url):
-#    request = HttpRequest()
-#    request.META.update(request_environ)
+def regrade_problem_for_all_students(request_environ, course_id, problem_url):
     factory = RequestFactory(**request_environ)
     request = factory.get('/')
     action_name = 'regraded'
@@ -263,101 +276,6 @@ def _regrade_problem_for_all_students(request_environ, course_id, problem_url):
     filter_fcn = filter_problem_module_state_for_done
     return _update_problem_module_state_for_all_students(request, course_id, problem_url,
                                                          update_fcn, action_name, filter_fcn)
-
-
-def regrade_problem_for_all_students(request, course_id, problem_url):
-    # Figure out (for now) how to serialize what we need of the request.  The actual
-    # request will not successfully serialize with json or with pickle.
-    # Maybe we can just pass all META info as a dict.
-    request_environ = {'HTTP_USER_AGENT': request.META['HTTP_USER_AGENT'],
-                       'REMOTE_ADDR': request.META['REMOTE_ADDR'],
-                       'SERVER_NAME': request.META['SERVER_NAME'],
-                       'REQUEST_METHOD': 'GET',
-#                             'HTTP_X_FORWARDED_PROTO': request.META['HTTP_X_FORWARDED_PROTO'],
-                      }
-
-    # Submit task.  Then put stuff into table with the resulting task_id.
-    task_args = [request_environ, course_id, problem_url]
-    result = _regrade_problem_for_all_students.apply_async(task_args)
-    task_id = result.id
-    tasklog_args = {'course_id': course_id,
-                    'task_name': 'regrade',
-                    'task_args': problem_url,
-                    'task_id': task_id,
-                    'task_status': result.state,
-                    'requester': request.user}
-    course_task_log = CourseTaskLog.objects.create(**tasklog_args)
-    return course_task_log
-
-
-def course_task_log_status(request, task_id=None):
-    """
-    This returns the status of a course-related task as a JSON-serialized dict.
-    """
-    output = {}
-    if task_id is not None:
-        output = _get_course_task_log_status(task_id)
-    elif 'task_id' in request.POST:
-        task_id = request.POST['task_id']
-        output = _get_course_task_log_status(task_id)
-    elif 'task_ids[]' in request.POST:
-        tasks = request.POST.getlist('task_ids[]')
-        for task_id in tasks:
-            task_output = _get_course_task_log_status(task_id)
-            output[task_id] = task_output
-    # TODO else:  raise exception?
-
-    return HttpResponse(json.dumps(output, indent=4))
-
-
-def _get_course_task_log_status(task_id):
-    course_task_log_entry = CourseTaskLog.objects.get(task_id=task_id)
-    # TODO: error handling if it doesn't exist...
-
-    def not_in_progress(entry):
-        # TODO: do better than to copy list from celery.states.READY_STATES
-        return entry.task_status in ['SUCCESS', 'FAILURE', 'REVOKED']
-
-    # if the task is already known to be done, then there's no reason to query
-    # the underlying task:
-    if not_in_progress(course_task_log_entry):
-        output = {
-                  'task_id': course_task_log_entry.task_id,
-                  'task_status': course_task_log_entry.task_status,
-                  'in_progress': False
-                  }
-        return output
-
-    # we need to get information from the task result directly now.
-    result = AsyncResult(task_id)
-
-    output = {
-        'task_id': result.id,
-        'task_status': result.state,
-        'in_progress': True
-    }
-    if result.traceback is not None:
-        output['task_traceback'] = result.traceback
-
-    if result.state == "PROGRESS":
-        if hasattr(result, 'result') and 'current' in result.result:
-            log.info("still waiting... progress at {0} of {1}".format(result.result['current'],
-                                                                      result.result['total']))
-            output['current'] = result.result['current']
-            output['total'] = result.result['total']
-        else:
-            log.info("still making progress... ")
-
-    if result.successful():
-        value = result.result
-        output['value'] = value
-
-    # update the entry if necessary:
-    if course_task_log_entry.task_status != result.state:
-        course_task_log_entry.task_status = result.state
-        course_task_log_entry.save()
-
-    return output
 
 
 def _reset_problem_attempts_module_state(request, module_to_reset, module_descriptor):
@@ -420,3 +338,16 @@ def _delete_problem_state_for_all_students(request, course_id, problem_url):
     update_fcn = _delete_problem_module_state
     return _update_problem_module_state_for_all_students(request, course_id, problem_url,
                                                          update_fcn, action_name)
+
+
+@worker_ready.connect
+def initialize_middleware(**kwargs):
+    # The initialize Django middleware - some middleware components
+    # are initialized lazily when the first request is served. Since
+    # the celery workers do not serve request, the components never
+    # get initialized, causing errors in some dependencies.
+    # In particular, the Mako template middleware is used by some xmodules
+    task_log.info("Initializing all middleware from worker_ready.connect hook")
+
+    from django.core.handlers.base import BaseHandler
+    BaseHandler().load_middleware()

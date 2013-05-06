@@ -8,21 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
         # Adding model 'CourseTaskLog'
         db.create_table('courseware_coursetasklog', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('task_name', self.gf('django.db.models.fields.CharField')(max_length=50, db_index=True)),
             ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
             ('student', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', null=True, to=orm['auth.User'])),
-            ('task_name', self.gf('django.db.models.fields.CharField')(max_length=50, db_index=True)),
             ('task_args', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
             ('task_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('task_status', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, db_index=True)),
+            ('task_state', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, db_index=True)),
+            ('task_progress', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True, db_index=True)),
             ('requester', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['auth.User'])),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
         ))
         db.send_create_signal('courseware', ['CourseTaskLog'])
+
 
     def backwards(self, orm):
         # Deleting model 'CourseTaskLog'
@@ -76,7 +77,8 @@ class Migration(SchemaMigration):
             'task_args': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'task_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'task_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
-            'task_status': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'db_index': 'True'}),
+            'task_progress': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'null': 'True', 'db_index': 'True'}),
+            'task_state': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'db_index': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'})
         },
         'courseware.offlinecomputedgrade': {

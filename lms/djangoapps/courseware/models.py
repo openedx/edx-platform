@@ -271,12 +271,27 @@ class CourseTaskLog(models.Model):
     perform course-specific work.
     Examples include grading and regrading.
     """
+    task_name = models.CharField(max_length=50, db_index=True)
     course_id = models.CharField(max_length=255, db_index=True)
     student = models.ForeignKey(User, null=True, db_index=True, related_name='+')  # optional: None = task applies to all students
-    task_name = models.CharField(max_length=50, db_index=True)
     task_args = models.CharField(max_length=255, db_index=True)
     task_id = models.CharField(max_length=255, db_index=True)  # max_length from celery_taskmeta
-    task_status = models.CharField(max_length=50, null=True, db_index=True)  # max_length from celery_taskmeta
+    task_state = models.CharField(max_length=50, null=True, db_index=True)  # max_length from celery_taskmeta
+    task_progress = models.CharField(max_length=1024, null=True, db_index=True)
     requester = models.ForeignKey(User, db_index=True, related_name='+')
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     updated = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __repr__(self):
+        return 'CourseTaskLog<%r>' % ({
+            'task_name': self.task_name,
+            'course_id': self.course_id,
+            'student': self.student.username,
+            'task_args': self.task_args,
+            'task_id': self.task_id,
+            'task_state': self.task_state,
+            'task_progress': self.task_progress,
+        },)
+
+    def __unicode__(self):
+        return unicode(repr(self))

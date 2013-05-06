@@ -74,18 +74,14 @@
             var task_id = name;
             var task_dict = response[task_id];
             // this should be a dict of properties for this task_id
-            var in_progress = task_dict.in_progress
-            if (in_progress === true) {
+            if (task_dict.in_progress === true) {
               something_in_progress = true;
             }
             // find the corresponding entry, and update it:
-            selector = '[data-task-id="' + task_id + '"]';
-            entry = $(_this.element).find(selector);
-            var task_status_el = entry.find('.task-status');
-            task_status_el.text(task_dict.task_status)
-            var task_progress_el = entry.find('.task-progress');
-            var progress_value = task_dict.task_progress || '';
-            task_progress_el.text(progress_value);
+            entry = $(_this.element).find('[data-task-id="' + task_id + '"]');
+            entry.find('.task-state').text(task_dict.task_state)
+            var progress_value = task_dict.message || '';
+            entry.find('.task-progress').text(progress_value);
           }
         }
         if (something_in_progress) {
@@ -491,7 +487,7 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 ## Output tasks in progress
 
-%if course_tasks is not None:
+%if course_tasks is not None and len(course_tasks) > 0:
     <p>Pending Course Tasks</p>
     <div id="task-progress-wrapper">
       <table class="stat_table">
@@ -503,7 +499,7 @@ function goto( mode)
           <th>Requester</th>
           <th>Submitted</th>
           <th>Last Update</th>
-          <th>Task Status</th>
+          <th>Task State</th>
           <th>Task Progress</th>
         </tr>
       %for tasknum, course_task in enumerate(course_tasks):
@@ -515,7 +511,7 @@ function goto( mode)
           <td>${course_task.requester}</td>
           <td>${course_task.created}</td>
           <td><div class="task-updated">${course_task.updated}</div></td>
-          <td><div class="task-status">${course_task.task_status}</div></td>
+          <td><div class="task-state">${course_task.task_state}</div></td>
           <td><div class="task-progress">unknown</div></td>
         </tr>
       %endfor

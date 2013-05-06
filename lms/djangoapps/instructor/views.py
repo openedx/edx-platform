@@ -10,9 +10,9 @@ import os
 import re
 import requests
 from requests.status_codes import codes
-import urllib
+#import urllib
 from collections import OrderedDict
-from time import sleep
+#from time import sleep
 
 from StringIO import StringIO
 
@@ -25,7 +25,8 @@ from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
 from courseware import grades
-from courseware import tasks
+#from courseware import tasks  # for now... should remove once things are in queue instead
+from courseware import task_queue
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
 from courseware.courses import get_course_with_access
@@ -176,12 +177,12 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'list-students', {}, page='idashboard')
 
-    elif 'Test Celery' in action:
-        args = (10,)
-        result = tasks.waitawhile.apply_async(args, retry=False)
-        task_id = result.id
-        celery_ajax_url = reverse('celery_ajax_status', kwargs={'task_id': task_id})
-        msg += '<p>Celery Status for task ${task}:</p><div class="celery-status" data-ajax_url="${url}"></div><p>Status end.</p>'.format(task=task_id, url=celery_ajax_url)
+#    elif 'Test Celery' in action:
+#        args = (10,)
+#        result = tasks.waitawhile.apply_async(args, retry=False)
+#        task_id = result.id
+#        celery_ajax_url = reverse('celery_ajax_status', kwargs={'task_id': task_id})
+#        msg += '<p>Celery Status for task ${task}:</p><div class="celery-status" data-ajax_url="${url}"></div><p>Status end.</p>'.format(task=task_id, url=celery_ajax_url)
 
     elif 'Dump Grades' in action:
         log.debug(action)
@@ -217,13 +218,13 @@ def instructor_dashboard(request, course_id):
     elif "Regrade ALL students' problem submissions" in action:
         problem_url = request.POST.get('problem_to_regrade', '')
         try:
-            course_task_log_entry = tasks.regrade_problem_for_all_students(request, course_id, problem_url)
+            course_task_log_entry = task_queue.submit_regrade_problem_for_all_students(request, course_id, problem_url)
+            if course_task_log_entry is None:
+                msg += '<font="red">Failed to create a background task for regrading "{0}".</font>'.format(problem_url)
         except Exception as e:
-            log.error("Encountered exception from regrade: {0}", e)
-        # check that a course_task_log entry was created:
-        if course_task_log_entry is None:
-            msg += '<font="red">Failed to create a background task for regrading "{0}".</font>'.format(problem_url)
-            
+            log.error("Encountered exception from regrade: {0}".format(e))
+            msg += '<font="red">Failed to create a background task for regrading "{0}": {1}.</font>'.format(problem_url, e)
+
     elif "Reset student's attempts" in action or "Delete student state for problem" in action:
         # get the form data
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
@@ -645,7 +646,7 @@ def instructor_dashboard(request, course_id):
         msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
 
     # generate list of pending background tasks
-    course_tasks = CourseTaskLog.objects.filter(course_id = course_id).exclude(task_status='SUCCESS').exclude(task_status='FAILURE')
+    course_tasks = task_queue.get_running_course_tasks(course_id)
 
     #----------------------------------------
     # context for rendering
@@ -1205,99 +1206,99 @@ def dump_grading_context(course):
     return msg
 
 
-def old1testcelery(request):
-    """
-    A Simple view that checks if the application can talk to the celery workers
-    """
-    args = ('ping',)
-    result = tasks.echo.apply_async(args, retry=False)
-    value = result.get(timeout=0.5)
-    output = {
-        'task_id': result.id,
-        'value': value
-    }
-    return HttpResponse(json.dumps(output, indent=4))
-
-
-def old2testcelery(request):
-    """
-    A Simple view that checks if the application can talk to the celery workers
-    """
-    args = (10,)
-    result = tasks.waitawhile.apply_async(args, retry=False)
-    while not result.ready():
-        sleep(0.5)  # in seconds
-        if result.state == "PROGRESS":
-            if hasattr(result, 'result') and 'current' in result.result:
-                log.info("still waiting... progress at {0} of {1}".format(result.result['current'], result.result['total']))
-            else:
-                log.info("still making progress... ")
-    if result.successful():
-        value = result.result
-    output = {
-        'task_id': result.id,
-        'value': value
-    }
-    return HttpResponse(json.dumps(output, indent=4))
-
-
-def testcelery(request):
-    """
-    A Simple view that checks if the application can talk to the celery workers
-    """
-    args = (10,)
-    result = tasks.waitawhile.apply_async(args, retry=False)
-    task_id = result.id
-    # return the task_id to a template which will set up an ajax call to 
-    # check the progress of the task.
-    return testcelery_status(request, task_id)
-#    return mitxmako.shortcuts.render_to_response('celery_ajax.html', {
-#            'element_id': 'celery_task'
-#            'id': self.task_id,
-#            'ajax_url': reverse('testcelery_ajax'),
-#        })
-
-
-def testcelery_status(request, task_id):
-    result = tasks.waitawhile.AsyncResult(task_id)
-    while not result.ready():
-        sleep(0.5)  # in seconds
-        if result.state == "PROGRESS":
-            if hasattr(result, 'result') and 'current' in result.result:
-                log.info("still waiting... progress at {0} of {1}".format(result.result['current'], result.result['total']))
-            else:
-                log.info("still making progress... ")
-    if result.successful():
-        value = result.result
-    output = {
-        'task_id': result.id,
-        'value': value
-    }
-    return HttpResponse(json.dumps(output, indent=4))
-
-
-def celery_task_status(request, task_id):
-    # TODO: determine if we need to know the name of the original task,
-    # or if this could be any task...  Sample code seems to indicate that
-    # we could just include the AsyncResult class directly, i.e.:
-    # from celery.result import AsyncResult.
-    result = tasks.waitawhile.AsyncResult(task_id)
-
-    output = {
-        'task_id': result.id,
-        'state': result.state
-    }
-
-    if result.state == "PROGRESS":
-        if hasattr(result, 'result') and 'current' in result.result:
-            log.info("still waiting... progress at {0} of {1}".format(result.result['current'], result.result['total']))
-            output['current'] = result.result['current']
-            output['total'] = result.result['total']
-        else:
-            log.info("still making progress... ")
-
-    if result.successful():
-        value = result.result
-        output['value'] = value
-
-    return HttpResponse(json.dumps(output, indent=4))
+#def old1testcelery(request):
+#    """
+#    A Simple view that checks if the application can talk to the celery workers
+#    """
+#    args = ('ping',)
+#    result = tasks.echo.apply_async(args, retry=False)
+#    value = result.get(timeout=0.5)
+#    output = {
+#        'task_id': result.id,
+#        'value': value
+#    }
+#    return HttpResponse(json.dumps(output, indent=4))
+#
+#
+#def old2testcelery(request):
+#    """
+#    A Simple view that checks if the application can talk to the celery workers
+#    """
+#    args = (10,)
+#    result = tasks.waitawhile.apply_async(args, retry=False)
+#    while not result.ready():
+#        sleep(0.5)  # in seconds
+#        if result.state == "PROGRESS":
+#            if hasattr(result, 'result') and 'current' in result.result:
+#                log.info("still waiting... progress at {0} of {1}".format(result.result['current'], result.result['total']))
+#            else:
+#                log.info("still making progress... ")
+#    if result.successful():
+#        value = result.result
+#    output = {
+#        'task_id': result.id,
+#        'value': value
+#    }
+#    return HttpResponse(json.dumps(output, indent=4))
+#
+#
+#def testcelery(request):
+#    """
+#    A Simple view that checks if the application can talk to the celery workers
+#    """
+#    args = (10,)
+#    result = tasks.waitawhile.apply_async(args, retry=False)
+#    task_id = result.id
+#    # return the task_id to a template which will set up an ajax call to 
+#    # check the progress of the task.
+#    return testcelery_status(request, task_id)
+##    return mitxmako.shortcuts.render_to_response('celery_ajax.html', {
+##            'element_id': 'celery_task'
+##            'id': self.task_id,
+##            'ajax_url': reverse('testcelery_ajax'),
+##        })
+#
+#
+#def testcelery_status(request, task_id):
+#    result = tasks.waitawhile.AsyncResult(task_id)
+#    while not result.ready():
+#        sleep(0.5)  # in seconds
+#        if result.state == "PROGRESS":
+#            if hasattr(result, 'result') and 'current' in result.result:
+#                log.info("still waiting... progress at {0} of {1}".format(result.result['current'], result.result['total']))
+#            else:
+#                log.info("still making progress... ")
+#    if result.successful():
+#        value = result.result
+#    output = {
+#        'task_id': result.id,
+#        'value': value
+#    }
+#    return HttpResponse(json.dumps(output, indent=4))
+#
+#
+#def celery_task_status(request, task_id):
+#    # TODO: determine if we need to know the name of the original task,
+#    # or if this could be any task...  Sample code seems to indicate that
+#    # we could just include the AsyncResult class directly, i.e.:
+#    # from celery.result import AsyncResult.
+#    result = tasks.waitawhile.AsyncResult(task_id)
+#
+#    output = {
+#        'task_id': result.id,
+#        'state': result.state
+#    }
+#
+#    if result.state == "PROGRESS":
+#        if hasattr(result, 'result') and 'current' in result.result:
+#            log.info("still waiting... progress at {0} of {1}".format(result.result['current'], result.result['total']))
+#            output['current'] = result.result['current']
+#            output['total'] = result.result['total']
+#        else:
+#            log.info("still making progress... ")
+#
+#    if result.successful():
+#        value = result.result
+#        output['value'] = value
+#
+#    return HttpResponse(json.dumps(output, indent=4))
