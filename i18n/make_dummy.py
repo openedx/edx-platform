@@ -2,6 +2,12 @@
 
 # Generate test translation files from human-readable po files.
 # 
+# Dummy language is specified in configuration file (see config.py)
+# two letter language codes reference:
+# see http://www.loc.gov/standards/iso639-2/php/code_list.php
+#
+# Django will not localize in languages that django itself has not been
+# localized for. So we are using a well-known language (default='fr').
 #
 # po files can be generated with this:
 # django-admin.py makemessages --all --extension html -l en
@@ -18,7 +24,8 @@
 import os, sys
 import polib
 from dummy import Dummy
-from execute import get_logger, create_dir_if_necessary
+from config import CONFIGURATION
+from execute import create_dir_if_necessary
 
 def main(file, locale):
     """
@@ -47,21 +54,13 @@ def new_filename(original_filename, new_locale):
                                         msgs_dir,
                                         orig_file))
 
-
-# Dummy language 
-# two letter language codes reference:
-# see http://www.loc.gov/standards/iso639-2/php/code_list.php
-#
-# Django will not localize in languages that django itself has not been
-# localized for. So we are using a well-known language: 'fr'.
-
-DEFAULT_LOCALE = 'fr'
-
 if __name__ == '__main__':
+    # required arg: file
     if len(sys.argv)<2:
         raise Exception("missing file argument")
+    # optional arg: locale
     if len(sys.argv)<3:
-        locale = DEFAULT_LOCALE
+        locale = CONFIGURATION.get_dummy_locale()
     else:
         locale = sys.argv[2]
     main(sys.argv[1], locale)
