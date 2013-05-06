@@ -16,15 +16,15 @@
 import os
 from polib import pofile
 
-from execute import execute, get_config, messages_dir, remove_file, \
-     BASE_DIR, LOG, SOURCE_LOCALE
+from config import BASE_DIR, CONFIGURATION
+from execute import execute, remove_file, LOG
 
 def merge(locale, target='django.po'):
     """
     For the given locale, merge django-partial.po, messages.po, mako.po -> django.po
     """
     LOG.info('Merging locale={0}'.format(locale))
-    locale_directory = messages_dir(locale)
+    locale_directory = CONFIGURATION.get_messages_dir(locale)
     files_to_merge = ('django-partial.po', 'messages.po', 'mako.po')
     validate_files(locale_directory, files_to_merge)
 
@@ -62,15 +62,8 @@ def validate_files(dir, files_to_merge):
             raise Exception("File not found: {0}".format(pathname))
 
 def main ():
-    configuration = get_config()
-    if configuration == None:
-        LOG.warn('Configuration file not found, using only English.')
-        locales = (SOURCE_LOCALE,)
-    else:
-        locales = configuration['locales']
-    for locale in locales:
+    for locale in CONFIGURATION.get_locales():
         merge(locale)
-
     compile_cmd = 'django-admin.py compilemessages'
     execute(compile_cmd, working_directory=BASE_DIR)
 

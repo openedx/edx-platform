@@ -18,9 +18,8 @@ See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
 import os
 from datetime import datetime
 from polib import pofile
-from execute import execute, create_dir_if_necessary, remove_file, \
-     BASE_DIR, LOCALE_DIR, SOURCE_MSGS_DIR, LOG
-
+from config import BASE_DIR, LOCALE_DIR, CONFIGURATION
+from execute import execute, create_dir_if_necessary, remove_file, LOG
 
 # BABEL_CONFIG contains declarations for Babel to extract strings from mako template files
 # Use relpath to reduce noise in logs
@@ -28,15 +27,19 @@ BABEL_CONFIG = os.path.relpath(LOCALE_DIR + '/babel.cfg', BASE_DIR)
 
 # Strings from mako template files are written to BABEL_OUT
 # Use relpath to reduce noise in logs
-BABEL_OUT = os.path.relpath(SOURCE_MSGS_DIR + '/mako.po', BASE_DIR)
+BABEL_OUT = os.path.relpath(CONFIGURATION.get_source_messages_dir() + '/mako.po', BASE_DIR)
 
+SOURCE_WARN = 'This English source file is machine-generated. Do not check it into github'
 
 def main ():
     create_dir_if_necessary(LOCALE_DIR)
-    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
+    source_msgs_dir = CONFIGURATION.get_source_messages_dir()
 
+    remove_file(os.path.join(source_msgs_dir, 'django.po'))
+    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
     for filename in generated_files:
-        remove_file(os.path.join(SOURCE_MSGS_DIR, filename))
+        remove_file(os.path.join(source_msgs_dir, filename))
+
 
     # Extract strings from mako templates
     babel_mako_cmd = 'pybabel extract -F %s -c "TRANSLATORS:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
@@ -52,13 +55,13 @@ def main ():
     execute(make_django_cmd, working_directory=BASE_DIR)
     # makemessages creates 'django.po'. This filename is hardcoded.
     # Rename it to django-partial.po to enable merging into django.po later.
-    os.rename(os.path.join(SOURCE_MSGS_DIR, 'django.po'), 
-              os.path.join(SOURCE_MSGS_DIR, 'django-partial.po'))
+    os.rename(os.path.join(source_msgs_dir, 'django.po'), 
+              os.path.join(source_msgs_dir, 'django-partial.po'))
     execute(make_djangojs_cmd, working_directory=BASE_DIR)
 
     for filename in generated_files:
         LOG.info('Cleaning %s' % filename)
-        po = pofile(os.path.join(SOURCE_MSGS_DIR, filename))
+        po = pofile(os.path.join(source_msgs_dir, filename))
         # replace default headers with edX headers
         fix_header(po)
         # replace default metadata with edX metadata
@@ -82,8 +85,8 @@ def fix_header(po):
     po.metadata_is_fuzzy = []   # remove [u'fuzzy']
     header = po.header
     fixes = (
-        ('SOME DESCRIPTIVE TITLE', 'edX translation file'),
-        ('Translations template for PROJECT.', 'edX translation file'),
+        ('SOME DESCRIPTIVE TITLE', 'edX translation file\n' + SOURCE_WARN),
+        ('Translations template for PROJECT.', 'edX translation file\n' + SOURCE_WARN),
         ('YEAR', '%s' % datetime.utcnow().year),
         ('ORGANIZATION', 'edX'),
         ("THE PACKAGE'S COPYRIGHT HOLDER", "EdX"),

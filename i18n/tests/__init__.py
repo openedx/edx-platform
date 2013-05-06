@@ -1,3 +1,4 @@
+from test_config import TestConfiguration
 from test_extract import TestExtract
 from test_generate import TestGenerate
 from test_converter import TestConverter

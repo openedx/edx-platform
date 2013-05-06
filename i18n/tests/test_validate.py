@@ -2,7 +2,8 @@ import os
 from unittest import TestCase
 from nose.plugins.skip import SkipTest
 
-from execute import call, LOCALE_DIR, LOG
+from config import LOCALE_DIR
+from execute import call, LOG
 
 class TestValidate(TestCase):
     """

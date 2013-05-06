@@ -551,14 +551,16 @@ namespace :i18n do
     desc "Push source strings to Transifex for translation"
     task :push do
       if validate_transifex_config()
-        sh("tx push -s")
+        cmd = File.join(REPO_ROOT, "i18n", "transifex.py")
+        sh("#{cmd} push")
       end
     end
 
     desc "Pull translated strings from Transifex"
     task :pull do
       if validate_transifex_config()
-        sh("tx pull")
+        cmd = File.join(REPO_ROOT, "i18n", "transifex.py")
+        sh("#{cmd} pull")
       end
     end
   end
