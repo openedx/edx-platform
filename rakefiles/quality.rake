@@ -4,13 +4,13 @@
     directory report_dir
 
     desc "Run pep8 on all #{system} code"
-    task "pep8_#{system}" => report_dir do
+    task "pep8_#{system}" => [report_dir, :install_python_prereqs] do
         sh("pep8 #{system} | tee #{report_dir}/pep8.report")
     end
     task :pep8 => "pep8_#{system}"
 
     desc "Run pylint on all #{system} code"
-    task "pylint_#{system}" => report_dir do
+    task "pylint_#{system}" => [report_dir, :install_python_prereqs] do
         apps = Dir["#{system}/*.py", "#{system}/djangoapps/*", "#{system}/lib/*"].map do |app|
             File.basename(app)
         end.select do |app|
