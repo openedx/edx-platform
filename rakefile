@@ -170,6 +170,7 @@ end
 desc "Install all python prerequisites for the lms and cms"
 task :install_python_prereqs do
     sh('pip install -r requirements/base.txt')
+    sh('pip install --exists-action w -r requirements/post.txt')
     # Check for private-requirements.txt: used to install our libs as working dirs,
     # or personal-use tools.
     if File.file?("requirements/private.txt")
