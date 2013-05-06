@@ -8,7 +8,8 @@ from django.db.models.signals import post_save
 
 from student.models import CourseEnrollment
 
-from courseware.courses import get_course_by_id
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 FORUM_ROLE_ADMINISTRATOR = 'Administrator'
 FORUM_ROLE_MODERATOR = 'Moderator'
@@ -32,6 +33,9 @@ class Role(models.Model):
     users = models.ManyToManyField(User, related_name="roles")
     course_id = models.CharField(max_length=255, blank=True, db_index=True)
 
+    class Meta:
+        db_table = 'django_comment_client_role'
+
     def __unicode__(self):
         return self.name + " for " + (self.course_id if self.course_id else "all courses")
 
@@ -47,7 +51,8 @@ class Role(models.Model):
         self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
 
     def has_permission(self, permission):
-        course = get_course_by_id(self.course_id)
+        course_loc = CourseDescriptor.id_to_location(self.course_id)
+        course = modulestore().get_instance(self.course_id, course_loc)
         if self.name == FORUM_ROLE_STUDENT and \
            (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
            (not course.forum_posts_allowed):
@@ -59,6 +64,9 @@ class Role(models.Model):
 class Permission(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False, primary_key=True)
     roles = models.ManyToManyField(Role, related_name="permissions")
+
+    class Meta:
+        db_table = 'django_comment_client_permission'
 
     def __unicode__(self):
         return self.name
