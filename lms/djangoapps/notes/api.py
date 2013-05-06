@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.core.exceptions import ValidationError
 from notes.models import Note
@@ -5,6 +6,10 @@ import json
 import logging
 
 log = logging.getLogger(__name__)
+
+API_SETTINGS = { 
+    'MAX_NOTE_LIMIT': 100 # Max number of annotations retrieved per set
+}
 
 #----------------------------------------------------------------------#
 # API requests are routed through api_request() using the resource map.
@@ -21,6 +26,7 @@ def api_resource_map():
         'search': {GET: search}
     }
 
+@login_required
 def api_request(request, course_id, **kwargs):
     ''' Routes API requests to the appropriate action method and formats the results
         (defaults to JSON). 
@@ -54,8 +60,7 @@ def api_request(request, course_id, **kwargs):
     response['Content-type'] = formatted[0]
     response.content = formatted[1]
 
-    log.debug("API response:")
-    log.debug(response)
+    log.debug("API response: {0}".format(formatted))
 
     return response
 
@@ -74,7 +79,9 @@ def api_format(request, response, data):
 # Exposed API actions via the resource map.
 
 def index(request, course_id):
-    notes = Note.objects.filter(course_id=course_id, user=request.user)
+    MAX_LIMIT = API_SETTINGS.get('MAX_NOTE_LIMIT')
+    notes = Note.objects.order_by('id').filter(course_id=course_id,
+            user=request.user)[:MAX_LIMIT]
     return [HttpResponse(), [note.as_dict() for note in notes]]
 
 def create(request, course_id):
@@ -139,17 +146,34 @@ def delete(request, course_id, note_id):
     return [HttpResponse('', status=204), None]
 
 def search(request, course_id):
+    MAX_LIMIT = API_SETTINGS.get('MAX_NOTE_LIMIT')
+    
+    # search parameters
     limit = request.GET.get('limit')
+    offset = request.GET.get('offset')
     uri = request.GET.get('uri')
 
-    filters = {'course_id':course_id, 'user':request.user}
+    # validate search parameters
+    if limit is not None and limit.isdigit():
+        limit = int(limit)
+        if limit == 0 or limit > MAX_LIMIT:
+            limit = MAX_LIMIT
+    else:
+        limit = MAX_LIMIT
+
+    if offset is not None and offset.isdigit():
+        offset = int(offset)
+    else:
+        offset = 0
+
+    # search filters
+    filters = {'course_id': course_id, 'user': request.user}
     if uri is not None:
         filters['uri'] = uri
 
-    notes = Note.objects.filter(**filters)
-    #if limit is not None and limit > 0:
-        #notes = notes[:limit]
-
+    start = offset
+    end = offset + limit
+    notes = Note.objects.order_by('id').filter(**filters)[start:end]
     result = {'rows': [note.as_dict() for note in notes]}
 
     return [HttpResponse(), result]
