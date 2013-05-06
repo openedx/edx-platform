@@ -40,11 +40,7 @@ site_status_msg = get_site_status_msg(course_id)
   <nav>
 
   <h1 class="logo">
-% if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-      <a href="${settings.MKTG_URLS.get('ROOT')}">
-% else:
-      <a href="${reverse('root')}">
-%endif
+      <a href="${marketing_link('ROOT')}">
         <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/>
       </a></h1>
 

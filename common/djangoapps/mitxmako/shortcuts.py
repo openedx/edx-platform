@@ -29,13 +29,18 @@ def marketing_link(name):
     which URL should be provided.
     """
 
-    link_map = settings.MKTG_URLS.get('LINK_MAP')
+    # link_map maps URLs from the marketing site to the old equivalent on
+    # the Django site
+    link_map = settings.MKTG_URL_LINK_MAP
     if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+        # special case for when we only want the root marketing URL
+        if name == 'ROOT':
+            return settings.MKTG_URLS.get('ROOT')
         return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
     elif name in link_map:
         return reverse(link_map[name])
     else:
-        return ''
+        return '#'
 
 
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
