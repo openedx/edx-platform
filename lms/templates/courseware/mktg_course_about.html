@@ -63,18 +63,22 @@
 
   <ul class="list-actions register">
     <li class="item">
-      %if user.is_authenticated():
-        %if registered:
-          <!-- signed in, registered -->
-          <a class="action action-register is-registered" href="${course_target}">Registered for <strong>${course.number}</strong></a>
+    %if coming_soon:
+      <a class="action action-register is-registered" href="#">Coming Soon</a>
+    %else:
+        %if user.is_authenticated():
+          %if registered:
+            <!-- signed in, registered -->
+            <a class="action action-register is-registered" href="${course_target}">Registered for <strong>${course.number}</strong></a>
+          %else:
+          <!-- signed in, not registered -->
+            <a href="" class="action action-register register">Register for ${course.number}</a> <div id="register_message"></div>
+          %endif
         %else:
-        <!-- signed in, not registered -->
-          <a href="" class="action action-register register">Register for ${course.number}</a> <div id="register_message"></div>
+        <!-- not signed in -->
+            <a class="action action-register is-not-signedin" href="${reverse('register_user')}">Register for <strong>${course.number}</strong></a>
         %endif
-      %else:
-      <!-- not signed in -->
-          <a class="action action-register is-not-signedin" href="${reverse('register_user')}">Register for <strong>${course.number}</strong></a>
-      %endif
+    %endif
     </li>
   </ul>
 
