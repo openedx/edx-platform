@@ -17,67 +17,40 @@
 </%block>
 
 <%block name="js_extra">
-  % if not registered:
-      %if user.is_authenticated():
-        ## If the user is authenticated, clicking the enroll button just submits a form
-        <script type="text/javascript">
-          (function() {
-            $('.register').click(function(e) {
-              (e).preventDefault();
-              $('#class_enroll_form').submit();
-            });
+  <script type="text/javascript">
+  (function() {
+    $(".register").click(function(event) {
+      $("#class_enroll_form").submit();
+      event.preventDefault();
+    });
 
-            $(document).delegate('#class_enroll_form', 'ajax:success', function(data, json, xhr) {
-              if(json.success) {
-                location.href="${reverse('dashboard')}";
-              }else{
-              $('#register_message').html('<p class="inline-error">' + json.error + "</p>");
-              }
-            });
-          })(this)
-        </script>
-      %else:
-        ## If the user is not authenticated, clicking the enroll button pops up the register
-        ## field. We also slip in the registration fields into the login/register fields so
-        ## the user is automatically registered after logging in / registering
-        <script type="text/javascript">
-          (function() {
-           $(".register").click(function() {
-              if ($(".login_form .enroll_fieldset").length === 0) {
-                $(".login_form").append( $(".enroll_fieldset").first().clone() );
-              }
-              if ($(".register_form .enroll_fieldset").length === 0) {
-                $(".register_form").append( $(".enroll_fieldset").first().clone() );
-              }
-            });
-          })(this)
-        </script>
-      %endif
-    %endif
+    $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        location.href = "${reverse('dashboard')}";
+      } else if (xhr.status == 403) {
+        location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
+      } else {
+        $('#register_error').html(
+            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
+        ).css("display", "block");
+      }
+    });
+  })(this)
+  </script>
 </%block>
 
 <%block name="content">
-
   <script src="${static.url('js/course_info.js')}"></script>
 
-
-  <ul class="list-actions register">
+  <ul class="list-actions">
     <li class="item">
-        %if user.is_authenticated():
-          %if registered:
-            <!-- signed in, registered -->
-            <a class="action action-register is-registered" href="${course_target}">Registered for <strong>${course.number}</strong></a>
-          %else:
-          <!-- signed in, not registered -->
-            <a href="" class="action action-register register">Register for ${course.number}</a> <div id="register_message"></div>
-          %endif
+        %if user.is_authenticated() and registered:
+          <a class="action action-register is-registered" href="${course_target}">Access Courseware</strong></a>
         %else:
-        <!-- not signed in -->
-            <a class="action action-register" href="${reverse('register_user')}">Register for <strong>${course.number}</strong></a>
+          <a class="action action-register register" href="#">Register for <strong>${course.number}</strong></a>
         %endif
     </li>
   </ul>
-
 
 %if not registered:
   <div style="display: none;">
@@ -88,9 +61,7 @@
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
       </fieldset>
       <div class="submit">
-
-        <button type="submit" name="class_enroll_form_submit" id="class_enroll_form-submit" value="enroll">Enroll</button>
-
+        <input name="enroll" type="submit" value="enroll">
       </div>
     </form>
   </div>
