@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from student.models import CourseEnrollment
 from django_comment_client.permissions import has_permission
-from django_comment_client.models import Role
+from django_comment_common.models import Role
 
 
 class PermissionsTestCase(TestCase):

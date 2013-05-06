@@ -2,7 +2,7 @@ from django.test import TestCase
 from factory import DjangoModelFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
-from django_comment_client.models import Role, Permission
+from django_comment_common.models import Role, Permission
 import django_comment_client.utils as utils
 
 
