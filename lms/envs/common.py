@@ -92,6 +92,7 @@ MITX_FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
+    # Enables the student notes API and UI.
     'ENABLE_STUDENT_NOTES': True
 }
 
