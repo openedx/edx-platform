@@ -538,7 +538,7 @@ def mktg_course_about(request, course_id):
     coming_soon = False
     try:
         course = get_course_with_access(request.user, course_id, 'see_exists')
-    except: Http404 as e:
+    except Http404 as e:
         # if a course does not exist yet, display a coming
         # soon button
         coming_soon = True
@@ -557,7 +557,7 @@ def mktg_course_about(request, course_id):
                               {'course': course,
                                'registered': registered,
                                'course_target': course_target,
-                               'show_courseware_link': show_courseware_link
+                               'show_courseware_link': show_courseware_link,
                                'coming_soon': coming_soon})
 
 
