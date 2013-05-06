@@ -53,7 +53,7 @@ projects depending on two different, incompatible versions of a library. Clearly
 you can't have both versions installed and used on your machine simultaneously.
 Virtual environments were created to solve this problem: by installing libraries
 into an isolated environment, only projects that live inside the environment
-will be able to see and use those libraries. Incompatible dependencies? Use
+will be able to see and use those libraries. Got incompatible dependencies? Use
 different virtual environments, and your problem is solved.
 
 Remember, each language has a different implementation. Python has
