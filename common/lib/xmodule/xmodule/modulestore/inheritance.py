@@ -31,15 +31,22 @@ def inherit_metadata(descriptor, model_data):
     Only metadata specified in self.inheritable_metadata will
     be inherited
     """
+    # The inherited values that are actually being used.
     if not hasattr(descriptor, '_inherited_metadata'):
         setattr(descriptor, '_inherited_metadata', {})
+
+    # All inheritable metadata values (for which a value exists in model_data).
+    if not hasattr(descriptor, '_inheritable_metadata'):
+        setattr(descriptor, '_inheritable_metadata', {})
 
     # Set all inheritable metadata from kwargs that are
     # in self.inheritable_metadata and aren't already set in metadata
     for attr in INHERITABLE_METADATA:
-        if attr not in descriptor._model_data and attr in model_data:
-            descriptor._inherited_metadata[attr] = model_data[attr]
-            descriptor._model_data[attr] = model_data[attr]
+        if attr in model_data:
+            descriptor._inheritable_metadata[attr] = model_data[attr]
+            if attr not in descriptor._model_data:
+                descriptor._inherited_metadata[attr] = model_data[attr]
+                descriptor._model_data[attr] = model_data[attr]
 
 
 def own_metadata(module):

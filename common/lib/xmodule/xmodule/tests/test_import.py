@@ -151,6 +151,10 @@ class ImportTestCase(BaseCourseTestCase):
         # Check that the child inherits due correctly
         child = descriptor.get_children()[0]
         self.assertEqual(child.lms.due, Date().from_json(v))
+        self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
+        self.assertEqual(2, len(child._inherited_metadata))
+        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        self.assertEqual(v, child._inherited_metadata['due'])
 
         # Now export and check things
         resource_fs = MemoryFS()
@@ -183,6 +187,60 @@ class ImportTestCase(BaseCourseTestCase):
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
         self.assertFalse('due' in chapter_xml.attrib)
+
+    def test_metadata_no_inheritance(self):
+        """
+        Checks that default value of None (for due) does not get marked as inherited.
+        """
+        system = self.get_system()
+        url_name = 'test1'
+        start_xml = '''
+        <course org="{org}" course="{course}"
+                url_name="{url_name}" unicorn="purple">
+            <chapter url="hi" url_name="ch" display_name="CH">
+                <html url_name="h" display_name="H">Two houses, ...</html>
+            </chapter>
+        </course>'''.format(org=ORG, course=COURSE, url_name=url_name)
+        descriptor = system.process_xml(start_xml)
+        compute_inherited_metadata(descriptor)
+
+        self.assertEqual(descriptor.lms.due, None)
+
+        # Check that the child does not inherit a value for due
+        child = descriptor.get_children()[0]
+        self.assertEqual(child.lms.due, None)
+        self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
+        self.assertEqual(1, len(child._inherited_metadata))
+        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+
+    def test_metadata_override_default(self):
+        """
+        Checks that due date can be overriden at child level.
+        """
+        system = self.get_system()
+        course_due = 'March 20 17:00'
+        child_due = 'April 10 00:00'
+        url_name = 'test1'
+        start_xml = '''
+        <course org="{org}" course="{course}"
+                due="{due}" url_name="{url_name}" unicorn="purple">
+            <chapter url="hi" url_name="ch" display_name="CH">
+                <html url_name="h" display_name="H">Two houses, ...</html>
+            </chapter>
+        </course>'''.format(due=course_due, org=ORG, course=COURSE, url_name=url_name)
+        descriptor = system.process_xml(start_xml)
+        child = descriptor.get_children()[0]
+        child._model_data['due'] = child_due
+        compute_inherited_metadata(descriptor)
+
+        self.assertEqual(descriptor.lms.due, Date().from_json(course_due))
+        self.assertEqual(child.lms.due, Date().from_json(child_due))
+        # Test inherited metadata. Due does not appear here (because explicitly set on child).
+        self.assertEqual(1, len(child._inherited_metadata))
+        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        # Test inheritable metadata. This has the course inheritable value for due.
+        self.assertEqual(2, len(child._inheritable_metadata))
+        self.assertEqual(course_due, child._inheritable_metadata['due'])
 
     def test_is_pointer_tag(self):
         """
