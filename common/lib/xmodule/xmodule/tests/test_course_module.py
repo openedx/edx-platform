@@ -40,34 +40,20 @@ class DummySystem(ImportSystem):
         )
 
 
-class IsNewCourseTestCase(unittest.TestCase):
-    """Make sure the property is_new works on courses"""
+def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None, end=None):
+    """Get a dummy course"""
 
-    def setUp(self):
-        # Needed for test_is_newish
-        datetime_patcher = patch.object(
-            xmodule.course_module, 'datetime',
-            Mock(wraps=datetime.datetime)
-        )
-        mocked_datetime = datetime_patcher.start()
-        mocked_datetime.utcnow.return_value = time_to_datetime(NOW)
-        self.addCleanup(datetime_patcher.stop)
+    system = DummySystem(load_error_modules=True)
 
-    @staticmethod
-    def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None, end=None):
-        """Get a dummy course"""
+    def to_attrb(n, v):
+        return '' if v is None else '{0}="{1}"'.format(n, v).lower()
 
-        system = DummySystem(load_error_modules=True)
+    is_new = to_attrb('is_new', is_new)
+    announcement = to_attrb('announcement', announcement)
+    advertised_start = to_attrb('advertised_start', advertised_start)
+    end = to_attrb('end', end)
 
-        def to_attrb(n, v):
-            return '' if v is None else '{0}="{1}"'.format(n, v).lower()
-
-        is_new = to_attrb('is_new', is_new)
-        announcement = to_attrb('announcement', announcement)
-        advertised_start = to_attrb('advertised_start', advertised_start)
-        end = to_attrb('end', end)
-
-        start_xml = '''
+    start_xml = '''
          <course org="{org}" course="{course}"
                 graceperiod="1 day" url_name="test"
                 start="{start}"
@@ -80,9 +66,23 @@ class IsNewCourseTestCase(unittest.TestCase):
             </chapter>
          </course>
          '''.format(org=ORG, course=COURSE, start=start, is_new=is_new,
-                    announcement=announcement, advertised_start=advertised_start, end=end)
+        announcement=announcement, advertised_start=advertised_start, end=end)
 
-        return system.process_xml(start_xml)
+    return system.process_xml(start_xml)
+
+
+class IsNewCourseTestCase(unittest.TestCase):
+    """Make sure the property is_new works on courses"""
+
+    def setUp(self):
+        # Needed for test_is_newish
+        datetime_patcher = patch.object(
+            xmodule.course_module, 'datetime',
+            Mock(wraps=datetime.datetime)
+        )
+        mocked_datetime = datetime_patcher.start()
+        mocked_datetime.utcnow.return_value = time_to_datetime(NOW)
+        self.addCleanup(datetime_patcher.stop)
 
     @patch('xmodule.course_module.time.gmtime')
     def test_sorting_score(self, gmtime_mock):
@@ -120,8 +120,8 @@ class IsNewCourseTestCase(unittest.TestCase):
         ]
 
         for a, b, assertion in dates:
-            a_score = self.get_dummy_course(start=a[0], announcement=a[1], advertised_start=a[2]).sorting_score
-            b_score = self.get_dummy_course(start=b[0], announcement=b[1], advertised_start=b[2]).sorting_score
+            a_score = get_dummy_course(start=a[0], announcement=a[1], advertised_start=a[2]).sorting_score
+            b_score = get_dummy_course(start=b[0], announcement=b[1], advertised_start=b[2]).sorting_score
             print "Comparing %s to %s" % (a, b)
             assertion(a_score, b_score)
 
@@ -138,36 +138,42 @@ class IsNewCourseTestCase(unittest.TestCase):
         ]
 
         for s in settings:
-            d = self.get_dummy_course(start=s[0], advertised_start=s[1])
+            d = get_dummy_course(start=s[0], advertised_start=s[1])
             print "Checking start=%s advertised=%s" % (s[0], s[1])
             self.assertEqual(d.start_date_text, s[2])
 
     def test_is_newish(self):
-        descriptor = self.get_dummy_course(start='2012-12-02T12:00', is_new=True)
+        descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
         assert(descriptor.is_newish is True)
 
-        descriptor = self.get_dummy_course(start='2013-02-02T12:00', is_new=False)
+        descriptor = get_dummy_course(start='2013-02-02T12:00', is_new=False)
         assert(descriptor.is_newish is False)
 
-        descriptor = self.get_dummy_course(start='2013-02-02T12:00', is_new=True)
+        descriptor = get_dummy_course(start='2013-02-02T12:00', is_new=True)
         assert(descriptor.is_newish is True)
 
-        descriptor = self.get_dummy_course(start='2013-01-15T12:00')
+        descriptor = get_dummy_course(start='2013-01-15T12:00')
         assert(descriptor.is_newish is True)
 
-        descriptor = self.get_dummy_course(start='2013-03-01T12:00')
+        descriptor = get_dummy_course(start='2013-03-01T12:00')
         assert(descriptor.is_newish is True)
 
-        descriptor = self.get_dummy_course(start='2012-10-15T12:00')
+        descriptor = get_dummy_course(start='2012-10-15T12:00')
         assert(descriptor.is_newish is False)
 
-        descriptor = self.get_dummy_course(start='2012-12-31T12:00')
+        descriptor = get_dummy_course(start='2012-12-31T12:00')
         assert(descriptor.is_newish is True)
 
     def test_end_date_text(self):
         # No end date set, returns empty string.
-        d = self.get_dummy_course('2012-12-02T12:00')
+        d = get_dummy_course('2012-12-02T12:00')
         self.assertEqual('', d.end_date_text)
 
-        d = self.get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
+        d = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
         self.assertEqual('Sep 04, 2014', d.end_date_text)
+
+
+class DiscussionTopicsTestCase(unittest.TestCase):
+    def test_default_discussion_topics(self):
+        d = get_dummy_course('2012-12-02T12:00')
+        self.assertEqual({'General': {'id': 'i4x-test_org-test_course-course-test'}}, d.discussion_topics)
