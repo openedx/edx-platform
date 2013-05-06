@@ -72,7 +72,8 @@ class OpenEndedChild(object):
             try:
                 instance_state = json.loads(instance_state)
             except:
-                log.error("Could not load instance state for open ended.  Setting it to nothing.: {0}".format(instance_state))
+                log.error(
+                    "Could not load instance state for open ended.  Setting it to nothing.: {0}".format(instance_state))
         else:
             instance_state = {}
 
@@ -81,8 +82,8 @@ class OpenEndedChild(object):
         # element.
         # Scores are on scale from 0 to max_score
 
-        self.child_history=instance_state.get('child_history',[])
-        self.child_state=instance_state.get('child_state', self.INITIAL)
+        self.child_history = instance_state.get('child_history', [])
+        self.child_state = instance_state.get('child_state', self.INITIAL)
         self.child_created = instance_state.get('child_created', False)
         self.child_attempts = instance_state.get('child_attempts', 0)
 
@@ -161,6 +162,12 @@ class OpenEndedChild(object):
         if not self.child_history:
             return None
         return self.child_history[-1].get('score')
+
+    def all_scores(self):
+        """None if not available"""
+        if not self.child_history:
+            return None
+        return [self.child_history[i].get('score') for i in xrange(0, len(self.child_history))]
 
     def latest_post_assessment(self, system):
         """Empty string if not available"""
@@ -357,10 +364,6 @@ class OpenEndedChild(object):
             if get_data['can_upload_files'] in ['true', '1']:
                 has_file_to_upload = True
                 file = get_data['student_file'][0]
-                if self.system.track_fuction:
-                    self.system.track_function('open_ended_image_upload', {'filename': file.name})
-                else:
-                    log.info("No tracking function found when uploading image.")
                 uploaded_to_s3, image_ok, s3_public_url = self.upload_image_to_s3(file)
                 if uploaded_to_s3:
                     image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)

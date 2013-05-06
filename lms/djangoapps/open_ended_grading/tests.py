@@ -4,22 +4,22 @@ Tests for open ended grading interfaces
 django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open_ended_grading
 """
 
-from django.test import TestCase
-from open_ended_grading import staff_grading_service
-from xmodule.open_ended_grading_classes import peer_grading_service
-from xmodule import peer_grading_module
+import json
+from mock import MagicMock
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
+from mitxmako.shortcuts import render_to_string
 
-from courseware.access import _course_staff_group_name
-import courseware.tests.tests as ct
+from xmodule.open_ended_grading_classes import peer_grading_service
+from xmodule import peer_grading_module
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
-from nose import SkipTest
-from mock import patch, Mock, MagicMock
-import json
 from xmodule.x_module import ModuleSystem
-from mitxmako.shortcuts import render_to_string
+
+from open_ended_grading import staff_grading_service
+from courseware.access import _course_staff_group_name
+from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE, get_user
 
 import logging
 
@@ -30,8 +30,8 @@ from django.http import QueryDict
 from xmodule.tests import test_util_open_ended
 
 
-@override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
-class TestStaffGradingService(ct.PageLoader):
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestStaffGradingService(LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
@@ -56,7 +56,7 @@ class TestStaffGradingService(ct.PageLoader):
         def make_instructor(course):
             group_name = _course_staff_group_name(course.location)
             g = Group.objects.create(name=group_name)
-            g.user_set.add(ct.user(self.instructor))
+            g.user_set.add(get_user(self.instructor))
 
         make_instructor(self.toy)
 
@@ -97,7 +97,7 @@ class TestStaffGradingService(ct.PageLoader):
         self.assertIsNotNone(d['rubric'])
 
 
-    def test_save_grade(self):
+    def save_grade_base(self,skip=False):
         self.login(self.instructor, self.password)
 
         url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
@@ -108,11 +108,19 @@ class TestStaffGradingService(ct.PageLoader):
                 'location': self.location,
                 'submission_flagged': "true",
                 'rubric_scores[]': ['1', '2']}
+        if skip:
+            data.update({'skipped' : True})
 
         r = self.check_for_post_code(200, url, data)
         d = json.loads(r.content)
         self.assertTrue(d['success'], str(d))
         self.assertEquals(d['submission_id'], self.mock_service.cnt)
+
+    def test_save_grade(self):
+        self.save_grade_base(skip=False)
+
+    def test_save_grade_skip(self):
+        self.save_grade_base(skip=True)
 
     def test_get_problem_list(self):
         self.login(self.instructor, self.password)
@@ -126,8 +134,8 @@ class TestStaffGradingService(ct.PageLoader):
         self.assertIsNotNone(d['problem_list'])
 
 
-@override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
-class TestPeerGradingService(ct.PageLoader):
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestPeerGradingService(LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the

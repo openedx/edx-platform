@@ -11,7 +11,6 @@ import requests
 from requests.status_codes import codes
 import urllib
 from collections import OrderedDict
-import json
 
 from StringIO import StringIO
 
@@ -21,7 +20,6 @@ from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
-import requests
 from django.core.urlresolvers import reverse
 
 from courseware import grades
@@ -36,18 +34,13 @@ from django_comment_client.models import (Role,
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
-from xmodule.modulestore.search import path_to_location
+import xmodule.graders as xmgraders
 import track.views
 
 from .offline_gradecalc import student_grades, offline_grades_available
 
 log = logging.getLogger(__name__)
-
-template_imports = {'urllib': urllib}
 
 # internal commands for managing forum roles:
 FORUM_ROLE_ADD = 'add'
@@ -55,6 +48,9 @@ FORUM_ROLE_REMOVE = 'remove'
 
 
 def split_by_comma_and_whitespace(s):
+    """
+    Return string s, split by , or whitespace
+    """
     return re.split(r'[\s,]', s)
 
 
@@ -92,13 +88,13 @@ def instructor_dashboard(request, course_id):
     data += compute_course_stats(course).items()
     if request.user.is_staff:
         for field in course.fields:
-            if getattr(field.scope, 'student', False):
+            if getattr(field.scope, 'user', False):
                 continue
 
             data.append([field.name, json.dumps(field.read_json(course))])
         for namespace in course.namespaces:
             for field in getattr(course, namespace).fields:
-                if getattr(field.scope, 'student', False):
+                if getattr(field.scope, 'user', False):
                     continue
 
                 data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
@@ -140,7 +136,7 @@ def instructor_dashboard(request, course_id):
         # 'beta', so adding it to get_access_group_name doesn't really make
         # sense.
         name = course_beta_test_group_name(course.location)
-        (group, created) = Group.objects.get_or_create(name=name)
+        (group, _) = Group.objects.get_or_create(name=name)
         return group
 
     # process actions from form POST
@@ -208,6 +204,10 @@ def instructor_dashboard(request, course_id):
         track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
 
+    elif 'Dump description of graded assignments configuration' in action:
+        track.views.server_track(request, action, {}, page='idashboard')
+        msg += dump_grading_context(course)
+
     elif "Reset student's attempts" in action or "Delete student state for problem" in action:
         # get the form data
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
@@ -229,14 +229,16 @@ def instructor_dashboard(request, course_id):
 
         if student_to_reset is not None:
             # find the module in question
+            if '/' not in problem_to_reset:				# allow state of modules other than problem to be reset
+                problem_to_reset = "problem/" + problem_to_reset	# but problem is the default
             try:
-                (org, course_name, run) = course_id.split("/")
-                module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_reset
+                (org, course_name, _) = course_id.split("/")
+                module_state_key = "i4x://" + org + "/" + course_name + "/" + problem_to_reset
                 module_to_reset = StudentModule.objects.get(student_id=student_to_reset.id,
                                                           course_id=course_id,
                                                           module_state_key=module_state_key)
                 msg += "Found module to reset.  "
-            except Exception as e:
+            except Exception:
                 msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
 
         if "Delete student state for problem" in action:
@@ -345,7 +347,7 @@ def instructor_dashboard(request, course_id):
                     return_csv('', datatable, fp=fp)
                     fp.seek(0)
                     files = {'datafile': fp}
-                    msg2, dataset = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
+                    msg2, _ = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
                     msg += msg2
 
 
@@ -416,7 +418,7 @@ def instructor_dashboard(request, course_id):
         datatable = {'header': ['username', 'email'] + profkeys}
         def getdat(u):
             p = u.profile
-            return [u.username, u.email] + [getattr(p,x,'') for x in profkeys]
+            return [u.username, u.email] + [getattr(p, x, '') for x in profkeys]
 
         datatable['data'] = [getdat(u) for u in enrolled_students]
         datatable['title'] = 'Student profile data for course %s' % course_id
@@ -426,17 +428,17 @@ def instructor_dashboard(request, course_id):
     elif 'Download CSV of all responses to problem' in action:
         problem_to_dump = request.POST.get('problem_to_dump','')
 
-        if problem_to_dump[-4:]==".xml":
-            problem_to_dump=problem_to_dump[:-4]
+        if problem_to_dump[-4:] == ".xml":
+            problem_to_dump = problem_to_dump[:-4]
         try:
-            (org, course_name, run)=course_id.split("/")
-            module_state_key="i4x://"+org+"/"+course_name+"/problem/"+problem_to_dump
+            (org, course_name, run) = course_id.split("/")
+            module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
             smdat = StudentModule.objects.filter(course_id=course_id,
                                                  module_state_key=module_state_key)
             smdat = smdat.order_by('student')
             msg += "Found %d records to dump " % len(smdat)
         except Exception as err:
-            msg+="<font color='red'>Couldn't find module with that urlname.  </font>"
+            msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
             msg += "<pre>%s</pre>" % escape(err)
             smdat = []
 
@@ -734,7 +736,7 @@ def _list_course_forum_members(course_id, rolename, datatable):
     # make sure datatable is set up properly for display first, before checking for errors
     datatable['header'] = ['Username', 'Full name', 'Roles']
     datatable['title'] = 'List of Forum {0}s in course {1}'.format(rolename, course_id)
-    datatable['data'] = [];
+    datatable['data'] = []
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
     except Role.DoesNotExist:
@@ -916,7 +918,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
         datarow = [student.id, student.username, student.profile.name, student.email]
         try:
             datarow.append(student.externalauthmap.external_email)
-        except:  	# ExternalAuthMap.DoesNotExist
+        except:  # ExternalAuthMap.DoesNotExist
             datarow.append('')
 
         if get_grades:
@@ -959,11 +961,14 @@ def gradebook(request, course_id):
                      }
                      for student in enrolled_students]
 
-    return render_to_response('courseware/gradebook.html', {'students': student_info,
-                                                 'course': course,
-                                                 'course_id': course_id,
-                                                 # Checked above
-                                                 'staff_access': True, })
+    return render_to_response('courseware/gradebook.html', {
+        'students': student_info,
+        'course': course,
+        'course_id': course_id,
+        # Checked above
+        'staff_access': True,
+        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
+    })
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -1033,7 +1038,8 @@ def _do_enroll_students(course, course_id, students, overload=False):
     datatable['data'] = [[x, status[x]] for x in status]
     datatable['title'] = 'Enrollment of students'
 
-    def sf(stat): return [x for x in status if status[x] == stat]
+    def sf(stat):
+        return [x for x in status if status[x] == stat]
 
     data = dict(added=sf('added'), rejected=sf('rejected') + sf('exists'),
                 deleted=sf('deleted'), datatable=datatable)
@@ -1120,3 +1126,50 @@ def compute_course_stats(course):
     walk(course)
     stats = dict(counts)  	# number of each kind of module
     return stats
+
+
+def dump_grading_context(course):
+    '''
+    Dump information about course grading context (eg which problems are graded in what assignments)
+    Very useful for debugging grading_policy.json and policy.json
+    '''
+    msg = "-----------------------------------------------------------------------------\n"
+    msg += "Course grader:\n"
+
+    msg += '%s\n' % course.grader.__class__
+    graders = {}
+    if isinstance(course.grader, xmgraders.WeightedSubsectionsGrader):
+        msg += '\n'
+        msg += "Graded sections:\n"
+        for subgrader, category, weight in course.grader.sections:
+            msg += "  subgrader=%s, type=%s, category=%s, weight=%s\n" % (subgrader.__class__, subgrader.type, category, weight)
+            subgrader.index = 1
+            graders[subgrader.type] = subgrader
+    msg += "-----------------------------------------------------------------------------\n"
+    msg += "Listing grading context for course %s\n" % course.id
+
+    gc = course.grading_context
+    msg += "graded sections:\n"
+
+    msg += '%s\n' % gc['graded_sections'].keys()
+    for (gs, gsvals) in gc['graded_sections'].items():
+        msg += "--> Section %s:\n" % (gs)
+        for sec in gsvals:
+            s = sec['section_descriptor']
+            format = getattr(s.lms, 'format', None)
+            aname = ''
+            if format in graders:
+                g = graders[format]
+                aname = '%s %02d' % (g.short_label, g.index)
+                g.index += 1
+            elif s.display_name in graders:
+                g = graders[s.display_name]
+                aname = '%s' % g.short_label
+            notes = ''
+            if getattr(s, 'score_by_attempt', False):
+                notes = ', score by attempt!'
+            msg += "      %s (format=%s, Assignment=%s%s)\n" % (s.display_name, format, aname, notes)
+    msg += "all descriptors:\n"
+    msg += "length=%d\n" % len(gc['all_descriptors'])
+    msg = '<pre>%s</pre>' % msg.replace('<','&lt;')
+    return msg

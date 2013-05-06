@@ -3,9 +3,8 @@
 
 body.course.unit {
 
-  .unit .main-wrapper {
-    @include clearfix();
-    margin: 40px;
+  .main-wrapper {
+    margin-top: ($baseline*2);
   }
 
   //Problem Selector tab menu requirements
@@ -31,7 +30,7 @@ body.course.unit {
   }
 
   .unit-body {
-    
+
     .unit-name-input {
       padding: 20px 40px;
 
@@ -44,7 +43,7 @@ body.course.unit {
         font-size: 20px;
       }
     }
-    
+
     .breadcrumbs {
       border-radius: 3px 3px 0 0;
       border-bottom: 1px solid #cbd1db;
@@ -189,10 +188,10 @@ body.course.unit {
             @include clearfix;
 
             a {
-              position: relative;            
+              position: relative;
               border: 1px solid $darkGreen;
               background: tint($green,20%);
-              color: #fff;            
+              color: #fff;
 
               &:hover {
                 background: $brightGreen;
@@ -254,8 +253,8 @@ body.course.unit {
               @include transition (none);
 
               &:hover {
-                background: tint($green,30%); 
-                color: #fff;        
+                background: tint($green,30%);
+                color: #fff;
                 @include transition(background-color .15s);
               }
             }
@@ -263,7 +262,7 @@ body.course.unit {
             li {
                 border:none;
                 border-bottom: 1px dashed $lightGrey;
-                color: #fff;      
+                color: #fff;
             }
 
             li:first-child {
@@ -326,7 +325,7 @@ body.course.unit {
               }
             }
 
-            // specific editor types 
+            // specific editor types
             .empty {
 
               a {
@@ -337,20 +336,20 @@ body.course.unit {
 
 
                 &:hover {
-                background: tint($green,30%); 
+                background: tint($green,30%);
                 color: #fff;
               }
               }
             }
           }
 
-          .new-component {          
+          .new-component {
             text-align: center;
 
             h5 {
               color: $darkGreen;
             }
-            
+
           }
         }
       }
@@ -374,7 +373,7 @@ body.course.unit {
       &.editing {
         border: 1px solid $lightBluishGrey2;
         z-index: auto;
-        
+
         .drag-handle,
         .component-actions {
           display: none;
@@ -434,7 +433,7 @@ body.course.unit {
 
         label {
           display: inline-block;
-          margin-right: 10px;  
+          margin-right: 10px;
         }
       }
 
@@ -528,7 +527,7 @@ body.course.unit {
       }
 
       .window-contents {
-        display: none;  
+        display: none;
       }
     }
 

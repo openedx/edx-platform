@@ -1,7 +1,6 @@
 from static_replace import replace_static_urls
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
-from django.http import Http404
 
 
 def get_module_info(store, location, parent_location=None, rewrite_static_links=False):

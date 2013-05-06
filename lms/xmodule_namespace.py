@@ -1,33 +1,8 @@
 """
 Namespace that defines fields common to all blocks used in the LMS
 """
-from xblock.core import Namespace, Boolean, Scope, String, Float
-from xmodule.fields import Date, Timedelta
-
-
-class StringyBoolean(Boolean):
-    """
-    Reads strings from JSON as booleans.
-
-    'true' (case insensitive) return True, other strings return False
-    Other types are returned unchanged
-    """
-    def from_json(self, value):
-        if isinstance(value, basestring):
-            return value.lower() == 'true'
-        return value
-
-
-class StringyFloat(Float):
-    """
-    Reads values as floats. If the value parses as a float, returns
-    that, otherwise returns None
-    """
-    def from_json(self, value):
-        try:
-            return float(value)
-        except:
-            return None
+from xblock.core import Namespace, Boolean, Scope, String
+from xmodule.fields import Date, Timedelta, StringyFloat, StringyBoolean
 
 
 class LmsNamespace(Namespace):
@@ -51,8 +26,9 @@ class LmsNamespace(Namespace):
     )
 
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
-    due = String(help="Date that this problem is due by", scope=Scope.settings, default='')
-    source_file = String(help="DO NOT USE", scope=Scope.settings)
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    source_file = String(help="source file name (eg for latex)", scope=Scope.settings)
+    giturl = String(help="url root for course data git repository", scope=Scope.settings)
     xqa_key = String(help="DO NOT USE", scope=Scope.settings)
     ispublic = Boolean(help="Whether this course is open to the public, or only to admins", scope=Scope.settings)
     graceperiod = Timedelta(

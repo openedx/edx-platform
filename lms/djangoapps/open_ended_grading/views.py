@@ -27,8 +27,6 @@ from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
 
-template_imports = {'urllib': urllib}
-
 system = ModuleSystem(
     ajax_url=None,
     track_function=None,
@@ -111,7 +109,7 @@ def peer_grading(request, course_id):
         #Get the peer grading modules currently in the course
         items = modulestore().get_items(['i4x', None, course_id_parts[1], 'peergrading', None])
         #See if any of the modules are centralized modules (ie display info from multiple problems)
-        items = [i for i in items if i.metadata.get("use_for_single_location", True) in false_dict]
+        items = [i for i in items if getattr(i,"use_for_single_location", True) in false_dict]
         #Get the first one
         item_location = items[0].location
         #Generate a url for the first module and redirect the user to it

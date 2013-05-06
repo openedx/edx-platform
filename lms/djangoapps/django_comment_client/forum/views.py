@@ -1,28 +1,22 @@
 import json
 import logging
+import xml.sax.saxutils as saxutils
 
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.http import HttpResponse, Http404
-from django.utils import simplejson
+from django.http import Http404
 from django.core.context_processors import csrf
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import is_course_cohorted, get_cohort_id, is_commentable_cohorted, get_cohorted_commentables, get_cohort, get_course_cohorts, get_cohort_by_id
+from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted, 
+                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
 
-from urllib import urlencode
-from operator import methodcaller
-from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
-from django_comment_client.utils import (merge_dict, extract, strip_none,
-                                         strip_blank, get_courseware_context)
-
+from django_comment_client.permissions import cached_has_permission
+from django_comment_client.utils import (merge_dict, extract, strip_none, get_courseware_context)
 import django_comment_client.utils as utils
 import comment_client as cc
-import xml.sax.saxutils as saxutils
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
@@ -31,6 +25,7 @@ escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")
 
 
+@login_required
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise cc.utils.CommentClientError or
@@ -59,7 +54,6 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         cc_user = cc.User.from_django_user(request.user)
         cc_user.default_sort_key = request.GET.get('sort_key')
         cc_user.save()
-
 
     #there are 2 dimensions to consider when executing a search with respect to group id
     #is user a moderator
@@ -91,18 +85,17 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     #now add the group name if the thread has a group id
     for thread in threads:
-        
+
         if thread.get('group_id'):
             thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
             thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
         else:
             thread['group_name'] = ""
             thread['group_string'] = "This post visible to everyone."
-        
+    
         #patch for backward compatibility to comments service
         if not 'pinned' in thread:
             thread['pinned'] = False
-        
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
@@ -110,6 +103,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     return threads, query_params
 
 
+@login_required
 def inline_discussion(request, course_id, discussion_id):
     """
     Renders JSON for DiscussionModules
@@ -142,14 +136,14 @@ def inline_discussion(request, course_id, discussion_id):
     cohorts_list = list()
 
     if is_cohorted:
-        cohorts_list.append({'name':'All Groups','id':None})
+        cohorts_list.append({'name': 'All Groups', 'id': None})
 
         #if you're a mod, send all cohorts and let you pick
 
         if is_moderator:
             cohorts = get_course_cohorts(course_id)
             for c in cohorts:
-                cohorts_list.append({'name':c.name, 'id':c.id})
+                cohorts_list.append({'name': c.name, 'id': c.id})
 
         else:
             #students don't get to choose
@@ -216,9 +210,6 @@ def forum_form_discussion(request, course_id):
 
         user_cohort_id = get_cohort_id(request.user, course_id)
 
-    
-        
-
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
@@ -239,8 +230,8 @@ def forum_form_discussion(request, course_id):
             'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
-
         return render_to_response('discussion/index.html', context)
+
 
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
@@ -250,11 +241,11 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     try:
         thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
-        
+
         #patch for backward compatibility with comments service
         if not 'pinned' in thread.attributes:
             thread['pinned'] = False
-        
+
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         log.error("Error loading single thread.")
         raise Http404
@@ -352,7 +343,7 @@ def user_profile(request, course_id, user_id):
         query_params = {
             'page': request.GET.get('page', 1),
             'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
-            }
+        }
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
         query_params['page'] = page
@@ -369,8 +360,6 @@ def user_profile(request, course_id, user_id):
                 'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             })
         else:
-
-
             context = {
                 'course': course,
                 'user': request.user,
@@ -426,5 +415,5 @@ def followed_threads(request, course_id, user_id):
             }
 
             return render_to_response('discussion/user_profile.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
         raise Http404

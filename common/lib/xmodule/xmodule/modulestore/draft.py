@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from . import ModuleStoreBase, Location
+from . import ModuleStoreBase, Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
+from .inheritance import own_metadata
 
 DRAFT = 'draft'
 
@@ -12,14 +13,20 @@ def as_draft(location):
     """
     return Location(location)._replace(revision=DRAFT)
 
+def as_published(location):
+    """
+    Returns the Location that is the published version for `location`
+    """
+    return Location(location)._replace(revision=None)    
+
 
 def wrap_draft(item):
     """
-    Sets `item.cms.is_draft` to `True` if the item is a
+    Sets `item.is_draft` to `True` if the item is a
     draft, and `False` otherwise. Sets the item's location to the
     non-draft location in either case
     """
-    item.cms.is_draft = item.location.revision == DRAFT
+    setattr(item, 'is_draft', item.location.revision == DRAFT)
     item.location = item.location._replace(revision=None)
     return item
 
@@ -55,11 +62,10 @@ class DraftModuleStore(ModuleStoreBase):
             get_children() to cache. None indicates to cache all descendents
         """
 
-        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
         try:
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth=0))
+            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth=depth))
         except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth=0))
+            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth=depth))
 
     def get_instance(self, course_id, location, depth=0):
         """
@@ -67,11 +73,10 @@ class DraftModuleStore(ModuleStoreBase):
         TODO (vshnayder): this may want to live outside the modulestore eventually
         """
 
-        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
         try:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location), depth=0))
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location), depth=depth))
         except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=0))
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=depth))
 
     def get_items(self, location, course_id=None, depth=0):
         """
@@ -88,9 +93,8 @@ class DraftModuleStore(ModuleStoreBase):
         """
         draft_loc = as_draft(location)
 
-        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
-        draft_items = super(DraftModuleStore, self).get_items(draft_loc, course_id=course_id, depth=0)
-        items = super(DraftModuleStore, self).get_items(location, course_id=course_id, depth=0)
+        draft_items = super(DraftModuleStore, self).get_items(draft_loc, course_id=course_id, depth=depth)
+        items = super(DraftModuleStore, self).get_items(location, course_id=course_id, depth=depth)
 
         draft_locs_found = set(item.location._replace(revision=None) for item in draft_items)
         non_draft_items = [
@@ -108,7 +112,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         return wrap_draft(super(DraftModuleStore, self).clone_item(source, as_draft(location)))
 
-    def update_item(self, location, data):
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data
@@ -117,9 +121,13 @@ class DraftModuleStore(ModuleStoreBase):
         data: A nested dictionary of problem data
         """
         draft_loc = as_draft(location)
-        draft_item = self.get_item(location)
-        if not draft_item.cms.is_draft:
-            self.clone_item(location, draft_loc)
+        try:
+            draft_item = self.get_item(location)
+            if not getattr(draft_item, 'is_draft', False):
+                self.clone_item(location, draft_loc)
+        except ItemNotFoundError, e:
+            if not allow_not_found:
+                raise e
 
         return super(DraftModuleStore, self).update_item(draft_loc, data)
 
@@ -133,7 +141,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
-        if not draft_item.cms.is_draft:
+        if not getattr(draft_item, 'is_draft', False):
             self.clone_item(location, draft_loc)
 
         return super(DraftModuleStore, self).update_children(draft_loc, children)
@@ -149,7 +157,7 @@ class DraftModuleStore(ModuleStoreBase):
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
 
-        if not draft_item.cms.is_draft:
+        if not getattr(draft_item, 'is_draft', False):
             self.clone_item(location, draft_loc)
 
         if 'is_draft' in metadata:
@@ -157,14 +165,17 @@ class DraftModuleStore(ModuleStoreBase):
 
         return super(DraftModuleStore, self).update_metadata(draft_loc, metadata)
 
-    def delete_item(self, location):
+    def delete_item(self, location, delete_all_versions=False):
         """
         Delete an item from this modulestore
 
         location: Something that can be passed to Location
         """
-        return super(DraftModuleStore, self).delete_item(as_draft(location))
+        super(DraftModuleStore, self).delete_item(as_draft(location))
+        if delete_all_versions:
+            super(DraftModuleStore, self).delete_item(as_published(location))
 
+        return
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location.  Needed
@@ -179,11 +190,12 @@ class DraftModuleStore(ModuleStoreBase):
         Save a current draft to the underlying modulestore
         """
         draft = self.get_item(location)
+
         draft.cms.published_date = datetime.utcnow()
         draft.cms.published_by = published_by_id
         super(DraftModuleStore, self).update_item(location, draft._model_data._kvs._data)
         super(DraftModuleStore, self).update_children(location, draft._model_data._kvs._children)
-        super(DraftModuleStore, self).update_metadata(location, draft._model_data._kvs._metadata)
+        super(DraftModuleStore, self).update_metadata(location, own_metadata(draft))
         self.delete_item(location)
 
     def unpublish(self, location):
@@ -192,3 +204,36 @@ class DraftModuleStore(ModuleStoreBase):
         """
         super(DraftModuleStore, self).clone_item(location, as_draft(location))
         super(DraftModuleStore, self).delete_item(location)
+
+    def _query_children_for_cache_children(self, items):
+        # first get non-draft in a round-trip
+        queried_children = []
+        to_process_non_drafts = super(DraftModuleStore, self)._query_children_for_cache_children(items)
+
+        to_process_dict = {}
+        for non_draft in to_process_non_drafts:
+            to_process_dict[Location(non_draft["_id"])] = non_draft
+
+        # now query all draft content in another round-trip
+        query = {
+            '_id': {'$in': [namedtuple_to_son(as_draft(Location(item))) for item in items]}
+        }
+        to_process_drafts = list(self.collection.find(query))
+
+        # now we have to go through all drafts and replace the non-draft
+        # with the draft. This is because the semantics of the DraftStore is to
+        # always return the draft - if available
+        for draft in to_process_drafts:
+            draft_loc = Location(draft["_id"])
+            draft_as_non_draft_loc = draft_loc._replace(revision=None)
+
+            # does non-draft exist in the collection
+            # if so, replace it
+            if draft_as_non_draft_loc in to_process_dict:
+                to_process_dict[draft_as_non_draft_loc] = draft
+
+        # convert the dict - which is used for look ups - back into a list
+        for key, value in to_process_dict.iteritems():
+            queried_children.append(value)
+
+        return queried_children

@@ -359,6 +359,8 @@ Supported fields at the course level
           * `auto_cohort_groups`: `["group name 1", "group name 2", ...]` If `cohorted` and `auto_cohort` is true, automatically put each student into a random group from the `auto_cohort_groups` list, creating the group if needed.  
      * - `pdf_textbooks`
        - have pdf-based textbooks on tabs in the courseware.  See below for details on config.
+     * - `html_textbooks`
+       - have html-based textbooks on tabs in the courseware.  See below for details on config.
 
 
 Available metadata
@@ -385,7 +387,14 @@ Inherited
   When this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
 
 `showanswer`
-  When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
+  When to show answer. Values: never, attempted, answered, closed, finished, past_due, always. Default: closed. Optional.
+    - `never`: never show answer
+    - `attempted`: show answer after first attempt
+    - `answered` : this is slightly different from `attempted` -- resetting the problems makes "done" False, but leaves attempts unchanged.
+    - `closed` : show answer after problem is closed, ie due date is past, or maximum attempts exceeded.
+    - `finished` : show answer after problem closed, or is correctly answered.
+    - `past_due` : show answer after problem due date is past.
+    - `always` : always allow answer to be shown.
 
 `graded`
   Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
@@ -511,6 +520,7 @@ If you want to customize the courseware tabs displayed for your course, specify 
       "name": "Exciting news"
     },
     {"type": "textbooks"},
+    {"type": "html_textbooks"},
     {"type": "pdf_textbooks"}
   ]
 
@@ -518,6 +528,7 @@ If you want to customize the courseware tabs displayed for your course, specify 
 * The first two tabs must have types `"courseware"` and `"course_info"`, in that order, or the course will not load.
 * The `courseware` tab never has a name attribute -- it's always rendered as "Courseware" for consistency between courses.
 * The `textbooks` tab will actually generate one tab per textbook, using the textbook titles as names.
+* The `html_textbooks` tab will actually generate one tab per html_textbook.  The tab name is found in the html textbook definition.
 * The `pdf_textbooks` tab will actually generate one tab per pdf_textbook.  The tab name is found in the pdf textbook definition.
 * For static tabs, the `url_slug` will be the url that points to the tab.  It can not be one of the existing courseware url types (even if those aren't used in your course).  The static content will come from `tabs/{course_url_name}/{url_slug}.html`, or `tabs/{url_slug}.html` if that doesn't exist.
 * An Instructor tab will be automatically added at the end for course staff users.
@@ -538,6 +549,8 @@ If you want to customize the courseware tabs displayed for your course, specify 
      - Parameters `name`, `link`.
    * - `textbooks`
      - No parameters--generates tab names from book titles.
+   * - `html_textbooks`
+     - No parameters--generates tab names from html book definition.  (See discussion below for configuration.)
    * - `pdf_textbooks`
      - No parameters--generates tab names from pdf book definition.  (See discussion below for configuration.)
    * - `progress`
@@ -550,7 +563,7 @@ If you want to customize the courseware tabs displayed for your course, specify 
 *********
 Textbooks
 *********
-Support is currently provided for image-based and PDF-based textbooks. In addition to enabling the display of textbooks in tabs (see above), specific information about the location of textbook content must be configured.  
+Support is currently provided for image-based, HTML-based and PDF-based textbooks. In addition to enabling the display of textbooks in tabs (see above), specific information about the location of textbook content must be configured.  
 
 Image-based Textbooks
 =====================
@@ -622,6 +635,62 @@ The course content can then link to page 25 using the `customtag` element:
 
   <customtag book="0" page="25" impl="book"/>
 
+
+HTML-based Textbooks
+====================
+
+Configuration
+-------------
+
+HTML-based textbooks are configured at the course level in the policy file.  The JSON markup consists of an array of maps, with each map corresponding to a separate textbook.  There are two styles to presenting HTML-based material.  The first way is as a single HTML on a tab, which requires only a tab title and a URL for configuration.  A second way permits the display of multiple HTML files that should be displayed together on a single view. For this view, a side panel of links is available on the left, allowing selection of a particular HTML to view.  
+
+.. code-block:: json
+
+        "html_textbooks": [ 
+          {"tab_title": "Textbook 1", 
+	   "url": "https://www.example.com/thiscourse/book1/book1.html" },
+          {"tab_title": "Textbook 2", 
+	   "chapters": [
+               { "title": "Chapter 1", "url": "https://www.example.com/thiscourse/book2/Chapter1.html" },
+               { "title": "Chapter 2", "url": "https://www.example.com/thiscourse/book2/Chapter2.html" },
+               { "title": "Chapter 3", "url": "https://www.example.com/thiscourse/book2/Chapter3.html" },
+               { "title": "Chapter 4", "url": "https://www.example.com/thiscourse/book2/Chapter4.html" },
+               { "title": "Chapter 5", "url": "https://www.example.com/thiscourse/book2/Chapter5.html" },
+               { "title": "Chapter 6", "url": "https://www.example.com/thiscourse/book2/Chapter6.html" },
+               { "title": "Chapter 7", "url": "https://www.example.com/thiscourse/book2/Chapter7.html" }
+	       ]
+	  }
+        ]
+
+Some notes:
+
+* It is not a good idea to include a top-level URL and chapter-level URLs in the same textbook configuration.
+
+Linking from Content
+--------------------
+
+It is possible to add links to specific pages in a textbook by using a URL that encodes the index of the textbook, the chapter (if chapters are used), and the page number.  For a book with no chapters, the URL is of the form `/course/htmlbook/${bookindex}`.  For a book with chapters, use `/course/htmlbook/${bookindex}/chapter/${chapter}` for a specific chapter, or `/course/htmlbook/${bookindex}` will default to the first chapter.   
+
+For example, for the book with no chapters configured above, the textbook can be reached using the URL `/course/htmlbook/0`.  Reaching the third chapter of the second book is accomplished with `/course/htmlbook/1/chapter/3`.  
+
+You can use a `customtag` to create a template for such links.  For example, you can create a `htmlbook` template in the `customtag` directory, containing:
+
+.. code-block:: xml
+
+  <img src="/static/images/icons/textbook_icon.png"/> More information given in <a href="/course/htmlbook/${book}">the text</a>. 
+
+And a `htmlchapter` template containing:
+
+.. code-block:: xml
+
+  <img src="/static/images/icons/textbook_icon.png"/> More information given in <a href="/course/htmlbook/${book}/chapter/${chapter}">the text</a>. 
+
+The example pages can then be linked using the `customtag` element:
+
+.. code-block:: xml
+
+  <customtag book="0" impl="htmlbook"/>
+  <customtag book="1" chapter="3" impl="htmlchapter"/>
 
 PDF-based Textbooks
 ===================

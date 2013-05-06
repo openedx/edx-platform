@@ -79,7 +79,7 @@ class CombinedOpenEndedRubric(object):
             raise RubricParsingError(error_message)
         return {'success': success, 'html': html, 'rubric_scores': rubric_scores}
 
-    def check_if_rubric_is_parseable(self, rubric_string, location, max_score_allowed, max_score):
+    def check_if_rubric_is_parseable(self, rubric_string, location, max_score_allowed):
         rubric_dict = self.render_rubric(rubric_string)
         success = rubric_dict['success']
         rubric_feedback = rubric_dict['html']
@@ -101,12 +101,7 @@ class CombinedOpenEndedRubric(object):
                 log.error(error_message)
                 raise RubricParsingError(error_message)
 
-        if int(total) != int(max_score):
-            #This is a staff_facing_error
-            error_msg = "The max score {0} for problem {1} does not match the total number of points in the rubric {2}. Contact the learning sciences group for assistance.".format(
-                max_score, location, total)
-            log.error(error_msg)
-            raise RubricParsingError(error_msg)
+        return int(total)
 
     def extract_categories(self, element):
         '''

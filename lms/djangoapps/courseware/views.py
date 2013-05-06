@@ -12,7 +12,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
-#from django.views.decorators.csrf import ensure_csrf_cookie
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 
@@ -21,6 +20,7 @@ from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
+from courseware.masquerade import setup_masquerade
 from courseware.model_data import ModelDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
@@ -67,9 +67,9 @@ def user_groups(user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def courses(request):
-    '''
+    """
     Render "find courses" page.  The course selection work is done in courseware.courses.
-    '''
+    """
     courses = get_courses(request.user, request.META.get('HTTP_HOST'))
     courses = sort_by_announcement(courses)
 
@@ -77,22 +77,26 @@ def courses(request):
 
 
 def render_accordion(request, course, chapter, section, model_data_cache):
-    ''' Draws navigation bar. Takes current position in accordion as
-        parameter.
+    """
+    Draws navigation bar. Takes current position in accordion as
+    parameter.
 
-        If chapter and section are '' or None, renders a default accordion.
+    If chapter and section are '' or None, renders a default accordion.
 
-        course, chapter, and section are the url_names.
+    course, chapter, and section are the url_names.
 
-        Returns the html string'''
+    Returns the html string
+    """
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    request.user = user	# keep just one instance of User
     toc = toc_for_course(user, request, course, chapter, section, model_data_cache)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
-                    ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
+                    ('csrf', csrf(request)['csrf_token']),
+                    ('show_timezone', course.show_timezone)] + template_imports.items())
     return render_to_string('courseware/accordion.html', context)
 
 
@@ -166,10 +170,10 @@ def save_child_position(seq_module, child_name):
 
 
 def check_for_active_timelimit_module(request, course_id, course):
-    '''
+    """
     Looks for a timing module for the given user and course that is currently active.
     If found, returns a context dict with timer-related values to enable display of time remaining.
-    '''
+    """
     context = {}
 
     # TODO (cpennington): Once we can query the course structure, replace this with such a query
@@ -201,11 +205,11 @@ def check_for_active_timelimit_module(request, course_id, course):
 
 
 def update_timelimit_module(user, course_id, model_data_cache, timelimit_descriptor, timelimit_module):
-    '''
+    """
     Updates the state of the provided timing module, starting it if it hasn't begun.
     Returns dict with timer-related values to enable display of time remaining.
     Returns 'timer_expiration_duration' in dict if timer is still active, and not if timer has expired.
-    '''
+    """
     context = {}
     # determine where to go when the exam ends:
     if timelimit_descriptor.time_expired_redirect_url is None:
@@ -258,6 +262,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    request.user = user	# keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
     staff_access = has_access(user, course, 'staff')
     registered = registered_for_course(course, user)
@@ -265,6 +270,8 @@ def index(request, course_id, chapter=None, section=None,
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug('User %s tried to view course %s but is not enrolled' % (user, course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
+
+    masq = setup_masquerade(request, staff_access)
 
     try:
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
@@ -287,6 +294,7 @@ def index(request, course_id, chapter=None, section=None,
             'init': '',
             'content': '',
             'staff_access': staff_access,
+            'masquerade': masq,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
@@ -299,12 +307,18 @@ def index(request, course_id, chapter=None, section=None,
         chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
+            if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+                log.debug('staff masq as student: no chapter %s' % chapter)
+                return redirect(reverse('courseware', args=[course.id]))
             raise Http404
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
+                if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+                    log.debug('staff masq as student: no section %s' % section)
+                    return redirect(reverse('courseware', args=[course.id]))
                 raise Http404
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
@@ -391,14 +405,14 @@ def index(request, course_id, chapter=None, section=None,
 
 @ensure_csrf_cookie
 def jump_to(request, course_id, location):
-    '''
+    """
     Show the page that contains a specific location.
 
     If the location is invalid or not in any class, return a 404.
 
     Otherwise, delegates to the index view to figure out whether this user
     has access, and what they should see.
-    '''
+    """
     # Complain if the location isn't valid
     try:
         location = Location(location)
@@ -435,9 +449,10 @@ def course_info(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
+    masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
 
     return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
-            'course': course, 'staff_access': staff_access})
+            'course': course, 'staff_access': staff_access, 'masquerade': masq})
 
 
 @ensure_csrf_cookie
@@ -486,7 +501,9 @@ def syllabus(request, course_id):
 
 
 def registered_for_course(course, user):
-    '''Return CourseEnrollment if user is registered for course, else False'''
+    """
+    Return CourseEnrollment if user is registered for course, else False
+    """
     if user is None:
         return False
     if user.is_authenticated():
@@ -522,6 +539,12 @@ def static_university_profile(request, org_id):
     """
     Return the profile for the particular org_id that does not have any courses.
     """
+    # Redirect to the properly capitalized org_id
+    last_path = request.path.split('/')[-1]
+    if last_path != org_id:
+        return redirect('static_university_profile', org_id=org_id)
+
+    # Render template
     template_file = "university_profile/{0}.html".format(org_id).lower()
     context = dict(courses=[], org_id=org_id)
     return render_to_response(template_file, context)
@@ -533,17 +556,28 @@ def university_profile(request, org_id):
     """
     Return the profile for the particular org_id.  404 if it's not valid.
     """
+    virtual_orgs_ids = settings.VIRTUAL_UNIVERSITIES
+    meta_orgs = getattr(settings, 'META_UNIVERSITIES', {})
+
+    # Get all the ids associated with this organization
     all_courses = modulestore().get_courses()
-    valid_org_ids = set(c.org for c in all_courses).union(settings.VIRTUAL_UNIVERSITIES)
-    if org_id not in valid_org_ids:
+    valid_orgs_ids = set(c.org for c in all_courses)
+    valid_orgs_ids.update(virtual_orgs_ids + meta_orgs.keys())
+
+    if org_id not in valid_orgs_ids:
         raise Http404("University Profile not found for {0}".format(org_id))
 
-    # Only grab courses for this org...
-    courses = get_courses_by_university(request.user,
-                                        domain=request.META.get('HTTP_HOST'))[org_id]
-    courses = sort_by_announcement(courses)
+    # Grab all courses for this organization(s)
+    org_ids = set([org_id] + meta_orgs.get(org_id, []))
+    org_courses = []
+    domain = request.META.get('HTTP_HOST')
+    for key in org_ids:
+        cs = get_courses_by_university(request.user, domain=domain)[key]
+        org_courses.extend(cs)
 
-    context = dict(courses=courses, org_id=org_id)
+    org_courses = sort_by_announcement(org_courses)
+
+    context = dict(courses=org_courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
     return render_to_response(template_file, context)
@@ -613,6 +647,7 @@ def progress(request, course_id, student_id=None):
                'courseware_summary': courseware_summary,
                'grade_summary': grade_summary,
                'staff_access': staff_access,
+               'student': student,
                }
     context.update()
 
@@ -646,13 +681,13 @@ def submission_history(request, course_id, student_username, location):
                             .format(student_username, location))
 
     history_entries = StudentModuleHistory.objects \
-                      .filter(student_module=student_module).order_by('-created')
+                      .filter(student_module=student_module).order_by('-id')
 
     # If no history records exist, let's force a save to get history started.
     if not history_entries:
         student_module.save()
         history_entries = StudentModuleHistory.objects \
-                          .filter(student_module=student_module).order_by('-created')
+                          .filter(student_module=student_module).order_by('-id')
 
     context = {
         'history_entries': history_entries,

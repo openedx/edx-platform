@@ -37,6 +37,9 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
         var errors = {};
+        if (newattrs.start_date === null) {
+            errors.start_date = "The course must have an assigned start date.";
+        }
         if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
             errors.end_date = "The course end date cannot be before the course start date.";
         }

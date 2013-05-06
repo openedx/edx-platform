@@ -3,13 +3,11 @@ from django.test.utils import override_settings
 
 import xmodule.modulestore.django
 
-from courseware.tests.tests import PageLoader, TEST_DATA_XML_MODULESTORE
+from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml_importer import import_from_xml
-
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class WikiRedirectTestCase(PageLoader):
+class WikiRedirectTestCase(LoginEnrollmentTestCase):
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
         courses = modulestore().get_courses()
@@ -29,8 +27,6 @@ class WikiRedirectTestCase(PageLoader):
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.student)
         self.activate_user(self.instructor)
-
-
 
     def test_wiki_redirect(self):
         """
@@ -69,7 +65,6 @@ class WikiRedirectTestCase(PageLoader):
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(resp['Location'], 'http://testserver' + destination)
 
-
     def create_course_page(self, course):
         """
         Test that loading the course wiki page creates the wiki page.
@@ -98,7 +93,6 @@ class WikiRedirectTestCase(PageLoader):
         self.assertTrue("course info" in resp.content.lower())
         self.assertTrue("courseware" in resp.content.lower())
 
-
     def test_course_navigator(self):
         """"
         Test that going from a course page to a wiki page contains the course navigator.
@@ -107,7 +101,6 @@ class WikiRedirectTestCase(PageLoader):
         self.login(self.student, self.password)
         self.enroll(self.toy)
         self.create_course_page(self.toy)
-
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
         referer = reverse("courseware", kwargs={'course_id': self.toy.id})

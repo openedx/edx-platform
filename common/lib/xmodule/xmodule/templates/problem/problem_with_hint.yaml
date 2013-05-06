@@ -1,7 +1,6 @@
 ---
 metadata:
     display_name: Problem with Adaptive Hint
-    source_processor_url: https://qisx.mit.edu:5443/latex2edx
     source_code: |
         \subsection{Problem With Adaptive Hint}
 

@@ -80,16 +80,17 @@ class CorrectMap(object):
 
         Special migration case:
             If correct_map is a one-level dict, then convert it to the new dict of dicts format.
-        '''
-        if correct_map and not (type(correct_map[correct_map.keys()[0]]) == dict):
-            # empty current dict
-            self.__init__()
 
-            # create new dict entries
+        '''
+        # empty current dict
+        self.__init__()
+
+        # create new dict entries
+        if correct_map and not isinstance(correct_map.values()[0], dict):
+            # special migration
             for k in correct_map:
-                self.set(k, correct_map[k])
+                self.set(k, correctness=correct_map[k])
         else:
-            self.__init__()
             for k in correct_map:
                 self.set(k, **correct_map[k])
 

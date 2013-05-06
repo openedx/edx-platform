@@ -36,7 +36,7 @@ ALLOWABLE_IMAGE_SUFFIXES = [
 ]
 
 #Maximum allowed dimensions (x and y) for an uploaded image
-MAX_ALLOWED_IMAGE_DIM = 1500
+MAX_ALLOWED_IMAGE_DIM = 2000
 
 #Dimensions to which image is resized before it is evaluated for color count, etc
 MAX_IMAGE_DIM = 150
@@ -178,7 +178,7 @@ class URLProperties(object):
         Runs all available url tests
         @return: True if URL passes tests, false if not.
         """
-        url_is_okay = self.check_suffix() and self.check_if_parses() and self.check_domain()
+        url_is_okay = self.check_suffix() and self.check_if_parses()
         return url_is_okay
 
     def check_domain(self):

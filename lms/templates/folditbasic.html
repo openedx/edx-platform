@@ -1,5 +1,8 @@
+<%!
+from xmodule.util.date_utils import get_default_time_display
+%>
 <div class="folditbasic">
-<p><strong>Due:</strong> ${due}
+<p><strong>Due:</strong> ${get_default_time_display(due)}
 
 <p>
   <strong>Status:</strong>

@@ -19,8 +19,7 @@ log = logging.getLogger(__name__)
 
 class VideoFields(object):
     data = String(help="XML data for the problem", scope=Scope.content)
-    position = Integer(help="Current position in the video", scope=Scope.student_state, default=0)
-    display_name = String(help="Display name for this module", scope=Scope.settings)
+    position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
 
 
 class VideoModule(VideoFields, XModule):

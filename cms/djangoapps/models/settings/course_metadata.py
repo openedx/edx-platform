@@ -4,6 +4,7 @@ from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata
 from xblock.core import Scope
 from xmodule.course_module import CourseDescriptor
+import copy
 
 
 class CourseMetadata(object):
@@ -13,8 +14,13 @@ class CourseMetadata(object):
     The objects have no predefined attrs but instead are obj encodings of the
     editable metadata.
     '''
-    FILTERED_LIST = XModuleDescriptor.system_metadata_fields + ['start', 'end',
-        'enrollment_start', 'enrollment_end', 'tabs', 'graceperiod', 'checklists']
+    FILTERED_LIST = XModuleDescriptor.system_metadata_fields + ['start',
+                                                                'end',
+                                                                'enrollment_start',
+                                                                'enrollment_end',
+                                                                'tabs',
+                                                                'graceperiod',
+                                                                'checklists']
 
     @classmethod
     def fetch(cls, course_location):
@@ -39,7 +45,7 @@ class CourseMetadata(object):
         return course
 
     @classmethod
-    def update_from_json(cls, course_location, jsondict):
+    def update_from_json(cls, course_location, jsondict, filter_tabs=True):
         """
         Decode the json into CourseMetadata and save any changed attrs to the db.
 
@@ -49,9 +55,15 @@ class CourseMetadata(object):
 
         dirty = False
 
+        #Copy the filtered list to avoid permanently changing the class attribute
+        filtered_list = copy.copy(cls.FILTERED_LIST)
+        #Don't filter on the tab attribute if filter_tabs is False
+        if not filter_tabs:
+            filtered_list.remove("tabs")
+
         for k, v in jsondict.iteritems():
             # should it be an error if one of the filtered list items is in the payload?
-            if k in cls.FILTERED_LIST:
+            if k in filtered_list:
                 continue
 
             if hasattr(descriptor, k) and getattr(descriptor, k) != v:
@@ -65,7 +77,7 @@ class CourseMetadata(object):
 
         if dirty:
             get_modulestore(course_location).update_metadata(course_location,
-                own_metadata(descriptor))
+                                                             own_metadata(descriptor))
 
         # Could just generate and return a course obj w/o doing any db reads,
         # but I put the reads in as a means to confirm it persisted correctly
@@ -86,6 +98,6 @@ class CourseMetadata(object):
                 delattr(descriptor.lms, key)
 
         get_modulestore(course_location).update_metadata(course_location,
-            own_metadata(descriptor))
+                                                         own_metadata(descriptor))
 
         return cls.fetch(course_location)

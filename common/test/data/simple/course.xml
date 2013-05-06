@@ -12,13 +12,20 @@
       </sequential>
     </section>
   </chapter>
-  <chapter name="Chapter 2">
+  <chapter name="Chapter 2" url_name='chapter_2'>
     <section name="Problem Set 1">
       <sequential>
         <problem type="lecture" showanswer="attempted" rerandomize="true" display_name="A simple coding problem" name="Simple coding problem" filename="ps01-simple" url_name="ps01-simple"/>
       </sequential>
     </section>
     <video name="Lost Video" youtube="1.0:TBvX7HzxexQ"/>
+    <sequential format="Lecture Sequence" url_name='test_sequence'>
+        <vertical url_name='test_vertical'>
+            <html url_name='test_html'>
+                Foobar
+            </html>
+        </vertical>
+    </sequential>
   </chapter>
 
 </course>

@@ -1,5 +1,3 @@
-from lxml import etree
-
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.core.urlresolvers import reverse
@@ -40,6 +38,20 @@ def index_shifted(request, course_id, page):
 
 @login_required
 def pdf_index(request, course_id, book_index, chapter=None, page=None):
+    """
+    Display a PDF textbook.
+
+    course_id: course for which to display text.  The course should have
+      "pdf_textbooks" property defined.
+
+    book index:  zero-based index of which PDF textbook to display.
+
+    chapter:  (optional) one-based index into the chapter array of textbook PDFs to display.
+        Defaults to first chapter.  Specifying this assumes that there are separate PDFs for
+        each chapter in a textbook.
+
+    page:  (optional) one-based page number to display within the PDF.  Defaults to first page.
+    """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
@@ -65,7 +77,6 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
         for entry in textbook['chapters']:
             entry['url'] = remap_static_url(entry['url'], course)
 
-
     return render_to_response('static_pdfbook.html',
                               {'book_index': book_index,
                                'course': course,
@@ -74,8 +85,21 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
                                'page': page,
                                'staff_access': staff_access})
 
+
 @login_required
-def html_index(request, course_id, book_index, chapter=None, anchor_id=None):
+def html_index(request, course_id, book_index, chapter=None):
+    """
+    Display an HTML textbook.
+
+    course_id: course for which to display text.  The course should have
+      "html_textbooks" property defined.
+
+    book index:  zero-based index of which HTML textbook to display.
+
+    chapter:  (optional) one-based index into the chapter array of textbook HTML files to display.
+        Defaults to first chapter.  Specifying this assumes that there are separate HTML files for
+        each chapter in a textbook.
+    """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
@@ -106,5 +130,4 @@ def html_index(request, course_id, book_index, chapter=None, anchor_id=None):
                                'course': course,
                                'textbook': textbook,
                                'chapter': chapter,
-                               'anchor_id': anchor_id,
                                'staff_access': staff_access})

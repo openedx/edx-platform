@@ -7,11 +7,14 @@ import requests
 import time
 from datetime import datetime
 
+import dateutil.parser
+
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
+from xmodule.util.date_utils import time_to_datetime
 import json
 
 from xblock.core import Scope, List, String, Object, Boolean
@@ -150,7 +153,7 @@ class CourseFields(object):
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
-    advertised_start = StringOrDate(help="Date that this course is advertised to start", scope=Scope.settings)
+    advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
     grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", scope=Scope.settings)
@@ -177,6 +180,7 @@ class CourseFields(object):
     has_children = True
     checklists = List(scope=Scope.settings)
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
+    show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
 
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
@@ -207,7 +211,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     template_dir_name = 'course'
 
-
     def __init__(self, *args, **kwargs):
         super(CourseDescriptor, self).__init__(*args, **kwargs)
 
@@ -229,6 +232,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
         self._grading_policy = {}
+
         self.set_grading_policy(self.grading_policy)
 
         self.test_center_exams = []
@@ -417,7 +421,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         policy['GRADE_CUTOFFS'] = value
         self.grading_policy = policy
 
-
     @property
     def lowest_passing_grade(self):
         return min(self._grading_policy['GRADE_CUTOFFS'].values())
@@ -456,7 +459,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         else:
             return self.cohort_config.get("auto_cohort_groups", [])
 
-
     @property
     def top_level_discussion_topic_ids(self):
         """
@@ -464,7 +466,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         topics = self.discussion_topics
         return [d["id"] for d in topics.values()]
-
 
     @property
     def cohorted_discussions(self):
@@ -478,8 +479,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return set()
 
         return set(config.get("cohorted_discussions", []))
-
-
 
     @property
     def is_newish(self):
@@ -531,17 +530,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def _sorting_dates(self):
         # utility function to get datetime objects for dates used to
         # compute the is_new flag and the sorting_score
-        def to_datetime(timestamp):
-            return datetime(*timestamp[:6])
 
         announcement = self.announcement
         if announcement is not None:
-            announcement = to_datetime(announcement)
-        if self.advertised_start is None or isinstance(self.advertised_start, basestring):
-            start = to_datetime(self.start)
-        else:
-            start = to_datetime(self.advertised_start)
-        now = to_datetime(time.gmtime())
+            announcement = time_to_datetime(announcement)
+
+        try:
+            start = dateutil.parser.parse(self.advertised_start)
+        except (ValueError, AttributeError):
+            start = time_to_datetime(self.start)
+
+        now = datetime.utcnow()
 
         return announcement, start, now
 
@@ -581,7 +580,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     yield module_descriptor
 
         for c in self.get_children():
-            sections = []
             for s in c.get_children():
                 if s.lms.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
@@ -597,8 +595,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     all_descriptors.append(s)
 
         return {'graded_sections': graded_sections,
-                 'all_descriptors': all_descriptors, }
-
+                'all_descriptors': all_descriptors, }
 
     @staticmethod
     def make_id(org, course, url_name):
@@ -631,8 +628,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def start_date_text(self):
+        def try_parse_iso_8601(text):
+            try:
+                result = datetime.strptime(text, "%Y-%m-%dT%H:%M")
+                result = result.strftime("%b %d, %Y")
+            except ValueError:
+                result = text.title()
+
+            return result
+
         if isinstance(self.advertised_start, basestring):
-            return self.advertised_start
+            return try_parse_iso_8601(self.advertised_start)
         elif self.advertised_start is None and self.start is None:
             return 'TBD'
         else:
@@ -640,7 +646,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def end_date_text(self):
-        return time.strftime("%b %d, %Y", self.end)
+        """
+        Returns the end date for the course formatted as a string.
+
+        If the course does not have an end date set (course.end is None), an empty string will be returned.
+        """
+        return '' if self.end is None else time.strftime("%b %d, %Y", self.end)
 
     @property
     def forum_posts_allowed(self):

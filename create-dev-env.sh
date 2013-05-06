@@ -26,12 +26,15 @@ EOL
     printf '\E[0m'
 
 }
+
 error() {
       printf '\E[31m'; echo "$@"; printf '\E[0m'
 }
+
 output() {
       printf '\E[36m'; echo "$@"; printf '\E[0m'
 }
+
 usage() {
     cat<<EO
 
@@ -47,11 +50,10 @@ EO
 }
 
 info() {
-
     cat<<EO
     MITx base dir : $BASE
-    Python dir : $PYTHON_DIR
-    Ruby dir : $RUBY_DIR
+    Python virtualenv dir : $PYTHON_DIR
+    Ruby RVM dir : $RUBY_DIR
     Ruby ver : $RUBY_VER
 
 EO
@@ -85,28 +87,46 @@ clone_repos() {
         if [[ -d "$BASE/data/$REPO" ]]; then
             mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
         fi
-	cd "$BASE/data"
+        cd "$BASE/data"
         git clone git@github.com:MITx/$REPO
     fi
 }
 
+
 ### START
 
 PROG=${0##*/}
-BASE="$HOME/mitx_all"
-PYTHON_DIR="$BASE/python"
-RUBY_DIR="$BASE/ruby"
-RUBY_VER="1.9.3"
+
+# Adjust this to wherever you'd like to place the codebase
+BASE="${PROJECT_HOME:-$HOME}/mitx_all"
+
+# Use a sensible default (~/.virtualenvs) for your Python virtualenvs
+# unless you've already got one set up with virtualenvwrapper.
+PYTHON_DIR=${WORKON_HOME:-"$HOME/.virtualenvs"}
+
+# RVM defaults its install to ~/.rvm, but use the overridden rvm_path
+# if that's what's preferred.
+RUBY_DIR=${rvm_path:-"$HOME/.rvm"}
+
 LOG="/var/tmp/install-$(date +%Y%m%d-%H%M%S).log"
 
-
-# Read arguments
-
+# Make sure the user's not about to do anything dumb
 if [[ $EUID -eq 0 ]]; then
     error "This script should not be run using sudo or as the root user"
     usage
     exit 1
 fi
+
+# If in an existing virtualenv, bail
+if [[ "x$VIRTUAL_ENV" != "x" ]]; then
+    envname=`basename $VIRTUAL_ENV`
+    error "Looks like you're already in the \"$envname\" virtual env."
+    error "Run \`deactivate\` and then re-run this script."
+    usage
+    exit 1
+fi
+
+# Read arguments
 ARGS=$(getopt "cvhs" "$*")
 if [[ $? != 0 ]]; then
     usage
@@ -236,31 +256,69 @@ clone_repos
 
 bash $BASE/mitx/install-system-req.sh
 
+output "Installing RVM, Ruby, and required gems"
 
-# Install Ruby RVM
-
-output "Installing rvm and ruby"
-
-if ! grep -q "export rvm_path=$RUBY_DIR" ~/.rvmrc; then
-    if [[ -f $HOME/.rvmrc ]]; then
-        output "Copying existing .rvmrc to .rvmrc.bak"
-        cp $HOME/.rvmrc $HOME/.rvmrc.bak
-    fi
-    output "Creating $HOME/.rvmrc so rvm uses $RUBY_DIR"
-    echo "export rvm_path=$RUBY_DIR" > $HOME/.rvmrc
+# If we're not installing RVM in the default location, then we'll do some
+# funky stuff to make sure that we load in the RVM stuff properly on login.
+if [ "$HOME/.rvm" != $RUBY_DIR ]; then
+  if ! grep -q "export rvm_path=$RUBY_DIR" ~/.rvmrc; then
+      if [[ -f $HOME/.rvmrc ]]; then
+          output "Copying existing .rvmrc to .rvmrc.bak"
+          cp $HOME/.rvmrc $HOME/.rvmrc.bak
+      fi
+      output "Creating $HOME/.rvmrc so rvm uses $RUBY_DIR"
+      echo "export rvm_path=$RUBY_DIR" > $HOME/.rvmrc
+  fi
 fi
 
 curl -sL get.rvm.io | bash -s -- --version 1.15.7
-source $RUBY_DIR/scripts/rvm
+
+# Ensure we have RVM available as a shell function so that it can mess
+# with the environment and set everything up properly. The RVM install
+# process adds this line to login scripts, so this shouldn't be necessary
+# for the user to do each time.
+if [[ `type -t rvm` != "function" ]]; then
+  source $RUBY_DIR/scripts/rvm
+fi
+
+# Ruby doesn't like to build with clang, which is the default on OS X, so
+# use gcc instead. This may not work, since if your gcc was installed with
+# XCode 4.2 or greater, you have an LLVM-based gcc, which also doesn't
+# always play nicely with Ruby, though it seems to be better than clang.
+# You may have to install apple-gcc42 using Homebrew if this doesn't work.
+# See `rvm requirements` for more information.
+case `uname -s` in
+    Darwin)
+        export CC=gcc
+        ;;
+esac
+
+# Let the repo override the version of Ruby to install
+if [[ -r $BASE/mitx/.ruby-version ]]; then
+  RUBY_VER=`cat $BASE/mitx/.ruby-version`
+fi
+
+# Current stable version of RVM (1.19.0) requires the following to build Ruby:
+#
+# autoconf automake libtool pkg-config libyaml libxml2 libxslt libksba openssl
+#
+# If we decide to upgrade from the current version (1.15.7), can run
+#
+# LESS="-E" rvm install $RUBY_VER --autolibs=3 --with-readline
+#
+# to have RVM look for a package manager like Homebrew and install any missing
+# libs automatically. RVM's --autolibs flag defaults to 2, which will fail if
+# any required libs are missing.
 LESS="-E" rvm install $RUBY_VER --with-readline
+
+# Create the "mitx" gemset
+rvm use "$RUBY_VER@mitx" --create
 
 output "Installing gem bundler"
 gem install bundler
 
 output "Installing ruby packages"
-# hack :(
-cd $BASE/mitx  || true
-bundle install
+bundle install --gemfile $BASE/mitx/Gemfile
 
 
 # Install Python virtualenv
@@ -274,16 +332,31 @@ case `uname -s` in
         ;;
 esac
 
+# virtualenvwrapper uses the $WORKON_HOME env var to determine where to place
+# virtualenv directories. Make sure it matches the selected $PYTHON_DIR.
+export WORKON_HOME=$PYTHON_DIR
+
+# Load in the mkvirtualenv function if needed
+if [[ `type -t mkvirtualenv` != "function" ]]; then
+  source `which virtualenvwrapper.sh`
+fi
+
+# Create MITx virtualenv and link it to repo
+# virtualenvwrapper automatically sources the activation script
 if [[ $systempkgs ]]; then
-    virtualenv --system-site-packages "$PYTHON_DIR"
+    mkvirtualenv -a "$BASE/mitx" --system-site-packages mitx || {
+      error "mkvirtualenv exited with a non-zero error"
+      return 1
+    }
 else
     # default behavior for virtualenv>1.7 is
     # --no-site-packages
-    virtualenv  "$PYTHON_DIR"
+    mkvirtualenv -a "$BASE/mitx" mitx || {
+      error "mkvirtualenv exited with a non-zero error"
+      return 1
+    }
 fi
 
-# activate mitx python virtualenv
-source $PYTHON_DIR/bin/activate
 
 # compile numpy and scipy if requested
 
@@ -315,6 +388,8 @@ case `uname -s` in
         # need latest pytz before compiling numpy and scipy
         pip install -U pytz
         pip install numpy
+        # scipy needs cython
+        pip install cython
         # fixes problem with scipy on 10.8
         pip install -e git+https://github.com/scipy/scipy#egg=scipy-dev
         ;;
@@ -344,14 +419,18 @@ cat<<END
    Success!!
 
    To start using Django you will need to activate the local Python
-   and Ruby environment (at this time rvm only supports bash) :
+   and Ruby environments. Ensure the following lines are added to your
+   login script, and source your login script if needed:
 
-        $ source $RUBY_DIR/scripts/rvm
-        $ source $PYTHON_DIR/bin/activate
+        source `which virtualenvwrapper.sh`
+        source $RUBY_DIR/scripts/rvm
+
+   Then, every time you're ready to work on the project, just run
+
+        $ workon mitx
 
    To initialize Django
 
-        $ cd $BASE/mitx
         $ rake django-admin[syncdb]
         $ rake django-admin[migrate]
 

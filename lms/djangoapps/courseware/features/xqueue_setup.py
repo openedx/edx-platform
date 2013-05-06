@@ -1,3 +1,6 @@
+#pylint: disable=C0111
+#pylint: disable=W0621
+
 from courseware.mock_xqueue_server.mock_xqueue_server import MockXQueueServer
 from lettuce import before, after, world
 from django.conf import settings
