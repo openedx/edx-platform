@@ -1,4 +1,4 @@
-This is edX, a platform for online higher education. The project is primarily
+This is edX, a platform for online course delivery. The project is primarily
 written in [Python](http://python.org/), using the
 [Django](https://www.djangoproject.com/) framework. We also use some
 [Ruby](http://www.ruby-lang.org/) and some [NodeJS](http://nodejs.org/).
