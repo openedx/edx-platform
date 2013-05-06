@@ -58,7 +58,7 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
     if cache:
         canonical_globals = sorted(json_safe(globals_dict).iteritems())
         md5er = hashlib.md5()
-        md5er.update(code)
+        md5er.update(repr(code))
         md5er.update(repr(canonical_globals))
         key = "safe_exec.%r.%s" % (random_seed, md5er.hexdigest())
         cached = cache.get(key)

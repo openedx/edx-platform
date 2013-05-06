@@ -143,6 +143,19 @@ class TestSafeExecCaching(unittest.TestCase):
         safe_exec(code, g, cache=DictCache(cache))
         self.assertEqual(g['a'], 17)
 
+    def test_unicode_submission(self):
+        # Check that using non-ASCII unicode does not raise an encoding error.
+    
+        # Try several non-ASCII unicode characters
+        for code in [129, 500, 2**8 - 1, 2**16 - 1]:
+
+            code_with_unichr = unicode("# ") + unichr(code)
+
+            try:
+                safe_exec(code_with_unichr, {}, cache=DictCache({}))
+            except UnicodeEncodeError:
+                self.fail("Tried executing code with non-ASCII unicode: {0}".format(code))
+
 
 class TestRealProblems(unittest.TestCase):
     def test_802x(self):
