@@ -1,5 +1,107 @@
 [
     {
+        "title": "Adapting to Blended Courses, and Finding Early Benefits",
+        "url": "http://www.nytimes.com/2013/04/30/education/adapting-to-blended-courses-and-finding-early-benefits.html?ref=education",
+	    "author": "Tamar Lewin",
+        "image": "nyt_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The New York Times",
+	    "publish_date": "April 29, 2013"
+    },
+
+    {
+        "title": "Colleges Adapt Online Courses to Ease Burden",
+        "url": "http://www.nytimes.com/2013/04/30/education/colleges-adapt-online-courses-to-ease-burden.html?pagewanted=all",
+	    "author": "Tamar Lewin",
+        "image": "nyt_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The New York Times",
+	    "publish_date": "April 29, 2013"
+    },
+ 
+    {
+        "title": "Online Education Lifts Pass Rates at University",
+        "url": "http://online.wsj.com/article/SB10001424127887323741004578414861572832182.html?mod=googlenews_wsj",
+	    "author": "Geoffrey Fowler",
+        "image": "wsj_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Wall Street Journal",
+	    "publish_date": "April 10, 2013"
+    },
+
+    {
+        "title": "Software Seen Giving Grades on Essay Tests",
+        "url": "http://www.nytimes.com/2013/04/05/science/new-test-for-computers-grading-essays-at-college-level.html?pagewanted=all&_r=0",
+	    "author": "John Markoff",
+        "image": "nyt_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The New York Times",
+	    "publish_date": "April 4, 2013"
+    },
+
+    {
+        "title": "Stanford to help build edX MOOC platform",
+        "url": "http://www.washingtonpost.com/local/education/stanford-to-help-build-edx-mooc-platform/2013/04/02/5b53bb3e-9bbe-11e2-9a79-eb5280c81c63_story.html",
+	    "author": "Nick Anderson",
+        "image": "wash_post_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Washington Post",
+	    "publish_date": "April 3, 2013"
+    },
+
+    {
+        "title": "Could online ed end college as we know it?",
+        "url": "http://www.cbsnews.com/video/watch/?id=50143164n",
+	    "author": "CBS This Morning",
+        "image": "cbsnews_178x138.jpg",
+        "deck": null,
+        "publication": "CBS Television Network",
+	    "publish_date": "March 19, 2013"
+    },
+
+    {
+        "title": "The Professors’ Big Stage",
+        "url": "http://www.nytimes.com/2013/03/06/opinion/friedman-the-professors-big-stage.html?_r=1&#commentsContainer",
+	    "author": "Thomas L. Friedman",
+        "image": "nyt_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The New York Times",
+	    "publish_date": "March 6, 2013"
+    },
+
+
+    {
+        "title": "Universities Abroad Join Partnerships On the Web",
+        "url": "http://www.nytimes.com/2013/02/21/education/universities-abroad-join-mooc-course-projects.html",
+	    "author": "Tamar Lewin",
+        "image": "nyt_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The New York Times",
+	    "publish_date": "February 20, 2013"
+    },
+
+ 
+    {
+        "title": "Georgetown to offer free online courses",
+        "url": "http://www.washingtonpost.com/local/education/georgetown-to-offer-free-online-courses/2012/12/09/365c4612-3fd3-11e2-bca3-aadc9b7e29c5_story.html",
+	    "author": "Nick Anderson",
+        "image": "wash_post_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Washington Post",
+	    "publish_date": "December 9, 2012"
+    },
+ 
+    {
+        "title": "Wellesley College teams up with online provider edX",
+        "url": "http://bostonglobe.com/2012/12/04/edx/AqnQ808q4IEcaUa8KuZuBO/story.html",
+	    "author": "Peter Schworm",
+        "image": "bostonglobe_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The Boston Globe",
+	    "publish_date": "December 4, 2012"
+    },
+
+    {
         "title": "The Year of the MOOC",
         "url": "http://www.nytimes.com/2012/11/04/education/edlife/massive-open-online-courses-are-multiplying-at-a-rapid-pace.html",
 	"author": "Laura Pappano",
