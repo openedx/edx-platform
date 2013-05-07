@@ -3,7 +3,6 @@ from path import path
 
 # BASE_DIR is the working directory to execute django-admin commands from.
 # Typically this should be the 'mitx' directory.
-#BASE_DIR = os.path.normpath(os.path.dirname(os.path.abspath(__file__))+'/..')
 BASE_DIR = path(__file__).abspath().dirname().joinpath('..').normpath()
 
 # LOCALE_DIR contains the locale files.
