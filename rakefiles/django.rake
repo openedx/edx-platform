@@ -20,7 +20,7 @@ end
         Start the #{system} locally with the specified environment (defaults to dev).
         Other useful environments are devplus (for dev testing with a real local database)
         desc
-    task system, [:env, :options] => [:install_prereqs, 'assets:watch', :predjango] do |t, args|
+    task system, [:env, :options] => [:install_prereqs, 'assets:_watch', :predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
         sh(django_admin(system, args.env, 'runserver', args.options))
     end

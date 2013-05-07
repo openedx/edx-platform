@@ -26,13 +26,17 @@ end
 desc "Compile all assets"
 multitask :assets => 'assets:all'
 
-desc "Compile all assets in debug mode"
-multitask 'assets:debug'
-
-desc "Watch all assets for changes and automatically recompile"
-multitask 'assets:watch'
-
 namespace :assets do
+
+    desc "Compile all assets in debug mode"
+    multitask :debug
+
+    desc "Watch all assets for changes and automatically recompile"
+    task :watch => 'assets:_watch' do
+        puts "Press ENTER to terminate".red
+        $stdin.gets
+    end
+
     {:xmodule => :install_python_prereqs,
      :coffee => :install_node_prereqs,
      :sass => :install_ruby_prereqs}.each_pair do |asset_type, prereq_task|
@@ -44,7 +48,7 @@ namespace :assets do
 
         multitask :all => asset_type
         multitask :debug => "assets:#{asset_type}:debug"
-        multitask :watch => "assets:#{asset_type}:watch"
+        multitask :_watch => "assets:#{asset_type}:_watch"
 
         namespace asset_type do
             desc "Compile all #{asset_type} assets in debug mode"
@@ -54,21 +58,31 @@ namespace :assets do
             end
 
             desc "Watch all #{asset_type} assets and compile on change"
-            task :watch => prereq_task do
+            task :watch => "assets:#{asset_type}:_watch" do
+                puts "Press ENTER to terminate".red
+                $stdin.gets
+            end
+
+            task :_watch => prereq_task do
                 cmd = send(asset_type.to_s + "_cmd", watch=true, debug=true)
                 background_process(cmd)
             end
         end
     end
 
-    # In watch mode, sass doesn't immediately compile out of date files,
-    # so force a recompile first
-    task "sass:watch" => "assets:sass:debug"
 
     multitask :sass => 'assets:xmodule'
-    multitask 'sass:debug' => 'assets:xmodule:debug'
+    namespace :sass do
+        # In watch mode, sass doesn't immediately compile out of date files,
+        # so force a recompile first
+        task :_watch => 'assets:sass:debug'
+        multitask :debug => 'assets:xmodule:debug'
+    end
+
     multitask :coffee => 'assets:xmodule'
-    multitask 'coffee:debug' => 'assets:xmodule:debug'
+    namespace :coffee do
+        multitask :debug => 'assets:xmodule:debug'
+    end
 end
 
 [:lms, :cms].each do |system|
