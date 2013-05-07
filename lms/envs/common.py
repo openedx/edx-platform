@@ -596,6 +596,9 @@ MKTG_URLS = {
     'CONTACT': '/contact',
     'HOW_IT_WORKS': '/how-it-works',
     'SCHOOLS': '/schools',
+    'TOS': '/terms',
+    'HONOR': '/terms',
+    'PRIVACY': '/privacypolicy',
 }
 MKTG_URL_LINK_MAP = {
     'ABOUT': 'about_edx',
@@ -603,4 +606,7 @@ MKTG_URL_LINK_MAP = {
     'FAQ': 'help_edx',
     'COURSES': 'courses',
     'ROOT': 'root',
+    'TOS': 'tos',
+    'HONOR': 'honor',
+    'PRIVACY': 'privacy_edx',
 }
