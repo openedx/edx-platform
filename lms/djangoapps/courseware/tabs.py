@@ -300,6 +300,27 @@ def get_course_tabs(user, course, active_page):
     return tabs
 
 
+def get_discussion_link(course):
+    """
+    Return the URL for the discussion tab for the given `course`.
+
+    If they have a discussion link specified, use that even if we disable
+    discussions. Disabling discsussions is mostly a server safety feature at
+    this point, and we don't need to worry about external sites. Otherwise,
+    if the course has a discussion tab or uses the default tabs, return the
+    discussion view URL. Otherwise, return None to indicate the lack of a
+    discussion tab.
+    """
+    if course.discussion_link:
+        return course.discussion_link
+    elif not settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+        return None
+    elif hasattr(course, 'tabs') and course.tabs and not any([tab['type'] == 'discussion' for tab in course.tabs]):
+        return None
+    else:
+        return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id])
+
+
 def get_default_tabs(user, course, active_page):
 
     # When calling the various _tab methods, can omit the 'type':'blah' from the
@@ -314,15 +335,9 @@ def get_default_tabs(user, course, active_page):
 
     tabs.extend(_textbooks({}, user, course, active_page))
 
-    ## If they have a discussion link specified, use that even if we feature
-    ## flag discussions off. Disabling that is mostly a server safety feature
-    ## at this point, and we don't need to worry about external sites.
-    if course.discussion_link:
-        tabs.append(CourseTab('Discussion', course.discussion_link, active_page == 'discussion'))
-    elif settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
-        link = reverse('django_comment_client.forum.views.forum_form_discussion',
-                              args=[course.id])
-        tabs.append(CourseTab('Discussion', link, active_page == 'discussion'))
+    discussion_link = get_discussion_link(course)
+    if discussion_link:
+        tabs.append(CourseTab('Discussion', discussion_link, active_page == 'discussion'))
 
     tabs.extend(_wiki({'name': 'Wiki', 'type': 'wiki'}, user, course, active_page))
 
