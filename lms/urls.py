@@ -185,9 +185,13 @@ if settings.COURSEWARE_ENABLED:
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
             'courseware.views.course_about', name="about_course"),
-        #View for mktg site
+        #View for mktg site (kept for backwards compatibility TODO - remove before merge to master)
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/mktg-about$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
+        #View for mktg site
+        url(r'^mktg/(?P<course_id>.*)$',
+            'courseware.views.mktg_course_about', name="mktg_about_course"),
+
 
 
         #Inside the course

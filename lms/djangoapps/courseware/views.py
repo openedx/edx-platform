@@ -537,7 +537,7 @@ def mktg_course_about(request, course_id):
 
     try:
         course = get_course_with_access(request.user, course_id, 'see_exists')
-    except Http404 as e:
+    except (ValueError, Http404) as e:
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response('courseware/mktg_coming_soon.html',
