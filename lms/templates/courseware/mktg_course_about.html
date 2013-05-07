@@ -73,7 +73,7 @@
           %endif
         %else:
         <!-- not signed in -->
-            <a class="action action-register is-not-signedin" href="${reverse('register_user')}">Register for <strong>${course.number}</strong></a>
+            <a class="action action-register" href="${reverse('register_user')}">Register for <strong>${course.number}</strong></a>
         %endif
     </li>
   </ul>

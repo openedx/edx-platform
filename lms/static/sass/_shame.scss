@@ -16,11 +16,12 @@
     display: block;
     padding: $baseline/2 $baseline*2.5;
     text-transform: lowercase;
-    color: $white !important;
+    color: $white;
     letter-spacing: 0.1rem;
     cursor: pointer;
     text-align: center;
     border: none !important;
+    text-decoration: none;
     text-shadow: none;
     letter-spacing: 0.1rem;
     font-size: 17px;
@@ -52,6 +53,17 @@
     }
   }
 
+  .btn-tertiary {
+    @extend .btn;
+    background: $m-blue-l1;
+    color: $m-blue;
+
+    // no hover state conventions to follow from marketing :/
+    &:hover, &:active {
+
+    }
+  }
+
   // nav list
   .list-actions {
     list-style: none;
@@ -63,23 +75,23 @@
     }
   }
 
-  // register actions
   .action {
 
-  }
+    // not registered (default)
+    &.action-register {
+      @extend .btn-primary;
+    }
 
-  // not registered (default)
-  .action-register {
-    @extend .btn-primary;
-  }
+    // already registered
+    &.is-registered {
+      @extend .btn-secondary;
+    }
 
-  // not signed in
-  .is-not-signedin {
-    @extend .btn-primary;
-  }
-
-  // already registered
-  .is-registered {
-    @extend .btn-secondary;
+    // coming soon
+    &.isnot-open {
+      @extend .btn-tertiary;
+      pointer-events: none !important;
+      outline: none;
+    }
   }
 }
