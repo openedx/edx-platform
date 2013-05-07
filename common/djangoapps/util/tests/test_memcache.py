@@ -4,6 +4,7 @@ Tests for memcache in util app
 
 from django.test import TestCase
 from django.core.cache import get_cache
+from django.conf import settings
 from util.memcache import safe_key
 
 
@@ -51,8 +52,17 @@ class MemcacheTest(TestCase):
 
     def test_long_key_prefix_version(self):
 
+        # Long key
         key = safe_key('a' * 300, 'prefix', 'version')
-        self.assertEqual(key[0:15], 'prefix:version:')
+        self.assertTrue(self._is_valid_key(key))
+
+        # Long prefix
+        key = safe_key('key', 'a' * 300, 'version')
+        self.assertTrue(self._is_valid_key(key))
+
+        # Long version
+        key = safe_key('key', 'prefix', 'a' * 300)
+        self.assertTrue(self._is_valid_key(key))
 
     def test_safe_key_unicode(self):
 

@@ -41,11 +41,9 @@ def safe_key(key, key_prefix, version):
     # Attempt to combine the prefix, version, and key
     combined = ":".join([key_prefix, version, key])
 
-    # If the total length is too long for memcache, hash the key
-    # and combine the parts again
+    # If the total length is too long for memcache, hash it
     if len(combined) > 250:
-        key = fasthash(key)
-        combined = ":".join([key_prefix, version, key])
+        combined = fasthash(combined)
 
     # Return the result
     return combined
