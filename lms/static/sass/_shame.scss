@@ -53,6 +53,17 @@
     }
   }
 
+  .btn-tertiary {
+    @extend .btn;
+    background: $m-blue-l1;
+    color: $m-blue;
+
+    // no hover state conventions to follow from marketing :/
+    &:hover, &:active {
+
+    }
+  }
+
   // nav list
   .list-actions {
     list-style: none;
@@ -71,17 +82,16 @@
       @extend .btn-primary;
     }
 
-    // not open for registration/coming soon
-    &.isnot-open {
-      @extend .btn-secondary;
-      color: #d8d9dc;
-      pointer-events: none !important;
-      outline: none;
-    }
-
     // already registered
     &.is-registered {
       @extend .btn-secondary;
+    }
+
+    // coming soon
+    &.isnot-open {
+      @extend .btn-tertiary;
+      pointer-events: none !important;
+      outline: none;
     }
   }
 }
