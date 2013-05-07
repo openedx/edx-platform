@@ -14,10 +14,12 @@
 
 from django.template import Context
 from django.http import HttpResponse
+import logging
 
 from . import middleware
 from django.conf import settings
 from django.core.urlresolvers import reverse
+log = logging.getLogger(__name__)
 
 
 def marketing_link(name):
@@ -32,14 +34,16 @@ def marketing_link(name):
     # link_map maps URLs from the marketing site to the old equivalent on
     # the Django site
     link_map = settings.MKTG_URL_LINK_MAP
-    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE') and name in settings.MKTG_URLS:
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
             return settings.MKTG_URLS.get('ROOT')
         return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
-    elif name in link_map:
+    # only link to the old pages when the marketing site isn't on
+    elif not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE') and name in link_map:
         return reverse(link_map[name])
     else:
+        log.warning("Cannot find corresponding link for name: {name}".format(name=name))
         return '#'
 
 
