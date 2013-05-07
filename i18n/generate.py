@@ -16,10 +16,11 @@
 import os
 from polib import pofile
 
+from logger import get_logger
 from config import BASE_DIR, CONFIGURATION
-from execute import execute, remove_file, LOG
+from execute import execute, remove_file
 
-def merge(locale, target='django.po', fail_if_missing=True):
+def merge(locale, target='django.po', fail_if_missing=True, log=None):
     """
     For the given locale, merge django-partial.po, messages.po, mako.po -> django.po
     target is the resulting filename
@@ -28,7 +29,8 @@ def merge(locale, target='django.po', fail_if_missing=True):
     If fail_if_missing is False, and the files to be merged are missing,
     just return silently.
     """
-    LOG.info('Merging locale={0}'.format(locale))
+    if log:
+        log.info('Merging locale={0}'.format(locale))
     locale_directory = CONFIGURATION.get_messages_dir(locale)
     files_to_merge = ('django-partial.po', 'messages.po', 'mako.po')
     try:
@@ -70,10 +72,12 @@ def validate_files(dir, files_to_merge):
             raise Exception("I18N: Cannot generate because file not found: {0}".format(pathname))
 
 def main ():
+    log = get_logger(__name__)
+
     for locale in CONFIGURATION.locales:
         merge(locale)
     # Dummy text is not required. Don't raise exception if files are missing.
-    merge(CONFIGURATION.dummy_locale, fail_if_missing=False)
+    merge(CONFIGURATION.dummy_locale, fail_if_missing=False, log=log)
     compile_cmd = 'django-admin.py compilemessages'
     execute(compile_cmd, working_directory=BASE_DIR)
 

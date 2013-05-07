@@ -76,4 +76,3 @@ class Configuration:
 
 
 CONFIGURATION = Configuration(LOCALE_DIR.joinpath('config').normpath())
-

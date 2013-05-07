@@ -18,8 +18,10 @@ See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
 import os
 from datetime import datetime
 from polib import pofile
+
+from logger import get_logger
 from config import BASE_DIR, LOCALE_DIR, CONFIGURATION
-from execute import execute, create_dir_if_necessary, remove_file, LOG
+from execute import execute, create_dir_if_necessary, remove_file
 
 # BABEL_CONFIG contains declarations for Babel to extract strings from mako template files
 # Use relpath to reduce noise in logs
@@ -32,6 +34,7 @@ BABEL_OUT = BASE_DIR.relpathto(CONFIGURATION.source_messages_dir.joinpath('mako.
 SOURCE_WARN = 'This English source file is machine-generated. Do not check it into github'
 
 def main ():
+    log = get_logger(__name__)
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
 
@@ -60,7 +63,7 @@ def main ():
     execute(make_djangojs_cmd, working_directory=BASE_DIR)
 
     for filename in generated_files:
-        LOG.info('Cleaning %s' % filename)
+        log.info('Cleaning %s' % filename)
         po = pofile(source_msgs_dir.joinpath(filename))
         # replace default headers with edX headers
         fix_header(po)

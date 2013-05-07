@@ -1,18 +1,9 @@
-import os, subprocess, logging
+import os, subprocess
+
+from logger import get_logger
 from config import CONFIGURATION, BASE_DIR
 
-
-def get_default_logger():
-    """Returns a default logger"""
-    log = logging.getLogger(__name__)
-    log.setLevel(logging.INFO)
-    log_handler = logging.StreamHandler()
-    log_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
-    log.addHandler(log_handler)
-    return log
-
-LOG = get_default_logger()
-
+LOG = get_logger(__name__)
 
 def execute(command, working_directory=BASE_DIR, log=LOG):
     """
