@@ -10,8 +10,10 @@ class @PeerGrading
     @ajax_url = @peer_grading_container.data('ajax-url')
 
     if @use_single_location
+      #If the peer grading element is linked to a single location, then activate the backend for that location
       @activate_problem()
     else
+      #Otherwise, activate the panel view.
       @error_container = $('.error-container')
       @error_container.toggle(not @error_container.is(':empty'))
 
