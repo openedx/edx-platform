@@ -27,6 +27,7 @@ class @PeerGradingProblemBackend
     else
       # if this post request fails, the error callback will catch it
       $.post(@ajax_url + cmd, data, callback)
+        .error => callback({success: false, error: "Error occured while performing this operation"})
 
   mock: (cmd, data) ->
     if cmd == 'is_student_calibrated'
