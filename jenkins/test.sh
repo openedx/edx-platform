@@ -27,9 +27,22 @@ git submodule foreach 'git reset --hard HEAD'
 export PYTHONIOENCODING=UTF-8
 
 GIT_BRANCH=${GIT_BRANCH/HEAD/master}
-if [ ! -d /mnt/virtualenvs/"$JOB_NAME" ]; then
-    mkdir -p /mnt/virtualenvs/"$JOB_NAME"
-    virtualenv /mnt/virtualenvs/"$JOB_NAME"
+
+# When running in parallel on jenkins, workspace could be suffixed by @x
+# In that case, we want to use a separate virtualenv that matches up with
+# workspace
+#
+# We need to handle both the case of /path/to/workspace
+# and /path/to/workspace@2, which is why we use the following substitutions
+#
+# $WORKSPACE is the absolute path for the workspace
+WORKSPACE_SUFFIX=$(expr "$WORKSPACE" : '.*\(@.*\)') || true
+
+VIRTUALENV_DIR="/mnt/virtualenvs/${JOB_NAME}${WORKSPACE_SUFFIX}"
+
+if [ ! -d "$VIRTUALENV_DIR" ]; then
+    mkdir -p "$VIRTUALENV_DIR"
+    virtualenv "$VIRTUALENV_DIR"
 fi
 
 export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
