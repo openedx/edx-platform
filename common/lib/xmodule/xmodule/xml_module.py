@@ -84,7 +84,8 @@ class XmlDescriptor(XModuleDescriptor):
     Mixin class for standardized parsing of from xml
     """
 
-    xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export", default={}, scope=Scope.settings)
+    xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export",
+        default={}, scope=Scope.settings)
 
     # Extension to append to filename paths
     filename_extension = 'xml'
@@ -418,3 +419,9 @@ class XmlDescriptor(XModuleDescriptor):
         """
         raise NotImplementedError(
             "%s does not implement definition_to_xml" % self.__class__.__name__)
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(XmlDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(XmlDescriptor.xml_attributes)
+        return non_editable_fields
