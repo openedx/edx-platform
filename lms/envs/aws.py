@@ -80,7 +80,7 @@ META_UNIVERSITIES = ENV_TOKENS.get('META_UNIVERSITIES', {})
 COMMENTS_SERVICE_URL = ENV_TOKENS.get("COMMENTS_SERVICE_URL", '')
 COMMENTS_SERVICE_KEY = ENV_TOKENS.get("COMMENTS_SERVICE_KEY", '')
 CERT_QUEUE = ENV_TOKENS.get("CERT_QUEUE", 'test-pull')
-MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', {})
+MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
