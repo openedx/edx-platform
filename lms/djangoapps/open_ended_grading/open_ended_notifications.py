@@ -11,6 +11,7 @@ from util.cache import cache
 import datetime
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
+import datetime
 
 log = logging.getLogger(__name__)
 
@@ -121,17 +122,20 @@ def combined_notifications(course, user):
     success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
     if success:
         return notification_dict
+    if user.is_authenticated():
+        last_login = user.last_login
+    else:
+        last_login = datetime.datetime.now()
 
-    min_time_to_query = user.last_login
     last_module_seen = StudentModule.objects.filter(student=user, course_id=course_id,
-                                                    modified__gt=min_time_to_query).values('modified').order_by(
+                                                    modified__gt=last_login).values('modified').order_by(
         '-modified')
     last_module_seen_count = last_module_seen.count()
 
     if last_module_seen_count > 0:
         last_time_viewed = last_module_seen[0]['modified'] - datetime.timedelta(seconds=(NOTIFICATION_CACHE_TIME + 60))
     else:
-        last_time_viewed = user.last_login
+        last_time_viewed = last_login
 
     pending_grading = False
 
