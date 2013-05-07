@@ -39,7 +39,7 @@ class TestExtract(TestCase):
         Fails assertion if one of the files doesn't exist.
         """
         for filename in self.generated_files:
-            path = os.path.join(CONFIGURATION.get_source_messages_dir(), filename)
+            path = os.path.join(CONFIGURATION.source_messages_dir, filename)
             exists = os.path.exists(path)
             self.assertTrue(exists, msg='Missing file: %s' % filename)
             if exists:

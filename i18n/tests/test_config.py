@@ -11,7 +11,7 @@ class TestConfiguration(TestCase):
     def test_config(self):
         config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'config'))
         config = Configuration(config_filename)
-        self.assertEqual(config.get_source_locale(), 'en')
+        self.assertEqual(config.source_locale, 'en')
 
     def test_no_config(self):
         config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'no_such_file'))
@@ -25,9 +25,9 @@ class TestConfiguration(TestCase):
         Also check values of dummy_locale and source_locale.
         """
         self.assertIsNotNone(CONFIGURATION)
-        locales = CONFIGURATION.get_locales()
+        locales = CONFIGURATION.locales
         self.assertIsNotNone(locales)
         self.assertIsInstance(locales, list)
         self.assertIn('en', locales)
-        self.assertEqual('fr', CONFIGURATION.get_dummy_locale())
-        self.assertEqual('en', CONFIGURATION.get_source_locale())
+        self.assertEqual('fr', CONFIGURATION.dummy_locale)
+        self.assertEqual('en', CONFIGURATION.source_locale)

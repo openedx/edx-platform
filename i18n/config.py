@@ -1,12 +1,14 @@
 import os, json
+from path import path
 
 # BASE_DIR is the working directory to execute django-admin commands from.
 # Typically this should be the 'mitx' directory.
-BASE_DIR = os.path.normpath(os.path.dirname(os.path.abspath(__file__))+'/..')
+#BASE_DIR = os.path.normpath(os.path.dirname(os.path.abspath(__file__))+'/..')
+BASE_DIR = path(__file__).abspath().dirname().joinpath('..').normpath()
 
 # LOCALE_DIR contains the locale files.
 # Typically this should be 'mitx/conf/locale'
-LOCALE_DIR =  os.path.join(BASE_DIR, 'conf', 'locale')
+LOCALE_DIR =  BASE_DIR.joinpath('conf', 'locale')
 
 class Configuration:
     """
@@ -16,10 +18,10 @@ class Configuration:
     _source_locale = 'en'
 
     def __init__(self, filename):
-        self.filename = filename
-        self.config = self.get_config(self.filename)
+        self._filename = filename
+        self._config = self.read_config(filename)
 
-    def get_config(self, filename):
+    def read_config(self, filename):
         """
         Returns data found in config file (as dict), or raises exception if file not found
         """
@@ -28,28 +30,31 @@ class Configuration:
         with open(filename) as stream:
             return json.load(stream)
 
-    def get_locales(self):
+    @property
+    def locales(self):
         """
         Returns a list of locales declared in the configuration file,
         e.g. ['en', 'fr', 'es']
         Each locale is a string.
         """
-        return self.config['locales']
+        return self._config['locales']
 
-    def get_source_locale(self):
+    @property
+    def source_locale(self):
         """
         Returns source language.
         Source language is English.
         """
         return self._source_locale
 
-    def get_dummy_locale(self):
+    @property
+    def dummy_locale(self):
         """
         Returns a locale to use for the dummy text, e.g. 'fr'.
         Throws exception if no dummy-locale is declared. 
         The locale is a string.
         """
-        dummy = self.config.get('dummy-locale', None)
+        dummy = self._config.get('dummy-locale', None)
         if not dummy:
             raise Exception('Could not read dummy-locale from configuration file.')
         return dummy
@@ -59,15 +64,16 @@ class Configuration:
         Returns the name of the directory holding the po files for locale.
         Example: mitx/conf/locale/fr/LC_MESSAGES
         """
-        return os.path.join(LOCALE_DIR, locale, 'LC_MESSAGES')
+        return LOCALE_DIR.joinpath(locale, 'LC_MESSAGES')
 
-    def get_source_messages_dir(self):
+    @property
+    def source_messages_dir(self):
         """
         Returns the name of the directory holding the source-language po files (English).
         Example: mitx/conf/locale/en/LC_MESSAGES
         """
-        return self.get_messages_dir(self.get_source_locale())
+        return self.get_messages_dir(self.source_locale)
 
 
-CONFIGURATION = Configuration(os.path.normpath(os.path.join(LOCALE_DIR, 'config')))
+CONFIGURATION = Configuration(LOCALE_DIR.joinpath('config').normpath())
 

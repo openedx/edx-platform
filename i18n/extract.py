@@ -23,22 +23,22 @@ from execute import execute, create_dir_if_necessary, remove_file, LOG
 
 # BABEL_CONFIG contains declarations for Babel to extract strings from mako template files
 # Use relpath to reduce noise in logs
-BABEL_CONFIG = os.path.relpath(LOCALE_DIR + '/babel.cfg', BASE_DIR)
+BABEL_CONFIG = BASE_DIR.relpathto(LOCALE_DIR.joinpath('babel.cfg'))
 
 # Strings from mako template files are written to BABEL_OUT
 # Use relpath to reduce noise in logs
-BABEL_OUT = os.path.relpath(CONFIGURATION.get_source_messages_dir() + '/mako.po', BASE_DIR)
+BABEL_OUT = BASE_DIR.relpathto(CONFIGURATION.source_messages_dir.joinpath('mako.po'))
 
 SOURCE_WARN = 'This English source file is machine-generated. Do not check it into github'
 
 def main ():
     create_dir_if_necessary(LOCALE_DIR)
-    source_msgs_dir = CONFIGURATION.get_source_messages_dir()
+    source_msgs_dir = CONFIGURATION.source_messages_dir
 
-    remove_file(os.path.join(source_msgs_dir, 'django.po'))
+    remove_file(source_msgs_dir.joinpath('django.po'))
     generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
     for filename in generated_files:
-        remove_file(os.path.join(source_msgs_dir, filename))
+        remove_file(source_msgs_dir.joinpath(filename))
 
 
     # Extract strings from mako templates
@@ -55,13 +55,13 @@ def main ():
     execute(make_django_cmd, working_directory=BASE_DIR)
     # makemessages creates 'django.po'. This filename is hardcoded.
     # Rename it to django-partial.po to enable merging into django.po later.
-    os.rename(os.path.join(source_msgs_dir, 'django.po'), 
-              os.path.join(source_msgs_dir, 'django-partial.po'))
+    os.rename(source_msgs_dir.joinpath('django.po'), 
+              source_msgs_dir.joinpath('django-partial.po'))
     execute(make_djangojs_cmd, working_directory=BASE_DIR)
 
     for filename in generated_files:
         LOG.info('Cleaning %s' % filename)
-        po = pofile(os.path.join(source_msgs_dir, filename))
+        po = pofile(source_msgs_dir.joinpath(filename))
         # replace default headers with edX headers
         fix_header(po)
         # replace default metadata with edX metadata

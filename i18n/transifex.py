@@ -13,7 +13,9 @@ def push():
     execute('tx push -s')
 
 def pull():
-    execute('tx pull')
+    for locale in CONFIGURATION.locales:
+        if locale != CONFIGURATION.source_locale:
+            execute('tx pull -l %s' % locale)
     clean_translated_locales()
 
 
@@ -22,8 +24,8 @@ def clean_translated_locales():
     Strips out the warning from all translated po files
     about being an English source file.
     """
-    for locale in CONFIGURATION.get_locales():
-        if locale != CONFIGURATION.get_source_locale():
+    for locale in CONFIGURATION.locales:
+        if locale != CONFIGURATION.source_locale:
             clean_locale(locale)
         
 def clean_locale(locale):
@@ -34,7 +36,7 @@ def clean_locale(locale):
     """
     dirname = CONFIGURATION.get_messages_dir(locale)
     for filename in ('django-partial.po', 'djangojs.po', 'mako.po'):
-        clean_file(os.path.join(dirname, filename))
+        clean_file(dirname.joinpath(filename))
 
 def clean_file(file):
     """

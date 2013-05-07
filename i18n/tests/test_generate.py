@@ -21,8 +21,8 @@ class TestGenerate(TestCase):
         """
         Tests merge script on English source files.
         """
-        filename = os.path.join(CONFIGURATION.get_source_messages_dir(), random_name())
-        generate.merge(CONFIGURATION.get_source_locale(), target=filename)
+        filename = os.path.join(CONFIGURATION.source_messages_dir, random_name())
+        generate.merge(CONFIGURATION.source_locale, target=filename)
         self.assertTrue(os.path.exists(filename))
         os.remove(filename)
 
@@ -35,7 +35,7 @@ class TestGenerate(TestCase):
         after start of test suite)
         """
         generate.main()
-        for locale in CONFIGURATION.get_locales():
+        for locale in CONFIGURATION.locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename+'.mo'
                 path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)

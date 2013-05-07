@@ -14,7 +14,7 @@ def get_default_logger():
 LOG = get_default_logger()
 
 
-def execute (command, working_directory=BASE_DIR, log=LOG):
+def execute(command, working_directory=BASE_DIR, log=LOG):
     """
     Executes shell command in a given working_directory.
     Command is a string to pass to the shell.
