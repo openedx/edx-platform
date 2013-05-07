@@ -29,12 +29,19 @@
     });
 
     (function() {
-      $(document).delegate('#login-form', 'ajax:success', function(data, json, xhr) {
-        $(this).find('.form-actions #submit').addClass('is-disabled');
+      toggleSubmitButton(true);
 
+      $('#login-form').on('submit', function() {
+        toggleSubmitButton(false);
+      });
+
+      $('#login-form').on('ajax:complete', function() {
+        toggleSubmitButton(true);
+      });
+
+      $('#login-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
           $('.message.submission-error').removeClass('is-shown');
-          toggleSubmitButton();
           var u=decodeURI(window.location.search);
           next=u.split("next=")[1];
           if (next) {
@@ -44,23 +51,25 @@
           }
         } else {
           $('.message.submission-error').addClass('is-shown');
-          toggleSubmitButton();
           $('.message.submission-error .message-copy').html(json.value);
         }
       });
     })(this);
 
-    function toggleSubmitButton(e) {
-      var $msgError = $('form .status.submission-error');
+    function toggleSubmitButton(enable) {
       var $submitButton = $('form .form-actions #submit');
-      var $submitButtonCopy = $submitButton.html();
 
-      if(!$msgError.hasClass('is-shown')) {
-        $submitButton.prop('disabled', true).html('Processing your account information &hellip;');
+      if(enable) {
+        $submitButton.
+          removeClass('is-disabled').
+          removeProp('disabled').
+          html('Log into My edX Account <span class="orn-plus">+</span> Access My Courses');
       }
-
       else {
-        $submitButton.prop('disabled', false).html($submitButtonCopy);
+        $submitButton.
+          addClass('is-disabled').
+          prop('disabled', true).
+          html('Processing your account information &hellip;');
       }
     }
   </script>
@@ -132,7 +141,7 @@
 % endif
 
       <div class="form-actions">
-        <button name="submit" type="submit" id="submit" class="action action-primary action-update">Log into My edX Account <span class="orn-plus">+</span> Access My Courses</button>
+        <button name="submit" type="submit" id="submit" class="action action-primary action-update"></button>
       </div>
     </form>
   </section>
