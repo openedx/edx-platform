@@ -25,3 +25,30 @@ def seed_permissions_roles(course_id):
     community_ta_role.inherit_permissions(moderator_role)
 
     administrator_role.inherit_permissions(moderator_role)
+
+
+def are_permissions_roles_seeded(course_id):
+
+    try:
+        administrator_role = Role.objects.get(name="Administrator", course_id=course_id)
+        moderator_role = Role.objects.get(name="Moderator", course_id=course_id)
+        student_role = Role.objects.get(name="Student", course_id=course_id)
+    except:
+        return False
+
+    for per in ["vote", "update_thread", "follow_thread", "unfollow_thread",
+                "update_comment", "create_sub_comment", "unvote", "create_thread",
+                "follow_commentable", "unfollow_commentable", "create_comment", ]:
+        if not student_role.has_permission(per):
+            return False
+
+    for per in ["edit_content", "delete_thread", "openclose_thread",
+                "endorse_comment", "delete_comment", "see_all_cohorts"]:
+        if not moderator_role.has_permission(per):
+            return False
+
+    for per in ["manage_moderator"]:
+        if not administrator_role.has_permission(per):
+            return False
+
+    return True

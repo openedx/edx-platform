@@ -34,6 +34,8 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from django_comment_common.utils import are_permissions_roles_seeded
+
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
@@ -597,6 +599,14 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+
+    def test_create_course_check_forum_seeding(self):
+        """Test new course creation and verify forum seeding """
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertTrue(are_permissions_roles_seeded('MITx/999/Robot_Super_Course'))
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
