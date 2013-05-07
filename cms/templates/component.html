@@ -17,49 +17,57 @@
 		</div> <!-- Editor Header -->
 
 		<div class="component-edit-modes">
-			<div class="module-editor editor-wrapper" id="editor-tab">
-				<!--${editor} -->
+			<div class="module-editor wrapper-component-editor" id="editor-tab">
+				<!--${editor}-->
 				<!-- no longer are settings imported from metadata-edit.hmtl, ideally? -->
 			</div> <!-- Editor Wrapper-->
-			<ul class="settings-wrapper" id="settings-tab">
-		  		<!--% for type in sorted(something.keys()):-->
-		  		<!--is-set class applied when user sets value-->
-		  		<li class="settings-row is-set">
-		  			<label class="setting-label" for="setting-id-1">Setting 1</label>
-		  			<input class="setting-input" type="text" id="setting-id-1"/> 
-		  			<!--button clickable if is-set -->
-		  			<button class="setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
-		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
-		  			</button>
-		  			<span class="setting-help">helpstring</span>
-		  		</li>
-		  		<!--% showing second example mostly to see is-set style difference -->
-		  		<li class="settings-row">
-		  			<label class="setting-label" for="setting-id-2">Setting 2</label>
-		  			<input class="setting-input" type="text" id="setting-id-2"/> 
-		  			<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
-		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
-		  			</button>
-		  			<div class="setting-help">This is a more reasonable helpstring sentence that would alos wrap around. A second sentence in some cases may be necessary.</div>
-		  		
-		  		<!--% showing dropdown example -->
-		  		<li class="settings-row">
-		  			<label class="setting-label" for="setting-id-3">Setting Display </label>
-		  			<select class="setting-input" id="setting-id-3" name="type">
-		  				<!--% for all in available options -->
-						<option value="displayName1" selected>Closed</option>
-						<!--in case value already defaulted --> 
-						<option value="displayName2">NotClosed</option>
-						<option value="displayName3">Open</option>
-						<option value="displayName4">Available</option>
-					</select> 
-					<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
-		  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
-		  			</button>
-		  			<span class="setting-help">helpstring</span>
-		  		</li>
-		  		
-		  	</ul> <!-- Settings Wrapper-->
+			<div class="wrapper-component-settings" id="settings-tab">
+				<ul class="list-input settings-list">
+			  		<!--% for type in sorted(something.keys()):-->
+			  		<!--is-set class applied when user sets value-->
+			  		<li class="settings-row is-set">
+			  			<div class="wrapper-setting-actions">
+				  			<label class="setting-label" for="setting-id-1">Display Name</label>
+				  			<input class="setting-input" type="text" id="setting-id-1" value="Name of Component"/> 
+				  			<!--button clickable if is-set -->
+				  			<button class="setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+				  			</button>
+				  		</div>
+			  			<span class="setting-help">helpstring</span>
+			  		</li>
+			  		<!--% showing second example mostly to see is-set style difference -->
+			  		<li class="settings-row">
+			  			<div class="wrapper-setting-actions">
+				  			<label class="setting-label" for="setting-id-2">Setting 2</label>
+				  			<input class="setting-input" type="text" id="setting-id-2"/> 
+				  			<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+				  			</button>
+			  			</div>
+			  			<span class="setting-help">This is a longer sentence, repeated multiple times here just to test out the functionaltiy.</span>
+			  		</li>
+			  		<!--% showing dropdown example -->
+			  		<li class="settings-row">
+			  			<div class="wrapper-setting-actions">
+				  			<label class="setting-label" for="setting-displayName">Display Name</label>
+				  			<select class="setting-input" id="setting-displayName" name="type">
+				  				<!--% for all in available options -->
+								<option value="displayName-closed" selected>Closed</option>
+								<!--in case value already defaulted --> 
+								<option value="displayName-notclosed">NotClosed</option>
+								<option value="displayName-open">Open</option>
+								<option value="displayName-available">Available</option>
+							</select> 
+							<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+				  			</button>
+			  			</div>
+			  			<span class="setting-help">helpstring</span>
+			  		</li>
+			  		
+			  	</ul>
+			  </div> <!-- Settings Wrapper-->
 		</div>
 		<div class="row module-actions">
 	  		<a href="#" class="save-button">Save</a>

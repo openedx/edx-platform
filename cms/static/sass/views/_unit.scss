@@ -445,20 +445,23 @@ body.course.unit {
 
       .component-edit-menu {
         @include box-sizing(border-box);
-        padding: 15px;
+        padding: 15px 0 15px 20px;
         top: 0;
         right: 0;
         border-bottom: 1px solid $gray-l2;
-        background-color: $lightBluishGrey2;
+        background-color: $blue;
+        color: $white;
         box-shadow: 0 1px 2px rgba(182, 182, 182, 0.75) inset;
 
         //Component Name
         .component-name {
+          @extend .t-copy-sub1;
+          color: $white;
           width: 50%;
-          @include font-size(14);
 
           em {
-            font-weight: 700;
+            @extend .t-title-3;
+            color: $white;
           }
         }
 
@@ -478,14 +481,18 @@ body.course.unit {
             }
 
             .active-mode {
-              @include white-button;
+              @include blue-button;
+            }
 
-              &.is-set {
-                background-color: $white;
-                cursor: default;
-                linear-gradient: none;
-                @include box-shadow(0 0 1px 1px rgba(240, 240, 240, .1) inset);
+            .is-set {
+              @include linear-gradient($blue, $blue);
+              box-shadow: inset 0 0 2px $shadow;
+              background-color: $blue;
+              cursor: default;
 
+              &:hover {
+                box-shadow: inset 0 0 2px $shadow;
+                background-color: $blue;
               }
             }
           }
@@ -493,16 +500,18 @@ body.course.unit {
       }
 
       // Editor Wrapper
-      .editor-wrapper{
+      .wrapper-component-editor {
         //TO-DO 
       }
 
+
+
       // Settings Wrapper
-      .settings-wrapper{
+      .wrapper-component-settings ul{
         overflow: auto;
         max-height: 400px;
-        //TO-DO browser testing for scrollbar, especially styles below. 
 
+        //chrome scrollbar visibility correction
         &::-webkit-scrollbar {
           -webkit-appearance: none;
           width: 11px;
@@ -511,57 +520,92 @@ body.course.unit {
 
         &::-webkit-scrollbar-thumb {
           border-radius: 8px;
-          border: 2px solid $lightBluishGrey2;
+          border: 2px solid $gray-l2;
           background-color: rgba(0, 0, 0, .5);
         }
 
         .settings-row {
-          // general row sizing stuff
+          @extend .field-group; // TO-DO ???
           background-color: $white;
           padding: 10px 20px;
           border-bottom: 1px solid $gray-l2;
           opacity: .8;
 
           &:hover {
+            @include transition(opacity 0.25s ease-in-out);
             opacity: 1;
           }
 
+          //Styles for component settings which are set
           &.is-set {
             opacity: 1;
             background-color: $white;
-            font-weight: 200;
+
+            .setting-label {
+              color: $blue-l1;
+            }
+
+            .setting-input {
+              color: $blue-l1;
+            }
+            
+            .setting-clear {
+              //...
+            }
           }
 
+          .wrapper-setting-actions {
+            @extend .field;
+            display: inline-block;
+            width: 360px;
+            top: 0;
+            vertical-align: top;
+          }
+
+          //Setting Label - also basic 'label'
           .setting-label {
-            font-weight: 500;
+            @extend .t-copy-sub2;
+            display: inline-block;
             position: relative;
             left: 0;
             height: 50%;
-            width: 100px;
+            width: 120px;
+            text-overflow: ellipsis;
           }
 
+          //Setting Input - also basic 'field'
           .setting-input {
+            @extend .t-copy-sub3;
             @include placeholder($gray-l4);
             border-radius: 2px;
             padding: 6px 8px 8px;
-            width: 200px;
+            width: 180px;
             height: auto;
             border: 1px solid $gray-l2;
+            text-overflow: ellipsis;
 
             //&:focus {
               //TO-DO
           }
 
+          //custom styling of selectbox to look more like input boxes. 
           select {
             border: 1px solid $gray-l4;
             background: none repeat scroll #F2F2F2;
             padding: 5px;
+
+            &:focus {
+              @include box-shadow(0 1px 1px $shadow);
+              @include transition(opacity 0.25s ease-in-out);
+              background-color: #FFFCF1;
+            }
 
             &:active {
               background-color: #FFFCF1;
             }
           }
 
+          //Setting Clear Button
           .setting-clear {
             @include font-size(11);
             color: $gray;
@@ -570,16 +614,17 @@ body.course.unit {
             vertical-align: middle;
             padding: 5px;
             border-radius: 50%;
-            margin-left: 10px;
+            margin: 0 10px;
             box-shadow: none;
             text-shadow: none;
             border: 1px solid $gray-l4;
 
             &:hover {
+              @include box-shadow(0 1px 1px $shadow);
+              @include transition(opacity 0.25s ease-in-out);
               background-color: $blue-s3;
               border: 1px solid $blue-s3;
               color: $white;
-              @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15));
             }
 
             &.inactive {
@@ -587,14 +632,13 @@ body.course.unit {
             }
           }
 
-          //SettingsHelp
+          //Setting Tip
           .setting-help {
-            @include clearfix;
-            display: inline-block;
             @include font-size(12);
+            display: inline-block;
             font-color: $gray-l6;
-            padding-left: 20px;
-            width: 65%;
+            max-width: 50%;
+            vertical-align: top;
           }
 
         }
@@ -632,9 +676,9 @@ body.course.unit {
       // ====================
 
       .module-actions {
+        @include box-shadow(inset 0 1px 1px $shadow);
         padding: 0 0 10px 10px;
-        box-shadow: 0 2px 1px rgba(182, 182, 182, 0.75) inset;
-        background-color: $gray-l6;
+        background-color: $gray-l4;
 
         .save-button {
         margin: 15px 8px 0 0;
@@ -755,9 +799,9 @@ body.course.unit {
 
   .unit-location {
     .url {
+      @include box-shadow(none);
       width: 100%;
       margin-bottom: 10px;
-      @include box-shadow(none);
     }
 
     .draft-tag,
@@ -771,6 +815,7 @@ body.course.unit {
       @include tree-view;
 
       .section-item {
+        @include box-sizing(border-box);
         display: inline-block;
         width: 100%;
         font-size: 11px;
@@ -778,7 +823,6 @@ body.course.unit {
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
-        @include box-sizing(border-box);
       }
 
       ol {
