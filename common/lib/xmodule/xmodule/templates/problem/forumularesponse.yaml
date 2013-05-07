@@ -1,10 +1,5 @@
 ---
-metadata:
-    display_name: Math Expression Input
-    rerandomize: never
-    showanswer: always
-    weight: ""
-    attempts: ""
+display_name: Math Expression Input
 data: |
   <problem>
   <p>
@@ -45,5 +40,3 @@ data: |
           </div>
       </solution>
   </problem>
-
-children: []

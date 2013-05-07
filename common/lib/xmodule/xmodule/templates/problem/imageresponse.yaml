@@ -1,10 +1,5 @@
 ---
-metadata:
-    display_name: Image Mapped Input
-    rerandomize: never
-    showanswer: always
-    weight: ""
-    attempts: ""
+display_name: Image Mapped Input
 data: |
   <problem>
   <p>
@@ -23,6 +18,3 @@ data: |
           </div>
       </solution>
   </problem>
-
-    
-children: []

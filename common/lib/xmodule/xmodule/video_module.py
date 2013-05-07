@@ -18,7 +18,9 @@ log = logging.getLogger(__name__)
 
 
 class VideoFields(object):
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem",
+        default='<video  youtube="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"/>',
+        scope=Scope.content)
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
 
 
@@ -110,7 +112,7 @@ class VideoModule(VideoFields, XModule):
         return None
 
     def get_instance_state(self):
-        #log.debug(u"STATE POSITION {0}".format(self.position))
+        # log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
 
     def video_list(self):
@@ -120,7 +122,7 @@ class VideoModule(VideoFields, XModule):
         # We normally let JS parse this, but in the case that we need a hacked
         # out <object> player because YouTube has broken their <iframe> API for
         # the third time in a year, we need to extract it server side.
-        normal_speed_video_id = None # The 1.0 speed video
+        normal_speed_video_id = None  # The 1.0 speed video
 
         # video_list() example:
         #   "0.75:nugHYNiD3fI,1.0:7m8pab1MfYY,1.25:3CxdPGXShq8,1.50:F-D7bOFCnXA"
@@ -146,4 +148,3 @@ class VideoModule(VideoFields, XModule):
 class VideoDescriptor(VideoFields, RawDescriptor):
     module_class = VideoModule
     stores_state = True
-    template_dir_name = "video"

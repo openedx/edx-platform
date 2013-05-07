@@ -7,9 +7,13 @@ from xblock.core import String, Scope
 
 
 class DiscussionFields(object):
-    discussion_id = String(scope=Scope.settings)
+    # TODO default to a guid
+    discussion_id = String(scope=Scope.settings, default="Week 1")
     discussion_category = String(scope=Scope.settings)
-    discussion_target = String(scope=Scope.settings)
+    discussion_target = String(scope=Scope.settings, default="Topic-Level Student-Visible Label")
+    display_name = String(help="Display name for this module", default="Discussion Tag", scope=Scope.settings)
+    data = String(help="XML data for the problem", scope=Scope.content,
+        default="<discussion></discussion>")
     sort_key = String(scope=Scope.settings)
 
 
@@ -29,8 +33,6 @@ class DiscussionModule(DiscussionFields, XModule):
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):
     module_class = DiscussionModule
-    template_dir_name = "discussion"
-
     # The discussion XML format uses `id` and `for` attributes,
     # but these would overload other module attributes, so we prefix them
     # for actual use in the code

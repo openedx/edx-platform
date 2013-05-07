@@ -132,15 +132,12 @@ def index(request):
     """
     List all courses available to the logged in user
     """
-    courses = modulestore('direct').get_items(['i4x', None, None, 'course', None])
+    # TODO seems expensive to get all and then filter out by ACL.
+    courses = modulestore().get_courses()
 
     # filter out courses that we don't have access too
     def course_filter(course):
-        return (has_access(request.user, course.location)
-                and course.location.course != 'templates'
-                and course.location.org != ''
-                and course.location.course != ''
-                and course.location.name != '')
+        return has_access(request.user, course.location)
     courses = filter(course_filter, courses)
 
     return render_to_response('index.html', {
@@ -150,7 +147,8 @@ def index(request):
                     get_lms_link_for_item(course.location, course_id=course.location.course_id))
                     for course in courses],
         'user': request.user,
-        'disable_course_creation': settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff
+        'disable_course_creation': (settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False)
+            and not request.user.is_staff)
     })
 
 
@@ -1245,7 +1243,7 @@ def course_grader_updates(request, org, course, name, grader_index=None):
         # ??? Should this return anything? Perhaps success fail?
         CourseGradingModel.delete_grader(Location(location), grader_index)
         return HttpResponse()
-    elif request.method == 'POST':   # post or put, doesn't matter.
+    elif request.method == 'POST':  # post or put, doesn't matter.
         return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(location), request.POST)),
                             mimetype="application/json")
 
@@ -1272,36 +1270,36 @@ def course_advanced_updates(request, org, course, name):
     elif real_method == 'POST' or real_method == 'PUT':
         # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
         request_body = json.loads(request.body)
-        #Whether or not to filter the tabs key out of the settings metadata
+        # Whether or not to filter the tabs key out of the settings metadata
         filter_tabs = True
-        #Check to see if the user instantiated any advanced components.  This is a hack to add the open ended panel tab
-        #to a course automatically if the user has indicated that they want to edit the combinedopenended or peergrading
-        #module, and to remove it if they have removed the open ended elements.
+        # Check to see if the user instantiated any advanced components.  This is a hack to add the open ended panel tab
+        # to a course automatically if the user has indicated that they want to edit the combinedopenended or peergrading
+        # module, and to remove it if they have removed the open ended elements.
         if ADVANCED_COMPONENT_POLICY_KEY in request_body:
-            #Check to see if the user instantiated any open ended components
+            # Check to see if the user instantiated any open ended components
             found_oe_type = False
-            #Get the course so that we can scrape current tabs
+            # Get the course so that we can scrape current tabs
             course_module = modulestore().get_item(location)
             for oe_type in OPEN_ENDED_COMPONENT_TYPES:
                 if oe_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
-                    #Add an open ended tab to the course if needed
+                    # Add an open ended tab to the course if needed
                     changed, new_tabs = add_open_ended_panel_tab(course_module)
-                    #If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
+                    # If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
                     if changed:
                         request_body.update({'tabs': new_tabs})
-                        #Indicate that tabs should not be filtered out of the metadata
+                        # Indicate that tabs should not be filtered out of the metadata
                         filter_tabs = False
-                    #Set this flag to avoid the open ended tab removal code below.
+                    # Set this flag to avoid the open ended tab removal code below.
                     found_oe_type = True
                     break
-            #If we did not find an open ended module type in the advanced settings,
+            # If we did not find an open ended module type in the advanced settings,
             # we may need to remove the open ended tab from the course.
             if not found_oe_type:
-                #Remove open ended tab to the course if needed
+                # Remove open ended tab to the course if needed
                 changed, new_tabs = remove_open_ended_panel_tab(course_module)
                 if changed:
                     request_body.update({'tabs': new_tabs})
-                    #Indicate that tabs should not be filtered out of the metadata
+                    # Indicate that tabs should not be filtered out of the metadata
                     filter_tabs = False
         response_json = json.dumps(CourseMetadata.update_from_json(location, request_body, filter_tabs=filter_tabs))
         return HttpResponse(response_json, mimetype="application/json")
@@ -1457,41 +1455,24 @@ def create_new_course(request):
     if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff:
         raise PermissionDenied()
 
-    # This logic is repeated in xmodule/modulestore/tests/factories.py
-    # so if you change anything here, you need to also change it there.
-    # TODO: write a test that creates two courses, one with the factory and
-    # the other with this method, then compare them to make sure they are
-    # equivalent.
-    template = Location(request.POST['template'])
     org = request.POST.get('org')
     number = request.POST.get('number')
     display_name = request.POST.get('display_name')
 
-    try:
-        dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
-    except InvalidLocationError as e:
-        return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" + display_name + "'.\n\n" + e.message}))
-
     # see if the course already exists
-    existing_course = None
-    try:
-        existing_course = modulestore('direct').get_item(dest_location)
-    except ItemNotFoundError:
-        pass
+    # TODO may want to find all courses using the given number in the org and present to user for them to
+    # check before creating the new one? [change the client work flow]
 
-    if existing_course is not None:
-        return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with this name.'}))
-
-    course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
-    courses = modulestore().get_items(course_search_location)
-
+    # arbitrarily deciding the number is the pretty id
+    courses = modulestore().get_courses({'org': org, 'prettyid': number})
     if len(courses) > 0:
-        return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with the same organization and course number.'}))
+        return HttpResponse(json.dumps({'ErrMsg':
+            'There is already a course defined with the same organization and course number.'}))
 
-    new_course = modulestore('direct').clone_item(template, dest_location)
+    new_course = modulestore().create_course(org, number, request.user.id, metadata={'display_name': display_name})
 
-    # clone a default 'about' module as well
-
+    # create a default 'about' module as well
+    # FIXME left off here
     about_template_location = Location(['i4x', 'edx', 'templates', 'about', 'overview'])
     dest_about_location = dest_location._replace(category='about', name='overview')
     modulestore('direct').clone_item(about_template_location, dest_about_location)
@@ -1612,7 +1593,7 @@ def generate_export_course(request, org, course, name):
     logging.debug('root = {0}'.format(root_dir))
 
     export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
-    #filename = root_dir / name + '.tar.gz'
+    # filename = root_dir / name + '.tar.gz'
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
     tf = tarfile.open(name=export_file.name, mode='w:gz')

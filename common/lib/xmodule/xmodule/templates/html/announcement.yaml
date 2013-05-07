@@ -1,7 +1,5 @@
 ---
-metadata:
-      display_name: Announcement
-
+display_name: Announcement
 data: |
       <ol>
       <li>  
@@ -22,4 +20,3 @@ data: |
       </section>
       </li>
       </ol>
-children: []

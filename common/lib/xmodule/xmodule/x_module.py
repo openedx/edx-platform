@@ -282,30 +282,29 @@ class ResourceTemplates(object):
     @classmethod
     def templates(cls):
         """
-        Returns a list of Template objects that describe possible templates that can be used
-        to create a module of this type.
-        If no templates are provided, there will be no way to create a module of
-        this type
+        Returns a list of dictionary field: value objects that describe possible templates that can be used
+        to seed a module of this type.
 
         Expects a class attribute template_dir_name that defines the directory
         inside the 'templates' resource directory to pull templates from
         """
         templates = []
-        dirname = os.path.join('templates', cls.template_dir_name)
-        if not resource_isdir(__name__, dirname):
-            log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
-                dir=dirname,
-                cls_name=cls.__name__,
-            ))
-            return []
+        if hasattr(cls, 'template_dir_name'):
+            dirname = os.path.join('templates', cls.template_dir_name)
+            if not resource_isdir(__name__, dirname):
+                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                    dir=dirname,
+                    cls_name=cls.__name__,
+                ))
+                return []
 
-        for template_file in resource_listdir(__name__, dirname):
-            if not template_file.endswith('.yaml'):
-                log.warning("Skipping unknown template file %s" % template_file)
-                continue
-            template_content = resource_string(__name__, os.path.join(dirname, template_file))
-            template = yaml.safe_load(template_content)
-            templates.append(Template(**template))
+            for template_file in resource_listdir(__name__, dirname):
+                if not template_file.endswith('.yaml'):
+                    log.warning("Skipping unknown template file %s" % template_file)
+                    continue
+                template_content = resource_string(__name__, os.path.join(dirname, template_file))
+                template = yaml.safe_load(template_content)
+                templates.append(template)
 
         return templates
 

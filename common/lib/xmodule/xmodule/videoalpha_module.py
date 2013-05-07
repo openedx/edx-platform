@@ -20,7 +20,9 @@ log = logging.getLogger(__name__)
 
 
 class VideoAlphaFields(object):
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem",
+        default='<videoalpha  youtube="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"/>',
+        scope=Scope.content)
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
     display_name = String(help="Display name for this module", scope=Scope.settings)
 
@@ -152,4 +154,3 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
 class VideoAlphaDescriptor(VideoAlphaFields, RawDescriptor):
     module_class = VideoAlphaModule
     stores_state = True
-    template_dir_name = "videoalpha"

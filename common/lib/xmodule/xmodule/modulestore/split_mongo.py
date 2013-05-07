@@ -1005,40 +1005,13 @@ class SplitMongoModuleStore(ModuleStoreBase):
         new_id = self.course_index.insert(index_entry)
         return self.get_course(CourseLocator(course_id=new_id))
 
-    # TODO refactor or remove
+    # TODO refactor or remove callers
     def clone_item(self, source_course_id, dest_course_id, source, location):
         """
         Clone a new item that is a copy of the item at the location `source`
         and writes it to `location`
         """
-        # FIXME is there a reason to clone anything other than a template? If
-        # not, can we not put the templates into the same db/collections as the
-        # real data?
-        try:
-            source_item = self.get_item(source_course_id, source)
-            source_item['_id'] = BlockUsageLocator(location).dict()
-            self.update_item(dest_course_id, location, source_item)
-
-            item = self.get_item(dest_course_id, location)
-
-            # VS[compat] cdodge: This is a hack because static_tabs also have
-            # references from the course module, so if we add one then we need
-            # to also add it to the policy information (i.e. metadata)
-            # we should remove this once we can break this reference from the
-            # course to static tabs
-            if location.category == 'static_tab':
-                try:
-                    course = self.get_item(dest_course_id, CourseDescriptor.id_to_location(dest_course_id))
-                    existing_tabs = course.tabs or []
-                    existing_tabs.append({'type':'static_tab', 'name' : item.metadata.get('display_name'), 'url_slug' : item.location.name})
-                    course.tabs = existing_tabs
-                    self.update_metadata(course.id, course.location, course.metadata)
-                except ItemNotFoundError:
-                    log.info("No course found for course_id %s, unable to set static tab %s", dest_course_id, location)
-
-            return item
-        except pymongo.errors.DuplicateKeyError:
-            raise DuplicateItemError(location)
+        raise NotImplementedError("Replace w/ create or update_item")
 
     def update_item(self, descriptor, user_id, force=False):
         """

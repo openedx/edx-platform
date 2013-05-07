@@ -27,6 +27,38 @@ VERSION_TUPLES = {
 }
 
 DEFAULT_VERSION = 1
+DEFAULT_DATA = """
+    <combinedopenended>
+        <rubric>
+            <rubric>
+                <category>
+                  <description>Category 1</description>
+                  <option>
+                      The response does not incorporate what is needed for a one response.
+                  </option>
+                  <option>
+                      The response is correct for category 1.
+                  </option>
+                </category>
+            </rubric>
+        </rubric>
+        <prompt>
+            <p>Why is the sky blue?</p>
+        </prompt>
+        <task>
+            <selfassessment/>
+        </task>
+        <task>
+            <openended min_score_to_attempt="1" max_score_to_attempt="2">
+                    <openendedparam>
+                        <initial_display>Enter essay here.</initial_display>
+                        <answer_display>This is the answer.</answer_display>
+                        <grader_payload>{"grader_settings" : "peer_grading.conf", "problem_id" : "700x/Demo"}</grader_payload>
+                    </openendedparam>
+            </openended>
+        </task>
+    </combinedopenended>
+"""
 
 
 class VersionInteger(Integer):
@@ -67,7 +99,8 @@ class CombinedOpenEndedFields(object):
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
                          scope=Scope.settings)
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem", scope=Scope.content,
+        default=DEFAULT_DATA)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
 
 
@@ -219,4 +252,3 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     stores_state = True
     has_score = True
     always_recalculate_grades = True
-    template_dir_name = "combinedopenended"
