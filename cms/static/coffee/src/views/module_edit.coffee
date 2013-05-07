@@ -20,6 +20,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   loadEdit: ->
     if not @module
       @module = XModule.loadModule(@$el.find('.xmodule_edit'))
+      @originalMetadata = @metadata()
 
   metadata: ->
     # cdodge: package up metadata which is separated into a number of input fields
@@ -34,6 +35,14 @@ class CMS.Views.ModuleEdit extends Backbone.View
       _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]', $metadata)
 
     return _metadata
+
+  changedMetadata: ->
+    currentMetadata = @metadata()
+    changedMetadata = {}
+    for key of currentMetadata
+      if currentMetadata[key] != @originalMetadata[key]
+        changedMetadata[key] = currentMetadata[key]
+    return changedMetadata
 
   cloneTemplate: (parent, template) ->
     $.post("/clone_item", {
@@ -60,7 +69,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
       course: course_location_analytics
       id: _this.model.id
 
-    data.metadata = _.extend(data.metadata || {}, @metadata())
+    data.metadata = _.extend(data.metadata || {}, @changedMetadata())
     @hideModal()
     @model.save(data).done( =>
     #   # showToastMessage("Your changes have been saved.", null, 3)
