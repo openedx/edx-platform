@@ -69,11 +69,11 @@
             <a class="action action-register is-registered" href="${course_target}">Registered for <strong>${course.number}</strong></a>
           %else:
           <!-- signed in, not registered -->
-            <a href="" class="action action-register register">Register for ${course.number}</a> <div id="register_message"></div>
+            <a href="" class="action action-register">Register for ${course.number}</a> <div id="register_message"></div>
           %endif
         %else:
         <!-- not signed in -->
-            <a class="action action-register is-not-signedin" href="${reverse('register_user')}">Register for <strong>${course.number}</strong></a>
+            <a class="action action-register" href="${reverse('register_user')}">Register for <strong>${course.number}</strong></a>
         %endif
     </li>
   </ul>
