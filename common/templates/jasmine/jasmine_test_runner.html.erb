@@ -17,6 +17,7 @@
   <script type="text/javascript" src="<%= common_js_root %>/vendor/tiny_mce/jquery.tinymce.js"></script>
   <script type="text/javascript" src="<%= common_js_root %>/vendor/tiny_mce/tiny_mce.js"></script>
   <script type="text/javascript" src="<%= common_js_root %>/vendor/RequireJS.js"></script>
+  <script type="text/javascript" src="<%= common_js_root %>/vendor/mathjax-MathJax-c9db6ac/MathJax.js?config=default"></script>
 
   <script type="text/javascript">
     AjaxPrefix.addAjaxPrefix(jQuery, function() {
@@ -37,10 +38,30 @@
 <body>
 
 <script type="text/javascript">
+  var jasmineEnv = jasmine.getEnv();
+
+  var htmlReporter = new jasmine.HtmlReporter();
   var console_reporter = new jasmine.ConsoleReporter()
-  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-  jasmine.getEnv().addReporter(console_reporter);
-  jasmine.getEnv().execute();
+
+  jasmineEnv.addReporter(htmlReporter);
+  jasmineEnv.addReporter(console_reporter);
+
+  jasmineEnv.specFilter = function(spec) {
+    return htmlReporter.specFilter(spec);
+  };
+
+  var currentWindowOnload = window.onload;
+
+  window.onload = function() {
+    if (currentWindowOnload) {
+      currentWindowOnload();
+    }
+    execJasmine();
+  };
+
+  function execJasmine() {
+    jasmineEnv.execute();
+  }
 </script>
 
 </body>

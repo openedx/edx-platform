@@ -35,11 +35,19 @@ def django_for_jasmine(system, django_reload)
 end
 
 def template_jasmine_runner(lib)
-    coffee_files = Dir["#{lib}/**/js/**/*.coffee", "common/static/coffee/src/**/*.coffee"]
+    case lib
+    when /common\/lib\/.+/
+        coffee_files = Dir["#{lib}/**/js/**/*.coffee", "common/static/coffee/src/**/*.coffee"]
+    when /common\/static\/coffee/
+        coffee_files = Dir["#{lib}/**/*.coffee"]
+    else
+        puts('I do not know how to run jasmine tests for #{lib}')
+        exit
+    end
     if !coffee_files.empty?
         sh("node_modules/.bin/coffee -c #{coffee_files.join(' ')}")
     end
-    phantom_jasmine_path = File.expand_path("node_modules/phantom-jasmine")
+    phantom_jasmine_path = File.expand_path("common/test/phantom-jasmine")
     common_js_root = File.expand_path("common/static/js")
     common_coffee_root = File.expand_path("common/static/coffee/src")
 
@@ -50,7 +58,7 @@ def template_jasmine_runner(lib)
     js_specs = Dir[spec_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
     js_source = Dir[src_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
 
-    template = ERB.new(File.read("#{lib}/jasmine_test_runner.html.erb"))
+    template = ERB.new(File.read("common/templates/jasmine/jasmine_test_runner.html.erb"))
     template_output = "#{lib}/jasmine_test_runner.html"
     File.open(template_output, 'w') do |f|
         f.write(template.result(binding))
@@ -93,5 +101,22 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
         template_jasmine_runner(lib) do |f|
             sh("#{phantomjs} node_modules/phantom-jasmine/lib/run_jasmine_test.coffee #{f}")
         end
+    end
+end
+
+desc "Open jasmine tests for discussion in your default browser"
+task "browse_jasmine_discussion" do
+    template_jasmine_runner("common/static/coffee") do |f|
+        sh("python -m webbrowser -t 'file://#{f}'")
+        puts "Press ENTER to terminate".red
+        $stdin.gets
+    end
+end
+
+desc "Use phantomjs to run jasmine tests for discussion from the console"
+task "phantomjs_jasmine_discussion" do
+    phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
+    template_jasmine_runner("common/static/coffee") do |f|
+        sh("#{phantomjs} node_modules/phantom-jasmine/lib/run_jasmine_test.coffee #{f}")
     end
 end
