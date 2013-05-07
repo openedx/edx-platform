@@ -10,7 +10,7 @@ import logging
 log = logging.getLogger(__name__)
 
 API_SETTINGS = { 
-    'MAX_NOTE_LIMIT': 100 # Max number of annotations retrieved per set
+    'MAX_NOTE_LIMIT': 100 # Max number of annotations to retrieve at one time
 }
 
 #----------------------------------------------------------------------#
@@ -18,11 +18,9 @@ API_SETTINGS = {
 
 def api_resource_map():
     ''' Maps API resources to (method, action) pairs. '''
-
-    (GET, PUT, POST, DELETE) = ('GET', 'PUT', 'POST', 'DELETE') # for convenience
-
+    (GET, PUT, POST, DELETE) = ('GET', 'PUT', 'POST', 'DELETE')
     return {
-        'root': {GET: version},
+        'root': {GET: root},
         'notes': {GET: index, POST: create},
         'note': {GET: read, PUT: update, DELETE: delete},
         'search': {GET: search}
@@ -83,15 +81,19 @@ def api_format(request, response, data):
     return [content_type, content]
 
 #----------------------------------------------------------------------#
-# Exposed API actions via the resource map.
+# API actions exposed via the resource map.
 
 def index(request, course_id):
+    ''' Returns a list of annotation objects. '''
     MAX_LIMIT = API_SETTINGS.get('MAX_NOTE_LIMIT')
+
     notes = Note.objects.order_by('id').filter(course_id=course_id,
             user=request.user)[:MAX_LIMIT]
+
     return [HttpResponse(), [note.as_dict() for note in notes]]
 
 def create(request, course_id):
+    ''' Receives an annotation object to create and returns a 303 with the read location. '''
     note = Note(course_id=course_id, user=request.user)
 
     try:
@@ -107,6 +109,7 @@ def create(request, course_id):
     return [response, None]
 
 def read(request, course_id, note_id):
+    ''' Returns a single annotation object. '''
     try:
         note = Note.objects.get(id=note_id)
     except:
@@ -118,6 +121,7 @@ def read(request, course_id, note_id):
     return [HttpResponse(), note.as_dict()]
 
 def update(request, course_id, note_id):
+    ''' Updates an annotation object and returns a 303 with the read location. '''
     try:
         note = Note.objects.get(id=note_id)
     except:
@@ -140,6 +144,7 @@ def update(request, course_id, note_id):
     return [response, None]
 
 def delete(request, course_id, note_id):
+    ''' Deletes the annotation object and returns a 204 with no content. '''
     try:
         note = Note.objects.get(id=note_id)
     except:
@@ -153,6 +158,7 @@ def delete(request, course_id, note_id):
     return [HttpResponse('', status=204), None]
 
 def search(request, course_id):
+    ''' Returns a subset of  annotation objects based on a search query.. '''
     MAX_LIMIT = API_SETTINGS.get('MAX_NOTE_LIMIT')
     
     # search parameters
@@ -185,5 +191,6 @@ def search(request, course_id):
 
     return [HttpResponse(), result]
 
-def version(request, course_id):
+def root(request, course_id):
+    ''' Returns version information about the API. '''
     return [HttpResponse(), {'name': 'Notes API', 'version': '1.0'}]
