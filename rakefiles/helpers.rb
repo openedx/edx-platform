@@ -37,18 +37,28 @@ def background_process(*command)
         pgid = Process.getpgid(pid)
         begin
             Timeout.timeout(5) do
-                puts "Terminating process group #{pgid}"
-                Process.kill(:SIGTERM, -pgid)
+                puts "Interrupting process group #{pgid}"
+                Process.kill(:SIGINT, -pgid)
                 puts "Waiting on process group #{pgid}"
                 Process.wait(-pgid)
                 puts "Done waiting on process group #{pgid}"
             end
         rescue Timeout::Error
-            puts "Killing process group #{pgid}"
-            Process.kill(:SIGKILL, -pgid)
-            puts "Waiting on process group #{pgid}"
-            Process.wait(-pgid)
-            puts "Done waiting on process group #{pgid}"
+            begin
+                Timeout.timeout(5) do
+                    puts "Terminating process group #{pgid}"
+                    Process.kill(:SIGTERM, -pgid)
+                    puts "Waiting on process group #{pgid}"
+                    Process.wait(-pgid)
+                    puts "Done waiting on process group #{pgid}"
+                end
+            rescue Timeout::Error
+                puts "Killing process group #{pgid}"
+                Process.kill(:SIGKILL, -pgid)
+                puts "Waiting on process group #{pgid}"
+                Process.wait(-pgid)
+                puts "Done waiting on process group #{pgid}"
+            end
         end
     end
 end
