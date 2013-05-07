@@ -182,6 +182,7 @@ class AboutDescriptor(HtmlDescriptor):
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
+    template_dir_name = None
     # is there a python way to set the data.default only here? wouldn't that change the shared field description?
     display_name = String(
         help="Display name for this module",
@@ -229,7 +230,9 @@ class AboutDescriptor(HtmlDescriptor):
                     <h2>Frequently Asked Questions</h2>
                     <article class="response">
                       <h3>Do I need to buy a textbook?</h3>
-                      <p>No, a free online version of Chemistry: Principles, Patterns, and Applications, First Edition by Bruce Averill and Patricia Eldredge will be available, though you can purchase a printed version (published by FlatWorld Knowledge) if you’d like.</p>
+                      <p>No, a free online version of Chemistry: Principles, Patterns, and Applications,
+                      First Edition by Bruce Averill and Patricia Eldredge will be available, though you can purchase
+                      a printed version (published by FlatWorld Knowledge) if you would like.</p>
                     </article>
 
                     <article class="response">
@@ -247,6 +250,7 @@ class StaticTabDescriptor(HtmlDescriptor):
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
+    template_dir_name = None
     data = String(default="""
     <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
     """, scope=Scope.content, help="HTML for the additional pages")
@@ -257,5 +261,6 @@ class CourseInfoDescriptor(HtmlDescriptor):
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
+    template_dir_name = None
     data = String(help="Html contents to display for this module",
         default="<ol></ol>", scope=Scope.content)

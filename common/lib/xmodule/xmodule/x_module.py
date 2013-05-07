@@ -289,7 +289,7 @@ class ResourceTemplates(object):
         inside the 'templates' resource directory to pull templates from
         """
         templates = []
-        if hasattr(cls, 'template_dir_name'):
+        if hasattr(cls, 'template_dir_name') and getattr(cls, 'template_dir_name'):
             dirname = os.path.join('templates', cls.template_dir_name)
             if not resource_isdir(__name__, dirname):
                 log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
@@ -342,9 +342,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
     equality_attributes = ('_model_data', 'location')
-
-    # Name of resource directory to load templates from
-    template_dir_name = "default"
 
     # Class level variable
     always_recalculate_grades = False

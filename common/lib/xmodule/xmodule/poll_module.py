@@ -142,7 +142,6 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
     _child_tag_name = 'answer'
 
     module_class = PollModule
-    template_dir_name = 'poll'
     stores_state = True
 
     @classmethod

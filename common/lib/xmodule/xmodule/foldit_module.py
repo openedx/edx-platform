@@ -82,7 +82,7 @@ class FolditModule(FolditFields, XModule):
         from foldit.models import Score
 
         leaders = [(e['username'], e['score']) for e in Score.get_tops_n(10)]
-        leaders.sort(key=lambda x: -x[1])
+        leaders.sort(key=lambda x:-x[1])
 
         return leaders
 
@@ -159,7 +159,6 @@ class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):
 
     stores_state = True
     has_score = True
-    template_dir_name = "foldit"
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
