@@ -1,6 +1,6 @@
 <div class="wrapper wrapper-component-editor">
 	<div class="component-editor">
-  		<div class="component-edit-menu">
+  		<div class="component-edit-header">
   			<span class="component-name"><em>Editing:</em> Name of Component</span>
   			<!--should this be a menubar/menu/tabbar instead of list? -->
   	  		<ul class="nav-edit-modes">
@@ -17,41 +17,41 @@
 		</div> <!-- Editor Header -->
 
 		<div class="component-edit-modes">
-			<div class="module-editor wrapper-component-editor" id="editor-tab">
+			<div class="module-editor wrapper-comp-editor" id="editor-tab">
 				<!--${editor}-->
 				<!-- no longer are settings imported from metadata-edit.hmtl, ideally? -->
 			</div> <!-- Editor Wrapper-->
-			<div class="wrapper-component-settings" id="settings-tab">
+			<div class="wrapper-comp-settings" id="settings-tab">
 				<ul class="list-input settings-list">
 			  		<!--% for type in sorted(something.keys()):-->
 			  		<!--is-set class applied when user sets value-->
-			  		<li class="settings-row is-set">
-			  			<div class="wrapper-setting-actions">
-				  			<label class="setting-label" for="setting-id-1">Display Name</label>
-				  			<input class="setting-input" type="text" id="setting-id-1" value="Name of Component"/> 
+			  		<li class="field comp-setting-entry is-set">
+			  			<div class="wrapper-comp-setting">
+				  			<label class="label setting-label" for="setting-id-1">Display Name</label>
+				  			<input class="input setting-input" type="text" id="setting-id-1" value="Name of Component"/> 
 				  			<!--button clickable if is-set -->
-				  			<button class="setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  			<button class="action setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
 				  			</button>
 				  		</div>
-			  			<span class="setting-help">helpstring</span>
+			  			<span class="tip setting-help">helpstring</span>
 			  		</li>
 			  		<!--% showing second example mostly to see is-set style difference -->
-			  		<li class="settings-row">
+			  		<li class="field comp-setting-entry">
 			  			<div class="wrapper-setting-actions">
-				  			<label class="setting-label" for="setting-id-2">Setting 2</label>
-				  			<input class="setting-input" type="text" id="setting-id-2"/> 
-				  			<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  			<label class="label setting-label" for="setting-id-2">Setting 2</label>
+				  			<input class="input setting-input" type="text" id="setting-id-2"/> 
+				  			<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
 				  			</button>
 			  			</div>
-			  			<span class="setting-help">This is a longer sentence, repeated multiple times here just to test out the functionaltiy.</span>
+			  			<span class="tip setting-help">This is a longer sentence, repeated multiple times here just to test out the functionaltiy.</span>
 			  		</li>
 			  		<!--% showing dropdown example -->
-			  		<li class="settings-row">
+			  		<li class="field comp-setting-entry">
 			  			<div class="wrapper-setting-actions">
-				  			<label class="setting-label" for="setting-displayName">Display Name</label>
-				  			<select class="setting-input" id="setting-displayName" name="type">
+				  			<label class="label setting-label" for="setting-displayName">Display Name</label>
+				  			<select class="input setting-input" id="setting-displayName" name="type">
 				  				<!--% for all in available options -->
 								<option value="displayName-closed" selected>Closed</option>
 								<!--in case value already defaulted --> 
@@ -59,11 +59,22 @@
 								<option value="displayName-open">Open</option>
 								<option value="displayName-available">Available</option>
 							</select> 
-							<button class="setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+							<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
 				  			</button>
 			  			</div>
-			  			<span class="setting-help">helpstring</span>
+			  			<span class="tip setting-help">helpstring</span>
+			  		</li>
+			  		<li class="field comp-setting-entry is-set">
+			  			<div class="wrapper-setting-actions">
+				  			<label class="label setting-label" for="setting-id-4">Display Name</label>
+				  			<input class="input setting-input" type="text" id="setting-id-4" value="Name of Component"/> 
+				  			<!--button clickable if is-set -->
+				  			<button class="action setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+				  			</button>
+				  		</div>
+			  			<span class="tip setting-help">helpstring</span>
 			  		</li>
 			  		
 			  	</ul>
