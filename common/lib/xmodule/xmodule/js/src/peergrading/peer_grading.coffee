@@ -9,7 +9,7 @@ class @PeerGrading
     @peer_grading_outer_container = $('.peer-grading-container')
     @ajax_url = @peer_grading_container.data('ajax-url')
 
-    if @use_single_location
+    if @use_single_location.toLowerCase() == "true"
       #If the peer grading element is linked to a single location, then activate the backend for that location
       @activate_problem()
     else
