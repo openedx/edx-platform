@@ -115,7 +115,7 @@
 
     </div>
 
-    <a href="preventDefault();" class="close-modal" title="Close Modal">
+    <a href="#" class="close-modal" title="Close Modal">
       <div class="inner">
         <p>&#10005;</p>
       </div>
@@ -134,5 +134,10 @@
        $("[data-field='"+json.field+"']").addClass('field-error')
      }
     });
+   
+   // removing close link's default behavior
+   $('#login-modal .close-modal').click(function(e) {
+    e.preventDefault();
+   });
   })(this)
 </script>
