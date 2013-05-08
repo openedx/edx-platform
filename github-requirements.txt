@@ -8,4 +8,4 @@
 -e git://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@5ce6f70a#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@483e0cb1#egg=XBlock
