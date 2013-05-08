@@ -37,18 +37,18 @@
 
 <script>
     {% block jasmine %}
+    var console_reporter = new jasmine.ConsoleReporter();
     (function() {
         var jasmineEnv = jasmine.getEnv();
         jasmineEnv.updateInterval = 1000;
 
-        var htmlReporter = new jasmine.HtmlReporter();
-        var console_reporter = new jasmine.ConsoleReporter()
+        var trivialReporter = new jasmine.TrivialReporter();
 
-        jasmineEnv.addReporter(htmlReporter);
-        jasmineEnv.addReporter(console_reporter);
+        jasmineEnv.addReporter(trivialReporter);
+        jasmine.getEnv().addReporter(console_reporter);
 
         jasmineEnv.specFilter = function(spec) {
-            return htmlReporter.specFilter(spec);
+            return trivialReporter.specFilter(spec);
         };
 
         // Additional configuration can be done in this block
