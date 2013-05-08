@@ -111,7 +111,6 @@
     .nav-actions .action-primary {
       @include green-button();
       @include font-size(12); // needed due to bad button mixins for now
-
       border-color: $green-d2;
     }
 
@@ -423,6 +422,7 @@
     }
 
     .action-secondary {
+
       @extend .t-action4;
     }
   }

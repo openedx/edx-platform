@@ -166,6 +166,37 @@ h1 {
   font-weight: 600;
 }
 
+// typography - primary content
+.content-secondary {
+
+  .section-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+
+  .content-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+
+  .content-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+}
+
+// ====================
+
+// typography - loose headings (BT: needs to be removed once html is clean)
 .title-1 {
   @extend .t-title3;
   margin-bottom: ($baseline*1.5);

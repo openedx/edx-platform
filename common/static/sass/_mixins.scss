@@ -26,26 +26,6 @@
   @include size($size);
 }
 
-// ====================
-
-// mixins - image-replacement hidden text
-@mixin text-hide() {
-  text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-// mixins - hidden elems - screenreaders
-@mixin text-sr() {
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
-}
 
 // ====================
 
