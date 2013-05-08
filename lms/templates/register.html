@@ -1,7 +1,9 @@
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
+<%namespace file='main.html' import="login_query"/>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils import html %>
 <%! from django_countries.countries import COUNTRIES %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
@@ -239,16 +241,14 @@
       <h3 class="sr">Registration Help</h3>
     </header>
 
-% if course_id and enrollment_action:
     <div class="cta">
       <h3>Already registered?</h3>
       <p class="instructions">
-        <a href="${reverse('signin_user')}?course_id=${course_id | h}&enrollment_action=${enrollment_action | h}">
+        <a href="${reverse('signin_user')}${login_query()}">
           Click here to log in.
         </a>
       </p>
     </div>
-% endif
 
     <div class="cta cta-welcome">
       <h3>Welcome to edX</h3>

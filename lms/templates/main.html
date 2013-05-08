@@ -1,4 +1,5 @@
 <%namespace name='static' file='static_content.html'/>
+<%! from django.utils import html %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,3 +58,10 @@
   <%block name="js_extra"/>
 </body>
 </html>
+
+<%def name="login_query()">${
+  "?course_id={0}&enrollment_action={1}".format(
+    html.escape(course_id),
+    html.escape(enrollment_action)
+  ) if course_id and enrollment_action else ""
+}</%def>
