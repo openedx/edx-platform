@@ -27,7 +27,7 @@ class CourseFactory(factory.Factory):
     display_name = 'Robot Super Course'
     user_id = "test_user"
     data = None
-    metadata = None
+    metadata = {}
 
     # pylint: disable=W0613
     @classmethod
