@@ -8,15 +8,42 @@ import urllib
 
 
 def fasthash(string):
-    m = hashlib.new("md4")
-    m.update(string)
-    return m.hexdigest()
+    """
+    Hashes `string` into a string representation of a 128-bit digest.
+    """
+    md4 = hashlib.new("md4")
+    md4.update(string)
+    return md4.hexdigest()
+
+
+def cleaned_string(val):
+    """
+    Converts `val` to unicode and URL-encodes special characters
+    (including quotes and spaces)
+    """
+    return urllib.quote_plus(smart_str(val))
 
 
 def safe_key(key, key_prefix, version):
-    safe_key = urllib.quote_plus(smart_str(key))
+    """
+    Given a `key`, `key_prefix`, and `version`,
+    return a key that is safe to use with memcache.
 
-    if len(safe_key) > 250:
-        safe_key = fasthash(safe_key)
+    `key`, `key_prefix`, and `version` can be numbers, strings, or unicode.
+    """
 
-    return ":".join([key_prefix, str(version), safe_key])
+    # Clean for whitespace and control characters, which
+    # cause memcache to raise an exception
+    key = cleaned_string(key)
+    key_prefix = cleaned_string(key_prefix)
+    version = cleaned_string(version)
+
+    # Attempt to combine the prefix, version, and key
+    combined = ":".join([key_prefix, version, key])
+
+    # If the total length is too long for memcache, hash it
+    if len(combined) > 250:
+        combined = fasthash(combined)
+
+    # Return the result
+    return combined

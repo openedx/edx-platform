@@ -678,11 +678,7 @@ def save_item(request):
         # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
         for metadata_key, value in posted_metadata.items():
 
-            # let's strip out any metadata fields from the postback which have been identified as system metadata
-            # and therefore should not be user-editable, so we should accept them back from the client
-            if metadata_key in existing_item.system_metadata_fields:
-                del posted_metadata[metadata_key]
-            elif posted_metadata[metadata_key] is None:
+            if posted_metadata[metadata_key] is None:
                 # remove both from passed in collection as well as the collection read in from the modulestore
                 if metadata_key in existing_item._model_data:
                     del existing_item._model_data[metadata_key]

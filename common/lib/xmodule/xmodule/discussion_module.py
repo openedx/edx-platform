@@ -37,3 +37,10 @@ class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawD
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['id'] = 'discussion_id'
     metadata_translations['for'] = 'discussion_target'
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(DiscussionDescriptor, self).non_editable_metadata_fields
+        # We may choose to enable sort_keys in the future, but while Kevin is investigating....
+        non_editable_fields.extend([DiscussionDescriptor.discussion_id, DiscussionDescriptor.sort_key])
+        return non_editable_fields
