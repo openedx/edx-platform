@@ -586,20 +586,7 @@ INSTALLED_APPS = (
 
 ######################### MARKETING SITE ###############################
 EDXMKTG_COOKIE_NAME = 'edxloggedin'
-MKTG_URLS = {
-    'ROOT': '',
-    'COURSES': '/courses/allschools/allsubjects/allcourses',
-    'ABOUT': '/about-us',
-    'JOBS': '/jobs',
-    'PRESS': '/in-the-news',
-    'FAQ': '/student-faq',
-    'CONTACT': '/contact',
-    'HOW_IT_WORKS': '/how-it-works',
-    'SCHOOLS': '/schools',
-    'TOS': '/terms',
-    'HONOR': '/terms',
-    'PRIVACY': '/privacypolicy',
-}
+MKTG_URLS = {}
 MKTG_URL_LINK_MAP = {
     'ABOUT': 'about_edx',
     'CONTACT': 'contact',
