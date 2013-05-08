@@ -803,6 +803,18 @@ class CombinedOpenEndedV1Module():
 
         return progress_object
 
+    def out_of_sync_error(self, get, msg=''):
+        """
+        return dict out-of-sync error message, and also log.
+        """
+        #This is a dev_facing_error
+        log.warning("Combined module state out sync. state: %r, get: %r. %s",
+                    self.state, get, msg)
+        #This is a student_facing_error
+        return {'success': False,
+                'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
+
+
 
 class CombinedOpenEndedV1Descriptor():
     """

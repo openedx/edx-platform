@@ -604,8 +604,10 @@ class OpenEndedModuleXmlTest(unittest.TestCase):
             #This error is okay.  We don't have a grading service to connect to!
             pass
 
+        #Try to get the rubric from the module
         module.handle_ajax("get_combined_rubric", {})
 
+        #Make a fake reply from the queue
         queue_reply = {
             'queuekey' : "",
             'xqueue_body' : json.dumps({
@@ -620,5 +622,20 @@ class OpenEndedModuleXmlTest(unittest.TestCase):
             })
         }
 
+        module.handle_ajax("check_for_score", {})
+
+        #Update the module with the fake queue reply
         module.handle_ajax("score_update", queue_reply)
 
+        #Get html and other data client will request
+        html = module.get_html()
+        legend = module.handle_ajax("get_legend", {})
+        status = module.handle_ajax("get_status", {})
+        legend = module.handle_ajax("skip_post_assessment", {})
+
+        #Get all results
+        legend = module.handle_ajax("get_results", {})
+
+        log.info(module.task_states)
+        #reset the problem
+        module.handle_ajax("reset", {})
