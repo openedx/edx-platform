@@ -2,12 +2,19 @@ import json
 from mock import Mock, MagicMock, ANY
 import unittest
 
+from fs.memoryfs import MemoryFS
+from mock import patch
+
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
-
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+
+from xmodule.tests.test_export import DATA_DIR
+
 from lxml import etree
 import capa.xqueue_interface as xqueue_interface
 from datetime import datetime
@@ -17,7 +24,35 @@ log = logging.getLogger(__name__)
 
 from . import test_system
 
+ORG = 'test_org'
+COURSE = 'open_ended'      # name of directory with course data
+
 import test_util_open_ended
+
+class DummySystem(ImportSystem):
+
+    @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
+    def __init__(self, load_error_modules):
+
+        xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
+        course_id = "/".join([ORG, COURSE, 'test_run'])
+        course_dir = "test_dir"
+        policy = {}
+        error_tracker = Mock()
+        parent_tracker = Mock()
+
+        super(DummySystem, self).__init__(
+            xmlstore,
+            course_id,
+            course_dir,
+            policy,
+            error_tracker,
+            parent_tracker,
+            load_error_modules=load_error_modules,
+        )
+
+    def render_template(self, template, context):
+        raise Exception("Shouldn't be called")
 
 """
 Tests for the various pieces of the CombinedOpenEndedGrading system
@@ -436,6 +471,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             changed = combinedoe.update_task_states()
             self.assertFalse(changed)
 
+    def test_ajax_actions(self):
+        self.combinedoe_container.handle_ajax('save_answer', {'student_answer' : "This is my answer"})
+
     def test_get_score_realistic(self):
         instance_state = r"""{"ready_to_reset": false, "skip_spelling_checks": true, "current_task_number": 1, "weight": 5.0, "graceperiod": "1 day 12 hours 59 minutes 59 seconds", "is_graded": "True", "task_states": ["{\"child_created\": false, \"child_attempts\": 4, \"version\": 1, \"child_history\": [{\"answer\": \"The students\\u2019 data are recorded in the table below.\\r\\n\\r\\nStarting Mass (g)\\tEnding Mass (g)\\tDifference in Mass (g)\\r\\nMarble\\t 9.8\\t 9.4\\t\\u20130.4\\r\\nLimestone\\t10.4\\t 9.1\\t\\u20131.3\\r\\nWood\\t11.2\\t11.2\\t 0.0\\r\\nPlastic\\t 7.2\\t 7.1\\t\\u20130.1\\r\\nAfter reading the group\\u2019s procedure, describe what additional information you would need in order to replicate the expe\", \"post_assessment\": \"{\\\"submission_id\\\": 3097, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: More grammar errors than average.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"the students data are recorded in the <bg>table below . starting mass</bg> g ending mass g difference in mass g marble . . . limestone . . . wood . . . plastic . . . after reading the groups <bg>procedure , describe what additional</bg> information you would need in order to replicate the <bs>expe</bs>\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3233, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}, {\"answer\": \"After 24 hours, remove the samples from the containers and rinse each sample with distilled water.\\r\\nAllow the samples to sit and dry for 30 minutes.\\r\\nDetermine the mass of each sample.\\r\\nThe students\\u2019 data are recorded in the table below.\\r\\n\\r\\nStarting Mass (g)\\tEnding Mass (g)\\tDifference in Mass (g)\\r\\nMarble\\t 9.8\\t 9.4\\t\\u20130.4\\r\\nLimestone\\t10.4\\t 9.1\\t\\u20131.3\\r\\nWood\\t11.2\\t11.2\\t 0.0\\r\\nPlastic\\t 7.2\\t 7.1\\t\\u20130.1\\r\\nAfter reading the\", \"post_assessment\": \"[3]\", \"score\": 3}, {\"answer\": \"To replicate the experiment, the procedure would require more detail. One piece of information that is omitted is the amount of vinegar used in the experiment. It is also important to know what temperature the experiment was kept at during the 24 hours. Finally, the procedure needs to include details about the experiment, for example if the whole sample must be submerged.\", \"post_assessment\": \"[3]\", \"score\": 3}, {\"answer\": \"e the mass of four different samples.\\r\\nPour vinegar in each of four separate, but identical, containers.\\r\\nPlace a sample of one material into one container and label. Repeat with remaining samples, placing a single sample into a single container.\\r\\nAfter 24 hours, remove the samples from the containers and rinse each sample with distilled water.\\r\\nAllow the samples to sit and dry for 30 minutes.\\r\\nDetermine the mass of each sample.\\r\\nThe students\\u2019 data are recorded in the table below.\\r\\n\", \"post_assessment\": \"[3]\", \"score\": 3}, {\"answer\": \"\", \"post_assessment\": \"[3]\", \"score\": 3}], \"max_score\": 3, \"child_state\": \"done\"}", "{\"child_created\": false, \"child_attempts\": 0, \"version\": 1, \"child_history\": [{\"answer\": \"The students\\u2019 data are recorded in the table below.\\r\\n\\r\\nStarting Mass (g)\\tEnding Mass (g)\\tDifference in Mass (g)\\r\\nMarble\\t 9.8\\t 9.4\\t\\u20130.4\\r\\nLimestone\\t10.4\\t 9.1\\t\\u20131.3\\r\\nWood\\t11.2\\t11.2\\t 0.0\\r\\nPlastic\\t 7.2\\t 7.1\\t\\u20130.1\\r\\nAfter reading the group\\u2019s procedure, describe what additional information you would need in order to replicate the expe\", \"post_assessment\": \"{\\\"submission_id\\\": 3097, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: More grammar errors than average.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"the students data are recorded in the <bg>table below . starting mass</bg> g ending mass g difference in mass g marble . . . limestone . . . wood . . . plastic . . . after reading the groups <bg>procedure , describe what additional</bg> information you would need in order to replicate the <bs>expe</bs>\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3233, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}, {\"answer\": \"After 24 hours, remove the samples from the containers and rinse each sample with distilled water.\\r\\nAllow the samples to sit and dry for 30 minutes.\\r\\nDetermine the mass of each sample.\\r\\nThe students\\u2019 data are recorded in the table below.\\r\\n\\r\\nStarting Mass (g)\\tEnding Mass (g)\\tDifference in Mass (g)\\r\\nMarble\\t 9.8\\t 9.4\\t\\u20130.4\\r\\nLimestone\\t10.4\\t 9.1\\t\\u20131.3\\r\\nWood\\t11.2\\t11.2\\t 0.0\\r\\nPlastic\\t 7.2\\t 7.1\\t\\u20130.1\\r\\nAfter reading the\", \"post_assessment\": \"{\\\"submission_id\\\": 3098, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: Ok.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"after hours , remove the samples from the containers and rinse each sample with distilled water . allow the samples to sit and dry for minutes . determine the mass of each sample . the students data are recorded in the <bg>table below . starting mass</bg> g ending mass g difference in mass g marble . . . limestone . . . wood . . . plastic . . . after reading the\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3235, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}, {\"answer\": \"To replicate the experiment, the procedure would require more detail. One piece of information that is omitted is the amount of vinegar used in the experiment. It is also important to know what temperature the experiment was kept at during the 24 hours. Finally, the procedure needs to include details about the experiment, for example if the whole sample must be submerged.\", \"post_assessment\": \"{\\\"submission_id\\\": 3099, \\\"score\\\": 3, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: Ok.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"to replicate the experiment , the procedure would require <bg>more detail . one</bg> piece of information <bg>that is omitted is the</bg> amount of vinegar used in the experiment . it is also important to know what temperature the experiment was kept at during the hours . finally , the procedure needs to include details about the experiment , for example if the whole sample must be submerged .\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3237, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>3</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 3}, {\"answer\": \"e the mass of four different samples.\\r\\nPour vinegar in each of four separate, but identical, containers.\\r\\nPlace a sample of one material into one container and label. Repeat with remaining samples, placing a single sample into a single container.\\r\\nAfter 24 hours, remove the samples from the containers and rinse each sample with distilled water.\\r\\nAllow the samples to sit and dry for 30 minutes.\\r\\nDetermine the mass of each sample.\\r\\nThe students\\u2019 data are recorded in the table below.\\r\\n\", \"post_assessment\": \"{\\\"submission_id\\\": 3100, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: Ok.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"e the mass of four different samples . pour vinegar in <bg>each of four separate</bg> , but identical , containers . place a sample of one material into one container and label . repeat with remaining samples , placing a single sample into a single container . after hours , remove the samples from the containers and rinse each sample with distilled water . allow the samples to sit and dry for minutes . determine the mass of each sample . the students data are recorded in the table below . \\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3239, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}, {\"answer\": \"\", \"post_assessment\": \"{\\\"submission_id\\\": 3101, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: Ok.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"invalid essay .\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3241, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}], \"max_score\": 3, \"child_state\": \"done\"}"], "attempts": "10000", "student_attempts": 0, "due": null, "state": "done", "accept_file_upload": false, "display_name": "Science Question -- Machine Assessed"}"""
         instance_state = json.loads(instance_state)
@@ -465,6 +503,29 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         score_dict = combinedoe.get_score()
         self.assertEqual(score_dict['score'], 15.0)
         self.assertEqual(score_dict['total'], 15.0)
+
+class OpenEndedModuleXmlTest(unittest.TestCase):
+    def setUp(self):
+        self.test_system = test_system()
+
+    @staticmethod
+    def get_import_system(load_error_modules=True):
+        '''Get a dummy system'''
+        return DummySystem(load_error_modules)
+
+    def get_course(self, name):
+        """Get a test course by directory name.  If there's more than one, error."""
+        print "Importing {0}".format(name)
+
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
+        courses = modulestore.get_courses()
+        self.modulestore = modulestore
+        self.assertEquals(len(courses), 1)
+        return courses[0]
+
+    def test_open_ended_load(self):
+        course = self.get_course('open_ended')
+        log.info(course.id)
 
 
 

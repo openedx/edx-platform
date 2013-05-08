@@ -20,7 +20,7 @@ from xmodule.x_module import ModuleSystem
 from mock import Mock
 
 open_ended_grading_interface = {
-        'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
+        'url': 'blah',
         'username': 'incorrect_user',
         'password': 'incorrect_pass',
         'staff_grading' : 'staff_grading',
