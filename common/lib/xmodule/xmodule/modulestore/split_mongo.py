@@ -48,6 +48,7 @@ log = logging.getLogger(__name__)
 SplitMongoKVSid = namedtuple('SplitMongoKVSid', 'id, def_id')
 
 
+# TODO should this be here or w/ x_module or ???
 class DefinitionLazyLoader(object):
     '''
     A placeholder to put into an xblock in place of its definition which
@@ -73,6 +74,7 @@ class DefinitionLazyLoader(object):
             {'_id': self.definition_locator.def_id})
 
 
+# TODO should this be here or w/ x_module or ???
 class SplitMongoKVS(KeyValueStore):
     """
     A KeyValueStore that maps keyed data access to one of the 3 data areas
@@ -214,6 +216,7 @@ class SplitMongoKVS(KeyValueStore):
         return self._inherited_metadata
 
 
+# TODO should this be here or w/ x_module or ???
 class CachingDescriptorSystem(MakoDescriptorSystem):
     """
     A system that has a cache of a course version's json that it will use to load modules
@@ -267,11 +270,14 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             if json_data is None:
                 raise ItemNotFoundError
 
+        class_ = XModuleDescriptor.load_class(
+            json_data.get('category'),
+            self.default_class
+        )
+        return self.xblock_from_json(class_, usage_id, json_data)
+
+    def xblock_from_json(self, class_, usage_id, json_data):
         try:
-            class_ = XModuleDescriptor.load_class(
-                json_data.get('category'),
-                self.default_class
-            )
             # most likely a lazy loader but not the id directly
             definition = json_data.get('definition', {})
             metadata = json_data.get('metadata', {})

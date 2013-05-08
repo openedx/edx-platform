@@ -6,10 +6,12 @@ from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
-from xmodule.modulestore import Location
+from xmodule.modulestore import Location, inheritance
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from xblock.core import XBlock, Scope, String
+import uuid
+import copy
 
 log = logging.getLogger(__name__)
 
@@ -459,65 +461,61 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
 
     # ================================= JSON PARSING ===========================
+    # TODO reconcile w/ and consolidate w/ split_mongo.CachingDescriptorSystem._load_item
     @staticmethod
-    def load_from_json(json_data, system, default_class=None):
+    def load_from_json(json_data, system, default_class=None, parent_xblock=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of json_data.
+        on the contents of json_data. It does not persist it and can create one which
+        has no usage id.
 
-        json_data must contain a 'location' element, and must be suitable to be
-        passed into the subclasses `from_json` method as model_data
+        parent_xblock is used to compute inherited metadata. The new xblock will not be its
+        child though since children pointers are through usage ids.
+
+        json_data:
+        - 'category': the xmodule category (required)
+        - 'metadata': a dict of locally set metadata (not inherited)
+        - 'children': a list of children's usage_ids w/in this course
+        - 'definition':
+        - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
         class_ = XModuleDescriptor.load_class(
-            json_data['location']['category'],
+            json_data['category'],
             default_class
         )
-        return class_.from_json(json_data, system)
+        return class_.from_json(json_data, system, parent_xblock)
 
     @classmethod
-    def from_json(cls, json_data, system):
+    def from_json(cls, json_data, system, parent_xblock=None):
         """
         Creates an instance of this descriptor from the supplied json_data.
         This may be overridden by subclasses
 
-        json_data: A json object with the keys 'definition' and 'metadata',
-            definition: A json object with the keys 'data' and 'children'
-                data: A json value
-                children: A list of edX Location urls
-            metadata: A json object with any keys
+        This method instantiates the correct subclass of XModuleDescriptor based
+        on the contents of json_data. It does not persist it and can create one which
+        has a temporary usage id.
 
-        This json_data is transformed to model_data using the following rules:
-            1) The model data contains all of the fields from metadata
-            2) The model data contains the 'children' array
-            3) If 'definition.data' is a json object, model data contains all of its fields
-               Otherwise, it contains the single field 'data'
-            4) Any value later in this list overrides a value earlier in this list
+        parent_usage_id is used to compute inherited metadata.
 
-        system: A DescriptorSystem for interacting with external resources
+        json_data:
+        - 'category': the xmodule category (required)
+        - 'metadata': a dict of locally set metadata (not inherited)
+        - 'children': a list of children's usage_ids w/in this course
+        - 'definition':
+        - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
-        model_data = {}
-
-        for key, value in json_data.get('metadata', {}).items():
-            model_data[cls._translate(key)] = value
-
-        model_data.update(json_data.get('metadata', {}))
-
-        definition = json_data.get('definition', {})
-        if 'children' in definition:
-            model_data['children'] = definition['children']
-
-        if 'data' in definition:
-            if isinstance(definition['data'], dict):
-                model_data.update(definition['data'])
-            else:
-                model_data['data'] = definition['data']
-
-        return cls(system=system, location=json_data['location'], model_data=model_data)
-
-    @classmethod
-    def _translate(cls, key):
-        'VS[compat]'
-        return cls.metadata_translations.get(key, key)
+        # TODO should this insert the child under the parent in some way? Right now ['children'] is a list
+        # of ids, a newly created element won't have an id; so, the parent can't point to it. In a traditional
+        # object-oriented system, the children would be a list of objects; so, the parent could point to the child.
+        # For that possibility, get_children stuffs the children objects into a private list but treats the list
+        # as a lazily fetched collection which if populated must be complete.
+        usage_id = json_data.get('_id', None)
+        if not '_inherited_metadata' in json_data and parent_xblock is not None:
+            json_data['_inherited_metadata'] = copy.copy(parent_xblock.xblock_kvs.get_inherited_metadata)
+            for field in inheritance.INHERITABLE_METADATA:
+                if field in json_data['metadata']:
+                    json_data['_inherited_metadata'][field] = json_data['metadata'][field]
+        return system.xblock_from_json(cls, usage_id, json_data)
 
     # ================================= XML PARSING ============================
     @staticmethod

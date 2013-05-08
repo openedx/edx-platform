@@ -5,6 +5,11 @@ Created on May 7, 2013
 '''
 import unittest
 from xmodule import templates
+from xmodule.modulestore.tests import factories
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.django import modulestore
+from xmodule.seq_module import SequenceDescriptor
+from xmodule.x_module import XModuleDescriptor
 
 
 class TemplateTests(unittest.TestCase):
@@ -34,3 +39,31 @@ class TemplateTests(unittest.TestCase):
         self.assertRegexpMatches(dropdown['markdown'], r'^Dropdown.*')
         self.assertRegexpMatches(dropdown['data'], r'<problem>\s*<p>Dropdown.*')
 
+    def test_factories(self):
+        test_course = factories.CourseFactory.create(org='testx', prettyid='tempcourse',
+            display_name='fun test course', user_id='testbot')
+        self.assertIsInstance(test_course, CourseDescriptor)
+        self.assertEqual(test_course.display_name, 'fun test course')
+        index_info = modulestore().get_course_index_info(test_course.location)
+        self.assertEqual(index_info['org'], 'testx')
+        self.assertEqual(index_info['prettyid'], 'tempcourse')
+
+        test_chapter = factories.ItemFactory.create(display_name='chapter 1',
+            parent_location=test_course.location)
+        self.assertIsInstance(test_chapter, SequenceDescriptor)
+        # refetch parent which should now point to child
+        test_course = modulestore().get_course(test_chapter.location)
+        self.assertIn(test_chapter.location.usage_id, test_course.children)
+
+    def test_temporary_xblocks(self):
+        """
+        Test using load_from_json to create non persisted xblocks
+        """
+        test_course = factories.CourseFactory.create(org='testx', prettyid='tempcourse',
+            display_name='fun test course', user_id='testbot')
+
+        test_chapter = XModuleDescriptor.load_from_json({'category': 'chapter',
+            'metadata': {'display_name': 'chapter n'}},
+            test_course.system, parent_xblock=test_course)
+        self.assertIsInstance(test_chapter, SequenceDescriptor)
+        self.assertEqual(test_chapter.display_name, 'chapter n')
