@@ -2,7 +2,7 @@
 // ====================
 
 body.course.static-pages {
-  
+
   .new-static-page-button {
     @include grey-button;
     display: block;
@@ -44,7 +44,7 @@ body.course.static-pages {
 
         label {
           display: inline-block;
-          margin-right: 10px;  
+          margin-right: 10px;
         }
       }
 
@@ -123,7 +123,7 @@ body.course.static-pages {
 
     .component-actions {
       position: absolute;
-      top: 26px;
+      top: 20px;
       right: 44px;
     }
   }
@@ -150,12 +150,12 @@ body.course.static-pages {
   }
 
   .static-page-item {
-    position: relative;    
+    position: relative;
     margin: 10px 0;
     padding: 22px 20px;
     border: 1px solid $darkGrey;
     border-radius: 3px;
-    background: #fff;    
+    background: #fff;
     @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
 
     .page-name {
