@@ -243,7 +243,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         })
 
         # Submit request. When successful, 'msg' is the prior length of the queue
-        (error, msg) = qinterface.send_to_queue(header=xheader,
+        qinterface.send_to_queue(header=xheader,
                                                 body=json.dumps(contents))
 
         # State associated with the queueing request

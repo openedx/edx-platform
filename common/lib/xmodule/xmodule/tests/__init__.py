@@ -52,7 +52,7 @@ def test_system():
         user=Mock(is_staff=False),
         filestore=Mock(),
         debug=True,
-        xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10},
+        xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10, 'construct_callback' : Mock(side_effect="/")},
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         xblock_model_data=lambda descriptor: descriptor._model_data,
         anonymous_student_id='student',
