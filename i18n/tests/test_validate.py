@@ -1,8 +1,7 @@
-import os
+import os, sys, logging
 from unittest import TestCase
 from nose.plugins.skip import SkipTest
 
-from logger import get_logger
 from config import LOCALE_DIR
 from execute import call
         
@@ -10,10 +9,11 @@ def test_po_files(root=LOCALE_DIR):
     """
     This is a generator. It yields all of the .po files under root, and tests each one.
     """
-    log = get_logger(__name__)
+    log = logging.getLogger(__name__)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    
     for (dirpath, dirnames, filenames) in os.walk(root):
         for name in filenames:
-            print name
             (base, ext) = os.path.splitext(name)
             if ext.lower() == '.po':
                 yield validate_po_file, os.path.join(dirpath, name), log

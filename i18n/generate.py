@@ -13,10 +13,9 @@
  languages to generate.
 """
 
-import os
+import os, sys, logging
 from polib import pofile
 
-from logger import get_logger
 from config import BASE_DIR, CONFIGURATION
 from execute import execute, remove_file
 
@@ -72,7 +71,8 @@ def validate_files(dir, files_to_merge):
             raise Exception("I18N: Cannot generate because file not found: {0}".format(pathname))
 
 def main ():
-    log = get_logger(__name__)
+    log = logging.getLogger(__name__)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     for locale in CONFIGURATION.locales:
         merge(locale)
