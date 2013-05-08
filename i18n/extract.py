@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
   
 """
 See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
