@@ -522,19 +522,39 @@ def validate_transifex_config()
   return true
 end
 
+# Make sure GNU gettext utilities are available
+# Returns boolean: returns true if utilities are available, else returns false
+def validate_gnu_gettext()
+    begin
+      select_executable('xgettext')
+      return true
+    rescue
+      puts "Error:".red
+      puts "Cannot locate GNU gettext utilities, which are required by django for internationalization.".red
+      puts "(see https://docs.djangoproject.com/en/dev/topics/i18n/translation/#message-files)".red
+      puts "Try downloading them from http://www.gnu.org/software/gettext/".red
+      return false
+    end
+end
+
+
 namespace :i18n do
 
   desc "Extract localizable strings from sources"
   task :extract do
-    sh(File.join(REPO_ROOT, "i18n", "extract.py"))
+    if validate_gnu_gettext()
+      sh(File.join(REPO_ROOT, "i18n", "extract.py"))
+    end
   end
 
   desc "Compile localizable strings from sources. With optional flag 'extract', will extract strings first."
   task :generate do
-    if ARGV.last.downcase == 'extract'
-      Rake::Task["i18n:extract"].execute
+    if validate_gnu_gettext()
+      if ARGV.last.downcase == 'extract'
+        Rake::Task["i18n:extract"].execute
+      end
+      sh(File.join(REPO_ROOT, "i18n", "generate.py"))
     end
-    sh(File.join(REPO_ROOT, "i18n", "generate.py"))
   end
 
   desc "Simulate international translation by generating dummy strings corresponding to source strings."
@@ -567,8 +587,10 @@ namespace :i18n do
 
   desc "Run tests for the internationalization library"
   task :test do
-    test = File.join(REPO_ROOT, "i18n", "tests")
-    sh("nosetests #{test}")
+    if validate_gnu_gettext()
+      test = File.join(REPO_ROOT, "i18n", "tests")
+      sh("nosetests #{test}")
+    end
   end
 
 end
