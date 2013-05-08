@@ -1,5 +1,6 @@
 '''
 Unit tests for enrollment methods in views.py
+
 '''
 
 from django.test.utils import override_settings
