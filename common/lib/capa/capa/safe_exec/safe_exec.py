@@ -49,7 +49,8 @@ LAZY_IMPORTS = "".join(LAZY_IMPORTS)
 
 @statsd.timed('capa.safe_exec.time')
 def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None):
-    """Exec python code safely.
+    """
+    Exec python code safely.
 
     `cache` is an object with .get(key) and .set(key, value) methods.
 
