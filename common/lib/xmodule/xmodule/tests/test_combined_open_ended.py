@@ -21,8 +21,6 @@ import capa.xqueue_interface as xqueue_interface
 from datetime import datetime
 import logging
 
-from mock_server import create_server
-
 log = logging.getLogger(__name__)
 
 from . import test_system
