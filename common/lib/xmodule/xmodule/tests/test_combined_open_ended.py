@@ -598,11 +598,27 @@ class OpenEndedModuleXmlTest(unittest.TestCase):
         except GradingServiceError:
             #This error is okay.  We don't have a grading service to connect to!
             pass
-            #Move to the next step in the problem
         try:
             module.get_html()
         except GradingServiceError:
             #This error is okay.  We don't have a grading service to connect to!
             pass
 
-            module.handle_ajax("get_combined_rubric", {})
+        module.handle_ajax("get_combined_rubric", {})
+
+        queue_reply = {
+            'queuekey' : "",
+            'xqueue_body' : json.dumps({
+                'score' : 0,
+                'feedback' : json.dumps({"spelling": "Spelling: Ok.", "grammar": "Grammar: Ok.", "markup-text": " all of us can think of a book that we hope none of our children or any other children have taken off the shelf . but if i have the right to remove that book from the shelf that work i abhor then you also have exactly the same right and so does everyone else . and then we <bg>have no books left</bg> on the shelf for any of us . <bs>katherine</bs> <bs>paterson</bs> , author write a persuasive essay to a newspaper reflecting your vies on censorship <bg>in libraries . do</bg> you believe that certain materials , such as books , music , movies , magazines , <bg>etc . , should be</bg> removed from the shelves if they are found <bg>offensive ? support your</bg> position with convincing arguments from your own experience , observations <bg>, and or reading .</bg> "}),
+                'grader_type' : "ML",
+                'success' : True,
+                'grader_id' : 1,
+                'submission_id' : 1,
+                'rubric_xml' : "<rubric><category><description>Writing Applications</description><score>0</score><option points='0'> The essay loses focus, has little information or supporting details, and the organization makes it difficult to follow.</option><option points='1'> The essay presents a mostly unified theme, includes sufficient information to convey the theme, and is generally organized well.</option></category><category><description> Language Conventions </description><score>0</score><option points='0'> The essay demonstrates a reasonable command of proper spelling and grammar. </option><option points='1'> The essay demonstrates superior command of proper spelling and grammar.</option></category></rubric>",
+                'rubric_scores_complete' : True,
+            })
+        }
+
+        module.handle_ajax("score_update", queue_reply)
+

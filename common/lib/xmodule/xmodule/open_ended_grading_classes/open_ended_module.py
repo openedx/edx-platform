@@ -516,7 +516,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             try:
                 feedback_dict = json.loads(score_result['feedback'])
             except:
-                pass
+                feedback_dict = score_result.get('feedback', '')
             feedback_dicts = [feedback_dict]
             grader_ids = [score_result['grader_id']]
             submission_ids = [score_result['submission_id']]
