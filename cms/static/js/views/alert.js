@@ -7,5 +7,11 @@ CMS.Views.Alert = Backbone.View.extend({
     render: function() {
         this.$el.html(this.template(this.model.attributes));
         return this;
+    },
+    events: {
+        "click .action-alert-close": "hide"
+    },
+    hide: function() {
+        this.model.set("shown", false);
     }
 });
