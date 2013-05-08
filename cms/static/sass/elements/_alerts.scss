@@ -6,7 +6,7 @@
   @include box-sizing(border-box);
 
   .copy {
-    @include font-size(13);
+    @extend .t-copy-sub2;
   }
 }
 
@@ -184,12 +184,12 @@
       }
 
       .action-primary {
-        @include font-size(13);
+        @extend .t-action3;
         font-weight: 600;
       }
 
       .action-secondary {
-        @include font-size(13);
+        @extend .t-action3;
       }
     }
   }
@@ -367,12 +367,12 @@
   }
 
   .copy {
-    @include font-size(13);
+    @extend .t-copy-sub2;
     width: flex-grid(10, 12);
     color: $gray-l2;
 
     .title {
-      @include font-size(14);
+      @extend .t-title-4;
       margin-bottom: 0;
       color: $white;
     }
@@ -409,13 +409,13 @@
 
     .action-primary {
       @include blue-button();
-      @include font-size(13);
+      @extend .t-action3;
       border-color: $blue-d2;
       font-weight: 600;
     }
 
     .action-secondary {
-      @include font-size(13);
+      @extend .t-action3;
     }
   }
 
@@ -504,7 +504,7 @@
 
 // adopted alerts
 .alert {
-	@include font-size(14);
+  @extend .t-copy-sub2;
   @include box-sizing(border-box);
   @include clearfix();
   margin: 0 auto;
@@ -530,7 +530,7 @@
   }
 
   .copy {
-    @include font-size(13);
+    @extend .t-copy-sub2;
     width: flex-grid(10, 12);
     color: $gray-l2;
 
@@ -568,12 +568,12 @@
   	    }
 
         .action-primary {
-          @include font-size(13);
+          @extend .t-action3;
           font-weight: 600;
         }
 
         .action-secondary {
-          @include font-size(13);
+          @extend .t-action3;
         }
   	  }
   	}
@@ -730,7 +730,7 @@ body.uxdesign.alerts {
     border-radius: 3px;
     background: #fbf6e1;
     // background: #edbd3c;
-    font-size: 14px;
+    @extend .t-copy-sub1;
     @include clearfix;
 
     .alert-message {
