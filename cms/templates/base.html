@@ -51,6 +51,52 @@
     <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
     <script type="text/javascript" src="//www.youtube.com/player_api"></script>
 
+    <!-- templates -->
+    <%text>
+    <script id="alert-tpl" type="text/template">
+<div class="wrapper wrapper-alert <% if(obj.type) { %>wrapper-alert-<%= type %> <% }; if(obj.shown) { %>is-shown <% } else { %>is-hiding<% } %>">
+  <div class="alert <%= type %> <% if(obj.actions) { %>has-actions <% } %>">
+    <% var iconText = {"warning": "&#x26A0;", "confirmation": "&#x2713;", "error": "&#x26A0;", "announcement": "&#x1F4E2;", "step-required": "&#xE0D1"} %>
+    <i class="ss-icon ss-symbolicons-block icon icon-<%= type %>"><%= iconText[type] %></i>
+
+    <div class="copy">
+      <h2 class="title title-3"><%= title %></h2>
+      <% if(obj.message) { %><p class="message"><%= message %></p><% } %>
+    </div>
+
+    <% if(obj.actions) { %>
+    <nav class="nav-actions">
+      <h3 class="sr">Alert Actions</h3>
+      <ul>
+        <% if(actions.primary) { %>
+        <li class="nav-item">
+          <a href="#" class="button action-primary <%= actions.primary.cls %>"><%= actions.primary.text %></a>
+        </li>
+        <% } %>
+        <% if(actions.secondary) {
+             _.each(actions.secondary, function(secondary) { %>
+        <li class="nav-item">
+          <a href="#" class="button action-secondary <%= secondary.cls %>"><%= secondary.text %></a>
+        </li>
+        <%   });
+           } %>
+      </ul>
+    </nav>
+    <% } %>
+
+    <% if(obj.close) { %>
+    <a href="#" rel="view" class="action action-alert-close">
+      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
+      <span class="label">close alert</span>
+    </a>
+    <% } %>
+  </div>
+</div>
+    </script>
+    </%text>
+    <script src="${static.url('js/models/alert.js')}"></script>
+    <script src="${static.url('js/views/alert.js')}"></script>
+
     <!-- view -->
     <div class="wrapper wrapper-view">
       <%include file="widgets/header.html" />
