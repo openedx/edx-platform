@@ -132,10 +132,6 @@ class MockPeerGradingService(object):
     def get_problem_list(self, course_id, grader_id):
         return {'success': True,
                            'problem_list': [
-                               {'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
-                                           'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5},
-                               {'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
-                                           'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5}
                            ]}
 
     def get_data_for_location(self, problem_location, student_id):
