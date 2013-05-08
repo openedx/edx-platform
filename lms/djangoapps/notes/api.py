@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 API_SETTINGS = {
     # Version
-    'META': {'name': 'Notes API', 'version': '1.0'},
+    'META': {'name': 'Notes API', 'version': 1},
 
     # Maps resources to HTTP methods
     'RESOURCE_MAP': {
