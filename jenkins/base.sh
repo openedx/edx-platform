@@ -1,6 +1,6 @@
 
 function github_status {
-    gcli status create mitx mitx $GIT_COMMIT \
+    gcli status create edx mitx $GIT_COMMIT \
          --params=$1 \
                   target_url:$BUILD_URL \
                   description:"Build #$BUILD_NUMBER is running" \

@@ -1,1 +1,4 @@
-# Please do not ignore *.js files. Some xmodules are written in JS.
+# Ignore .js files in this folder as they are compiled from coffeescript
+# For each of the xmodules subdirectories, add a .gitignore file that
+# will version any *.js file that is specifically written, not compiled.
+*.js

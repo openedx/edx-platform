@@ -206,6 +206,8 @@ PIPELINE_CSS = {
     },
 }
 
+# test_order: Determines the position of this chunk of javascript on
+# the jasmine test page
 PIPELINE_JS = {
     'main': {
         'source_filenames': sorted(
@@ -213,6 +215,7 @@ PIPELINE_JS = {
             rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.js')
         ) + ['js/hesitate.js', 'js/base.js'],
         'output_filename': 'js/cms-application.js',
+        'test_order': 0
     },
     'module-js': {
         'source_filenames': (
@@ -220,11 +223,8 @@ PIPELINE_JS = {
             rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js')
         ),
         'output_filename': 'js/cms-modules.js',
+        'test_order': 1
     },
-    'spec': {
-        'source_filenames': sorted(rooted_glob(PROJECT_ROOT / 'static/', 'coffee/spec/**/*.js')),
-        'output_filename': 'js/cms-spec.js'
-    }
 }
 
 PIPELINE_CSS_COMPRESSOR = None

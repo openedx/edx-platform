@@ -37,11 +37,17 @@ class XModuleCourseFactory(Factory):
             new_course.display_name = display_name
 
         new_course.lms.start = gmtime()
-        new_course.tabs = [{"type": "courseware"},
-                           {"type": "course_info", "name": "Course Info"},
-                           {"type": "discussion", "name": "Discussion"},
-                           {"type": "wiki", "name": "Wiki"},
-                           {"type": "progress", "name": "Progress"}]
+        new_course.tabs = kwargs.get(
+            'tabs',
+            [
+                {"type": "courseware"},
+                {"type": "course_info", "name": "Course Info"},
+                {"type": "discussion", "name": "Discussion"},
+                {"type": "wiki", "name": "Wiki"},
+                {"type": "progress", "name": "Progress"}
+            ]
+        )
+        new_course.discussion_link = kwargs.get('discussion_link')
 
         # Update the data in the mongo datastore
         store.update_metadata(new_course.location.url(), own_metadata(new_course))

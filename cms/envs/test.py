@@ -17,9 +17,6 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 TEST_ROOT = path('test_root')
 
-# Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
-
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 

@@ -2,8 +2,3 @@
 -e common/lib/capa
 -e common/lib/xmodule
 -e .
-
-# XBlock:
-# Might change frequently, so put it in local-requirements.txt,
-# but conceptually is an external package, so it is in a separate repo.
--e git+https://github.com/edx/XBlock.git@96d8f5f4#egg=XBlock

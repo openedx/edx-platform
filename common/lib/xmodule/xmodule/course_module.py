@@ -162,8 +162,7 @@ class CourseFields(object):
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
     discussion_topics = Object(
         help="Map of topics names to ids",
-        scope=Scope.settings,
-        computed_default=lambda c: {'General': {'id': c.location.html_id()}},
+        scope=Scope.settings
         )
     testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
@@ -234,6 +233,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         self._grading_policy = {}
 
         self.set_grading_policy(self.grading_policy)
+        if self.discussion_topics == {}:
+            self.discussion_topics = {'General': {'id': self.location.html_id()}}
 
         self.test_center_exams = []
         test_center_info = self.testcenter_info

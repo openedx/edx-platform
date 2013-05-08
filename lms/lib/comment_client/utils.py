@@ -37,6 +37,10 @@ def perform_request(method, url, data_or_params=None, *args, **kwargs):
         else:
             response = requests.request(method, url, params=data_or_params, timeout=5)
     except Exception as err:
+        # remove API key if it is in the params
+        if 'api_key' in data_or_params:
+            log.info('Deleting API key from params')
+            del data_or_params['api_key']
         log.exception("Trying to call {method} on {url} with params {params}".format(
             method=method, url=url, params=data_or_params))
         # Reraise with a single exception type

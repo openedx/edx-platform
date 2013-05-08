@@ -90,7 +90,10 @@ MITX_FEATURES = {
 
     # Give a UI to show a student's submission history in a problem by the
     # Staff Debug tool.
-    'ENABLE_STUDENT_HISTORY_VIEW': True
+    'ENABLE_STUDENT_HISTORY_VIEW': True,
+
+    # Provide a UI to allow users to submit feedback from the LMS
+    'ENABLE_FEEDBACK_SUBMISSION': False,
 }
 
 # Used for A/B testing
@@ -262,6 +265,7 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
+SERVER_EMAIL = 'devops@edx.org'
 ADMINS = (
     ('edX Admins', 'admin@edx.org'),
 )
@@ -322,6 +326,14 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 
 PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
 # TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+
+##### Feedback submission mechanism #####
+FEEDBACK_SUBMISSION_EMAIL = None
+
+##### Zendesk #####
+ZENDESK_URL = None
+ZENDESK_USER = None
+ZENDESK_API_KEY = None
 
 ################################# open ended grading config  #####################
 
@@ -440,6 +452,9 @@ PIPELINE_CSS = {
     },
 }
 
+
+# test_order: Determines the position of this chunk of javascript on
+# the jasmine test page
 PIPELINE_JS = {
     'application': {
 
@@ -455,31 +470,39 @@ PIPELINE_JS = {
             'js/sticky_filter.js',
             'js/query-params.js',
         ],
-        'output_filename': 'js/lms-application.js'
+        'output_filename': 'js/lms-application.js',
+
+        'test_order': 1,
     },
     'courseware': {
         'source_filenames': courseware_js,
-        'output_filename': 'js/lms-courseware.js'
+        'output_filename': 'js/lms-courseware.js',
+        'test_order': 2,
     },
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
+        'test_order': 0,
     },
     'module-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
         'output_filename': 'js/lms-modules.js',
+        'test_order': 3,
     },
     'discussion': {
         'source_filenames': discussion_js,
-        'output_filename': 'js/discussion.js'
+        'output_filename': 'js/discussion.js',
+        'test_order': 4,
     },
     'staff_grading': {
         'source_filenames': staff_grading_js,
-        'output_filename': 'js/staff_grading.js'
+        'output_filename': 'js/staff_grading.js',
+        'test_order': 5,
     },
     'open_ended': {
         'source_filenames': open_ended_js,
-        'output_filename': 'js/open_ended.js'
+        'output_filename': 'js/open_ended.js',
+        'test_order': 6,
     }
 }
 
@@ -571,3 +594,4 @@ INSTALLED_APPS = (
     # Discussion forums
     'django_comment_client',
 )
+

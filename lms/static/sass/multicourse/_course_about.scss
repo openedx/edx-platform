@@ -272,7 +272,9 @@
       }
 
       .course-staff {
+
         .teacher {
+          @include clearfix;
           margin-bottom: 40px;
 
           h3 {
@@ -312,7 +314,7 @@
           }
         }
       }
-      
+
       .faq {
         @include clearfix;
 
