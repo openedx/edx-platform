@@ -41,6 +41,7 @@ def modulestore():
     """
     Find and return the correctly ModuleStore instance for this environment.
     """
+    global _MODULESTORE
     if _MODULESTORE is None:
         if settings.MODULESTORE['ENGINE'] == 'xmodule.modulestore.comparison.ComparisonModuleStore':
             stores = [load_modulestore(cfg) for cfg in settings.MODULESTORE['stores']]

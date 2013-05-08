@@ -154,7 +154,7 @@ class CourseFields(object):
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = DateTime(help="Start time when this module is visible",
-        computed_default=lambda i: datetime.datetime.utcnow(),
+        default=datetime.utcnow(),
         scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
@@ -200,7 +200,7 @@ class CourseFields(object):
     discussion_topics = Object(
         help="Map of topics names to ids",
         scope=Scope.settings,
-        computed_default=lambda c: {'General': {'id': c.location.html_id()}},
+        # TODO computed_default=lambda c: {'General': {'id': c.location.html_id()}},
         )
     testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)

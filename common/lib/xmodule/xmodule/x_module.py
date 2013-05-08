@@ -10,8 +10,6 @@ from xmodule.modulestore import Location, inheritance
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from xblock.core import XBlock, Scope, String
-import uuid
-import copy
 
 log = logging.getLogger(__name__)
 
@@ -174,6 +172,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         These children will be the same children returned by the
         descriptor unless descriptor.has_dynamic_children() is true.
         '''
+        # FIXME wrong place to get children
         return self.descriptor.get_children()
 
     def get_child_by(self, selector):
@@ -511,10 +510,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         # as a lazily fetched collection which if populated must be complete.
         usage_id = json_data.get('_id', None)
         if not '_inherited_metadata' in json_data and parent_xblock is not None:
-            json_data['_inherited_metadata'] = copy.copy(parent_xblock.xblock_kvs.get_inherited_metadata)
+            json_data['_inherited_metadata'] = parent_xblock.xblock_kvs().get_inherited_metadata().copy()
+            json_metadata = json_data.get('metadata', {})
             for field in inheritance.INHERITABLE_METADATA:
-                if field in json_data['metadata']:
-                    json_data['_inherited_metadata'][field] = json_data['metadata'][field]
+                if field in json_metadata:
+                    json_data['_inherited_metadata'][field] = json_metadata[field]
         return system.xblock_from_json(cls, usage_id, json_data)
 
     # ================================= XML PARSING ============================

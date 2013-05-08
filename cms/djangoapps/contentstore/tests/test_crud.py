@@ -10,6 +10,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.x_module import XModuleDescriptor
+from xmodule.capa_module import CapaDescriptor
 
 
 class TemplateTests(unittest.TestCase):
@@ -67,3 +68,11 @@ class TemplateTests(unittest.TestCase):
             test_course.system, parent_xblock=test_course)
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         self.assertEqual(test_chapter.display_name, 'chapter n')
+
+        # test w/ a definition (e.g., a problem)
+        test_def_content = '<problem>boo</problem>'
+        test_problem = XModuleDescriptor.load_from_json({'category': 'problem',
+            'definition': {'data': test_def_content}},
+            test_course.system, parent_xblock=test_course)
+        self.assertIsInstance(test_problem, CapaDescriptor)
+        self.assertEqual(test_problem.data, test_def_content)

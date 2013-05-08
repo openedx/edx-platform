@@ -819,10 +819,10 @@ class SplitMongoModuleStore(ModuleStoreBase):
         existing_uses = self.course_index.find({"_id": {"$regex": id_root}})
         if existing_uses.count() > 0:
             max_found = 0
-            matcher = re.compile(id_root + r'(\d*)')
+            matcher = re.compile(id_root + r'(\d+)')
             for entry in existing_uses:
                 serial = re.search(matcher, entry['_id'])
-                if serial.groups > 0:
+                if serial is not None and serial.groups > 0:
                     value = int(serial.group(1))
                     if value > max_found:
                         max_found = value
@@ -1235,6 +1235,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
         '''
         if isinstance(definition, DefinitionLazyLoader):
             return definition.definition_locator
+        elif '_id' not in definition:
+            return None
         else:
             return DescriptionLocator(definition['_id'])
 
