@@ -1,6 +1,7 @@
 # Packages to install in the Python sandbox for secured execution.
 numpy==1.6.2
 scipy==0.11.0
+lxml==3.0.1
 -e common/lib/calc
 -e common/lib/chem
 -e common/lib/sandbox-packages
