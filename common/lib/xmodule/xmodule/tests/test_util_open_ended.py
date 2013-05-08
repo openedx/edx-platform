@@ -1,5 +1,5 @@
 OPEN_ENDED_GRADING_INTERFACE = {
-    'url': 'http://127.0.0.1:3033/',
+    'url': 'blah/',
     'username': 'incorrect',
     'password': 'incorrect',
     'staff_grading': 'staff_grading',
@@ -12,3 +12,15 @@ S3_INTERFACE = {
     'aws_secret_key': "",
     "aws_bucket_name": "",
 }
+
+class MockQueryDict(dict):
+    """
+    Mock a query set so that it can be used with default authorization
+    """
+    def getlist(self, key, default=None):
+        try:
+            return super(MockQueryDict, self).__getitem__(key)
+        except KeyError:
+            if default is None:
+                return []
+        return default

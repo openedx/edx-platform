@@ -2,7 +2,8 @@ import json
 from mock import Mock, MagicMock, ANY
 import unittest
 
-from dummy_system import DummySystemUser, MockQueryDict
+from dummy_system import DummySystemUser
+from test_util_open_ended import MockQueryDict
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule

@@ -4,7 +4,8 @@ import json
 from lxml import etree
 from mock import Mock
 from . import test_system
-from dummy_system import DummySystem, DummySystemUser, MockQueryDict
+from dummy_system import DummySystem, DummySystemUser
+from test_util_open_ended import MockQueryDict
 
 from xmodule.peer_grading_module import PeerGradingModule, PeerGradingDescriptor
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError

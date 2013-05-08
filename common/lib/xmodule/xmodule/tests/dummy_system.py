@@ -52,15 +52,3 @@ class DummySystemUser(object):
             location = Location(location)
         descriptor = self.modulestore.get_instance(course.id, location, depth=None)
         return descriptor.xmodule(self.test_system)
-
-class MockQueryDict(dict):
-    """
-    Mock a query set so that it can be used with default authorization
-    """
-    def getlist(self, key, default=None):
-        try:
-            return super(MockQueryDict, self).__getitem__(key)
-        except KeyError:
-            if default is None:
-                return []
-        return default
