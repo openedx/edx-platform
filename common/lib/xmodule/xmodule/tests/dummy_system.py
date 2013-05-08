@@ -44,7 +44,6 @@ class DummySystemUser(object):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
         courses = modulestore.get_courses()
         self.modulestore = modulestore
-        self.assertEquals(len(courses), 1)
         return courses[0]
 
     def get_module_from_location(self, location, course):
@@ -53,3 +52,15 @@ class DummySystemUser(object):
             location = Location(location)
         descriptor = self.modulestore.get_instance(course.id, location, depth=None)
         return descriptor.xmodule(self.test_system)
+
+class MockQueryDict(dict):
+    """
+    Mock a query set so that it can be used with default authorization
+    """
+    def getlist(self, key, default=None):
+        try:
+            return super(MockQueryDict, self).__getitem__(key)
+        except KeyError:
+            if default is None:
+                return []
+        return default

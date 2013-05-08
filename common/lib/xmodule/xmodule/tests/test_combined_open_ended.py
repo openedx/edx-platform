@@ -2,21 +2,14 @@ import json
 from mock import Mock, MagicMock, ANY
 import unittest
 
-from fs.memoryfs import MemoryFS
-from mock import patch
-
-from dummy_system import DummySystemUser
+from dummy_system import DummySystemUser, MockQueryDict
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-
-from xmodule.tests.test_export import DATA_DIR
 
 from lxml import etree
 import capa.xqueue_interface as xqueue_interface
@@ -27,22 +20,10 @@ log = logging.getLogger(__name__)
 
 from . import test_system
 
-ORG = 'test_org'
+ORG = 'edX'
 COURSE = 'open_ended'      # name of directory with course data
 
 import test_util_open_ended
-
-class MockQueryDict(dict):
-    """
-    Mock a query set so that it can be used with default authorization
-    """
-    def getlist(self, key, default=None):
-        try:
-            return super(MockQueryDict, self).__getitem__(key)
-        except KeyError:
-            if default is None:
-                return []
-        return default
 
 """
 Tests for the various pieces of the CombinedOpenEndedGrading system
@@ -492,7 +473,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(score_dict['total'], 15.0)
 
 class OpenEndedModuleXmlTest(unittest.TestCase, DummySystemUser):
-    problem_location = Location(["i4x", "edX", "oe_test", "combinedopenended", "SampleQuestion"])
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
     answer = "blah blah"
     assessment = [0,1]
     hint = "blah"

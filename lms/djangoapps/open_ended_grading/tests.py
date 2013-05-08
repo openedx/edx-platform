@@ -84,7 +84,13 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         data = {'location': self.location}
 
         r = self.check_for_post_code(200, url, data)
-        d = json.loads(r.content)
+
+        d = r.content
+        try:
+            d = json.loads(d)
+        except Exception:
+            pass
+
         self.assertTrue(d['success'])
         self.assertEquals(d['submission_id'], self.mock_service.cnt)
         self.assertIsNotNone(d['submission'])
@@ -112,7 +118,11 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
             data.update({'skipped' : True})
 
         r = self.check_for_post_code(200, url, data)
-        d = json.loads(r.content)
+        d = r.content
+        try:
+            d = json.loads(d)
+        except Exception:
+            pass
         self.assertTrue(d['success'], str(d))
         self.assertEquals(d['submission_id'], self.mock_service.cnt)
 
@@ -129,7 +139,11 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         data = {}
 
         r = self.check_for_post_code(200, url, data)
-        d = json.loads(r.content)
+        d = r.content
+        try:
+            d = json.loads(d)
+        except Exception:
+            pass
         self.assertTrue(d['success'], str(d))
         self.assertIsNotNone(d['problem_list'])
 
@@ -179,7 +193,11 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         data = {'location': self.location}
 
         r = self.peer_module.get_next_submission(data)
-        d = json.loads(r)
+        d = r
+        try:
+            d = json.loads(d)
+        except Exception:
+            pass
         self.assertTrue(d['success'])
         self.assertIsNotNone(d['submission_id'])
         self.assertIsNotNone(d['prompt'])
@@ -213,7 +231,11 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         qdict.keys = data.keys
 
         r = self.peer_module.save_grade(qdict)
-        d = json.loads(r)
+        d = r
+        try:
+            d = json.loads(d)
+        except Exception:
+            pass
         self.assertTrue(d['success'])
 
     def test_save_grade_missing_keys(self):
@@ -225,7 +247,11 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
     def test_is_calibrated_success(self):
         data = {'location': self.location}
         r = self.peer_module.is_student_calibrated(data)
-        d = json.loads(r)
+        d = r
+        try:
+            d = json.loads(d)
+        except Exception:
+            pass
         self.assertTrue(d['success'])
         self.assertTrue('calibrated' in d)
 
@@ -239,9 +265,11 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         data = {'location': self.location}
 
         r = self.peer_module.show_calibration_essay(data)
-        d = json.loads(r)
-        log.debug(d)
-        log.debug(type(d))
+        d = r
+        try:
+            d = json.loads(r)
+        except Exception:
+            pass
         self.assertTrue(d['success'])
         self.assertIsNotNone(d['submission_id'])
         self.assertIsNotNone(d['prompt'])

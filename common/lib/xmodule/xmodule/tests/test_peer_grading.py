@@ -14,17 +14,13 @@ COURSE="open_ended"
 
 
 class PeerGradingModuleTest(unittest.TestCase, DummySystemUser):
-    location = Location(["i4x", "edX", "open_ended", "peergrading",
-                         "SampleQuestion"])
-    max_score = 1
-
-    definition = "<peergrading/>"
-    descriptor = Mock(data=definition)
+    problem_location = Location(["i4x", "edX", "open_ended", "peergrading",
+                         "PeerGradingSample"])
 
     def setUp(self):
         self.test_system = test_system()
         self.test_system.open_ended_grading_interface = None
-        self.peer_grading = PeerGradingModule(self.test_system, self.location,self.descriptor, model_data={'data': self.definition})
+        self.peer_grading = self.get_module_from_location(self.problem_location, COURSE)
 
     def test_module_closed(self):
         closed = self.peer_grading.closed()
