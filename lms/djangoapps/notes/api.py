@@ -212,7 +212,7 @@ def search(request, course_id):
     total = notes.count()
     rows = notes[offset:offset+limit]
     result = {
-        'total': notes.count(), 
+        'total': total,
         'rows': [note.as_dict() for note in rows]
     }
 
