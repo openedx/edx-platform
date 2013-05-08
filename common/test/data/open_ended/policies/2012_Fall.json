@@ -9,6 +9,9 @@
         "display_name": "Overview"
     },
     "combinedopenended/SampleQuestion": {
-        "display_name": "Sample Question",
+        "display_name": "Sample Question"
     },
+    "peergrading/PeerGradingSample": {
+        "display_name": "Sample Question"
+    }
 }

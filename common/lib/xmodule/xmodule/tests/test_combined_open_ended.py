@@ -5,6 +5,8 @@ import unittest
 from fs.memoryfs import MemoryFS
 from mock import patch
 
+from dummy_system import DummySystemUser
+
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
@@ -41,31 +43,6 @@ class MockQueryDict(dict):
             if default is None:
                 return []
         return default
-
-class DummySystem(ImportSystem):
-
-    @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
-    def __init__(self, load_error_modules):
-
-        xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
-        course_id = "/".join([ORG, COURSE, 'test_run'])
-        course_dir = "test_dir"
-        policy = {}
-        error_tracker = Mock()
-        parent_tracker = Mock()
-
-        super(DummySystem, self).__init__(
-            xmlstore,
-            course_id,
-            course_dir,
-            policy,
-            error_tracker,
-            parent_tracker,
-            load_error_modules=load_error_modules,
-        )
-
-    def render_template(self, template, context):
-        raise Exception("Shouldn't be called")
 
 """
 Tests for the various pieces of the CombinedOpenEndedGrading system
@@ -514,7 +491,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(score_dict['score'], 15.0)
         self.assertEqual(score_dict['total'], 15.0)
 
-class OpenEndedModuleXmlTest(unittest.TestCase):
+class OpenEndedModuleXmlTest(unittest.TestCase, DummySystemUser):
     problem_location = Location(["i4x", "edX", "oe_test", "combinedopenended", "SampleQuestion"])
     answer = "blah blah"
     assessment = [0,1]
@@ -525,37 +502,15 @@ class OpenEndedModuleXmlTest(unittest.TestCase):
                 send_to_queue = Mock(side_effect=[1,"queued"])
             )
 
-    @staticmethod
-    def get_import_system(load_error_modules=True):
-        '''Get a dummy system'''
-        return DummySystem(load_error_modules)
-
-    def get_course(self, name):
-        """Get a test course by directory name.  If there's more than one, error."""
-        print "Importing {0}".format(name)
-
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
-        courses = modulestore.get_courses()
-        self.modulestore = modulestore
-        self.assertEquals(len(courses), 1)
-        return courses[0]
-
-    def get_module_from_location(self, location):
-        course = self.get_course('open_ended')
-        if not isinstance(location, Location):
-            location = Location(location)
-        descriptor = self.modulestore.get_instance(course.id, location, depth=None)
-        return descriptor.xmodule(self.test_system)
-
     def test_open_ended_load_and_save(self):
-        module = self.get_module_from_location(self.problem_location)
+        module = self.get_module_from_location(self.problem_location, COURSE)
         module.handle_ajax("save_answer", {"student_answer" : self.answer})
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
 
     def test_open_ended_flow_reset(self):
         assessment = [0,1]
-        module = self.get_module_from_location(self.problem_location)
+        module = self.get_module_from_location(self.problem_location, COURSE)
 
         #Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer" : self.answer})
@@ -578,7 +533,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase):
 
     def test_open_ended_flow_correct(self):
         assessment = [1,1]
-        module = self.get_module_from_location(self.problem_location)
+        module = self.get_module_from_location(self.problem_location, COURSE)
 
         #Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer" : self.answer})
