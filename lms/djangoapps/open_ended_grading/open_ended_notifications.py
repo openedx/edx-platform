@@ -11,6 +11,7 @@ from util.cache import cache
 import datetime
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
+import datetime
 
 log = logging.getLogger(__name__)
 
@@ -104,6 +105,25 @@ def peer_grading_notifications(course, user):
 
 
 def combined_notifications(course, user):
+    """
+    Show notifications to a given user for a given course.  Get notifications from the cache if possible,
+    or from the grading controller server if not.
+    @param course: The course object for which we are getting notifications
+    @param user: The user object for which we are getting notifications
+    @return: A dictionary with boolean pending_grading (true if there is pending grading), img_path (for notification
+    image), and response (actual response from grading controller server).
+    """
+    #Set up return values so that we can return them for error cases
+    pending_grading = False
+    img_path = ""
+    notifications={}
+    notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
+
+    #We don't want to show anonymous users anything.
+    if not user.is_authenticated():
+        return notification_dict
+
+    #Define a mock modulesystem
     system = ModuleSystem(
         ajax_url=None,
         track_function=None,
@@ -112,41 +132,44 @@ def combined_notifications(course, user):
         replace_urls=None,
         xblock_model_data= {}
     )
+    #Initialize controller query service using our mock system
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, course, 'staff')
     course_id = course.id
     notification_type = "combined"
 
+    #See if we have a stored value in the cache
     success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
     if success:
         return notification_dict
 
-    min_time_to_query = user.last_login
+    #Get the time of the last login of the user
+    last_login = user.last_login
+
+    #Find the modules they have seen since they logged in
     last_module_seen = StudentModule.objects.filter(student=user, course_id=course_id,
-                                                    modified__gt=min_time_to_query).values('modified').order_by(
+                                                    modified__gt=last_login).values('modified').order_by(
         '-modified')
     last_module_seen_count = last_module_seen.count()
 
     if last_module_seen_count > 0:
+        #The last time they viewed an updated notification (last module seen minus how long notifications are cached)
         last_time_viewed = last_module_seen[0]['modified'] - datetime.timedelta(seconds=(NOTIFICATION_CACHE_TIME + 60))
     else:
-        last_time_viewed = user.last_login
+        #If they have not seen any modules since they logged in, then don't refresh
+        return {'pending_grading': False, 'img_path': img_path, 'response': notifications}
 
-    pending_grading = False
-
-    img_path = ""
     try:
+        #Get the notifications from the grading controller
         controller_response = controller_qs.check_combined_notifications(course.id, student_id, user_is_staff,
                                                                          last_time_viewed)
-        log.debug(controller_response)
         notifications = json.loads(controller_response)
         if notifications['success']:
             if notifications['overall_need_to_check']:
                 pending_grading = True
     except:
         #Non catastrophic error, so no real action
-        notifications = {}
         #This is a dev_facing_error
         log.exception(
             "Problem with getting notifications from controller query service for course {0} user {1}.".format(
@@ -157,6 +180,7 @@ def combined_notifications(course, user):
 
     notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
 
+    #Store the notifications in the cache
     set_value_in_cache(student_id, course_id, notification_type, notification_dict)
 
     return notification_dict
