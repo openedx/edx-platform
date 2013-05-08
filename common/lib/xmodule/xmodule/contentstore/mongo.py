@@ -35,8 +35,11 @@ class MongoContentStore(ContentStore):
         with self.fs.new_file(_id=id, filename=content.get_url_path(), content_type=content.content_type,
                               displayname=content.name, thumbnail_location=content.thumbnail_location,
                               import_path=content.import_path) as fp:
-
-            fp.write(content.data)
+            if hasattr(content.data, '__iter__'):
+                for chunk in content.data:
+                    fp.write(chunk)
+            else:
+                fp.write(content.data)
 
         return content
 

@@ -113,7 +113,7 @@ class ContentStore(object):
         '''
         raise NotImplementedError
 
-    def generate_thumbnail(self, content):
+    def generate_thumbnail(self, content, tempfile_path=None):
         thumbnail_content = None
         # use a naming convention to associate originals with the thumbnail
         thumbnail_name = StaticContent.generate_thumbnail_name(content.location.name)
@@ -129,7 +129,10 @@ class ContentStore(object):
                 # My understanding is that PIL will maintain aspect ratios while restricting
                 # the max-height/width to be whatever you pass in as 'size'
                 # @todo: move the thumbnail size to a configuration setting?!?
-                im = Image.open(StringIO.StringIO(content.data))
+                if tempfile_path is None:
+                    im = Image.open(StringIO.StringIO(content.data))
+                else:
+                    im = Image.open(tempfile_path)
 
                 # I've seen some exceptions from the PIL library when trying to save palletted
                 # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
