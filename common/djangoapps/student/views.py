@@ -216,6 +216,9 @@ def signin_user(request):
     """
     This view will display the non-modal login form
     """
+    if request.user.is_authenticated():
+        return redirect(reverse('dashboard'))
+
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action')
@@ -227,6 +230,9 @@ def register_user(request):
     """
     This view will display the non-modal registration form
     """
+    if request.user.is_authenticated():
+        return redirect(reverse('dashboard'))
+
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action')
