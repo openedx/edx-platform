@@ -496,8 +496,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 grader_types.append(score_result['grader_type'])
                 try:
                     feedback_dict = json.loads(score_result['feedback'][i])
-                except:
-                    pass
+                except Exception:
+                    feedback_dict = score_result['feedback'][i]
                 feedback_dicts.append(feedback_dict)
                 grader_ids.append(score_result['grader_id'][i])
                 submission_ids.append(score_result['submission_id'])
@@ -515,7 +515,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             feedback_items = [feedback]
             try:
                 feedback_dict = json.loads(score_result['feedback'])
-            except:
+            except Exception:
                 feedback_dict = score_result.get('feedback', '')
             feedback_dicts = [feedback_dict]
             grader_ids = [score_result['grader_id']]
