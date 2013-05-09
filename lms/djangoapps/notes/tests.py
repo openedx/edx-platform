@@ -1,5 +1,5 @@
 """
-Unit tests for the notes API and model.
+Unit tests for the notes app.
 """
 
 from django.test import TestCase
@@ -7,8 +7,8 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-from collections import namedtuple
-from random import random
+import collections
+import unittest
 import json
 import logging
 
@@ -20,7 +20,7 @@ class UtilsTest(TestCase):
         Setup a dummy course-like object with a tabs field that can be
         accessed via attribute lookup. 
         '''
-        self.course = namedtuple('DummyCourse', ['tabs'])
+        self.course = collections.namedtuple('DummyCourse', ['tabs'])
         self.course.tabs = []
 
     def test_notes_not_enabled(self):
@@ -48,11 +48,12 @@ class ApiTest(TestCase):
         self.client = Client()
 
         # Mocks
-        api.api_enabled = (lambda request, course_id: True)
+        api.api_enabled = self.mock_api_enabled(True) 
 
         # Create two accounts
         self.password = 'abc'
         self.student = User.objects.create_user('student', 'student@test.com', self.password)
+        self.student2 = User.objects.create_user('student2', 'student2@test.com', self.password)
         self.instructor = User.objects.create_user('instructor', 'instructor@test.com', self.password)
         self.course_id = 'HarvardX/CB22x/The_Ancient_Greek_Hero'
         self.note = {
@@ -68,15 +69,31 @@ class ApiTest(TestCase):
             'tags':'a,b,c'
         }
 
-    def login(self):
-        self.client.login(username=self.student.username, password=self.password)
+    def mock_api_enabled(self, is_enabled):
+        return (lambda request, course_id: is_enabled)
 
-    def url(self, name):
-        return reverse(name, kwargs={'course_id':self.course_id})
+    def login(self, as_student=None):
+        username = None
+        password = self.password
 
-    def create_notes(self, num_notes):
-        notes = [ models.Note(**self.note) for n in range(num_notes) ]
-        models.Note.objects.bulk_create(notes)
+        if as_student is None:
+            username = self.student.username
+        else:
+            username = as_student.username
+
+        self.client.login(username=username, password=password)
+
+    def url(self, name, args={}):
+        args.update({'course_id':self.course_id})
+        return reverse(name, kwargs=args)
+
+    def create_notes(self, num_notes, create=True):
+        notes = []
+        for n in range(num_notes):
+            note = models.Note(**self.note)
+            if create:
+                note.save()
+            notes.append(note)
         return notes
 
     def test_root(self):
@@ -103,7 +120,7 @@ class ApiTest(TestCase):
         self.assertEqual(len(content), 0)
 
     def test_index_with_notes(self):
-        num_notes = 7
+        num_notes = 3
         self.login()
         self.create_notes(num_notes)
 
@@ -112,6 +129,7 @@ class ApiTest(TestCase):
         self.assertNotEqual(resp.content, '')
 
         content = json.loads(resp.content)
+        self.assertIsInstance(content, list)
         self.assertEqual(len(content), num_notes)
 
     def test_index_max_notes(self):
@@ -126,4 +144,88 @@ class ApiTest(TestCase):
         self.assertNotEqual(resp.content, '')
 
         content = json.loads(resp.content)
+        self.assertIsInstance(content, list)
         self.assertEqual(len(content), MAX_LIMIT)
+
+    def test_create_note(self):
+        self.login()
+
+        notes = self.create_notes(1)
+        self.assertEqual(len(notes), 1)
+
+        note_dict = notes[0].as_dict()
+        excluded_fields = ['id', 'user_id', 'created', 'updated']
+        note = dict([(k, v) for k,v in note_dict.items() if k not in excluded_fields])
+
+        resp = self.client.post(self.url('notes_api_notes'), json.dumps(note),
+                content_type='application/json',
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(resp.status_code, 303)
+        self.assertEqual(len(resp.content), 0)
+
+    def test_create_empty_notes(self):
+        self.login()
+
+        for empty_test in [None, [], '']:
+            resp = self.client.post(self.url('notes_api_notes'), json.dumps(empty_test),
+                    content_type='application/json',
+                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+            self.assertEqual(resp.status_code, 500)
+
+    def test_create_note_missing_ranges(self):
+        self.login()
+
+        notes = self.create_notes(1)
+        self.assertEqual(len(notes), 1)
+        note_dict = notes[0].as_dict()
+
+        excluded_fields = ['id', 'user_id', 'created', 'updated'] + ['ranges']
+        note = dict([(k, v) for k,v in note_dict.items() if k not in excluded_fields])
+
+        resp = self.client.post(self.url('notes_api_notes'), json.dumps(note),
+                content_type='application/json',
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(resp.status_code, 500)
+
+    def test_read_note(self): 
+        self.login()
+
+        notes = self.create_notes(3)
+        self.assertEqual(len(notes), 3)
+
+        for note in notes:
+            resp = self.client.get(self.url('notes_api_note', {'note_id': note.id}))
+            self.assertEqual(resp.status_code, 200)
+            self.assertNotEqual(resp.content, '')
+
+            content = json.loads(resp.content)
+            self.assertEqual(content['id'], note.id)
+            self.assertEqual(content['user_id'], note.user_id)
+
+    def test_note_doesnt_exist_to_read(self):
+        NOTE_ID_DOES_NOT_EXIST = 99999
+
+        self.login()
+        resp = self.client.get(self.url('notes_api_note', {
+            'note_id': NOTE_ID_DOES_NOT_EXIST
+        }))
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.content, '')
+
+    def test_student_doesnt_have_permission_to_read_note(self):
+        notes = self.create_notes(1)
+        self.assertEqual(len(notes), 1)
+        note = notes[0]
+
+        # set the student id to a different student (not the one that created the notes)
+        self.login(as_student=self.student2)
+        resp = self.client.get(self.url('notes_api_note', { 'note_id': note.id}))
+        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(resp.content, '')
+
+    @unittest.skip("skipping update test stub")
+    def test_update_note(self): pass
+
+    @unittest.skip("skipping search test stub")
+    def test_search_note(self): pass

@@ -13,7 +13,7 @@ API_SETTINGS = {
     # Version
     'META': {'name': 'Notes API', 'version': 1},
 
-    # Maps resources to HTTP methods
+    # Maps resources to HTTP methods and actions
     'RESOURCE_MAP': {
         'root': {'GET': 'root'},
         'notes': {'GET': 'index', 'POST': 'create'},
@@ -43,12 +43,12 @@ def api_request(request, course_id, **kwargs):
         disabled for the course.
     '''
 
-    # Verify that notes are enabled for the course
+    # Verify that the api should be accessible to this course
     if not api_enabled(request, course_id):
         log.debug('Notes not enabled for course')
         raise Http404
 
-    # Locate and validate the requested resource
+    # Locate the requested resource
     resource_map = API_SETTINGS.get('RESOURCE_MAP', {}) 
     resource_name = kwargs.pop('resource')
     resource_method = request.method
@@ -62,7 +62,7 @@ def api_request(request, course_id, **kwargs):
         log.debug('Resource "{0}" does not support method "{1}"'.format(resource_name, resource_method)) 
         raise Http404
 
-    # Find the associated function definition and execute the request
+    # Execute the action associated with the resource
     func = resource.get(resource_method)
     module = globals()
     if func not in module:
