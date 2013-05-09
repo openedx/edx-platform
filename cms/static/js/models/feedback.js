@@ -4,7 +4,8 @@ CMS.Models.SystemFeedback = Backbone.Model.extend({
         "title": null,
         "message": null,
         "shown": true,
-        "close": false  // show a close button?
+        "close": false,  // show a close button?
+        "icon": true  // show an icon?
         /* could also have an "actions" hash: here is an example demonstrating
            the expected structure
         "actions": {
@@ -28,5 +29,11 @@ CMS.Models.SystemFeedback = Backbone.Model.extend({
             ]
         }
         */
+    },
+    show: function() {
+        this.set("shown", true);
+    },
+    hide: function() {
+        this.set("shown", false);
     }
 });

@@ -53,15 +53,23 @@
 
     <!-- templates -->
     <%text>
-    <script id="alert-tpl" type="text/template">
-<div class="wrapper wrapper-alert <% if(obj.type) { %>wrapper-alert-<%= type %> <% }; if(obj.shown) { %>is-shown <% } else { %>is-hiding<% } %>">
-  <div class="alert <%= type %> <% if(obj.actions) { %>has-actions <% } %>">
-    <% var iconText = {"warning": "&#x26A0;", "confirmation": "&#x2713;", "error": "&#x26A0;", "announcement": "&#x1F4E2;", "step-required": "&#xE0D1"} %>
-    <i class="ss-icon ss-symbolicons-block icon icon-<%= type %>"><%= iconText[type] %></i>
+    <script id="system-feedback-tpl" type="text/template">
+<div class="wrapper wrapper-<%= viewType %> wrapper-<%= viewType %>-<%= modelType %> <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>"
+     id="<%= viewType %>-<%= modelType %>"
+     aria-hidden="<% if(obj.shown) { %>false<% } else { %>true<% } %>"
+     aria-labelledby="<%= viewType %>-<%= modelType %>-title"
+     <% if (obj.message) { %>aria-describedby="<%= viewType %>-<%= modelType %>-description" <% } %>
+     <% if (obj.actions) { %>role="dialog"<% } %>
+  >
+  <div class="<%= modelType %> <%= viewType %> <% if(obj.actions) { %>has-actions <% } %>">
+    <% if (icon) { %>
+      <% var iconText = {"warning": "&#x26A0;", "confirmation": "&#x2713;", "error": "&#x26A0;", "announcement": "&#x1F4E2;", "step-required": "&#xE0D1", "help": "&#x2753;"} %>
+      <i class="ss-icon ss-symbolicons-block icon icon-<%= modelType %>"><%= iconText[modelType] %></i>
+    <% } %>
 
     <div class="copy">
-      <h2 class="title title-3"><%= title %></h2>
-      <% if(obj.message) { %><p class="message"><%= message %></p><% } %>
+      <h2 class="title title-3" id="<%= viewType %>-<%= modelType %>-title"><%= title %></h2>
+      <% if(obj.message) { %><p class="message" id="<%= viewType %>-<%= modelType %>-description"><%= message %></p><% } %>
     </div>
 
     <% if(obj.actions) { %>
@@ -85,7 +93,7 @@
     <% } %>
 
     <% if(obj.close) { %>
-    <a href="#" rel="view" class="action action-alert-close">
+    <a href="#" rel="view" class="action action-close action-<%= viewType %>-close">
       <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
       <span class="label">close alert</span>
     </a>
@@ -101,8 +109,7 @@
     <div class="wrapper wrapper-view">
       <%include file="widgets/header.html" />
 
-      <%block name="view_alerts"></%block>
-      <%block name="view_banners"></%block>
+      <div id="page-alert"></div>
 
       <%block name="content"></%block>
 
@@ -113,10 +120,10 @@
       <%include file="widgets/footer.html" />
       <%include file="widgets/tender.html" />
 
-      <%block name="view_notifications"></%block>
+      <div id="page-notification"></div>
     </div>
 
-    <%block name="view_prompts"></%block>
+    <div id="page-prompt"></div>
     <%block name="jsextra"></%block>
   </body>
 

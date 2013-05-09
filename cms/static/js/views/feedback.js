@@ -1,20 +1,27 @@
 CMS.Views.SystemFeedback = Backbone.View.extend({
     initialize: function() {
-        this.setElement(document.getElementById(this.id));
+        this.setElement($("#page-"+this.type));
         this.listenTo(this.model, 'change', this.render);
         return this.render();
     },
+    template: _.template($("#system-feedback-tpl").text()),
     render: function() {
-        this.$el.html(this.template(this.model.attributes));
+        var attrs = this.model.attributes;
+        if(attrs.type) {
+            attrs.modelType = attrs.type;
+            delete attrs.type;
+        }
+        attrs.viewType = this.type;
+        this.$el.html(this.template(attrs));
         return this;
     },
     events: {
-        "click .action-alert-close": "hide",
+        "click .action-close": "hide",
         "click .action-primary": "primaryClick",
         "click .action-secondary": "secondaryClick"
     },
     hide: function() {
-        this.model.set("shown", false);
+        this.model.hide();
     },
     primaryClick: function() {
         var primary = this.model.get("actions").primary;
@@ -37,6 +44,20 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
 });
 
 CMS.Views.Alert = CMS.Views.SystemFeedback.extend({
-    template: _.template($("#alert-tpl").text()),
-    id: "page-alert"
+    type: "alert"
+});
+CMS.Views.Notification = CMS.Views.SystemFeedback.extend({
+    type: "notification"
+});
+CMS.Views.Prompt = CMS.Views.SystemFeedback.extend({
+    type: "prompt",
+    render: function() {
+        if(this.model.get('shown')) {
+            $body.addClass('prompt-is-shown');
+        } else {
+            $body.removeClass('prompt-is-shown');
+        }
+        // super() in Javascript has awkward syntax :(
+        return CMS.Views.SystemFeedback.prototype.render.apply(this, arguments);
+    }
 });

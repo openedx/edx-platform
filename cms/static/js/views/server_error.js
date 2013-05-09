@@ -3,8 +3,15 @@ CMS.ServerError = function(model, error) {
         "type": "error",
         "title": "Server Error",
         "message": error.responseText,
-        "close": true
+        "actions": {
+            "primary": {
+                "text": "Dismiss",
+                "click": function(model) {
+                    model.hide();
+                }
+            }
+        }
     });
-    new CMS.Views.Alert({model: m});
+    new CMS.Views.Notification({model: m});
     return m;
 };
