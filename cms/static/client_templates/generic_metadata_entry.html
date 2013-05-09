@@ -1,2 +1,9 @@
-<label><%= model.get('display_name') %>:</label>
-<input type='text' class='editor' value='<%= model.get("value") %>' size='60'/>
+<div class="wrapper-comp-setting">
+	<label class="label setting-label" for="setting-discussion_category"><%= model.get('display_name') %></label>
+	<input class="input setting-input" type="text" id="setting-discussion_category" value='<%= model.get("value") %>'/> 
+	<!--button clickable if is-set -->
+	<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+		<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+	</button>
+</div>
+<span class="tip setting-help">'<%= model.get("help") %>'</span>

@@ -1,7 +1,9 @@
-<ul>
-    <% _.each(metadata_entries, function(entry) { %>
-    <li>
-        <div class='metadata_entry' />
-    </li>
-    <% }) %>
-</ul>
+<div class="wrapper-comp-settings" id="settings-tab">
+	<ul class="list-input settings-list">
+	    <% _.each(metadata_entries, function(entry) { %>
+	    <li class="field comp-setting-entry">
+	        <div class='metadata_entry' />
+	    </li>
+	    <% }) %>
+	</ul>
+</div>
