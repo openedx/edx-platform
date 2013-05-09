@@ -101,8 +101,9 @@ class OpenEndedChild(object):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         if system.open_ended_grading_interface:
             self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
-            self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,
-                system)
+            self.controller_qs = controller_query_service.ControllerQueryService(
+                system.open_ended_grading_interface,system
+            )
         else:
             self.peer_gs = MockPeerGradingService()
             self.controller_qs = None
@@ -180,8 +181,8 @@ class OpenEndedChild(object):
         try:
             answer = autolink_html(answer)
             cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=True,
-                host_whitelist=open_ended_image_submission.TRUSTED_IMAGE_DOMAINS,
-                whitelist_tags=set(['embed', 'iframe', 'a', 'img']))
+                              host_whitelist=open_ended_image_submission.TRUSTED_IMAGE_DOMAINS,
+                              whitelist_tags=set(['embed', 'iframe', 'a', 'img']))
             clean_html = cleaner.clean_html(answer)
             clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
         except:
@@ -282,7 +283,7 @@ class OpenEndedChild(object):
         """
         #This is a dev_facing_error
         log.warning("Open ended child state out sync. state: %r, get: %r. %s",
-            self.child_state, get, msg)
+                    self.child_state, get, msg)
         #This is a student_facing_error
         return {'success': False,
                 'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
@@ -343,7 +344,7 @@ class OpenEndedChild(object):
             try:
                 image_data.seek(0)
                 success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key,
-                    self.s3_interface)
+                                                                                  self.s3_interface)
             except:
                 log.exception("Could not upload image to S3.")
 
@@ -462,7 +463,7 @@ class OpenEndedChild(object):
             allowed_to_submit = False
             #This is a student_facing_error
             error_message = error_string.format(count_required - count_graded, count_graded, count_required,
-                student_sub_count)
+                                                student_sub_count)
             return success, allowed_to_submit, error_message
 
     def get_eta(self):

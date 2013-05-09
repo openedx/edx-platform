@@ -18,7 +18,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from .import test_system
+from . import test_system
 
 ORG = 'edX'
 COURSE = 'open_ended'      # name of directory with course data
@@ -70,8 +70,7 @@ class OpenEndedChildTest(unittest.TestCase):
     def setUp(self):
         self.test_system = test_system()
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
-            self.definition, self.descriptor, self.static_data, self.metadata)
-
+                                             self.definition, self.descriptor, self.static_data, self.metadata)
 
     def test_latest_answer_empty(self):
         answer = self.openendedchild.latest_answer()
@@ -117,7 +116,7 @@ class OpenEndedChildTest(unittest.TestCase):
         post_assessment = "Post assessment"
         self.openendedchild.record_latest_post_assessment(post_assessment)
         self.assertEqual(post_assessment,
-            self.openendedchild.latest_post_assessment(self.test_system))
+                         self.openendedchild.latest_post_assessment(self.test_system))
 
     def test_get_score(self):
         new_answer = "New Answer"
@@ -144,12 +143,12 @@ class OpenEndedChildTest(unittest.TestCase):
         self.openendedchild.new_history_entry(new_answer)
         self.openendedchild.record_latest_score(self.static_data['max_score'])
         self.assertEqual(self.openendedchild.is_last_response_correct(),
-            'correct')
+                         'correct')
 
         self.openendedchild.new_history_entry(new_answer)
         self.openendedchild.record_latest_score(0)
         self.assertEqual(self.openendedchild.is_last_response_correct(),
-            'incorrect')
+                         'incorrect')
 
 
 class OpenEndedModuleTest(unittest.TestCase):
@@ -207,7 +206,7 @@ class OpenEndedModuleTest(unittest.TestCase):
                                    'default_queuename': 'testqueue',
                                    'waittime': 1}
         self.openendedmodule = OpenEndedModule(self.test_system, self.location,
-            self.definition, self.descriptor, self.static_data, self.metadata)
+                                               self.definition, self.descriptor, self.static_data, self.metadata)
 
     def test_message_post(self):
         get = {'feedback': 'feedback text',
@@ -372,21 +371,20 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock(data=full_definition)
     test_system = test_system()
     combinedoe_container = CombinedOpenEndedModule(test_system,
-        location,
-        descriptor,
-        model_data={'data': full_definition, 'weight': '1'})
-
+                                                   location,
+                                                   descriptor,
+                                                   model_data={'data': full_definition, 'weight': '1'})
 
     def setUp(self):
         # TODO: this constructor call is definitely wrong, but neither branch
         # of the merge matches the module constructor.  Someone (Vik?) should fix this.
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
-            self.location,
-            self.definition,
-            self.descriptor,
-            static_data=self.static_data,
-            metadata=self.metadata,
-            instance_state=self.static_data)
+                                                    self.location,
+                                                    self.definition,
+                                                    self.descriptor,
+                                                    static_data=self.static_data,
+                                                    metadata=self.metadata,
+                                                    instance_state=self.static_data)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
@@ -441,12 +439,12 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric), 'task_xml': xml}
             descriptor = Mock(data=definition)
             combinedoe = CombinedOpenEndedV1Module(self.test_system,
-                self.location,
-                definition,
-                descriptor,
-                static_data=self.static_data,
-                metadata=self.metadata,
-                instance_state=self.static_data)
+                                                   self.location,
+                                                   definition,
+                                                   descriptor,
+                                                   static_data=self.static_data,
+                                                   metadata=self.metadata,
+                                                   instance_state=self.static_data)
 
             changed = combinedoe.update_task_states()
             self.assertFalse(changed)
@@ -471,12 +469,12 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                       'task_xml': [self.task_xml1, self.task_xml2]}
         descriptor = Mock(data=definition)
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
-            self.location,
-            definition,
-            descriptor,
-            static_data=self.static_data,
-            metadata=self.metadata,
-            instance_state=instance_state)
+                                               self.location,
+                                               definition,
+                                               descriptor,
+                                               static_data=self.static_data,
+                                               metadata=self.metadata,
+                                               instance_state=instance_state)
         score_dict = combinedoe.get_score()
         self.assertEqual(score_dict['score'], 15.0)
         self.assertEqual(score_dict['total'], 15.0)

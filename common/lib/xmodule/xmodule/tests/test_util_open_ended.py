@@ -18,11 +18,11 @@ S3_INTERFACE = {
     "aws_bucket_name": "",
 }
 
+
 class MockQueryDict(dict):
     """
     Mock a query dict so that it can be used in test classes
     """
-
     def getlist(self, key, default=None):
         try:
             return super(MockQueryDict, self).__getitem__(key)

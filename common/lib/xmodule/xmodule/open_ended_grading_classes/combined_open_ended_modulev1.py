@@ -294,9 +294,8 @@ class CombinedOpenEndedV1Module():
             if self.current_task_number > 0:
                 last_response_data = self.get_last_response(self.current_task_number - 1)
                 current_response_data = self.get_current_attributes(self.current_task_number)
-
                 if (current_response_data['min_score_to_attempt'] > last_response_data['score']
-                    or current_response_data['max_score_to_attempt'] < last_response_data['score']):
+                        or current_response_data['max_score_to_attempt'] < last_response_data['score']):
                     self.state = self.DONE
                     self.ready_to_reset = True
 
@@ -662,9 +661,10 @@ class CombinedOpenEndedV1Module():
             return {
                 'success': False,
                 #This is a student_facing_error
-                'error': ('You have attempted this question {0} times.  '
-                          'You are only allowed to attempt it {1} times.').format(
-                    self.student_attempts, self.attempts)
+                'error': (
+                    'You have attempted this question {0} times.  '
+                    'You are only allowed to attempt it {1} times.'
+                ).format(self.student_attempts, self.attempts)
             }
         self.state = self.INITIAL
         self.ready_to_reset = False
@@ -815,7 +815,6 @@ class CombinedOpenEndedV1Module():
                 'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
 
 
-
 class CombinedOpenEndedV1Descriptor():
     """
     Module for adding combined open ended questions
@@ -860,7 +859,6 @@ class CombinedOpenEndedV1Descriptor():
             return xml_object.xpath(k)[0]
 
         return {'task_xml': parse_task('task'), 'prompt': parse('prompt'), 'rubric': parse('rubric')}
-
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
