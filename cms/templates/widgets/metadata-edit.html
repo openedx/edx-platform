@@ -5,7 +5,9 @@
 %>
 
 <% showHighLevelSource='source_code' in json_metadata_data and json_metadata_data['source_code']['explicitly_set'] %>
-<% del json_metadata_data['source_code'] %>
+% if 'source_code' in json_metadata_data:
+    <% del json_metadata_data['source_code'] %>
+% endif
 <section class="metadata_edit" data-metadata='${json.dumps(json_metadata_data)}'/>
 
 % if showHighLevelSource:
