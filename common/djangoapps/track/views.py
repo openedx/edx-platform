@@ -1,13 +1,11 @@
 import json
 import logging
-import os
 import pytz
 import datetime
 import dateutil.parser
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.http import Http404
 from django.shortcuts import redirect
 from django.conf import settings
 from mitxmako.shortcuts import render_to_response
@@ -92,6 +90,46 @@ def server_track(request, event_type, event, page=None):
 
     if event_type.startswith("/event_logs") and request.user.is_staff:  # don't log
         return
+    log_event(event)
+
+
+def task_track(request_info, task_info, event_type, event, page=None):
+    """
+    Outputs tracking information for events occuring within celery tasks.
+
+    The `event_type` is a string naming the particular event being logged,
+    while `event` is a dict containing whatever additional contextual information
+    is desired.
+
+    The `request_info` is a dict containing information about the original
+    task request.  Relevant keys are `username`, `ip`, `agent`, and `host`.
+
+    In addition, a `task_info` dict provides more information to be stored with
+    the `event` dict.
+
+    The `page` parameter is optional, and allows the name of the page to
+    be provided.
+    """
+
+    # supplement event information with additional information
+    # about the task in which it is running.
+    full_event = dict(event, **task_info)
+
+    # All fields must be specified, in case the tracking information is
+    # also saved to the TrackingLog model.  Get values from the task-level
+    # information, or just add placeholder values.
+    event = {
+        "username": request_info.get('username', 'unknown'),
+        "ip": request_info.get('ip', 'unknown'),
+        "event_source": "task",
+        "event_type": event_type,
+        "event": full_event,
+        "agent": request_info.get('agent', 'unknown'),
+        "page": page,
+        "time": datetime.datetime.utcnow().isoformat(),
+        "host": request_info.get('host', 'unknown')
+        }
+
     log_event(event)
 
 

@@ -220,7 +220,10 @@ def instructor_dashboard(request, course_id):
         try:
             course_task_log_entry = task_queue.submit_regrade_problem_for_all_students(request, course_id, problem_url)
             if course_task_log_entry is None:
-                msg += '<font="red">Failed to create a background task for regrading "{0}".</font>'.format(problem_url)
+                msg += '<font color="red">Failed to create a background task for regrading "{0}".</font>'.format(problem_url)
+            else:
+                track_msg = 'regrade problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
+                track.views.server_track(request, track_msg, {}, page='idashboard')
         except Exception as e:
             log.error("Encountered exception from regrade: {0}".format(e))
             msg += '<font="red">Failed to create a background task for regrading "{0}": {1}.</font>'.format(problem_url, e)

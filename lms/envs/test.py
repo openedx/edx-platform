@@ -188,3 +188,8 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
     # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
+
+################################# CELERY ######################################
+
+# By default don't use a worker, execute tasks as if they were local functions
+CELERY_ALWAYS_EAGER = True
