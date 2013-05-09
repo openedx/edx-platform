@@ -1,17 +1,17 @@
-// single per course holds the updates and handouts	
+// single per course holds the updates and handouts
 CMS.Models.CourseInfo = Backbone.Model.extend({
 	// This model class is not suited for restful operations and is considered just a server side initialized container
 	url: '',
-	
+
 	defaults: {
 		"courseId": "", // the location url
 		"updates" : null,	// UpdateCollection
 		"handouts": null	// HandoutCollection
 		},
-		
+
 	idAttribute : "courseId"
 });
-	
+
 // course update -- biggest kludge here is the lack of a real id to map updates to originals
 CMS.Models.CourseUpdate = Backbone.Model.extend({
 	defaults: {
@@ -26,11 +26,11 @@ CMS.Models.CourseUpdate = Backbone.Model.extend({
 */
 CMS.Models.CourseUpdateCollection = Backbone.Collection.extend({
 	url : function() {return this.urlbase  + "course_info/updates/";},
-	
+
 	model : CMS.Models.CourseUpdate
 });
 
 
-	
-	
-	
+
+
+
