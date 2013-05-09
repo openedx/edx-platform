@@ -68,11 +68,13 @@ class TemplateTests(unittest.TestCase):
             test_course.system, parent_xblock=test_course)
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         self.assertEqual(test_chapter.display_name, 'chapter n')
+        self.assertIn(test_chapter, test_course.get_children())
 
         # test w/ a definition (e.g., a problem)
         test_def_content = '<problem>boo</problem>'
         test_problem = XModuleDescriptor.load_from_json({'category': 'problem',
             'definition': {'data': test_def_content}},
-            test_course.system, parent_xblock=test_course)
+            test_course.system, parent_xblock=test_chapter)
         self.assertIsInstance(test_problem, CapaDescriptor)
         self.assertEqual(test_problem.data, test_def_content)
+        self.assertIn(test_problem, test_chapter.get_children())

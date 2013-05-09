@@ -259,7 +259,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             course_entry.get('blocks', {})
             .get(course_entry.get('root')))
 
-
     def _load_item(self, usage_id):
         # TODO ensure all callers of system.load_item pass just the id
         json_data = self.module_data.get(usage_id)

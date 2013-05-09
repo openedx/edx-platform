@@ -416,11 +416,14 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         if self._child_instances is None:
             self._child_instances = []
             for child_loc in self.children:
-                try:
-                    child = self.system.load_item(child_loc)
-                except ItemNotFoundError:
-                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
-                    continue
+                if isinstance(child_loc, XModuleDescriptor):
+                    child = child_loc
+                else:
+                    try:
+                        child = self.system.load_item(child_loc)
+                    except ItemNotFoundError:
+                        log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                        continue
                 self._child_instances.append(child)
 
         return self._child_instances
@@ -468,8 +471,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         on the contents of json_data. It does not persist it and can create one which
         has no usage id.
 
-        parent_xblock is used to compute inherited metadata. The new xblock will not be its
-        child though since children pointers are through usage ids.
+        parent_xblock is used to compute inherited metadata as well as to append the new xblock.
 
         json_data:
         - 'category': the xmodule category (required)
@@ -515,7 +517,9 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             for field in inheritance.INHERITABLE_METADATA:
                 if field in json_metadata:
                     json_data['_inherited_metadata'][field] = json_metadata[field]
-        return system.xblock_from_json(cls, usage_id, json_data)
+        new_block = system.xblock_from_json(cls, usage_id, json_data)
+        parent_xblock.children.append(new_block)
+        return new_block
 
     # ================================= XML PARSING ============================
     @staticmethod
