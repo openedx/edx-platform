@@ -23,6 +23,9 @@ class Note(models.Model):
     updated = models.DateTimeField(auto_now=True, db_index=True)
 
     def clean(self, json_body):
+        '''
+        Cleans the note object or raises a ValidationError.
+        '''
         if json_body is None:
             raise ValidationError('Note must have a body.')
 
@@ -49,13 +52,19 @@ class Note(models.Model):
             self.tags = ",".join(tags)
 
     def get_absolute_url(self):
-        kwargs = {'course_id': self.course_id, 'note_id': str(self.id)}
+        '''
+        Returns the aboslute url for the note object.
+        '''
+        kwargs = {'course_id': self.course_id, 'note_id': str(self.pk)}
         return reverse('notes_api_note', kwargs=kwargs)
 
     def as_dict(self):
+        '''
+        Returns the note object as a dictionary.
+        '''
         return {
-            'id': self.id,
-            'user_id': self.user.id,
+            'id': self.pk,
+            'user_id': self.user.pk,
             'uri': self.uri,
             'text': self.text,
             'quote': self.quote,

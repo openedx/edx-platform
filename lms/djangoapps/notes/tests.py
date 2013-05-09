@@ -14,7 +14,6 @@ import json
 import logging
 
 from . import utils, api, models
-from .models import Note
 
 
 class UtilsTest(TestCase):
@@ -204,12 +203,12 @@ class ApiTest(TestCase):
         self.assertEqual(len(notes), 3)
 
         for note in notes:
-            resp = self.client.get(self.url('notes_api_note', {'note_id': note.id}))
+            resp = self.client.get(self.url('notes_api_note', {'note_id': note.pk}))
             self.assertEqual(resp.status_code, 200)
             self.assertNotEqual(resp.content, '')
 
             content = json.loads(resp.content)
-            self.assertEqual(content['id'], note.id)
+            self.assertEqual(content['id'], note.pk)
             self.assertEqual(content['user_id'], note.user_id)
 
     def test_note_doesnt_exist_to_read(self):
@@ -227,7 +226,7 @@ class ApiTest(TestCase):
 
         # set the student id to a different student (not the one that created the notes)
         self.login(as_student=self.student2)
-        resp = self.client.get(self.url('notes_api_note', {'note_id': note.id}))
+        resp = self.client.get(self.url('notes_api_note', {'note_id': note.pk}))
         self.assertEqual(resp.status_code, 403)
         self.assertEqual(resp.content, '')
 
@@ -239,13 +238,13 @@ class ApiTest(TestCase):
         note = notes[0]
 
         resp = self.client.delete(self.url('notes_api_note', {
-            'note_id': note.id
+            'note_id': note.pk
         }))
         self.assertEqual(resp.status_code, 204)
         self.assertEqual(resp.content, '')
 
         with self.assertRaises(models.Note.DoesNotExist):
-            models.Note.objects.get(pk=note.id)
+            models.Note.objects.get(pk=note.pk)
 
     def test_note_does_not_exist_to_delete(self):
         self.login()
@@ -263,13 +262,13 @@ class ApiTest(TestCase):
 
         self.login(as_student=self.student2)
         resp = self.client.delete(self.url('notes_api_note', {
-            'note_id': note.id
+            'note_id': note.pk
         }))
         self.assertEqual(resp.status_code, 403)
         self.assertEqual(resp.content, '')
 
         try:
-            models.Note.objects.get(pk=note.id)
+            models.Note.objects.get(pk=note.pk)
         except models.Note.DoesNotExist:
             self.fail('note should exist and not be deleted because the student does not have permission to do so')
 
@@ -284,14 +283,14 @@ class ApiTest(TestCase):
         })
 
         self.login()
-        resp = self.client.put(self.url('notes_api_note', {'note_id': note.id}),
+        resp = self.client.put(self.url('notes_api_note', {'note_id': note.pk}),
                                json.dumps(updated_dict),
                                content_type='application/json',
                                HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(resp.status_code, 303)
         self.assertEqual(resp.content, '')
 
-        actual = models.Note.objects.get(pk=note.id)
+        actual = models.Note.objects.get(pk=note.pk)
         actual_dict = actual.as_dict()
         for field in ['text', 'tags']:
             self.assertEqual(actual_dict[field], updated_dict[field])
@@ -361,10 +360,10 @@ class NoteTest(TestCase):
         }
 
     def test_clean_valid_note(self):
-        reference_note = Note(**self.note)
+        reference_note = models.Note(**self.note)
         body = reference_note.as_dict()
 
-        note = Note(course_id=self.course_id, user=self.student)
+        note = models.Note(course_id=self.course_id, user=self.student)
         try:
             note.clean(json.dumps(body))
             self.assertEqual(note.uri, body['uri'])
@@ -379,7 +378,7 @@ class NoteTest(TestCase):
             self.fail('a valid note should not raise an exception')
 
     def test_clean_invalid_note(self):
-        note = Note(course_id=self.course_id, user=self.student)
+        note = models.Note(course_id=self.course_id, user=self.student)
         for empty_type in (None, '', 0, []):
             with self.assertRaises(ValidationError):
                 note.clean(None)
@@ -392,7 +391,7 @@ class NoteTest(TestCase):
             }))
 
     def test_as_dict(self):
-        note = Note(course_id=self.course_id, user=self.student)
+        note = models.Note(course_id=self.course_id, user=self.student)
         d = note.as_dict()
         self.assertNotIsInstance(d, basestring)
         self.assertEqual(d['user_id'], self.student.id)

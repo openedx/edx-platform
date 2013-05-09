@@ -68,7 +68,7 @@ def api_request(request, course_id, **kwargs):
     func = resource.get(resource_method)
     module = globals()
     if func not in module:
-        log.debug('Function "{0}" does not exist for request {1} {2}'.format(action, resource_method, resource_name))
+        log.debug('Function "{0}" does not exist for request {1} {2}'.format(func, resource_method, resource_name))
         raise Http404
 
     log.debug('API request: {0} {1}'.format(resource_method, resource_name))
