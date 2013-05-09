@@ -14,8 +14,6 @@ import logging
 
 from . import utils, api, models
 
-logging.disable(logging.CRITICAL) # remove debugging from the log output 
-
 class UtilsTest(TestCase):
     def setUp(self): 
         ''' 
@@ -41,11 +39,16 @@ class UtilsTest(TestCase):
                 {'type': 'foo'},
                 {'name': 'My Notes', 'type': 'notes'},
                 {'type':'bar'}]
+
         self.assertTrue(utils.notes_enabled_for_course(self.course))
 
 class ApiTest(TestCase):
+
     def setUp(self):
         self.client = Client()
+
+        # Mocks
+        api.api_enabled = (lambda request, course_id: True)
 
         # Create two accounts
         self.password = 'abc'

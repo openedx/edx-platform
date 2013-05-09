@@ -28,6 +28,13 @@ API_SETTINGS = {
 #----------------------------------------------------------------------#
 # API requests are routed through api_request() using the resource map.
 
+def api_enabled(request, course_id):
+    '''
+    Returns True if the api is enabled for the course, otherwise False.
+    '''
+    course = _get_course(request, course_id)
+    return notes_enabled_for_course(course)
+
 @login_required
 def api_request(request, course_id, **kwargs):
     ''' 
@@ -37,8 +44,7 @@ def api_request(request, course_id, **kwargs):
     '''
 
     # Verify that notes are enabled for the course
-    course = get_course_with_access(request.user, course_id, 'load')
-    if not notes_enabled_for_course(course):
+    if not api_enabled(request, course_id):
         log.debug('Notes not enabled for course')
         raise Http404
 
@@ -90,6 +96,12 @@ def api_format(request, response, data):
     else:
         content = json.dumps(data)
     return [content_type, content]
+
+def _get_course(request, course_id):
+    '''
+    Helper function to load and return a user's course.
+    '''
+    return get_course_with_access(request.user, course_id, 'load')
 
 #----------------------------------------------------------------------#
 # API actions exposed via the resource map.
