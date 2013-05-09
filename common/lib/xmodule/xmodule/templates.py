@@ -19,7 +19,6 @@ from collections import defaultdict
 from .x_module import XModuleDescriptor
 from .mako_module import MakoDescriptorSystem
 from .modulestore import Location
-from .modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ class TemplateTestSystem(MakoDescriptorSystem):
         )
 
 
-def update_templates():
+def update_templates(modulestore):
     """
     Updates the set of templates in the modulestore with all templates currently
     available from the installed plugins
@@ -58,7 +57,7 @@ def update_templates():
 
     # cdodge: build up a list of all existing templates. This will be used to determine which
     # templates have been removed from disk - and thus we need to remove from the DB
-    templates_to_delete = modulestore('direct').get_items(['i4x', 'edx', 'templates', None, None, None])
+    templates_to_delete = modulestore.get_items(['i4x', 'edx', 'templates', None, None, None])
 
     for category, templates in all_templates().items():
         for template in templates:
@@ -86,9 +85,9 @@ def update_templates():
                 ), exc_info=True)
                 continue
 
-            modulestore('direct').update_item(template_location, template.data)
-            modulestore('direct').update_children(template_location, template.children)
-            modulestore('direct').update_metadata(template_location, template.metadata)
+            modulestore.update_item(template_location, template.data)
+            modulestore.update_children(template_location, template.children)
+            modulestore.update_metadata(template_location, template.metadata)
 
             # remove template from list of templates to delete
             templates_to_delete = [t for t in templates_to_delete if t.location != template_location]
@@ -97,4 +96,4 @@ def update_templates():
     if len(templates_to_delete) > 0:
         logging.debug('deleting dangling templates = {0}'.format(templates_to_delete))
         for template in templates_to_delete:
-            modulestore('direct').delete_item(template.location)
+            modulestore.delete_item(template.location)
