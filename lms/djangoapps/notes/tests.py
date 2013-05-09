@@ -294,6 +294,47 @@ class ApiTest(TestCase):
         for field in ['text', 'tags']:
             self.assertEqual(actual_dict[field], updated_dict[field])
 
-    @unittest.skip("skipping search test stub")
-    def test_search_note(self):
-        pass
+    def test_search_note_params(self):
+        self.login()
+
+        total = 3
+        notes = self.create_notes(total)
+        invalid_uri = ''.join([note.uri for note in notes])
+
+        tests = [{'limit': 0, 'offset': 0, 'expected_rows': total},
+                 {'limit': 0, 'offset': 2, 'expected_rows': total - 2},
+                 {'limit': 0, 'offset': total, 'expected_rows': 0},
+                 {'limit': 1, 'offset': 0, 'expected_rows': 1},
+                 {'limit': 2, 'offset': 0, 'expected_rows': 2},
+                 {'limit': total, 'offset': 2, 'expected_rows': 1},
+                 {'limit': total, 'offset': total, 'expected_rows': 0},
+                 {'limit': total + 1, 'offset': total + 1, 'expected_rows': 0},
+                 {'limit': total + 1, 'offset': 0, 'expected_rows': total},
+                 {'limit': 0, 'offset': 0, 'uri': invalid_uri, 'expected_rows': 0, 'expected_total': 0}]
+
+        for test in tests:
+            params = dict([(k, str(test[k]))
+                          for k in ('limit', 'offset', 'uri')
+                          if k in test])
+            resp = self.client.get(self.url('notes_api_search'),
+                                   params,
+                                   content_type='application/json',
+                                   HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertNotEqual(resp.content, '')
+
+            content = json.loads(resp.content)
+
+            for expected_key in ('total', 'rows'):
+                self.assertTrue(expected_key in content)
+
+            if 'expected_total' in test:
+                self.assertEqual(content['total'], test['expected_total'])
+            else:
+                self.assertEqual(content['total'], total)
+
+            self.assertEqual(len(content['rows']), test['expected_rows'])
+
+            for row in content['rows']:
+                self.assertTrue('id' in row)
