@@ -24,33 +24,97 @@
 			<div class="wrapper-comp-settings" id="settings-tab">
 				<ul class="list-input settings-list">
 			  		<!--% for type in sorted(something.keys()):-->
+			  		
 			  		<!--is-set class applied when user sets value-->
+
+					<li class="field comp-setting-entry">
+			  			<div class="wrapper-comp-setting">
+				  			<label class="label setting-label" for="setting-accept_file_upload">Accept File Upload</label>
+				  			<select class="input setting-input" id="setting-accept_file_upload" name="Accept File Upload">
+				  				<!--% for all in available options -->
+								<option value="True">True</option>
+								<option value="False" selected>False</option>
+							</select> 
+							<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+				  			</button>
+			  			</div>
+			  			<span class="tip setting-help">If disabled, students cannot upload images to be graded with this problem.</span>
+			  		</li>
+
+			  		<li class="field comp-setting-entry">
+			  			<div class="wrapper-comp-setting">
+				  			<label class="label setting-label" for="setting-skip_spelling_checks">Basic Quality Filter</label>
+				  			<select class="input setting-input" id="setting-skip_spelling_checks" name="Basic Quality Filter">
+				  				<!--% for all in available options -->
+								<option value="True" selected>True</option>
+								<option value="False">False</option>
+							</select> 
+							<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+				  			</button>
+			  			</div>
+			  			<span class="tip setting-help">If enabled, submissions with poor spelling, short length, or poor grammar won't be peer reviewed.</span>
+			  		</li>
+
+			  		<li class="field comp-setting-entry">
+			  			<div class="wrapper-comp-setting">
+				  			<label class="label setting-label" for="setting-displayName">Discussion Area</label>
+				  			<input class="input setting-input" type="text" id="setting-accept_file_upload" value="False"/> 
+				  			<!--button clickable if is-set -->
+				  			<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+				  			</button>
+				  		</div>
+			  			<span class="tip setting-help">This value specifies the discussion are where this . This name appears in the left pane of the discussion forum for your course (question)</span>
+			  		</li>
+
+
+
+
+
+					<li class="field comp-setting-entry">
+			  			<div class="wrapper-comp-setting">
+				  			<label class="label setting-label" for="setting-displayName">Accept Fle Upload</label>
+				  			<input class="input setting-input" type="text" id="setting-accept_file_upload" value="False"/> 
+				  			<!--button clickable if is-set -->
+				  			<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
+				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
+				  			</button>
+				  		</div>
+			  			<span class="tip setting-help">This value defines the name of this component, and is shown to students as a tooltip.</span>
+			  		</li>
+
+
+
+
+
 			  		<li class="field comp-setting-entry is-set">
 			  			<div class="wrapper-comp-setting">
-				  			<label class="label setting-label" for="setting-id-1">Display Name</label>
-				  			<input class="input setting-input" type="text" id="setting-id-1" value="Name of Component"/> 
+				  			<label class="label setting-label" for="setting-displayName">Display Name</label>
+				  			<input class="input setting-input" type="text" id="setting-displayName" value="closed"/> 
 				  			<!--button clickable if is-set -->
 				  			<button class="action setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
 				  			</button>
 				  		</div>
-			  			<span class="tip setting-help">helpstring</span>
+			  			<span class="tip setting-help">This value defines the name of this component, and is shown to students as a tooltip.</span>
 			  		</li>
-			  		<!--% showing second example mostly to see is-set style difference -->
+
 			  		<li class="field comp-setting-entry">
-			  			<div class="wrapper-setting-actions">
-				  			<label class="label setting-label" for="setting-id-2">Setting 2</label>
-				  			<input class="input setting-input" type="text" id="setting-id-2"/> 
+			  			<div class="wrapper-comp-setting">
+				  			<label class="label setting-label" for="setting-displayName">Maximum Attempts</label>
+				  			<input class="input setting-input" type="number" placeholder="None Set" id="setting-displayName"/> 
 				  			<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 				  				<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
 				  			</button>
 			  			</div>
-			  			<span class="tip setting-help">This is a longer sentence, repeated multiple times here just to test out the functionaltiy.</span>
+			  			<span class="tip setting-help">When set, this limits the number of times a student can attempt this problem.</span>
 			  		</li>
-			  		<!--% showing dropdown example -->
+
 			  		<li class="field comp-setting-entry">
-			  			<div class="wrapper-setting-actions">
-				  			<label class="label setting-label" for="setting-displayName">Display Name</label>
+			  			<div class="wrapper-comp-setting">
+				  			<label class="label setting-label" for="setting-displayName">Randomization</label>
 				  			<select class="input setting-input" id="setting-displayName" name="type">
 				  				<!--% for all in available options -->
 								<option value="displayName-closed" selected>Closed</option>
@@ -65,9 +129,10 @@
 			  			</div>
 			  			<span class="tip setting-help">helpstring</span>
 			  		</li>
+
 			  		<li class="field comp-setting-entry is-set">
-			  			<div class="wrapper-setting-actions">
-				  			<label class="label setting-label" for="setting-id-4">Display Name</label>
+			  			<div class="wrapper-comp-setting">
+				  			<label class="label setting-label" for="setting-id-4">Show Answer</label>
 				  			<input class="input setting-input" type="text" id="setting-id-4" value="Name of Component"/> 
 				  			<!--button clickable if is-set -->
 				  			<button class="action setting-clear" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">

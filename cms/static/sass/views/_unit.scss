@@ -452,6 +452,19 @@ body.course.unit {
         color: #fff;
         font-weight: 700;
       }
+
+      // Module Actions
+      .module-actions {
+        @include box-shadow(inset 0 1px 1px $shadow);
+        padding: 0px 0 10px 10px;
+        background-color: $gray-l4;
+
+        .save-button {
+        margin: 15px 8px 0 0;
+        }
+      }
+
+
     }
   }
 }
@@ -501,12 +514,13 @@ body.course.unit {
 
       .is-set {
         @include linear-gradient($blue, $blue);
-        box-shadow: inset 0 0 2px $shadow;
+        box-shadow: inset 0 0 3px $shadow;
         background-color: $blue;
+
         cursor: default;
 
         &:hover {
-          box-shadow: inset 0 0 2px $shadow;
+          box-shadow: inset 0 0 3px $shadow;
           background-color: $blue;
         }
       }
@@ -531,7 +545,6 @@ body.course.unit {
     overflow: auto;
     max-height: 400px;
 
-
     //chrome scrollbar visibility correction
     &::-webkit-scrollbar {
       -webkit-appearance: none;
@@ -547,10 +560,9 @@ body.course.unit {
 
     //component-setting-entry 
     .field.comp-setting-entry {
-      //margin: 0 0 $baseline 0;
-
+      //margin: 0 0 $baseline 0; WILL BE REMOVED PRIOR TO PUSH
       background-color: $white;
-      padding: 20px 20px;
+      padding: 20px;
       border-bottom: 1px solid $gray-l2;
       opacity: .6;
 
@@ -603,31 +615,32 @@ body.course.unit {
       }
 
       label.setting-label {
-        //@extend .t-copy-sub1;
-        //@include transition(color, 0.15s, ease-in-out);
-        //margin: 0 0 ($baseline/4) 0;
-        //font-weight: 400;
+        @extend .t-copy-sub1;
+        @include transition(color, 0.15s, ease-in-out);
+        //margin: 0 0 ($baseline/4) 0; WILL BE REMOVED PRIOR TO PUSH
+        font-weight: 400;
 
-        @extend .t-copy-sub2;
         display: inline-block;
         position: relative;
         left: 0;
-        height: 50%;
-        width: 120px;
-        text-overflow: ellipsis;
+        min-width: 100px;
+        width: 35%;
 
-        //&.is-focused {
-        //  color: $blue;
-        //}
+        &.is-focused {
+          color: $blue;
+        }
       }
 
       input, select {
-        //@include placeholder($gray-l4);
-        //@include font-size(16);
-        //@include size(100%,100%);
-        //padding: ($baseline/2);
+        @include placeholder($gray-l4);
+        @include font-size(16);
+        @include size(100%,100%);
+        padding: ($baseline/2);
+        min-width: 100px;
+        width: 45%;
 
         //&.long {
+          //
         //}
 
         //&.short {
@@ -638,23 +651,16 @@ body.course.unit {
         //}
 
         //&:focus {
-
         //  + .tip {
         //    color: $gray;
         //  }
-
-        @extend .t-copy-sub3;
-        @include placeholder($gray-l4);
-        border-radius: 2px;
-        padding: 6px 8px 8px;
-        width: 180px;
-        height: auto;
+        border-radius: 3px;
         border: 1px solid $gray-l2;
         text-overflow: ellipsis;
       }
 
       select {
-        border: 1px solid $gray-l4;
+        //border: 1px solid $gray-l2;
         background: none repeat scroll #F2F2F2;
         padding: 5px;
 
@@ -701,23 +707,10 @@ body.course.unit {
         @include font-size(12);
         display: inline-block;
         font-color: $gray-l6;
-        max-width: 50%;
+        //max-width: 50%;
         vertical-align: top;
       }
     }
-  }
-}
-
-// Module Actions
-// ====================
-
-.module-actions {
-  @include box-shadow(inset 0 1px 1px $shadow);
-  padding: 0 0 10px 10px;
-  background-color: $gray-l4;
-
-  .save-button {
-  margin: 15px 8px 0 0;
   }
 }
 
