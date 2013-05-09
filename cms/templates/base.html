@@ -79,7 +79,7 @@
 
     <% if(obj.actions) { %>
     <nav class="nav-actions">
-      <h3 class="sr">Alert Actions</h3>
+      <h3 class="sr"><%= viewType %> Actions</h3>
       <ul>
         <% if(actions.primary) { %>
         <li class="nav-item">
@@ -100,7 +100,7 @@
     <% if(obj.close) { %>
     <a href="#" rel="view" class="action action-close action-<%= viewType %>-close">
       <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
-      <span class="label">close alert</span>
+      <span class="label">close <%= viewType %></span>
     </a>
     <% } %>
   </div>
