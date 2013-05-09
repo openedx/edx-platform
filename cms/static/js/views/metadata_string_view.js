@@ -10,7 +10,7 @@ CMS.Views.Metadata.Generic = Backbone.View.extend({
         var self = this;
         // instantiates an editor template for each update in the collection
         window.templateLoader.loadRemoteTemplate("metadata_entry",
-            "/static/client_templates/generic_metadata_entry.html",
+            "/static/client_templates/metadata_string_entry.html",
             function (raw_template) {
                 self.template = _.template(raw_template);
                 self.$el.append(self.template({model: self.model}));
