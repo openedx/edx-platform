@@ -70,6 +70,9 @@ class ApiTest(TestCase):
             'tags': 'a,b,c'
         }
 
+        # Make sure no note with this ID ever exists for testing purposes
+        self.NOTE_ID_DOES_NOT_EXIST = 99999
+
     def mock_api_enabled(self, is_enabled):
         return (lambda request, course_id: is_enabled)
 
@@ -208,11 +211,9 @@ class ApiTest(TestCase):
             self.assertEqual(content['user_id'], note.user_id)
 
     def test_note_doesnt_exist_to_read(self):
-        NOTE_ID_DOES_NOT_EXIST = 99999
-
         self.login()
         resp = self.client.get(self.url('notes_api_note', {
-            'note_id': NOTE_ID_DOES_NOT_EXIST
+            'note_id': self.NOTE_ID_DOES_NOT_EXIST
         }))
         self.assertEqual(resp.status_code, 404)
         self.assertEqual(resp.content, '')
@@ -228,9 +229,70 @@ class ApiTest(TestCase):
         self.assertEqual(resp.status_code, 403)
         self.assertEqual(resp.content, '')
 
-    @unittest.skip("skipping update test stub")
+    def test_delete_note(self):
+        self.login()
+
+        notes = self.create_notes(1)
+        self.assertEqual(len(notes), 1)
+        note = notes[0]
+
+        resp = self.client.delete(self.url('notes_api_note', {
+            'note_id': note.id
+        }))
+        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(resp.content, '')
+
+        with self.assertRaises(models.Note.DoesNotExist):
+            models.Note.objects.get(pk=note.id)
+
+    def test_note_does_not_exist_to_delete(self):
+        self.login()
+
+        resp = self.client.delete(self.url('notes_api_note', {
+            'note_id': self.NOTE_ID_DOES_NOT_EXIST
+        }))
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.content, '')
+
+    def test_student_doesnt_have_permission_to_delete_note(self):
+        notes = self.create_notes(1)
+        self.assertEqual(len(notes), 1)
+        note = notes[0]
+
+        self.login(as_student=self.student2)
+        resp = self.client.delete(self.url('notes_api_note', {
+            'note_id': note.id
+        }))
+        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(resp.content, '')
+
+        try:
+            models.Note.objects.get(pk=note.id)
+        except models.Note.DoesNotExist:
+            self.fail('note should exist and not be deleted because the student does not have permission to do so')
+
     def test_update_note(self):
-        pass
+        notes = self.create_notes(1)
+        note = notes[0]
+
+        updated_dict = note.as_dict()
+        updated_dict.update({
+            'text': 'itchy and scratchy',
+            'tags': ['simpsons', 'cartoons', 'animation']
+        })
+
+        self.login()
+        resp = self.client.put(self.url('notes_api_note', {'note_id': note.id}),
+                               json.dumps(updated_dict),
+                               content_type='application/json',
+                               HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(resp.status_code, 303)
+        self.assertEqual(resp.content, '')
+
+        actual = models.Note.objects.get(pk=note.id)
+        actual_dict = actual.as_dict()
+        for field in ['text', 'tags']:
+            self.assertEqual(actual_dict[field], updated_dict[field])
 
     @unittest.skip("skipping search test stub")
     def test_search_note(self):
