@@ -515,6 +515,9 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
+    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+        raise Http404
+
     course = get_course_with_access(request.user, course_id, 'see_exists')
     registered = registered_for_course(course, request.user)
 
