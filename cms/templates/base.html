@@ -58,7 +58,8 @@
             wrapper-<%= viewType %>
             wrapper-<%= viewType %>-<%= modelType %>
             <% if(obj.status) { %>wrapper-<%= viewType %>-status <% } %>
-            <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>"
+            <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>
+            <% if(obj.fleeting) { %>is-fleeting<% } %>"
      id="<%= viewType %>-<%= modelType %>"
      aria-hidden="<% if(obj.shown) { %>false<% } else { %>true<% } %>"
      aria-labelledby="<%= viewType %>-<%= modelType %>-title"
