@@ -2,11 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
-
 import json
 import logging
 
 log = logging.getLogger(__name__)
+
 
 class Note(models.Model):
     user = models.ForeignKey(User, db_index=True)
@@ -18,7 +18,7 @@ class Note(models.Model):
     range_start_offset = models.IntegerField()
     range_end = models.CharField(max_length=2048)
     range_end_offset = models.IntegerField()
-    tags = models.TextField(default="") # comma-separated string
+    tags = models.TextField(default="")  # comma-separated string
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     updated = models.DateTimeField(auto_now=True, db_index=True)
 

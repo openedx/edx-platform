@@ -28,6 +28,7 @@ API_SETTINGS = {
 #----------------------------------------------------------------------#
 # API requests are routed through api_request() using the resource map.
 
+
 def api_enabled(request, course_id):
     '''
     Returns True if the api is enabled for the course, otherwise False.
@@ -35,9 +36,10 @@ def api_enabled(request, course_id):
     course = _get_course(request, course_id)
     return notes_enabled_for_course(course)
 
+
 @login_required
 def api_request(request, course_id, **kwargs):
-    ''' 
+    '''
     Routes API requests to the appropriate action method and returns JSON.
     Raises a 404 if the requested resource does not exist or notes are
         disabled for the course.
@@ -49,7 +51,7 @@ def api_request(request, course_id, **kwargs):
         raise Http404
 
     # Locate the requested resource
-    resource_map = API_SETTINGS.get('RESOURCE_MAP', {}) 
+    resource_map = API_SETTINGS.get('RESOURCE_MAP', {})
     resource_name = kwargs.pop('resource')
     resource_method = request.method
     resource = resource_map.get(resource_name)
@@ -59,7 +61,7 @@ def api_request(request, course_id, **kwargs):
         raise Http404
 
     if resource_method not in resource.keys():
-        log.debug('Resource "{0}" does not support method "{1}"'.format(resource_name, resource_method)) 
+        log.debug('Resource "{0}" does not support method "{1}"'.format(resource_name, resource_method))
         raise Http404
 
     # Execute the action associated with the resource
@@ -75,7 +77,7 @@ def api_request(request, course_id, **kwargs):
     # Format and output the results
     data = None
     response = result[0]
-    if len(result) == 2: 
+    if len(result) == 2:
         data = result[1]
 
     formatted = api_format(request, response, data)
@@ -86,16 +88,18 @@ def api_request(request, course_id, **kwargs):
 
     return response
 
+
 def api_format(request, response, data):
-    ''' 
-    Returns a two-element list containing the content type and content. 
-    ''' 
+    '''
+    Returns a two-element list containing the content type and content.
+    '''
     content_type = 'application/json'
     if data is None:
         content = ''
     else:
         content = json.dumps(data)
     return [content_type, content]
+
 
 def _get_course(request, course_id):
     '''
@@ -106,20 +110,22 @@ def _get_course(request, course_id):
 #----------------------------------------------------------------------#
 # API actions exposed via the resource map.
 
+
 def index(request, course_id):
-    ''' 
-    Returns a list of annotation objects. 
+    '''
+    Returns a list of annotation objects.
     '''
     MAX_LIMIT = API_SETTINGS.get('MAX_NOTE_LIMIT')
 
     notes = Note.objects.order_by('id').filter(course_id=course_id,
-            user=request.user)[:MAX_LIMIT]
+                                               user=request.user)[:MAX_LIMIT]
 
     return [HttpResponse(), [note.as_dict() for note in notes]]
 
+
 def create(request, course_id):
-    ''' 
-    Receives an annotation object to create and returns a 303 with the read location. 
+    '''
+    Receives an annotation object to create and returns a 303 with the read location.
     '''
     note = Note(course_id=course_id, user=request.user)
 
@@ -135,9 +141,10 @@ def create(request, course_id):
 
     return [response, None]
 
+
 def read(request, course_id, note_id):
-    ''' 
-    Returns a single annotation object. 
+    '''
+    Returns a single annotation object.
     '''
     try:
         note = Note.objects.get(id=note_id)
@@ -149,9 +156,10 @@ def read(request, course_id, note_id):
 
     return [HttpResponse(), note.as_dict()]
 
+
 def update(request, course_id, note_id):
-    ''' 
-    Updates an annotation object and returns a 303 with the read location. 
+    '''
+    Updates an annotation object and returns a 303 with the read location.
     '''
     try:
         note = Note.objects.get(id=note_id)
@@ -174,8 +182,9 @@ def update(request, course_id, note_id):
 
     return [response, None]
 
+
 def delete(request, course_id, note_id):
-    ''' 
+    '''
     Deletes the annotation object and returns a 204 with no content.
     '''
     try:
@@ -190,12 +199,13 @@ def delete(request, course_id, note_id):
 
     return [HttpResponse('', status=204), None]
 
+
 def search(request, course_id):
-    ''' 
+    '''
     Returns a subset of  annotation objects based on a search query.
     '''
     MAX_LIMIT = API_SETTINGS.get('MAX_NOTE_LIMIT')
-    
+
     # search parameters
     offset = request.GET.get('offset', '')
     limit = request.GET.get('limit', '')
@@ -222,7 +232,7 @@ def search(request, course_id):
     # retrieve notes
     notes = Note.objects.order_by('id').filter(**filters)
     total = notes.count()
-    rows = notes[offset:offset+limit]
+    rows = notes[offset:offset + limit]
     result = {
         'total': total,
         'rows': [note.as_dict() for note in rows]
@@ -230,8 +240,9 @@ def search(request, course_id):
 
     return [HttpResponse(), result]
 
+
 def root(request, course_id):
-    ''' 
-    Returns version information about the API. 
+    '''
+    Returns version information about the API.
     '''
     return [HttpResponse(), API_SETTINGS.get('META')]

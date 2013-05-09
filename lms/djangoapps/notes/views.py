@@ -6,6 +6,7 @@ from notes.models import Note
 from notes.utils import notes_enabled_for_course
 import json
 
+
 @login_required
 def notes(request, course_id):
     ''' Displays the student's notes. '''
@@ -13,7 +14,7 @@ def notes(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     if not notes_enabled_for_course(course):
         raise Http404
-    
+
     notes = Note.objects.filter(course_id=course_id, user=request.user).order_by('-created', 'uri')
     json_notes = json.dumps([n.as_dict() for n in notes])
     context = {
