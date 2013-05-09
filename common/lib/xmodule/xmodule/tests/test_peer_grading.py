@@ -2,6 +2,7 @@ import unittest
 from xmodule.modulestore import Location
 from .import test_system
 from test_util_open_ended import MockQueryDict, DummyModulestore
+import json
 
 from xmodule.peer_grading_module import PeerGradingModule, PeerGradingDescriptor
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
@@ -63,10 +64,8 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Try getting data from the external grading service
         @return:
         """
-        try:
-            success, data = self.peer_grading.query_data_for_location()
-        except GradingServiceError:
-            pass
+        success, data = self.peer_grading.query_data_for_location()
+        self.assertEqual(success, True)
 
     def test_get_score(self):
         """
@@ -74,6 +73,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         score = self.peer_grading.get_score()
+        self.assertEquals(score['score'], None)
 
     def test_get_max_score(self):
         """
@@ -81,6 +81,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         max_score = self.peer_grading.max_score()
+        self.assertEquals(max_score, None)
 
     def get_next_submission(self):
         """
@@ -88,13 +89,15 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         success, next_submission = self.peer_grading.get_next_submission({'location': 'blah'})
+        self.assertEqual(success, True)
 
     def test_save_grade(self):
         """
         Test if we can save the grade
         @return:
         """
-        self.peer_grading.save_grade(self.save_dict)
+        response = self.peer_grading.save_grade(self.save_dict)
+        self.assertEqual(response['success'], True)
 
     def test_is_student_calibrated(self):
         """
@@ -102,28 +105,32 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         calibrated_dict = {'location': "blah"}
-        self.peer_grading.is_student_calibrated(self.calibrated_dict)
+        response = self.peer_grading.is_student_calibrated(self.calibrated_dict)
+        self.assertEqual(response['success'], True)
 
     def test_show_calibration_essay(self):
         """
         Test showing the calibration essay
         @return:
         """
-        self.peer_grading.show_calibration_essay(self.calibrated_dict)
+        response = self.peer_grading.show_calibration_essay(self.calibrated_dict)
+        self.assertEqual(response['success'], True)
 
     def test_save_calibration_essay(self):
         """
         Test saving the calibration essay
         @return:
         """
-        self.peer_grading.save_calibration_essay(self.save_dict)
+        response = self.peer_grading.save_calibration_essay(self.save_dict)
+        self.assertEqual(response['success'], True)
 
     def test_peer_grading_problem(self):
         """
         See if we can render a single problem
         @return:
         """
-        self.peer_grading.peer_grading_problem(self.calibrated_dict)
+        response = self.peer_grading.peer_grading_problem(self.calibrated_dict)
+        self.assertEqual(response['success'], True)
 
     def test_get_instance_state(self):
         """
