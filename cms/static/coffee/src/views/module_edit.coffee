@@ -20,29 +20,15 @@ class CMS.Views.ModuleEdit extends Backbone.View
   loadEdit: ->
     if not @module
       @module = XModule.loadModule(@$el.find('.xmodule_edit'))
-      @originalMetadata = @metadata()
-
-  metadata: ->
-    # cdodge: package up metadata which is separated into a number of input fields
-    # there's probably a better way to do this, but at least this lets me continue to move onwards
-    _metadata = {}
-
-    $metadata = @$component_editor().find('.metadata_edit')
-
-    if $metadata
-      # walk through the set of elments which have the 'xmetadata_name' attribute and
-      # build up a object to pass back to the server on the subsequent POST
-      _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]', $metadata)
-
-    return _metadata
+      # At this point, metadata-edit.html will be loaded, and the metadata (as JSON) is available.
+      metadataEditor = @$el.find('.metadata_edit')
+      @metadataEditor = new CMS.Views.Metadata.Editor({
+          el: metadataEditor,
+          model: new CMS.Models.MetadataEditor(metadataEditor.data('metadata'))
+          });
 
   changedMetadata: ->
-    currentMetadata = @metadata()
-    changedMetadata = {}
-    for key of currentMetadata
-      if currentMetadata[key] != @originalMetadata[key]
-        changedMetadata[key] = currentMetadata[key]
-    return changedMetadata
+    return @metadataEditor.getModifiedMetadataValues()
 
   cloneTemplate: (parent, template) ->
     $.post("/clone_item", {

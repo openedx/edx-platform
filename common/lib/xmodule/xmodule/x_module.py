@@ -626,6 +626,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         inherited_metadata = getattr(self, '_inherited_metadata', {})
         inheritable_metadata = getattr(self, '_inheritable_metadata', {})
         metadata = {}
+        simple_metadata = {}
         for field in self.fields:
 
             if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
@@ -645,9 +646,15 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                                     'value': value,
                                     'default_value': default_value,
                                     'inheritable': inheritable,
-                                    'explicitly_set': explicitly_set }
+                                    'explicitly_set': explicitly_set}
 
-        return metadata
+            simple_metadata[field.name] = {'value': field.to_json(value),
+                                           'display_name' : field.display_name,
+                                           'default_value': field.to_json(default_value),
+                                           'inheritable': inheritable,
+                                           'explicitly_set': explicitly_set}
+
+        return metadata, simple_metadata
 
 
 class DescriptorSystem(object):

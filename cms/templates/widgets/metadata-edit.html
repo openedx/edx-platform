@@ -1,49 +1,15 @@
 <%
   import hashlib
-  from xmodule.fields import StringyInteger, StringyFloat
+  import json
   hlskey = hashlib.md5(module.location.url()).hexdigest()
 %>
-<section class="metadata_edit">
-  <ul>
-    % for field_name, field_value in editable_metadata_fields.items():
-    <li>
-      % if field_name == 'source_code':
-        % if field_value['explicitly_set'] is True:
-            <a href="#hls-modal-${hlskey}" style="color:yellow;" id="hls-trig-${hlskey}" >Edit High Level Source</a>
-        % endif
-      % else:
-        <label>${field_value['field'].display_name}:</label>
- 	      <input type='text' data-metadata-name='${field_value["field"].display_name}'
-            ## This is a hack to keep current behavior for weight and attempts (empty will parse OK as unset).
-            ## This hack will go away with our custom editors.
-            % if field_value["value"] == None and (isinstance(field_value["field"], StringyFloat) or isinstance(field_value["field"], StringyInteger)):
-              value = ''
-            % else:
-              value='${field_value["field"].to_json(field_value["value"])}'
-            % endif
-            size='60' />
-        ## Change to True to see all the information being passed through.
-        % if False:
-            <label>Help: ${field_value['field'].help}</label>
-            <label>Type: ${type(field_value['field']).__name__}</label>
-            <label>Inheritable: ${field_value['inheritable']}</label>
-            <label>Showing inherited value: ${field_value['inheritable'] and not field_value['explicitly_set']}</label>
-            <label>Explicitly set: ${field_value['explicitly_set']}</label>
-            <label>Default value: ${field_value['default_value']}</label>
-            % if field_value['field'].values:
-              <label>Possible values:</label>
-              % for value in field_value['field'].values:
-                <label>${value}</label>
-              % endfor
-            % endif
-        % endif
-      % endif
-    </li>
-    % endfor
-  </ul>
 
-  % if 'source_code' in editable_metadata_fields and editable_metadata_fields['source_code']['explicitly_set']:
+<% showHighLevelSource='source_code' in json_metadata_data and json_metadata_data['source_code']['explicitly_set'] %>
+<% del json_metadata_data['source_code'] %>
+<section class="metadata_edit" data-metadata='${json.dumps(json_metadata_data)}'/>
+
+% if showHighLevelSource:
+    <a href="#hls-modal-${hlskey}" style="color:yellow;" id="hls-trig-${hlskey}" >Edit High Level Source</a>
     <%include file="source-edit.html" />
-  % endif
+% endif
 
-</section>
