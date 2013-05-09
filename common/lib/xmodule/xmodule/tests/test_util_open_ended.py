@@ -1,3 +1,8 @@
+from .import test_system
+from xmodule.modulestore import Location
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xmodule.tests.test_export import DATA_DIR
+
 OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'blah/',
     'username': 'incorrect',
@@ -17,6 +22,7 @@ class MockQueryDict(dict):
     """
     Mock a query set so that it can be used with default authorization
     """
+
     def getlist(self, key, default=None):
         try:
             return super(MockQueryDict, self).__getitem__(key)
@@ -24,3 +30,22 @@ class MockQueryDict(dict):
             if default is None:
                 return []
         return default
+
+
+class DummyModulestore(object):
+    test_system = test_system()
+
+    def get_course(self, name):
+        """Get a test course by directory name.  If there's more than one, error."""
+
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
+        courses = modulestore.get_courses()
+        self.modulestore = modulestore
+        return courses[0]
+
+    def get_module_from_location(self, location, course):
+        course = self.get_course(course)
+        if not isinstance(location, Location):
+            location = Location(location)
+        descriptor = self.modulestore.get_instance(course.id, location, depth=None)
+        return descriptor.xmodule(self.test_system)

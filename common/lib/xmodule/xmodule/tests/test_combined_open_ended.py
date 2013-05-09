@@ -2,8 +2,7 @@ import json
 from mock import Mock, MagicMock, ANY
 import unittest
 
-from dummy_system import DummySystemUser
-from test_util_open_ended import MockQueryDict
+from test_util_open_ended import MockQueryDict, DummyModulestore
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
@@ -19,7 +18,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from . import test_system
+from .import test_system
 
 ORG = 'edX'
 COURSE = 'open_ended'      # name of directory with course data
@@ -68,7 +67,7 @@ class OpenEndedChildTest(unittest.TestCase):
     def setUp(self):
         self.test_system = test_system()
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
-                                             self.definition, self.descriptor, self.static_data, self.metadata)
+            self.definition, self.descriptor, self.static_data, self.metadata)
 
 
     def test_latest_answer_empty(self):
@@ -115,7 +114,7 @@ class OpenEndedChildTest(unittest.TestCase):
         post_assessment = "Post assessment"
         self.openendedchild.record_latest_post_assessment(post_assessment)
         self.assertEqual(post_assessment,
-                         self.openendedchild.latest_post_assessment(self.test_system))
+            self.openendedchild.latest_post_assessment(self.test_system))
 
     def test_get_score(self):
         new_answer = "New Answer"
@@ -142,12 +141,12 @@ class OpenEndedChildTest(unittest.TestCase):
         self.openendedchild.new_history_entry(new_answer)
         self.openendedchild.record_latest_score(self.static_data['max_score'])
         self.assertEqual(self.openendedchild.is_last_response_correct(),
-                         'correct')
+            'correct')
 
         self.openendedchild.new_history_entry(new_answer)
         self.openendedchild.record_latest_score(0)
         self.assertEqual(self.openendedchild.is_last_response_correct(),
-                         'incorrect')
+            'incorrect')
 
 
 class OpenEndedModuleTest(unittest.TestCase):
@@ -202,7 +201,7 @@ class OpenEndedModuleTest(unittest.TestCase):
                                    'default_queuename': 'testqueue',
                                    'waittime': 1}
         self.openendedmodule = OpenEndedModule(self.test_system, self.location,
-                                               self.definition, self.descriptor, self.static_data, self.metadata)
+            self.definition, self.descriptor, self.static_data, self.metadata)
 
     def test_message_post(self):
         get = {'feedback': 'feedback text',
@@ -364,21 +363,21 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock(data=full_definition)
     test_system = test_system()
     combinedoe_container = CombinedOpenEndedModule(test_system,
-                                                   location,
-                                                   descriptor,
-                                                   model_data={'data': full_definition, 'weight': '1'})
+        location,
+        descriptor,
+        model_data={'data': full_definition, 'weight': '1'})
 
 
     def setUp(self):
         # TODO: this constructor call is definitely wrong, but neither branch
         # of the merge matches the module constructor.  Someone (Vik?) should fix this.
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
-                                                    self.location,
-                                                    self.definition,
-                                                    self.descriptor,
-                                                    static_data=self.static_data,
-                                                    metadata=self.metadata,
-                                                    instance_state=self.static_data)
+            self.location,
+            self.definition,
+            self.descriptor,
+            static_data=self.static_data,
+            metadata=self.metadata,
+            instance_state=self.static_data)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
@@ -433,12 +432,12 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric), 'task_xml': xml}
             descriptor = Mock(data=definition)
             combinedoe = CombinedOpenEndedV1Module(self.test_system,
-                                                   self.location,
-                                                   definition,
-                                                   descriptor,
-                                                   static_data=self.static_data,
-                                                   metadata=self.metadata,
-                                                   instance_state=self.static_data)
+                self.location,
+                definition,
+                descriptor,
+                static_data=self.static_data,
+                metadata=self.metadata,
+                instance_state=self.static_data)
 
             changed = combinedoe.update_task_states()
             self.assertFalse(changed)
@@ -463,44 +462,46 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                       'task_xml': [self.task_xml1, self.task_xml2]}
         descriptor = Mock(data=definition)
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
-                                               self.location,
-                                               definition,
-                                               descriptor,
-                                               static_data=self.static_data,
-                                               metadata=self.metadata,
-                                               instance_state=instance_state)
+            self.location,
+            definition,
+            descriptor,
+            static_data=self.static_data,
+            metadata=self.metadata,
+            instance_state=instance_state)
         score_dict = combinedoe.get_score()
         self.assertEqual(score_dict['score'], 15.0)
         self.assertEqual(score_dict['total'], 15.0)
 
-class OpenEndedModuleXmlTest(unittest.TestCase, DummySystemUser):
+
+class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
     answer = "blah blah"
-    assessment = [0,1]
+    assessment = [0, 1]
     hint = "blah"
+
     def setUp(self):
         self.test_system = test_system()
         self.test_system.xqueue['interface'] = Mock(
-                send_to_queue = Mock(side_effect=[1,"queued"])
-            )
+            send_to_queue=Mock(side_effect=[1, "queued"])
+        )
 
     def test_open_ended_load_and_save(self):
         module = self.get_module_from_location(self.problem_location, COURSE)
-        module.handle_ajax("save_answer", {"student_answer" : self.answer})
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
 
     def test_open_ended_flow_reset(self):
-        assessment = [0,1]
+        assessment = [0, 1]
         module = self.get_module_from_location(self.problem_location, COURSE)
 
         #Simulate a student saving an answer
-        module.handle_ajax("save_answer", {"student_answer" : self.answer})
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
         status = module.handle_ajax("get_status", {})
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment' : sum(assessment), 'score_list[]' : assessment})
+        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
@@ -514,16 +515,16 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummySystemUser):
         module.handle_ajax("reset", {})
 
     def test_open_ended_flow_correct(self):
-        assessment = [1,1]
+        assessment = [1, 1]
         module = self.get_module_from_location(self.problem_location, COURSE)
 
         #Simulate a student saving an answer
-        module.handle_ajax("save_answer", {"student_answer" : self.answer})
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
         status = module.handle_ajax("get_status", {})
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment' : sum(assessment), 'score_list[]' : assessment})
+        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
@@ -546,16 +547,17 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummySystemUser):
 
         #Make a fake reply from the queue
         queue_reply = {
-            'queuekey' : "",
-            'xqueue_body' : json.dumps({
-                'score' : 0,
-                'feedback' : json.dumps({"spelling": "Spelling: Ok.", "grammar": "Grammar: Ok.", "markup-text": " all of us can think of a book that we hope none of our children or any other children have taken off the shelf . but if i have the right to remove that book from the shelf that work i abhor then you also have exactly the same right and so does everyone else . and then we <bg>have no books left</bg> on the shelf for any of us . <bs>katherine</bs> <bs>paterson</bs> , author write a persuasive essay to a newspaper reflecting your vies on censorship <bg>in libraries . do</bg> you believe that certain materials , such as books , music , movies , magazines , <bg>etc . , should be</bg> removed from the shelves if they are found <bg>offensive ? support your</bg> position with convincing arguments from your own experience , observations <bg>, and or reading .</bg> "}),
-                'grader_type' : "ML",
-                'success' : True,
-                'grader_id' : 1,
-                'submission_id' : 1,
-                'rubric_xml' : "<rubric><category><description>Writing Applications</description><score>0</score><option points='0'> The essay loses focus, has little information or supporting details, and the organization makes it difficult to follow.</option><option points='1'> The essay presents a mostly unified theme, includes sufficient information to convey the theme, and is generally organized well.</option></category><category><description> Language Conventions </description><score>0</score><option points='0'> The essay demonstrates a reasonable command of proper spelling and grammar. </option><option points='1'> The essay demonstrates superior command of proper spelling and grammar.</option></category></rubric>",
-                'rubric_scores_complete' : True,
+            'queuekey': "",
+            'xqueue_body': json.dumps({
+                'score': 0,
+                'feedback': json.dumps({"spelling": "Spelling: Ok.", "grammar": "Grammar: Ok.",
+                                        "markup-text": " all of us can think of a book that we hope none of our children or any other children have taken off the shelf . but if i have the right to remove that book from the shelf that work i abhor then you also have exactly the same right and so does everyone else . and then we <bg>have no books left</bg> on the shelf for any of us . <bs>katherine</bs> <bs>paterson</bs> , author write a persuasive essay to a newspaper reflecting your vies on censorship <bg>in libraries . do</bg> you believe that certain materials , such as books , music , movies , magazines , <bg>etc . , should be</bg> removed from the shelves if they are found <bg>offensive ? support your</bg> position with convincing arguments from your own experience , observations <bg>, and or reading .</bg> "}),
+                'grader_type': "ML",
+                'success': True,
+                'grader_id': 1,
+                'submission_id': 1,
+                'rubric_xml': "<rubric><category><description>Writing Applications</description><score>0</score><option points='0'> The essay loses focus, has little information or supporting details, and the organization makes it difficult to follow.</option><option points='1'> The essay presents a mostly unified theme, includes sufficient information to convey the theme, and is generally organized well.</option></category><category><description> Language Conventions </description><score>0</score><option points='0'> The essay demonstrates a reasonable command of proper spelling and grammar. </option><option points='1'> The essay demonstrates superior command of proper spelling and grammar.</option></category></rubric>",
+                'rubric_scores_complete': True,
             })
         }
 
