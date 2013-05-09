@@ -6,7 +6,7 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
     },
     template: _.template($("#system-feedback-tpl").text()),
     render: function() {
-        var attrs = this.model.attributes;
+        var attrs = $.extend({}, this.model.attributes);
         if(attrs.type) {
             attrs.modelType = attrs.type;
             delete attrs.type;
