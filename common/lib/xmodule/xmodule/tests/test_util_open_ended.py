@@ -38,12 +38,12 @@ class DummyModulestore(object):
     """
     test_system = test_system()
 
+    def setup_modulestore(self, name):
+        self.modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
+
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
-
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
-        courses = modulestore.get_courses()
-        self.modulestore = modulestore
+        courses = self.modulestore.get_courses()
         return courses[0]
 
     def get_module_from_location(self, location, course):

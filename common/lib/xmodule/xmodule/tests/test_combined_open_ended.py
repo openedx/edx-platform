@@ -496,6 +496,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.test_system.xqueue['interface'] = Mock(
             send_to_queue=Mock(side_effect=[1, "queued"])
         )
+        self.setup_modulestore(COURSE)
 
     def test_open_ended_load_and_save(self):
         """
@@ -507,6 +508,10 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Try saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
+        task_one_json = json.loads(module.task_states[0])
+        self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
+
+        module = self.get_module_from_location(self.problem_location, COURSE)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
 

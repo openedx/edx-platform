@@ -40,6 +40,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         """
         self.test_system = test_system()
         self.test_system.open_ended_grading_interface = None
+        self.setup_modulestore(COURSE)
         self.peer_grading = self.get_module_from_location(self.problem_location, COURSE)
 
     def test_module_closed(self):
@@ -130,3 +131,23 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         self.peer_grading.get_instance_state()
+
+class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
+    """
+    Test peer grading xmodule at the unit level.  More detailed tests are difficult, as the module relies on an
+    external grading service.
+    """
+    problem_location = Location(["i4x", "edX", "open_ended", "peergrading",
+                                 "PeerGradingScored"])
+    def setUp(self):
+        """
+        Create a peer grading module from a test system
+        @return:
+        """
+        self.test_system = test_system()
+        self.test_system.open_ended_grading_interface = None
+        self.setup_modulestore(COURSE)
+
+    def test_metadata_load(self):
+        peer_grading = self.get_module_from_location(self.problem_location, COURSE)
+        self.assertEqual(peer_grading.closed(), False)
