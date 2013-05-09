@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 import collections
 import unittest
@@ -13,6 +14,7 @@ import json
 import logging
 
 from . import utils, api, models
+from .models import Note
 
 
 class UtilsTest(TestCase):
@@ -338,3 +340,60 @@ class ApiTest(TestCase):
 
             for row in content['rows']:
                 self.assertTrue('id' in row)
+
+
+class NoteTest(TestCase):
+    def setUp(self):
+        self.password = 'abc'
+        self.student = User.objects.create_user('student', 'student@test.com', self.password)
+        self.course_id = 'HarvardX/CB22x/The_Ancient_Greek_Hero'
+        self.note = {
+            'user': self.student,
+            'course_id': self.course_id,
+            'uri': '/',
+            'text': 'foo',
+            'quote': 'bar',
+            'range_start': 0,
+            'range_start_offset': 0,
+            'range_end': 100,
+            'range_end_offset': 0,
+            'tags': 'a,b,c'
+        }
+
+    def test_clean_valid_note(self):
+        reference_note = Note(**self.note)
+        body = reference_note.as_dict()
+
+        note = Note(course_id=self.course_id, user=self.student)
+        try:
+            note.clean(json.dumps(body))
+            self.assertEqual(note.uri, body['uri'])
+            self.assertEqual(note.text, body['text'])
+            self.assertEqual(note.quote, body['quote'])
+            self.assertEqual(note.range_start, body['ranges'][0]['start'])
+            self.assertEqual(note.range_start_offset, body['ranges'][0]['startOffset'])
+            self.assertEqual(note.range_end, body['ranges'][0]['end'])
+            self.assertEqual(note.range_end_offset, body['ranges'][0]['endOffset'])
+            self.assertEqual(note.tags, ','.join(body['tags']))
+        except ValidationError:
+            self.fail('a valid note should not raise an exception')
+
+    def test_clean_invalid_note(self):
+        note = Note(course_id=self.course_id, user=self.student)
+        for empty_type in (None, '', 0, []):
+            with self.assertRaises(ValidationError):
+                note.clean(None)
+
+        with self.assertRaises(ValidationError):
+            note.clean(json.dumps({
+                'text': 'foo',
+                'quote': 'bar',
+                'ranges': [{} for i in range(10)]  # too many ranges
+            }))
+
+    def test_as_dict(self):
+        note = Note(course_id=self.course_id, user=self.student)
+        d = note.as_dict()
+        self.assertNotIsInstance(d, basestring)
+        self.assertEqual(d['user_id'], self.student.id)
+        self.assertTrue('course_id' not in d)
