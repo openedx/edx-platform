@@ -49,8 +49,5 @@ describe 'ResponseCommentShowView', ->
         it 'produces the correct HTML', ->
             @view.render()
             expect(@view.el.innerHTML).toContainHtml """
-            <div class="response-body">this is a response</div>
-            <div class="discussion-flag-abuse notflagged"
-                data-role="thread-flag" data-tooltip="report misuse">
-                <i class="icon"></i><span class="flag-label"></span></div>
+            <div
             """

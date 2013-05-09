@@ -36,13 +36,12 @@ describe 'All Content', ->
             expect(@content.get 'voted').toEqual true
             expect(@content.get 'subscribed').toEqual true
 
-        xdescribe 'can be flagged and unflagged', ->
-            beforeEach ->
-                spyOn @content, 'trigger'
-
-            it 'can be flagged for abuse', ->
-                @content.flagAbuse
-                expect(@content.get 'abuse_flaggers').toEqual ['123', '567']
+        it 'can be flagged for abuse', ->
+            @content.flagAbuse
+            #temp_array = @content.get("abuse_flaggers")
+            #temp_array.push(window.user.get('id'))
+            #@content.set("abuse_flaggers",temp_array)
+            expect(@content.get 'abuse_flaggers').toEqual ['123', '567']
 
     describe 'Comments', ->
         beforeEach ->
