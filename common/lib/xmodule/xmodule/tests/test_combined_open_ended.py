@@ -35,6 +35,9 @@ OpenEndedModule
 
 
 class OpenEndedChildTest(unittest.TestCase):
+    """
+    Test the open ended child class
+    """
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
                          "SampleQuestion"])
 
@@ -150,6 +153,9 @@ class OpenEndedChildTest(unittest.TestCase):
 
 
 class OpenEndedModuleTest(unittest.TestCase):
+    """
+    Test the open ended module class
+    """
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
                          "SampleQuestion"])
 
@@ -291,6 +297,9 @@ class OpenEndedModuleTest(unittest.TestCase):
 
 
 class CombinedOpenEndedModuleTest(unittest.TestCase):
+    """
+    Unit tests for the combined open ended xmodule
+    """
     location = Location(["i4x", "edX", "open_ended", "combinedopenended",
                          "SampleQuestion"])
     definition_template = """
@@ -474,6 +483,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
 
 
 class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
+    """
+    Test the student flow in the combined open ended xmodule
+    """
     problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
     answer = "blah blah"
     assessment = [0, 1]
@@ -486,12 +498,23 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         )
 
     def test_open_ended_load_and_save(self):
+        """
+        See if we can load the module and save an answer
+        @return:
+        """
+        #Load the module
         module = self.get_module_from_location(self.problem_location, COURSE)
+
+        #Try saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
 
     def test_open_ended_flow_reset(self):
+        """
+        Test the flow of the module if we complete the self assessment step and then reset
+        @return:
+        """
         assessment = [0, 1]
         module = self.get_module_from_location(self.problem_location, COURSE)
 
@@ -515,7 +538,13 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         module.handle_ajax("reset", {})
 
     def test_open_ended_flow_correct(self):
+        """
+        Test a two step problem where the student first goes through the self assessment step, and then the
+        open ended step.
+        @return:
+        """
         assessment = [1, 1]
+        #Load the module
         module = self.get_module_from_location(self.problem_location, COURSE)
 
         #Simulate a student saving an answer

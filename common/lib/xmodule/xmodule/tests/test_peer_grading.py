@@ -15,6 +15,10 @@ COURSE = "open_ended"
 
 
 class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
+    """
+    Test peer grading xmodule at the unit level.  More detailed tests are difficult, as the module relies on an
+    external grading service.
+    """
     problem_location = Location(["i4x", "edX", "open_ended", "peergrading",
                                  "PeerGradingSample"])
     calibrated_dict = {'location': "blah"}
@@ -30,50 +34,99 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
     })
 
     def setUp(self):
+        """
+        Create a peer grading module from a test system
+        @return:
+        """
         self.test_system = test_system()
         self.test_system.open_ended_grading_interface = None
         self.peer_grading = self.get_module_from_location(self.problem_location, COURSE)
 
     def test_module_closed(self):
+        """
+        Test if peer grading is closed
+        @return:
+        """
         closed = self.peer_grading.closed()
         self.assertEqual(closed, False)
 
     def test_get_html(self):
+        """
+        Test to see if the module can be rendered
+        @return:
+        """
         html = self.peer_grading.get_html()
 
     def test_get_data(self):
+        """
+        Try getting data from the external grading service
+        @return:
+        """
         try:
             success, data = self.peer_grading.query_data_for_location()
         except GradingServiceError:
             pass
 
     def test_get_score(self):
+        """
+        Test getting the score
+        @return:
+        """
         score = self.peer_grading.get_score()
 
     def test_get_max_score(self):
+        """
+        Test getting the max score
+        @return:
+        """
         max_score = self.peer_grading.max_score()
 
     def get_next_submission(self):
+        """
+        Test to see if we can get the next mock submission
+        @return:
+        """
         success, next_submission = self.peer_grading.get_next_submission({'location': 'blah'})
 
     def test_save_grade(self):
+        """
+        Test if we can save the grade
+        @return:
+        """
         self.peer_grading.save_grade(self.save_dict)
 
     def test_is_student_calibrated(self):
+        """
+        Check to see if the student has calibrated yet
+        @return:
+        """
         calibrated_dict = {'location': "blah"}
         self.peer_grading.is_student_calibrated(self.calibrated_dict)
 
     def test_show_calibration_essay(self):
+        """
+        Test showing the calibration essay
+        @return:
+        """
         self.peer_grading.show_calibration_essay(self.calibrated_dict)
 
     def test_save_calibration_essay(self):
+        """
+        Test saving the calibration essay
+        @return:
+        """
         self.peer_grading.save_calibration_essay(self.save_dict)
 
-    def test_peer_grading_closed(self):
-        self.peer_grading.peer_grading_closed()
-
     def test_peer_grading_problem(self):
+        """
+        See if we can render a single problem
+        @return:
+        """
         self.peer_grading.peer_grading_problem(self.calibrated_dict)
 
     def test_get_instance_state(self):
+        """
+        Get the instance state dict
+        @return:
+        """
         self.peer_grading.get_instance_state()

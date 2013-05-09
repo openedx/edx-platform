@@ -20,7 +20,7 @@ S3_INTERFACE = {
 
 class MockQueryDict(dict):
     """
-    Mock a query set so that it can be used with default authorization
+    Mock a query dict so that it can be used in test classes
     """
 
     def getlist(self, key, default=None):
@@ -33,6 +33,9 @@ class MockQueryDict(dict):
 
 
 class DummyModulestore(object):
+    """
+    A mixin that allows test classes to have convenience functions to get a module given a location
+    """
     test_system = test_system()
 
     def get_course(self, name):
