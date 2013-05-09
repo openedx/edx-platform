@@ -37,7 +37,7 @@ class PeerGradingService(GradingService):
 
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(self.get_next_submission_url,
-                            {'location': problem_location, 'grader_id': grader_id})
+            {'location': problem_location, 'grader_id': grader_id})
         return self.try_to_decode(self._render_rubric(response))
 
     def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores,
@@ -101,12 +101,12 @@ without making actual service calls to the grading controller
 class MockPeerGradingService(object):
     def get_next_submission(self, problem_location, grader_id):
         return {'success': True,
-                           'submission_id': 1,
-                           'submission_key': "",
-                           'student_response': 'fake student response',
-                           'prompt': 'fake submission prompt',
-                           'rubric': 'fake rubric',
-                           'max_score': 4}
+                'submission_id': 1,
+                'submission_key': "",
+                'student_response': 'fake student response',
+                'prompt': 'fake submission prompt',
+                'rubric': 'fake rubric',
+                'max_score': 4}
 
     def save_grade(self, location, grader_id, submission_id,
                    score, feedback, submission_key, rubric_scores, submission_flagged):
@@ -117,12 +117,12 @@ class MockPeerGradingService(object):
 
     def show_calibration_essay(self, problem_location, grader_id):
         return {'success': True,
-                           'submission_id': 1,
-                           'submission_key': '',
-                           'student_response': 'fake student response',
-                           'prompt': 'fake submission prompt',
-                           'rubric': 'fake rubric',
-                           'max_score': 4}
+                'submission_id': 1,
+                'submission_key': '',
+                'student_response': 'fake student response',
+                'prompt': 'fake submission prompt',
+                'rubric': 'fake rubric',
+                'max_score': 4}
 
     def save_calibration_essay(self, problem_location, grader_id,
                                calibration_essay_id, submission_key, score,
@@ -131,8 +131,8 @@ class MockPeerGradingService(object):
 
     def get_problem_list(self, course_id, grader_id):
         return {'success': True,
-                           'problem_list': [
-                           ]}
+                'problem_list': [
+                ]}
 
     def get_data_for_location(self, problem_location, student_id):
         return {"version": 1, "count_graded": 3, "count_required": 3, "success": True, "student_sub_count": 1}

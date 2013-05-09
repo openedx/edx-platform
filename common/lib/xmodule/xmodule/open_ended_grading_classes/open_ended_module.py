@@ -191,7 +191,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         }
 
         (error, msg) = qinterface.send_to_queue(header=xheader,
-                                                body=json.dumps(contents))
+            body=json.dumps(contents))
 
         #Convert error to a success value
         success = True
@@ -225,8 +225,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                                                  str(len(self.child_history)))
 
         xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['construct_callback'](),
-                                                lms_key=queuekey,
-                                                queue_name=self.queue_name)
+            lms_key=queuekey,
+            queue_name=self.queue_name)
 
         contents = self.payload.copy()
 
@@ -244,7 +244,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         qinterface.send_to_queue(header=xheader,
-                                                body=json.dumps(contents))
+            body=json.dumps(contents))
 
         # State associated with the queueing request
         queuestate = {'key': queuekey,
@@ -402,7 +402,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         if not response_items['success']:
             return system.render_template("{0}/open_ended_error.html".format(self.TEMPLATE_DIR),
-                                          {'errors': feedback})
+                {'errors': feedback})
 
         feedback_template = system.render_template("{0}/open_ended_feedback.html".format(self.TEMPLATE_DIR), {
             'grader_type': response_items['grader_type'],
@@ -546,7 +546,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             return ""
 
         feedback_dict = self._parse_score_msg(self.child_history[-1].get('post_assessment', ""), system,
-                                              join_feedback=join_feedback)
+            join_feedback=join_feedback)
         if not short_feedback:
             return feedback_dict['feedback'] if feedback_dict['valid'] else ''
         if feedback_dict['valid']:
@@ -711,7 +711,7 @@ class OpenEndedDescriptor():
     template_dir_name = "openended"
 
     def __init__(self, system):
-        self.system =system
+        self.system = system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
