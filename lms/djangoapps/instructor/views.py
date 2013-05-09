@@ -10,9 +10,7 @@ import os
 import re
 import requests
 from requests.status_codes import codes
-#import urllib
 from collections import OrderedDict
-#from time import sleep
 
 from StringIO import StringIO
 
@@ -25,7 +23,6 @@ from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
 from courseware import grades
-#from courseware import tasks  # for now... should remove once things are in queue instead
 from courseware import task_queue
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
@@ -43,6 +40,7 @@ import xmodule.graders as xmgraders
 import track.views
 
 from .offline_gradecalc import student_grades, offline_grades_available
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -139,6 +137,25 @@ def instructor_dashboard(request, course_id):
         (group, _) = Group.objects.get_or_create(name=name)
         return group
 
+    def get_module_url(urlname):
+        """
+        Construct full URL for a module from its urlname.
+
+        Form is either urlname or modulename/urlname.  If no modulename
+        is provided, "problem" is assumed.
+        """
+        # tolerate an XML suffix in the urlname
+        if urlname[-4:] == ".xml":
+            urlname = urlname[:-4]
+
+        # implement default
+        if '/' not in urlname:
+            urlname = "problem/" + urlname
+
+        # complete the url using information about the current course:
+        (org, course_name, _) = course_id.split("/")
+        return "i4x://" + org + "/" + course_name + "/" + urlname
+
     # process actions from form POST
     action = request.POST.get('action', '')
     use_offline = request.POST.get('use_offline_grades', False)
@@ -177,13 +194,6 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'list-students', {}, page='idashboard')
 
-#    elif 'Test Celery' in action:
-#        args = (10,)
-#        result = tasks.waitawhile.apply_async(args, retry=False)
-#        task_id = result.id
-#        celery_ajax_url = reverse('celery_ajax_status', kwargs={'task_id': task_id})
-#        msg += '<p>Celery Status for task ${task}:</p><div class="celery-status" data-ajax_url="${url}"></div><p>Status end.</p>'.format(task=task_id, url=celery_ajax_url)
-
     elif 'Dump Grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
@@ -216,7 +226,8 @@ def instructor_dashboard(request, course_id):
         msg += dump_grading_context(course)
 
     elif "Regrade ALL students' problem submissions" in action:
-        problem_url = request.POST.get('problem_to_regrade', '')
+        problem_urlname = request.POST.get('problem_for_all_students', '')
+        problem_url = get_module_url(problem_urlname)
         try:
             course_task_log_entry = task_queue.submit_regrade_problem_for_all_students(request, course_id, problem_url)
             if course_task_log_entry is None:
@@ -224,73 +235,121 @@ def instructor_dashboard(request, course_id):
             else:
                 track_msg = 'regrade problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
                 track.views.server_track(request, track_msg, {}, page='idashboard')
+        except ItemNotFoundError as e:
+            log.error('Failure to regrade: unknown problem "{0}"'.format(e))
+            msg += '<font color="red">Failed to create a background task for regrading "{0}": problem not found.</font>'.format(problem_url)
         except Exception as e:
             log.error("Encountered exception from regrade: {0}".format(e))
-            msg += '<font="red">Failed to create a background task for regrading "{0}": {1}.</font>'.format(problem_url, e)
+            msg += '<font color="red">Failed to create a background task for regrading "{0}": {1}.</font>'.format(problem_url, e.message)
 
-    elif "Reset student's attempts" in action or "Delete student state for problem" in action:
+    elif "Reset ALL students' attempts" in action:
+        problem_urlname = request.POST.get('problem_for_all_students', '')
+        problem_url = get_module_url(problem_urlname)
+        try:
+            course_task_log_entry = task_queue.submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
+            if course_task_log_entry is None:
+                msg += '<font color="red">Failed to create a background task for resetting "{0}".</font>'.format(problem_url)
+            else:
+                track_msg = 'reset problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
+                track.views.server_track(request, track_msg, {}, page='idashboard')
+        except ItemNotFoundError as e:
+            log.error('Failure to reset: unknown problem "{0}"'.format(e))
+            msg += '<font color="red">Failed to create a background task for resetting "{0}": problem not found.</font>'.format(problem_url)
+        except Exception as e:
+            log.error("Encountered exception from reset: {0}".format(e))
+            msg += '<font color="red">Failed to create a background task for resetting "{0}": {1}.</font>'.format(problem_url, e.message)
+
+    elif "Delete ALL student state for module" in action:
+        problem_urlname = request.POST.get('problem_for_all_students', '')
+        problem_url = get_module_url(problem_urlname)
+        try:
+            course_task_log_entry = task_queue.submit_delete_problem_state_for_all_students(request, course_id, problem_url)
+            if course_task_log_entry is None:
+                msg += '<font color="red">Failed to create a background task for deleting "{0}".</font>'.format(problem_url)
+            else:
+                track_msg = 'delete state for problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
+                track.views.server_track(request, track_msg, {}, page='idashboard')
+        except ItemNotFoundError as e:
+            log.error('Failure to delete state: unknown problem "{0}"'.format(e))
+            msg += '<font color="red">Failed to create a background task for deleting state for "{0}": problem not found.</font>'.format(problem_url)
+        except Exception as e:
+            log.error("Encountered exception from delete state: {0}".format(e))
+            msg += '<font color="red">Failed to create a background task for deleting state for "{0}": {1}.</font>'.format(problem_url, e.message)
+
+    elif "Reset student's attempts" in action or "Delete student state for module" in action \
+            or "Regrade student's problem submission" in action:
         # get the form data
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
-        problem_to_reset = request.POST.get('problem_to_reset', '')
-
-        if problem_to_reset[-4:] == ".xml":
-            problem_to_reset = problem_to_reset[:-4]
+        problem_urlname = request.POST.get('problem_for_student', '')
+        module_state_key = get_module_url(problem_urlname)
 
         # try to uniquely id student by email address or username
         try:
             if "@" in unique_student_identifier:
-                student_to_reset = User.objects.get(email=unique_student_identifier)
+                student = User.objects.get(email=unique_student_identifier)
             else:
-                student_to_reset = User.objects.get(username=unique_student_identifier)
-            msg += "Found a single student to reset.  "
-        except:
-            student_to_reset = None
+                student = User.objects.get(username=unique_student_identifier)
+            msg += "Found a single student.  "
+        except User.DoesNotExist:
+            student = None
             msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
 
-        if student_to_reset is not None:
+        student_module = None
+        if student is not None:
             # find the module in question
-            if '/' not in problem_to_reset:				# allow state of modules other than problem to be reset
-                problem_to_reset = "problem/" + problem_to_reset    # but problem is the default
             try:
-                (org, course_name, _) = course_id.split("/")
-                module_state_key = "i4x://" + org + "/" + course_name + "/" + problem_to_reset
-                module_to_reset = StudentModule.objects.get(student_id=student_to_reset.id,
+                student_module = StudentModule.objects.get(student_id=student.id,
                                                             course_id=course_id,
                                                             module_state_key=module_state_key)
-                msg += "Found module to reset.  "
-            except Exception:
+                msg += "Found module.  "
+            except StudentModule.DoesNotExist:
                 msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
 
-        if "Delete student state for problem" in action:
-            # delete the state
-            try:
-                module_to_reset.delete()
-                msg += "<font color='red'>Deleted student module state for %s!</font>" % module_state_key
-            except:
-                msg += "Failed to delete module state for %s/%s" % (unique_student_identifier, problem_to_reset)
-        else:
-            # modify the problem's state
-            try:
-                # load the state json
-                problem_state = json.loads(module_to_reset.state)
-                old_number_of_attempts = problem_state["attempts"]
-                problem_state["attempts"] = 0
+        if student_module is not None:
+            if "Delete student state for module" in action:
+                # delete the state
+                try:
+                    student_module.delete()
+                    msg += "<font color='red'>Deleted student module state for %s!</font>" % module_state_key
+                    track_msg = 'delete student module state for problem {problem} for student {student} in {course}'
+                    track_msg = track_msg.format(problem=problem_url, student=unique_student_identifier, course=course_id)
+                    track.views.server_track(request, track_msg, {}, page='idashboard')
+                except:
+                    msg += "Failed to delete module state for %s/%s" % (unique_student_identifier, problem_urlname)
+            elif "Reset student's attempts" in action:
+                # modify the problem's state
+                try:
+                    # load the state json
+                    problem_state = json.loads(student_module.state)
+                    old_number_of_attempts = problem_state["attempts"]
+                    problem_state["attempts"] = 0
 
-                # save
-                module_to_reset.state = json.dumps(problem_state)
-                module_to_reset.save()
-                track.views.server_track(request,
-                                         '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
-                                             old_attempts=old_number_of_attempts,
-                                             student=student_to_reset,
-                                             problem=module_to_reset.module_state_key,
-                                             instructor=request.user,
-                                             course=course_id),
-                                         {},
-                                         page='idashboard')
-                msg += "<font color='green'>Module state successfully reset!</font>"
-            except:
-                msg += "<font color='red'>Couldn't reset module state.  </font>"
+                    # save
+                    student_module.state = json.dumps(problem_state)
+                    student_module.save()
+                    track.views.server_track(request,
+                                             '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
+                                                 old_attempts=old_number_of_attempts,
+                                                 student=student,
+                                                 problem=student_module.module_state_key,
+                                                 instructor=request.user,
+                                                 course=course_id),
+                                             {},
+                                             page='idashboard')
+                    msg += "<font color='green'>Module state successfully reset!</font>"
+                except:
+                    msg += "<font color='red'>Couldn't reset module state.  </font>"
+            else:
+                try:
+                    course_task_log_entry = task_queue.submit_regrade_problem_for_student(request, course_id, module_state_key, student)
+                    if course_task_log_entry is None:
+                        msg += '<font color="red">Failed to create a background task for regrading "{0}" for student {1}.</font>'.format(module_state_key, unique_student_identifier)
+                    else:
+                        track_msg = 'regrade problem {problem} for student {student} in {course}'.format(problem=module_state_key, student=unique_student_identifier, course=course_id)
+                        track.views.server_track(request, track_msg, {}, page='idashboard')
+                except Exception as e:
+                    log.error("Encountered exception from regrade: {0}".format(e))
+                    msg += '<font color="red">Failed to create a background task for regrading "{0}": {1}.</font>'.format(module_state_key, e.message)
 
     elif "Get link to student's progress page" in action:
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
@@ -308,7 +367,7 @@ def instructor_dashboard(request, course_id):
                                      {},
                                      page='idashboard')
             msg += "<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url, student_to_reset.username, student_to_reset.email)
-        except:
+        except User.DoesNotExist:
             msg += "<font color='red'>Couldn't find student with that username.  </font>"
 
     #----------------------------------------

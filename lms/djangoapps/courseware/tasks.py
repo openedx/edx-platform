@@ -11,7 +11,7 @@ from celery.utils.log import get_task_logger
 
 import mitxmako.middleware as middleware
 
-from courseware.models import StudentModule, CourseTaskLog
+from courseware.models import StudentModule
 from courseware.model_data import ModelDataCache
 # from courseware.module_render import get_module
 from courseware.module_render import get_module_for_descriptor_internal
@@ -25,18 +25,6 @@ from track.views import task_track
 task_log = get_task_logger(__name__)
 
 
-@task
-def waitawhile(value):
-    for i in range(value):
-        sleep(1)  # in seconds
-        task_log.info('Waited {0} seconds...'.format(i))
-        current_task.update_state(state='PROGRESS',
-                                  meta={'current': i, 'total': value})
-
-    result = 'Yeah!'
-    return result
-
-
 class UpdateProblemModuleStateError(Exception):
     pass
 
@@ -48,6 +36,13 @@ def _update_problem_module_state(course_id, module_state_key, student, update_fc
 
     If student is None, performs update on modules for all students on the specified problem.
     """
+    task_id = current_task.request.id
+    fmt = 'Starting to update problem modules as task "{task_id}": course "{course_id}" problem "{state_key}": nothing {action} yet'
+    task_log.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, action=action_name))
+
+    # add task_id to xmodule_instance_args, so that it can be output with tracking info:
+    xmodule_instance_args['task_id'] = task_id
+    
     # add hack so that mako templates will work on celery worker server:
     # The initialization of Make templating is usually done when Django is
     # initializing middleware packages as part of processing a server request.
@@ -86,7 +81,6 @@ def _update_problem_module_state(course_id, module_state_key, student, update_fc
                     }
         return progress
 
-    task_log.info("Starting to process task {0}".format(current_task.request.id))
 
     for module_to_update in modules_to_update:
         num_attempted += 1
@@ -142,8 +136,10 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, module_
 #    instance = get_module(student, request, module_state_key, model_data_cache,
 #                          course_id, grade_bucket_type='regrade')
 
+    # get request-related tracking information from args passthrough, and supplement with task-specific
+    # information:
     request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
-    task_info = {}
+    task_info = {"student": student.username, "task_id": xmodule_instance_args['task_id']}
 
     def make_track_function():
         '''
@@ -250,19 +246,21 @@ def _reset_problem_attempts_module_state(module_descriptor, student_module, xmod
 
 
 @task
-def reset_problem_attempts_for_student(course_id, problem_url, student_identifier):
+def reset_problem_attempts_for_student(course_id, problem_url, student_identifier, xmodule_instance_args):
     action_name = 'reset'
     update_fcn = _reset_problem_attempts_module_state
     return _update_problem_module_state_for_student(course_id, problem_url, student_identifier,
-                                                    update_fcn, action_name)
+                                                    update_fcn, action_name,
+                                                    xmodule_instance_args=xmodule_instance_args)
 
 
 @task
-def reset_problem_attempts_for_all_students(course_id, problem_url):
+def reset_problem_attempts_for_all_students(course_id, problem_url, xmodule_instance_args):
     action_name = 'reset'
     update_fcn = _reset_problem_attempts_module_state
     return _update_problem_module_state_for_all_students(course_id, problem_url,
-                                                         update_fcn, action_name)
+                                                         update_fcn, action_name,
+                                                         xmodule_instance_args=xmodule_instance_args)
 
 
 @transaction.autocommit
@@ -273,19 +271,21 @@ def _delete_problem_module_state(module_descriptor, student_module, xmodule_inst
 
 
 @task
-def delete_problem_state_for_student(course_id, problem_url, student_ident):
+def delete_problem_state_for_student(course_id, problem_url, student_ident, xmodule_instance_args):
     action_name = 'deleted'
     update_fcn = _delete_problem_module_state
     return _update_problem_module_state_for_student(course_id, problem_url, student_ident,
-                                                    update_fcn, action_name)
+                                                    update_fcn, action_name,
+                                                    xmodule_instance_args=xmodule_instance_args)
 
 
 @task
-def delete_problem_state_for_all_students(course_id, problem_url):
+def delete_problem_state_for_all_students(course_id, problem_url, xmodule_instance_args):
     action_name = 'deleted'
     update_fcn = _delete_problem_module_state
     return _update_problem_module_state_for_all_students(course_id, problem_url,
-                                                         update_fcn, action_name)
+                                                         update_fcn, action_name,
+                                                         xmodule_instance_args=xmodule_instance_args)
 
 
 #@worker_ready.connect

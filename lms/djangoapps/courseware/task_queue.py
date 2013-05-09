@@ -8,7 +8,8 @@ from celery.states import READY_STATES
 
 from courseware.models import CourseTaskLog
 from courseware.module_render import get_xqueue_callback_url_prefix
-from courseware.tasks import regrade_problem_for_all_students
+from courseware.tasks import (regrade_problem_for_all_students, regrade_problem_for_student,
+                              reset_problem_attempts_for_all_students, delete_problem_state_for_all_students)
 from xmodule.modulestore.django import modulestore
 
 
@@ -16,11 +17,51 @@ log = logging.getLogger(__name__)
 
 
 def get_running_course_tasks(course_id):
-    """Returns a query of CourseTaskLog objects of running tasks for a given course."""
+    """
+    Returns a query of CourseTaskLog objects of running tasks for a given course.
+
+    Used to generate a list of tasks to display on the instructor dashboard.
+    """
     course_tasks = CourseTaskLog.objects.filter(course_id=course_id)
     for state in READY_STATES:
         course_tasks = course_tasks.exclude(task_state=state)
     return course_tasks
+
+
+def course_task_log_status(request, task_id=None):
+    """
+    This returns the status of a course-related task as a JSON-serialized dict.
+
+    The task_id can be specified in one of three ways:
+
+    * explicitly as an argument to the method (by specifying in the url)
+      Returns a dict containing status information for the specified task_id
+
+    * by making a post request containing 'task_id' as a parameter with a single value
+      Returns a dict containing status information for the specified task_id
+
+    * by making a post request containing 'task_ids' as a parameter,
+      with a list of task_id values.
+      Returns a dict of dicts, with the task_id as key, and the corresponding
+      dict containing status information for the specified task_id
+
+      Task_id values that are unrecognized are skipped.
+
+    """
+    output = {}
+    if task_id is not None:
+        output = _get_course_task_log_status(task_id)
+    elif 'task_id' in request.POST:
+        task_id = request.POST['task_id']
+        output = _get_course_task_log_status(task_id)
+    elif 'task_ids[]' in request.POST:
+        tasks = request.POST.getlist('task_ids[]')
+        for task_id in tasks:
+            task_output = _get_course_task_log_status(task_id)
+            if task_output is not None:
+                output[task_id] = task_output
+
+    return HttpResponse(json.dumps(output, indent=4))
 
 
 def _task_is_running(course_id, task_name, task_args, student=None):
@@ -66,9 +107,7 @@ def _update_task(course_task_log, task_result):
 
     Autocommit annotation makes sure the database entry is committed.
     """
-    course_task_log.task_state = task_result.state
-    course_task_log.task_id = task_result.id
-    course_task_log.save()
+    _update_course_task_log(course_task_log, task_result)
 
 
 def _get_xmodule_instance_args(request):
@@ -91,42 +130,68 @@ def _get_xmodule_instance_args(request):
     return xmodule_instance_args
 
 
-def course_task_log_status(request, task_id=None):
+def _update_course_task_log(course_task_log_entry, task_result):
     """
-    This returns the status of a course-related task as a JSON-serialized dict.
+    Updates and possibly saves a CourseTaskLog entry based on a task Result.
 
-    The task_id can be specified in one of three ways:
+    Used when a task initially returns, as well as when updated status is
+    requested.
 
-    * explicitly as an argument to the method (by specifying in the url)
-      Returns a dict containing status information for the specified task_id
-
-    * by making a post request containing 'task_id' as a parameter with a single value
-      Returns a dict containing status information for the specified task_id
-
-    * by making a post request containing 'task_ids' as a parameter,
-      with a list of task_id values.
-      Returns a dict of dicts, with the task_id as key, and the corresponding
-      dict containing status information for the specified task_id
-
-      Task_id values that are unrecognized are skipped.
-
+    Calculates json to store in task_progress field.
     """
+    task_id = task_result.task_id
+    result_state = task_result.state
+    returned_result = task_result.result
+    result_traceback = task_result.traceback
+
+    # Assume we don't always update the CourseTaskLog entry if we don't have to:
+    entry_needs_saving = False
     output = {}
-    if task_id is not None:
-        output = _get_course_task_log_status(task_id)
-    elif 'task_id' in request.POST:
-        task_id = request.POST['task_id']
-        output = _get_course_task_log_status(task_id)
-    elif 'task_ids[]' in request.POST:
-        tasks = request.POST.getlist('task_ids[]')
-        for task_id in tasks:
-            task_output = _get_course_task_log_status(task_id)
-            if task_output is not None:
-                output[task_id] = task_output
-    # TODO decide whether to raise exception if bad args are passed.
-    # May be enough just to return an empty output.
 
-    return HttpResponse(json.dumps(output, indent=4))
+    if result_state == 'PROGRESS':
+        # construct a status message directly from the task result's result:
+        if hasattr(task_result, 'result') and 'attempted' in returned_result:
+            fmt = "Attempted {attempted} of {total}, {action_name} {updated}"
+            message = fmt.format(attempted=returned_result['attempted'],
+                                 updated=returned_result['updated'],
+                                 total=returned_result['total'],
+                                 action_name=returned_result['action_name'])
+            output['message'] = message
+            log.info("task progress: {0}".format(message))
+        else:
+            log.info("still making progress... ")
+        output['task_progress'] = returned_result
+
+    elif result_state == 'SUCCESS':
+        output['task_progress'] = returned_result
+        course_task_log_entry.task_progress = json.dumps(returned_result)
+        log.info("task succeeded: {0}".format(returned_result))
+        entry_needs_saving = True
+
+    elif result_state == 'FAILURE':
+        # on failure, the result's result contains the exception that caused the failure
+        exception = returned_result
+        traceback = result_traceback if result_traceback is not None else ''
+        entry_needs_saving = True
+        task_progress = {'exception': type(exception).__name__, 'message': str(exception.message)}
+        output['message'] = exception.message
+        log.warning("background task (%s) failed: %s %s".format(task_id, returned_result, traceback))
+        if result_traceback is not None:
+            output['task_traceback'] = result_traceback
+            task_progress['traceback'] = result_traceback
+        course_task_log_entry.task_progress = json.dumps(task_progress)
+        output['task_progress'] = task_progress
+
+    # always update the entry if the state has changed:
+    if result_state != course_task_log_entry.task_state:
+        course_task_log_entry.task_state = result_state
+        course_task_log_entry.task_id = task_id
+        entry_needs_saving = True
+
+    if entry_needs_saving:
+        course_task_log_entry.save()
+
+    return output
 
 
 def _get_course_task_log_status(task_id):
@@ -169,56 +234,12 @@ def _get_course_task_log_status(task_id):
         # Just create the result object, and pull values out once.
         # (If we check them later, the state and result may have changed.)
         result = AsyncResult(task_id)
-        result_state = result.state
-        returned_result = result.result
-        result_traceback = result.traceback
-
-        # Assume we don't always update the CourseTaskLog entry if we don't have to:
-        entry_needs_saving = False
-
-        if result_state == 'PROGRESS':
-            # construct a status message directly from the task result's result:
-            if hasattr(result, 'result') and 'attempted' in returned_result:
-                fmt = "Attempted {attempted} of {total}, {action_name} {updated}"
-                message = fmt.format(attempted=returned_result['attempted'],
-                                     updated=returned_result['updated'],
-                                     total=returned_result['total'],
-                                     action_name=returned_result['action_name'])
-                output['message'] = message
-                log.info("task progress: {0}".format(message))
-            else:
-                log.info("still making progress... ")
-            output['task_progress'] = returned_result
-
-        elif result_state == 'SUCCESS':
-            # on success, save out the result here, but the message
-            # will be calculated later
-            output['task_progress'] = returned_result
-            course_task_log_entry.task_progress = json.dumps(returned_result)
-            log.info("task succeeded: {0}".format(returned_result))
-            entry_needs_saving = True
-
-        elif result_state == 'FAILURE':
-            # on failure, the result's result contains the exception that caused the failure
-            exception = str(returned_result)
-            course_task_log_entry.task_progress = exception
-            entry_needs_saving = True
-            output['message'] = exception
-            log.info("task failed: {0}".format(returned_result))
-            if result_traceback is not None:
-                output['task_traceback'] = result_traceback
-
-        # always update the entry if the state has changed:
-        if result_state != course_task_log_entry.task_state:
-            course_task_log_entry.task_state = result_state
-            entry_needs_saving = True
-
-        if entry_needs_saving:
-            course_task_log_entry.save()
-    else:
+        output.update(_update_course_task_log(course_task_log_entry, result))
+    elif course_task_log_entry.task_progress is not None:
         # task is already known to have finished, but report on its status:
-        if course_task_log_entry.task_progress is not None:
-            output['task_progress'] = json.loads(course_task_log_entry.task_progress)
+        output['task_progress'] = json.loads(course_task_log_entry.task_progress)
+        if course_task_log_entry.task_state == 'FAILURE':
+            output['message'] = output['task_progress']['message']
 
     # output basic information matching what's stored in CourseTaskLog:
     output['task_id'] = course_task_log_entry.task_id
@@ -274,14 +295,48 @@ def _get_task_completion_message(course_task_log_entry):
     return (succeeded, message)
 
 
+########### Add task-submission methods here:
+
+
+def submit_regrade_problem_for_student(request, course_id, problem_url, student):
+    """
+    Request a problem to be regraded as a background task.
+
+    The problem will be regraded for the specified student only.  Parameters are the `course_id`,
+    the `problem_url`, and the `student` as a User object.
+    The url must specify the location of the problem, using i4x-type notation.
+
+    An exception is thrown if the problem doesn't exist, or if the particular
+    problem is already being regraded for this student.
+    """
+    # check arguments:  make sure that the problem_url is defined
+    # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
+    # an exception will be raised.  Let it pass up to the caller.
+    modulestore().get_instance(course_id, problem_url)
+
+    task_name = 'regrade_problem'
+
+    # check to see if task is already running, and reserve it otherwise
+    course_task_log = _reserve_task(course_id, task_name, problem_url, request.user, student)
+
+    # Submit task:
+    task_args = [course_id, problem_url, student.username, _get_xmodule_instance_args(request)]
+    task_result = regrade_problem_for_student.apply_async(task_args)
+
+    # Update info in table with the resulting task_id (and state).
+    _update_task(course_task_log, task_result)
+
+    return course_task_log
+
+
 def submit_regrade_problem_for_all_students(request, course_id, problem_url):
     """
     Request a problem to be regraded as a background task.
 
     The problem will be regraded for all students who have accessed the
-    particular problem in a course.  Parameters are the `course_id` and
-    the `problem_url`.  The url must specify the location of the problem,
-    using i4x-type notation.
+    particular problem in a course and have provided and checked an answer.
+    Parameters are the `course_id` and the `problem_url`.
+    The url must specify the location of the problem, using i4x-type notation.
 
     An exception is thrown if the problem doesn't exist, or if the particular
     problem is already being regraded.
@@ -299,6 +354,70 @@ def submit_regrade_problem_for_all_students(request, course_id, problem_url):
     # Submit task:
     task_args = [course_id, problem_url, _get_xmodule_instance_args(request)]
     task_result = regrade_problem_for_all_students.apply_async(task_args)
+
+    # Update info in table with the resulting task_id (and state).
+    _update_task(course_task_log, task_result)
+
+    return course_task_log
+
+
+def submit_reset_problem_attempts_for_all_students(request, course_id, problem_url):
+    """
+    Request to have attempts reset for a problem as a background task.
+
+    The problem's attempts will be reset for all students who have accessed the
+    particular problem in a course.  Parameters are the `course_id` and
+    the `problem_url`.  The url must specify the location of the problem,
+    using i4x-type notation.
+
+    An exception is thrown if the problem doesn't exist, or if the particular
+    problem is already being reset.
+    """
+    # check arguments:  make sure that the problem_url is defined
+    # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
+    # an exception will be raised.  Let it pass up to the caller.
+    modulestore().get_instance(course_id, problem_url)
+
+    task_name = 'reset_problem_attempts'
+
+    # check to see if task is already running, and reserve it otherwise
+    course_task_log = _reserve_task(course_id, task_name, problem_url, request.user)
+
+    # Submit task:
+    task_args = [course_id, problem_url, _get_xmodule_instance_args(request)]
+    task_result = reset_problem_attempts_for_all_students.apply_async(task_args)
+
+    # Update info in table with the resulting task_id (and state).
+    _update_task(course_task_log, task_result)
+
+    return course_task_log
+
+
+def submit_delete_problem_state_for_all_students(request, course_id, problem_url):
+    """
+    Request to have state deleted for a problem as a background task.
+
+    The problem's state will be deleted for all students who have accessed the
+    particular problem in a course.  Parameters are the `course_id` and
+    the `problem_url`.  The url must specify the location of the problem,
+    using i4x-type notation.
+
+    An exception is thrown if the problem doesn't exist, or if the particular
+    problem is already being deleted.
+    """
+    # check arguments:  make sure that the problem_url is defined
+    # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
+    # an exception will be raised.  Let it pass up to the caller.
+    modulestore().get_instance(course_id, problem_url)
+
+    task_name = 'delete_problem_state'
+
+    # check to see if task is already running, and reserve it otherwise
+    course_task_log = _reserve_task(course_id, task_name, problem_url, request.user)
+
+    # Submit task:
+    task_args = [course_id, problem_url, _get_xmodule_instance_args(request)]
+    task_result = delete_problem_state_for_all_students.apply_async(task_args)
 
     # Update info in table with the resulting task_id (and state).
     _update_task(course_task_log, task_result)
