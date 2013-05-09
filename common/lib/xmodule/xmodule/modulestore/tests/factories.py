@@ -44,7 +44,7 @@ class CourseFactory(factory.Factory):
 
         # Write the data to the mongo datastore
         new_course = modulestore().create_course(org, prettyid, user_id, metadata=metadata,
-            course_data=data)
+            course_data=data, id_root=prettyid)
 
         return new_course
 

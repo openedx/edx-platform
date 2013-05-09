@@ -1047,17 +1047,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
             is_updated = True
         # check metadata
         if not is_updated:
-            original_metadata = original_entry['metadata']
-            original_keys = original_metadata.keys()
-            new_metadata = descriptor.xblock_kvs().get_own_metadata()
-            if len(new_metadata) != len(original_keys):
-                is_updated = True
-            else:
-                new_keys = new_metadata.keys()
-                for key in original_keys:
-                    if key not in new_keys or original_metadata[key] != new_metadata[key]:
-                        is_updated = True
-                        break
+            is_updated = self._compare_metadata(descriptor.xblock_kvs().get_own_metadata(), original_entry['metadata'])
+
         # if updated, rev the structure
         if is_updated:
             new_structure = self._version_structure(original_structure, user_id)
@@ -1079,6 +1070,98 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             # nothing changed, just return the one sent in
             return descriptor
+
+    def persist_xblock_dag(self, xblock, user_id, force=False):
+        """
+        create or update the xblock and all of its children. The xblock's location must specify a course.
+        If it doesn't specify a usage_id, then it's presumed to be new and need creation. This function
+        descends the children performing the same operation for any that are xblocks. Any children which
+        are usage_ids just update the children pointer.
+
+        All updates go into the same course version (bulk updater).
+
+        Updates the objects which came in w/ updated location and definition_location info.
+
+        returns the post-persisted version of the incoming xblock. Note that its children will be ids not
+        objects.
+
+        :param xblock:
+        :param user_id:
+        """
+        # find course_index entry if applicable and structures entry
+        index_entry = self._get_index_if_valid(xblock.location, force)
+        structure = self._lookup_course(xblock.location)
+        new_structure = self._version_structure(structure, user_id)
+
+        is_updated = self._persist_subdag(xblock, user_id, new_structure['blocks'])
+
+        if is_updated:
+            new_id = self.structures.insert(new_structure)
+
+            # update the index entry if appropriate
+            if index_entry is not None and structure["_id"] == index_entry["draftVersion"]:
+                index_entry["draftVersion"] = new_id
+                self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
+
+            # fetch and return the new item--fetching is unnecessary but a good qc step
+            return self.get_item(BlockUsageLocator(xblock.location, version_guid=new_id))
+        else:
+            return xblock
+
+    def _persist_subdag(self, xblock, user_id, structure_blocks):
+        # persist the definition if persisted != passed
+        new_def_data = xblock.xblock_kvs().get_data()
+        if (xblock.definition_locator is None or xblock.definition_locator.def_id is None):
+            xblock.definition_locator = self.create_definition_from_data(new_def_data,
+                xblock.category, user_id)
+            is_updated = True
+        elif new_def_data is not None:
+            xblock.definition_locator, is_updated = self.update_definition_from_data(xblock.definition_locator,
+                new_def_data, user_id)
+
+        if xblock.location.usage_id is None:
+            # generate an id
+            is_updated = True
+            usage_id = self._generate_usage_id(structure_blocks, xblock.category)
+            xblock.location.usage_id = usage_id
+        else:
+            usage_id = xblock.location.usage_id
+            if (not is_updated and xblock.has_children
+                and not self._lists_equal(structure_blocks[usage_id]['children'], xblock.children)):
+                is_updated = True
+
+        children = []
+        if xblock.has_children:
+            for child in xblock.children:
+                if isinstance(child, XModuleDescriptor):
+                    is_updated = self._persist_subdag(child, user_id, structure_blocks) or is_updated
+                    children.append(child.location.usage_id)
+                else:
+                    children.append(child)
+
+        metadata = xblock.xblock_kvs().get_own_metadata()
+        if not is_updated:
+            is_updated = self._compare_metadata(metadata, structure_blocks[usage_id]['metadata'])
+
+        if is_updated:
+            structure_blocks[usage_id] = {
+                "children": children,
+                "category": xblock.category,
+                "definition": xblock.definition_locator.def_id,
+                "metadata": metadata if metadata else {}
+            }
+
+        return is_updated
+
+    def _compare_metadata(self, metadata, original_metadata):
+        original_keys = original_metadata.keys()
+        if len(metadata) != len(original_keys):
+            return True
+        else:
+            new_keys = metadata.keys()
+            for key in original_keys:
+                if key not in new_keys or original_metadata[key] != metadata[key]:
+                    return True
 
     # TODO change all callers to update_item
     def update_children(self, course_id, location, children):

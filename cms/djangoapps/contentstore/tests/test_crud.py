@@ -78,3 +78,31 @@ class TemplateTests(unittest.TestCase):
         self.assertIsInstance(test_problem, CapaDescriptor)
         self.assertEqual(test_problem.data, test_def_content)
         self.assertIn(test_problem, test_chapter.get_children())
+        test_problem.display_name = 'test problem'
+        self.assertEqual(test_problem.display_name, 'test problem')
+
+    def test_persist_dag(self):
+        """
+        try saving temporary xblocks
+        """
+        test_course = factories.CourseFactory.create(org='testx', prettyid='tempcourse',
+            display_name='fun test course', user_id='testbot')
+        test_chapter = XModuleDescriptor.load_from_json({'category': 'chapter',
+            'metadata': {'display_name': 'chapter n'}},
+            test_course.system, parent_xblock=test_course)
+        test_def_content = '<problem>boo</problem>'
+        test_problem = XModuleDescriptor.load_from_json({'category': 'problem',
+            'definition': {'data': test_def_content}},
+            test_course.system, parent_xblock=test_chapter)
+        # better to pass in persisted parent over the subdag so
+        # subdag gets the parent pointer (otherwise 2 ops, persist dag, update parent children,
+        # persist parent
+        persisted_course = modulestore().persist_xblock_dag(test_course, 'testbot')
+        self.assertEqual(len(persisted_course.children), 1)
+        persisted_chapter = persisted_course.get_children()[0]
+        self.assertEqual(persisted_chapter.category, 'chapter')
+        self.assertEqual(persisted_chapter.display_name, 'chapter n')
+        self.assertEqual(len(persisted_chapter.children), 1)
+        persisted_problem = persisted_chapter.get_children()[0]
+        self.assertEqual(persisted_problem.category, 'problem')
+        self.assertEqual(persisted_problem.data, test_def_content)
