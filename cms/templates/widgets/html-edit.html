@@ -1,14 +1,14 @@
 <%include file="metadata-edit.html" />
 <div class="wrapper-comp-editor" id="editor-tab">
-<section class="html-editor editor">
-  <ul class="editor-tabs">
-    <li><a href="#" class="visual-tab tab current" data-tab="visual">Visual</a></li>
-    <li><a href="#" class="html-tab tab" data-tab="advanced">HTML</a></li>
-  </ul>
-  
-  <div class="row">
-    <textarea class="tiny-mce">${data | h}</textarea>
-    <textarea name="" class="edit-box">${data | h}</textarea>
-  </div>
-</section>
+    <section class="html-editor editor">
+      <ul class="editor-tabs">
+        <li><a href="#" class="visual-tab tab current" data-tab="visual">Visual</a></li>
+        <li><a href="#" class="html-tab tab" data-tab="advanced">HTML</a></li>
+      </ul>
+
+      <div class="row">
+        <textarea class="tiny-mce">${data | h}</textarea>
+        <textarea name="" class="edit-box">${data | h}</textarea>
+      </div>
+    </section>
 </div>
