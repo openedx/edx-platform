@@ -463,7 +463,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
 
     # ================================= JSON PARSING ===========================
-    # TODO reconcile w/ and consolidate w/ split_mongo.CachingDescriptorSystem._load_item
     @staticmethod
     def load_from_json(json_data, system, default_class=None, parent_xblock=None):
         """

@@ -1,8 +1,7 @@
 from . import ModuleStoreBase
-from .exceptions import ItemNotFoundError, DuplicateItemError
+from .exceptions import ItemNotFoundError
 from importlib import import_module
 from path import path
-from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
@@ -1043,7 +1042,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # check children
         original_entry = original_structure['blocks'][descriptor.location.usage_id]
         if (not is_updated and descriptor.has_children
-            and not self._lists_equal(original_entry['children'], descriptor.children)):
+            and not self._xblock_lists_equal(original_entry['children'], descriptor.children)):
             is_updated = True
         # check metadata
         if not is_updated:
@@ -1054,7 +1053,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             new_structure = self._version_structure(original_structure, user_id)
             block_data = new_structure['blocks'][descriptor.location.usage_id]
             if descriptor.has_children:
-                block_data["children"] = descriptor.children
+                block_data["children"] = [self._usage_id(child) for child in descriptor.children]
 
             block_data["definition"] = descriptor.definition_locator.def_id
             block_data["metadata"] = descriptor.xblock_kvs().get_own_metadata()
@@ -1127,7 +1126,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             usage_id = xblock.location.usage_id
             if (not is_updated and xblock.has_children
-                and not self._lists_equal(structure_blocks[usage_id]['children'], xblock.children)):
+                and not self._xblock_lists_equal(structure_blocks[usage_id]['children'], xblock.children)):
                 is_updated = True
 
         children = []
@@ -1354,10 +1353,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return criteria == target
 
-    def _lists_equal(self, lista, listb):
+    def _xblock_lists_equal(self, lista, listb):
         """
-        The obvious function but local b/c I don't want some arcane method in the persistence layer
-        becoming the universal util
+        Do the 2 lists refer to the same xblocks in the same order (presumes they're from the
+        same course)
+
         :param lista:
         :param listb:
         """
@@ -1365,8 +1365,20 @@ class SplitMongoModuleStore(ModuleStoreBase):
             return False
         for idx in enumerate(lista):
             if lista[idx] != listb[idx]:
-                return False
+                itema = self._usage_id(lista[idx])
+                if itema != self._usage_id(listb[idx]):
+                    return False
         return True
+
+    def _usage_id(self, xblock_or_id):
+        """
+        arg is either an xblock or an id. If an xblock, get the usage_id from its location. Otherwise, return itself.
+        :param xblock_or_id:
+        """
+        if isinstance(xblock_or_id, XModuleDescriptor):
+            return xblock_or_id.location.usage_id
+        else:
+            return xblock_or_id
 
     def _get_index_if_valid(self, locator, force=False):
         """
