@@ -13,6 +13,10 @@ body.course.unit {
   }
   //end problem selector reqs
 
+
+  // Unit Page Main Column
+  // ====================
+
   .main-column {
     clear: both;
     float: left;
@@ -30,6 +34,9 @@ body.course.unit {
   }
 
   .unit-body {
+
+    // Unit Page Name
+    // ====================
 
     .unit-name-input {
       padding: 20px 40px;
@@ -73,6 +80,10 @@ body.course.unit {
       letter-spacing: 1px;
       text-transform: uppercase;
     }
+    
+    // Component List Meta
+    // ====================
+    // TODO: clean up organization of this page, to many levels/duplication
 
     .components {
 
@@ -81,8 +92,6 @@ body.course.unit {
         z-index: 10;
         margin: 20px 40px;
 
-
-
         .title {
           margin: 0 0 15px 0;
           color: $mediumGrey;
@@ -90,6 +99,9 @@ body.course.unit {
           .value {
           }
         }
+
+        // New Components
+        // ====================
 
         &.new-component-item {
           margin: 20px 0px;
@@ -355,6 +367,9 @@ body.course.unit {
       }
     }
 
+    // Component Drag and Drop, Non-Edit Module Rendering, Styling
+    // ====================
+
     .component {
       border: 1px solid $lightBluishGrey2;
       border-radius: 3px;
@@ -410,32 +425,21 @@ body.course.unit {
       }
     }
 
+    // Component Editing
+    // ====================
+
     .wrapper-component-editor {
       z-index: 9999;
       position: relative;
-      background: $lightBluishGrey2;
+      background: $white;
     }
 
     .component-editor {
       @include edit-box;
       @include box-shadow(none);
       display: none;
-      padding: 20px;
+      padding: 0;
       border-radius: 2px 2px 0 0;
-
-      .metadata_edit {
-        margin-bottom: 20px;
-        font-size: 13px;
-
-        li {
-          margin-bottom: 10px;
-        }
-
-        label {
-          display: inline-block;
-          margin-right: 10px;
-        }
-      }
 
       h3 {
         margin-bottom: 10px;
@@ -449,214 +453,270 @@ body.course.unit {
         font-weight: 700;
       }
 
-      .save-button {
-        margin-top: 10px;
+      // Module Actions
+      .module-actions {
+        @include box-shadow(inset 0 1px 1px $shadow);
+        padding: 0px 0 10px 10px;
+        background-color: $gray-l4;
+
+        .save-button {
         margin: 15px 8px 0 0;
-      }
-    }
-  }
-
-  .unit-settings {
-    .window-contents {
-      padding: 10px 20px;
-    }
-
-    .unit-actions {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .published-alert {
-      display: none;
-      padding: 10px;
-      border: 1px solid #edbd3c;
-      border-radius: 3px;
-      background: #fbf6e1;
-      font-size: 14px;
-      line-height: 1.4;
-
-      div {
-        margin-top: 15px;
-      }
-    }
-
-    input[type="radio"] {
-        margin-right: 7px;
-    }
-
-    .status {
-      font-size: 12px;
-
-      strong {
-        font-weight: 700;
-      }
-    }
-
-    .preview-button, .view-button {
-      @include white-button;
-      margin-bottom: 10px;
-    }
-
-    .publish-button {
-      @include orange-button;
-    }
-
-    .delete-button {
-      @include blue-button;
-    }
-
-    .delete-draft {
-      display: inline-block;
-    }
-
-    .delete-button,
-    .preview-button,
-    .publish-button,
-    .view-button {
-      font-size: 11px;
-      margin-top: 10px;
-      padding: 6px 15px 8px;
-    }
-  }
-
-  .unit-history {
-    &.collapsed {
-      h4 {
-        border-bottom: none;
-        border-radius: 3px;
-      }
-
-      .window-contents {
-        display: none;
-      }
-    }
-
-    ol {
-      border: 1px solid #ced2db;
-
-      li {
-        display: block;
-        padding: 6px 8px 8px 10px;
-        background: #edf1f5;
-        font-size: 12px;
-
-        &:hover {
-          background: #fffcf1;
-
-          .item-actions {
-            display: block;
-          }
-        }
-
-        &.checked {
-          background: #d1dae3;
-        }
-
-        .item-actions {
-          display: none;
-        }
-
-        input[type="radio"] {
-          margin-right: 7px;
-        }
-      }
-    }
-  }
-
-  .unit-location {
-    .url {
-      width: 100%;
-      margin-bottom: 10px;
-      @include box-shadow(none);
-    }
-
-    .draft-tag,
-    .hidden-tag,
-    .private-tag,
-    .has-new-draft-tag {
-      font-size: 8px;
-    }
-
-    .window-contents > ol {
-      @include tree-view;
-
-      .section-item {
-        display: inline-block;
-        width: 100%;
-        font-size: 11px;
-        padding: 2px 8px 4px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        @include box-sizing(border-box);
-      }
-
-      ol {
-        .section-item {
-          padding-left: 20px;
-        }
-
-        .new-unit-item {
-          margin-left: 20px;
         }
       }
 
-      ol ol {
-        .section-item {
-          padding-left: 34px;
-        }
 
-        .new-unit-item {
-          margin: 0 0 10px 41px;
-        }
-      }
-    }
-  }
-
-  .edit-state-draft {
-    .visibility,
-
-    .edit-draft-message,
-    .view-button {
-      display: none;
-    }
-
-    .published-alert {
-      display: block;
-    }
-  }
-
-  .edit-state-public {
-    .delete-draft,
-    .component-actions,
-    .new-component-item,
-    .editing-draft-alert,
-    .publish-draft-message,
-    .preview-button {
-      display: none;
-    }
-
-    .published-alert {
-      display: block;
-    }
-
-    .drag-handle {
-      display: none !important;
-    }
-  }
-
-  .edit-state-private {
-    .delete-draft,
-    .publish-draft,
-    .editing-draft-alert,
-    .create-draft,
-    .view-button {
-      display: none;
     }
   }
 }
 
-// editing units from courseware
+// Edit Header (Component Name, Mode-Editor, Mode-Settings)
+
+.component-edit-header {
+  @include box-sizing(border-box);
+  padding: 15px 0 15px 20px;
+  top: 0;
+  right: 0;
+  border-bottom: 1px solid $gray-l2;
+  background-color: $blue;
+  color: $white;
+  box-shadow: 0 1px 2px rgba(182, 182, 182, 0.75) inset;
+
+  //Component Name
+  .component-name {
+    @extend .t-copy-sub1;
+    color: $white;
+    width: 50%;
+
+    em {
+      font-weight: 600;
+      color: $white;
+    }
+  }
+
+  //Nav-Edit Modes
+  .nav-edit-modes {
+    list-style: none;
+    right: 0;
+    top: 0;
+    position: absolute;
+    padding: 10px;
+
+    .mode {
+      display: inline-block;
+
+      .inactive-mode {
+        display: none;
+      }
+
+      .active-mode {
+        @include blue-button;
+      }
+
+      .is-set {
+        @include linear-gradient($blue, $blue);
+        box-shadow: inset 0 0 3px $shadow;
+        background-color: $blue;
+
+        cursor: default;
+
+        &:hover {
+          box-shadow: inset 0 0 3px $shadow;
+          background-color: $blue;
+        }
+      }
+    }
+  }
+}
+
+// Editor Wrapper
+.wrapper-comp-editor {
+  //TO-DO 
+}
+
+// Settings Wrapper
+.wrapper-comp-settings {
+
+  //settings-list
+  .list-input.settings-list { 
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    overflow: auto;
+    max-height: 400px;
+
+    //chrome scrollbar visibility correction
+    &::-webkit-scrollbar {
+      -webkit-appearance: none;
+      width: 11px;
+      height: 11px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 8px;
+      border: 2px solid $gray-l2;
+      background-color: rgba(0, 0, 0, .5);
+    }
+
+    //component-setting-entry 
+    .field.comp-setting-entry {
+      //margin: 0 0 $baseline 0; WILL BE REMOVED PRIOR TO PUSH
+      background-color: $white;
+      padding: 20px;
+      border-bottom: 1px solid $gray-l2;
+      opacity: .6;
+
+      &:last-child {
+        //margin-bottom: 0;
+      }
+
+      //no required component settings currently
+      &.required {
+        label {
+          //font-weight: 600;
+        }
+        label:after {
+          //margin-left: ($baseline/4);
+          //content: "*";
+        }
+      }
+
+      &:hover {
+        //TO-DO review existing patterns for hover on field
+        @include transition(opacity 0.25s ease-in-out);
+        opacity: 1;
+      }
+
+      &.is-set {
+        opacity: 1;
+        background-color: $white;
+
+        //setting-label
+        .setting-label {
+          //color: $blue-l1;
+        }
+
+        //setting-input
+        .setting-input {
+          color: $blue-l1;
+        }
+        
+        //setting-clear
+        .setting-clear {
+          //...
+        }
+      }
+
+      .wrapper-comp-setting{
+        display: inline-block;
+        width: 360px;
+        top: 0;
+        vertical-align: top;
+      }
+
+      label.setting-label {
+        @extend .t-copy-sub1;
+        @include transition(color, 0.15s, ease-in-out);
+        //margin: 0 0 ($baseline/4) 0; WILL BE REMOVED PRIOR TO PUSH
+        font-weight: 400;
+
+        display: inline-block;
+        position: relative;
+        left: 0;
+        min-width: 100px;
+        width: 35%;
+
+        &.is-focused {
+          color: $blue;
+        }
+      }
+
+      input, select {
+        @include placeholder($gray-l4);
+        @include font-size(16);
+        @include size(100%,100%);
+        padding: ($baseline/2);
+        min-width: 100px;
+        width: 45%;
+
+        //&.long {
+          //
+        //}
+
+        //&.short {
+        //}
+
+        //&.error {
+        // border-color: $red;
+        //}
+
+        //&:focus {
+        //  + .tip {
+        //    color: $gray;
+        //  }
+        border-radius: 3px;
+        border: 1px solid $gray-l2;
+        text-overflow: ellipsis;
+      }
+
+      select {
+        //border: 1px solid $gray-l2;
+        background: none repeat scroll #F2F2F2;
+        @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+
+        &:focus {
+          @include box-shadow(0 0 1px $shadow);
+          @include transition(opacity 0.25s ease-in-out);
+          background-color: #FFFCF1;
+        }
+
+        &:active {
+          background-color: #FFFCF1;
+        }
+      }
+
+      //input[type=others]
+
+      .action.setting-clear {
+        @include font-size(11);
+        color: $gray;
+        width: 25px;
+        height: 25px;
+        vertical-align: middle;
+        padding: 5px;
+        border-radius: 50%;
+        margin: 0 10px;
+        box-shadow: none;
+        text-shadow: none;
+        border: 1px solid $gray-l4;
+
+        &:hover {
+          @include box-shadow(0 1px 1px $shadow);
+          @include transition(opacity 0.25s ease-in-out);
+          background-color: $blue-s3;
+          border: 1px solid $blue-s3;
+          color: $white;
+        }
+
+        &.inactive {
+          visibility: hidden;
+        }
+      }
+
+      tip.setting-help {
+        @include font-size(12);
+        display: inline-block;
+        font-color: $gray-l6;
+        //max-width: 50%;
+        vertical-align: top;
+      }
+    }
+  }
+}
+
+// Editing Units from Courseware  
+// ====================
+
 body.unit {
 
   .component {
@@ -676,5 +736,224 @@ body.unit {
     &.editing {
       padding-top: 0;
     }
+  }
+}
+
+// Unit Page Sidebar  
+// ====================
+
+.unit-settings {
+  .window-contents {
+    padding: 10px 20px;
+  }
+
+  .unit-actions {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .published-alert {
+    display: none;
+    padding: 10px;
+    border: 1px solid #edbd3c;
+    border-radius: 3px;
+    background: #fbf6e1;
+    font-size: 14px;
+    line-height: 1.4;
+
+    div {
+      margin-top: 15px;
+    }
+  }
+
+  input[type="radio"] {
+      margin-right: 7px;
+  }
+
+  .status {
+    font-size: 12px;
+
+    strong {
+      font-weight: 700;
+    }
+  }
+
+  .preview-button, .view-button {
+    @include white-button;
+    margin-bottom: 10px;
+  }
+
+  .publish-button {
+    @include orange-button;
+  }
+
+  .delete-button {
+    @include blue-button;
+  }
+
+  .delete-draft {
+    display: inline-block;
+  }
+
+  .delete-button,
+  .preview-button,
+  .publish-button,
+  .view-button {
+    font-size: 11px;
+    margin-top: 10px;
+    padding: 6px 15px 8px;
+  }
+}
+
+.unit-history {
+  &.collapsed {
+    h4 {
+      border-bottom: none;
+      border-radius: 3px;
+    }
+
+    .window-contents {
+      display: none;
+    }
+  }
+
+  ol {
+    border: 1px solid #ced2db;
+
+    li {
+      display: block;
+      padding: 6px 8px 8px 10px;
+      background: #edf1f5;
+      font-size: 12px;
+
+      &:hover {
+        background: #fffcf1;
+
+        .item-actions {
+          display: block;
+        }
+      }
+
+      &.checked {
+        background: #d1dae3;
+      }
+
+      .item-actions {
+        display: none;
+      }
+
+      input[type="radio"] {
+        margin-right: 7px;
+      }
+    }
+  }
+}
+
+.unit-location {
+  .url {
+    @include box-shadow(none);
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .draft-tag,
+  .hidden-tag,
+  .private-tag,
+  .has-new-draft-tag {
+    font-size: 8px;
+  }
+
+  .window-contents > ol {
+    @include tree-view;
+
+    .section-item {
+      @include box-sizing(border-box);
+      display: inline-block;
+      width: 100%;
+      font-size: 11px;
+      padding: 2px 8px 4px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    ol {
+      .section-item {
+        padding-left: 20px;
+      }
+
+      .new-unit-item {
+        margin-left: 20px;
+      }
+    }
+
+    ol ol {
+      .section-item {
+        padding-left: 34px;
+      }
+
+      .new-unit-item {
+        margin: 0 0 10px 41px;
+      }
+    }
+  }
+}
+
+.edit-state-draft {
+  .visibility,
+
+  .edit-draft-message,
+  .view-button {
+    display: none;
+  }
+
+  .published-alert {
+    display: block;
+  }
+}
+
+.edit-state-public {
+  .delete-draft,
+  .component-actions,
+  .new-component-item,
+  .editing-draft-alert,
+  .publish-draft-message,
+  .preview-button {
+    display: none;
+  }
+
+  .published-alert {
+    display: block;
+  }
+
+  .drag-handle {
+    display: none !important;
+  }
+}
+
+.edit-state-private {
+  .delete-draft,
+  .publish-draft,
+  .editing-draft-alert,
+  .create-draft,
+  .view-button {
+    display: none;
+  }
+}
+
+
+//OLD Meta-data Styling
+//TO-DO port over old styling
+.metadata_edit {
+  margin-bottom: 20px;
+  font-size: 13px;
+
+  li {
+    margin-bottom: 10px;
+  }
+
+  label {
+    display: inline-block;
+    margin-right: 10px;
   }
 }
