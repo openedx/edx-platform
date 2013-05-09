@@ -560,7 +560,6 @@ body.course.unit {
 
     //component-setting-entry 
     .field.comp-setting-entry {
-      //margin: 0 0 $baseline 0; WILL BE REMOVED PRIOR TO PUSH
       background-color: $white;
       padding: 20px;
       border-bottom: 1px solid $gray-l2;
@@ -945,12 +944,6 @@ body.unit {
 //OLD Meta-data Styling
 //TO-DO port over old styling
 .metadata_edit {
-  margin-bottom: 20px;
-  font-size: 13px;
-
-  li {
-    margin-bottom: 10px;
-  }
 
   label {
     display: inline-block;
