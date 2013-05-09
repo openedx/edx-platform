@@ -5,7 +5,8 @@ CMS.Models.SystemFeedback = Backbone.Model.extend({
         "message": null,
         "shown": true,
         "close": false,  // show a close button?
-        "icon": true  // show an icon?
+        "icon": true,  // show an icon?
+        "status": false  // example: "saving" popup
         /* could also have an "actions" hash: here is an example demonstrating
            the expected structure
         "actions": {

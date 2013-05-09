@@ -54,7 +54,11 @@
     <!-- templates -->
     <%text>
     <script id="system-feedback-tpl" type="text/template">
-<div class="wrapper wrapper-<%= viewType %> wrapper-<%= viewType %>-<%= modelType %> <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>"
+<div class="wrapper
+            wrapper-<%= viewType %>
+            wrapper-<%= viewType %>-<%= modelType %>
+            <% if(obj.status) { %>wrapper-<%= viewType %>-status <% } %>
+            <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>"
      id="<%= viewType %>-<%= modelType %>"
      aria-hidden="<% if(obj.shown) { %>false<% } else { %>true<% } %>"
      aria-labelledby="<%= viewType %>-<%= modelType %>-title"
@@ -63,7 +67,7 @@
   >
   <div class="<%= modelType %> <%= viewType %> <% if(obj.actions) { %>has-actions <% } %>">
     <% if (icon) { %>
-      <% var iconText = {"warning": "&#x26A0;", "confirmation": "&#x2713;", "error": "&#x26A0;", "announcement": "&#x1F4E2;", "step-required": "&#xE0D1", "help": "&#x2753;"} %>
+      <% var iconText = {"warning": "&#x26A0;", "confirmation": "&#x2713;", "error": "&#x26A0;", "announcement": "&#x1F4E2;", "step-required": "&#xE0D1", "help": "&#x2753;", "saving": "&#x2699;"} %>
       <i class="ss-icon ss-symbolicons-block icon icon-<%= modelType %>"><%= iconText[modelType] %></i>
     <% } %>
 
