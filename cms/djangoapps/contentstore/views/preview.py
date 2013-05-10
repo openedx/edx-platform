@@ -1,5 +1,4 @@
 import logging, sys
-import static_replace
 from functools import partial
 
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
@@ -17,6 +16,7 @@ from xmodule.modulestore.mongo import MongoUsage
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import DbModel
 
+import static_replace
 from session_kv_store import SessionKeyValueStore
 from requests import render_from_lms
 from access import has_access
