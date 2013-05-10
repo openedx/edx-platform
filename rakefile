@@ -513,14 +513,12 @@ end
 namespace :i18n do
 
   desc "Extract localizable strings from sources"
-  task :extract do
-    Rake::Task["i18n:validate:gettext"].execute
+  task :extract => "i18n:validate:gettext" do
     sh(File.join(REPO_ROOT, "i18n", "extract.py"))
   end
 
   desc "Compile localizable strings from sources. With optional flag 'extract', will extract strings first."
-  task :generate do
-    Rake::Task["i18n:validate:gettext"].execute
+  task :generate => "i18n:validate:gettext" do
     if ARGV.last.downcase == 'extract'
       Rake::Task["i18n:extract"].execute
     end
@@ -579,8 +577,7 @@ namespace :i18n do
   end
 
   desc "Run tests for the internationalization library"
-  task :test do
-    Rake::Task["i18n:validate:gettext"].execute
+  task :test => "i18n:validate:gettext" do
     test = File.join(REPO_ROOT, "i18n", "tests")
     sh("nosetests #{test}")
   end
