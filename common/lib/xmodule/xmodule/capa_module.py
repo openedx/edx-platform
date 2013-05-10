@@ -655,7 +655,7 @@ class CapaModule(CapaFields, XModule):
     @staticmethod
     def make_dict_of_responses(get):
         '''Make dictionary of student responses (aka "answers")
-        get is POST dictionary (Djano QueryDict).
+        get is POST dictionary (Django QueryDict).
 
         The *get* dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
@@ -739,13 +739,13 @@ class CapaModule(CapaFields, XModule):
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
-            self.system.track_function('save_problem_check_fail', event_info)
+            self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem is closed')
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
-            self.system.track_function('save_problem_check_fail', event_info)
+            self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem must be reset before it can be checked again')
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
@@ -800,7 +800,7 @@ class CapaModule(CapaFields, XModule):
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
-        self.system.track_function('save_problem_check', event_info)
+        self.system.track_function('problem_check', event_info)
 
         if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
             self.system.psychometrics_handler(self.get_state_for_lcp())
@@ -813,20 +813,32 @@ class CapaModule(CapaFields, XModule):
                 }
 
     def regrade_problem(self):
-        ''' Checks whether answers to a problem are correct, and
-            returns a map of correct/incorrect answers:
+        """
+        Checks whether the existing answers to a problem are correct.
 
-            {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
-             'contents' : html}
-            '''
+        This is called when the correct answer to a problem has been changed,
+        and the grade should be re-evaluated.
+
+        Returns a dict with one key:
+            {'success' : 'correct' | 'incorrect' | AJAX alert msg string }
+
+        Raises NotFoundError if called on a problem that has not yet been answered
+        (since this is avoidable).  Returns the error messages for exceptions
+        occurring while performing the regrading, rather than throwing them.
+        """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
 
         if not self.done:
             event_info['failure'] = 'unanswered'
-            self.system.track_function('save_problem_regrade_fail', event_info)
+            self.system.track_function('problem_regrade_fail', event_info)
             raise NotFoundError('Problem must be answered before it can be graded again')
+
+        # get old score, for comparison:
+        orig_score = self.lcp.get_score()
+        event_info['orig_score'] = orig_score['score']
+        event_info['orig_max_score'] = orig_score['total']
 
         try:
             correct_map = self.lcp.regrade_existing_answers()
@@ -835,8 +847,12 @@ class CapaModule(CapaFields, XModule):
             self.set_state_from_lcp()
         except StudentInputError as inst:
             log.exception("StudentInputError in capa_module:problem_regrade")
+            event_info['failure'] = 'student_input_error'
+            self.system.track_function('problem_regrade_fail', event_info)
             return {'success': inst.message}
         except Exception, err:
+            event_info['failure'] = 'unexpected'
+            self.system.track_function('problem_regrade_fail', event_info)
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
@@ -844,6 +860,10 @@ class CapaModule(CapaFields, XModule):
             raise
 
         self.publish_grade()
+
+        new_score = self.lcp.get_score()
+        event_info['new_score'] = new_score['score']
+        event_info['new_max_score'] = new_score['total']
 
         # success = correct if ALL questions in this problem are correct
         success = 'correct'
@@ -856,25 +876,20 @@ class CapaModule(CapaFields, XModule):
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
-        self.system.track_function('save_problem_regrade', event_info)
+        self.system.track_function('problem_regrade', event_info)
 
         # TODO: figure out if psychometrics should be called on regrading requests
         if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
             self.system.psychometrics_handler(self.get_instance_state())
 
-        # render problem into HTML
-        html = self.get_problem_html(encapsulate=False)
-
-        return {'success': success,
-                'contents': html,
-                }
+        return {'success': success}
 
     def save_problem(self, get):
-        '''
+        """
         Save the passed in answers.
-        Returns a dict { 'success' : bool, ['error' : error-msg]},
-        with the error key only present if success is False.
-        '''
+        Returns a dict { 'success' : bool, 'msg' : message }
+        The message is informative on success, and an error message on failure.
+        """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
