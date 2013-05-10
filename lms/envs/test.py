@@ -16,7 +16,7 @@ from path import path
 MITX_FEATURES['DISABLE_START_DATES'] = True
 
 # Until we have discussion actually working in test mode, just turn it off
-MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
