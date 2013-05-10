@@ -243,6 +243,12 @@ def run_tests(system, report_dir, stop_on_failure=true)
     end
 end
 
+def run_acceptance_tests(system, report_dir)
+    ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, 'acceptance_tests.xml')
+    sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode'))
+end
+
+
 TEST_TASK_DIRS = []
 
 task :fastlms do
@@ -263,6 +269,12 @@ end
     task "fasttest_#{system}", [:stop_on_failure] => [report_dir, :predjango] do |t, args|
         args.with_defaults(:stop_on_failure => 'true')
         run_tests(system, report_dir, args.stop_on_failure)
+    end
+
+    # Run acceptance tests
+    desc "Run acceptance tests"
+    task "test_acceptance" => ["clean_test_files", "#{system}:gather_assets:acceptance", :predjango, report_dir] do
+        run_acceptance_tests(system, report_dir)
     end
 
     task :fasttest => "fasttest_#{system}"
