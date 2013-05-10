@@ -248,8 +248,8 @@ CMS.Views.SectionEdit = Backbone.View.extend({
             actions: {
                 primary: {
                     text: "Dismiss",
-                    click: function(model) {
-                        model.hide()
+                    click: function() {
+                        this.hide()
                     }
                 }
             }

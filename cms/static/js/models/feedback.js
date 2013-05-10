@@ -13,19 +13,20 @@ CMS.Models.SystemFeedback = Backbone.Model.extend({
             "primary": {
                 "text": "Save",
                 "class": "action-save",
-                "click": function(model) {
+                "click": function() {
                     // do something when Save is clicked
+                    // `this` refers to the model
                 }
             },
             "secondary": [
                 {
                     "text": "Cancel",
                     "class": "action-cancel",
-                    "click": function(model) {}
+                    "click": function() {}
                 }, {
                     "text": "Discard Changes",
                     "class": "action-discard",
-                    "click": function(model) {}
+                    "click": function() {}
                 }
             ]
         }

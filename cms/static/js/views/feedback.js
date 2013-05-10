@@ -26,7 +26,7 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
     primaryClick: function() {
         var primary = this.model.get("actions").primary;
         if(primary.click) {
-            primary.click(this.model);
+            primary.click.call(this.model);
         }
     },
     secondaryClick: function(e) {
@@ -38,7 +38,7 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         var i = _.indexOf(this.$(".action-secondary"), e.target);
         var secondary = this.model.get("actions").secondary[i];
         if(secondary.click) {
-            secondary.click(this.model);
+            secondary.click.call(this.model);
         }
     }
 });

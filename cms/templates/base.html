@@ -117,8 +117,8 @@ $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
         "actions": {
             "primary": {
                 "text": "Dismiss",
-                "click": function(model) {
-                    model.hide();
+                "click": function() {
+                    this.hide();
                 }
             }
         }
