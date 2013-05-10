@@ -562,15 +562,13 @@ namespace :i18n do
 
   namespace :transifex do
     desc "Push source strings to Transifex for translation"
-    task :push do
-      Rake::Task["i18n:validate:transifex_config"].execute
+    task :push => "i18n:validate:transifex_config" do
       cmd = File.join(REPO_ROOT, "i18n", "transifex.py")
       sh("#{cmd} push")
     end
 
     desc "Pull translated strings from Transifex"
-    task :pull do
-      Rake::Task["i18n:validate:transifex_config"].execute
+    task :pull => "i18n:validate:transifex_config" do
       cmd = File.join(REPO_ROOT, "i18n", "transifex.py")
       sh("#{cmd} pull")
     end
