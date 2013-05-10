@@ -945,7 +945,7 @@ class TemplateTestCase(ModuleStoreTestCase):
         self.assertIsNotNone(verify_create)
 
         # now run cleanup
-        update_templates()
+        update_templates(modulestore('direct'))
 
         # now try to find dangling template, it should not be in DB any longer
         asserted = False
