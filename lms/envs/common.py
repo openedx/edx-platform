@@ -91,7 +91,10 @@ MITX_FEATURES = {
 
     # Give a UI to show a student's submission history in a problem by the
     # Staff Debug tool.
-    'ENABLE_STUDENT_HISTORY_VIEW': True
+    'ENABLE_STUDENT_HISTORY_VIEW': True,
+
+    # Provide a UI to allow users to submit feedback from the LMS
+    'ENABLE_FEEDBACK_SUBMISSION': False,
 }
 
 # Used for A/B testing
@@ -263,6 +266,7 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
+SERVER_EMAIL = 'devops@edx.org'
 ADMINS = (
     ('edX Admins', 'admin@edx.org'),
 )
@@ -323,6 +327,14 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 
 PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
 # TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+
+##### Feedback submission mechanism #####
+FEEDBACK_SUBMISSION_EMAIL = None
+
+##### Zendesk #####
+ZENDESK_URL = None
+ZENDESK_USER = None
+ZENDESK_API_KEY = None
 
 ################################# open ended grading config  #####################
 

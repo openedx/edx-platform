@@ -80,6 +80,6 @@ $(document).ready(function(){
     $('section.problem-edit').show();
     return false;
   });
-    
+
 });
 
