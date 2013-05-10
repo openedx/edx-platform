@@ -382,6 +382,10 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         # TODO removed coercion to Location: verify all callers pass right obj
         self.location = location
         self.category = category
+        # update_version is the version which last updated this xblock v prev being the penultimate updater
+        # leaving off original_version since it complicates creation w/o any obv value yet and is computable
+        # by following previous until None
+        self.edited_by = self.edited_on = self.previous_version = self.update_version = None
         self.definition_locator = definition_id
         self._model_data = model_data
 

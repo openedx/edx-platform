@@ -11,7 +11,9 @@
         "blocks":{
             "head12345":{
                 "children":[
-                    "chapter1", "chapter2", "chapter3"
+                    "chapter1",
+                    "chapter2",
+                    "chapter3"
                 ],
                 "category":"course",
                 "definition":"head12345_12",
@@ -51,6 +53,12 @@
                     "data_dir":"MITx-2-Base",
                     "advertised_start":"Fall 2013",
                     "display_name":"The Ancient Greek Hero"
+                },
+                "update_version":"v12345d",
+                "previous_version":"v12345d1",
+                "edited_by":"testassist@edx.org",
+                "edited_on":{
+                    "$date":1364483713238
                 }
             },
             "chapter1":{
@@ -61,6 +69,12 @@
                 "definition":"chapter12345_1",
                 "metadata":{
                     "display_name":"Hercules"
+                },
+                "update_version":"v12345d",
+                "previous_version":null,
+                "edited_by":"testassist@edx.org",
+                "edited_on":{
+                    "$date":1364483713238
                 }
             },
             "chapter2":{
@@ -71,18 +85,31 @@
                 "definition":"chapter12345_2",
                 "metadata":{
                     "display_name":"Hera heckles Hercules"
+                },
+                "update_version":"v12345d",
+                "previous_version":null,
+                "edited_by":"testassist@edx.org",
+                "edited_on":{
+                    "$date":1364483713238
                 }
             },
             "chapter3":{
                 "children":[
-                    "problem1", "problem3_2"
+                    "problem1",
+                    "problem3_2"
                 ],
                 "category":"chapter",
                 "definition":"chapter12345_3",
                 "metadata":{
                     "display_name":"Hera cuckolds Zeus"
+                },
+                "update_version":"v12345d",
+                "previous_version":null,
+                "edited_by":"testassist@edx.org",
+                "edited_on":{
+                    "$date":1364483713238
                 }
-             },
+            },
             "problem1":{
                 "children":[
                     
@@ -92,6 +119,12 @@
                 "metadata":{
                     "display_name":"Problem 3.1",
                     "graceperiod":"4 hours 0 minutes 0 seconds"
+                },
+                "update_version":"v12345d",
+                "previous_version":null,
+                "edited_by":"testassist@edx.org",
+                "edited_on":{
+                    "$date":1364483713238
                 }
             },
             "problem3_2":{
@@ -102,9 +135,14 @@
                 "definition":"problem12345_3_2",
                 "metadata":{
                     "display_name":"Problem 3.2"
+                },
+                "update_version":"v12345d",
+                "previous_version":null,
+                "edited_by":"testassist@edx.org",
+                "edited_on":{
+                    "$date":1364483713238
                 }
             }
-            
         }
     },
     {
@@ -159,6 +197,12 @@
                     "data_dir":"MITx-2-Base",
                     "advertised_start":null,
                     "display_name":"The Ancient Greek Hero"
+                },
+                "update_version":"v12345d1",
+                "previous_version":"v12345d0",
+                "edited_by":"testassist@edx.org",
+                "edited_on":{
+                    "$date":1364481713238
                 }
             }
         }
@@ -205,6 +249,12 @@
                     "data_dir":"MITx-2-Base",
                     "advertised_start":null,
                     "display_name":"The Ancient Greek Hero"
+                },
+                "update_version":"v12345d0",
+                "previous_version":null,
+                "edited_by":"test@edx.org",
+                "edited_on":{
+                    "$date":1364473713238
                 }
             }
         }
@@ -251,7 +301,14 @@
                     "data_dir":"MITx-2-Base",
                     "advertised_start":null,
                     "display_name":"The most wonderful course"
+                },
+                "update_version":"v23456d",
+                "previous_version":"v23456d0",
+                "edited_by":"test@edx.org",
+                "edited_on":{
+                    "$date":1364481313238
                 }
+                
             }
         }
     },
@@ -297,6 +354,12 @@
                     "data_dir":"MITx-2-Base",
                     "advertised_start":null,
                     "display_name":"A wonderful course"
+                },
+                "update_version":"v23456d0",
+                "previous_version":null,
+                "edited_by":"test@edx.org",
+                "edited_on":{
+                    "$date":1364480313238
                 }
             }
         }
@@ -343,6 +406,12 @@
                     "data_dir":"MITx-2-Base",
                     "advertised_start":null,
                     "display_name":"The most wonderful course"
+                },
+                "update_version":"v23456p",
+                "previous_version":null,
+                "edited_by":"test@edx.org",
+                "edited_on":{
+                    "$date":1364481333238
                 }
             }
         }
@@ -389,6 +458,12 @@
                     "data_dir":"MITx-3-Base",
                     "advertised_start":null,
                     "display_name":"Yet another contender"
+                },
+                "update_version":"v345679d",
+                "previous_version":null,
+                "edited_by":"test@guestx.edu",
+                "edited_on":{
+                    "$date":1364491313238
                 }
             }
         }

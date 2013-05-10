@@ -102,12 +102,9 @@ class SplitModuleCourseTests(SplitModuleTest):
             "children")
         self.assertEqual(course.definition_locator.def_id, "head12345_12")
         # check dates and graders--forces loading of descriptor
-        self.assertEqual(course.cms.edited_by, "testassist@edx.org",
-            course.cms.edited_by)
-        self.assertEqual(course.cms.previous_version, "head12345_11")
-        self.assertEqual(course.cms.original_version, "head12345_10")
-        self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45},
-            course.grade_cutoffs)
+        self.assertEqual(course.edited_by, "testassist@edx.org")
+        self.assertEqual(course.previous_version, "v12345d1")
+        self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
     def test_revision_requests(self):
         # query w/ revision qualifier (both draft and published)
@@ -172,7 +169,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(course.children), 0)
         self.assertEqual(course.definition_locator.def_id, "head12345_11")
         # check dates and graders--forces loading of descriptor
-        self.assertEqual(course.cms.edited_by, "testassist@edx.org")
+        self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.55})
 
         locator = CourseLocator(course_id='GreekHero')
@@ -185,7 +182,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(course.advertised_start, "Fall 2013")
         self.assertEqual(len(course.children), 3)
         # check dates and graders--forces loading of descriptor
-        self.assertEqual(course.cms.edited_by, "testassist@edx.org")
+        self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
         locator = CourseLocator(course_id='GreekHero', revision='draft')
@@ -308,8 +305,7 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(len(block.children), 3)
         self.assertEqual(block.definition_locator.def_id, "head12345_12")
         # check dates and graders--forces loading of descriptor
-        self.assertEqual(block.cms.edited_by, "testassist@edx.org",
-            block.cms.edited_by)
+        self.assertEqual(block.edited_by, "testassist@edx.org")
         self.assertDictEqual(block.grade_cutoffs, {"Pass": 0.45},
             block.grade_cutoffs)
 
@@ -328,7 +324,7 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(block.category, 'chapter')
         self.assertEqual(block.definition_locator.def_id, "chapter12345_1")
         self.assertEqual(block.display_name, "Hercules")
-        self.assertEqual(block.cms.edited_by, "testassist@edx.org")
+        self.assertEqual(block.edited_by, "testassist@edx.org")
 
         # in published course
         locator = BlockUsageLocator(course_id="wonderful", usage_id="head23456", revision='published')
@@ -732,7 +728,7 @@ class TestCourseCreation(SplitModuleTest):
         self.assertFalse(new_course.show_calculator)
         self.assertTrue(new_course.allow_anonymous)
         self.assertEqual(len(new_course.children), 0)
-        self.assertEqual(new_course.cms.edited_by, "create_user")
+        self.assertEqual(new_course.edited_by, "create_user")
         self.assertEqual(len(new_course.grading_policy['GRADER']), 4)
         self.assertDictEqual(new_course.grade_cutoffs, {"Pass": 0.5})
 
@@ -748,8 +744,8 @@ class TestCourseCreation(SplitModuleTest):
         new_draft_locator = new_draft.location
         self.assertRegexpMatches(new_draft_locator.course_id, r'best.*')
         # the edited_by and other meta fields on the new course will be the original author not this one
-        self.assertEqual(new_draft.cms.edited_by, 'test@edx.org')
-        self.assertLess(new_draft.cms.edited_on, pre_time)
+        self.assertEqual(new_draft.edited_by, 'test@edx.org')
+        self.assertLess(new_draft.edited_on, pre_time)
         self.assertEqual(new_draft.location.version_guid, original_index['draftVersion'])
         # however the edited_by and other meta fields on course_index will be this one
         new_index = modulestore().get_course_index_info(new_draft_locator)
@@ -759,8 +755,8 @@ class TestCourseCreation(SplitModuleTest):
 
         new_published_locator = CourseLocator(course_id=new_draft_locator.course_id, revision='published')
         new_published = modulestore().get_course(new_published_locator)
-        self.assertEqual(new_published.cms.edited_by, 'test@edx.org')
-        self.assertLess(new_published.cms.edited_on, pre_time)
+        self.assertEqual(new_published.edited_by, 'test@edx.org')
+        self.assertLess(new_published.edited_on, pre_time)
         self.assertEqual(new_published.location.version_guid, original_index['publishedVersion'])
 
         # changing this course will not change the original course
@@ -771,8 +767,8 @@ class TestCourseCreation(SplitModuleTest):
         new_index = modulestore().get_course_index_info(new_draft_locator)
         self.assertNotEqual(new_index['draftVersion'], original_index['draftVersion'])
         new_draft = modulestore().get_course(new_draft_locator)
-        self.assertEqual(new_item.cms.edited_by, 'leech_master')
-        self.assertGreaterEqual(new_item.cms.edited_on, pre_time)
+        self.assertEqual(new_item.edited_by, 'leech_master')
+        self.assertGreaterEqual(new_item.edited_on, pre_time)
         self.assertNotEqual(new_item.location.version_guid, original_index['draftVersion'])
         self.assertNotEqual(new_draft.location.version_guid, original_index['draftVersion'])
         structure_info = modulestore().get_course_history_info(new_draft_locator)
@@ -782,7 +778,8 @@ class TestCourseCreation(SplitModuleTest):
 
         original_course = modulestore().get_course(original_locator)
         self.assertEqual(original_course.location.version_guid, original_index['draftVersion'])
-        self.assertFalse(modulestore().has_item(BlockUsageLocator(original_locator, usage_id=new_item.location.usage_id)))
+        self.assertFalse(modulestore().has_item(BlockUsageLocator(original_locator,
+            usage_id=new_item.location.usage_id)))
 
     def test_derived_course(self):
         """
@@ -807,8 +804,8 @@ class TestCourseCreation(SplitModuleTest):
         new_draft_locator = new_draft.location
         self.assertRegexpMatches(new_draft_locator.course_id, r'counter.*')
         # the edited_by and other meta fields on the new course will be the original author not this one
-        self.assertEqual(new_draft.cms.edited_by, 'leech_master')
-        self.assertGreaterEqual(new_draft.cms.edited_on, pre_time)
+        self.assertEqual(new_draft.edited_by, 'leech_master')
+        self.assertGreaterEqual(new_draft.edited_on, pre_time)
         self.assertNotEqual(new_draft.location.version_guid, original_index['draftVersion'])
         # however the edited_by and other meta fields on course_index will be this one
         new_index = modulestore().get_course_index_info(new_draft_locator)
