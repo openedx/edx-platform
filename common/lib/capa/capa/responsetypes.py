@@ -1869,8 +1869,6 @@ class FormulaResponse(LoncapaResponse):
                 log.debug('formularesponse: error %s in formula' % err)
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
                                         cgi.escape(given))
-            if numpy.isnan(student_result) or numpy.isinf(student_result):
-                return "incorrect"
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
                 return "incorrect"
         return "correct"

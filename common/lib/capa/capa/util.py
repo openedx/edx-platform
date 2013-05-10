@@ -1,4 +1,5 @@
 from .calc import evaluator, UndefinedVariable
+from cmath import isinf
 
 #-----------------------------------------------------------------------------
 #
@@ -20,8 +21,11 @@ def compare_with_tolerance(v1, v2, tol):
         tolerance = tolerance_rel * max(abs(v1), abs(v2))
     else:
         tolerance = evaluator(dict(), dict(), tol)
-    return abs(v1 - v2) <= tolerance
 
+    if isinf(v1) or isinf(v2):
+        return v1 == v2 # because the other numerical comparison does not work with infinities
+    else:
+        return abs(v1 - v2) <= tolerance
 
 def contextualize_text(text, context):  # private
     ''' Takes a string with variables. E.g. $a+$b.
