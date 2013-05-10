@@ -271,14 +271,18 @@ end
         run_tests(system, report_dir, args.stop_on_failure)
     end
 
+    task :fasttest => "fasttest_#{system}"
+
     # Run acceptance tests
     desc "Run acceptance tests"
-    task "test_acceptance", [:feature_path] => ["clean_test_files", :predjango, report_dir] do |t, args|
+    task "test_acceptance", [:feature_path] => ["#{system}:gather_assets:acceptance", "fasttest_acceptance"]
+
+    desc "Run acceptance tests without collectstatic"
+    task "fasttest_acceptance", [:feature_path] => ["clean_test_files", :predjango, report_dir] do |t, args|
         args.with_defaults(:feature_path => '')
         run_acceptance_tests(system, report_dir, args.feature_path)
     end
 
-    task :fasttest => "fasttest_#{system}"
 
     TEST_TASK_DIRS << system
 
