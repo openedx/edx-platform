@@ -109,6 +109,25 @@
     </%text>
     <script src="${static.url('js/models/feedback.js')}"></script>
     <script src="${static.url('js/views/feedback.js')}"></script>
+    <script type="text/javascript">
+$(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
+    var m = new CMS.Models.SystemFeedback({
+        "type": "error",
+        "title": "Server Error",
+        "message": jqXHR.responseText,
+        "actions": {
+            "primary": {
+                "text": "Dismiss",
+                "click": function(model) {
+                    model.hide();
+                }
+            }
+        }
+    });
+    new CMS.Views.Notification({model: m});
+    return m;
+})
+    </script>
 
     <!-- view -->
     <div class="wrapper wrapper-view">

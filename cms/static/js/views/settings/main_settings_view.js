@@ -26,7 +26,6 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         var dateIntrospect = new Date();
         this.$el.find('#timezone').html("(" + dateIntrospect.getTimezone() + ")");
 
-        this.listenTo(this.model, 'error', CMS.ServerError);
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
     },
