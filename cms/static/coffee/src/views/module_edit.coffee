@@ -8,6 +8,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     "click .component-actions .edit-button": 'clickEditButton'
     "click .component-actions .delete-button": 'onDelete'
 
+
   initialize: ->
     @onDelete = @options.onDelete
     @render()

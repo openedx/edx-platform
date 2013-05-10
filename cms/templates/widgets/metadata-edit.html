@@ -8,7 +8,7 @@
 % if 'source_code' in json_metadata_data:
     <% del json_metadata_data['source_code'] %>
 % endif
-<section class="metadata_edit" data-metadata='${json.dumps(json_metadata_data)}'/>
+<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(json_metadata_data)}'/>
 
 % if showHighLevelSource:
     <a href="#hls-modal-${hlskey}" style="color:yellow;" id="hls-trig-${hlskey}" >Edit High Level Source</a>
