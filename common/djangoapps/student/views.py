@@ -279,7 +279,7 @@ def dashboard(request):
     exam_registrations = {course.id: exam_registration_info(request.user, course) for course in courses}
 
     # Get the 3 most recent news
-    top_news = _get_news(top=3)
+    top_news = _get_news(top=3) if not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False) else None
 
     context = {'courses': courses,
                'message': message,
