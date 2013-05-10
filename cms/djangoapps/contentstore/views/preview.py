@@ -1,24 +1,25 @@
 import logging, sys
 import static_replace
-from xmodule_modifiers import replace_static_urls
+from functools import partial
+
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
+from mitxmako.shortcuts import render_to_response
+
+from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from django.core.urlresolvers import reverse
-from mitxmako.shortcuts import render_to_response
-from django.contrib.auth.decorators import login_required
-from xblock.runtime import DbModel
-from xmodule.x_module import ModuleSystem
+from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mongo import MongoUsage
-from xmodule_modifiers import wrap_xmodule
+from xmodule.x_module import ModuleSystem
+from xblock.runtime import DbModel
+
 from session_kv_store import SessionKeyValueStore
 from requests import render_from_lms
-from functools import partial
-from xmodule.modulestore import Location
 from access import has_access
-from xmodule.modulestore.django import modulestore
-from xmodule.exceptions import NotFoundError, ProcessingError
-from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
-
 
 log = logging.getLogger(__name__)
 

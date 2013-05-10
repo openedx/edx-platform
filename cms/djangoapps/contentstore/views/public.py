@@ -1,10 +1,11 @@
-from external_auth.views import ssl_login_shortcut
-from mitxmako.shortcuts import render_to_response
 from django_future.csrf import ensure_csrf_cookie
 from django.core.context_processors import csrf
 from django.shortcuts import redirect
 from django.conf import settings
 
+from mitxmako.shortcuts import render_to_response
+
+from external_auth.views import ssl_login_shortcut
 from user import index
 
 """
