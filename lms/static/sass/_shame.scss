@@ -13,8 +13,9 @@
 
   // button elements - not a better place to put these, sadly
   .btn {
+    @include box-sizing('border-box');
     display: block;
-    padding: $baseline/2 $baseline*2.5;
+    padding: $baseline/ $baseline*1.5;
     text-transform: lowercase;
     color: $white;
     letter-spacing: 0.1rem;
