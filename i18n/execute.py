@@ -1,9 +1,8 @@
-import os, subprocess
+import os, subprocess, logging
 
-from logger import get_logger
 from config import CONFIGURATION, BASE_DIR
 
-LOG = get_logger(__name__)
+LOG = logging.getLogger(__name__)
 
 def execute(command, working_directory=BASE_DIR, log=LOG):
     """
