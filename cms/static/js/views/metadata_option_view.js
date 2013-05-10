@@ -18,6 +18,11 @@ CMS.Views.Metadata.Option = Backbone.View.extend({
                 $('#' + self.uniqueId + " option").filter(function() {
                     return $(this).text() === self.model.get('value');
                 }).prop('selected', true);
+                if (self.model.get('explicitly_set')) {
+                    self.$el.addClass('is-set');
+                    self.$el.find('#'+self.uniqueId + " .setting-clear").addClass('active');
+                }
+
             }
         );
     },

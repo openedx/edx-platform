@@ -15,6 +15,10 @@ CMS.Views.Metadata.String = Backbone.View.extend({
             function (raw_template) {
                 self.template = _.template(raw_template);
                 self.$el.append(self.template({model: self.model, uniqueId: self.uniqueId}));
+                if (self.model.get('explicitly_set')) {
+                    self.$el.addClass('is-set');
+                    self.$el.find('#'+self.uniqueId + " .setting-clear").addClass('active');
+                }
             }
         );
     },

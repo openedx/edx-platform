@@ -24,6 +24,8 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
                             model: new CMS.Models.Metadata(item)
                         };
                         if (item.options.length > 0) {
+                            // Right now, all our option types only hold strings. Should really support
+                            // any type though.
                             self.views[key] = new CMS.Views.Metadata.Option(data);
                         }
                         else {
