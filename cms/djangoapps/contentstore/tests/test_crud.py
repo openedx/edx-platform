@@ -11,6 +11,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.x_module import XModuleDescriptor
 from xmodule.capa_module import CapaDescriptor
+from xmodule.modulestore.locator import CourseLocator
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 class TemplateTests(unittest.TestCase):
@@ -106,3 +108,21 @@ class TemplateTests(unittest.TestCase):
         persisted_problem = persisted_chapter.get_children()[0]
         self.assertEqual(persisted_problem.category, 'problem')
         self.assertEqual(persisted_problem.data, test_def_content)
+
+    def test_delete_course(self):
+        test_course = factories.CourseFactory.create(org='testx', prettyid='doomed course',
+            display_name='doomed test course', user_id='testbot')
+        factories.ItemFactory.create(display_name='chapter 1',
+            parent_location=test_course.location)
+
+        id_locator = CourseLocator(course_id=test_course.location.course_id)
+        guid_locator = CourseLocator(version_guid=test_course.location.version_guid)
+        # verify it can be retireved by id
+        self.assertIsInstance(modulestore().get_course(id_locator), CourseDescriptor)
+        # and by guid
+        self.assertIsInstance(modulestore().get_course(guid_locator), CourseDescriptor)
+        modulestore().delete_course(id_locator.course_id)
+        # test can no longer retrieve by id
+        self.assertRaises(ItemNotFoundError, modulestore().get_course, id_locator)
+        # but can by guid
+        self.assertIsInstance(modulestore().get_course(guid_locator), CourseDescriptor)

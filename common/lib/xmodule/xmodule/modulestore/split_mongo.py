@@ -1262,6 +1262,22 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         return result
 
+    def delete_course(self, course_id):
+        """
+        Remove the given course from the course index.
+
+        Only removes the course from the index. The data remains. You can use create_course
+        with draft_version and published_version to restore the course; however, the edited_on and
+        edited_by won't reflect the originals, of course.
+
+        :param course_id: uses course_id rather than locator to emphasize its global effect
+        """
+        index = self.course_index.find_one({'_id': course_id})
+        if index is None:
+            raise ItemNotFoundError(course_id)
+        # this is the only real delete in the system. should it do something else?
+        self.course_index.remove(index['_id'])
+
     # TODO remove all callers and then this
     def get_errored_courses(self):
         """

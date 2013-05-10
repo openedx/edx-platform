@@ -27,7 +27,7 @@ class CourseFactory(factory.Factory):
     display_name = 'Robot Super Course'
     user_id = "test_user"
     data = None
-    metadata = {}
+    metadata = None
 
     # pylint: disable=W0613
     @classmethod
@@ -39,6 +39,8 @@ class CourseFactory(factory.Factory):
         user_id = kwargs.get('user_id')
         data = kwargs.get('data')
         metadata = kwargs.get('metadata', {})
+        if metadata is None:
+            metadata = {}
         if 'display_name' not in metadata:
             metadata['display_name'] = display_name
 
