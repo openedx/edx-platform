@@ -137,4 +137,4 @@ def clear_courses():
     # $ mongo test_xmodule --eval "db.dropDatabase()"
     _MODULESTORES = {}
     modulestore().collection.drop()
-    update_templates()
+    update_templates(modulestore('direct'))
