@@ -1,4 +1,4 @@
-from xblock.runtime import KeyValueStore
+from xblock.runtime import KeyValueStore, InvalidScopeError
 
 class SessionKeyValueStore(KeyValueStore):
     def __init__(self, request, model_data):

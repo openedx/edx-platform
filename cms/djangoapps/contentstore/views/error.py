@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotFound
+from django.http import HttpResponseServerError, HttpResponseNotFound
 
 from mitxmako.shortcuts import render_to_string, render_to_response
 

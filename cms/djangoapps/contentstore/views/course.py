@@ -1,8 +1,64 @@
+import json, time
+
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
-
-from util.json_request import expect_json
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_response
+
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore import Location
+
+from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
+from contentstore.utils import get_lms_link_for_item, add_open_ended_panel_tab, remove_open_ended_panel_tab
+from models.settings.course_details import CourseDetails, CourseSettingsEncoder
+from models.settings.course_grading import CourseGradingModel
+from models.settings.course_metadata import CourseMetadata
+from component import OPEN_ENDED_COMPONENT_TYPES, ADVANCED_COMPONENT_POLICY_KEY
+from auth.authz import create_all_course_groups
+from util.json_request import expect_json
+from access import has_access, get_location_and_verify_access
+from requests import get_request_method
+from tabs import initialize_course_tabs
+
+
+@login_required
+@ensure_csrf_cookie
+def course_index(request, org, course, name):
+    """
+    Display an editable course overview.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+
+    lms_link = get_lms_link_for_item(location)
+
+    upload_asset_callback_url = reverse('upload_asset', kwargs={
+        'org': org,
+        'course': course,
+        'coursename': name
+    })
+
+    course = modulestore().get_item(location, depth=3)
+    sections = course.get_children()
+
+    return render_to_response('overview.html', {
+        'active_tab': 'courseware',
+        'context_course': course,
+        'lms_link': lms_link,
+        'sections': sections,
+        'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+        'parent_location': course.location,
+        'new_section_template': Location('i4x', 'edx', 'templates', 'chapter', 'Empty'),
+        'new_subsection_template': Location('i4x', 'edx', 'templates', 'sequential', 'Empty'),  # for now they are the same, but the could be different at some point...
+        'upload_asset_callback_url': upload_asset_callback_url,
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
+    })
+
 
 @login_required
 @expect_json
@@ -63,140 +119,246 @@ def create_new_course(request):
     return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
 
-def initialize_course_tabs(course):
-    # set up the default tabs
-    # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
-    # at least a list populated with the minimal times
-    # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
-    # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
-
-    # This logic is repeated in xmodule/modulestore/tests/factories.py
-    # so if you change anything here, you need to also change it there.
-    course.tabs = [{"type": "courseware"},
-                   {"type": "course_info", "name": "Course Info"},
-                   {"type": "discussion", "name": "Discussion"},
-                   {"type": "wiki", "name": "Wiki"},
-                   {"type": "progress", "name": "Progress"}]
-
-    modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
-
-
-@ensure_csrf_cookie
 @login_required
-def import_course(request, org, course, name):
-
-    location = get_location_and_verify_access(request, org, course, name)
-
-    if request.method == 'POST':
-        filename = request.FILES['course-data'].name
-
-        if not filename.endswith('.tar.gz'):
-            return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
-
-        data_root = path(settings.GITHUB_REPO_ROOT)
-
-        course_subdir = "{0}-{1}-{2}".format(org, course, name)
-        course_dir = data_root / course_subdir
-        if not course_dir.isdir():
-            os.mkdir(course_dir)
-
-        temp_filepath = course_dir / filename
-
-        logging.debug('importing course to {0}'.format(temp_filepath))
-
-        # stream out the uploaded files in chunks to disk
-        temp_file = open(temp_filepath, 'wb+')
-        for chunk in request.FILES['course-data'].chunks():
-            temp_file.write(chunk)
-        temp_file.close()
-
-        tf = tarfile.open(temp_filepath)
-        tf.extractall(course_dir + '/')
-
-        # find the 'course.xml' file
-
-        for r, d, f in os.walk(course_dir):
-            for files in f:
-                if files == 'course.xml':
-                    break
-            if files == 'course.xml':
-                break
-
-        if files != 'course.xml':
-            return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
-
-        logging.debug('found course.xml at {0}'.format(r))
-
-        if r != course_dir:
-            for fname in os.listdir(r):
-                shutil.move(r / fname, course_dir)
-
-        module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-                                                     [course_subdir], load_error_modules=False,
-                                                     static_content_store=contentstore(),
-                                                     target_location_namespace=Location(location),
-                                                     draft_store=modulestore())
-
-        # we can blow this away when we're done importing.
-        shutil.rmtree(course_dir)
-
-        logging.debug('new course at {0}'.format(course_items[0].location))
-
-        create_all_course_groups(request.user, course_items[0].location)
-
-        return HttpResponse(json.dumps({'Status': 'OK'}))
-    else:
-        course_module = modulestore().get_item(location)
-
-        return render_to_response('import.html', {
-            'context_course': course_module,
-            'active_tab': 'import',
-            'successful_import_redirect_url': get_url_reverse('CourseOutline', course_module)
-        })
-
-
 @ensure_csrf_cookie
-@login_required
-def generate_export_course(request, org, course, name):
-    location = get_location_and_verify_access(request, org, course, name)
+def course_info(request, org, course, name, provided_id=None):
+    """
+    Send models and views as well as html for editing the course info to the client.
 
-    loc = Location(location)
-    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
-
-    root_dir = path(mkdtemp())
-
-    # export out to a tempdir
-
-    logging.debug('root = {0}'.format(root_dir))
-
-    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
-    #filename = root_dir / name + '.tar.gz'
-
-    logging.debug('tar file being generated at {0}'.format(export_file.name))
-    tf = tarfile.open(name=export_file.name, mode='w:gz')
-    tf.add(root_dir / name, arcname=name)
-    tf.close()
-
-    # remove temp dir
-    shutil.rmtree(root_dir / name)
-
-    wrapper = FileWrapper(export_file)
-    response = HttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
-    response['Content-Length'] = os.path.getsize(export_file.name)
-    return response
-
-@ensure_csrf_cookie
-@login_required
-def export_course(request, org, course, name):
-
+    org, course, name: Attributes of the Location for the item to edit
+    """
     location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)
 
-    return render_to_response('export.html', {
+    # get current updates
+    location = ['i4x', org, course, 'course_info', "updates"]
+
+    return render_to_response('course_info.html', {
+        'active_tab': 'courseinfo-tab',
         'context_course': course_module,
-        'active_tab': 'export',
-        'successful_import_redirect_url': ''
+        'url_base': "/" + org + "/" + course + "/",
+        'course_updates': json.dumps(get_course_updates(location)),
+        'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url()
     })
+
+
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_info_updates(request, org, course, provided_id=None):
+    """
+    restful CRUD operations on course_info updates.
+
+    org, course: Attributes of the Location for the item to edit
+    provided_id should be none if it's new (create) and a composite of the update db id + index otherwise.
+    """
+    # ??? No way to check for access permission afaik
+    # get current updates
+    location = ['i4x', org, course, 'course_info', "updates"]
+
+    # Hmmm, provided_id is coming as empty string on create whereas I believe it used to be None :-(
+    # Possibly due to my removing the seemingly redundant pattern in urls.py
+    if provided_id == '':
+        provided_id = None
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    real_method = get_request_method(request)
+
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(get_course_updates(location)),
+                            mimetype="application/json")
+    elif real_method == 'DELETE':
+        try:
+            return HttpResponse(json.dumps(delete_course_update(location,
+                                request.POST, provided_id)), mimetype="application/json")
+        except:
+            return HttpResponseBadRequest("Failed to delete",
+                                          content_type="text/plain")
+    elif request.method == 'POST':
+        try:
+            return HttpResponse(json.dumps(update_course_updates(location,
+                                request.POST, provided_id)), mimetype="application/json")
+        except:
+            return HttpResponseBadRequest("Failed to save",
+                                          content_type="text/plain")
+
+@login_required
+@ensure_csrf_cookie
+def get_course_settings(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+
+    course_module = modulestore().get_item(location)
+
+    return render_to_response('settings.html', {
+        'context_course': course_module,
+        'course_location': location,
+        'details_url': reverse(course_settings_updates,
+                               kwargs={"org": org,
+                                       "course": course,
+                                       "name": name,
+                                       "section": "details"})
+    })
+
+
+@login_required
+@ensure_csrf_cookie
+def course_config_graders_page(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+
+    course_module = modulestore().get_item(location)
+    course_details = CourseGradingModel.fetch(location)
+
+    return render_to_response('settings_graders.html', {
+        'context_course': course_module,
+        'course_location': location,
+        'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
+    })
+
+
+@login_required
+@ensure_csrf_cookie
+def course_config_advanced_page(request, org, course, name):
+    """
+    Send models and views as well as html for editing the advanced course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+
+    course_module = modulestore().get_item(location)
+
+    return render_to_response('settings_advanced.html', {
+        'context_course': course_module,
+        'course_location': location,
+        'advanced_dict': json.dumps(CourseMetadata.fetch(location)),
+    })
+
+
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_settings_updates(request, org, course, name, section):
+    """
+    restful CRUD operations on course settings. This differs from get_course_settings by communicating purely
+    through json (not rendering any html) and handles section level operations rather than whole page.
+
+    org, course: Attributes of the Location for the item to edit
+    section: one of details, faculty, grading, problems, discussions
+    """
+    get_location_and_verify_access(request, org, course, name)
+
+    if section == 'details':
+        manager = CourseDetails
+    elif section == 'grading':
+        manager = CourseGradingModel
+    else:
+        return
+
+    if request.method == 'GET':
+        # Cannot just do a get w/o knowing the course name :-(
+        return HttpResponse(json.dumps(manager.fetch(Location(['i4x', org, course, 'course', name])), cls=CourseSettingsEncoder),
+                            mimetype="application/json")
+    elif request.method == 'POST':  # post or put, doesn't matter.
+        return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseSettingsEncoder),
+                            mimetype="application/json")
+
+
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_grader_updates(request, org, course, name, grader_index=None):
+    """
+    restful CRUD operations on course_info updates. This differs from get_course_settings by communicating purely
+    through json (not rendering any html) and handles section level operations rather than whole page.
+
+    org, course: Attributes of the Location for the item to edit
+    """
+
+    location = get_location_and_verify_access(request, org, course, name)
+
+    real_method = get_request_method(request)
+
+    if real_method == 'GET':
+        # Cannot just do a get w/o knowing the course name :-(
+        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(location), grader_index)),
+                            mimetype="application/json")
+    elif real_method == "DELETE":
+        # ??? Should this return anything? Perhaps success fail?
+        CourseGradingModel.delete_grader(Location(location), grader_index)
+        return HttpResponse()
+    elif request.method == 'POST':   # post or put, doesn't matter.
+        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(location), request.POST)),
+                            mimetype="application/json")
+
+
+# # NB: expect_json failed on ["key", "key2"] and json payload
+@login_required
+@ensure_csrf_cookie
+def course_advanced_updates(request, org, course, name):
+    """
+    restful CRUD operations on metadata. The payload is a json rep of the metadata dicts. For delete, otoh,
+    the payload is either a key or a list of keys to delete.
+
+    org, course: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+
+    real_method = get_request_method(request)
+
+    if real_method == 'GET':
+        return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
+    elif real_method == 'DELETE':
+        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))),
+                            mimetype="application/json")
+    elif real_method == 'POST' or real_method == 'PUT':
+        # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
+        request_body = json.loads(request.body)
+        #Whether or not to filter the tabs key out of the settings metadata
+        filter_tabs = True
+        #Check to see if the user instantiated any advanced components.  This is a hack to add the open ended panel tab
+        #to a course automatically if the user has indicated that they want to edit the combinedopenended or peergrading
+        #module, and to remove it if they have removed the open ended elements.
+        if ADVANCED_COMPONENT_POLICY_KEY in request_body:
+            #Check to see if the user instantiated any open ended components
+            found_oe_type = False
+            #Get the course so that we can scrape current tabs
+            course_module = modulestore().get_item(location)
+            for oe_type in OPEN_ENDED_COMPONENT_TYPES:
+                if oe_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
+                    #Add an open ended tab to the course if needed
+                    changed, new_tabs = add_open_ended_panel_tab(course_module)
+                    #If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
+                    if changed:
+                        request_body.update({'tabs': new_tabs})
+                        #Indicate that tabs should not be filtered out of the metadata
+                        filter_tabs = False
+                    #Set this flag to avoid the open ended tab removal code below.
+                    found_oe_type = True
+                    break
+            #If we did not find an open ended module type in the advanced settings,
+            # we may need to remove the open ended tab from the course.
+            if not found_oe_type:
+                #Remove open ended tab to the course if needed
+                changed, new_tabs = remove_open_ended_panel_tab(course_module)
+                if changed:
+                    request_body.update({'tabs': new_tabs})
+                    #Indicate that tabs should not be filtered out of the metadata
+                    filter_tabs = False
+        response_json = json.dumps(CourseMetadata.update_from_json(location, request_body, filter_tabs=filter_tabs))
+        return HttpResponse(response_json, mimetype="application/json")
+
 

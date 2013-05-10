@@ -1,7 +1,21 @@
+import json
+from uuid import uuid4
+
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.inheritance import own_metadata
+
 from util.json_request import expect_json
-from mitxmako.shortcuts import render_to_response
+from contentstore.utils import get_modulestore
+from access import has_access
+from requests import _xmodule_recurse
+
+# cdodge: these are categories which should not be parented, they are detached from the hierarchy
+DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 
 @login_required

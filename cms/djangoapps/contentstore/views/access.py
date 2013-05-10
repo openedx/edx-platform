@@ -1,11 +1,7 @@
-#from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
-#from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
-#from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
-
 from auth.authz import STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME
 from auth.authz import is_user_in_course_group_role
 from contentstore.utils import get_course_location_for_item
-
+from django.core.exceptions import PermissionDenied
 
 def get_location_and_verify_access(request, org, course, name):
     """

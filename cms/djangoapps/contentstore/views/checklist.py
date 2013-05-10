@@ -1,9 +1,16 @@
+import json
+
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
-from access import get_location_and_verify_access
 from mitxmako.shortcuts import render_to_response
+
+from xmodule.modulestore import Location
+from xmodule.modulestore.inheritance import own_metadata
+
 from contentstore.utils import get_modulestore, get_url_reverse
+from requests import get_request_method
+from access import get_location_and_verify_access
 
 @ensure_csrf_cookie
 @login_required

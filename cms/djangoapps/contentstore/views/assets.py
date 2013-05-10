@@ -1,12 +1,29 @@
+import logging, json, os, tarfile, shutil
+from tempfile import mkdtemp
+from path import path
+
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
+from django.core.urlresolvers import reverse
+from django.core.servers.basehttp import FileWrapper
+from django.core.files.temp import NamedTemporaryFile
 
-from xmodule.contentstore.content import StaticContent
-from access import get_location_and_verify_access
-from xmodule.util.date_utils import get_default_time_display
 from mitxmako.shortcuts import render_to_response
+from cache_toolbox.core import del_cached_content
+from contentstore.utils import get_url_reverse
 
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location
+from xmodule.contentstore.content import StaticContent
+from xmodule.util.date_utils import get_default_time_display
+
+from access import get_location_and_verify_access
+from auth.authz import create_all_course_groups
 
 @login_required
 @ensure_csrf_cookie
@@ -115,4 +132,123 @@ def upload_asset(request, org, course, coursename):
     response = HttpResponse(json.dumps(response_payload))
     response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
+
+@ensure_csrf_cookie
+@login_required
+def import_course(request, org, course, name):
+
+    location = get_location_and_verify_access(request, org, course, name)
+
+    if request.method == 'POST':
+        filename = request.FILES['course-data'].name
+
+        if not filename.endswith('.tar.gz'):
+            return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
+
+        data_root = path(settings.GITHUB_REPO_ROOT)
+
+        course_subdir = "{0}-{1}-{2}".format(org, course, name)
+        course_dir = data_root / course_subdir
+        if not course_dir.isdir():
+            os.mkdir(course_dir)
+
+        temp_filepath = course_dir / filename
+
+        logging.debug('importing course to {0}'.format(temp_filepath))
+
+        # stream out the uploaded files in chunks to disk
+        temp_file = open(temp_filepath, 'wb+')
+        for chunk in request.FILES['course-data'].chunks():
+            temp_file.write(chunk)
+        temp_file.close()
+
+        tf = tarfile.open(temp_filepath)
+        tf.extractall(course_dir + '/')
+
+        # find the 'course.xml' file
+
+        for r, d, f in os.walk(course_dir):
+            for files in f:
+                if files == 'course.xml':
+                    break
+            if files == 'course.xml':
+                break
+
+        if files != 'course.xml':
+            return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
+
+        logging.debug('found course.xml at {0}'.format(r))
+
+        if r != course_dir:
+            for fname in os.listdir(r):
+                shutil.move(r / fname, course_dir)
+
+        module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
+                                                     [course_subdir], load_error_modules=False,
+                                                     static_content_store=contentstore(),
+                                                     target_location_namespace=Location(location),
+                                                     draft_store=modulestore())
+
+        # we can blow this away when we're done importing.
+        shutil.rmtree(course_dir)
+
+        logging.debug('new course at {0}'.format(course_items[0].location))
+
+        create_all_course_groups(request.user, course_items[0].location)
+
+        return HttpResponse(json.dumps({'Status': 'OK'}))
+    else:
+        course_module = modulestore().get_item(location)
+
+        return render_to_response('import.html', {
+            'context_course': course_module,
+            'active_tab': 'import',
+            'successful_import_redirect_url': get_url_reverse('CourseOutline', course_module)
+        })
+
+
+@ensure_csrf_cookie
+@login_required
+def generate_export_course(request, org, course, name):
+    location = get_location_and_verify_access(request, org, course, name)
+
+    loc = Location(location)
+    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
+
+    root_dir = path(mkdtemp())
+
+    # export out to a tempdir
+
+    logging.debug('root = {0}'.format(root_dir))
+
+    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
+    #filename = root_dir / name + '.tar.gz'
+
+    logging.debug('tar file being generated at {0}'.format(export_file.name))
+    tf = tarfile.open(name=export_file.name, mode='w:gz')
+    tf.add(root_dir / name, arcname=name)
+    tf.close()
+
+    # remove temp dir
+    shutil.rmtree(root_dir / name)
+
+    wrapper = FileWrapper(export_file)
+    response = HttpResponse(wrapper, content_type='application/x-tgz')
+    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
+    response['Content-Length'] = os.path.getsize(export_file.name)
+    return response
+
+@ensure_csrf_cookie
+@login_required
+def export_course(request, org, course, name):
+
+    location = get_location_and_verify_access(request, org, course, name)
+
+    course_module = modulestore().get_item(location)
+
+    return render_to_response('export.html', {
+        'context_course': course_module,
+        'active_tab': 'export',
+        'successful_import_redirect_url': ''
+    })
 
