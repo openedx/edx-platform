@@ -49,7 +49,10 @@ class _ZendeskApi(object):
             settings.ZENDESK_USER,
             settings.ZENDESK_API_KEY,
             use_api_token=True,
-            api_version=2
+            api_version=2,
+            # As of 2012-05-08, Zendesk is using a CA that is not
+            # installed on our servers
+            client_args={"disable_ssl_certificate_validation": True}
         )
 
     def create_ticket(self, ticket):

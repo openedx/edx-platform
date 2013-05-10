@@ -1,4 +1,6 @@
 <%namespace name='static' file='static_content.html'/>
+<%! from datetime import datetime %>
+<%! import pytz %>
 <%! from django.conf import settings %>
 <%! from courseware.tabs import get_discussion_link %>
 
@@ -79,9 +81,16 @@ discussion_link = get_discussion_link(course) if course else None
       <hr>
     </header>
 
+    <%
+      dst = datetime.now(pytz.utc).astimezone(pytz.timezone("America/New_York")).dst()
+      business_hours = "13:00 UTC to 21:00 UTC" if dst else "14:00 UTC to 22:00 UTC"
+    %>
     <p>
-    Thanks for your feedback. We will read your message, and our
-    support team may contact you to respond or ask for further clarification.
+    Thank you for your inquiry or feedback.  We typically respond to a
+    request within one business day (Monday to Friday,
+    ${business_hours}.) In the meantime, please review our
+    <a href="/help" target="_blank">detailed FAQs</a>
+    where most questions have already been answered.
     </p>
 
     <div class="close-modal">
