@@ -15,7 +15,7 @@
   .btn {
     @include box-sizing('border-box');
     display: block;
-    padding: $baseline/ $baseline*1.5;
+    padding: $baseline/2;
     text-transform: lowercase;
     color: $white;
     letter-spacing: 0.1rem;
