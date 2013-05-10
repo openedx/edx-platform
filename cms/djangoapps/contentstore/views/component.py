@@ -25,6 +25,8 @@ from models.settings.course_grading import CourseGradingModel
 from requests import get_request_method, _xmodule_recurse
 from access import has_access, get_location_and_verify_access
 
+# TODO: should explicitly enumerate exports with __all__
+
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
 log = logging.getLogger(__name__)

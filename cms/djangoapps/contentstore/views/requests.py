@@ -40,7 +40,6 @@ def create_json_response(errmsg=None):
         resp = HttpResponse(json.dumps({'Status': 'Failed', 'ErrMsg': errmsg}))
     else:
         resp = HttpResponse(json.dumps({'Status': 'OK'}))
-
     return resp
 
 def render_from_lms(template_name, dictionary, context=None, namespace='main'):

@@ -1,5 +1,3 @@
-# TODO: replace asterisks, should explicitly enumerate imports instead
-
 from assets import *
 from checklist import *
 from component import *

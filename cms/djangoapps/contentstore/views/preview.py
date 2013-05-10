@@ -1,4 +1,5 @@
-import logging, sys
+import logging
+import sys
 from functools import partial
 
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
@@ -24,6 +25,7 @@ from access import has_access
 __all__ = ['preview_dispatch', 'preview_component']
 
 log = logging.getLogger(__name__)
+
 
 @login_required
 def preview_dispatch(request, preview_id, location, dispatch=None):
@@ -58,6 +60,7 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
 
     return HttpResponse(ajax_return)
 
+
 @login_required
 def preview_component(request, location):
     # TODO (vshnayder): change name from id to location in coffee+html as well.
@@ -70,7 +73,6 @@ def preview_component(request, location):
         'preview': get_module_previews(request, component)[0],
         'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
-
 
 
 def preview_module_system(request, preview_id, descriptor):
@@ -103,6 +105,7 @@ def preview_module_system(request, preview_id, descriptor):
         user=request.user,
         xblock_model_data=preview_model_data,
     )
+
 
 def get_preview_module(request, preview_id, descriptor):
     """
@@ -159,6 +162,7 @@ def load_preview_module(request, preview_id, descriptor):
 
     return module
 
+
 def get_module_previews(request, descriptor):
     """
     Returns a list of preview XModule html contents. One preview is returned for each
@@ -171,4 +175,3 @@ def get_module_previews(request, descriptor):
         module = load_preview_module(request, str(idx), descriptor)
         preview_html.append(module.get_html())
     return preview_html
-
