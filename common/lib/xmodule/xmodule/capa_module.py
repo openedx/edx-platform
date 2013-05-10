@@ -68,7 +68,8 @@ class CapaFields(object):
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed",
                         values=["answered", "always", "attempted", "closed", "never"])
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
-    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings,
+                                values=["always", "onreset", "never", "per_student"])
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
     input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)

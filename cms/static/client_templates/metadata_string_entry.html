@@ -1,7 +1,6 @@
 <div class="wrapper-comp-setting">
-	<label class="label setting-label" for="setting-discussion_category"><%= model.get('display_name') %></label>
-	<input class="input setting-input" type="text" id="setting-discussion_category" value='<%= model.get("value") %>'/> 
-	<!--button clickable if is-set -->
+	<label class="label setting-label" for="<%= uniqueId %>"><%= model.get('display_name') %></label>
+	<input class="input setting-input" type="text" id="<%= uniqueId %>" value='<%= model.get("value") %>'/>
 	<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
 		<i class="ss-icon ss-symbolicons-block undo">&#x21A9;</i>
 	</button>

@@ -19,12 +19,17 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
                 var counter = 0;
                 _.each(self.model.attributes,
                     function(item, key) {
-                        self.views[key] = new CMS.Views.Metadata.Generic({
-                                el: self.$el.find('.metadata_entry')[counter],
-                                model: new CMS.Models.Metadata(item)
-                            }
-                        );
-                        counter+=1;
+                        var data = {
+                            el: self.$el.find('.metadata_entry')[counter++],
+                            model: new CMS.Models.Metadata(item)
+                        };
+                        if (item.options.length > 0) {
+                            self.views[key] = new CMS.Views.Metadata.Option(data);
+                        }
+                        else {
+                            self.views[key] = new CMS.Views.Metadata.String(data);
+                        }
+
                     });
             }
         );
