@@ -8,7 +8,7 @@
     % for field_name, field_value in editable_metadata_fields.items():
     <li>
       % if field_name == 'source_code':
-        % if field_value['is_default'] is False:
+        % if field_value['explicitly_set'] is True:
             <a href="#hls-modal-${hlskey}" style="color:yellow;" id="hls-trig-${hlskey}" >Edit High Level Source</a>
         % endif
       % else:
@@ -26,8 +26,10 @@
         % if False:
             <label>Help: ${field_value['field'].help}</label>
             <label>Type: ${type(field_value['field']).__name__}</label>
-            <label>Inherited: ${field_value['is_inherited']}</label>
-            <label>Default: ${field_value['is_default']}</label>
+            <label>Inheritable: ${field_value['inheritable']}</label>
+            <label>Showing inherited value: ${field_value['inheritable'] and not field_value['explicitly_set']}</label>
+            <label>Explicitly set: ${field_value['explicitly_set']}</label>
+            <label>Default value: ${field_value['default_value']}</label>
             % if field_value['field'].values:
               <label>Possible values:</label>
               % for value in field_value['field'].values:
@@ -40,7 +42,7 @@
     % endfor
   </ul>
 
-  % if 'source_code' in editable_metadata_fields and not editable_metadata_fields['source_code']['is_default']:
+  % if 'source_code' in editable_metadata_fields and editable_metadata_fields['source_code']['explicitly_set']:
     <%include file="source-edit.html" />
   % endif
 

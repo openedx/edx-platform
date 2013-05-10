@@ -624,27 +624,28 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         Can be limited by extending `non_editable_metadata_fields`.
         """
         inherited_metadata = getattr(self, '_inherited_metadata', {})
+        inheritable_metadata = getattr(self, '_inheritable_metadata', {})
         metadata = {}
         for field in self.fields:
 
             if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
                 continue
 
-            inherited = False
-            default = False
+            inheritable = False
             value = getattr(self, field.name)
-            if field.name in self._model_data:
-                default = False
+            default_value = field.default
+            explicitly_set = field.name in self._model_data
+            if field.name in inheritable_metadata:
+                inheritable = True
+                default_value = field.from_json(inheritable_metadata.get(field.name))
                 if field.name in inherited_metadata:
-                    if self._model_data.get(field.name) == inherited_metadata.get(field.name):
-                        inherited = True
-            else:
-                default = True
+                    explicitly_set = False
 
             metadata[field.name] = {'field': field,
                                     'value': value,
-                                    'is_inherited': inherited,
-                                    'is_default': default}
+                                    'default_value': default_value,
+                                    'inheritable': inheritable,
+                                    'explicitly_set': explicitly_set }
 
         return metadata
 
