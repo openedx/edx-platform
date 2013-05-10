@@ -9,6 +9,21 @@ from django.conf import settings
 from lms import one_time_startup
 from cms import one_time_startup
 
+# There is an import issue when using django-staticfiles with lettuce
+# Lettuce assumes that we are using django.contrib.staticfiles,
+# but the rest of the app assumes we are using django-staticfiles
+# (in particular, django-pipeline and our mako implementation)
+# To resolve this, we check whether staticfiles is installed,
+# then redirect imports for django.contrib.staticfiles
+# to use staticfiles.
+try:
+    import staticfiles
+except ImportError:
+    pass
+else:
+    import sys
+    sys.modules['django.contrib.staticfiles'] = staticfiles
+
 logger = getLogger(__name__)
 logger.info("Loading the lettuce acceptance testing terrain file...")
 
