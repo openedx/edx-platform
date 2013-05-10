@@ -21,6 +21,8 @@ from session_kv_store import SessionKeyValueStore
 from requests import render_from_lms
 from access import has_access
 
+__all__ = ['preview_dispatch', 'preview_component']
+
 log = logging.getLogger(__name__)
 
 @login_required

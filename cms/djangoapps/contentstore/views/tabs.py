@@ -12,6 +12,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_course_for_item
 
+__all__ = ['edit_tabs', 'reorder_static_tabs']
 
 def initialize_course_tabs(course):
     # set up the default tabs

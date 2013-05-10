@@ -14,6 +14,8 @@ from contentstore.utils import get_modulestore
 from access import has_access
 from requests import _xmodule_recurse
 
+__all__ = ['save_item', 'clone_item', 'delete_item']
+
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 

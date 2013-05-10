@@ -12,6 +12,8 @@ from contentstore.utils import get_modulestore, get_url_reverse
 from requests import get_request_method
 from access import get_location_and_verify_access
 
+__all__ = ['get_checklists', 'update_checklist']
+
 @ensure_csrf_cookie
 @login_required
 def get_checklists(request, org, course, name):

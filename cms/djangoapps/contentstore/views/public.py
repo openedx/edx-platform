@@ -8,6 +8,8 @@ from mitxmako.shortcuts import render_to_response
 from external_auth.views import ssl_login_shortcut
 from user import index
 
+__all__ = ['signup', 'old_login_redirect', 'login_page', 'howitworks', 'ux_alerts']
+
 """
 Public views
 """

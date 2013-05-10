@@ -25,6 +25,8 @@ from xmodule.util.date_utils import get_default_time_display
 from access import get_location_and_verify_access
 from auth.authz import create_all_course_groups
 
+__all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
+
 @login_required
 @ensure_csrf_cookie
 def asset_index(request, org, course, name):
