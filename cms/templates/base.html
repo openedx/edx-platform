@@ -111,8 +111,7 @@
     <script src="${static.url('js/views/feedback.js')}"></script>
     <script type="text/javascript">
 $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
-    var m = new CMS.Models.SystemFeedback({
-        "type": "error",
+    var msg = new CMS.Models.ErrorMessage({
         "title": "Server Error",
         "message": jqXHR.responseText,
         "actions": {
@@ -124,8 +123,8 @@ $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
             }
         }
     });
-    new CMS.Views.Notification({model: m});
-    return m;
+    new CMS.Views.Notification({model: msg});
+    return msg;
 })
     </script>
 

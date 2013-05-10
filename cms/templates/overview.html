@@ -240,8 +240,7 @@ CMS.Views.SectionEdit = Backbone.View.extend({
         this.showView.render();
     },
     showErrorMessage: function(model, error, options) {
-        var msg = new CMS.Models.SystemFeedback({
-            type: "error",
+        var msg = new CMS.Models.ErrorMessage({
             title: "Validation Error",
             message: error,
             close: false,

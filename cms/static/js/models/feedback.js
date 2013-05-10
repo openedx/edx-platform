@@ -1,6 +1,6 @@
 CMS.Models.SystemFeedback = Backbone.Model.extend({
     defaults: {
-        "type": null,  // "warning", "confirmation", "error", "announcement", "step-required"
+        "type": null,  // "warning", "confirmation", "error", "announcement", "step-required", etc
         "title": null,
         "message": null,
         "shown": true,
@@ -37,4 +37,22 @@ CMS.Models.SystemFeedback = Backbone.Model.extend({
     hide: function() {
         this.set("shown", false);
     }
+});
+
+CMS.Models.WarningMessage = CMS.Models.SystemFeedback.extend({
+    defaults: $.extend({}, CMS.Models.SystemFeedback.prototype.defaults, {
+        "type": "warning"
+    })
+});
+
+CMS.Models.ErrorMessage = CMS.Models.SystemFeedback.extend({
+    defaults: $.extend({}, CMS.Models.SystemFeedback.prototype.defaults, {
+        "type": "error"
+    })
+});
+
+CMS.Models.ConfirmationMessage = CMS.Models.SystemFeedback.extend({
+    defaults: $.extend({}, CMS.Models.SystemFeedback.prototype.defaults, {
+        "type": "confirmation"
+    })
 });
