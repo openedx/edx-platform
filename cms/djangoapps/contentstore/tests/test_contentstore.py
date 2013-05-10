@@ -220,6 +220,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 1)
 
+    def test_import_textbook_as_content_element(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        module_store = modulestore('direct')
+        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        self.assertGreater(len(course.textbooks), 0)
+
     def test_static_tab_reordering(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
