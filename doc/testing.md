@@ -171,20 +171,26 @@ Before running the tests, you need to set up the test database:
     rm ../db/test_mitx.db
     rake django-admin[syncdb,lms,acceptance,--noinput]
     rake django-admin[migrate,lms,acceptance,--noinput]
+    rake django-admin[syncdb,cms,acceptance,--noinput]
+    rake django-admin[migrate,cms,acceptance,--noinput]
 
-To run the acceptance tests:
+To run all the acceptance tests:
 
-1. Start the Django server locally using the settings in **acceptance.py**:
+    rake test_acceptance_lms
+    rake test_acceptance_cms
 
-        rake lms[acceptance]
-
-2. In another shell, run the tests:
-
-        django-admin.py harvest --no-server --settings=lms.envs.acceptance --pythonpath=. lms/djangoapps/portal/features/
 
 To test only a specific feature:
 
-    django-admin.py harvest --no-server --settings=lms.envs.acceptance --pythonpath=. lms/djangoapps/courseware/features/high-level-tabs.feature
+    rake test_acceptance_lms[lms/djangoapps/courseware/features/problems.feature]
+
+To start the debugger on failure, add the `--pdb` option:
+
+    rake test_acceptance_lms["lms/djangoapps/courseware/features/problems.feature --pdb"]
+
+To run tests faster by not collecting static files, you can use
+`rake fasttest_acceptance_lms` and `rake fasttest_acceptance_cms`.
+
 
 **Troubleshooting**: If you get an error message that says something about harvest not being a command, you probably are missing a requirement.
 Try running:
