@@ -24,16 +24,19 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         this.model.hide();
     },
     primaryClick: function() {
-        var primary = this.model.get("actions").primary;
+        var actions = this.model.get("actions");
+        if(!actions) { return; }
+        var primary = actions.primary;
+        if(!primary) { return; }
         if(primary.click) {
             primary.click.call(this.model);
         }
     },
     secondaryClick: function(e) {
-        var secondaryList = this.model.get("actions").secondary;
-        if(!secondaryList) {
-            return;
-        }
+        var actions = this.model.get("actions");
+        if(!actions) { return; }
+        var secondaryList = actions.secondary;
+        if(!secondaryList) { return; }
         // which secondary action was clicked?
         var i = _.indexOf(this.$(".action-secondary"), e.target);
         var secondary = this.model.get("actions").secondary[i];
