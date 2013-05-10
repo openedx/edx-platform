@@ -140,11 +140,6 @@ $(document).ready(function() {
 
     $('.new-course-button').bind('click', addNewCourse);
 
-    // section name editing
-    $('.section-name').bind('click', editSectionName);
-    $('.edit-section-name-cancel').bind('click', cancelEditSectionName);
-    // $('.edit-section-name-save').bind('click', saveEditSectionName);
-
     // section date setting
     $('.set-publish-date').bind('click', setSectionScheduleDate);
     $('.edit-section-start-cancel').bind('click', cancelSetSectionScheduleDate);
@@ -761,72 +756,6 @@ function saveNewSubsection(e) {
 function cancelNewSubsection(e) {
     e.preventDefault();
     $(this).parents('li.branch').remove();
-}
-
-function editSectionName(e) {
-    e.preventDefault();
-    $(this).unbind('click', editSectionName);
-    $(this).children('.section-name-edit').show();
-    $(this).find('.edit-section-name').focus();
-    $(this).children('.section-name-span').hide();
-    $(this).find('.section-name-edit').bind('submit', saveEditSectionName);
-    $(this).find('.edit-section-name-cancel').bind('click', cancelNewSection);
-    $body.bind('keyup', {
-        $cancelButton: $(this).find('.edit-section-name-cancel')
-    }, checkForCancel);
-}
-
-function cancelEditSectionName(e) {
-    e.preventDefault();
-    $(this).parent().hide();
-    $(this).parent().siblings('.section-name-span').show();
-    $(this).closest('.section-name').bind('click', editSectionName);
-    e.stopPropagation();
-}
-
-function saveEditSectionName(e) {
-    e.preventDefault();
-
-    $(this).closest('.section-name').unbind('click', editSectionName);
-
-    var id = $(this).closest('.courseware-section').data('id');
-    var display_name = $.trim($(this).find('.edit-section-name').val());
-
-    $(this).closest('.courseware-section .section-name').append($spinner);
-    $spinner.show();
-
-    if (display_name == '') {
-        alert("You must specify a name before saving.");
-        return;
-    }
-
-    analytics.track('Edited Section Name', {
-        'course': course_location_analytics,
-        'display_name': display_name,
-        'id': id
-    });
-
-
-    var $_this = $(this);
-    // call into server to commit the new order
-    $.ajax({
-        url: "/save_item",
-        type: "POST",
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({
-            'id': id,
-            'metadata': {
-                'display_name': display_name
-            }
-        })
-    }).success(function() {
-        $spinner.delay(250).fadeOut(250);
-        $_this.closest('h3').find('.section-name-span').html(display_name).show();
-        $_this.hide();
-        $_this.closest('.section-name').bind('click', editSectionName);
-        e.stopPropagation();
-    });
 }
 
 function setSectionScheduleDate(e) {
