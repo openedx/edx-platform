@@ -47,7 +47,7 @@ def api_request(request, course_id, **kwargs):
 
     # Verify that the api should be accessible to this course
     if not api_enabled(request, course_id):
-        log.debug('Notes not enabled for course')
+        log.debug('Notes are disabled for course: {0}'.format(course_id))
         raise Http404
 
     # Locate the requested resource
