@@ -1,16 +1,18 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.core.exceptions import ValidationError
+
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
 from courseware.courses import get_course_with_access
+
 import json
 import logging
+import collections
 
 log = logging.getLogger(__name__)
 
 API_SETTINGS = {
-    # Version
     'META': {'name': 'Notes API', 'version': 1},
 
     # Maps resources to HTTP methods and actions
@@ -24,6 +26,9 @@ API_SETTINGS = {
     # Cap the number of notes that can be returned in one request
     'MAX_NOTE_LIMIT': 1000,
 }
+
+# Wrapper class for HTTP response and data. All API actions are expected to return this.
+ApiResponse = collections.namedtuple('ApiResponse', ['http_response', 'data'])
 
 #----------------------------------------------------------------------#
 # API requests are routed through api_request() using the resource map.
@@ -72,33 +77,30 @@ def api_request(request, course_id, **kwargs):
         raise Http404
 
     log.debug('API request: {0} {1}'.format(resource_method, resource_name))
-    result = module[func](request, course_id, **kwargs)
 
-    # Format and output the results
-    data = None
-    response = result[0]
-    if len(result) == 2:
-        data = result[1]
+    api_response = module[func](request, course_id, **kwargs)
+    http_response = api_format(api_response)
 
-    formatted = api_format(request, response, data)
-    response['Content-type'] = formatted[0]
-    response.content = formatted[1]
-
-    log.debug('API response: {0}'.format(formatted))
-
-    return response
+    return http_response
 
 
-def api_format(request, response, data):
+def api_format(api_response):
     '''
-    Returns a two-element list containing the content type and content.
+    Takes an ApiResponse and returns an HttpResponse.
     '''
+    http_response = api_response.http_response
     content_type = 'application/json'
-    if data is None:
-        content = ''
-    else:
-        content = json.dumps(data)
-    return [content_type, content]
+    content = ''
+
+    if api_response.data is not None and api_response.data != '':
+        content = json.dumps(api_response.data)
+
+    http_response['Content-type'] = content_type
+    http_response.content = content
+
+    log.debug('API response type: {0} content: {1}'.format(content_type, content))
+
+    return http_response
 
 
 def _get_course(request, course_id):
@@ -120,7 +122,7 @@ def index(request, course_id):
     notes = Note.objects.order_by('id').filter(course_id=course_id,
                                                user=request.user)[:MAX_LIMIT]
 
-    return [HttpResponse(), [note.as_dict() for note in notes]]
+    return ApiResponse(http_response=HttpResponse(), data=[note.as_dict() for note in notes])
 
 
 def create(request, course_id):
@@ -133,13 +135,13 @@ def create(request, course_id):
         note.clean(request.body)
     except ValidationError as e:
         log.debug(e)
-        return [HttpResponse('', status=500), None]
+        return ApiResponse(http_response=HttpResponse('', status=500), data=None)
 
     note.save()
     response = HttpResponse('', status=303)
     response['Location'] = note.get_absolute_url()
 
-    return [response, None]
+    return ApiResponse(http_response=response, data=None)
 
 
 def read(request, course_id, note_id):
@@ -149,12 +151,12 @@ def read(request, course_id, note_id):
     try:
         note = Note.objects.get(id=note_id)
     except:
-        return [HttpResponse('', status=404), None]
+        return ApiResponse(http_response=HttpResponse('', status=404), data=None)
 
     if not note.user.id == request.user.id:
-        return [HttpResponse('', status=403)]
+        return ApiResponse(http_response=HttpResponse('', status=403), data=None)
 
-    return [HttpResponse(), note.as_dict()]
+    return ApiResponse(http_response=HttpResponse(), data=note.as_dict())
 
 
 def update(request, course_id, note_id):
@@ -164,23 +166,23 @@ def update(request, course_id, note_id):
     try:
         note = Note.objects.get(id=note_id)
     except:
-        return [HttpResponse('', status=404), None]
+        return ApiResponse(http_response=HttpResponse('', status=404), data=None)
 
     if not note.user.id == request.user.id:
-        return [HttpResponse('', status=403)]
+        return ApiResponse(http_response=HttpResponse('', status=403), data=None)
 
     try:
         note.clean(request.body)
     except ValidationError as e:
         log.debug(e)
-        return [HttpResponse('', status=500), None]
+        return ApiResponse(http_response=HttpResponse('', status=500), data=None)
 
     note.save()
 
     response = HttpResponse('', status=303)
     response['Location'] = note.get_absolute_url()
 
-    return [response, None]
+    return ApiResponse(http_response=response, data=None)
 
 
 def delete(request, course_id, note_id):
@@ -190,14 +192,14 @@ def delete(request, course_id, note_id):
     try:
         note = Note.objects.get(id=note_id)
     except:
-        return [HttpResponse('', status=404), None]
+        return ApiResponse(http_response=HttpResponse('', status=404), data=None)
 
     if not note.user.id == request.user.id:
-        return [HttpResponse('', status=403)]
+        return ApiResponse(http_response=HttpResponse('', status=403), data=None)
 
     note.delete()
 
-    return [HttpResponse('', status=204), None]
+    return ApiResponse(http_response=HttpResponse('', status=204), data=None)
 
 
 def search(request, course_id):
@@ -238,11 +240,11 @@ def search(request, course_id):
         'rows': [note.as_dict() for note in rows]
     }
 
-    return [HttpResponse(), result]
+    return ApiResponse(http_response=HttpResponse(), data=result)
 
 
 def root(request, course_id):
     '''
     Returns version information about the API.
     '''
-    return [HttpResponse(), API_SETTINGS.get('META')]
+    return ApiResponse(http_response=HttpResponse(), data=API_SETTINGS.get('META'))
