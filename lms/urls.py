@@ -353,6 +353,12 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
         url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
     )
 
+if settings.MITX_FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
+    urlpatterns += (
+        url('^', include('djanalytics.core.urls')),
+    )
+    import djanalytics.core.registry
+
 # FoldIt views
 urlpatterns += (
     # The path is hardcoded into their app...
@@ -367,3 +373,5 @@ if settings.DEBUG:
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
+
+
