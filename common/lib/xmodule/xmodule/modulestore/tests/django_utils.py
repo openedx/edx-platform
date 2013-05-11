@@ -42,7 +42,7 @@ class ModuleStoreTestCase(TestCase):
         num_templates = modulestore.collection.find(query).count()
 
         if num_templates < 1:
-            update_templates()
+            update_templates(modulestore)
 
     @classmethod
     def setUpClass(cls):
