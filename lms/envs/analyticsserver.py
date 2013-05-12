@@ -19,9 +19,6 @@ import json
 ROOT_URLCONF = 'lms.urls'
 
 import sys
-#sys.path.append("/home/pmitros/mitx_all/mitx")
-#sys.path.append("/home/pmitros/mitx_all/mitx/edxdataanalytic")
-#print ">>>>>>>>>>>", [x for x in sys.path if "mitx_all/mitx" in str(x)]
 
 from .common import *
 from logsettings import get_logger_config
