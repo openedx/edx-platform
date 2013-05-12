@@ -18,6 +18,11 @@ import json
 
 ROOT_URLCONF = 'lms.urls'
 
+import sys
+#sys.path.append("/home/pmitros/mitx_all/mitx")
+#sys.path.append("/home/pmitros/mitx_all/mitx/edxdataanalytic")
+#print ">>>>>>>>>>>", [x for x in sys.path if "mitx_all/mitx" in str(x)]
+
 from .common import *
 from logsettings import get_logger_config
 
@@ -43,7 +48,7 @@ INSTALLED_APPS = INSTALLED_APPS + ( 'djeventstream.httphandler',
 )
 
 INSTALLED_ANALYTICS_MODULES = open("../analytics_modules.txt").readlines()
-INSTALLED_ANALYTICS_MODULES = [x for x in INSTALLED_ANALYTICS_MODULES if x and len(x)>1]
+INSTALLED_ANALYTICS_MODULES = [x.strip() for x in INSTALLED_ANALYTICS_MODULES if x and len(x)>1]
 
 DJFS = { 'type' : 'osfs',
          'directory_root' : '/tmp/djfsmodule',
