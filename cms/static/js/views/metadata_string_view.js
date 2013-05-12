@@ -1,6 +1,6 @@
 if (!CMS.Views['Metadata']) CMS.Views.Metadata = {};
 
-CMS.Views.Metadata.Generic = Backbone.View.extend({
+CMS.Views.Metadata.String = Backbone.View.extend({
 
     // Model class ...
     events : {
@@ -8,12 +8,17 @@ CMS.Views.Metadata.Generic = Backbone.View.extend({
 
     initialize : function() {
         var self = this;
+        this.uniqueId = _.uniqueId('metadata_string_entry_');
         // instantiates an editor template for each update in the collection
-        window.templateLoader.loadRemoteTemplate("metadata_entry",
+        window.templateLoader.loadRemoteTemplate("metadata_string_entry",
             "/static/client_templates/metadata_string_entry.html",
             function (raw_template) {
                 self.template = _.template(raw_template);
-                self.$el.append(self.template({model: self.model}));
+                self.$el.append(self.template({model: self.model, uniqueId: self.uniqueId}));
+                if (self.model.get('explicitly_set')) {
+                    self.$el.addClass('is-set');
+                    self.$el.find('#'+self.uniqueId + " .setting-clear").addClass('active');
+                }
             }
         );
     },
@@ -23,6 +28,6 @@ CMS.Views.Metadata.Generic = Backbone.View.extend({
     },
 
     getValue: function() {
-        return this.$el.find('.editor').val();
+        return this.$el.find('#' + this.uniqueId).val();
     }
 });

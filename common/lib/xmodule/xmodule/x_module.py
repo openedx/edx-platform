@@ -648,8 +648,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                                     'inheritable': inheritable,
                                     'explicitly_set': explicitly_set}
 
+            values = [] if field.values is None else field.values
+            for index, choice in enumerate(values):
+                values[index] = field.to_json(choice)
+
             simple_metadata[field.name] = {'value': field.to_json(value),
                                            'display_name' : field.display_name,
+                                           'options' : values,
                                            'default_value': field.to_json(default_value),
                                            'inheritable': inheritable,
                                            'explicitly_set': explicitly_set,
