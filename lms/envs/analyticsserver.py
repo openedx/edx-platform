@@ -4,7 +4,10 @@ This config file is used to host an analytics server. The edX codebase
 is fairly monolithic, and expensive to import from within the
 analytics framework. It also mixes up Django authentication databases,
 etc. The analytics framework is fairly modular, and easy to import
-from within edX. With this configuration.
+from within edX. With this configuration, we can import analytics as a
+library into the core edX platform, and use it to expose data through
+the standard analytics protocols. The main analytics servers can then
+use this to pull data out.
 
 This should configuration should never be enabled on a production LMS. 
 
