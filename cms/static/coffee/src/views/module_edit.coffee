@@ -86,5 +86,5 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   clickModeButton: (event) ->
     event.preventDefault()
-    @$el.removeClass('not-set')
-    @$el.addClass('is-set')
+    @$el.find("a").removeClass('not-set')
+    @$el.find("a").addClass('is-set')
