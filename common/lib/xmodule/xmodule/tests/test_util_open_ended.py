@@ -21,7 +21,8 @@ S3_INTERFACE = {
 
 class MockQueryDict(dict):
     """
-    Mock a query dict so that it can be used in test classes
+    Mock a query dict so that it can be used in test classes.  This will only work with the combinedopenended tests,
+    and does not mock the full query dict, only the behavior that is needed there (namely get_list).
     """
     def getlist(self, key, default=None):
         try:
