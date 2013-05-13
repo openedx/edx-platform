@@ -165,6 +165,13 @@ Video
     :members:
     :show-inheritance:
 
+Word Cloud
+==========
+
+.. automodule:: xmodule.word_cloud_module
+    :members:
+    :show-inheritance:
+
 X
 =
 
