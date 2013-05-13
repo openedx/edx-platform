@@ -3,8 +3,6 @@ metadata:
     display_name: Math Expression Input
     rerandomize: never
     showanswer: always
-    weight: ""
-    attempts: ""
 data: |
   <problem>
   <p>
