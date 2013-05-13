@@ -2,12 +2,15 @@ import json
 from mock import Mock, MagicMock, ANY
 import unittest
 
+from test_util_open_ended import MockQueryDict, DummyModulestore
+
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
-
 from xmodule.modulestore import Location
+
 from lxml import etree
 import capa.xqueue_interface as xqueue_interface
 from datetime import datetime
@@ -16,6 +19,9 @@ import logging
 log = logging.getLogger(__name__)
 
 from . import test_system
+
+ORG = 'edX'
+COURSE = 'open_ended'      # name of directory with course data
 
 import test_util_open_ended
 
@@ -29,6 +35,9 @@ OpenEndedModule
 
 
 class OpenEndedChildTest(unittest.TestCase):
+    """
+    Test the open ended child class
+    """
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
                          "SampleQuestion"])
 
@@ -62,7 +71,6 @@ class OpenEndedChildTest(unittest.TestCase):
         self.test_system = test_system()
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
                                              self.definition, self.descriptor, self.static_data, self.metadata)
-
 
     def test_latest_answer_empty(self):
         answer = self.openendedchild.latest_answer()
@@ -144,6 +152,9 @@ class OpenEndedChildTest(unittest.TestCase):
 
 
 class OpenEndedModuleTest(unittest.TestCase):
+    """
+    Test the open ended module class
+    """
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
                          "SampleQuestion"])
 
@@ -285,6 +296,9 @@ class OpenEndedModuleTest(unittest.TestCase):
 
 
 class CombinedOpenEndedModuleTest(unittest.TestCase):
+    """
+    Unit tests for the combined open ended xmodule
+    """
     location = Location(["i4x", "edX", "open_ended", "combinedopenended",
                          "SampleQuestion"])
     definition_template = """
@@ -360,7 +374,6 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                    location,
                                                    descriptor,
                                                    model_data={'data': full_definition, 'weight': '1'})
-
 
     def setUp(self):
         # TODO: this constructor call is definitely wrong, but neither branch
@@ -467,5 +480,148 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(score_dict['total'], 15.0)
 
 
+class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
+    """
+    Test the student flow in the combined open ended xmodule
+    """
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
+    answer = "blah blah"
+    assessment = [0, 1]
+    hint = "blah"
 
+    def setUp(self):
+        self.test_system = test_system()
+        self.test_system.xqueue['interface'] = Mock(
+            send_to_queue=Mock(side_effect=[1, "queued"])
+        )
+        self.setup_modulestore(COURSE)
 
+    def test_open_ended_load_and_save(self):
+        """
+        See if we can load the module and save an answer
+        @return:
+        """
+        #Load the module
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        #Try saving an answer
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
+        task_one_json = json.loads(module.task_states[0])
+        self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
+
+        module = self.get_module_from_location(self.problem_location, COURSE)
+        task_one_json = json.loads(module.task_states[0])
+        self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
+
+    def test_open_ended_flow_reset(self):
+        """
+        Test the flow of the module if we complete the self assessment step and then reset
+        @return:
+        """
+        assessment = [0, 1]
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        #Simulate a student saving an answer
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
+        status = module.handle_ajax("get_status", {})
+        self.assertTrue(isinstance(status, basestring))
+
+        #Mock a student submitting an assessment
+        assessment_dict = MockQueryDict()
+        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        module.handle_ajax("save_assessment", assessment_dict)
+        task_one_json = json.loads(module.task_states[0])
+        self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
+        status = module.handle_ajax("get_status", {})
+        self.assertTrue(isinstance(status, basestring))
+
+        #Move to the next step in the problem
+        module.handle_ajax("next_problem", {})
+        self.assertEqual(module.current_task_number, 0)
+
+        html = module.get_html()
+        self.assertTrue(isinstance(html, basestring))
+
+        rubric = module.handle_ajax("get_combined_rubric", {})
+        self.assertTrue(isinstance(rubric, basestring))
+        self.assertEqual(module.state, "assessing")
+        module.handle_ajax("reset", {})
+        self.assertEqual(module.current_task_number, 0)
+
+    def test_open_ended_flow_correct(self):
+        """
+        Test a two step problem where the student first goes through the self assessment step, and then the
+        open ended step.
+        @return:
+        """
+        assessment = [1, 1]
+        #Load the module
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        #Simulate a student saving an answer
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
+        status = module.handle_ajax("get_status", {})
+        self.assertTrue(isinstance(status, basestring))
+
+        #Mock a student submitting an assessment
+        assessment_dict = MockQueryDict()
+        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        module.handle_ajax("save_assessment", assessment_dict)
+        task_one_json = json.loads(module.task_states[0])
+        self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
+        module.handle_ajax("get_status", {})
+
+        #Move to the next step in the problem
+        try:
+            module.handle_ajax("next_problem", {})
+        except GradingServiceError:
+            #This error is okay.  We don't have a grading service to connect to!
+            pass
+        self.assertEqual(module.current_task_number, 1)
+        try:
+            module.get_html()
+        except GradingServiceError:
+            #This error is okay.  We don't have a grading service to connect to!
+            pass
+
+        #Try to get the rubric from the module
+        module.handle_ajax("get_combined_rubric", {})
+
+        #Make a fake reply from the queue
+        queue_reply = {
+            'queuekey': "",
+            'xqueue_body': json.dumps({
+                'score': 0,
+                'feedback': json.dumps({"spelling": "Spelling: Ok.", "grammar": "Grammar: Ok.",
+                                        "markup-text": " all of us can think of a book that we hope none of our children or any other children have taken off the shelf . but if i have the right to remove that book from the shelf that work i abhor then you also have exactly the same right and so does everyone else . and then we <bg>have no books left</bg> on the shelf for any of us . <bs>katherine</bs> <bs>paterson</bs> , author write a persuasive essay to a newspaper reflecting your vies on censorship <bg>in libraries . do</bg> you believe that certain materials , such as books , music , movies , magazines , <bg>etc . , should be</bg> removed from the shelves if they are found <bg>offensive ? support your</bg> position with convincing arguments from your own experience , observations <bg>, and or reading .</bg> "}),
+                'grader_type': "ML",
+                'success': True,
+                'grader_id': 1,
+                'submission_id': 1,
+                'rubric_xml': "<rubric><category><description>Writing Applications</description><score>0</score><option points='0'> The essay loses focus, has little information or supporting details, and the organization makes it difficult to follow.</option><option points='1'> The essay presents a mostly unified theme, includes sufficient information to convey the theme, and is generally organized well.</option></category><category><description> Language Conventions </description><score>0</score><option points='0'> The essay demonstrates a reasonable command of proper spelling and grammar. </option><option points='1'> The essay demonstrates superior command of proper spelling and grammar.</option></category></rubric>",
+                'rubric_scores_complete': True,
+            })
+        }
+
+        module.handle_ajax("check_for_score", {})
+
+        #Update the module with the fake queue reply
+        module.handle_ajax("score_update", queue_reply)
+        self.assertFalse(module.ready_to_reset)
+        self.assertEqual(module.current_task_number, 1)
+
+        #Get html and other data client will request
+        html = module.get_html()
+        legend = module.handle_ajax("get_legend", {})
+        self.assertTrue(isinstance(legend, basestring))
+
+        status = module.handle_ajax("get_status", {})
+        module.handle_ajax("skip_post_assessment", {})
+        self.assertTrue(isinstance(legend, basestring))
+
+        #Get all results
+        module.handle_ajax("get_results", {})
+
+        #reset the problem
+        module.handle_ajax("reset", {})
+        self.assertEqual(module.state, "initial")
