@@ -1,0 +1,17 @@
+{
+    "course/2012_Fall": {
+        "graceperiod": "2 days 5 hours 59 minutes 59 seconds",
+        "start": "2015-07-17T12:00",
+        "display_name": "Self Assessment Test",
+        "graded": "true"
+    },
+    "chapter/Overview": {
+        "display_name": "Overview"
+    },
+    "combinedopenended/SampleQuestion": {
+        "display_name": "Sample Question"
+    },
+    "peergrading/PeerGradingSample": {
+        "display_name": "Sample Question"
+    }
+}

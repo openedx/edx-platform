@@ -16,7 +16,7 @@ CMS.Models.Location = Backbone.Model.extend({
 	},
 	_tagPattern : /[^:]+/g,
 	_fieldPattern : new RegExp('[^/]+','g'),
-	
+
 	parse: function(payload) {
 		if (_.isArray(payload)) {
 			return {
@@ -25,7 +25,7 @@ CMS.Models.Location = Backbone.Model.extend({
 				course: payload[2],
 				category: payload[3],
 				name: payload[4]
-			}
+			};
 		}
 		else if (_.isString(payload)) {
 			this._tagPattern.lastIndex = 0; // odd regex behavior requires this to be reset sometimes
