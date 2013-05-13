@@ -19,5 +19,3 @@ def render_404(request):
 
 def render_500(request):
     return HttpResponseServerError(render_to_string('500.html', {}))
-
-

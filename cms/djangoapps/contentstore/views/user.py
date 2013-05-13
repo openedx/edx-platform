@@ -61,6 +61,7 @@ def index(request):
         'disable_course_creation': settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff
     })
 
+
 @login_required
 @ensure_csrf_cookie
 def manage_users(request, location):
@@ -82,8 +83,6 @@ def manage_users(request, location):
         'allow_actions': has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME),
         'request_user_id': request.user.id
     })
-
-
 
 
 @expect_json
@@ -145,4 +144,3 @@ def remove_user(request, location):
     remove_user_from_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
     return create_json_response()
-

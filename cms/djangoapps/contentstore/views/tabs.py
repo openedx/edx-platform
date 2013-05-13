@@ -11,8 +11,10 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_course_for_item
+from access import get_location_and_verify_access
 
 __all__ = ['edit_tabs', 'reorder_static_tabs']
+
 
 def initialize_course_tabs(course):
     # set up the default tabs
@@ -75,6 +77,7 @@ def reorder_static_tabs(request):
     modulestore('direct').update_metadata(course.location, own_metadata(course))
     return HttpResponse()
 
+
 @login_required
 @ensure_csrf_cookie
 def edit_tabs(request, org, course, coursename):
@@ -109,3 +112,21 @@ def edit_tabs(request, org, course, coursename):
         'context_course': course_item,
         'components': components
     })
+
+
+@login_required
+@ensure_csrf_cookie
+def static_pages(request, org, course, coursename):
+
+    location = get_location_and_verify_access(request, org, course, coursename)
+
+    course = modulestore().get_item(location)
+
+    return render_to_response('static-pages.html', {
+        'active_tab': 'pages',
+        'context_course': course,
+    })
+
+
+def edit_static(request, org, course, coursename):
+    return render_to_response('edit-static-page.html', {})

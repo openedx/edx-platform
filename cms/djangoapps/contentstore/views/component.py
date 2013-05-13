@@ -1,4 +1,5 @@
-import json, logging
+import json
+import logging
 from collections import defaultdict
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
@@ -23,7 +24,7 @@ from contentstore.utils import get_modulestore, get_lms_link_for_item, \
 from models.settings.course_grading import CourseGradingModel
 
 from requests import get_request_method, _xmodule_recurse
-from access import has_access, get_location_and_verify_access
+from access import has_access
 
 # TODO: should explicitly enumerate exports with __all__
 
@@ -269,23 +270,6 @@ def unpublish_unit(request):
     return HttpResponse()
 
 
-@login_required
-@ensure_csrf_cookie
-def static_pages(request, org, course, coursename):
-
-    location = get_location_and_verify_access(request, org, course, coursename)
-
-    course = modulestore().get_item(location)
-
-    return render_to_response('static-pages.html', {
-        'active_tab': 'pages',
-        'context_course': course,
-    })
-
-
-def edit_static(request, org, course, coursename):
-    return render_to_response('edit-static-page.html', {})
-
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -311,5 +295,3 @@ def module_info(request, module_location):
         return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
     else:
         return HttpResponseBadRequest()
-
-

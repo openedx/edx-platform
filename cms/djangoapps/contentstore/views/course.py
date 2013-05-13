@@ -1,4 +1,5 @@
-import json, time
+import json
+import time
 
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
@@ -26,6 +27,7 @@ from tabs import initialize_course_tabs
 from component import OPEN_ENDED_COMPONENT_TYPES, ADVANCED_COMPONENT_POLICY_KEY
 
 # TODO: should explicitly enumerate exports with __all__
+
 
 @login_required
 @ensure_csrf_cookie
@@ -187,6 +189,7 @@ def course_info_updates(request, org, course, provided_id=None):
         except:
             return HttpResponseBadRequest("Failed to save",
                                           content_type="text/plain")
+
 
 @login_required
 @ensure_csrf_cookie
@@ -362,5 +365,3 @@ def course_advanced_updates(request, org, course, name):
                     filter_tabs = False
         response_json = json.dumps(CourseMetadata.update_from_json(location, request_body, filter_tabs=filter_tabs))
         return HttpResponse(response_json, mimetype="application/json")
-
-

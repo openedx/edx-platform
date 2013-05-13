@@ -14,6 +14,7 @@ __all__ = ['signup', 'old_login_redirect', 'login_page', 'howitworks', 'ux_alert
 Public views
 """
 
+
 @ensure_csrf_cookie
 def signup(request):
     """
@@ -49,9 +50,9 @@ def howitworks(request):
     else:
         return render_to_response('howitworks.html', {})
 
+
 def ux_alerts(request):
     """
     static/proof-of-concept views
     """
     return render_to_response('ux-alerts.html', {})
-

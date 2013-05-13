@@ -14,6 +14,7 @@ from access import get_location_and_verify_access
 
 __all__ = ['get_checklists', 'update_checklist']
 
+
 @ensure_csrf_cookie
 @login_required
 def get_checklists(request, org, course, name):
@@ -101,7 +102,3 @@ def expand_checklist_action_urls(course_module):
             modified = True
 
     return checklists, modified
-
-
-
-

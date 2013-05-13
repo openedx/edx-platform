@@ -1,4 +1,8 @@
-import logging, json, os, tarfile, shutil
+import logging
+import json
+import os
+import tarfile
+import shutil
 from tempfile import mkdtemp
 from path import path
 
@@ -26,6 +30,7 @@ from access import get_location_and_verify_access
 from auth.authz import create_all_course_groups
 
 __all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
+
 
 @login_required
 @ensure_csrf_cookie
@@ -135,6 +140,7 @@ def upload_asset(request, org, course, coursename):
     response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
+
 @ensure_csrf_cookie
 @login_required
 def import_course(request, org, course, name):
@@ -240,6 +246,7 @@ def generate_export_course(request, org, course, name):
     response['Content-Length'] = os.path.getsize(export_file.name)
     return response
 
+
 @ensure_csrf_cookie
 @login_required
 def export_course(request, org, course, name):
@@ -253,4 +260,3 @@ def export_course(request, org, course, name):
         'active_tab': 'export',
         'successful_import_redirect_url': ''
     })
-

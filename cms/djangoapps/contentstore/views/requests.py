@@ -5,9 +5,11 @@ from mitxmako.shortcuts import render_to_string, render_to_response
 
 __all__ = ['edge', 'event', 'landing']
 
+
 # points to the temporary course landing page with log in and sign up
 def landing(request, org, course, coursename):
     return render_to_response('temp-course-landing.html', {})
+
 
 # points to the temporary edge page
 def edge(request):
@@ -35,12 +37,14 @@ def get_request_method(request):
 
     return real_method
 
+
 def create_json_response(errmsg=None):
     if errmsg is not None:
         resp = HttpResponse(json.dumps({'Status': 'Failed', 'ErrMsg': errmsg}))
     else:
         resp = HttpResponse(json.dumps({'Status': 'OK'}))
     return resp
+
 
 def render_from_lms(template_name, dictionary, context=None, namespace='main'):
     """
@@ -54,4 +58,3 @@ def _xmodule_recurse(item, action):
         _xmodule_recurse(child, action)
 
     action(item)
-

@@ -136,4 +136,3 @@ def delete_item(request):
                 modulestore('direct').update_children(parent.location, parent.children)
 
     return HttpResponse()
-

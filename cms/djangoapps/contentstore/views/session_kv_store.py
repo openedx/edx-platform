@@ -1,5 +1,6 @@
 from xblock.runtime import KeyValueStore, InvalidScopeError
 
+
 class SessionKeyValueStore(KeyValueStore):
     def __init__(self, request, model_data):
         self._model_data = model_data
