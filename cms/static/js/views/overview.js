@@ -6,26 +6,26 @@ $(document).ready(function() {
     $('.unit').draggable({
         axis: 'y',
         handle: '.drag-handle',
-        zIndex: 999,  
+        zIndex: 999,
         start: initiateHesitate,
         // left 2nd arg in as inert selector b/c i was uncertain whether we'd try to get the shove up/down
         // to work in the future
-        drag: generateCheckHoverState('.collapsed', ''), 
+        drag: generateCheckHoverState('.collapsed', ''),
         stop: removeHesitate,
         revert: "invalid"
     });
-    
+
     // Subsection reordering
     $('.id-holder').draggable({
         axis: 'y',
         handle: '.section-item .drag-handle',
-        zIndex: 999,  
+        zIndex: 999,
         start: initiateHesitate,
         drag: generateCheckHoverState('.courseware-section.collapsed', ''),
         stop: removeHesitate,
         revert: "invalid"
     });
-    
+
     // Section reordering
     $('.courseware-section').draggable({
         axis: 'y',
@@ -33,8 +33,8 @@ $(document).ready(function() {
         stack: '.courseware-section',
         revert: "invalid"
     });
-    
-    
+
+
     $('.sortable-unit-list').droppable({
         accept : '.unit',
         greedy: true,
@@ -50,7 +50,7 @@ $(document).ready(function() {
         drop: onSubsectionReordered,
         greedy: true
     });
-    
+
     // Section reordering
     $('.courseware-overview').droppable({
         accept : '.courseware-section',
@@ -58,7 +58,7 @@ $(document).ready(function() {
         drop: onSectionReordered,
         greedy: true
     });
-    
+
     // stop clicks on drag bars from doing their thing w/o stopping drag
     $('.drag-handle').click(function(e) {e.preventDefault(); });
 
@@ -87,7 +87,7 @@ function computeIntersection(droppable, uiHelper, y) {
 
     $.extend(droppable, {offset : $(droppable).offset()});
 
-    var t = droppable.offset.top, 
+    var t = droppable.offset.top,
         b = t + droppable.proportions.height;
 
     if (t === b) {
@@ -118,10 +118,10 @@ function generateCheckHoverState(selectorsToOpen, selectorsToShove) {
             this[c === "isout" ? "isover" : "isout"] = false;
             $(this).trigger(c === "isover" ? "dragEnter" : "dragLeave");
         });
-        
+
         $(selectorsToShove).each(function() {
             var intersectsBottom = computeIntersection(this, ui.helper, (draggable.positionAbs || draggable.position.absolute).top);
-            
+
             if ($(this).hasClass('ui-dragging-pushup')) {
                 if (!intersectsBottom) {
                      console.log('not up', $(this).data('id'));
@@ -132,10 +132,10 @@ function generateCheckHoverState(selectorsToOpen, selectorsToShove) {
                 console.log('up', $(this).data('id'));
                 $(this).addClass('ui-dragging-pushup');
             }
-            
-            var intersectsTop = computeIntersection(this, ui.helper, 
+
+            var intersectsTop = computeIntersection(this, ui.helper,
                     (draggable.positionAbs || draggable.position.absolute).top + draggable.helperProportions.height);
-            
+
             if ($(this).hasClass('ui-dragging-pushdown')) {
                 if (!intersectsTop) {
                     console.log('not down', $(this).data('id'));
@@ -146,7 +146,7 @@ function generateCheckHoverState(selectorsToOpen, selectorsToShove) {
                 console.log('down', $(this).data('id'));
                 $(this).addClass('ui-dragging-pushdown');
             }
-            
+
         });
     }
 }
@@ -159,20 +159,20 @@ function removeHesitate(event, ui) {
 }
 
 function expandSection(event) {
-        $(event.delegateTarget).removeClass('collapsed', 400); 
+        $(event.delegateTarget).removeClass('collapsed', 400);
         // don't descend to icon's on children (which aren't under first child) only to this element's icon
         $(event.delegateTarget).children().first().find('.expand-collapse-icon').removeClass('expand', 400).addClass('collapse');
 }
 
 function onUnitReordered(event, ui) {
         // a unit's been dropped on this subsection,
-        //       figure out where it came from and where it slots in. 
+        //       figure out where it came from and where it slots in.
         _handleReorder(event, ui, 'subsection-id', 'li:.leaf');
 }
 
 function onSubsectionReordered(event, ui) {
         // a subsection has been dropped on this section,
-        //       figure out where it came from and where it slots in. 
+        //       figure out where it came from and where it slots in.
         _handleReorder(event, ui, 'section-id', 'li:.branch');
 }
 
@@ -182,7 +182,7 @@ function onSectionReordered(event, ui) {
 }
 
 function _handleReorder(event, ui, parentIdField, childrenSelector) {
-        // figure out where it came from and where it slots in. 
+        // figure out where it came from and where it slots in.
         var subsection_id = $(event.target).data(parentIdField);
         var _els = $(event.target).children(childrenSelector);
         var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();

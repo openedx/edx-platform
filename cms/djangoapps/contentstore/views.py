@@ -72,7 +72,7 @@ log = logging.getLogger(__name__)
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
-ADVANCED_COMPONENT_TYPES = ['annotatable'] + OPEN_ENDED_COMPONENT_TYPES
+ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud'] + OPEN_ENDED_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 

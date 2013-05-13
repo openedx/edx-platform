@@ -11,7 +11,7 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.django import modulestore
 from .timeinfo import TimeInfo
 from xblock.core import Object, Integer, Boolean, String, Scope
-from xmodule.fields import Date, StringyFloat
+from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
 from open_ended_grading_classes import combined_open_ended_rubric
@@ -28,14 +28,14 @@ EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please 
 
 
 class PeerGradingFields(object):
-    use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.",
+    use_for_single_location = StringyBoolean(help="Whether to use this for a single location or as a panel.",
                                       default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
     link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION,
                               scope=Scope.settings)
-    is_graded = Boolean(help="Whether or not this module is scored.", default=IS_GRADED, scope=Scope.settings)
+    is_graded = StringyBoolean(help="Whether or not this module is scored.", default=IS_GRADED, scope=Scope.settings)
     due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
-    max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE,
+    max_grade = StringyInteger(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE,
                         scope=Scope.settings)
     student_data_for_location = Object(help="Student data for a given peer grading problem.",
                                        scope=Scope.user_state)
@@ -93,9 +93,9 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
 
-        if not isinstance(self.max_grade, (int, long)):
-            #This could result in an exception, but not wrapping in a try catch block so it moves up the stack
-            self.max_grade = int(self.max_grade)
+        #StringyInteger could return None, so keep this check.
+        if not isinstance(self.max_grade, int):
+            raise TypeError("max_grade needs to be an integer.")
 
     def closed(self):
         return self._closed(self.timeinfo)

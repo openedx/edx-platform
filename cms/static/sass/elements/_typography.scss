@@ -2,7 +2,7 @@
 // ====================
 
 // headings/titles
-.t-title-1, .t-title-2, .t-title-3, .t-title-4, .t-title-5, .t-title-5 {
+.t-title-1, .t-title-2, .t-title-3, .t-title-4, .t-title-5 {
   color: $gray-d3;
 }
 
@@ -21,7 +21,7 @@
 }
 
 .t-title-4 {
-
+  @include font-size(14);
 }
 
 .t-title-5 {
