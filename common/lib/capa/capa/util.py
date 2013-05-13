@@ -23,7 +23,9 @@ def compare_with_tolerance(v1, v2, tol):
         tolerance = evaluator(dict(), dict(), tol)
 
     if isinf(v1) or isinf(v2):
-        # because the other numerical comparison does not work with infinities
+        # If an input is infinite, we can end up with `abs(v1-v2)` and
+        # `tolerance` both equal to infinity. Then, below we would have
+        # `inf <= inf` which is a fail. Instead, compare directly.
         return v1 == v2
     else:
         return abs(v1 - v2) <= tolerance

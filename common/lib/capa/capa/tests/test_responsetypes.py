@@ -452,9 +452,12 @@ class FormulaResponseTest(ResponseTest):
         # Expect such a large answer to be marked incorrect
         input_formula = "x*1e999"
         self.assert_grade(problem, input_formula, "incorrect")
+        # Expect such a large negative answer to be marked incorrect
+        input_formula = "-x*1e999"
+        self.assert_grade(problem, input_formula, "incorrect")
 
     def test_grade_nan(self):
-        # attempt to produce a value which causes the student's answer to be
+        # Attempt to produce a value which causes the student's answer to be
         # evaluated to nan. See if this is resolved correctly.
 
         sample_dict = {'x': (1, 2)}
@@ -465,7 +468,7 @@ class FormulaResponseTest(ResponseTest):
                                      tolerance="1%",
                                      answer="x")
         # Expect an incorrect answer (+ nan) to be marked incorrect
-        # right now this evaluates to 'nan' for a given x (Python implementation-dependent)
+        # Right now this evaluates to 'nan' for a given x (Python implementation-dependent)
         input_formula = "10*x + 0*1e999"
         self.assert_grade(problem, input_formula, "incorrect")
         # Expect an correct answer (+ nan) to be marked incorrect
@@ -756,18 +759,19 @@ class NumericalResponseTest(ResponseTest):
                                      answer=4,
                                      tolerance="10%")
         correct_responses = []
-        incorrect_responses = ["1e999"]
+        incorrect_responses = ["1e999", "-1e999"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_nan(self):
-        # attempt to produce a value which causes the student's answer to be
+        # Attempt to produce a value which causes the student's answer to be
         # evaluated to nan. See if this is resolved correctly.
         problem = self.build_problem(question_text="What is 2 + 2 approximately?",
                                      explanation="The answer is 4",
                                      answer=4,
                                      tolerance="10%")
         correct_responses = []
-        # right now these evaluate to 'nan'
+        # Right now these evaluate to `nan`
+        # `4 + nan` should be incorrect
         incorrect_responses = ["0*1e999", "4 + 0*1e999"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
