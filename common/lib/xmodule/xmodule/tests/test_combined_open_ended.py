@@ -524,6 +524,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
         status = module.handle_ajax("get_status", {})
+        self.assertTrue(isinstance(status, basestring))
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
@@ -531,14 +532,21 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
-        module.handle_ajax("get_status", {})
+        status = module.handle_ajax("get_status", {})
+        self.assertTrue(isinstance(status, basestring))
 
         #Move to the next step in the problem
         module.handle_ajax("next_problem", {})
-        module.get_html()
-        module.handle_ajax("get_combined_rubric", {})
+        self.assertEqual(module.current_task_number,0)
 
+        html = module.get_html()
+        self.assertTrue(isinstance(html, basestring))
+
+        rubric = module.handle_ajax("get_combined_rubric", {})
+        self.assertTrue(isinstance(rubric, basestring))
+        self.assertEqual(module.state, "assessing")
         module.handle_ajax("reset", {})
+        self.assertEqual(module.current_task_number, 0)
 
     def test_open_ended_flow_correct(self):
         """
@@ -553,6 +561,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
         status = module.handle_ajax("get_status", {})
+        self.assertTrue(isinstance(status, basestring))
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
@@ -568,6 +577,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         except GradingServiceError:
             #This error is okay.  We don't have a grading service to connect to!
             pass
+        self.assertEqual(module.current_task_number,1)
         try:
             module.get_html()
         except GradingServiceError:
@@ -597,16 +607,21 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Update the module with the fake queue reply
         module.handle_ajax("score_update", queue_reply)
+        self.assertFalse(module.ready_to_reset)
+        self.assertEqual(module.current_task_number,1)
 
         #Get html and other data client will request
         html = module.get_html()
         legend = module.handle_ajax("get_legend", {})
+        self.assertTrue(isinstance(legend, basestring))
+
         status = module.handle_ajax("get_status", {})
-        legend = module.handle_ajax("skip_post_assessment", {})
+        module.handle_ajax("skip_post_assessment", {})
+        self.assertTrue(isinstance(legend, basestring))
 
         #Get all results
-        legend = module.handle_ajax("get_results", {})
+        module.handle_ajax("get_results", {})
 
-        log.info(module.task_states)
         #reset the problem
         module.handle_ajax("reset", {})
+        self.assertEqual(module.state, "initial")
