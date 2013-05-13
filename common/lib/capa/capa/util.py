@@ -23,9 +23,11 @@ def compare_with_tolerance(v1, v2, tol):
         tolerance = evaluator(dict(), dict(), tol)
 
     if isinf(v1) or isinf(v2):
-        return v1 == v2 # because the other numerical comparison does not work with infinities
+        # because the other numerical comparison does not work with infinities
+        return v1 == v2
     else:
         return abs(v1 - v2) <= tolerance
+
 
 def contextualize_text(text, context):  # private
     ''' Takes a string with variables. E.g. $a+$b.
@@ -55,7 +57,8 @@ def convert_files_to_filenames(answers):
     new_answers = dict()
     for answer_id in answers.keys():
         answer = answers[answer_id]
-        if is_list_of_files(answer):   # Files are stored as a list, even if one file
+        # Files are stored as a list, even if one file
+        if is_list_of_files(answer):
             new_answers[answer_id] = [f.name for f in answer]
         else:
             new_answers[answer_id] = answers[answer_id]

@@ -2,7 +2,8 @@
 # File:   courseware/capa/responsetypes.py
 #
 '''
-Problem response evaluation.  Handles checking of student responses, of a variety of types.
+Problem response evaluation.  Handles checking of student responses,
+of a variety of types.
 
 Used by capa_problem.py
 '''

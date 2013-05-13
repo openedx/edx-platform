@@ -442,7 +442,7 @@ class FormulaResponseTest(ResponseTest):
         # This resolves a bug where a problem with relative tolerance would
         # pass with any arbitrarily large student answer.
 
-        sample_dict = {'x' : (1,2)}
+        sample_dict = {'x': (1, 2)}
 
         # Test problem
         problem = self.build_problem(sample_dict=sample_dict,
@@ -457,7 +457,7 @@ class FormulaResponseTest(ResponseTest):
         # attempt to produce a value which causes the student's answer to be
         # evaluated to nan. See if this is resolved correctly.
 
-        sample_dict = {'x' : (1,2)}
+        sample_dict = {'x': (1, 2)}
 
         # Test problem
         problem = self.build_problem(sample_dict=sample_dict,
@@ -465,7 +465,11 @@ class FormulaResponseTest(ResponseTest):
                                      tolerance="1%",
                                      answer="x")
         # Expect an incorrect answer (+ nan) to be marked incorrect
-        input_formula = "10*x + 0*1e999" # right now this evaluates to 'nan' for a given x
+        # right now this evaluates to 'nan' for a given x (Python implementation-dependent)
+        input_formula = "10*x + 0*1e999"
+        self.assert_grade(problem, input_formula, "incorrect")
+        # Expect an correct answer (+ nan) to be marked incorrect
+        input_formula = "x + 0*1e999"
         self.assert_grade(problem, input_formula, "incorrect")
 
 
@@ -763,7 +767,8 @@ class NumericalResponseTest(ResponseTest):
                                      answer=4,
                                      tolerance="10%")
         correct_responses = []
-        incorrect_responses = ["0*1e999"] # right now this evaluates to 'nan' for a given x
+        # right now these evaluate to 'nan'
+        incorrect_responses = ["0*1e999", "4 + 0*1e999"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_with_script(self):
