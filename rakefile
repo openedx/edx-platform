@@ -14,8 +14,7 @@ LMS_REPORT_DIR = File.join(REPORT_DIR, "lms")
 
 # Packaging constants
 DEPLOY_DIR = "/opt/wwc"
-PACKAGE_NAME = "mitx"
-LINK_PATH = "/opt/wwc/mitx"
+PACKAGE_NAME = "edx-platform"
 PKG_VERSION = "0.1"
 COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
 BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '')
