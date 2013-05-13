@@ -1,8 +1,8 @@
-'''
+"""
 Created on Mar 13, 2013
 
 @author: dmitchell
-'''
+"""
 from __future__ import absolute_import
 import re
 import logging
@@ -41,13 +41,13 @@ class Locator(object):
 
 
 class CourseLocator(Locator):
-    '''
+    """
     Should have at lease a specific course_id (id for the course as if it were a project w/
     versions) with optional 'revision' (must be 'draft', 'published', or None),
     or version_guid (which points to a specific version). Can contain both in which case
     the persistence layer may raise exceptions if the given version != the current such version
     of the course.
-    '''
+    """
     SPECIFIC_VERSION = 'cvx'
     RUN_TRACKING_VERSION = 'crx'
 
@@ -95,10 +95,10 @@ class CourseLocator(Locator):
         _parse_init_arg(kwargs)
 
     def _ensure_fully_specified(self):
-        '''
+        """
         Make sure this object is valid, and fully specified.
         Returns True or False.
-        '''
+        """
         return self.version_guid is not None or self.course_id is not None
 
     def url(self):
@@ -210,7 +210,7 @@ class BlockUsageLocator(CourseLocator):
 
     @staticmethod
     def ensure_fully_specified(location):
-        '''
+        """
         Make sure location is valid, and fully specified.  Raises
         InvalidLocationError or InsufficientSpecificationError if not.
 
@@ -219,7 +219,7 @@ class BlockUsageLocator(CourseLocator):
         does not accept kwargs nor overrides. Replace uses of this which intend
         it to only give an instance if the model is well-formed with
         BlockUsageLocator.ensure_fully_specified(BlockUsageLocator(args..))
-        '''
+        """
         if isinstance(location, BlockUsageLocator):
             loc = location
         else:
@@ -232,10 +232,10 @@ class BlockUsageLocator(CourseLocator):
         return loc
 
     def replace(self, **kwargs):
-        '''
+        """
         Return a new Location instance which is a copy of this one except for
         overrides in the arg list.
-        '''
+        """
         return BlockUsageLocator(self, kwargs)
 
     def url(self):
@@ -250,9 +250,9 @@ class BlockUsageLocator(CourseLocator):
 
 
 class DescriptionLocator(Locator):
-    '''
+    """
     Container for how to locate a description
-    '''
+    """
     DESCRIPTION_TAG = 'dx'
 
     def __init__(self, def_id):
@@ -266,13 +266,13 @@ class DescriptionLocator(Locator):
 
 
 class VersionTree(object):
-    '''
+    """
     Holds trees of Locators to represent version histories.
-    '''
+    """
     def __init__(self, locator, tree_dict=None):
-        '''
+        """
         :param locator: must be version specific (Course has version_guid or definition had id)
-        '''
+        """
         self.locator = locator
         if tree_dict is None:
             self.children = []
