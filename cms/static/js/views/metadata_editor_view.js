@@ -6,8 +6,6 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
     events : {
     },
 
-    views : {}, // child views
-
     initialize : function() {
         var self = this;
         // instantiates an editor template for each update in the collection
@@ -17,8 +15,17 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
                 self.template = _.template(raw_template);
                 self.$el.append(self.template({metadata_entries: self.model.attributes}));
                 var counter = 0;
-                _.each(self.model.attributes,
-                    function(item, key) {
+
+                // Sort entries by display name.
+                var sortedObject = _.sortBy(self.model.attributes,
+                    function (val) {
+                        return val.display_name
+                    });
+
+                self.views = [];
+
+                _.each(sortedObject,
+                    function (item) {
                         var data = {
                             el: self.$el.find('.metadata_entry')[counter++],
                             model: new CMS.Models.Metadata(item)
@@ -26,10 +33,10 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
                         if (item.options.length > 0) {
                             // Right now, all our option types only hold strings. Should really support
                             // any type though.
-                            self.views[key] = new CMS.Views.Metadata.Option(data);
+                            self.views.push(new CMS.Views.Metadata.Option(data));
                         }
                         else {
-                            self.views[key] = new CMS.Views.Metadata.String(data);
+                            self.views.push(new CMS.Views.Metadata.String(data));
                         }
 
                     });
@@ -40,9 +47,9 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
     getModifiedMetadataValues: function () {
         var modified_values = {};
         _.each(this.views,
-            function (item, key) {
+            function (item) {
                 if (item.modified()) {
-                    modified_values[key] = item.getValue();
+                    modified_values[item.getFieldName()] = item.getValue();
                 }
             }
         );
@@ -114,6 +121,10 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
 
     getValue: function() {
         return this.model.getValue();
+    },
+
+    getFieldName: function() {
+        return this.model.getFieldName();
     }
 });
 
@@ -152,10 +163,27 @@ CMS.Views.Metadata.Option = CMS.Views.Metadata.AbstractEditor.extend({
     },
 
     getValueFromEditor : function () {
-        return this.$el.find('#' + this.uniqueId).find(":selected").text();
+        var selectedText = this.$el.find('#' + this.uniqueId).find(":selected").text();
+        var selectedValue;
+        _.each(this.model.getOptions(), function (modelValue) {
+            if (modelValue === selectedText) {
+                selectedValue = modelValue;
+            }
+            else if (modelValue['display_name'] === selectedText) {
+                selectedValue = modelValue['value'];
+            }
+        });
+        return selectedValue;
     },
 
     setValueInEditor : function (value) {
+        // Value here is the json value as used by the field. The choice may instead be showing display names.
+        // Find the display name matching the value passed in.
+        _.each(this.model.getOptions(), function (modelValue) {
+            if (modelValue['value'] === value) {
+                value = modelValue['display_name'];
+            }
+        });
         $('#' + this.uniqueId + " option").filter(function() {
             return $(this).text() === value;
         }).prop('selected', true);

@@ -651,10 +651,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
             values = [] if field.values is None else field.values
             for index, choice in enumerate(values):
-                values[index] = field.to_json(choice)
+                json_choice = choice
+                # TODO: test this logic.
+                if 'value' in json_choice:
+                    json_choice['value'] = field.to_json(json_choice['value'])
+                else:
+                    json_choice = field.to_json(json_choice)
+                values[index] = json_choice
 
-            simple_metadata[field.name] = {'value': field.to_json(value),
+            simple_metadata[field.name] = {'field_name' : field.name,
                                            'display_name' : field.display_name,
+                                           'value': field.to_json(value),
                                            'options' : values,
                                            'default_value': field.to_json(default_value),
                                            'inheritable': inheritable,

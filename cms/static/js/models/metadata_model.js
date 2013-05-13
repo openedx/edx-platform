@@ -3,10 +3,12 @@ CMS.Models.Metadata = Backbone.Model.extend({
     url: '',
 
     defaults: {
+        "field_name": null,
         "display_name": null,
         "value" : null,
         "explicitly_set": null,
-        "default_value" : null
+        "default_value" : null,
+        "options" : null
     },
 
     initialize: function() {
@@ -43,6 +45,14 @@ CMS.Models.Metadata = Backbone.Model.extend({
     setValue: function (value) {
         this.set('explicitly_set', true);
         this.set('value', value);
+    },
+
+    getFieldName: function () {
+        return this.get('field_name');
+    },
+
+    getOptions: function () {
+        return this.get('options');
     },
 
     clear: function() {
