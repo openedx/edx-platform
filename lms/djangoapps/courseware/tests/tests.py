@@ -399,6 +399,14 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
         import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
         self.check_random_page_loads(module_store)
 
+    def test_full_textbooks_loads(self):
+        module_store = modulestore()
+        import_from_xml(module_store, TEST_DATA_DIR, ['full'])
+
+        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        self.assertGreater(len(course.textbooks), 0)
+
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestNavigation(LoginEnrollmentTestCase):
