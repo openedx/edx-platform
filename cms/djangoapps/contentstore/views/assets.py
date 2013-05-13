@@ -149,9 +149,9 @@ def import_course(request, org, course, name):
     location = get_location_and_verify_access(request, org, course, name)
 
     if request.method == 'POST':
-        filenames = request.FILES['course-data'].name
+        filename = request.FILES['course-data'].name
 
-        if not filenames.endswith('.tar.gz'):
+        if not filename.endswith('.tar.gz'):
             return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
 
         data_root = path(settings.GITHUB_REPO_ROOT)
@@ -161,7 +161,7 @@ def import_course(request, org, course, name):
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        temp_filepath = course_dir / filenames
+        temp_filepath = course_dir / filename
 
         logging.debug('importing course to {0}'.format(temp_filepath))
 
