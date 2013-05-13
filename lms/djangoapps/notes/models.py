@@ -2,10 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from django.utils.html import strip_tags
 import json
-import logging
-
-log = logging.getLogger(__name__)
 
 
 class Note(models.Model):
@@ -14,9 +12,9 @@ class Note(models.Model):
     uri = models.CharField(max_length=1024, db_index=True)
     text = models.TextField(default="")
     quote = models.TextField(default="")
-    range_start = models.CharField(max_length=2048)
+    range_start = models.CharField(max_length=2048) # xpath string
     range_start_offset = models.IntegerField()
-    range_end = models.CharField(max_length=2048)
+    range_end = models.CharField(max_length=2048) # xpath string
     range_end_offset = models.IntegerField()
     tags = models.TextField(default="")  # comma-separated string
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
@@ -33,9 +31,12 @@ class Note(models.Model):
         if not type(body) is dict:
             raise ValidationError('Note body must be a dictionary.')
 
-        self.uri = body.get('uri')
-        self.text = body.get('text')
-        self.quote = body.get('quote')
+        # NOTE: all three of these fields should be considered user input
+        # and may be output back to the user, so we need to sanitize them.
+        # These fields should only contain _plain text_.
+        self.uri = strip_tags(body.get('uri', ''))
+        self.text = strip_tags(body.get('text', ''))
+        self.quote = strip_tags(body.get('quote', ''))
 
         ranges = body.get('ranges')
         if ranges is None or len(ranges) != 1:
@@ -47,7 +48,7 @@ class Note(models.Model):
         self.range_end_offset = ranges[0]['endOffset']
 
         self.tags = ""
-        tags = body.get('tags', [])
+        tags = [strip_tags(tag) for tag in body.get('tags', [])]
         if len(tags) > 0:
             self.tags = ",".join(tags)
 
