@@ -13,7 +13,7 @@ from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_course_for_item
 from access import get_location_and_verify_access
 
-__all__ = ['edit_tabs', 'reorder_static_tabs']
+__all__ = ['edit_tabs', 'reorder_static_tabs', 'static_pages', 'edit_static']
 
 
 def initialize_course_tabs(course):
