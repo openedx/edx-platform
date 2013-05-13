@@ -12,9 +12,9 @@ class Note(models.Model):
     uri = models.CharField(max_length=1024, db_index=True)
     text = models.TextField(default="")
     quote = models.TextField(default="")
-    range_start = models.CharField(max_length=2048) # xpath string
+    range_start = models.CharField(max_length=2048)  # xpath string
     range_start_offset = models.IntegerField()
-    range_end = models.CharField(max_length=2048) # xpath string
+    range_end = models.CharField(max_length=2048)  # xpath string
     range_end_offset = models.IntegerField()
     tags = models.TextField(default="")  # comma-separated string
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)

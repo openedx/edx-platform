@@ -1,5 +1,8 @@
 <%namespace name='static' file='static_content.html'/>
 <%inherit file="main.html" />
+<%!
+    from django.core.urlresolvers import reverse
+%>
 
 <%block name="headextra">
     <%static:css group='course'/>
@@ -52,7 +55,7 @@
 
 <section class="container">
     <div class="notes-wrapper">
-        <h2>My Notes</h2>
+        <h1>My Notes</h1>
         % for note in notes:
         <div class="note">
             <blockquote>${note.quote|h}</blockquote>
@@ -67,6 +70,9 @@
                 </ul>
         </div>
         % endfor
+        % if notes is UNDEFINED or len(notes) == 0:
+            <p>You do not have any notes.</p>
+        % endif
     </div>
 </section>
 

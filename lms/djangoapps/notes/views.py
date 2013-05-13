@@ -16,11 +16,9 @@ def notes(request, course_id):
         raise Http404
 
     notes = Note.objects.filter(course_id=course_id, user=request.user).order_by('-created', 'uri')
-    json_notes = json.dumps([n.as_dict() for n in notes])
     context = {
         'course': course,
-        'notes': notes,
-        'json_notes': json_notes
+        'notes': notes
     }
 
     return render_to_response('notes.html', context)
