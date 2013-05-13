@@ -9,6 +9,7 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from xblock.core import XBlock, Scope, String
+from xmodule.modulestore import inheritance
 
 log = logging.getLogger(__name__)
 
