@@ -23,8 +23,8 @@ def pretty_bool(value):
     return value in BOOL_DICT
 
 
-class WordCloudDescriptorFields(object):
-    """Word Cloud Xfields for descriptor/xml."""
+class WordCloudFields(object):
+    """XFields for word cloud."""
     display_name = String(
         help="Display name for this module",
         scope=Scope.settings
@@ -45,9 +45,7 @@ class WordCloudDescriptorFields(object):
         default=True
     )
 
-
-class WordCloudFields(object):
-    """ XFields for word cloud """
+    # Fields for descriptor.
     submitted = Boolean(
         help="Whether this student has posted words to the cloud.",
         scope=Scope.user_state,
@@ -68,7 +66,7 @@ class WordCloudFields(object):
     )
 
 
-class WordCloudModule(WordCloudFields, WordCloudDescriptorFields, XModule):
+class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Xmodule"""
     js = {
         'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
@@ -229,7 +227,7 @@ class WordCloudModule(WordCloudFields, WordCloudDescriptorFields, XModule):
         return self.content
 
 
-class WordCloudDescriptor(WordCloudDescriptorFields, RawDescriptor):
+class WordCloudDescriptor(WordCloudFields, RawDescriptor):
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
