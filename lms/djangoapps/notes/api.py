@@ -153,7 +153,7 @@ def read(request, course_id, note_id):
     except Note.DoesNotExist:
         return ApiResponse(http_response=HttpResponse('', status=404), data=None)
 
-    if not note.user.id == request.user.id:
+    if note.user.id != request.user.id:
         return ApiResponse(http_response=HttpResponse('', status=403), data=None)
 
     return ApiResponse(http_response=HttpResponse(), data=note.as_dict())
@@ -168,7 +168,7 @@ def update(request, course_id, note_id):
     except Note.DoesNotExist:
         return ApiResponse(http_response=HttpResponse('', status=404), data=None)
 
-    if not note.user.id == request.user.id:
+    if note.user.id != request.user.id:
         return ApiResponse(http_response=HttpResponse('', status=403), data=None)
 
     try:
@@ -194,7 +194,7 @@ def delete(request, course_id, note_id):
     except Note.DoesNotExist:
         return ApiResponse(http_response=HttpResponse('', status=404), data=None)
 
-    if not note.user.id == request.user.id:
+    if note.user.id != request.user.id:
         return ApiResponse(http_response=HttpResponse('', status=403), data=None)
 
     note.delete()
