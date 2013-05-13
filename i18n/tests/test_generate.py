@@ -1,9 +1,10 @@
-import os, string, random
+import os, string, random, re
+from polib import pofile
 from unittest import TestCase
 from datetime import datetime, timedelta
 
 import generate
-from execute import get_config, messages_dir, SOURCE_MSGS_DIR, SOURCE_LOCALE
+from config import CONFIGURATION
 
 class TestGenerate(TestCase):
     """
@@ -12,29 +13,16 @@ class TestGenerate(TestCase):
     generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
 
     def setUp(self):
-        self.configuration = get_config()
-
         # Subtract 1 second to help comparisons with file-modify time succeed,
         # since os.path.getmtime() is not millisecond-accurate
         self.start_time = datetime.now() - timedelta(seconds=1)
-
-    def test_configuration(self):
-        """
-        Make sure we have a valid configuration file,
-        and that it contains an 'en' locale.
-        """
-        self.assertIsNotNone(self.configuration)
-        locales = self.configuration['locales']
-        self.assertIsNotNone(locales)
-        self.assertIsInstance(locales, list)
-        self.assertIn('en', locales)
 
     def test_merge(self):
         """
         Tests merge script on English source files.
         """
-        filename = os.path.join(SOURCE_MSGS_DIR, random_name())
-        generate.merge(SOURCE_LOCALE, target=filename)
+        filename = os.path.join(CONFIGURATION.source_messages_dir, random_name())
+        generate.merge(CONFIGURATION.source_locale, target=filename)
         self.assertTrue(os.path.exists(filename))
         os.remove(filename)
 
@@ -47,13 +35,35 @@ class TestGenerate(TestCase):
         after start of test suite)
         """
         generate.main()
-        for locale in self.configuration['locales']:
-            for filename in ('django.mo', 'djangojs.mo'):
-                path = os.path.join(messages_dir(locale), filename)
+        for locale in CONFIGURATION.locales:
+            for filename in ('django', 'djangojs'):
+                mofile = filename+'.mo'
+                path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
-                self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, filename))
+                self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
                 self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path)) >= self.start_time,
                                 msg='File not recently modified: %s' % path)
+            self.assert_merge_headers(locale)
+
+    def assert_merge_headers(self, locale):
+        """
+        This is invoked by test_main to ensure that it runs after
+        calling generate.main().
+        
+        There should be exactly three merge comment headers
+        in our merged .po file. This counts them to be sure.
+        A merge comment looks like this:
+        # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+
+        """
+        path = os.path.join(CONFIGURATION.get_messages_dir(locale), 'django.po')
+        po = pofile(path)
+        pattern = re.compile('^#-#-#-#-#', re.M)
+        match = pattern.findall(po.header)
+        self.assertEqual(len(match), 3,
+                         msg="Found %s (should be 3) merge comments in the header for %s" % \
+                         (len(match), path))
+
 
 def random_name(size=6):
     """Returns random filename as string, like test-4BZ81W"""
