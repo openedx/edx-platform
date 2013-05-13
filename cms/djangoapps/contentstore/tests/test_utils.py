@@ -2,6 +2,7 @@
 from contentstore import utils
 import mock
 import collections
+import copy
 from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -92,7 +93,7 @@ class ExtraPanelTabTestCase(TestCase):
             course.tabs = tabs
         return course
 
-    def add_extra_panel_tab(self):
+    def test_add_extra_panel_tab(self):
         """ Tests if a tab can be added to a course tab list. """
         for tab_type in utils.EXTRA_TAB_PANELS.keys():
             tab = utils.EXTRA_TAB_PANELS.get(tab_type)
@@ -100,7 +101,8 @@ class ExtraPanelTabTestCase(TestCase):
             # test adding with changed = True
             for tab_setup in ['', 'x', 'x,y,z']:
                 course = self.get_course_with_tabs(tab_setup)
-                expected_tabs = course.tabs + tab
+                expected_tabs = copy.copy(course.tabs)
+                expected_tabs.append(tab)
                 changed, actual_tabs = utils.add_extra_panel_tab(tab_type, course)
                 self.assertTrue(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
@@ -114,12 +116,12 @@ class ExtraPanelTabTestCase(TestCase):
 
             for tab_setup in tab_test_setup:
                 course = self.get_course_with_tabs(tab_setup)
-                expected_tabs = course.tabs
+                expected_tabs = copy.copy(course.tabs)
                 changed, actual_tabs = utils.add_extra_panel_tab(tab_type, course)
                 self.assertFalse(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
 
-    def remove_tab_test(self):
+    def test_remove_extra_panel_tab(self):
         """ Tests if a tab can be removed from a course tab list. """
         for tab_type in utils.EXTRA_TAB_PANELS.keys():
             tab = utils.EXTRA_TAB_PANELS.get(tab_type)
@@ -141,9 +143,7 @@ class ExtraPanelTabTestCase(TestCase):
             # test removing with changed = False
             for tab_setup in ['', 'x', 'x,y,z']:
                 course = self.get_course_with_tabs(tab_setup)
-                expected_tabs = course.tabs
-                print "expected_tabs = "
-                print expected_tabs
+                expected_tabs = copy.copy(course.tabs)
                 changed, actual_tabs = utils.remove_extra_panel_tab(tab_type, course)
                 self.assertFalse(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
