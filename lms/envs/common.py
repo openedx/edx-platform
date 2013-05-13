@@ -90,7 +90,11 @@ MITX_FEATURES = {
 
     # Give a UI to show a student's submission history in a problem by the
     # Staff Debug tool.
-    'ENABLE_STUDENT_HISTORY_VIEW': True
+    'ENABLE_STUDENT_HISTORY_VIEW': True,
+
+    # Turn on a page that lets staff enter Python code to be run in the
+    # sandbox, for testing whether it's enabled properly.
+    'ENABLE_DEBUG_RUN_PYTHON': False,
 }
 
 # Used for A/B testing
