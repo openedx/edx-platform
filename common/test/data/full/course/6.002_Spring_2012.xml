@@ -1,4 +1,5 @@
-<sequential>
+<course>
+  <textbook title="Textbook" book_url="https://s3.amazonaws.com/edx-textbooks/guttag_computation_v3/"/>
   <chapter filename="Overview" slug="Overview" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Overview"/>
   <chapter filename="Week_1" slug="Week_1" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Week 1"/>
   <chapter slug="Midterm_Exam" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Midterm Exam">
@@ -9,4 +10,4 @@
       <vertical filename="vertical_98" slug="vertical_1124" graceperiod="0 day 0 hours 5 minutes 0 seconds" showanswer="attempted" rerandomize="per_student" due="April 30, 12:00" graded="true"/>
     </sequential>
   </chapter>
-</sequential>
+</course>
