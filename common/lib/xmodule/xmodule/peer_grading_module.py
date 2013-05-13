@@ -498,7 +498,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error("Problem {0} does not exist in this course".format(location))
                 raise
 
-
         for problem in problem_list:
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)

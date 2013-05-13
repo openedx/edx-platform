@@ -4,7 +4,7 @@ from nose.plugins.skip import SkipTest
 from datetime import datetime, timedelta
 
 import extract
-from execute import SOURCE_MSGS_DIR
+from config import CONFIGURATION
 
 # Make sure setup runs only once
 SETUP_HAS_RUN = False
@@ -39,7 +39,7 @@ class TestExtract(TestCase):
         Fails assertion if one of the files doesn't exist.
         """
         for filename in self.generated_files:
-            path = os.path.join(SOURCE_MSGS_DIR, filename)
+            path = os.path.join(CONFIGURATION.source_messages_dir, filename)
             exists = os.path.exists(path)
             self.assertTrue(exists, msg='Missing file: %s' % filename)
             if exists:

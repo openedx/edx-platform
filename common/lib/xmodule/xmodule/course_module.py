@@ -382,6 +382,19 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         return definition, children
 
+    def definition_to_xml(self, resource_fs):
+        xml_object = super(CourseDescriptor, self).definition_to_xml(resource_fs)
+
+        if len(self.textbooks) > 0:
+            textbook_xml_object = etree.Element('textbook')
+            for textbook in self.textbooks:
+                textbook_xml_object.set('title', textbook.title)
+                textbook_xml_object.set('book_url', textbook.book_url)
+
+            xml_object.append(textbook_xml_object)
+        
+        return xml_object
+
     def has_ended(self):
         """
         Returns True if the current time is after the specified course end date.
