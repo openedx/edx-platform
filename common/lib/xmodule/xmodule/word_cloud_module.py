@@ -19,7 +19,11 @@ log = logging.getLogger(__name__)
 
 
 def pretty_bool(value):
-    """Check value for possible `True` value."""
+    """Check value for possible `True` value.
+
+    Using this function we can manage different type of Boolean value
+    in xml files.
+    """
     bool_dict = [True, "True", "true", "T", "t", "1"]
     return value in bool_dict
 
