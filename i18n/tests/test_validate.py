@@ -28,7 +28,7 @@ def validate_po_file(filename, log):
     raise SkipTest()
     # Use relative paths to make output less noisy.
     rfile = os.path.relpath(filename, LOCALE_DIR)
-    (out, err) = call(['msgfmt','-c', rfile], log=False, working_directory=LOCALE_DIR)
+    (out, err) = call(['msgfmt','-c', rfile], working_directory=LOCALE_DIR)
     if err != '':
         log.warn('\n'+err)
 

@@ -32,8 +32,9 @@ BABEL_OUT = BASE_DIR.relpathto(CONFIGURATION.source_messages_dir.joinpath('mako.
 
 SOURCE_WARN = 'This English source file is machine-generated. Do not check it into github'
 
+LOG = logging.getLogger(__name__)
+
 def main ():
-    log = logging.getLogger(__name__)
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
@@ -63,7 +64,7 @@ def main ():
     execute(make_djangojs_cmd, working_directory=BASE_DIR)
 
     for filename in generated_files:
-        log.info('Cleaning %s' % filename)
+        LOG.info('Cleaning %s' % filename)
         po = pofile(source_msgs_dir.joinpath(filename))
         # replace default headers with edX headers
         fix_header(po)
