@@ -59,12 +59,12 @@ def asset_index(request, org, course, name):
 
     asset_display = []
     for asset in assets:
-        id = asset['_id']
+        asset_id = asset['_id']
         display_info = {}
         display_info['displayname'] = asset['displayname']
         display_info['uploadDate'] = get_default_time_display(asset['uploadDate'].timetuple())
 
-        asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
+        asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
 
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
@@ -149,9 +149,9 @@ def import_course(request, org, course, name):
     location = get_location_and_verify_access(request, org, course, name)
 
     if request.method == 'POST':
-        filename = request.FILES['course-data'].name
+        filenames = request.FILES['course-data'].name
 
-        if not filename.endswith('.tar.gz'):
+        if not filenames.endswith('.tar.gz'):
             return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
 
         data_root = path(settings.GITHUB_REPO_ROOT)
@@ -161,7 +161,7 @@ def import_course(request, org, course, name):
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        temp_filepath = course_dir / filename
+        temp_filepath = course_dir / filenames
 
         logging.debug('importing course to {0}'.format(temp_filepath))
 
@@ -171,13 +171,13 @@ def import_course(request, org, course, name):
             temp_file.write(chunk)
         temp_file.close()
 
-        tf = tarfile.open(temp_filepath)
-        tf.extractall(course_dir + '/')
+        tar_file = tarfile.open(temp_filepath)
+        tar_file.extractall(course_dir + '/')
 
         # find the 'course.xml' file
 
-        for r, d, f in os.walk(course_dir):
-            for files in f:
+        for dirpath, dirnames, filenames in os.walk(course_dir):
+            for files in filenames:
                 if files == 'course.xml':
                     break
             if files == 'course.xml':
@@ -186,12 +186,14 @@ def import_course(request, org, course, name):
         if files != 'course.xml':
             return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
 
-        logging.debug('found course.xml at {0}'.format(r))
+        logging.debug('found course.xml at {0}'.format(dirpath))
 
-        if r != course_dir:
-            for fname in os.listdir(r):
-                shutil.move(r / fname, course_dir)
+        if dirpath != course_dir:
+            for fname in os.listdir(dirpath):
+                shutil.move(dirpath / fname, course_dir)
 
+        # var module_store is unused
+        # pylint: disable=W0612
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
                                                      [course_subdir], load_error_modules=False,
                                                      static_content_store=contentstore(),
@@ -234,9 +236,9 @@ def generate_export_course(request, org, course, name):
     #filename = root_dir / name + '.tar.gz'
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
-    tf = tarfile.open(name=export_file.name, mode='w:gz')
-    tf.add(root_dir / name, arcname=name)
-    tf.close()
+    tar_file = tarfile.open(name=export_file.name, mode='w:gz')
+    tar_file.add(root_dir / name, arcname=name)
+    tar_file.close()
 
     # remove temp dir
     shutil.rmtree(root_dir / name)
