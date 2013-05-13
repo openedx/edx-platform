@@ -48,7 +48,6 @@ class VersionInteger(Integer):
 
 
 class CombinedOpenEndedFields(object):
-    display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
     current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.user_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
     state = String(help="Which step within the current task that the student is on.", default="initial",
@@ -57,18 +56,26 @@ class CombinedOpenEndedFields(object):
                                scope=Scope.user_state)
     ready_to_reset = Boolean(help="If the problem is ready to be reset or not.", default=False,
                              scope=Scope.user_state)
-    attempts = Integer(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
-    is_graded = Boolean(help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
-    accept_file_upload = Boolean(help="Whether or not the problem accepts file uploads.", default=False,
-                                 scope=Scope.settings)
-    skip_spelling_checks = Boolean(help="Whether or not to skip initial spelling checks.", default=True,
-                                   scope=Scope.settings)
+    attempts = Integer(display_name="Maximum Attempts",
+        help="Specifies the number of times the student can try to answer this problem.", default=1, scope=Scope.settings)
+    # TODO: move values to Boolean in xblock.
+    is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings,
+        values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
+    accept_file_upload = Boolean(display_name="Accept File Upload",
+        help="If disabled, students cannot upload images to be graded with this problem.", default=False, scope=Scope.settings,
+        values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
+    skip_spelling_checks = Boolean(display_name="Basic Quality Filter",
+        # TODO: passing of text failed with "won't". Need to make our code more robust.
+        help="If enabled, submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
+        default=False, scope=Scope.settings, values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
     due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
                          scope=Scope.settings)
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    weight = StringyFloat(display_name="Problem Weight",
+        help="Specifies the number of points the problem is worth. By default, each response field in the problem is worth one point.",
+        scope=Scope.settings)
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
@@ -221,3 +228,10 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     has_score = True
     always_recalculate_grades = True
     template_dir_name = "combinedopenended"
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
+                                    CombinedOpenEndedDescriptor.version])
+        return non_editable_fields

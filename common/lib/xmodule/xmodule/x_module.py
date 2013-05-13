@@ -653,7 +653,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             for index, choice in enumerate(values):
                 json_choice = choice
                 # TODO: test this logic.
-                if 'value' in json_choice:
+                if hasattr(json_choice, 'value'):
                     json_choice['value'] = field.to_json(json_choice['value'])
                 else:
                     json_choice = field.to_json(json_choice)

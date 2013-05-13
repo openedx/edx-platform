@@ -10,7 +10,7 @@ from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.django import modulestore
 from .timeinfo import TimeInfo
-from xblock.core import Object, Integer, Boolean, String, Scope
+from xblock.core import Object, String, Scope
 from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
@@ -32,14 +32,18 @@ class PeerGradingFields(object):
                                       default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
     link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION,
                               scope=Scope.settings)
-    is_graded = StringyBoolean(help="Whether or not this module is scored.", default=IS_GRADED, scope=Scope.settings)
+    # TODO: move boolean default into xfields
+    is_graded = StringyBoolean(display_name="Graded", help="Whether or not this module is scored.", default=IS_GRADED,
+        values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}], scope=Scope.settings)
     due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
     max_grade = StringyInteger(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE,
                         scope=Scope.settings)
     student_data_for_location = Object(help="Student data for a given peer grading problem.",
                                        scope=Scope.user_state)
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    weight = StringyFloat(display_name="Problem Weight",
+        help="Specifies the number of points the problem is worth. By default, each response field in the problem is worth one point.",
+        scope=Scope.settings)
 
 
 class PeerGradingModule(PeerGradingFields, XModule):
@@ -587,3 +591,12 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     has_score = True
     always_recalculate_grades = True
     template_dir_name = "peer_grading"
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([PeerGradingFields.due_date, PeerGradingFields.grace_period_string,
+                                    PeerGradingFields.link_to_location, PeerGradingFields.max_grade,
+                                    PeerGradingFields.use_for_single_location])
+        return non_editable_fields
+
