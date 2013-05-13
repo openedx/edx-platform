@@ -537,7 +537,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Move to the next step in the problem
         module.handle_ajax("next_problem", {})
-        self.assertEqual(module.current_task_number,0)
+        self.assertEqual(module.current_task_number, 0)
 
         html = module.get_html()
         self.assertTrue(isinstance(html, basestring))
@@ -577,7 +577,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         except GradingServiceError:
             #This error is okay.  We don't have a grading service to connect to!
             pass
-        self.assertEqual(module.current_task_number,1)
+        self.assertEqual(module.current_task_number, 1)
         try:
             module.get_html()
         except GradingServiceError:
@@ -608,7 +608,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #Update the module with the fake queue reply
         module.handle_ajax("score_update", queue_reply)
         self.assertFalse(module.ready_to_reset)
-        self.assertEqual(module.current_task_number,1)
+        self.assertEqual(module.current_task_number, 1)
 
         #Get html and other data client will request
         html = module.get_html()
