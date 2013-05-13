@@ -19,6 +19,7 @@ from django.http import QueryDict
 
 from . import test_system
 from pytz import UTC
+from capa.correctmap import CorrectMap
 
 
 class CapaFactory(object):
@@ -596,6 +597,71 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the problem was NOT reset
         self.assertTrue('success' in result and not result['success'])
+
+    def test_regrade_problem_correct(self):
+
+        module = CapaFactory.create(attempts=1, done=True)
+
+        # Simulate that all answers are marked correct, no matter
+        # what the input is, by patching LoncapaResponse.evaluate_answers()
+        with patch('capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
+            mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'correct')
+            result = module.regrade_problem()
+
+        # Expect that the problem is marked correct
+        self.assertEqual(result['success'], 'correct')
+
+        # Expect that we get no HTML
+        self.assertFalse('contents' in result)
+
+        # Expect that the number of attempts is not incremented
+        self.assertEqual(module.attempts, 1)
+
+    def test_regrade_problem_incorrect(self):
+
+        module = CapaFactory.create(attempts=0, done=True)
+
+        # Simulate that all answers are marked correct, no matter
+        # what the input is, by patching LoncapaResponse.evaluate_answers()
+        with patch('capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
+            mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'incorrect')
+            result = module.regrade_problem()
+
+        # Expect that the problem is marked incorrect
+        self.assertEqual(result['success'], 'incorrect')
+
+        # Expect that the number of attempts is not incremented
+        self.assertEqual(module.attempts, 0)
+
+    def test_regrade_problem_not_done(self):
+        # Simulate that the problem is NOT done
+        module = CapaFactory.create(done=False)
+
+        # Try to regrade the problem, and get exception
+        with self.assertRaises(xmodule.exceptions.NotFoundError):
+            module.regrade_problem()
+
+    def test_regrade_problem_error(self):
+
+        # Try each exception that capa_module should handle
+        for exception_class in [StudentInputError,
+                                LoncapaProblemError,
+                                ResponseError]:
+
+            # Create the module
+            module = CapaFactory.create(attempts=1, done=True)
+
+            # Simulate answering a problem that raises the exception
+            with patch('capa.capa_problem.LoncapaProblem.regrade_existing_answers') as mock_regrade:
+                mock_regrade.side_effect = exception_class('test error')
+                result = module.regrade_problem()
+
+            # Expect an AJAX alert message in 'success'
+            expected_msg = 'Error: test error'
+            self.assertEqual(expected_msg, result['success'])
+
+            # Expect that the number of attempts is NOT incremented
+            self.assertEqual(module.attempts, 1)
 
     def test_save_problem(self):
         module = CapaFactory.create(done=False)

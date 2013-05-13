@@ -845,11 +845,13 @@ class CapaModule(CapaFields, XModule):
             # regrading should have no effect on attempts, so don't
             # need to increment here, or mark done.  Just save.
             self.set_state_from_lcp()
-        except StudentInputError as inst:
-            log.exception("StudentInputError in capa_module:problem_regrade")
+
+        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
+            log.warning("StudentInputError in capa_module:problem_regrade", exc_info=True)
             event_info['failure'] = 'student_input_error'
             self.system.track_function('problem_regrade_fail', event_info)
-            return {'success': inst.message}
+            return {'success': "Error: {0}".format(inst.message)}
+
         except Exception, err:
             event_info['failure'] = 'unexpected'
             self.system.track_function('problem_regrade_fail', event_info)
