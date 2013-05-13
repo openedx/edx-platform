@@ -137,11 +137,14 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
     icon_class = 'problem'
 
-    js = {'coffee':
-              [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
-               resource_string(__name__, 'js/src/collapsible.coffee'),
-               resource_string(__name__, 'js/src/javascript_loader.coffee'),
-              ]}
+    js = {
+            'coffee':
+            [
+                resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
+                resource_string(__name__, 'js/src/collapsible.coffee'),
+                resource_string(__name__, 'js/src/javascript_loader.coffee'),
+            ]
+    }
     js_module_name = "CombinedOpenEnded"
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
@@ -236,9 +239,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
     def save_instance_data(self):
         for attribute in self.student_attributes:
-            child_attr = getattr(self.child_module, attribute)
-            if child_attr != getattr(self, attribute):
-                setattr(self, attribute, getattr(self.child_module, attribute))
+            setattr(self, attribute, getattr(self.child_module, attribute))
 
 
 class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):

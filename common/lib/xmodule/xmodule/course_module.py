@@ -199,8 +199,7 @@ class CourseFields(object):
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
     discussion_topics = Object(
         help="Map of topics names to ids",
-        scope=Scope.settings,
-        # TODO computed_default=lambda c: {'General': {'id': c.location.html_id()}},
+        scope=Scope.settings
         )
     testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
@@ -390,6 +389,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         self._grading_policy = {}
 
         self.set_grading_policy(self.grading_policy)
+        if self.discussion_topics == {}:
+            self.discussion_topics = {'General': {'id': self.location.html_id()}}
 
         self.test_center_exams = []
         test_center_info = self.testcenter_info
@@ -405,6 +406,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     log.error(msg)
                     continue
 
+        # TODO check that this is still needed here and can't be by defaults.
         if self.tabs is None:
             # When calling the various _tab methods, can omit the 'type':'blah' from the
             # first arg, since that's only used for dispatch
@@ -526,6 +528,19 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         definition['wiki_slug'] = wiki_slug
 
         return definition, children
+
+    def definition_to_xml(self, resource_fs):
+        xml_object = super(CourseDescriptor, self).definition_to_xml(resource_fs)
+
+        if len(self.textbooks) > 0:
+            textbook_xml_object = etree.Element('textbook')
+            for textbook in self.textbooks:
+                textbook_xml_object.set('title', textbook.title)
+                textbook_xml_object.set('book_url', textbook.book_url)
+
+            xml_object.append(textbook_xml_object)
+        
+        return xml_object
 
     def has_ended(self):
         """

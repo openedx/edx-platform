@@ -19,6 +19,7 @@ log = logging.getLogger("mitx.courseware")
 
 class HtmlFields(object):
     data = String(help="Html contents to display for this module", scope=Scope.content)
+    source_code = String(help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
 
 
 class HtmlModule(HtmlFields, XModule):
@@ -165,16 +166,6 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         elt = etree.Element('html')
         elt.set("filename", relname)
         return elt
-
-    @property
-    def editable_metadata_fields(self):
-        """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
-        subset = super(HtmlDescriptor, self).editable_metadata_fields
-
-        if 'empty' in subset:
-            del subset['empty']
-
-        return subset
 
 
 class AboutDescriptor(HtmlDescriptor):

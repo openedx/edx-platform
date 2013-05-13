@@ -33,6 +33,12 @@ PIPELINE_JS['spec'] = {
 
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
-STATICFILES_DIRS.append(COMMON_ROOT / 'test' / 'phantom-jasmine' / 'lib')
+STATICFILES_DIRS.append(REPO_ROOT/'node_modules/phantom-jasmine/lib')
+
+# Remove the localization middleware class because it requires the test database
+# to be sync'd and migrated in order to run the jasmine tests interactively
+# with a browser
+MIDDLEWARE_CLASSES = tuple(e for e in MIDDLEWARE_CLASSES \
+                           if e != 'django.middleware.locale.LocaleMiddleware')
 
 INSTALLED_APPS += ('django_jasmine', )

@@ -6,9 +6,18 @@
   <link type="text/html" rel="alternate" href="http://blog.edx.org/"/>
   <link type="application/atom+xml" rel="self" href="https://github.com/blog.atom"/>
   <title>EdX Blog</title>
-  <updated>2013-04-03T14:00:12-07:00</updated>
+  <updated>2013-05-03T14:00:12-07:00</updated>
   <entry>
-    <id>tag:www.edx.org,2012:Post/17</id>
+    <id>tag:www.edx.org,2013:Post/18</id>
+    <published>2013-05-02T14:00:00-07:00</published>
+    <updated>2013-05-02T14:00:00-07:00</updated>
+    <link type="text/html" rel="alternate" href="http://www.nytimes.com/2013/04/30/education/colleges-adapt-online-courses-to-ease-burden.html?pagewanted=all"/>
+    <title>edX project at San Jose State featured in New York Times</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/nytimes_240x180.png')}&quot; /&gt;
+        &lt;p&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <id>tag:www.edx.org,2013:Post/17</id>
     <published>2012-12-19T14:00:00-07:00</published>
     <updated>2012-12-19T14:00:00-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press_release', args=['stanford-to-work-with-edx'])}"/>

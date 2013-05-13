@@ -2,7 +2,6 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
-from django.views.generic import RedirectView
 
 from . import one_time_startup
 
@@ -10,10 +9,9 @@ import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG:
-    from django.contrib import admin
     admin.autodiscover()
 
-urlpatterns = ('',
+urlpatterns = ('',  # nopep8
     # certificate view
 
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
@@ -116,8 +114,9 @@ urlpatterns = ('',
     # Favicon
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
 
+    url(r'^submit_feedback$', 'util.views.submit_feedback_via_zendesk'),
+
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
-    # url(r'^send_feedback$', 'util.views.send_feedback'),
     # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
 )
 
@@ -299,12 +298,12 @@ if settings.COURSEWARE_ENABLED:
                 'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
                 include('django_comment_client.urls'))
-            )
+        )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>[^/]+)/$',
         'courseware.views.static_tab', name="static_tab"),
-        )
+    )
 
     if settings.MITX_FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
         urlpatterns += (
@@ -346,13 +345,13 @@ if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
         url(r'^migrate/reload/(?P<reload_dir>[^/]+)/(?P<commit_id>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
         url(r'^gitreload$', 'lms_migration.migrate.gitreload'),
         url(r'^gitreload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.gitreload'),
-        )
+    )
 
 if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     urlpatterns += (
         url(r'^event_logs$', 'track.views.view_tracking_log'),
         url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
-        )
+    )
 
 # FoldIt views
 urlpatterns += (

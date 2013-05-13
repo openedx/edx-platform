@@ -1,13 +1,13 @@
 '''
 Test for lms courseware app
 '''
-
 import logging
 import json
 import time
 import random
 
 from urlparse import urlsplit, urlunsplit
+from uuid import uuid4
 
 from django.contrib.auth.models import User, Group
 from django.test import TestCase
@@ -62,7 +62,7 @@ def mongo_store_config(data_dir):
                 'default_class': 'xmodule.raw_module.RawDescriptor',
                 'host': 'localhost',
                 'db': 'test_xmodule',
-                'collection': 'modulestore',
+                'collection': 'modulestore_%s' % uuid4().hex,
                 'fs_root': data_dir,
                 'render_template': 'mitxmako.shortcuts.render_to_string',
             }
@@ -81,7 +81,7 @@ def draft_mongo_store_config(data_dir):
                 'default_class': 'xmodule.raw_module.RawDescriptor',
                 'host': 'localhost',
                 'db': 'test_xmodule',
-                'collection': 'modulestore',
+                'collection': 'modulestore_%s' % uuid4().hex,
                 'fs_root': data_dir,
                 'render_template': 'mitxmako.shortcuts.render_to_string',
             }
@@ -92,7 +92,7 @@ def draft_mongo_store_config(data_dir):
                 'default_class': 'xmodule.raw_module.RawDescriptor',
                 'host': 'localhost',
                 'db': 'test_xmodule',
-                'collection': 'modulestore',
+                'collection': 'modulestore_%s' % uuid4().hex,
                 'fs_root': data_dir,
                 'render_template': 'mitxmako.shortcuts.render_to_string',
             }
@@ -398,6 +398,14 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
         module_store = modulestore()
         import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
         self.check_random_page_loads(module_store)
+
+    def test_full_textbooks_loads(self):
+        module_store = modulestore()
+        import_from_xml(module_store, TEST_DATA_DIR, ['full'])
+
+        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        self.assertGreater(len(course.textbooks), 0)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)

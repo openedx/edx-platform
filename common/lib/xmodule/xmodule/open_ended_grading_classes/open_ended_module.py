@@ -72,7 +72,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         self._parse(oeparam, self.child_prompt, self.child_rubric, system)
 
-        if self.child_created == True and self.child_state == self.ASSESSING:
+        if self.child_created is True and self.child_state == self.ASSESSING:
             self.child_created = False
             self.send_to_grader(self.latest_answer(), system)
             self.child_created = False
@@ -159,9 +159,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = int(survey_responses['score'])
         except:
             # This is a dev_facing_error
-            error_message = ("Could not parse submission id, grader id, "
-                             "or feedback from message_post ajax call.  Here is the message data: {0}".format(
-                survey_responses))
+            error_message = (
+                "Could not parse submission id, grader id, "
+                "or feedback from message_post ajax call.  "
+                "Here is the message data: {0}".format(survey_responses)
+            )
             log.exception(error_message)
             # This is a student_facing_error
             return {'success': False, 'msg': "There was an error saving your feedback.  Please contact course staff."}
@@ -179,8 +181,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             queue_name=self.message_queue_name
         )
 
-        student_info = {'anonymous_student_id': anonymous_student_id,
-                        'submission_time': qtime,
+        student_info = {
+            'anonymous_student_id': anonymous_student_id,
+            'submission_time': qtime,
         }
         contents = {
             'feedback': feedback,
@@ -190,8 +193,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'student_info': json.dumps(student_info),
         }
 
-        (error, msg) = qinterface.send_to_queue(header=xheader,
-                                                body=json.dumps(contents))
+        (error, msg) = qinterface.send_to_queue(
+            header=xheader,
+            body=json.dumps(contents)
+        )
 
         # Convert error to a success value
         success = True
@@ -302,11 +307,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # We want to display available feedback in a particular order.
         # This dictionary specifies which goes first--lower first.
-        priorities = {  # These go at the start of the feedback
-                      'spelling': 0,
-                      'grammar': 1,
-                      # needs to be after all the other feedback
-                      'markup_text': 3}
+        priorities = {
+            # These go at the start of the feedback
+            'spelling': 0,
+            'grammar': 1,
+            # needs to be after all the other feedback
+            'markup_text': 3
+        }
         do_not_render = ['topicality', 'prompt-overlap']
 
         default_priority = 2

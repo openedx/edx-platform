@@ -8,5 +8,5 @@ CMS.Models.ModuleInfo = Backbone.Model.extend({
     "data": null,
     "metadata" : null,
     "children" : null
-  },
+  }
 });

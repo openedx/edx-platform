@@ -217,7 +217,6 @@ VALID_TAB_TYPES = {
     'courseware': TabImpl(null_validator, _courseware),
     'course_info': TabImpl(need_name, _course_info),
     'wiki': TabImpl(need_name, _wiki),
-    'external_discussion': TabImpl(key_checker(['link']), _external_discussion),
     'discussion': TabImpl(need_name, _discussion),
     'external_link': TabImpl(key_checker(['name', 'link']), _external_link),
     'textbooks': TabImpl(null_validator, _textbooks),
@@ -228,7 +227,6 @@ VALID_TAB_TYPES = {
     'peer_grading': TabImpl(null_validator, _peer_grading),
     'staff_grading': TabImpl(null_validator, _staff_grading),
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
-    'syllabus': TabImpl(null_validator, _syllabus),
     }
 
 
@@ -272,12 +270,9 @@ def get_course_tabs(user, course, active_page):
     """
     Return the tabs to show a particular user, as a list of CourseTab items.
     """
-<<<<<<< HEAD
     if not hasattr(course, 'tabs') or not course.tabs:
         return get_default_tabs(user, course, active_page)
 
-=======
->>>>>>> Move default tab definition to course_module
     # TODO (vshnayder): There needs to be a place to call this right after course
     # load, but not from inside xmodule, since that doesn't (and probably
     # shouldn't) know about the details of what tabs are supported, etc.
@@ -299,7 +294,27 @@ def get_course_tabs(user, course, active_page):
     return tabs
 
 
-<<<<<<< HEAD
+def get_discussion_link(course):
+    """
+    Return the URL for the discussion tab for the given `course`.
+
+    If they have a discussion link specified, use that even if we disable
+    discussions. Disabling discsussions is mostly a server safety feature at
+    this point, and we don't need to worry about external sites. Otherwise,
+    if the course has a discussion tab or uses the default tabs, return the
+    discussion view URL. Otherwise, return None to indicate the lack of a
+    discussion tab.
+    """
+    if course.discussion_link:
+        return course.discussion_link
+    elif not settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+        return None
+    elif hasattr(course, 'tabs') and course.tabs and not any([tab['type'] == 'discussion' for tab in course.tabs]):
+        return None
+    else:
+        return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id])
+
+
 def get_default_tabs(user, course, active_page):
 
     # When calling the various _tab methods, can omit the 'type':'blah' from the
@@ -314,15 +329,9 @@ def get_default_tabs(user, course, active_page):
 
     tabs.extend(_textbooks({}, user, course, active_page))
 
-    ## If they have a discussion link specified, use that even if we feature
-    ## flag discussions off. Disabling that is mostly a server safety feature
-    ## at this point, and we don't need to worry about external sites.
-    if course.discussion_link:
-        tabs.append(CourseTab('Discussion', course.discussion_link, active_page == 'discussion'))
-    elif settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
-        link = reverse('django_comment_client.forum.views.forum_form_discussion',
-                              args=[course.id])
-        tabs.append(CourseTab('Discussion', link, active_page == 'discussion'))
+    discussion_link = get_discussion_link(course)
+    if discussion_link:
+        tabs.append(CourseTab('Discussion', discussion_link, active_page == 'discussion'))
 
     tabs.extend(_wiki({'name': 'Wiki', 'type': 'wiki'}, user, course, active_page))
 
@@ -336,8 +345,6 @@ def get_default_tabs(user, course, active_page):
     return tabs
 
 
-=======
->>>>>>> Move default tab definition to course_module
 def get_static_tab_by_slug(course, tab_slug):
     """
     Look for a tab with type 'static_tab' and the specified 'tab_slug'.  Returns

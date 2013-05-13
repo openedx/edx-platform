@@ -1,7 +1,6 @@
 import unittest
 
 from fs.osfs import OSFS
-from nose.tools import assert_equals, assert_true
 from path import path
 from tempfile import mkdtemp
 import shutil
@@ -22,9 +21,9 @@ def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
     """
-    print "strip filename from {desc}".format(desc=descriptor.location.url())
+    print("strip filename from {desc}".format(desc=descriptor.location.url()))
     descriptor._model_data.pop('filename', None)
-    
+
     if hasattr(descriptor, 'xml_attributes'):
         if 'filename' in descriptor.xml_attributes:
             del descriptor.xml_attributes['filename']
@@ -41,12 +40,12 @@ class RoundTripTestCase(unittest.TestCase):
     '''
     def check_export_roundtrip(self, data_dir, course_dir):
         root_dir = path(self.temp_dir)
-        print "Copying test course to temp dir {0}".format(root_dir)
+        print("Copying test course to temp dir {0}".format(root_dir))
 
         data_dir = path(data_dir)
         shutil.copytree(data_dir / course_dir, root_dir / course_dir)
 
-        print "Starting import"
+        print("Starting import")
         initial_import = XMLModuleStore(root_dir, course_dirs=[course_dir])
 
         courses = initial_import.get_courses()
@@ -55,7 +54,7 @@ class RoundTripTestCase(unittest.TestCase):
 
         # export to the same directory--that way things like the custom_tags/ folder
         # will still be there.
-        print "Starting export"
+        print("Starting export")
         fs = OSFS(root_dir)
         export_fs = fs.makeopendir(course_dir)
 
@@ -63,14 +62,14 @@ class RoundTripTestCase(unittest.TestCase):
         with export_fs.open('course.xml', 'w') as course_xml:
             course_xml.write(xml)
 
-        print "Starting second import"
+        print("Starting second import")
         second_import = XMLModuleStore(root_dir, course_dirs=[course_dir])
 
         courses2 = second_import.get_courses()
         self.assertEquals(len(courses2), 1)
         exported_course = courses2[0]
 
-        print "Checking course equality"
+        print("Checking course equality")
 
         # HACK: filenames change when changing file formats
         # during imports from old-style courses.  Ignore them.
@@ -81,16 +80,18 @@ class RoundTripTestCase(unittest.TestCase):
         self.assertEquals(initial_course.id, exported_course.id)
         course_id = initial_course.id
 
-        print "Checking key equality"
+        print("Checking key equality")
         self.assertEquals(sorted(initial_import.modules[course_id].keys()),
                           sorted(second_import.modules[course_id].keys()))
 
-        print "Checking module equality"
+        print("Checking module equality")
         for location in initial_import.modules[course_id].keys():
-            print "Checking", location
+            print("Checking", location)
             if location.category == 'html':
-                print ("Skipping html modules--they can't import in"
-                       " final form without writing files...")
+                print(
+                    "Skipping html modules--they can't import in"
+                    " final form without writing files..."
+                )
                 continue
             self.assertEquals(initial_import.modules[course_id][location],
                               second_import.modules[course_id][location])
@@ -123,3 +124,6 @@ class RoundTripTestCase(unittest.TestCase):
     def test_exam_registration_roundtrip(self):
         # Test exam_registration xmodule to see if it exports correctly
         self.check_export_roundtrip(DATA_DIR, "test_exam_registration")
+
+    def test_word_cloud_roundtrip(self):
+        self.check_export_roundtrip(DATA_DIR, "word_cloud")

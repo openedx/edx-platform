@@ -6,7 +6,6 @@ from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
-from xmodule.modulestore import Location, inheritance
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from xblock.core import XBlock, Scope, String
@@ -82,7 +81,7 @@ class XModuleFields(object):
     display_name = String(
         help="Display name for this module",
         scope=Scope.settings,
-        default=None,
+        default=None
     )
 
 
@@ -334,11 +333,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # It should respond to max_score() and grade(). It can be graded or ungraded
     # (like a practice problem).
     has_score = False
-
-    # cdodge: this is a list of metadata names which are 'system' metadata
-    # and should not be edited by an end-user
-    system_metadata_fields = ['data_dir', 'create_date', 'edited_by',
-        'previous_version', 'is_draft', 'discussion_id', 'xml_attributes']
 
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
@@ -615,6 +609,49 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             location=self.location,
             model_data=self._model_data,
         ))
+
+    @property
+    def non_editable_metadata_fields(self):
+        """
+        Return the list of fields that should not be editable in Studio.
+
+        When overriding, be sure to append to the superclasses' list.
+        """
+        # We are not allowing editing of xblock tag and name fields at this time (for any component).
+        return [XBlock.tags, XBlock.name]
+
+    @property
+    def editable_metadata_fields(self):
+        """
+        Returns the metadata fields to be edited in Studio. These are fields with scope `Scope.settings`.
+
+        Can be limited by extending `non_editable_metadata_fields`.
+        """
+        inherited_metadata = getattr(self, '_inherited_metadata', {})
+        inheritable_metadata = getattr(self, '_inheritable_metadata', {})
+        metadata = {}
+        for field in self.fields:
+
+            if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
+                continue
+
+            inheritable = False
+            value = getattr(self, field.name)
+            default_value = field.default
+            explicitly_set = field.name in self._model_data
+            if field.name in inheritable_metadata:
+                inheritable = True
+                default_value = field.from_json(inheritable_metadata.get(field.name))
+                if field.name in inherited_metadata:
+                    explicitly_set = False
+
+            metadata[field.name] = {'field': field,
+                                    'value': value,
+                                    'default_value': default_value,
+                                    'inheritable': inheritable,
+                                    'explicitly_set': explicitly_set }
+
+        return metadata
 
 
 class DescriptorSystem(object):

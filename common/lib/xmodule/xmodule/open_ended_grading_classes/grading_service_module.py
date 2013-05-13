@@ -76,7 +76,6 @@ class GradingService(object):
 
         return r.text
 
-
     def _try_with_login(self, operation):
         """
         Call operation(), which should return a requests response object.  If
@@ -87,7 +86,7 @@ class GradingService(object):
         """
         response = operation()
         if (response.json
-            and response.json.get('success') == False
+            and response.json.get('success') is False
             and response.json.get('error') == 'login_required'):
             # apparrently we aren't logged in.  Try to fix that.
             r = self._login()

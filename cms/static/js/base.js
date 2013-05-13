@@ -10,7 +10,7 @@ var $newComponentTypePicker;
 var $newComponentTemplatePickers;
 var $newComponentButton;
 
-$(document).ready(function () {
+$(document).ready(function() {
     $body = $('body');
     $modal = $('.history-modal');
     $modalCover = $('<div class="modal-cover">');
@@ -35,7 +35,7 @@ $(document).ready(function () {
     $('.uploads .upload-button').bind('click', showUploadModal);
     $('.upload-modal .close-button').bind('click', hideModal);
 
-    $body.on('click', '.embeddable-xml-input', function () {
+    $body.on('click', '.embeddable-xml-input', function() {
         $(this).select();
     });
 
@@ -45,8 +45,11 @@ $(document).ready(function () {
     $('.new-unit-item').bind('click', createNewUnit);
 
     // lean/simple modal
-    $('a[rel*=modal]').leanModal({overlay : 0.80, closeButton: '.action-modal-close' });
-    $('a.action-modal-close').click(function(e){
+    $('a[rel*=modal]').leanModal({
+        overlay: 0.80,
+        closeButton: '.action-modal-close'
+    });
+    $('a.action-modal-close').click(function(e) {
         (e).preventDefault();
     });
 
@@ -55,12 +58,12 @@ $(document).ready(function () {
     $('.action-notification-close').bind('click', hideNotification);
 
     // nav - dropdown related
-    $body.click(function (e) {
+    $body.click(function(e) {
         $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
         $('.nav-dropdown .nav-item .title').removeClass('is-selected');
     });
 
-    $('.nav-dropdown .nav-item .title').click(function (e) {
+    $('.nav-dropdown .nav-item .title').click(function(e) {
 
         $subnav = $(this).parent().find('.wrapper-nav-sub');
         $title = $(this).parent().find('.title');
@@ -70,9 +73,7 @@ $(document).ready(function () {
         if ($subnav.hasClass('is-shown')) {
             $subnav.removeClass('is-shown');
             $title.removeClass('is-selected');
-        }
-
-        else {
+        } else {
             $('.nav-dropdown .nav-item .title').removeClass('is-selected');
             $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
             $title.addClass('is-selected');
@@ -84,8 +85,11 @@ $(document).ready(function () {
     $('a[rel="external"]').attr('title', 'This link will open in a new browser window/tab').bind('click', linkNewWindow);
 
     // general link management - lean modal window
-    $('a[rel="modal"]').attr('title', 'This link will open in a modal window').leanModal({overlay: 0.50, closeButton: '.action-modal-close' });
-    $('.action-modal-close').click(function (e) {
+    $('a[rel="modal"]').attr('title', 'This link will open in a modal window').leanModal({
+        overlay: 0.50,
+        closeButton: '.action-modal-close'
+    });
+    $('.action-modal-close').click(function(e) {
         (e).preventDefault();
     });
 
@@ -99,7 +103,7 @@ $(document).ready(function () {
     $('.cta-show-sock').bind('click', toggleSock);
 
     // toggling overview section details
-    $(function () {
+    $(function() {
         if ($('.courseware-section').length > 0) {
             $('.toggle-button-sections').addClass('is-shown');
         }
@@ -108,7 +112,7 @@ $(document).ready(function () {
 
     // autosave when leaving input field
     $body.on('change', '.subsection-display-name-input', saveSubsection);
-    $('.subsection-display-name-input').each(function () {
+    $('.subsection-display-name-input').each(function() {
         this.val = $(this).val();
     });
     $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
@@ -129,7 +133,7 @@ $(document).ready(function () {
 
     // import form setup
     $('.import .file-input').bind('change', showImportSubmit);
-    $('.import .choose-file-button, .import .choose-file-button-inline').bind('click', function (e) {
+    $('.import .choose-file-button, .import .choose-file-button-inline').bind('click', function(e) {
         e.preventDefault();
         $('.import .file-input').click();
     });
@@ -152,12 +156,12 @@ $(document).ready(function () {
     $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
     $body.on('click', '.edit-subsection-publish-settings .save-button', saveSetSectionScheduleDate);
     $body.on('click', '.edit-subsection-publish-settings .cancel-button', hideModal);
-    $body.on('change', '.edit-subsection-publish-settings .start-date', function () {
+    $body.on('change', '.edit-subsection-publish-settings .start-date', function() {
         if ($('.edit-subsection-publish-settings').find('.start-time').val() == '') {
             $('.edit-subsection-publish-settings').find('.start-time').val('12:00am');
         }
     });
-    $('.edit-subsection-publish-settings').on('change', '.start-date, .start-time', function () {
+    $('.edit-subsection-publish-settings').on('change', '.start-date, .start-time', function() {
         $('.edit-subsection-publish-settings').find('.save-button').show();
     });
 });
@@ -177,7 +181,7 @@ function smoothScrollLink(e) {
 // On AWS instances, this base.js gets wrapped in a separate scope as part of Django static
 // pipelining (note, this doesn't happen on local runtimes). So if we set it on window,
 //  when we can access it from other scopes (namely Course Advanced Settings).
-window.CmsUtils.smoothScrollTop = function (e) {
+window.CmsUtils.smoothScrollTop = function(e) {
     (e).preventDefault();
 
     $.smoothScroll({
@@ -260,8 +264,7 @@ function getEdxTimeFromDateTimeVals(date_val, time_val) {
     var edxTimeStr = null;
 
     if (date_val != '') {
-        if (time_val == '')
-            time_val = '00:00';
+        if (time_val == '') time_val = '00:00';
 
         // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
         var date = Date.parse(date_val + " " + time_val);
@@ -284,7 +287,7 @@ function autosaveInput(e) {
         clearTimeout(this.saveTimer);
     }
 
-    this.saveTimer = setTimeout(function () {
+    this.saveTimer = setTimeout(function() {
         $changedInput = $(e.target);
         saveSubsection();
         self.saveTimer = null;
@@ -324,12 +327,15 @@ function saveSubsection() {
         type: "POST",
         dataType: "json",
         contentType: "application/json",
-        data: JSON.stringify({ 'id': id, 'metadata': metadata}),
-        success: function () {
+        data: JSON.stringify({
+            'id': id,
+            'metadata': metadata
+        }),
+        success: function() {
             $spinner.delay(500).fadeOut(150);
             $changedInput = null;
         },
-        error: function () {
+        error: function() {
             showToastMessage('There has been an error while saving your changes.');
         }
     });
@@ -348,15 +354,16 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/clone_item',
-        {'parent_location': parent,
-            'template': template,
-            'display_name': 'New Unit'
-        },
-        function (data) {
-            // redirect to the edit page
-            window.location = "/edit/" + data['id'];
-        });
+    $.post('/clone_item', {
+        'parent_location': parent,
+        'template': template,
+        'display_name': 'New Unit'
+    },
+
+    function(data) {
+        // redirect to the edit page
+        window.location = "/edit/" + data['id'];
+    });
 }
 
 function deleteUnit(e) {
@@ -375,8 +382,7 @@ function deleteSection(e) {
 }
 
 function _deleteItem($el) {
-    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!'))
-        return;
+    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!')) return;
 
     var id = $el.data('id');
 
@@ -386,11 +392,15 @@ function _deleteItem($el) {
     });
 
 
-    $.post('/delete_item',
-        {'id': id, 'delete_children': true, 'delete_all_versions': true},
-        function (data) {
-            $el.remove();
-        });
+    $.post('/delete_item', {
+        'id': id,
+        'delete_children': true,
+        'delete_all_versions': true
+    },
+
+    function(data) {
+        $el.remove();
+    });
 }
 
 function showUploadModal(e) {
@@ -492,18 +502,16 @@ function toggleSock(e) {
     $sockContent.toggle('fast');
 
     $.smoothScroll({
-       offset: -200,
-       easing: 'swing',
-       speed: 1000,
-       scrollElement: null,
-       scrollTarget: $sock
+        offset: -200,
+        easing: 'swing',
+        speed: 1000,
+        scrollElement: null,
+        scrollTarget: $sock
     });
 
-    if($sock.hasClass('is-shown')) {
+    if ($sock.hasClass('is-shown')) {
         $btnLabel.text(gettext('Hide Studio Help'));
-    }
-
-    else {
+    } else {
         $btnLabel.text(gettext('Looking for Help with Studio?'));
     }
 }
@@ -549,7 +557,7 @@ function removeDateSetter(e) {
 
 function hideNotification(e) {
     (e).preventDefault();
-    $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding').attr('aria-hidden','true');
+    $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding').attr('aria-hidden', 'true');
 }
 
 function hideAlert(e) {
@@ -580,7 +588,7 @@ function showToastMessage(message, $button, lifespan) {
     $toast.fadeIn(200);
 
     if (lifespan) {
-        $toast.timer = setTimeout(function () {
+        $toast.timer = setTimeout(function() {
             $toast.fadeOut(300);
         }, lifespan * 1000);
     }
@@ -602,7 +610,9 @@ function addNewSection(e, isTemplate) {
     $newSection.find('.new-section-name').focus().select();
     $newSection.find('.section-name-form').bind('submit', saveNewSection);
     $cancelButton.bind('click', cancelNewSection);
-    $body.bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
+    $body.bind('keyup', {
+        $cancelButton: $cancelButton
+    }, checkForCancel);
 }
 
 function checkForCancel(e) {
@@ -627,15 +637,14 @@ function saveNewSection(e) {
     });
 
     $.post('/clone_item', {
-            'parent_location': parent,
-            'template': template,
-            'display_name': display_name,
-        },
-        function (data) {
-            if (data.id != undefined)
-                location.reload();
-        }
-    );
+        'parent_location': parent,
+        'template': template,
+        'display_name': display_name,
+    },
+
+    function(data) {
+        if (data.id != undefined) location.reload();
+    });
 }
 
 function cancelNewSection(e) {
@@ -654,7 +663,9 @@ function addNewCourse(e) {
     $newCourse.find('.new-course-name').focus().select();
     $newCourse.find('form').bind('submit', saveNewCourse);
     $cancelButton.bind('click', cancelNewCourse);
-    $body.bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
+    $body.bind('keyup', {
+        $cancelButton: $cancelButton
+    }, checkForCancel);
 }
 
 function saveNewCourse(e) {
@@ -681,7 +692,7 @@ function saveNewCourse(e) {
             'number': number,
             'display_name': display_name
         },
-        function (data) {
+        function(data) {
             if (data.id != undefined) {
                 window.location = '/' + data.id.replace(/.*:\/\//, '');
             } else if (data.ErrMsg != undefined) {
@@ -713,7 +724,9 @@ function addNewSubsection(e) {
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
     $cancelButton.bind('click', cancelNewSubsection);
-    $body.bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
+    $body.bind('keyup', {
+        $cancelButton: $cancelButton
+    }, checkForCancel);
 }
 
 function saveNewSubsection(e) {
@@ -730,16 +743,16 @@ function saveNewSubsection(e) {
 
 
     $.post('/clone_item', {
-            'parent_location': parent,
-            'template': template,
-            'display_name': display_name
-        },
-        function (data) {
-            if (data.id != undefined) {
-                location.reload();
-            }
+        'parent_location': parent,
+        'template': template,
+        'display_name': display_name
+    },
+
+    function(data) {
+        if (data.id != undefined) {
+            location.reload();
         }
-    );
+    });
 }
 
 function cancelNewSubsection(e) {
@@ -755,7 +768,9 @@ function editSectionName(e) {
     $(this).children('.section-name-span').hide();
     $(this).find('.section-name-edit').bind('submit', saveEditSectionName);
     $(this).find('.edit-section-name-cancel').bind('click', cancelNewSection);
-    $body.bind('keyup', { $cancelButton: $(this).find('.edit-section-name-cancel') }, checkForCancel);
+    $body.bind('keyup', {
+        $cancelButton: $(this).find('.edit-section-name-cancel')
+    }, checkForCancel);
 }
 
 function cancelEditSectionName(e) {
@@ -796,14 +811,19 @@ function saveEditSectionName(e) {
         type: "POST",
         dataType: "json",
         contentType: "application/json",
-        data: JSON.stringify({ 'id': id, 'metadata': {'display_name': display_name}})
-    }).success(function () {
-            $spinner.delay(250).fadeOut(250);
-            $_this.closest('h3').find('.section-name-span').html(display_name).show();
-            $_this.hide();
-            $_this.closest('.section-name').bind('click', editSectionName);
-            e.stopPropagation();
-        });
+        data: JSON.stringify({
+            'id': id,
+            'metadata': {
+                'display_name': display_name
+            }
+        })
+    }).success(function() {
+        $spinner.delay(250).fadeOut(250);
+        $_this.closest('h3').find('.section-name-span').html(display_name).show();
+        $_this.hide();
+        $_this.closest('.section-name').bind('click', editSectionName);
+        e.stopPropagation();
+    });
 }
 
 function setSectionScheduleDate(e) {
@@ -840,28 +860,36 @@ function saveSetSectionScheduleDate(e) {
         type: "POST",
         dataType: "json",
         contentType: "application/json",
-        data: JSON.stringify({ 'id': id, 'metadata': {'start': start}})
-    }).success(function () {
-            var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-  	    var format = gettext('<strong>Will Release:</strong> %(date)s at $(time)s UTC');
-            var willReleaseAt = interpolate(format, [input_date, input_time], true);
-            $thisSection.find('.section-published-date').html(
-	      '<span class="published-status">' + willReleaseAt + '</span>' +
-	      '<a href="#" class="edit-button" ' +
-		'" data-date="' + input_date +
-		'" data-time="' + input_time +
-		'" data-id="' + id + '">' +
-		gettext('Edit') + '</a>');
-            $thisSection.find('.section-published-date').animate({
-                'background-color': 'rgb(182,37,104)'
-            }, 300).animate({
-                    'background-color': '#edf1f5'
-                }, 300).animate({
-                    'background-color': 'rgb(182,37,104)'
-                }, 300).animate({
-                    'background-color': '#edf1f5'
-                }, 300);
+        data: JSON.stringify({
+            'id': id,
+            'metadata': {
+                'start': start
+            }
+        })
+    }).success(function() {
+        var $thisSection = $('.courseware-section[data-id="' + id + '"]');
+        var format = gettext('<strong>Will Release:</strong> %(date)s at %(time)s UTC');
+        var willReleaseAt = interpolate(format, {
+            'date': input_date,
+            'time': input_time
+        },
+        true);
+        $thisSection.find('.section-published-date').html(
+            '<span class="published-status">' + willReleaseAt + '</span>' +
+            '<a href="#" class="edit-button" ' +
+            '" data-date="' + input_date +
+            '" data-time="' + input_time +
+            '" data-id="' + id + '">' + gettext('Edit') + '</a>');
+        $thisSection.find('.section-published-date').animate({
+            'background-color': 'rgb(182,37,104)'
+        }, 300).animate({
+            'background-color': '#edf1f5'
+        }, 300).animate({
+            'background-color': 'rgb(182,37,104)'
+        }, 300).animate({
+            'background-color': '#edf1f5'
+        }, 300);
 
-            hideModal();
-        });
+        hideModal();
+    });
 }

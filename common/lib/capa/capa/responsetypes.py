@@ -2,7 +2,8 @@
 # File:   courseware/capa/responsetypes.py
 #
 '''
-Problem response evaluation.  Handles checking of student responses, of a variety of types.
+Problem response evaluation.  Handles checking of student responses,
+of a variety of types.
 
 Used by capa_problem.py
 '''
@@ -35,7 +36,7 @@ from datetime import datetime
 from .util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
-import xqueue_interface
+import capa.xqueue_interface
 
 log = logging.getLogger(__name__)
 
@@ -300,7 +301,7 @@ class LoncapaResponse(object):
                     # response
                     aid = self.answer_ids[-1]
                     new_cmap.set_hint_and_mode(aid, hint_text, hintmode)
-            log.debug('after hint: new_cmap = %s' % new_cmap)
+            log.debug('after hint: new_cmap = %s', new_cmap)
 
     @abc.abstractmethod
     def get_score(self, student_answers):
@@ -790,6 +791,10 @@ class OptionResponse(LoncapaResponse):
 
 
 class NumericalResponse(LoncapaResponse):
+    '''
+    This response type expects a number or formulaic expression that evaluates
+    to a number (e.g. `4+5/2^2`), and accepts with a tolerance.
+    '''
 
     response_tag = 'numericalresponse'
     hint_tag = 'numericalhint'
@@ -806,12 +811,12 @@ class NumericalResponse(LoncapaResponse):
                 '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                 id=xml.get('id'))[0]
             self.tolerance = contextualize_text(self.tolerance_xml, context)
-        except Exception:
+        except IndexError:  # xpath found an empty list, so (...)[0] is the error
             self.tolerance = '0'
         try:
             self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                        id=xml.get('id'))[0]
-        except Exception:
+        except IndexError:  # Same as above
             self.answer_id = None
 
     def get_score(self, student_answers):
@@ -836,7 +841,6 @@ class NumericalResponse(LoncapaResponse):
         except:
             # Use the traceback-preserving version of re-raising with a
             # different type
-            import sys
             type, value, traceback = sys.exc_info()
 
             raise StudentInputError, ("Could not interpret '%s' as a number" %
@@ -1147,9 +1151,9 @@ def sympy_check2():
                     messages = []
                     for input_dict in input_list:
                         correct.append('correct'
-                                if input_dict['ok'] else 'incorrect')
+                                       if input_dict['ok'] else 'incorrect')
                         msg = (self.clean_message_html(input_dict['msg'])
-                                if 'msg' in input_dict else None)
+                               if 'msg' in input_dict else None)
                         messages.append(msg)
 
                 # Otherwise, we do not recognize the dictionary
@@ -1174,7 +1178,7 @@ def sympy_check2():
 
         for k in range(len(idset)):
             npoints = (self.maxpoints[idset[k]]
-                    if correct[k] == 'correct' else 0)
+                       if correct[k] == 'correct' else 0)
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
@@ -1783,7 +1787,7 @@ class FormulaResponse(LoncapaResponse):
     response_tag = 'formularesponse'
     hint_tag = 'formulahint'
     allowed_inputfields = ['textline']
-    required_attributes = ['answer']
+    required_attributes = ['answer', 'samples']
     max_inputfields = 1
 
     def setup_response(self):
@@ -1851,13 +1855,24 @@ class FormulaResponse(LoncapaResponse):
                     'formularesponse: undefined variable in given=%s' % given)
                 raise StudentInputError(
                     "Invalid input: " + uv.message + " not permitted in answer")
+            except ValueError as ve:
+                if 'factorial' in ve.message:
+                    # This is thrown when fact() or factorial() is used in a formularesponse answer
+                    #   that tests on negative and/or non-integer inputs
+                    # ve.message will be: `factorial() only accepts integral values` or `factorial() not defined for negative values`
+                    log.debug(
+                        'formularesponse: factorial function used in response that tests negative and/or non-integer inputs. given={0}'.format(given))
+                    raise StudentInputError(
+                        "factorial function not permitted in answer for this problem. Provided answer was: {0}".format(given))
+                # If non-factorial related ValueError thrown, handle it the same as any other Exception
+                log.debug('formularesponse: error {0} in formula'.format(ve))
+                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
+                                        cgi.escape(given))
             except Exception as err:
                 # traceback.print_exc()
                 log.debug('formularesponse: error %s in formula' % err)
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
                                         cgi.escape(given))
-            if numpy.isnan(student_result) or numpy.isinf(student_result):
-                return "incorrect"
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
                 return "incorrect"
         return "correct"
@@ -1983,7 +1998,6 @@ class ImageResponse(LoncapaResponse):
         self.ielements = self.inputfields
         self.answer_ids = [ie.get('id') for ie in self.ielements]
 
-
     def get_score(self, student_answers):
         correct_map = CorrectMap()
         expectedset = self.get_mapped_answers()
@@ -2052,7 +2066,7 @@ class ImageResponse(LoncapaResponse):
                 rectangles (dict) - a map of inputs to the defined rectangle for that input
                 regions (dict) - a map of inputs to the defined region for that input
         '''
-        answers =  (
+        answers = (
             dict([(ie.get('id'), ie.get(
                 'rectangle')) for ie in self.ielements]),
             dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
@@ -2074,8 +2088,6 @@ class ImageResponse(LoncapaResponse):
             answers[ie_id] = (ie.get('rectangle'), ie.get('regions'))
 
         return answers
-            
-
 
 #-----------------------------------------------------------------------------
 

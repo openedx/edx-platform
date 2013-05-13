@@ -475,8 +475,16 @@ class MongoModuleStore(ModuleStoreBase):
         Returns a list of course descriptors.
         '''
         # TODO (vshnayder): Why do I have to specify i4x here?
-        course_filter = Location(category="course")
-        return (item for item in self.get_items(course_filter) if item.location.course != 'templates')
+        course_filter = Location("i4x", category="course")
+        return [
+            course
+            for course
+            in self.get_items(course_filter)
+            if not (
+                course.location.org == 'edx' and
+                course.location.course == 'templates'
+            )
+        ]
 
     def _find_one(self, location):
         '''Look for a given location in the collection.  If revision is not
