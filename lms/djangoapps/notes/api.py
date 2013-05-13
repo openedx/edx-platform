@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError 
 
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
@@ -150,7 +150,7 @@ def read(request, course_id, note_id):
     '''
     try:
         note = Note.objects.get(id=note_id)
-    except:
+    except Note.DoesNotExist:
         return ApiResponse(http_response=HttpResponse('', status=404), data=None)
 
     if not note.user.id == request.user.id:
@@ -165,7 +165,7 @@ def update(request, course_id, note_id):
     '''
     try:
         note = Note.objects.get(id=note_id)
-    except:
+    except Note.DoesNotExist:
         return ApiResponse(http_response=HttpResponse('', status=404), data=None)
 
     if not note.user.id == request.user.id:
@@ -191,7 +191,7 @@ def delete(request, course_id, note_id):
     '''
     try:
         note = Note.objects.get(id=note_id)
-    except:
+    except Note.DoesNotExist:
         return ApiResponse(http_response=HttpResponse('', status=404), data=None)
 
     if not note.user.id == request.user.id:
