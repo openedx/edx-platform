@@ -4,8 +4,18 @@ These templates are used by the CMS to provide baseline content that
 can be cloned when adding new modules to a course.
 
 `Template`s are defined in x_module. They contain 3 attributes:
-    metadata: A dictionary with the template metadata
-    data: A JSON value that defines the template content
+    metadata: A dictionary with the template metadata. This should contain
+        any values for fields
+            * with scope Scope.settings
+            * that have values different than the field defaults
+            * and that are to be editable in Studio
+    data: A JSON value that defines the template content. This should be a dictionary
+        containing values for fields
+            * with scope Scope.content
+            * that have values different than the field defaults
+            * and that are to be editable in Studio
+        or, if the module uses a single Scope.content String field named `data`, this
+        should be a string containing the contents of that field
     children: A list of Location urls that define the template children
 
 Templates are defined on XModuleDescriptor types, in the template attribute.
