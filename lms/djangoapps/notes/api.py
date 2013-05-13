@@ -92,6 +92,7 @@ def api_format(api_response):
     content_type = 'application/json'
     content = ''
 
+    # not doing a strict boolean check on data becuase it could be an empty list
     if api_response.data is not None and api_response.data != '':
         content = json.dumps(api_response.data)
 
