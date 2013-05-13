@@ -710,14 +710,47 @@ class SplitMongoModuleStore(ModuleStoreBase):
         return VersionTree(CourseLocator(course_locator, version_guid=version_guid), result)
 
 
-    def get_block_successors(self, block_locator, version_history_depth=1):
+    def get_block_generations(self, block_locator):
         '''
-        Find the version_history_depth next versions of this block. Return as a VersionTree
-        Mostly makes sense when course_locator uses a version_guid or some other course has branched
-        from this course's current head.
+        Find the history of this block. Return as a VersionTree of each place the block changed (except
+        deletion).
+
+        The block's history tracks its explicit changes; so, changes in descendants won't be reflected
+        as new iterations.
         '''
-        # TODO implement
-        pass
+        block_locator = self._version_agnostic(block_locator)
+        course_struct = self._lookup_course(block_locator)
+        usage_id = block_locator.usage_id
+        update_version_field = 'blocks.{}.update_version'.format(usage_id)
+        all_versions_with_block = self.structures.find({'original_version': course_struct['original_version'],
+            update_version_field: {'$exists': True}})
+        # find (all) root versions and build map previous: [successors]
+        possible_roots = []
+        result = {}
+        for version in all_versions_with_block:
+            if version['_id'] == version['blocks'][usage_id]['update_version']:
+                if version['blocks'][usage_id].get('previous_version') is None:
+                    possible_roots.append(version['blocks'][usage_id]['update_version'])
+                else:
+                    result.setdefault(version['blocks'][usage_id]['previous_version'], set()).add(
+                        version['blocks'][usage_id]['update_version'])
+        # more than one possible_root means usage was added and deleted > 1x.
+        if len(possible_roots) > 1:
+            # find the history segment including block_locator's version
+            element_to_find = course_struct['blocks'][usage_id]['update_version']
+            if element_to_find in possible_roots:
+                possible_roots = [element_to_find]
+            for possibility in possible_roots:
+                if self._find_local_root(element_to_find, possibility, result):
+                    possible_roots = [possibility]
+                    break
+        elif len(possible_roots) == 0:
+            return None
+        # convert the results value sets to locators
+        for k, versions in result.iteritems():
+            result[k] = [BlockUsageLocator(version_guid=version, usage_id=usage_id)
+                for version in versions]
+        return VersionTree(BlockUsageLocator(version_guid=possible_roots[0], usage_id=usage_id), result)
 
     def get_definition_successors(self, definition_locator, version_history_depth=1):
         '''
@@ -870,8 +903,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
         new_structure = self._version_structure(structure, user_id)
         # generate an id
         new_usage_id = self._generate_usage_id(new_structure['blocks'], category)
+        update_version_keys = ['blocks.{}.update_version'.format(new_usage_id)]
         if isinstance(course_or_parent_locator, BlockUsageLocator) and course_or_parent_locator.usage_id is not None:
-            new_structure['blocks'][course_or_parent_locator.usage_id]['children'].append(new_usage_id)
+            parent = new_structure['blocks'][course_or_parent_locator.usage_id]
+            parent['children'].append(new_usage_id)
+            parent['edited_on'] = datetime.datetime.utcnow()
+            parent['edited_by'] = user_id
+            parent['previous_version'] = parent['update_version']
+            update_version_keys.append('blocks.{}.update_version'.format(course_or_parent_locator.usage_id))
         new_structure['blocks'][new_usage_id] = {
             "children": [],
             "category": category,
@@ -882,8 +921,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
             'previous_version': None
             }
         new_id = self.structures.insert(new_structure)
+        update_version_payload = {key: new_id for key in update_version_keys}
         self.structures.update({'_id': new_id},
-            {'$set': {'blocks.{}.update_version'.format(new_usage_id): new_id}})
+            {'$set': update_version_payload})
 
         # update the index entry if appropriate
         if index_entry is not None and structure["_id"] == index_entry["draftVersion"]:
@@ -1240,8 +1280,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
         new_structure = self._version_structure(original_structure, user_id)
         new_blocks = new_structure['blocks']
         parents = self.get_parent_locations(usage_locator)
+        update_version_keys = []
         for parent in parents:
-            new_blocks[parent.usage_id]['children'].remove(usage_locator.usage_id)
+            parent_block = new_blocks[parent.usage_id]
+            parent_block['children'].remove(usage_locator.usage_id)
+            parent_block['edited_on'] = datetime.datetime.utcnow()
+            parent_block['edited_by'] = user_id
+            parent_block['previous_version'] = parent_block['update_version']
+            update_version_keys.append('blocks.{}.update_version'.format(parent.usage_id))
         # remove subtree
         def remove_subtree(usage_id):
             for child in new_blocks[usage_id]['children']:
@@ -1251,6 +1297,10 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         # update index if appropriate and structures
         new_id = self.structures.insert(new_structure)
+        if update_version_keys:
+            update_version_payload = {key: new_id for key in update_version_keys}
+            self.structures.update({'_id': new_id}, {'$set': update_version_payload})
+
         result = CourseLocator(version_guid=new_id)
 
         # update the index entry if appropriate
@@ -1449,3 +1499,25 @@ class SplitMongoModuleStore(ModuleStoreBase):
         new_structure['edited_by'] = user_id
         new_structure['edited_on'] = datetime.datetime.utcnow()
         return new_structure
+
+    def _find_local_root(self, element_to_find, possibility, tree):
+        if possibility not in tree:
+            return False
+        if element_to_find in tree[possibility]:
+            return True
+        for subtree in tree[possibility]:
+            if self._find_local_root(element_to_find, subtree, tree):
+                return True
+        return False
+
+    def _version_agnostic(self, block_locator):
+        """
+        We don't care if the locator's version is not the current head; so, avoid version conflict
+        by reducing info.
+
+        :param block_locator:
+        """
+        if block_locator.course_id and block_locator.version_guid:
+            block_locator = BlockUsageLocator(block_locator)
+            block_locator.course_id = None
+        return block_locator

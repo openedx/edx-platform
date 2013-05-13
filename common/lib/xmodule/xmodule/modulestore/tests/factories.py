@@ -76,8 +76,6 @@ class ItemFactory(factory.Factory):
 
         definition_locator (optional): the DescriptorLocator for the definition this uses or branches
 
-        definition (optional): the definition payload (mutually exclusive with the definition_locator)
-
         *display_name* (optional): the display name of the item
 
         *metadata* (optional): dictionary of metadata attributes (display_name here takes

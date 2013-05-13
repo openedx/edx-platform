@@ -11,7 +11,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.x_module import XModuleDescriptor
 from xmodule.capa_module import CapaDescriptor
-from xmodule.modulestore.locator import CourseLocator
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
@@ -126,3 +126,46 @@ class TemplateTests(unittest.TestCase):
         self.assertRaises(ItemNotFoundError, modulestore().get_course, id_locator)
         # but can by guid
         self.assertIsInstance(modulestore().get_course(guid_locator), CourseDescriptor)
+
+    def test_block_generations(self):
+        """
+        Test get_block_generations
+        """
+        test_course = factories.CourseFactory.create(org='testx', prettyid='history course',
+            display_name='history test course', user_id='testbot')
+        chapter = factories.ItemFactory.create(display_name='chapter 1',
+            parent_location=test_course.location, user_id='testbot')
+        sub = factories.ItemFactory.create(display_name='subsection 1',
+            parent_location=chapter.location, user_id='testbot', category='vertical')
+        first_problem = factories.ItemFactory.create(display_name='problem 1',
+            parent_location=sub.location, user_id='testbot', category='problem', data="<problem></problem>")
+        first_problem.max_attempts = 3
+        updated_problem = modulestore().update_item(first_problem, 'testbot')
+        updated_loc = modulestore().delete_item(updated_problem.location, 'testbot')
+
+        second_problem = factories.ItemFactory.create(display_name='problem 2',
+            parent_location=BlockUsageLocator(updated_loc, usage_id=sub.location.usage_id),
+            user_id='testbot', category='problem', data="<problem></problem>")
+
+        # course root only updated 2x
+        version_history = modulestore().get_block_generations(test_course.location)
+        self.assertEqual(version_history.locator.version_guid, test_course.location.version_guid)
+        self.assertEqual(len(version_history.children), 1)
+        self.assertEqual(version_history.children[0].children, [])
+        self.assertEqual(version_history.children[0].locator.version_guid, chapter.location.version_guid)
+
+        # sub changed on add, add problem, delete problem, add problem in strict linear seq
+        version_history = modulestore().get_block_generations(sub.location)
+        self.assertEqual(len(version_history.children), 1)
+        self.assertEqual(len(version_history.children[0].children), 1)
+        self.assertEqual(len(version_history.children[0].children[0].children), 1)
+        self.assertEqual(len(version_history.children[0].children[0].children[0].children), 0)
+
+        # first and second problem may show as same usage_id; so, need to ensure their histories are right
+        version_history = modulestore().get_block_generations(updated_problem.location)
+        self.assertEqual(version_history.locator.version_guid, first_problem.location.version_guid)
+        self.assertEqual(len(version_history.children), 1)  # updated max_attempts
+        self.assertEqual(len(version_history.children[0].children), 0)
+
+        version_history = modulestore().get_block_generations(second_problem.location)
+        self.assertNotEqual(version_history.locator.version_guid, first_problem.location.version_guid)
