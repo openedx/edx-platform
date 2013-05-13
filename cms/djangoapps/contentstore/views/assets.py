@@ -16,7 +16,7 @@ from django.core.files.temp import NamedTemporaryFile
 
 from mitxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
-from contentstore.utils import get_url_reverse
+from auth.authz import create_all_course_groups
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
@@ -26,8 +26,9 @@ from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.util.date_utils import get_default_time_display
 
-from access import get_location_and_verify_access
-from auth.authz import create_all_course_groups
+from ..utils import get_url_reverse
+from .access import get_location_and_verify_access
+
 
 __all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
 

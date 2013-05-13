@@ -3,20 +3,17 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
-
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_url_reverse, get_lms_link_for_item
-
-from access import has_access
-from requests import create_json_response
 from util.json_request import expect_json
-
 from auth.authz import STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 
+from .access import has_access
+from .requests import create_json_response
 
 def user_author_string(user):
     '''Get an author string for commits by this user.  Format:

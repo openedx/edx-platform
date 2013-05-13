@@ -8,9 +8,9 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 
-from contentstore.utils import get_modulestore, get_url_reverse
-from requests import get_request_method
-from access import get_location_and_verify_access
+from ..utils import get_modulestore, get_url_reverse
+from .requests import get_request_method
+from .access import get_location_and_verify_access
 
 __all__ = ['get_checklists', 'update_checklist']
 

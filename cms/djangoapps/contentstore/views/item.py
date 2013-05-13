@@ -10,9 +10,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 
 from util.json_request import expect_json
-from contentstore.utils import get_modulestore
-from access import has_access
-from requests import _xmodule_recurse
+from ..utils import get_modulestore
+from .access import has_access
+from .requests import _xmodule_recurse
 
 __all__ = ['save_item', 'clone_item', 'delete_item']
 

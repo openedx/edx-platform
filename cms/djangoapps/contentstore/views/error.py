@@ -1,5 +1,4 @@
 from django.http import HttpResponseServerError, HttpResponseNotFound
-
 from mitxmako.shortcuts import render_to_string, render_to_response
 
 __all__ = ['not_found', 'server_error', 'render_404', 'render_500']
