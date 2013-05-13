@@ -10,16 +10,12 @@ from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, \
-     InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore import Location
 
-from contentstore.course_info_model import get_course_updates, \
-     update_course_updates, delete_course_update
-from contentstore.utils import get_lms_link_for_item, \
-     add_open_ended_panel_tab, remove_open_ended_panel_tab
-from models.settings.course_details import CourseDetails, \
-     CourseSettingsEncoder
+from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
+from contentstore.utils import get_lms_link_for_item, add_open_ended_panel_tab, remove_open_ended_panel_tab
+from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from auth.authz import create_all_course_groups
@@ -29,6 +25,8 @@ from .access import has_access, get_location_and_verify_access
 from .requests import get_request_method
 from .tabs import initialize_course_tabs
 from .component import OPEN_ENDED_COMPONENT_TYPES, ADVANCED_COMPONENT_POLICY_KEY
+
+from django_comment_common.utils import seed_permissions_roles
 
 # TODO: should explicitly enumerate exports with __all__
 
@@ -123,6 +121,9 @@ def create_new_course(request):
     initialize_course_tabs(new_course)
 
     create_all_course_groups(request.user, new_course.location)
+
+    # seed the forums
+    seed_permissions_roles(new_course.location.course_id)
 
     return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
