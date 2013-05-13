@@ -121,7 +121,7 @@ class CourseLocator(Locator):
 
 
 class BlockUsageLocator(CourseLocator):
-    '''
+    """
     Encodes a location.
 
     Locations address modules (aka blocks) which are definitions situated in a
@@ -137,7 +137,7 @@ class BlockUsageLocator(CourseLocator):
         course_identifier: course_guid | version_guid
         block : guid
         revision : 'draft' | 'published' (optional)
-    '''
+    """
     _I4X_RE_ = re.compile("""
         i4x:?//?
         (?P<org>[^/]+)/
