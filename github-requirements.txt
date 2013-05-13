@@ -7,5 +7,5 @@
 -e git://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@5ce6f70a#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@c33a0ce#egg=XBlock
 -e git+https://github.com/edx/codejail.git@eb0803a#egg=codejail
