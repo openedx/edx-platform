@@ -1,3 +1,11 @@
+"""
+Browser set up for acceptance tests.
+"""
+
+#pylint: disable=E1101
+#pylint: disable=W0613
+#pylint: disable=W0611
+
 from lettuce import before, after, world
 from splinter.browser import Browser
 from logging import getLogger
@@ -24,42 +32,40 @@ else:
     import sys
     sys.modules['django.contrib.staticfiles'] = staticfiles
 
-logger = getLogger(__name__)
-logger.info("Loading the lettuce acceptance testing terrain file...")
-
+LOGGER = getLogger(__name__)
+LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 
 @before.harvest
 def initial_setup(server):
-    '''
-    Launch the browser once before executing the tests
-    '''
+    """
+    Launch the browser once before executing the tests.
+    """
     browser_driver = getattr(settings, 'LETTUCE_BROWSER', 'chrome')
     world.browser = Browser(browser_driver)
 
 
 @before.each_scenario
 def reset_data(scenario):
-    '''
+    """
     Clean out the django test database defined in the
     envs/acceptance.py file: mitx_all/db/test_mitx.db
-    '''
-    logger.debug("Flushing the test database...")
+    """
+    LOGGER.debug("Flushing the test database...")
     call_command('flush', interactive=False)
 
 
 @after.each_scenario
 def screenshot_on_error(scenario):
-    '''
-    Save a screenshot to help with debugging
-    '''
+    """
+    Save a screenshot to help with debugging.
+    """
     if scenario.failed:
         world.browser.driver.save_screenshot('/tmp/last_failed_scenario.png')
 
 
 @after.all
 def teardown_browser(total):
-    '''
-    Quit the browser after executing the tests
-    '''
+    """
+    Quit the browser after executing the tests.
+    """
     world.browser.quit()
-    pass
