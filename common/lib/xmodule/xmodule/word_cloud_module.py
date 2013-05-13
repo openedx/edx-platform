@@ -10,7 +10,7 @@ import json
 import logging
 
 from pkg_resources import resource_string
-from xmodule.raw_module import RawDescriptor
+from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
 from xblock.core import Scope, String, Object, Boolean, List, Integer
@@ -19,8 +19,9 @@ log = logging.getLogger(__name__)
 
 
 def pretty_bool(value):
-    BOOL_DICT = [True, "True", "true", "T", "t", "1"]
-    return value in BOOL_DICT
+    """Check value for possible `True` value."""
+    bool_dict = [True, "True", "true", "T", "t", "1"]
+    return value in bool_dict
 
 
 class WordCloudFields(object):
@@ -227,7 +228,7 @@ class WordCloudModule(WordCloudFields, XModule):
         return self.content
 
 
-class WordCloudDescriptor(WordCloudFields, RawDescriptor):
+class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor):
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
