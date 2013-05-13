@@ -10,7 +10,7 @@
  *
  *  @requires logme
  *
- *  @external d3
+ *  @external d3, $, RequireJS
  */
 
 (function (requirejs, require, define) {
@@ -165,7 +165,7 @@ define('WordCloudMain', ['logme'], function (logme) {
         d3.layout.cloud().size([this.width, this.height])
             .words(words)
             .rotate(function () {
-                return ~~(Math.random() * 2) * 90;
+                return Math.floor((Math.random() * 2) * 90);
             })
             .font('Impact')
             .fontSize(function (d) {
@@ -201,11 +201,8 @@ define('WordCloudMain', ['logme'], function (logme) {
      * coordinate object contains two properties: 'x', and 'y'.
      */
     WordCloudMain.prototype.drawWordCloud = function (response, words, bounds) {
-        // The first word in the list of user enetered words does not get a leading comma.
-        var firstWord = false,
-
             // Color words in different colors.
-            fill = d3.scale.category20(),
+        var fill = d3.scale.category20(),
 
             // Will be populated by words the user enetered.
             studentWordsKeys = [],
