@@ -392,7 +392,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 textbook_xml_object.set('book_url', textbook.book_url)
 
             xml_object.append(textbook_xml_object)
-
+        
         return xml_object
 
     def has_ended(self):

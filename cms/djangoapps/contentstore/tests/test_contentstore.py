@@ -226,7 +226,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
 
-        self.assertGreater(len(course.textbooks), 0)
+        self.assertGreater(len(course.textbooks), 0)     
 
     def test_static_tab_reordering(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -497,6 +497,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                                                                'vertical', 'vertical_66', None]))
 
         self.assertTrue(getattr(test_private_vertical, 'is_draft', False))
+
+        # make sure the textbook survived the export/import
+        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        self.assertGreater(len(course.textbooks), 0)
 
         shutil.rmtree(root_dir)
 
