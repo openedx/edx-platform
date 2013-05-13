@@ -226,7 +226,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
 
-        self.assertGreater(len(course.textbooks), 0)     
+        self.assertGreater(len(course.textbooks), 0)
 
     def test_static_tab_reordering(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -300,7 +300,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)
-
 
     def test_about_overrides(self):
         '''
