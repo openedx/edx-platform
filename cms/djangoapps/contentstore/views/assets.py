@@ -176,7 +176,7 @@ def import_course(request, org, course, name):
 
         # find the 'course.xml' file
 
-        for dirpath, dirnames, filenames in os.walk(course_dir):
+        for dirpath, _dirnames, filenames in os.walk(course_dir):
             for files in filenames:
                 if files == 'course.xml':
                     break
@@ -192,13 +192,11 @@ def import_course(request, org, course, name):
             for fname in os.listdir(dirpath):
                 shutil.move(dirpath / fname, course_dir)
 
-        # var module_store is unused
-        # pylint: disable=W0612
-        module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-                                                     [course_subdir], load_error_modules=False,
-                                                     static_content_store=contentstore(),
-                                                     target_location_namespace=Location(location),
-                                                     draft_store=modulestore())
+        _module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
+                                                      [course_subdir], load_error_modules=False,
+                                                      static_content_store=contentstore(),
+                                                      target_location_namespace=Location(location),
+                                                      draft_store=modulestore())
 
         # we can blow this away when we're done importing.
         shutil.rmtree(course_dir)
