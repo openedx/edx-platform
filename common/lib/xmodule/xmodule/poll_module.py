@@ -4,8 +4,6 @@ to do set of polls.
 On the client side we show:
 If student does not yet anwered - Question with set of choices.
 If student have answered - Question with statistics for each answers.
-
-Student can't change his answer.
 """
 
 import cgi
