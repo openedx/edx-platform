@@ -309,7 +309,7 @@ def course_grader_updates(request, org, course, name, grader_index=None):
         # ??? Should this return anything? Perhaps success fail?
         CourseGradingModel.delete_grader(Location(location), grader_index)
         return HttpResponse()
-    elif request.method == 'POST':   # post or put, doesn't matter.
+    elif request.method == 'POST':  # post or put, doesn't matter.
         return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(location), request.POST)),
                             mimetype="application/json")
 
@@ -347,24 +347,24 @@ def course_advanced_updates(request, org, course, name):
         # to edit the combinedopenended or peergrading
         # module, and to remove it if they have removed the open ended elements.
         if ADVANCED_COMPONENT_POLICY_KEY in request_body:
-            #Check to see if the user instantiated any open ended components
+            # Check to see if the user instantiated any open ended components
             found_oe_type = False
-            #Get the course so that we can scrape current tabs
+            # Get the course so that we can scrape current tabs
             course_module = modulestore().get_item(location)
             for oe_type in OPEN_ENDED_COMPONENT_TYPES:
                 if oe_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
-                    #Add an open ended tab to the course if needed
+                    # Add an open ended tab to the course if needed
                     changed, new_tabs = add_open_ended_panel_tab(course_module)
                     # If a tab has been added to the course, then send the
                     # metadata along to CourseMetadata.update_from_json
                     if changed:
                         request_body.update({'tabs': new_tabs})
-                        #Indicate that tabs should not be filtered out of the metadata
+                        # Indicate that tabs should not be filtered out of the metadata
                         filter_tabs = False
-                    #Set this flag to avoid the open ended tab removal code below.
+                    # Set this flag to avoid the open ended tab removal code below.
                     found_oe_type = True
                     break
-            #If we did not find an open ended module type in the advanced settings,
+            # If we did not find an open ended module type in the advanced settings,
             # we may need to remove the open ended tab from the course.
             if not found_oe_type:
                 # Remove open ended tab to the course if needed

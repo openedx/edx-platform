@@ -15,6 +15,7 @@ from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_
 from .access import has_access
 from .requests import create_json_response
 
+
 def user_author_string(user):
     '''Get an author string for commits by this user.  Format:
     first last <email@email.com>.
