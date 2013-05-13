@@ -95,7 +95,7 @@ def template_jasmine_runner(lib)
     if !coffee_files.empty?
         sh("node_modules/.bin/coffee -c #{coffee_files.join(' ')}")
     end
-    phantom_jasmine_path = File.expand_path("common/test/phantom-jasmine")
+    phantom_jasmine_path = File.expand_path("node_modules/phantom-jasmine")
     common_js_root = File.expand_path("common/static/js")
     common_coffee_root = File.expand_path("common/static/coffee/src")
 
@@ -319,7 +319,7 @@ end
         compile_assets()
         phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
         django_for_jasmine(system, false) do |jasmine_url|
-            sh("#{phantomjs} common/test/phantom-jasmine/lib/run_jasmine_test.coffee #{jasmine_url}")
+            sh("#{phantomjs} node_modules/phantom-jasmine/lib/run_jasmine_test.coffee #{jasmine_url}")
         end
     end
 end
@@ -376,7 +376,7 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     task "phantomjs_jasmine_#{lib}" do
         phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
         template_jasmine_runner(lib) do |f|
-            sh("#{phantomjs} common/test/phantom-jasmine/lib/run_jasmine_test.coffee #{f}")
+            sh("#{phantomjs} node_modules/phantom-jasmine/lib/run_jasmine_test.coffee #{f}")
         end
     end
 end
