@@ -1,8 +1,8 @@
 CMS.Models.SystemFeedback = Backbone.Model.extend({
     defaults: {
         "type": null,  // "warning", "confirmation", "error", "announcement", "step-required", etc
-        "title": null,
-        "message": null,
+        "title": "",
+        "message": "",
         "shown": true,
         "close": false,  // show a close button?
         "icon": true,  // show an icon?
