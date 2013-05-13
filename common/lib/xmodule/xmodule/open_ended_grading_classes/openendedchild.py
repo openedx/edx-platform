@@ -101,8 +101,9 @@ class OpenEndedChild(object):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         if system.open_ended_grading_interface:
             self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
-            self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,
-                                                                                 system)
+            self.controller_qs = controller_query_service.ControllerQueryService(
+                system.open_ended_grading_interface,system
+            )
         else:
             self.peer_gs = MockPeerGradingService()
             self.controller_qs = None
