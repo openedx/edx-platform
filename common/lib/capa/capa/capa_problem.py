@@ -230,14 +230,12 @@ class LoncapaProblem(object):
             if hasattr(the_input, 'ungraded_response'):
                 the_input.ungraded_response(xqueue_msg, queuekey)
 
-
     def is_queued(self):
         '''
         Returns True if any part of the problem has been submitted to an external queue
         (e.g. for grading.)
         '''
         return any(self.correct_map.is_queued(answer_id) for answer_id in self.correct_map)
-
 
     def get_recentmost_queuetime(self):
         '''
@@ -256,7 +254,6 @@ class LoncapaProblem(object):
 
         return max(queuetimes)
 
-
     def grade_answers(self, answers):
         '''
         Grade student responses.  Called by capa_module.check_problem.
@@ -271,6 +268,31 @@ class LoncapaProblem(object):
         # if answers include File objects, convert them to filenames.
         self.student_answers = convert_files_to_filenames(answers)
         return self._grade_answers(answers)
+
+    def supports_regrading(self):
+        """
+        Checks that the current problem definition permits regrading.
+
+        More precisely, it checks that there are no response types in
+        the current problem that are not fully supported (yet) for regrading.
+
+        This includes responsetypes for which the student's answer
+        is not properly stored in state, i.e. file submissions.  At present,
+        we have no way to know if an existing response was actually a real
+        answer or merely the filename of a file submitted as an answer.
+
+        It turns out that because regrading is a background task, limiting
+        it to responsetypes that don't support file submissions also means
+        that the responsetypes are synchronous.  This is convenient as it
+        permits regrading to be complete when the regrading call returns.
+        """
+        # We check for synchronous grading and no file submissions by
+        # screening out all problems with a CodeResponse type.
+        for responder in self.responders.values():
+            if 'filesubmission' in responder.allowed_inputfields:
+                return False
+
+        return True
 
     def regrade_existing_answers(self):
         '''
@@ -298,14 +320,21 @@ class LoncapaProblem(object):
         # log.debug('Responders: %s' % self.responders)
         # Call each responsetype instance to do actual grading
         for responder in self.responders.values():
-            # File objects are passed only if responsetype explicitly allows for file
-            # submissions
+            # File objects are passed only if responsetype explicitly allows
+            # for file submissions.  But we have no way of knowing if
+            # student_answers contains a proper answer or the filename of
+            # an earlier submission, so for now skip these entirely.
             # TODO: figure out where to get file submissions when regrading.
-            if 'filesubmission' in responder.allowed_inputfields and answers is not None:
+            if 'filesubmission' in responder.allowed_inputfields and answers is None:
+                raise Exception("Cannot regrade problems with possible file submissions")
+
+            # use 'answers' if it is provided, otherwise use the saved student_answers.
+            if answers is not None:
                 results = responder.evaluate_answers(answers, oldcmap)
             else:
                 results = responder.evaluate_answers(self.student_answers, oldcmap)
             newcmap.update(results)
+
         self.correct_map = newcmap
         # log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
         return newcmap

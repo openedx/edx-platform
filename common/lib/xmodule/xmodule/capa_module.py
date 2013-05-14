@@ -822,13 +822,20 @@ class CapaModule(CapaFields, XModule):
         Returns a dict with one key:
             {'success' : 'correct' | 'incorrect' | AJAX alert msg string }
 
-        Raises NotFoundError if called on a problem that has not yet been answered
-        (since this is avoidable).  Returns the error messages for exceptions
-        occurring while performing the regrading, rather than throwing them.
+        Raises NotFoundError if called on a problem that has not yet been
+        answered, or if it's a problem that cannot be regraded.
+
+        Returns the error messages for exceptions occurring while performing
+        the regrading, rather than throwing them.
         """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
+
+        if not self.lcp.supports_regrading():
+            event_info['failure'] = 'unsupported'
+            self.system.track_function('problem_regrade_fail', event_info)
+            raise NotFoundError('Problem does not support regrading')
 
         if not self.done:
             event_info['failure'] = 'unanswered'

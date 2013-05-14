@@ -641,6 +641,16 @@ class CapaModuleTest(unittest.TestCase):
         with self.assertRaises(xmodule.exceptions.NotFoundError):
             module.regrade_problem()
 
+    def test_regrade_problem_not_supported(self):
+        # Simulate that the problem is NOT done
+        module = CapaFactory.create(done=True)
+
+        # Try to regrade the problem, and get exception
+        with patch('capa.capa_problem.LoncapaProblem.supports_regrading') as mock_supports_regrading:
+            mock_supports_regrading.return_value = False
+            with self.assertRaises(xmodule.exceptions.NotFoundError):
+                module.regrade_problem()
+
     def test_regrade_problem_error(self):
 
         # Try each exception that capa_module should handle
