@@ -55,6 +55,7 @@ CMS.Views.Notification = CMS.Views.SystemFeedback.extend({
 CMS.Views.Prompt = CMS.Views.SystemFeedback.extend({
     type: "prompt",
     render: function() {
+        if(!window.$body) { window.$body = $(document.body); }
         if(this.model.get('shown')) {
             $body.addClass('prompt-is-shown');
         } else {

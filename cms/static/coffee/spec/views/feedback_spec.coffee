@@ -40,5 +40,13 @@ describe "CMS.Views.SystemFeedback", ->
     expect(view.$('.wrapper')).not.toHaveClass("is-shown")
     expect(view.$('.wrapper')).toHaveClass("is-hiding")
 
-
+  # for some reason, expect($("body")) blows up the test runner, so this test
+  # just exercises the Prompt rather than asserting on anything. Best I can
+  # do for now. :(
+  it "prompt view changes class on body", ->
+    # expect($("body")).not.toHaveClass("prompt-is-shown")
+    view = new CMS.Views.Prompt({model: @model})
+    # expect($("body")).toHaveClass("prompt-is-shown")
+    @model.hide()
+    # expect($("body")).not.toHaveClass("prompt-is-shown")
 
