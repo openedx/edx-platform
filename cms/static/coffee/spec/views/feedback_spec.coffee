@@ -58,14 +58,17 @@ describe "SystemFeedback click events", ->
       actions:
         primary:
           text: "Save",
+          class: "save-button",
           click: jasmine.createSpy('primaryClick')
         secondary: [{
             text: "Revert",
+            class: "cancel-button",
             click: jasmine.createSpy('secondaryClick')
           }]
 
       )
 
+    setFixtures(sandbox({id: "page-alert"}))
     @view = new CMS.Views.Alert({model: @model})
 
   it "should trigger the primary event on a primary click", ->
@@ -75,3 +78,10 @@ describe "SystemFeedback click events", ->
   it "should trigger the secondary event on a secondary click", ->
     @view.secondaryClick()
     expect(@model.get('actions').secondary[0].click).toHaveBeenCalled()
+
+  it "should apply class to primary action", ->
+    expect(@view.$(".action-primary")).toHaveClass("save-button")
+
+  it "should apply class to secondary action", ->
+    expect(@view.$(".action-secondary")).toHaveClass("cancel-button")
+
