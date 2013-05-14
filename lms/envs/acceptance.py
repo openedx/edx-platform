@@ -13,7 +13,7 @@ modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'test_modulestore',
+    'collection': 'acceptance_modulestore',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
