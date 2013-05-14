@@ -9,7 +9,7 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from xblock.core import XBlock, Scope, String
+from xblock.core import XBlock, Scope, String, Integer, Float
 
 log = logging.getLogger(__name__)
 
@@ -649,17 +649,29 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                                     'inheritable': inheritable,
                                     'explicitly_set': explicitly_set}
 
+            # We support the following editors:
+            # 1. A select editor for fields with a list of possible values (includes Booleans).
+            # 2. Number editor for integers and floats.
+            # 3. A generic string editor for anything else (editing JSON representation of the value).
+            type = "Generic"
+            # TODO: test all this logic
             values = [] if field.values is None else field.values
-            for index, choice in enumerate(values):
-                json_choice = choice
-                # TODO: test this logic.
-                if hasattr(json_choice, 'value'):
-                    json_choice['value'] = field.to_json(json_choice['value'])
-                else:
-                    json_choice = field.to_json(json_choice)
-                values[index] = json_choice
-
+            if isinstance(values, list):
+                if len(values) > 0:
+                    type = "Select"
+                for index, choice in enumerate(values):
+                    json_choice = choice
+                    if hasattr(json_choice, 'value'):
+                        json_choice['value'] = field.to_json(json_choice['value'])
+                    else:
+                        json_choice = field.to_json(json_choice)
+                    values[index] = json_choice
+            elif isinstance(field, Integer):
+                type = "Integer"
+            elif isinstance(field, Float):
+                type = "Float"
             simple_metadata[field.name] = {'field_name' : field.name,
+                                           'type' : type,
                                            'display_name' : field.display_name,
                                            'value': field.to_json(value),
                                            'options' : values,

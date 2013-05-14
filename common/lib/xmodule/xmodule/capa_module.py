@@ -63,7 +63,8 @@ class ComplexEncoder(json.JSONEncoder):
 class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
     max_attempts = StringyInteger(display_name="Maximum Attempts",
-        help="When set, this specifies the number of times the student can try to answer this problem.", scope=Scope.settings)
+        help="This specifies the number of times the student can try to answer this problem. If unset, infinite attempts are allowed.",
+        values = {"min" : 1 }, scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     showanswer = String(display_name="Show Answer",
@@ -87,7 +88,8 @@ class CapaFields(object):
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
     weight = StringyFloat(display_name="Problem Weight",
-        help="Specifies the number of points the problem is worth. By default, each response field in the problem is worth one point.",
+        help="Specifies the number of points the problem is worth. If unset, each response field in the problem is worth one point.",
+        values = {"min" : 0 },
         scope=Scope.settings)
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
     source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.",

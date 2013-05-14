@@ -30,15 +30,15 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
                             el: self.$el.find('.metadata_entry')[counter++],
                             model: new CMS.Models.Metadata(item)
                         };
-                        if (item.options.length > 0) {
-                            // Right now, all our option types only hold strings. Should really support
-                            // any type though.
+                        if (item.type === 'Select') {
                             self.views.push(new CMS.Views.Metadata.Option(data));
+                        }
+                        else if (item.type === 'Integer' || item.type === 'Float') {
+                            self.views.push(new CMS.Views.Metadata.Number(data));
                         }
                         else {
                             self.views.push(new CMS.Views.Metadata.String(data));
                         }
-
                     });
             }
         );
@@ -150,6 +150,28 @@ CMS.Views.Metadata.String = CMS.Views.Metadata.AbstractEditor.extend({
         this.$el.find('input').val(value);
     }
 });
+
+CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
+
+    events : {
+        "change input" : "updateModel",
+        "keypress .setting-input" : "showClearButton"  ,
+        "click .setting-clear" : "clear"
+    },
+
+    getTemplateName : function () {
+        return "metadata_number_entry";
+    },
+
+    getValueFromEditor : function () {
+        return this.$el.find('#' + this.uniqueId).val();
+    },
+
+    setValueInEditor : function (value) {
+        this.$el.find('input').val(value);
+    }
+});
+
 
 CMS.Views.Metadata.Option = CMS.Views.Metadata.AbstractEditor.extend({
 

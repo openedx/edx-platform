@@ -57,7 +57,8 @@ class CombinedOpenEndedFields(object):
     ready_to_reset = Boolean(help="If the problem is ready to be reset or not.", default=False,
                              scope=Scope.user_state)
     attempts = Integer(display_name="Maximum Attempts",
-        help="Specifies the number of times the student can try to answer this problem.", default=1, scope=Scope.settings)
+        help="Specifies the number of times the student can try to answer this problem.", default=1,
+        scope=Scope.settings)
     # TODO: move values to Boolean in xblock.
     is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings,
         values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
