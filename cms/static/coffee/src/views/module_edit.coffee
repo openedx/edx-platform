@@ -7,7 +7,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     "click .component-editor .save-button": 'clickSaveButton'
     "click .component-actions .edit-button": 'clickEditButton'
     "click .component-actions .delete-button": 'onDelete'
-    "click .mode .not-set": 'clickModeButton'
+    "click .not-set ": 'clickModeButton'
 
   initialize: ->
     @onDelete = @options.onDelete
@@ -86,5 +86,11 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   clickModeButton: (event) ->
     event.preventDefault()
-    @$el.find("a").removeClass('not-set')
-    @$el.find("a").addClass('is-set')
+    @$el.find("a").removeClass('not-set').addClass('is-set')
+
+    previouslySetMode = @$el.siblings('li.active-mode').find('.is-set')
+    previouslySetMode.find("a").removeClass('is-set').addClass('not-set')
+
+    activeTab = $component_editor.find('.xmodule_edit').find(".is-set")
+    activeTab.removeClass('is-set')
+    activeTab.siblings('.not-set').addClass('is-set')
