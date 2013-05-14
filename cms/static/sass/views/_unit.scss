@@ -480,10 +480,8 @@ body.course.unit {
   padding: 15px 0 15px 20px;
   top: 0;
   right: 0;
-  border-bottom: 1px solid $gray-l2;
   background-color: $blue;
   color: $white;
-  box-shadow: 0 1px 2px rgba(182, 182, 182, 0.75) inset;
 
   //Component Name
   .component-name {
@@ -518,12 +516,13 @@ body.course.unit {
 
         &.is-set {
           @include linear-gradient($blue, $blue);
-          box-shadow: inset 0 0 3px $shadow;
+          color: $blue-d1;
+          box-shadow: inset 0 3px 3px $shadow-d1;
           background-color: $blue;
           cursor: default;
 
           &:hover {
-            box-shadow: inset 0 0 3px $shadow;
+            box-shadow: inset 0 3px 3px $shadow-d1;
             background-color: $blue;
           }
         }
@@ -614,6 +613,7 @@ body.course.unit {
         @extend .t-copy-sub1;
         @include transition(color, 0.15s, ease-in-out);
         font-weight: 400;
+        vertical-align: middle;
         display: inline-block;
         position: relative;
         left: 0;
@@ -702,7 +702,7 @@ body.course.unit {
         margin-top: 5px;
         display: inline-block;
         font-color: $gray-l6;
-        min-width: 280px;
+        min-width: 260px;
         width: 50%;
         vertical-align: top;
       }
