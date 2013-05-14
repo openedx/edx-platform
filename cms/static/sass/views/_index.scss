@@ -18,14 +18,14 @@ body.index {
     }
 
     .content {
+      @extend .t-copy-base;
       @include clearfix();
-      @include font-size(16);
       max-width: $fg-max-width;
       min-width: $fg-min-width;
       width: flex-grid(12);
       margin: 0 auto;
       color: $gray-d2;
-    
+
       header {
         border: none;
         padding-bottom: 0;
@@ -62,7 +62,7 @@ body.index {
       color: $white;
 
       h1 {
-        @include font-size(52);
+        @extend .t-title2;
         float: none;
         margin: 0 0 ($baseline/2) 0;
         border-bottom: 1px solid $blue-l1;
@@ -72,7 +72,7 @@ body.index {
       }
 
       .logo {
-        @include text-hide();
+        @extend .text-hide;
         position: relative;
         top: 3px;
         display: inline-block;
@@ -83,7 +83,7 @@ body.index {
       }
 
       .tagline {
-        @include font-size(24);
+        @extend .t-title4;
         margin: 0;
         color: $blue-l3;
       }
@@ -198,13 +198,13 @@ body.index {
           margin-top: -($baseline/4);
 
           h3 {
+            @extend .t-title4;
             margin: 0 0 ($baseline/2) 0;
-            @include font-size(24);
             font-weight: 600;
           }
 
           > p {
-            @include font-size(18);
+            @extend .t-copy-lead1;
             color: $gray-d1;
           }
 
@@ -214,8 +214,8 @@ body.index {
           }
 
           .list-proofpoints {
+            @extend .t-copy-sub1;
             @include clearfix();
-            @include font-size(14);
             width: flex-grid(9, 9);
             margin: ($baseline*1.5) 0 0 0;
 
@@ -233,7 +233,7 @@ body.index {
               color: $gray-l1;
 
               .title {
-                @include font-size(16);
+                @extend .t-copy-base;
                 margin: 0 0 ($baseline/4) 0;
                 font-weight: 500;
                 color: $gray-d3;
@@ -314,7 +314,7 @@ body.index {
         margin-top: -($baseline*1.5);
 
         li {
-          width: flex-grid(6, 12); 
+          width: flex-grid(6, 12);
           margin: 0 auto;
         }
 
@@ -322,21 +322,21 @@ body.index {
           display: block;
           width: 100%;
           text-align: center;
-        }
 
-        .action-primary {
-          @include blue-button;
-          @include transition(all .15s);
-          @include font-size(18);
-          padding: ($baseline*0.75) ($baseline/2);
-          font-weight: 600;
-          text-align: center;
-          text-transform: uppercase;
-        }
+          &.action-primary {
+            @extend .t-action1;
+            @include blue-button;
+            @include transition(all .15s);
+            padding: ($baseline*0.75) ($baseline/2);
+            font-weight: 600;
+            text-align: center;
+            text-transform: uppercase;
+          }
 
-        .action-secondary {
-          @include font-size(14);
-          margin-top: ($baseline/2);
+          &.action-secondary {
+            @extend .t-action3;
+            margin-top: ($baseline/2);
+          }
         }
       }
     }
