@@ -131,6 +131,11 @@
     text-overflow: ellipsis;
     @include font-size(16);
     font-weight: 600;
+
+    [class^="icon-"] {
+      @include font-size(36);
+      @include lh(36);
+    }
   }
 }
 
@@ -219,10 +224,11 @@
   .nav-item {
     position: relative;
 
-    .icon-expand {
+    .icon-caret-down {
       @include font-size(14);
       @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
       display: inline-block;
+      vertical-align: middle;
       margin-left: 2px;
       opacity: 0.5;
       color: $gray-l2;
@@ -230,7 +236,7 @@
 
     &:hover {
 
-      .icon-expand {
+      .icon-caret-down {
         color: $blue;
         opacity: 1.0;
       }
