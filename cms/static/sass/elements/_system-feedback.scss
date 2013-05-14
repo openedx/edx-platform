@@ -442,7 +442,7 @@
     }
 
     .copy p {
-      @extend text-sr;
+      @extend .text-sr;
     }
   }
 }
@@ -597,7 +597,7 @@
     text-align: center;
 
     .label {
-      @extend text-sr;
+      @extend .text-sr;
     }
 
     .icon {
