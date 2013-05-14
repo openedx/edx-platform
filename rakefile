@@ -244,7 +244,8 @@ def run_tests(system, report_dir, stop_on_failure=true)
 end
 
 def run_acceptance_tests(system, report_dir, harvest_args)
-    ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, 'acceptance_tests.xml')
+    sh(django_admin(system, 'acceptance', 'syncdb', '--noinput'))
+    sh(django_admin(system, 'acceptance', 'migrate', '--noinput'))
     sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', harvest_args))
 end
 

@@ -166,14 +166,6 @@ uses [Selenium](http://docs.seleniumhq.org/) to control the browser.
 **Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver) 
 installed to run the tests in Chrome.  
 
-Before running the tests, you need to set up the test database:
-
-    rm ../db/test_mitx.db
-    rake django-admin[syncdb,lms,acceptance,--noinput]
-    rake django-admin[migrate,lms,acceptance,--noinput]
-    rake django-admin[syncdb,cms,acceptance,--noinput]
-    rake django-admin[migrate,cms,acceptance,--noinput]
-
 To run all the acceptance tests:
 
     rake test_acceptance_lms
