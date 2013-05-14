@@ -1,17 +1,17 @@
-CMS.Views.SystemFeedback = Backbone.View.extend({
+CMS.Views.Alert = Backbone.View.extend({
+    options: {
+        type: "alert",
+        shown: true,  // is this view currently being shown?
+        closeIcon: true  // should we render a close button in the top right corner?
+    },
     initialize: function() {
-        this.setElement($("#page-"+this.type));
+        this.template = _.template($("#"+this.options.type+"-tpl").text()),
+        this.setElement($("#page-"+this.options.type));
         this.listenTo(this.model, 'change', this.render);
         return this.render();
     },
-    template: _.template($("#system-feedback-tpl").text()),
     render: function() {
-        var attrs = $.extend({}, this.model.attributes);
-        if(attrs.type) {
-            attrs.modelType = attrs.type;
-            delete attrs.type;
-        }
-        attrs.viewType = this.type;
+        var attrs = $.extend({}, this.options, this.model.attributes);
         this.$el.html(this.template(attrs));
         return this;
     },
@@ -20,8 +20,13 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         "click .action-primary": "primaryClick",
         "click .action-secondary": "secondaryClick"
     },
+    show: function() {
+        this.options.shown = true;
+        return this.render();
+    },
     hide: function() {
-        this.model.hide();
+        this.options.shown = false;
+        return this.render();
     },
     primaryClick: function() {
         var actions = this.model.get("actions");
@@ -29,7 +34,7 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         var primary = actions.primary;
         if(!primary) { return; }
         if(primary.click) {
-            primary.click.call(this.model);
+            primary.click.call(this.model, this);
         }
     },
     secondaryClick: function(e) {
@@ -46,19 +51,22 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         }
         var secondary = this.model.get("actions").secondary[i];
         if(secondary.click) {
-            secondary.click.call(this.model);
+            secondary.click.call(this.model, this);
         }
     }
 });
 
-CMS.Views.Alert = CMS.Views.SystemFeedback.extend({
-    type: "alert"
+CMS.Views.Notification = CMS.Views.Alert.extend({
+    options: $.extend({}, CMS.Views.Alert.prototype.options, {
+        type: "notification",
+        closeIcon: false
+    })
 });
-CMS.Views.Notification = CMS.Views.SystemFeedback.extend({
-    type: "notification"
-});
-CMS.Views.Prompt = CMS.Views.SystemFeedback.extend({
-    type: "prompt",
+CMS.Views.Prompt = CMS.Views.Alert.extend({
+    options: $.extend({}, CMS.Views.Alert.prototype.options, {
+        type: "prompt",
+        closeIcon: false
+    }),
     render: function() {
         if(!window.$body) { window.$body = $(document.body); }
         if(this.model.get('shown')) {
@@ -67,6 +75,6 @@ CMS.Views.Prompt = CMS.Views.SystemFeedback.extend({
             $body.removeClass('prompt-is-shown');
         }
         // super() in Javascript has awkward syntax :(
-        return CMS.Views.SystemFeedback.prototype.render.apply(this, arguments);
+        return CMS.Views.Alert.prototype.render.apply(this, arguments);
     }
 });

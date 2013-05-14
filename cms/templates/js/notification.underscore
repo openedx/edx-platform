@@ -1,0 +1,46 @@
+<div class="wrapper wrapper-notification wrapper-notification-<%= type %>
+            <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>
+            <% if(_.contains(['help', 'saving'], type)) { %>wrapper-notification-status<% } %>"
+     id="notification-<%= type %>"
+     aria-hidden="<% if(obj.shown) { %>false<% } else { %>true<% } %>"
+     aria-labelledby="notification-<%= type %>-title"
+     <% if (obj.message) { %>aria-describedby="notification-<%= type %>-description" <% } %>
+     <% if (obj.actions) { %>role="dialog"<% } %>
+  >
+  <div class="notification <%= type %> <% if(obj.actions) { %>has-actions<% } %>">
+    <% var iconText = {"warning": "&#x26A0;", "confirmation": "&#x2713;", "error": "&#x26A0;", "announcement": "&#x1F4E2;", "step-required": "&#xE0D1", "help": "&#x2753;", "saving": "&#x2699;"} %>
+    <i class="ss-icon ss-symbolicons-block icon icon-<%= type %>"><%= iconText[type] %></i>
+
+    <div class="copy">
+      <h2 class="title title-3" id="notification-<%= type %>-title"><%= title %></h2>
+      <% if(obj.message) { %><p class="message" id="notification-<%= type %>-description"><%= message %></p><% } %>
+    </div>
+
+    <% if(obj.actions) { %>
+    <nav class="nav-actions">
+      <h3 class="sr">Notification Actions</h3>
+      <ul>
+        <% if(actions.primary) { %>
+        <li class="nav-item">
+          <a href="#" class="button action-primary <%= actions.primary.class %>"><%= actions.primary.text %></a>
+        </li>
+        <% } %>
+        <% if(actions.secondary) {
+             _.each(actions.secondary, function(secondary) { %>
+        <li class="nav-item">
+          <a href="#" class="button action-secondary <%= secondary.class %>"><%= secondary.text %></a>
+        </li>
+        <%   });
+           } %>
+      </ul>
+    </nav>
+    <% } %>
+
+    <% if(obj.closeIcon) { %>
+    <a href="#" rel="view" class="action action-close action-notification-close">
+      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
+      <span class="label">close notification</span>
+    </a>
+    <% } %>
+  </div>
+</div>

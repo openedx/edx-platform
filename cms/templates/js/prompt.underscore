@@ -1,0 +1,35 @@
+<div class="wrapper wrapper-prompt wrapper-prompt-<%= type %>
+            <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>
+     id="prompt-<%= type %>"
+     aria-hidden="<% if(obj.shown) { %>false<% } else { %>true<% } %>"
+     aria-labelledby="prompt-<%= type %>-title"
+     <% if (obj.message) { %>aria-describedby="prompt-<%= type %>-description" <% } %>
+     <% if (obj.actions) { %>role="dialog"<% } %>
+  >
+  <div class="prompt <%= type %> <% if(obj.actions) { %>has-actions<% } %>">
+    <div class="copy">
+      <h2 class="title title-3" id="prompt-<%= type %>-title"><%= title %></h2>
+      <% if(obj.message) { %><p class="message" id="prompt-<%= type %>-description"><%= message %></p><% } %>
+    </div>
+
+    <% if(obj.actions) { %>
+    <nav class="nav-actions">
+      <h3 class="sr">Prompt Actions</h3>
+      <ul>
+        <% if(actions.primary) { %>
+        <li class="nav-item">
+          <a href="#" class="button action-primary <%= actions.primary.class %>"><%= actions.primary.text %></a>
+        </li>
+        <% } %>
+        <% if(actions.secondary) {
+             _.each(actions.secondary, function(secondary) { %>
+        <li class="nav-item">
+          <a href="#" class="button action-secondary <%= secondary.class %>"><%= secondary.text %></a>
+        </li>
+        <%   });
+           } %>
+      </ul>
+    </nav>
+    <% } %>
+  </div>
+</div>

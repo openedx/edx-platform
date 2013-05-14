@@ -11,18 +11,6 @@ describe "CMS.Models.SystemFeedback", ->
   it "should not have a type set by default", ->
     expect(@model.get("type")).toBeNull()
 
-  it "should be shown by default", ->
-    expect(@model.get("shown")).toEqual(true)
-
-  it "should trigger a change event on calling .hide()", ->
-    spy = jasmine.createSpy()
-    @model.on("change", spy)
-
-    @model.hide()
-
-    expect(@model.get("shown")).toEqual(false)
-    expect(spy).toHaveBeenCalled()
-
 
 describe "CMS.Models.WarningMessage", ->
   beforeEach ->

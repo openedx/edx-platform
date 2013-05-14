@@ -32,8 +32,14 @@
     <%include file="courseware_vendor_js.html"/>
 
     ## js templates
-    <script id="system-feedback-tpl" type="text/template">
-      <%static:include path="js/system-feedback.underscore" />
+    <script id="alert-tpl" type="text/template">
+      <%static:include path="js/alert.underscore" />
+    </script>
+    <script id="notification-tpl" type="text/template">
+      <%static:include path="js/notification.underscore" />
+    </script>
+    <script id="prompt-tpl" type="text/template">
+      <%static:include path="js/prompt.underscore" />
     </script>
 
     ## javascript
@@ -68,8 +74,8 @@ $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
         "actions": {
             "primary": {
                 "text": "Dismiss",
-                "click": function() {
-                    this.hide();
+                "click": function(view) {
+                    view.hide();
                 }
             }
         }
