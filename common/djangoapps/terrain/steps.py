@@ -144,3 +144,8 @@ def i_am_an_edx_user(step):
 @step(u'User "([^"]*)" is an edX user$')
 def registered_edx_user(step, uname):
     world.create_user(uname)
+
+
+@step(u'All dialogs should be closed$')
+def dialogs_are_closed(step):
+    assert world.dialogs_closed()

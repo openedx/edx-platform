@@ -15,4 +15,6 @@ Feature: Register for a course
     And I visit the dashboard
     When I click the link with the text "Unregister"
     And I press the "Unregister" button in the Unenroll dialog
-    Then I should see "Looks like you haven't registered for any courses yet." somewhere in the page
+    Then All dialogs should be closed
+    And I should be on the dashboard page
+    And I should see "Looks like you haven't registered for any courses yet." somewhere in the page

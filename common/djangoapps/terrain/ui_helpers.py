@@ -1,7 +1,7 @@
 #pylint: disable=C0111
 #pylint: disable=W0621
 
-from lettuce import world, step
+from lettuce import world
 import time
 from urllib import quote_plus
 from selenium.common.exceptions import WebDriverException
@@ -105,10 +105,21 @@ def css_visible(css_selector):
 
 
 @world.absorb
+def dialogs_closed():
+    def are_dialogs_closed(driver):
+        '''
+        Return True when no modal dialogs are visible
+        '''
+        return not css_visible('.modal')
+    wait_for(are_dialogs_closed)
+    return not css_visible('.modal')
+
+
+@world.absorb
 def save_the_html(path='/tmp'):
     u = world.browser.url
     html = world.browser.html.encode('ascii', 'ignore')
     filename = '%s.html' % quote_plus(u)
     f = open('%s/%s' % (path, filename), 'w')
     f.write(html)
-    f.close
+    f.close()
