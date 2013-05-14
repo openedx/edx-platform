@@ -26,16 +26,22 @@ from models.settings.course_grading import CourseGradingModel
 from .requests import get_request_method, _xmodule_recurse
 from .access import has_access
 
-# TODO: should explicitly enumerate exports with __all__
-
-# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
+__all__ = ['OPEN_ENDED_COMPONENT_TYPES',
+           'ADVANCED_COMPONENT_POLICY_KEY',
+           'edit_subsection',
+           'edit_unit',
+           'assignment_type_update',
+           'create_draft',
+           'publish_draft',
+           'unpublish_unit',
+           'module_info']
 
 log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
-ADVANCED_COMPONENT_TYPES = ['annotatable' + 'word_cloud'] + OPEN_ENDED_COMPONENT_TYPES
+ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud'] + OPEN_ENDED_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 

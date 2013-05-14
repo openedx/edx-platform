@@ -1,3 +1,6 @@
+"""
+Views related to operations on course objects
+"""
 import json
 import time
 
@@ -10,6 +13,7 @@ from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
+
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore import Location
 
@@ -29,6 +33,14 @@ from .component import OPEN_ENDED_COMPONENT_TYPES, ADVANCED_COMPONENT_POLICY_KEY
 from django_comment_common.utils import seed_permissions_roles
 
 # TODO: should explicitly enumerate exports with __all__
+
+__all__ = ['course_index', 'create_new_course', 'course_info',
+           'course_info_updates', 'get_course_settings',
+           'course_config_graders_page',
+           'course_config_advanced_page',
+           'course_settings_updates',
+           'course_grader_updates',
+           'course_advanced_updates']
 
 
 @login_required
@@ -85,8 +97,9 @@ def create_new_course(request):
 
     try:
         dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
-    except InvalidLocationError as e:
-        return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" + display_name + "'.\n\n" + e.message}))
+    except InvalidLocationError as error:
+        return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" +
+                                        display_name + "'.\n\n" + error.message}))
 
     # see if the course already exists
     existing_course = None

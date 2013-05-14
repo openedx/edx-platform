@@ -96,7 +96,7 @@ def preview_module_system(request, preview_id, descriptor):
     return ModuleSystem(
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
-        track_function=lambda type, event: None,
+        track_function=lambda event_type, event: None,
         filestore=descriptor.system.resources_fs,
         get_module=partial(get_preview_module, request, preview_id),
         render_template=render_from_lms,
@@ -171,7 +171,7 @@ def get_module_previews(request, descriptor):
     descriptor: An XModuleDescriptor
     """
     preview_html = []
-    for idx, (instance_state, shared_state) in enumerate(descriptor.get_sample_state()):
+    for idx, (_instance_state, _shared_state) in enumerate(descriptor.get_sample_state()):
         module = load_preview_module(request, str(idx), descriptor)
         preview_html.append(module.get_html())
     return preview_html
