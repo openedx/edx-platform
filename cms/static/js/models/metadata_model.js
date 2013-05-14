@@ -8,7 +8,8 @@ CMS.Models.Metadata = Backbone.Model.extend({
         "value" : null,
         "explicitly_set": null,
         "default_value" : null,
-        "options" : null
+        "options" : null,
+        "type" : null
     },
 
     initialize: function() {
@@ -53,6 +54,10 @@ CMS.Models.Metadata = Backbone.Model.extend({
 
     getOptions: function () {
         return this.get('options');
+    },
+
+    getType: function() {
+        return this.get('type');
     },
 
     clear: function() {

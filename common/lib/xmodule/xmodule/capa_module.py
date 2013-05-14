@@ -89,7 +89,7 @@ class CapaFields(object):
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
     weight = StringyFloat(display_name="Problem Weight",
         help="Specifies the number of points the problem is worth. If unset, each response field in the problem is worth one point.",
-        values = {"min" : 0 },
+        values = {"min" : 0 , "step": ".1"},
         scope=Scope.settings)
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
     source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.",
