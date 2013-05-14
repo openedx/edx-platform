@@ -21,7 +21,7 @@
   $(document).ready(function(){
     var course_updates = new CMS.Models.CourseUpdateCollection();
     course_updates.urlbase = '${url_base}';
-    course_updates.fetch();
+    course_updates.fetch({reset: true});
 
     var course_handouts = new CMS.Models.ModuleInfo({
         id: '${handouts_location}'
