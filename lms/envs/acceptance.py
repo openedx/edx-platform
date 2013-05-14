@@ -14,7 +14,7 @@ modulestore_options = {
     'host': 'localhost',
     'db': 'test_xmodule',
     'collection': 'modulestore',
-    'fs_root': GITHUB_REPO_ROOT,
+    'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
