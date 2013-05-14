@@ -413,12 +413,17 @@ class LoncapaProblem(object):
         path = []
 
         for dir in raw_path:
-
             if not dir:
                 continue
 
             # path is an absolute path or a path relative to the data dir
             dir = os.path.join(self.system.filestore.root_path, dir)
+            # Check that we are within the filestore tree.
+            reldir = os.path.relpath(dir, self.system.filestore.root_path)
+            if ".." in reldir:
+                log.warning("Ignoring Python directory outside of course: %r" % dir)
+                continue
+
             abs_dir = os.path.normpath(dir)
             path.append(abs_dir)
 
