@@ -159,6 +159,33 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
         "click .setting-clear" : "clear"
     },
 
+    render: function () {
+        CMS.Views.Metadata.AbstractEditor.prototype.render.apply(this);
+        if (!this.inputAttributesSet) {
+            var min = "min";
+            var max = "max";
+            var step = "step";
+            var options = this.model.getOptions();
+            if (options.hasOwnProperty(min)) {
+                this.$el.find('input').attr(min, options[min].toString());
+            }
+            if (options.hasOwnProperty(max)) {
+                this.$el.find('input').attr(max, options[max].toString());
+            }
+            var stepValue = undefined;
+            if (options.hasOwnProperty(step)) {
+                stepValue = options[step].toString();
+            }
+            else if (this.model.getType() === 'Integer') {
+                stepValue = "1";
+            }
+            if (stepValue !== undefined) {
+                this.$el.find('input').attr(step, stepValue);
+            }
+            this.inputAttributesSet = true;
+        }
+    },
+
     getTemplateName : function () {
         return "metadata_number_entry";
     },

@@ -33,6 +33,6 @@ PIPELINE_JS['spec'] = {
 
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
-STATICFILES_DIRS.append(COMMON_ROOT / 'test' / 'phantom-jasmine' / 'lib')
+STATICFILES_DIRS.append(REPO_ROOT/'node_modules/phantom-jasmine/lib')
 
 INSTALLED_APPS += ('django_jasmine', )
