@@ -23,6 +23,7 @@ describe "CMS.Models.SystemFeedback", ->
     expect(@model.get("shown")).toEqual(false)
     expect(spy).toHaveBeenCalled()
 
+
 describe "CMS.Models.WarningMessage", ->
   beforeEach ->
     @model = new CMS.Models.WarningMessage()
@@ -43,4 +44,3 @@ describe "CMS.Models.ConfirmationMessage", ->
 
   it "should have the correct type", ->
     expect(@model.get("type")).toEqual("confirmation")
-

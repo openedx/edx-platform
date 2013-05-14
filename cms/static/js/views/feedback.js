@@ -38,7 +38,12 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         var secondaryList = actions.secondary;
         if(!secondaryList) { return; }
         // which secondary action was clicked?
-        var i = _.indexOf(this.$(".action-secondary"), e.target);
+        var i;
+        if(e && e.target) {
+            i = _.indexOf(this.$(".action-secondary"), e.target);
+        } else {
+            i = 0;
+        }
         var secondary = this.model.get("actions").secondary[i];
         if(secondary.click) {
             secondary.click.call(this.model);

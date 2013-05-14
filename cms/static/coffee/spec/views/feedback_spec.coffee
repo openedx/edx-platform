@@ -50,3 +50,28 @@ describe "CMS.Views.SystemFeedback", ->
     @model.hide()
     # expect($("body")).not.toHaveClass("prompt-is-shown")
 
+describe "SystemFeedback click events", ->
+  beforeEach ->
+    @model = new CMS.Models.WarningMessage(
+      title: "Unsaved",
+      message: "Your content is currently unsaved.",
+      actions:
+        primary:
+          text: "Save",
+          click: jasmine.createSpy('primaryClick')
+        secondary: [{
+            text: "Revert",
+            click: jasmine.createSpy('secondaryClick')
+          }]
+
+      )
+
+    @view = new CMS.Views.Alert({model: @model})
+
+  it "should trigger the primary event on a primary click", ->
+    @view.primaryClick()
+    expect(@model.get('actions').primary.click).toHaveBeenCalled()
+
+  it "should trigger the secondary event on a secondary click", ->
+    @view.secondaryClick()
+    expect(@model.get('actions').secondary[0].click).toHaveBeenCalled()
