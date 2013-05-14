@@ -87,3 +87,34 @@ class ViewsTestCase(ModuleStoreTestCase):
                                         'anonymous': False, 'course_id': u'MITx/999/Robot_Super_Course',
                                         'api_key': 'PUT_YOUR_API_KEY_HERE'}, timeout=5)
         assert_equal(response.status_code, 200)
+
+    def test_flag_thread(self, mock_request):
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.text = u'{"title":"Hello",\
+                                            "body":"this is a post",\
+                                            "course_id":"MITx/999/Robot_Super_Course",\
+                                            "anonymous":false,\
+                                            "anonymous_to_peers":false,\
+                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
+                                            "created_at":"2013-05-10T18:53:43Z",\
+                                            "updated_at":"2013-05-10T18:53:43Z",\
+                                            "at_position_list":[],\
+                                            "closed":false,\
+                                            "id":"518d4237b023791dca00000d",\
+                                            "user_id":"1","username":"robot",\
+                                            "votes":{"count":0,"up_count":0,\
+                                            "down_count":0,"point":0},\
+                                            "abuse_flaggers":[1],"tags":[],\
+                                            "type":"thread","group_id":null,\
+                                            "pinned":false,\
+                                            "endorsed":false,\
+                                            "unread_comments_count":0,\
+                                            "read":false,"comments_count":0}'
+        url = reverse('flag_thread', kwargs={'thread_id':'518d4237b023791dca00000d'})
+        response = self.client.put(url)
+        assert_true(mock_request.called)
+        mock_request.assert_called_with('put',
+                                        'http://localhost:4567/api/v1/i4x-MITx-999-course-Robot_Super_Course/threads/518d4237b023791dca00000d/abuse_flag',
+                                        data={'user_id': 1,
+                                        'api_key': 'PUT_YOUR_API_KEY_HERE'}, timeout=5)
+        assert_equal(response.status_code, 200)
