@@ -160,11 +160,17 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var targetModel = this.eventModel(event);
         this.modelDom(event).remove();
         var cacheThis = this;
-        targetModel.destroy({success : function (model, response) {
-            cacheThis.collection.fetch({success : function() {cacheThis.render();},
-                error : CMS.ServerError});
-        },
-        error : CMS.ServerError
+        targetModel.destroy({
+            success: function (model, response) {
+                cacheThis.collection.fetch({
+                    success: function() {
+                        cacheThis.render();
+                    },
+                    reset: true,
+                    error: CMS.ServerError
+                });
+            },
+            error : CMS.ServerError
         });
     },
 
@@ -238,20 +244,19 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
 
     initialize: function() {
         var self = this;
-        this.model.fetch(
-            {
-                complete: function() {
-                    window.templateLoader.loadRemoteTemplate("course_info_handouts",
-                        "/static/client_templates/course_info_handouts.html",
-                        function (raw_template) {
-                            self.template = _.template(raw_template);
-                            self.render();
-                        }
-                    );
-                },
-                error : CMS.ServerError
-            }
-        );
+        this.model.fetch({
+            complete: function() {
+                window.templateLoader.loadRemoteTemplate("course_info_handouts",
+                    "/static/client_templates/course_info_handouts.html",
+                    function (raw_template) {
+                        self.template = _.template(raw_template);
+                        self.render();
+                    }
+                );
+            },
+            reset: true,
+            error: CMS.ServerError
+        });
     },
 
     render: function () {
