@@ -30,6 +30,13 @@
 
   <body class="<%block name='bodyclass'></%block> hide-wip">
     <%include file="courseware_vendor_js.html"/>
+
+    ## js templates
+    <script id="system-feedback-tpl" type="text/template">
+      <%static:include path="js/system-feedback.underscore" />
+    </script>
+
+    ## javascript
     <script type="text/javascript" src="/jsi18n/"></script>
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
@@ -51,62 +58,6 @@
     <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
     <script type="text/javascript" src="//www.youtube.com/player_api"></script>
 
-    <!-- templates -->
-    <%text>
-    <script id="system-feedback-tpl" type="text/template">
-<div class="wrapper
-            wrapper-<%= viewType %>
-            wrapper-<%= viewType %>-<%= modelType %>
-            <% if(obj.status) { %>wrapper-<%= viewType %>-status <% } %>
-            <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>
-            <% if(obj.fleeting) { %>is-fleeting<% } %>"
-     id="<%= viewType %>-<%= modelType %>"
-     aria-hidden="<% if(obj.shown) { %>false<% } else { %>true<% } %>"
-     aria-labelledby="<%= viewType %>-<%= modelType %>-title"
-     <% if (obj.message) { %>aria-describedby="<%= viewType %>-<%= modelType %>-description" <% } %>
-     <% if (obj.actions) { %>role="dialog"<% } %>
-  >
-  <div class="<%= modelType %> <%= viewType %> <% if(obj.actions) { %>has-actions <% } %>">
-    <% if (icon) { %>
-      <% var iconText = {"warning": "&#x26A0;", "confirmation": "&#x2713;", "error": "&#x26A0;", "announcement": "&#x1F4E2;", "step-required": "&#xE0D1", "help": "&#x2753;", "saving": "&#x2699;"} %>
-      <i class="ss-icon ss-symbolicons-block icon icon-<%= modelType %>"><%= iconText[modelType] %></i>
-    <% } %>
-
-    <div class="copy">
-      <h2 class="title title-3" id="<%= viewType %>-<%= modelType %>-title"><%= title %></h2>
-      <% if(obj.message) { %><p class="message" id="<%= viewType %>-<%= modelType %>-description"><%= message %></p><% } %>
-    </div>
-
-    <% if(obj.actions) { %>
-    <nav class="nav-actions">
-      <h3 class="sr"><%= viewType %> Actions</h3>
-      <ul>
-        <% if(actions.primary) { %>
-        <li class="nav-item">
-          <a href="#" class="button action-primary <%= actions.primary.class %>"><%= actions.primary.text %></a>
-        </li>
-        <% } %>
-        <% if(actions.secondary) {
-             _.each(actions.secondary, function(secondary) { %>
-        <li class="nav-item">
-          <a href="#" class="button action-secondary <%= secondary.class %>"><%= secondary.text %></a>
-        </li>
-        <%   });
-           } %>
-      </ul>
-    </nav>
-    <% } %>
-
-    <% if(obj.close) { %>
-    <a href="#" rel="view" class="action action-close action-<%= viewType %>-close">
-      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
-      <span class="label">close <%= viewType %></span>
-    </a>
-    <% } %>
-  </div>
-</div>
-    </script>
-    </%text>
     <script src="${static.url('js/models/feedback.js')}"></script>
     <script src="${static.url('js/views/feedback.js')}"></script>
     <script type="text/javascript">

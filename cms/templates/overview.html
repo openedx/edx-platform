@@ -20,6 +20,12 @@
   <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
 
+  <script type="text/template" id="section-name-edit-tpl">
+    <%static:include path="js/section-name-edit.underscore" />
+  </script>
+  <script type="text/javascript" src="${static.url('js/models/section.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/section.js')}"></script>
+
   <script type="text/javascript">
   $(document).ready(function(){
     // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
@@ -37,6 +43,14 @@
             graders : window.graderTypes
         });
     });
+
+    $(".section-name").each(function() {
+        var model = new CMS.Models.Section({
+            id: $(this).parent(".item-details").data("id"),
+            name: $(this).data("name")
+        });
+        new CMS.Views.SectionShow({model: model, el: this}).render();
+    })
   });
 
   </script>
@@ -127,149 +141,6 @@
       </nav>
     </header>
   </div>
-
-<%text>
-<script type="text/template" id="section-name-edit-tpl">
-  <form class="section-name-edit">
-    <input type="text" value="<%= name %>" autocomplete="off"/>
-    <input type="submit" class="save-button" value="Save" />
-    <input type="button" class="cancel-button" value="Cancel" />
-  </form>
-</script>
-<script type="text/javascript">
-CMS.Models.Section = Backbone.Model.extend({
-    defaults: {
-        "name": ""
-    },
-    validate: function(attrs, options) {
-        if (!attrs.name) {
-            return "You must specify a name"
-        }
-    },
-    url: "/save_item",
-    toJSON: function() {
-        return {
-            id: this.get("id"),
-            metadata: {
-                display_name: this.get("name")
-            }
-        }
-    },
-    initialize: function() {
-        this.listenTo(this, "request", this.showNotification);
-        this.listenTo(this, "sync", this.hideNotification);
-        this.listenTo(this, "error", this.hideNotification);
-    },
-    showNotification: function() {
-        if(!this.msg) {
-            this.msg = new CMS.Models.SystemFeedback({
-                type: "saving",
-                title: "Saving&hellip;",
-                icon: true,
-                status: true
-            })
-        }
-        if(!this.msgView) {
-            this.msgView = new CMS.Views.Notification({model: this.msg});
-        }
-        this.msg.show();
-    },
-    hideNotification: function() {
-        if(!this.msg) { return }
-        this.msg.hide();
-    }
-});
-
-CMS.Views.SectionShow = Backbone.View.extend({
-    template: _.template('<span data-tooltip="Edit this section\'s name" class="section-name-span"><%= name %></span>'),
-    render: function() {
-        this.$el.html(this.template(this.model.attributes));
-        this.delegateEvents();
-        return this;
-    },
-    events: {
-        "click": "switchToEditView"
-    },
-    switchToEditView: function() {
-        if(!this.editView) {
-            this.editView = new CMS.Views.SectionEdit({
-                model: this.model, el: this.el, showView: this});
-        }
-        this.undelegateEvents();
-        this.editView.render();
-    }
-})
-CMS.Views.SectionEdit = Backbone.View.extend({
-    template: _.template($("#section-name-edit-tpl").text()),
-    render: function() {
-        this.$el.html(this.template(this.model.attributes));
-        this.delegateEvents();
-        return this;
-    },
-    initialize: function() {
-        this.listenTo(this.model, "invalid", this.showErrorMessage);
-        this.render();
-    },
-    events: {
-        "click .save-button": "saveName",
-        "submit": "saveName",
-        "click .cancel-button": "switchToShowView"
-    },
-    saveName: function(e) {
-        if (e) { e.preventDefault() }
-        var name = this.$("input[type=text]").val();
-        var that = this;
-        this.model.save("name", name, {
-            success: function() {
-                analytics.track('Edited Section Name', {
-                    'course': course_location_analytics,
-                    'display_name': that.model.get('name'),
-                    'id': that.model.get('id')
-                });
-                that.switchToShowView();
-            }
-        })
-    },
-    switchToShowView: function() {
-        if(!this.showView) {
-            this.showView = new CMS.Views.SectionShow({
-                model: this.model, el: this.el, editView: this});
-        }
-        this.undelegateEvents();
-        this.stopListening();
-        this.showView.render();
-    },
-    showErrorMessage: function(model, error, options) {
-        var msg = new CMS.Models.ErrorMessage({
-            title: "Validation Error",
-            message: error,
-            close: false,
-            icon: false,
-            actions: {
-                primary: {
-                    text: "Dismiss",
-                    click: function() {
-                        this.hide()
-                    }
-                }
-            }
-        })
-        new CMS.Views.Prompt({model: msg})
-    }
-})
-
-$(function() {
-    $(".section-name").each(function() {
-        var model = new CMS.Models.Section({
-            id: $(this).parent(".item-details").data("id"),
-            name: $(this).data("name")
-        });
-        new CMS.Views.SectionShow({model: model, el: this}).render();
-    })
-})
-
-</script>
-</%text>
 
   <div class="main-wrapper">
     <div class="inner-wrapper">
