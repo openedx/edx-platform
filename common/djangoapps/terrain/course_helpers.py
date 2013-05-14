@@ -42,6 +42,8 @@ def log_in(username, password):
     Log the user in programatically
     '''
 
+    world.browser.visit(django_url('/'))
+
     # Authenticate the user
     user = authenticate(username=username, password=password)
     assert(user is not None and user.is_active)
@@ -60,15 +62,8 @@ def log_in(username, password):
 
     # Retrieve the sessionid and add it to the browser's cookies
     cookie_dict = {settings.SESSION_COOKIE_NAME: request.session.session_key}
-    try:
-        world.browser.cookies.add(cookie_dict)
-
-    # WebDriver has an issue where we cannot set cookies
-    # before we make a GET request, so if we get an error,
-    # we load the '/' page and try again
-    except:
-        world.browser.visit(django_url('/'))
-        world.browser.cookies.add(cookie_dict)
+    world.browser.cookies.delete()
+    world.browser.cookies.add(cookie_dict)
 
 
 @world.absorb
