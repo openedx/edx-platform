@@ -23,7 +23,7 @@ body.course.checklists {
 
     // visual status
     .viz-checklist-status {
-      @include text-hide();
+      @extend text-hide;
       @include size(100%,($baseline/4));
       position: relative;
       display: block;
@@ -40,7 +40,7 @@ body.course.checklists {
         background: $green;
 
         .int {
-          @include text-sr();
+          @extend text-sr;
         }
       }
     }

@@ -581,7 +581,7 @@ p, ul, ol, dl {
 
 // misc
 hr.divide {
-  @include text-sr();
+  @extend text-sr;
 }
 
 .item-details {
@@ -832,7 +832,7 @@ hr.divide {
 
 // basic utility
 .sr {
-  @include text-sr();
+  @extend text-sr;
 }
 
 .fake-link {
@@ -885,7 +885,7 @@ body.js {
       text-align: center;
 
       .label {
-        @include text-sr();
+        @extend text-sr;
       }
 
       .ss-icon {

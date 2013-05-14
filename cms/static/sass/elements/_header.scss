@@ -67,7 +67,7 @@
   padding-right: ($baseline*0.75);
 
   a {
-    @include text-hide();
+    @extend text-hide;
     display: block;
     width: 164px;
     height: 32px;
