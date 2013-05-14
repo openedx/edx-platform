@@ -36,7 +36,7 @@ from datetime import datetime
 from .util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
-import capa.xqueue_interface
+import capa.xqueue_interface as xqueue_interface
 
 log = logging.getLogger(__name__)
 
