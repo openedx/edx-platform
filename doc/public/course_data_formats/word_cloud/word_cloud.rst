@@ -26,6 +26,12 @@ The following attributes can be specified for this tag::
 
 .. note::
 
+   Possible answer for boolean type attributes:
+   True – "True", "true", "T", "t", "1"
+   False – "False", "false", "F", "f", "0"
+
+.. note::
+
    If you want to use the same word cloud (the same storage of words), you must use the same display_name value.
 
 
