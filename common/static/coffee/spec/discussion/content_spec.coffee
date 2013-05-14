@@ -37,11 +37,15 @@ describe 'All Content', ->
             expect(@content.get 'subscribed').toEqual true
 
         it 'can be flagged for abuse', ->
-            @content.flagAbuse
-            #temp_array = @content.get("abuse_flaggers")
-            #temp_array.push(window.user.get('id'))
-            #@content.set("abuse_flaggers",temp_array)
+            @content.flagAbuse()
             expect(@content.get 'abuse_flaggers').toEqual ['123', '567']
+
+        it 'can be unflagged for abuse', ->
+            temp_array = []
+            temp_array.push(window.user.get('id'))
+            @content.set("abuse_flaggers",temp_array)
+            @content.unflagAbuse()
+            expect(@content.get 'abuse_flaggers').toEqual []
 
     describe 'Comments', ->
         beforeEach ->

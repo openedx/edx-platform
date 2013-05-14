@@ -1,8 +1,8 @@
-xdescribe "DiscussionContentView", ->
+describe "DiscussionContentView", ->
     beforeEach ->
 
         setFixtures
-        '''
+        """
         <div class="discussion-post">
             <header>
                 <a data-tooltip="vote" data-role="discussion-vote" class="vote-btn discussion-vote discussion-vote-up" href="#">
@@ -19,10 +19,28 @@ xdescribe "DiscussionContentView", ->
             <div data-tooltip="pin this thread" data-role="thread-pin" class="admin-pin discussion-pin notpinned">
             <i class="icon"></i><span class="pin-label">Pin Thread</span></div>
         </div>
-        '''
-        @
+        """
+        @thread = new Thread {
+                id: '01234567',
+                user_id: '567',
+                course_id: 'mitX/999/test',
+                body: 'this is a thread',
+                created_at: '2013-04-03T20:08:39Z',
+                abuse_flaggers: ['123']
+                roles: []
+        }
+        @view = new DiscussionContentView({ model: @thread })
+
+    it 'defines the tag', ->
+        expect($('#jasmine-fixtures')).toExist
+        expect(@view.tagName).toBeDefined
+        expect(@view.el.tagName.toLowerCase()).toBe 'div'
 
     it "defines the class", ->
         # spyOn @content, 'initialize'
-        myView = new DiscussionContentView(new Content)
-        expect(myView.tagName).toBeDefined()
+        expect(@view.model).toBeDefined();
+
+    it 'is tied to the model', ->
+        expect(@view.model).toBeDefined();
+
+ 

@@ -48,6 +48,4 @@ describe 'ResponseCommentShowView', ->
 
         it 'produces the correct HTML', ->
             @view.render()
-            expect(@view.el.innerHTML).toContainHtml """
-            <div
-            """
+            expect(@view.el.innerHTML).toContain('"discussion-flag-abuse notflagged"')
