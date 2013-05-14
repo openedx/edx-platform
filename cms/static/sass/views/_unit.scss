@@ -508,24 +508,24 @@ body.course.unit {
     .mode {
       display: inline-block;
 
-      .inactive-mode {
+      &.inactive-mode{
         display: none;
       }
 
-      .active-mode {
+      &.active-mode a {
+
         @include blue-button;
-      }
 
-      .is-set {
-        @include linear-gradient($blue, $blue);
-        box-shadow: inset 0 0 3px $shadow;
-        background-color: $blue;
-
-        cursor: default;
-
-        &:hover {
+        &.is-set {
+          @include linear-gradient($blue, $blue);
           box-shadow: inset 0 0 3px $shadow;
           background-color: $blue;
+          cursor: default;
+
+          &:hover {
+            box-shadow: inset 0 0 3px $shadow;
+            background-color: $blue;
+          }
         }
       }
     }
@@ -654,7 +654,7 @@ body.course.unit {
       }
 
       select {
-        @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+        @include box-shadow(0 1px 2px $shadow-l1 inset);
         background: none repeat scroll #F2F2F2;
 
         &:focus {
