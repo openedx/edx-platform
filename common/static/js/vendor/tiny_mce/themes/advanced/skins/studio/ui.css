@@ -25,7 +25,7 @@
 
 /* Layout */
 .studioSkin table.mceLayout {border:0;}
-.studioSkin table.mceLayout tr.mceFirst td {border-top: 1px solid #D1DCE6;}
+.studioSkin table.mceLayout tr.mceFirst td {border-top: 1px solid #D1DCE6; border-left: none; border-right:none;}
 .studioSkin table.mceLayout tr.mceLast td {border-bottom:none;}
 .studioSkin table.mceToolbar, .studioSkin tr.mceFirst .mceToolbar tr td, .studioSkin tr.mceLast .mceToolbar tr td {border:0; margin:0; padding:0;}
 .studioSkin td.mceToolbar {
