@@ -3,7 +3,7 @@ default_options = {
     :cms => '8001',
 }
 
-task :predjango do
+task :predjango => :install_python_prereqs do
     sh("find . -type f -name *.pyc -delete")
     sh('pip install -q --no-index -r requirements/local.txt')
 end
