@@ -11,6 +11,7 @@ from splinter.browser import Browser
 from logging import getLogger
 from django.core.management import call_command
 from django.conf import settings
+from selenium.common.exceptions import WebDriverException
 
 # Let the LMS and CMS do their one-time setup
 # For example, setting up mongo caches
@@ -35,14 +36,41 @@ else:
 LOGGER = getLogger(__name__)
 LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 
+MAX_VALID_BROWSER_ATTEMPTS = 20
+
 @before.harvest
 def initial_setup(server):
     """
     Launch the browser once before executing the tests.
     """
     browser_driver = getattr(settings, 'LETTUCE_BROWSER', 'chrome')
-    world.browser = Browser(browser_driver)
 
+    # There is an issue with ChromeDriver2 r195627 on Ubuntu
+    # in which we sometimes get an invalid browser session.
+    # This is a work-around to ensure that we get a valid session.
+    success = False
+    num_attempts = 0
+    while (not success) and num_attempts < MAX_VALID_BROWSER_ATTEMPTS:
+
+        # Get a browser session
+        world.browser = Browser(browser_driver)
+
+        # Try to visit the main page
+        # If the browser session is invalid, this will
+        # raise a WebDriverException
+        try:
+            world.visit('/')
+
+        except WebDriverException:
+            num_attempts += 1
+
+        else:
+            success = True
+
+    # If we were unable to get a valid session within the limit of attempts,
+    # then we cannot run the tests.
+    if not success:
+        raise IOError("Could not acquire valid ChromeDriver browser session.")
 
 @before.each_scenario
 def reset_data(scenario):

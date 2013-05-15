@@ -38,11 +38,11 @@ def create_user(uname):
 
 @world.absorb
 def log_in(username, password):
-    '''
-    Log the user in programatically
-    '''
-
-    world.browser.visit(django_url('/'))
+    """
+    Log the user in programatically.
+    This will delete any existing cookies to ensure that the user
+    logs in to the correct session.
+    """
 
     # Authenticate the user
     user = authenticate(username=username, password=password)
