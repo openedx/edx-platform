@@ -140,6 +140,11 @@ class @Problem
   check_fd: =>
     Logger.log 'problem_check', @answers
 
+    # If some function wants to be called before sending the answer to the
+    # server, give it a chance to do so.
+    if $('input[waitfor]').length != 0
+      ($(lcall).data("waitfor").call() for lcall in $('input[waitfor]'))
+      @refreshAnswers()
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0 
       @check()
