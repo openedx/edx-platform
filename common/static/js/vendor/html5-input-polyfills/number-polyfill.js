@@ -3,8 +3,6 @@
 /*
 HTML5 Number polyfill | Jonathan Stipe | https://github.com/jonstipe/number-polyfill
 */
-
-function triggerNumberPolyfill() {
   
 (function() {
 
@@ -298,5 +296,3 @@ function triggerNumberPolyfill() {
   })(jQuery);
 
 }).call(this);
-
-}

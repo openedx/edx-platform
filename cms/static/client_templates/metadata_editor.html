@@ -4,3 +4,7 @@
     </li>
     <% }) %>
 </ul>
+% if showHighLevelSource:
+    <a href="#hls-modal-${hlskey}" class="launch-latex-compiler" id="hls-trig-${hlskey}" >Edit High Level Source</a>
+    <%include file="source-edit.html" />
+% endif

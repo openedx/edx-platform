@@ -955,3 +955,18 @@ body.unit {
     display: none;
   }
 }
+
+// Latex Compiler
+// ====================
+.launch-latex-compiler {
+  background-color: $white;
+  padding: 10px 0 10px 20px;
+  border-bottom: 1px solid $gray-l2;
+  opacity: .8;
+
+
+  &:hover {
+    @include transition(opacity 0.25s ease-in-out);
+    opacity: 1;
+  }
+}
