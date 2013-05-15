@@ -187,6 +187,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 return ErrorDescriptor.from_json(
                     json_data,
                     self,
+                    json_data['location'],
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
 
