@@ -41,6 +41,7 @@ CMS.Views.Alert = Backbone.View.extend({
         if(this.shownAt && $.isNumeric(this.options.minShown) &&
            this.options.minShown > new Date() - this.shownAt)
         {
+            clearTimeout(this.hideTimeout);
             this.hideTimeout = setTimeout($.proxy(this.hide, this),
                 this.options.minShown - (new Date() - this.shownAt));
         } else {
