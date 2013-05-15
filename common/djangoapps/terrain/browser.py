@@ -62,6 +62,7 @@ def initial_setup(server):
             world.visit('/')
 
         except WebDriverException:
+            world.browser.quit()
             num_attempts += 1
 
         else:

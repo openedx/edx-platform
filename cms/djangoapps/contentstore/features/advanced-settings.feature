@@ -11,7 +11,7 @@ Feature: Advanced (manual) course policy
     Given I am on the Advanced Course Settings page in Studio
     Then the settings are alphabetized
 
-  @skip-phantom
+  @skip
   Scenario: Test cancel editing key value
     Given I am on the Advanced Course Settings page in Studio
     When I edit the value of a policy key
@@ -20,7 +20,7 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then the policy key value is unchanged
 
-  @skip-phantom
+  @skip
   Scenario: Test editing key value
     Given I am on the Advanced Course Settings page in Studio
     When I edit the value of a policy key and save
@@ -28,7 +28,7 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then the policy key value is changed
 
-  @skip-phantom
+  @skip
   Scenario: Test how multi-line input appears
     Given I am on the Advanced Course Settings page in Studio
     When I create a JSON object as a value
@@ -36,7 +36,7 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then it is displayed as formatted
 
-  @skip-phantom
+  @skip
   Scenario: Test automatic quoting of non-JSON values
     Given I am on the Advanced Course Settings page in Studio
     When I create a non-JSON value not in quotes

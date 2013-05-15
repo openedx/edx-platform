@@ -246,7 +246,7 @@ end
 def run_acceptance_tests(system, report_dir, harvest_args)
     sh(django_admin(system, 'acceptance', 'syncdb', '--noinput'))
     sh(django_admin(system, 'acceptance', 'migrate', '--noinput'))
-    sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', harvest_args))
+    sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))
 end
 
 
