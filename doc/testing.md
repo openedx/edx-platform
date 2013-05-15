@@ -164,13 +164,14 @@ to simulate UI browser interactions.  Splinter, in turn,
 uses [Selenium](http://docs.seleniumhq.org/) to control the Chrome browser.
 
 **Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver) 
-installed to run the tests in Chrome.  
+installed to run the tests in Chrome.  The tests are confirmed to run
+with Chrome (not Chromium) version 26.0.0.1410.63 with ChromeDriver
+version r195636.
 
 To run all the acceptance tests:
 
     rake test_acceptance_lms
     rake test_acceptance_cms
-
 
 To test only a specific feature:
 

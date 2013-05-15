@@ -11,6 +11,7 @@ Feature: Advanced (manual) course policy
     Given I am on the Advanced Course Settings page in Studio
     Then the settings are alphabetized
 
+  # Skipped because Ubuntu ChromeDriver cannot click notification "Cancel"
   @skip
   Scenario: Test cancel editing key value
     Given I am on the Advanced Course Settings page in Studio
@@ -20,6 +21,7 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then the policy key value is unchanged
 
+  # Skipped because Ubuntu ChromeDriver cannot click notification "Save"
   @skip
   Scenario: Test editing key value
     Given I am on the Advanced Course Settings page in Studio
@@ -28,6 +30,7 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then the policy key value is changed
 
+  # Skipped because Ubuntu ChromeDriver cannot edit CodeMirror input
   @skip
   Scenario: Test how multi-line input appears
     Given I am on the Advanced Course Settings page in Studio
@@ -36,6 +39,7 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then it is displayed as formatted
 
+  # Skipped because Ubuntu ChromeDriver cannot edit CodeMirror input
   @skip
   Scenario: Test automatic quoting of non-JSON values
     Given I am on the Advanced Course Settings page in Studio
