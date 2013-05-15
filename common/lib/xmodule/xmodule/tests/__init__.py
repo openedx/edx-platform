@@ -85,10 +85,12 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(abs(calc.evaluator(variables, functions, "e^(j*pi)") + 1) < 0.00001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "j||1") - 0.5 - 0.5j) < 0.00001)
         variables['t'] = 1.0
+        # Use self.assertAlmostEqual here...
         self.assertTrue(abs(calc.evaluator(variables, functions, "t") - 1.0) < 0.00001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "T") - 1.0) < 0.00001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "t", cs=True) - 1.0) < 0.00001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "T", cs=True) - 298) < 0.2)
+        # Use self.assertRaises here...
         exception_happened = False
         try:
             calc.evaluator({}, {}, "5+7 QWSEKO")
