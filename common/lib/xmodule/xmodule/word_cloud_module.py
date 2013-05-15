@@ -10,6 +10,7 @@ import json
 import logging
 
 from pkg_resources import resource_string
+from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
@@ -232,9 +233,8 @@ class WordCloudModule(WordCloudFields, XModule):
         return self.content
 
 
-class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor):
+class WordCloudDescriptor(MetadataOnlyEditingDescriptor, RawDescriptor, WordCloudFields):
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
     stores_state = True
-    mako_template = "widgets/raw-edit.html"
