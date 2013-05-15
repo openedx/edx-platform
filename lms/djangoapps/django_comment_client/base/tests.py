@@ -111,12 +111,108 @@ class ViewsTestCase(ModuleStoreTestCase):
                                             "endorsed":false,\
                                             "unread_comments_count":0,\
                                             "read":false,"comments_count":0}'
-        #url(r'threads/(?P<thread_id>[\w\-]+)/flagAbuse$', 'flag_abuse_for_thread', name='flag_abuse_for_thread')
         url = reverse('flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d','course_id': self.course_id })
-        response = self.client.put(url)
+        response = self.client.post(url)
         assert_true(mock_request.called)
-        mock_request.assert_called_with('put',
-                                        'http://localhost:4567/api/v1/i4x-MITx-999-course-Robot_Super_Course/threads/518d4237b023791dca00000d/abuse_flag',
-                                        data={'user_id': 1,
-                                        'api_key': 'PUT_YOUR_API_KEY_HERE'}, timeout=5)
+
+        call_list = [(('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params':{'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5}),
+                     (('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_flag'), {'data':{'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout':5}),
+                     (('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params':{'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5})]
+
+        assert_equal (call_list,mock_request.call_args_list)
+
+        assert_equal(response.status_code, 200)
+        
+    def test_un_flag_thread(self, mock_request):
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.text = u'{"title":"Hello",\
+                                            "body":"this is a post",\
+                                            "course_id":"MITx/999/Robot_Super_Course",\
+                                            "anonymous":false,\
+                                            "anonymous_to_peers":false,\
+                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
+                                            "created_at":"2013-05-10T18:53:43Z",\
+                                            "updated_at":"2013-05-10T18:53:43Z",\
+                                            "at_position_list":[],\
+                                            "closed":false,\
+                                            "id":"518d4237b023791dca00000d",\
+                                            "user_id":"1","username":"robot",\
+                                            "votes":{"count":0,"up_count":0,\
+                                            "down_count":0,"point":0},\
+                                            "abuse_flaggers":[],"tags":[],\
+                                            "type":"thread","group_id":null,\
+                                            "pinned":false,\
+                                            "endorsed":false,\
+                                            "unread_comments_count":0,\
+                                            "read":false,"comments_count":0}'
+        url = reverse('un_flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d','course_id': self.course_id })
+        response = self.client.post(url)
+        assert_true(mock_request.called)
+
+        call_list = [(('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params':{'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5}),
+                     (('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_unflag'), {'data':{'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout':5}),
+                     (('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params':{'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5})]
+
+        assert_equal (call_list,mock_request.call_args_list)
+
+        assert_equal(response.status_code, 200)
+
+    def test_flag_comment(self, mock_request):
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.text = u'{"body":"this is a comment",\
+                                            "course_id":"MITx/999/Robot_Super_Course",\
+                                            "anonymous":false,\
+                                            "anonymous_to_peers":false,\
+                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
+                                            "created_at":"2013-05-10T18:53:43Z",\
+                                            "updated_at":"2013-05-10T18:53:43Z",\
+                                            "at_position_list":[],\
+                                            "closed":false,\
+                                            "id":"518d4237b023791dca00000d",\
+                                            "user_id":"1","username":"robot",\
+                                            "votes":{"count":0,"up_count":0,\
+                                            "down_count":0,"point":0},\
+                                            "abuse_flaggers":[1],\
+                                            "type":"comment",\
+                                            "endorsed":false}'         
+        url = reverse('flag_abuse_for_comment', kwargs={'comment_id': '518d4237b023791dca00000d','course_id': self.course_id })
+        response = self.client.post(url)
+        assert_true(mock_request.called)
+
+        call_list = [(('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params':{'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5}),
+                     (('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_flag'), {'data':{'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout':5}),
+                     (('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params':{'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5})]
+
+        assert_equal (call_list,mock_request.call_args_list)
+
+        assert_equal(response.status_code, 200)
+
+    def test_un_flag_comment(self, mock_request):
+        mock_request.return_value.status_code = 200
+        mock_request.return_value.text = u'{"body":"this is a comment",\
+                                            "course_id":"MITx/999/Robot_Super_Course",\
+                                            "anonymous":false,\
+                                            "anonymous_to_peers":false,\
+                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
+                                            "created_at":"2013-05-10T18:53:43Z",\
+                                            "updated_at":"2013-05-10T18:53:43Z",\
+                                            "at_position_list":[],\
+                                            "closed":false,\
+                                            "id":"518d4237b023791dca00000d",\
+                                            "user_id":"1","username":"robot",\
+                                            "votes":{"count":0,"up_count":0,\
+                                            "down_count":0,"point":0},\
+                                            "abuse_flaggers":[],\
+                                            "type":"comment",\
+                                            "endorsed":false}'
+        url = reverse('un_flag_abuse_for_comment', kwargs={'comment_id': '518d4237b023791dca00000d','course_id': self.course_id })
+        response = self.client.post(url)
+        assert_true(mock_request.called)
+
+        call_list = [(('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params':{'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5}),
+                     (('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_unflag'), {'data':{'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout':5}),
+                     (('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params':{'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5})]
+
+        assert_equal (call_list,mock_request.call_args_list)
+
         assert_equal(response.status_code, 200)
