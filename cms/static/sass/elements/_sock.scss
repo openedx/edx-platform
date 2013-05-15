@@ -28,13 +28,13 @@
 
     .cta-show-sock {
       @extend .btn-pill;
-      @extend .t-action3;
+      @extend .t-action4;
       background: $gray-l5;
       padding: ($baseline/2) $baseline;
       color: $gray;
 
       .icon {
-        @include font-size(16);
+        @include font-size(14);
       }
 
       &:hover {
@@ -59,7 +59,7 @@
     header {
 
       .title {
-        @extend .t-title-2;
+        @extend .t-title4;
       }
 
       .ss-icon {
@@ -73,12 +73,13 @@
       @include box-sizing(border-box);
 
       .title {
-        @extend .t-title-3;
+        @extend .t-title6;
         color: $white;
         margin-bottom: ($baseline/2);
       }
 
       .copy {
+        @extend .t-copy-sub2;
         margin: 0 0 $baseline 0;
       }
 
@@ -94,6 +95,7 @@
           }
 
           .action {
+            @extend .t-action4;
             display: block;
 
             .icon {

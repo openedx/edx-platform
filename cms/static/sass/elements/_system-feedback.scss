@@ -1,4 +1,5 @@
-// studio alerts, prompts and notifications
+// studio - elements - system feedback
+// alerts, notifications, prompts, and status communication
 // ====================
 
 // shared
@@ -6,7 +7,7 @@
   @include box-sizing(border-box);
 
   .copy {
-    @extend .t-copy-sub2;
+    @extend .t-copy-sub1;
   }
 }
 
@@ -36,6 +37,7 @@
 
     .nav-actions .action-primary {
       @include blue-button();
+      @include font-size(12); // needed due to bad button mixins for now
       border-color: $blue-d2;
     }
 
@@ -53,6 +55,7 @@
 
     .nav-actions .action-primary {
       @include orange-button();
+      @include font-size(12); // needed due to bad button mixins for now
       border-color: $orange-d2;
       color: $gray-d4;
     }
@@ -71,6 +74,7 @@
 
     .nav-actions .action-primary {
       @include red-button();
+      @include font-size(12); // needed due to bad button mixins for now
       border-color: $red-d2;
     }
 
@@ -88,6 +92,7 @@
 
     .nav-actions .action-primary {
       @include blue-button();
+      @include font-size(12); // needed due to bad button mixins for now
       border-color: $blue-d2;
     }
 
@@ -105,6 +110,7 @@
 
     .nav-actions .action-primary {
       @include green-button();
+      @include font-size(12); // needed due to bad button mixins for now
       border-color: $green-d2;
     }
 
@@ -121,8 +127,9 @@
   &.step-required {
 
     .nav-actions .action-primary {
-      border-color: $pink-d2;
       @include pink-button();
+      @include font-size(12); // needed due to bad button mixins for now
+      border-color: $pink-d2;
     }
 
     a {
@@ -137,6 +144,7 @@
 
 // prompts
 .wrapper-prompt {
+  @extend .depth4;
   @include transition(all 0.05s ease-in-out);
   position: fixed;
   top: 0;
@@ -144,7 +152,6 @@
   width: 100%;
   height: 100%;
   text-align: center;
-  z-index: 10000;
 
   &:before {
     content: '';
@@ -184,12 +191,12 @@
       }
 
       .action-primary {
-        @extend .t-action3;
+        @extend .t-action4;
         font-weight: 600;
       }
 
       .action-secondary {
-        @extend .t-action3;
+        @extend .t-action4;
       }
     }
   }
@@ -235,11 +242,11 @@
 
 // notifications
 .wrapper-notification {
+  @extend .depth3;
   @include clearfix();
   @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $blue);
   position: fixed;
   bottom: 0;
-  z-index: 1000;
   width: 100%;
   padding: $baseline ($baseline*2);
 
@@ -361,18 +368,19 @@
     @include font-size(22);
     width: flex-grid(1, 12);
     height: ($baseline*1.25);
+    margin-top: ($baseline/4);
     margin-right: flex-gutter();
     text-align: right;
     color: $white;
   }
 
   .copy {
-    @extend .t-copy-sub2;
+    @extend .t-copy-sub1;
     width: flex-grid(10, 12);
     color: $gray-l2;
 
     .title {
-      @extend .t-title-4;
+      @extend .t-title7;
       margin-bottom: 0;
       color: $white;
     }
@@ -409,13 +417,13 @@
 
     .action-primary {
       @include blue-button();
-      @extend .t-action3;
       border-color: $blue-d2;
       font-weight: 600;
     }
 
     .action-secondary {
-      @extend .t-action3;
+
+      @extend .t-action4;
     }
   }
 
@@ -434,7 +442,7 @@
     }
 
     .copy p {
-      @include text-sr();
+      @extend .text-sr;
     }
   }
 }
@@ -443,10 +451,10 @@
 
 // alerts
 .wrapper-alert {
+  @extend .depth2;
   @include box-sizing(border-box);
   @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue);
   position: relative;
-  z-index: 100;
   overflow: hidden;
   width: 100%;
   border-top: 1px solid $black;
@@ -504,7 +512,6 @@
 
 // adopted alerts
 .alert {
-  @extend .t-copy-sub2;
   @include box-sizing(border-box);
   @include clearfix();
   margin: 0 auto;
@@ -530,11 +537,11 @@
   }
 
   .copy {
-    @extend .t-copy-sub2;
     width: flex-grid(10, 12);
     color: $gray-l2;
 
     .title {
+      @extend .t-title7;
       margin-bottom: 0;
       color: $white;
     }
@@ -568,12 +575,12 @@
   	    }
 
         .action-primary {
-          @extend .t-action3;
+          @extend .t-action4;
           font-weight: 600;
         }
 
         .action-secondary {
-          @extend .t-action3;
+          @extend .t-action4;
         }
   	  }
   	}
@@ -590,7 +597,7 @@
     text-align: center;
 
     .label {
-      @include text-sr();
+      @extend .text-sr;
     }
 
     .icon {
@@ -730,7 +737,7 @@ body.uxdesign.alerts {
     border-radius: 3px;
     background: #fbf6e1;
     // background: #edbd3c;
-    @extend .t-copy-sub1;
+    font-size: 14px;
     @include clearfix;
 
     .alert-message {

@@ -66,7 +66,7 @@ body.course.settings {
       }
 
       .tip {
-        @include font-size(13);
+        @extend .t-copy-sub2;
         width: flex-grid(5, 9);
         float: right;
         margin-top: ($baseline/2);
@@ -86,20 +86,20 @@ body.course.settings {
 
     // in form  -UI hints/tips/messages
     .instructions {
-      @include font-size(14);
+      @extend .t-copy-sub1;
       margin: 0 0 $baseline 0;
     }
 
     .tip {
+      @extend .t-copy-sub2;
       @include transition(color, 0.15s, ease-in-out);
-      @include font-size(13);
       display: block;
       margin-top: ($baseline/4);
       color: $gray-l3;
     }
 
     .message-error {
-      @include font-size(13);
+      @extend .t-copy-sub1;
       display: block;
       margin-top: ($baseline/4);
       margin-bottom: ($baseline/2);
@@ -109,12 +109,13 @@ body.course.settings {
     // buttons
     .remove-item {
       @include white-button;
-      @include font-size(13);
+      @extend .t-action-3;
       font-weight: 400;
     }
 
     .new-button {
-      @include font-size(13);
+      // @extend .t-action-3; - bad buttons won't render this properly
+      @include font-size(14);
     }
 
     // form basics
@@ -158,8 +159,8 @@ body.course.settings {
         }
 
         input, textarea {
+          @extend .t-copy-base;
           @include placeholder($gray-l4);
-          @include font-size(16);
           @include size(100%,100%);
           padding: ($baseline/2);
 
@@ -324,7 +325,7 @@ body.course.settings {
 
           .action-primary {
             @include blue-button();
-            @include font-size(13);
+            @extend .t-action-3;
             font-weight: 600;
 
             .icon {
@@ -747,7 +748,7 @@ body.course.settings {
 
       // specific to code mirror instance in JSON policy editing, need to sync up with other similar code mirror UIs
       .CodeMirror {
-        @include font-size(16);
+        @extend .t-copy-base;
         @include box-sizing(border-box);
         @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
         @include linear-gradient($lightGrey, tint($lightGrey, 90%));

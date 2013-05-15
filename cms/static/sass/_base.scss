@@ -8,11 +8,10 @@ html {
 }
 
 body {
-  @include font-size(16);
+  @extend .t-copy-base;
   min-width: $fg-min-width;
   background: $gray-l5;
-  line-height: 1.6;
-  color: $baseFontColor;
+  color: $gray-d2;
 }
 
 body, input {
@@ -30,7 +29,7 @@ a {
 }
 
 h1 {
-  @include font-size(28);
+  @extend .t-title4;
   font-weight: 300;
 }
 
@@ -51,43 +50,183 @@ h1 {
 // ====================
 
 // typography - basic
-.title-1, .title-2, .title-3, .title-4, .title-5, .title-6 {
+.page-header {
+  @extend .t-title3;
+  display: block;
   font-weight: 600;
   color: $gray-d3;
-  margin: 0;
-  padding: 0;
+
+  .subtitle {
+    @extend .t-title7;
+    position: relative;
+    top: ($baseline/4);
+    display: block;
+    color: $gray-l2;
+    font-weight: 400;
+  }
 }
 
+.section-header {
+  @extend .t-title4;
+  font-weight: 600;
+
+  .subtitle {
+    @extend .t-title7;
+  }
+}
+
+.area-header {
+  @extend .t-title6;
+  font-weight: 600;
+
+  .subtitle {
+    @extend .t-title8;
+  }
+}
+
+.area-subheader {
+  @extend .t-title7;
+  font-weight: 600;
+
+  .subtitle {
+    @extend .t-title9;
+  }
+}
+
+// ====================
+
+// typography - primary content
+.content-primary {
+
+  .section-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+
+  .content-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+
+  .area-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+
+  .area-subheader {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+}
+
+// typography - primary content
+.content-secondary {
+
+  .section-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+
+  .content-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+
+  .content-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+}
+
+// ====================
+
+// typography - loose headings (BT: needs to be removed once html is clean)
+.title-1, .title-2, .title-3, .title-4, .title-5, .title-6 {
+  font-weight: 600;
+}
+
+// typography - primary content
+.content-secondary {
+
+  .section-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+
+  .content-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+
+  .content-header {
+    color: $gray-d3;
+
+    .subtitle {
+      color: $gray-l2;
+    }
+  }
+}
+
+// ====================
+
+// typography - loose headings (BT: needs to be removed once html is clean)
 .title-1 {
-  @include font-size(32);
+  @extend .t-title3;
   margin-bottom: ($baseline*1.5);
 }
 
 .title-2 {
-  @include font-size(24);
+  @extend .t-title4;
   margin-bottom: $baseline;
 }
 
 .title-3 {
-  @include font-size(18);
+  @extend .t-title5;
   margin-bottom: ($baseline/2);
 }
 
 .title-4 {
-  @include font-size(14);
+  @extend .t-title7;
   margin-bottom: $baseline;
   font-weight: 500
 }
 
 .title-5 {
-  @include font-size(14);
+  @extend .t-title7;
   color: $gray-l1;
   margin-bottom: $baseline;
   font-weight: 500
 }
 
 .title-6 {
-  @include font-size(14);
+  @extend .t-title7;
   color: $gray-l2;
   margin-bottom: $baseline;
   font-weight: 500
@@ -118,7 +257,6 @@ p, ul, ol, dl {
 
   .mast, .metadata {
     @include clearfix();
-    @include font-size(16);
     position: relative;
     max-width: $fg-max-width;
     min-width: $fg-min-width;
@@ -131,53 +269,8 @@ p, ul, ol, dl {
     border-bottom: 1px solid $gray-l4;
     padding-bottom: ($baseline/2);
 
-    .title-sub {
-      @include font-size(14);
-      position: relative;
-      top: ($baseline/4);
-      display: block;
-      margin: 0;
-      color: $gray-l2;
-      font-weight: 400;
-    }
-
-    .title, .title-1 {
-      @include font-size(32);
-      margin: 0;
-      padding: 0;
-      font-weight: 600;
-      color: $gray-d3;
-    }
-
-    .nav-hierarchy {
-      @include font-size(14);
-      display: block;
-      margin: 0;
-      color: $gray-l2;
-      font-weight: 400;
-
-      .nav-item {
-        display: inline;
-        vertical-align: middle;
-        margin-right: ($baseline/4);
-
-        &:after {
-          content: ">>";
-          margin-left: ($baseline/4);
-        }
-
-        &:last-child {
-          margin-right: 0;
-
-          &:after {
-            content: none;
-          }
-        }
-      }
-    }
-
     // layout with actions
-    .title {
+    .page-header {
       width: flex-grid(12);
     }
 
@@ -185,7 +278,7 @@ p, ul, ol, dl {
     &.has-actions {
       @include clearfix();
 
-      .title {
+      .page-header {
         float: left;
         width: flex-grid(6,12);
         margin-right: flex-gutter();
@@ -210,22 +303,20 @@ p, ul, ol, dl {
 
         // buttons
         .button {
-          padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2) !important;
-          font-weight: 400 !important;
+          padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
         }
 
         .new-button {
-          font-weight: 700 !important;
+
         }
 
         .view-button {
 
-          font-weight: 700 !important;
         }
 
         .upload-button .icon-create {
-          @include font-size(18);
-          margin-top: ($baseline/4);
+          @extend .t-action2;
+          line-height: 0 !important;
         }
       }
     }
@@ -254,7 +345,7 @@ p, ul, ol, dl {
 
 .content {
   @include clearfix();
-  @include font-size(16);
+  @extend .t-copy-base;
   max-width: $fg-max-width;
   min-width: $fg-min-width;
   width: flex-grid(12);
@@ -268,14 +359,14 @@ p, ul, ol, dl {
     padding-bottom: ($baseline/2);
 
     .title-sub {
-      @include font-size(14);
+      @extend .t-copy-sub1;
       display: block;
       margin: 0;
       color: $gray-l2;
     }
 
     .title-1 {
-      @include font-size(32);
+      @extend .t-title3;
       margin: 0;
       padding: 0;
       font-weight: 600;
@@ -285,7 +376,7 @@ p, ul, ol, dl {
 
   .introduction {
     @include box-sizing(border-box);
-    @include font-size(14);
+    @extend .t-copy-sub1;
     width: flex-grid(12);
     margin: 0 0 $baseline 0;
 
@@ -303,14 +394,14 @@ p, ul, ol, dl {
       }
 
       .nav-introduction-supplementary {
-        @include font-size(13);
+        @extend .t-copy-sub2;
         float: right;
         width: flex-grid(4,12);
         display: block;
         text-align: right;
 
         .icon {
-          @include font-size(14);
+          @extend .t-action3;
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/4);
@@ -327,21 +418,17 @@ p, ul, ol, dl {
 // layout - primary content
 .content-primary {
 
-  .title-1, .title-2, .title-3, .title-4, .title-5, .title-5 {
-    color: $gray-d3;
-  }
-
   .title-1 {
-    @extend .t-title-1;
+    @extend .t-title3;
   }
 
   .title-2 {
-    @extend .t-title-2;
+    @extend .t-title4;
     margin: 0 0 ($baseline/2) 0;
   }
 
   .title-3 {
-    @extend .t-title-3;
+    @extend .t-title6;
     margin: 0 0 ($baseline/2) 0;
   }
 
@@ -355,7 +442,7 @@ p, ul, ol, dl {
     }
 
     .tip {
-      @include font-size(13);
+      @extend .t-copy-sub2;
       width: flex-grid(7, 12);
       float: right;
       margin-top: ($baseline/2);
@@ -373,7 +460,7 @@ p, ul, ol, dl {
   }
 
   .bit {
-    @include font-size(13);
+    @extend .t-copy-sub1;
     margin: 0 0 $baseline 0;
     border-bottom: 1px solid $gray-l4;
     padding: 0 0 $baseline 0;
@@ -386,7 +473,7 @@ p, ul, ol, dl {
     }
 
     h3 {
-      @include font-size(14);
+      @extend .t-title7;
       margin: 0 0 ($baseline/4) 0;
       color: $gray-d2;
       font-weight: 600;
@@ -494,7 +581,7 @@ p, ul, ol, dl {
 
 // misc
 hr.divide {
-  @include text-sr();
+  @extend .text-sr;
 }
 
 .item-details {
@@ -655,7 +742,7 @@ hr.divide {
 
 .new-button {
   @include green-button;
-  @include font-size(13);
+  @extend .t-action4;
   padding: 8px 20px 10px;
   text-align: center;
 
@@ -674,7 +761,7 @@ hr.divide {
 
 .view-button {
   @include blue-button;
-  @include font-size(13);
+  @extend .t-copy-base;
   text-align: center;
 
   &.big {
@@ -693,7 +780,7 @@ hr.divide {
 
 .edit-button.standard,
 .delete-button.standard {
-  @include font-size(12);
+  @extend .t-action4;
   @include white-button;
   float: left;
   padding: 3px 10px 4px;
@@ -714,6 +801,7 @@ hr.divide {
 }
 
 .tooltip {
+  @extend .t-copy-sub2;
   position: absolute;
   top: 0;
   left: 0;
@@ -721,7 +809,6 @@ hr.divide {
   padding: 0 10px;
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.85);
-  font-size: 11px;
   font-weight: normal;
   line-height: 26px;
   color: #fff;
@@ -745,7 +832,7 @@ hr.divide {
 
 // basic utility
 .sr {
-  @include text-sr();
+  @extend .text-sr;
 }
 
 .fake-link {
@@ -798,7 +885,7 @@ body.js {
       text-align: center;
 
       .label {
-        @include text-sr();
+        @extend .text-sr;
       }
 
       .ss-icon {
@@ -821,14 +908,14 @@ body.js {
     }
 
     .title {
-      @include font-size(18);
+      @extend .t-title5;
       margin: 0 0 ($baseline/2) 0;
       font-weight: 600;
       color: $gray-d3;
     }
 
     .description {
-      @include font-size(13);
+      @extend .t-copy-sub2;
       margin-top: ($baseline/2);
       color: $gray-l1;
     }

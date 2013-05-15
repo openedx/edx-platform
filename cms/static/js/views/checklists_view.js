@@ -22,6 +22,7 @@ CMS.Views.Checklists = Backbone.View.extend({
                         }
                     );
                 },
+                reset: true,
                 error: CMS.ServerError
             }
         );
