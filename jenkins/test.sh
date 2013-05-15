@@ -64,13 +64,8 @@ export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
 export DJANGO_LIVE_TEST_SERVER_ADDRESS=${DJANGO_LIVE_TEST_SERVER_ADDRESS-localhost:8000-9000}
 
 source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
-pip install -q -r pre-requirements.txt
-yes w | pip install -q -r requirements.txt
 
-bundle install
-
-npm install
-
+rake install_prereqs
 rake clobber
 rake pep8 > pep8.log || cat pep8.log
 rake pylint > pylint.log || cat pylint.log
