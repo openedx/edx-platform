@@ -45,7 +45,7 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return False
 
-    def do_PUT self):
+    def do_PUT(self):
         '''
         Handle a PUT request from the client
         Used by the APIs for comment threads, commentables, comments,
