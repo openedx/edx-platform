@@ -94,7 +94,7 @@
 
 // notifications slide up then down
 @mixin notificationsSlideUpDown {
-  0%, 100% { 
+  0%, 100% {
     @include transform(translateY(0));
   }
 
