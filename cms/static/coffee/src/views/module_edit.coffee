@@ -123,3 +123,4 @@ class CMS.Views.ModuleEdit extends Backbone.View
     editorModeButtonParent.addClass('inactive-mode')
     editorModeButtonParent.removeClass('active-mode')
     @$el.find('.wrapper-comp-settings').addClass('is-active')
+    @$el.find('#settings-mode').find("a").addClass('is-set')
