@@ -8,6 +8,10 @@ from .test import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
+# Disable warnings for acceptance tests, to make the logs readable
+import logging
+logging.disable(logging.ERROR)
+
 # Show the courses that are in the data directory
 COURSES_ROOT = ENV_ROOT / "data"
 DATA_DIR = COURSES_ROOT

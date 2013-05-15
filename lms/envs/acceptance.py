@@ -8,6 +8,10 @@ from .test import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
+# Disable warnings for acceptance tests, to make the logs readable
+import logging
+logging.disable(logging.ERROR)
+
 # Use the mongo store for acceptance tests
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
