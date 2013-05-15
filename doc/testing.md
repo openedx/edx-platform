@@ -161,7 +161,7 @@ try running `bundle install` to install the required ruby gems.
 We use [Lettuce](http://lettuce.it/) for acceptance testing.
 Most of our tests use [Splinter](http://splinter.cobrateam.info/)
 to simulate UI browser interactions.  Splinter, in turn,
-uses [Selenium](http://docs.seleniumhq.org/) to control the browser.
+uses [Selenium](http://docs.seleniumhq.org/) to control the Chrome browser.
 
 **Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver) 
 installed to run the tests in Chrome.  
@@ -189,6 +189,7 @@ Try running:
 
     pip install -r requirements.txt
 
+**Note**: The acceptance tests can *not* currently run in parallel.  
 
 ## Viewing Test Coverage
 
