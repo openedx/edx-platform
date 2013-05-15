@@ -626,8 +626,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         inherited_metadata = getattr(self, '_inherited_metadata', {})
         inheritable_metadata = getattr(self, '_inheritable_metadata', {})
-        metadata = {}
-        simple_metadata = {}
+        metadata_fields = {}
         for field in self.fields:
 
             if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
@@ -642,12 +641,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 default_value = field.from_json(inheritable_metadata.get(field.name))
                 if field.name in inherited_metadata:
                     explicitly_set = False
-
-            metadata[field.name] = {'field': field,
-                                    'value': value,
-                                    'default_value': default_value,
-                                    'inheritable': inheritable,
-                                    'explicitly_set': explicitly_set}
 
             # We support the following editors:
             # 1. A select editor for fields with a list of possible values (includes Booleans).
@@ -670,7 +663,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 type = "Integer"
             elif isinstance(field, Float):
                 type = "Float"
-            simple_metadata[field.name] = {'field_name' : field.name,
+            metadata_fields[field.name] = {'field_name' : field.name,
                                            'type' : type,
                                            'display_name' : field.display_name,
                                            'value': field.to_json(value),
@@ -680,7 +673,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                                            'explicitly_set': explicitly_set,
                                            'help': field.help}
 
-        return metadata, simple_metadata
+        return metadata_fields
 
 
 class DescriptorSystem(object):
