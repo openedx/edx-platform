@@ -7,7 +7,11 @@ CMS.Views.Alert = Backbone.View.extend({
         maxShown: Infinity  // length of time after this view has been shown before it will be automatically hidden (milliseconds)
     },
     initialize: function() {
-        this.template = _.template($("#"+this.options.type+"-tpl").text()),
+        var tpl = $("#"+this.options.type+"-tpl").text();
+        if(!tpl) {
+            console.error("Couldn't load template from ID "+this.options.type+"-tpl");
+        }
+        this.template = _.template(tpl);
         this.setElement($("#page-"+this.options.type));
         this.listenTo(this.model, 'change', this.render);
         return this.show();
