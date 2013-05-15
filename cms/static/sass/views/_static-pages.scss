@@ -10,6 +10,16 @@ body.course.static-pages {
     padding: 12px 0;
   }
 
+  .nav-introduction-supplementary {
+
+    .icon-question-sign {
+      display: inline-block;
+      vertical-align: baseline;
+      margin-right: ($baseline/4);
+    }
+
+  }
+
   .unit-body {
     padding: 0;
 
