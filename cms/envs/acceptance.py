@@ -12,10 +12,6 @@ DEBUG = True
 import logging
 logging.disable(logging.ERROR)
 
-# Show the courses that are in the data directory
-COURSES_ROOT = ENV_ROOT / "data"
-DATA_DIR = COURSES_ROOT
-
 MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
