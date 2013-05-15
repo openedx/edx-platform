@@ -54,6 +54,12 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
             }
         );
         return modified_values;
+    },
+
+    getDisplayName: function () {
+        // It is possible that there is no display name set. In that case, return empty string.
+        var displayNameValue = this.model.get('display_name').value;
+        return displayNameValue ? displayNameValue : '';
     }
 });
 
