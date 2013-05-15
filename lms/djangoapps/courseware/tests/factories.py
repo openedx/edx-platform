@@ -10,6 +10,8 @@ from student.tests.factories import CourseEnrollmentAllowedFactory as StudentCou
 from student.tests.factories import RegistrationFactory as StudentRegistrationFactory
 from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
+from courseware.models import CourseTaskLog
+
 
 from xmodule.modulestore import Location
 from pytz import UTC
@@ -84,3 +86,16 @@ class StudentInfoFactory(DjangoModelFactory):
     field_name = 'existing_field'
     value = json.dumps('old_value')
     student = SubFactory(UserFactory)
+
+
+class CourseTaskLogFactory(DjangoModelFactory):
+    FACTORY_FOR = CourseTaskLog
+
+    task_name = 'regrade_problem'
+    course_id = "MITx/999/Robot_Super_Course"
+    student = SubFactory(UserFactory)
+    task_args = None
+    task_id = None
+    task_state = "QUEUED"
+    task_progress = None
+    requester = SubFactory(UserFactory)

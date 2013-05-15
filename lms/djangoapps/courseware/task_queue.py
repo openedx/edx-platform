@@ -16,6 +16,10 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 
+class AlreadyRunningError(Exception):
+    pass
+
+
 def get_running_course_tasks(course_id):
     """
     Returns a query of CourseTaskLog objects of running tasks for a given course.
@@ -85,7 +89,7 @@ def _reserve_task(course_id, task_name, task_args, requester, student=None):
     """
 
     if _task_is_running(course_id, task_name, task_args, student):
-        raise Exception("requested task is already running")
+        raise AlreadyRunningError("requested task is already running")
 
     # Create log entry now, so that future requests won't
     tasklog_args = {'course_id': course_id,
@@ -157,7 +161,7 @@ def _update_course_task_log(course_task_log_entry, task_result):
                                  total=returned_result['total'],
                                  action_name=returned_result['action_name'])
             output['message'] = message
-            log.info("task progress: {0}".format(message))
+            log.info("task progress: %s", message)
         else:
             log.info("still making progress... ")
         output['task_progress'] = returned_result
@@ -165,7 +169,7 @@ def _update_course_task_log(course_task_log_entry, task_result):
     elif result_state == 'SUCCESS':
         output['task_progress'] = returned_result
         course_task_log_entry.task_progress = json.dumps(returned_result)
-        log.info("task succeeded: {0}".format(returned_result))
+        log.info("task succeeded: %s", returned_result)
         entry_needs_saving = True
 
     elif result_state == 'FAILURE':
@@ -175,10 +179,20 @@ def _update_course_task_log(course_task_log_entry, task_result):
         entry_needs_saving = True
         task_progress = {'exception': type(exception).__name__, 'message': str(exception.message)}
         output['message'] = exception.message
-        log.warning("background task (%s) failed: %s %s".format(task_id, returned_result, traceback))
+        log.warning("background task (%s) failed: %s %s", task_id, returned_result, traceback)
         if result_traceback is not None:
             output['task_traceback'] = result_traceback
             task_progress['traceback'] = result_traceback
+        course_task_log_entry.task_progress = json.dumps(task_progress)
+        output['task_progress'] = task_progress
+
+    elif result_state == 'REVOKED':
+        # on revocation, the result's result doesn't contain anything
+        entry_needs_saving = True
+        message = 'Task revoked before running'
+        output['message'] = message
+        log.warning("background task (%s) revoked.", task_id)
+        task_progress = {'message': message}
         course_task_log_entry.task_progress = json.dumps(task_progress)
         output['task_progress'] = task_progress
 
@@ -308,7 +322,7 @@ def _check_arguments_for_regrading(course_id, problem_url):
     """
     descriptor = modulestore().get_instance(course_id, problem_url)
     supports_regrade = False
-    if hasattr(descriptor,'module_class'):
+    if hasattr(descriptor, 'module_class'):
         module_class = descriptor.module_class
         if hasattr(module_class, 'regrade_problem'):
             supports_regrade = True
