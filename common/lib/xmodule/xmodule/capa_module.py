@@ -70,11 +70,14 @@ class CapaFields(object):
     showanswer = String(display_name="Show Answer",
         help="Specifies when to show the answer to this problem. A default value can be set course-wide in Advanced Settings.",
         scope=Scope.settings, default="closed",
-        values=[{"display_name": "Always", "value": "always"},
-         {"display_name": "Answered", "value": "answered"},
-         {"display_name": "Attempted", "value": "attempted"},
-         {"display_name": "Closed", "value": "closed"},
-         {"display_name": "Never", "value": "never"}])
+        values=[
+            {"display_name": "Always", "value": "always"},
+            {"display_name": "Answered", "value": "answered"},
+            {"display_name": "Attempted", "value": "attempted"},
+            {"display_name": "Closed", "value": "closed"},
+            {"display_name": "Finished", "value": "finished"},
+            {"display_name": "Past Due", "value": "past_due"},
+            {"display_name": "Never", "value": "never"}])
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
     rerandomize = Randomization(display_name="Randomization", help="Specifies whether variable inputs for this problem are randomized each time a student loads the problem. This only applies to problems that have randomly generated numeric variables. A default value can be set course-wide in Advanced Settings.",
         default="always", scope=Scope.settings, values=[{"display_name": "Always", "value": "always"},

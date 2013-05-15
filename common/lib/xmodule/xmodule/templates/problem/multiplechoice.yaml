@@ -2,7 +2,7 @@
 metadata:
     display_name: Multiple Choice
     rerandomize: never
-    showanswer: always
+    showanswer: finished
     weight: ""
     attempts: ""
     markdown: 
