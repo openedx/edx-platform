@@ -2,7 +2,7 @@
 metadata:
     display_name: Custom Python-Evaluated Input
     rerandomize: never
-    showanswer: always
+    showanswer: finished
 data: |
   <problem>
   <p>
