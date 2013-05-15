@@ -1,80 +1,132 @@
 // studio - elements - typography
 // ====================
 
+// Scale - (6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72)
+
 // headings/titles
-.t-title-1, .t-title-2, .t-title-3, .t-title-4, .t-title-5 {
-  color: $gray-d3;
+.t-title {
+  font-family: $f-sans-serif;
 }
 
-.t-title-1 {
+.t-title1 {
+  @extend .t-title;
+  @include font-size(60);
+  @include lh(60);
+}
+
+.t-title2 {
+  @extend .t-title;
+  @include font-size(48);
+  @include lh(48);
+}
+
+.t-title3 {
   @include font-size(36);
+  @include lh(36);
 }
 
-.t-title-2 {
+.t-title4 {
+  @extend .t-title;
   @include font-size(24);
-  font-weight: 600;
+  @include lh(24);
 }
 
-.t-title-3 {
+.t-title5 {
+  @extend .t-title;
+  @include font-size(18);
+  @include lh(18);
+}
+
+.t-title6 {
+  @extend .t-title;
   @include font-size(16);
-  font-weight: 600;
+  @include lh(16);
 }
 
-.t-title-4 {
+.t-title7 {
+  @extend .t-title;
   @include font-size(14);
+  @include lh(14);
 }
 
-.t-title-5 {
+.t-title8 {
+  @extend .t-title;
+  @include font-size(12);
+  @include lh(12);
+}
 
+.t-title9 {
+  @extend .t-title;
+  @include font-size(11);
+  @include lh(11);
 }
 
 // ====================
 
 // copy
+.t-copy {
+  font-family: $f-sans-serif;
+}
+
 .t-copy-base {
+  @extend .t-copy;
   @include font-size(16);
+  @include lh(16);
 }
 
 .t-copy-lead1 {
+  @extend .t-copy;
   @include font-size(18);
+  @include lh(18);
 }
 
 .t-copy-lead2 {
-  @include font-size(20);
+  @extend .t-copy;
+  @include font-size(24);
+  @include lh(24);
 }
 
 .t-copy-sub1 {
+  @extend .t-copy;
   @include font-size(14);
+  @include lh(14);
 }
 
 .t-copy-sub2 {
-  @include font-size(13);
-}
-
-.t-copy-sub3 {
+  @extend .t-copy;
   @include font-size(12);
+  @include lh(12);
 }
 
 // ====================
 
 // actions/labels
 .t-action1 {
-  @include font-size(14);
-  font-weight: 600;
+  @include font-size(18);
+  @include lh(18);
 }
 
 .t-action2 {
-  @include font-size(13);
-  font-weight: 600;
-  text-transform: uppercase;
+  @include font-size(16);
+  @include lh(16);
 }
 
 .t-action3 {
-  @include font-size(13);
+  @include font-size(14);
+  @include lh(14);
 }
 
 .t-action4 {
   @include font-size(12);
+  @include lh(12);
+}
+
+
+// ====================
+
+// code
+.t-code {
+  font-family: $f-monospace;
 }
 
 // ====================
