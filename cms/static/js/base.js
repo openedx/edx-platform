@@ -896,3 +896,17 @@ function saveSetSectionScheduleDate(e) {
         hideModal();
     });
 }
+
+function checkNumberSettingValidity(e) {
+    e.preventDefault();
+
+    if (!e.checkNumberSettingValidity())
+    {
+        alert("You have invalid input. Correct it!");
+        obj.focus();
+
+        $('this').val('');
+    }
+}
+
+

@@ -517,12 +517,12 @@ body.course.unit {
         &.is-set {
           @include linear-gradient($blue, $blue);
           color: $blue-d1;
-          box-shadow: inset 0 3px 3px $shadow-d1;
+          box-shadow: inset 0 2px 2px $shadow-d1;
           background-color: $blue;
           cursor: default;
 
           &:hover {
-            box-shadow: inset 0 3px 3px $shadow-d1;
+            box-shadow: inset 0 2px 2px $shadow-d1;
             background-color: $blue;
           }
         }
@@ -662,6 +662,10 @@ body.course.unit {
         border-radius: 3px;
         border: 1px solid $gray-l2;
         text-overflow: ellipsis;
+      }
+
+      input[type="number"] {
+        width: 39%;
       }
 
       select {
