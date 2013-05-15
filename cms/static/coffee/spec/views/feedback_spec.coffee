@@ -20,9 +20,8 @@ describe "CMS.Views.Alert as base class", ->
         view = new CMS.Views.Alert({model: @model})
         expect(view.$(".action-close")).toBeDefined()
         expect(view.$('.wrapper')).toHaveClass("is-shown")
-        text = view.$el.text()
-        expect(text).toMatch(/Portal/)
-        expect(text).toMatch(/Aperture Science/)
+        expect(view.$el).toContainText(@model.get("title"))
+        expect(view.$el).toContainText(@model.get("message"))
 
     it "close button sends a .hide() message", ->
         spyOn(CMS.Views.Alert.prototype, 'hide').andCallThrough()

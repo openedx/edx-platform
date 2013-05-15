@@ -19,13 +19,13 @@ CMS.Views.SectionShow = Backbone.View.extend({
 });
 
 CMS.Views.SectionEdit = Backbone.View.extend({
-    template: _.template($("#section-name-edit-tpl").text()),
     render: function() {
         this.$el.html(this.template(this.model.attributes));
         this.delegateEvents();
         return this;
     },
     initialize: function() {
+        this.template = _.template($("#section-name-edit-tpl").text());
         this.listenTo(this.model, "invalid", this.showErrorMessage);
         this.render();
     },
