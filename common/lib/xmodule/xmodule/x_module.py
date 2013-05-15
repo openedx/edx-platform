@@ -1,4 +1,5 @@
 import logging
+import copy
 import yaml
 import os
 
@@ -644,17 +645,16 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
             # We support the following editors:
             # 1. A select editor for fields with a list of possible values (includes Booleans).
-            # 2. Number editor for integers and floats.
+            # 2. Number editors for integers and floats.
             # 3. A generic string editor for anything else (editing JSON representation of the value).
             type = "Generic"
-            # TODO: test all this logic
-            values = [] if field.values is None else field.values
+            values = [] if field.values is None else copy.deepcopy(field.values)
             if isinstance(values, list):
                 if len(values) > 0:
                     type = "Select"
                 for index, choice in enumerate(values):
-                    json_choice = choice
-                    if hasattr(json_choice, 'value'):
+                    json_choice = copy.deepcopy(choice)
+                    if isinstance(json_choice, dict) and 'value' in json_choice:
                         json_choice['value'] = field.to_json(json_choice['value'])
                     else:
                         json_choice = field.to_json(json_choice)
