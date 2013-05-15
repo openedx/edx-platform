@@ -2,13 +2,15 @@ CMS.Views.Alert = Backbone.View.extend({
     options: {
         type: "alert",
         shown: true,  // is this view currently being shown?
-        closeIcon: true  // should we render a close button in the top right corner?
+        closeIcon: true,  // should we render a close button in the top right corner?
+        minShown: 0,  // length of time after this view has been shown before it can be hidden (milliseconds)
+        maxShown: Infinity  // length of time after this view has been shown before it will be automatically hidden (milliseconds)
     },
     initialize: function() {
         this.template = _.template($("#"+this.options.type+"-tpl").text()),
         this.setElement($("#page-"+this.options.type));
         this.listenTo(this.model, 'change', this.render);
-        return this.render();
+        return this.show();
     },
     render: function() {
         var attrs = $.extend({}, this.options, this.model.attributes);
@@ -21,12 +23,28 @@ CMS.Views.Alert = Backbone.View.extend({
         "click .action-secondary": "secondaryClick"
     },
     show: function() {
+        clearTimeout(this.hideTimeout);
         this.options.shown = true;
-        return this.render();
+        this.shownAt = new Date();
+        this.render();
+        if($.isNumeric(this.options.maxShown)) {
+            this.hideTimeout = setTimeout($.proxy(this.hide, this),
+                this.options.maxShown);
+        }
+        return this;
     },
     hide: function() {
-        this.options.shown = false;
-        return this.render();
+        if(this.shownAt && $.isNumeric(this.options.minShown) &&
+           this.options.minShown > new Date() - this.shownAt)
+        {
+            this.hideTimeout = setTimeout($.proxy(this.hide, this),
+                this.options.minShown - (new Date() - this.shownAt));
+        } else {
+            this.options.shown = false;
+            delete this.shownAt;
+            this.render();
+        }
+        return this;
     },
     primaryClick: function() {
         var actions = this.model.get("actions");

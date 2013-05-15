@@ -31,7 +31,8 @@ CMS.Models.Section = Backbone.Model.extend({
         if(!this.msgView) {
             this.msgView = new CMS.Views.Notification({
                 model: this.msg,
-                closeIcon: false
+                closeIcon: false,
+                minShown: 1000
             });
         }
         this.msgView.show();
