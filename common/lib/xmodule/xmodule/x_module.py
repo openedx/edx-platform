@@ -1,4 +1,5 @@
 import logging
+import copy
 import yaml
 import os
 
@@ -626,8 +627,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         inherited_metadata = getattr(self, '_inherited_metadata', {})
         inheritable_metadata = getattr(self, '_inheritable_metadata', {})
-        metadata = {}
-        simple_metadata = {}
+        metadata_fields = {}
         for field in self.fields:
 
             if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
@@ -643,25 +643,18 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 if field.name in inherited_metadata:
                     explicitly_set = False
 
-            metadata[field.name] = {'field': field,
-                                    'value': value,
-                                    'default_value': default_value,
-                                    'inheritable': inheritable,
-                                    'explicitly_set': explicitly_set}
-
             # We support the following editors:
             # 1. A select editor for fields with a list of possible values (includes Booleans).
-            # 2. Number editor for integers and floats.
+            # 2. Number editors for integers and floats.
             # 3. A generic string editor for anything else (editing JSON representation of the value).
             type = "Generic"
-            # TODO: test all this logic
-            values = [] if field.values is None else field.values
+            values = [] if field.values is None else copy.deepcopy(field.values)
             if isinstance(values, list):
                 if len(values) > 0:
                     type = "Select"
                 for index, choice in enumerate(values):
-                    json_choice = choice
-                    if hasattr(json_choice, 'value'):
+                    json_choice = copy.deepcopy(choice)
+                    if isinstance(json_choice, dict) and 'value' in json_choice:
                         json_choice['value'] = field.to_json(json_choice['value'])
                     else:
                         json_choice = field.to_json(json_choice)
@@ -670,7 +663,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 type = "Integer"
             elif isinstance(field, Float):
                 type = "Float"
-            simple_metadata[field.name] = {'field_name' : field.name,
+            metadata_fields[field.name] = {'field_name' : field.name,
                                            'type' : type,
                                            'display_name' : field.display_name,
                                            'value': field.to_json(value),
@@ -680,7 +673,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                                            'explicitly_set': explicitly_set,
                                            'help': field.help}
 
-        return metadata, simple_metadata
+        return metadata_fields
 
 
 class DescriptorSystem(object):

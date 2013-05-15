@@ -39,6 +39,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
         @selectMode(@editorMode)
       else
         @hideDataEditor()
+      @$el.find('.component-name').html('<em>Editing:</em> ' + @metadataEditor.getDisplayName())
 
   changedMetadata: ->
     return @metadataEditor.getModifiedMetadataValues()
