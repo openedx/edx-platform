@@ -666,6 +666,11 @@ body.course.unit {
 
       input[type="number"] {
         width: 39%;
+        @include box-shadow(0 1px 2px $shadow-l1 inset);
+
+        &:active {
+          background-color: #FFFCF1;
+        }
       }
 
       select {
