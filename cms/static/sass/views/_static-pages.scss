@@ -31,38 +31,23 @@ body.course.static-pages {
       @include edit-box;
       @include box-shadow(none);
       display: none;
-      padding: 20px;
+      padding: 0;
       border-radius: 2px 2px 0 0;
 
-      .metadata_edit {
-        margin-bottom: 20px;
-        font-size: 13px;
-
-        li {
-          margin-bottom: 10px;
-        }
-
-        label {
-          display: inline-block;
-          margin-right: 10px;  
-        }
+      //Overrides general edit-box mixin 
+      .row {
+        margin-bottom: 0px;
       }
 
-      h3 {
-        margin-bottom: 10px;
-        font-size: 18px;
-        font-weight: 700;
-      }
+      // This duplicates the styling from Unit page editing
+      .module-actions {
+        @include box-shadow(inset 0 1px 1px $shadow);
+        padding: 0px 0 10px 10px;
+        background-color: $gray-l6;
 
-      h5 {
-        margin-bottom: 8px;
-        color: #fff;
-        font-weight: 700;
-      }
-
-      .save-button {
-        margin-top: 10px;
+        .save-button {
         margin: 15px 8px 0 0;
+        }
       }
     }
   }
