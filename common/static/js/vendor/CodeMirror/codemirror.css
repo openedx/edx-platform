@@ -1,6 +1,7 @@
 .CodeMirror {
   line-height: 1em;
   font-family: monospace;
+  padding: 15px;
 }
 
 .CodeMirror-scroll {
