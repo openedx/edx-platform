@@ -457,7 +457,7 @@ body.course.unit {
         margin-bottom: 0px;
       }
 
-      // Module Actions
+      // Module Actions, also used for Static Pages 
       .module-actions {
         @include box-shadow(inset 0 1px 1px $shadow);
         padding: 0px 0 10px 10px;
