@@ -642,13 +642,12 @@ class CapaModuleTest(unittest.TestCase):
             module.regrade_problem()
 
     def test_regrade_problem_not_supported(self):
-        # Simulate that the problem is NOT done
         module = CapaFactory.create(done=True)
 
         # Try to regrade the problem, and get exception
         with patch('capa.capa_problem.LoncapaProblem.supports_regrading') as mock_supports_regrading:
             mock_supports_regrading.return_value = False
-            with self.assertRaises(xmodule.exceptions.NotFoundError):
+            with self.assertRaises(NotImplementedError):
                 module.regrade_problem()
 
     def test_regrade_problem_error(self):
@@ -668,7 +667,7 @@ class CapaModuleTest(unittest.TestCase):
 
             # Expect an AJAX alert message in 'success'
             expected_msg = 'Error: test error'
-            self.assertEqual(expected_msg, result['success'])
+            self.assertEqual(result['success'], expected_msg)
 
             # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)

@@ -297,6 +297,26 @@ def _get_task_completion_message(course_task_log_entry):
 
 ########### Add task-submission methods here:
 
+def _check_arguments_for_regrading(course_id, problem_url):
+    """
+    Do simple checks on the descriptor to confirm that it supports regrading.
+
+    Confirms first that the problem_url is defined (since that's currently typed
+    in).  An ItemNotFoundException is raised if the corresponding module
+    descriptor doesn't exist.  NotImplementedError is returned if the
+    corresponding module doesn't support regrading calls.
+    """
+    descriptor = modulestore().get_instance(course_id, problem_url)
+    supports_regrade = False
+    if hasattr(descriptor,'module_class'):
+        module_class = descriptor.module_class
+        if hasattr(module_class, 'regrade_problem'):
+            supports_regrade = True
+
+    if not supports_regrade:
+        msg = "Specified module does not support regrading."
+        raise NotImplementedError(msg)
+
 
 def submit_regrade_problem_for_student(request, course_id, problem_url, student):
     """
@@ -309,10 +329,8 @@ def submit_regrade_problem_for_student(request, course_id, problem_url, student)
     An exception is thrown if the problem doesn't exist, or if the particular
     problem is already being regraded for this student.
     """
-    # check arguments:  make sure that the problem_url is defined
-    # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
-    # an exception will be raised.  Let it pass up to the caller.
-    modulestore().get_instance(course_id, problem_url)
+    # check arguments:  let exceptions return up to the caller. 
+    _check_arguments_for_regrading(course_id, problem_url)
 
     task_name = 'regrade_problem'
 
@@ -341,14 +359,11 @@ def submit_regrade_problem_for_all_students(request, course_id, problem_url):
     An exception is thrown if the problem doesn't exist, or if the particular
     problem is already being regraded.
     """
-    # check arguments:  make sure that the problem_url is defined
-    # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
-    # an exception will be raised.  Let it pass up to the caller.
-    modulestore().get_instance(course_id, problem_url)
-
-    task_name = 'regrade_problem'
+    # check arguments:  let exceptions return up to the caller.
+    _check_arguments_for_regrading(course_id, problem_url)
 
     # check to see if task is already running, and reserve it otherwise
+    task_name = 'regrade_problem'
     course_task_log = _reserve_task(course_id, task_name, problem_url, request.user)
 
     # Submit task:

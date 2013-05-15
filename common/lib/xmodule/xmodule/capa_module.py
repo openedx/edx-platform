@@ -823,7 +823,7 @@ class CapaModule(CapaFields, XModule):
             {'success' : 'correct' | 'incorrect' | AJAX alert msg string }
 
         Raises NotFoundError if called on a problem that has not yet been
-        answered, or if it's a problem that cannot be regraded.
+        answered, or NotImplementedError if it's a problem that cannot be regraded.
 
         Returns the error messages for exceptions occurring while performing
         the regrading, rather than throwing them.
@@ -835,7 +835,7 @@ class CapaModule(CapaFields, XModule):
         if not self.lcp.supports_regrading():
             event_info['failure'] = 'unsupported'
             self.system.track_function('problem_regrade_fail', event_info)
-            raise NotFoundError('Problem does not support regrading')
+            raise NotImplementedError("Problem's definition does not support regrading")
 
         if not self.done:
             event_info['failure'] = 'unanswered'
