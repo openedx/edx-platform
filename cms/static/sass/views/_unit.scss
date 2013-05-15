@@ -532,10 +532,21 @@ body.course.unit {
 }
 
 // Editor Wrapper
-.wrapper-comp-editor { }
+.wrapper-comp-editor {
+  display: none;
+
+  &.is-active {
+    display: block;
+  }
+ }
 
 // Settings Wrapper
 .wrapper-comp-settings {
+  display: none;
+
+  &.is-active {
+    display: block;
+  }
 
   //settings-list
   .list-input.settings-list { 
@@ -625,7 +636,7 @@ body.course.unit {
         }
       }
 
-      input, select {
+      input, select, input[type="number"] {
         @include placeholder($gray-l4);
         @include font-size(16);
         @include size(100%,100%);
