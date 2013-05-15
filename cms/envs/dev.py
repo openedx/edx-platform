@@ -18,8 +18,7 @@ modulestore_options = {
     'db': 'xmodule',
     'collection': 'modulestore',
     'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string',
-    'draft_aware': True
+    'render_template': 'mitxmako.shortcuts.render_to_string'
 }
 
 MODULESTORE = {

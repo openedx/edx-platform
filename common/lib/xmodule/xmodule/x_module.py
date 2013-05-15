@@ -503,11 +503,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         - 'definition':
         - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
-        # TODO should this insert the child under the parent in some way? Right now ['children'] is a list
-        # of ids, a newly created element won't have an id; so, the parent can't point to it. In a traditional
-        # object-oriented system, the children would be a list of objects; so, the parent could point to the child.
-        # For that possibility, get_children stuffs the children objects into a private list but treats the list
-        # as a lazily fetched collection which if populated must be complete.
         usage_id = json_data.get('_id', None)
         if not '_inherited_metadata' in json_data and parent_xblock is not None:
             json_data['_inherited_metadata'] = parent_xblock.xblock_kvs().get_inherited_metadata().copy()

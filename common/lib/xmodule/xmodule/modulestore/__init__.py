@@ -125,7 +125,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def get_courses(self, qualifiers=None, revision=None):
+    def get_courses(self, revision, qualifiers=None):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
         in this modulestore.
@@ -195,7 +195,7 @@ class ModuleStoreBase(ModuleStore):
 
     def get_course(self, course_id):
         """Default impl--linear search through course list"""
-        for c in self.get_courses():
+        for c in self.get_courses('published'):
             if c.id == course_id:
                 return c
         return None

@@ -28,6 +28,7 @@ class CourseFactory(factory.Factory):
     user_id = "test_user"
     data = None
     metadata = None
+    master_version = 'draft'
 
     # pylint: disable=W0613
     @classmethod
@@ -45,8 +46,9 @@ class CourseFactory(factory.Factory):
             metadata['display_name'] = display_name
 
         # Write the data to the mongo datastore
-        new_course = modulestore().create_course(org, prettyid, user_id, metadata=metadata,
-            course_data=data, id_root=prettyid)
+        new_course = modulestore().create_course(
+            org, prettyid, user_id, metadata=metadata, course_data=data, id_root=prettyid,
+            master_version=kwargs.get('master_version'))
 
         return new_course
 

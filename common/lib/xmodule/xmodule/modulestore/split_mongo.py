@@ -13,7 +13,7 @@ from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, C
 from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from collections import namedtuple
 from xblock.core import Scope
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, NotDraftVersion, VersionConflictError
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError
 import re
 from xmodule.modulestore import inheritance
 import threading
@@ -47,7 +47,6 @@ log = logging.getLogger(__name__)
 SplitMongoKVSid = namedtuple('SplitMongoKVSid', 'id, def_id')
 
 
-# TODO should this be here or w/ x_module or ???
 class DefinitionLazyLoader(object):
     '''
     A placeholder to put into an xblock in place of its definition which
@@ -242,7 +241,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.lazy = lazy
         self.module_data = module_data
         self.default_class = default_class
-        # TODO see if self.course_id is needed
+        # TODO see if self.course_id is needed: is already in course_entry but could be > 1 value
         # Compute inheritance
         modulestore.inherit_metadata(course_entry.get('blocks', {}),
             course_entry.get('blocks', {})
@@ -274,8 +273,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 json_data.get('children', []),
                 metadata, json_data.get('_inherited_metadata'))
 
-            block_locator = BlockUsageLocator(version_guid=self.course_entry['_id'],
-                usage_id=usage_id, course_id=self.course_entry.get('course_id'))
+            block_locator = BlockUsageLocator(
+                version_guid=self.course_entry['_id'],
+                usage_id=usage_id,
+                course_id=self.course_entry.get('course_id'), revision=self.course_entry.get('revision'))
             model_data = DbModel(kvs, class_, None,
                 SplitMongoKVSid(
                     # DbModel req's that these support .url()
@@ -309,7 +310,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
                  user=None, password=None,
-                 draft_aware=False,
                  **kwargs):
 
         ModuleStoreBase.__init__(self)
@@ -325,7 +325,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self.course_index = self.db[collection + '.active_versions']
         self.structures = self.db[collection + '.structures']
         self.definitions = self.db[collection + '.definitions']
-        self.draft_aware = draft_aware
 
         # ??? Code review question: those familiar w/ python threading. Should I instead
         # use django cache? How should I expire entries?
@@ -335,13 +334,13 @@ class SplitMongoModuleStore(ModuleStoreBase):
         if user is not None and password is not None:
             self.db.authenticate(user, password)
 
-        if draft_aware:
-            # Force mongo to report errors, at the expense of performance
-            # pymongo docs suck but explanation:
-            # http://api.mongodb.org/java/2.10.1/com/mongodb/WriteConcern.html
-            self.course_index.write_concern = {'w': 1}
-            self.structures.write_concern = {'w': 1}
-            self.definitions.write_concern = {'w': 1}
+        # every app has write access to the db (v having a flag to indicate r/o v write)
+        # Force mongo to report errors, at the expense of performance
+        # pymongo docs suck but explanation:
+        # http://api.mongodb.org/java/2.10.1/com/mongodb/WriteConcern.html
+        self.course_index.write_concern = {'w': 1}
+        self.structures.write_concern = {'w': 1}
+        self.definitions.write_concern = {'w': 1}
 
         if default_class is not None:
             module_path, _, class_name = default_class.rpartition('.')
@@ -450,25 +449,27 @@ class SplitMongoModuleStore(ModuleStoreBase):
         return the CourseDescriptor! It returns the actual db json from
         structures.
 
+        Semantics: if course_id and revision given, then it will get that revision. If
+        also give a version_guid, it will see if the current head of that revision == that guid. If not
+        it raises VersionConflictError (the version now differs from what it was when you got your
+        reference)
+
         :param course_locator: any subclass of CourseLocator
         '''
         # NOTE: if and when this uses cache, the update if changed logic will break if the cache
         # holds the same objects as the descriptors!
-        if (course_locator.version_guid is None and
-            course_locator.course_id is None):
+        if (course_locator.version_guid is None
+            and (course_locator.course_id is None or course_locator.revision is None)):
             raise InsufficientSpecificationError(course_locator)
 
-        if course_locator.course_id is not None:
+        if course_locator.course_id is not None and course_locator.revision is not None:
             # use the course_id
             index = self.course_index.find_one({'_id': course_locator.course_id})
             if index is None:
                 raise ItemNotFoundError(course_locator)
-            if self.wants_published(course_locator.revision):
-                version_guid = index['publishedVersion']
-                if version_guid is None:
-                    raise ItemNotFoundError(course_locator)
-            else:
-                version_guid = index['draftVersion']
+            if course_locator.revision not in index['versions']:
+                raise ItemNotFoundError(course_locator)
+            version_guid = index['versions'][course_locator.revision]
             if course_locator.version_guid is not None and version_guid != course_locator.version_guid:
                 # This may be a bit too touchy but it's hard to infer intent
                 raise VersionConflictError(course_locator, CourseLocator(course_locator, version_guid=version_guid))
@@ -477,44 +478,43 @@ class SplitMongoModuleStore(ModuleStoreBase):
             version_guid = course_locator.version_guid
 
         entry = self.structures.find_one({'_id': version_guid})
+        # b/c more than one course can use same structure, the 'course_id' is not intrinsic to structure
+        # and the one assoc'd w/ it by another fetch may not be the one relevant to this fetch; so,
+        # fake it by explicitly setting it in the in memory structure.
         if course_locator.course_id:
             entry['course_id'] = course_locator.course_id
+            entry['revision'] = course_locator.revision
         return entry
 
-    def get_courses(self, qualifiers=None, revision=None):
+    def get_courses(self, revision, qualifiers=None):
         '''
         Returns a list of course descriptors matching any given qualifiers.
-        Explicitly filters out the template course; so, you can't use this to
-        get that one.
 
         qualifiers should be a dict of keywords matching the db fields or any
         legal query for mongo to use against the active_versions collection.
 
-        Note, this is to find the current draft or published head versions not
-        any other versions (which you'd do via get_course)
+        Note, this is to find the current head of the named revision type
+        (e.g., 'draft'). To get specific versions via guid use get_course.
         '''
-        # FIXME filter out the template course
+        if qualifiers is None:
+            qualifiers = {}
+        qualifiers.update({"versions.{}".format(revision): {"$exists": True}})
         matching = self.course_index.find(qualifiers)
-        get_published = self.wants_published(revision)
 
         # collect ids and then query for those
-        course_ids = []
+        version_guids = []
         id_version_map = {}
-        if get_published:
-            for course_entry in matching:
-                if course_entry['publishedVersion'] is not None:
-                    course_ids.append(course_entry['publishedVersion'])
-                    id_version_map[course_entry['publishedVersion']] = course_entry['_id']
-        else:
-            for course_entry in matching:
-                course_ids.append(course_entry['draftVersion'])
-                id_version_map[course_entry['draftVersion']] = course_entry['_id']
+        for course_entry in matching:
+            version_guid = course_entry['versions'][revision]
+            version_guids.append(version_guid)
+            id_version_map[version_guid] = course_entry['_id']
 
-        course_entries = self.structures.find({'_id': {'$in': course_ids}})
+        course_entries = self.structures.find({'_id': {'$in': version_guids}})
 
         # get the block for the course element (s/b the root)
         result = []
         for entry in course_entries:
+            # structures are course agnostic but the caller wants to know course, so add it in here
             entry['course_id'] = id_version_map[entry['_id']]
             result.extend(self._load_items(entry, [entry['root']], 0,
                 lazy=True))
@@ -623,13 +623,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
     def get_course_index_info(self, course_locator):
         """
-        The index records the initial creation of the indexed course and tracks the current draft
-        and published heads. This function is primarily for test verification but may serve some
+        The index records the initial creation of the indexed course and tracks the current version
+        heads. This function is primarily for test verification but may serve some
         more general purpose.
         :param course_locator: must have a course_id set
         :return {'org': , 'prettyid': ,
-            'draftVersion': the head draft version id,
-            'publishedVersion': the head published version id if any,
+            versions: {'draft': the head draft version id,
+                'published': the head published version id if any,
+            },
             'edited_by': who created the course originally (named edited for consistency),
             'edited_on': when the course was originally created
         }
@@ -759,7 +760,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # TODO implement
         pass
 
-    # TODO is it an error to call create, update, or delete if self.draft_aware == False?
     def create_definition_from_data(self, new_def_data, category, user_id):
         """
         Pull the definition fields out of descriptor and save to the db as a new definition
@@ -863,7 +863,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         merely the containing course.
 
         raises InsufficientSpecificationError if there is no course locator.
-        raises NotDraftVersion if course_id and version_guid given and the current draft head != version_guid
+        raises VersionConflictError if course_id and version_guid given and the current version head != version_guid
             and force is not True.
         force: fork the structure and don't update the course draftVersion if the above
 
@@ -873,18 +873,15 @@ class SplitMongoModuleStore(ModuleStoreBase):
         to the existing definition. If new_def_data is not None and definition_location is not None, then
         new_def_data is assumed to be a new payload for definition_location.
 
-        Creates a new draft of the course structure, creates and inserts the new block, makes the block point
+        Creates a new version of the course structure, creates and inserts the new block, makes the block point
         to the definition which may be new or a new version of an existing or an existing.
         Rules for course locator:
 
         * If the course locator specifies a course_id and either it doesn't
           specify version_guid or the one it specifies == the current draft, it progresses the course to point
           to the new draft and sets the active version to point to the new draft
-        * If the locator has a course_id but its version_guid != current draft, the course index will not point
-          to this new version although the new version will be created.
-        * Note, if the version_guid == the published one, this is innocuous but mostly ineffective in that it
-          will create a new version of the course to which no entries in the course index point.
-        * If the course locator is just a version_guid, it's the same as the version_guid != current draft.
+        * If the locator has a course_id but its version_guid != current draft, it raises VersionConflictError.
+
         NOTE: using a version_guid will end up creating a new version of the course. Your new item won't be in
         the course id'd by version_guid but instead in one w/ a new version_guid. Ensure in this case that you get
         the new version_guid from the locator in the returned object!
@@ -926,16 +923,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
             {'$set': update_version_payload})
 
         # update the index entry if appropriate
-        if index_entry is not None and structure["_id"] == index_entry["draftVersion"]:
-            index_entry["draftVersion"] = new_id
-            self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
+        if index_entry is not None:
+            self._update_head(index_entry, course_or_parent_locator.revision, new_id)
 
         # fetch and return the new item--fetching is unnecessary but a good qc step
         return self.get_item(BlockUsageLocator(course_or_parent_locator, usage_id=new_usage_id, version_guid=new_id))
 
-    # TODO should this get the org from the user object?
     def create_course(self, org, prettyid, user_id, id_root=None, metadata=None, course_data=None,
-        draft_version=None, published_version=None, root_category='course'):
+        master_version='draft', versions_dict=None, root_category='course'):
         """
         Create a new entry in the active courses index which points to an existing or new structure. Returns
         the course root of the resulting entry (the location has the course id)
@@ -944,33 +939,35 @@ class SplitMongoModuleStore(ModuleStoreBase):
         this method will append things to the root to make it unique. (defaults to org)
 
         metadata: if provided, will set the metadata of the root course object in the new draft course. If both
-        metadata and draft_version are provided, it will generate a successor version to the given draft_version,
+        metadata and a starting version are provided, it will generate a successor version to the given version,
         and update the metadata with any provided values (via update not setting).
 
         course_data: if provided, will update the data of the new course xblock definition to this. Like metadata,
-        if provided, this will cause a new version of any given draft_version as well as a new version of the
-        definition (which will point to the existing one if given a draft_version). If not provided and given
+        if provided, this will cause a new version of any given version as well as a new version of the
+        definition (which will point to the existing one if given a version). If not provided and given
         a draft_version, it will reuse the same definition as the draft course (obvious since it's reusing the draft
         course). If not provided and no draft is given, it will be empty and get the field defaults (hopefully) when
         loaded.
 
-        draft_version: if provided, the new course will reuse this version (unless you also provide metadata, see
-        above). if not provided, will create a mostly empty course structure with just a category course root
-        xblock. The draft_version can be a CourseLocator or just the version id
+        master_version: the tag (key) for the version name in the dict which is the 'draft' version. Not the actual
+        version guid, but what to call it.
 
-        published_version: if provided, the new course will treat this as its published version otherwise it
-        will have no currently published version. The published_version can be a CourseLocator or just a version
-        id. Note, this method will not update the published_version with any provided metadata or course_data.
-        Those will remain unpublished in the draft.
+        versions_dict: the starting version ids where the keys are the tags such as 'draft' and 'published'
+        and the values are structure guids. If provided, the new course will reuse this version (unless you also
+        provide any overrides such as metadata, see above). if not provided, will create a mostly empty course
+        structure with just a category course root xblock.
         """
         if metadata is None:
             metadata = {}
-        # work from inside out: definition, structure, index entry
-        if draft_version is None:
+        # build from inside out: definition, structure, index entry
+        # if building a wholly new structure
+        if versions_dict is None or master_version not in versions_dict:
             # create new definition and structure
+            if course_data is None:
+                course_data = {}
             definition_entry = {
                 'category': root_category,
-                'data': {},
+                'data': course_data,
                 'edited_by': user_id,
                 'edited_on': datetime.datetime.utcnow(),
                 'previous_version': None,
@@ -998,11 +995,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
             self.structures.update({'_id': new_id},
                 {'$set': {"original_version": new_id,
                     'blocks.course.update_version': new_id}})
+            if versions_dict is None:
+                versions_dict = {master_version: new_id}
+            else:
+                versions_dict[master_version] = new_id
 
         else:
             # just get the draft_version structure
-            if not isinstance(draft_version, CourseLocator):
-                draft_version = CourseLocator(version_guid=draft_version)
+            draft_version = CourseLocator(version_guid=versions_dict[master_version])
             draft_structure = self._lookup_course(draft_version)
             if course_data is not None or metadata:
                 draft_structure = self._version_structure(draft_structure, user_id)
@@ -1022,23 +1022,13 @@ class SplitMongoModuleStore(ModuleStoreBase):
                     root_block['previous_version'] = root_block.get('update_version')
                 # insert updates the '_id' in draft_structure
                 new_id = self.structures.insert(draft_structure)
+                versions_dict[master_version] = new_id
                 self.structures.update({'_id': new_id},
                     {'$set': {'blocks.{}.update_version'.format(draft_structure['root']): new_id}})
         # create the index entry
         if id_root is None:
             id_root = org
         new_id = self._generate_course_id(id_root)
-        if isinstance(published_version, CourseLocator):
-            # convert to simple version guid
-            if published_version.version_guid is None:
-                # need to look up course to get published version
-                published_index = self.course_index.find_one({'_id': published_version.course_id})
-                if published_version.revision == 'draft':
-                    published_version = published_index['draftVersion']
-                else:
-                    published_version = published_index['publishedVersion']
-            else:
-                published_version = published_version.version_guid
 
         index_entry = {
             '_id': new_id,
@@ -1046,10 +1036,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
             'prettyid': prettyid,
             'edited_by': user_id,
             'edited_on': datetime.datetime.utcnow(),
-            'draftVersion': draft_structure['_id'],
-            'publishedVersion': published_version}
+            'versions': versions_dict}
         new_id = self.course_index.insert(index_entry)
-        return self.get_course(CourseLocator(course_id=new_id))
+        return self.get_course(CourseLocator(course_id=new_id, revision=master_version))
 
     # TODO refactor or remove callers
     def clone_item(self, source_course_id, dest_course_id, source, location):
@@ -1074,8 +1063,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
         The implementation tries to detect which, if any changes, actually need to be saved and thus won't version
         the definition, structure, nor course if they didn't change.
         """
-        # TODO question: by passing a descriptor, because descriptors are only instantiable from get_item
-        # and ilk, we're necessitating a read, modify, call this, which reads, modifies, and persists. Is that ok?
         original_structure = self._lookup_course(descriptor.location)
         index_entry = self._get_index_if_valid(descriptor.location, force)
 
@@ -1107,9 +1094,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 {'$set': {'blocks.{}.update_version'.format(descriptor.location.usage_id): new_id}})
 
             # update the index entry if appropriate
-            if index_entry is not None and original_structure["_id"] == index_entry["draftVersion"]:
-                index_entry["draftVersion"] = new_id
-                self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
+            if index_entry is not None:
+                self._update_head(index_entry, descriptor.location.revision, new_id)
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
             return self.get_item(BlockUsageLocator(descriptor.location, version_guid=new_id))
@@ -1149,9 +1135,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
             self.structures.update({'_id': new_id}, {'$set': update_command})
 
             # update the index entry if appropriate
-            if index_entry is not None and structure["_id"] == index_entry["draftVersion"]:
-                index_entry["draftVersion"] = new_id
-                self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
+            if index_entry is not None:
+                self._update_head(index_entry, xblock.location.revision, new_id)
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
             return self.get_item(BlockUsageLocator(xblock.location, version_guid=new_id))
@@ -1234,10 +1219,10 @@ class SplitMongoModuleStore(ModuleStoreBase):
         Change the given course's index entry for the given fields. new_values_dict
         should be a subset of the dict returned by get_course_index_info.
         It cannot include '_id' (will raise IllegalArgument).
-        Provide update_versions=True if you intend this to update draftVersion or publishedVersion.
+        Provide update_versions=True if you intend this to replace the versions hash.
         Note, this operation can be dangerous and break running courses.
 
-        If the dict includes either value and not update_versions, it will raise an exception.
+        If the dict includes versions and not update_versions, it will raise an exception.
 
         If the dict includes edited_on or edited_by, it will raise an exception
 
@@ -1250,10 +1235,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
             raise ValueError("Cannot override _id")
         if 'edited_on' in new_values_dict or 'edited_by' in new_values_dict:
             raise ValueError("Cannot set edited_on or edited_by")
-        if not update_versions and 'draftVersion' in new_values_dict:
-            raise ValueError("Cannot override draftVersion without setting update_versions")
-        if not update_versions and 'publishedVersion' in new_values_dict:
-            raise ValueError("Cannot override publishedVersion without setting update_versions")
+        if not update_versions and 'versions' in new_values_dict:
+            raise ValueError("Cannot override versions without setting update_versions")
         self.course_index.update({'_id': course_locator.course_id},
             {'$set': new_values_dict})
 
@@ -1304,9 +1287,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
         result = CourseLocator(version_guid=new_id)
 
         # update the index entry if appropriate
-        if index_entry is not None and original_structure["_id"] == index_entry["draftVersion"]:
-            index_entry["draftVersion"] = new_id
-            self.course_index.update({"_id": index_entry["_id"]}, {"$set": {"draftVersion": new_id}})
+        if index_entry is not None:
+            self._update_head(index_entry, usage_locator.revision, new_id)
             result.course_id = usage_locator.course_id
             result.revision = usage_locator.revision
 
@@ -1317,7 +1299,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         Remove the given course from the course index.
 
         Only removes the course from the index. The data remains. You can use create_course
-        with draft_version and published_version to restore the course; however, the edited_on and
+        with a versions hash to restore the course; however, the edited_on and
         edited_by won't reflect the originals, of course.
 
         :param course_id: uses course_id rather than locator to emphasize its global effect
@@ -1385,14 +1367,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
                     descendent_map)
 
         return descendent_map
-
-    def wants_published(self, revision):
-        if revision == 'draft':
-            return False
-        if revision == 'published':
-            return True
-        else:
-            return not self.draft_aware
 
     def definition_locator(self, definition):
         '''
@@ -1470,19 +1444,23 @@ class SplitMongoModuleStore(ModuleStoreBase):
         If the locator identifies a course and points to its draft (or plausibly its draft),
         then return the index entry.
 
-        raises NotDraftVersion if not the right version
+        raises VersionConflictError if not the right version
 
         :param locator:
         """
-        if locator.course_id is None:
+        if locator.course_id is None or locator.revision is None:
             return None
         else:
             index_entry = self.course_index.find_one({'_id': locator.course_id})
             if (locator.version_guid is not None
-                and index_entry['draftVersion'] != locator.version_guid
+                and index_entry['versions'][locator.revision] != locator.version_guid
                 and not force):
-                raise NotDraftVersion(locator,
-                    CourseLocator(course_id=index_entry['_id'], version_guid=index_entry['draftVersion']))
+                raise VersionConflictError(
+                    locator,
+                    CourseLocator(
+                        course_id=index_entry['_id'],
+                        version_guid=index_entry['versions'][locator.revision],
+                        revision=locator.revision))
             else:
                 return index_entry
 
@@ -1521,3 +1499,15 @@ class SplitMongoModuleStore(ModuleStoreBase):
             block_locator = BlockUsageLocator(block_locator)
             block_locator.course_id = None
         return block_locator
+
+    def _update_head(self, index_entry, revision, new_id):
+        """
+        Update the active index for the given course's revision to point to new_id
+
+        :param index_entry:
+        :param course_locator:
+        :param new_id:
+        """
+        self.course_index.update(
+            {"_id": index_entry["_id"]},
+            {"$set": {"versions.{}".format(revision): new_id}})

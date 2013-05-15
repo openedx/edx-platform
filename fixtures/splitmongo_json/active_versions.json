@@ -1,23 +1,26 @@
 [{"_id" : "GreekHero", 
   "org" : "testx", 
   "prettyid" : "test_course", 
-  "draftVersion" : "v12345d",
-  "publishedVersion" : null,
+  "versions" : {
+    "draft" : "v12345d"
+   },
   "edited_on" : {"$date" : 1364481713238},
   "edited_by" : "test@edx.org"},
  {"_id" : "wonderful", 
   "org" : "testx", 
   "prettyid" : "another_course", 
-  "draftVersion" : "v23456d",
-  "publishedVersion" : "v23456p",
+  "versions" : {
+    "draft" : "v23456d",
+    "published" : "v23456p"
+    },
   "edited_on" : {"$date" : 1364481313238},
   "edited_by" : "test@edx.org"},
   
  {"_id" : "contender", 
   "org" : "guestx", 
   "prettyid" : "test_course", 
-  "draftVersion" : "v345679d",
-  "publishedVersion" : null,
+  "versions" : {
+    "draft" : "v345679d"},
   "edited_on" : {"$date" : 1364491313238},
   "edited_by" : "test@guestx.edu"}]
   

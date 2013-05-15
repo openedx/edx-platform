@@ -26,15 +26,6 @@ class NoPathToItem(Exception):
 class DuplicateItemError(Exception):
     pass
 
-class NotDraftVersion(Exception):
-    """
-    A caller attempted to change a course but was not using the draftVersion.
-    """
-    def __init__(self, requestedLocation, currentHead):
-        super(NotDraftVersion, self).__init__()
-        self.requestedLocation = requestedLocation
-        self.currentHead = currentHead
-
 class VersionConflictError(Exception):
     """
     The caller asked for either draft or published head and gave a version which conflicted with it.

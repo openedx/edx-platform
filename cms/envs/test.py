@@ -10,7 +10,6 @@ sessions. Assumes structure:
 import os
 from path import path
 from .common import *
-import copy
 import uuid
 
 # Nose Test Runner
@@ -45,8 +44,7 @@ MODULESTORE_OPTIONS = {
     'db': 'test_xmodule',
     'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
     'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string',
-    'draft_aware': True
+    'render_template': 'mitxmako.shortcuts.render_to_string'
 }
 
 MODULESTORE = {
