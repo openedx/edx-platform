@@ -6,10 +6,10 @@
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
-    <div class="title">
-      <span class="title-sub">Course Settings</span>
-      <h1 class="title-1">Course Team</h1>
-    </div>
+    <h1 class="page-header">
+      <small class="subtitle">Course Settings</small>
+      <span class="sr">&gt; </span>Course Team
+    </h1>
 
     <nav class="nav-actions">
       <h3 class="sr">Page Actions</h3>
@@ -31,7 +31,7 @@
       <p>The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional course staff below, if you are the course instructor. Please note that they must have already registered and verified their account.</p>
     </div>
 
-    <article class="user-overview">           
+    <article class="user-overview">
       %if allow_actions:
       <form class="new-user-form">
         <div id="result"></div>
@@ -106,7 +106,7 @@
 
   $(document).ready(function() {
     $newUserForm = $('.new-user-form');
-    var $cancelButton = $newUserForm.find('.cancel-button');    
+    var $cancelButton = $newUserForm.find('.cancel-button');
     $newUserForm.bind('submit', addUser);
     $cancelButton.bind('click', hideNewUserForm);
 
@@ -119,7 +119,7 @@
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
-        data:JSON.stringify({ 'email': $(this).data('id')}),          
+        data:JSON.stringify({ 'email': $(this).data('id')}),
         }).done(function() {
           location.reload();
         })
