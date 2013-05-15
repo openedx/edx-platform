@@ -477,7 +477,7 @@ body.course.unit {
 
 .component-edit-header {
   @include box-sizing(border-box);
-  padding: 15px 0 15px 20px;
+  padding: 18px 0 18px 20px;
   top: 0;
   right: 0;
   background-color: $blue;
@@ -502,7 +502,7 @@ body.course.unit {
     right: 0;
     top: 0;
     position: absolute;
-    padding: 10px;
+    padding: 15px;
 
     .mode {
       display: inline-block;
