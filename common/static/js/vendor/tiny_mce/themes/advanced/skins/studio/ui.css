@@ -40,7 +40,7 @@
   padding: 10px 10px 9px;
   vertical-align: top;
 }
-.studioSkin .mceIframeContainer {border: 1px solid #3c3c3c; border-top: none;}
+.studioSkin .mceIframeContainer {border: 1px solid white; border-top: none;}
 .studioSkin .mceStatusbar {background:#F0F0EE; font-size:9pt; line-height:16px; overflow:visible; color:#000; display:block; height:20px}
 .studioSkin .mceStatusbar div {float:left; margin:2px}
 .studioSkin .mceStatusbar a.mceResize {display:block; float:right; background:url(../../img/studio-icons.png) -800px 0; width:20px; height:20px; cursor:se-resize; outline:0}

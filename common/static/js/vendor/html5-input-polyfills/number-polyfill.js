@@ -4,7 +4,8 @@
 HTML5 Number polyfill | Jonathan Stipe | https://github.com/jonstipe/number-polyfill
 */
 
-
+function triggerNumberPolyfill() {
+  
 (function() {
 
   (function($) {
@@ -297,3 +298,5 @@ HTML5 Number polyfill | Jonathan Stipe | https://github.com/jonstipe/number-poly
   })(jQuery);
 
 }).call(this);
+
+}

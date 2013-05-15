@@ -234,7 +234,7 @@ body.course.unit {
               opacity:.8;
 
               &:hover {
-                opacity:1;
+                opacity:.9;
                 background-color: tint($lightBluishGrey, 20%);
               }
 
@@ -481,6 +481,7 @@ body.course.unit {
   top: 0;
   right: 0;
   background-color: $blue;
+  border-bottom: 1px solid $blue-d2;
   color: $white;
 
   //Component Name
@@ -517,12 +518,12 @@ body.course.unit {
         &.is-set {
           @include linear-gradient($blue, $blue);
           color: $blue-d1;
-          box-shadow: inset 0 2px 2px $shadow-d1;
+          box-shadow: inset 1px 1px 1px $shadow-d1;
           background-color: $blue;
           cursor: default;
 
           &:hover {
-            box-shadow: inset 0 2px 2px $shadow-d1;
+            box-shadow: inset 1px 1px 1px $shadow-d1;
             background-color: $blue;
           }
         }
@@ -575,7 +576,7 @@ body.course.unit {
       background-color: $white;
       padding: 20px;
       border-bottom: 1px solid $gray-l2;
-      opacity: .6;
+      opacity: .8;
 
       &:last-child {
         //margin-bottom: 0;
@@ -687,8 +688,6 @@ body.course.unit {
           background-color: #FFFCF1;
         }
       }
-
-      //input[type=others]
 
       .action.setting-clear {
         @include font-size(11);

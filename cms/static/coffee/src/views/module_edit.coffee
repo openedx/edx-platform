@@ -27,6 +27,8 @@ class CMS.Views.ModuleEdit extends Backbone.View
           el: metadataEditor,
           model: new CMS.Models.MetadataEditor(metadataEditor.data('metadata'))
           });
+      # Checks for number input fields and adds polyfill 
+      #triggerNumberPolyfill()
 
   changedMetadata: ->
     return @metadataEditor.getModifiedMetadataValues()
