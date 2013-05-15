@@ -38,7 +38,8 @@ TESTS_FAILED=0
 export DISPLAY=:1
 
 # Run the lms and cms acceptance tests
-rake test_acceptance_lms || TESTS_FAILED=1
-rake test_acceptance_cms || TESTS_FAILED=1
+# (the -v flag turns off color in the output)
+rake test_acceptance_lms["-v 3"] || TESTS_FAILED=1
+rake test_acceptance_cms["-v 3"] || TESTS_FAILED=1
 
 [ $TESTS_FAILED == '0' ]
