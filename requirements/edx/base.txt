@@ -74,6 +74,7 @@ lettuce==0.2.16
 mock==0.8.0
 nosexcover==1.0.7
 pep8==1.4.5
+pylint==0.28
 rednose==0.3
 selenium==2.31.0
 splinter==0.5.0
@@ -81,7 +82,3 @@ django_nose==1.1
 django-jasmine==0.3.2
 django_debug_toolbar
 django-debug-toolbar-mongo
-
-# Install pylint from a specific commit on trunk
-# to get the fix for this issue: http://www.logilab.org/ticket/122793
-https://bitbucket.org/logilab/pylint/get/e828cb5.zip
