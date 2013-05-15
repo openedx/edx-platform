@@ -384,6 +384,11 @@ body.course.settings {
       #course-overview {
         height: ($baseline*20);
       }
+
+      //adds back in CodeMirror border removed due to Unit page styling of component editors
+      .CodeMirror {
+        border: 1px solid $gray-l2;
+      }
     }
 
     // specific fields - video
