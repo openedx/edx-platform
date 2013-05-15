@@ -36,7 +36,12 @@ PIPELINE_JS['spec'] = {
 }
 
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
+JASMINE_REPORT_DIR = os.environ.get('JASMINE_REPORT_DIR', 'reports/lms/jasmine')
+
+TEMPLATE_CONTEXT_PROCESSORS += ('settings_context_processor.context_processors.settings',)
+TEMPLATE_VISIBLE_SETTINGS = ('JASMINE_REPORT_DIR', )
 
 STATICFILES_DIRS.append(REPO_ROOT/'node_modules/phantom-jasmine/lib')
+STATICFILES_DIRS.append(REPO_ROOT/'node_modules/jasmine-reporters/src')
 
-INSTALLED_APPS += ('django_jasmine', )
+INSTALLED_APPS += ('django_jasmine', 'settings_context_processor')
