@@ -28,8 +28,6 @@ class CMS.Views.ModuleEdit extends Backbone.View
           model: new CMS.Models.MetadataEditor(metadataEditor.data('metadata'))
           });
 
-   ----> find id of the li that wraps the is-set A thinger, that thing's name, get the first word set to VAR, and then add is-active to the div whose class equals  wrapper-comp-VAR
-
   changedMetadata: ->
     return @metadataEditor.getModifiedMetadataValues()
 
@@ -89,17 +87,11 @@ class CMS.Views.ModuleEdit extends Backbone.View
   clickModeButton: (event) ->
     event.preventDefault()
     if $(this).hasClass(".is-set")
-      alert("Hey Sucka")
+      alert("Hi There")
     else
       previousTab = @$el.find('li.active-mode .is-set')
-      previousTab.parent().siblings().find("a").addClass('is-set').attr({
-        aria-selected: 'true',
-        tab-index: '1'
-        })
-      previousTab.removeClass('is-set').attr({
-        aria-selected: 'false',
-        tab-index: '0'
-        })
+      previousTab.parent().siblings().find("a").addClass('is-set')
+      previousTab.removeClass('is-set')
 
       previousTabContent = @$el.find('div.is-active')
       previousTabContent.siblings().addClass('is-active')
