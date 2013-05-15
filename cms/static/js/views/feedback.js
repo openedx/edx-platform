@@ -69,7 +69,7 @@ CMS.Views.Prompt = CMS.Views.Alert.extend({
     }),
     render: function() {
         if(!window.$body) { window.$body = $(document.body); }
-        if(this.model.get('shown')) {
+        if(this.options.shown) {
             $body.addClass('prompt-is-shown');
         } else {
             $body.removeClass('prompt-is-shown');

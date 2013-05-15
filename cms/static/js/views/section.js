@@ -59,16 +59,16 @@ CMS.Views.SectionEdit = Backbone.View.extend({
         this.showView.render();
     },
     showErrorMessage: function(model, error, options) {
+        var that = this;
         var msg = new CMS.Models.ErrorMessage({
             title: "Validation Error",
             message: error,
-            close: false,
-            icon: false,
             actions: {
                 primary: {
                     text: "Dismiss",
-                    click: function() {
-                        this.hide();
+                    click: function(view) {
+                        view.hide();
+                        that.$("input[type=text]").focus();
                     }
                 }
             }
