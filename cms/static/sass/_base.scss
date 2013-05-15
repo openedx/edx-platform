@@ -314,7 +314,7 @@ p, ul, ol, dl {
 
         }
 
-        .upload-button .icon-create {
+        .upload-button .icon-plus {
           @extend .t-action2;
           line-height: 0 !important;
         }
@@ -750,11 +750,10 @@ hr.divide {
     display: block;
   }
 
-  .icon-create {
+  .icon-plus {
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: baseline;
     margin-right: ($baseline/4);
-    margin-top: ($baseline/10);
     line-height: 0;
   }
 }
