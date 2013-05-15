@@ -701,6 +701,7 @@ body.course.unit {
         box-shadow: none;
         text-shadow: none;
         border: 1px solid $gray-l1;
+        background-color: $gray-l4;
 
         &:hover {
           @include box-shadow(0 1px 1px $shadow);
