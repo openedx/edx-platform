@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@patch('comment_client.utils.requests.request')
 class ViewsTestCase(ModuleStoreTestCase):
     def setUp(self):
         # create a course
@@ -45,7 +46,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.client = Client()
             assert_true(self.client.login(username='student', password='test'))
 
-    @patch('comment_client.utils.requests.request')
+    
     def test_create_thread(self, mock_request):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"title":"Hello",\
@@ -87,7 +88,7 @@ class ViewsTestCase(ModuleStoreTestCase):
                                         'anonymous': False, 'course_id': u'MITx/999/Robot_Super_Course',
                                         'api_key': 'PUT_YOUR_API_KEY_HERE'}, timeout=5)
         assert_equal(response.status_code, 200)
-
+        
     def test_flag_thread(self, mock_request):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"title":"Hello",\
@@ -110,7 +111,8 @@ class ViewsTestCase(ModuleStoreTestCase):
                                             "endorsed":false,\
                                             "unread_comments_count":0,\
                                             "read":false,"comments_count":0}'
-        url = reverse('flag_thread', kwargs={'thread_id':'518d4237b023791dca00000d'})
+        #url(r'threads/(?P<thread_id>[\w\-]+)/flagAbuse$', 'flag_abuse_for_thread', name='flag_abuse_for_thread')
+        url = reverse('flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d','course_id': self.course_id })
         response = self.client.put(url)
         assert_true(mock_request.called)
         mock_request.assert_called_with('put',
