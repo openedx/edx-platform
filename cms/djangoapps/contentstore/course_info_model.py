@@ -6,21 +6,22 @@ import re
 from django.http import HttpResponseBadRequest
 import logging
 import django.utils
-from xmodule.templates import TEMPLATE_COURSEID
 
 # # TODO store as array of { date, content } and override  course_info_module.definition_from_xml
 # # This should be in a class which inherits from XmlDescriptor
 log = logging.getLogger(__name__)
-def get_course_updates(course_id, location):
+
+
+def get_course_updates(location):
     """
     Retrieve the relevant course_info updates and unpack into the model which the client expects:
     [{id : location.url() + idx to make unique, date : string, content : html string}]
     """
     try:
-        course_updates = modulestore().get_instance(course_id, location)
+        course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
         template = Location(['i4x', 'edx', "templates", 'course_info', "Empty"])
-        course_updates = modulestore().clone_item(TEMPLATE_COURSEID, course_id, template, Location(location))
+        course_updates = modulestore('direct').clone_item(template, Location(location))
 
     # current db rep: {"_id" : locationjson, "definition" : { "data" : "<ol>[<li><h2>date</h2>content</li>]</ol>"} "metadata" : ignored}
     location_base = course_updates.location.url()
@@ -54,14 +55,14 @@ def get_course_updates(course_id, location):
     return course_upd_collection
 
 
-def update_course_updates(course_id, location, update, passed_id=None):
+def update_course_updates(location, update, passed_id=None):
     """
     Either add or update the given course update. It will add it if the passed_id is absent or None. It will update it if
     it has an passed_id which has a valid value. Until updates have distinct values, the passed_id is the location url + an index
     into the html structure.
     """
     try:
-        course_updates = modulestore().get_instance(course_id, location)
+        course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
         return HttpResponseBadRequest()
 
@@ -91,7 +92,7 @@ def update_course_updates(course_id, location, update, passed_id=None):
 
         # update db record
         course_updates.data = html.tostring(course_html_parsed)
-        modulestore().update_item(location, course_updates.data)
+        modulestore('direct').update_item(location, course_updates.data)
 
         if (len(new_html_parsed) == 1):
             content = new_html_parsed[0].tail
@@ -103,7 +104,7 @@ def update_course_updates(course_id, location, update, passed_id=None):
                 "content": content}
 
 
-def delete_course_update(course_id, location, update, passed_id):
+def delete_course_update(location, update, passed_id):
     """
     Delete the given course_info update from the db.
     Returns the resulting course_updates b/c their ids change.
@@ -112,7 +113,7 @@ def delete_course_update(course_id, location, update, passed_id):
         return HttpResponseBadRequest()
 
     try:
-        course_updates = modulestore().get_instance(course_id, location)
+        course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
         return HttpResponseBadRequest()
 
@@ -135,9 +136,10 @@ def delete_course_update(course_id, location, update, passed_id):
 
         # update db record
         course_updates.data = html.tostring(course_html_parsed)
-        modulestore().update_item(location, course_updates.data)
+        store = modulestore('direct')
+        store.update_item(location, course_updates.data)
 
-    return get_course_updates(course_id, location)
+    return get_course_updates(location)
 
 
 def get_idx(passed_id):

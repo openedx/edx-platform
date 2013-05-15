@@ -13,7 +13,7 @@ This def will enumerate through a passed in subsection and list all of the units
   % for unit in subsection_units:
   <li class="leaf unit" data-id="${unit.location}">
     <%
-      unit_state = compute_unit_state(context_course.location, unit)
+      unit_state = compute_unit_state(unit)
       if unit.location == selected:
         selected_class = 'editing'
       else:

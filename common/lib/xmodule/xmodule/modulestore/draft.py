@@ -78,7 +78,7 @@ class DraftModuleStore(ModuleStoreBase):
         except ItemNotFoundError:
             return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=depth))
 
-    def get_items(self, course_id, location, depth=0):
+    def get_items(self, location, course_id=None, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -108,18 +108,18 @@ class DraftModuleStore(ModuleStoreBase):
     def clone_item(self, source, location):
         """
         Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location` as a draft
+        and writes it to `location`
         """
         return wrap_draft(super(DraftModuleStore, self).clone_item(source, as_draft(location)))
 
     def update_item(self, location, data, allow_not_found=False):
         """
-        Persist the data (item) as a draft. Updates existing draft or clones published and updates it.
+        Set the data in the item specified by the location to
+        data
 
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
-        # TODO don't do 2 finds
         draft_loc = as_draft(location)
         try:
             draft_item = self.get_item(location)
@@ -177,13 +177,13 @@ class DraftModuleStore(ModuleStoreBase):
 
         return
 
-    def get_parent_locations(self, course_id, location):
+    def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
 
         returns an iterable of things that can be passed to Location.
         '''
-        return super(DraftModuleStore, self).get_parent_locations(course_id, location)
+        return super(DraftModuleStore, self).get_parent_locations(location, course_id)
 
     def publish(self, location, published_by_id):
         """

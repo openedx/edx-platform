@@ -6,17 +6,17 @@ from path import path
 
 from xblock.core import Scope
 
-from .xml import XMLModuleStore
-from .exceptions import DuplicateItemError
+from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
-from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
+from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
+from xmodule.errortracker import make_error_tracker
 
 log = logging.getLogger(__name__)
 
 
 def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace,
-    subpath='static', verbose=False):
+                          subpath='static', verbose=False):
 
     remap_dict = {}
 
@@ -107,10 +107,10 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
         # the caller passed in
         if module.location.category != 'course':
             module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                course=target_location_namespace.course)
+                                                       course=target_location_namespace.course)
         else:
             module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                course=target_location_namespace.course, name=target_location_namespace.name)
+                                                       course=target_location_namespace.course, name=target_location_namespace.name)
 
         # then remap children pointers since they too will be re-namespaced
         if module.has_children:
@@ -119,7 +119,7 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
             for child in children_locs:
                 child_loc = Location(child)
                 new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                    course=target_location_namespace.course)
+                                                   course=target_location_namespace.course)
 
                 new_locs.append(new_child_loc.url())
 
@@ -139,8 +139,7 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
             # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
             # no good, so we have to do this kludge
             if isinstance(module.data, str) or isinstance(module.data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                lxml_rewrite_links(module.data, lambda link: verify_content_links(module, course_data_path,
-                    static_content_store, link, remap_dict))
+                lxml_rewrite_links(module.data, lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
 
                 for key in remap_dict.keys():
                     module.data = module.data.replace(key, remap_dict[key])
@@ -163,9 +162,9 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
     # if there is *any* tabs - then there at least needs to be some predefined ones
     if module.tabs is None or len(module.tabs) == 0:
         module.tabs = [{"type": "courseware"},
-            {"type": "course_info", "name": "Course Info"},
-            {"type": "discussion", "name": "Discussion"},
-            {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
+                       {"type": "course_info", "name": "Course Info"},
+                       {"type": "discussion", "name": "Discussion"},
+                       {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
     # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
     # so let's make sure we import in case there are no other references to it in the modules
@@ -175,7 +174,8 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
 
 def import_from_xml(store, data_dir, course_dirs=None,
                     default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True, static_content_store=None, target_location_namespace=None, verbose=False):
+                    load_error_modules=True, static_content_store=None, target_location_namespace=None,
+                    verbose=False, draft_store=None):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
@@ -189,7 +189,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
     the policy.json. so we need to keep the original url_name during import
 
     """
-    # TODO figure out how the caller indicates to put this in draft or do all go into draft?
+
     xml_module_store = XMLModuleStore(
         data_dir,
         default_class=default_class,
@@ -235,9 +235,9 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     # if there is *any* tabs - then there at least needs to be some predefined ones
                     if module.tabs is None or len(module.tabs) == 0:
                         module.tabs = [{"type": "courseware"},
-                            {"type": "course_info", "name": "Course Info"}, 
-                            {"type": "discussion", "name": "Discussion"},
-                            {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
+                                       {"type": "course_info", "name": "Course Info"},
+                                       {"type": "discussion", "name": "Discussion"},
+                                       {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
                     import_module(module, store, course_data_path, static_content_store)
 
@@ -271,6 +271,13 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     log.debug('importing module location {0}'.format(module.location))
 
                 import_module(module, store, course_data_path, static_content_store)
+
+            # now import any 'draft' items
+            if draft_store is not None:
+                import_course_draft(xml_module_store, store, draft_store, course_data_path,
+                                    static_content_store, target_location_namespace if target_location_namespace is not None
+                                    else course_location)
+
         finally:
             # turn back on all write signalling
             if pseudo_course_id in store.ignore_write_events_on_courses:
@@ -279,6 +286,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                                                                target_location_namespace is not None else course_location)
 
     return xml_module_store, course_items
+
 
 def import_module(module, store, course_data_path, static_content_store, allow_not_found=False):
     content = {}
@@ -330,6 +338,82 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
     # inherited metadata everywhere.
     store.update_metadata(module.location, dict(own_metadata(module)))
 
+
+def import_course_draft(xml_module_store, store, draft_store, course_data_path, static_content_store, target_location_namespace):
+    '''
+    This will import all the content inside of the 'drafts' folder, if it exists
+    NOTE: This is not a full course import, basically in our current application only verticals (and downwards)
+    can be in draft. Therefore, we need to use slightly different call points into the import process_xml
+    as we can't simply call XMLModuleStore() constructor (like we do for importing public content)
+    '''
+    draft_dir = course_data_path + "/drafts"
+    if not os.path.exists(draft_dir):
+        return
+
+    # create a new 'System' object which will manage the importing
+    errorlog = make_error_tracker()
+    system = ImportSystem(
+        xml_module_store,
+        target_location_namespace.course_id,
+        draft_dir,
+        {},
+        errorlog.tracker,
+        ParentTracker(),
+        None,
+    )
+
+    # now walk the /vertical directory where each file in there will be a draft copy of the Vertical
+    for dirname, dirnames, filenames in os.walk(draft_dir + "/vertical"):
+        for filename in filenames:
+            module_path = os.path.join(dirname, filename)
+            with open(module_path) as f:
+                try:
+                    xml = f.read().decode('utf-8')
+                    descriptor = system.process_xml(xml)
+
+                    def _import_module(module):
+                        module.location = module.location._replace(revision='draft')
+                        # make sure our parent has us in its list of children
+                        # this is to make sure private only verticals show up in the list of children since
+                        # they would have been filtered out from the non-draft store export
+                        if module.location.category == 'vertical':
+                            module.location = module.location._replace(revision=None)
+                            sequential_url = module.xml_attributes['parent_sequential_url']
+                            index = int(module.xml_attributes['index_in_children_list'])
+
+                            seq_location = Location(sequential_url)
+
+                            # IMPORTANT: Be sure to update the sequential in the NEW namespace
+                            seq_location = seq_location._replace(org=target_location_namespace.org,
+                                                                 course=target_location_namespace.course
+                                                                 )
+                            sequential = store.get_item(seq_location)
+
+                            if module.location.url() not in sequential.children:
+                                sequential.children.insert(index, module.location.url())
+                                store.update_children(sequential.location, sequential.children)
+
+                            del module.xml_attributes['parent_sequential_url']
+                            del module.xml_attributes['index_in_children_list']
+
+                        import_module(module, draft_store, course_data_path, static_content_store, allow_not_found=True)
+                        for child in module.get_children():
+                            _import_module(child)
+
+                    # HACK: since we are doing partial imports of drafts
+                    # the vertical doesn't have the 'url-name' set in the attributes (they are normally in the parent
+                    # object, aka sequential), so we have to replace the location.name with the XML filename
+                    # that is part of the pack
+                    fn, fileExtension = os.path.splitext(filename)
+                    descriptor.location = descriptor.location._replace(name=fn)
+
+                    _import_module(descriptor)
+
+                except Exception, e:
+                    logging.exception('There was an error. {0}'.format(unicode(e)))
+                    pass
+
+
 def remap_namespace(module, target_location_namespace):
     if target_location_namespace is None:
         return module
@@ -338,10 +422,10 @@ def remap_namespace(module, target_location_namespace):
     # the caller passed in
     if module.location.category != 'course':
         module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-            course=target_location_namespace.course)
+                                                   course=target_location_namespace.course)
     else:
         module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-            course=target_location_namespace.course, name=target_location_namespace.name)
+                                                   course=target_location_namespace.course, name=target_location_namespace.name)
 
     # then remap children pointers since they too will be re-namespaced
     if hasattr(module, 'children'):
@@ -351,7 +435,7 @@ def remap_namespace(module, target_location_namespace):
             for child in children_locs:
                 child_loc = Location(child)
                 new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                    course=target_location_namespace.course)
+                                                   course=target_location_namespace.course)
 
                 new_locs.append(new_child_loc.url())
 
@@ -381,7 +465,6 @@ def check_module_metadata_editability(module):
 
     allowed = allowed + ['xml_attributes', 'display_name']
     err_cnt = 0
-    my_metadata = dict(own_metadata(module))
     illegal_keys = set(own_metadata(module).keys()) - set(allowed)
 
     if len(illegal_keys) > 0:
@@ -424,7 +507,7 @@ def validate_data_source_path_existence(path, is_err=True, extra_msg=None):
     _cnt = 0
     if not os.path.exists(path):
         print ("{0}: Expected folder at {1}. {2}".format('ERROR' if is_err == True else 'WARNING', path, extra_msg if
-            extra_msg is not None else ''))
+               extra_msg is not None else ''))
         _cnt = 1
     return _cnt
 
@@ -436,13 +519,13 @@ def validate_data_source_paths(data_dir, course_dir):
     warn_cnt = 0
     err_cnt += validate_data_source_path_existence(course_path / 'static')
     warn_cnt += validate_data_source_path_existence(course_path / 'static/subs', is_err=False,
-        extra_msg='Video captions (if they are used) will not work unless they are static/subs.')
+                                                    extra_msg='Video captions (if they are used) will not work unless they are static/subs.')
     return err_cnt, warn_cnt
 
 
 def perform_xlint(data_dir, course_dirs,
-                    default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True):
+                  default_class='xmodule.raw_module.RawDescriptor',
+                  load_error_modules=True):
     err_cnt = 0
     warn_cnt = 0
 

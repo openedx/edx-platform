@@ -1,14 +1,14 @@
 from static_replace import replace_static_urls
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from django.http import Http404
-from xmodule.templates import TEMPLATE_COURSEID
-from xmodule.course_module import CourseDescriptor
 
-def get_module_info(course_id, location, parent_location = None, rewrite_static_links = False):
+
+def get_module_info(store, location, parent_location=None, rewrite_static_links=False):
     try:
-        module = modulestore().get_instance(course_id, location)
+        if location.revision is None:
+            module = store.get_item(location)
+        else:
+            module = store.get_item(location)
     except ItemNotFoundError:
         # create a new one
         template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])
@@ -35,10 +35,14 @@ def get_module_info(course_id, location, parent_location = None, rewrite_static_
         'metadata': module._model_data._kvs._metadata
     }
 
-def set_module_info(course_id, location, post_data):
+
+def set_module_info(store, location, post_data):
     module = None
     try:
-        module = modulestore().get_instance(course_id, location)
+        if location.revision is None:
+            module = store.get_item(location)
+        else:
+            module = store.get_item(location)
     except:
         pass
 
@@ -46,22 +50,18 @@ def set_module_info(course_id, location, post_data):
         # new module at this location
         # presume that we have an 'Empty' template
         template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])
-        module = modulestore().clone_item(TEMPLATE_COURSEID, course_id, template_location, location)
+        module = store.clone_item(template_location, location)
 
     if post_data.get('data') is not None:
         data = post_data['data']
-        modulestore().update_item(course_id, location, data)
-
-    if post_data.get('data') is not None:
-        data = post_data['data']
-        modulestore().update_item(course_id, location, data)
+        store.update_item(location, data)
 
     # cdodge: note calling request.POST.get('children') will return None if children is an empty array
     # so it lead to a bug whereby the last component to be deleted in the UI was not actually
     # deleting the children object from the children collection
     if 'children' in post_data and post_data['children'] is not None:
         children = post_data['children']
-        modulestore().update_children(course_id, location, children)
+        store.update_children(location, children)
 
     # cdodge: also commit any metadata which might have been passed along in the
     # POST from the client, if it is there
@@ -85,4 +85,4 @@ def set_module_info(course_id, location, post_data):
 
         # commit to datastore
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
-        modulestore().update_metadata(location, module._model_data._kvs._metadata)
+        store.update_metadata(location, module._model_data._kvs._metadata)

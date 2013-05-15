@@ -672,6 +672,7 @@ function saveNewCourse(e) {
     e.preventDefault();
 
     var $newCourse = $(this).closest('.new-course');
+    var template = $(this).find('.new-course-save').data('template');
     var org = $newCourse.find('.new-course-org').val();
     var number = $newCourse.find('.new-course-number').val();
     var display_name = $newCourse.find('.new-course-name').val();
@@ -688,17 +689,19 @@ function saveNewCourse(e) {
     });
 
     $.post('/create_new_course', {
-            'org': org,
-            'number': number,
-            'display_name': display_name
-        },
-        function(data) {
-            if (data.id != undefined) {
-                window.location = '/' + data.id.replace(/.*:\/\//, '');
-            } else if (data.ErrMsg != undefined) {
-                alert(data.ErrMsg);
-            }
-        });
+        'template': template,
+        'org': org,
+        'number': number,
+        'display_name': display_name
+    },
+
+    function(data) {
+        if (data.id != undefined) {
+            window.location = '/' + data.id.replace(/.*:\/\//, '');
+        } else if (data.ErrMsg != undefined) {
+            alert(data.ErrMsg);
+        }
+    });
 }
 
 function cancelNewCourse(e) {

@@ -1,7 +1,5 @@
 CMS.Models.ModuleInfo = Backbone.Model.extend({
-  url: function() {
-    return "/" + this.get('courseId') + "/module_info/" + this.id;
-  },
+  url: function() {return "/module_info/" + this.id;},
 
   defaults: {
     "id": null,

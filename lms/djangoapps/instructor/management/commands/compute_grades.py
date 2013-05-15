@@ -37,8 +37,9 @@ class Command(BaseCommand):
         try:
             course = get_course_by_id(course_id)
         except Exception as err:
-            course = modulestore().get_course(course_id)
-            if course is None:
+            if course_id in modulestore().courses:
+                course = modulestore().courses[course_id]
+            else:
                 print "-----------------------------------------------------------------------------"
                 print "Sorry, cannot find course %s" % course_id
                 print "Please provide a course ID or course data directory name, eg content-mit-801rq"

@@ -1,14 +1,12 @@
 class CMS.Views.TabsEdit extends Backbone.View
 
   initialize: =>
-    @courseId = @$('.unit-body').data('course-id')
     @$('.component').each((idx, element) =>
         new CMS.Views.ModuleEdit(
             el: element,
             onDelete: @deleteTab,
             model: new CMS.Models.Module(
-                id: $(element).data('id')
-                courseId: @courseId
+                id: $(element).data('id'),
             )
         )
     )
@@ -23,7 +21,7 @@ class CMS.Views.TabsEdit extends Backbone.View
       forcePlaceholderSize: true
       axis: 'y'
       items: '> .component'
-    )
+    )    
 
   tabMoved: (event, ui) =>
     tabs = []
@@ -36,7 +34,7 @@ class CMS.Views.TabsEdit extends Backbone.View
 
     $.ajax({
       type:'POST',
-      url: "#{@courseId}/reorder_static_tabs",
+      url: '/reorder_static_tabs', 
       data: JSON.stringify({
         tabs : tabs
       }),
@@ -48,7 +46,7 @@ class CMS.Views.TabsEdit extends Backbone.View
 
     editor = new CMS.Views.ModuleEdit(
       onDelete: @deleteTab
-      model: new CMS.Models.Module(courseId: @courseId)
+      model: new CMS.Models.Module()
     )
 
     $('.new-component-item').before(editor.$el)

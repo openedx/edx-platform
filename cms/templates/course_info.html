@@ -16,19 +16,18 @@
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
   <script src="${static.url('js/vendor/date.js')}"></script>
-
+  
   <script type="text/javascript" charset="utf-8">
   $(document).ready(function(){
     var course_updates = new CMS.Models.CourseUpdateCollection();
-    course_updates.urlbase = '${course_id}';
+    course_updates.urlbase = '${url_base}';
     course_updates.fetch();
 
     var course_handouts = new CMS.Models.ModuleInfo({
-        id: '${handouts_location}',
-        courseId: '${course_id}'
+        id: '${handouts_location}'
       });
     course_handouts.urlbase = '${url_base}';
-
+    
     var editor = new CMS.Views.CourseInfoEdit({
       el: $('.main-wrapper'),
       model : new CMS.Models.CourseInfo({

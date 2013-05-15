@@ -11,7 +11,6 @@
       el: $('.main-wrapper'),
       model: new CMS.Models.Module({
         id: '${unit_location}',
-        courseId: '${course_id}',
         state: '${unit_state}'
       })
     });
@@ -33,7 +32,7 @@
 
 </%block>
 <%block name="content">
-  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}" data-course-id="${course_id}">
+  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
         <p class="alert-message"><strong>You are editing a draft.</strong>

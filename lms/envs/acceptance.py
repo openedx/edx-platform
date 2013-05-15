@@ -19,8 +19,14 @@ modulestore_options = {
 }
 
 MODULESTORE = {
-    'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-    'OPTIONS': modulestore_options
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': modulestore_options
+    },
+    'direct': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': modulestore_options
+    }
 }
 
 CONTENTSTORE = {

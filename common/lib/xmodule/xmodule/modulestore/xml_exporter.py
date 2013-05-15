@@ -1,12 +1,14 @@
+import logging
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
 from json import dumps
 
 
-def export_to_xml(modulestore, contentstore, course_id, course_location, root_dir, course_dir):
-    course = modulestore.get_instance(course_id, course_location)
-    # TODO figure out what it should do w/ draft v published. Hopefully indicated via course_location
+def export_to_xml(modulestore, contentstore, course_location, root_dir, course_dir, draft_modulestore=None):
+
+    course = modulestore.get_item(course_location)
+
     fs = OSFS(root_dir)
     export_fs = fs.makeopendir(course_dir)
 
@@ -18,13 +20,13 @@ def export_to_xml(modulestore, contentstore, course_id, course_location, root_di
     contentstore.export_all_for_course(course_location, root_dir + '/' + course_dir + '/static/')
 
     # export the static tabs
-    export_extra_content(export_fs, modulestore, course_id, course_location, 'static_tab', 'tabs', '.html')
+    export_extra_content(export_fs, modulestore, course_location, 'static_tab', 'tabs', '.html')
 
     # export the custom tags
-    export_extra_content(export_fs, modulestore, course_id, course_location, 'custom_tag_template', 'custom_tags')
+    export_extra_content(export_fs, modulestore, course_location, 'custom_tag_template', 'custom_tags')
 
     # export the course updates
-    export_extra_content(export_fs, modulestore, course_id, course_location, 'course_info', 'info', '.html')
+    export_extra_content(export_fs, modulestore, course_location, 'course_info', 'info', '.html')
 
     # export the grading policy
     policies_dir = export_fs.makeopendir('policies')
@@ -58,9 +60,9 @@ def export_to_xml(modulestore, contentstore, course_id, course_location, root_di
                     draft_vertical.export_to_xml(draft_course_dir)
 
 
-def export_extra_content(export_fs, modulestore, course_id, course_location, category_type, dirname, file_suffix = ''):
+def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):
     query_loc = Location('i4x', course_location.org, course_location.course, category_type, None)
-    items = modulestore.get_items(course_id, query_loc)
+    items = modulestore.get_items(query_loc)
 
     if len(items) > 0:
         item_dir = export_fs.makeopendir(dirname)

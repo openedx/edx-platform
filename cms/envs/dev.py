@@ -22,8 +22,18 @@ modulestore_options = {
 }
 
 MODULESTORE = {
-    'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-    'OPTIONS': modulestore_options
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'OPTIONS': modulestore_options
+    },
+    'direct': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': modulestore_options
+    },
+    'split': {
+        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'OPTIONS': modulestore_options
+    }
 }
 
 # cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store

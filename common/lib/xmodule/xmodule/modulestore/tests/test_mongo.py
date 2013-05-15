@@ -78,15 +78,15 @@ class TestMongoModuleStore(object):
 
     def test_loads(self):
         assert_not_equals(
-            self.store.get_instance('edX/toy/2012_Fall', "i4x://edX/toy/course/2012_Fall"),
+            self.store.get_item("i4x://edX/toy/course/2012_Fall"),
             None)
 
         assert_not_equals(
-            self.store.get_instance('edX/simple/2012_Fall', "i4x://edX/simple/course/2012_Fall"),
+            self.store.get_item("i4x://edX/simple/course/2012_Fall"),
             None)
 
         assert_not_equals(
-            self.store.get_instance('edX/toy/2012_Fall', "i4x://edX/toy/video/Welcome"),
+            self.store.get_item("i4x://edX/toy/video/Welcome"),
             None)
 
     def test_find_one(self):

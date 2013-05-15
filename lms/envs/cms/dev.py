@@ -22,25 +22,9 @@ modulestore_options = {
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.comparison.ComparisonModuleStore',
-        'stores': [
-            {
-                'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-                'OPTIONS': {
-                    'data_dir': DATA_DIR,
-                    'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-                }
-            },
-            {
-                'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-                'OPTIONS': modulestore_options
-            },
-            {
-                'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-                'OPTIONS': modulestore_options
-            }
-        ]
-    }
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': modulestore_options
+    },
 }
 
 CONTENTSTORE = {

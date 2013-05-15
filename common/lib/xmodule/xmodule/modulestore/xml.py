@@ -169,7 +169,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Didn't load properly.  Fall back on loading as an error
                 # descriptor.  This should never error due to formatting.
 
-
                 msg = "Error loading from xml. " + str(err)[:200]
                 log.warning(msg)
                 # Normally, we don't want lots of exception traces in our logs from common
@@ -367,7 +366,7 @@ class XMLModuleStore(ModuleStoreBase):
 
             if org is None:
                 msg = ("No 'org' attribute set for course in {dir}. "
-                          "Using default 'edx'".format(dir=course_dir))
+                       "Using default 'edx'".format(dir=course_dir))
                 log.warning(msg)
                 tracker(msg)
                 org = 'edx'
@@ -376,10 +375,10 @@ class XMLModuleStore(ModuleStoreBase):
 
             if course is None:
                 msg = ("No 'course' attribute set for course in {dir}."
-                          " Using default '{default}'".format(
-                        dir=course_dir,
-                        default=course_dir
-                        ))
+                       " Using default '{default}'".format(dir=course_dir,
+                                                           default=course_dir
+                                                           )
+                       )
                 log.warning(msg)
                 tracker(msg)
                 course = course_dir
@@ -445,14 +444,12 @@ class XMLModuleStore(ModuleStoreBase):
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 
-
     def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
         self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
 
          # then look in a override folder based on the course run
         if os.path.isdir(base_dir / url_name):
             self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)
-
 
     def _load_extra_content(self, system, course_descriptor, category, path, course_dir):
 
@@ -480,7 +477,6 @@ class XMLModuleStore(ModuleStoreBase):
                     logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
                     system.error_tracker("ERROR: " + str(e))
 
-
     def get_instance(self, course_id, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at
@@ -502,7 +498,7 @@ class XMLModuleStore(ModuleStoreBase):
         except KeyError:
             raise ItemNotFoundError(location)
 
-    def has_item(self, course_id, location):
+    def has_item(self, location):
         """
         Returns True if location exists in this ModuleStore.
         """
@@ -524,7 +520,7 @@ class XMLModuleStore(ModuleStoreBase):
         raise NotImplementedError("XMLModuleStores can't guarantee that definitions"
                                   " are unique. Use get_instance.")
 
-    def get_items(self, course_id, location, depth=0):
+    def get_items(self, location, course_id=None, depth=0):
         items = []
 
         def _add_get_items(self, location, modules):
@@ -542,19 +538,12 @@ class XMLModuleStore(ModuleStoreBase):
 
         return items
 
-
-    def get_courses(self, org=None, course=None, run=None):
+    def get_courses(self, depth=0):
         """
         Returns a list of course descriptors.  If there were errors on loading,
         some of these may be ErrorDescriptors instead.
         """
-        return (
-            course for course in self.courses.values()
-            if ((org is None or course.location.org == org) and
-                (course is None or course.location.course == course) and
-                (run is None or course.location.name == run))
-        )
-
+        return self.courses.values()
 
     def get_errored_courses(self):
         """
@@ -563,19 +552,17 @@ class XMLModuleStore(ModuleStoreBase):
         """
         return dict((k, self.errored_courses[k].errors) for k in self.errored_courses)
 
-    def update_item(self, course_id, location, data):
+    def update_item(self, location, data):
         """
         Set the data in the item specified by the location to
         data
 
-        course_id: Id of the course this item is in
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 
-
-    def update_children(self, course_id, location, children):
+    def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
         data
@@ -585,8 +572,7 @@ class XMLModuleStore(ModuleStoreBase):
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 
-
-    def update_metadata(self, course_id, location, metadata):
+    def update_metadata(self, location, metadata):
         """
         Set the metadata for the item specified by the location to
         metadata
@@ -596,7 +582,7 @@ class XMLModuleStore(ModuleStoreBase):
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 
-    def get_parent_locations(self, course_id, location):
+    def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
 

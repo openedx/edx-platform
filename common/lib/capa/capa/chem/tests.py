@@ -120,7 +120,7 @@ class Test_Compare_Expressions(unittest.TestCase):
         self.assertFalse(compare_chemical_expression(
             "H2O(s) + CO2", "H2O+CO2"))
 
-    def test_compare_phases_not_ignored_explicitly_s(self):
+    def test_compare_phases_not_ignored_explicitly(self):
         self.assertTrue(compare_chemical_expression(
             "H2O(s) + CO2", "H2O(s)+CO2", ignore_state=False))
 

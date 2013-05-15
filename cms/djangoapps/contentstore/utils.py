@@ -5,8 +5,23 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from django.core.urlresolvers import reverse
 import copy
 
-# In order to instantiate an open ended tab automatically, need to have this data
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
+
+#In order to instantiate an open ended tab automatically, need to have this data
 OPEN_ENDED_PANEL = {"name": "Open Ended Panel", "type": "open_ended"}
+
+
+def get_modulestore(location):
+    """
+    Returns the correct modulestore to use for modifying the specified location
+    """
+    if not isinstance(location, Location):
+        location = Location(location)
+
+    if location.category in DIRECT_ONLY_CATEGORIES:
+        return modulestore('direct')
+    else:
+        return modulestore()
 
 
 def get_course_location_for_item(location):
@@ -183,12 +198,12 @@ def add_open_ended_panel_tab(course):
     @param course: A course object from the modulestore.
     @return: Boolean indicating whether or not a tab was added and a list of tabs for the course.
     """
-    # Copy course tabs
+    #Copy course tabs
     course_tabs = copy.copy(course.tabs)
     changed = False
-    # Check to see if open ended panel is defined in the course
+    #Check to see if open ended panel is defined in the course
     if OPEN_ENDED_PANEL not in course_tabs:
-        # Add panel to the tabs if it is not defined
+        #Add panel to the tabs if it is not defined
         course_tabs.append(OPEN_ENDED_PANEL)
         changed = True
     return changed, course_tabs
@@ -200,12 +215,12 @@ def remove_open_ended_panel_tab(course):
     @param course: A course object from the modulestore.
     @return: Boolean indicating whether or not a tab was added and a list of tabs for the course.
     """
-    # Copy course tabs
+    #Copy course tabs
     course_tabs = copy.copy(course.tabs)
     changed = False
-    # Check to see if open ended panel is defined in the course
+    #Check to see if open ended panel is defined in the course
     if OPEN_ENDED_PANEL in course_tabs:
-        # Add panel to the tabs if it is not defined
+        #Add panel to the tabs if it is not defined
         course_tabs = [ct for ct in course_tabs if ct != OPEN_ENDED_PANEL]
         changed = True
     return changed, course_tabs

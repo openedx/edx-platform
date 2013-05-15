@@ -9,7 +9,7 @@ from importlib import import_module
 
 from django.conf import settings
 
-_MODULESTORE = None
+_MODULESTORES = {}
 
 FUNCTION_KEYS = ['render_template']
 
@@ -25,41 +25,24 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def load_modulestore(config):
-    class_ = load_function(config['ENGINE'])
+def modulestore(name='default'):
+    global _MODULESTORES
 
-    options = {}
-    options.update(config['OPTIONS'])
-    for key in FUNCTION_KEYS:
-        if key in options:
-            options[key] = load_function(options[key])
+    if name not in _MODULESTORES:
+        class_ = load_function(settings.MODULESTORE[name]['ENGINE'])
 
-    return class_(**options)
+        options = {}
 
-# TODO why's this here v in modulestore.py?
-def modulestore():
-    """
-    Find and return the correctly ModuleStore instance for this environment.
-    """
-    global _MODULESTORE
-    if _MODULESTORE is None:
-        if settings.MODULESTORE['ENGINE'] == 'xmodule.modulestore.comparison.ComparisonModuleStore':
-            stores = [load_modulestore(cfg) for cfg in settings.MODULESTORE['stores']]
-            class_ = load_function(settings.MODULESTORE['ENGINE'])
-            _MODULESTORE = class_(*stores)
-        else:
-            class_ = load_function(settings.MODULESTORE['ENGINE'])
+        options.update(settings.MODULESTORE[name]['OPTIONS'])
+        for key in FUNCTION_KEYS:
+            if key in options:
+                options[key] = load_function(options[key])
 
-            options = {}
+        _MODULESTORES[name] = class_(
+            **options
+        )
 
-            options.update(settings.MODULESTORE['OPTIONS'])
-            for key in FUNCTION_KEYS:
-                if key in options:
-                    options[key] = load_function(options[key])
-
-            _MODULESTORE = class_(**options)
-
-    return _MODULESTORE
+    return _MODULESTORES[name]
 
 # if 'DJANGO_SETTINGS_MODULE' in environ:
 #     # Initialize the modulestores immediately

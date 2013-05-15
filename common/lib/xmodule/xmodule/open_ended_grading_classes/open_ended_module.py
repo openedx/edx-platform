@@ -229,15 +229,18 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                                                  anonymous_student_id +
                                                  str(len(self.child_history)))
 
-        xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['construct_callback'](),
-                                                lms_key=queuekey,
-                                                queue_name=self.queue_name)
+        xheader = xqueue_interface.make_xheader(
+            lms_callback_url=system.xqueue['construct_callback'](),
+            lms_key=queuekey,
+            queue_name=self.queue_name
+        )
 
         contents = self.payload.copy()
 
         # Metadata related to the student submission revealed to the external grader
-        student_info = {'anonymous_student_id': anonymous_student_id,
-                        'submission_time': qtime,
+        student_info = {
+            'anonymous_student_id': anonymous_student_id,
+            'submission_time': qtime,
         }
 
         # Update contents with student response and student info
@@ -248,12 +251,16 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         })
 
         # Submit request. When successful, 'msg' is the prior length of the queue
-        (error, msg) = qinterface.send_to_queue(header=xheader,
-                                                body=json.dumps(contents))
+        qinterface.send_to_queue(
+            header=xheader,
+            body=json.dumps(contents)
+        )
 
         # State associated with the queueing request
-        queuestate = {'key': queuekey,
-                      'time': qtime, }
+        queuestate = {
+            'key': queuekey,
+            'time': qtime,
+        }
         return True
 
     def _update_score(self, score_msg, queuekey, system):
@@ -400,7 +407,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         rubric_feedback = ""
         feedback = self._convert_longform_feedback_to_html(response_items)
         rubric_scores = []
-        if response_items['rubric_scores_complete'] == True:
+        if response_items['rubric_scores_complete'] is True:
             rubric_renderer = CombinedOpenEndedRubric(system, True)
             rubric_dict = rubric_renderer.render_rubric(response_items['rubric_xml'])
             success = rubric_dict['success']
@@ -408,8 +415,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             rubric_scores = rubric_dict['rubric_scores']
 
         if not response_items['success']:
-            return system.render_template("{0}/open_ended_error.html".format(self.TEMPLATE_DIR),
-                                          {'errors': feedback})
+            return system.render_template(
+                "{0}/open_ended_error.html".format(self.TEMPLATE_DIR),
+                {'errors': feedback}
+            )
 
         feedback_template = system.render_template("{0}/open_ended_feedback.html".format(self.TEMPLATE_DIR), {
             'grader_type': response_items['grader_type'],
@@ -503,8 +512,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 grader_types.append(score_result['grader_type'])
                 try:
                     feedback_dict = json.loads(score_result['feedback'][i])
-                except:
-                    pass
+                except Exception:
+                    feedback_dict = score_result['feedback'][i]
                 feedback_dicts.append(feedback_dict)
                 grader_ids.append(score_result['grader_id'][i])
                 submission_ids.append(score_result['submission_id'])
@@ -522,8 +531,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             feedback_items = [feedback]
             try:
                 feedback_dict = json.loads(score_result['feedback'])
-            except:
-                pass
+            except Exception:
+                feedback_dict = score_result.get('feedback', '')
             feedback_dicts = [feedback_dict]
             grader_ids = [score_result['grader_id']]
             submission_ids = [score_result['submission_id']]
@@ -552,8 +561,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not self.child_history:
             return ""
 
-        feedback_dict = self._parse_score_msg(self.child_history[-1].get('post_assessment', ""), system,
-                                              join_feedback=join_feedback)
+        feedback_dict = self._parse_score_msg(
+            self.child_history[-1].get('post_assessment', ""),
+            system,
+            join_feedback=join_feedback
+        )
         if not short_feedback:
             return feedback_dict['feedback'] if feedback_dict['valid'] else ''
         if feedback_dict['valid']:
@@ -740,8 +752,9 @@ class OpenEndedDescriptor():
             """Assumes that xml_object has child k"""
             return xml_object.xpath(k)[0]
 
-        return {'oeparam': parse('openendedparam')}
-
+        return {
+            'oeparam': parse('openendedparam')
+        }
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''

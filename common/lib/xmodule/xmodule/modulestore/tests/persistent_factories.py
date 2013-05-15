@@ -7,7 +7,7 @@ import factory
 # [dhm] I'm not sure why we're using factory_boy if we're not following its pattern. If anyone
 # assumes they can call build, it will completely fail, for example.
 # pylint: disable=W0232
-class CourseFactory(factory.Factory):
+class PersistentCourseFactory(factory.Factory):
     """
     Create a new course (not a new version of a course, but a whole new index entry).
 
@@ -46,7 +46,7 @@ class CourseFactory(factory.Factory):
             metadata['display_name'] = display_name
 
         # Write the data to the mongo datastore
-        new_course = modulestore().create_course(
+        new_course = modulestore('split').create_course(
             org, prettyid, user_id, metadata=metadata, course_data=data, id_root=prettyid,
             master_version=kwargs.get('master_version'))
 
@@ -87,7 +87,7 @@ class ItemFactory(factory.Factory):
         if 'display_name' not in metadata and 'display_name' in kwargs:
             metadata['display_name'] = kwargs['display_name']
 
-        return modulestore().create_item(kwargs['parent_location'], kwargs['category'],
+        return modulestore('split').create_item(kwargs['parent_location'], kwargs['category'],
             kwargs['user_id'], definition_locator=kwargs.get('definition_locator'),
             new_def_data=kwargs.get('data'), metadata=metadata)
 

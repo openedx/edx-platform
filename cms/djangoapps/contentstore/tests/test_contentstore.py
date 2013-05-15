@@ -13,6 +13,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.dispatch import Signal
+from contentstore.utils import get_modulestore
 from contentstore.tests.utils import parse_json
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -73,9 +74,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def check_edit_unit(self, test_course_name):
-        _, course_items = import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
+        import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
 
-        for descriptor in modulestore().get_items(course_items[0].id, Location(None, None, 'vertical', None, None)):
+        for descriptor in modulestore().get_items(Location(None, None, 'vertical', None, None)):
             print "Checking ", descriptor.location.url()
             print descriptor.__class__, descriptor.location
             resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
@@ -311,8 +312,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(effort.data, '6 hours')
 
         # this one should be in a non-override folder
-        effort = ms.get_instance(course_id, Location(['i4x','edX','full','about','end_date', None]))
-        self.assertEqual(effort.data,'TBD')
+        effort = module_store.get_item(Location(['i4x', 'edX', 'full', 'about', 'end_date', None]))
+        self.assertEqual(effort.data, 'TBD')
 
     def test_remove_hide_progress_tab(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -332,7 +333,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             'display_name': 'Robot Super Course',
         }
 
-        _, course_items = import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
         resp = self.client.post(reverse('create_new_course'), course_data)
         self.assertEqual(resp.status_code, 200)
@@ -551,6 +552,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
         root_dir = path(mkdtemp_clean())
+
         course = module_store.get_item(location)
 
         metadata = own_metadata(course)
@@ -657,8 +659,7 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_item_factory(self):
         """Test that the item factory works correctly."""
         course = CourseFactory.create()
-        item = ItemFactory.create(course_id = CourseDescriptor.location_to_id(course.location),
-                                  parent_location=course.location)
+        item = ItemFactory.create(parent_location=course.location)
         self.assertIsInstance(item, SequenceDescriptor)
 
     def test_course_index_view_with_course(self):
@@ -711,7 +712,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
-        course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         problem_data = {
             'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
@@ -723,7 +724,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         payload = parse_json(resp)
         problem_loc = payload['id']
-        problem = modulestore().get_instance(course.location, problem_loc)
+        problem = get_modulestore(problem_loc).get_item(problem_loc)
         # should be a CapaDescriptor
         self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")
         context = problem.get_context()

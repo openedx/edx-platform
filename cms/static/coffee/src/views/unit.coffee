@@ -32,8 +32,6 @@ class CMS.Views.UnitEdit extends Backbone.View
     @$newComponentTemplatePickers = @$('.new-component-templates')
     @$newComponentButton = @$('.new-component-button')
 
-    @courseId = @$('.main-wrapper').data('course-id')
-
     @$('.components').sortable(
       handle: '.drag-handle'
       update: (event, ui) =>
@@ -54,11 +52,10 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     @$('.component').each((idx, element) =>
         new CMS.Views.ModuleEdit(
-            el: element
-            onDelete: @deleteComponent
+            el: element,
+            onDelete: @deleteComponent,
             model: new CMS.Models.Module(
-                id: $(element).data('id')
-                courseId: @courseId
+                id: $(element).data('id'),
             )
         )
     )
@@ -69,8 +66,8 @@ class CMS.Views.UnitEdit extends Backbone.View
     type = $(event.currentTarget).data('type')
     @$newComponentTypePicker.slideUp(250)
     @$(".new-component-#{type}").slideDown(250)
-    $('html, body').animate({
-      scrollTop: @$(".new-component-#{type}").offset().top
+    $('html, body').animate({ 
+      scrollTop: @$(".new-component-#{type}").offset().top 
     }, 500)
 
   closeNewComponent: (event) =>
@@ -86,7 +83,7 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     editor = new CMS.Views.ModuleEdit(
       onDelete: @deleteComponent
-      model: new CMS.Models.Module(courseId: @courseId)
+      model: new CMS.Models.Module()
     )
 
     @$newComponentItem.before(editor.$el)
@@ -238,7 +235,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
 class CMS.Views.UnitEdit.LocationState extends Backbone.View
   initialize: =>
     @model.on('change:state', @render)
-
+  
   render: =>
     @$el.toggleClass("#{@model.previous('state')}-item #{@model.get('state')}-item")
 

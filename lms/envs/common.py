@@ -41,11 +41,11 @@ MITX_FEATURES = {
     'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': True,
-    'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
-    'DEBUG_LEVEL': 0,  # 0 = lowest level, least verbose, 255 = max level, most verbose
+    'REROUTE_ACTIVATION_EMAIL': False,		# nonempty string = address for all activation emails
+    'DEBUG_LEVEL': 0,				# 0 = lowest level, least verbose, 255 = max level, most verbose
 
-    # # DO NOT SET TO True IN THIS FILE
-    # # Doing so will cause all courses to be released on production
+    ## DO NOT SET TO True IN THIS FILE
+    ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 
     # When True, will only publicly list courses by the subdomain. Expects you
@@ -58,13 +58,13 @@ MITX_FEATURES = {
     # university to use for branding purposes
     'SUBDOMAIN_BRANDING': False,
 
-    'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
+    'FORCE_UNIVERSITY_DOMAIN': False,  	# set this to the university domain to use, as an override to HTTP_HOST
                                         # set to None to do no university selection
 
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
 
-    'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+    'ENABLE_PSYCHOMETRICS': False,  	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
@@ -74,7 +74,7 @@ MITX_FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
-    'STUB_VIDEO_FOR_TESTING': False,  # do not display video when running automated acceptance tests
+    'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
 
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
@@ -103,7 +103,7 @@ DEFAULT_GROUPS = []
 GENERATE_PROFILE_SCORES = False
 
 # Used with XQueue
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5   # seconds
 
 
 ############################# SET PATH INFORMATION #############################
@@ -164,9 +164,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
-    # 'django.core.context_processors.i18n',
-    'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',  # necessary for csrf protection
+    #'django.core.context_processors.i18n',
+    'django.contrib.auth.context_processors.auth',   # this is required for admin
+    'django.core.context_processors.csrf',   # necessary for csrf protection
 
     # Added for django-wiki
     'django.core.context_processors.media',
@@ -176,7 +176,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'course_wiki.course_nav.context_processor',
 )
 
-STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
+STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000   # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
 # FIXME:
@@ -186,7 +186,7 @@ LIB_URL = '/static/js/'
 
 # Dev machines shouldn't need the book
 # BOOK_URL = '/static/book/'
-BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'  # For AWS deploys
+BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'   # For AWS deploys
 # RSS_URL = r'lms/templates/feed.rss'
 # PRESS_URL = r''
 RSS_TIMEOUT = 600
@@ -208,16 +208,16 @@ COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
 COURSE_TITLE = "Circuits and Electronics"
 
-# ## Dark code. Should be enabled in local settings for devel.
+### Dark code. Should be enabled in local settings for devel.
 
-ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.mitxhome)
+ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
 
 WIKI_ENABLED = False
 
-# ##
+###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
+COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number': '6.002x',
                                           'title': 'Circuits and Electronics',
                                           'xmlpath': '6002x/',
                                           'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
@@ -235,10 +235,12 @@ SUBDOMAIN_BRANDING = {}
 
 ############################### XModule Store ##################################
 MODULESTORE = {
-    'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-    'OPTIONS': {
-        'data_dir': DATA_DIR,
-        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+    'default': {
+        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+        'OPTIONS': {
+            'data_dir': DATA_DIR,
+            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        }
     }
 }
 CONTENTSTORE = None
@@ -280,8 +282,8 @@ STATICFILES_DIRS = [
 ]
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'America/New_York'   # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'en'   # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
 USE_L10N = True
 
@@ -302,7 +304,7 @@ ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 # setting is, I'm just bumping the expiration time to something absurd (100
 # years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
 # in the global settings.py
-AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60  # 10 years
+AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60   # 10 years
 
 ################################# SIMPLEWIKI ###################################
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
@@ -311,8 +313,8 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 ################################# WIKI ###################################
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
-WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
-WIKI_ANONYMOUS = False  # Don't allow anonymous access until the styling is figured out
+WIKI_SHOW_MAX_CHILDREN = 0   # We don't use the little menu that shows children of an article in the breadcrumb
+WIKI_ANONYMOUS = False   # Don't allow anonymous access until the styling is figured out
 WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.is_staff or user.is_superuser
 WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
 
@@ -335,7 +337,7 @@ ZENDESK_API_KEY = None
 
 ################################# open ended grading config  #####################
 
-# By setting up the default settings with an incorrect user name and password,
+#By setting up the default settings with an incorrect user name and password,
 # will get an error when attempting to connect
 OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
@@ -382,7 +384,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
-    # 'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -519,7 +521,7 @@ if os.path.isdir(DATA_DIR):
                 new_filename = os.path.splitext(filename)[0] + ".js"
                 if os.path.exists(js_dir / new_filename):
                     coffee_timestamp = os.stat(js_dir / filename).st_mtime
-                    js_timestamp = os.stat(js_dir / new_filename).st_mtime
+                    js_timestamp     = os.stat(js_dir / new_filename).st_mtime
                     if coffee_timestamp <= js_timestamp:
                         continue
                 os.system("rm %s" % (js_dir / new_filename))
@@ -572,13 +574,13 @@ INSTALLED_APPS = (
     'licenses',
     'course_groups',
 
-    # For the wiki
-    'wiki',  # The new django-wiki from benjaoming
+    #For the wiki
+    'wiki',   # The new django-wiki from benjaoming
     'django_notify',
-    'course_wiki',  # Our customizations
+    'course_wiki',   # Our customizations
     'mptt',
     'sekizai',
-    # 'wiki.plugins.attachments',
+    #'wiki.plugins.attachments',
     'wiki.plugins.links',
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
@@ -587,7 +589,7 @@ INSTALLED_APPS = (
     'foldit',
 
     # For testing
-    'django.contrib.admin',  # only used in DEBUG mode
+    'django.contrib.admin',   # only used in DEBUG mode
 
     # Discussion forums
     'django_comment_client',

@@ -48,8 +48,22 @@ MODULESTORE_OPTIONS = {
 }
 
 MODULESTORE = {
-    'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-    'OPTIONS': MODULESTORE_OPTIONS
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': MODULESTORE_OPTIONS
+    },
+    'direct': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': MODULESTORE_OPTIONS
+    },
+    'draft': {
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'OPTIONS': MODULESTORE_OPTIONS
+    },
+    'split': {
+        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'OPTIONS': MODULESTORE_OPTIONS
+    }
 }
 
 CONTENTSTORE = {

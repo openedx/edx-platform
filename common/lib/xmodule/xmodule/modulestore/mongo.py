@@ -649,7 +649,7 @@ class MongoModuleStore(ModuleStoreBase):
         if result['n'] == 0:
             raise ItemNotFoundError(location)
 
-    def update_item(self, course_id, location, data):
+    def update_item(self, location, data):
         """
         Set the data in the item specified by the location to
         data
@@ -726,7 +726,7 @@ class MongoModuleStore(ModuleStoreBase):
         self.refresh_cached_metadata_inheritance_tree(Location(location))
         self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
 
-    def get_parent_locations(self, course_id, location):
+    def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
         '''

@@ -85,7 +85,7 @@ class Command(BaseCommand):
         course_location = 'i4x://edx/6002xs12/course/6.002_Spring_2012'
         student_module_cache = ModelDataCache.cache_for_descriptor_descendents(
         course_id,
-            sample_user, modulestore().get_instance(course_id, course_location))
+            sample_user, modulestore().get_item(course_location))
         course = get_module(sample_user, None, course_location, student_module_cache)
 
         to_run = [
