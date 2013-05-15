@@ -6,6 +6,11 @@
 // 	@include box-sizing(border-box);
 // }
 
+// better text rendering/kerning through SVG
+* {
+	text-rendering: optimizeLegibility;
+}
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -15,7 +20,7 @@ b, u, i, center,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, figcaption, figure, 
+article, aside, canvas, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section, summary,
 time, mark, audio, video {
 	margin: 0;
@@ -31,7 +36,7 @@ html,body {
   height: 100%;
 }
 
-article, aside, details, figcaption, figure, 
+article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;
 }
@@ -110,7 +115,7 @@ abbr[title] {
 	border: none;
 	top: 0;
 	margin: 0;
-	float: none; 
+	float: none;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 }
@@ -131,7 +136,7 @@ abbr[title] {
 	padding: 0;
 }
 
-// reapplying the tab styles from unit.scss after removing jquery ui ui-lightness styling 
+// reapplying the tab styles from unit.scss after removing jquery ui ui-lightness styling
 .problem-type-tabs {
 	border:none;
 	list-style-type: none;
@@ -139,7 +144,7 @@ abbr[title] {
 	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
 	//background-color: $lightBluishGrey;
 	@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
-	
+
 	li:first-child {
 		margin-left: 20px;
 	}

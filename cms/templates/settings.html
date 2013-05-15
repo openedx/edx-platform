@@ -32,15 +32,15 @@ from contentstore import utils
         });
       var model = new CMS.Models.Settings.CourseDetails();
       model.urlRoot = '${details_url}';
-      model.fetch({success :
-          function(model) {
-              var editor = new CMS.Views.Settings.Details({
-                  el: $('.settings-details'),
-                  model: model
-                });
-
-              editor.render();
-          }
+      model.fetch({
+        success: function(model) {
+          var editor = new CMS.Views.Settings.Details({
+              el: $('.settings-details'),
+              model: model
+          });
+          editor.render();
+        },
+        reset: true
       });
     });
 
@@ -50,10 +50,10 @@ from contentstore import utils
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
-    <div class="title">
-      <span class="title-sub">Settings</span>
-      <h1 class="title-1">Schedule &amp; Details</h1>
-    </div>
+    <h1 class="page-header">
+      <small class="subtitle">Settings</small>
+      <span class="sr">&gt; </span>Schedule &amp; Details
+    </h1>
   </header>
 </div>
 

@@ -16,18 +16,18 @@
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
   <script src="${static.url('js/vendor/date.js')}"></script>
-  
+
   <script type="text/javascript" charset="utf-8">
   $(document).ready(function(){
     var course_updates = new CMS.Models.CourseUpdateCollection();
     course_updates.urlbase = '${url_base}';
-    course_updates.fetch();
+    course_updates.fetch({reset: true});
 
     var course_handouts = new CMS.Models.ModuleInfo({
         id: '${handouts_location}'
       });
     course_handouts.urlbase = '${url_base}';
-    
+
     var editor = new CMS.Views.CourseInfoEdit({
       el: $('.main-wrapper'),
       model : new CMS.Models.CourseInfo({
@@ -44,10 +44,10 @@
 <%block name="content">
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
-      <div class="title">
-        <span class="title-sub">Course Content</span>
-        <h1 class="title-1">Course Updates</h1>
-      </div>
+      <h1 class="page-header">
+        <small class="subtitle">Course Content</small>
+        <span class="sr">&gt; </span>Course Updates
+      </h1>
 
       <nav class="nav-actions">
         <h3 class="sr">Page Actions</h3>
