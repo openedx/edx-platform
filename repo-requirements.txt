@@ -1,2 +1,0 @@
--r github-requirements.txt
--r local-requirements.txt
