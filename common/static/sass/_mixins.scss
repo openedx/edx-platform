@@ -1,34 +1,80 @@
 // studio - utilities - mixins and extends
 // ====================
 
-// font-sizing
-@function em($pxval, $base: 16) {
-  @return #{$pxval / $base}em;
-}
-
+// mixins - font sizing
 @mixin font-size($sizeValue: 16){
   font-size: $sizeValue + px;
   font-size: ($sizeValue/10) + rem;
 }
 
-// ====================
-
-// line-height
-@function lh($amount: 1) {
-  @return $body-line-height * $amount;
+// mixins - line height
+@mixin lh($fontSize: auto){
+  line-height: ($fontSize*1.48) + px;
+  line-height: (($fontSize/10)*1.48) + rem;
 }
 
 // ====================
 
-// image-replacement hidden text
-@mixin text-hide() {
+// mixins - sizing
+@mixin size($width: $baseline, $height: $baseline) {
+  height: $height;
+  width: $width;
+}
+
+// mixins - sizing
+@mixin square($size: $baseline) {
+  @include size($size);
+}
+
+
+// ====================
+
+// mixins - placeholder styling
+@mixin placeholder($color) {
+  :-moz-placeholder {
+    color: $color;
+  }
+  ::-webkit-input-placeholder {
+    color: $color;
+  }
+  :-ms-input-placeholder {
+     color: $color;
+  }
+}
+
+// ====================
+
+// extends - layout
+
+// used for page/view-level wrappers (for centering/grids)
+.wrapper {
+  @include clearfix();
+  @include box-sizing(border-box);
+  width: 100%;
+}
+
+// removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+.no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// extends - image-replacement hidden text
+.text-hide {
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
 }
 
-// hidden elems - screenreaders
-@mixin text-sr() {
+// extends - hidden elems - screenreaders
+.text-sr {
   border: 0;
   clip: rect(0 0 0 0);
   height: 1px;
@@ -39,144 +85,107 @@
   width: 1px;
 }
 
-// ====================
-
-// vertical and horizontal centering
-@mixin vertically-and-horizontally-centered ($height, $width) {
-  left: 50%;
-  margin-left: -$width / 2;
-  //margin-top: -$height / 2;
-  min-height: $height;
-  min-width: $width;
-  position: absolute;
-  top: 150px;
+// extends - wrapping
+.text-wrap {
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  word-wrap: break-word;
 }
 
-// ====================
-
-// sizing
-@mixin size($width: $baseline, $height: $baseline) {
-  height: $height;
-  width: $width;
+// extends - visual link
+.fake-link {
+  cursor: pointer;
 }
 
-@mixin square($size: $baseline) {
-  @include size($size);
+// extends - functional disable
+.disabled {
+  pointer-events: none;
+  outline: none;
 }
 
-// ====================
-
-// placeholder styling
-@mixin placeholder($color) {
-  :-moz-placeholder {
-    color: $color;
-  }
-  ::-webkit-input-placeholder {
-    color: $color;
-  }
-  :-ms-input-placeholder {  
-     color: $color; 
-  }
-}
+// extends - depth levels
+.depth0 { z-index: 0; }
+.depth1 { z-index: 10; }
+.depth2 { z-index: 100; }
+.depth3 { z-index: 1000; }
+.depth4 { z-index: 10000; }
+.depth5 { z-index: 100000; }
 
 // ====================
 
-// extends - visual
-.faded-hr-divider {
-  @include background-image(linear-gradient(180deg, rgba(200,200,200, 0) 0%,
-                                                    rgba(200,200,200, 1) 50%,
-                                                    rgba(200,200,200, 0)));
-  height: 1px;
-  width: 100%;
-}
-
-.faded-hr-divider-medium {
-  @include background-image(linear-gradient(180deg, rgba(240,240,240, 0) 0%,
-                                                    rgba(240,240,240, 1) 50%,
-                                                    rgba(240,240,240, 0)));
-  height: 1px;
-  width: 100%;
-}
-
-.faded-hr-divider-light {
-  @include background-image(linear-gradient(180deg, rgba(255,255,255, 0) 0%,
-                                                    rgba(255,255,255, 0.8) 50%,
-                                                    rgba(255,255,255, 0)));
-  height: 1px;
-  width: 100%;
-}
-
-.faded-vertical-divider {
-  @include background-image(linear-gradient(90deg, rgba(200,200,200, 0) 0%,
-                                                    rgba(200,200,200, 1) 50%,
-                                                    rgba(200,200,200, 0)));
-  height: 100%;
-  width: 1px;
-}
-
-.faded-vertical-divider-light {
-  @include background-image(linear-gradient(90deg, rgba(255,255,255, 0) 0%,
-                                                    rgba(255,255,255, 0.6) 50%,
-                                                    rgba(255,255,255, 0)));
-  height: 100%;
-  width: 1px;
-}
-
-.vertical-divider {
-  @extend .faded-vertical-divider;
-  position: relative;
-
-  &::after {
-    @extend .faded-vertical-divider-light;
-    content: "";
-    display: block;
-    position: absolute;
-    left: 1px;
-  }
-}
-
-.horizontal-divider {
-  border: none;
-  @extend .faded-hr-divider;
-  position: relative;
-
-  &::after {
-    @extend .faded-hr-divider-light;
-    content: "";
-    display: block;
-    position: absolute;
-    top: 1px;
-  }
-}
-
-.fade-right-hr-divider {
-  @include background-image(linear-gradient(180deg, rgba(200,200,200, 0) 0%,
-                                                    rgba(200,200,200, 1)));
-  border: none;
-}
-
-.fade-left-hr-divider {
-  @include background-image(linear-gradient(180deg, rgba(200,200,200, 1) 0%,
-                                                    rgba(200,200,200, 0)));
-  border: none;
-}
-
-// extends - ui
-.window {
-  @include clearfix();
-  @include border-radius(3px);
-  @include box-shadow(0 1px 1px $shadow-l1);
-  margin-bottom: $baseline;
-  border: 1px solid $gray-l2;
-  background: $white;
-}
-
-.elem-d1 {
-  @include clearfix();
+// extends - buttons
+.btn {
   @include box-sizing(border-box);
+  @include transition(color 0.25s ease-in-out, border-color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
+  display: inline-block;
+  cursor: pointer;
+
+  &:hover, &:active {
+
+  }
+
+  &.disabled, &[disabled] {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .icon-inline {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+  }
 }
 
-.elem-d2 {
-  @include clearfix();
-  @include box-sizing(border-box);
+// pill button
+.btn-pill {
+  @include border-radius($baseline/5);
+}
+
+.btn-rounded {
+  @include border-radius($baseline/2);
+}
+
+// primary button
+.btn-primary {
+  @extend .btn;
+  @extend .btn-pill;
+  padding:($baseline/2) $baseline;
+  border-width: 1px;
+  border-style: solid;
+  line-height: 1.5em;
+  text-align: center;
+
+  &:hover, &:active {
+    @include box-shadow(0 2px 1px $shadow-l1);
+  }
+
+  &.current, &.active {
+    @include box-shadow(inset 1px 1px 2px $shadow-d1);
+
+    &:hover, &:active {
+      @include box-shadow(inset 1px 1px 1px $shadow-d1);
+    }
+  }
+}
+
+// secondary button
+.btn-secondary {
+  @extend .btn;
+  @extend .btn-pill;
+  border-width: 1px;
+  border-style: solid;
+  padding:($baseline/2) $baseline;
+  background: transparent;
+  line-height: 1.5em;
+  text-align: center;
+
+  &:hover, &:active {
+
+  }
+
+  &.current, &.active {
+
+  }
 }

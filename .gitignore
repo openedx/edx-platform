@@ -4,6 +4,7 @@
 *.swp
 *.orig
 *.DS_Store
+*.mo
 :2e_*
 :2e#
 .AppleDouble
@@ -22,6 +23,8 @@ reports/
 *.egg-info
 Gemfile.lock
 .env/
+conf/locale/en/LC_MESSAGES/*.po
+!messages.po
 lms/static/sass/*.css
 cms/static/sass/*.css
 lms/lib/comment_client/python
@@ -33,3 +36,7 @@ chromedriver.log
 /nbproject
 ghostdriver.log
 node_modules
+.pip_download_cache/
+.prereqs_cache
+autodeploy.properties
+.ws_migrations_complete

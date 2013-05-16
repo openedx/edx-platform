@@ -2,7 +2,7 @@ from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment)
 from django.contrib.auth.models import Group
 from datetime import datetime
-from factory import DjangoModelFactory, Factory, SubFactory, PostGenerationMethodCall
+from factory import DjangoModelFactory, Factory, SubFactory, PostGenerationMethodCall, post_generation
 from uuid import uuid4
 
 
@@ -44,6 +44,16 @@ class UserFactory(DjangoModelFactory):
     is_superuser = False
     last_login = datetime(2012, 1, 1)
     date_joined = datetime(2011, 1, 1)
+
+    @post_generation
+    def profile(obj, create, extracted, **kwargs):
+        if create:
+            obj.save()
+            return UserProfileFactory.create(user=obj, **kwargs)
+        elif kwargs:
+            raise Exception("Cannot build a user profile without saving the user")
+        else:
+            return None
 
 
 class AdminFactory(UserFactory):

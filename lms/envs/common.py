@@ -92,6 +92,9 @@ MITX_FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
+    # Provide a UI to allow users to submit feedback from the LMS
+    'ENABLE_FEEDBACK_SUBMISSION': False,
+
     # Turn on a page that lets staff enter Python code to be run in the
     # sandbox, for testing whether it's enabled properly.
     'ENABLE_DEBUG_RUN_PYTHON': False,
@@ -124,9 +127,7 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 # For Node.js
 
-system_node_path = os.environ.get("NODE_PATH", None)
-if system_node_path is None:
-    system_node_path = "/usr/local/lib/node_modules"
+system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
 
 node_paths = [COMMON_ROOT / "static/js/vendor",
               COMMON_ROOT / "static/coffee/src",
@@ -291,6 +292,7 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
+SERVER_EMAIL = 'devops@edx.org'
 ADMINS = (
     ('edX Admins', 'admin@edx.org'),
 )
@@ -351,6 +353,14 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 
 PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
 # TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+
+##### Feedback submission mechanism #####
+FEEDBACK_SUBMISSION_EMAIL = None
+
+##### Zendesk #####
+ZENDESK_URL = None
+ZENDESK_USER = None
+ZENDESK_API_KEY = None
 
 ################################# open ended grading config  #####################
 
@@ -613,3 +623,4 @@ INSTALLED_APPS = (
     # Discussion forums
     'django_comment_client',
 )
+

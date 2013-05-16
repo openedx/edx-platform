@@ -41,8 +41,8 @@ MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'modulestore',
-    'fs_root': GITHUB_REPO_ROOT,
+    'collection': 'test_modulestore',
+    'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 

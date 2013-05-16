@@ -1,41 +1,48 @@
 // studio - css architecture
 // ====================
 
-// bourbon libs and resets
-@import 'bourbon/bourbon';
-@import 'bourbon/addons/button';
-@import "variables";
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'bourbon/addons/button'; // lib bourbon - button add-on
+
+
+// VENDOR + REBASE *referenced/used vendor presentation and reset*
+// ====================
 @import 'vendor/normalize';
 @import 'reset';
 
-// utilities
+
+// BASE  *default edX offerings*
+// ====================
+// base - utilities
 @import 'variables';
 @import 'mixins';
-@import 'cms_mixins';
+@import 'mixins-inherited';
 
-// assets
+// base - assets
 @import 'assets/fonts';
-@import 'assets/graphics';
-@import 'assets/keyframes';
+@import 'assets/graphics'; // sprites, basic img/figure/svg styling
+@import 'assets/anims'; // animations
 
-// base
+// base - starter
 @import 'base';
 
-// elements
+// base - elements
 @import 'elements/typography';
-@import 'elements/icons';
-@import 'elements/controls';
-@import 'elements/navigation';
+@import 'elements/icons'; // references to icons used
+@import 'elements/controls'; // buttons, link styles, sliders, etc.
+@import 'elements/navigation'; // all archetypes of navigation
+@import 'elements/forms';
 @import 'elements/header';
 @import 'elements/footer';
 @import 'elements/sock';
-@import 'elements/forms';
-@import 'elements/modal';
-@import 'elements/alerts';
-@import 'elements/vendor';
 @import 'elements/tender-widget';
+@import 'elements/system-feedback'; // alerts, notifications, states
+@import 'elements/system-help'; // help UI
+@import 'elements/modal'; // interstitial UI, dialogs, modal windows
+@import 'elements/vendor'; // overrides to vendor-provided styling
 
-// specific views
+// base - specific views
 @import 'views/account';
 @import 'views/assets';
 @import 'views/updates';
@@ -51,8 +58,12 @@
 @import 'views/users';
 @import 'views/checklists';
 
+// temp - inherited
 @import 'assets/content-types';
 
-// xblock-related
+// xmodule
 @import 'xmodule/modules/css/module-styles.scss';
 @import 'xmodule/descriptors/css/module-styles.scss';
+
+
+@import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)

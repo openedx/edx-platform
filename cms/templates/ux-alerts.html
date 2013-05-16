@@ -82,10 +82,10 @@
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
-    <div class="title">
-      <span class="title-sub">UX Design</span>
-      <h1 class="title-1">System Notifications</h1>
-    </div>
+    <h1 class="page-header">
+      <small class="subtitle">UX Design</small>
+      <span class="sr">&gt; </span>System Notifications
+    </h1>
   </header>
 </div>
 
@@ -114,6 +114,7 @@
           <li><a href="#alert-announcement2" class="show-alert">Show Announcement</a></li>
           <li><a href="#alert-announcement1" class="show-alert">Show Announcement with Actions</a></li>
           <li><a href="#alert-activation" class="show-alert">Show Activiation</a></li>
+          <li><a href="#alert-threeActions" class="show-alert">Alert with three actions</a></li>
         </ul>
       </section>
 
@@ -129,8 +130,8 @@
 
         <ul>
           <li>
-            <a href="#notification-change" class="show-notification">Show Change Warning</a>
-            <a href="#notification-change" class="hide-notification">Hide Change Warning</a>
+            <a href="#notification-changesMade" class="show-notification">Show Changes Made (used in Advanced Settings)</a>
+            <a href="#notification-changesMade" class="hide-notification">Hide Changes Made (used in Advanced Settings)</a>
           </li>
           <li>
             <a href="#notification-version" class="show-notification">Show New Version Warning</a>
@@ -182,6 +183,33 @@
 </%block>
 
 <%block name="view_alerts">
+<!-- alert: 3 actions -->
+<div class="wrapper wrapper-alert wrapper-alert-warning" id="alert-threeActions">
+  <div class="alert warning has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">You are editing a draft</h2>
+      <p class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Alert Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="action action-save action-primary">Save Draft</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="action action-cancel action-secondary">Disgard Draft</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="action action-secondary">Do Something Elsee</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
 <!-- alert: you're editing a draft -->
 <div class="wrapper wrapper-alert wrapper-alert-warning" id="alert-draft">
   <div class="alert warning has-actions">
@@ -196,10 +224,10 @@
       <h3 class="sr">Alert Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button save-button action-primary">Save Draft</a>
+          <a href="#" class="action action-save action-primary">Save Draft</a>
         </li>
         <li class="nav-item">
-          <a href="#" class="button cancel-button action-secondary">Disgard Draft</a>
+          <a href="#" class="action action-cancel action-secondary">Disgard Draft</a>
         </li>
       </ul>
     </nav>
@@ -220,10 +248,10 @@
       <h3 class="sr">Alert Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button save-button action-primary">Go to Newer Version</a>
+          <a href="#" class="action action-save action-primary">Go to Newer Version</a>
         </li>
         <li class="nav-item">
-          <a href="#" class="button cancel-button action-secondary">Continue Editing</a>
+          <a href="#" class="action action-cancel action-secondary">Continue Editing</a>
         </li>
       </ul>
     </nav>
@@ -297,7 +325,7 @@
       <h3 class="sr">Alert Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button cancel-button action-primary">Cancel Your Submission</a>
+          <a href="#" class="action action-cancel action-primary">Cancel Your Submission</a>
         </li>
       </ul>
     </nav>
@@ -367,23 +395,23 @@
 
 <%block name="view_notifications">
 <!-- notification: change has been made and a save is needed -->
-<div class="wrapper wrapper-notification wrapper-notification-change" id="notification-change" role="status">
-  <div class="notification change has-actions">
-    <i class="ss-icon ss-symbolicons-block icon icon-change">&#x1F4DD;</i>
+<div class="wrapper wrapper-notification wrapper-notification-warning" aria-hidden="true" role="dialog" aria-labelledby="notification-changesMade-title" aria-describedby="notification-changesMade-description" id="notification-changesMade">
+  <div class="notification warning has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
     <div class="copy">
-      <h2 class="title title-3">You've Made Some Changes</h2>
-      <p class="message">Your changes will not take effect until you <strong>save your progress</strong>.</p>
+      <h2 class="title title-3" id="notification-changesMade-title">You've Made Some Changes</h2>
+      <p id="notification-changesMade-description">Your changes will not take effect until you <strong>save your progress</strong>. Take care with key and value formatting, as validation is <strong>not implemented</strong>.</p>
     </div>
 
     <nav class="nav-actions">
       <h3 class="sr">Notification Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="action-primary">Save Changes</a>
+          <a href="" class="action action-save action-primary">Save Changes</a>
         </li>
         <li class="nav-item">
-          <a href="#" class="action-secondary">Don't Save</a>
+          <a href="" class="action action-cancel action-secondary">Cancel</a>
         </li>
       </ul>
     </nav>
@@ -404,10 +432,10 @@
       <h3 class="sr">Notification Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button save-button action-primary">Go to Newer Version</a>
+          <a href="#" class="action action-save action-primary">Go to Newer Version</a>
         </li>
         <li class="nav-item">
-          <a href="#" class="button cancel-button action-secondary">Continue Editing</a>
+          <a href="#" class="action action-cancel action-secondary">Continue Editing</a>
         </li>
       </ul>
     </nav>
@@ -428,10 +456,10 @@
       <h3 class="sr">Notification Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="action-primary">Yes, I want to Edit X</a>
+          <a href="#" class="action action-proceed action-primary">Yes, I want to Edit X</a>
         </li>
         <li class="nav-item">
-          <a href="#" class="action-secondary">No, I do not</a>
+          <a href="#" class="action action-cancel action-secondary">No, I do not</a>
         </li>
       </ul>
     </nav>

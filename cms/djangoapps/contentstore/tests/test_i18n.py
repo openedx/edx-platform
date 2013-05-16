@@ -6,6 +6,7 @@ from django.test.client import Client
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
+
 class InternationalizationTest(ModuleStoreTestCase):
     """
     Tests to validate Internationalization.
@@ -38,34 +39,33 @@ class InternationalizationTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
-            }
+        }
 
     def test_course_plain_english(self):
         """Test viewing the index page with no courses"""
         self.client = Client()
         self.client.login(username=self.uname, password=self.password)
-        
+
         resp = self.client.get(reverse('index'))
         self.assertContains(resp,
-            '<h1 class="title-1">My Courses</h1>',
-            status_code=200,
-            html=True)
+                            '<h1 class="page-header">My Courses</h1>',
+                            status_code=200,
+                            html=True)
 
     def test_course_explicit_english(self):
         """Test viewing the index page with no courses"""
         self.client = Client()
         self.client.login(username=self.uname, password=self.password)
-        
+
         resp = self.client.get(reverse('index'),
                                {},
                                HTTP_ACCEPT_LANGUAGE='en'
                                )
 
         self.assertContains(resp,
-            '<h1 class="title-1">My Courses</h1>',
-            status_code=200,
-            html=True)        
-
+                            '<h1 class="page-header">My Courses</h1>',
+                            status_code=200,
+                            html=True)
 
     # ****
     # NOTE:
@@ -74,14 +74,13 @@ class InternationalizationTest(ModuleStoreTestCase):
     # This test will break when we replace this fake 'test' language
     # with actual French. This test will need to be updated with
     # actual French at that time.
-    
     # Test temporarily disable since it depends on creation of dummy strings
     @skip
-    def test_course_with_accents (self):
+    def test_course_with_accents(self):
         """Test viewing the index page with no courses"""
         self.client = Client()
         self.client.login(username=self.uname, password=self.password)
-        
+
         resp = self.client.get(reverse('index'),
                                {},
                                HTTP_ACCEPT_LANGUAGE='fr'
@@ -90,8 +89,8 @@ class InternationalizationTest(ModuleStoreTestCase):
         TEST_STRING = u'<h1 class="title-1">' \
                       + u'My \xc7\xf6\xfcrs\xe9s L#' \
                       + u'</h1>'
-        
+
         self.assertContains(resp,
                             TEST_STRING,
                             status_code=200,
-                            html=True)        
+                            html=True)

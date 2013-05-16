@@ -53,12 +53,9 @@ def css_find(css):
 
 @world.absorb
 def css_click(css_selector):
-    '''
-    First try to use the regular click method,
-    but if clicking in the middle of an element
-    doesn't work it might be that it thinks some other
-    element is on top of it there so click in the upper left
-    '''
+    """
+    Perform a click on a CSS selector, retrying if it initially fails
+    """
     try:
         world.browser.find_by_css(css_selector).click()
 
