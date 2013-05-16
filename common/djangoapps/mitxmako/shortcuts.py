@@ -47,6 +47,26 @@ def marketing_link(name):
         return '#'
 
 
+def marketing_link_context_processor(request):
+    """
+    A django context processor to give templates access to marketing URLs
+
+    Returns a dict whose keys are the marketing link names usable with the
+    marketing_link method (e.g. 'ROOT', 'CONTACT', etc.) prefixed with
+    'MKTG_URL_' and whose values are the corresponding URLs as computed by the
+    marketing_link method.
+    """
+    return dict(
+        [
+            ("MKTG_URL_" + k, marketing_link(k))
+            for k in (
+                settings.MKTG_URL_LINK_MAP.viewkeys() |
+                settings.MKTG_URLS.viewkeys()
+            )
+        ]
+    )
+
+
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_instance = Context(dictionary)
     # add dictionary to context_instance

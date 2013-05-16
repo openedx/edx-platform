@@ -175,6 +175,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'sekizai.context_processors.sekizai',
     'course_wiki.course_nav.context_processor',
+
+    # Hack to get required link URLs to password reset templates
+    'mitxmako.shortcuts.marketing_link_context_processor',
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000   # 4 MB
