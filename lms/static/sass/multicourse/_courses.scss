@@ -42,7 +42,7 @@
 
         .logo {
           @include inline-block;
-          height: 100px;
+          height: 80px;
           margin-right: 30px;
           padding-right: 30px;
           position: relative;
@@ -52,7 +52,7 @@
             @extend .faded-vertical-divider;
             content: "";
             display: block;
-            height: 100px;
+            height: 80px;
             position: absolute;
             right: 0px;
             top: 0px;

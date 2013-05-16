@@ -14,7 +14,6 @@
     @include box-shadow(0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
     @include clearfix;
     height: 460px;
-    float: left;
     overflow: hidden;
     margin-top: -69px;
     padding: 0px;
@@ -173,7 +172,7 @@
       letter-spacing: 1px;
       margin-bottom: 0px;
       margin-top: -15px;
-      padding: 10px 10px 12px;
+      padding: 10px 10px 8px;
       text-align: center;
       text-transform: uppercase;
       text-shadow: 0 1px rgba(255,255,255, 0.6);

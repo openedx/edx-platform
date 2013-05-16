@@ -29,7 +29,7 @@ header.global {
       height: 50px;
       position: absolute;
       right: 1px;
-      top: -5px;
+      top: -8px;
       width: 1px;
     }
 
@@ -40,7 +40,7 @@ header.global {
       height: 50px;
       position: absolute;
       right: 0px;
-      top: -10px;
+      top: -12px;
       width: 1px;
     }
 
@@ -77,6 +77,7 @@ header.global {
     li.secondary {
       > a {
         color: $lighter-base-font-color;
+        color: $link-color
         display: block;
         font-family: $sans-serif;
         @include inline-block;
