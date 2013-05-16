@@ -77,8 +77,8 @@ environment), and Node has a library installer called
 Once you've got your languages and virtual environments set up, install
 the libraries like so:
 
-    $ pip install -r requirements/base.txt
-    $ pip install -r requirements/post.txt
+    $ pip install -r requirements/edx/base.txt
+    $ pip install -r requirements/edx/post.txt
     $ bundle install
     $ npm install
 
