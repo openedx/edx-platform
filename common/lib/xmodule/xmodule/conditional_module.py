@@ -37,6 +37,7 @@ class ConditionalModule(ConditionalFields, XModule):
 
             completed - map to `is_completed` module method
             attempted - map to `is_attempted` module method
+            correct - map to `is_correct` module method
             poll_answer - map to `poll_answer` module attribute
             voted - map to `voted` module attribute
 
