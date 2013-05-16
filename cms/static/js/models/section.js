@@ -4,7 +4,7 @@ CMS.Models.Section = Backbone.Model.extend({
     },
     validate: function(attrs, options) {
         if (!attrs.name) {
-            return "You must specify a name";
+            return gettext("You must specify a name");
         }
     },
     url: "/save_item",
@@ -25,7 +25,7 @@ CMS.Models.Section = Backbone.Model.extend({
         if(!this.msg) {
             this.msg = new CMS.Models.SystemFeedback({
                 type: "saving",
-                title: "Saving&hellip;"
+                title: gettext("Saving&hellip;")
             });
         }
         if(!this.msgView) {

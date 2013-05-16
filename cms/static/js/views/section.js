@@ -1,7 +1,11 @@
 CMS.Views.SectionShow = Backbone.View.extend({
-    template: _.template('<span data-tooltip="Edit this section\'s name" class="section-name-span"><%= name %></span>'),
+    template: _.template('<span data-tooltip="<%= tooltip %>" class="section-name-span"><%= name %></span>'),
     render: function() {
-        this.$el.html(this.template(this.model.attributes));
+        var attrs = {
+            tooltip: gettext("Edit this section's name")
+        };
+        attrs = $.extend(attrs, this.model.attributes);
+        this.$el.html(this.template(attrs));
         this.delegateEvents();
         return this;
     },
@@ -20,7 +24,12 @@ CMS.Views.SectionShow = Backbone.View.extend({
 
 CMS.Views.SectionEdit = Backbone.View.extend({
     render: function() {
-        this.$el.html(this.template(this.model.attributes));
+        var attrs = {
+            save: gettext("Save"),
+            cancel: gettext("Cancel")
+        };
+        attrs = $.extend(attrs, this.model.attributes);
+        this.$el.html(this.template(attrs));
         this.delegateEvents();
         return this;
     },
@@ -61,11 +70,11 @@ CMS.Views.SectionEdit = Backbone.View.extend({
     showInvalidMessage: function(model, error, options) {
         var that = this;
         var msg = new CMS.Models.ErrorMessage({
-            title: "Validation Error",
+            title: gettext("Validation Error"),
             message: error,
             actions: {
                 primary: {
-                    text: "Dismiss",
+                    text: gettext("Dismiss"),
                     click: function(view) {
                         view.hide();
                         that.$("input[type=text]").focus();

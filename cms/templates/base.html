@@ -69,7 +69,7 @@
     <script type="text/javascript">
 $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
     var msg = new CMS.Models.ErrorMessage({
-        "title": "Server Error",
+        "title": gettext("Server Error"),
         "message": jqXHR.responseText,
         "actions": {
             "primary": {
