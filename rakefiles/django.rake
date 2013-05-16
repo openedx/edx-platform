@@ -5,7 +5,7 @@ default_options = {
 
 task :predjango => :install_python_prereqs do
     sh("find . -type f -name *.pyc -delete")
-    sh('pip install -q --no-index -r requirements/local.txt')
+    sh('pip install -q --no-index -r requirements/edx/local.txt')
 end
 
 
