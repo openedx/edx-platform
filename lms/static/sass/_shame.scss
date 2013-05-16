@@ -79,14 +79,15 @@
 
   .action {
 
-    // not registered (default)
-    &.action-register {
+    // register or access courseware
+    &.action-register, &.access-courseware {
       @extend .btn-primary;
     }
 
-    // already registered
+    // already registered but course not started
     &.is-registered {
       @extend .btn-secondary;
+      pointer-events: none !important;
     }
 
     // coming soon
