@@ -535,12 +535,14 @@ body.course.unit {
 
 // Editor Wrapper
 .wrapper-comp-editor {
-  display: none;
+  display: block;
 
-  &.is-active {
-    display: block;
+  // Because the editor may be a CodeMirror editor (which must be visible at the time it is created
+  // in order for it to properly initialize), we must toggle "is-inactive" instead of the more common "is-active".
+  &.is-inactive {
+    display: none;
   }
- }
+}
 
 // Settings Wrapper
 .wrapper-comp-settings {

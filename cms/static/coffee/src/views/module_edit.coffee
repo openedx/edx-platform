@@ -113,14 +113,16 @@ class CMS.Views.ModuleEdit extends Backbone.View
     settingsModeButton = @$el.find('#settings-mode').find("a")
 
     if mode == @editorMode
-      dataEditor.addClass('is-active')
-      settingsEditor.removeClass('is-active')
+      # Because of CodeMirror editor, cannot hide the data editor when it is first loaded. Therefore
+      # we have to use a class of is-inactive instead of is-active.
+      dataEditor.removeClass('is-inactive')
       editorModeButton.addClass('is-set')
+      settingsEditor.removeClass('is-active')
       settingsModeButton.removeClass('is-set')
     else
-      dataEditor.removeClass('is-active')
-      settingsEditor.addClass('is-active')
+      dataEditor.addClass('is-inactive')
       editorModeButton.removeClass('is-set')
+      settingsEditor.addClass('is-active')
       settingsModeButton.addClass('is-set')
 
   hideDataEditor: =>
