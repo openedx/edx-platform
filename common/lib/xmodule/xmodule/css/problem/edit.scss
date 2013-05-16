@@ -99,6 +99,13 @@
   }
 }
 
+.problem-editor {
+// adding padding to simple editor only - adjacent selector is needed since there are no toggles for CodeMirror
+ .markdown-box+.CodeMirror {
+    padding: 10px;
+  }
+}
+
 .problem-editor-icon {
   display: inline-block;
   width: 26px;

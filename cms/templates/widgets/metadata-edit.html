@@ -12,13 +12,12 @@
     ## source-edit.html needs access to the 'source_code' value, so delete from a copy.
     <% del metadata_field_copy['source_code'] %>
 % endif
-<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy)}'/>
 
 % if showHighLevelSource:
     <div class="launch-latex-compiler">
-      <label class="label setting-label">Latex Compiler Mode</label> 
-      <a href="#hls-modal-${hlskey}" id="hls-trig-${hlskey}" >Launch Latex Source Compiler</a></div>
+      <a href="#hls-modal-${hlskey}" id="hls-trig-${hlskey}">Launch Latex Source Compiler</a>
+    </div>
     <%include file="source-edit.html" />
 % endif
-</div>
 
+<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy)}'/>

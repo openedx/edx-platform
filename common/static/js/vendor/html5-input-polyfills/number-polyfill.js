@@ -3,7 +3,7 @@
 /*
 HTML5 Number polyfill | Jonathan Stipe | https://github.com/jonstipe/number-polyfill
 */
-  
+
 (function() {
 
   (function($) {

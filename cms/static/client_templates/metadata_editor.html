@@ -1,10 +1,6 @@
 <ul class="list-input settings-list">
     <% _.each(metadata_entries, function(entry) { %>
-    <li class="field comp-setting-entry metadata_entry">
+    <li class="field comp-setting-entry metadata_entry" id="settings-listing">
     </li>
     <% }) %>
 </ul>
-% if showHighLevelSource:
-    <a href="#hls-modal-${hlskey}" class="launch-latex-compiler" id="hls-trig-${hlskey}" >Edit High Level Source</a>
-    <%include file="source-edit.html" />
-% endif
