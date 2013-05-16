@@ -517,8 +517,14 @@ class CapaModule(CapaFields, XModule):
         return False
 
     def is_completed(self):
-        # used by conditional module
-        # return self.answer_available()
+        """ Used to decide to show or hide RESET or CHECK buttons.
+
+        Actually means that student submitted problem and nothing more.
+        Problem can be completely wrong.
+        Pressing RESET button makes this function to return False.
+        Suggestion: rename it to is_submitted.
+
+        # older comment: return self.answer_available()"""
         return self.lcp.done
 
     def is_attempted(self):

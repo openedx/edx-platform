@@ -70,8 +70,18 @@ class ConditionalModule(ConditionalFields, XModule):
     # value: <name of module attribute>
     conditions_map = {
         'poll_answer': 'poll_answer',  # poll_question attr
+
+        # problem was submitted (it can be wrong)
+        # if student will press reset button after that,
+        # state will be reverted
         'completed': 'is_completed',  # capa_problem attr
+
+        # if student attempted problem
         'attempted': 'is_attempted',  # capa_problem attr
+
+        # if problem is full points
+        'correct': 'is_correct',
+
         'voted': 'voted'  # poll_question attr
     }
 
