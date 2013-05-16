@@ -50,9 +50,19 @@ LAZY_IMPORTS = "".join(LAZY_IMPORTS)
 @statsd.timed('capa.safe_exec.time')
 def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None):
     """
-    Exec python code safely.
+    Execute python code safely.
 
-    `cache` is an object with .get(key) and .set(key, value) methods.
+    `code` is the Python code to execute.  It has access to the globals in `globals_dict`,
+    and any changes it makes to those globals are visible in `globals_dict` when this
+    function returns.
+
+    `random_seed` will be used to see the `random` module available to the code.
+
+    `python_path` is a list of directories to add to the Python path before execution.
+
+    `cache` is an object with .get(key) and .set(key, value) methods.  It will be used
+    to cache the execution, taking into account the code, the values of the globals,
+    and the random seed.
 
     """
     # Check the cache for a previous result.
