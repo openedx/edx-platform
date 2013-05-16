@@ -767,12 +767,12 @@ hr.divide {
     display: block;
   }
 
-  .icon-view {
-    @include font-size(15);
+  .icon-eye-open {
+    @include font-size(16);
     display: inline-block;
     vertical-align: middle;
-    margin-right: ($baseline/2);
-    margin-top: ($baseline/5);
+    margin-right: 8px;
+    margin-top: -3px;
     line-height: 0;
   }
 }
@@ -887,7 +887,7 @@ body.js {
         @extend .text-sr;
       }
 
-      .ss-icon {
+      [class^="icon-"] {
         @include font-size(18);
         color: $white;
       }
