@@ -225,7 +225,7 @@ class TaskQueueTestCase(TestCase):
         self.assertFalse(output['succeeded'])
 
         _, output = self._get_output_for_task_success(10, 0, 10)
-        self.assertTrue("Problem failed to be regraded for any of 10 students " in output['message'])
+        self.assertTrue("Problem failed to be regraded for any of 10 students" in output['message'])
         self.assertFalse(output['succeeded'])
 
         _, output = self._get_output_for_task_success(10, 8, 10)

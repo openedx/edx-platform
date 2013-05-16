@@ -143,6 +143,8 @@ def _update_course_task_log(course_task_log_entry, task_result):
 
     Calculates json to store in task_progress field.
     """
+    # Just pull values out of the result object once.  If we check them later,
+    # the state and result may have changed.
     task_id = task_result.task_id
     result_state = task_result.state
     returned_result = task_result.result
@@ -240,39 +242,36 @@ def _get_course_task_log_status(task_id):
     # define ajax return value:
     output = {}
 
-    # if the task is already known to be done, then there's no reason to query
+    # if the task is not already known to be done, then we need to query
     # the underlying task's result object:
     if course_task_log_entry.task_state not in READY_STATES:
-        # we need to get information from the task result directly now.
-
-        # Just create the result object, and pull values out once.
-        # (If we check them later, the state and result may have changed.)
         result = AsyncResult(task_id)
         output.update(_update_course_task_log(course_task_log_entry, result))
     elif course_task_log_entry.task_progress is not None:
         # task is already known to have finished, but report on its status:
         output['task_progress'] = json.loads(course_task_log_entry.task_progress)
-        if course_task_log_entry.task_state == 'FAILURE':
-            output['message'] = output['task_progress']['message']
 
     # output basic information matching what's stored in CourseTaskLog:
     output['task_id'] = course_task_log_entry.task_id
     output['task_state'] = course_task_log_entry.task_state
     output['in_progress'] = course_task_log_entry.task_state not in READY_STATES
 
-    if course_task_log_entry.task_state == 'SUCCESS':
-        succeeded, message = _get_task_completion_message(course_task_log_entry)
+    if course_task_log_entry.task_state in READY_STATES:
+        succeeded, message = get_task_completion_message(course_task_log_entry)
         output['message'] = message
         output['succeeded'] = succeeded
 
     return output
 
 
-def _get_task_completion_message(course_task_log_entry):
+def get_task_completion_message(course_task_log_entry):
     """
     Construct progress message from progress information in CourseTaskLog entry.
 
     Returns (boolean, message string) duple.
+
+    Used for providing messages to course_task_log_status(), as well as
+    external calls for providing course task submission history information.
     """
     succeeded = False
 
@@ -281,30 +280,36 @@ def _get_task_completion_message(course_task_log_entry):
         return (succeeded, "No status information available")
 
     task_progress = json.loads(course_task_log_entry.task_progress)
+    if course_task_log_entry.task_state in ['FAILURE', 'REVOKED']:
+        return(succeeded, task_progress['message'])
+
     action_name = task_progress['action_name']
     num_attempted = task_progress['attempted']
     num_updated = task_progress['updated']
-    # num_total = task_progress['total']
+    num_total = task_progress['total']
     if course_task_log_entry.student is not None:
         if num_attempted == 0:
-            msg = "Unable to find submission to be {action} for student '{student}' and problem '{problem}'."
+            msg = "Unable to find submission to be {action} for student '{student}'"
         elif num_updated == 0:
-            msg = "Problem failed to be {action} for student '{student}' and problem '{problem}'"
+            msg = "Problem failed to be {action} for student '{student}'"
         else:
             succeeded = True
-            msg = "Problem successfully {action} for student '{student}' and problem '{problem}'"
+            msg = "Problem successfully {action} for student '{student}'"
     elif num_attempted == 0:
-        msg = "Unable to find any students with submissions to be {action} for problem '{problem}'."
+        msg = "Unable to find any students with submissions to be {action}"
     elif num_updated == 0:
-        msg = "Problem failed to be {action} for any of {attempted} students for problem '{problem}'"
+        msg = "Problem failed to be {action} for any of {attempted} students"
     elif num_updated == num_attempted:
         succeeded = True
-        msg = "Problem successfully {action} for {attempted} students for problem '{problem}'"
+        msg = "Problem successfully {action} for {attempted} students"
     elif num_updated < num_attempted:
-        msg = "Problem {action} for {updated} of {attempted} students for problem '{problem}'"
+        msg = "Problem {action} for {updated} of {attempted} students"
+
+    if course_task_log_entry.student is not None and num_attempted != num_total:
+        msg += " (out of {total})"
 
     # Update status in task result object itself:
-    message = msg.format(action=action_name, updated=num_updated, attempted=num_attempted,
+    message = msg.format(action=action_name, updated=num_updated, attempted=num_attempted, total=num_total,
                          student=course_task_log_entry.student, problem=course_task_log_entry.task_args)
     return (succeeded, message)
 
@@ -343,7 +348,7 @@ def submit_regrade_problem_for_student(request, course_id, problem_url, student)
     An exception is thrown if the problem doesn't exist, or if the particular
     problem is already being regraded for this student.
     """
-    # check arguments:  let exceptions return up to the caller. 
+    # check arguments:  let exceptions return up to the caller.
     _check_arguments_for_regrading(course_id, problem_url)
 
     task_name = 'regrade_problem'
