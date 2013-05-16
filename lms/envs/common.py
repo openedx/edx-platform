@@ -446,7 +446,7 @@ PIPELINE_CSS = {
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
-            'css/vendor/annotator.min.css',
+            'css/vendor/annotator.css',
             'sass/course.css',
             'xmodule/modules.css',
         ],
