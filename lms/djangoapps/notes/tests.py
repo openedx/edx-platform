@@ -178,7 +178,7 @@ class ApiTest(TestCase):
                                     json.dumps(empty_test),
                                     content_type='application/json',
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-            self.assertEqual(resp.status_code, 500)
+            self.assertEqual(resp.status_code, 400)
 
     def test_create_note_missing_ranges(self):
         self.login()
@@ -194,7 +194,7 @@ class ApiTest(TestCase):
                                 json.dumps(note),
                                 content_type='application/json',
                                 HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(resp.status_code, 500)
+        self.assertEqual(resp.status_code, 400)
 
     def test_read_note(self):
         self.login()
