@@ -25,7 +25,6 @@ function (VideoPlayer) {
      * @param {DOM element} element Container of the entire Video Alpha DOM element.
      */
     return function (state, element) {
-        checkForNativeFunctions();
         makeFunctionsPublic(state);
         renderElements(state, element);
     };
@@ -57,6 +56,9 @@ function (VideoPlayer) {
     function renderElements(state, element) {
         var onPlayerReadyFunc;
 
+        // This is used in places where we instead would have to check if an element has a CSS class 'fullscreen'.
+        state.isFullScreen = false;
+
         // The parent element of the video, and the ID.
         state.el = $(element).find('.videoalpha');
         state.id = state.el.attr('id').replace(/video_/, '');
@@ -77,7 +79,18 @@ function (VideoPlayer) {
             sub:                state.el.data('sub'),
             mp4Source:          state.el.data('mp4-source'),
             webmSource:         state.el.data('webm-source'),
-            oggSource:          state.el.data('ogg-source')
+            oggSource:          state.el.data('ogg-source'),
+
+            fadeOutTimeout:     1400,
+
+            availableQualities: ['hd720', 'hd1080', 'highres'],
+
+            qTipConfig: {
+                position: {
+                    my: 'top right',
+                    at: 'top center'
+                }
+            }
         };
 
         // Try to parse YouTube stream ID's. If
@@ -95,9 +108,9 @@ function (VideoPlayer) {
             parseVideoSources(
                 state,
                 {
-                    'mp4': state.config.mp4Source,
-                    'webm': state.config.webmSource,
-                    'ogg': state.config.oggSource
+                    mp4: state.config.mp4Source,
+                    webm: state.config.webmSource,
+                    ogg: state.config.oggSource
                 }
             );
 
@@ -136,8 +149,8 @@ function (VideoPlayer) {
             state.hide_captions = true;
 
             $.cookie('hide_captions', state.hide_captions, {
-                'expires': 3650,
-                'path': '/'
+                expires: 3650,
+                path: '/'
             });
 
             state.el.addClass('closed');
@@ -153,8 +166,8 @@ function (VideoPlayer) {
                 state.currentPlayerMode = currentPlayerMode;
             } else {
                 $.cookie('current_player_mode', 'html5', {
-                    'expires': 3650,
-                    'path': '/'
+                    expires: 3650,
+                    path: '/'
                 });
                 state.currentPlayerMode = 'html5';
             }
@@ -196,7 +209,7 @@ function (VideoPlayer) {
 
 
     function parseYoutubeStreams(state, youtubeStreams) {
-        if (!youtubeStreams.length) {
+        if (typeof youtubeStreams === 'undefined' || youtubeStreams.length === 0) {
             return false;
         }
 
@@ -219,7 +232,11 @@ function (VideoPlayer) {
     //     Take the HTML5 sources (URLs of videos), and make them available explictly for each type
     //     of video format (mp4, webm, ogg).
     function parseVideoSources(state, sources) {
-        state.html5Sources = { 'mp4': null, 'webm': null, 'ogg': null };
+        state.html5Sources = {
+            mp4: null,
+            webm: null,
+            ogg: null
+        };
 
         $.each(sources, function (name, source) {
             if (source && source.length) {
@@ -254,48 +271,6 @@ function (VideoPlayer) {
         state.setSpeed($.cookie('video_speed'));
     }
 
-    function checkForNativeFunctions() {
-        // REFACTOR:
-        // 1.) IE8 doc.
-        // 2.) Move to separate file.
-        // 3.) Write about a generic soluction system wide.
-        
-        // 
-        // IE browser supports Function.bind() only starting with version 8.
-        // 
-        // The bind function is a recent addition to ECMA-262, 5th edition; as such it may not be present in all
-        // browsers. You can partially work around this by inserting the following code at the beginning of your
-        // scripts, allowing use of much of the functionality of bind() in implementations that do not natively support
-        // it.
-        //
-        // https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/bind
-        if (!Function.prototype.bind) {
-            Function.prototype.bind = function (oThis) {
-                var aArgs, fToBind, fNOP, fBound;
-
-                if (typeof this !== 'function') {
-                    // closest thing possible to the ECMAScript 5 internal IsCallable function
-                    throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-                }
-
-                aArgs = Array.prototype.slice.call(arguments, 1);
-                fToBind = this;
-                fNOP = function () {};
-                fBound = function () {
-                    return fToBind.apply(
-                        this instanceof fNOP && oThis ? this : oThis,
-                        aArgs.concat(Array.prototype.slice.call(arguments))
-                    );
-                };
-
-                fNOP.prototype = this.prototype;
-                fBound.prototype = new fNOP();
-
-                return fBound;
-            };
-        }
-    }
-
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
@@ -311,8 +286,8 @@ function (VideoPlayer) {
 
         if (updateCookie) {
             $.cookie('video_speed', this.speed, {
-                'expires': 3650,
-                'path': '/'
+                expires: 3650,
+                path: '/'
             });
         }
     }

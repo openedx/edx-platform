@@ -35,7 +35,7 @@ from .discussionsettings import *
 PLATFORM_NAME = "edX"
 
 COURSEWARE_ENABLED = True
-ENABLE_JASMINE = True
+ENABLE_JASMINE = False
 
 PERFSTATS = False
 

@@ -61,10 +61,10 @@ function () {
 
     function buildSlider(state) {
         state.videoProgressSlider.slider = state.videoProgressSlider.el.slider({
-            'range': 'min',
-            'change': state.videoProgressSlider.onChange,
-            'slide': state.videoProgressSlider.onSlide,
-            'stop': state.videoProgressSlider.onStop
+            range: 'min',
+            change: state.videoProgressSlider.onChange,
+            slide: state.videoProgressSlider.onSlide,
+            stop: state.videoProgressSlider.onStop
         });
     }
 
@@ -72,18 +72,18 @@ function () {
         state.videoProgressSlider.handle = state.videoProgressSlider.el.find('.ui-slider-handle');
 
         state.videoProgressSlider.handle.qtip({
-            'content': '' + Time.format(state.videoProgressSlider.slider.slider('value')),
-            'position': {
-                'my': 'bottom center',
-                'at': 'top center',
-                'container': state.videoProgressSlider.handle
+            content: '' + Time.format(state.videoProgressSlider.slider.slider('value')),
+            position: {
+                my: 'bottom center',
+                at: 'top center',
+                container: state.videoProgressSlider.handle
             },
-            'hide': {
-                'delay': 700
+            hide: {
+                delay: 700
             },
-            'style': {
-                'classes': 'ui-tooltip-slider',
-                'widget': true
+            style: {
+                classes: 'ui-tooltip-slider',
+                widget: true
             }
         });
     }
@@ -97,7 +97,7 @@ function () {
     function onSlide(event, ui) {
         this.videoProgressSlider.frozen = true;
         this.videoProgressSlider.updateTooltip(ui.value);
-        this.trigger(['videoPlayer', 'onSeek'], ui.value);
+        this.trigger(['videoPlayer', 'onSlideSeek'], ui.value);
     }
 
     function onChange(event, ui) {
@@ -109,7 +109,7 @@ function () {
 
         this.videoProgressSlider.frozen = true;
 
-        this.trigger(['videoPlayer', 'onSeek'], ui.value);
+        this.trigger(['videoPlayer', 'onSlideSeek'], ui.value);
 
         setTimeout(function() {
             _this.videoProgressSlider.frozen = false;
@@ -122,9 +122,9 @@ function () {
 
     function updatePlayTime(params) {
         if ((this.videoProgressSlider.slider) && (!this.videoProgressSlider.frozen)) {
-            // REFACTOR: Check if you can chain.
-            this.videoProgressSlider.slider.slider('option', 'max', params.duration);
-            this.videoProgressSlider.slider.slider('value', params.time);
+            this.videoProgressSlider.slider
+                .slider('option', 'max', params.duration)
+                .slider('value', params.time);
         }
     }
 

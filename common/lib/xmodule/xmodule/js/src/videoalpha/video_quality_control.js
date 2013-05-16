@@ -44,13 +44,7 @@ function () {
         state.videoQualityControl.quality = null;
 
         if (!onTouchBasedDevice()) {
-            // REFACTOR: Move qtip config to state.config
-            state.videoQualityControl.el.qtip({
-                'position': {
-                    'my': 'top right',
-                    'at': 'top center'
-                }
-            });
+            state.videoQualityControl.el.qtip(state.config.qTipConfig);
         }
     }
 
@@ -70,8 +64,7 @@ function () {
     function onQualityChange(value) {
         this.videoQualityControl.quality = value;
 
-        // refactor: Move constants to state.config.
-        if ((value === 'hd720') || (value === 'hd1080') || (value === 'highres')) {
+        if (this.config.availableQualities.indexOf(value) !== -1) {
             this.videoQualityControl.el.addClass('active');
         } else {
             this.videoQualityControl.el.removeClass('active');
@@ -79,14 +72,12 @@ function () {
     }
 
     function toggleQuality(event) {
-        var newQuality, _ref;
+        var newQuality,
+            value = this.videoQualityControl.quality;
 
         event.preventDefault();
 
-        _ref = this.videoQualityControl.quality;
-
-        // refactor: Move constants to state.config.
-        if ((_ref === 'hd720') || (_ref === 'hd1080') || (_ref === 'highres')) {
+        if (this.config.availableQualities.indexOf(value) !== -1) {
             newQuality = 'large';
         } else {
             newQuality = 'hd720';

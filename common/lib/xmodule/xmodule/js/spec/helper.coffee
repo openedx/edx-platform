@@ -8,6 +8,26 @@ window.YT =
     BUFFERING: 3
     CUED: 5
 
+window.TYPES =
+  'undefined'        : 'undefined'
+  'number'           : 'number'
+  'boolean'          : 'boolean'
+  'string'           : 'string'
+  '[object Function]': 'function'
+  '[object RegExp]'  : 'regexp'
+  '[object Array]'   : 'array'
+  '[object Date]'    : 'date'
+  '[object Error]'   : 'error'
+
+window.TOSTRING = Object.prototype.toString
+window.STATUS = window.YT.PlayerState
+
+window.whatType = (o) ->
+  TYPES[typeof o] || TYPES[TOSTRING.call(o)] || (o ? 'object' : 'null');
+
+# Time waitsFor() should wait for before failing a test.
+window.WAIT_TIMEOUT = 1000
+
 jasmine.getFixtures().fixturesPath = 'xmodule/js/fixtures'
 
 jasmine.stubbedMetadata =
@@ -78,7 +98,8 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   if createPlayer
     return new VideoPlayer(video: context.video)
 
-jasmine.stubVideoPlayerAlpha = (context, enableParts, createPlayer=true, html5=false) ->
+jasmine.stubVideoPlayerAlpha = (context, enableParts, html5=false) ->
+  console.log('stubVideoPlayerAlpha called')
   suite = context.suite
   currentPartName = suite.description while suite = suite.parentSuite
   if html5 == false
@@ -88,10 +109,8 @@ jasmine.stubVideoPlayerAlpha = (context, enableParts, createPlayer=true, html5=f
   jasmine.stubRequests()
   YT.Player = undefined
   window.OldVideoPlayerAlpha = undefined
-  context.video = new VideoAlpha '#example', '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
   jasmine.stubYoutubePlayer()
-  if createPlayer
-    return new VideoPlayerAlpha(video: context.video)
+  return new VideoAlpha '#example', '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
 
 
 # Stub jQuery.cookie

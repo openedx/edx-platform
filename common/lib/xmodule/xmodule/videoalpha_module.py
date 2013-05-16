@@ -69,15 +69,16 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
 
     js = {
         'js': [
-            resource_string(__name__, 'js/src/videoalpha/display/initialize.js'),
-            resource_string(__name__, 'js/src/videoalpha/display/html5_video.js'),
-            resource_string(__name__, 'js/src/videoalpha/display/video_player.js'),
-            resource_string(__name__, 'js/src/videoalpha/display/video_control.js'),
-            resource_string(__name__, 'js/src/videoalpha/display/video_quality_control.js'),
-            resource_string(__name__, 'js/src/videoalpha/display/video_progress_slider.js'),
-            resource_string(__name__, 'js/src/videoalpha/display/video_volume_control.js'),
-            resource_string(__name__, 'js/src/videoalpha/display/video_speed_control.js'),
-            resource_string(__name__, 'js/src/videoalpha/display/video_caption.js'),
+            resource_string(__name__, 'js/src/videoalpha/helper_utils.js'),
+            resource_string(__name__, 'js/src/videoalpha/initialize.js'),
+            resource_string(__name__, 'js/src/videoalpha/html5_video.js'),
+            resource_string(__name__, 'js/src/videoalpha/video_player.js'),
+            resource_string(__name__, 'js/src/videoalpha/video_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/video_quality_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/video_progress_slider.js'),
+            resource_string(__name__, 'js/src/videoalpha/video_volume_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/video_speed_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/video_caption.js'),
             resource_string(__name__, 'js/src/videoalpha/main.js')
         ]
     }
@@ -141,11 +142,11 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
             if str_time is None:
                 return ''
             else:
-                obj_time = time.strptime(str_time, '%H:%M:%S')
+                x = time.strptime(str_time, '%H:%M:%S')
                 return datetime.timedelta(
-                    hours=obj_time.tm_hour,
-                    minutes=obj_time.tm_min,
-                    seconds=obj_time.tm_sec
+                    hours=x.tm_hour,
+                    minutes=x.tm_min,
+                    seconds=x.tm_sec
                 ).total_seconds()
 
         return parse_time(xmltree.get('start_time')), parse_time(xmltree.get('end_time'))

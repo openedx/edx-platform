@@ -1,7 +1,5 @@
 (function (requirejs, require, define) {
 
-// REFACTOR. Build JS doc. Add docs on how to build docs.
-
 // Main module.
 require(
 [
@@ -38,7 +36,7 @@ function (
 
         // Check for existance of previous state, uninitialize it if necessary, and create a new state.
         // Store new state for future invocation of this module consturctor function.
-        if (previousState !== null) {
+        if (previousState !== null && typeof previousState.videoPlayer !== 'undefined') {
             previousState.videoPlayer.onPause();
         }
         state = {};
@@ -55,6 +53,11 @@ function (
         if (state.config.show_captions) {
             VideoCaption(state);
         }
+
+        // Because the 'state' object is only available inside this closure, we will also make
+        // it available to the caller by returning it. This is necessary so that we can test
+        // VideoAlpha with Jasmine.
+        return state;
     };
 });
 

@@ -1,2 +1,4 @@
 *.js
 
+# Tests for videoalpha are written in pure JavaScript.
+!videoalpha/*.js

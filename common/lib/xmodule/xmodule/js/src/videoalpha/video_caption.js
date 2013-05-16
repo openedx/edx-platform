@@ -60,14 +60,13 @@ function () {
         state.el.find('.video-controls .secondary-controls').append(state.videoCaption.hideSubtitlesEl);
 
         state.el.find('.subtitles').css({
-            'maxHeight': state.el.find('.video-wrapper').height() - 5
+            maxHeight: state.el.find('.video-wrapper').height() - 5
         });
 
         fetchCaption(state);
 
-        // REFACTOR. Const.
         if (state.videoType === 'html5') {
-            state.videoCaption.fadeOutTimeout = 1400;
+            state.videoCaption.fadeOutTimeout = state.config.fadeOutTimeout;
 
             state.videoCaption.subtitlesEl.addClass('html5');
             state.captionHideTimeout = setTimeout(state.videoCaption.autoHideCaptions, state.videoCaption.fadeOutTimeout);
@@ -80,21 +79,24 @@ function () {
     function bindHandlers(state) {
         $(window).bind('resize', state.videoCaption.resize);
         state.videoCaption.hideSubtitlesEl.click(state.videoCaption.toggle);
-        
-        // REFACTOR: Use .on()
-        state.videoCaption.subtitlesEl.mouseenter(
-            state.videoCaption.onMouseEnter
-        ).mouseleave(
-            state.videoCaption.onMouseLeave
-        ).mousemove(
-            state.videoCaption.onMovement
-        ).bind(
-            'mousewheel',
-            state.videoCaption.onMovement
-        ).bind(
-            'DOMMouseScroll',
-            state.videoCaption.onMovement
-        );
+
+        state.videoCaption.subtitlesEl
+            .on(
+                'mouseenter',
+                state.videoCaption.onMouseEnter
+            ).on(
+                'mouseleave',
+                state.videoCaption.onMouseLeave
+            ).on(
+                'mousemove',
+                state.videoCaption.onMovement
+            ).on(
+                'mousewheel',
+                state.videoCaption.onMovement
+            ).on(
+                'DOMMouseScroll',
+                state.videoCaption.onMovement
+            );
 
         if (state.videoType === 'html5') {
             state.el.on('mousemove', state.videoCaption.autoShowCaptions)
@@ -137,22 +139,17 @@ function () {
 
             this.captionsShowLock = true;
 
-            // REFACTOR.
-
             if (this.captionState === 'invisible') {
                 this.videoCaption.subtitlesEl.show();
                 this.captionState = 'visible';
-                this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
             } else if (this.captionState === 'hiding') {
-                this.videoCaption.subtitlesEl.stop(true, false);
-                this.videoCaption.subtitlesEl.css('opacity', 1);
-                this.videoCaption.subtitlesEl.show();
+                this.videoCaption.subtitlesEl.stop(true, false).css('opacity', 1).show();
                 this.captionState = 'visible';
-                this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
             } else if (this.captionState === 'visible') {
                 clearTimeout(this.captionHideTimeout);
-                this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
             }
+
+            this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
 
             this.captionsShowLock = false;
         }
@@ -171,20 +168,19 @@ function () {
 
         _this = this;
 
-        // REFACTOR.
-        this.videoCaption.subtitlesEl.fadeOut(1000, function () {
+        this.videoCaption.subtitlesEl.fadeOut(this.videoCaption.fadeOutTimeout, function () {
             _this.captionState = 'invisible';
         });
     }
 
     function resize() {
         this.videoCaption.subtitlesEl.css({
-            'maxHeight': this.videoCaption.captionHeight()
+            maxHeight: this.videoCaption.captionHeight()
         });
 
-        // REFACTOR: Chain.
-        this.videoCaption.subtitlesEl.find('.spacing:first').height(this.videoCaption.topSpacingHeight());
-        this.videoCaption.subtitlesEl.find('.spacing:last').height(this.videoCaption.bottomSpacingHeight());
+        this.videoCaption.subtitlesEl
+            .find('.spacing:first').height(this.videoCaption.topSpacingHeight())
+            .find('.spacing:last').height(this.videoCaption.bottomSpacingHeight());
 
         this.videoCaption.scrollCaption();
     }
@@ -194,7 +190,6 @@ function () {
             clearTimeout(this.videoCaption.frozen);
         }
 
-        // REFACTOR.
         this.videoCaption.frozen = setTimeout(this.videoCaption.onMouseLeave, 10000);
     }
 
@@ -219,37 +214,34 @@ function () {
         container = $('<ol>');
 
         $.each(this.videoCaption.captions, function(index, text) {
-            // REFACTOR: Use .data()
-            container.append($('<li>').html(text).attr({
-                'data-index': index,
-                'data-start': _this.videoCaption.start[index]
-            }));
+            container.append(
+                $('<li>').html(text)
+                    .data('index', index)
+                    .data('start', _this.videoCaption.start[index])
+            );
         });
 
-        // REFACTOR: Chain.
-        this.videoCaption.subtitlesEl.html(container.html());
-        this.videoCaption.subtitlesEl.find('li[data-index]').on('click', this.videoCaption.seekPlayer);
         this.videoCaption.subtitlesEl
-                .prepend(
-            $('<li class="spacing">').height(this.videoCaption.topSpacingHeight())
-        )
-                .append(
-            $('<li class="spacing">').height(this.videoCaption.bottomSpacingHeight())
-        );
+            .html(container.html())
+            .find('li[data-index]').on('click', this.videoCaption.seekPlayer)
+            .prepend(
+                $('<li class="spacing">').height(this.videoCaption.topSpacingHeight())
+            )
+            .append(
+                $('<li class="spacing">').height(this.videoCaption.bottomSpacingHeight())
+            );
 
         this.videoCaption.rendered = true;
     }
 
     function scrollCaption() {
-        // REFACTOR: Cache current:first
-        if (
-            !this.videoCaption.frozen && 
-            this.videoCaption.subtitlesEl.find('.current:first').length
-        ) {
+        var el = this.videoCaption.subtitlesEl.find('.current:first');
+
+        if (!this.videoCaption.frozen && el.length) {
             this.videoCaption.subtitlesEl.scrollTo(
-                this.videoCaption.subtitlesEl.find('.current:first'),
+                el,
                 {
-                    'offset': -this.videoCaption.calculateOffset(this.videoCaption.subtitlesEl.find('.current:first'))
+                    offset: -this.videoCaption.calculateOffset(el)
                 }
             );
         }
@@ -323,7 +315,7 @@ function () {
         event.preventDefault();
         time = Math.round(Time.convert($(event.target).data('start'), '1.0', this.speed) / 1000);
 
-        this.trigger(['videoPlayer', 'onSeek'], time);
+        this.trigger(['videoPlayer', 'onCaptionSeek'], time);
     }
 
     function calculateOffset(element) {
@@ -361,14 +353,13 @@ function () {
         }
 
         $.cookie('hide_captions', hide_captions, {
-            'expires': 3650,
-            'path': '/'
+            expires: 3650,
+            path: '/'
         });
     }
 
     function captionHeight() {
-        // REFACTOR: Use property instead of class.
-        if (this.el.hasClass('fullscreen')) {
+        if (this.isFullScreen) {
             return $(window).height() - this.el.find('.video-controls').height();
         } else {
             return this.el.find('.video-wrapper').height();

@@ -41,28 +41,24 @@ function () {
 
         state.videoControl.secondaryControlsEl.prepend(state.videoVolumeControl.el);
 
-        // Figure out what the current volume is. Set it up so that muting/unmuting works correctly.
-        // If no information about volume level could be retrieved, then we will use the default
-        // 100 level (full volume).
-        // REFACTOR: Remove unnecessary checks.
+        // Figure out what the current volume is. If no information about volume level could be retrieved,
+        // then we will use the default 100 level (full volume).
         state.videoVolumeControl.currentVolume = parseInt($.cookie('video_player_volume_level'), 10);
-        state.videoVolumeControl.previousVolume = 100;
-        if (
-            (!isFinite(state.videoVolumeControl.currentVolume)) ||
-            (state.videoVolumeControl.currentVolume < 0) ||
-            (state.videoVolumeControl.currentVolume > 100)
-        ) {
+        if (!isFinite(state.videoVolumeControl.currentVolume)) {
             state.videoVolumeControl.currentVolume = 100;
         }
 
+        // Set it up so that muting/unmuting works correctly.
+        state.videoVolumeControl.previousVolume = 100;
+
         state.videoVolumeControl.slider = state.videoVolumeControl.volumeSliderEl.slider({
-            'orientation': 'vertical',
-            'range': 'min',
-            'min': 0,
-            'max': 100,
-            'value': state.videoVolumeControl.currentVolume,
-            'change': state.videoVolumeControl.onChange,
-            'slide': state.videoVolumeControl.onChange
+            orientation: 'vertical',
+            range: 'min',
+            min: 0,
+            max: 100,
+            value: state.videoVolumeControl.currentVolume,
+            change: state.videoVolumeControl.onChange,
+            slide: state.videoVolumeControl.onChange
         });
 
         state.videoVolumeControl.el.toggleClass('muted', state.videoVolumeControl.currentVolume === 0);
@@ -94,8 +90,8 @@ function () {
         this.videoVolumeControl.el.toggleClass('muted', this.videoVolumeControl.currentVolume === 0);
 
         $.cookie('video_player_volume_level', ui.value, {
-            'expires': 3650,
-            'path': '/'
+            expires: 3650,
+            path: '/'
         });
 
         this.trigger(['videoPlayer', 'onVolumeChange'], ui.value);

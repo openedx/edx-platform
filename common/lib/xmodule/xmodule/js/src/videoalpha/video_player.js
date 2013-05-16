@@ -28,7 +28,8 @@ function (HTML5Video) {
         state.videoPlayer.play                        = play.bind(state);
         state.videoPlayer.update                      = update.bind(state);
         state.videoPlayer.onSpeedChange               = onSpeedChange.bind(state);
-        state.videoPlayer.onSeek                      = onSeek.bind(state);
+        state.videoPlayer.onCaptionSeek               = onSeek.bind(state);
+        state.videoPlayer.onSlideSeek                 = onSeek.bind(state);
         state.videoPlayer.onEnded                     = onEnded.bind(state);
         state.videoPlayer.onPause                     = onPause.bind(state);
         state.videoPlayer.onPlay                      = onPlay.bind(state);
@@ -62,12 +63,12 @@ function (HTML5Video) {
         state.videoPlayer.currentTime = 0;
 
         state.videoPlayer.playerVars = {
-            'controls': 0,
-            'wmode': 'transparent',
-            'rel': 0,
-            'showinfo': 0,
-            'enablejsapi': 1,
-            'modestbranding': 1
+            controls: 0,
+            wmode: 'transparent',
+            rel: 0,
+            showinfo: 0,
+            enablejsapi: 1,
+            modestbranding: 1
         };
 
         if (state.currentPlayerMode !== 'flash') {
@@ -82,13 +83,26 @@ function (HTML5Video) {
           state.videoPlayer.playerVars.end = state.config.end;
         }
 
+        // There is a bug which prevents YouTube API to correctly set the speed
+        // to 1.0 from another speed in Firefox when in HTML5 mode. There is a
+        // fix which basically reloads the video at speed 1.0 when this change
+        // is requested (instead of simply requesting a speed change to 1.0).
+        // This has to be done only when the video is being watched in Firefox.
+        // We need to figure out what browser is currently executing this code.
+        //
+        // TODO: Check the status of
+        // http://code.google.com/p/gdata-issues/issues/detail?id=4654
+        // When the YouTube team fixes the API bug, we can remove this temporary
+        // bug fix.
+        state.browserIsFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
         if (state.videoType === 'html5') {
             state.videoPlayer.player = new HTML5Video.Player(state.el, {
-                'playerVars':   state.videoPlayer.playerVars,
-                'videoSources': state.html5Sources,
-                'events': {
-                    'onReady':       state.videoPlayer.onReady,
-                    'onStateChange': state.videoPlayer.onStateChange
+                playerVars:   state.videoPlayer.playerVars,
+                videoSources: state.html5Sources,
+                events: {
+                    onReady:       state.videoPlayer.onReady,
+                    onStateChange: state.videoPlayer.onStateChange
                 }
             });
         } else { // if (state.videoType === 'youtube') {
@@ -98,12 +112,12 @@ function (HTML5Video) {
                 youTubeId = state.youtubeId('1.0');
             }
             state.videoPlayer.player = new YT.Player(state.id, {
-                'playerVars': state.videoPlayer.playerVars,
-                'videoId': youTubeId,
-                'events': {
-                    'onReady': state.videoPlayer.onReady,
-                    'onStateChange': state.videoPlayer.onStateChange,
-                    'onPlaybackQualityChange': state.videoPlayer.onPlaybackQualityChange
+                playerVars: state.videoPlayer.playerVars,
+                videoId: youTubeId,
+                events: {
+                    onReady: state.videoPlayer.onReady,
+                    onStateChange: state.videoPlayer.onStateChange,
+                    onPlaybackQualityChange: state.videoPlayer.onPlaybackQualityChange
                 }
             });
         }
@@ -173,6 +187,11 @@ function (HTML5Video) {
         }
     }
 
+    // We request the reloading of the video in the case when YouTube is in
+    // Flash player mode, or when we are in Firefox, and the new speed is 1.0.
+    // The second case is necessary to avoid the bug where in Firefox speed
+    // switching to 1.0 in HTML5 player mode is handled incorrectly by YouTube
+    // API.
     function onSpeedChange(newSpeed, updateCookie) {
         if (this.currentPlayerMode === 'flash') {
             this.videoPlayer.currentTime = Time.convert(
@@ -182,9 +201,19 @@ function (HTML5Video) {
             );
         }
         newSpeed = parseFloat(newSpeed).toFixed(2).replace(/\.00$/, '.0');
+
+        this.videoPlayer.log(
+            'speed_change_video',
+            {
+                current_time: this.videoPlayer.currentTime,
+                old_speed: this.speed,
+                new_speed: newSpeed
+            }
+        );
+
         this.setSpeed(newSpeed, updateCookie);
 
-        if (this.currentPlayerMode === 'html5') {
+        if (this.currentPlayerMode === 'html5' && !(state.browserIsFirefox && newSpeed === '1.0')) {
             this.videoPlayer.player.setPlaybackRate(newSpeed);
         } else { // if (this.currentPlayerMode === 'flash') {
             if (this.videoPlayer.isPlaying()) {
@@ -197,7 +226,16 @@ function (HTML5Video) {
         }
     }
 
-    function onSeek(time) {
+    function onSeek(event, time) {
+        this.videoPlayer.log(
+            'seek_video',
+            {
+                old_time: this.videoPlayer.currentTime,
+                new_time: time,
+                type: event.type
+            }
+        );
+
         this.videoPlayer.player.seekTo(time, true);
 
         if (this.videoPlayer.isPlaying()) {
@@ -215,7 +253,12 @@ function (HTML5Video) {
     }
 
     function onPause() {
-        this.videoPlayer.log('pause_video');
+        this.videoPlayer.log(
+            'pause_video',
+            {
+                'currentTime': this.videoPlayer.currentTime
+            }
+        );
 
         clearInterval(this.videoPlayer.updateInterval);
         delete this.videoPlayer.updateInterval;
@@ -224,7 +267,12 @@ function (HTML5Video) {
     }
 
     function onPlay() {
-        this.videoPlayer.log('play_video');
+        this.videoPlayer.log(
+            'play_video',
+            {
+                'currentTime': this.videoPlayer.currentTime
+            }
+        );
 
         if (!this.videoPlayer.updateInterval) {
             this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
@@ -249,8 +297,8 @@ function (HTML5Video) {
 
     function onReady() {
         var availablePlaybackRates, baseSpeedSubs, _this;
-        
-        // REFACTOR: Check if logic.
+
+        this.videoPlayer.log('load_video');
 
         availablePlaybackRates = this.videoPlayer.player.getAvailablePlaybackRates();
         if ((this.currentPlayerMode === 'html5') && (this.videoType === 'youtube')) {
@@ -283,7 +331,7 @@ function (HTML5Video) {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
 
-        if (!onTouchBasedDevice()) {
+        if (!onTouchBasedDevice() && $('.video:first').data('autoplay') === 'True') {
             this.videoPlayer.play();
         }
     }
@@ -330,15 +378,21 @@ function (HTML5Video) {
         return duration;
     }
 
-    function log(eventName) {
+    function log(eventName, data) {
         var logInfo;
 
+        // Default parameters that always get logged.
         logInfo = {
-            'id':          this.id,
-            'code':        this.youtubeId(),
-            'currentTime': this.videoPlayer.currentTime,
-            'speed':       this.speed
+            'id':   this.id,
+            'code': this.youtubeId()
         };
+
+        // If extra parameters were passed to the log.
+        if (data) {
+            $.each(data, function(paramName, value) {
+                logInfo[paramName] = value;
+            });
+        }
 
         if (this.videoType === 'youtube') {
             logInfo.code = this.youtubeId();

@@ -40,8 +40,6 @@ function () {
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function renderElements(state) {
-        var qTipConfig;
-
         state.videoControl.el = state.el.find('.video-controls');
         // state.videoControl.el.append(el);
 
@@ -56,23 +54,14 @@ function () {
         if (!onTouchBasedDevice()) {
             state.videoControl.pause();
 
-            qTipConfig = {
-                'position': {
-                    'my': 'top right',
-                    'at': 'top center'
-                }
-            };
-
-            state.videoControl.playPauseEl.qtip(qTipConfig);
-            state.videoControl.fullScreenEl.qtip(qTipConfig);
+            state.videoControl.playPauseEl.qtip(state.config.qTipConfig);
+            state.videoControl.fullScreenEl.qtip(state.config.qTipConfig);
         } else {
             state.videoControl.play();
         }
 
         if (state.videoType === 'html5') {
-            // REFACTOR: constants move to initialize()
-            
-            state.videoControl.fadeOutTimeout = 1400;
+            state.videoControl.fadeOutTimeout = state.config.fadeOutTimeout;
 
             state.videoControl.el.addClass('html5');
             state.controlHideTimeout = setTimeout(state.videoControl.hideControls, state.videoControl.fadeOutTimeout);
@@ -97,7 +86,6 @@ function () {
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
-    // REFACTOR document
     function showControls(event) {
         if (!this.controlShowLock) {
             if (!this.captionsHidden) {
@@ -106,24 +94,17 @@ function () {
 
             this.controlShowLock = true;
 
-            // Refactor: separate UI state in object. No code duplication.
-            // REFACTOR:
-            // 1.) Chain jQuery calls.
-            // 2.) Drop out common code.
             if (this.controlState === 'invisible') {
                 this.videoControl.el.show();
                 this.controlState = 'visible';
-                this.controlHideTimeout = setTimeout(this.videoControl.hideControls, this.videoControl.fadeOutTimeout);
             } else if (this.controlState === 'hiding') {
-                this.videoControl.el.stop(true, false);
-                this.videoControl.el.css('opacity', 1);
-                this.videoControl.el.show();
+                this.videoControl.el.stop(true, false).css('opacity', 1).show();
                 this.controlState = 'visible';
-                this.controlHideTimeout = setTimeout(this.videoControl.hideControls, this.videoControl.fadeOutTimeout);
             } else if (this.controlState === 'visible') {
                 clearTimeout(this.controlHideTimeout);
-                this.controlHideTimeout = setTimeout(this.videoControl.hideControls, this.videoControl.fadeOutTimeout);
             }
+
+            this.controlHideTimeout = setTimeout(this.videoControl.hideControls, this.videoControl.fadeOutTimeout);
 
             this.controlShowLock = false;
         }
@@ -142,28 +123,27 @@ function () {
 
         _this = this;
 
-        this.videoControl.el.fadeOut(1000, function () {
+        this.videoControl.el.fadeOut(this.videoControl.fadeOutTimeout, function () {
             _this.controlState = 'invisible';
         });
     }
 
     function play() {
-        // REFACTOR: this.videoControl.playPauseState should be bool.
         this.videoControl.playPauseEl.removeClass('play').addClass('pause').attr('title', 'Pause');
-        this.videoControl.playPauseState = 'playing';
+        this.videoControl.isPlaying = true;
     }
 
     function pause() {
         this.videoControl.playPauseEl.removeClass('pause').addClass('play').attr('title', 'Play');
-        this.videoControl.playPauseState = 'paused';
+        this.videoControl.isPlaying = false;
     }
 
     function togglePlayback(event) {
         event.preventDefault();
 
-        if (this.videoControl.playPauseState === 'playing') {
+        if (this.videoControl.isPlaying) {
             this.trigger(['videoPlayer', 'pause'], null);
-        } else { // if (this.videoControl.playPauseState === 'paused') {
+        } else {
             this.trigger(['videoPlayer', 'play'], null);
         }
     }
@@ -174,10 +154,12 @@ function () {
         if (this.videoControl.fullScreenState) {
             this.videoControl.fullScreenState = false;
             this.el.removeClass('fullscreen');
+            this.isFullScreen = false;
             this.videoControl.fullScreenEl.attr('title', 'Fullscreen');
         } else {
             this.videoControl.fullScreenState = true;
             this.el.addClass('fullscreen');
+            this.isFullScreen = true;
             this.videoControl.fullScreenEl.attr('title', 'Exit fullscreen');
         }
 
@@ -185,8 +167,7 @@ function () {
     }
 
     function exitFullScreen(event) {
-        // REFACTOR: Add variable instead of class.
-        if ((this.el.hasClass('fullscreen')) && (event.keyCode === 27)) {
+        if ((this.isFullScreen) && (event.keyCode === 27)) {
             this.videoControl.toggleFullScreen(event);
         }
     }

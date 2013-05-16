@@ -44,13 +44,9 @@ function () {
         state.videoControl.secondaryControlsEl.prepend(state.videoSpeedControl.el);
 
         $.each(state.videoSpeedControl.speeds, function(index, speed) {
-            // REFACTOR: Move all HTML into one function call.
-            var link = $('<a>').attr({
-                'href': '#'
-             }).html('' + speed + 'x');
+            var link = $('<a href="#">' + speed + 'x</a>');
 
-             // REFACTOR: Use jQuery .data()
-            state.videoSpeedControl.videoSpeedsEl.prepend($('<li>').attr('data-speed', speed).html(link));
+            state.videoSpeedControl.videoSpeedsEl.prepend($('<li data-speed="' + speed + '">' + link + '</li>'));
         });
 
         state.videoSpeedControl.setSpeed(state.speed);
@@ -68,19 +64,17 @@ function () {
                 $(this).toggleClass('open');
             });
         } else {
-            // REFACTOR: Chain.
-            state.videoSpeedControl.el.on('mouseenter', function() {
-                $(this).addClass('open');
-            });
-
-            state.videoSpeedControl.el.on('mouseleave', function() {
-                $(this).removeClass('open');
-            });
-
-            state.videoSpeedControl.el.on('click', function(event) {
-                event.preventDefault();
-                $(this).removeClass('open');
-            });
+            state.videoSpeedControl.el
+                .on('mouseenter', function () {
+                    $(this).addClass('open');
+                })
+                .on('mouseleave', function () {
+                    $(this).removeClass('open');
+                })
+                .on('click', function (event) {
+                    event.preventDefault();
+                    $(this).removeClass('open');
+                });
         }
     }
 
@@ -91,18 +85,18 @@ function () {
     // ***************************************************************
 
     function setSpeed(speed) {
-        // REFACTOR: Use chaining.
         this.videoSpeedControl.videoSpeedsEl.find('li').removeClass('active');
         this.videoSpeedControl.videoSpeedsEl.find("li[data-speed='" + speed + "']").addClass('active');
         this.videoSpeedControl.el.find('p.active').html('' + speed + 'x');
     }
 
     function changeVideoSpeed(event) {
+        var parentEl = $(event.target).parent();
+
         event.preventDefault();
 
-        // REFACTOR: Cache parent el.
-        if (!$(event.target).parent().hasClass('active')) {
-            this.videoSpeedControl.currentSpeed = $(event.target).parent().data('speed');
+        if (!parentEl.hasClass('active')) {
+            this.videoSpeedControl.currentSpeed = parentEl.data('speed');
 
             this.videoSpeedControl.setSpeed(
                 // To meet the API expected format.
@@ -113,23 +107,19 @@ function () {
         }
     }
 
-    // REFACTOR.
-    function reRender(params /*newSpeeds, currentSpeed*/) {
-        var _this;
+    function reRender(params) {
+        var _this = this;
 
         this.videoSpeedControl.videoSpeedsEl.empty();
         this.videoSpeedControl.videoSpeedsEl.find('li').removeClass('active');
         this.videoSpeedControl.speeds = params.newSpeeds;
 
-        _this = this;
         $.each(this.videoSpeedControl.speeds, function(index, speed) {
             var link, listItem;
 
-            link = $('<a>').attr({
-                'href': '#'
-            }).html('' + speed + 'x');
+            link = $('<a href="#">' + speed + 'x</a>');
 
-            listItem = $('<li>').attr('data-speed', speed).html(link);
+            listItem = $('<li data-speed="' + speed + '">' + link + '</li>');
 
             if (speed === params.currentSpeed) {
                 listItem.addClass('active');

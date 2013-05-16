@@ -23,7 +23,7 @@ function () {
         Player.prototype.callStateChangeCallback = function () {
             if ($.isFunction(this.config.events.onStateChange)) {
                 this.config.events.onStateChange({
-                    'data': this.playerState
+                    data: this.playerState
                 });
             }
         };
@@ -96,61 +96,47 @@ function () {
          *
          *     config = {
          *
-         *         'videoSources': {},   // An object with properties being video sources. The property name is the
+         *        videoSources: {},   // An object with properties being video sources. The property name is the
          *                               // video format of the source. Supported video formats are: 'mp4', 'webm', and
          *                               // 'ogg'.
          *
-         *          'playerVars': {     // Object's properties identify player parameters.
-         *              'start': 0,     // Possible values: positive integer. Position from which to start playing the
+         *          playerVars: {     // Object's properties identify player parameters.
+         *              start: 0,     // Possible values: positive integer. Position from which to start playing the
          *                              // video. Measured in seconds. If value is non-numeric, or 'start' property is
          *                              // not specified, the video will start playing from the beginning.
          *
-         *              'end': null     // Possible values: positive integer. Position when to stop playing the
+         *              end: null     // Possible values: positive integer. Position when to stop playing the
          *                              // video. Measured in seconds. If value is null, or 'end' property is not
          *                              // specified, the video will end playing at the end.
          *
          *          },
          *
-         *          'events': {         // Object's properties identify the events that the API fires, and the
+         *          events: {         // Object's properties identify the events that the API fires, and the
          *                              // functions (event listeners) that the API will call when those events occur.
          *                              // If value is null, or property is not specified, then no callback will be
          *                              // called for that event.
          *
-         *              'onReady': null,
-         *              'onStateChange': null
+         *              onReady: null,
+         *              onStateChange: null
          *          }
          *     }
          */
         function Player(el, config) {
             var sourceStr, _this;
 
-            // If el is string, we assume it is an ID of a DOM element. Get the element, and check that the ID
-            // really belongs to an element. If we didn't get a DOM element, return. At this stage, nothing will
-            // break because other parts of the video player are waiting for 'onReady' callback to be called.
-            
-            // REFACTOR: Use .length === 0
-            
-               this.el = $(el);
-                // REFACTOR: Simplify chck.
+            // Initially we assume that el is a DOM element. If jQuery selector fails to select something, we
+            // assume that el is an ID of a DOM element. We try to select by ID. If jQuery fails this time,
+            // we return. Nothing breaks because the player 'onReady' event will never be fired.
+
+            this.el = $(el);
+            if (this.el.length === 0) {
+                this.el = $('#' + el);
+
                 if (this.el.length === 0) {
                     return;
                 }
-            
-            
-            
-            
-            if (typeof el === 'string') {
-                this.el = $(el);
-                // REFACTOR: Simplify chck.
-                if (this.el.length === 0) {
-                    return;
-                }
-            } else if (el instanceof jQuery) {
-                this.el = el;
-            } else {
-                return;
             }
-            
+
             // A simple test to see that the 'config' is a normal object.
             if ($.isPlainObject(config)) {
                 this.config = config;
@@ -165,9 +151,9 @@ function () {
 
             // From the start, all sources are empty. We will populate this object below.
             sourceStr = {
-                'mp4': ' ',
-                'webm': ' ',
-                'ogg': ' '
+                mp4: ' ',
+                webm: ' ',
+                ogg: ' '
             };
 
             // Will be used in inner functions to point to the current object.
@@ -304,14 +290,16 @@ function () {
         }
     }());
 
-    // REFACTOR: Doc.
+    // The YouTube API presents several constants which describe the player's state at a given moment.
+    // HTML5Video API will copy these constats so that code which uses both the YouTube API and this API
+    // doesn't have to change.
     HTML5Video.PlayerState = {
-        'UNSTARTED': -1,
-        'ENDED': 0,
-        'PLAYING': 1,
-        'PAUSED': 2,
-        'BUFFERING': 3,
-        'CUED': 5
+        UNSTARTED: -1,
+        ENDED: 0,
+        PLAYING: 1,
+        PAUSED: 2,
+        BUFFERING: 3,
+        CUED: 5
     };
 
     // HTML5Video object - what this module exports.
