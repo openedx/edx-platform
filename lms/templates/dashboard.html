@@ -194,17 +194,20 @@
 
         <article class="my-course">
           <%
-          if has_access(user, course, 'load'):
             course_target = reverse('info', args=[course.id])
-          else:
-            course_target = reverse('about_course', args=[course.id])
           %>
 
 
 
-          <a href="${course_target}" class="cover">
-            <img src="${course_image_url(course)}" />
-          </a>
+          % if course.id in show_courseware_links_for:
+            <a href="${course_target}" class="cover">
+              <img src="${course_image_url(course)}" />
+            </a>
+          % else:
+            <div class="cover">
+              <img src="${course_image_url(course)}" />
+            </div>
+          % endif
 
           <section class="info">
             <hgroup>
@@ -218,7 +221,13 @@
               % endif
               </p>
               <h2 class="university">${get_course_about_section(course, 'university')}</h2>
-              <h3><a href="${course_target}">${course.number} ${course.display_name_with_default}</a></h3>
+              <h3>
+                % if course.id in show_courseware_links_for:
+                  <a href="${course_target}">${course.number} ${course.display_name_with_default}</a>
+                % else:
+                  <span>${course.number} ${course.display_name_with_default}</span>
+                % endif
+              </h3>
             </hgroup>
 
             <%
