@@ -48,7 +48,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
         resp = self.client.get(reverse('index'))
         self.assertContains(resp,
-                            '<h1 class="title-1">My Courses</h1>',
+                            '<h1 class="page-header">My Courses</h1>',
                             status_code=200,
                             html=True)
 
@@ -63,7 +63,7 @@ class InternationalizationTest(ModuleStoreTestCase):
                                )
 
         self.assertContains(resp,
-                            '<h1 class="title-1">My Courses</h1>',
+                            '<h1 class="page-header">My Courses</h1>',
                             status_code=200,
                             html=True)
 

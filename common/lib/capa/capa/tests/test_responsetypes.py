@@ -708,7 +708,7 @@ class JavascriptResponseTest(ResponseTest):
     def test_grade(self):
         # Compile coffee files into javascript used by the response
         coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
-        os.system("coffee -c %s" % (coffee_file_path))
+        os.system("node_modules/.bin/coffee -c %s" % (coffee_file_path))
 
         problem = self.build_problem(generator_src="test_problem_generator.js",
                                      grader_src="test_problem_grader.js",
