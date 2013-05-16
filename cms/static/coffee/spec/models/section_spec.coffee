@@ -44,10 +44,10 @@ describe "CMS.Models.Section", ->
             @requests[0].respond(200)
             expect(CMS.Models.Section.prototype.hideNotification).toHaveBeenCalled()
 
-        it "show/hide a notification when saving fails", ->
+        it "don't hide notification when saving fails", ->
+            # this is handled by the global AJAX error handler
             @model.save()
-            expect(CMS.Models.Section.prototype.showNotification).toHaveBeenCalled()
             @requests[0].respond(500)
-            expect(CMS.Models.Section.prototype.hideNotification).toHaveBeenCalled()
+            expect(CMS.Models.Section.prototype.hideNotification).not.toHaveBeenCalled()
 
 
