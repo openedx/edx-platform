@@ -70,11 +70,11 @@ CMS.Views.SectionEdit = Backbone.View.extend({
     showInvalidMessage: function(model, error, options) {
         var that = this;
         var msg = new CMS.Models.ErrorMessage({
-            title: gettext("Validation Error"),
+            title: gettext("Your change could not be saved"),
             message: error,
             actions: {
                 primary: {
-                    text: gettext("Dismiss"),
+                    text: gettext("Return and resolve this issue"),
                     click: function(view) {
                         view.hide();
                         that.$("input[type=text]").focus();
