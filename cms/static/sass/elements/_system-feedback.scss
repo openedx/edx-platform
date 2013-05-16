@@ -669,10 +669,6 @@
     &.is-hiding {
       @include anim-notificationsSlideDown(0.25s);
     }
-
-    &.is-fleeting {
-      @include anim-notificationsSlideUpDown(2s);
-    }
   }
 }
 
