@@ -3,8 +3,21 @@
 set -e
 set -x
 
+##
+## requires >= 1.3.0 of the Jenkins git plugin
+##
+
 function github_status {
-    gcli status create edx mitx $GIT_COMMIT \
+    if [[ ! ${GIT_URL} =~ git@github.com:([^/]+)/([^\.]+).git ]]; then
+        echo "Cannot parse Github org or repo from URL, using defaults."
+        ORG="edx"
+        REPO="edx-platform"
+    else
+        ORG=${BASH_REMATCH[1]}
+        REPO=${BASH_REMATCH[2]}
+    fi
+
+    gcli status create $ORG $REPO $GIT_COMMIT \
          --params=$1 \
                   target_url:$BUILD_URL \
                   description:"Build #$BUILD_NUMBER $2" \
@@ -27,21 +40,32 @@ git submodule foreach 'git reset --hard HEAD'
 export PYTHONIOENCODING=UTF-8
 
 GIT_BRANCH=${GIT_BRANCH/HEAD/master}
-if [ ! -d /mnt/virtualenvs/"$JOB_NAME" ]; then
-    mkdir -p /mnt/virtualenvs/"$JOB_NAME"
-    virtualenv /mnt/virtualenvs/"$JOB_NAME"
+
+# When running in parallel on jenkins, workspace could be suffixed by @x
+# In that case, we want to use a separate virtualenv that matches up with
+# workspace
+#
+# We need to handle both the case of /path/to/workspace
+# and /path/to/workspace@2, which is why we use the following substitutions
+#
+# $WORKSPACE is the absolute path for the workspace
+WORKSPACE_SUFFIX=$(expr "$WORKSPACE" : '.*\(@.*\)') || true
+
+VIRTUALENV_DIR="/mnt/virtualenvs/${JOB_NAME}${WORKSPACE_SUFFIX}"
+
+if [ ! -d "$VIRTUALENV_DIR" ]; then
+    mkdir -p "$VIRTUALENV_DIR"
+    virtualenv "$VIRTUALENV_DIR"
 fi
 
 export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
 
+# Allow django liveserver tests to use a range of ports
+export DJANGO_LIVE_TEST_SERVER_ADDRESS=${DJANGO_LIVE_TEST_SERVER_ADDRESS-localhost:8000-9000}
+
 source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
-pip install -q -r pre-requirements.txt
-yes w | pip install -q -r requirements.txt
 
-bundle install
-
-npm install
-
+rake install_prereqs
 rake clobber
 rake pep8 > pep8.log || cat pep8.log
 rake pylint > pylint.log || cat pylint.log
@@ -54,7 +78,7 @@ rake test_lms[false] || TESTS_FAILED=1
 rake test_common/lib/capa || TESTS_FAILED=1
 rake test_common/lib/xmodule || TESTS_FAILED=1
 
-# Run the jaavascript unit tests
+# Run the javascript unit tests
 rake phantomjs_jasmine_lms || TESTS_FAILED=1
 rake phantomjs_jasmine_cms || TESTS_FAILED=1
 rake phantomjs_jasmine_common/lib/xmodule || TESTS_FAILED=1

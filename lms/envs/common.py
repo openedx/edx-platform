@@ -93,6 +93,9 @@ MITX_FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
+    # Enables the student notes API and UI.
+    'ENABLE_STUDENT_NOTES': True,
+
     # Provide a UI to allow users to submit feedback from the LMS
     'ENABLE_FEEDBACK_SUBMISSION': False,
 }
@@ -124,9 +127,7 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 # For Node.js
 
-system_node_path = os.environ.get("NODE_PATH", None)
-if system_node_path is None:
-    system_node_path = "/usr/local/lib/node_modules"
+system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
 
 node_paths = [COMMON_ROOT / "static/js/vendor",
               COMMON_ROOT / "static/coffee/src",
@@ -425,11 +426,15 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
   'js/vendor/swfobject/swfobject.js',
   'js/vendor/jquery.ba-bbq.min.js',
+  'js/vendor/annotator.min.js',
+  'js/vendor/annotator.store.min.js',
+  'js/vendor/annotator.tags.min.js'
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
+notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
 
 PIPELINE_CSS = {
     'application': {
@@ -442,6 +447,7 @@ PIPELINE_CSS = {
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
+            'css/vendor/annotator.min.css',
             'sass/course.css',
             'xmodule/modules.css',
         ],
@@ -463,7 +469,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js)
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -504,7 +510,12 @@ PIPELINE_JS = {
         'source_filenames': open_ended_js,
         'output_filename': 'js/open_ended.js',
         'test_order': 6,
-    }
+    },
+    'notes': {
+        'source_filenames': notes_js,
+        'output_filename': 'js/notes.js',
+        'test_order': 7
+    },
 }
 
 PIPELINE_DISABLE_WRAPPER = True
@@ -594,6 +605,9 @@ INSTALLED_APPS = (
 
     # Discussion forums
     'django_comment_client',
+
+    # Student notes
+    'notes',
 )
 
 ######################### MARKETING SITE ###############################

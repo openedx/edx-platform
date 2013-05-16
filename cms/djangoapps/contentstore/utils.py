@@ -9,6 +9,8 @@ DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_ta
 
 #In order to instantiate an open ended tab automatically, need to have this data
 OPEN_ENDED_PANEL = {"name": "Open Ended Panel", "type": "open_ended"}
+NOTES_PANEL = {"name": "My Notes", "type": "notes"}
+EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
 
 
 def get_modulestore(location):
@@ -192,9 +194,10 @@ class CoursePageNames:
     Checklists = "checklists"
 
 
-def add_open_ended_panel_tab(course):
+def add_extra_panel_tab(tab_type, course):
     """
-    Used to add the open ended panel tab to a course if it does not exist.
+    Used to add the panel tab to a course if it does not exist.
+    @param tab_type: A string representing the tab type.
     @param course: A course object from the modulestore.
     @return: Boolean indicating whether or not a tab was added and a list of tabs for the course.
     """
@@ -202,16 +205,19 @@ def add_open_ended_panel_tab(course):
     course_tabs = copy.copy(course.tabs)
     changed = False
     #Check to see if open ended panel is defined in the course
-    if OPEN_ENDED_PANEL not in course_tabs:
+    
+    tab_panel = EXTRA_TAB_PANELS.get(tab_type)
+    if tab_panel not in course_tabs:
         #Add panel to the tabs if it is not defined
-        course_tabs.append(OPEN_ENDED_PANEL)
+        course_tabs.append(tab_panel)
         changed = True
     return changed, course_tabs
 
 
-def remove_open_ended_panel_tab(course):
+def remove_extra_panel_tab(tab_type, course):
     """
-    Used to remove the open ended panel tab from a course if it exists.
+    Used to remove the panel tab from a course if it exists.
+    @param tab_type: A string representing the tab type.
     @param course: A course object from the modulestore.
     @return: Boolean indicating whether or not a tab was added and a list of tabs for the course.
     """
@@ -219,8 +225,10 @@ def remove_open_ended_panel_tab(course):
     course_tabs = copy.copy(course.tabs)
     changed = False
     #Check to see if open ended panel is defined in the course
-    if OPEN_ENDED_PANEL in course_tabs:
+
+    tab_panel = EXTRA_TAB_PANELS.get(tab_type)
+    if tab_panel in course_tabs:
         #Add panel to the tabs if it is not defined
-        course_tabs = [ct for ct in course_tabs if ct != OPEN_ENDED_PANEL]
+        course_tabs = [ct for ct in course_tabs if ct != tab_panel]
         changed = True
     return changed, course_tabs
