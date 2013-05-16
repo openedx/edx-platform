@@ -24,6 +24,13 @@ def run_tests(system, report_dir, stop_on_failure=true)
     end
 end
 
+def run_acceptance_tests(system, report_dir, harvest_args)
+    sh(django_admin(system, 'acceptance', 'syncdb', '--noinput'))
+    sh(django_admin(system, 'acceptance', 'migrate', '--noinput'))
+    sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))
+end
+
+
 directory REPORT_DIR
 
 task :clean_test_files do
@@ -45,6 +52,17 @@ TEST_TASK_DIRS = []
         args.with_defaults(:stop_on_failure => 'true')
         run_tests(system, report_dir, args.stop_on_failure)
     end
+
+    # Run acceptance tests
+    desc "Run acceptance tests"
+    task "test_acceptance_#{system}", [:harvest_args] => ["#{system}:gather_assets:acceptance", "fasttest_acceptance_#{system}"]
+
+    desc "Run acceptance tests without collectstatic"
+    task "fasttest_acceptance_#{system}", [:harvest_args] => ["clean_test_files", :predjango, report_dir] do |t, args|
+        args.with_defaults(:harvest_args => '')
+        run_acceptance_tests(system, report_dir, args.harvest_args)
+    end
+
 
     task :fasttest => "fasttest_#{system}"
 

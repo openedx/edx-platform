@@ -63,14 +63,6 @@ def test_have_set_dates_in_different_years(step):
     set_date_and_time('input#due_date', '01/02/2012', 'input#due_time', '04:00')
 
 
-@step('I see the correct dates$')
-def i_see_the_correct_dates(step):
-    assert_equal('12/25/2011', world.css_find('input#start_date').first.value)
-    assert_equal('03:00', world.css_find('input#start_time').first.value)
-    assert_equal('01/02/2012', world.css_find('input#due_date').first.value)
-    assert_equal('04:00', world.css_find('input#due_time').first.value)
-
-
 @step('I mark it as Homework$')
 def i_mark_it_as_homework(step):
     world.css_click('a.menu-toggle')
@@ -101,7 +93,19 @@ def the_subsection_does_not_exist(step):
     assert world.browser.is_element_not_present_by_css(css)
 
 
+@step('I see the correct dates$')
+def i_see_the_correct_dates(step):
+    assert_equal('12/25/2011', get_date('input#start_date'))
+    assert_equal('03:00', get_date('input#start_time'))
+    assert_equal('01/02/2012', get_date('input#due_date'))
+    assert_equal('04:00', get_date('input#due_time'))
+
+
 ############ HELPER METHODS ###################
+
+def get_date(css):
+    return world.css_find(css).first.value.strip()
+
 
 def save_subsection_name(name):
     name_css = 'input.new-subsection-name-input'
