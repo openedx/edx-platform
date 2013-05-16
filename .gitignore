@@ -40,4 +40,3 @@ node_modules
 .prereqs_cache
 autodeploy.properties
 .ws_migrations_complete
-jasmine_test_runner.html
