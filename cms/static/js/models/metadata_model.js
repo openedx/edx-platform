@@ -1,6 +1,8 @@
+/**
+ * Model used for metadata setting editors. This model does not do its own saving,
+ * as that is done by module_edit.coffee.
+ */
 CMS.Models.Metadata = Backbone.Model.extend({
-    // This model class is not suited for restful operations and is considered just a server side initialized container
-    url: '',
 
     defaults: {
         "field_name": null,
