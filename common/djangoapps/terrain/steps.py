@@ -122,6 +122,13 @@ def should_see_a_link_called(step, text):
     assert len(world.browser.find_link_by_text(text)) > 0
 
 
+@step(r'should see (?:the|a) link with the id "([^"]*)" called "([^"]*)"$')
+def should_have_link_with_id_and_text(step, link_id, text):
+    link = world.browser.find_by_id(link_id)
+    assert len(link) > 0
+    assert_equals(link.text, text)
+
+
 @step(r'should see "(.*)" (?:somewhere|anywhere) in (?:the|this) page')
 def should_see_in_the_page(step, text):
     assert_in(text, world.css_text('body'))
