@@ -402,6 +402,11 @@ def modx_dispatch(request, dispatch, location, course_id):
            through the part before the first '?'.
       - location -- the module location. Used to look up the XModule instance
       - course_id -- defines the course context for this request.
+
+    Raises PermissionDenied if the user is not logged in. Raises Http404 if
+    the location and course_id do not identify a valid module, the module is
+    not accessible by the user, or the module raises NotFoundError. If the
+    module raises any other error, it will escape this function.
     '''
     # ''' (fix emacs broken parsing)
 
@@ -430,8 +435,19 @@ def modx_dispatch(request, dispatch, location, course_id):
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
 
+    try:
+        descriptor = modulestore().get_instance(course_id, location)
+    except ItemNotFoundError:
+        log.warn(
+            "Invalid location for course id {course_id}: {location}".format(
+                course_id=course_id,
+                location=location
+            )
+        )
+        raise Http404
+
     model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
-        request.user, modulestore().get_instance(course_id, location))
+        request.user, descriptor)
 
     instance = get_module(request.user, request, location, model_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
