@@ -47,6 +47,29 @@ for name, modname in ASSUMED_IMPORTS:
 LAZY_IMPORTS = "".join(LAZY_IMPORTS)
 
 
+def update_hash(hasher, obj):
+    """
+    Update a `hashlib` hasher with a nested object.
+
+    To properly cache nested structures, we need to compute a hash from the
+    entire structure, canonicalizing at every level.
+
+    `hasher`'s `.update()` method is called a number of times, touching all of
+    `obj` in the process.  Only primitive JSON-safe types are supported.
+
+    """
+    hasher.update(str(type(obj)))
+    if isinstance(obj, (tuple, list)):
+        for e in obj:
+            update_hash(hasher, e)
+    elif isinstance(obj, dict):
+        for k in sorted(obj):
+            update_hash(hasher, k)
+            update_hash(hasher, obj[k])
+    else:
+        hasher.update(repr(obj))
+
+
 @statsd.timed('capa.safe_exec.time')
 def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None):
     """
@@ -67,10 +90,10 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
     """
     # Check the cache for a previous result.
     if cache:
-        canonical_globals = sorted(json_safe(globals_dict).iteritems())
+        safe_globals = json_safe(globals_dict)
         md5er = hashlib.md5()
         md5er.update(repr(code))
-        md5er.update(repr(canonical_globals))
+        update_hash(md5er, safe_globals)
         key = "safe_exec.%r.%s" % (random_seed, md5er.hexdigest())
         cached = cache.get(key)
         if cached is not None:

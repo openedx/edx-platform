@@ -1,11 +1,12 @@
 """Test safe_exec.py"""
 
+import hashlib
 import os.path
 import random
 import textwrap
 import unittest
 
-from capa.safe_exec import safe_exec
+from capa.safe_exec import safe_exec, update_hash
 from codejail.safe_exec import SafeExecException
 
 
@@ -145,16 +146,71 @@ class TestSafeExecCaching(unittest.TestCase):
 
     def test_unicode_submission(self):
         # Check that using non-ASCII unicode does not raise an encoding error.
-    
         # Try several non-ASCII unicode characters
         for code in [129, 500, 2**8 - 1, 2**16 - 1]:
-
             code_with_unichr = unicode("# ") + unichr(code)
-
             try:
                 safe_exec(code_with_unichr, {}, cache=DictCache({}))
             except UnicodeEncodeError:
                 self.fail("Tried executing code with non-ASCII unicode: {0}".format(code))
+
+
+class TestUpdateHash(unittest.TestCase):
+    """Test the safe_exec.update_hash function to be sure it canonicalizes properly."""
+
+    def hash_obj(self, obj):
+        """Return the md5 hash that `update_hash` makes us."""
+        md5er = hashlib.md5()
+        update_hash(md5er, obj)
+        return md5er.hexdigest()
+
+    def equal_but_different_dicts(self):
+        """
+        Make two equal dicts with different key order.
+
+        Simple literals won't do it.  Filling one and then shrinking it will
+        make them different.
+
+        """
+        d1 = {k:1 for k in "abcdefghijklmnopqrstuvwxyz"}
+        d2 = dict(d1)
+        for i in xrange(10000):
+            d2[i] = 1
+        for i in xrange(10000):
+            del d2[i]
+
+        # Check that our dicts are equal, but with different key order.
+        self.assertEqual(d1, d2)
+        self.assertNotEqual(d1.keys(), d2.keys())
+
+        return d1, d2
+
+    def test_simple_cases(self):
+        h1 = self.hash_obj(1)
+        h10 = self.hash_obj(10)
+        hs1 = self.hash_obj("1")
+
+        self.assertNotEqual(h1, h10)
+        self.assertNotEqual(h1, hs1)
+
+    def test_list_ordering(self):
+        h1 = self.hash_obj({'a': [1,2,3]})
+        h2 = self.hash_obj({'a': [3,2,1]})
+        self.assertNotEqual(h1, h2)
+
+    def test_dict_ordering(self):
+        d1, d2 = self.equal_but_different_dicts()
+        h1 = self.hash_obj(d1)
+        h2 = self.hash_obj(d2)
+        self.assertEqual(h1, h2)
+
+    def test_deep_ordering(self):
+        d1, d2 = self.equal_but_different_dicts()
+        o1 = {'a':[1, 2, [d1], 3, 4]}
+        o2 = {'a':[1, 2, [d2], 3, 4]}
+        h1 = self.hash_obj(o1)
+        h2 = self.hash_obj(o2)
+        self.assertEqual(h1, h2)
 
 
 class TestRealProblems(unittest.TestCase):
