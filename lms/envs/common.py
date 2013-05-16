@@ -126,9 +126,7 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 # For Node.js
 
-system_node_path = os.environ.get("NODE_PATH", None)
-if system_node_path is None:
-    system_node_path = "/usr/local/lib/node_modules"
+system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
 
 node_paths = [COMMON_ROOT / "static/js/vendor",
               COMMON_ROOT / "static/coffee/src",

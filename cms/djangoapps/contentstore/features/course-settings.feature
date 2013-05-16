@@ -1,20 +1,17 @@
 Feature: Course Settings
   As a course author, I want to be able to configure my course settings.
 
-  @skip-phantom
   Scenario: User can set course dates
     Given I have opened a new course in Studio
     When I select Schedule and Details
     And I set course dates
     Then I see the set dates on refresh
 
-  @skip-phantom
   Scenario: User can clear previously set course dates (except start date)
     Given I have set course dates
     And I clear all the dates except start
     Then I see cleared dates on refresh
 
-  @skip-phantom
   Scenario: User cannot clear the course start date
     Given I have set course dates
     And I clear the course start date

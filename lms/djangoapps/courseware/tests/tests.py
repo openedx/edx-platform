@@ -631,8 +631,8 @@ class TestViewAuth(LoginEnrollmentTestCase):
             urls = reverse_urls(['info', 'progress'], course)
             urls.extend([
                 reverse('book', kwargs={'course_id': course.id,
-                                        'book_index': book.title})
-                for book in course.textbooks
+                                        'book_index': index})
+                for index, book in enumerate(course.textbooks)
             ])
             return urls
 
@@ -643,8 +643,6 @@ class TestViewAuth(LoginEnrollmentTestCase):
             """
             urls = reverse_urls(['about_course'], course)
             urls.append(reverse('courses'))
-            # Need separate test for change_enrollment, since it's a POST view
-            #urls.append(reverse('change_enrollment'))
 
             return urls
 
