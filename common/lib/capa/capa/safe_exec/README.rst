@@ -28,5 +28,24 @@ __ https://github.com/edx/codejail/blob/master/README.rst
 
     <EDXPLATFORM>/common/lib/sandbox-packages/** r,
 
+3. You can configure resource limits in settings.py.  A CODE_JAIL setting is
+   available, a dictionary.  The "limits" key lets you adjust the limits for
+   CPU time, real time, and memory use.  Setting any of them to zero disables
+   that limit::
+
+    # in settings.py...
+    CODE_JAIL = {
+        # Configurable limits.
+        'limits': {
+            # How many CPU seconds can jailed code use?
+            'CPU': 1,
+            # How many real-time seconds will a sandbox survive?
+            'REALTIME': 1,
+            # How much memory (in bytes) can a sandbox use?
+            'VMEM': 30000000,
+        },
+    }
+
+
 That's it.  Once you've finished the CodeJail configuration instructions,
 your course-hosted Python code should be run securely.
