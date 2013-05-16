@@ -67,22 +67,14 @@
     <script src="${static.url('js/models/feedback.js')}"></script>
     <script src="${static.url('js/views/feedback.js')}"></script>
     <script type="text/javascript">
-$(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
-    var msg = new CMS.Models.ErrorMessage({
-        "title": gettext("Server Error"),
-        "message": jqXHR.responseText,
-        "actions": {
-            "primary": {
-                "text": "Dismiss",
-                "click": function(view) {
-                    view.hide();
-                }
-            }
-        }
-    });
-    new CMS.Views.Notification({model: msg});
-    return msg;
-})
+        $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
+            var msg = new CMS.Models.ErrorMessage({
+                "title": gettext("Studio's having trouble saving your work"),
+                "message": jqXHR.responseText || gettext("This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure are online.")
+            });
+            new CMS.Views.Notification({model: msg});
+            return msg;
+        })
     </script>
 
     <!-- view -->
