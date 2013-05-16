@@ -156,7 +156,7 @@ def initialize_discussion_info(course):
 
     # get all discussion models within this course_id
     all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course,
-        'discussion', None], course_id=course_id)
+                                          'discussion', None], course_id=course_id)
 
     for module in all_modules:
         skip_module = False

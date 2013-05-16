@@ -46,7 +46,6 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.client = Client()
             assert_true(self.client.login(username='student', password='test'))
 
-    
     def test_create_thread(self, mock_request):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"title":"Hello",\
@@ -88,7 +87,7 @@ class ViewsTestCase(ModuleStoreTestCase):
                                         'anonymous': False, 'course_id': u'MITx/999/Robot_Super_Course',
                                         'api_key': 'PUT_YOUR_API_KEY_HERE'}, timeout=5)
         assert_equal(response.status_code, 200)
-        
+
     def test_flag_thread(self, mock_request):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"title":"Hello",\
@@ -111,18 +110,18 @@ class ViewsTestCase(ModuleStoreTestCase):
                                             "endorsed":false,\
                                             "unread_comments_count":0,\
                                             "read":false,"comments_count":0}'
-        url = reverse('flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d','course_id': self.course_id })
+        url = reverse('flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d', 'course_id': self.course_id})
         response = self.client.post(url)
         assert_true(mock_request.called)
 
-        call_list = [(('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params':{'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5}),
-                     (('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_flag'), {'data':{'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout':5}),
-                     (('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params':{'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5})]
+        call_list = [(('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params': {'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5}),
+                     (('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_flag'), {'data': {'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout': 5}),
+                     (('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params': {'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5})]
 
-        assert_equal (call_list,mock_request.call_args_list)
+        assert_equal(call_list, mock_request.call_args_list)
 
         assert_equal(response.status_code, 200)
-        
+
     def test_un_flag_thread(self, mock_request):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"title":"Hello",\
@@ -145,15 +144,15 @@ class ViewsTestCase(ModuleStoreTestCase):
                                             "endorsed":false,\
                                             "unread_comments_count":0,\
                                             "read":false,"comments_count":0}'
-        url = reverse('un_flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d','course_id': self.course_id })
+        url = reverse('un_flag_abuse_for_thread', kwargs={'thread_id': '518d4237b023791dca00000d', 'course_id': self.course_id})
         response = self.client.post(url)
         assert_true(mock_request.called)
 
-        call_list = [(('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params':{'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5}),
-                     (('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_unflag'), {'data':{'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout':5}),
-                     (('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params':{'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5})]
+        call_list = [(('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params': {'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5}),
+                     (('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_unflag'), {'data': {'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout': 5}),
+                     (('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params': {'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5})]
 
-        assert_equal (call_list,mock_request.call_args_list)
+        assert_equal(call_list, mock_request.call_args_list)
 
         assert_equal(response.status_code, 200)
 
@@ -174,16 +173,16 @@ class ViewsTestCase(ModuleStoreTestCase):
                                             "down_count":0,"point":0},\
                                             "abuse_flaggers":[1],\
                                             "type":"comment",\
-                                            "endorsed":false}'         
-        url = reverse('flag_abuse_for_comment', kwargs={'comment_id': '518d4237b023791dca00000d','course_id': self.course_id })
+                                            "endorsed":false}'
+        url = reverse('flag_abuse_for_comment', kwargs={'comment_id': '518d4237b023791dca00000d', 'course_id': self.course_id})
         response = self.client.post(url)
         assert_true(mock_request.called)
 
-        call_list = [(('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params':{'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5}),
-                     (('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_flag'), {'data':{'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout':5}),
-                     (('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params':{'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5})]
+        call_list = [(('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params': {'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5}),
+                     (('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_flag'), {'data': {'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout': 5}),
+                     (('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params': {'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5})]
 
-        assert_equal (call_list,mock_request.call_args_list)
+        assert_equal(call_list, mock_request.call_args_list)
 
         assert_equal(response.status_code, 200)
 
@@ -205,14 +204,14 @@ class ViewsTestCase(ModuleStoreTestCase):
                                             "abuse_flaggers":[],\
                                             "type":"comment",\
                                             "endorsed":false}'
-        url = reverse('un_flag_abuse_for_comment', kwargs={'comment_id': '518d4237b023791dca00000d','course_id': self.course_id })
+        url = reverse('un_flag_abuse_for_comment', kwargs={'comment_id': '518d4237b023791dca00000d', 'course_id': self.course_id})
         response = self.client.post(url)
         assert_true(mock_request.called)
 
-        call_list = [(('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params':{'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5}),
-                     (('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_unflag'), {'data':{'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout':5}),
-                     (('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params':{'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout':5})]
+        call_list = [(('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params': {'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5}),
+                     (('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_unflag'), {'data': {'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout': 5}),
+                     (('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params': {'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5})]
 
-        assert_equal (call_list,mock_request.call_args_list)
+        assert_equal(call_list, mock_request.call_args_list)
 
         assert_equal(response.status_code, 200)
