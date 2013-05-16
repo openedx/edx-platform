@@ -9,4 +9,4 @@
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@483e0cb1#egg=XBlock
--e git+https://github.com/edx/codejail.git@94dc7ce#egg=codejail
+-e git+https://github.com/edx/codejail.git@07494f1#egg=codejail
