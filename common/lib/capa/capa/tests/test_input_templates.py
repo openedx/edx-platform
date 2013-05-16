@@ -1,20 +1,27 @@
-"""Tests for the logic in input type mako templates."""
+"""
+Tests for the logic in input type mako templates.
+"""
 
 import unittest
 import capa
 import os.path
+import json
 from lxml import etree
 from mako.template import Template as MakoTemplate
 from mako import exceptions
 
 
 class TemplateError(Exception):
-    """Error occurred while rendering a Mako template"""
+    """
+    Error occurred while rendering a Mako template.
+    """
     pass
 
 
 class TemplateTestCase(unittest.TestCase):
-    """Utilitites for testing templates"""
+    """
+    Utilitites for testing templates.
+    """
 
     # Subclasses override this to specify the file name of the template
     # to be loaded from capa/templates.
@@ -23,7 +30,9 @@ class TemplateTestCase(unittest.TestCase):
     TEMPLATE_NAME = None
 
     def setUp(self):
-        """Load the template"""
+        """
+        Load the template under test.
+        """
         capa_path = capa.__path__[0]
         self.template_path = os.path.join(capa_path,
                                           'templates',
@@ -33,18 +42,31 @@ class TemplateTestCase(unittest.TestCase):
         template_file.close()
 
     def render_to_xml(self, context_dict):
-        """Render the template using the `context_dict` dict.
-
-        Returns an `etree` XML element."""
+        """
+        Render the template using the `context_dict` dict.
+        Returns an `etree` XML element.
+        """
         try:
             xml_str = self.template.render_unicode(**context_dict)
         except:
             raise TemplateError(exceptions.text_error_template().render())
 
-        return etree.fromstring(xml_str)
+        # Attempt to construct an XML tree from the template
+        # This makes it easy to use XPath to make assertions, rather
+        # than dealing with a string.
+        # We modify the string slightly by wrapping it in <test>
+        # tags, to ensure it has one root element.
+        try:
+            xml = etree.fromstring("<test>" + xml_str + "</test>")
+        except Exception as exc:
+            raise TemplateError("Could not parse XML from '{0}': {1}".format(
+                                xml_str, str(exc)))
+        else:
+            return xml
 
     def assert_has_xpath(self, xml_root, xpath, context_dict, exact_num=1):
-        """Asserts that the xml tree has an element satisfying `xpath`.
+        """
+        Asserts that the xml tree has an element satisfying `xpath`.
 
         `xml_root` is an etree XML element
         `xpath` is an XPath string, such as `'/foo/bar'`
@@ -57,7 +79,8 @@ class TemplateTestCase(unittest.TestCase):
         self.assertEqual(len(xml_root.xpath(xpath)), exact_num, msg=message)
 
     def assert_no_xpath(self, xml_root, xpath, context_dict):
-        """Asserts that the xml tree does NOT have an element
+        """
+        Asserts that the xml tree does NOT have an element
         satisfying `xpath`.
 
         `xml_root` is an etree XML element
@@ -67,7 +90,8 @@ class TemplateTestCase(unittest.TestCase):
         self.assert_has_xpath(xml_root, xpath, context_dict, exact_num=0)
 
     def assert_has_text(self, xml_root, xpath, text, exact=True):
-        """Find the element at `xpath` in `xml_root` and assert
+        """
+        Find the element at `xpath` in `xml_root` and assert
         that its text is `text`.
 
         `xml_root` is an etree XML element
@@ -88,7 +112,9 @@ class TemplateTestCase(unittest.TestCase):
 
 
 class ChoiceGroupTemplateTest(TemplateTestCase):
-    """Test mako template for `<choicegroup>` input"""
+    """
+    Test mako template for `<choicegroup>` input.
+    """
 
     TEMPLATE_NAME = 'choicegroup.html'
 
@@ -103,8 +129,10 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         super(ChoiceGroupTemplateTest, self).setUp()
 
     def test_problem_marked_correct(self):
-        """Test conditions under which the entire problem
-        (not a particular option) is marked correct"""
+        """
+        Test conditions under which the entire problem
+        (not a particular option) is marked correct.
+        """
 
         self.context['status'] = 'correct'
         self.context['input_type'] = 'checkbox'
@@ -123,8 +151,10 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
                              self.context)
 
     def test_problem_marked_incorrect(self):
-        """Test all conditions under which the entire problem
-        (not a particular option) is marked incorrect"""
+        """
+        Test all conditions under which the entire problem
+        (not a particular option) is marked incorrect.
+        """
         conditions = [
             {'status': 'incorrect', 'input_type': 'radio', 'value': ''},
             {'status': 'incorrect', 'input_type': 'checkbox', 'value': []},
@@ -151,8 +181,10 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
                                  self.context)
 
     def test_problem_marked_unsubmitted(self):
-        """Test all conditions under which the entire problem
-        (not a particular option) is marked unanswered"""
+        """
+        Test all conditions under which the entire problem
+        (not a particular option) is marked unanswered.
+        """
         conditions = [
             {'status': 'unsubmitted', 'input_type': 'radio', 'value': ''},
             {'status': 'unsubmitted', 'input_type': 'radio', 'value': []},
@@ -181,8 +213,10 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
                                  self.context)
 
     def test_option_marked_correct(self):
-        """Test conditions under which a particular option
-        (not the entire problem) is marked correct."""
+        """
+        Test conditions under which a particular option
+        (not the entire problem) is marked correct.
+        """
         conditions = [
             {'input_type': 'radio', 'value': '2'},
             {'input_type': 'radio', 'value': ['2']}]
@@ -200,8 +234,10 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             self.assert_no_xpath(xml, xpath, self.context)
 
     def test_option_marked_incorrect(self):
-        """Test conditions under which a particular option
-        (not the entire problem) is marked incorrect."""
+        """
+        Test conditions under which a particular option
+        (not the entire problem) is marked incorrect.
+        """
         conditions = [
             {'input_type': 'radio', 'value': '2'},
             {'input_type': 'radio', 'value': ['2']}]
@@ -219,7 +255,8 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             self.assert_no_xpath(xml, xpath, self.context)
 
     def test_never_show_correctness(self):
-        """Test conditions under which we tell the template to
+        """
+        Test conditions under which we tell the template to
         NOT show correct/incorrect, but instead show a message.
 
         This is used, for example, by the Justice course to ask
@@ -268,8 +305,10 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
                                  self.context['submitted_message'])
 
     def test_no_message_before_submission(self):
-        """Ensure that we don't show the `submitted_message`
-        before submitting"""
+        """
+        Ensure that we don't show the `submitted_message`
+        before submitting.
+        """
 
         conditions = [
             {'input_type': 'radio', 'status': 'unsubmitted', 'value': ''},
@@ -298,7 +337,9 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
 
 
 class TextlineTemplateTest(TemplateTestCase):
-    """Test mako template for `<textline>` input"""
+    """
+    Test mako template for `<textline>` input.
+    """
 
     TEMPLATE_NAME = 'textline.html'
 
@@ -405,3 +446,271 @@ class TextlineTemplateTest(TemplateTestCase):
 
         xpath = "//span[@class='message']"
         self.assert_has_text(xml, xpath, self.context['msg'])
+
+
+class AnnotationInputTemplateTest(TemplateTestCase):
+    """
+    Test mako template for `<annotationinput>` input.
+    """
+
+    TEMPLATE_NAME = 'annotationinput.html'
+
+    def setUp(self):
+        self.context = {'id': 2,
+                        'value': '<p>Test value</p>',
+                        'title': '<h1>This is a title</h1>',
+                        'text': '<p><b>This</b> is a test.</p>',
+                        'comment': '<p>This is a test comment</p>',
+                        'comment_prompt': '<p>This is a test comment prompt</p>',
+                        'comment_value': '<p>This is the value of a test comment</p>',
+                        'tag_prompt': '<p>This is a tag prompt</p>',
+                        'options': [],
+                        'has_options_value': False,
+                        'debug': False,
+                        'status': 'unsubmitted',
+                        'return_to_annotation': False,
+                        'msg': '<p>This is a test message</p>', }
+        super(AnnotationInputTemplateTest, self).setUp()
+
+    def test_return_to_annotation(self):
+        """
+        Test link for `Return to Annotation` appears if and only if
+        the flag is set.
+        """
+
+        xpath = "//a[@class='annotation-return']"
+
+        # If return_to_annotation set, then show the link
+        self.context['return_to_annotation'] = True
+        xml = self.render_to_xml(self.context)
+        self.assert_has_xpath(xml, xpath, self.context)
+
+        # Otherwise, do not show the links
+        self.context['return_to_annotation'] = False
+        xml = self.render_to_xml(self.context)
+        self.assert_no_xpath(xml, xpath, self.context)
+
+    def test_option_selection(self):
+        """
+        Test that selected options are selected.
+        """
+
+        # Create options 0-4 and select option 2
+        self.context['options_value'] = [2]
+        self.context['options'] = [
+            {'id': id_num,
+             'choice': 'correct',
+             'description': '<p>Unescaped <b>HTML {0}</b></p>'.format(id_num)}
+            for id_num in range(0, 5)]
+
+        xml = self.render_to_xml(self.context)
+
+        # Expect that each option description is visible
+        # with unescaped HTML.
+        # Since the HTML is unescaped, we can traverse the XML tree
+        for id_num in range(0, 5):
+            xpath = "//span[@data-id='{0}']/p/b".format(id_num)
+            self.assert_has_text(xml, xpath, 'HTML {0}'.format(id_num), exact=False)
+
+        # Expect that the correct option is selected
+        xpath = "//span[contains(@class,'selected')]/p/b"
+        self.assert_has_text(xml, xpath, 'HTML 2', exact=False)
+
+    def test_submission_status(self):
+        """
+        Test that the submission status displays correctly.
+        """
+
+        # Test cases of `(input_status, expected_css_class)` tuples
+        test_cases = [('unsubmitted', 'unanswered'),
+                      ('incomplete', 'incorrect'),
+                      ('incorrect', 'incorrect')]
+
+        for (input_status, expected_css_class) in test_cases:
+            self.context['status'] = input_status
+            xml = self.render_to_xml(self.context)
+
+            xpath = "//span[@class='{0}']".format(expected_css_class)
+            self.assert_has_xpath(xml, xpath, self.context)
+
+        # If individual options are being marked, then expect
+        # just the option to be marked incorrect, not the whole problem
+        self.context['has_options_value'] = True
+        self.context['status'] = 'incorrect'
+        xpath = "//span[@class='incorrect']"
+        xml = self.render_to_xml(self.context)
+        self.assert_no_xpath(xml, xpath, self.context)
+
+    def test_display_html_comment(self):
+        """
+        Test that HTML comment and comment prompt render.
+        """
+        self.context['comment'] = "<p>Unescaped <b>comment HTML</b></p>"
+        self.context['comment_prompt'] = "<p>Prompt <b>prompt HTML</b></p>"
+        self.context['text'] = "<p>Unescaped <b>text</b></p>"
+        xml = self.render_to_xml(self.context)
+
+        # Because the HTML is unescaped, we should be able to
+        # descend to the <b> tag
+        xpath = "//div[@class='block']/p/b"
+        self.assert_has_text(xml, xpath, 'prompt HTML')
+
+        xpath = "//div[@class='block block-comment']/p/b"
+        self.assert_has_text(xml, xpath, 'comment HTML')
+
+        xpath = "//div[@class='block block-highlight']/p/b"
+        self.assert_has_text(xml, xpath, 'text')
+
+    def test_display_html_tag_prompt(self):
+        """
+        Test that HTML tag prompts render.
+        """
+        self.context['tag_prompt'] = "<p>Unescaped <b>HTML</b></p>"
+        xml = self.render_to_xml(self.context)
+
+        # Because the HTML is unescaped, we should be able to
+        # descend to the <b> tag
+        xpath = "//div[@class='block']/p/b"
+        self.assert_has_text(xml, xpath, 'HTML')
+
+
+class MathStringTemplateTest(TemplateTestCase):
+    """
+    Test mako template for `<mathstring>` input.
+    """
+
+    TEMPLATE_NAME = 'mathstring.html'
+
+    def setUp(self):
+        self.context = {'isinline': False, 'mathstr': '', 'tail': ''}
+        super(MathStringTemplateTest, self).setUp()
+
+    def test_math_string_inline(self):
+        self.context['isinline'] = True
+        self.context['mathstr'] = 'y = ax^2 + bx + c'
+
+        xml = self.render_to_xml(self.context)
+        xpath = "//section[@class='math-string']/span[1]"
+        self.assert_has_text(xml, xpath,
+                             '[mathjaxinline]y = ax^2 + bx + c[/mathjaxinline]')
+
+    def test_math_string_not_inline(self):
+        self.context['isinline'] = False
+        self.context['mathstr'] = 'y = ax^2 + bx + c'
+
+        xml = self.render_to_xml(self.context)
+        xpath = "//section[@class='math-string']/span[1]"
+        self.assert_has_text(xml, xpath,
+                             '[mathjax]y = ax^2 + bx + c[/mathjax]')
+
+    def test_tail_html(self):
+        self.context['tail'] = "<p>This is some <b>tail</b> <em>HTML</em></p>"
+        xml = self.render_to_xml(self.context)
+
+        # HTML from `tail` should NOT be escaped.
+        # We should be able to traverse it as part of the XML tree
+        xpath = "//section[@class='math-string']/span[2]/p/b"
+        self.assert_has_text(xml, xpath, 'tail')
+
+        xpath = "//section[@class='math-string']/span[2]/p/em"
+        self.assert_has_text(xml, xpath, 'HTML')
+
+
+class OptionInputTemplateTest(TemplateTestCase):
+    """
+    Test mako template for `<optioninput>` input.
+    """
+
+    TEMPLATE_NAME = 'optioninput.html'
+
+    def setUp(self):
+        self.context = {'id': 2, 'options': [], 'status': 'unsubmitted', 'value': 0}
+        super(OptionInputTemplateTest, self).setUp()
+
+    def test_select_options(self):
+
+        # Create options 0-4, and select option 2
+        self.context['options'] = [(id_num, '<b>Option {0}</b>'.format(id_num))
+                                   for id_num in range(0, 5)]
+        self.context['value'] = 2
+
+        xml = self.render_to_xml(self.context)
+
+        # Should have a dummy default
+        xpath = "//option[@value='option_2_dummy_default']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+        # Should have each of the options, with the correct description
+        # The description HTML should NOT be escaped
+        # (that's why we descend into the <b> tag)
+        for id_num in range(0, 5):
+            xpath = "//option[@value='{0}']/b".format(id_num)
+            self.assert_has_text(xml, xpath, 'Option {0}'.format(id_num))
+
+        # Should have the correct option selected
+        xpath = "//option[@selected='true']/b"
+        self.assert_has_text(xml, xpath, 'Option 2')
+
+    def test_status(self):
+
+        # Test cases, where each tuple represents
+        # `(input_status, expected_css_class)`
+        test_cases = [('unsubmitted', 'unanswered'),
+                      ('correct', 'correct'),
+                      ('incorrect', 'incorrect'),
+                      ('incomplete', 'incorrect')]
+
+        for (input_status, expected_css_class) in test_cases:
+            self.context['status'] = input_status
+            xml = self.render_to_xml(self.context)
+
+            xpath = "//span[@class='{0}']".format(expected_css_class)
+            self.assert_has_xpath(xml, xpath, self.context)
+
+
+class DragAndDropTemplateTest(TemplateTestCase):
+    """
+    Test mako template for `<draganddropinput>` input.
+    """
+
+    TEMPLATE_NAME = 'drag_and_drop_input.html'
+
+    def setUp(self):
+        self.context = {'id': 2,
+                        'drag_and_drop_json': '',
+                        'value': 0,
+                        'status': 'unsubmitted',
+                        'msg': ''}
+        super(DragAndDropTemplateTest, self).setUp()
+
+    def test_status(self):
+
+        # Test cases, where each tuple represents
+        # `(input_status, expected_css_class, expected_text)`
+        test_cases = [('unsubmitted', 'unanswered', 'unanswered'),
+                      ('correct', 'correct', 'correct'),
+                      ('incorrect', 'incorrect', 'incorrect'),
+                      ('incomplete', 'incorrect', 'incomplete')]
+
+        for (input_status, expected_css_class, expected_text) in test_cases:
+            self.context['status'] = input_status
+            xml = self.render_to_xml(self.context)
+
+            # Expect a <div> with the status
+            xpath = "//div[@class='{0}']".format(expected_css_class)
+            self.assert_has_xpath(xml, xpath, self.context)
+
+            # Expect a <p> with the status
+            xpath = "//p[@class='status']"
+            self.assert_has_text(xml, xpath, expected_text, exact=False)
+
+    def test_drag_and_drop_json_html(self):
+
+        json_with_html = json.dumps({'test': '<p>Unescaped <b>HTML</b></p>'})
+        self.context['drag_and_drop_json'] = json_with_html
+        xml = self.render_to_xml(self.context)
+
+        # Assert that the JSON-encoded string was inserted without
+        # escaping the HTML.  We should be able to traverse the XML tree.
+        xpath = "//div[@class='drag_and_drop_problem_json']/p/b"
+        self.assert_has_text(xml, xpath, 'HTML')
