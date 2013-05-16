@@ -259,23 +259,6 @@ def instructor_dashboard(request, course_id):
             log.error("Encountered exception from reset: {0}".format(e))
             msg += '<font color="red">Failed to create a background task for resetting "{0}": {1}.</font>'.format(problem_url, e.message)
 
-    elif "Delete ALL student state for module" in action:
-        problem_urlname = request.POST.get('problem_for_all_students', '')
-        problem_url = get_module_url(problem_urlname)
-        try:
-            course_task_log_entry = task_queue.submit_delete_problem_state_for_all_students(request, course_id, problem_url)
-            if course_task_log_entry is None:
-                msg += '<font color="red">Failed to create a background task for deleting "{0}".</font>'.format(problem_url)
-            else:
-                track_msg = 'delete state for problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
-                track.views.server_track(request, track_msg, {}, page='idashboard')
-        except ItemNotFoundError as e:
-            log.error('Failure to delete state: unknown problem "{0}"'.format(e))
-            msg += '<font color="red">Failed to create a background task for deleting state for "{0}": problem not found.</font>'.format(problem_url)
-        except Exception as e:
-            log.error("Encountered exception from delete state: {0}".format(e))
-            msg += '<font color="red">Failed to create a background task for deleting state for "{0}": {1}.</font>'.format(problem_url, e.message)
-
     elif "Reset student's attempts" in action or "Delete student state for module" in action \
             or "Regrade student's problem submission" in action:
         # get the form data
