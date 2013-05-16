@@ -156,8 +156,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         else:
             # load the module and apply the inherited metadata
             try:
+                category = json_data['location']['category']
                 class_ = XModuleDescriptor.load_class(
-                    json_data['location']['category'],
+                    category,
                     self.default_class
                 )
                 definition = json_data.get('definition', {})
@@ -174,7 +175,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 )
 
                 model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
-                module = class_(self, location, model_data)
+                module = class_(self, category, location, None, model_data)
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
                     # so when we do the lookup, we should do so with a non-draft location

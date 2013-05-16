@@ -9,7 +9,8 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from xblock.core import XBlock, Scope, String
-from xmodule.modulestore import inheritance
+from xmodule.modulestore import inheritance, Location
+from xmodule.modulestore.locator import BlockUsageLocator
 
 log = logging.getLogger(__name__)
 
@@ -124,8 +125,8 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         # TODO ensure each caller passes correct type (removed coercion)
         self.location = location
         self.descriptor = descriptor
-        self.category = category
-        self.definition_locator = definition_id
+        self.url_name = descriptor.url_name
+        self.category = descriptor.category
         self._loaded_children = None
 
     @property
@@ -381,9 +382,16 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         # leaving off original_version since it complicates creation w/o any obv value yet and is computable
         # by following previous until None
         self.edited_by = self.edited_on = self.previous_version = self.update_version = None
+        # only used by mongostores which separate definitions from blocks
         self.definition_locator = definition_id
         self._model_data = model_data
-
+        if isinstance(location, Location):
+            self.url_name = location.name
+        elif isinstance(location, BlockUsageLocator):
+            self.url_name = location.usage_id
+        else:
+            # TODO what should it do?
+            pass
         self._child_instances = None
 
     @property
@@ -478,6 +486,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         - 'definition':
         - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
+        # NOTE: this won't work if category is not in json_data (i.e., old modulestore)
         class_ = XModuleDescriptor.load_class(
             json_data['category'],
             default_class
@@ -511,7 +520,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 if field in json_metadata:
                     json_data['_inherited_metadata'][field] = json_metadata[field]
         new_block = system.xblock_from_json(cls, usage_id, json_data)
-        parent_xblock.children.append(new_block)
+        if parent_xblock is not None:
+            parent_xblock.children.append(new_block)
         return new_block
 
     # ================================= XML PARSING ============================
