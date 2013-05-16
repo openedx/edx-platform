@@ -38,6 +38,7 @@ LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 
 MAX_VALID_BROWSER_ATTEMPTS = 20
 
+
 @before.harvest
 def initial_setup(server):
     """
@@ -72,6 +73,7 @@ def initial_setup(server):
     # then we cannot run the tests.
     if not success:
         raise IOError("Could not acquire valid ChromeDriver browser session.")
+
 
 @before.each_scenario
 def reset_data(scenario):

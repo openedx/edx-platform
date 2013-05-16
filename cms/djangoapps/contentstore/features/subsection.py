@@ -92,6 +92,7 @@ def the_subsection_does_not_exist(step):
     css = 'span.subsection-name'
     assert world.browser.is_element_not_present_by_css(css)
 
+
 @step('I see the correct dates$')
 def i_see_the_correct_dates(step):
     assert_equal('12/25/2011', get_date('input#start_date'))
@@ -104,6 +105,7 @@ def i_see_the_correct_dates(step):
 
 def get_date(css):
     return world.css_find(css).first.value.strip()
+
 
 def save_subsection_name(name):
     name_css = 'input.new-subsection-name-input'
