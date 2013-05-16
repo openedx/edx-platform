@@ -5,10 +5,10 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, Boolean, List
+from xblock.core import Scope, String, Integer, Boolean, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date, StringyFloat
+from .fields import Date, StringyFloat, StringyInteger
 
 log = logging.getLogger("mitx.courseware")
 
@@ -56,18 +56,18 @@ class CombinedOpenEndedFields(object):
                                scope=Scope.user_state)
     ready_to_reset = Boolean(help="If the problem is ready to be reset or not.", default=False,
                              scope=Scope.user_state)
-    attempts = Integer(display_name="Maximum Attempts",
-        help="Specifies the number of times the student can try to answer this problem.", default=1,
+    attempts = StringyInteger(display_name="Maximum Attempts",
+        help="The number of times the student can try to answer this problem.", default=1,
         scope=Scope.settings)
     # TODO: move values to Boolean in xblock.
     is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings,
         values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
-    accept_file_upload = Boolean(display_name="Accept File Upload",
-        help="If disabled, students cannot upload images to be graded with this problem.", default=False, scope=Scope.settings,
+    accept_file_upload = Boolean(display_name="Allow File Uploads",
+        help="Whether or not the student can submit files as a response.", default=False, scope=Scope.settings,
         values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
-    skip_spelling_checks = Boolean(display_name="Basic Quality Filter",
+    skip_spelling_checks = Boolean(display_name="Disable Quality Filter",
         # TODO: passing of text failed with "won't". Need to make our code more robust.
-        help="If enabled, submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
+        help="If False, submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
         default=False, scope=Scope.settings, values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
     due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
@@ -75,8 +75,8 @@ class CombinedOpenEndedFields(object):
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     weight = StringyFloat(display_name="Problem Weight",
-        help="Specifies the number of points the problem is worth. By default, each response field in the problem is worth one point.",
-        scope=Scope.settings)
+        help="The number of points the problem is worth. By default, each problem is worth one point.",
+        scope=Scope.settings, values = {"min" : 0 , "step": ".1"})
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
