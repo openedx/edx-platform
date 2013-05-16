@@ -360,6 +360,7 @@ def course_advanced_updates(request, org, course, name):
         #   has indicated that they want to edit the combinedopendended or peergrading module
         #   2) adds/removes the notes panel tab to a course automatically if the user has
         #   indicated that they want the notes module enabled in their course
+        # TODO refactor the above into distinct advanced policy settings
         if ADVANCED_COMPONENT_POLICY_KEY in request_body:
             #Get the course so that we can scrape current tabs
             course_module = modulestore().get_item(location)
