@@ -19,7 +19,6 @@ CMS.Models.Section = Backbone.Model.extend({
     initialize: function() {
         this.listenTo(this, "request", this.showNotification);
         this.listenTo(this, "sync", this.hideNotification);
-        this.listenTo(this, "error", this.hideNotification);
     },
     showNotification: function() {
         if(!this.msg) {
