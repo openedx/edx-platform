@@ -972,3 +972,7 @@ body.unit {
     opacity: 1;
   }
 }
+
+div.wrapper-comp-editor.is-inactive + div.launch-latex-compiler{
+ display: none;
+}
