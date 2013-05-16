@@ -31,7 +31,7 @@ describe "CMS.Views.SectionEdit", ->
             setFixtures($("<script>", {id: "section-name-edit-tpl", type: "text/template"}).text(tpl))
             spyOn(CMS.Views.SectionEdit.prototype, "switchToShowView")
                 .andCallThrough()
-            spyOn(CMS.Views.SectionEdit.prototype, "showErrorMessage")
+            spyOn(CMS.Views.SectionEdit.prototype, "showInvalidMessage")
                 .andCallThrough()
             window.analytics = jasmine.createSpyObj('analytics', ['track'])
             window.course_location_analytics = jasmine.createSpy()
@@ -68,12 +68,9 @@ describe "CMS.Views.SectionEdit", ->
             @requests[0].respond(200)
             expect(@view.switchToShowView).toHaveBeenCalled()
 
-        it "should call showErrorMessage when save() is unsuccessful", ->
+        it "should call showInvalidMessage when validation is unsuccessful", ->
+            spyOn(@model, 'validate').andReturn("BLARRGH")
             @view.$("input[type=submit]").click()
-            @requests[0].respond(500)
-            expect(@view.showErrorMessage).toHaveBeenCalled()
+            expect(@view.showInvalidMessage).toHaveBeenCalledWith(
+                jasmine.any(Object), "BLARRGH", jasmine.any(Object))
             expect(@view.switchToShowView).not.toHaveBeenCalled()
-
-
-
-

@@ -26,7 +26,7 @@ CMS.Views.SectionEdit = Backbone.View.extend({
     },
     initialize: function() {
         this.template = _.template($("#section-name-edit-tpl").text());
-        this.listenTo(this.model, "invalid", this.showErrorMessage);
+        this.listenTo(this.model, "invalid", this.showInvalidMessage);
         this.render();
     },
     events: {
@@ -58,7 +58,7 @@ CMS.Views.SectionEdit = Backbone.View.extend({
         this.stopListening();
         this.showView.render();
     },
-    showErrorMessage: function(model, error, options) {
+    showInvalidMessage: function(model, error, options) {
         var that = this;
         var msg = new CMS.Models.ErrorMessage({
             title: "Validation Error",
