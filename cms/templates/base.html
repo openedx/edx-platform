@@ -70,7 +70,7 @@
         $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
             var msg = new CMS.Models.ErrorMessage({
                 "title": gettext("Studio's having trouble saving your work"),
-                "message": jqXHR.responseText || gettext("This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure are online.")
+                "message": jqXHR.responseText || gettext("This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.")
             });
             new CMS.Views.Notification({model: msg});
             return msg;
