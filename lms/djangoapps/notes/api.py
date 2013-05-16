@@ -136,7 +136,7 @@ def create(request, course_id):
         note.clean(request.body)
     except ValidationError as e:
         log.debug(e)
-        return ApiResponse(http_response=HttpResponse('', status=500), data=None)
+        return ApiResponse(http_response=HttpResponse('', status=400), data=None)
 
     note.save()
     response = HttpResponse('', status=303)
@@ -176,7 +176,7 @@ def update(request, course_id, note_id):
         note.clean(request.body)
     except ValidationError as e:
         log.debug(e)
-        return ApiResponse(http_response=HttpResponse('', status=500), data=None)
+        return ApiResponse(http_response=HttpResponse('', status=400), data=None)
 
     note.save()
 
