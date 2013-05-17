@@ -16,7 +16,7 @@ end
 
 def when_changed(unchanged_message, *files)
     Rake::Task[PREREQS_MD5_DIR].invoke
-    cache_file = File.join(PREREQS_MD5_DIR, files.join('-').gsub(/\W+/, '-')) + '.md5'
+    cache_file = File.join(PREREQS_MD5_DIR, files[0].gsub(/\W+/, '-').sub(/-+$/, '') + '.md5'
     digest = Digest::MD5.new()
     Dir[*files].select{|file| File.file?(file)}.each do |file|
         digest.file(file)
