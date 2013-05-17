@@ -66,11 +66,9 @@ CMS.Views.Alert = Backbone.View.extend({
         var secondaryList = actions.secondary;
         if(!secondaryList) { return; }
         // which secondary action was clicked?
-        var i;
+        var i = 0;  // default to the first secondary action (easier for testing)
         if(e && e.target) {
             i = _.indexOf(this.$(".action-secondary"), e.target);
-        } else {
-            i = 0;
         }
         var secondary = this.model.get("actions").secondary[i];
         if(secondary.click) {
