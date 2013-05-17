@@ -50,8 +50,10 @@
           %else:
             <div class="action is-registered">You Are Registered</div>
           %endif
-        %else:
+        %elif allow_registration:
           <a class="action action-register register" href="#">Register for <strong>${course.number}</strong></a>
+        %else:
+          <div class="action registration-closed">Registration Is Closed</div>
         %endif
     </li>
   </ul>
