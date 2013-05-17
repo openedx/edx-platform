@@ -213,6 +213,7 @@ def _cert_info(user, course, cert_status):
     return d
 
 
+@ensure_csrf_cookie
 def signin_user(request):
     """
     This view will display the non-modal login form
@@ -227,6 +228,7 @@ def signin_user(request):
     return render_to_response('login.html', context)
 
 
+@ensure_csrf_cookie
 def register_user(request):
     """
     This view will display the non-modal registration form
