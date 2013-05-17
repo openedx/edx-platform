@@ -1,4 +1,10 @@
+tpl = readFixtures('system-feedback.underscore')
+
 beforeEach ->
+    setFixtures(sandbox({id: "page-alert"}))
+    appendSetFixtures(sandbox({id: "page-notification"}))
+    appendSetFixtures(sandbox({id: "page-prompt"}))
+    appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(tpl))
     @addMatchers
         toBeShown: ->
             @actual.hasClass("is-shown") and not @actual.hasClass("is-hiding")
@@ -6,12 +12,7 @@ beforeEach ->
             @actual.hasClass("is-hiding") and not @actual.hasClass("is-shown")
 
 describe "CMS.Views.Alert as base class", ->
-    tpl = readFixtures('alert.underscore')
-
     beforeEach ->
-        setFixtures(sandbox({id: "page-alert"}))
-        appendSetFixtures($("<script>", {id: "alert-tpl", type: "text/template"}).text(tpl))
-
         @model = new CMS.Models.ConfirmationMessage({
             title: "Portal"
             message: "Welcome to the Aperture Science Computer-Aided Enrichment Center"
@@ -40,12 +41,7 @@ describe "CMS.Views.Alert as base class", ->
         expect(view.$('.wrapper')).toBeHiding()
 
 describe "CMS.Views.Prompt", ->
-    tpl = readFixtures('prompt.underscore')
-
     beforeEach ->
-        setFixtures(sandbox({id: "page-prompt"}))
-        appendSetFixtures($("<script>", {id: "prompt-tpl", type: "text/template"}).text(tpl))
-
         @model = new CMS.Models.ConfirmationMessage({
             title: "Portal"
             message: "Welcome to the Aperture Science Computer-Aided Enrichment Center"
@@ -62,8 +58,6 @@ describe "CMS.Views.Prompt", ->
         # expect($("body")).not.toHaveClass("prompt-is-shown")
 
 describe "CMS.Views.Alert click events", ->
-    tpl = readFixtures('alert.underscore')
-
     beforeEach ->
         @model = new CMS.Models.WarningMessage(
             title: "Unsaved",
@@ -81,8 +75,6 @@ describe "CMS.Views.Alert click events", ->
 
         )
 
-        setFixtures(sandbox({id: "page-alert"}))
-        appendSetFixtures($("<script>", {id: "alert-tpl", type: "text/template"}).text(tpl))
         @view = new CMS.Views.Alert({model: @model})
 
     it "should trigger the primary event on a primary click", ->
@@ -100,14 +92,9 @@ describe "CMS.Views.Alert click events", ->
         expect(@view.$(".action-secondary")).toHaveClass("cancel-button")
 
 describe "CMS.Views.Notification minShown and maxShown", ->
-    tpl = readFixtures('notification.underscore')
-
     beforeEach ->
-        setFixtures(sandbox({id: "page-notification"}))
-        appendSetFixtures($("<script>", {id: "notification-tpl", type: "text/template"}).text(tpl))
-
         @model = new CMS.Models.SystemFeedback(
-            type: "saving"
+            intent: "saving"
             title: "Saving"
         )
         spyOn(CMS.Views.Notification.prototype, 'show').andCallThrough()

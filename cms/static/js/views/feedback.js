@@ -2,14 +2,15 @@ CMS.Views.Alert = Backbone.View.extend({
     options: {
         type: "alert",
         shown: true,  // is this view currently being shown?
+        icon: true,  // should we render an icon related to the message intent?
         closeIcon: true,  // should we render a close button in the top right corner?
         minShown: 0,  // length of time after this view has been shown before it can be hidden (milliseconds)
         maxShown: Infinity  // length of time after this view has been shown before it will be automatically hidden (milliseconds)
     },
     initialize: function() {
-        var tpl = $("#"+this.options.type+"-tpl").text();
+        var tpl = $("#system-feedback-tpl").text();
         if(!tpl) {
-            console.error("Couldn't load template from ID "+this.options.type+"-tpl");
+            console.error("Couldn't load system-feedback template");
         }
         this.template = _.template(tpl);
         this.setElement($("#page-"+this.options.type));
@@ -86,7 +87,8 @@ CMS.Views.Notification = CMS.Views.Alert.extend({
 CMS.Views.Prompt = CMS.Views.Alert.extend({
     options: $.extend({}, CMS.Views.Alert.prototype.options, {
         type: "prompt",
-        closeIcon: false
+        closeIcon: false,
+        icon: false
     }),
     render: function() {
         if(!window.$body) { window.$body = $(document.body); }

@@ -23,7 +23,7 @@ CMS.Models.Section = Backbone.Model.extend({
     showNotification: function() {
         if(!this.msg) {
             this.msg = new CMS.Models.SystemFeedback({
-                type: "saving",
+                intent: "saving",
                 title: gettext("Saving&hellip;")
             });
         }

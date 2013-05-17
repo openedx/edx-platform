@@ -1,6 +1,6 @@
 CMS.Models.SystemFeedback = Backbone.Model.extend({
     defaults: {
-        "type": null,  // "warning", "confirmation", "error", "announcement", "step-required", etc
+        "intent": null,  // "warning", "confirmation", "error", "announcement", "step-required", etc
         "title": "",
         "message": ""
         /* could also have an "actions" hash: here is an example demonstrating
@@ -32,18 +32,18 @@ CMS.Models.SystemFeedback = Backbone.Model.extend({
 
 CMS.Models.WarningMessage = CMS.Models.SystemFeedback.extend({
     defaults: $.extend({}, CMS.Models.SystemFeedback.prototype.defaults, {
-        "type": "warning"
+        "intent": "warning"
     })
 });
 
 CMS.Models.ErrorMessage = CMS.Models.SystemFeedback.extend({
     defaults: $.extend({}, CMS.Models.SystemFeedback.prototype.defaults, {
-        "type": "error"
+        "intent": "error"
     })
 });
 
 CMS.Models.ConfirmationMessage = CMS.Models.SystemFeedback.extend({
     defaults: $.extend({}, CMS.Models.SystemFeedback.prototype.defaults, {
-        "type": "confirmation"
+        "intent": "confirmation"
     })
 });
