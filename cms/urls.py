@@ -135,6 +135,12 @@ if settings.ENABLE_JASMINE:
     # # Jasmine
     urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
+
+if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
+    urlpatterns += (
+        url(r'^status/', include('service_status.urls')),
+    )
+
 urlpatterns = patterns(*urlpatterns)
 
 # Custom error pages
