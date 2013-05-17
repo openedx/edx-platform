@@ -106,13 +106,19 @@
     width: 1px;
   }
 
-  .course-org {
-    margin-right: ($baseline/4);
-  }
-
   .course-number, .course-org {
     @include font-size(12);
     display: inline-block;
+    max-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+
+  .course-org {
+    margin-right: ($baseline/4);
+    max-width: 140px;
   }
 
   .course-title {
@@ -132,7 +138,7 @@
 
 // specific elements - course nav
 .nav-course {
-  width: 285px;
+  width: 290px;
   margin-top: -($baseline/4);
   @include font-size(14);
 

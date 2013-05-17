@@ -736,4 +736,4 @@ def test6():		# imaginary numbers
   </mstyle>
 </math>
 '''
-    return formula(xmlstr, options='imaginaryi')
+    return formula(xmlstr, options='imaginary')

@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand, CommandError
-from django_comment_client.models import Permission, Role
 from django.contrib.auth.models import User
 
 

@@ -74,7 +74,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def check_edit_unit(self, test_course_name):
-        import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
+        import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
 
         for descriptor in modulestore().get_items(Location(None, None, 'vertical', None, None)):
             print "Checking ", descriptor.location.url()
@@ -101,7 +101,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Unfortunately, None = published for the revision field, so get_items() would return
         both draft and non-draft copies.
         '''
-        store = modulestore()
+        store = modulestore('direct')
         draft_store = modulestore('draft')
         import_from_xml(store, 'common/test/data/', ['simple'])
 
@@ -128,7 +128,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module as 'own-metadata' when publishing. Also verifies the metadata inheritance is
         properly computed
         '''
-        store = modulestore()
+        store = modulestore('direct')
         draft_store = modulestore('draft')
         import_from_xml(store, 'common/test/data/', ['simple'])
 
@@ -186,7 +186,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
 
     def test_get_depth_with_drafts(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+        import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
 
         course = modulestore('draft').get_item(
             Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
@@ -221,17 +221,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(num_drafts, 1)
 
     def test_import_textbook_as_content_element(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
-
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
+
         course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
 
         self.assertGreater(len(course.textbooks), 0)
 
     def test_static_tab_reordering(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
-
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
+
         course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
 
         # reverse the ordering
@@ -253,10 +253,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(reverse_tabs, course_tabs)
 
     def test_import_polls(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
-
         module_store = modulestore('direct')
-        found = False
+        import_from_xml(module_store, 'common/test/data/', ['full'])
 
         items = module_store.get_items(['i4x', 'edX', 'full', 'poll_question', None, None])
         found = len(items) > 0
@@ -270,9 +268,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertGreater(err_cnt, 0)
 
     def test_delete(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
-
         direct_store = modulestore('direct')
+        import_from_xml(direct_store, 'common/test/data/', ['full'])
 
         sequential = direct_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
 
@@ -306,8 +303,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html
         while there is a base definition in /about/effort.html
         '''
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
+
         effort = module_store.get_item(Location(['i4x', 'edX', 'full', 'about', 'effort', None]))
         self.assertEqual(effort.data, '6 hours')
 
@@ -316,9 +314,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(effort.data, 'TBD')
 
     def test_remove_hide_progress_tab(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
-
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
 
         source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
         course = module_store.get_item(source_location)
@@ -333,14 +330,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             'display_name': 'Robot Super Course',
         }
 
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
 
         resp = self.client.post(reverse('create_new_course'), course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
 
-        module_store = modulestore('direct')
         content_store = contentstore()
 
         source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
@@ -365,9 +362,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 400)
 
     def test_delete_course(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
-
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
+
         content_store = contentstore()
 
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
@@ -523,8 +520,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
 
     def test_prefetch_children(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
+
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
         wrapper = MongoCollectionFindWrapper(module_store.collection.find)
@@ -736,7 +734,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         Import and walk through some common URL endpoints. This just verifies non-500 and no other
         correct behavior, so it is not a deep test
         """
-        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+        import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
         loc = Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None])
         resp = self.client.get(reverse('course_index',
                                        kwargs={'org': loc.org,
@@ -838,9 +836,11 @@ class ContentStoreTest(ModuleStoreTestCase):
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
 
+
     def test_import_metadata_with_attempts_empty_string(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['simple'])
+
         did_load_item = False
         try:
             module_store.get_item(Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None]))
@@ -852,8 +852,9 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertTrue(did_load_item)
 
     def test_forum_id_generation(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
+
         new_component_location = Location('i4x', 'edX', 'full', 'discussion', 'new_component')
         source_template_location = Location('i4x', 'edx', 'templates', 'discussion', 'Discussion_Tag')
 
@@ -865,9 +866,8 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
     def test_update_modulestore_signal_did_fire(self):
-
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
 
         try:
             module_store.modulestore_update_signal = Signal(providing_args=['modulestore', 'course_id', 'location'])
@@ -891,9 +891,9 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertTrue(self.got_signal)
 
     def test_metadata_inheritance(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
-
         module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'])
+
         course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
 
         verticals = module_store.get_items(['i4x', 'edX', 'full', 'vertical', None, None])

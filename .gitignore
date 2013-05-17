@@ -9,7 +9,7 @@
 :2e#
 .AppleDouble
 database.sqlite
-private-requirements.txt
+requirements/private.txt
 courseware/static/js/mathjax/*
 flushdb.sh
 build
