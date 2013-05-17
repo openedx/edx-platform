@@ -151,7 +151,7 @@
             <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
 
             <div class="item-details" data-id="${section.location}">
-              <h3 class="section-name" data-name="${section.display_name_with_default}"></h3>
+              <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
               <div class="section-published-date">
                 <%
                   start_date_str = get_time_struct_display(section.lms.start, '%m/%d/%Y')
