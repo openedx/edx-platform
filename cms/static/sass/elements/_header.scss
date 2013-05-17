@@ -139,8 +139,8 @@
 // specific elements - course nav
 .nav-course {
   width: 290px;
+  @extend .t-copy-sub1;
   margin-top: -($baseline/4);
-  @include font-size(14);
 
   > ol > .nav-item {
     vertical-align: bottom;
@@ -158,8 +158,8 @@
       color: $gray-d3;
 
       .label-prefix {
-        display: block;
         @include font-size(11);
+        display: block;
         font-weight: 400;
       }
     }
