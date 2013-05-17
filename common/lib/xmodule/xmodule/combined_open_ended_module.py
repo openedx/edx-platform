@@ -58,7 +58,7 @@ class CombinedOpenEndedFields(object):
                              scope=Scope.user_state)
     attempts = StringyInteger(display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.", default=1,
-        scope=Scope.settings)
+        scope=Scope.settings, values = {"min" : 1 })
     # TODO: move values to Boolean in xblock.
     is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings,
         values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
