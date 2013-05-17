@@ -74,3 +74,10 @@ describe "CMS.Views.SectionEdit", ->
             expect(@view.showInvalidMessage).toHaveBeenCalledWith(
                 jasmine.any(Object), "BLARRGH", jasmine.any(Object))
             expect(@view.switchToShowView).not.toHaveBeenCalled()
+
+        it "should not save when validation is unsuccessful", ->
+            spyOn(@model, 'validate').andReturn("BLARRGH")
+            @view.$("input[type=text]").val("changed")
+            @view.$("input[type=submit]").click()
+            expect(@model.get('name')).not.toEqual("changed")
+

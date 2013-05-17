@@ -68,6 +68,7 @@ CMS.Views.SectionEdit = Backbone.View.extend({
         this.showView.render();
     },
     showInvalidMessage: function(model, error, options) {
+        model.set("name", model.previous("name"));
         var that = this;
         var msg = new CMS.Models.ErrorMessage({
             title: gettext("Your change could not be saved"),
