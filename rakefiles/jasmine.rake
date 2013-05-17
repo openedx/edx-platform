@@ -47,7 +47,7 @@ def template_jasmine_runner(lib)
     if !coffee_files.empty?
         sh("node_modules/.bin/coffee -c #{coffee_files.join(' ')}")
     end
-    phantom_jasmine_path = File.expand_path("common/test/phantom-jasmine")
+    phantom_jasmine_path = File.expand_path("node_modules/phantom-jasmine")
     common_js_root = File.expand_path("common/static/js")
     common_coffee_root = File.expand_path("common/static/coffee/src")
 
