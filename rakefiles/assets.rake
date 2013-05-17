@@ -13,7 +13,22 @@ def xmodule_cmd(watch=false, debug=false)
 end
 
 def coffee_cmd(watch=false, debug=false)
-    "node_modules/.bin/coffee #{watch ? '--watch' : ''} --compile */static"
+    if watch
+        # On OSx, coffee fails with EMFILE when
+        # trying to watch all of our coffee files at the same
+        # time.
+        #
+        # Ref: https://github.com/joyent/node/issues/2479
+        #
+        # Instead, watch 50 files per process in parallel
+        cmds = []
+        Dir['*/static/**/*.coffee'].each_slice(50) do |coffee_files|
+            cmds << "node_modules/.bin/coffee --watch --compile #{coffee_files.join(' ')}"
+        end
+        cmds
+    else
+        'node_modules/.bin/coffee --compile */static'
+    end
 end
 
 def sass_cmd(watch=false, debug=false)
@@ -43,7 +58,11 @@ namespace :assets do
         desc "Compile all #{asset_type} assets"
         task asset_type => prereq_task do
             cmd = send(asset_type.to_s + "_cmd", watch=false, debug=false)
-            sh(cmd)
+            if cmd.kind_of?(Array)
+                cmd.each {|c| sh(c)}
+            else
+                sh(cmd)
+            end
         end
 
         multitask :all => asset_type
@@ -65,7 +84,11 @@ namespace :assets do
 
             task :_watch => prereq_task do
                 cmd = send(asset_type.to_s + "_cmd", watch=true, debug=true)
-                background_process(cmd)
+                if cmd.kind_of?(Array)
+                    cmd.each {|c| background_process(c)}
+                else
+                    background_process(cmd)
+                end
             end
         end
     end
