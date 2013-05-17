@@ -82,6 +82,7 @@ rake test_common/lib/xmodule || TESTS_FAILED=1
 rake phantomjs_jasmine_lms || TESTS_FAILED=1
 rake phantomjs_jasmine_cms || TESTS_FAILED=1
 rake phantomjs_jasmine_common/lib/xmodule || TESTS_FAILED=1
+rake phantomjs_jasmine_discussion || TESTS_FAILED=1
 
 rake coverage:xml coverage:html
 

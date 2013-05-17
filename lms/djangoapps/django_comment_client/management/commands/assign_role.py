@@ -12,7 +12,7 @@ class Command(BaseCommand):
                     dest='remove',
                     default=False,
                     help='Remove the role instead of adding it'),
-        )
+    )
 
     args = '<user|email> <role> <course_id>'
     help = 'Assign a discussion forum role to a user '

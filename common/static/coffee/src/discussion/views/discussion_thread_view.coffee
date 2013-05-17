@@ -91,7 +91,7 @@ if Backbone?
       body = @getWmdContent("reply-body")
       return if not body.trim().length
       @setWmdContent("reply-body", "")
-      comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, endorsed: false, user_id: window.user.get("id"))
+      comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, abuse_flaggers:[], endorsed: false, user_id: window.user.get("id"))
       comment.set('thread', @model.get('thread'))
       @renderResponse(comment)
       @model.addComment()
