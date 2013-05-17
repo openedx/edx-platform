@@ -43,4 +43,14 @@ describe "DiscussionContentView", ->
     it 'is tied to the model', ->
         expect(@view.model).toBeDefined();
 
+    it 'can be flagged for abuse', ->
+            @thread.flagAbuse()
+            expect(@thread.get 'abuse_flaggers').toEqual ['123', '567']
+
+        it 'can be unflagged for abuse', ->
+            temp_array = []
+            temp_array.push(window.user.get('id'))
+            @thread.set("abuse_flaggers",temp_array)
+            @thread.unflagAbuse()
+            expect(@thread.get 'abuse_flaggers').toEqual []
  
