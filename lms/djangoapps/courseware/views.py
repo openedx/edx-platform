@@ -40,7 +40,6 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
-
 def user_groups(user):
     """
     TODO (vshnayder): This is not used. When we have a new plan for groups, adjust appropriately.
@@ -296,6 +295,15 @@ def index(request, course_id, chapter=None, section=None,
             'staff_access': staff_access,
             'masquerade': masq,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            }
+
+        if course.show_chat:
+            context['chat'] = {
+                'domain': settings.JABBER_DOMAIN,
+                'room': "{ID}_class".format(ID=course.id.replace('/', '-')), # Jabber doesn't like /s
+                'username': "{USER}@{DOMAIN}".format(USER=user.username, DOMAIN=settings.JABBER_DOMAIN),
+                # TODO: clearly this needs to be something other than the username
+                'password': "{USER}@{DOMAIN}".format(USER=user.username, DOMAIN=settings.JABBER_DOMAIN),
             }
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
