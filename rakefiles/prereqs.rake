@@ -26,7 +26,7 @@ end
 
 desc "Install all python prerequisites for the lms and cms"
 task :install_python_prereqs => "ws:migrate" do
-    when_changed('requirements/**') do
+    when_changed('requirements/**/*') do
         ENV['PIP_DOWNLOAD_CACHE'] ||= '.pip_download_cache'
         sh('pip install --exists-action w -r requirements/edx/base.txt')
         sh('pip install --exists-action w -r requirements/edx/post.txt')
