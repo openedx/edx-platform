@@ -46,7 +46,7 @@
     <li class="item">
         %if user.is_authenticated() and registered:
           %if show_courseware_link:
-            <a class="action access-courseware" href="${course_target}">Access Courseware</a>
+            <a class="action access-courseware" href="${course_target}" target="_top">Access Courseware</a>
           %else:
             <div class="action is-registered">You Are Registered</div>
           %endif
