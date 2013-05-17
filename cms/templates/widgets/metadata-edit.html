@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%
   import hashlib
   import copy
@@ -15,7 +17,7 @@
 
 % if showHighLevelSource:
     <div class="launch-latex-compiler">
-      <a href="#hls-modal-${hlskey}" id="hls-trig-${hlskey}">Launch Latex Source Compiler</a>
+      <a href="#hls-modal-${hlskey}" id="hls-trig-${hlskey}">${_("Launch Latex Source Compiler")}</a>
     </div>
     <%include file="source-edit.html" />
 % endif

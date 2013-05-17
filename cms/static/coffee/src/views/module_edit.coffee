@@ -26,7 +26,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
       metadataEditor = @$el.find('.metadata_edit')
       @metadataEditor = new CMS.Views.Metadata.Editor({
           el: metadataEditor,
-          model: new CMS.Models.MetadataEditor(metadataEditor.data('metadata'))
+          model: new Backbone.Model(metadataEditor.data('metadata'))
           });
 
       #Manually runs polyfill for input number types to correct for Firefox non-support
@@ -39,7 +39,10 @@ class CMS.Views.ModuleEdit extends Backbone.View
         @selectMode(@editorMode)
       else
         @hideDataEditor()
-      @$el.find('.component-name').html('<em>Editing:</em> ' + @metadataEditor.getDisplayName())
+
+      title = interpolate(gettext('<em>Editing:</em> %s'),
+        [@metadataEditor.getDisplayName()])
+      @$el.find('.component-name').html(title)
 
   changedMetadata: ->
     return @metadataEditor.getModifiedMetadataValues()
@@ -77,7 +80,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
       @render()
       @$el.removeClass('editing')
     ).fail( ->
-      showToastMessage("There was an error saving your changes. Please try again.", null, 3)
+      showToastMessage(gettext("There was an error saving your changes. Please try again."), null, 3)
     )
 
   clickCancelButton: (event) ->

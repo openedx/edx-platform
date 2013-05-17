@@ -22,22 +22,24 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
                         return val.display_name
                     });
 
-                self.views = [];
+                self.models = [];
 
                 _.each(sortedObject,
                     function (item) {
+                        var model = new CMS.Models.Metadata(item);
+                        self.models.push(model);
                         var data = {
                             el: self.$el.find('.metadata_entry')[counter++],
-                            model: new CMS.Models.Metadata(item)
+                            model: model
                         };
                         if (item.type === 'Select') {
-                            self.views.push(new CMS.Views.Metadata.Option(data));
+                            new CMS.Views.Metadata.Option(data);
                         }
                         else if (item.type === 'Integer' || item.type === 'Float') {
-                            self.views.push(new CMS.Views.Metadata.Number(data));
+                            new CMS.Views.Metadata.Number(data);
                         }
                         else {
-                            self.views.push(new CMS.Views.Metadata.String(data));
+                            new CMS.Views.Metadata.String(data);
                         }
                     });
             }
@@ -46,10 +48,10 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
 
     getModifiedMetadataValues: function () {
         var modified_values = {};
-        _.each(this.views,
-            function (item) {
-                if (item.modified()) {
-                    modified_values[item.getFieldName()] = item.getValue();
+        _.each(this.models,
+            function (model) {
+                if (model.isModified()) {
+                    modified_values[model.getFieldName()] = model.getValue();
                 }
             }
         );
@@ -118,19 +120,6 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
             this.$el.find('.setting-clear').addClass('inactive');
             this.$el.find('.setting-clear').removeClass('active');
         }
-    },
-
-
-    modified: function () {
-        return this.model.isModified();
-    },
-
-    getValue: function() {
-        return this.model.getValue();
-    },
-
-    getFieldName: function() {
-        return this.model.getFieldName();
     }
 });
 
@@ -147,9 +136,7 @@ CMS.Views.Metadata.String = CMS.Views.Metadata.AbstractEditor.extend({
     },
 
     getValueFromEditor : function () {
-        var val = this.$el.find('#' + this.uniqueId).val();
-//      TODO: not sure this is necessary. Trying to support empty value ("").
-        return val ? val : "";
+        return this.$el.find('#' + this.uniqueId).val();
     },
 
     setValueInEditor : function (value) {
@@ -244,6 +231,3 @@ CMS.Views.Metadata.Option = CMS.Views.Metadata.AbstractEditor.extend({
         }).prop('selected', true);
     }
 });
-
-
-

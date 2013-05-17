@@ -1,13 +1,15 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <div class="wrapper wrapper-component-editor">
 	<div class="component-editor">
 		<div class="component-edit-header">
   			<span class="component-name"></span>
   	  		<ul class="nav-edit-modes">
   	  			<li id="editor-mode" class="mode active-mode" aria-controls="editor-tab" role="tab">
-  	  				<a href="#">Editor</a>
+  	  				<a href="#">${_("Editor")}</a>
 	  			</li>
 	  			<li id="settings-mode" class="mode active-mode" aria-controls="settings-tab" role="tab">
-	  				<a href="#">Settings</a>
+	  				<a href="#">${_("Settings")}</a>
 	  			</li>
 	  		</ul>
 		</div> <!-- Editor Header -->
@@ -18,16 +20,16 @@
 	        </div>
 		</div>
 		<div class="row module-actions">
-	  		<a href="#" class="save-button">Save</a>
-	  		<a href="#" class="cancel-button">Cancel</a>	  	
+	  		<a href="#" class="save-button">${_("Save")}</a>
+	  		<a href="#" class="cancel-button">${_("Cancel")}</a>
 		</div> <!-- Module Actions-->
   </div>
 </div>
 
 <div class="component-actions">
-  <a href="#" class="edit-button standard"><span class="edit-icon"></span>Edit</a>
-  <a href="#" class="delete-button standard"><span class="delete-icon"></span>Delete</a>  
+  <a href="#" class="edit-button standard"><span class="edit-icon"></span>${_("Edit")}</a>
+  <a href="#" class="delete-button standard"><span class="delete-icon"></span>${_("Delete")}</a>
 </div>
-<a data-tooltip="Drag to reorder" href="#" class="drag-handle"></a>
+<a data-tooltip='${_("Drag to reorder")}' href="#" class="drag-handle"></a>
 ${preview}
 
