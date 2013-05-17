@@ -20,7 +20,8 @@ describe "DiscussionContentView", ->
                 <div data-tooltip="pin this thread" data-role="thread-pin" class="admin-pin discussion-pin notpinned">
                 <i class="icon"></i><span class="pin-label">Pin Thread</span></div>
             </div>
-            """)
+            """
+        )
 
         @thread = new Thread {
                 id: '01234567',
