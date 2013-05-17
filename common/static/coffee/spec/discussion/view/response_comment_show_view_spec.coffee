@@ -49,3 +49,14 @@ describe 'ResponseCommentShowView', ->
         it 'produces the correct HTML', ->
             @view.render()
             expect(@view.el.innerHTML).toContain('"discussion-flag-abuse notflagged"')
+
+        it 'can be flagged for abuse', ->
+            @response.flagAbuse()
+            expect(@response.get 'abuse_flaggers').toEqual ['123', '567']
+
+        it 'can be unflagged for abuse', ->
+            temp_array = []
+            temp_array.push(window.user.get('id'))
+            @response.set("abuse_flaggers",temp_array)
+            @response.unflagAbuse()
+            expect(@response.get 'abuse_flaggers').toEqual []
