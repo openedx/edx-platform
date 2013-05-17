@@ -2,7 +2,6 @@ import re
 
 URL_RE = re.compile('^edx://(.+)$')
 
-
 def parse_url(string):
     """
     A url must begin with 'edx://' (case-insensitive match),
@@ -12,6 +11,7 @@ def parse_url(string):
         'edx://@0123FFFF'
         'edx://edu.mit.eecs.6002x'
         'edx://edu.mit.eecs.6002x;published'
+        'edx://edu.mit.eecs.6002x;published#HW3'
 
     This returns None if string cannot be parsed.
 
@@ -31,6 +31,25 @@ def parse_url(string):
     return parse_course_id(path)
     
 
+BLOCK_RE = re.compile('^\w+$')
+
+def parse_block_ref(string):
+    """
+    A block_ref is a string of word_chars.
+    
+    <word_chars> matches one or more Unicode word characters; this includes most
+    characters that can be part of a word in any language, as well as numbers
+    and the underscore. (see definition of \w in python regular expressions,
+    at http://docs.python.org/dev/library/re.html)
+
+    If string is a block_ref, returns a dict with key 'block_ref' and the value,
+    otherwise returns None.
+    """
+    if len(string)>0 and BLOCK_RE.match(string):
+        return {'block' : string}
+    return None
+
+
 GUID_RE = re.compile('^[a-fA-F0-9]+$')
 
 def parse_guid(string):
@@ -45,25 +64,32 @@ def parse_guid(string):
     return None
 
 
-COURSE_ID_RE = re.compile('^(?P<id>(\w+)(\.\w+\w*)*)(;(?P<revision>\w+))?$')
+COURSE_ID_RE = re.compile('^(?P<id>(\w+)(\.\w+\w*)*)(;(?P<revision>\w+))?(#(?P<block>\w+))?$')
     
 def parse_course_id(string):
     """
 
-    A course_id has a main id component and an optional revision.
+    A course_id has a main id component.
+    There may also be an optional revision (;published or ;draft).
+    There may also be an optional block (#HW3 or #Quiz2).
+    
     Examples of valid course_ids:
 
       'edu.mit.eecs.6002x'
       'edu.mit.eecs.6002x;published'
+      'edu.mit.eecs.6002x#HW3'
+      'edu.mit.eecs.6002x;published#HW3'
 
 
     Syntax:
 
-      course_id = main_id [; revision]
+      course_id = main_id [; revision] [# block]
    
       main_id = name [. name]*
 
       revision = name
+
+      block = name
 
       name = <word_chars>
 
@@ -72,8 +98,9 @@ def parse_course_id(string):
     and the underscore. (see definition of \w in python regular expressions,
     at http://docs.python.org/dev/library/re.html)
 
-    If string is a course_id, returns a dict with keys 'id' and 'revision'.
+    If string is a course_id, returns a dict with keys 'id', 'revision', and 'block'.
     Revision is optional: if missing returned_dict['revision'] is None.
+    Block is optional: if missing returned_dict['block'] is None.
     Else returns None.
     """
     match = COURSE_ID_RE.match(string)

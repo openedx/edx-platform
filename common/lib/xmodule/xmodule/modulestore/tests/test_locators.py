@@ -7,12 +7,15 @@ from unittest import TestCase
 from nose.plugins.skip import SkipTest
 
 from bson.objectid import ObjectId
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
+from xmodule.modulestore.locator import Locator, CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import InvalidLocationError, \
     InsufficientSpecificationError, OverSpecificationError
 
 
 class LocatorTest(TestCase):
+
+    def test_cant_instantiate_abstract_class(self):
+        self.assertRaises(TypeError, Locator)
 
     def test_course_constructor_overspecified(self):
         self.assertRaises(
@@ -156,6 +159,21 @@ class LocatorTest(TestCase):
         self.assertEqual(testobj.revision, test_revision)
         self.assertEqual(str(testobj), expected_urn)
         self.assertEqual(testobj.url(), 'edx://'+expected_urn)
+
+
+    def test_block_constructor(self):
+        testurn = 'edu.mit.eecs.6002x;published#HW3'
+        expected_id = 'edu.mit.eecs.6002x'
+        expected_revision = 'published'
+        expected_block_ref = 'HW3'
+        testobj = BlockUsageLocator(course_id=testurn)
+        self.check_block_locn_fields(testobj, 'test_block constructor',
+                                      course_id=expected_id,
+                                      revision=expected_revision,
+                                      block=expected_block_ref,
+                                      )
+        self.assertEqual(str(testobj), testurn)
+        self.assertEqual(testobj.url(), 'edx://'+testurn)
 
 
     # ------------------------------------------------------------

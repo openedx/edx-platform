@@ -15,7 +15,7 @@ from bson.errors import InvalidId
 from xmodule.modulestore.exceptions import InvalidLocationError, \
     InsufficientSpecificationError, OverSpecificationError
 
-from .parsers import parse_url, parse_guid, parse_course_id
+from .parsers import parse_url, parse_guid, parse_course_id, parse_block_ref
 
 log = logging.getLogger(__name__)
 
@@ -52,11 +52,11 @@ class Locator(object):
 class CourseLocator(Locator):
     """
     Examples of valid CourseLocator specifications:
-     CourseLocator(version_guid=ObjectId('0123FFFF'))
+     CourseLocator(version_guid=ObjectId('519665f6223ebd6980884f2b'))
      CourseLocator(course_id='edu.mit.eecs.6002x')
      CourseLocator(course_id='edu.mit.eecs.6002x;published')
      CourseLocator(course_id='edu.mit.eecs.6002x', revision='published')
-     CourseLocator(url='edx://@0123FFFF')
+     CourseLocator(url='edx://@519665f6223ebd6980884f2b')
      CourseLocator(url='edx://edu.mit.eecs.6002x')
      CourseLocator(url='edx://edu.mit.eecs.6002x;published')
      
@@ -88,8 +88,23 @@ class CourseLocator(Locator):
         """
         Return a string containing the URL for this location.
         """
-        return 'edx://' + quote(str(self), '@;')
+        return 'edx://' + quote(str(self), '@;#')
         
+
+    def validate_args (self, url, version_guid, course_id, revision):
+        """
+        Validate provided arguments.
+        """
+        args = [arg for arg in [url, version_guid, course_id, revision] if arg]
+        if len(args)>2:
+            raise OverSpecificationError()
+        if len(args)>1 and (url or version_guid):
+            raise OverSpecificationError()
+        if len(args)==2 and (course_id is None or revision is None):
+            raise OverSpecificationError()
+        if len(args)==0:
+            raise InsufficientSpecificationError()
+
 
     def __init__(self, url=None, version_guid=None, course_id=None, revision=None):
         """
@@ -106,15 +121,7 @@ class CourseLocator(Locator):
         url, course_id, and revision must be strings or None
         
         """
-        args = [arg for arg in [url, version_guid, course_id, revision] if arg]
-        if len(args)>2:
-            raise OverSpecificationError()
-        if len(args)>1 and (url or version_guid):
-            raise OverSpecificationError()
-        if len(args)==2 and (course_id is None or revision is None):
-            raise OverSpecificationError()
-        if len(args)==0:
-            raise InsufficientSpecificationError()
+        self.validate_args(url, version_guid, course_id, revision)
         if url:
             self.init_from_url(url)
         elif version_guid:
@@ -132,6 +139,7 @@ class CourseLocator(Locator):
         """
         url must be a string beginning with 'edx://' and containing
         either a valid version_guid or course_id (with optional revision)
+        If a block ('#HW3') is present, it is ignored.
         """
         assert isinstance(url, basestring), \
                '%s is not an instance of basestring' % url
@@ -162,6 +170,7 @@ class CourseLocator(Locator):
         Course_id is a string like 'edu.mit.eecs.6002x' or 'edu.mit.eecs.6002x;published'.
         Revision (optional) is a string like 'published'.
         If revision is part of course_id, parse it out separately.
+        If a block ('#HW3') is a part of course_id, it is ignored.
         
         """
         parse = parse_course_id(course_id)
@@ -194,115 +203,79 @@ class BlockUsageLocator(CourseLocator):
         block : guid
         revision : 'draft' | 'published' (optional)
     """
-    _I4X_RE_ = re.compile("""
-        i4x:?//?
-        (?P<org>[^/]+)/
-        (?P<course>[^/]+)/
-        (?P<category>[^/]+)/
-        (?P<name>[^@]+)
-        (@(?P<revision>[^/]+))?
-        """, re.VERBOSE)
+    
+    # Default value
+    usage_id = None
 
-    _URN_RE_ = re.compile("""
-    (?P<tag>crx|cvx):?//?
-    (?P<identifier>[^/@]+)(@(?P<revision>[^/]+))?/?
-    (?P<usage_id>[^/]+)?
-    """, re.VERBOSE)
-
-    def __init__(self, *structured_loc, **kwargs):
+    def __init__(self, url=None, version_guid=None, course_id=None,
+                 revision=None, usage_id=None):
         """
-        Create a new location that is a clone of the specified one.
+        Construct a BlockUsageLocator
+        Keyword arguments are mostly exclusive.
+        Caller may provide url (but no other parameters).
+        Caller may provide version_guid (but no other parameters).
+        Caller may provide course_id (optionally provide revision).
+        If course_id is provided, then usage_id is either part of course_id
+        or provided separately.
 
-        first arg - Can be any of the following types:
-            string: should be of the form
-                    crx/{course_id}[@{revision}]/usage_id
-                    cvx/version_id/usage_id
+        Resulting BlockUsageLocator will have a usage_id property.
+        It will have either a version_guid property
+        or a course_id (with optional revision) property.
 
-            dict or keywords: should be of the form {
-                'version_guid' : uniqueid mutually exclusive w/ course_id,
-                'course_id' : uniqueid alternative to version_guid,
-                'usage_id' : guid,
-                'revision': 'draft' | 'published' (optional only applies for
-                    course_id),
-            }
-            BlockUsageLocator: another BlockUsageLocator object
+        version_guid must be an instance of bson.objectid.ObjectId or None
+        url, course_id, revision, and usage_id must be strings or None
+
         """
-        fields = {}
+        self.validate_args(url, version_guid, course_id, revision)
+        if url:
+            self.init_block_ref_from_url(url)
+        if course_id:
+            assert url == None, "Cannot specify both url and course_id"
+            self.init_block_ref_from_course_id(course_id)
+        if version_guid:
+            assert url == None, "Cannot specify both url and version_guid"
+        if usage_id:
+            self.init_block_ref(usage_id)
+        CourseLocator.__init__(self, url=url,
+                                     version_guid=version_guid,
+                                     course_id=course_id,
+                                     revision=revision)
+        assert self.usage_id, "usage_id should not be None"
 
-        if len(structured_loc) == 0:
-            pass
-        elif isinstance(structured_loc[0], basestring):
-            val = http.urlunquote(structured_loc[0])
-            match = self._URN_RE_.match(val)
-            if match is None:
-                log.debug('location is instance of %s but no URL match'
-                    % basestring)
-                raise InvalidLocationError(val)
-            urnfields = match.groupdict()
-            if urnfields['tag'] == self.SPECIFIC_VERSION:
-                fields['version_guid'] = urnfields['identifier']
-            else:
-                fields['course_id'] = urnfields['identifier']
-                if 'revision' in urnfields:
-                    fields['revision'] = urnfields['revision']
-            fields['usage_id'] = urnfields['usage_id']
+    def init_block_ref(self, block_ref):
+        parse = parse_block_ref(block_ref)
+        assert parse, 'Could not parse "%s" as a block_ref' % block_ref
+        self.usage_id = parse['block']
 
-        elif isinstance(structured_loc[0], dict):
-            fields = structured_loc[0]
+    def init_block_ref_from_url(self, url):
+        parse = parse_url(url)
+        assert parse, 'Could not parse "%s" as a url' % url
+        block = parse['block']
+        assert block, 'Could not parse a block reference from url: "%s"' % url
+        self.usage_id = block
 
-        elif isinstance(structured_loc[0], CourseLocator):
-            fields = structured_loc[0].__dict__.copy()
+    def init_block_ref_from_course_id(self, course_id):
+        parse = parse_course_id(course_id)
+        assert parse, 'Could not parse "%s" as a course_id' % course_id
+        block = parse['block']
+        assert block, 'Could not parse a block reference from course_id: "%s"' % course_id
+        self.usage_id = block
 
-        for struct in structured_loc[1:]:
-            fields.update(struct if isinstance(struct, dict)
-                else struct.__dict__)
 
-        fields.update(kwargs)
-
-        super(BlockUsageLocator, self).__init__(fields)
-        # TODO should it be an error if block is unspecified or is
-        # ensure_fully_specified sufficient for this case?
-        self.usage_id = fields.get('usage_id')
-
-    @staticmethod
-    def ensure_fully_specified(location):
-        """
-        Make sure location is valid, and fully specified.  Raises
-        InvalidLocationError or InsufficientSpecificationError if not.
-
-        returns a BlockUsageLocator object corresponding to location.
-        NOTE: this function is not as flexible as the class constructor. It
-        does not accept kwargs nor overrides. Replace uses of this which intend
-        it to only give an instance if the model is well-formed with
-        BlockUsageLocator.ensure_fully_specified(BlockUsageLocator(args..))
-        """
-        if isinstance(location, BlockUsageLocator):
-            loc = location
-        else:
-            loc = BlockUsageLocator(location)
-
-        if not super(BlockUsageLocator, loc)._ensure_fully_specified():
-            raise InsufficientSpecificationError(location)
-        if loc.usage_id is None:
-            raise InsufficientSpecificationError(location)
-        return loc
-
-    def replace(self, **kwargs):
-        """
-        Return a new Location instance which is a copy of this one except for
-        overrides in the arg list.
-        """
-        return BlockUsageLocator(self, kwargs)
-
-    def url(self):
-        """
-        Return a string containing the URL for this location
-        """
-        return (super(BlockUsageLocator, self).url() + '/' +
-            (self.usage_id or ''))
+    """ TODO: in progress
+    def validate_args(url, version_guid, course_id, revision, block_ref):
+        CourseLocator.validate_args(url, version_guid, course_id, revision)
+    """
 
     def __repr__(self):
-        return "BlockUsageLocator(%s)" % repr(self.__dict__)
+        """
+        Return a string representing this location.
+        """
+        rep = CourseLocator.__repr__(self)
+        if self.version_guid:
+            return rep
+        else: 
+            return rep + '#' + self.usage_id
 
 
 class DescriptionLocator(Locator):
