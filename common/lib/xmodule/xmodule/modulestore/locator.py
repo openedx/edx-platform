@@ -6,15 +6,30 @@ Created on Mar 13, 2013
 from __future__ import absolute_import
 import re
 import logging
+from abc import ABCMeta, abstractmethod
+from urllib import quote
+
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
+
 from xmodule.modulestore.exceptions import InvalidLocationError, \
-    InsufficientSpecificationError
-from django.utils import http
+    InsufficientSpecificationError, OverSpecificationError
+
+from .parsers import parse_url, parse_guid, parse_course_id
 
 log = logging.getLogger(__name__)
 
 
-# TODO how to keep this from being instantiated but not fail subclass inits?
 class Locator(object):
+    """
+    A locator is like a URL, it refers to a course resource.
+    
+    Locator is an abstract base class: do not instantiate
+    """
+
+    __metaclass__ = ABCMeta 
+
+    @abstractmethod
     def url(self):
         """
         Return a string containing the URL for this location. Raises
@@ -23,101 +38,142 @@ class Locator(object):
         """
         raise InsufficientSpecificationError()
 
-    def html_id(self):
-        """
-        Return a string with a version of the location that is safe for use in
-        html id attributes
-        """
-        # dhm: seems wrong to me to have the DAO worry about client
-        # representations and escaping. Is urlquote overkill? (converts
-        # @ sign too :-(
-        return http.urlquote(self.url())
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
-    def __str__(self):
-        return self.url()
+    def __repr__(self):
+        try:
+            return self.url()
+        except Exception, e:
+            return "<@%s:%s>" % (self.__class__.__name__, e.message)
 
 
 class CourseLocator(Locator):
     """
+    Examples of valid CourseLocator specifications:
+     CourseLocator(version_guid=ObjectId('0123FFFF'))
+     CourseLocator(course_id='edu.mit.eecs.6002x')
+     CourseLocator(course_id='edu.mit.eecs.6002x;published')
+     CourseLocator(course_id='edu.mit.eecs.6002x', revision='published')
+     CourseLocator(url='edx://@0123FFFF')
+     CourseLocator(url='edx://edu.mit.eecs.6002x')
+     CourseLocator(url='edx://edu.mit.eecs.6002x;published')
+     
     Should have at lease a specific course_id (id for the course as if it were a project w/
     versions) with optional 'revision' (must be 'draft', 'published', or None),
     or version_guid (which points to a specific version). Can contain both in which case
     the persistence layer may raise exceptions if the given version != the current such version
     of the course.
     """
-    SPECIFIC_VERSION = 'cvx'
-    RUN_TRACKING_VERSION = 'crx'
 
-    _URN_RE_ = re.compile("""
-    (?P<tag>crx|cvx):?//?
-    (?P<identifier>[^/@]+)(@(?P<revision>[^/]+))?
-    """, re.VERBOSE)
-
-    def __init__(self, *fields, **kwargs):
-        def _parse_init_arg(arg):
-            if 'version_guid' in arg:
-                self.version_guid = arg['version_guid']
-            if 'course_id' in arg:
-                self.course_id = arg['course_id']
-            if 'revision' in arg:
-                self.revision = arg['revision']
-
-        # init fields so they're all defined
-        self.version_guid = self.course_id = self.revision = None
-
-        # first arg can be a url
-        if len(fields) > 0:
-            if isinstance(fields[0], basestring):
-                val = http.urlunquote(fields[0])
-                match = self._URN_RE_.match(val)
-                if match is None:
-                    log.debug('location is instance of %s but no URL match'
-                        % basestring)
-                    raise InvalidLocationError(val)
-                urnfields = match.groupdict()
-                if urnfields['tag'] == self.SPECIFIC_VERSION:
-                    self.version_guid = urnfields['identifier']
-                else:
-                    self.course_id = urnfields['identifier']
-                    if 'revision' in urnfields:
-                        self.revision = urnfields['revision']
-            elif isinstance(fields[0], CourseLocator):
-                self.__dict__.update(fields[0].__dict__)
-
-        for arg in fields:
-            if isinstance(arg, CourseLocator):
-                _parse_init_arg(arg.__dict__)
-            elif isinstance(arg, dict):
-                _parse_init_arg(arg)
-        _parse_init_arg(kwargs)
-
-    def _ensure_fully_specified(self):
-        """
-        Make sure this object is valid, and fully specified.
-        Returns True or False.
-        """
-        return self.version_guid is not None or self.course_id is not None
-
-    def url(self):
-        if self.version_guid is not None:
-            return self.SPECIFIC_VERSION + '/' + str(self.version_guid)
-        elif self.revision is not None:
-            return (self.RUN_TRACKING_VERSION + '/' + self.course_id + '@'
-                + self.revision)
-        elif self.course_id is not None:
-            return self.RUN_TRACKING_VERSION + '/' + self.course_id
-        else:
-            # TODO should this raise an error, return empty string, or None?
-            return ""
+    # Default values
+    version_guid = None
+    course_id = None
+    revision = None
 
     def __repr__(self):
-        return 'CourseLocator(%s)' % repr(self.__dict__)
+        """
+        Return a string representing this location.
+        """
+        if self.version_guid:
+            return '@' + str(self.version_guid)
+        else: 
+            result = self.course_id
+            if self.revision:
+                result += ';' + self.revision
+            return result
 
-    def version(self):
-        return self.version_guid
+    def url(self):
+        """
+        Return a string containing the URL for this location.
+        """
+        return 'edx://' + quote(str(self), '@;')
+        
+
+    def __init__(self, url=None, version_guid=None, course_id=None, revision=None):
+        """
+        Construct a CourseLocator
+        Keyword arguments are mostly exclusive.
+        Caller may provide url (but no other parameters).
+        Caller may provide version_guid (but no other parameters).
+        Caller may provide course_id (optionally provide revision).
+
+        Resulting CourseLocator will have either a version_guid property
+        or a course_id (with optional revision) property.
+
+        version_guid must be an instance of bson.objectid.ObjectId or None
+        url, course_id, and revision must be strings or None
+        
+        """
+        args = [arg for arg in [url, version_guid, course_id, revision] if arg]
+        if len(args)>2:
+            raise OverSpecificationError()
+        if len(args)>1 and (url or version_guid):
+            raise OverSpecificationError()
+        if len(args)==2 and (course_id is None or revision is None):
+            raise OverSpecificationError()
+        if len(args)==0:
+            raise InsufficientSpecificationError()
+        if url:
+            self.init_from_url(url)
+        elif version_guid:
+            self.init_from_version_guid(version_guid)
+        elif course_id:
+            self.init_from_course_id(course_id, revision)
+        assert self.version_guid or self.course_id, \
+               "Either version_guid or course_id should be set."
+        assert (self.version_guid and not self.course_id) or \
+               (not self.version_guid and self.course_id), \
+               "Either version_guid or course_id (but not both) should be set"
+        
+
+    def init_from_url(self, url):
+        """
+        url must be a string beginning with 'edx://' and containing
+        either a valid version_guid or course_id (with optional revision)
+        """
+        assert isinstance(url, basestring), \
+               '%s is not an instance of basestring' % url
+        parse = parse_url(url)
+        assert parse, 'Could not parse "%s" as a url' % url
+        if parse.has_key('version_guid'):
+            try:
+                self.version_guid = ObjectId(parse['version_guid'])
+            except InvalidId:
+                raise ValueError(
+                    'The URL "%s" does not contain a valid version_guid' %
+                    parse['version_guid'])
+        else:
+            self.course_id = parse['id']
+            self.revision = parse['revision']
+
+
+    def init_from_version_guid(self, version_guid):
+        """
+        version_guid must be ain instance of bson.objectid.ObjectId
+        """
+        assert isinstance(version_guid, ObjectId), \
+               '%s is not an instance of ObjectId' % version_guid
+        self.version_guid = version_guid
+
+    def init_from_course_id(self, course_id, revision=None):
+        """
+        Course_id is a string like 'edu.mit.eecs.6002x' or 'edu.mit.eecs.6002x;published'.
+        Revision (optional) is a string like 'published'.
+        If revision is part of course_id, parse it out separately.
+        
+        """
+        parse = parse_course_id(course_id)
+        assert parse, 'Could not parse "%s" as a course_id' % course_id
+        rev = parse['revision']
+        if revision:
+            if rev and revision != rev:
+                raise OverSpecificationError('Revision cannot be both %s and %s' % (rev, revision))
+            self.revision = revision
+        else:
+            self.revision = rev
+        self.course_id = parse['id']
 
 
 class BlockUsageLocator(CourseLocator):
@@ -279,3 +335,4 @@ class VersionTree(object):
         else:
             self.children = [VersionTree(child, tree_dict)
                 for child in tree_dict.get(locator.version(), [])]
+
