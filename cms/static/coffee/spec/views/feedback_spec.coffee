@@ -1,3 +1,10 @@
+beforeEach ->
+    @addMatchers
+        toBeShown: ->
+            @actual.hasClass("is-shown") and not @actual.hasClass("is-hiding")
+        toBeHiding: ->
+            @actual.hasClass("is-hiding") and not @actual.hasClass("is-shown")
+
 describe "CMS.Views.Alert as base class", ->
     tpl = readFixtures('alert.underscore')
 
@@ -19,7 +26,7 @@ describe "CMS.Views.Alert as base class", ->
     it "renders the template", ->
         view = new CMS.Views.Alert({model: @model})
         expect(view.$(".action-close")).toBeDefined()
-        expect(view.$('.wrapper')).toHaveClass("is-shown")
+        expect(view.$('.wrapper')).toBeShown()
         expect(view.$el).toContainText(@model.get("title"))
         expect(view.$el).toContainText(@model.get("message"))
 
@@ -30,8 +37,7 @@ describe "CMS.Views.Alert as base class", ->
         view.$(".action-close").click()
 
         expect(CMS.Views.Alert.prototype.hide).toHaveBeenCalled()
-        expect(view.$('.wrapper')).not.toHaveClass("is-shown")
-        expect(view.$('.wrapper')).toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeHiding()
 
 describe "CMS.Views.Prompt", ->
     tpl = readFixtures('prompt.underscore')
@@ -114,63 +120,52 @@ describe "CMS.Views.Notification minShown and maxShown", ->
     it "a minShown view should not hide too quickly", ->
         view = new CMS.Views.Notification({model: @model, minShown: 1000})
         expect(CMS.Views.Notification.prototype.show).toHaveBeenCalled()
-        expect(view.$('.wrapper')).toHaveClass("is-shown")
-        expect(view.$('.wrapper')).not.toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeShown()
 
         # call hide() on it, but the minShown should prevent it from hiding right away
         view.hide()
-        expect(view.$('.wrapper')).toHaveClass("is-shown")
-        expect(view.$('.wrapper')).not.toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeShown()
 
         # wait for the minShown timeout to expire, and check again
         @clock.tick(1001)
-        expect(view.$('.wrapper')).not.toHaveClass("is-shown")
-        expect(view.$('.wrapper')).toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeHiding()
 
     it "a maxShown view should hide by itself", ->
         view = new CMS.Views.Notification({model: @model, maxShown: 1000})
         expect(CMS.Views.Notification.prototype.show).toHaveBeenCalled()
-        expect(view.$('.wrapper')).toHaveClass("is-shown")
-        expect(view.$('.wrapper')).not.toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeShown()
 
         # wait for the maxShown timeout to expire, and check again
         @clock.tick(1001)
-        expect(view.$('.wrapper')).not.toHaveClass("is-shown")
-        expect(view.$('.wrapper')).toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeHiding()
 
     it "a minShown view can stay visible longer", ->
         view = new CMS.Views.Notification({model: @model, minShown: 1000})
         expect(CMS.Views.Notification.prototype.show).toHaveBeenCalled()
-        expect(view.$('.wrapper')).toHaveClass("is-shown")
-        expect(view.$('.wrapper')).not.toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeShown()
 
         # wait for the minShown timeout to expire, and check again
         @clock.tick(1001)
         expect(CMS.Views.Notification.prototype.hide).not.toHaveBeenCalled()
-        expect(view.$('.wrapper')).toHaveClass("is-shown")
-        expect(view.$('.wrapper')).not.toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeShown()
 
         # can now hide immediately
         view.hide()
-        expect(view.$('.wrapper')).not.toHaveClass("is-shown")
-        expect(view.$('.wrapper')).toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeHiding()
 
     it "a maxShown view can hide early", ->
         view = new CMS.Views.Notification({model: @model, maxShown: 1000})
         expect(CMS.Views.Notification.prototype.show).toHaveBeenCalled()
-        expect(view.$('.wrapper')).toHaveClass("is-shown")
-        expect(view.$('.wrapper')).not.toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeShown()
 
         # wait 50 milliseconds, and hide it early
         @clock.tick(50)
         view.hide()
-        expect(view.$('.wrapper')).not.toHaveClass("is-shown")
-        expect(view.$('.wrapper')).toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeHiding()
 
         # wait for timeout to expire, make sure it doesn't do anything weird
         @clock.tick(1000)
-        expect(view.$('.wrapper')).not.toHaveClass("is-shown")
-        expect(view.$('.wrapper')).toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeHiding()
 
     it "a view can have both maxShown and minShown", ->
         view = new CMS.Views.Notification({model: @model, minShown: 1000, maxShown: 2000})
@@ -178,17 +173,13 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         # can't hide early
         @clock.tick(50)
         view.hide()
-        expect(view.$('.wrapper')).toHaveClass("is-shown")
-        expect(view.$('.wrapper')).not.toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeShown()
         @clock.tick(1000)
-        expect(view.$('.wrapper')).not.toHaveClass("is-shown")
-        expect(view.$('.wrapper')).toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeHiding()
 
         # show it again, and let it hide automatically
         view.show()
         @clock.tick(1050)
-        expect(view.$('.wrapper')).toHaveClass("is-shown")
-        expect(view.$('.wrapper')).not.toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeShown()
         @clock.tick(1000)
-        expect(view.$('.wrapper')).not.toHaveClass("is-shown")
-        expect(view.$('.wrapper')).toHaveClass("is-hiding")
+        expect(view.$('.wrapper')).toBeHiding()
