@@ -14,7 +14,7 @@ def report_dir_path(dir)
     return File.join(REPORT_DIR, dir.to_s)
 end
 
-def when_changed(*files)
+def when_changed(unchanged_message, *files)
     Rake::Task[PREREQS_MD5_DIR].invoke
     cache_file = File.join(PREREQS_MD5_DIR, files.join('-').gsub(/\W+/, '-')) + '.md5'
     digest = Digest::MD5.new()
@@ -24,6 +24,8 @@ def when_changed(*files)
     if !File.exists?(cache_file) or digest.hexdigest != File.read(cache_file)
         yield
         File.write(cache_file, digest.hexdigest)
+    elsif !unchanged_message.empty?
+        puts unchanged_message
     end
 end
 
