@@ -84,14 +84,14 @@
       @extend .btn-primary;
     }
 
-    // already registered but course not started
-    &.is-registered {
+    // already registered but course not started or registration is closed
+    &.is-registered, &.registration-closed {
       @extend .btn-secondary;
       pointer-events: none !important;
     }
 
     // coming soon
-    &.isnot-open {
+    &.coming-soon {
       @extend .btn-tertiary;
       pointer-events: none !important;
       outline: none;
