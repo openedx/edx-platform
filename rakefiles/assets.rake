@@ -1,3 +1,36 @@
+# Theming constants
+THEME_NAME = ENV_TOKENS['THEME_NAME']
+USE_CUSTOM_THEME = !(THEME_NAME.nil? || THEME_NAME.empty?)
+if USE_CUSTOM_THEME
+    THEME_ROOT = File.join(ENV_ROOT, "themes", THEME_NAME)
+    THEME_SASS = File.join(THEME_ROOT, "static", "sass")
+end
+
+# Run the specified file through the Mako templating engine, providing
+# the ENV_TOKENS to the templating context.
+def preprocess_with_mako(filename)
+    # simple command-line invocation of Mako engine
+    mako = "from mako.template import Template;" +
+           "print Template(filename=\"#{filename}\")" +
+           # Total hack. It works because a Python dict literal has
+           # the same format as a JSON object.
+           ".render(env=#{ENV_TOKENS.to_json});"
+
+    # strip off the .mako extension
+    output_filename = filename.chomp(File.extname(filename))
+
+    # just pipe from stdout into the new file
+    File.open(output_filename, 'w') do |file|
+      file.write(`python -c '#{mako}'`)
+    end
+end
+
+# Preprocess all static assets that have the .mako extension by
+# running them through the Mako templating engine. Right now we
+# just hardcode the asset filenames.
+def preprocess_assets
+    preprocess_with_mako("lms/static/sass/application.scss.mako")
+end
 
 def xmodule_cmd(watch=false, debug=false)
     xmodule_cmd = 'xmodule_assets common/static/xmodule'
@@ -32,10 +65,20 @@ def coffee_cmd(watch=false, debug=false)
 end
 
 def sass_cmd(watch=false, debug=false)
+    # Make sure to preprocess templatized Sass first
+    preprocess_assets()
+
+    sass_load_paths = ["./common/static/sass"]
+    sass_watch_paths = ["*/static"]
+    if USE_CUSTOM_THEME
+      sass_load_paths << THEME_SASS
+      sass_watch_paths << THEME_SASS
+    end
+
     "sass #{debug ? '--debug-info' : '--style compressed'} " +
-          "--load-path ./common/static/sass " +
+          "--load-path #{sass_load_paths.join(' ')} " +
           "--require ./common/static/sass/bourbon/lib/bourbon.rb " +
-          "#{watch ? '--watch' : '--update'} */static"
+          "#{watch ? '--watch' : '--update'} #{sass_watch_paths.join(' ')}"
 end
 
 desc "Compile all assets"

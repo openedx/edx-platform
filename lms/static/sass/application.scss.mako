@@ -36,3 +36,16 @@
 @import 'news';
 
 @import 'shame';
+
+## THEMING
+## -------
+## Set up this file to import an edX theme library if the environment
+## indicates that a theme should be used. The assumption is that the
+## theme resides outside of this main edX repository, in a directory
+## called themes/<theme-name>/, with its base Sass file in
+## themes/<theme-name>/static/sass/_<theme-name>.scss. That one entry
+## point can be used to @import in as many other things as needed.
+% if not env['THEME_NAME'] is None:
+  // import theme's Sass overrides
+  @import '${env['THEME_NAME']}'
+% endif
