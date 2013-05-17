@@ -1,6 +1,5 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
 <%namespace name="units" file="widgets/units.html" />
 <%block name="title">Individual Unit</%block>
 <%block name="bodyclass">is-signedin course unit</%block>
@@ -36,23 +35,23 @@
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
-        <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
+        <p class="alert-message"><strong>You are editing a draft.</strong>
         % if published_date:
         This unit was originally published on ${published_date}.
         % endif
         </p>
-        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">${_("View the Live Version")}</a>
+        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">View the Live Version</a>
       </div>
       <div class="main-column">
         <article class="unit-body window">
-          <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
+          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
           <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>
             % endfor
             <li class="new-component-item adding">
               <div class="new-component">
-                <h5>${_("Add New Component")}</h5>
+                <h5>Add New Component</h5>
                 <ul class="new-component-type">
                   % for type in sorted(component_templates.keys()):
                   <li>
@@ -70,10 +69,10 @@
                     <div class="tab-group tabs">
                             <ul class="problem-type-tabs nav-tabs">
                               <li class="current">
-                                <a class="link-tab" href="#tab1">${_("Common Problem Types")}</a>
+                                <a class="link-tab" href="#tab1">Common Problem Types</a>
                               </li>
                               <li>
-                                <a class="link-tab" href="#tab2">${_("Advanced")}</a>
+                                <a class="link-tab" href="#tab2">Advanced</a>
                               </li>
                             </ul>
                     % endif
@@ -126,7 +125,7 @@
                             </div>
                     </div>
                     % endif
-                    <a href="#" class="cancel-button">${_("Cancel")}</a>
+                    <a href="#" class="cancel-button">Cancel</a>
                 </div>
                 % endfor
             </li>
@@ -136,13 +135,13 @@
 
       <div class="sidebar">
         <div class="unit-settings window">
-          <h4 class="header">${_("Unit Settings")}</h4>
+          <h4 class="header">Unit Settings</h4>
           <div class="window-contents">
             <div class="row visibility">
-              <label class="inline-label">${_("Visibility:")}</label>
+              <label class="inline-label">Visibility</label>
               <select class='visibility-select'>
-                <option value="public">${_("Public")}</option>
-                <option value="private">${_("Private")}</option>
+                <option value="public">Public</option>
+                <option value="private">Private</option>
               </select>
             </div>
             <div class="row published-alert">
@@ -157,14 +156,14 @@
               with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name_with_default}"</a></p>
             </div>
             <div class="row unit-actions">
-              <a href="#" class="delete-draft delete-button">${_("Delete Draft")}</a>
-              <a href="${draft_preview_link}" target="_blank" class="preview-button">${_("Preview")}</a>
-              <a href="${published_preview_link}" target="_blank" class="view-button">${_("View Live")}</a>
+              <a href="#" class="delete-draft delete-button">Delete Draft</a>
+              <a href="${draft_preview_link}" target="_blank" class="preview-button">Preview</a>
+              <a href="${published_preview_link}" target="_blank" class="view-button">View Live</a>
             </div>
           </div>
         </div>
         <div class="window unit-location">
-          <h4 class="header">${_("Unit Location")}</h4>
+          <h4 class="header">Unit Location</h4>
           <div class="window-contents">
             <div><input type="text" class="url" value="/courseware/${section.url_name}/${subsection.url_name}" disabled /></div>
             <ol>
