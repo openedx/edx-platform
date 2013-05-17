@@ -515,6 +515,9 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
+    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+        raise Http404
+
     course = get_course_with_access(request.user, course_id, 'see_exists')
     registered = registered_for_course(course, request.user)
 
@@ -531,6 +534,37 @@ def course_about(request, course_id):
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link': show_courseware_link})
+@ensure_csrf_cookie
+@cache_if_anonymous
+def mktg_course_about(request, course_id):
+
+    try:
+        course = get_course_with_access(request.user, course_id, 'see_exists')
+    except (ValueError, Http404) as e:
+        # if a course does not exist yet, display a coming
+        # soon button
+        return render_to_response('courseware/mktg_coming_soon.html',
+                              {'course_id': course_id})
+
+    registered = registered_for_course(course, request.user)
+
+    if has_access(request.user, course, 'load'):
+        course_target = reverse('info', args=[course.id])
+    else:
+        course_target = reverse('about_course', args=[course.id])
+
+    allow_registration = has_access(request.user, course, 'enroll')
+
+    show_courseware_link = (has_access(request.user, course, 'load') or
+                            settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+
+    return render_to_response('courseware/mktg_course_about.html',
+                              {'course': course,
+                               'registered': registered,
+                               'allow_registration': allow_registration,
+                               'course_target': course_target,
+                               'show_courseware_link': show_courseware_link})
+
 
 
 @ensure_csrf_cookie

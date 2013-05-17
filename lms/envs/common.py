@@ -36,6 +36,7 @@ DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
+
 # Features
 MITX_FEATURES = {
     'SAMPLE': False,
@@ -182,6 +183,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'sekizai.context_processors.sekizai',
     'course_wiki.course_nav.context_processor',
+
+    # Hack to get required link URLs to password reset templates
+    'mitxmako.shortcuts.marketing_link_context_processor',
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000   # 4 MB
@@ -691,3 +695,17 @@ INSTALLED_APPS = (
     # Student notes
     'notes',
 )
+
+######################### MARKETING SITE ###############################
+EDXMKTG_COOKIE_NAME = 'edxloggedin'
+MKTG_URLS = {}
+MKTG_URL_LINK_MAP = {
+    'ABOUT': 'about_edx',
+    'CONTACT': 'contact',
+    'FAQ': 'help_edx',
+    'COURSES': 'courses',
+    'ROOT': 'root',
+    'TOS': 'tos',
+    'HONOR': 'honor',
+    'PRIVACY': 'privacy_edx',
+}

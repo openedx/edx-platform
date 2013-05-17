@@ -7,10 +7,23 @@
   @return $body-line-height * $amount;
 }
 
-@mixin hide-text(){
-  text-indent: -9999px;
+// image-replacement hidden text
+@mixin text-hide() {
+  text-indent: 100%;
+  white-space: nowrap;
   overflow: hidden;
-  display: block;
+}
+
+// hidden elems - screenreaders
+@mixin text-sr() {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
 }
 
 @mixin vertically-and-horizontally-centered ( $height, $width ) {
@@ -21,4 +34,11 @@
   min-width: $width;
   position: absolute;
   top: 150px;
+}
+
+// sunsetted, but still used mixins
+@mixin hide-text(){
+  text-indent: -9999px;
+  overflow: hidden;
+  display: block;
 }

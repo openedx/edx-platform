@@ -17,6 +17,8 @@ urlpatterns = ('',  # nopep8
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
+    url(r'^login$', 'student.views.signin_user', name="signin_user"),
+    url(r'^register$', 'student.views.register_user', name="register_user"),
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
 
@@ -35,8 +37,8 @@ urlpatterns = ('',  # nopep8
 
     url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
 
-    url(r'^login$', 'student.views.login_user', name="login"),
-    url(r'^login/(?P<error>[^/]*)$', 'student.views.login_user'),
+    url(r'^login_ajax$', 'student.views.login_user', name="login"),
+    url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
     url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
@@ -177,11 +179,19 @@ if settings.COURSEWARE_ENABLED:
 
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
-            'student.views.change_enrollment_view', name="change_enrollment"),
+            'student.views.change_enrollment', name="change_enrollment"),
 
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
             'courseware.views.course_about', name="about_course"),
+        #View for mktg site (kept for backwards compatibility TODO - remove before merge to master)
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/mktg-about$',
+            'courseware.views.mktg_course_about', name="mktg_about_course"),
+        #View for mktg site
+        url(r'^mktg/(?P<course_id>.*)$',
+            'courseware.views.mktg_course_about', name="mktg_about_course"),
+
+
 
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',

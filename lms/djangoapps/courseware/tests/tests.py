@@ -220,25 +220,20 @@ class LoginEnrollmentTestCase(TestCase):
         # Now make sure that the user is now actually activated
         self.assertTrue(get_user(email).is_active)
 
-    def _enroll(self, course):
-        """Post to the enrollment view, and return the parsed json response"""
+    def try_enroll(self, course):
+        """Try to enroll.  Return bool success instead of asserting it."""
         resp = self.client.post('/change_enrollment', {
             'enrollment_action': 'enroll',
             'course_id': course.id,
         })
-        return parse_json(resp)
-
-    def try_enroll(self, course):
-        """Try to enroll.  Return bool success instead of asserting it."""
-        data = self._enroll(course)
-        print ('Enrollment in %s result: %s'
-               % (course.location.url(), str(data)))
-        return data['success']
+        print ('Enrollment in %s result status code: %s'
+               % (course.location.url(), str(resp.status_code)))
+        return resp.status_code == 200
 
     def enroll(self, course):
         """Enroll the currently logged-in user, and check that it worked."""
-        data = self._enroll(course)
-        self.assertTrue(data['success'])
+        result = self.try_enroll(course)
+        self.assertTrue(result)
 
     def unenroll(self, course):
         """Unenroll the currently logged-in user, and check that it worked."""
@@ -246,8 +241,7 @@ class LoginEnrollmentTestCase(TestCase):
             'enrollment_action': 'unenroll',
             'course_id': course.id,
         })
-        data = parse_json(resp)
-        self.assertTrue(data['success'])
+        self.assertTrue(resp.status_code == 200)
 
     def check_for_get_code(self, code, url):
         """
