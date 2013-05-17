@@ -1,4 +1,6 @@
 # Python libraries to install that are local to the mitx repo
+-e common/lib/calc
 -e common/lib/capa
+-e common/lib/chem
 -e common/lib/xmodule
 -e .

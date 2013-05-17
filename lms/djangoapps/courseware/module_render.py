@@ -1,6 +1,7 @@
 import json
 import logging
 import pyparsing
+import re
 import sys
 import static_replace
 
@@ -8,6 +9,7 @@ from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -273,6 +275,14 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
 
         statsd.increment("lms.courseware.question_answered", tags=tags)
 
+    def can_execute_unsafe_code():
+        # To decide if we can run unsafe code, we check the course id against
+        # a list of regexes configured on the server.
+        for regex in settings.COURSES_WITH_UNSAFE_CODE:
+            if re.match(regex, course_id):
+                return True
+        return False
+
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
@@ -299,6 +309,8 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
                           course_id=course_id,
                           open_ended_grading_interface=open_ended_grading_interface,
                           s3_interface=s3_interface,
+                          cache=cache,
+                          can_execute_unsafe_code=can_execute_unsafe_code,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)

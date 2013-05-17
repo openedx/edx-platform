@@ -97,6 +97,10 @@ MITX_FEATURES = {
 
     # Provide a UI to allow users to submit feedback from the LMS
     'ENABLE_FEEDBACK_SUBMISSION': False,
+
+    # Turn on a page that lets staff enter Python code to be run in the
+    # sandbox, for testing whether it's enabled properly.
+    'ENABLE_DEBUG_RUN_PYTHON': False,
 }
 
 # Used for A/B testing
@@ -245,6 +249,31 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+
+#################### Python sandbox ############################################
+
+CODE_JAIL = {
+    # Path to a sandboxed Python executable.  None means don't bother.
+    'python_bin': None,
+    # User to run as in the sandbox.
+    'user': 'sandbox',
+
+    # Configurable limits.
+    'limits': {
+        # How many CPU seconds can jailed code use?
+        'CPU': 1,
+    },
+}
+
+# Some courses are allowed to run unsafe code. This is a list of regexes, one
+# of them must match the course id for that course to run unsafe code.
+#
+# For example:
+#
+#   COURSES_WITH_UNSAFE_CODE = [
+#       r"Harvard/XY123.1/.*"
+#   ]
+COURSES_WITH_UNSAFE_CODE = []
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
@@ -398,6 +427,7 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
+    'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -601,6 +631,7 @@ INSTALLED_APPS = (
 
     # For testing
     'django.contrib.admin',   # only used in DEBUG mode
+    'debug',
 
     # Discussion forums
     'django_comment_client',
