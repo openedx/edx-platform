@@ -37,6 +37,9 @@
                   <li class="nav-item nav-course-courseware-uploads">
                     <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Files &amp; Uploads</a>
                   </li>
+                  <li class="nav-item nav-course-courseware-textbooks">
+                    <a href="${reverse('textbook_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Textbooks</a>
+                  </li>
                 </ul>
               </div>
             </div>

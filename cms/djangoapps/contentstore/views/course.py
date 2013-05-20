@@ -44,7 +44,7 @@ __all__ = ['course_index', 'create_new_course', 'course_info',
            'course_config_advanced_page',
            'course_settings_updates',
            'course_grader_updates',
-           'course_advanced_updates']
+           'course_advanced_updates', 'textbook_index']
 
 
 @login_required
@@ -411,3 +411,18 @@ def course_advanced_updates(request, org, course, name):
             return HttpResponseBadRequest("Incorrect setting format. " + str(e), content_type="text/plain")
 
         return HttpResponse(response_json, mimetype="application/json")
+
+
+@login_required
+@ensure_csrf_cookie
+def textbook_index(request, org, course, name):
+    """
+    Display an editable textbook overview.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+    course = modulestore().get_item(location, depth=3)
+    return render_to_response('textbooks.html', {
+        'context_course': course,
+    })
