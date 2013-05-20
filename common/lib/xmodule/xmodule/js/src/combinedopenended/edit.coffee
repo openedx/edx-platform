@@ -131,8 +131,12 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
 
   @insertGenericInput: (selectedText, lineStart, lineEnd, template) ->
     if selectedText.length > 0
-      # TODO: should this insert a newline afterwards?
-      return lineStart + selectedText + lineEnd
+      new_string = selectedText.replace(/^\s+|\s+$/g,'')
+      if new_string.substring(0,lineStart.length) != lineStart
+        new_string = lineStart + new_string
+      if new_string.substring((new_string.length)-lineEnd.length,new_string.length) != lineEnd
+        new_string = new_string + lineEnd
+      return new_string
     else
       return template
 
