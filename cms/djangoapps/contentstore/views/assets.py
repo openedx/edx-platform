@@ -89,11 +89,11 @@ def asset_index(request, org, course, name):
     })
 
 
-@login_required
 @ensure_csrf_cookie
+@login_required
 def upload_asset(request, org, course, coursename):
     '''
-    cdodge: this method allows for POST uploading of files into the course asset library, which will
+    This method allows for POST uploading of files into the course asset library, which will
     be supported by GridFS in MongoDB.
     '''
     if request.method != 'POST':
@@ -118,16 +118,25 @@ def upload_asset(request, org, course, coursename):
     # compute a 'filename' which is similar to the location formatting, we're using the 'filename'
     # nomenclature since we're using a FileSystem paradigm here. We're just imposing
     # the Location string formatting expectations to keep things a bit more consistent
-
-    filename = request.FILES['file'].name
-    mime_type = request.FILES['file'].content_type
-    filedata = request.FILES['file'].read()
+    upload_file = request.FILES['file']
+    filename = upload_file.name
+    mime_type = upload_file.content_type
 
     content_loc = StaticContent.compute_location(org, course, filename)
-    content = StaticContent(content_loc, filename, mime_type, filedata)
+
+    chunked = upload_file.multiple_chunks()
+    if chunked:
+        content = StaticContent(content_loc, filename, mime_type, upload_file.chunks())
+    else:
+        content = StaticContent(content_loc, filename, mime_type, upload_file.read())
+
+    thumbnail_content = None
+    thumbnail_location = None
 
     # first let's see if a thumbnail can be created
-    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content)
+    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content,
+                                                                                tempfile_path=None if not chunked else
+                                                                                upload_file.temporary_file_path())
 
     # delete cached thumbnail even if one couldn't be created this time (else the old thumbnail will continue to show)
     del_cached_content(thumbnail_location)
@@ -208,7 +217,9 @@ def remove_asset(request, org, course, name):
 @ensure_csrf_cookie
 @login_required
 def import_course(request, org, course, name):
-
+    """
+    This method will handle a POST request to upload and import a .tar.gz file into a specified course
+    """
     location = get_location_and_verify_access(request, org, course, name)
 
     if request.method == 'POST':
@@ -282,6 +293,10 @@ def import_course(request, org, course, name):
 @ensure_csrf_cookie
 @login_required
 def generate_export_course(request, org, course, name):
+    """
+    This method will serialize out a course to a .tar.gz file which contains a XML-based representation of
+    the course
+    """
     location = get_location_and_verify_access(request, org, course, name)
 
     loc = Location(location)
@@ -312,7 +327,9 @@ def generate_export_course(request, org, course, name):
 @ensure_csrf_cookie
 @login_required
 def export_course(request, org, course, name):
-
+    """
+    This method serves up the 'Export Course' page
+    """
     location = get_location_and_verify_access(request, org, course, name)
 
     course_module = modulestore().get_item(location)

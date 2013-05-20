@@ -14,11 +14,13 @@ from PIL import Image
 
 
 class StaticContent(object):
-    def __init__(self, loc, name, content_type, data, last_modified_at=None, thumbnail_location=None, import_path=None):
+    def __init__(self, loc, name, content_type, data, last_modified_at=None, thumbnail_location=None, import_path=None,
+                 length=None):
         self.location = loc
         self.name = name   # a display string which can be edited, and thus not part of the location which needs to be fixed
         self.content_type = content_type
-        self.data = data
+        self._data = data
+        self.length = length
         self.last_modified_at = last_modified_at
         self.thumbnail_location = Location(thumbnail_location) if thumbnail_location is not None else None
         # optional information about where this file was imported from. This is needed to support import/export
@@ -44,6 +46,10 @@ class StaticContent(object):
 
     def get_url_path(self):
         return StaticContent.get_url_path_from_location(self.location)
+
+    @property
+    def data(self):
+        return self._data
 
     @staticmethod
     def get_url_path_from_location(location):
@@ -79,6 +85,35 @@ class StaticContent(object):
     def convert_legacy_static_url(path, course_namespace):
         loc = StaticContent.compute_location(course_namespace.org, course_namespace.course, path)
         return StaticContent.get_url_path_from_location(loc)
+
+    def stream_data(self):
+        yield self._data
+
+
+class StaticContentStream(StaticContent):
+    def __init__(self, loc, name, content_type, stream, last_modified_at=None, thumbnail_location=None, import_path=None,
+                 length=None):
+        super(StaticContentStream, self).__init__(loc, name, content_type, None, last_modified_at=last_modified_at,
+                                                  thumbnail_location=thumbnail_location, import_path=import_path,
+                                                  length=length)
+        self._stream = stream
+
+    def stream_data(self):
+        while True:
+            chunk = self._stream.read(1024)
+            if len(chunk) == 0:
+                break
+            yield chunk
+
+    def close(self):
+        self._stream.close()
+
+    def copy_to_in_mem(self):
+        self._stream.seek(0)
+        content = StaticContent(self.location, self.name, self.content_type, self._stream.read(),
+                                last_modified_at=self.last_modified_at, thumbnail_location=self.thumbnail_location,
+                                import_path=self.import_path, length=self.length)
+        return content
 
 
 class ContentStore(object):

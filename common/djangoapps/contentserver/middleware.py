@@ -6,6 +6,7 @@ from xmodule.modulestore import InvalidLocationError
 from cache_toolbox.core import get_cached_content, set_cached_content
 from xmodule.exceptions import NotFoundError
 
+import logging
 
 class StaticContentServer(object):
     def process_request(self, request):
@@ -24,17 +25,21 @@ class StaticContentServer(object):
             if content is None:
                 # nope, not in cache, let's fetch from DB
                 try:
-                    content = contentstore().find(loc)
+                    content = contentstore().find(loc, as_stream=True)
                 except NotFoundError:
                     response = HttpResponse()
                     response.status_code = 404
                     return response
 
-                # since we fetched it from DB, let's cache it going forward
-                set_cached_content(content)
+                # since we fetched it from DB, let's cache it going forward, but only if it's < 1MB
+                # this is because I haven't been able to find a means to stream data out of memcached
+                if content.length is not None:
+                    if content.length < 1048576:
+                        # since we've queried as a stream, let's read in the stream into memory to set in cache
+                        content = content.copy_to_in_mem()
+                        set_cached_content(content)
             else:
-                # @todo: we probably want to have 'cache hit' counters so we can
-                # measure the efficacy of our caches
+                # NOP here, but we may wish to add a "cache-hit" counter in the future
                 pass
 
             # see if the last-modified at hasn't changed, if not return a 302 (Not Modified)
@@ -50,7 +55,7 @@ class StaticContentServer(object):
                 if if_modified_since == last_modified_at_str:
                     return HttpResponseNotModified()
 
-            response = HttpResponse(content.data, content_type=content.content_type)
+            response = HttpResponse(content.stream_data(), content_type=content.content_type)
             response['Last-Modified'] = last_modified_at_str
 
             return response
