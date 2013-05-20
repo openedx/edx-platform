@@ -108,7 +108,6 @@ def edit_tabs(request, org, course, coursename):
     ]
 
     return render_to_response('edit-tabs.html', {
-        'active_tab': 'pages',
         'context_course': course_item,
         'components': components
     })
@@ -123,7 +122,6 @@ def static_pages(request, org, course, coursename):
     course = modulestore().get_item(location)
 
     return render_to_response('static-pages.html', {
-        'active_tab': 'pages',
         'context_course': course,
     })
 

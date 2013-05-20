@@ -77,7 +77,6 @@ def asset_index(request, org, course, name):
         asset_display.append(display_info)
 
     return render_to_response('asset_index.html', {
-        'active_tab': 'assets',
         'context_course': course_module,
         'assets': asset_display,
         'upload_asset_callback_url': upload_asset_callback_url,
@@ -285,7 +284,6 @@ def import_course(request, org, course, name):
 
         return render_to_response('import.html', {
             'context_course': course_module,
-            'active_tab': 'import',
             'successful_import_redirect_url': get_url_reverse('CourseOutline', course_module)
         })
 
@@ -336,6 +334,5 @@ def export_course(request, org, course, name):
 
     return render_to_response('export.html', {
         'context_course': course_module,
-        'active_tab': 'export',
         'successful_import_redirect_url': ''
     })

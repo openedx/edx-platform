@@ -69,7 +69,6 @@ def course_index(request, org, course, name):
     sections = course.get_children()
 
     return render_to_response('overview.html', {
-        'active_tab': 'courseware',
         'context_course': course,
         'lms_link': lms_link,
         'sections': sections,
@@ -161,7 +160,6 @@ def course_info(request, org, course, name, provided_id=None):
     location = Location(['i4x', org, course, 'course_info', "updates"])
 
     return render_to_response('course_info.html', {
-        'active_tab': 'courseinfo-tab',
         'context_course': course_module,
         'url_base': "/" + org + "/" + course + "/",
         'course_updates': json.dumps(get_course_updates(location)),

@@ -73,7 +73,6 @@ def manage_users(request, location):
     course_module = modulestore().get_item(location)
 
     return render_to_response('manage_users.html', {
-        'active_tab': 'users',
         'context_course': course_module,
         'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
         'add_user_postback_url': reverse('add_user', args=[location]).rstrip('/'),

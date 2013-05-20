@@ -209,7 +209,6 @@ def edit_unit(request, location):
 
     return render_to_response('unit.html', {
         'context_course': course,
-        'active_tab': 'courseware',
         'unit': item,
         'unit_location': location,
         'components': components,
