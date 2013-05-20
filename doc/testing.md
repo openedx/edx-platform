@@ -117,12 +117,11 @@ xmodule can be tested independently, with this:
 
 To run a single django test class:
 
-    django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/courseware/tests/tests.py:TestViewAuth
+    rake test_lms[courseware.tests.tests:testViewAuth]
 
 To run a single django test:
 
-    django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/courseware/tests/tests.py:TestViewAuth.test_dark_launch
-
+    rake test_lms[courseware.tests.tests:TestViewAuth.test_dark_launch]
 
 To run a single nose test file:
 
