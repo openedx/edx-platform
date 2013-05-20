@@ -100,10 +100,13 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
     showClearButton: function() {
         if (!this.$el.hasClass('is-set')) {
             this.$el.addClass('is-set');
-            // TODO: can we use toggleclass?
-            this.$el.find('.setting-clear').removeClass('inactive');
-            this.$el.find('.setting-clear').addClass('active');
+            this.getClearButton().removeClass('inactive');
+            this.getClearButton().addClass('active');
         }
+    },
+
+    getClearButton: function () {
+        return this.$el.find('.setting-clear');
     },
 
     render: function () {
@@ -116,9 +119,8 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
         }
         else {
             this.$el.removeClass('is-set');
-            // TODO: can we use toggleclass?
-            this.$el.find('.setting-clear').addClass('inactive');
-            this.$el.find('.setting-clear').removeClass('active');
+            this.getClearButton().addClass('inactive');
+            this.getClearButton().removeClass('active');
         }
     }
 });
@@ -154,7 +156,7 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
 
     render: function () {
         CMS.Views.Metadata.AbstractEditor.prototype.render.apply(this);
-        if (!this.inputAttributesSet) {
+        if (!this.initialized) {
             var min = "min";
             var max = "max";
             var step = "step";
@@ -175,7 +177,11 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
             if (stepValue !== undefined) {
                 this.$el.find('input').attr(step, stepValue);
             }
-            this.inputAttributesSet = true;
+
+            //   Manually runs polyfill for input number types to correct for Firefox non-support
+            this.$el.find('.setting-input-number').inputNumber();
+
+            this.initialized = true;
         }
     },
 
