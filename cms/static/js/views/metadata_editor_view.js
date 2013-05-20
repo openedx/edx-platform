@@ -2,9 +2,7 @@ if (!CMS.Views['Metadata']) CMS.Views.Metadata = {};
 
 CMS.Views.Metadata.Editor = Backbone.View.extend({
 
-    // Model class is ...
-    events : {
-    },
+    // Model is simply a Backbone.Model instance.
 
     initialize : function() {
         var self = this;
@@ -32,13 +30,15 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
                             el: self.$el.find('.metadata_entry')[counter++],
                             model: model
                         };
-                        if (item.type === 'Select') {
+                        if (item.type === CMS.Models.Metadata.SELECT_TYPE) {
                             new CMS.Views.Metadata.Option(data);
                         }
-                        else if (item.type === 'Integer' || item.type === 'Float') {
+                        else if (item.type === CMS.Models.Metadata.INTEGER_TYPE ||
+                            item.type === CMS.Models.Metadata.FLOAT_TYPE) {
                             new CMS.Views.Metadata.Number(data);
                         }
                         else {
+                            // Everything else is treated as GENERIC_TYPE, which uses String editor.
                             new CMS.Views.Metadata.String(data);
                         }
                     });
@@ -66,6 +66,8 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
 });
 
 CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
+
+    // Model is CMS.Models.Metadata.
 
     initialize : function() {
         var self = this;
