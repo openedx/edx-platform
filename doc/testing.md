@@ -161,36 +161,36 @@ try running `bundle install` to install the required ruby gems.
 We use [Lettuce](http://lettuce.it/) for acceptance testing.
 Most of our tests use [Splinter](http://splinter.cobrateam.info/)
 to simulate UI browser interactions.  Splinter, in turn,
-uses [Selenium](http://docs.seleniumhq.org/) to control the browser.
+uses [Selenium](http://docs.seleniumhq.org/) to control the Chrome browser.
 
 **Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver) 
-installed to run the tests in Chrome.  
+installed to run the tests in Chrome.  The tests are confirmed to run
+with Chrome (not Chromium) version 26.0.0.1410.63 with ChromeDriver
+version r195636.
 
-Before running the tests, you need to set up the test database:
+To run all the acceptance tests:
 
-    rm ../db/test_mitx.db
-    rake django-admin[syncdb,lms,acceptance,--noinput]
-    rake django-admin[migrate,lms,acceptance,--noinput]
-
-To run the acceptance tests:
-
-1. Start the Django server locally using the settings in **acceptance.py**:
-
-        rake lms[acceptance]
-
-2. In another shell, run the tests:
-
-        django-admin.py harvest --no-server --settings=lms.envs.acceptance --pythonpath=. lms/djangoapps/portal/features/
+    rake test_acceptance_lms
+    rake test_acceptance_cms
 
 To test only a specific feature:
 
-    django-admin.py harvest --no-server --settings=lms.envs.acceptance --pythonpath=. lms/djangoapps/courseware/features/high-level-tabs.feature
+    rake test_acceptance_lms[lms/djangoapps/courseware/features/problems.feature]
+
+To start the debugger on failure, add the `--pdb` option:
+
+    rake test_acceptance_lms["lms/djangoapps/courseware/features/problems.feature --pdb"]
+
+To run tests faster by not collecting static files, you can use
+`rake fasttest_acceptance_lms` and `rake fasttest_acceptance_cms`.
+
 
 **Troubleshooting**: If you get an error message that says something about harvest not being a command, you probably are missing a requirement.
 Try running:
 
     pip install -r requirements.txt
 
+**Note**: The acceptance tests can *not* currently run in parallel.  
 
 ## Viewing Test Coverage
 

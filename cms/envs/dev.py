@@ -116,6 +116,11 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
+################################# CELERY ######################################
+
+# By default don't use a worker, execute tasks as if they were local functions
+CELERY_ALWAYS_EAGER = True
+
 ################################ DEBUG TOOLBAR #################################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
 MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
@@ -150,6 +155,9 @@ DEBUG_TOOLBAR_MONGO_STACKTRACES = True
 
 # disable NPS survey in dev mode
 MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
+
+# Enable URL that shows information about the status of variuous services
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # segment-io key for dev
 SEGMENT_IO_KEY = 'mty8edrrsg'

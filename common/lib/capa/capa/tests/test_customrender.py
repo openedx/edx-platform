@@ -26,7 +26,7 @@ class HelperTest(unittest.TestCase):
     Make sure that our helper function works!
     '''
     def check(self, d):
-        xml = etree.XML(test_system.render_template('blah', d))
+        xml = etree.XML(test_system().render_template('blah', d))
         self.assertEqual(d, extract_context(xml))
 
     def test_extract_context(self):
@@ -46,11 +46,11 @@ class SolutionRenderTest(unittest.TestCase):
         xml_str = """<solution id="solution_12">{s}</solution>""".format(s=solution)
         element = etree.fromstring(xml_str)
 
-        renderer = lookup_tag('solution')(test_system, element)
+        renderer = lookup_tag('solution')(test_system(), element)
 
         self.assertEqual(renderer.id, 'solution_12')
 
-        # our test_system "renders" templates to a div with the repr of the context
+        # Our test_system "renders" templates to a div with the repr of the context.
         xml = renderer.get_html()
         context = extract_context(xml)
         self.assertEqual(context, {'id': 'solution_12'})
@@ -65,7 +65,7 @@ class MathRenderTest(unittest.TestCase):
         xml_str = """<math>{tex}</math>""".format(tex=latex_in)
         element = etree.fromstring(xml_str)
 
-        renderer = lookup_tag('math')(test_system, element)
+        renderer = lookup_tag('math')(test_system(), element)
 
         self.assertEqual(renderer.mathstr, mathjax_out)
 

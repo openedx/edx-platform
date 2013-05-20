@@ -8,7 +8,7 @@ Installation
 The installation process is a bit messy at the moment. Here's a high-level
 overview of what you should do to get started.
 
-**TLDR:** There is a `create-dev-env.sh` script that will attempt to set all
+**TLDR:** There is a `scripts/create-dev-env.sh` script that will attempt to set all
 of this up for you. If you're in a hurry, run that script. Otherwise, I suggest
 that you understand what the script is doing, and why, by reading this document.
 
@@ -77,10 +77,15 @@ environment), and Node has a library installer called
 Once you've got your languages and virtual environments set up, install
 the libraries like so:
 
-    $ pip install -r pre-requirements.txt
-    $ pip install -r requirements.txt
+    $ pip install -r requirements/edx/base.txt
+    $ pip install -r requirements/edx/post.txt
     $ bundle install
     $ npm install
+
+You can also use [`rake`](http://rake.rubyforge.org/) to get all of the prerequisites (or to update)
+them if they've changed
+
+    $ rake install_prereqs
 
 Other Dependencies
 ------------------
@@ -137,7 +142,7 @@ Studio, visit `127.0.0.1:8001` in your web browser; to view the LMS, visit
 There's also an older version of the LMS that saves its information in XML files
 in the `data` directory, instead of in Mongo. To run this older version, run:
 
-$ rake lms
+    $ rake lms
 
 Further Documentation
 =====================
