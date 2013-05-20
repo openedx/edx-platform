@@ -30,7 +30,7 @@ desc "Install all python prerequisites for the lms and cms"
 task :install_python_prereqs => "ws:migrate" do
     Tempfile.open('pyinstalled') do |pyinstalled|
         # Read the names of everything in site-packages, and include them in the fingerprint.
-        sh("python -c 'import os; import distutils.sysconfig as dusc; print sorted(os.listdir(dusc.get_python_lib()))' > #{pyinstalled.path}")
+        `python -c 'import os; import distutils.sysconfig as dusc; print sorted(os.listdir(dusc.get_python_lib()))' > #{pyinstalled.path}`
         unchanged = 'Python requirements unchanged, nothing to install'
         when_changed(unchanged, 'requirements/**/*', pyinstalled.path) do
             ENV['PIP_DOWNLOAD_CACHE'] ||= '.pip_download_cache'
