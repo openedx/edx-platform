@@ -158,24 +158,27 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
     render: function () {
         CMS.Views.Metadata.AbstractEditor.prototype.render.apply(this);
         if (!this.initialized) {
+            var numToString = function (val) {
+                return val.toFixed(4);
+            };
             var min = "min";
             var max = "max";
             var step = "step";
             var options = this.model.getOptions();
             if (options.hasOwnProperty(min)) {
                 this.min = Number(options[min]);
-                this.$el.find('input').attr(min, this.min.toFixed(4));
+                this.$el.find('input').attr(min, numToString(this.min));
             }
             if (options.hasOwnProperty(max)) {
                 this.max = Number(options[max]);
-                this.$el.find('input').attr(max, this.max.toFixed(4));
+                this.$el.find('input').attr(max, numToString(this.max.toFixed));
             }
             var stepValue = undefined;
             if (options.hasOwnProperty(step)) {
                 // Parse step and convert to String. Polyfill doesn't like float values like ".1" (expects "0.1").
-                stepValue = Number(options[step]).toFixed(4);
+                stepValue = numToString(Number(options[step]));
             }
-            else if (this.model.getType() === 'Integer') {
+            else if (this.isIntegerField()) {
                 stepValue = "1";
             }
             if (stepValue !== undefined) {
@@ -201,6 +204,10 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
         this.$el.find('input').val(value);
     },
 
+    isIntegerField : function () {
+        return this.model.getType() === 'Integer';
+    },
+
     keyPressed: function (e) {
         this.showClearButton();
         // This first filtering if statement is take from polyfill to prevent
@@ -212,7 +219,7 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
             e.preventDefault();
         }
         // For integers, prevent decimal points.
-        if (this.model.getType() === 'Integer' && e.keyCode === 46) {
+        if (this.isIntegerField() && e.keyCode === 46) {
             e.preventDefault();
         }
     },
