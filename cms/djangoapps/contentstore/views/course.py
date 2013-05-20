@@ -18,7 +18,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.modulestore import Location
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
-from contentstore.utils import get_lms_link_for_item, add_extra_panel_tab, remove_open_ended_panel_tab
+from contentstore.utils import get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
