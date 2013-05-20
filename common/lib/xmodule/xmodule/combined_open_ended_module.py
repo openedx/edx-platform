@@ -221,3 +221,9 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     has_score = True
     always_recalculate_grades = True
     template_dir_name = "combinedopenended"
+
+    #Specify whether or not to pass in S3 interface
+    needs_s3_interface = True
+
+    #Specify whether or not to pass in open ended interface
+    needs_open_ended_interface = True

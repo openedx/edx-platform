@@ -216,20 +216,26 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     #It needs the open ended grading interface in order to get peer grading to be done
     #TODO: refactor these settings into module-specific settings when possible.
     #this first checks to see if the descriptor is the correct one, and only sends settings if it is
-    is_descriptor_combined_open_ended = (descriptor.__class__.__name__ == 'CombinedOpenEndedDescriptor')
-    is_descriptor_peer_grading =  (descriptor.__class__.__name__ == 'PeerGradingDescriptor')
+
+    #Get descriptor metadata fields indicating needs for various settings
+    needs_open_ended_interface = descriptor.needs_open_ended_interface
+    needs_s3_interface =  descriptor.needs_s3_interface
+
+    #Initialize interfaces to None
     open_ended_grading_interface = None
     s3_interface = None
-    if is_descriptor_combined_open_ended or is_descriptor_peer_grading:
+
+    #Create interfaces if needed
+    if needs_open_ended_interface:
         open_ended_grading_interface = settings.OPEN_ENDED_GRADING_INTERFACE
         open_ended_grading_interface['mock_peer_grading'] = settings.MOCK_PEER_GRADING
         open_ended_grading_interface['mock_staff_grading'] = settings.MOCK_STAFF_GRADING
-        if is_descriptor_combined_open_ended:
-            s3_interface = {
-                'access_key' : getattr(settings,'AWS_ACCESS_KEY_ID',''),
-                'secret_access_key' : getattr(settings,'AWS_SECRET_ACCESS_KEY',''),
-                'storage_bucket_name' : getattr(settings,'AWS_STORAGE_BUCKET_NAME','openended')
-            }
+    if needs_s3_interface:
+        s3_interface = {
+            'access_key' : getattr(settings,'AWS_ACCESS_KEY_ID',''),
+            'secret_access_key' : getattr(settings,'AWS_SECRET_ACCESS_KEY',''),
+            'storage_bucket_name' : getattr(settings,'AWS_STORAGE_BUCKET_NAME','openended')
+        }
 
     def inner_get_module(descriptor):
         """
