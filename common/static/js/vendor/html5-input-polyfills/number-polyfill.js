@@ -142,7 +142,7 @@ HTML5 Number polyfill | Jonathan Stipe | https://github.com/jonstipe/number-poly
           var $downBtn, $elem, $upBtn, attrMutationCallback, attrObserver, btnContainer, downBtn, elem, halfHeight, upBtn;
           elem = this;
           $elem = $(elem);
-          halfHeight = ($elem.outerHeight() / 2) + 'px';
+          halfHeight = ($elem.outerHeight() / 5) + 'px';
           upBtn = document.createElement('div');
           downBtn = document.createElement('div');
           $upBtn = $(upBtn);

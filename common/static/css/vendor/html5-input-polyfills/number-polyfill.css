@@ -2,9 +2,8 @@
 div.number-spin-btn-container {
   display: inline-block;
   position: relative;
-  vertical-align: top;
-  margin: 0;
-  margin-left: 3px;
+  vertical-align: middle;
+  margin: 0 0 0 3px;
   padding: 0; }
 
 div.number-spin-btn {
