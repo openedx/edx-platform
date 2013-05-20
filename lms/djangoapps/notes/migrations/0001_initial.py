@@ -13,7 +13,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('uri', self.gf('django.db.models.fields.CharField')(max_length=1024, db_index=True)),
+            ('uri', self.gf('django.db.models.fields.CharField')(max_length=512, db_index=True)),
             ('text', self.gf('django.db.models.fields.TextField')(default='')),
             ('quote', self.gf('django.db.models.fields.TextField')(default='')),
             ('range_start', self.gf('django.db.models.fields.CharField')(max_length=2048)),
@@ -82,7 +82,7 @@ class Migration(SchemaMigration):
             'tags': ('django.db.models.fields.TextField', [], {'default': "''"}),
             'text': ('django.db.models.fields.TextField', [], {'default': "''"}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'uri': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'db_index': 'True'}),
+            'uri': ('django.db.models.fields.CharField', [], {'max_length': '512', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         }
     }
