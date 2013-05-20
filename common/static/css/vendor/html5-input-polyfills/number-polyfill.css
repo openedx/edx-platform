@@ -5,7 +5,7 @@ div.number-spin-btn-container {
   vertical-align: middle;
   margin: 0 0 0 3px;
   padding: 0;
-  right: 74px;
+  left: 74%;
   top: 6px; 
 }
 
@@ -17,7 +17,7 @@ div.number-spin-btn {
   border-color: #ededed #777777 #777777 #ededed;
   border-style: solid;
   background-color: #eeeeee;
-  width: 1.2em;
+  width: 1em;
   font-size: 14px; }
   div.number-spin-btn:hover {
     /* added blue hover color */
