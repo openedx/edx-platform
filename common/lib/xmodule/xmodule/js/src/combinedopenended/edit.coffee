@@ -140,8 +140,8 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
-  @markdownToXml: (markdown, mock=false)->
-    toXml = `function(markdown, mock) {
+  @markdownToXml: (markdown)->
+    toXml = `function(markdown) {
 
       function template(template_html,data){
         return template_html.replace(/%(\w*)%/g,function(m,key){return data.hasOwnProperty(key)?data[key]:"";});
@@ -183,10 +183,9 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
 
       // group tasks
       xml = xml.replace(/\[tasks\]\n?([^\]]*)\[\/?tasks\]/gmi, function(match, p) {
-        if(mock == false){
-          var open_ended_template = $('#open-ended-template').html();
-        } else {
-          var open_ended_template = "<openended %min_max_string%>%grading_config%</openended>";
+        var open_ended_template = $('#open-ended-template').html();
+        if(open_ended_template == null) {
+          open_ended_template = "<openended %min_max_string%>%grading_config%</openended>";
         }
         var groupString = '';
         var options = p.split(",");

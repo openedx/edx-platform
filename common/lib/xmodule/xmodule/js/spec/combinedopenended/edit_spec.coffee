@@ -106,7 +106,7 @@ describe 'OpenEndedMarkdownEditingDescriptor', ->
       data = OpenEndedMarkdownEditingDescriptor.markdownToXml("""[tasks]
                                                               (Self), ({1-2}AI), ({1-4}AI), ({1-2}Peer
                                                               [tasks]
-                                                              """, true)
+                                                              """)
       data = data.replace(/[\t\n\s]/gmi,'')
       equality_list = """
                       <combinedopenended>
