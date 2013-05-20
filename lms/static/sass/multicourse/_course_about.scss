@@ -154,6 +154,15 @@
             @include transition();
             width: flex-grid(5, 8);
           }
+
+          #register_error {
+            background: $error-red;
+            border: 1px solid rgb(202, 17, 17);
+            color: rgb(143, 14, 14);
+            display: none;
+            padding: 12px;
+            margin-top: 5px;
+          }
         }
       }
 

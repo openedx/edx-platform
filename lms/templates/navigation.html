@@ -1,8 +1,6 @@
 ## mako
-## TODO: Split this into two files, one for people who are authenticated, and
-## one for people who aren't. Assume a Course object is passed to the former,
-## instead of using settings.COURSE_TITLE
 <%namespace name='static' file='static_content.html'/>
+<%namespace file='main.html' import="login_query"/>
 <%!
 from django.core.urlresolvers import reverse
 
@@ -38,19 +36,23 @@ site_status_msg = get_site_status_msg(course_id)
   <header class="global" aria-label="Global Navigation">
 % endif
   <nav>
-  <h1 class="logo"><a href="${reverse('root')}"><img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/></a></h1>
+
+  <h1 class="logo">
+      <a href="${marketing_link('ROOT')}">
+        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/>
+      </a></h1>
 
     % if course:
       <h2><span class="provider">${course.org}:</span> ${course.number} ${course.display_name_with_default}</h2>
     % endif
 
-    <ol class="left find-courses-button">
-      <li class="primary">
-        <a href="${reverse('courses')}">Find Courses</a>
+    % if user.is_authenticated():
+
+    <ol class="left nav-global authenticated">
+      <li class="nav-global-01">
+      <a href="${marketing_link('COURSES')}">Find Courses</a>
       </li>
     </ol>
-
-  % if user.is_authenticated():
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
@@ -61,30 +63,43 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="#" class="dropdown">&#9662</a>
         <ul class="dropdown-menu">
-##          <li><a href="#">Account Settings</a></li>
-          <li><a href="${reverse('help_edx')}">Help</a></li>
+            <li>
+            <a href="${marketing_link('FAQ')}">
+            Help
+          </a></li>
           <li><a href="${reverse('logout')}">Log Out</a></li>
         </ul>
       </li>
     </ol>
 
-  % else:
-    <ol class="guest">
-      <li class="secondary">
-        <a href="${reverse('about_edx')}">About</a>
-        <a href="http://edxonline.tumblr.com/">Blog</a>
-        <a href="${reverse('jobs')}">Jobs</a>
-% if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-        <a href="#login-modal" id="login" rel="leanModal">Log In</a>
-% endif
+    % else:
+    <ol class="left nav-global">
+      % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+      <li class="nav-global-01">
+        <a href="${marketing_link('HOW_IT_WORKS')}">How it Works</a>
       </li>
-% if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-      <li class="primary">
-        <a href="#signup-modal" id="signup" rel="leanModal">Sign Up</a>
+      <li class="nav-global-02">
+        <a href="${marketing_link('COURSES')}">Courses</a>
       </li>
-% endif
+      <li class="nav-global-03">
+        <a href="${marketing_link('SCHOOLS')}">Schools</a>
+      </li>
+      % endif
+      % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
+      <li class="nav-global-04">
+        <a class="cta cta-register" href="/register">Register Now</a>
+      </li>
+      % endif
     </ol>
-  %endif
+
+    <ol class="right nav-courseware">
+    <li class="nav-courseware-01">
+      % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
+      <a class="cta cta-login" href="/login${login_query()}">Log in</a>
+      % endif
+    </li>
+    </ol>
+    % endif
   </nav>
 </header>
 % if course:
@@ -92,8 +107,6 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 
 %if not user.is_authenticated():
-  <%include file="login_modal.html" />
-  <%include file="signup_modal.html" />
   <%include file="forgot_password_modal.html" />
 %endif
 

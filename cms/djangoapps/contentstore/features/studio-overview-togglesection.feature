@@ -14,7 +14,6 @@ Feature: Overview Toggle Section
     When I navigate to the course overview page
     Then I do not see the "Collapse All Sections" link
 
-  @skip-phantom
 	Scenario: Collapse link appears after creating first section of a course
 		Given I have a course with no sections
     When I navigate to the course overview page
@@ -22,7 +21,8 @@ Feature: Overview Toggle Section
     Then I see the "Collapse All Sections" link
     And all sections are expanded
 
-	@skip-phantom
+    # Skipped because Ubuntu ChromeDriver hangs on alert
+    @skip
 	Scenario: Collapse link is not removed after last section of a course is deleted
 		Given I have a course with 1 section
     And I navigate to the course overview page

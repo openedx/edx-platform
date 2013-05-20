@@ -73,7 +73,6 @@ def check_conditions_permissions(user, permissions, course_id, **kwargs):
                 return True in results
             elif operator == "and":
                 return not False in results
-
     return test(user, permissions, operator="or")
 
 
@@ -89,6 +88,10 @@ VIEW_PERMISSIONS = {
     'vote_for_comment'  :       [['vote', 'is_open']],
     'undo_vote_for_comment':    [['unvote', 'is_open']],
     'vote_for_thread'   :       [['vote', 'is_open']],
+    'flag_abuse_for_thread':    [['vote', 'is_open']],
+    'un_flag_abuse_for_thread':    [['vote', 'is_open']],
+    'flag_abuse_for_comment':    [['vote', 'is_open']],
+    'un_flag_abuse_for_comment':    [['vote', 'is_open']],
     'undo_vote_for_thread':     [['unvote', 'is_open']],
     'pin_thread':    ['create_comment'],
     'un_pin_thread':    ['create_comment'],

@@ -17,6 +17,8 @@ urlpatterns = ('',  # nopep8
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
+    url(r'^login$', 'student.views.signin_user', name="signin_user"),
+    url(r'^register$', 'student.views.register_user', name="register_user"),
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
 
@@ -35,8 +37,8 @@ urlpatterns = ('',  # nopep8
 
     url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
 
-    url(r'^login$', 'student.views.login_user', name="login"),
-    url(r'^login/(?P<error>[^/]*)$', 'student.views.login_user'),
+    url(r'^login_ajax$', 'student.views.login_user', name="login"),
+    url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
     url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
@@ -177,11 +179,19 @@ if settings.COURSEWARE_ENABLED:
 
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
-            'student.views.change_enrollment_view', name="change_enrollment"),
+            'student.views.change_enrollment', name="change_enrollment"),
 
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
             'courseware.views.course_about', name="about_course"),
+        #View for mktg site (kept for backwards compatibility TODO - remove before merge to master)
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/mktg-about$',
+            'courseware.views.mktg_course_about', name="mktg_about_course"),
+        #View for mktg site
+        url(r'^mktg/(?P<course_id>.*)$',
+            'courseware.views.mktg_course_about', name="mktg_about_course"),
+
+
 
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
@@ -283,6 +293,10 @@ if settings.COURSEWARE_ENABLED:
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
             'open_ended_grading.views.peer_grading', name='peer_grading'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/notes$', 'notes.views.notes', name='notes'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/notes/', include('notes.urls')),
+
     )
 
     # allow course staff to change to student view of courseware
@@ -353,11 +367,21 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
         url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
     )
 
+if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
+    urlpatterns += (
+        url(r'^status/', include('service_status.urls')),
+    )
+
 # FoldIt views
 urlpatterns += (
     # The path is hardcoded into their app...
     url(r'^comm/foldit_ops', 'foldit.views.foldit_ops', name="foldit_ops"),
 )
+
+if settings.MITX_FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
+    urlpatterns += (
+        url(r'^debug/run_python', 'debug.views.run_python'),
+    )
 
 urlpatterns = patterns(*urlpatterns)
 

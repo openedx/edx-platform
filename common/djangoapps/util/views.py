@@ -16,7 +16,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from urllib import urlencode
 import zendesk
 
-import capa.calc
+import calc
 import track.views
 
 
@@ -27,7 +27,7 @@ def calculate(request):
     ''' Calculator in footer of every page. '''
     equation = request.GET['equation']
     try:
-        result = capa.calc.evaluator({}, {}, equation)
+        result = calc.evaluator({}, {}, equation)
     except:
         event = {'error': map(str, sys.exc_info()),
                  'equation': equation}

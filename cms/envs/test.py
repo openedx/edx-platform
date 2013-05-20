@@ -41,14 +41,14 @@ MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'modulestore',
-    'fs_root': GITHUB_REPO_ROOT,
+    'collection': 'test_modulestore',
+    'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
@@ -108,6 +108,12 @@ CACHES = {
     }
 }
 
+################################# CELERY ######################################
+
+CELERY_ALWAYS_EAGER = True
+CELERY_RESULT_BACKEND = 'cache'
+BROKER_TRANSPORT = 'memory'
+
 ################### Make tests faster
 #http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
 PASSWORD_HASHERS = (
@@ -121,3 +127,4 @@ SEGMENT_IO_KEY = '***REMOVED***'
 # disable NPS survey in test mode
 MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
 
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True

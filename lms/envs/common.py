@@ -36,6 +36,7 @@ DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
+
 # Features
 MITX_FEATURES = {
     'SAMPLE': False,
@@ -92,8 +93,18 @@ MITX_FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
+    # Enables the student notes API and UI.
+    'ENABLE_STUDENT_NOTES': True,
+
     # Provide a UI to allow users to submit feedback from the LMS
     'ENABLE_FEEDBACK_SUBMISSION': False,
+
+    # Turn on a page that lets staff enter Python code to be run in the
+    # sandbox, for testing whether it's enabled properly.
+    'ENABLE_DEBUG_RUN_PYTHON': False,
+
+    # Enable URL that shows information about the status of variuous services
+    'ENABLE_SERVICE_STATUS': False,
 }
 
 # Used for A/B testing
@@ -123,9 +134,7 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 # For Node.js
 
-system_node_path = os.environ.get("NODE_PATH", None)
-if system_node_path is None:
-    system_node_path = "/usr/local/lib/node_modules"
+system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
 
 node_paths = [COMMON_ROOT / "static/js/vendor",
               COMMON_ROOT / "static/coffee/src",
@@ -174,6 +183,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'sekizai.context_processors.sekizai',
     'course_wiki.course_nav.context_processor',
+
+    # Hack to get required link URLs to password reset templates
+    'mitxmako.shortcuts.marketing_link_context_processor',
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000   # 4 MB
@@ -244,6 +256,31 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+
+#################### Python sandbox ############################################
+
+CODE_JAIL = {
+    # Path to a sandboxed Python executable.  None means don't bother.
+    'python_bin': None,
+    # User to run as in the sandbox.
+    'user': 'sandbox',
+
+    # Configurable limits.
+    'limits': {
+        # How many CPU seconds can jailed code use?
+        'CPU': 1,
+    },
+}
+
+# Some courses are allowed to run unsafe code. This is a list of regexes, one
+# of them must match the course id for that course to run unsafe code.
+#
+# For example:
+#
+#   COURSES_WITH_UNSAFE_CODE = [
+#       r"Harvard/XY123.1/.*"
+#   ]
+COURSES_WITH_UNSAFE_CODE = []
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
@@ -397,6 +434,7 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
+    'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -424,11 +462,15 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
   'js/vendor/swfobject/swfobject.js',
   'js/vendor/jquery.ba-bbq.min.js',
+  'js/vendor/annotator.min.js',
+  'js/vendor/annotator.store.min.js',
+  'js/vendor/annotator.tags.min.js'
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
+notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
 
 PIPELINE_CSS = {
     'application': {
@@ -441,6 +483,7 @@ PIPELINE_CSS = {
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
+            'css/vendor/annotator.min.css',
             'sass/course.css',
             'xmodule/modules.css',
         ],
@@ -462,7 +505,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js)
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -503,7 +546,12 @@ PIPELINE_JS = {
         'source_filenames': open_ended_js,
         'output_filename': 'js/open_ended.js',
         'test_order': 6,
-    }
+    },
+    'notes': {
+        'source_filenames': notes_js,
+        'output_filename': 'js/notes.js',
+        'test_order': 7
+    },
 }
 
 PIPELINE_DISABLE_WRAPPER = True
@@ -541,7 +589,52 @@ PIPELINE_YUI_BINARY = 'yui-compressor'
 # Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
-################################### APPS #######################################
+################################# CELERY ######################################
+
+# Message configuration
+
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERY_MESSAGE_COMPRESSION = 'gzip'
+
+# Results configuration
+
+CELERY_IGNORE_RESULT = False
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+
+# Events configuration
+
+CELERY_TRACK_STARTED = True
+
+CELERY_SEND_EVENTS = True
+CELERY_SEND_TASK_SENT_EVENT = True
+
+# Exchange configuration
+
+CELERY_DEFAULT_EXCHANGE = 'edx.core'
+CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
+
+# Queues configuration
+
+HIGH_PRIORITY_QUEUE = 'edx.core.high'
+DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
+LOW_PRIORITY_QUEUE = 'edx.core.low'
+
+CELERY_QUEUE_HA_POLICY = 'all'
+
+CELERY_CREATE_MISSING_QUEUES = True
+
+CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
+CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+
+CELERY_QUEUES = {
+    HIGH_PRIORITY_QUEUE: {},
+    LOW_PRIORITY_QUEUE: {},
+    DEFAULT_PRIORITY_QUEUE: {}
+}
+
+################################### APPS ######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...
     'django.contrib.auth',
@@ -550,7 +643,11 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'djcelery',
     'south',
+
+    # Monitor the status of services
+    'service_status',
 
     # For asset pipelining
     'pipeline',
@@ -590,9 +687,24 @@ INSTALLED_APPS = (
 
     # For testing
     'django.contrib.admin',   # only used in DEBUG mode
+    'debug',
 
     # Discussion forums
     'django_comment_client',
     'django_comment_common',
+    'notes',
 )
 
+######################### MARKETING SITE ###############################
+EDXMKTG_COOKIE_NAME = 'edxloggedin'
+MKTG_URLS = {}
+MKTG_URL_LINK_MAP = {
+    'ABOUT': 'about_edx',
+    'CONTACT': 'contact',
+    'FAQ': 'help_edx',
+    'COURSES': 'courses',
+    'ROOT': 'root',
+    'TOS': 'tos',
+    'HONOR': 'honor',
+    'PRIVACY': 'privacy_edx',
+}

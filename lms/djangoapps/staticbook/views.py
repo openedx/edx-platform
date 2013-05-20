@@ -1,9 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_response
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
+from notes.utils import notes_enabled_for_course
 from static_replace import replace_static_urls
 
 
@@ -23,7 +25,8 @@ def index(request, course_id, book_index, page=None):
 
     return render_to_response('staticbook.html',
                               {'book_index': book_index, 'page': int(page),
-                               'course': course, 'book_url': textbook.book_url,
+                               'course': course,
+                               'book_url': textbook.book_url,
                                'table_of_contents': table_of_contents,
                                'start_page': textbook.start_page,
                                'end_page': textbook.end_page,
@@ -100,6 +103,7 @@ def html_index(request, course_id, book_index, chapter=None):
     """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
+    notes_enabled = notes_enabled_for_course(course)
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.html_textbooks):
@@ -128,4 +132,5 @@ def html_index(request, course_id, book_index, chapter=None):
                                'course': course,
                                'textbook': textbook,
                                'chapter': chapter,
-                               'staff_access': staff_access})
+                               'staff_access': staff_access,
+                               'notes_enabled': notes_enabled})

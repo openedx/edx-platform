@@ -36,7 +36,7 @@ Check out the course data directories that you want to work with into the
 To create your development environment, run the shell script in the root of
 the repo:
 
-    create-dev-env.sh
+    scripts/create-dev-env.sh
 
 
 ## Starting development servers

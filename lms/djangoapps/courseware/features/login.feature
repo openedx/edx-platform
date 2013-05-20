@@ -7,7 +7,7 @@ Feature: Login in as a registered user
     Given I am an edX user
     And I am an unactivated user
     And I visit the homepage
-    When I click the link with the text "Log In"
+    When I click the link with the text "Log in"
     And I submit my credentials on the login form
     Then I should see the login error message "This account has not been activated"
 
@@ -15,7 +15,7 @@ Feature: Login in as a registered user
     Given I am an edX user
     And I am an activated user
     And I visit the homepage
-    When I click the link with the text "Log In"
+    When I click the link with the text "Log in"
     And I submit my credentials on the login form
     Then I should be on the dashboard page
 
@@ -23,5 +23,5 @@ Feature: Login in as a registered user
     Given I am logged in
     When I click the dropdown arrow
     And I click the link with the text "Log Out"
-    Then I should see a link with the text "Log In"
+    Then I should see a link with the text "Log in"
     And I should see that the path is "/"
