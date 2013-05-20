@@ -214,12 +214,11 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     #This is a hacky way to pass settings to the combined open ended xmodule
     #It needs an S3 interface to upload images to S3
     #It needs the open ended grading interface in order to get peer grading to be done
-    #TODO: refactor these settings into module-specific settings when possible.
     #this first checks to see if the descriptor is the correct one, and only sends settings if it is
 
     #Get descriptor metadata fields indicating needs for various settings
     needs_open_ended_interface = hasattr(descriptor, "needs_open_ended_interface") and descriptor.needs_open_ended_interface
-    needs_s3_interface =  hasattr(descriptor, "needs_s3_interface") and descriptor.needs_s3_interface
+    needs_s3_interface = hasattr(descriptor, "needs_s3_interface") and descriptor.needs_s3_interface
 
     #Initialize interfaces to None
     open_ended_grading_interface = None
@@ -232,9 +231,9 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         open_ended_grading_interface['mock_staff_grading'] = settings.MOCK_STAFF_GRADING
     if needs_s3_interface:
         s3_interface = {
-            'access_key' : getattr(settings,'AWS_ACCESS_KEY_ID',''),
-            'secret_access_key' : getattr(settings,'AWS_SECRET_ACCESS_KEY',''),
-            'storage_bucket_name' : getattr(settings,'AWS_STORAGE_BUCKET_NAME','openended')
+            'access_key' : getattr(settings,'AWS_ACCESS_KEY_ID', ''),
+            'secret_access_key' : getattr(settings,'AWS_SECRET_ACCESS_KEY', ''),
+            'storage_bucket_name' : getattr(settings,'AWS_STORAGE_BUCKET_NAME', 'openended')
         }
 
     def inner_get_module(descriptor):
