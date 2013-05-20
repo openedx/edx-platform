@@ -14,16 +14,31 @@ def report_dir_path(dir)
     return File.join(REPORT_DIR, dir.to_s)
 end
 
-def when_changed(unchanged_message, *files)
-    Rake::Task[PREREQS_MD5_DIR].invoke
-    cache_file = File.join(PREREQS_MD5_DIR, files[0].gsub(/\W+/, '-').sub(/-+$/, '')) + '.md5'
+def compute_fingerprint(files, dirs)
     digest = Digest::MD5.new()
+
+    # Digest the contents of all the files.
     Dir[*files].select{|file| File.file?(file)}.each do |file|
         digest.file(file)
     end
-    if !File.exists?(cache_file) or digest.hexdigest != File.read(cache_file)
+
+    # Digest the names of the files in all the dirs.
+    dirs.each do |dir|
+        file_names = Dir.entries(dir).sort.join(" ")
+        digest.update(file_names)
+    end
+
+    digest.hexdigest
+end
+
+# Hash the contents of all the files, and the names of files in the dirs.
+# Run the block if they've changed.
+def when_changed(unchanged_message, files, dirs=[])
+    Rake::Task[PREREQS_MD5_DIR].invoke
+    cache_file = File.join(PREREQS_MD5_DIR, files[0].gsub(/\W+/, '-').sub(/-+$/, '')) + '.md5'
+    if !File.exists?(cache_file) or compute_fingerprint(files, dirs) != File.read(cache_file)
         yield
-        File.write(cache_file, digest.hexdigest)
+        File.write(cache_file, compute_fingerprint(files, dirs))
     elsif !unchanged_message.empty?
         puts unchanged_message
     end
