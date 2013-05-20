@@ -228,7 +228,7 @@ HTML5 Number polyfill | Jonathan Stipe | https://github.com/jonstipe/number-poly
             $elem.data("timeoutID", window.setTimeout(timeoutFunc, 700, elem, decrement));
             return null;
           });
-          $elem.css("textAlign", 'right');
+          $elem.css("textAlign", 'left');
           if ($elem.css("opacity") !== "1") {
             $(btnContainer).css("opacity", $elem.css("opacity"));
           }

@@ -898,8 +898,8 @@ function saveSetSectionScheduleDate(e) {
 }
 
 function checkNumberValidity(e) {
-    e.preventDefault;
-    $(e).val($(e).val().match(/\d*\.?\d+/));
+    //e.preventDefault;
+    //$(e).val($(e).val().match(/\d*\.?\d+/));
 }
 
 
