@@ -624,6 +624,7 @@ body.course.unit {
         top: 0;
         vertical-align: top;
         margin-bottom:5px;
+        position: relative;
       }
 
       label.setting-label {
@@ -671,8 +672,13 @@ body.course.unit {
       }
 
       input[type="number"] {
-        width: 32%;
+
+        width: 38.5%;
         @include box-shadow(0 1px 2px $shadow-l1 inset);
+        //For webkit browsers which render number fields differently, make input wider. 
+        -moz-column-width: {
+          width: 32%;
+        }
 
         &:active {
           background-color: #FFFCF1;
