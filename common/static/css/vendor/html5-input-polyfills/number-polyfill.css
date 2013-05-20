@@ -2,8 +2,9 @@
 div.number-spin-btn-container {
   display: inline-block;
   position: relative;
-  vertical-align: bottom;
+  vertical-align: top;
   margin: 0;
+  margin-left: 3px;
   padding: 0; }
 
 div.number-spin-btn {
@@ -13,9 +14,11 @@ div.number-spin-btn {
   border-width: 2px;
   border-color: #ededed #777777 #777777 #ededed;
   border-style: solid;
-  background-color: #cccccc;
+  background-color: #eeeeee;
   width: 1.2em; }
   div.number-spin-btn:hover {
+    /* added blue hover color */
+    background-color: rgb(85, 151, 221);
     cursor: pointer; }
   div.number-spin-btn:active {
     border-width: 2px;

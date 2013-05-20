@@ -30,8 +30,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
           });
 
       #Manually runs polyfill for input number types to correct for Firefox non-support
-      #wrapperSettings = @$el.find(".wrapper-comp-settings")
-      #wrapperSettings.inputNumber()
+      #numberPolyfill()
 
       # Need to update set "active" class on data editor if there is one.
       # If we are only showing settings, hide the data editor controls and update settings accordingly.
