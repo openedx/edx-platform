@@ -1,12 +1,8 @@
 class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
-  @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
-  @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
-  @stringInputTemplate: "= answer\n"
-  @numberInputTemplate: "= answer +- x%\n"
-  @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
-  @headerTemplate: "Header\n=====\n"
-  @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
+  @rubricTemplate : "+ Color Identification\n- Incorrect\n- Correct\n + Grammar\n- Poor\n- Acceptable\n- Superb \n"
+  @tasksTemplate: "[[Self, {0,1}AI, {1,3}Peer]]\n"
+  @promptTemplate: "[prompt]\nWhy is the sky blue?\n[prompt]\n"
 
   constructor: (element) ->
     @element = element
@@ -49,7 +45,7 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
   onShowXMLButton: (e) =>
     e.preventDefault();
     if @confirmConversionToXml()
-      @createXMLEditor(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
+      @createXMLEditor(OpenEndedMarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
       # Need to refresh to get line numbers to display properly (and put cursor position to 0)
       @xml_editor.setCursor(0)
       @xml_editor.refresh()
@@ -72,13 +68,9 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
     selection = @markdown_editor.getSelection()
     revisedSelection = null
     switch $(e.currentTarget).attr('class')
-      when "multiple-choice-button" then revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice(selection)
-      when "string-button" then revisedSelection = MarkdownEditingDescriptor.insertStringInput(selection)
-      when "number-button" then revisedSelection = MarkdownEditingDescriptor.insertNumberInput(selection)
-      when "checks-button" then revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice(selection)
-      when "dropdown-button" then revisedSelection = MarkdownEditingDescriptor.insertSelect(selection)
-      when "header-button" then revisedSelection = MarkdownEditingDescriptor.insertHeader(selection)
-      when "explanation-button" then revisedSelection = MarkdownEditingDescriptor.insertExplanation(selection)
+      when "rubric-button" then revisedSelection = OpenEndedMarkdownEditingDescriptor.insertRubric(selection)
+      when "prompt-button" then revisedSelection = OpenEndedMarkdownEditingDescriptor.insertPrompt(selection)
+      when "tasks-button" then revisedSelection = OpenEndedMarkdownEditingDescriptor.insertTasks(selection)
       else # ignore click
 
     if revisedSelection != null
@@ -128,46 +120,14 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
                markdown: null
        }
 
-  @insertMultipleChoice: (selectedText) ->
-    return MarkdownEditingDescriptor.insertGenericChoice(selectedText, '(', ')', MarkdownEditingDescriptor.multipleChoiceTemplate)
+  @insertRubric: (selectedText) ->
+    return OpenEndedMarkdownEditingDescriptor.insertGenericInput(selectedText, '(', ')', OpenEndedMarkdownEditingDescriptor.rubricTemplate)
 
-  @insertCheckboxChoice: (selectedText) ->
-    return MarkdownEditingDescriptor.insertGenericChoice(selectedText, '[', ']', MarkdownEditingDescriptor.checkboxChoiceTemplate)
+  @insertPrompt: (selectedText) ->
+    return OpenEndedMarkdownEditingDescriptor.insertGenericInput(selectedText, '[', ']', OpenEndedMarkdownEditingDescriptor.promptTemplate)
 
-  @insertGenericChoice: (selectedText, choiceStart, choiceEnd, template) ->
-    if selectedText.length > 0
-      # Replace adjacent newlines with a single newline, strip any trailing newline
-      cleanSelectedText = selectedText.replace(/\n+/g, '\n').replace(/\n$/,'')
-      lines =  cleanSelectedText.split('\n')
-      revisedLines = ''
-      for line in lines
-        revisedLines += choiceStart
-        # a stand alone x before other text implies that this option is "correct"
-        if /^\s*x\s+(\S)/i.test(line)
-          # Remove the x and any initial whitespace as long as there's more text on the line
-          line = line.replace(/^\s*x\s+(\S)/i, '$1')
-          revisedLines += 'x'
-        else
-          revisedLines += ' '
-        revisedLines += choiceEnd + ' ' + line + '\n'
-      return revisedLines
-    else
-      return template
-
-  @insertStringInput: (selectedText) ->
-    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '', MarkdownEditingDescriptor.stringInputTemplate)
-
-  @insertNumberInput: (selectedText) ->
-    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '', MarkdownEditingDescriptor.numberInputTemplate)
-
-  @insertSelect: (selectedText) ->
-    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[[', ']]', MarkdownEditingDescriptor.selectTemplate)
-
-  @insertHeader: (selectedText) ->
-    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '', '\n====\n', MarkdownEditingDescriptor.headerTemplate)
-
-  @insertExplanation: (selectedText) ->
-    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[explanation]\n', '\n[explanation]', MarkdownEditingDescriptor.explanationTemplate)
+  @insertTasks: (selectedText) ->
+    return OpenEndedMarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '', OpenEndedMarkdownEditingDescriptor.tasksTemplate)
 
   @insertGenericInput: (selectedText, lineStart, lineEnd, template) ->
     if selectedText.length > 0
@@ -176,16 +136,6 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
-# We may wish to add insertHeader. Here is Tom's code.
-# function makeHeader() {
-#  var selection = simpleEditor.getSelection();
-#  var revisedSelection = selection + '\n';
-#  for(var i = 0; i < selection.length; i++) {
-#revisedSelection += '=';
-#  }
-#  simpleEditor.replaceSelection(revisedSelection);
-#}
-#
   @markdownToXml: (markdown)->
     toXml = `function(markdown) {
       var xml = markdown;
