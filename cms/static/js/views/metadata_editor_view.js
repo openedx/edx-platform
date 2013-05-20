@@ -150,28 +150,35 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
 
     events : {
         "change input" : "updateModel",
-        "keypress .setting-input" : "showClearButton"  ,
+        "keypress .setting-input" : "keyPressed",
+        "change .setting-input" : "changed",
         "click .setting-clear" : "clear"
     },
 
     render: function () {
         CMS.Views.Metadata.AbstractEditor.prototype.render.apply(this);
         if (!this.initialized) {
+            var numToString = function (val) {
+                return val.toFixed(4);
+            };
             var min = "min";
             var max = "max";
             var step = "step";
             var options = this.model.getOptions();
             if (options.hasOwnProperty(min)) {
-                this.$el.find('input').attr(min, options[min].toString());
+                this.min = Number(options[min]);
+                this.$el.find('input').attr(min, numToString(this.min));
             }
             if (options.hasOwnProperty(max)) {
-                this.$el.find('input').attr(max, options[max].toString());
+                this.max = Number(options[max]);
+                this.$el.find('input').attr(max, numToString(this.max.toFixed));
             }
             var stepValue = undefined;
             if (options.hasOwnProperty(step)) {
-                stepValue = options[step].toString();
+                // Parse step and convert to String. Polyfill doesn't like float values like ".1" (expects "0.1").
+                stepValue = numToString(Number(options[step]));
             }
-            else if (this.model.getType() === 'Integer') {
+            else if (this.isIntegerField()) {
                 stepValue = "1";
             }
             if (stepValue !== undefined) {
@@ -195,7 +202,39 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
 
     setValueInEditor : function (value) {
         this.$el.find('input').val(value);
+    },
+
+    isIntegerField : function () {
+        return this.model.getType() === 'Integer';
+    },
+
+    keyPressed: function (e) {
+        this.showClearButton();
+        // This first filtering if statement is take from polyfill to prevent
+        // non-numeric input (for browsers that don't use polyfill because they DO have a number input type).
+        var _ref, _ref1;
+        if (((_ref = e.keyCode) !== 8 && _ref !== 9 && _ref !== 35 && _ref !== 36 && _ref !== 37 && _ref !== 39) &&
+            ((_ref1 = e.which) !== 45 && _ref1 !== 46 && _ref1 !== 48 && _ref1 !== 49 && _ref1 !== 50 && _ref1 !== 51
+                && _ref1 !== 52 && _ref1 !== 53 && _ref1 !== 54 && _ref1 !== 55 && _ref1 !== 56 && _ref1 !== 57)) {
+            e.preventDefault();
+        }
+        // For integers, prevent decimal points.
+        if (this.isIntegerField() && e.keyCode === 46) {
+            e.preventDefault();
+        }
+    },
+
+    changed: function () {
+        // Limit value to the range specified by min and max (necessary for browsers that aren't using polyfill).
+        var value = this.getValueFromEditor();
+        if ((this.max !== undefined) && value > this.max) {
+            value = this.max;
+        } else if ((this.min != undefined) && value < this.min) {
+            value = this.min;
+        }
+        this.setValueInEditor(value);
     }
+
 });
 
 
