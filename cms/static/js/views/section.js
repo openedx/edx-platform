@@ -2,9 +2,9 @@ CMS.Views.SectionShow = Backbone.View.extend({
     template: _.template('<span data-tooltip="<%= tooltip %>" class="section-name-span"><%= name %></span>'),
     render: function() {
         var attrs = {
+            name: this.model.escape('name'),
             tooltip: gettext("Edit this section's name")
         };
-        attrs = $.extend(attrs, this.model.attributes);
         this.$el.html(this.template(attrs));
         this.delegateEvents();
         return this;
@@ -25,10 +25,10 @@ CMS.Views.SectionShow = Backbone.View.extend({
 CMS.Views.SectionEdit = Backbone.View.extend({
     render: function() {
         var attrs = {
+            name: this.model.escape('name'),
             save: gettext("Save"),
             cancel: gettext("Cancel")
         };
-        attrs = $.extend(attrs, this.model.attributes);
         this.$el.html(this.template(attrs));
         this.delegateEvents();
         return this;
