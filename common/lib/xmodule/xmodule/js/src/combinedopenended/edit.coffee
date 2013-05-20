@@ -109,7 +109,7 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
     @element.off('click', '.cheatsheet-toggle', @toggleCheatsheet)
     if @current_editor == @markdown_editor
       {
-      data: MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue())
+      data: OpenEndedMarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue())
       metadata:
         markdown: @markdown_editor.getValue()
       }
@@ -168,6 +168,9 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
               groupString += text;
               groupString += "\n</option>\n";
             }
+          }
+          if(i==options.length-1){
+            groupString += "\n</category>\n";
           }
         }
         groupString += '</rubric>\n</rubric>\n';
