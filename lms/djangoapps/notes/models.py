@@ -9,7 +9,7 @@ import json
 class Note(models.Model):
     user = models.ForeignKey(User, db_index=True)
     course_id = models.CharField(max_length=255, db_index=True)
-    uri = models.CharField(max_length=1024, db_index=True)
+    uri = models.CharField(max_length=512, db_index=True)
     text = models.TextField(default="")
     quote = models.TextField(default="")
     range_start = models.CharField(max_length=2048)  # xpath string
@@ -54,7 +54,7 @@ class Note(models.Model):
 
     def get_absolute_url(self):
         '''
-        Returns the aboslute url for the note object.
+        Returns the absolute url for the note object.
         '''
         kwargs = {'course_id': self.course_id, 'note_id': str(self.pk)}
         return reverse('notes_api_note', kwargs=kwargs)
