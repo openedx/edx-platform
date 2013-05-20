@@ -752,8 +752,9 @@ hr.divide {
 
   .icon-plus {
     display: inline-block;
-    vertical-align: baseline;
+    vertical-align: middle;
     margin-right: ($baseline/4);
+    margin-top: -2px;
     line-height: 0;
   }
 }
