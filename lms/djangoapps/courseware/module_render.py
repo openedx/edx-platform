@@ -218,8 +218,8 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     #this first checks to see if the descriptor is the correct one, and only sends settings if it is
 
     #Get descriptor metadata fields indicating needs for various settings
-    needs_open_ended_interface = descriptor.needs_open_ended_interface
-    needs_s3_interface =  descriptor.needs_s3_interface
+    needs_open_ended_interface = hasattr(descriptor, "needs_open_ended_interface") and descriptor.needs_open_ended_interface
+    needs_s3_interface =  hasattr(descriptor, "needs_s3_interface") and descriptor.needs_s3_interface
 
     #Initialize interfaces to None
     open_ended_grading_interface = None

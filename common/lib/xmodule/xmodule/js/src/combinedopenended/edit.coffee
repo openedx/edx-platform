@@ -1,7 +1,7 @@
 class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
   @rubricTemplate : "[rubric]\n+ Color Identification\n- Incorrect\n- Correct\n + Grammar\n- Poor\n- Acceptable\n- Superb \n[rubric]\n"
-  @tasksTemplate: "[tasks]\n(Self), ({0-1}AI), ({1-3}Peer)\n[tasks]\n"
+  @tasksTemplate: "[tasks]\n(Self), ({2-5}AI), ({4-5}Peer)\n[tasks]\n"
   @promptTemplate: "[prompt]\nWhy is the sky blue?\n[prompt]\n"
 
   constructor: (element) ->
