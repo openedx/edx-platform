@@ -2,7 +2,7 @@ from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment)
 from django.contrib.auth.models import Group
 from datetime import datetime
-from factory import DjangoModelFactory, Factory, SubFactory, PostGenerationMethodCall, post_generation
+from factory import DjangoModelFactory, SubFactory, PostGenerationMethodCall, post_generation, Sequence
 from uuid import uuid4
 
 
@@ -33,11 +33,11 @@ class RegistrationFactory(DjangoModelFactory):
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = User
 
-    username = 'robot'
-    email = 'robot+test@edx.org'
+    username = Sequence('robot{0}'.format)
+    email = Sequence('robot+test+{0}@edx.org'.format)
     password = PostGenerationMethodCall('set_password',
                                         'test')
-    first_name = 'Robot'
+    first_name = Sequence('Robot{0}'.format)
     last_name = 'Test'
     is_staff = False
     is_active = True
