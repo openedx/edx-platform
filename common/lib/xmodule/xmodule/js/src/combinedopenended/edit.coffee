@@ -1,7 +1,7 @@
 class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
   @rubricTemplate : "[rubric]\n+ Color Identification\n- Incorrect\n- Correct\n + Grammar\n- Poor\n- Acceptable\n- Superb \n[rubric]\n"
-  @tasksTemplate: "[tasks]\n(Self), ({0,1}AI), ({1,3}Peer)\n[tasks]\n"
+  @tasksTemplate: "[tasks]\n(Self), ({0-1}AI), ({1-3}Peer)\n[tasks]\n"
   @promptTemplate: "[prompt]\nWhy is the sky blue?\n[prompt]\n"
 
   constructor: (element) ->
@@ -138,76 +138,78 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
 
   @markdownToXml: (markdown)->
     toXml = `function(markdown) {
+
+      function template(template_html,data){
+        return template_html.replace(/%(\w*)%/g,function(m,key){return data.hasOwnProperty(key)?data[key]:"";});
+      }
+
       var xml = markdown;
 
       // group rubrics
       xml = xml.replace(/\[rubric\]\n?([^\]]*)\[\/?rubric\]/gmi, function(match, p) {
-        var groupString = '<multiplechoiceresponse>\n';
-        groupString += '  <choicegroup type="MultipleChoice">\n';
-        var options = match.split('\n');
+        var groupString = '<rubric>\n<rubric>\n';
+        var options = p.split('\n');
         for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
-            var value = options[i].split(/^\s*\(.?\)\s*/)[1];
-            var correct = /^\s*\(x\)/i.test(options[i]);
-            groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+            var value = options[i].replace(/^\s+|\s+$/g,'');
+            if (value.charAt(0)=="+") {
+              if(i>0){
+                groupString += "</category>\n";
+              }
+              groupString += "<category>\n<description>\n";
+              text = value.substr(1);
+              text = text.replace(/^\s+|\s+$/g,'');
+              groupString += text;
+              groupString += "\n</description>\n";
+            } else if (value.charAt(0) == "-") {
+              groupString += "<option>\n";
+              text = value.substr(1);
+              text = text.replace(/^\s+|\s+$/g,'');
+              groupString += text;
+              groupString += "\n</option>\n";
+            }
           }
         }
-        groupString += '  </choicegroup>\n';
-        groupString += '</multiplechoiceresponse>\n\n';
+        groupString += '</rubric>\n</rubric>\n';
         return groupString;
       });
 
-      // group check answers
-      xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match, p) {
-        var groupString = '<choiceresponse>\n';
-        groupString += '  <checkboxgroup direction="vertical">\n';
-        var options = match.split('\n');
+      // group tasks
+      xml = xml.replace(/\[tasks\]\n?([^\]]*)\[\/?tasks\]/gmi, function(match, p) {
+        var open_ended_template = $('#open-ended-template').html()
+        var groupString = '';
+        var options = p.split(",");
         for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
-            var value = options[i].split(/^\s*\[.?\]\s*/)[1];
-            var correct = /^\s*\[x\]/i.test(options[i]);
-            groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+            var value = options[i].replace(/^\s+|\s+$/g,'');
+            var lower_option = value.toLowerCase();
+            type = lower_option.match(/(peer|self|ai)/gmi)
+            if(type != null) {
+              type = type[0]
+              var min_max = value.match(/\{\n?([^\]]*)\}/gmi);
+              var min_max_string = "";
+              if(min_max!=null) {
+                min_max = min_max[0].replace(/^{|}/gmi,'');
+                min_max = min_max.split("-");
+                min = min_max[0];
+                max = min_max[1];
+                min_max_string = 'min_score_to_attempt="' + min + '" max_score_to_attempt="' + max + '" ';
+              }
+              groupString += "<task>\n"
+              if(type=="self") {
+                groupString +="<selfassessment" + min_max_string + "/>"
+              } else if (type=="peer") {
+                config = "peer_grading.conf"
+                groupString += template(open_ended_template,{min_max_string: min_max_string, grading_config: config});
+              } else if (type=="ai") {
+                                       config = "ml_grading.conf"
+                                       groupString += template(open_ended_template,{min_max_string: min_max_string, grading_config: config});
+              }
+              groupString += "</task>\n"
+            }
           }
         }
-        groupString += '  </checkboxgroup>\n';
-        groupString += '</choiceresponse>\n\n';
         return groupString;
-      });
-
-      // replace string and numerical
-      xml = xml.replace(/^\=\s*(.*?$)/gm, function(match, p) {
-        var string;
-        var floatValue = parseFloat(p);
-        if(!isNaN(floatValue)) {
-          var params = /(.*?)\+\-\s*(.*?$)/.exec(p);
-          if(params) {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
-            string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
-          } else {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
-          }
-          string += '  <textline />\n';
-          string += '</numericalresponse>\n\n';
-        } else {
-          string = '<stringresponse answer="' + p + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
-        }
-        return string;
-      });
-
-      // replace selects
-      xml = xml.replace(/\[\[(.+?)\]\]/g, function(match, p) {
-        var selectString = '\n<optionresponse>\n';
-        selectString += '  <optioninput options="(';
-        var options = p.split(/\,\s*/g);
-        for(var i = 0; i < options.length; i++) {
-          selectString += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
-        }
-        selectString += ')" correct="';
-        var correct = /(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g.exec(p);
-        if (correct) selectString += correct[1];
-        selectString += '"></optioninput>\n';
-        selectString += '</optionresponse>\n\n';
-        return selectString;
       });
 
       // replace prompts

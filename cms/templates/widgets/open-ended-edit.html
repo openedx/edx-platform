@@ -22,6 +22,16 @@
     </div>
 </section>
 
+<script type="text/template" id="open-ended-template">
+    <openended %min_max_string%>
+        <openendedparam>
+            <initial_display>Enter essay here.</initial_display>
+            <answer_display>This is the answer.</answer_display>
+            <grader_payload>{"grader_settings" : "%grading_config%", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+        </openendedparam>
+    </openended>
+</script>
+
 <script type="text/template" id="simple-editor-cheatsheet">
     <article class="simple-editor-cheatsheet">
         <div class="cheatsheet-wrapper">
@@ -41,7 +51,11 @@
                 <div class="col prompt">
                 </div>
                 <div class="col">
-                    <pre><code>[prompt]Why is the sky blue?[prompt]</code></pre>
+                    <pre><code>
+                        [prompt]
+                        Why is the sky blue?
+                        [prompt]
+                    </code></pre>
                 </div>
             </div>
             <div class="row">
@@ -67,7 +81,11 @@
                 <div class="col sample tasks">
                 </div>
                 <div class="col">
-                    <pre><code>[tasks](Self), ({0,1}AI), ({1,3}Peer)[tasks]</code></pre>
+                    <pre><code>
+                        [tasks]
+                        (Self), ({0-1}AI), ({1-3}Peer)
+                        [tasks]
+                    </code></pre>
                 </div>
             </div>
         </div>
