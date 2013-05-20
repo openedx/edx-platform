@@ -1,7 +1,7 @@
 class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
-  @rubricTemplate : "+ Color Identification\n- Incorrect\n- Correct\n + Grammar\n- Poor\n- Acceptable\n- Superb \n"
-  @tasksTemplate: "[[Self, {0,1}AI, {1,3}Peer]]\n"
+  @rubricTemplate : "[rubric]\n+ Color Identification\n- Incorrect\n- Correct\n + Grammar\n- Poor\n- Acceptable\n- Superb \n[rubric]\n"
+  @tasksTemplate: "[tasks]\n(Self), ({0,1}AI), ({1,3}Peer)\n[tasks]\n"
   @promptTemplate: "[prompt]\nWhy is the sky blue?\n[prompt]\n"
 
   constructor: (element) ->
@@ -108,26 +108,26 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
     @element.off('click', '.format-buttons a', @onToolbarButton)
     @element.off('click', '.cheatsheet-toggle', @toggleCheatsheet)
     if @current_editor == @markdown_editor
-        {
-            data: MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue())
-            metadata:
-            	markdown: @markdown_editor.getValue()
-        }
+      {
+      data: MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue())
+      metadata:
+        markdown: @markdown_editor.getValue()
+      }
     else
-       {
-            data: @xml_editor.getValue()
-            metadata:
-               markdown: null
-       }
+      {
+      data: @xml_editor.getValue()
+      metadata:
+        markdown: null
+      }
 
   @insertRubric: (selectedText) ->
-    return OpenEndedMarkdownEditingDescriptor.insertGenericInput(selectedText, '(', ')', OpenEndedMarkdownEditingDescriptor.rubricTemplate)
+    return OpenEndedMarkdownEditingDescriptor.insertGenericInput(selectedText, '[rubric]', '[rubric]', OpenEndedMarkdownEditingDescriptor.rubricTemplate)
 
   @insertPrompt: (selectedText) ->
-    return OpenEndedMarkdownEditingDescriptor.insertGenericInput(selectedText, '[', ']', OpenEndedMarkdownEditingDescriptor.promptTemplate)
+    return OpenEndedMarkdownEditingDescriptor.insertGenericInput(selectedText, '[prompt]', '[prompt]', OpenEndedMarkdownEditingDescriptor.promptTemplate)
 
   @insertTasks: (selectedText) ->
-    return OpenEndedMarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '', OpenEndedMarkdownEditingDescriptor.tasksTemplate)
+    return OpenEndedMarkdownEditingDescriptor.insertGenericInput(selectedText, '[tasks]', '[tasks]', OpenEndedMarkdownEditingDescriptor.tasksTemplate)
 
   @insertGenericInput: (selectedText, lineStart, lineEnd, template) ->
     if selectedText.length > 0
@@ -140,12 +140,8 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
     toXml = `function(markdown) {
       var xml = markdown;
 
-      // replace headers
-      xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
-      xml = xml.replace(/\n^\=\=+$/gm, '');
-
-      // group multiple choice answers
-      xml = xml.replace(/(^\s*\(.?\).*?$\n*)+/gm, function(match, p) {
+      // group rubrics
+      xml = xml.replace(/\[rubric\]\n?([^\]]*)\[\/?rubric\]/gmi, function(match, p) {
         var groupString = '<multiplechoiceresponse>\n';
         groupString += '  <choicegroup type="MultipleChoice">\n';
         var options = match.split('\n');
@@ -213,37 +209,20 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
         selectString += '</optionresponse>\n\n';
         return selectString;
       });
-      
-      // replace explanations
-      xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
-          var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
+
+      // replace prompts
+      xml = xml.replace(/\[prompt\]\n?([^\]]*)\[\/?prompt\]/gmi, function(match, p1) {
+          var selectString = '<prompt>\n' + p1 + '\n</prompt>';
           return selectString;
       });
 
-      // split scripts and wrap paragraphs
-      var splits = xml.split(/(\<\/?script.*?\>)/g);
-      var scriptFlag = false;
-      for(var i = 0; i < splits.length; i++) {
-        if(/\<script/.test(splits[i])) {
-          scriptFlag = true;
-        }
-        if(!scriptFlag) {
-          splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
-        }
-        if(/\<\/script/.test(splits[i])) {
-          scriptFlag = false;
-        }
-      }
-      xml = splits.join('');
-
       // rid white space
       xml = xml.replace(/\n\n\n/g, '\n');
-      
-      // surround w/ problem tag
-      xml = '<problem>\n' + xml + '\n</problem>';
+
+      // surround w/ combinedopenended tag
+      xml = '<combinedopenended>\n' + xml + '\n</combinedopenended>';
 
       return xml;
     }
     `
     return toXml markdown
-

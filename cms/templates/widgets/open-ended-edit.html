@@ -41,7 +41,7 @@
                 <div class="col prompt">
                 </div>
                 <div class="col">
-                    <pre><code>[explanation] A short explanation of the answer. [explanation]</code></pre>
+                    <pre><code>[prompt]Why is the sky blue?[prompt]</code></pre>
                 </div>
             </div>
             <div class="row">
@@ -49,9 +49,17 @@
                 <div class="col sample rubric"><!DOCTYPE html>
                 </div>
                 <div class="col">
-                <pre><code>( ) red
-                    ( ) green
-                    (x) blue</code></pre>
+                <pre><code>
+                    [rubric]
+                    + Color Identification
+                    - Incorrect
+                    - Correct
+                    + Grammar
+                    - Poor
+                    - Acceptable
+                    - Superb
+                    [rubric]
+                </code></pre>
                                 </div>
              </div>
             <div class="row">
@@ -59,7 +67,7 @@
                 <div class="col sample tasks">
                 </div>
                 <div class="col">
-                    <pre><code>[[wrong, (right)]]</code></pre>
+                    <pre><code>[tasks](Self), ({0,1}AI), ({1,3}Peer)[tasks]</code></pre>
                 </div>
             </div>
         </div>
