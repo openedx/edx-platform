@@ -106,40 +106,22 @@ describe 'OpenEndedMarkdownEditingDescriptor', ->
       data = OpenEndedMarkdownEditingDescriptor.markdownToXml("""[tasks]
                                                               (Self), ({1-2}AI), ({1-4}AI), ({1-2}Peer
                                                               [tasks]
-                                                              """)
+                                                              """, true)
       data = data.replace(/[\t\n\s]/gmi,'')
       equality_list = """
                       <combinedopenended>
-                      <task>
-                      <selfassessment/>
-                      </task>
-                      <task>
-                      <openended min_score_to_attempt="1" max_score_to_attempt="2">
-                      <openendedparam>
-                      <initial_display>Enter essay here.</initial_display>
-                      <answer_display>This is the answer.</answer_display>
-                      <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
-                      </openendedparam>
-                      </openended>
-                      </task>
-                      <task>
-                      <openended min_score_to_attempt="1" max_score_to_attempt="4">
-                      <openendedparam>
-                      <initial_display>Enter essay here.</initial_display>
-                      <answer_display>This is the answer.</answer_display>
-                      <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
-                      </openendedparam>
-                      </openended>
-                      </task>
-                      <task>
-                      <openended min_score_to_attempt="1" max_score_to_attempt="2">
-                      <openendedparam>
-                      <initial_display>Enter essay here.</initial_display>
-                      <answer_display>This is the answer.</answer_display>
-                      <grader_payload>{"grader_settings" : "peer_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
-                      </openendedparam>
-                      </openended>
-                      </task>
+                        <task>
+                        <selfassessment/>
+                        </task>
+                        <task>
+                          <openended min_score_to_attempt="1" max_score_to_attempt="2">ml_grading.conf</openended>
+                        </task>
+                        <task>
+                          <openended min_score_to_attempt="1" max_score_to_attempt="4">ml_grading.conf</openended>
+                        </task>
+                        <task>
+                          <openended min_score_to_attempt="1" max_score_to_attempt="2">peer_grading.conf</openended>
+                        </task>
                       </combinedopenended>
                       """
       expect(data).toEqual(equality_list.replace(/[\t\n\s]/gmi,''))
