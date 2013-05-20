@@ -1,3 +1,5 @@
+$baseline: 20px;
+
 $gw-column: 80px;
 $gw-gutter: 20px;
 
@@ -8,27 +10,48 @@ $fg-max-width: 1400px;
 $fg-min-width: 810px;
 
 $sans-serif: 'Open Sans', $verdana;
+$monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
 $serif: $georgia;
-$monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 
-$body-font-size: em(14);
-$body-line-height: golden-ratio(.875em, 1);
-$base-font-color: rgb(60,60,60);
-$baseFontColor: rgb(60,60,60);
-$base-font-color: rgb(60,60,60);
-$lighter-base-font-color: rgb(100,100,100);
-
+$white: rgb(255,255,255);
+$black: rgb(0,0,0);
 $blue: rgb(29,157,217);
 $pink: rgb(182,37,104);
 $yellow: rgb(255, 252, 221);
+$red: rgb(178, 6, 16);
 $error-red: rgb(253, 87, 87);
-$border-color: #C8C8C8;
-$sidebar-color: #f6f6f6;
-$outer-border-color: #aaa;
+$light-gray: rgb(221, 221, 221);
+$dark-gray: rgb(51, 51, 51);
+$border-color: rgb(200, 200, 200);
+$sidebar-color: rgb(246, 246, 246);
+$outer-border-color: rgb(170, 170, 170);
 
 // old variables
 $light-gray: #ddd;
 $dark-gray: #333;
+
+// edx.org-related
+$m-gray-l1: rgb(203,203,203);
+$m-gray-l2: rgb(246,246,246);
+$m-gray: rgb(153,153,153);
+$m-gray-d1: rgb(102,102,102);
+$m-gray-d2: rgb(51,51,51);
+$m-gray-a1: rgb(80,80,80);
+$m-blue: rgb(85, 151, 221);
+$m-blue-l1: rgb(230,245,252);
+$m-blue-d1: shade($m-blue,15%);
+$m-blue-s1: saturate($m-blue,15%);
+$m-pink: rgb(204,51,102);
+
+$m-base-font-size: em(15);
+
+
+$base-font-color: rgb(60,60,60);
+$baseFontColor: rgb(60,60,60);
+$lighter-base-font-color: rgb(100,100,100);
 $text-color: $dark-gray;
 
+$body-font-family: $sans-serif;
+$body-font-size: em(14);
+$body-line-height: golden-ratio(.875em, 1);

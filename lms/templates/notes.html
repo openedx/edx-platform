@@ -1,0 +1,81 @@
+<%namespace name='static' file='static_content.html'/>
+<%inherit file="main.html" />
+<%!
+    from django.core.urlresolvers import reverse
+%>
+
+<%block name="headextra">
+    <%static:css group='course'/>
+    <%static:js group='courseware'/>
+<style type="text/css">
+    blockquote {
+        background:#f9f9f9;
+        border-left:10px solid #ccc;
+        margin:1.5em 10px;
+        padding:.5em 10px;
+    }
+    blockquote:before {
+        color:#ccc;
+        content:'“';
+        font-size:4em;
+        line-height:.1em;
+        margin-right:.25em;
+        vertical-align:-.4em;
+    }
+    blockquote p {
+        display:inline;
+    }
+    .notes-wrapper {
+        padding: 32px 40px;
+    }
+    .note {
+        border-bottom: 1px solid #ccc;
+        padding: 0 0 1em 0;
+    }
+    .note .text {
+        margin-bottom: 1em;
+    }
+    .note ul.meta {
+        margin: .5em 0;
+    }
+    .note ul.meta li {
+        font-size: .9em;
+        margin-bottom: .5em;
+    }
+</style>
+
+</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+  </script>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='notes'" />
+
+<section class="container">
+    <div class="notes-wrapper">
+        <h1>My Notes</h1>
+        % for note in notes:
+        <div class="note">
+            <blockquote>${note.quote|h}</blockquote>
+            <div class="text">${note.text.replace("\n", "<br />") | n,h}</div>
+            <ul class="meta">
+                % if note.tags:
+                    <li class="tags">Tags: ${note.tags|h}</li>
+                % endif
+                <li class="user">Author: ${note.user.username}</li>
+                <li class="time">Created: ${note.created.strftime('%m/%d/%Y %H:%m')}</li>
+                <li class="uri">Source: <a href="${note.uri}">${note.uri|h}</a></li>
+                </ul>
+        </div>
+        % endfor
+        % if notes is UNDEFINED or len(notes) == 0:
+            <p>You do not have any notes.</p>
+        % endif
+    </div>
+</section>
+
+
+
+

@@ -59,14 +59,16 @@
       $("#unenroll_course_number").text( $(event.target).data("course-number") );
     });
 
-    $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
-      if(json.success) {
-        location.href="${reverse('dashboard')}";
+    $('#unenroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        location.href = "${reverse('dashboard')}";
+      } else if (xhr.status == 403) {
+        location.href = "${reverse('signin_user')}?course_id=" +
+          $("#unenroll_course_id").val() + "&enrollment_action=unenroll";
       } else {
-        if($('#unenroll_error').length == 0) {
-          $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
-        }
-        $('#unenroll_error').text(json.error).stop().css("display", "block");
+        $('#unenroll_error').html(
+          xhr.responseText ? xhr.responseText : "An error occurred. Please try again later."
+        ).stop().css("display", "block");
       }
     });
 
@@ -192,17 +194,20 @@
 
         <article class="my-course">
           <%
-          if has_access(user, course, 'load'):
             course_target = reverse('info', args=[course.id])
-          else:
-            course_target = reverse('about_course', args=[course.id])
           %>
 
 
 
-          <a href="${course_target}" class="cover">
-            <img src="${course_image_url(course)}" />
-          </a>
+          % if course.id in show_courseware_links_for:
+            <a href="${course_target}" class="cover">
+              <img src="${course_image_url(course)}" />
+            </a>
+          % else:
+            <div class="cover">
+              <img src="${course_image_url(course)}" />
+            </div>
+          % endif
 
           <section class="info">
             <hgroup>
@@ -216,7 +221,13 @@
               % endif
               </p>
               <h2 class="university">${get_course_about_section(course, 'university')}</h2>
-              <h3><a href="${course_target}">${course.number} ${course.display_name_with_default}</a></h3>
+              <h3>
+                % if course.id in show_courseware_links_for:
+                  <a href="${course_target}">${course.number} ${course.display_name_with_default}</a>
+                % else:
+                  <span>${course.number} ${course.display_name_with_default}</span>
+                % endif
+              </h3>
             </hgroup>
 
             <%
@@ -326,7 +337,9 @@
     % else:
       <section class="empty-dashboard-message">
         <p>Looks like you haven't registered for any courses yet.</p>
-        <a href="${reverse('courses')}">Find courses now!</a>
+        <a href="${marketing_link('COURSES')}">
+            Find courses now!
+        </a>
       </section>
     % endif
 
@@ -354,6 +367,8 @@
       <h2>Are you sure you want to unregister from <span id="unenroll_course_number"></span>?</h2>
       <hr/>
     </header>
+
+    <div id="unenroll_error" class="modal-form-error"></div>
 
     <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <input name="course_id" id="unenroll_course_id" type="hidden" />

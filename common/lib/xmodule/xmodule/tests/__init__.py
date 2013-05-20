@@ -14,7 +14,7 @@ import fs.osfs
 
 import numpy
 
-import capa.calc as calc
+import calc
 import xmodule
 from xmodule.x_module import ModuleSystem
 from mock import Mock
@@ -33,15 +33,14 @@ def test_system():
     """
     Construct a test ModuleSystem instance.
 
-    By default, the render_template() method simply returns
-    the context it is passed as a string.
-    You can override this behavior by monkey patching:
+    By default, the render_template() method simply returns the context it is
+    passed as a string.  You can override this behavior by monkey patching::
 
-    system = test_system()
-    system.render_template = my_render_func
+        system = test_system()
+        system.render_template = my_render_func
 
-    where my_render_func is a function of the form
-    my_render_func(template, context)
+    where `my_render_func` is a function of the form my_render_func(template, context).
+
     """
     return ModuleSystem(
         ajax_url='courses/course_id/modx/a_location',
@@ -86,10 +85,12 @@ class ModelsTest(unittest.TestCase):
         self.assertTrue(abs(calc.evaluator(variables, functions, "e^(j*pi)") + 1) < 0.00001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "j||1") - 0.5 - 0.5j) < 0.00001)
         variables['t'] = 1.0
+        # Use self.assertAlmostEqual here...
         self.assertTrue(abs(calc.evaluator(variables, functions, "t") - 1.0) < 0.00001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "T") - 1.0) < 0.00001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "t", cs=True) - 1.0) < 0.00001)
         self.assertTrue(abs(calc.evaluator(variables, functions, "T", cs=True) - 298) < 0.2)
+        # Use self.assertRaises here...
         exception_happened = False
         try:
             calc.evaluator({}, {}, "5+7 QWSEKO")

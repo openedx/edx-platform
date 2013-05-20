@@ -801,7 +801,8 @@ hr.divide {
 }
 
 .tooltip {
-  @extend .t-copy-sub2;
+  @include font-size(12);
+  @include transition(opacity 0.1s ease-out);
   position: absolute;
   top: 0;
   left: 0;
@@ -811,10 +812,9 @@ hr.divide {
   background: rgba(0, 0, 0, 0.85);
   font-weight: normal;
   line-height: 26px;
-  color: #fff;
+  color: $white;
   pointer-events: none;
   opacity: 0;
-  @include transition(opacity 0.1s ease-out);
 
   &:after {
     content: '▾';

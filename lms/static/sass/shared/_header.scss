@@ -1,8 +1,8 @@
 header.global {
-  border-bottom: 1px solid rgb(190,190,190);
+  border-bottom: 1px solid $m-gray;
   @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
-  @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9)));
-  height: 68px;
+  background: $white;
+  height: 76px;
   position: relative;
   width: 100%;
   z-index: 10;
@@ -11,39 +11,16 @@ header.global {
     @include clearfix;
     height: 40px;
     margin: 0 auto;
-    max-width: 1200px;
-    padding: 14px 10px 0px;
+    padding: 18px 10px 0px;
     max-width: grid-width(12);
     min-width: 760px;
+    width: flex-grid(12);
   }
 
   h1.logo {
     float: left;
-    margin: 0px 15px 0px 0px;
-    padding-right: 20px;
+    margin: -2px 39px 0px 0px;
     position: relative;
-
-    &::before {
-      @extend .faded-vertical-divider;
-      content: "";
-      display: block;
-      height: 50px;
-      position: absolute;
-      right: 1px;
-      top: -8px;
-      width: 1px;
-    }
-
-    &::after {
-      @extend .faded-vertical-divider-light;
-      content: "";
-      display: block;
-      height: 50px;
-      position: absolute;
-      right: 0px;
-      top: -12px;
-      width: 1px;
-    }
 
     a {
       display: block;
@@ -251,4 +228,104 @@ header.global {
       }
     }
   }
+
+  .nav-global {
+    margin-top: ($baseline/2);
+    list-style: none;
+
+    li {
+      display: inline-block;
+      margin: 0 $baseline+1 0 0;
+      font-size: em(14);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0 !important;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      a {
+        display:block;
+        padding: ($baseline/4);
+        color: $m-gray-d1;
+        font-weight: 600;
+
+        &:hover, &:active {
+          text-decoration: none;
+          color: $m-blue-s1;
+        }
+      }
+
+      &.active {
+
+        a {
+          text-decoration: none;
+          color: $m-blue-s1;
+        }
+      }
+    }
+
+    // logged in
+    &.authenticated {
+
+    }
+  }
+
+  .nav-courseware {
+    float: right;
+    margin-top: ($baseline/4);
+    list-style: none;
+
+    li {
+      display: inline-block;
+
+      a {
+        @include border-radius(0);
+        @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
+        display: inline-block;
+        padding: $baseline/2 $baseline*2.5;
+        text-transform: lowercase;
+        color: $white;
+        letter-spacing: 0.1rem;
+        font-weight: 300;
+        cursor: pointer;
+        text-align: center;
+        border: none !important;
+        text-shadow: none;
+        letter-spacing: 0.1rem;
+        font-size: 14px;
+        box-shadow: none !important;
+
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+
+    // logged in
+    &.authenticated {
+
+    }
+  }
+}
+
+// marketing site design syncing
+.view-register, .view-login {
+
+  header.global nav {
+    width: 960px;
+  }
+}
+
+// page-based nav states
+.view-howitworks .nav-global-01, 
+.view-courses .nav-global-02, 
+.view-schools .nav-global-03, 
+.view-register .nav-global-04 {
+
+  a {
+    text-decoration: none;
+    color: $m-blue-s1 !important;
+  } 
 }

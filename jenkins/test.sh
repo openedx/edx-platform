@@ -64,13 +64,8 @@ export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
 export DJANGO_LIVE_TEST_SERVER_ADDRESS=${DJANGO_LIVE_TEST_SERVER_ADDRESS-localhost:8000-9000}
 
 source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
-pip install -q -r pre-requirements.txt
-yes w | pip install -q -r requirements.txt
 
-bundle install
-
-npm install
-
+rake install_prereqs
 rake clobber
 rake pep8 > pep8.log || cat pep8.log
 rake pylint > pylint.log || cat pylint.log
@@ -83,10 +78,11 @@ rake test_lms[false] || TESTS_FAILED=1
 rake test_common/lib/capa || TESTS_FAILED=1
 rake test_common/lib/xmodule || TESTS_FAILED=1
 
-# Run the jaavascript unit tests
+# Run the javascript unit tests
 rake phantomjs_jasmine_lms || TESTS_FAILED=1
 rake phantomjs_jasmine_cms || TESTS_FAILED=1
 rake phantomjs_jasmine_common/lib/xmodule || TESTS_FAILED=1
+rake phantomjs_jasmine_discussion || TESTS_FAILED=1
 
 rake coverage:xml coverage:html
 
