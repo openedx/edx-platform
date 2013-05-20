@@ -69,6 +69,7 @@ class CombinedOpenEndedFields(object):
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
@@ -213,9 +214,8 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     """
     Module for adding combined open ended questions
     """
-    mako_template = "widgets/raw-edit.html"
+    mako_template = "widgets/open-ended-edit.html"
     module_class = CombinedOpenEndedModule
-    filename_extension = "xml"
 
     stores_state = True
     has_score = True
@@ -227,3 +227,23 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
 
     #Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True
+
+    metadata_attributes = RawDescriptor.metadata_attributes
+
+    js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/edit.coffee')]}
+    js_module_name = "OpenEndedMarkdownEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/combinedopenended/edit.scss')]}
+
+    def get_context(self):
+        _context = RawDescriptor.get_context(self)
+        _context.update({'markdown': self.markdown,
+                         'enable_markdown': self.markdown is not None})
+        return _context
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
+                                    CombinedOpenEndedDescriptor.markdown])
+        return non_editable_fields
+

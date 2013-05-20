@@ -1,4 +1,4 @@
-class @MarkdownEditingDescriptor extends XModule.Descriptor
+class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
   @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
   @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"

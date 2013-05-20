@@ -1,0 +1,67 @@
+<%include file="metadata-edit.html" />
+<section class="combinedopenended-editor editor">
+    <div class="row">
+        %if enable_markdown:
+        <div class="editor-bar">
+            <ul class="format-buttons">
+                <li><a href="#" class="prompt-button" data-tooltip="Prompt"><span
+                        class="combinedopenended-editor-icon explanation"></span></a></li>
+                <li><a href="#" class="rubric-button" data-tooltip="Rubric"><span
+                        class="combinedopenended-editor-icon multiple-choice"></span></a></li>
+                <li><a href="#" class="tasks-button" data-tooltip="Tasks"><span
+                        class="combinedopenended-editor-icon dropdown"></span></a></li>
+            </ul>
+            <ul class="editor-tabs">
+                <li><a href="#" class="xml-tab advanced-toggle" data-tab="xml">Advanced Editor</a></li>
+                <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
+            </ul>
+        </div>
+        <textarea class="markdown-box">${markdown | h}</textarea>
+        %endif
+        <textarea class="xml-box" rows="8" cols="40">${data | h}</textarea>
+    </div>
+</section>
+
+<script type="text/template" id="simple-editor-cheatsheet">
+    <article class="simple-editor-cheatsheet">
+        <div class="cheatsheet-wrapper">
+            <div class="row">
+                <h6>Heading 1</h6>
+                <div class="col sample heading-1">
+                    <img src="/static/img/header-example.png" />
+                </div>
+                <div class="col">
+<pre><code>H1
+    =====
+</pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>Prompt</h6>
+                <div class="col prompt">
+                </div>
+                <div class="col">
+                    <pre><code>[explanation] A short explanation of the answer. [explanation]</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>Rubric</h6>
+                <div class="col sample rubric"><!DOCTYPE html>
+                </div>
+                <div class="col">
+                <pre><code>( ) red
+                    ( ) green
+                    (x) blue</code></pre>
+                                </div>
+             </div>
+            <div class="row">
+                <h6>Tasks</h6>
+                <div class="col sample tasks">
+                </div>
+                <div class="col">
+                    <pre><code>[[wrong, (right)]]</code></pre>
+                </div>
+            </div>
+        </div>
+    </article>
+</script>
