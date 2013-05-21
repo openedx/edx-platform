@@ -144,7 +144,7 @@
 
 // prompts
 .wrapper-prompt {
-  @extend .depth4;
+  @extend .depth5;
   @include transition(all 0.05s ease-in-out);
   position: fixed;
   top: 0;
@@ -242,7 +242,7 @@
 
 // notifications
 .wrapper-notification {
-  @extend .depth3;
+  @extend .depth5;
   @include clearfix();
   @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $blue);
   position: fixed;
