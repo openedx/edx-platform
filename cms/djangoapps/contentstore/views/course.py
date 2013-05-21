@@ -423,6 +423,12 @@ def textbook_index(request, org, course, name):
     """
     location = get_location_and_verify_access(request, org, course, name)
     course = modulestore().get_item(location, depth=3)
+    upload_asset_callback_url = reverse('upload_asset', kwargs={
+        'org': org,
+        'course': course,
+        'coursename': name
+    })
     return render_to_response('textbooks.html', {
         'context_course': course,
+        'upload_asset_callback_url': upload_asset_callback_url,
     })

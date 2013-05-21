@@ -43,6 +43,8 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
+window.UPLOAD_ASSET_CALLBACK_URL = "${upload_asset_callback_url}"
+
 CMS.Models.Textbook = Backbone.Model.extend({
     defaults: {
         name: ""
