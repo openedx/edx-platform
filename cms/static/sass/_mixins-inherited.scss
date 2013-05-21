@@ -5,6 +5,12 @@
 // talbs: we need to slowly ween ourselves off of these
 // ====================
 
+
+// line-height (old way)
+@function lh($amount: 1) {
+  @return $body-line-height * $amount;
+}
+
 // inherited - vertical and horizontal centering
 @mixin vertically-and-horizontally-centered ($height, $width) {
   left: 50%;
