@@ -1,8 +1,40 @@
 class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
-  @rubricTemplate : "[rubric]\n+ Color Identification\n- Incorrect\n- Correct\n + Grammar\n- Poor\n- Acceptable\n- Superb \n[rubric]\n"
-  @tasksTemplate: "[tasks]\n(Self), ({2-5}AI), ({4-5}Peer)\n[tasks]\n"
-  @promptTemplate: "[prompt]\nWhy is the sky blue?\n[prompt]\n"
+  @rubricTemplate : """
+                    [rubric]
+                    + Ideas and Content
+                    - Difficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus
+                    - Attempts a main idea.  Sometimes loses focus or ineffectively displays focus
+                    - Presents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.
+                    - Presents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.
+                    + Organization
+                    - Ideas organized illogically, transitions weak, and response difficult to follow.
+                    - Attempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.
+                    - Ideas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.
+                    + Style
+                    - Contains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.
+                    - Contains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).
+                    - Includes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.
+                    + Voice
+                    - Demonstrates language and tone that may be inappropriate to task and reader.
+                    - Demonstrates an attempt to adjust language and tone to task and reader.
+                    - Demonstrates effective adjustment of language and tone to task and reader.
+                    [rubric]
+                    """
+
+  @tasksTemplate: "[tasks]\n(Self), ({3-9}AI), ({7-9}Peer)\n[tasks]\n"
+  @promptTemplate: """
+                  [prompt]\n
+                  <h3>Censorship in the Libraries</h3>
+
+                  <p>'All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us.' --Katherine Paterson, Author
+                  </p>
+
+                  <p>
+Write a persuasive essay to a newspaper reflecting your vies on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
+                  </p>
+                  [prompt]\n
+                   """
 
   constructor: (element) ->
     @element = element
@@ -82,8 +114,8 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
   ###
   toggleCheatsheet: (e) =>
     e.preventDefault();
-    if !$(@markdown_editor.getWrapperElement()).find('.simple-editor-cheatsheet')[0]
-      @cheatsheet = $($('#simple-editor-cheatsheet').html())
+    if !$(@markdown_editor.getWrapperElement()).find('.simple-editor-open-ended-cheatsheet')[0]
+      @cheatsheet = $($('#simple-editor-open-ended-cheatsheet').html())
       $(@markdown_editor.getWrapperElement()).append(@cheatsheet)
 
     setTimeout (=> @cheatsheet.toggleClass('shown')), 10
@@ -153,14 +185,19 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/\[rubric\]\n?([^\]]*)\[\/?rubric\]/gmi, function(match, p) {
         var groupString = '<rubric>\n<rubric>\n';
         var options = p.split('\n');
+        var category_open = false;
         for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
             var value = options[i].replace(/^\s+|\s+$/g,'');
             if (value.charAt(0)=="+") {
               if(i>0){
-                groupString += "</category>\n";
+                if(category_open==true){
+                  groupString += "</category>\n";
+                  category_open = false;
+                }
               }
               groupString += "<category>\n<description>\n";
+              category_open = true;
               text = value.substr(1);
               text = text.replace(/^\s+|\s+$/g,'');
               groupString += text;
@@ -173,7 +210,7 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
               groupString += "\n</option>\n";
             }
           }
-          if(i==options.length-1){
+          if(i==options.length-1 && category_open == true){
             groupString += "\n</category>\n";
           }
         }
