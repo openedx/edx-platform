@@ -4,8 +4,6 @@
 from lettuce import world, step
 from nose.tools import assert_true, assert_equal, assert_in
 from terrain.steps import reload_the_page
-from selenium.common.exceptions import StaleElementReferenceException
-import time
 
 
 ############### ACTIONS ####################
@@ -15,5 +13,5 @@ def i_created_blank_common_problem(step):
     step.given('I have added a new subsection')
     step.given('I expand the first section')
     world.css_click('a.new-unit-item')
-    time.sleep(float(2))
-#    world.css_click('a.problem')
+    world.css_click('.large-problem-icon')
+    world.css_click('#i4x://edx/templates/problem/Blank_Common_Problem')
