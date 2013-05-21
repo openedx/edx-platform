@@ -3,6 +3,141 @@
 <%block name="title">Textbooks</%block>
 <%block name="bodyclass">is-signedin course textbooks</%block>
 
+<%block name="header_extras">
+<%text>
+  <script type="text/template" id="new-textbook-tpl">
+    <form>
+      <div class='input-wrap'>
+        <label for="textbook-name-input"><%= gettext("Name") %>:</label>
+        <input id="textbook-name-input" type="text" placeholder="<%= gettext("Introduction to Cookie Baking") %> value="<%= name %>">
+        <p class="help_text"><%= gettext("the title/name of the text book as you would like your students to see it.") %></span>
+      </div>
+      <ol class="chapters"></ol>
+      <p><%= gettext("Note: <strong>It's best practice to break your course's textbook into multiple chapters</strong> to reduce loading times for students. Breaking up textbooks into chapters can also help with students more easily finding a concept or topic-based information.") %></p>
+      <button class="add-chapter"><%= gettext("Add a Chapter") %></button>
+      <div class="buttons">
+        <input type="submit" class="action-primary" value="<%= gettext("Save") %>" />
+        <input type="button" class="action-secondary action-cancel" value="<%= gettext("Cancel") %>" />
+      </div>
+    </form>
+  </script>
+
+  <script type="text/template" id="new-chapter-tpl">
+    <li>
+      <div class="input-wrap">
+        <label for="chapter-<%= order %>-name"><%= gettext("Chapter Name") %></label>
+        <input id="chapter-<%= order %>-name" name="chapter-<%= order %>-name" placeholder="<%= _.str.sprintf(gettext("Chapter %s"), order) %>" value="<%= name %>">
+        <p class="help_text"><%= gettext("the title/name of the chapter that will be used in navigating") %></p>
+      </div>
+      <div class="input-wrap">
+        <label for="chapter-<%= order %>-asset-path"><%= gettext("Chapter Asset") %>:</label>
+        <input id="chapter-<%= order %>-asset-path" name="chapter-<%= order %>-asset-path" placeholder="<%= _.str.sprintf(gettext("path/to/introductionToCookieBaking-CH%d.pdf"), order) %>" value="<%= asset_path %>">
+        <p class="help_text"><%= gettext("provide the path for a file or asset already added to this course") %></p>
+      </div>
+      <input type="button" value="<%= gettext("Upload Asset") %>">
+      <% if (obj.close) { %><a class="action-close">close-button</a><% } %>
+    </li>
+  </script>
+</%text>
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+CMS.Models.Textbook = Backbone.Model.extend({
+    defaults: {
+        name: ""
+    },
+    initialize: function() {
+        this.chapters = new CMS.Collections.ChapterSet;
+        this.chapters.add([{}]);
+    }
+})
+CMS.Models.Chapter = Backbone.Model.extend({
+    defaults: function() {
+        return {
+            name: "",
+            asset_path: "",
+            order: this.collection ? this.collection.nextOrder() : 1
+        }
+    }
+})
+CMS.Collections.ChapterSet = Backbone.Collection.extend({
+    model: CMS.Models.Chapter,
+    comparator: "order",
+    nextOrder: function() {
+        if(!this.length) return 1;
+        return this.last().get('order') + 1;
+    }
+})
+CMS.Views.TextbookEdit = Backbone.View.extend({
+    initialize: function() {
+        this.template = _.template($("#new-textbook-tpl").text());
+        this.listenTo(this.model.chapters, "add", this.addOne);
+        this.listenTo(this.model.chapters, "reset", this.addAll);
+        this.listenTo(this.model.chapters, "all", this.render);
+    },
+    render: function() {
+        this.$el.html(this.template({
+            name: this.model.escape('name'),
+        }));
+        this.addAll();
+        return this;
+    },
+    events: {
+        "submit": "save",
+        "click .action-cancel": "remove",
+        "click .add-chapter": "createChapter"
+    },
+    addOne: function(chapter) {
+        var view = new CMS.Views.ChapterEdit({model: chapter});
+        this.$("ol.chapters").append(view.render().el)
+        return this;
+    },
+    addAll: function() {
+        this.model.chapters.each(this.addOne, this);
+    },
+    createChapter: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.chapters.add([{}])
+    },
+    save: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        alert("save is currently unimplemented")
+    }
+
+})
+CMS.Views.ChapterEdit = Backbone.View.extend({
+    initialize: function() {
+        this.template = _.template($("#new-chapter-tpl").text());
+    },
+    render: function() {
+        this.$el.html(this.template({
+            name: this.model.escape('name'),
+            asset_path: this.model.escape('asset_path'),
+            order: this.model.get('order'),
+            close: true
+        }));
+        return this;
+    },
+    events: {
+        "click .action-close": "removeChapter"
+    },
+    removeChapter: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.collection.remove(this.model);
+        return this.remove();
+    }
+})
+$(function() {
+    $(".new-button").click(function() {
+        var textbook = new CMS.Models.Textbook();
+        var view = new CMS.Views.TextbookEdit({model: textbook})
+        $(".inner-wrapper").append(view.render().el);
+    })
+})
+</script>
+</%block>
+
 <%block name="content">
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
