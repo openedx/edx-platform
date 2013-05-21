@@ -90,6 +90,11 @@ def staff_grading(request, course_id):
         'staff_access': True, })
 
 def find_peer_grading_module(course):
+    """
+    Given a course, finds the first peer grading module in it.
+    @param course: A course object.
+    @return: boolean found_module, string problem_url
+    """
     #Reverse the base course url
     base_course_url = reverse('courses')
     found_module = False
@@ -117,7 +122,7 @@ def find_peer_grading_module(course):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def peer_grading(request, course_id):
     '''
-    Show a peer grading interface
+    Show a peer grading interface to the student.  The interface is linked to from the button.
     '''
 
     #Get the current course
@@ -153,7 +158,8 @@ def generate_problem_url(problem_url_parts, base_course_url):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def student_problem_list(request, course_id):
     '''
-    Show a student problem list
+    Show a student problem list to a student.  Fetch the list from the grading controller server, get some metadata,
+    and then show it to the student.
     '''
     course = get_course_with_access(request.user, course_id, 'load')
     student_id = unique_id_for_user(request.user)
@@ -175,6 +181,8 @@ def student_problem_list(request, course_id):
         else:
             problem_list = problem_list_dict['problem_list']
 
+        #A list of problems to remove (problems that can't be found in the course)
+        list_to_remove = []
         for i in xrange(0, len(problem_list)):
             try:
                 #Try to load each problem in the courseware to get links to them
@@ -184,6 +192,8 @@ def student_problem_list(request, course_id):
                 #Continue with the rest of the location to construct the list
                 error_message = "Could not find module for course {0} at location {1}".format(course.id, problem_list[i]['location'])
                 log.error(error_message)
+                #Mark the problem for removal from the list
+                list_to_remove.append(i)
                 continue
             problem_url = generate_problem_url(problem_url_parts, base_course_url)
             problem_list[i].update({'actual_url': problem_url})
@@ -214,6 +224,8 @@ def student_problem_list(request, course_id):
         log.error("Problem with results from external grading service for open ended.")
         success = False
 
+    #Remove problems that cannot be found in the courseware from the list
+    problem_list = [problem_list[i] for i in xrange(0,len(problem_list)) if i not in list_to_remove]
     ajax_url = _reverse_with_slash('open_ended_problems', course_id)
 
     return render_to_response('open_ended_problems/open_ended_problems.html', {
