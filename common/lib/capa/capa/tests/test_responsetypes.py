@@ -349,10 +349,13 @@ class OptionResponseTest(ResponseTest):
 
 
 class FormulaResponseTest(ResponseTest):
+    """ Test the FormulaResponse class """
     from response_xml_factory import FormulaResponseXMLFactory
     xml_factory_class = FormulaResponseXMLFactory
 
     def test_grade(self):
+        """ Test basic functionality of FormulaResponse
+        Specifically, if it can understand equivalence of formulae"""
         # Sample variables x and y in the range [-10, 10]
         sample_dict = {'x': (-10, 10), 'y': (-10, 10)}
 
@@ -373,6 +376,7 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_hint(self):
+        """ Test the hint-giving functionality of FormulaResponse"""
         # Sample variables x and y in the range [-10, 10]
         sample_dict = {'x': (-10, 10), 'y': (-10, 10)}
 
@@ -401,6 +405,8 @@ class FormulaResponseTest(ResponseTest):
                           'Try including the variable x')
 
     def test_script(self):
+        """ Test if python script can be used to generate answers"""
+
         # Calculate the answer using a script
         script = "calculated_ans = 'x+x'"
 
@@ -496,8 +502,8 @@ class FormulaResponseTest(ResponseTest):
                               msg="Failed on function {0}; the given, incorrect answer was {1} but graded 'correct'".format(func, incorrect))
 
     def test_grade_infinity(self):
-        # This resolves a bug where a problem with relative tolerance would
-        # pass with any arbitrarily large student answer.
+        """This resolves a bug where a problem with relative tolerance would
+        pass with any arbitrarily large student answer"""
 
         sample_dict = {'x': (1, 2)}
 
@@ -514,8 +520,8 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_grade_nan(self):
-        # Attempt to produce a value which causes the student's answer to be
-        # evaluated to nan. See if this is resolved correctly.
+        """Attempt to produce a value which causes the student's answer to be
+        evaluated to nan. See if this is resolved correctly."""
 
         sample_dict = {'x': (1, 2)}
 
@@ -532,6 +538,15 @@ class FormulaResponseTest(ResponseTest):
         input_formula = "x + 0*1e999"
         self.assert_grade(problem, input_formula, "incorrect")
 
+    def test_raises_zero_division_err(self):
+        """See if division by zero is handled correctly"""
+        sample_dict = {'x': (1, 2)}
+        problem = self.build_problem(sample_dict=sample_dict,
+                                     num_samples=10,
+                                     tolerance="1%",
+                                     answer="x")  # Answer doesn't matter
+        input_dict = {'1_2_1': '1/0'}
+        self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
 
 class StringResponseTest(ResponseTest):
     from response_xml_factory import StringResponseXMLFactory
@@ -898,6 +913,13 @@ class NumericalResponseTest(ResponseTest):
         incorrect_responses = ["", "3.9", "4.1", "0", "5.01e1"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
+    def test_raises_zero_division_err(self):
+        """See if division by zero is handled correctly"""
+        problem = self.build_problem(question_text="What 5 * 10?",
+                                     explanation="The answer is 50",
+                                     answer="5e+1") # Answer doesn't matter
+        input_dict = {'1_2_1': '1/0'}
+        self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
 
 class CustomResponseTest(ResponseTest):
     from response_xml_factory import CustomResponseXMLFactory
