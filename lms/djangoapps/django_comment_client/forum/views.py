@@ -174,6 +174,9 @@ def forum_form_discussion(request, course_id):
     try:
         unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
         threads = [utils.safe_content(thread) for thread in unsafethreads]
+    except (cc.utils.CommentClientMaintenanceError) as err:
+        log.warning("Forum is in maintenance mode")
+        return render_to_response('discussion/maintenance.html', {})
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         log.error("Error loading forum discussion threads: %s" % str(err))
         raise Http404
