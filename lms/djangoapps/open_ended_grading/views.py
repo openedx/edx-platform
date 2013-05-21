@@ -165,6 +165,7 @@ def student_problem_list(request, course_id):
     base_course_url = reverse('courses')
 
     try:
+        #Get list of all open ended problems that the grading server knows about
         problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
         problem_list_dict = json.loads(problem_list_json)
         success = problem_list_dict['success']
@@ -176,8 +177,11 @@ def student_problem_list(request, course_id):
 
         for i in xrange(0, len(problem_list)):
             try:
+                #Try to load each problem in the courseware to get links to them
                 problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
             except:
+                #If the problem cannot be found at the location received from the grading controller server, it has been deleted by the course author.
+                #Continue with the rest of the location to construct the list
                 error_message = "Could not find module for course {0} at location {1}".format(course.id, problem_list[i]['location'])
                 log.error(error_message)
                 continue
