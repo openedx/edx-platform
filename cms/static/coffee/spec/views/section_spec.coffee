@@ -26,9 +26,11 @@ describe "CMS.Views.SectionShow", ->
 describe "CMS.Views.SectionEdit", ->
     describe "Basic", ->
         tpl = readFixtures('section-name-edit.underscore')
+        feedback_tpl = readFixtures('system-feedback.underscore')
 
         beforeEach ->
             setFixtures($("<script>", {id: "section-name-edit-tpl", type: "text/template"}).text(tpl))
+            appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedback_tpl))
             spyOn(CMS.Views.SectionEdit.prototype, "switchToShowView")
                 .andCallThrough()
             spyOn(CMS.Views.SectionEdit.prototype, "showInvalidMessage")
