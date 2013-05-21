@@ -175,7 +175,12 @@ def student_problem_list(request, course_id):
             problem_list = problem_list_dict['problem_list']
 
         for i in xrange(0, len(problem_list)):
-            problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
+            try:
+                problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
+            except:
+                error_message = "Could not find module for course {0} at location {1}".format(course.id, problem_list[i]['location'])
+                log.error(error_message)
+                continue
             problem_url = generate_problem_url(problem_url_parts, base_course_url)
             problem_list[i].update({'actual_url': problem_url})
             eta_available = problem_list[i]['eta_available']
