@@ -59,16 +59,13 @@ class CombinedOpenEndedFields(object):
     attempts = StringyInteger(display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.", default=1,
         scope=Scope.settings, values = {"min" : 1 })
-    # TODO: move values to Boolean in xblock.
-    is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings,
-        values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
+    is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
     accept_file_upload = Boolean(display_name="Allow File Uploads",
-        help="Whether or not the student can submit files as a response.", default=False, scope=Scope.settings,
-        values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
+        help="Whether or not the student can submit files as a response.", default=False, scope=Scope.settings)
     skip_spelling_checks = Boolean(display_name="Disable Quality Filter",
         # TODO: passing of text failed with "won't". Need to make our code more robust.
         help="If False, submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
-        default=False, scope=Scope.settings, values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
+        default=False, scope=Scope.settings)
     due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
                          scope=Scope.settings)

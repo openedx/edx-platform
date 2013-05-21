@@ -649,6 +649,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             # 3. A generic string editor for anything else (editing JSON representation of the value).
             type = "Generic"
             values = [] if field.values is None else copy.deepcopy(field.values)
+            if isinstance(values, tuple):
+                values = list(values)
             if isinstance(values, list):
                 if len(values) > 0:
                     type = "Select"

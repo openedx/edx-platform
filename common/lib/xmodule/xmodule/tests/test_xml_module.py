@@ -32,8 +32,7 @@ class TestFields(object):
     # Used for testing float type
     float_non_select = StringyFloat(scope=Scope.settings, default=.999, values={'min': 0 , 'step' : .3})
     # Used for testing that Booleans get mapped to select type
-    # TODO: move default value into xblock!
-    boolean_select = Boolean(scope=Scope.settings, values=[{'display_name': "True", "value": True}, {'display_name': "False", "value": False}])
+    boolean_select = Boolean(scope=Scope.settings)
 
 
 class EditableMetadataFieldsTest(unittest.TestCase):
