@@ -19,7 +19,8 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminF
 from courseware.model_data import StudentModule
 from courseware.task_queue import (submit_regrade_problem_for_all_students, 
                                    submit_regrade_problem_for_student,
-                                   course_task_log_status)
+                                   course_task_log_status,
+    submit_reset_problem_attempts_for_all_students)
 from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
 
 
@@ -228,7 +229,7 @@ class TestRegrading(TestRegradingBase):
         self.create_student('u4')
         self.logout()
 
-    def testRegradingOptionProblem(self):
+    def test_regrading_option_problem(self):
         '''Run regrade scenario on option problem'''
         # get descriptor:
         problem_url_name = 'H1P1'
@@ -280,7 +281,7 @@ class TestRegrading(TestRegradingBase):
                            display_name=str(problem_url_name),
                            data=problem_xml)
 
-    def testRegradingFailure(self):
+    def test_regrading_failure(self):
         """Simulate a failure in regrading a problem"""
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
@@ -307,19 +308,19 @@ class TestRegrading(TestRegradingBase):
         status = json.loads(response.content)
         self.assertEqual(status['message'], expected_message)
 
-    def testRegradingNonProblem(self):
+    def test_regrading_non_problem(self):
         """confirm that a non-problem will not submit"""
         problem_url_name = self.problem_section.location.url()
         with self.assertRaises(NotImplementedError):
             self.regrade_all_student_answers('instructor', problem_url_name)
 
-    def testRegradingNonexistentProblem(self):
+    def test_regrading_nonexistent_problem(self):
         """confirm that a non-existent problem will not submit"""
         problem_url_name = 'NonexistentProblem'
         with self.assertRaises(ItemNotFoundError):
             self.regrade_all_student_answers('instructor', problem_url_name)
 
-    def testRegradingCodeProblem(self):
+    def test_regrading_code_problem(self):
         '''Run regrade scenario on problem with code submission'''
         problem_url_name = 'H1P2'
         self.define_code_response_problem(problem_url_name)
@@ -338,3 +339,84 @@ class TestRegrading(TestRegradingBase):
         response = course_task_log_status(mock_request, task_id=course_task_log.task_id)
         status = json.loads(response.content)
         self.assertEqual(status['message'], "Problem's definition does not support regrading")
+
+
+class TestResetAttempts(TestRegradingBase):
+    userlist = ['u1', 'u2', 'u3', 'u4']
+
+    def setUp(self):
+        self.initialize_course()
+        self.create_instructor('instructor')
+        for username in self.userlist:
+            self.create_student(username)
+        self.logout()
+
+    def get_num_attempts(self, username, descriptor):
+        module = self.get_student_module(username, descriptor)
+        state = json.loads(module.state)
+        return state['attempts']
+
+    def reset_problem_attempts(self, instructor, problem_url_name):
+        """Submits the current problem for resetting"""
+        return submit_reset_problem_attempts_for_all_students(self._create_task_request(instructor), self.course.id,
+                                                              TestRegradingBase.problem_location(problem_url_name))
+
+    def test_reset_attempts_on_problem(self):
+        '''Run reset-attempts scenario on option problem'''
+        # get descriptor:
+        problem_url_name = 'H1P1'
+        self.define_option_problem(problem_url_name)
+        location = TestRegradingBase.problem_location(problem_url_name)
+        descriptor = self.module_store.get_instance(self.course.id, location)
+        num_attempts = 3
+        # first store answers for each of the separate users:
+        for _ in range(num_attempts):
+            for username in self.userlist:
+                self.submit_student_answer(username, problem_url_name, ['Option 1', 'Option 1'])
+
+        for username in self.userlist:
+            self.assertEquals(self.get_num_attempts(username, descriptor), num_attempts)
+
+        self.reset_problem_attempts('instructor', problem_url_name)
+
+        for username in self.userlist:
+            self.assertEquals(self.get_num_attempts(username, descriptor), 0)
+
+    def test_reset_failure(self):
+        """Simulate a failure in resetting attempts on a problem"""
+        problem_url_name = 'H1P1'
+        self.define_option_problem(problem_url_name)
+        self.submit_student_answer('u1', problem_url_name, ['Option 1', 'Option 1'])
+
+        expected_message = "bad things happened"
+        with patch('courseware.models.StudentModule.save') as mock_save:
+            mock_save.side_effect = ZeroDivisionError(expected_message)
+            course_task_log = self.reset_problem_attempts('instructor', problem_url_name)
+
+        # check task_log returned
+        self.assertEqual(course_task_log.task_state, 'FAILURE')
+        self.assertEqual(course_task_log.student, None)
+        self.assertEqual(course_task_log.requester.username, 'instructor')
+        self.assertEqual(course_task_log.task_name, 'reset_problem_attempts')
+        self.assertEqual(course_task_log.task_args, TestRegrading.problem_location(problem_url_name))
+        status = json.loads(course_task_log.task_progress)
+        self.assertEqual(status['exception'], 'ZeroDivisionError')
+        self.assertEqual(status['message'], expected_message)
+
+        # check status returned:
+        mock_request = Mock()
+        response = course_task_log_status(mock_request, task_id=course_task_log.task_id)
+        status = json.loads(response.content)
+        self.assertEqual(status['message'], expected_message)
+
+    def test_reset_non_problem(self):
+        """confirm that a non-problem can still be successfully reset"""
+        problem_url_name = self.problem_section.location.url()
+        course_task_log = self.reset_problem_attempts('instructor', problem_url_name)
+        self.assertEqual(course_task_log.task_state, 'SUCCESS')
+
+    def test_reset_nonexistent_problem(self):
+        """confirm that a non-existent problem will not submit"""
+        problem_url_name = 'NonexistentProblem'
+        with self.assertRaises(ItemNotFoundError):
+            self.reset_problem_attempts('instructor', problem_url_name)

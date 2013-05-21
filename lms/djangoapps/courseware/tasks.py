@@ -1,19 +1,18 @@
 
 import json
-from time import sleep
+from time import sleep, time
+
 
 from django.contrib.auth.models import User
 from django.db import transaction
 
 from celery import task, current_task
-# from celery.signals import worker_ready
 from celery.utils.log import get_task_logger
 
 import mitxmako.middleware as middleware
 
 from courseware.models import StudentModule
 from courseware.model_data import ModelDataCache
-# from courseware.module_render import get_module
 from courseware.module_render import get_module_for_descriptor_internal
 
 from xmodule.modulestore.django import modulestore
@@ -40,14 +39,18 @@ def _update_problem_module_state(course_id, module_state_key, student, update_fc
     fmt = 'Starting to update problem modules as task "{task_id}": course "{course_id}" problem "{state_key}": nothing {action} yet'
     task_log.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, action=action_name))
 
+    # get start time for task:
+    start_time = time()
+
     # add task_id to xmodule_instance_args, so that it can be output with tracking info:
     xmodule_instance_args['task_id'] = task_id
-    
-    # add hack so that mako templates will work on celery worker server:
-    # The initialization of Make templating is usually done when Django is
+
+    # Hack to get mako templates to work on celery worker server's worker thread.
+    # The initialization of Mako templating is usually done when Django is
     # initializing middleware packages as part of processing a server request.
     # When this is run on a celery worker server, no such initialization is
-    # called.  So we look for the result: the defining of the lookup paths
+    # called. Using @worker_ready.connect doesn't run in the right container.
+    #  So we look for the result: the defining of the lookup paths
     # for templates.
     if 'main' not in middleware.lookup:
         task_log.info("Initializing Mako middleware explicitly")
@@ -74,13 +77,15 @@ def _update_problem_module_state(course_id, module_state_key, student, update_fc
     num_total = len(modules_to_update)  # TODO: make this more efficient.  Count()?
 
     def get_task_progress():
+        current_time = time()
         progress = {'action_name': action_name,
                     'attempted': num_attempted,
                     'updated': num_updated,
                     'total': num_total,
+                    'start_ms': int(start_time * 1000),
+                    'duration_ms': int((current_time - start_time) * 1000),
                     }
         return progress
-
 
     for module_to_update in modules_to_update:
         num_attempted += 1
@@ -102,7 +107,8 @@ def _update_problem_module_state(course_id, module_state_key, student, update_fc
     task_progress = get_task_progress()
     current_task.update_state(state='PROGRESS', meta=task_progress)
 
-    task_log.info("Finished processing task")
+    fmt = 'Finishing task "{task_id}": course "{course_id}" problem "{state_key}": final: {progress}'
+    task_log.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, progress=task_progress))
     return task_progress
 
 
@@ -288,11 +294,15 @@ def delete_problem_state_for_all_students(course_id, problem_url, xmodule_instan
                                                          xmodule_instance_args=xmodule_instance_args)
 
 
+# Using @worker_ready.connect was an effort to call middleware initialization
+# only once, when the worker was coming up.  However, the actual worker task
+# was not getting initialized, so it was likely running in a separate process
+# from the worker server.
 #@worker_ready.connect
 #def initialize_middleware(**kwargs):
-#    # The initialize Django middleware - some middleware components
+#    # Initialize Django middleware - some middleware components
 #    # are initialized lazily when the first request is served. Since
-#    # the celery workers do not serve request, the components never
+#    # the celery workers do not serve requests, the components never
 #    # get initialized, causing errors in some dependencies.
 #    # In particular, the Mako template middleware is used by some xmodules
 #    task_log.info("Initializing all middleware from worker_ready.connect hook")

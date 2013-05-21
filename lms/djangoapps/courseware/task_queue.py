@@ -224,6 +224,7 @@ def _get_course_task_log_status(task_id):
           'updated': number of attempts that "succeeded"
           'total': number of possible subtasks to attempt
           'action_name': user-visible verb to use in status messages.  Should be past-tense.
+          'duration_ms': how long the task has (or had) been running.
       'task_traceback': optional, returned if task failed and produced a traceback.
       'succeeded': on complete tasks, indicates if the task outcome was successful:
           did it achieve what it set out to do.

@@ -1308,25 +1308,34 @@ def get_background_task_table(course_id, problem_url, student=None):
             "Task Id",
             "Requester",
             "Submitted",
-            "Updated",
+            "Duration",
             "Task State",
             "Task Status",
             "Message"]
 
         datatable['data'] = []
         for i, course_task in enumerate(history_entries):
+            # get duration info, if known:
+            duration_ms = 'unknown'
+            if hasattr(course_task, 'task_progress'):
+                task_progress = json.loads(course_task.task_progress)
+                if 'duration_ms' in task_progress:
+                    duration_ms = task_progress['duration_ms']
+            # get progress status message:
             success, message = task_queue.get_task_completion_message(course_task)
             if success:
                 status = "Complete"
             else:
                 status = "Incomplete"
+            # generate row for this task:
             row = ["#{0}".format(len(history_entries) - i),
                 str(course_task.task_name),
                 str(course_task.student),
                 str(course_task.task_id),
                 str(course_task.requester),
                 course_task.created.strftime("%Y/%m/%d %H:%M:%S"),
-                course_task.updated.strftime("%Y/%m/%d %H:%M:%S"),
+                duration_ms,
+                #course_task.updated.strftime("%Y/%m/%d %H:%M:%S"),
                 str(course_task.task_state),
                 status,
                 message]
