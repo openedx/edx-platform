@@ -8,7 +8,7 @@
 }
 
 // mixins - line height
-@mixin lh($fontSize: auto){
+@mixin line-height($fontSize: auto){
   line-height: ($fontSize*1.48) + px;
   line-height: (($fontSize/10)*1.48) + rem;
 }
