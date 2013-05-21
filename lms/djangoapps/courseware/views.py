@@ -233,6 +233,30 @@ def update_timelimit_module(user, course_id, model_data_cache, timelimit_descrip
     return context
 
 
+def chat_settings(course, user):
+    """
+    Returns a dict containing the settings required to connect to a
+    Jabber chat server and room.
+    """
+    return {
+        'domain': settings.JABBER_DOMAIN,
+
+        # Jabber doesn't like slashes, so replace with dashes
+        'room': "{ID}_class".format(ID=course.id.replace('/', '-')),
+
+        'username': "{USER}@{DOMAIN}".format(
+            USER=user.username, DOMAIN=settings.JABBER_DOMAIN
+        ),
+
+        # TODO: clearly this needs to be something other than the username
+        #       should also be something that's not necessarily tied to a
+        #       particular course
+        'password': "{USER}@{DOMAIN}".format(
+            USER=user.username, DOMAIN=settings.JABBER_DOMAIN
+        ),
+    }
+
+
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -298,13 +322,7 @@ def index(request, course_id, chapter=None, section=None,
             }
 
         if course.show_chat:
-            context['chat'] = {
-                'domain': settings.JABBER_DOMAIN,
-                'room': "{ID}_class".format(ID=course.id.replace('/', '-')), # Jabber doesn't like /s
-                'username': "{USER}@{DOMAIN}".format(USER=user.username, DOMAIN=settings.JABBER_DOMAIN),
-                # TODO: clearly this needs to be something other than the username
-                'password': "{USER}@{DOMAIN}".format(USER=user.username, DOMAIN=settings.JABBER_DOMAIN),
-            }
+            context['chat'] = chat_settings(course, user)
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
