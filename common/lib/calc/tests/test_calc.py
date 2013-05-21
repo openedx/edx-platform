@@ -38,18 +38,19 @@ class EvaluatorTest(unittest.TestCase):
     def test_exponential_answer(self):
         ''' Test for correct interpretation of scientific notation'''
         answer = 50
-        correct_responses = ["50", "50.0", "5e1", "5e+1", "50e0", "50.0e0", "500e-1"]
+        correct_responses = ["50", "50.0", "5e1", "5e+1",
+                             "50e0", "50.0e0", "500e-1"]
         incorrect_responses = ["", "3.9", "4.1", "0", "5.01e1"]
 
         for input_str in correct_responses:
             result = calc.evaluator({}, {}, input_str)
-            fail_msg = "Failed when checking '{0}' against {1} (expected equality)".format(
+            fail_msg = "Expected '{0}' to equal {1}".format(
                 input_str, answer)
             self.assertEqual(answer, result, msg=fail_msg)
 
         for input_str in incorrect_responses:
             result = calc.evaluator({}, {}, input_str)
-            fail_msg = "Failed when checking '{0}' against {1} (expected inequality)".format(
+            fail_msg = "Expected '{0}' to not equal {1}".format(
                 input_str, answer)
             self.assertNotEqual(answer, result, msg=fail_msg)
 
@@ -62,9 +63,9 @@ class EvaluatorTest(unittest.TestCase):
                         ('5.6n', 5.6e-9), ('4.2p', 4.2e-12)]
 
         for (expr, answer) in test_mapping:
-            tolerance = answer * 1e-6  # Testing exactly fails for the large values
-            fail_msg = "Failure in testing suffix '{0}': '{1}' was not {2}".format(
-                expr[-1], expr, answer)
+            tolerance = answer * 1e-6  # Make rel. tolerance, because of floats
+            fail_msg = "Failure in testing suffix '{0}': '{1}' was not {2}"
+            fail_msg = fail_msg.format(expr[-1], expr, answer)
             self.assertAlmostEqual(calc.evaluator({}, {}, expr), answer,
                                    delta=tolerance, msg=fail_msg)
 
@@ -85,7 +86,7 @@ class EvaluatorTest(unittest.TestCase):
                           {}, {}, '1/0')
 
     def test_parallel_resistors(self):
-        ''' Test the special operator ||
+        ''' Test the parallel resistor operator ||
         The formula is given by
             a || b || c ...
             = 1 / (1/a + 1/b + 1/c + ...)
@@ -99,7 +100,6 @@ class EvaluatorTest(unittest.TestCase):
 
         self.assertRaises(ZeroDivisionError, calc.evaluator,
                           {}, {}, '0||1')
-
 
     def assert_function_values(self, fname, ins, outs, tolerance=1e-3):
         ''' Helper function to test many values at once
@@ -115,12 +115,12 @@ class EvaluatorTest(unittest.TestCase):
             self.assertAlmostEqual(val, result, delta=tolerance, msg=fail_msg)
 
     def test_trig_functions(self):
-        """Test the trig functions provided in common/lib/calc/calc.py"""
-        # which are: sin, cos, tan, arccos, arcsin, arctan
+        """Test the trig functions provided in common/lib/calc/calc.py
+        which are: sin, cos, tan, arccos, arcsin, arctan"""
 
-        angles = ['-pi/4', '0', 'pi/6', 'pi/5', '5*pi/4', '9*pi/4', 'j', '1 + j']
-        sin_values = [-0.707, 0, 0.5, 0.588, -0.707, 0.707, 1.175j, 1.298 + 0.635j]
-        cos_values = [0.707, 1, 0.866, 0.809, -0.707, 0.707, 1.543, 0.834 - 0.989j]
+        angles = ['-pi/4', '0', 'pi/6', 'pi/5', '5*pi/4', '9*pi/4', '1 + j']
+        sin_values = [-0.707, 0, 0.5, 0.588, -0.707, 0.707, 1.298 + 0.635j]
+        cos_values = [0.707, 1, 0.866, 0.809, -0.707, 0.707, 0.834 - 0.989j]
         tan_values = [-1, 0, 0.577, 0.727, 1, 1, 0.762j, 0.272 + 1.084j]
         # Cannot test tan(pi/2) b/c pi/2 is a float and not precise...
 
@@ -150,9 +150,10 @@ class EvaluatorTest(unittest.TestCase):
         self.assert_function_values('arctan', arctan_inputs, arctan_angles)
 
     def test_other_functions(self):
-        """Test the other functions provided in common/lib/calc/calc.py"""
-        # sqrt, log10, log2, ln, abs,
-        # fact, factorial
+        """Test the non-trig functions provided in common/lib/calc/calc.py
+        Specifically:
+          sqrt, log10, log2, ln, abs,
+          fact, factorial"""
 
         # test sqrt
         self.assert_function_values('sqrt',
@@ -212,8 +213,7 @@ class EvaluatorTest(unittest.TestCase):
                                         delta=tolerance, msg=fail_msg)
 
     def test_complex_expression(self):
-        """We've only tried simple things so far, make sure it can handle a
-        more complexity than this."""
+        """ Calculate combinations of operators and default functions """
 
         self.assertAlmostEqual(
             calc.evaluator({}, {}, "(2^2+1.0)/sqrt(5e0)*5-1"),
@@ -227,40 +227,86 @@ class EvaluatorTest(unittest.TestCase):
         self.assertAlmostEqual(
             calc.evaluator({}, {}, "10||sin(7+5)"),
             -0.567, delta=0.01)
+        self.assertAlmostEqual(calc.evaluator({}, {}, "sin(e)"),
+                               0.41, delta=0.01)
+        self.assertAlmostEqual(calc.evaluator({}, {}, "k*T/q"),
+                               0.025, delta=1e-3)
+        self.assertAlmostEqual(calc.evaluator({}, {}, "e^(j*pi)"),
+                               -1, delta=1e-5)
 
-    def test_calc(self):
-        variables = {'R1': 2.0, 'R3': 4.0}
-        functions = {'sin': numpy.sin, 'cos': numpy.cos}
+    def test_simple_vars(self):
+        """ Substitution of variables into simple equations """
+        variables = {'x': 9.72, 'y': 7.91, 'loooooong': 6.4}
 
-        self.assertAlmostEqual(
-            calc.evaluator(variables, functions, "10||sin(7+5)"),
-            -0.567, delta=0.01)
-        self.assertEqual(calc.evaluator({'R1': 2.0, 'R3': 4.0}, {}, "13"), 13)
-        self.assertEqual(calc.evaluator(variables, functions, "13"), 13)
+        # Should not change value of constant
+        self.assertEqual(calc.evaluator(variables, {}, '13'), 13)
+
+        # Easy evaluation
+        self.assertEqual(calc.evaluator(variables, {}, 'x'), 9.72)
+        self.assertEqual(calc.evaluator(variables, {}, 'y'), 7.91)
+        self.assertEqual(calc.evaluator(variables, {}, 'loooooong'), 6.4)
+
+        # Test a simple equation
+        self.assertAlmostEqual(calc.evaluator(variables, {}, '3*x-y'),
+                               21.25, delta=0.01)  # = 3 * 9.72 - 7.91
+        self.assertAlmostEqual(calc.evaluator(variables, {}, 'x*y'),
+                               76.89, delta=0.01)
+
+        # more, I guess
+        self.assertEqual(calc.evaluator({'x': 9.72, 'y': 7.91}, {}, "13"), 13)
+        self.assertEqual(calc.evaluator(variables, {}, "13"), 13)
         self.assertEqual(
             calc.evaluator({
                 'a': 2.2997471478310274, 'k': 9, 'm': 8,
                 'x': 0.66009498411213041},
                            {}, "5"),
             5)
-        self.assertEqual(calc.evaluator(variables, functions, "R1*R3"), 8.0)
-        self.assertAlmostEqual(calc.evaluator(variables, functions, "sin(e)"), 0.41, delta=0.01)
-        self.assertAlmostEqual(calc.evaluator(variables, functions, "k*T/q"), 0.025, delta=1e-3)
-        self.assertAlmostEqual(calc.evaluator(variables, functions, "e^(j*pi)"), -1, delta=1e-5)
 
-        variables['t'] = 1.0
-        self.assertAlmostEqual(calc.evaluator(variables, functions, "t"), 1.0, delta=1e-5)
-        self.assertAlmostEqual(calc.evaluator(variables, functions, "T"), 1.0, delta=1e-5)
-        self.assertAlmostEqual(calc.evaluator(variables, functions, "t", cs=True), 1.0, delta=1e-5)
-        self.assertAlmostEqual(calc.evaluator(variables, functions, "T", cs=True), 298, delta=0.2)
+    def test_variable_case_sensitivity(self):
+        """ Test the case sensitivity flag and corresponding behavior """
+        self.assertEqual(
+            calc.evaluator({'R1': 2.0, 'R3': 4.0}, {}, "r1*r3"),
+            8.0)
+
+        variables = {'t': 1.0}
+        self.assertEqual(calc.evaluator(variables, {}, "t"), 1.0)
+        self.assertEqual(calc.evaluator(variables, {}, "T"), 1.0)
+        self.assertEqual(calc.evaluator(variables, {}, "t", cs=True), 1.0)
+        # Recall 'T' is a default constant, with value 298.15
+        self.assertAlmostEqual(calc.evaluator(variables, {}, "T", cs=True),
+                               298, delta=0.2)
+
+    def test_simple_funcs(self):
+        """ Subsitution of custom functions """
+        variables = {'x': 4.712}
+        functions = {'id': lambda x: x}
+        self.assertEqual(calc.evaluator({}, functions, 'id(2.81)'), 2.81)
+        self.assertEqual(calc.evaluator({}, functions, 'id(2.81)'), 2.81)
+        self.assertEqual(calc.evaluator(variables, functions, 'id(x)'), 4.712)
+
+        functions.update({'f': numpy.sin})
+        self.assertAlmostEqual(calc.evaluator(variables, functions, 'f(x)'),
+                               -1, delta=1e-3)
+
+    def test_function_case_sensitivity(self):
+        """ Test the case sensitivity of functions """
+        functions = {'f': lambda x: x,
+                     'F': lambda x: x + 1}
+        # Which is it? will it call f or F?
+        # In any case, they should both be the same...
+        self.assertEqual(calc.evaluator({}, functions, 'f(6)'),
+                         calc.evaluator({}, functions, 'F(6)'))
+        # except if we want case sensitivity...
+        self.assertNotEqual(calc.evaluator({}, functions, 'f(6)', cs=True),
+                            calc.evaluator({}, functions, 'F(6)', cs=True))
+
+    def test_undefined_vars(self):
+        """ Check to see if the evaluator catches undefined variables """
+        variables = {'R1': 2.0, 'R3': 4.0}
 
         self.assertRaises(calc.UndefinedVariable, calc.evaluator,
                           {}, {}, "5+7 QWSEKO")
-
         self.assertRaises(calc.UndefinedVariable, calc.evaluator,
                           {'r1': 5}, {}, "r1+r2")
-
-        self.assertEqual(calc.evaluator(variables, functions, "r1*r3"), 8.0)
-
         self.assertRaises(calc.UndefinedVariable, calc.evaluator,
-                          variables, functions, "r1*r3", cs=True)
+                          variables, {}, "r1*r3", cs=True)
