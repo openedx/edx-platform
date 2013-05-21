@@ -3,7 +3,7 @@ unittests for calc.py
 
 Run like this:
 
-    rake test_common/lib/calc ??
+    rake test_common/lib/calc
 
 """
 
@@ -82,6 +82,8 @@ class EvaluatorTest(unittest.TestCase):
                 operator, input_str, answer)
             self.assertEqual(answer, result, msg=fail_msg)
 
+    def test_raises_zero_division_err(self):
+        ''' Ensure division by zero gives an error '''
         self.assertRaises(ZeroDivisionError, calc.evaluator,
                           {}, {}, '1/0')
 
@@ -98,6 +100,8 @@ class EvaluatorTest(unittest.TestCase):
         # I don't know why you would want this, but it works.
         self.assertEqual(calc.evaluator({}, {}, "j||1"), 0.5 + 0.5j)
 
+    def test_parallel_resistors_zero_error(self):
+        ''' Check the behavior of the || operator with 0 '''
         self.assertRaises(ZeroDivisionError, calc.evaluator,
                           {}, {}, '0||1')
 
@@ -121,7 +125,7 @@ class EvaluatorTest(unittest.TestCase):
         angles = ['-pi/4', '0', 'pi/6', 'pi/5', '5*pi/4', '9*pi/4', '1 + j']
         sin_values = [-0.707, 0, 0.5, 0.588, -0.707, 0.707, 1.298 + 0.635j]
         cos_values = [0.707, 1, 0.866, 0.809, -0.707, 0.707, 0.834 - 0.989j]
-        tan_values = [-1, 0, 0.577, 0.727, 1, 1, 0.762j, 0.272 + 1.084j]
+        tan_values = [-1, 0, 0.577, 0.727, 1, 1, 0.272 + 1.084j]
         # Cannot test tan(pi/2) b/c pi/2 is a float and not precise...
 
         self.assert_function_values('sin', angles, sin_values)
@@ -239,6 +243,9 @@ class EvaluatorTest(unittest.TestCase):
         variables = {'x': 9.72, 'y': 7.91, 'loooooong': 6.4}
 
         # Should not change value of constant
+        # even with different numbers of variables...
+        self.assertEqual(calc.evaluator({'x': 9.72}, {}, '13'), 13)
+        self.assertEqual(calc.evaluator({'x': 9.72, 'y': 7.91}, {}, '13'), 13)
         self.assertEqual(calc.evaluator(variables, {}, '13'), 13)
 
         # Easy evaluation
