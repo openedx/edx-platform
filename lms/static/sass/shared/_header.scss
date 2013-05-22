@@ -22,28 +22,6 @@ header.global {
     margin: -2px 39px 0px 0px;
     position: relative;
 
-    &::before {
-      @extend .faded-vertical-divider;
-      content: "";
-      display: block;
-      height: 50px;
-      position: absolute;
-      right: 1px;
-      top: -8px;
-      width: 1px;
-    }
-
-    &::after {
-      @extend .faded-vertical-divider-light;
-      content: "";
-      display: block;
-      height: 50px;
-      position: absolute;
-      right: 0px;
-      top: -12px;
-      width: 1px;
-    }
-
     a {
       display: block;
     }
@@ -76,8 +54,7 @@ header.global {
 
     li.secondary {
       > a {
-        color: $lighter-base-font-color;
-        color: $link-color
+        color: $link-color;
         display: block;
         font-family: $sans-serif;
         @include inline-block;
