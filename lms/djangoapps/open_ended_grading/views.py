@@ -103,13 +103,12 @@ def find_peer_grading_module(course):
 
     #Get the course id and split it
     course_id_parts = course.id.split("/")
-    false_dict = [False, "False", "false", "FALSE"]
     #TODO:  This will not work with multiple runs of a course.  Make it work.  The last key in the Location passed
     #to get_items is called revision.  Is this the same as run?
     #Get the peer grading modules currently in the course
     items = modulestore().get_items(['i4x', None, course_id_parts[1], 'peergrading', None])
     #See if any of the modules are centralized modules (ie display info from multiple problems)
-    items = [i for i in items if getattr(i,"use_for_single_location", True) in false_dict]
+    items = [i for i in items if not getattr(i,"use_for_single_location", True)]
     #Get the first one
     if len(items)>0:
         item_location = items[0].location
