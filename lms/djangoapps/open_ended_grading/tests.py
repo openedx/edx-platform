@@ -292,7 +292,9 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestPanel(LoginEnrollmentTestCase):
-    """Check the Table of Contents for a course"""
+    """
+    Run tests on the open ended panel
+    """
 
     def setUp(self):
         # Toy courses should be loaded
@@ -311,6 +313,10 @@ class TestPanel(LoginEnrollmentTestCase):
     @patch('xmodule.open_ended_grading_classes.controller_query_service.ControllerQueryService',
            controller_query_service.MockControllerQueryService)
     def test_problem_list(self):
+        """
+        Ensure that the problem list from the grading controller server can be rendered properly locally
+        @return:
+        """
         request = Mock(user=self.user)
         response = views.student_problem_list(request, self.course.id)
         self.assertTrue(isinstance(response, HttpResponse))
