@@ -21,6 +21,7 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from mitxmako.shortcuts import render_to_string
@@ -187,7 +188,7 @@ def student_problem_list(request, course_id):
             try:
                 #Try to load each problem in the courseware to get links to them
                 problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
-            except:
+            except ItemNotFoundError:
                 #If the problem cannot be found at the location received from the grading controller server, it has been deleted by the course author.
                 #Continue with the rest of the location to construct the list
                 error_message = "Could not find module for course {0} at location {1}".format(course.id, problem_list[i]['location'])
