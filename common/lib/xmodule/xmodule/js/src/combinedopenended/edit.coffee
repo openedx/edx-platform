@@ -2,11 +2,16 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
   @rubricTemplate : """
                     [rubric]
-                    + Ideas and Content
-                    - Difficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus
-                    - Attempts a main idea.  Sometimes loses focus or ineffectively displays focus
+                    + Ideas
+                    - Difficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.
+                    - Attempts a main idea.  Sometimes loses focus or ineffectively displays focus.
                     - Presents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.
                     - Presents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.
+                    + Content
+                    - Includes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.
+                    - Includes little information and few or no details.  Explores only one or two facets of the topic.
+                    - Includes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.
+                    - Includes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.
                     + Organization
                     - Ideas organized illogically, transitions weak, and response difficult to follow.
                     - Attempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.
@@ -22,7 +27,7 @@ class @OpenEndedMarkdownEditingDescriptor extends XModule.Descriptor
                     [rubric]
                     """
 
-  @tasksTemplate: "[tasks]\n(Self), ({3-9}AI), ({7-9}Peer)\n[tasks]\n"
+  @tasksTemplate: "[tasks]\n(Self), ({4-12}AI), ({9-12}Peer)\n[tasks]\n"
   @promptTemplate: """
                   [prompt]\n
                   <h3>Censorship in the Libraries</h3>
