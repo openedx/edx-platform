@@ -8,7 +8,7 @@ from .x_module import XModule
 from xblock.core import Integer, Scope, String, Boolean, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date, StringyFloat
+from .fields import Date, StringyFloat, StringyInteger, StringyBoolean
 
 log = logging.getLogger("mitx.courseware")
 
@@ -49,19 +49,19 @@ class VersionInteger(Integer):
 
 class CombinedOpenEndedFields(object):
     display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
-    current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.user_state)
+    current_task_number = StringyInteger(help="Current task that the student is on.", default=0, scope=Scope.user_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
     state = String(help="Which step within the current task that the student is on.", default="initial",
                    scope=Scope.user_state)
-    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
+    student_attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0,
                                scope=Scope.user_state)
-    ready_to_reset = Boolean(help="If the problem is ready to be reset or not.", default=False,
+    ready_to_reset = StringyBoolean(help="If the problem is ready to be reset or not.", default=False,
                              scope=Scope.user_state)
-    attempts = Integer(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
-    is_graded = Boolean(help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
-    accept_file_upload = Boolean(help="Whether or not the problem accepts file uploads.", default=False,
+    attempts = StringyInteger(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
+    is_graded = StringyBoolean(help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
+    accept_file_upload = StringyBoolean(help="Whether or not the problem accepts file uploads.", default=False,
                                  scope=Scope.settings)
-    skip_spelling_checks = Boolean(help="Whether or not to skip initial spelling checks.", default=True,
+    skip_spelling_checks = StringyBoolean(help="Whether or not to skip initial spelling checks.", default=True,
                                    scope=Scope.settings)
     due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
