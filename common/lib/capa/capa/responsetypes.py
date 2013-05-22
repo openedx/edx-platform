@@ -286,7 +286,7 @@ class LoncapaResponse(object):
             }
 
             try:
-                safe_exec.safe_exec(code, globals_dict)
+                safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'])
             except Exception as err:
                 msg = 'Error %s in evaluating hint function %s' % (err, hintfn)
                 msg += "\nSee XML source line %s" % getattr(
@@ -972,7 +972,7 @@ class CustomResponse(LoncapaResponse):
                             'ans': ans,
                         }
                         globals_dict.update(kwargs)
-                        safe_exec.safe_exec(code, globals_dict, cache=self.system.cache)
+                        safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'])
                         return globals_dict['cfn_return']
                     return check_function
 
