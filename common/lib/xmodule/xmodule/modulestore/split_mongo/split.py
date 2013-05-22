@@ -302,7 +302,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             descendants.
         raises InsufficientSpecificationError or ItemNotFoundError
         """
-        location = BlockUsageLocator.ensure_fully_specified(location)
+        assert isinstance(location, BlockUsageLocator) and location.is_initialized()
         course = self._lookup_course(location)
         items = self._load_items(course, [location.usage_id], depth, lazy=True)
         if len(items) == 0:
@@ -356,7 +356,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
         for parent_id, value in course['blocks'].iteritems():
             for child_id in value['children']:
                 if usage_id == child_id:
-                    items.append(BlockUsageLocator(locator, usage_id=parent_id))
+                    locator = locator.as_course_locator()
+                    items.append(BlockUsageLocator(url=locator, usage_id=parent_id))
         return items
 
     def get_course_index_info(self, course_locator):
@@ -457,7 +458,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         The block's history tracks its explicit changes; so, changes in descendants won't be reflected
         as new iterations.
         '''
-        block_locator = self._version_agnostic(block_locator)
+        block_locator = block_locator.version_agnostic()
         course_struct = self._lookup_course(block_locator)
         usage_id = block_locator.usage_id
         update_version_field = 'blocks.{}.update_version'.format(usage_id)
@@ -537,7 +538,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         # if this looks in cache rather than fresh fetches, then it will probably not detect
         # actual change b/c the descriptor and cache probably point to the same objects
-        old_definition = self.definitions.find_one({'_id': definition_locator.def_id})
+        old_definition = self.definitions.find_one({'_id': definition_locator.definition_id})
         if old_definition is None:
             raise ItemNotFoundError(definition_locator.url())
         del old_definition['_id']
@@ -546,7 +547,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             old_definition['data'] = new_def_data
             old_definition['edited_by'] = user_id
             old_definition['edited_on'] = datetime.datetime.utcnow()
-            old_definition['previous_version'] = definition_locator.def_id
+            old_definition['previous_version'] = definition_locator.definition_id
             new_id = self.definitions.insert(old_definition)
             return DescriptionLocator(new_id), True
         else:
@@ -629,7 +630,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         structure = self._lookup_course(course_or_parent_locator)
 
         # persist the definition if persisted != passed
-        if (definition_locator is None or definition_locator.def_id is None):
+        if (definition_locator is None or definition_locator.definition_id is None):
             definition_locator = self.create_definition_from_data(new_def_data, category, user_id)
         elif new_def_data is not None:
             definition_locator, _ = self.update_definition_from_data(definition_locator, new_def_data, user_id)
@@ -649,7 +650,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         new_structure['blocks'][new_usage_id] = {
             "children": [],
             "category": category,
-            "definition": definition_locator.def_id,
+            "definition": definition_locator.definition_id,
             "metadata": metadata if metadata else {},
             'edited_on': datetime.datetime.utcnow(),
             'edited_by': user_id,
@@ -663,9 +664,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # update the index entry if appropriate
         if index_entry is not None:
             self._update_head(index_entry, course_or_parent_locator.revision, new_id)
+            course_parent = course_or_parent_locator.as_course_locator()
+        else:
+            course_parent = None
 
         # fetch and return the new item--fetching is unnecessary but a good qc step
-        return self.get_item(BlockUsageLocator(course_or_parent_locator, usage_id=new_usage_id, version_guid=new_id))
+        return self.get_item(BlockUsageLocator(course_id=course_parent, 
+                                               usage_id=new_usage_id, 
+                                               version_guid=new_id))
 
     def create_course(self, org, prettyid, user_id, id_root=None, metadata=None, course_data=None,
         master_version='draft', versions_dict=None, root_category='course'):
@@ -822,7 +828,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             if descriptor.has_children:
                 block_data["children"] = [self._usage_id(child) for child in descriptor.children]
 
-            block_data["definition"] = descriptor.definition_locator.def_id
+            block_data["definition"] = descriptor.definition_locator.definition_id
             block_data["metadata"] = descriptor.xblock_kvs().get_own_metadata()
             block_data['edited_on'] = datetime.datetime.utcnow()
             block_data['edited_by'] = user_id
@@ -884,7 +890,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
     def _persist_subdag(self, xblock, user_id, structure_blocks):
         # persist the definition if persisted != passed
         new_def_data = xblock.xblock_kvs().get_data()
-        if (xblock.definition_locator is None or xblock.definition_locator.def_id is None):
+        if (xblock.definition_locator is None or xblock.definition_locator.definition_id is None):
             xblock.definition_locator = self.create_definition_from_data(new_def_data,
                 xblock.category, user_id)
             is_updated = True
@@ -924,7 +930,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             structure_blocks[usage_id] = {
                 "children": children,
                 "category": xblock.category,
-                "definition": xblock.definition_locator.def_id,
+                "definition": xblock.definition_locator.definition_id,
                 "metadata": metadata if metadata else {},
                 'previous_version': structure_blocks.get(usage_id, {}).get('update_version'),
                 'edited_by': user_id,
@@ -993,7 +999,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
         """
-        BlockUsageLocator.ensure_fully_specified(usage_locator)
+        assert isinstance(usage_locator, BlockUsageLocator) and usage_locator.is_initialized()
         original_structure = self._lookup_course(usage_locator)
         if original_structure['root'] == usage_locator.usage_id:
             raise ValueError("Cannot delete the root of a course")
@@ -1226,17 +1232,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 return True
         return False
 
-    def _version_agnostic(self, block_locator):
-        """
-        We don't care if the locator's version is not the current head; so, avoid version conflict
-        by reducing info.
-
-        :param block_locator:
-        """
-        if block_locator.course_id and block_locator.version_guid:
-            block_locator = BlockUsageLocator(block_locator)
-            block_locator.course_id = None
-        return block_locator
 
     def _update_head(self, index_entry, revision, new_id):
         """

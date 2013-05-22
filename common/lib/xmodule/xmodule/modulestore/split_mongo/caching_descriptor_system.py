@@ -83,7 +83,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             block_locator = BlockUsageLocator(
                 version_guid=self.course_entry['_id'],
                 usage_id=usage_id,
-                course_id=self.course_entry.get('course_id'), revision=self.course_entry.get('revision'))
+                course_id=self.course_entry.get('course_id'), 
+                revision=self.course_entry.get('revision')
+            )
             model_data = DbModel(kvs, class_, None,
                 SplitMongoKVSid(
                     # DbModel req's that these support .url()
@@ -99,6 +101,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             return module
         except:
             log.warning("Failed to load descriptor", exc_info=True)
+            if usage_id is None:
+                usage_id = "MISSING"
+
             return ErrorDescriptor.from_json(
                 json_data,
                 self,

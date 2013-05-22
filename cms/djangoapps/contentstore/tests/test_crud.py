@@ -110,8 +110,11 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(persisted_problem.data, test_def_content)
 
     def test_delete_course(self):
-        test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='doomed course',
-            display_name='doomed test course', user_id='testbot')
+        test_course = persistent_factories.PersistentCourseFactory.create(
+            org='testx', 
+            prettyid='edu.harvard.history.doomed',
+            display_name='doomed test course', 
+            user_id='testbot')
         persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
 
@@ -131,8 +134,11 @@ class TemplateTests(unittest.TestCase):
         """
         Test get_block_generations
         """
-        test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='history course',
-            display_name='history test course', user_id='testbot')
+        test_course = persistent_factories.PersistentCourseFactory.create(
+            org='testx', 
+            prettyid='edu.harvard.history.hist101',
+            display_name='history test course', 
+            user_id='testbot')
         chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location, user_id='testbot')
         sub = persistent_factories.ItemFactory.create(display_name='subsection 1',

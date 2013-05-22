@@ -22,4 +22,4 @@ class DefinitionLazyLoader(object):
         loader pointer with the result so as not to fetch more than once
         """
         return self.modulestore.definitions.find_one(
-            {'_id': self.definition_locator.def_id})
+            {'_id': self.definition_locator.definition_id})
