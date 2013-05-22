@@ -55,6 +55,9 @@ def perform_request(method, url, data_or_params=None, *args, **kwargs):
 
     if 200 < response.status_code < 500:
         raise CommentClientError(response.text)
+    # Heroku returns a 503 when an application is in maintenance mode
+    elif response.status_code == 503:
+        raise CommentClientMaintenanceError(response.text)
     elif response.status_code == 500:
         raise CommentClientUnknownError(response.text)
     else:
@@ -70,6 +73,10 @@ class CommentClientError(Exception):
 
     def __str__(self):
         return repr(self.message)
+
+
+class CommentClientMaintenanceError(CommentClientError):
+    pass
 
 
 class CommentClientUnknownError(CommentClientError):

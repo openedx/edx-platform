@@ -9,6 +9,11 @@ following domains to 127.0.0.1 in your /etc/hosts file:
 Note that OS X has a bug where using *.local domains is excruciatingly slow, so
 use *.dev domains instead for local testing.
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .dev import *
 
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = True

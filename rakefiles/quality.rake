@@ -1,3 +1,20 @@
+def run_pylint(system, report_dir, flags='')
+    apps = Dir["#{system}", "#{system}/djangoapps/*", "#{system}/lib/*"].map do |app|
+        File.basename(app)
+    end.select do |app|
+        app !=~ /.pyc$/
+    end.map do |app|
+        if app =~ /.py$/
+            app.gsub('.py', '')
+        else
+            app
+        end
+    end
+
+    pythonpath_prefix = "PYTHONPATH=#{system}:#{system}/djangoapps:#{system}/lib:common/djangoapps:common/lib"
+    sh("#{pythonpath_prefix} pylint #{flags} -f parseable #{apps.join(' ')} | tee #{report_dir}/pylint.report")
+end
+
 
 [:lms, :cms, :common].each do |system|
     report_dir = report_dir_path(system)
@@ -11,21 +28,18 @@
 
     desc "Run pylint on all #{system} code"
     task "pylint_#{system}" => [report_dir, :install_python_prereqs] do
-        apps = Dir["#{system}/*.py", "#{system}/djangoapps/*", "#{system}/lib/*"].map do |app|
-            File.basename(app)
-        end.select do |app|
-            app !=~ /.pyc$/
-        end.map do |app|
-            if app =~ /.py$/
-                app.gsub('.py', '')
-            else
-                app
-            end
-        end
-
-        pythonpath_prefix = "PYTHONPATH=#{system}:#{system}/djangoapps:#{system}/lib:common/djangoapps:common/lib"
-        sh("#{pythonpath_prefix} pylint --rcfile=.pylintrc -f parseable #{apps.join(' ')} | tee #{report_dir}/pylint.report")
+        run_pylint(system, report_dir)
     end
+    namespace "pylint_#{system}" do
+        desc "Run pylint checking for errors only, and aborting if there are any"
+        task :errors do
+            run_pylint(system, report_dir, '-E')
+        end
+    end
+    namespace :pylint do
+        task :errors => "pylint_#{system}:errors"
+    end
+
     task :pylint => "pylint_#{system}"
 
 end
