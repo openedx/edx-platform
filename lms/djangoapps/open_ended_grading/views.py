@@ -135,7 +135,11 @@ def peer_grading(request, course_id):
     found_module, problem_url = find_peer_grading_module(course)
     if not found_module:
         #This is a student_facing_error
-        error_message = "Error with initializing peer grading.  Centralized module does not exist.  Please contact course staff."
+        error_message = """
+        Error with initializing peer grading.
+        There has not been a peer grading module created in the courseware that would allow you to grade others.
+        Please check back later for this.
+        """
         #This is a dev_facing_error
         log.exception(error_message + "Current course is: {0}".format(course_id))
         return HttpResponse(error_message)
