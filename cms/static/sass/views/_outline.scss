@@ -29,6 +29,7 @@ body.course.outline {
           width: 100px;
 
           .status-label {
+            @include font-size(12);
             position: absolute;
             top: 2px;
             right: -5px;
@@ -38,7 +39,6 @@ body.course.outline {
             @include border-radius(3px);
             color: $lightGrey;
             text-align: right;
-            font-size: 12px;
             font-weight: bold;
             line-height: 16px;
           }
@@ -57,6 +57,10 @@ body.course.outline {
               }
 
               .menu {
+                @include font-size(12);
+                @include border-radius(4px);
+                @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
+                @include transition(opacity .15s);
                 z-index: 1;
                 display: none;
                 opacity: 0.0;
@@ -67,10 +71,6 @@ body.course.outline {
                 padding: 8px 12px;
                 background: $white;
                 border: 1px solid $mediumGrey;
-                font-size: 12px;
-                @include border-radius(4px);
-                @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
-                @include transition(opacity .15s);
 
 
                 li {
@@ -167,7 +167,7 @@ body.course.outline {
           text-align: right;
 
           .published-status {
-              font-size: 12px;
+              @include font-size(12);
               margin-right: 15px;
 
               strong {
@@ -185,19 +185,19 @@ body.course.outline {
 
           .schedule-button,
           .edit-button {
-              font-size: 11px;
+              @include font-size(11);
               padding: 3px 15px 5px;
           }
       }
 
       .datepair .date,
       .datepair .time {
+          @include font-size(13);
+          @include box-shadow(none);
           padding-left: 0;
           padding-right: 0;
           border: none;
           background: none;
-          @include box-shadow(none);
-          font-size: 13px;
           font-weight: bold;
           color: $blue;
           cursor: pointer;
@@ -231,10 +231,10 @@ body.course.outline {
               @include clearfix();
 
               .section-name {
+                @include font-size(19);
                 float: left;
                 margin-right: 10px;
                 width: 350px;
-                font-size: 19px;
                 font-weight: bold;
                 color: $blue;
               }
@@ -254,9 +254,9 @@ body.course.outline {
                 background: $white;
 
                 input {
-              font-size: 16px;        
+                @include font-size(16);
             }
-                              
+
             .save-button {
               @include blue-button;
               padding: 7px 20px 7px;
@@ -275,7 +275,7 @@ body.course.outline {
             background: $lightGrey;
 
             .published-status {
-              font-size: 12px;
+              @include font-size(12);
               margin-right: 15px;
 
               strong {
@@ -293,9 +293,8 @@ body.course.outline {
 
             .schedule-button,
             .edit-button {
-              font-size: 11px;
-              padding: 3px 15px 5px;
-             
+              @include font-size(11);
+              padding: 0 15px 2px 15px;
               }
             }
 
@@ -306,17 +305,17 @@ body.course.outline {
               width: 145px;
 
               .status-label {
+                @include font-size(12);
+                @include border-radius(3px);
                 position: absolute;
                 top: 0;
                 right: 2px;
                 display: none;
                 width: 100px;
                 padding: 10px 35px 10px 10px;
-                @include border-radius(3px);
                 background: $lightGrey;
                 color: $lightGrey;
                 text-align: right;
-                font-size: 12px;
                 font-weight: bold;
                 line-height: 16px;
               }
@@ -335,6 +334,11 @@ body.course.outline {
               }
 
               .menu {
+                @include font-size(12);
+                @include border-radius(4px);
+                @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
+                @include transition(opacity .15s);
+                @include transition(display .15s);
                 z-index: 1;
                 display: none;
                 opacity: 0.0;
@@ -345,11 +349,7 @@ body.course.outline {
                 padding: 8px 12px;
                 background: $white;
                 border: 1px solid $mediumGrey;
-                font-size: 12px;
-                @include border-radius(4px);
-                @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
-                @include transition(opacity .15s);
-                @include transition(display .15s);
+
 
 
                 li {
@@ -410,7 +410,7 @@ body.course.outline {
         }
       }
 
-          .item-actions {         
+          .item-actions {
               margin-top: 21px;
               margin-right: 12px;
 
@@ -422,7 +422,7 @@ body.course.outline {
 
           .expand-collapse-icon {
               float: left;
-              margin: 29px 6px 16px 16px;
+              margin: 25px 6px 16px 16px;
               @include transition(none);
 
               &.expand {
@@ -430,7 +430,7 @@ body.course.outline {
               }
 
               &.collapsed {
-                  
+
               }
           }
 
@@ -440,7 +440,7 @@ body.course.outline {
       }
 
       h3 {
-          font-size: 19px;
+          @include font-size(19);
           font-weight: 700;
           color: $blue;
       }
@@ -460,9 +460,9 @@ body.course.outline {
 
       .section-name-edit {
           input {
-              font-size: 16px;
+            @include font-size(16);
           }
-          
+
           .save-button {
               @include blue-button;
               padding: 7px 20px 7px;
@@ -476,7 +476,7 @@ body.course.outline {
       }
 
       h4 {
-          font-size: 12px;
+          @include font-size(12);
           color: #878e9d;
 
           strong {
@@ -502,8 +502,8 @@ body.course.outline {
       &.new-section {
 
           header {
-              height: auto;
               @include clearfix();
+              height: auto;
           }
 
           .expand-collapse-icon {
@@ -522,12 +522,11 @@ body.course.outline {
   }
 
   .toggle-button-sections {
+      @include font-size(12);
       display: none;
       position: relative;
       float: right;
-      margin-top: 10px;
-
-      font-size: 13px;
+      margin-top: ($baseline/4);
       color: $darkGrey;
 
       &.is-shown {
@@ -535,13 +534,13 @@ body.course.outline {
       }
 
       .ss-icon {
+          @include font-size(11);
           @include border-radius(20px);
           position: relative;
           top: -1px;
           display: inline-block;
           margin-right: 2px;
           line-height: 5px;
-          font-size: 11px;
       }
 
       .label {
@@ -599,7 +598,7 @@ body.course.outline {
       }
 
       h3 {
-          font-size: 34px;
+          @include font-size(34);
           font-weight: 300;
       }
 
@@ -625,16 +624,16 @@ body.course.outline {
             }
 
             label {
-              @include font-size(14);
+              @extend .t-copy-sub1;
               margin-bottom: ($baseline/4);
             }
           }
       }
 
       .description {
+          @include font-size(14);
           float: left;
           margin-top: 30px;
-          font-size: 14px;
           line-height: 20px;
           width: 100%;
       }
@@ -645,7 +644,7 @@ body.course.outline {
 
       .start-date,
       .start-time {
-          font-size: 19px;
+          @include font-size(19);
       }
 
       .save-button {
@@ -659,14 +658,14 @@ body.course.outline {
 
       .save-button,
       .cancel-button {
-          font-size: 16px;
+        @include font-size(16);
       }
   }
 
   .collapse-all-button {
+      @include font-size(13);
       float: right;
       margin-top: 10px;
-      font-size: 13px;
       color: $darkGrey;
   }
 
@@ -686,7 +685,7 @@ body.course.outline {
       border: 1px solid $darkGrey;
       opacity : 0.2;
       &:hover {
-          opacity : 1.0;    
+          opacity : 1.0;
           .section-item {
               background: $yellow !important;
           }

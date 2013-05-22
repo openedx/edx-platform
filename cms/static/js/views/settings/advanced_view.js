@@ -155,6 +155,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         self.model.clear({silent : true});
         self.model.fetch({
             success : function() { self.render(); },
+            reset: true,
             error : CMS.ServerError
         });
     },

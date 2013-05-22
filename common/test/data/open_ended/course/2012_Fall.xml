@@ -1,0 +1,7 @@
+<course>
+  <chapter url_name="Overview">
+    <combinedopenended url_name="SampleQuestion"/>
+    <peergrading url_name="PeerGradingSample"/>
+    <peergrading url_name="PeerGradingScored"/>
+  </chapter>
+</course>

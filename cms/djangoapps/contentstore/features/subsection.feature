@@ -3,14 +3,12 @@ Feature: Create Subsection
   As a course author
   I want to create and edit subsections
 
-  @skip-phantom
   Scenario: Add a new subsection to a section
     Given I have opened a new course section in Studio
     When I click the New Subsection link
     And I enter the subsection name and click save
     Then I see my subsection on the Courseware page
 
-  @skip-phantom
   Scenario: Add a new subsection (with a name containing a quote) to a section (bug #216)
     Given I have opened a new course section in Studio
     When I click the New Subsection link
@@ -27,7 +25,6 @@ Feature: Create Subsection
     And I reload the page
     Then I see it marked as Homework
 
-  @skip-phantom
   Scenario: Set a due date in a different year (bug #256)
     Given I have opened a new subsection in Studio
     And I have set a release date and due date in different years
@@ -35,7 +32,8 @@ Feature: Create Subsection
     And I reload the page
     Then I see the correct dates
 
-  @skip-phantom
+  # Skipped because Ubuntu ChromeDriver hangs on alert
+  @skip
   Scenario: Delete a subsection
     Given I have opened a new course section in Studio
     And I have added a new subsection

@@ -18,10 +18,10 @@
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
-    <div class="title">
-      <span class="title-sub">Course Content</span>
-      <h1 class="title-1">Static Pages</h1>
-    </div>
+    <h1 class="page-header">
+      <small class="subtitle">Course Content</small>
+      <span class="sr">&gt; </span>Static Pages
+    </h1>
 
     <nav class="nav-actions">
       <h3 class="sr">Page Actions</h3>
@@ -52,17 +52,17 @@
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <article class="unit-body">
-      
+
       <div class="tab-list">
         <ol class='components'>
           % for id in components:
           <li class="component" data-id="${id}"/>
           % endfor
-                   
+
           <li class="new-component-item">
-            
+
           </li>
-        </ol>      
+        </ol>
       </div>
     </article>
   </div>

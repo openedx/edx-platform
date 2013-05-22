@@ -2,7 +2,8 @@
 # File:   courseware/capa/responsetypes.py
 #
 '''
-Problem response evaluation.  Handles checking of student responses, of a variety of types.
+Problem response evaluation.  Handles checking of student responses,
+of a variety of types.
 
 Used by capa_problem.py
 '''
@@ -35,7 +36,7 @@ from datetime import datetime
 from .util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
-import xqueue_interface
+import capa.xqueue_interface as xqueue_interface
 
 log = logging.getLogger(__name__)
 
@@ -300,7 +301,7 @@ class LoncapaResponse(object):
                     # response
                     aid = self.answer_ids[-1]
                     new_cmap.set_hint_and_mode(aid, hint_text, hintmode)
-            log.debug('after hint: new_cmap = %s' % new_cmap)
+            log.debug('after hint: new_cmap = %s', new_cmap)
 
     @abc.abstractmethod
     def get_score(self, student_answers):
@@ -790,6 +791,10 @@ class OptionResponse(LoncapaResponse):
 
 
 class NumericalResponse(LoncapaResponse):
+    '''
+    This response type expects a number or formulaic expression that evaluates
+    to a number (e.g. `4+5/2^2`), and accepts with a tolerance.
+    '''
 
     response_tag = 'numericalresponse'
     hint_tag = 'numericalhint'
@@ -806,12 +811,12 @@ class NumericalResponse(LoncapaResponse):
                 '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
                 id=xml.get('id'))[0]
             self.tolerance = contextualize_text(self.tolerance_xml, context)
-        except Exception:
+        except IndexError:  # xpath found an empty list, so (...)[0] is the error
             self.tolerance = '0'
         try:
             self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                        id=xml.get('id'))[0]
-        except Exception:
+        except IndexError:  # Same as above
             self.answer_id = None
 
     def get_score(self, student_answers):
@@ -836,7 +841,6 @@ class NumericalResponse(LoncapaResponse):
         except:
             # Use the traceback-preserving version of re-raising with a
             # different type
-            import sys
             type, value, traceback = sys.exc_info()
 
             raise StudentInputError, ("Could not interpret '%s' as a number" %
@@ -1869,8 +1873,6 @@ class FormulaResponse(LoncapaResponse):
                 log.debug('formularesponse: error %s in formula' % err)
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
                                         cgi.escape(given))
-            if numpy.isnan(student_result) or numpy.isinf(student_result):
-                return "incorrect"
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
                 return "incorrect"
         return "correct"

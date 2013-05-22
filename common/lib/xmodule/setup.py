@@ -52,6 +52,7 @@ setup(
             "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
             "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
             "foldit = xmodule.foldit_module:FolditDescriptor",
+            "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
             "hidden = xmodule.hidden_module:HiddenDescriptor",
             "raw = xmodule.raw_module:RawDescriptor",
         ],

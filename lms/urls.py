@@ -61,10 +61,12 @@ urlpatterns = ('',  # nopep8
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
+    ##
+    ## Only universities without courses should be included here.  If
+    ## courses exist, the dynamic profile rule below should win.
+    ##
     url(r'^(?i)university_profile/WellesleyX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
-    url(r'^(?i)university_profile/GeorgetownX$', 'courseware.views.static_university_profile',
-        name="static_university_profile", kwargs={'org_id': 'GeorgetownX'}),
     url(r'^(?i)university_profile/McGillX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'McGillX'}),
     url(r'^(?i)university_profile/TorontoX$', 'courseware.views.static_university_profile',
@@ -73,8 +75,6 @@ urlpatterns = ('',  # nopep8
         name="static_university_profile", kwargs={'org_id': 'RiceX'}),
     url(r'^(?i)university_profile/ANUx$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'ANUx'}),
-    url(r'^(?i)university_profile/DelftX$', 'courseware.views.static_university_profile',
-        name="static_university_profile", kwargs={'org_id': 'DelftX'}),
     url(r'^(?i)university_profile/EPFLx$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'EPFLx'}),
 
@@ -283,6 +283,10 @@ if settings.COURSEWARE_ENABLED:
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
             'open_ended_grading.views.peer_grading', name='peer_grading'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/notes$', 'notes.views.notes', name='notes'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/notes/', include('notes.urls')),
+
     )
 
     # allow course staff to change to student view of courseware

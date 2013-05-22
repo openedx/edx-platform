@@ -12,7 +12,7 @@ body.signup, body.signin {
 
   .content {
     @include clearfix();
-    @include font-size(16);
+    @extend .t-copy-base;
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
@@ -26,14 +26,14 @@ body.signup, body.signin {
       padding-bottom: ($baseline/2);
 
       h1 {
-        @include font-size(32);
+        @extend .t-title3;
         margin: 0;
         padding: 0;
         font-weight: 600;
       }
 
       .action {
-        @include font-size(13);
+        @extend .t-action3;
         position: absolute;
         right: 0;
         top: 40%;
@@ -41,7 +41,7 @@ body.signup, body.signin {
     }
 
     .introduction {
-      @include font-size(14);
+      @extend .t-copy-sub1;
       margin: 0 0 $baseline 0;
     }
   }
@@ -69,8 +69,8 @@ body.signup, body.signin {
 
         .action-primary {
           @include blue-button;
+          @extend .t-action2;
           @include transition(all .15s);
-          @include font-size(15);
           display: block;
           width: 100%;
           padding: ($baseline*0.75) ($baseline/2);
@@ -108,7 +108,7 @@ body.signup, body.signin {
           }
 
           label {
-            @include font-size(14);
+            @extend  .t-copy-sub1;
             @include transition(color, 0.15s, ease-in-out);
             margin: 0 0 ($baseline/4) 0;
 
@@ -118,7 +118,7 @@ body.signup, body.signin {
           }
 
           input, textarea {
-            @include font-size(16);
+            @extend .t-copy-base;
             height: 100%;
             width: 100%;
             padding: ($baseline/2);
@@ -171,8 +171,8 @@ body.signup, body.signin {
           }
 
           .tip {
+            @extend .t-copy-sub2;
             @include transition(color, 0.15s, ease-in-out);
-            @include font-size(13);
             display: block;
             margin-top: ($baseline/4);
             color: $gray-l3;
@@ -212,7 +212,7 @@ body.signup, body.signin {
     width: flex-grid(4, 12);
 
     .bit {
-      @include font-size(13);
+      @extend .t-copy-sub1;
       margin: 0 0 $baseline 0;
       border-bottom: 1px solid $gray-l4;
       padding: 0 0 $baseline 0;
@@ -225,7 +225,7 @@ body.signup, body.signin {
       }
 
       h3 {
-        @include font-size(14);
+        @extend .t-title7;
         margin: 0 0 ($baseline/4) 0;
         color: $gray-d2;
         font-weight: 600;
@@ -245,7 +245,7 @@ body.signup, body.signin {
     position: relative;
 
     .action-forgotpassword {
-      @include font-size(13);
+      @extend .t-action3;
       position: absolute;
       top: 0;
       right: 0;
@@ -257,7 +257,7 @@ body.signup, body.signin {
 
 // messages
 .message {
-  @include font-size(14);
+  @extend .t-copy-sub1;
   display: block;
 }
 

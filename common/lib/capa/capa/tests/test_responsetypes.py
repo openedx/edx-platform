@@ -438,6 +438,43 @@ class FormulaResponseTest(ResponseTest):
             self.assert_grade(problem, incorrect, 'incorrect',
                               msg="Failed on function {0}; the given, incorrect answer was {1} but graded 'correct'".format(func, incorrect))
 
+    def test_grade_infinity(self):
+        # This resolves a bug where a problem with relative tolerance would
+        # pass with any arbitrarily large student answer.
+
+        sample_dict = {'x': (1, 2)}
+
+        # Test problem
+        problem = self.build_problem(sample_dict=sample_dict,
+                                     num_samples=10,
+                                     tolerance="1%",
+                                     answer="x")
+        # Expect such a large answer to be marked incorrect
+        input_formula = "x*1e999"
+        self.assert_grade(problem, input_formula, "incorrect")
+        # Expect such a large negative answer to be marked incorrect
+        input_formula = "-x*1e999"
+        self.assert_grade(problem, input_formula, "incorrect")
+
+    def test_grade_nan(self):
+        # Attempt to produce a value which causes the student's answer to be
+        # evaluated to nan. See if this is resolved correctly.
+
+        sample_dict = {'x': (1, 2)}
+
+        # Test problem
+        problem = self.build_problem(sample_dict=sample_dict,
+                                     num_samples=10,
+                                     tolerance="1%",
+                                     answer="x")
+        # Expect an incorrect answer (+ nan) to be marked incorrect
+        # Right now this evaluates to 'nan' for a given x (Python implementation-dependent)
+        input_formula = "10*x + 0*1e999"
+        self.assert_grade(problem, input_formula, "incorrect")
+        # Expect an correct answer (+ nan) to be marked incorrect
+        input_formula = "x + 0*1e999"
+        self.assert_grade(problem, input_formula, "incorrect")
+
 
 class StringResponseTest(ResponseTest):
     from response_xml_factory import StringResponseXMLFactory
@@ -671,7 +708,7 @@ class JavascriptResponseTest(ResponseTest):
     def test_grade(self):
         # Compile coffee files into javascript used by the response
         coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
-        os.system("coffee -c %s" % (coffee_file_path))
+        os.system("node_modules/.bin/coffee -c %s" % (coffee_file_path))
 
         problem = self.build_problem(generator_src="test_problem_generator.js",
                                      grader_src="test_problem_grader.js",
@@ -712,6 +749,30 @@ class NumericalResponseTest(ResponseTest):
                                      tolerance="10%")
         correct_responses = ["4.0", "4.3", "3.7", "4.30", "3.70"]
         incorrect_responses = ["", "4.5", "3.5", "0"]
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
+    def test_grade_infinity(self):
+        # This resolves a bug where a problem with relative tolerance would
+        # pass with any arbitrarily large student answer.
+        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
+                                     explanation="The answer is 4",
+                                     answer=4,
+                                     tolerance="10%")
+        correct_responses = []
+        incorrect_responses = ["1e999", "-1e999"]
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
+    def test_grade_nan(self):
+        # Attempt to produce a value which causes the student's answer to be
+        # evaluated to nan. See if this is resolved correctly.
+        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
+                                     explanation="The answer is 4",
+                                     answer=4,
+                                     tolerance="10%")
+        correct_responses = []
+        # Right now these evaluate to `nan`
+        # `4 + nan` should be incorrect
+        incorrect_responses = ["0*1e999", "4 + 0*1e999"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_with_script(self):

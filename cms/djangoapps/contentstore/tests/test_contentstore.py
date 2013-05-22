@@ -220,6 +220,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 1)
 
+    def test_import_textbook_as_content_element(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        module_store = modulestore('direct')
+        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        self.assertGreater(len(course.textbooks), 0)
+
     def test_static_tab_reordering(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
@@ -292,7 +300,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)
-
 
     def test_about_overrides(self):
         '''
@@ -490,6 +497,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertTrue(getattr(test_private_vertical, 'is_draft', False))
 
+        # make sure the textbook survived the export/import
+        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        self.assertGreater(len(course.textbooks), 0)
+
         shutil.rmtree(root_dir)
 
     def test_course_handouts_rewrites(self):
@@ -634,7 +646,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.get(reverse('index'))
         self.assertContains(
             resp,
-            '<h1 class="title-1">My Courses</h1>',
+            '<h1 class="page-header">My Courses</h1>',
             status_code=200,
             html=True
         )
