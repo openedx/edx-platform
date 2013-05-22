@@ -72,6 +72,7 @@ MITX_FEATURES = {
 
     'ENABLE_PSYCHOMETRICS': False,  	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
+    'ENABLE_DJANGO_ADMIN_SITE': False,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
