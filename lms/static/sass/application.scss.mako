@@ -45,7 +45,7 @@
 ## called themes/<theme-name>/, with its base Sass file in
 ## themes/<theme-name>/static/sass/_<theme-name>.scss. That one entry
 ## point can be used to @import in as many other things as needed.
-% if not env['THEME_NAME'] is None:
+% if not env.get('THEME_NAME') is None:
   // import theme's Sass overrides
-  @import '${env['THEME_NAME']}'
+  @import '${env.get('THEME_NAME')}'
 % endif
