@@ -105,7 +105,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var targetModel = this.eventModel(event);
         targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change
-        targetModel.save({}, {error : CMS.ServerError});
+        targetModel.save({});
         this.closeEditor(this);
 
         analytics.track('Saved Course Update', {
@@ -166,11 +166,9 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
                     success: function() {
                         cacheThis.render();
                     },
-                    reset: true,
-                    error: CMS.ServerError
+                    reset: true
                 });
-            },
-            error : CMS.ServerError
+            }
         });
     },
 
@@ -254,8 +252,7 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
                     }
                 );
             },
-            reset: true,
-            error: CMS.ServerError
+            reset: true
         });
     },
 
@@ -296,7 +293,7 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     onSave: function(event) {
         this.model.set('data', this.$codeMirror.getValue());
         this.render();
-        this.model.save({}, {error: CMS.ServerError});
+        this.model.save({});
         this.$form.hide();
         this.closeEditor(this);
 

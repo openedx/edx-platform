@@ -3,7 +3,6 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     // decorates the fields. Needs wiring per class, but this initialization shows how
     // either have your init call this one or copy the contents
     initialize : function() {
-        this.listenTo(this.model, 'error', CMS.ServerError);
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
     },

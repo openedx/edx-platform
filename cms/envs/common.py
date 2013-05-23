@@ -221,7 +221,9 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.js') +
             rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.js')
-        ) + ['js/hesitate.js', 'js/base.js'],
+        ) + ['js/hesitate.js', 'js/base.js',
+             'js/models/feedback.js', 'js/views/feedback.js',
+             'js/models/section.js', 'js/views/section.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
     },
