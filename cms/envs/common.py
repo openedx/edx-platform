@@ -41,6 +41,7 @@ MITX_FEATURES = {
 
     # Enable URL that shows information about the status of variuous services
     'ENABLE_SERVICE_STATUS': False,
+    'PREVIEW_LMS_BASE' : None
 }
 ENABLE_JASMINE = False
 
