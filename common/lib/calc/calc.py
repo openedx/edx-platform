@@ -144,6 +144,8 @@ def evaluator(variables, functions, string, cs=False):
         return x
 
     def parallel(x):  # Parallel resistors [ 1 2 ] => 2/3
+        # convert from pyparsing.ParseResults, which doesn't support '0 in x'
+        x = list(x)
         if len(x) == 1:
             return x[0]
         if 0 in x:

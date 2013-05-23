@@ -92,6 +92,10 @@ class EvaluatorTest(unittest.TestCase):
         """
         self.assertRaises(ZeroDivisionError, calc.evaluator,
                           {}, {}, '1/0')
+        self.assertRaises(ZeroDivisionError, calc.evaluator,
+                          {}, {}, '1/0.0')
+        self.assertRaises(ZeroDivisionError, calc.evaluator,
+                          {'x': 0.0}, {}, '1/x')
 
     def test_parallel_resistors(self):
         """
@@ -107,12 +111,13 @@ class EvaluatorTest(unittest.TestCase):
         self.assertEqual(calc.evaluator({}, {}, '1||1||2'), 0.4)
         self.assertEqual(calc.evaluator({}, {}, "j||1"), 0.5 + 0.5j)
 
-    def test_parallel_resistors_zero_error(self):
+    def test_parallel_resistors_with_zero(self):
         """
         Check the behavior of the || operator with 0
         """
-        self.assertRaises(ZeroDivisionError, calc.evaluator,
-                          {}, {}, '0||1')
+        self.assertTrue(numpy.isnan(calc.evaluator({}, {}, '0||1')))
+        self.assertTrue(numpy.isnan(calc.evaluator({}, {}, '0.0||1')))
+        self.assertTrue(numpy.isnan(calc.evaluator({'x': 0.0}, {}, 'x||1')))
 
     def assert_function_values(self, fname, ins, outs, tolerance=1e-3):
         """

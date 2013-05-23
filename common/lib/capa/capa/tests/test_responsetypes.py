@@ -10,7 +10,6 @@ import random
 import unittest
 import textwrap
 import mock
-import textwrap
 
 from . import new_loncapa_problem, test_system
 
