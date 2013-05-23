@@ -9,7 +9,7 @@ import json
 class Note(models.Model):
     user = models.ForeignKey(User, db_index=True)
     course_id = models.CharField(max_length=255, db_index=True)
-    uri = models.CharField(max_length=512, db_index=True)
+    uri = models.CharField(max_length=255, db_index=True)
     text = models.TextField(default="")
     quote = models.TextField(default="")
     range_start = models.CharField(max_length=2048)  # xpath string

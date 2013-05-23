@@ -8,6 +8,10 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 import socket
 
 if 'eecs1' in socket.gethostname():
