@@ -20,7 +20,6 @@ from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
-
 import xmodule.graders as xmgraders
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -721,7 +720,10 @@ def instructor_dashboard(request, course_id):
         msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
 
     # generate list of pending background tasks
-    course_tasks = task_queue.get_running_course_tasks(course_id)
+    if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
+        course_tasks = task_queue.get_running_course_tasks(course_id)
+    else:
+        course_tasks = None
 
     #----------------------------------------
     # context for rendering
@@ -1211,11 +1213,11 @@ def get_answers_distribution(request, course_id):
 
 
 def compute_course_stats(course):
-    '''
+    """
     Compute course statistics, including number of problems, videos, html.
 
     course is a CourseDescriptor from the xmodule system.
-    '''
+    """
 
     # walk the course by using get_children() until we come to the leaves; count the
     # number of different leaf types
@@ -1235,10 +1237,10 @@ def compute_course_stats(course):
 
 
 def dump_grading_context(course):
-    '''
+    """
     Dump information about course grading context (eg which problems are graded in what assignments)
     Very useful for debugging grading_policy.json and policy.json
-    '''
+    """
     msg = "-----------------------------------------------------------------------------\n"
     msg += "Course grader:\n"
 
@@ -1262,10 +1264,10 @@ def dump_grading_context(course):
         msg += "--> Section %s:\n" % (gs)
         for sec in gsvals:
             s = sec['section_descriptor']
-            format = getattr(s.lms, 'format', None)
+            grade_format = getattr(s.lms, 'grade_format', None)
             aname = ''
-            if format in graders:
-                g = graders[format]
+            if grade_format in graders:
+                g = graders[grade_format]
                 aname = '%s %02d' % (g.short_label, g.index)
                 g.index += 1
             elif s.display_name in graders:
@@ -1274,7 +1276,7 @@ def dump_grading_context(course):
             notes = ''
             if getattr(s, 'score_by_attempt', False):
                 notes = ', score by attempt!'
-            msg += "      %s (format=%s, Assignment=%s%s)\n" % (s.display_name, format, aname, notes)
+            msg += "      %s (grade_format=%s, Assignment=%s%s)\n" % (s.display_name, grade_format, aname, notes)
     msg += "all descriptors:\n"
     msg += "length=%d\n" % len(gc['all_descriptors'])
     msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')
@@ -1282,6 +1284,16 @@ def dump_grading_context(course):
 
 
 def get_background_task_table(course_id, problem_url, student=None):
+    """
+    Construct the "datatable" structure to represent background task history.
+
+    Filters the background task history to the specified course and problem.
+    If a student is provided, filters to only those tasks for which that student 
+    was specified.
+
+    Returns a tuple of (msg, datatable), where the msg is a possible error message,
+    and the datatable is the datatable to be used for display.
+    """
     course_tasks = CourseTaskLog.objects.filter(course_id=course_id, task_args=problem_url)
     if student is not None:
         course_tasks = course_tasks.filter(student=student)
@@ -1292,7 +1304,7 @@ def get_background_task_table(course_id, problem_url, student=None):
     # first check to see if there is any history at all
     # (note that we don't have to check that the arguments are valid; it
     # just won't find any entries.)
-    if (len(history_entries)) == 0:
+    if (history_entries.count()) == 0:
         if student is not None:
             log.debug("Found no background tasks for request: {course}, {problem}, and student {student}".format(course=course_id, problem=problem_url, student=student.username))
             template = '<font color="red">Failed to find any background tasks for course "{course}", module "{problem}" and student "{student}".</font>'

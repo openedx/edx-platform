@@ -122,7 +122,10 @@ MITX_FEATURES = {
     'USE_CUSTOM_THEME': False,
 
     # Do autoplay videos for students
-    'AUTOPLAY_VIDEOS': True
+    'AUTOPLAY_VIDEOS': True,
+
+    # Enable instructor dash to submit course-level background tasks
+    'ENABLE_COURSE_BACKGROUND_TASKS': True,
 }
 
 # Used for A/B testing
