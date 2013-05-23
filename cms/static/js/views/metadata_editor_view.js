@@ -235,6 +235,7 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
             value = this.min;
         }
         this.setValueInEditor(value);
+        this.updateModel();
     }
 
 });
