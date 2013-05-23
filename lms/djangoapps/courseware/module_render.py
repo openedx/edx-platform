@@ -183,6 +183,10 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
 
     See get_module() docstring for further details.
     """
+    # allow course staff to masquerade as student
+    if has_access(user, descriptor, 'staff', course_id):
+        setup_masquerade(request, True)
+
     track_function = make_track_function(request)
     xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(request)
 
@@ -201,10 +205,6 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
 
     See get_module() docstring for further details.
     """
-
-    # allow course staff to masquerade as student
-    if has_access(user, descriptor, 'staff', course_id):
-        setup_masquerade(request, True)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load', course_id):

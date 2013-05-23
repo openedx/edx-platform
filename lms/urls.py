@@ -58,7 +58,7 @@ urlpatterns = ('',  # nopep8
         name='auth_password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
-    url(r'^course_task_log_status/$', 'courseware.tasks.course_task_log_status', name='course_task_log_status'),
+    url(r'^course_task_log_status/$', 'courseware.task_queue.course_task_log_status', name='course_task_log_status'),
 )
 
 # University profiles only make sense in the default edX context
