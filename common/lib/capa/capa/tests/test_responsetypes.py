@@ -190,7 +190,7 @@ class SymbolicResponseTest(ResponseTest):
 
     def test_grade_single_input(self):
         problem = self.build_problem(math_display=True,
-                                    expect="2*x+3*y")
+                                     expect="2*x+3*y")
 
         # Correct answers
         correct_inputs = [
@@ -348,13 +348,18 @@ class OptionResponseTest(ResponseTest):
 
 
 class FormulaResponseTest(ResponseTest):
-    """ Test the FormulaResponse class """
+    """
+    Test the FormulaResponse class
+    """
     from response_xml_factory import FormulaResponseXMLFactory
     xml_factory_class = FormulaResponseXMLFactory
 
     def test_grade(self):
-        """ Test basic functionality of FormulaResponse
-        Specifically, if it can understand equivalence of formulae"""
+        """
+        Test basic functionality of FormulaResponse
+
+        Specifically, if it can understand equivalence of formulae
+        """
         # Sample variables x and y in the range [-10, 10]
         sample_dict = {'x': (-10, 10), 'y': (-10, 10)}
 
@@ -375,7 +380,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_hint(self):
-        """ Test the hint-giving functionality of FormulaResponse"""
+        """
+        Test the hint-giving functionality of FormulaResponse
+        """
         # Sample variables x and y in the range [-10, 10]
         sample_dict = {'x': (-10, 10), 'y': (-10, 10)}
 
@@ -404,7 +411,9 @@ class FormulaResponseTest(ResponseTest):
                           'Try including the variable x')
 
     def test_script(self):
-        """ Test if python script can be used to generate answers"""
+        """
+        Test if python script can be used to generate answers
+        """
 
         # Calculate the answer using a script
         script = "calculated_ans = 'x+x'"
@@ -424,7 +433,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, '3*x', 'incorrect')
 
     def test_parallel_resistors(self):
-        """Test parallel resistors"""
+        """
+        Test parallel resistors
+        """
         sample_dict = {'R1': (10, 10), 'R2': (2, 2), 'R3': (5, 5), 'R4': (1, 1)}
 
         # Test problem
@@ -445,8 +456,11 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_default_variables(self):
-        """Test the default variables provided in common/lib/capa/capa/calc.py"""
-        # which are: j (complex number), e, pi, k, c, T, q
+        """
+        Test the default variables provided in calc.py
+
+        which are: j (complex number), e, pi, k, c, T, q
+        """
 
         # Sample x in the range [-10,10]
         sample_dict = {'x': (-10, 10)}
@@ -469,11 +483,14 @@ class FormulaResponseTest(ResponseTest):
                               msg="Failed on variable {0}; the given, incorrect answer was {1} but graded 'correct'".format(var, incorrect))
 
     def test_default_functions(self):
-        """Test the default functions provided in common/lib/capa/capa/calc.py"""
-        # which are: sin, cos, tan, sqrt, log10, log2, ln,
-        # arccos, arcsin, arctan, abs,
-        # fact, factorial
+        """
+        Test the default functions provided in common/lib/capa/capa/calc.py
 
+        which are:
+          sin, cos, tan, sqrt, log10, log2, ln,
+          arccos, arcsin, arctan, abs,
+          fact, factorial
+        """
         w = random.randint(3, 10)
         sample_dict = {'x': (-10, 10),  # Sample x in the range [-10,10]
                        'y': (1, 10),    # Sample y in the range [1,10] - logs, arccos need positive inputs
@@ -501,8 +518,10 @@ class FormulaResponseTest(ResponseTest):
                               msg="Failed on function {0}; the given, incorrect answer was {1} but graded 'correct'".format(func, incorrect))
 
     def test_grade_infinity(self):
-        """This resolves a bug where a problem with relative tolerance would
-        pass with any arbitrarily large student answer"""
+        """
+        Test that a large input on a problem with relative tolerance isn't
+        erroneously marked as correct.
+        """
 
         sample_dict = {'x': (1, 2)}
 
@@ -519,8 +538,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_grade_nan(self):
-        """Attempt to produce a value which causes the student's answer to be
-        evaluated to nan. See if this is resolved correctly."""
+        """
+        Test that expressions that evaluate to NaN are not marked as correct.
+        """
 
         sample_dict = {'x': (1, 2)}
 
@@ -538,7 +558,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_raises_zero_division_err(self):
-        """See if division by zero is handled correctly"""
+        """
+        See if division by zero raises an error.
+        """
         sample_dict = {'x': (1, 2)}
         problem = self.build_problem(sample_dict=sample_dict,
                                      num_samples=10,
