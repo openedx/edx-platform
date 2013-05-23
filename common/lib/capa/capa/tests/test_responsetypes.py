@@ -223,7 +223,6 @@ class SymbolicResponseTest(ResponseTest):
         for (input_str, input_mathml) in incorrect_inputs:
             self._assert_symbolic_grade(problem, input_str, input_mathml, 'incorrect')
 
-
     def test_complex_number_grade(self):
         problem = self.build_problem(math_display=True,
             expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
@@ -241,7 +240,7 @@ class SymbolicResponseTest(ResponseTest):
         # Correct answer
         with mock.patch.object(requests, 'post') as mock_post:
 
-            # Simulate what the LaTeX-to-MathML server would 
+            # Simulate what the LaTeX-to-MathML server would
             # send for the correct response input
             mock_post.return_value.text = correct_snuggletex_response
 
@@ -323,7 +322,7 @@ class SymbolicResponseTest(ResponseTest):
                                 dynamath_input,
                                 expected_correctness):
         input_dict = {'1_2_1': str(student_input),
-                        '1_2_1_dynamath': str(dynamath_input) }
+                        '1_2_1_dynamath': str(dynamath_input)}
 
         correct_map = problem.grade_answers(input_dict)
 
@@ -548,6 +547,7 @@ class FormulaResponseTest(ResponseTest):
         input_dict = {'1_2_1': '1/0'}
         self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
 
+
 class StringResponseTest(ResponseTest):
     from response_xml_factory import StringResponseXMLFactory
     xml_factory_class = StringResponseXMLFactory
@@ -607,7 +607,7 @@ class StringResponseTest(ResponseTest):
         problem = self.build_problem(
             answer="Michigan",
             hintfn="gimme_a_hint",
-            script = textwrap.dedent("""
+            script=textwrap.dedent("""
                 def gimme_a_hint(answer_ids, student_answers, new_cmap, old_cmap):
                     aid = answer_ids[0]
                     answer = student_answers[aid]
@@ -917,9 +917,10 @@ class NumericalResponseTest(ResponseTest):
         """See if division by zero is handled correctly"""
         problem = self.build_problem(question_text="What 5 * 10?",
                                      explanation="The answer is 50",
-                                     answer="5e+1") # Answer doesn't matter
+                                     answer="5e+1")  # Answer doesn't matter
         input_dict = {'1_2_1': '1/0'}
         self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
+
 
 class CustomResponseTest(ResponseTest):
     from response_xml_factory import CustomResponseXMLFactory
@@ -969,8 +970,8 @@ class CustomResponseTest(ResponseTest):
         #
         #   'answer_given' is the answer the student gave (if there is just one input)
         #       or an ordered list of answers (if there are multiple inputs)
-        #   
-        # The function should return a dict of the form 
+        #
+        # The function should return a dict of the form
         # { 'ok': BOOL, 'msg': STRING }
         #
         script = textwrap.dedent("""
