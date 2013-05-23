@@ -9,35 +9,35 @@ from uuid import uuid4
 class GroupFactory(DjangoModelFactory):
     FACTORY_FOR = Group
 
-    name = 'staff_MITx/999/Robot_Super_Course'
+    name = u'staff_MITx/999/Robot_Super_Course'
 
 
 class UserProfileFactory(DjangoModelFactory):
     FACTORY_FOR = UserProfile
 
     user = None
-    name = 'Robot Test'
+    name = u'Robot Test'
     level_of_education = None
-    gender = 'm'
+    gender = u'm'
     mailing_address = None
-    goals = 'World domination'
+    goals = u'World domination'
 
 
 class RegistrationFactory(DjangoModelFactory):
     FACTORY_FOR = Registration
 
     user = None
-    activation_key = uuid4().hex
+    activation_key = uuid4().hex.decode('ascii')
 
 
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = User
 
-    username = Sequence('robot{0}'.format)
-    email = Sequence('robot+test+{0}@edx.org'.format)
+    username = Sequence(u'robot{0}'.format)
+    email = Sequence(u'robot+test+{0}@edx.org'.format)
     password = PostGenerationMethodCall('set_password',
                                         'test')
-    first_name = Sequence('Robot{0}'.format)
+    first_name = Sequence(u'Robot{0}'.format)
     last_name = 'Test'
     is_staff = False
     is_active = True
@@ -64,7 +64,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):
     FACTORY_FOR = CourseEnrollment
 
     user = SubFactory(UserFactory)
-    course_id = 'edX/toy/2012_Fall'
+    course_id = u'edX/toy/2012_Fall'
 
 
 class CourseEnrollmentAllowedFactory(DjangoModelFactory):
