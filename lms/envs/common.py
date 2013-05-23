@@ -700,8 +700,7 @@ INSTALLED_APPS = (
 
     # Discussion forums
     'django_comment_client',
-
-    # Student notes
+    'django_comment_common',
     'notes',
 )
 

@@ -26,6 +26,16 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
 end
 
 def run_acceptance_tests(system, report_dir, harvest_args)
+    # HACK: Since now the CMS depends on the existence of some database tables
+    # that used to be in LMS (Role/Permissions for Forums) we need to make
+    # sure the acceptance tests create/migrate the database tables
+    # that are represented in the LMS. We might be able to address this by moving
+    # out the migrations from lms/django_comment_client, but then we'd have to
+    # repair all the existing migrations from the upgrade tables in the DB.
+    if system == :cms
+        sh(django_admin('lms', 'acceptance', 'syncdb', '--noinput'))
+        sh(django_admin('lms', 'acceptance', 'migrate', '--noinput'))
+    end
     sh(django_admin(system, 'acceptance', 'syncdb', '--noinput'))
     sh(django_admin(system, 'acceptance', 'migrate', '--noinput'))
     sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))

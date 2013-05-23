@@ -1,6 +1,6 @@
 from django.test import TestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-
+from django_comment_common.models import Role, Permission
 from factories import RoleFactory
 import django_comment_client.utils as utils
 
