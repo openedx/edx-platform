@@ -35,7 +35,7 @@
         <p class="help_text"><%= gettext("provide the path for a file or asset already added to this course") %></p>
       </div>
       <input type="button" value="<%= gettext("Upload Asset") %>">
-      <% if (obj.close) { %><a class="action-close">close-button</a><% } %>
+      <a class="action-close">close-button</a>
     </li>
   </script>
 </%text>
@@ -116,8 +116,7 @@ CMS.Views.ChapterEdit = Backbone.View.extend({
         this.$el.html(this.template({
             name: this.model.escape('name'),
             asset_path: this.model.escape('asset_path'),
-            order: this.model.get('order'),
-            close: true
+            order: this.model.get('order')
         }));
         return this;
     },
