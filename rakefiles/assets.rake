@@ -19,9 +19,11 @@ def preprocess_with_mako(filename)
     # strip off the .mako extension
     output_filename = filename.chomp(File.extname(filename))
 
-    # just pipe from stdout into the new file
+    # just pipe from stdout into the new file, exiting on failure
     File.open(output_filename, 'w') do |file|
       file.write(`python -c '#{mako}'`)
+      exit_code = $?.to_i
+      abort "#{mako} failed with #{exit_code}" if exit_code.to_i != 0
     end
 end
 
