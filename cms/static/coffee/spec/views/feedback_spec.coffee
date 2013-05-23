@@ -10,6 +10,13 @@ beforeEach ->
             @actual.hasClass("is-shown") and not @actual.hasClass("is-hiding")
         toBeHiding: ->
             @actual.hasClass("is-hiding") and not @actual.hasClass("is-shown")
+        toContainText: (text) ->
+            # remove this when we upgrade jasmine-jquery
+            trimmedText = $.trim(@actual.text())
+            if text and $.isFunction(text.test)
+                return text.test(trimmedText)
+            else
+                return trimmedText.indexOf(text) != -1;
 
 describe "CMS.Views.Alert as base class", ->
     beforeEach ->
