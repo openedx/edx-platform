@@ -2,7 +2,7 @@
 // ====================
 
 body.course.static-pages {
-  
+
   .new-static-page-button {
     @include grey-button;
     display: block;
@@ -43,8 +43,8 @@ body.course.static-pages {
       display: none;
       padding: 0;
       border-radius: 2px 2px 0 0;
-      
-      //Overrides general edit-box mixin 
+
+      //Overrides general edit-box mixin
       .row {
         margin-bottom: 0px;
       }
@@ -56,7 +56,7 @@ body.course.static-pages {
         background-color: $gray-l6;
 
         .save-button {
-        margin: 15px 8px 0 0;
+        margin: ($baseline/2) 8px 0 0;
         }
       }
     }
