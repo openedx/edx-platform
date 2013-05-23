@@ -11,6 +11,9 @@
   <script type="text/template" id="new-chapter-tpl">
     <%static:include path="js/chapter.underscore" />
   </script>
+  <script type="text/template" id="upload-dialog-tpl">
+    <%static:include path="js/upload-dialog.underscore" />
+  </script>
 </%block>
 
 <%block name="jsextra">
@@ -60,7 +63,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
     events: {
         "submit": "save",
         "click .action-cancel": "remove",
-        "click .add-chapter": "createChapter"
+        "click .action-add-chapter": "createChapter"
     },
     addOne: function(chapter) {
         var view = new CMS.Views.ChapterEdit({model: chapter});
@@ -83,6 +86,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
 CMS.Views.ChapterEdit = Backbone.View.extend({
     initialize: function() {
         this.template = _.template($("#new-chapter-tpl").text());
+        this.listenTo(this.model, "change", this.render)
     },
     render: function() {
         this.$el.html(this.template({
@@ -93,14 +97,114 @@ CMS.Views.ChapterEdit = Backbone.View.extend({
         return this;
     },
     events: {
-        "click .action-close": "removeChapter"
+        "click .action-close": "removeChapter",
+        "click .action-uploadasset": "openUploadDialog",
+        "submit": "uploadAsset"
     },
     removeChapter: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.model.collection.remove(this.model);
         return this.remove();
+    },
+    openUploadDialog: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        var msg = new CMS.Models.FileUpload({
+            title: _.str.sprintf(gettext("Upload a new asset to %s"),
+                section.escape('name')),
+            message: "[asset upload requirements]"
+        })
+        var view = new CMS.Views.UploadDialog({model: msg, chapter: this.model})
+        $(".wrapper-view").append(view.render().el)
     }
 })
+CMS.Models.FileUpload = Backbone.Model.extend({
+    defaults: {
+        "title": "",
+        "message": "",
+        "selectFile": null,
+        "uploading": false,
+        "uploadedBytes": 0,
+        "totalBytes": 0,
+    }
+});
+CMS.Views.UploadDialog = Backbone.View.extend({
+    initialize: function() {
+        this.template = _.template($("#upload-dialog-tpl").text());
+        this.listenTo(this.model, "change", this.render);
+    },
+    render: function() {
+        // some browsers (like Chrome) allow you to assign to the .files attribute
+        // of an <input type="file"> DOM element -- for those browsers, we can
+        // create a new DOM element and assign the old content to it. Other browsers
+        // (like Firefox) make this attribute read-only, and we have to save the
+        // old DOM element in order to save it's content. For compatibility purposes,
+        // we'll just save the old element every time.
+        var oldInput = this.$("input[type=file]").get(0), selectedFile;
+        if (oldInput && oldInput.files.length) {
+            selectedFile = oldInput.files[0];
+        }
+        this.$el.html(this.template({
+            url: UPLOAD_ASSET_CALLBACK_URL,
+            title: this.model.escape('title'),
+            message: this.model.escape('message'),
+            selectedFile: selectedFile,
+            uploading: this.model.get('uploading'),
+            uploadedBytes: this.model.get('uploadedBytes'),
+            totalBytes: this.model.get('totalBytes'),
+        }))
+        if (oldInput) {
+            this.$('input[type=file]').replaceWith(oldInput);
+        }
+
+        return this;
+    },
+    events: {
+        "change input[type=file]": "selectFile",
+        "click .action-cancel": "removeSelf",
+        "click .action-upload": "upload"
+    },
+    selectFile: function(e) {
+        this.model.set('fileList', e.target.files)
+    },
+    removeSelf: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.remove();
+    },
+    upload: function(e) {
+        this.model.set('uploading', true);
+        this.$("form").ajaxSubmit({
+            success: _.bind(this.success, this),
+            error: _.bind(this.error, this),
+            uploadProgress: _.bind(this.progress, this),
+        });
+    },
+    progress: function(event, position, total, percentComplete) {
+        this.model.set({
+            "uploadedBytes": position,
+            "totalBytes": total,
+        })
+    },
+    success: function(response, statusText, xhr, form) {
+        this.model.set('uploading', false);
+        var chapter = this.options.chapter;
+        if(chapter) {
+            var options = {}
+            if(!chapter.get("name")) {
+                options.name = response.displayname;
+            }
+            options.asset_path = response.url;
+            chapter.set(options);
+        }
+        this.remove();
+    },
+    error: function() {
+        this.model.set("uploading", false);
+    }
+})
+var section = new CMS.Models.Section({
+    id: "${course.id}",
+    name: "${course.display_name_with_default | h}"
+});
 $(function() {
     $(".new-button").click(function() {
         var textbook = new CMS.Models.Textbook();

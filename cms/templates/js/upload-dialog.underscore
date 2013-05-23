@@ -1,0 +1,16 @@
+<form class="upload-dialog" method="POST" action="<%= url %>" enctype="multipart/form-data">
+  <h3><%= title %></h3>
+  <p><%= message %></p>
+  <input type="file" name="file" />
+  <% if(uploading) { %>
+    <% if (uploadedBytes && totalBytes) { %>
+      <progress value="<%= uploadedBytes %>" max="<%= totalBytes %>"><%= uploadedBytes/totalBytes*100 %>%</progress>
+    <% } else { %>
+      <progress></progress>
+    <% } %>
+  <% } %>
+  <div class="actions">
+    <input type="button" class="button action-upload" value="Upload" <% if (!selectedFile) { %>disabled="disabled"<% } %> />
+    <input type="button" class="button action-cancel" value="Cancel" />
+  </div>
+</form>

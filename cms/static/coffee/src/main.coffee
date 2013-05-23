@@ -18,7 +18,7 @@ $ ->
 
   $(document).ajaxError (event, jqXHR, ajaxSettings, thrownError) ->
     if ajaxSettings.notifyOnError is false
-      return
+        return
     if jqXHR.responseText
       try
         message = JSON.parse(jqXHR.responseText).error
