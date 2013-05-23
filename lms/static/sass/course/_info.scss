@@ -117,7 +117,7 @@ div.info-wrapper {
           @include transition(all .2s);
 
           h4 {
-            color: $blue;
+            color: $link-color;
             font-size: 1em;
             font-weight: normal;
             padding-left: 30px;
