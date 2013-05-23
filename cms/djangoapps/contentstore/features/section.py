@@ -62,7 +62,7 @@ def i_click_to_edit_section_name(step):
 
 @step('I see the complete section name with a quote in the editor$')
 def i_see_complete_section_name_with_quote_in_editor(step):
-    css = '.edit-section-name'
+    css = '.section-name-edit input[type=text]'
     assert world.is_css_present(css)
     assert_equal(world.browser.find_by_css(css).value, 'Section with "Quote"')
 
