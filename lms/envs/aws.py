@@ -6,6 +6,11 @@ Common traits:
 * Use memcached, and cache-backed sessions
 * Use a MySQL 5.1 database
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 import json
 
 from .common import *
@@ -108,6 +113,11 @@ DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)
 ADMINS = ENV_TOKENS.get('ADMINS', ADMINS)
 SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
+
+#Theme overrides
+THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
+if not THEME_NAME is None:
+    enable_theme(THEME_NAME)
 
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)

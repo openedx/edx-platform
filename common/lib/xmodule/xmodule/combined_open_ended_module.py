@@ -48,13 +48,14 @@ class VersionInteger(Integer):
 
 
 class CombinedOpenEndedFields(object):
+    display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
     current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.user_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
     state = String(help="Which step within the current task that the student is on.", default="initial",
                    scope=Scope.user_state)
-    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
+    student_attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0,
                                scope=Scope.user_state)
-    ready_to_reset = Boolean(help="If the problem is ready to be reset or not.", default=False,
+    ready_to_reset = StringyBoolean(help="If the problem is ready to be reset or not.", default=False,
                              scope=Scope.user_state)
     attempts = StringyInteger(display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.", default=1,
@@ -226,10 +227,3 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     has_score = True
     always_recalculate_grades = True
     template_dir_name = "combinedopenended"
-
-    @property
-    def non_editable_metadata_fields(self):
-        non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
-                                    CombinedOpenEndedDescriptor.version])
-        return non_editable_fields

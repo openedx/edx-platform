@@ -74,6 +74,9 @@ def initial_setup(server):
     if not success:
         raise IOError("Could not acquire valid ChromeDriver browser session.")
 
+    # Set the browser size to 1280x1024
+    world.browser.driver.set_window_size(1280, 1024)
+
 
 @before.each_scenario
 def reset_data(scenario):

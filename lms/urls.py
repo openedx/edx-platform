@@ -8,7 +8,7 @@ from . import one_time_startup
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
-if settings.DEBUG:
+if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
 
 urlpatterns = ('',  # nopep8
@@ -330,7 +330,7 @@ if settings.COURSEWARE_ENABLED:
 if settings.ENABLE_JASMINE:
     urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
-if settings.DEBUG:
+if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin
     urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 

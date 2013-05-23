@@ -39,6 +39,9 @@ class TestLazyMod(unittest.TestCase):
         self.assertEqual(hsv[0], 0.25)
 
     def test_dotted(self):
-        self.assertNotIn("email.utils", sys.modules)
-        email_utils = LazyModule("email.utils")
-        self.assertEqual(email_utils.quote('"hi"'), r'\"hi\"')
+        # wsgiref is a module with submodules that is not already imported.
+        # Any similar module would do. This test demonstrates that the module
+        # is not already im
+        self.assertNotIn("wsgiref.util", sys.modules)
+        wsgiref_util = LazyModule("wsgiref.util")
+        self.assertEqual(wsgiref_util.guess_scheme({}), "http")

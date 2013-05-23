@@ -26,6 +26,7 @@ Gemfile.lock
 conf/locale/en/LC_MESSAGES/*.po
 !messages.po
 lms/static/sass/*.css
+lms/static/sass/application.scss
 cms/static/sass/*.css
 lms/lib/comment_client/python
 nosetests.xml
