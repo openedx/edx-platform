@@ -8,7 +8,7 @@ and acceptance tests.
 ### Unit Tests
 
 * Each test case should be concise: setup, execute, check, and teardown.
-If you find yourself writing tests with many steps, consider refactoring 
+If you find yourself writing tests with many steps, consider refactoring
 the unit under tests into smaller units, and then testing those individually.
 
 * As a rule of thumb, your unit tests should cover every code branch.
@@ -16,19 +16,19 @@ the unit under tests into smaller units, and then testing those individually.
 * Mock or patch external dependencies.
 We use [voidspace mock](http://www.voidspace.org.uk/python/mock/).
 
-* We unit test Python code (using [unittest](http://docs.python.org/2/library/unittest.html)) and 
+* We unit test Python code (using [unittest](http://docs.python.org/2/library/unittest.html)) and
 Javascript (using [Jasmine](http://pivotal.github.io/jasmine/))
 
 ### Integration Tests
 * Test several units at the same time.
 Note that you can still mock or patch dependencies
-that are not under test!  For example, you might test that 
-`LoncapaProblem`, `NumericalResponse`, and `CorrectMap` in the 
+that are not under test!  For example, you might test that
+`LoncapaProblem`, `NumericalResponse`, and `CorrectMap` in the
 `capa` package work together, while still mocking out template rendering.
 
 * Use integration tests to ensure that units are hooked up correctly.
-You do not need to test every possible input--that's what unit 
-tests are for.  Instead, focus on testing the "happy path" 
+You do not need to test every possible input--that's what unit
+tests are for.  Instead, focus on testing the "happy path"
 to verify that the components work together correctly.
 
 * Many of our tests use the [Django test client](https://docs.djangoproject.com/en/dev/topics/testing/overview/) to simulate
@@ -43,8 +43,8 @@ these tests simulate user interactions through the browser using
 
 Overall, you want to write the tests that **maximize coverage**
 while **minimizing maintenance**.
-In practice, this usually means investing heavily 
-in unit tests, which tend to be the most robust to changes in the code base.  
+In practice, this usually means investing heavily
+in unit tests, which tend to be the most robust to changes in the code base.
 
 ![Test Pyramid](test_pyramid.png)
 
@@ -53,13 +53,13 @@ and acceptance tests.  Most of our tests are unit tests or integration tests.
 
 ## Test Locations
 
-* Python unit and integration tests: Located in 
+* Python unit and integration tests: Located in
 subpackages called `tests`.
-For example, the tests for the `capa` package are located in 
+For example, the tests for the `capa` package are located in
 `common/lib/capa/capa/tests`.
 
 * Javascript unit tests: Located in `spec` folders.  For example,
-`common/lib/xmodule/xmodule/js/spec` and `{cms,lms}/static/coffee/spec`  
+`common/lib/xmodule/xmodule/js/spec` and `{cms,lms}/static/coffee/spec`
 For consistency, you should use the same directory structure for implementation
 and test.  For example, the test for `src/views/module.coffee`
 should be written in `spec/views/module_spec.coffee`.
@@ -101,7 +101,7 @@ You can run tests using `rake` commands.  For example,
 
     rake test
 
-runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).  
+runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).
 
 You can also run the tests without `collectstatic`, which tends to be faster:
 
@@ -149,7 +149,7 @@ If the `phantomjs` binary is not on the path, set the `PHANTOMJS_PATH` environme
 
     PHANTOMJS_PATH=/path/to/phantomjs rake phantomjs_jasmine_{lms,cms}
 
-Once you have run the `rake` command, your browser should open to 
+Once you have run the `rake` command, your browser should open to
 to `http://localhost/_jasmine/`, which displays the test results.
 
 **Troubleshooting**: If you get an error message while running the `rake` task,
@@ -162,7 +162,7 @@ Most of our tests use [Splinter](http://splinter.cobrateam.info/)
 to simulate UI browser interactions.  Splinter, in turn,
 uses [Selenium](http://docs.seleniumhq.org/) to control the Chrome browser.
 
-**Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver) 
+**Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver)
 installed to run the tests in Chrome.  The tests are confirmed to run
 with Chrome (not Chromium) version 26.0.0.1410.63 with ChromeDriver
 version r195636.
@@ -189,7 +189,7 @@ Try running:
 
     pip install -r requirements.txt
 
-**Note**: The acceptance tests can *not* currently run in parallel.  
+**Note**: The acceptance tests can *not* currently run in parallel.
 
 ## Viewing Test Coverage
 
