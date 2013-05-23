@@ -1,0 +1,14 @@
+<li>
+  <div class="input-wrap">
+    <label for="chapter-<%= order %>-name"><%= gettext("Chapter Name") %></label>
+    <input id="chapter-<%= order %>-name" name="chapter-<%= order %>-name" placeholder="<%= _.str.sprintf(gettext("Chapter %s"), order) %>" value="<%= name %>">
+    <p class="help_text"><%= gettext("the title/name of the chapter that will be used in navigating") %></p>
+  </div>
+  <div class="input-wrap">
+    <label for="chapter-<%= order %>-asset-path"><%= gettext("Chapter Asset") %>:</label>
+    <input id="chapter-<%= order %>-asset-path" name="chapter-<%= order %>-asset-path" placeholder="<%= _.str.sprintf(gettext("path/to/introductionToCookieBaking-CH%d.pdf"), order) %>" value="<%= asset_path %>">
+    <p class="help_text"><%= gettext("provide the path for a file or asset already added to this course") %></p>
+  </div>
+  <input type="button" value="<%= gettext("Upload Asset") %>">
+  <a class="action-close">close-button</a>
+</li>

@@ -1,0 +1,14 @@
+<form>
+  <div class='input-wrap'>
+    <label for="textbook-name-input"><%= gettext("Name") %>:</label>
+    <input id="textbook-name-input" type="text" placeholder="<%= gettext("Introduction to Cookie Baking") %> value="<%= name %>">
+    <p class="help_text"><%= gettext("the title/name of the text book as you would like your students to see it.") %></span>
+  </div>
+  <ol class="chapters"></ol>
+  <p><%= gettext("Note: <strong>It's best practice to break your course's textbook into multiple chapters</strong> to reduce loading times for students. Breaking up textbooks into chapters can also help with students more easily finding a concept or topic-based information.") %></p>
+  <button class="add-chapter"><%= gettext("Add a Chapter") %></button>
+  <div class="buttons">
+    <input type="submit" class="action-primary" value="<%= gettext("Save") %>" />
+    <input type="button" class="action-secondary action-cancel" value="<%= gettext("Cancel") %>" />
+  </div>
+</form>
