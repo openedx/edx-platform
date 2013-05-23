@@ -48,7 +48,6 @@ Feature: Problem Editor
     And I edit and select Settings
     Then if I set the max attempts to -3, the max attempts are persisted as 1
 
-
   Scenario: Settings changes are not saved on Cancel
     Given I have created a Blank Common Problem
     And I edit and select Settings
@@ -61,5 +60,3 @@ Feature: Problem Editor
     And I edit and select Settings
     Then Edit High Level Source is visible
 
-# Future tests to add--
-# Check that code is shown in editor (type code, Save, check that code appears when re-edited).
