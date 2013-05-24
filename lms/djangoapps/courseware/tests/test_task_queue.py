@@ -12,10 +12,10 @@ from django.test.testcases import TestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from courseware.tests.factories import UserFactory, CourseTaskLogFactory
-from courseware.task_queue import (get_running_course_tasks, 
+from courseware.task_queue import (get_running_course_tasks,
                                    course_task_log_status,
                                    AlreadyRunningError,
-                                   submit_regrade_problem_for_all_students, 
+                                   submit_regrade_problem_for_all_students,
                                    submit_regrade_problem_for_student,
                                    submit_reset_problem_attempts_for_all_students,
                                    submit_delete_problem_state_for_all_students)

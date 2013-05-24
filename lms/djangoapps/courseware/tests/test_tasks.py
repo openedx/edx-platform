@@ -5,14 +5,13 @@ import logging
 import json
 from mock import Mock, patch
 import textwrap
-import random
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
-from capa.tests.response_xml_factory import (OptionResponseXMLFactory, 
-                                             CodeResponseXMLFactory, 
+from capa.tests.response_xml_factory import (OptionResponseXMLFactory,
+                                             CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -21,7 +20,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminFactory
 
 from courseware.model_data import StudentModule
-from courseware.task_queue import (submit_regrade_problem_for_all_students, 
+from courseware.task_queue import (submit_regrade_problem_for_all_students,
                                    submit_regrade_problem_for_student,
                                    course_task_log_status,
                                    submit_reset_problem_attempts_for_all_students,
@@ -69,12 +68,8 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     def get_user_email(username):
         return '{0}@test.com'.format(username)
 
-    @staticmethod
-    def get_user_password(username):
-        return 'test'
-
     def login_username(self, username):
-        self.login(TestRegradingBase.get_user_email(username), TestRegradingBase.get_user_password(username))
+        self.login(TestRegradingBase.get_user_email(username), "test")
         self.current_user = username
 
     def _create_user(self, username, is_staff=False):
@@ -139,10 +134,9 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.login_username(username)
         # make ajax call:
         modx_url = reverse('modx_dispatch',
-                            kwargs={
-                                'course_id': self.course.id,
-                                'location': TestRegrading.problem_location(problem_url_name),
-                                'dispatch': 'problem_get', })
+                           kwargs={'course_id': self.course.id,
+                                   'location': TestRegrading.problem_location(problem_url_name),
+                                   'dispatch': 'problem_get', })
         resp = self.client.post(modx_url, {})
         return resp
 
@@ -163,10 +157,9 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.login_username(username)
         # make ajax call:
         modx_url = reverse('modx_dispatch',
-                            kwargs={
-                                'course_id': self.course.id,
-                                'location': TestRegrading.problem_location(problem_url_name),
-                                'dispatch': 'problem_check', })
+                           kwargs={'course_id': self.course.id,
+                                   'location': TestRegrading.problem_location(problem_url_name),
+                                   'dispatch': 'problem_check', })
 
         resp = self.client.post(modx_url, {
             get_input_id('2_1'): responses[0],
@@ -196,10 +189,9 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     def show_correct_answer(self, problem_url_name):
         modx_url = reverse('modx_dispatch',
-                            kwargs={
-                                'course_id': self.course.id,
-                                'location': TestRegradingBase.problem_location(problem_url_name),
-                                'dispatch': 'problem_show', })
+                           kwargs={'course_id': self.course.id,
+                                   'location': TestRegradingBase.problem_location(problem_url_name),
+                                   'dispatch': 'problem_show', })
         return self.client.post(modx_url, {})
 
     def get_student_module(self, username, descriptor):
@@ -388,7 +380,7 @@ class TestRegrading(TestRegradingBase):
                                data=problem_xml,
                                metadata={"rerandomize": "per_student"})
 
-    def test_regrading_randomized_problem(self):
+    def WAITING_FOR_SAFEEXEC_FIX_test_regrading_randomized_problem(self):
         """Run regrade scenario on custom problem that uses randomize"""
         # First define the custom response problem:
         problem_url_name = 'H1P1'
