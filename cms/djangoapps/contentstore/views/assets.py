@@ -157,7 +157,7 @@ def upload_asset(request, org, course, coursename):
                         'msg': 'Upload completed'
                         }
 
-    response = HttpResponse(json.dumps(response_payload))
+    response = HttpResponse(json.dumps(response_payload), mimetype="application/json")
     response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
