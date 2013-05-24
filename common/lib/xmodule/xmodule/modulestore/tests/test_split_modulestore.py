@@ -80,10 +80,10 @@ class SplitModuleTest(unittest.TestCase):
         SplitModuleTest.modulestore = None
 
     def findByIdInResult(self, collection, _id):
-        '''
-        Result is a collection of descriptors. Find the one who's block id
+        """
+        Result is a collection of descriptors. Find the one whose block id
         matches the _id.
-        '''
+        """
         for element in collection:
             if element.location.usage_id == _id:
                 return element
@@ -206,21 +206,21 @@ class SplitModuleCourseTests(SplitModuleTest):
         """
         get_course_successors(course_locator, version_history_depth=1)
         """
-        locator = CourseLocator(version_guid=self.GUID_D0)
+        locator = CourseLocator(version_guid=self.GUID_D3)
         result = modulestore().get_course_successors(locator)
         self.assertIsInstance(result, VersionTree)
         self.assertIsNone(result.locator.course_id)
-        self.assertEqual(str(result.locator.version_guid), self.GUID_D0)
+        self.assertEqual(str(result.locator.version_guid), self.GUID_D3)
         self.assertEqual(len(result.children), 1)
-        self.assertEqual(result.children[0].locator.version_guid, self.GUID_D1)
+        self.assertEqual(str(result.children[0].locator.version_guid), self.GUID_D1)
         self.assertEqual(len(result.children[0].children), 0, "descended more than one level")
         result = modulestore().get_course_successors(locator, version_history_depth=2)
         self.assertEqual(len(result.children), 1)
-        self.assertEqual(result.children[0].locator.version_guid, self.GUID_D1)
+        self.assertEqual(str(result.children[0].locator.version_guid), self.GUID_D1)
         self.assertEqual(len(result.children[0].children), 1)
         result = modulestore().get_course_successors(locator, version_history_depth=99)
         self.assertEqual(len(result.children), 1)
-        self.assertEqual(result.children[0].locator.version_guid, self.GUID_D1)
+        self.assertEqual(str(result.children[0].locator.version_guid), self.GUID_D1)
         self.assertEqual(len(result.children[0].children), 1)
 
 
@@ -649,16 +649,22 @@ class TestItemCrud(SplitModuleTest):
 
     def test_delete_item(self):
         course = self.create_course_for_deletion()
-        self.assertRaises(ValueError, modulestore().delete_item, course.location, 'deleting_user')
-        reusable_location = BlockUsageLocator(course_id=course.location.course_id,
-            usage_id=course.location.usage_id, revision='draft')
+        self.assertRaises(ValueError,
+                          modulestore().delete_item,
+                          course.location,
+                          'deleting_user')
+        reusable_location = BlockUsageLocator(
+            course_id=course.location.course_id,
+            usage_id=course.location.usage_id,
+            revision='draft')
 
         # delete a leaf
         problems = modulestore().get_items(reusable_location, {'category' : 'problem'})
         new_course_loc = modulestore().delete_item(problems[0].location, 'deleting_user')
-        self.assertFalse(modulestore().has_item(
-            BlockUsageLocator(reusable_location.as_course_locator(),
-                              usage_id=problems[0].location.usage_id)))
+        deleted = BlockUsageLocator(course_id=reusable_location.course_id,
+                                    revision=reusable_location.revision,
+                                    usage_id=problems[0].location.usage_id)
+        self.assertFalse(modulestore().has_item(deleted))
         locator = BlockUsageLocator(problems[0].location)
         locator.course_id = None
         self.assertTrue(modulestore().has_item(locator))
