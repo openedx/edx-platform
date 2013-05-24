@@ -8,6 +8,7 @@
   <script type="text/javascript" src="<%= phantom_jasmine_path %>/vendor/jasmine-1.2.0/jasmine-html.js"></script>
 
   <script type="text/javascript" src="<%= phantom_jasmine_path %>/lib/console-runner.js"></script>
+  <script type="text/javascript" src="<%= jasmine_reporters_path %>/src/jasmine.junit_reporter.js"></script>
   <script type="text/javascript" src="<%= common_coffee_root %>/ajax_prefix.js"></script>
   <script type="text/javascript" src="<%= common_coffee_root %>/logger.js"></script>
   <script type="text/javascript" src="<%= common_js_root %>/vendor/jasmine-jquery.js"></script>
@@ -44,30 +45,10 @@
 <body>
 
 <script type="text/javascript">
-  var jasmineEnv = jasmine.getEnv();
-
-  var htmlReporter = new jasmine.HtmlReporter();
-  var console_reporter = new jasmine.ConsoleReporter()
-
-  jasmineEnv.addReporter(htmlReporter);
-  jasmineEnv.addReporter(console_reporter);
-
-  jasmineEnv.specFilter = function(spec) {
-    return htmlReporter.specFilter(spec);
-  };
-
-  var currentWindowOnload = window.onload;
-
-  window.onload = function() {
-    if (currentWindowOnload) {
-      currentWindowOnload();
-    }
-    execJasmine();
-  };
-
-  function execJasmine() {
-    jasmineEnv.execute();
-  }
+  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+  jasmine.getEnv().addReporter(new jasmine.ConsoleReporter());
+  jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter('<%= report_dir %>/'));
+  jasmine.getEnv().execute();
 </script>
 
 </body>

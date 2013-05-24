@@ -73,8 +73,8 @@ rake pylint > pylint.log || cat pylint.log
 TESTS_FAILED=0
 
 # Run the python unit tests
-rake test_cms[false] || TESTS_FAILED=1
-rake test_lms[false] || TESTS_FAILED=1
+rake test_cms || TESTS_FAILED=1
+rake test_lms || TESTS_FAILED=1
 rake test_common/lib/capa || TESTS_FAILED=1
 rake test_common/lib/xmodule || TESTS_FAILED=1
 
@@ -82,7 +82,7 @@ rake test_common/lib/xmodule || TESTS_FAILED=1
 rake phantomjs_jasmine_lms || TESTS_FAILED=1
 rake phantomjs_jasmine_cms || TESTS_FAILED=1
 rake phantomjs_jasmine_common/lib/xmodule || TESTS_FAILED=1
-rake phantomjs_jasmine_discussion || TESTS_FAILED=1
+rake phantomjs_jasmine_common/static/coffee || TESTS_FAILED=1
 
 rake coverage:xml coverage:html
 

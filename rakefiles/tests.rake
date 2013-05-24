@@ -12,10 +12,11 @@ def run_under_coverage(cmd, root)
     return cmd
 end
 
-def run_tests(system, report_dir, stop_on_failure=true)
+def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
     ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
     dirs = Dir["common/djangoapps/*"] + Dir["#{system}/djangoapps/*"]
-    cmd = django_admin(system, :test, 'test', '--logging-clear-handlers', *dirs.each)
+    test_id = dirs.join(' ') if test_id.nil? or test_id == ''
+    cmd = django_admin(system, :test, 'test', '--logging-clear-handlers', test_id)
     sh(run_under_coverage(cmd, system)) do |ok, res|
         if !ok and stop_on_failure
             abort "Test failed!"
@@ -25,6 +26,16 @@ def run_tests(system, report_dir, stop_on_failure=true)
 end
 
 def run_acceptance_tests(system, report_dir, harvest_args)
+    # HACK: Since now the CMS depends on the existence of some database tables
+    # that used to be in LMS (Role/Permissions for Forums) we need to make
+    # sure the acceptance tests create/migrate the database tables
+    # that are represented in the LMS. We might be able to address this by moving
+    # out the migrations from lms/django_comment_client, but then we'd have to
+    # repair all the existing migrations from the upgrade tables in the DB.
+    if system == :cms
+        sh(django_admin('lms', 'acceptance', 'syncdb', '--noinput'))
+        sh(django_admin('lms', 'acceptance', 'migrate', '--noinput'))
+    end
     sh(django_admin(system, 'acceptance', 'syncdb', '--noinput'))
     sh(django_admin(system, 'acceptance', 'migrate', '--noinput'))
     sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))
@@ -44,13 +55,13 @@ TEST_TASK_DIRS = []
 
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}", [:stop_on_failure] => ["clean_test_files", :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
+    task "test_#{system}", [:test_id, :stop_on_failure] => ["clean_test_files", :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
-    task "fasttest_#{system}", [:stop_on_failure] => [report_dir, :install_prereqs, :predjango] do |t, args|
-        args.with_defaults(:stop_on_failure => 'true')
-        run_tests(system, report_dir, args.stop_on_failure)
+    task "fasttest_#{system}", [:test_id, :stop_on_failure] => [report_dir, :install_prereqs, :predjango] do |t, args|
+        args.with_defaults(:stop_on_failure => 'true', :test_id => nil)
+        run_tests(system, report_dir, args.test_id, args.stop_on_failure)
     end
 
     # Run acceptance tests
@@ -100,7 +111,7 @@ end
 
 task :test do
     TEST_TASK_DIRS.each do |dir|
-        Rake::Task["test_#{dir}"].invoke(false)
+        Rake::Task["test_#{dir}"].invoke(nil, false)
     end
 
     if $failed_tests > 0

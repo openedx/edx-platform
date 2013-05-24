@@ -3,7 +3,6 @@ from time import gmtime
 from uuid import uuid4
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.timeparse import stringify_time
 from xmodule.modulestore.inheritance import own_metadata
 
 

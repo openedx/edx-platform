@@ -113,7 +113,7 @@ section.wiki {
       }
 
       &:focus {
-        border-color: $blue;
+        border-color: $link-color;
       }
     }
   }
@@ -276,7 +276,7 @@ section.wiki {
     li {
       &.active {
         a {
-          color: $blue;
+          color: $link-color;
 
           .icon-view,
           .icon-home {

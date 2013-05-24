@@ -56,6 +56,12 @@ body.course.outline {
                 }
               }
 
+              [class^="icon-"] {
+                  vertical-align: middle;
+                  margin-top: -5px;
+                  display: inline-block;
+                }
+
               .menu {
                 @include font-size(12);
                 @include border-radius(4px);
@@ -331,6 +337,7 @@ body.course.outline {
                 &:hover, &.is-active {
                   color: $blue;
                 }
+
               }
 
               .menu {
@@ -533,7 +540,7 @@ body.course.outline {
           display: block;
       }
 
-      .ss-icon {
+      [class^="icon-"] {
           @include font-size(11);
           @include border-radius(20px);
           position: relative;

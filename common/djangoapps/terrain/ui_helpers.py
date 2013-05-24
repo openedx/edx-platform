@@ -123,3 +123,17 @@ def save_the_html(path='/tmp'):
     f = open('%s/%s' % (path, filename), 'w')
     f.write(html)
     f.close()
+
+
+@world.absorb
+def click_course_settings():
+    course_settings_css = 'li.nav-course-settings'
+    if world.browser.is_element_present_by_css(course_settings_css):
+        world.css_click(course_settings_css)
+
+
+@world.absorb
+def click_tools():
+    tools_css = 'li.nav-course-tools'
+    if world.browser.is_element_present_by_css(tools_css):
+        world.css_click(tools_css)

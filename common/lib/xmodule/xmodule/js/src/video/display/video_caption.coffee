@@ -27,16 +27,19 @@ class @VideoCaption extends Subview
     @fetchCaption()
 
   fetchCaption: ->
-    $.getWithPrefix @captionURL(), (captions) =>
-      @captions = captions.text
-      @start = captions.start
+    $.ajaxWithPrefix
+      url: @captionURL()
+      notifyOnError: false
+      success: (captions) =>
+        @captions = captions.text
+        @start = captions.start
 
-      @loaded = true
+        @loaded = true
 
-      if onTouchBasedDevice()
-        $('.subtitles li').html "Caption will be displayed when you start playing the video."
-      else
-        @renderCaption()
+        if onTouchBasedDevice()
+          $('.subtitles li').html "Caption will be displayed when you start playing the video."
+        else
+          @renderCaption()
 
   renderCaption: ->
     container = $('<ol>')

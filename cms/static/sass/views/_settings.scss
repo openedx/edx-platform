@@ -328,11 +328,12 @@ body.course.settings {
             @extend .t-action-3;
             font-weight: 600;
 
-            .icon {
+            [class^="icon-"] {
               @extend .t-icon;
               @include font-size(16);
               display: inline-block;
               vertical-align: middle;
+              margin-top: -3px;
             }
           }
         }

@@ -21,7 +21,7 @@ def event(request):
     A noop to swallow the analytics call so that cms methods don't spook and poor developers looking at
     console logs don't get distracted :-)
     '''
-    return HttpResponse(True)
+    return HttpResponse(status=204)
 
 
 def get_request_method(request):

@@ -20,6 +20,12 @@
   <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
 
+  <script type="text/template" id="section-name-edit-tpl">
+    <%static:include path="js/section-name-edit.underscore" />
+  </script>
+  <script type="text/javascript" src="${static.url('js/models/section.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/section.js')}"></script>
+
   <script type="text/javascript">
   $(document).ready(function(){
     // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
@@ -37,6 +43,14 @@
             graders : window.graderTypes
         });
     });
+
+    $(".section-name").each(function() {
+        var model = new CMS.Models.Section({
+            id: $(this).parent(".item-details").data("id"),
+            name: $(this).data("name")
+        });
+        new CMS.Views.SectionShow({model: model, el: this}).render();
+    })
   });
 
   </script>
@@ -115,13 +129,13 @@
         <h3 class="sr">Page Actions</h3>
         <ul>
           <li class="nav-item">
-            <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block icon">up</i> <span class="label">Collapse All Sections</span></a>
+            <a href="#" class="toggle-button toggle-button-sections"><i class="icon-arrow-up"></i> <span class="label">Collapse All Sections</span></a>
           </li>
           <li class="nav-item">
-            <a href="#" class="button new-button new-courseware-section-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Section</a>
+            <a href="#" class="button new-button new-courseware-section-button"><i class="icon-plus"></i> New Section</a>
           </li>
           <li class="nav-item">
-            <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button">View Live</a>
           </li>
         </ul>
       </nav>
@@ -137,14 +151,7 @@
             <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
 
             <div class="item-details" data-id="${section.location}">
-              <h3 class="section-name">
-                <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name_with_default}</span>
-                <form class="section-name-edit" style="display:none">
-                  <input type="text" value="${section.display_name_with_default | h}" class="edit-section-name" autocomplete="off"/>
-                  <input type="submit" class="save-button edit-section-name-save" value="Save" />
-                  <input type="button" class="cancel-button edit-section-name-cancel" value="Cancel" />
-                </form>
-              </h3>
+              <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
               <div class="section-published-date">
                 <%
                   start_date_str = get_time_struct_display(section.lms.start, '%m/%d/%Y')

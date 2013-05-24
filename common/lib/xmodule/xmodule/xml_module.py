@@ -136,6 +136,7 @@ class XmlDescriptor(XModuleDescriptor):
         'hide_progress_tab': bool_map,
         'allow_anonymous': bool_map,
         'allow_anonymous_to_peers': bool_map,
+        'show_timezone': bool_map,
     }
 
 
