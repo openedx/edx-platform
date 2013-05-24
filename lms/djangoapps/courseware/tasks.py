@@ -1,23 +1,20 @@
 
 import json
-from time import sleep, time
-
+from time import time
 
 from django.contrib.auth.models import User
 from django.db import transaction
-
 from celery import task, current_task
 from celery.utils.log import get_task_logger
 
+from xmodule.modulestore.django import modulestore
+
 import mitxmako.middleware as middleware
+from track.views import task_track
 
 from courseware.models import StudentModule
 from courseware.model_data import ModelDataCache
 from courseware.module_render import get_module_for_descriptor_internal
-
-from xmodule.modulestore.django import modulestore
-
-from track.views import task_track
 
 
 # define different loggers for use within tasks and on client side
@@ -25,6 +22,12 @@ task_log = get_task_logger(__name__)
 
 
 class UpdateProblemModuleStateError(Exception):
+    """
+    Error signaling a fatal condition while updating problem modules.
+
+    Used when the current module cannot be processed and that no more
+    modules should be attempted.
+    """
     pass
 
 
@@ -33,7 +36,20 @@ def _update_problem_module_state(course_id, module_state_key, student, update_fc
     """
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
 
-    If student is None, performs update on modules for all students on the specified problem.
+    StudentModule instances are those that match the specified `course_id` and `module_state_key`.
+    If `student` is not None, it is used as an additional filter to limit the modules to those belonging
+    to that student. If `student` is None, performs update on modules for all students on the specified problem.
+
+    If a `filter_fcn` is not None, it is applied to the query that has been constructed.  It takes one
+    argument, which is the query being filtered.
+
+    The `update_fcn` is called on each StudentModule that passes the resulting filtering.
+    It is passed three arguments:  the module_descriptor for the module pointed to by the
+    module_state_key, the particular StudentModule to update, and the xmodule_instance_args being
+    passed through.
+
+    Because this is run internal to a task, it does not catch exceptions.  These are allowed to pass up to the
+    task-running level, so that it can set the failure modes and capture the error trace in the result object.
     """
     task_id = current_task.request.id
     fmt = 'Starting to update problem modules as task "{task_id}": course "{course_id}" problem "{state_key}": nothing {action} yet'
@@ -74,9 +90,10 @@ def _update_problem_module_state(course_id, module_state_key, student, update_fc
     # perform the main loop
     num_updated = 0
     num_attempted = 0
-    num_total = len(modules_to_update)  # TODO: make this more efficient.  Count()?
+    num_total = modules_to_update.count()
 
     def get_task_progress():
+        """Return a dict containing info about current task"""
         current_time = time()
         progress = {'action_name': action_name,
                     'attempted': num_attempted,
@@ -101,9 +118,6 @@ def _update_problem_module_state(course_id, module_state_key, student, update_fc
         #  -- may depend on each iteration's duration
         current_task.update_state(state='PROGRESS', meta=get_task_progress())
 
-        # TODO: remove this once done with manual testing
-        sleep(5)  # in seconds
-
     task_progress = get_task_progress()
     current_task.update_state(state='PROGRESS', meta=task_progress)
 
@@ -114,6 +128,9 @@ def _update_problem_module_state(course_id, module_state_key, student, update_fc
 
 def _update_problem_module_state_for_student(course_id, problem_url, student_identifier,
                                              update_fcn, action_name, filter_fcn=None, xmodule_instance_args=None):
+    """
+    Update the StudentModule for a given student.  See _update_problem_module_state().
+    """
     msg = ''
     success = False
     # try to uniquely id student by email address or username
@@ -131,16 +148,22 @@ def _update_problem_module_state_for_student(course_id, problem_url, student_ide
 
 
 def _update_problem_module_state_for_all_students(course_id, problem_url, update_fcn, action_name, filter_fcn=None, xmodule_instance_args=None):
+    """
+    Update the StudentModule for all students.  See _update_problem_module_state().
+    """
     return _update_problem_module_state(course_id, problem_url, None, update_fcn, action_name, filter_fcn, xmodule_instance_args)
 
 
 def _get_module_instance_for_task(course_id, student, module_descriptor, module_state_key, xmodule_instance_args=None,
                                   grade_bucket_type=None):
+    """
+    Fetches a StudentModule instance for a given course_id, student, and module_state_key.
+
+    Includes providing information for creating a track function and an XQueue callback,
+    but does not require passing in a Request object.
+    """
     # reconstitute the problem's corresponding XModule:
     model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, student, module_descriptor)
-    # Note that the request is passed to get_module() to provide xqueue-related URL information
-#    instance = get_module(student, request, module_state_key, model_data_cache,
-#                          course_id, grade_bucket_type='regrade')
 
     # get request-related tracking information from args passthrough, and supplement with task-specific
     # information:
@@ -211,11 +234,13 @@ def _regrade_problem_module_state(module_descriptor, student_module, xmodule_ins
 
 
 def filter_problem_module_state_for_done(modules_to_update):
+    """Filter to apply for regrading, to limit module instances to those marked as done"""
     return modules_to_update.filter(state__contains='"done": true')
 
 
 @task
 def regrade_problem_for_student(course_id, problem_url, student_identifier, xmodule_instance_args):
+    """Regrades problem `problem_url` in `course_id` for specified student."""
     action_name = 'regraded'
     update_fcn = _regrade_problem_module_state
     filter_fcn = filter_problem_module_state_for_done
@@ -225,8 +250,7 @@ def regrade_problem_for_student(course_id, problem_url, student_identifier, xmod
 
 @task
 def regrade_problem_for_all_students(course_id, problem_url, xmodule_instance_args):
-#    factory = RequestFactory(**request_environ)
-#    request = factory.get('/')
+    """Regrades problem `problem_url` in `course_id` for all students."""
     action_name = 'regraded'
     update_fcn = _regrade_problem_module_state
     filter_fcn = filter_problem_module_state_for_done
@@ -236,8 +260,11 @@ def regrade_problem_for_all_students(course_id, problem_url, xmodule_instance_ar
 
 @transaction.autocommit
 def _reset_problem_attempts_module_state(module_descriptor, student_module, xmodule_instance_args=None):
-    # modify the problem's state
-    # load the state json and change state
+    """
+    Resets problem attempts to zero for specified `student_module`.
+
+    Always returns true, if it doesn't throw an exception.
+    """
     problem_state = json.loads(student_module.state)
     if 'attempts' in problem_state:
         old_number_of_attempts = problem_state["attempts"]
@@ -246,6 +273,13 @@ def _reset_problem_attempts_module_state(module_descriptor, student_module, xmod
             # convert back to json and save
             student_module.state = json.dumps(problem_state)
             student_module.save()
+            # get request-related tracking information from args passthrough,
+            # and supplement with task-specific information:
+            request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
+            task_id = xmodule_instance_args['task_id'] if xmodule_instance_args is not None else "unknown-task_id"
+            task_info = {"student": student_module.student.username, "task_id": task_id}
+            event_info = {"old_attempts": old_number_of_attempts, "new_attempts": 0}
+            task_track(request_info, task_info, 'problem_reset_attempts', event_info, page='x_module_task')
 
     # consider the reset to be successful, even if no update was performed.  (It's just "optimized".)
     return True
@@ -253,6 +287,7 @@ def _reset_problem_attempts_module_state(module_descriptor, student_module, xmod
 
 @task
 def reset_problem_attempts_for_student(course_id, problem_url, student_identifier, xmodule_instance_args):
+    """Resets problem attempts to zero for `problem_url` in `course_id` for specified student."""
     action_name = 'reset'
     update_fcn = _reset_problem_attempts_module_state
     return _update_problem_module_state_for_student(course_id, problem_url, student_identifier,
@@ -262,6 +297,7 @@ def reset_problem_attempts_for_student(course_id, problem_url, student_identifie
 
 @task
 def reset_problem_attempts_for_all_students(course_id, problem_url, xmodule_instance_args):
+    """Resets problem attempts to zero for `problem_url` in `course_id` for all students."""
     action_name = 'reset'
     update_fcn = _reset_problem_attempts_module_state
     return _update_problem_module_state_for_all_students(course_id, problem_url,
@@ -273,11 +309,18 @@ def reset_problem_attempts_for_all_students(course_id, problem_url, xmodule_inst
 def _delete_problem_module_state(module_descriptor, student_module, xmodule_instance_args=None):
     """Delete the StudentModule entry."""
     student_module.delete()
+    # get request-related tracking information from args passthrough,
+    # and supplement with task-specific information:
+    request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
+    task_id = xmodule_instance_args['task_id'] if xmodule_instance_args is not None else "unknown-task_id"
+    task_info = {"student": student_module.student.username, "task_id": task_id}
+    task_track(request_info, task_info, 'problem_delete_state', {}, page='x_module_task')
     return True
 
 
 @task
 def delete_problem_state_for_student(course_id, problem_url, student_ident, xmodule_instance_args):
+    """Deletes problem state entirely for `problem_url` in `course_id` for specified student."""
     action_name = 'deleted'
     update_fcn = _delete_problem_module_state
     return _update_problem_module_state_for_student(course_id, problem_url, student_ident,
@@ -287,6 +330,7 @@ def delete_problem_state_for_student(course_id, problem_url, student_ident, xmod
 
 @task
 def delete_problem_state_for_all_students(course_id, problem_url, xmodule_instance_args):
+    """Deletes problem state entirely for `problem_url` in `course_id` for all students."""
     action_name = 'deleted'
     update_fcn = _delete_problem_module_state
     return _update_problem_module_state_for_all_students(course_id, problem_url,

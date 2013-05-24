@@ -1,6 +1,6 @@
-'''
+"""
 Test for LMS courseware background tasks
-'''
+"""
 import logging
 import json
 from mock import Mock, patch
@@ -20,7 +20,8 @@ from courseware.model_data import StudentModule
 from courseware.task_queue import (submit_regrade_problem_for_all_students, 
                                    submit_regrade_problem_for_student,
                                    course_task_log_status,
-    submit_reset_problem_attempts_for_all_students)
+                                   submit_reset_problem_attempts_for_all_students,
+                                   submit_delete_problem_state_for_all_students)
 from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
 
 
@@ -169,7 +170,7 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         })
         return resp
 
-    def _create_task_request(self, requester_username):
+    def create_task_request(self, requester_username):
         """Generate request that can be used for submitting tasks"""
         request = Mock()
         request.user = User.objects.get(username=requester_username)
@@ -180,12 +181,12 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     def regrade_all_student_answers(self, instructor, problem_url_name):
         """Submits the current problem for regrading"""
-        return submit_regrade_problem_for_all_students(self._create_task_request(instructor), self.course.id,
+        return submit_regrade_problem_for_all_students(self.create_task_request(instructor), self.course.id,
                                                        TestRegradingBase.problem_location(problem_url_name))
 
     def regrade_one_student_answer(self, instructor, problem_url_name, student):
         """Submits the current problem for regrading for a particular student"""
-        return submit_regrade_problem_for_student(self._create_task_request(instructor), self.course.id,
+        return submit_regrade_problem_for_student(self.create_task_request(instructor), self.course.id,
                                                   TestRegradingBase.problem_location(problem_url_name),
                                                   student)
 
@@ -358,7 +359,7 @@ class TestResetAttempts(TestRegradingBase):
 
     def reset_problem_attempts(self, instructor, problem_url_name):
         """Submits the current problem for resetting"""
-        return submit_reset_problem_attempts_for_all_students(self._create_task_request(instructor), self.course.id,
+        return submit_reset_problem_attempts_for_all_students(self.create_task_request(instructor), self.course.id,
                                                               TestRegradingBase.problem_location(problem_url_name))
 
     def test_reset_attempts_on_problem(self):
@@ -420,3 +421,78 @@ class TestResetAttempts(TestRegradingBase):
         problem_url_name = 'NonexistentProblem'
         with self.assertRaises(ItemNotFoundError):
             self.reset_problem_attempts('instructor', problem_url_name)
+
+
+class TestDeleteProblem(TestRegradingBase):
+    userlist = ['u1', 'u2', 'u3', 'u4']
+
+    def setUp(self):
+        self.initialize_course()
+        self.create_instructor('instructor')
+        for username in self.userlist:
+            self.create_student(username)
+        self.logout()
+
+    def delete_problem_state(self, instructor, problem_url_name):
+        """Submits the current problem for deletion"""
+        return submit_delete_problem_state_for_all_students(self.create_task_request(instructor), self.course.id,
+                                                            TestRegradingBase.problem_location(problem_url_name))
+
+    def test_delete_problem_state(self):
+        '''Run delete-state scenario on option problem'''
+        # get descriptor:
+        problem_url_name = 'H1P1'
+        self.define_option_problem(problem_url_name)
+        location = TestRegradingBase.problem_location(problem_url_name)
+        descriptor = self.module_store.get_instance(self.course.id, location)
+        # first store answers for each of the separate users:
+        for username in self.userlist:
+            self.submit_student_answer(username, problem_url_name, ['Option 1', 'Option 1'])
+        # confirm that state exists:
+        for username in self.userlist:
+            self.assertTrue(self.get_student_module(username, descriptor) is not None)
+        # run delete task:
+        self.delete_problem_state('instructor', problem_url_name)
+        # confirm that no state can be found:
+        for username in self.userlist:
+            with self.assertRaises(StudentModule.DoesNotExist):
+                self.get_student_module(username, descriptor)
+
+    def test_delete_failure(self):
+        """Simulate a failure in deleting state of a problem"""
+        problem_url_name = 'H1P1'
+        self.define_option_problem(problem_url_name)
+        self.submit_student_answer('u1', problem_url_name, ['Option 1', 'Option 1'])
+
+        expected_message = "bad things happened"
+        with patch('courseware.models.StudentModule.delete') as mock_delete:
+            mock_delete.side_effect = ZeroDivisionError(expected_message)
+            course_task_log = self.delete_problem_state('instructor', problem_url_name)
+
+        # check task_log returned
+        self.assertEqual(course_task_log.task_state, 'FAILURE')
+        self.assertEqual(course_task_log.student, None)
+        self.assertEqual(course_task_log.requester.username, 'instructor')
+        self.assertEqual(course_task_log.task_name, 'delete_problem_state')
+        self.assertEqual(course_task_log.task_args, TestRegrading.problem_location(problem_url_name))
+        status = json.loads(course_task_log.task_progress)
+        self.assertEqual(status['exception'], 'ZeroDivisionError')
+        self.assertEqual(status['message'], expected_message)
+
+        # check status returned:
+        mock_request = Mock()
+        response = course_task_log_status(mock_request, task_id=course_task_log.task_id)
+        status = json.loads(response.content)
+        self.assertEqual(status['message'], expected_message)
+
+    def test_delete_non_problem(self):
+        """confirm that a non-problem can still be successfully deleted"""
+        problem_url_name = self.problem_section.location.url()
+        course_task_log = self.delete_problem_state('instructor', problem_url_name)
+        self.assertEqual(course_task_log.task_state, 'SUCCESS')
+
+    def test_delete_nonexistent_module(self):
+        """confirm that a non-existent module will not submit"""
+        problem_url_name = 'NonexistentProblem'
+        with self.assertRaises(ItemNotFoundError):
+            self.delete_problem_state('instructor', problem_url_name)
