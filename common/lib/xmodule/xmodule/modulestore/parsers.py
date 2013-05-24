@@ -1,6 +1,6 @@
 import re
 
-URL_RE = re.compile('^edx://(.+)$')
+URL_RE = re.compile('^edx://(.+)$', re.IGNORECASE)
 
 def parse_url(string):
     """
@@ -22,7 +22,7 @@ def parse_url(string):
     with keys 'id' and 'revision' (value of 'revision' may be None),
     
     """
-    match = URL_RE.match(string.lower())
+    match = URL_RE.match(string)
     if not match:
         return None
     path = match.group(1)
@@ -31,7 +31,7 @@ def parse_url(string):
     return parse_course_id(path)
     
 
-BLOCK_RE = re.compile('^\w+$')
+BLOCK_RE = re.compile('^\w+$', re.IGNORECASE)
 
 def parse_block_ref(string):
     """
@@ -50,7 +50,7 @@ def parse_block_ref(string):
     return None
 
 
-GUID_RE = re.compile('^[a-fA-F0-9]+$')
+GUID_RE = re.compile('^[A-F0-9]+$', re.IGNORECASE)
 
 def parse_guid(string):
     """
@@ -64,7 +64,7 @@ def parse_guid(string):
     return None
 
 
-COURSE_ID_RE = re.compile('^(?P<id>(\w+)(\.\w+\w*)*)(;(?P<revision>\w+))?(#(?P<block>\w+))?$')
+COURSE_ID_RE = re.compile('^(?P<id>(\w+)(\.\w+\w*)*)(;(?P<revision>\w+))?(#(?P<block>\w+))?$', re.IGNORECASE)
     
 def parse_course_id(string):
     """

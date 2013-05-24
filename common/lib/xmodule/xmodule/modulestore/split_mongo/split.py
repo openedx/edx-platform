@@ -102,7 +102,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
         new_module_data = {}
         for usage_id in base_usage_ids:
             new_module_data = self.descendants(system.course_entry['blocks'],
-                usage_id, depth, new_module_data)
+                                               usage_id,
+                                               depth,
+                                               new_module_data)
 
         # remove any which were already in module_data (not sure if there's a better way)
         for newkey in new_module_data.iterkeys():
@@ -112,15 +114,15 @@ class SplitMongoModuleStore(ModuleStoreBase):
         if lazy:
             for block in new_module_data.itervalues():
                 block['definition'] = DefinitionLazyLoader(self,
-                    block['definition'])
+                                                           block['definition'])
         else:
             # Load all descendants by id
             descendent_definitions = self.definitions.find({
                 '_id': {'$in': [block['definition']
-                    for block in new_module_data.itervalues()]}})
+                                for block in new_module_data.itervalues()]}})
             # turn into a map
             definitions = {definition['_id']: definition
-                for definition in descendent_definitions}
+                           for definition in descendent_definitions}
 
             for block in new_module_data.itervalues():
                 if block['definition'] in definitions:
@@ -196,9 +198,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
         '''
         # NOTE: if and when this uses cache, the update if changed logic will break if the cache
         # holds the same objects as the descriptors!
-        if (course_locator.version_guid is None
-            and (course_locator.course_id is None or course_locator.revision is None)):
-            raise InsufficientSpecificationError(course_locator)
+        if not course_locator.is_fully_specified():
+            raise InsufficientSpecificationError('Not fully specified: %s' % course_locator)
 
         if course_locator.course_id is not None and course_locator.revision is not None:
             # use the course_id
@@ -215,10 +216,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
             # TODO should this raise an exception if revision was provided?
             version_guid = course_locator.version_guid
 
+        # cast string to ObjectId if necessary
+        version_guid = course_locator.as_object_id(version_guid)
         entry = self.structures.find_one({'_id': version_guid})
+
         # b/c more than one course can use same structure, the 'course_id' is not intrinsic to structure
         # and the one assoc'd w/ it by another fetch may not be the one relevant to this fetch; so,
         # fake it by explicitly setting it in the in memory structure.
+
         if course_locator.course_id:
             entry['course_id'] = course_locator.course_id
             entry['revision'] = course_locator.revision
@@ -254,8 +259,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
         for entry in course_entries:
             # structures are course agnostic but the caller wants to know course, so add it in here
             entry['course_id'] = id_version_map[entry['_id']]
-            result.extend(self._load_items(entry, [entry['root']], 0,
-                lazy=True))
+            root = entry['root']
+            result.extend(self._load_items(entry, [root], 0, lazy=True))
         return result
 
     def get_course(self, course_locator):
@@ -266,8 +271,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
         raises InsufficientSpecificationError
         '''
         course_entry = self._lookup_course(course_locator)
-        result = self._load_items(course_entry, [course_entry['root']], 0,
-            lazy=True)
+        root = course_entry['root']
+        result = self._load_items(course_entry, [root], 0, lazy=True)
         return result[0]
 
     def get_course_for_item(self, location):
@@ -302,7 +307,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
             descendants.
         raises InsufficientSpecificationError or ItemNotFoundError
         """
-        assert isinstance(location, BlockUsageLocator) and location.is_initialized()
+        assert isinstance(location, BlockUsageLocator)
+        if not location.is_initialized():
+            raise InsufficientSpecificationError("Not yet initialized: %s" % location)
         course = self._lookup_course(location)
         items = self._load_items(course, [location.usage_id], depth, lazy=True)
         if len(items) == 0:
@@ -408,7 +415,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             'edited_on': when the change was made
         }
         """
-        definition = self.definitions.find_one({'_id': definition_locator.def_id})
+        definition = self.definitions.find_one({'_id': definition_locator.definition_id})
         if definition is None:
             return None
         return {'original_version': definition['original_version'],

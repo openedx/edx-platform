@@ -1,9 +1,9 @@
 [
     {
-        "_id":"v12345d",
+        "_id": { "$oid" : "1d00000000000000dddd0000"},
         "root":"head12345",
-        "original_version":"v12345d0",
-        "previous_version":"v12345d1",
+        "original_version":{ "$oid" : "1d00000000000000dddd3333" },
+        "previous_version":{ "$oid" : "1d00000000000000dddd1111" },
         "edited_by":"testassist@edx.org",
         "edited_on":{
             "$date":1364483713238
@@ -54,8 +54,8 @@
                     "advertised_start":"Fall 2013",
                     "display_name":"The Ancient Greek Hero"
                 },
-                "update_version":"v12345d",
-                "previous_version":"v12345d1",
+                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
+                "previous_version":{ "$oid" : "1d00000000000000dddd1111" },
                 "edited_by":"testassist@edx.org",
                 "edited_on":{
                     "$date":1364483713238
@@ -70,7 +70,7 @@
                 "metadata":{
                     "display_name":"Hercules"
                 },
-                "update_version":"v12345d",
+                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
                 "previous_version":null,
                 "edited_by":"testassist@edx.org",
                 "edited_on":{
@@ -86,7 +86,7 @@
                 "metadata":{
                     "display_name":"Hera heckles Hercules"
                 },
-                "update_version":"v12345d",
+                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
                 "previous_version":null,
                 "edited_by":"testassist@edx.org",
                 "edited_on":{
@@ -103,7 +103,7 @@
                 "metadata":{
                     "display_name":"Hera cuckolds Zeus"
                 },
-                "update_version":"v12345d",
+                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
                 "previous_version":null,
                 "edited_by":"testassist@edx.org",
                 "edited_on":{
@@ -120,7 +120,7 @@
                     "display_name":"Problem 3.1",
                     "graceperiod":"4 hours 0 minutes 0 seconds"
                 },
-                "update_version":"v12345d",
+                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
                 "previous_version":null,
                 "edited_by":"testassist@edx.org",
                 "edited_on":{
@@ -136,7 +136,7 @@
                 "metadata":{
                     "display_name":"Problem 3.2"
                 },
-                "update_version":"v12345d",
+                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
                 "previous_version":null,
                 "edited_by":"testassist@edx.org",
                 "edited_on":{
@@ -146,10 +146,10 @@
         }
     },
     {
-        "_id":"v12345d1",
+        "_id": { "$oid" : "1d00000000000000dddd1111"},
         "root":"head12345",
-        "original_version":"v12345d0",
-        "previous_version":"v12345d0",
+        "original_version":{ "$oid" : "1d00000000000000dddd3333" },
+        "previous_version":{ "$oid" : "1d00000000000000dddd3333" },
         "edited_by":"testassist@edx.org",
         "edited_on":{
             "$date":1364481713238
@@ -198,8 +198,8 @@
                     "advertised_start":null,
                     "display_name":"The Ancient Greek Hero"
                 },
-                "update_version":"v12345d1",
-                "previous_version":"v12345d0",
+                "update_version":{ "$oid" : "1d00000000000000dddd1111" },
+                "previous_version":{ "$oid" : "1d00000000000000dddd3333" },
                 "edited_by":"testassist@edx.org",
                 "edited_on":{
                     "$date":1364481713238
@@ -208,9 +208,9 @@
         }
     },
     {
-        "_id":"v12345d0",
+        "_id": { "$oid" : "1d00000000000000dddd3333"},
         "root":"head12345",
-        "original_version":"v12345d0",
+        "original_version":{ "$oid" : "1d00000000000000dddd3333" },
         "previous_version":null,
         "edited_by":"test@edx.org",
         "edited_on":{
@@ -250,7 +250,7 @@
                     "advertised_start":null,
                     "display_name":"The Ancient Greek Hero"
                 },
-                "update_version":"v12345d0",
+                "update_version":{ "$oid" : "1d00000000000000dddd3333" },
                 "previous_version":null,
                 "edited_by":"test@edx.org",
                 "edited_on":{
@@ -260,10 +260,10 @@
         }
     },
     {
-        "_id":"v23456d",
+        "_id": { "$oid" : "1d00000000000000dddd2222"},
         "root":"head23456",
-        "original_version":"v23456d0",
-        "previous_version":"v23456d0",
+        "original_version":{ "$oid" : "1d00000000000000dddd4444" },
+        "previous_version":{ "$oid" : "1d00000000000000dddd4444" },
         "edited_by":"test@edx.org",
         "edited_on":{
             "$date":1364481313238
@@ -302,8 +302,8 @@
                     "advertised_start":null,
                     "display_name":"The most wonderful course"
                 },
-                "update_version":"v23456d",
-                "previous_version":"v23456d0",
+                "update_version":{ "$oid" : "1d00000000000000dddd2222" },
+                "previous_version":{ "$oid" : "1d00000000000000dddd4444" },
                 "edited_by":"test@edx.org",
                 "edited_on":{
                     "$date":1364481313238
@@ -313,9 +313,9 @@
         }
     },
     {
-        "_id":"v23456d0",
+        "_id": { "$oid" : "1d00000000000000dddd4444"},
         "root":"head23456",
-        "original_version":"v23456d0",
+        "original_version":{ "$oid" : "1d00000000000000dddd4444" },
         "previous_version":null,
         "edited_by":"test@edx.org",
         "edited_on":{
@@ -355,7 +355,7 @@
                     "advertised_start":null,
                     "display_name":"A wonderful course"
                 },
-                "update_version":"v23456d0",
+                "update_version":{ "$oid" : "1d00000000000000dddd4444" },
                 "previous_version":null,
                 "edited_by":"test@edx.org",
                 "edited_on":{
@@ -365,9 +365,9 @@
         }
     },
     {
-        "_id":"v23456p",
+        "_id": { "$oid" : "1d00000000000000eeee0000"},
         "root":"head23456",
-        "original_version":"v23456p",
+        "original_version":{ "$oid" : "1d00000000000000eeee0000" },
         "previous_version":null,
         "edited_by":"test@edx.org",
         "edited_on":{
@@ -407,7 +407,7 @@
                     "advertised_start":null,
                     "display_name":"The most wonderful course"
                 },
-                "update_version":"v23456p",
+                "update_version":{ "$oid" : "1d00000000000000eeee0000" },
                 "previous_version":null,
                 "edited_by":"test@edx.org",
                 "edited_on":{
@@ -417,9 +417,9 @@
         }
     },
     {
-        "_id":"v345679d",
+        "_id": { "$oid" : "1d00000000000000dddd5555"},
         "root":"head345679",
-        "original_version":"v345679d",
+        "original_version":{ "$oid" : "1d00000000000000dddd5555" },
         "previous_version":null,
         "edited_by":"test@guestx.edu",
         "edited_on":{
@@ -459,7 +459,7 @@
                     "advertised_start":null,
                     "display_name":"Yet another contender"
                 },
-                "update_version":"v345679d",
+                "update_version":{ "$oid" : "1d00000000000000dddd5555" },
                 "previous_version":null,
                 "edited_by":"test@guestx.edu",
                 "edited_on":{

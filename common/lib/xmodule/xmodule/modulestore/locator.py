@@ -143,6 +143,15 @@ class CourseLocator(Locator):
             raise InsufficientSpecificationError("Must provide one of these args: %s " %
                                                  list(need_oneof))
 
+    def is_fully_specified(self):
+        """
+        Returns True if either version_guid is specified, or course_id+revision
+        are specified.
+        This should always return True, since this should be validated in the constructor.
+        """
+        return self.version_guid is not None \
+            or (self.course_id is not None and self.revision is not None)
+
     def set_course_id(self, new):
         """
         Initialize course_id to new value.
@@ -163,6 +172,17 @@ class CourseLocator(Locator):
         If version_guid has already been initialized to a different value, raise an exception.
         """
         self.set_property('version_guid', new)
+
+    def as_course_locator(self):
+        """
+        Returns a copy of itself (downcasting) as a CourseLocator.
+        The copy has the same CourseLocator fields as the original.
+        The copy does not include subclass information, such as
+        a usage_id (a property of BlockUsageLocator).
+        """
+        return CourseLocator(course_id=self.course_id,
+                             version_guid=self.version_guid,
+                             revision=self.revision)
 
     def __init__(self, url=None, version_guid=None, course_id=None, revision=None):
         """
@@ -188,6 +208,19 @@ class CourseLocator(Locator):
         assert self.version_guid or self.course_id, \
             "Either version_guid or course_id should be set."
 
+    @classmethod
+    def as_object_id(cls, value):
+        """
+        Attempts to cast value as a bson.objectid.ObjectId.
+        If cast fails, raises ValueError
+        """
+        if isinstance(value, ObjectId):
+            return value
+        try:
+            return ObjectId(value)
+        except InvalidId:
+            raise ValueError('"%s" is not a valid version_guid' % value)
+
     def init_from_url(self, url):
         """
         url must be a string beginning with 'edx://' and containing
@@ -202,21 +235,19 @@ class CourseLocator(Locator):
         assert parse, 'Could not parse "%s" as a url' % url
         if 'version_guid' in parse:
             new_guid = parse['version_guid']
-            try:
-                self.set_version_guid(ObjectId(new_guid))
-            except InvalidId:
-                raise ValueError(
-                    '"%s" is not a valid version_guid' % new_guid
-                )
-
+            self.set_version_guid(self.as_object_id(new_guid))
         else:
             self.set_course_id(parse['id'])
             self.set_revision(parse['revision'])
 
     def init_from_version_guid(self, version_guid):
         """
-        version_guid must be an instance of bson.objectid.ObjectId
+        version_guid must be an instance of bson.objectid.ObjectId,
+        or able to be cast as one.
+        If it's a string, attempt to cast it as an ObjectId first.
         """
+        version_guid = self.as_object_id(version_guid)
+
         assert isinstance(version_guid, ObjectId), \
             '%s is not an instance of ObjectId' % version_guid
         self.set_version_guid(version_guid)
@@ -312,15 +343,6 @@ class BlockUsageLocator(CourseLocator):
         Returns True if usage_id has been initialized, else returns False
         """
         return self.usage_id is not None
-
-    def as_course_locator(self):
-        """
-        Returns a copy of itself as a CourseLocator.
-        The copy has the same information as the original, but without a usage_id.
-        """
-        return CourseLocator(course_id=self.course_id,
-                             version_guid=self.version_guid,
-                             revision=self.revision)
 
     def version_agnostic(self):
         """

@@ -47,9 +47,7 @@ class LocatorTest(TestCase):
         self.assertRaises(InsufficientSpecificationError, CourseLocator, revision='published')
 
     def test_course_constructor_bad_version_guid(self):
-        guid = ObjectId()
-        self.assertRaises(AssertionError, CourseLocator, version_guid="012345")
-        self.assertRaises(AssertionError, CourseLocator, version_guid=str(guid))
+        self.assertRaises(ValueError, CourseLocator, version_guid="012345")
         self.assertRaises(InsufficientSpecificationError, CourseLocator, version_guid=None)
 
     def test_course_constructor_version_guid(self):
