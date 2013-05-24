@@ -407,7 +407,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertTrue(changed)
 
     def test_get_max_score(self):
-        changed = self.combinedoe.update_task_states()
+        self.combinedoe.update_task_states()
         self.combinedoe.state = "done"
         self.combinedoe.is_scored = True
         max_score = self.combinedoe.max_score()
@@ -611,11 +611,11 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.assertEqual(module.current_task_number, 1)
 
         #Get html and other data client will request
-        html = module.get_html()
+        module.get_html()
         legend = module.handle_ajax("get_legend", {})
         self.assertTrue(isinstance(legend, basestring))
 
-        status = module.handle_ajax("get_status", {})
+        module.handle_ajax("get_status", {})
         module.handle_ajax("skip_post_assessment", {})
         self.assertTrue(isinstance(legend, basestring))
 
