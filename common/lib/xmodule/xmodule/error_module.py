@@ -82,8 +82,10 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
         }
         return ErrorDescriptor(
             system,
+            'error',
             location,
-            model_data,
+            None,
+            model_data
         )
 
     def get_context(self):

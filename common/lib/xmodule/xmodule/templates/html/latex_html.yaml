@@ -1,4 +1,6 @@
-display_name: E-text Written in LaTeX
+---
+metadata:
+    display_name: E-text Written in LaTeX
 source_code: |
     \subsection{Example of E-text in LaTeX}
 

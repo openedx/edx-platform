@@ -92,7 +92,10 @@ class DateTime(ModelType):
             # struct_times are always utc
             return time.strftime('%Y-%m-%dT%H:%M:%SZ', value)
         elif isinstance(value, datetime.datetime):
-            return value.isoformat() + 'Z'
+            if value.utcoffset() is None:
+                return value.isoformat() + 'Z'
+            else:
+                return value.isoformat()
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 

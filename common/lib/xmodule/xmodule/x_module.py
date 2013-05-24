@@ -125,8 +125,14 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         # TODO ensure each caller passes correct type (removed coercion)
         self.location = location
         self.descriptor = descriptor
-        self.url_name = descriptor.url_name
-        self.category = descriptor.category
+        # LMS tests don't require descriptor but really it's required
+        if descriptor:
+            self.url_name = descriptor.url_name
+            self.category = descriptor.category
+        elif isinstance(location, Location):
+            self.url_name = location.name
+        elif isinstance(location, BlockUsageLocator):
+            self.url_name = location.usage_id
         self._loaded_children = None
 
     @property
@@ -390,8 +396,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         elif isinstance(location, BlockUsageLocator):
             self.url_name = location.usage_id
         else:
-            # TODO what should it do?
-            pass
+            log.warning("cannot derive url_name from: {}".format(location))
+            self.url_name = location
         self._child_instances = None
 
     @property
@@ -523,6 +529,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         if parent_xblock is not None:
             parent_xblock.children.append(new_block)
         return new_block
+
+    @classmethod
+    def _translate(cls, key):
+        'VS[compat]'
+        return cls.metadata_translations.get(key, key)
 
     # ================================= XML PARSING ============================
     @staticmethod

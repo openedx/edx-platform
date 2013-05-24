@@ -1,4 +1,3 @@
-import re
 import json
 import logging
 import time
@@ -9,6 +8,7 @@ from functools import wraps
 from mitxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
 from xmodule.vertical_module import VerticalModule
+import datetime
 
 log = logging.getLogger("mitx.xmodule_modifiers")
 
@@ -83,7 +83,7 @@ def grade_histogram(module_id):
     cursor.execute(q, [module_id])
 
     grades = list(cursor.fetchall())
-    grades.sort(key=lambda x: x[0])          # Add ORDER BY to sql query?
+    grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
     if len(grades) >= 1 and grades[0][0] is None:
         return []
     return grades
@@ -101,7 +101,7 @@ def add_histogram(get_html, module, user):
     @wraps(get_html)
     def _get_html():
 
-        if type(module) in [SequenceModule, VerticalModule]:  	# TODO: make this more general, eg use an XModule attribute instead
+        if type(module) in [SequenceModule, VerticalModule]:  # TODO: make this more general, eg use an XModule attribute instead
             return get_html()
 
         module_id = module.id
@@ -132,7 +132,7 @@ def add_histogram(get_html, module, user):
 
         # useful to indicate to staff if problem has been released or not
         # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
-        now = time.gmtime()
+        now = datetime.datetime.utcnow()
         is_released = "unknown"
         mstart = module.descriptor.lms.start
 

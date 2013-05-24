@@ -20,6 +20,7 @@ from xblock.core import Scope, List, String, Object, Boolean
 from .fields import Date
 import logging
 from xmodule.fields import DateTime
+from xmodule.modulestore.locator import CourseLocator
 
 
 log = logging.getLogger(__name__)
@@ -151,12 +152,12 @@ class CourseFields(object):
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
         default=[], scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
-    enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
-    enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
+    enrollment_start = DateTime(help="Date that enrollment for this class is opened", scope=Scope.settings)
+    enrollment_end = DateTime(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = DateTime(help="Start time when this module is visible",
         default=datetime.utcnow(),
         scope=Scope.settings)
-    end = Date(help="Date that this class ends", scope=Scope.settings)
+    end = DateTime(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
     grading_policy = Object(help="Grading policy definition for this class",
         default={"GRADER": [
@@ -371,9 +372,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         # to just show a dashboard of courses. Can we move it?
         super(CourseDescriptor, self).__init__(*args, **kwargs)
 
-#        if self.wiki_slug is None:
-#            # FIXME won't work
-#            self.wiki_slug = self.location.course
+        if self.wiki_slug is None:
+            if isinstance(self.location, Location):
+                self.wiki_slug = self.location.course
+            elif isinstance(self.location, CourseLocator):
+                self.wiki_slug = self.location.course_id or self.display_name
 
         msg = None
 
@@ -499,10 +502,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             system.error_tracker("Unable to decode grading policy as json")
             policy = {}
 
-        # cdodge: import the grading policy information that is on disk and put into the
-        # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
-        instance.grading_policy = policy
-
         # now set the current instance. set_grading_policy() will apply some inheritance rules
         instance.set_grading_policy(policy)
 
@@ -539,7 +538,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 textbook_xml_object.set('book_url', textbook.book_url)
 
             xml_object.append(textbook_xml_object)
-        
+
         return xml_object
 
     def has_ended(self):
@@ -553,7 +552,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return time.gmtime() > self.end
 
     def has_started(self):
-        return datetime.datetime.utcnow() > self.start
+        return datetime.utcnow() > self.start
 
     @property
     def grader(self):
@@ -803,8 +802,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         elif self.advertised_start is None and self.start is None:
             # TODO this is an impossible state since the init function forces start to have a value
             return 'TBD'
+        elif isinstance(self.advertised_start, time.struct_time):
+            return time.strftime("%b %d, %Y", self.advertised_start)
+        elif hasattr(self.advertised_start, 'strftime'):
+            return self.advertised_start.strftime("%b %d, %Y")
         else:
-            return time.strftime("%b %d, %Y", self.advertised_start or self.start)
+            return self.start.strftime("%b %d, %Y")
 
     @property
     def end_date_text(self):

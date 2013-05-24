@@ -23,6 +23,10 @@ def compute_inherited_metadata(descriptor):
     NOTE: This means that there is no such thing as lazy loading at the
     moment--this accesses all the children."""
     for child in descriptor.get_children():
+        # force inherited fields w/ defaults to take the defaults so the children can inherit
+        for attr in INHERITABLE_METADATA:
+            if hasattr(descriptor, attr):
+                descriptor._model_data[attr] = getattr(descriptor, attr)
         inherit_metadata(child, descriptor._model_data)
         compute_inherited_metadata(child)
 

@@ -13,6 +13,7 @@ from xmodule.modulestore.inheritance import compute_inherited_metadata
 from xmodule.fields import Date
 
 from .test_export import DATA_DIR
+import datetime
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -153,7 +154,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(child.lms.due, Date().from_json(v))
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
         self.assertEqual(2, len(child._inherited_metadata))
-        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        self.assertLessEqual(child._inherited_metadata['start'], datetime.datetime.utcnow())
         self.assertEqual(v, child._inherited_metadata['due'])
 
         # Now export and check things
@@ -211,7 +212,8 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(child.lms.due, None)
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
         self.assertEqual(1, len(child._inherited_metadata))
-        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        # why do these tests look in the internal structure v just calling child.start?
+        self.assertLessEqual(child._inherited_metadata['start'], datetime.datetime.utcnow())
 
     def test_metadata_override_default(self):
         """
@@ -237,7 +239,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(child.lms.due, Date().from_json(child_due))
         # Test inherited metadata. Due does not appear here (because explicitly set on child).
         self.assertEqual(1, len(child._inherited_metadata))
-        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        self.assertLessEqual(child._inherited_metadata['start'], datetime.datetime.utcnow())
         # Test inheritable metadata. This has the course inheritable value for due.
         self.assertEqual(2, len(child._inheritable_metadata))
         self.assertEqual(course_due, child._inheritable_metadata['due'])

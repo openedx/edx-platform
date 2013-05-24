@@ -44,14 +44,13 @@ class CMS.Views.ModuleEdit extends Backbone.View
         changedMetadata[key] = currentMetadata[key]
     return changedMetadata
 
-  cloneTemplate: (parent, template) ->
-    $.post("/clone_item", {
-      parent_location: parent
-      template: template
-    }, (data) => 
-      @model.set(id: data.id)
-      @$el.data('id', data.id)
-      @render()
+  cloneTemplate: (parent, payload) ->
+    payload.parent_location = parent
+    $.post("/clone_item", payload, 
+        (data) => 
+            @model.set(id: data.id)
+            @$el.data('id', data.id)
+            @render()
     )
 
   render: ->

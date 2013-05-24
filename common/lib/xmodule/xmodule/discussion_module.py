@@ -4,11 +4,11 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.core import String, Scope
+from uuid import uuid4
 
 
 class DiscussionFields(object):
-    # TODO default to a guid
-    discussion_id = String(scope=Scope.settings, default="Week 1")
+    discussion_id = String(scope=Scope.settings, default="$$GUID$$")
     discussion_category = String(scope=Scope.settings)
     discussion_target = String(scope=Scope.settings, default="Topic-Level Student-Visible Label")
     display_name = String(help="Display name for this module", default="Discussion Tag", scope=Scope.settings)
@@ -32,6 +32,19 @@ class DiscussionModule(DiscussionFields, XModule):
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):
+
+    def __init__(self, system, category, location, definition_id, model_data):
+        super(DiscussionDescriptor, self).__init__(
+            system,
+            category,
+            location,
+            definition_id,
+            model_data)
+        # is this too late? i.e., will it get persisted and stay static w/ the first value
+        # any code references. I believe so.
+        if self.discussion_id == '$$GUID$$':
+            self.discussion_id = uuid4().hex
+
     module_class = DiscussionModule
     # The discussion XML format uses `id` and `for` attributes,
     # but these would overload other module attributes, so we prefix them

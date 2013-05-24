@@ -68,10 +68,10 @@ class CapaFields(object):
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted",
         scope=Scope.settings)
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings,
-        default="always", values=["answered", "always", "attempted", "closed", "never"])
+        default="closed", values=["answered", "always", "attempted", "closed", "never"])
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings,
         default=False)
-    rerandomize = Randomization(help="When to rerandomize the problem", default="never", scope=Scope.settings)
+    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", default="<problem></problem>", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers",
         scope=Scope.user_state, default={})
@@ -80,6 +80,7 @@ class CapaFields(object):
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    # markdown is tricky but unit.html has hardcoding for adding the blank advanced version; so, the default is ""
     markdown = String(help="Markdown source of this module", default="", scope=Scope.settings)
     source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.",
         scope=Scope.settings)

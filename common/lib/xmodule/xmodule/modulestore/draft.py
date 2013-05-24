@@ -1,8 +1,11 @@
 from datetime import datetime
 
-from . import ModuleStoreBase, Location, namedtuple_to_son
+from . import Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
+from xmodule.modulestore.mongo import location_to_query, get_course_id_no_run, MongoModuleStore
+import pymongo
+from xmodule.modulestore.exceptions import DuplicateItemError
 
 DRAFT = 'draft'
 
@@ -17,7 +20,7 @@ def as_published(location):
     """
     Returns the Location that is the published version for `location`
     """
-    return Location(location)._replace(revision=None)    
+    return Location(location)._replace(revision=None)
 
 
 def wrap_draft(item):
@@ -31,7 +34,7 @@ def wrap_draft(item):
     return item
 
 
-class DraftModuleStore(ModuleStoreBase):
+class DraftModuleStore(MongoModuleStore):
     """
     This mixin modifies a modulestore to give it draft semantics.
     That is, edits made to units are stored to locations that have the revision DRAFT,
@@ -105,6 +108,25 @@ class DraftModuleStore(ModuleStoreBase):
         ]
         return [wrap_draft(item) for item in draft_items + non_draft_items]
 
+    def convert_to_draft(self, source_location):
+        """
+        Create a copy of the source and mark its revision as draft.
+
+        :param source: the location of the source (its revision must be None)
+        """
+        original = self.collection.find_one(location_to_query(source_location))
+        draft_location = as_draft(source_location)
+        original['_id'] = draft_location.dict()
+        try:
+            self.collection.insert(original)
+        except pymongo.errors.DuplicateKeyError:
+            raise DuplicateItemError(original['_id'])
+
+        self.refresh_cached_metadata_inheritance_tree(draft_location)
+        self.fire_updated_modulestore_signal(get_course_id_no_run(draft_location), draft_location)
+
+        return self._load_items([original])[0]
+
     def clone_item(self, source, location):
         """
         Clone a new item that is a copy of the item at the location `source`
@@ -124,7 +146,7 @@ class DraftModuleStore(ModuleStoreBase):
         try:
             draft_item = self.get_item(location)
             if not getattr(draft_item, 'is_draft', False):
-                self.clone_item(location, draft_loc)
+                self.convert_to_draft(location)
         except ItemNotFoundError, e:
             if not allow_not_found:
                 raise e
@@ -142,7 +164,7 @@ class DraftModuleStore(ModuleStoreBase):
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
         if not getattr(draft_item, 'is_draft', False):
-            self.clone_item(location, draft_loc)
+            self.convert_to_draft(location)
 
         return super(DraftModuleStore, self).update_children(draft_loc, children)
 
@@ -158,7 +180,7 @@ class DraftModuleStore(ModuleStoreBase):
         draft_item = self.get_item(location)
 
         if not getattr(draft_item, 'is_draft', False):
-            self.clone_item(location, draft_loc)
+            self.convert_to_draft(location)
 
         if 'is_draft' in metadata:
             del metadata['is_draft']
@@ -202,7 +224,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         Turn the published version into a draft, removing the published version
         """
-        super(DraftModuleStore, self).clone_item(location, as_draft(location))
+        super(DraftModuleStore, self).convert_to_draft(location)
         super(DraftModuleStore, self).delete_item(location)
 
     def _query_children_for_cache_children(self, items):

@@ -25,7 +25,8 @@ class LogicTest(unittest.TestCase):
 
     def setUp(self):
         class EmptyClass:
-            pass
+            url_name = ''
+            category = 'test'
 
         self.system = None
         self.location = None
@@ -116,4 +117,4 @@ class WordCloudModuleTest(LogicTest):
              {'text': 'cat', 'size': 12, 'percent': 54.0}]
         )
 
-        self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']) )
+        self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']))

@@ -1041,7 +1041,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         return self.get_course(CourseLocator(course_id=new_id, revision=master_version))
 
     # TODO refactor or remove callers
-    def clone_item(self, source_course_id, dest_course_id, source, location):
+    def clone_item(self, source, location):
         """
         Clone a new item that is a copy of the item at the location `source`
         and writes it to `location`

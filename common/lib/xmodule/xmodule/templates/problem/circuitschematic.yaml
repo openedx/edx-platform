@@ -1,5 +1,6 @@
 ---
-display_name: Circuit Schematic Builder
+metadata:
+    display_name: Circuit Schematic Builder
 data: |
       <problem >
         Please make a voltage divider that splits the provided voltage evenly.

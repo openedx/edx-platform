@@ -47,7 +47,7 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-        course = CourseFactory.create(template='i4x://edx/templates/course/Empty', org='MITx', number='999', display_name='Robot Super Course')
+        course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         self.course_location = course.location
 
 
@@ -59,7 +59,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
         self.assertIsNone(details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end))
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
-        self.assertEqual(details.overview, "", "overview somehow initialized" + details.overview)
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
 
@@ -73,7 +72,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
         self.assertIsNone(jsondetails['syllabus'], "syllabus somehow initialized")
-        self.assertEqual(jsondetails['overview'], "", "overview somehow initialized")
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
 
@@ -132,13 +130,12 @@ class CourseDetailsViewTest(CourseTestCase):
         resp = self.client.get(url)
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
 
-        utc = UTC()
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=utc))
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=utc))
-        self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30, tzinfo=utc))
-        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30, tzinfo=utc))
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30))
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30))
+        self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30))
+        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30))
 
-        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=utc))
+        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30))
         self.alter_field(url, details, 'overview', "Overview")
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
@@ -154,7 +151,7 @@ class CourseDetailsViewTest(CourseTestCase):
 
     @staticmethod
     def struct_to_datetime(struct_time):
-        return datetime.datetime(*struct_time[:6], tzinfo=UTC())
+        return datetime.datetime(*struct_time[:6])
 
     def compare_date_fields(self, details, encoded, context, field):
         if details[field] is not None:
@@ -169,8 +166,8 @@ class CourseDetailsViewTest(CourseTestCase):
                     details_encoded = date.from_json(details[field])
                     dt2 = CourseDetailsViewTest.struct_to_datetime(details_encoded)
 
-                expected_delta = datetime.timedelta(0)
-                self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
+                expected_delta = datetime.timedelta(seconds=1)
+                self.assertLessEqual(abs(dt1 - dt2), expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:

@@ -32,14 +32,15 @@ class TemplateTests(unittest.TestCase):
         self.assertGreaterEqual(len(found.get('problem')), 10)
         dropdown = None
         for template in found['problem']:
-            self.assertIn('display_name', template)
-            if template['display_name'] == 'Dropdown':
+            self.assertIn('metadata', template)
+            self.assertIn('display_name', template['metadata'])
+            if template['metadata']['display_name'] == 'Dropdown':
                 dropdown = template
                 break
         self.assertIsNotNone(dropdown)
-        self.assertIn('markdown', dropdown)
+        self.assertIn('markdown', dropdown['metadata'])
         self.assertIn('data', dropdown)
-        self.assertRegexpMatches(dropdown['markdown'], r'^Dropdown.*')
+        self.assertRegexpMatches(dropdown['metadata']['markdown'], r'^Dropdown.*')
         self.assertRegexpMatches(dropdown['data'], r'<problem>\s*<p>Dropdown.*')
 
     def test_factories(self):

@@ -8,7 +8,6 @@ from fs.osfs import OSFS
 from itertools import repeat
 from path import path
 from operator import attrgetter
-from uuid import uuid4
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -19,9 +18,7 @@ from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from xblock.core import Scope
 
 from . import ModuleStoreBase, Location, namedtuple_to_son
-from .draft import DraftModuleStore
-from .exceptions import (ItemNotFoundError,
-                         DuplicateItemError)
+from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
 
 log = logging.getLogger(__name__)
@@ -352,7 +349,9 @@ class MongoModuleStore(ModuleStoreBase):
             if self.metadata_inheritance_cache_subsystem is not None:
                 tree = self.metadata_inheritance_cache_subsystem.get(key, {})
             else:
-                logging.warning('Running MongoModuleStore without a metadata_inheritance_cache_subsystem. This is OK in localdev and testing environment. Not OK in production.')
+                # DON'T CHECK IN
+                pass
+#                 logging.warning('Running MongoModuleStore without a metadata_inheritance_cache_subsystem. This is OK in localdev and testing environment. Not OK in production.')
 
         if not tree:
             # if not in subsystem, or we are on force refresh, then we have to compute
@@ -553,51 +552,96 @@ class MongoModuleStore(ModuleStoreBase):
         modules = self._load_items(list(items), depth)
         return modules
 
+    def create_xmodule(self, location, definition_data=None, metadata=None, system=None):
+        """
+        Create the new xmodule but don't save it. Returns the new module.
+
+        :param location: a Location--must have a category
+        :param definition_data: can be empty. The initial definition_data for the kvs
+        :param metadata: can be empty, the initial metadata for the kvs
+        :param system: if you already have an xmodule from the course, the xmodule.system value
+        """
+        if not isinstance(location, Location):
+            location = Location(location)
+        # differs from split mongo in that I believe most of this logic should be above the persistence
+        # layer but added it here to enable quick conversion. I'll need to reconcile these.
+        if definition_data is None:
+            definition_data = {}
+        if metadata is None:
+            metadata = {}
+        if system is None:
+            system = CachingDescriptorSystem(
+                self,
+                {},
+                self.default_class,
+                None,
+                self.error_tracker,
+                self.render_template,
+                {}
+            )
+        dbmodel = self._create_new_model_data(location.category, location, definition_data, metadata)
+        xblock_class = XModuleDescriptor.load_class(location.category, self.default_class)
+        return xblock_class(system, location.category, location, None, dbmodel)
+
+    def save_xmodule(self, xmodule):
+        """
+        Save the given xmodule (will either create or update based on whether id already exists).
+        Pulls out the data definition v metadata v children locally but saves it all.
+
+        :param xmodule:
+        """
+        # split mongo's persist_dag is more general and useful.
+        self.collection.save({
+                '_id': xmodule.location.dict(),
+                'metadata': own_metadata(xmodule),
+                'definition': {
+                    'data': xmodule.xblock_kvs()._data,
+                    'children': xmodule.children if xmodule.has_children else []
+                }
+            })
+        # recompute (and update) the metadata inheritance tree which is cached
+        self.refresh_cached_metadata_inheritance_tree(xmodule.location)
+        self.fire_updated_modulestore_signal(get_course_id_no_run(xmodule.location), xmodule.location)
+
+    def create_and_save_xmodule(self, location, definition_data=None, metadata=None, system=None):
+        """
+        Create the new xmodule and save it. Returns the new module (from persistence). The difference
+        between this and just doing create_xmodule and save_xmodule is this ensures static_tabs get
+        pointed to by the course.
+
+        :param location: a Location--must have a category
+        :param definition_data: can be empty. The initial definition_data for the kvs
+        :param metadata: can be empty, the initial metadata for the kvs
+        :param system: if you already have an xmodule from the course, the xmodule.system value
+        """
+        # differs from split mongo in that I believe most of this logic should be above the persistence
+        # layer but added it here to enable quick conversion. I'll need to reconcile these.
+        new_object = self.create_xmodule(location, definition_data, metadata, system)
+        location = new_object.location
+        self.save_xmodule(new_object)
+
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        # TODO move this special casing to app tier (similar to attaching new element to parent)
+        if location.category == 'static_tab':
+            course = self.get_course_for_item(location)
+            existing_tabs = course.tabs or []
+            existing_tabs.append({
+                'type': 'static_tab',
+                'name': new_object.display_name,
+                'url_slug': new_object.location.name
+            })
+            course.tabs = existing_tabs
+            self.update_metadata(course.location, course.xblock_kvs()._metadata)
+        return self.get_item(location)
+
     def clone_item(self, source, location):
         """
         Clone a new item that is a copy of the item at the location `source`
         and writes it to `location`
         """
-        item = None
-        try:
-            source_item = self.collection.find_one(location_to_query(source))
-
-            # allow for some programmatically generated substitutions in metadata, e.g. Discussion_id's should be auto-generated
-            for key in source_item['metadata'].keys():
-                if source_item['metadata'][key] == '$$GUID$$':
-                    source_item['metadata'][key] = uuid4().hex
-
-            source_item['_id'] = Location(location).dict()
-            self.collection.insert(
-                source_item,
-                # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
-                # from overriding our default value set in the init method.
-                safe=self.collection.safe
-            )
-            item = self._load_items([source_item])[0]
-
-            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-            # if we add one then we need to also add it to the policy information (i.e. metadata)
-            # we should remove this once we can break this reference from the course to static tabs
-            if location.category == 'static_tab':
-                course = self.get_course_for_item(item.location)
-                existing_tabs = course.tabs or []
-                existing_tabs.append({
-                    'type': 'static_tab',
-                    'name': item.display_name,
-                    'url_slug': item.location.name
-                })
-                course.tabs = existing_tabs
-                self.update_metadata(course.location, course._model_data._kvs._metadata)
-
-        except pymongo.errors.DuplicateKeyError:
-            raise DuplicateItemError(location)
-
-        # recompute (and update) the metadata inheritance tree which is cached
-        self.refresh_cached_metadata_inheritance_tree(Location(location))
-        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
-
-        return item
+        raise NotImplementedError("Replace w/ create_and_save_xmodule")
 
     def fire_updated_modulestore_signal(self, course_id, location):
         if self.modulestore_update_signal is not None:
@@ -744,13 +788,18 @@ class MongoModuleStore(ModuleStoreBase):
         """
         return {}
 
+    def _create_new_model_data(self, category, location, definition_data, metadata):
+        """
+        To instantiate a new xmodule which will be saved latter, set up the dbModel and kvs
+        """
+        kvs = MongoKeyValueStore(
+            definition_data,
+            [],
+            metadata
+        )
 
-# DraftModuleStore is first, because it needs to intercept calls to MongoModuleStore
-class DraftMongoModuleStore(DraftModuleStore, MongoModuleStore):
-    """
-    Version of MongoModuleStore with draft capability mixed in
-    """
-    """
-    Version of MongoModuleStore with draft capability mixed in
-    """
-    pass
+        class_ = XModuleDescriptor.load_class(
+                    category,
+                    self.default_class
+                )
+        return DbModel(kvs, class_, None, MongoUsage(None, location))

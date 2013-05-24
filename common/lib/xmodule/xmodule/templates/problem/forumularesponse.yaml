@@ -1,5 +1,6 @@
 ---
-display_name: Math Expression Input
+metadata:
+    display_name: Math Expression Input
 data: |
   <problem>
   <p>

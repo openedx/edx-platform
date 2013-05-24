@@ -25,6 +25,8 @@ from models.settings.course_grading import CourseGradingModel
 
 from .requests import get_request_method, _xmodule_recurse
 from .access import has_access
+from xmodule import templates
+from xmodule.x_module import XModuleDescriptor
 
 # TODO: should explicitly enumerate exports with __all__
 
@@ -32,10 +34,11 @@ from .access import has_access
 
 log = logging.getLogger(__name__)
 
+# NOTE: edit_unit assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
-ADVANCED_COMPONENT_TYPES = ['annotatable' + 'word_cloud'] + OPEN_ENDED_COMPONENT_TYPES
+ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud'] + OPEN_ENDED_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -85,7 +88,7 @@ def edit_subsection(request, location):
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
                                'context_course': course,
-                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+                               'new_unit_category': 'vertical',
                                'lms_link': lms_link,
                                'preview_link': preview_link,
                                'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
@@ -111,10 +114,31 @@ def edit_unit(request, location):
         raise PermissionDenied()
 
     item = modulestore().get_item(location, depth=1)
-
     lms_link = get_lms_link_for_item(item.location, course_id=course.location.course_id)
 
     component_templates = defaultdict(list)
+    for category in COMPONENT_TYPES:
+        component_class = XModuleDescriptor.load_class(category)
+        # add the default template
+        has_markdown = hasattr(component_class, 'markdown') and component_class.markdown is not None
+        component_templates[category].append((
+            component_class.display_name.default or 'Blank',
+            category,
+            has_markdown,
+            True,
+            None,  # don't override default data
+            None  # don't override default metadata
+        ))
+        # add boilerplates
+        for template in component_class.templates():
+            component_templates[category].append((
+                template['metadata'].get('display_name'),
+                category,
+                template['metadata'].get('markdown') is not None,
+                False,
+                template.get('data'),
+                template.get('metadata')
+            ))
 
     # Check if there are any advanced modules specified in the course policy. These modules
     # should be specified as a list of strings, where the strings are the names of the modules
@@ -122,29 +146,23 @@ def edit_unit(request, location):
     course_advanced_keys = course.advanced_modules
 
     # Set component types according to course policy file
-    component_types = list(COMPONENT_TYPES)
     if isinstance(course_advanced_keys, list):
-        course_advanced_keys = [c for c in course_advanced_keys if c in ADVANCED_COMPONENT_TYPES]
-        if len(course_advanced_keys) > 0:
-            component_types.append(ADVANCED_COMPONENT_CATEGORY)
+        for category in course_advanced_keys:
+            if category in ADVANCED_COMPONENT_TYPES:
+                # Do I need to allow for boilerplates or just defaults on the class? i.e., can an advanced
+                # have more than one entry in the menu? one for default and others for prefilled boilerplates?
+                component_class = XModuleDescriptor.load_class(category)
+
+                component_templates['advanced'].append((
+                    component_class.display_name.default or category,
+                    category,
+                    hasattr(component_class, 'markdown') and component_class.markdown is not None,
+                    False,
+                    None,  # don't override default data
+                    None
+                    ))
     else:
         log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
-
-    templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
-    for template in templates:
-        category = template.location.category
-
-        if category in course_advanced_keys:
-            category = ADVANCED_COMPONENT_CATEGORY
-
-        if category in component_types:
-            # This is a hack to create categories for different xmodules
-            component_templates[category].append((
-                template.display_name_with_default,
-                template.location.url(),
-                hasattr(template, 'markdown') and template.markdown is not None,
-                template.cms.empty,
-            ))
 
     components = [
         component.location.url()
@@ -199,7 +217,7 @@ def edit_unit(request, location):
         'subsection': containing_subsection,
         'release_date': get_default_time_display(containing_subsection.lms.start) if containing_subsection.lms.start is not None else None,
         'section': containing_section,
-        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+        'new_unit_category': 'vertical',
         'unit_state': unit_state,
         'published_date': item.cms.published_date.strftime('%B %d, %Y') if item.cms.published_date is not None else None,
     })
@@ -235,7 +253,7 @@ def create_draft(request):
 
     # This clones the existing item location to a draft location (the draft is implicit,
     # because modulestore is a Draft modulestore)
-    modulestore().clone_item(location, location)
+    modulestore().convert_to_draft(location)
 
     return HttpResponse()
 

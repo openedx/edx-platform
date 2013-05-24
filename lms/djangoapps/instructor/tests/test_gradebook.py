@@ -51,11 +51,11 @@ class TestGradebook(ModuleStoreTestCase):
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
-        for i in xrange(USER_COUNT-1):
-            template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
+        for i in xrange(USER_COUNT - 1):
+            category = "problem"
             item = ItemFactory.create(
                 parent_location=section.location,
-                template=template_name,
+                category=category,
                 data=StringResponseXMLFactory().build_xml(answer='foo'),
                 metadata={'rerandomize': 'always'}
             )

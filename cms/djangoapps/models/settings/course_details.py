@@ -10,19 +10,20 @@ from contentstore.utils import update_item
 from xmodule.fields import Date
 import re
 import logging
+import datetime
 
 
 class CourseDetails(object):
     def __init__(self, location):
-        self.course_location = location    # a Location obj
+        self.course_location = location  # a Location obj
         self.start_date = None  # 'start'
-        self.end_date = None    # 'end'
+        self.end_date = None  # 'end'
         self.enrollment_start = None
         self.enrollment_end = None
-        self.syllabus = None    # a pdf file asset
-        self.overview = ""      # html to render as the overview
-        self.intro_video = None    # a video pointer
-        self.effort = None      # int hours/week
+        self.syllabus = None  # a pdf file asset
+        self.overview = ""  # html to render as the overview
+        self.intro_video = None  # a video pointer
+        self.effort = None  # int hours/week
 
     @classmethod
     def fetch(cls, course_location):
@@ -73,9 +74,9 @@ class CourseDetails(object):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
-        ## TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
+        # # TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
         course_location = jsondict['course_location']
-        ## Will probably want to cache the inflight courses because every blur generates an update
+        # # Will probably want to cache the inflight courses because every blur generates an update
         descriptor = get_modulestore(course_location).get_item(course_location)
 
         dirty = False
@@ -174,14 +175,19 @@ class CourseDetails(object):
         return result
 
 
-# TODO move to a more general util? Is there a better way to do the isinstance model check?
+# TODO move to a more general util?
 class CourseSettingsEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, CourseDetails) or isinstance(obj, course_grading.CourseGradingModel):
+        if isinstance(obj, (CourseDetails, course_grading.CourseGradingModel)):
             return obj.__dict__
         elif isinstance(obj, Location):
             return obj.dict()
         elif isinstance(obj, time.struct_time):
             return Date().to_json(obj)
+        elif isinstance(obj, datetime.datetime):
+            if obj.utcoffset() is None:
+                return obj.isoformat() + 'Z'
+            else:
+                return obj.isoformat()
         else:
             return JSONEncoder.default(self, obj)

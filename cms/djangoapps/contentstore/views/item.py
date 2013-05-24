@@ -75,23 +75,24 @@ def save_item(request):
 @expect_json
 def clone_item(request):
     parent_location = Location(request.POST['parent_location'])
-    template = Location(request.POST['template'])
+    category = request.POST['category']
 
     display_name = request.POST.get('display_name')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
 
-    parent = get_modulestore(template).get_item(parent_location)
-    dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
+    parent = get_modulestore(category).get_item(parent_location)
+    dest_location = parent_location._replace(category=category, name=uuid4().hex)
 
-    new_item = get_modulestore(template).clone_item(template, dest_location)
-
-    # replace the display name with an optional parameter passed in from the caller
+    # get the metadata, display_name, and definition from the request
+    data = request.POST.get('data')
+    metadata = request.POST.get('metadata', {})
     if display_name is not None:
-        new_item.display_name = display_name
+        metadata['display_name'] = display_name
 
-    get_modulestore(template).update_metadata(new_item.location.url(), own_metadata(new_item))
+    new_item = get_modulestore(category).create_and_save_xmodule(dest_location, definition_data=data,
+        metadata=metadata, system=parent.system)
 
     if new_item.location.category not in DETACHED_CATEGORIES:
         get_modulestore(parent.location).update_children(parent_location, parent.children + [new_item.location.url()])

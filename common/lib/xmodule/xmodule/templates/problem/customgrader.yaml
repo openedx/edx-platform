@@ -1,4 +1,6 @@
-display_name: Custom Python-Evaluated Input
+---
+metadata:
+    display_name: Custom Python-Evaluated Input
 data: |
       <problem>
       <p>
