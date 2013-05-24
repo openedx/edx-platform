@@ -1,25 +1,21 @@
-from . import ModuleStoreBase
-from .exceptions import ItemNotFoundError
-from importlib import import_module
-from path import path
-from xmodule.error_module import ErrorDescriptor
-from xmodule.errortracker import null_error_tracker, exc_info_to_str
-from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XModuleDescriptor
-import logging
-import pymongo
-import sys
-from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, CourseLocator, VersionTree
-from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
-from collections import namedtuple
-from xblock.core import Scope
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError
-import re
-from xmodule.modulestore import inheritance
 import threading
 import datetime
-import copy
+import logging
+import pymongo
+import re
+from importlib import import_module
+from path import path
 
+from xmodule.errortracker import null_error_tracker
+from xmodule.x_module import XModuleDescriptor
+from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, CourseLocator, VersionTree
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError
+from xmodule.modulestore import inheritance
+
+from .. import ModuleStoreBase
+from ..exceptions import ItemNotFoundError
+from .definition_lazy_loader import DefinitionLazyLoader
+from .caching_descriptor_system import CachingDescriptorSystem
 
 log = logging.getLogger(__name__)
 #==============================================================================
@@ -41,264 +37,6 @@ log = logging.getLogger(__name__)
 #   Local fix wont' permanently work b/c xblock may cache a.foo...
 #
 #==============================================================================
-
-
-# id is a BlockUsageLocator, def_id is the definition's guid
-SplitMongoKVSid = namedtuple('SplitMongoKVSid', 'id, def_id')
-
-
-class DefinitionLazyLoader(object):
-    '''
-    A placeholder to put into an xblock in place of its definition which
-    when accessed knows how to get its content. Only useful if the containing
-    object doesn't force access during init but waits until client wants the
-    definition. Only works if the modulestore is a split mongo store.
-    '''
-    def __init__(self, modulestore, definition_id):
-        '''
-        Simple placeholder for yet-to-be-fetched data
-        :param modulestore: the pymongo db connection with the definitions
-        :param definition_locator: the id of the record in the above to fetch
-        '''
-        self.modulestore = modulestore
-        self.definition_locator = DescriptionLocator(definition_id)
-
-    def fetch(self):
-        '''
-        Fetch the definition. Note, the caller should replace this lazy
-        loader pointer with the result so as not to fetch more than once
-        '''
-        return self.modulestore.definitions.find_one(
-            {'_id': self.definition_locator.def_id})
-
-
-# TODO should this be here or w/ x_module or ???
-class SplitMongoKVS(KeyValueStore):
-    """
-    A KeyValueStore that maps keyed data access to one of the 3 data areas
-    known to the MongoModuleStore (data, children, and metadata)
-    """
-    def __init__(self, definition, children, metadata, _inherited_metadata):
-        """
-
-        :param definition:
-        :param children:
-        :param metadata: the locally defined value for each metadata field
-        :param _inherited_metadata: the value of each inheritable field from above this.
-            Note, metadata may override and disagree w/ this b/c this says what the value
-            should be if metadata is undefined for this field.
-        """
-        # ensure kvs's don't share objects w/ others so that changes can't appear in separate ones
-        # the particular use case was that changes to kvs's were polluting caches. My thinking was
-        # that kvs's should be independent thus responsible for the isolation.
-        if isinstance(definition, DefinitionLazyLoader):
-            self._definition = definition
-        else:
-            self._definition = copy.copy(definition)
-        self._children = copy.copy(children)
-        self._metadata = copy.copy(metadata)
-        self._inherited_metadata = _inherited_metadata
-
-    def get(self, key):
-        if key.scope == Scope.children:
-            return self._children
-        elif key.scope == Scope.parent:
-            return None
-        elif key.scope == Scope.settings:
-            if key.field_name in self._metadata:
-                return self._metadata[key.field_name]
-            elif key.field_name in self._inherited_metadata:
-                return self._inherited_metadata[key.field_name]
-            else:
-                raise KeyError()
-        elif key.scope == Scope.content:
-            if isinstance(self._definition, DefinitionLazyLoader):
-                self._definition = self._definition.fetch()
-            if (key.field_name == 'data' and
-                not isinstance(self._definition.get('data'), dict)):
-                return self._definition.get('data')
-            elif 'data' not in self._definition or key.field_name not in self._definition['data']:
-                raise KeyError()
-            else:
-                return self._definition['data'][key.field_name]
-        else:
-            raise InvalidScopeError(key.scope)
-
-    def set(self, key, value):
-        # TODO cache db update implications & add method to invoke
-        if key.scope == Scope.children:
-            self._children = value
-            # TODO remove inheritance from any orphaned exchildren
-            # TODO add inheritance to any new children
-        elif key.scope == Scope.settings:
-            # TODO if inheritable, push down to children who don't override
-            self._metadata[key.field_name] = value
-        elif key.scope == Scope.content:
-            if isinstance(self._definition, DefinitionLazyLoader):
-                self._definition = self._definition.fetch()
-            if (key.field_name == 'data' and
-                not isinstance(self._definition.get('data'), dict)):
-                self._definition.get('data')
-            else:
-                self._definition.setdefault('data', {})[key.field_name] = value
-        else:
-            raise InvalidScopeError(key.scope)
-
-    def delete(self, key):
-        # TODO cache db update implications & add method to invoke
-        if key.scope == Scope.children:
-            self._children = []
-        elif key.scope == Scope.settings:
-            # TODO if inheritable, ensure _inherited_metadata has value from above and
-            # revert children to that value
-            if key.field_name in self._metadata:
-                del self._metadata[key.field_name]
-        elif key.scope == Scope.content:
-            if isinstance(self._definition, DefinitionLazyLoader):
-                self._definition = self._definition.fetch()
-            if (key.field_name == 'data' and
-                not isinstance(self._definition.get('data'), dict)):
-                self._definition.setdefault('data', None)
-            else:
-                try:
-                    del self._definition['data'][key.field_name]
-                except KeyError:
-                    pass
-        else:
-            raise InvalidScopeError(key.scope)
-
-    def has(self, key):
-        if key.scope in (Scope.children, Scope.parent):
-            return True
-        elif key.scope == Scope.settings:
-            return key.field_name in self._metadata or key.field_name in self._inherited_metadata
-        elif key.scope == Scope.content:
-            if isinstance(self._definition, DefinitionLazyLoader):
-                self._definition = self._definition.fetch()
-            if (key.field_name == 'data' and
-                not isinstance(self._definition.get('data'), dict)):
-                return self._definition.get('data') is not None
-            else:
-                return key.field_name in self._definition.get('data', {})
-        else:
-            return False
-
-    def get_data(self):
-        """
-        Intended only for use by persistence layer to get the native definition['data'] rep
-        """
-        if isinstance(self._definition, DefinitionLazyLoader):
-            self._definition = self._definition.fetch()
-        return self._definition.get('data')
-
-    def get_own_metadata(self):
-        """
-        Get the metadata explicitly set on this element.
-        """
-        return self._metadata
-
-    def get_inherited_metadata(self):
-        """
-        Get the metadata set by the ancestors (which own metadata may override or not)
-        """
-        return self._inherited_metadata
-
-
-# TODO should this be here or w/ x_module or ???
-class CachingDescriptorSystem(MakoDescriptorSystem):
-    """
-    A system that has a cache of a course version's json that it will use to load modules
-    from, with a backup of calling to the underlying modulestore for more data.
-
-    Computes the metadata inheritance upon creation.
-    """
-    def __init__(self, modulestore, course_entry, module_data, lazy,
-        default_class, error_tracker, render_template):
-        """
-        Computes the metadata inheritance and sets up the cache.
-
-        modulestore: the module store that can be used to retrieve additional
-        modules
-
-        module_data: a dict mapping Location -> json that was cached from the
-            underlying modulestore
-
-        default_class: The default_class to use when loading an
-            XModuleDescriptor from the module_data
-
-        resources_fs: a filesystem, as per MakoDescriptorSystem
-
-        error_tracker: a function that logs errors for later display to users
-
-        render_template: a function for rendering templates, as per
-            MakoDescriptorSystem
-        """
-        # TODO find all references to resources_fs and make handle None
-        super(CachingDescriptorSystem, self).__init__(
-                self._load_item, None, error_tracker, render_template)
-        self.modulestore = modulestore
-        self.course_entry = course_entry
-        self.lazy = lazy
-        self.module_data = module_data
-        self.default_class = default_class
-        # TODO see if self.course_id is needed: is already in course_entry but could be > 1 value
-        # Compute inheritance
-        modulestore.inherit_metadata(course_entry.get('blocks', {}),
-            course_entry.get('blocks', {})
-            .get(course_entry.get('root')))
-
-    def _load_item(self, usage_id):
-        # TODO ensure all callers of system.load_item pass just the id
-        json_data = self.module_data.get(usage_id)
-        if json_data is None:
-            # deeper than initial descendant fetch or doesn't exist
-            self.modulestore.cache_items(self, [usage_id], lazy=self.lazy)
-            json_data = self.module_data.get(usage_id)
-            if json_data is None:
-                raise ItemNotFoundError
-
-        class_ = XModuleDescriptor.load_class(
-            json_data.get('category'),
-            self.default_class
-        )
-        return self.xblock_from_json(class_, usage_id, json_data)
-
-    def xblock_from_json(self, class_, usage_id, json_data):
-        try:
-            # most likely a lazy loader but not the id directly
-            definition = json_data.get('definition', {})
-            metadata = json_data.get('metadata', {})
-
-            kvs = SplitMongoKVS(definition,
-                json_data.get('children', []),
-                metadata, json_data.get('_inherited_metadata'))
-
-            block_locator = BlockUsageLocator(
-                version_guid=self.course_entry['_id'],
-                usage_id=usage_id,
-                course_id=self.course_entry.get('course_id'), revision=self.course_entry.get('revision'))
-            model_data = DbModel(kvs, class_, None,
-                SplitMongoKVSid(
-                    # DbModel req's that these support .url()
-                    block_locator,
-                    self.modulestore.definition_locator(definition)))
-            module = class_(self, json_data.get('category'),
-                block_locator, self.modulestore.definition_locator(definition),
-                model_data)
-            module.edited_by = json_data.get('edited_by')
-            module.edited_on = json_data.get('edited_on')
-            module.previous_version = json_data.get('previous_version')
-            module.update_version = json_data.get('update_version')
-            return module
-        except:
-            log.warning("Failed to load descriptor", exc_info=True)
-            return ErrorDescriptor.from_json(
-                json_data,
-                self,
-                BlockUsageLocator(version_guid=self.course_entry['_id'],
-                    usage_id=usage_id),
-                error_msg=exc_info_to_str(sys.exc_info())
-            )
 
 
 class SplitMongoModuleStore(ModuleStoreBase):
@@ -564,7 +302,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             descendants.
         raises InsufficientSpecificationError or ItemNotFoundError
         """
-        location = BlockUsageLocator.ensure_fully_specified(location)
+        assert isinstance(location, BlockUsageLocator) and location.is_initialized()
         course = self._lookup_course(location)
         items = self._load_items(course, [location.usage_id], depth, lazy=True)
         if len(items) == 0:
@@ -618,7 +356,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
         for parent_id, value in course['blocks'].iteritems():
             for child_id in value['children']:
                 if usage_id == child_id:
-                    items.append(BlockUsageLocator(locator, usage_id=parent_id))
+                    locator = locator.as_course_locator()
+                    items.append(BlockUsageLocator(url=locator, usage_id=parent_id))
         return items
 
     def get_course_index_info(self, course_locator):
@@ -719,7 +458,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         The block's history tracks its explicit changes; so, changes in descendants won't be reflected
         as new iterations.
         '''
-        block_locator = self._version_agnostic(block_locator)
+        block_locator = block_locator.version_agnostic()
         course_struct = self._lookup_course(block_locator)
         usage_id = block_locator.usage_id
         update_version_field = 'blocks.{}.update_version'.format(usage_id)
@@ -799,7 +538,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         # if this looks in cache rather than fresh fetches, then it will probably not detect
         # actual change b/c the descriptor and cache probably point to the same objects
-        old_definition = self.definitions.find_one({'_id': definition_locator.def_id})
+        old_definition = self.definitions.find_one({'_id': definition_locator.definition_id})
         if old_definition is None:
             raise ItemNotFoundError(definition_locator.url())
         del old_definition['_id']
@@ -808,7 +547,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             old_definition['data'] = new_def_data
             old_definition['edited_by'] = user_id
             old_definition['edited_on'] = datetime.datetime.utcnow()
-            old_definition['previous_version'] = definition_locator.def_id
+            old_definition['previous_version'] = definition_locator.definition_id
             new_id = self.definitions.insert(old_definition)
             return DescriptionLocator(new_id), True
         else:
@@ -891,7 +630,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         structure = self._lookup_course(course_or_parent_locator)
 
         # persist the definition if persisted != passed
-        if (definition_locator is None or definition_locator.def_id is None):
+        if (definition_locator is None or definition_locator.definition_id is None):
             definition_locator = self.create_definition_from_data(new_def_data, category, user_id)
         elif new_def_data is not None:
             definition_locator, _ = self.update_definition_from_data(definition_locator, new_def_data, user_id)
@@ -911,7 +650,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         new_structure['blocks'][new_usage_id] = {
             "children": [],
             "category": category,
-            "definition": definition_locator.def_id,
+            "definition": definition_locator.definition_id,
             "metadata": metadata if metadata else {},
             'edited_on': datetime.datetime.utcnow(),
             'edited_by': user_id,
@@ -925,9 +664,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
         # update the index entry if appropriate
         if index_entry is not None:
             self._update_head(index_entry, course_or_parent_locator.revision, new_id)
+            course_parent = course_or_parent_locator.as_course_locator()
+        else:
+            course_parent = None
 
         # fetch and return the new item--fetching is unnecessary but a good qc step
-        return self.get_item(BlockUsageLocator(course_or_parent_locator, usage_id=new_usage_id, version_guid=new_id))
+        return self.get_item(BlockUsageLocator(course_id=course_parent, 
+                                               usage_id=new_usage_id, 
+                                               version_guid=new_id))
 
     def create_course(self, org, prettyid, user_id, id_root=None, metadata=None, course_data=None,
         master_version='draft', versions_dict=None, root_category='course'):
@@ -1084,7 +828,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             if descriptor.has_children:
                 block_data["children"] = [self._usage_id(child) for child in descriptor.children]
 
-            block_data["definition"] = descriptor.definition_locator.def_id
+            block_data["definition"] = descriptor.definition_locator.definition_id
             block_data["metadata"] = descriptor.xblock_kvs().get_own_metadata()
             block_data['edited_on'] = datetime.datetime.utcnow()
             block_data['edited_by'] = user_id
@@ -1146,7 +890,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
     def _persist_subdag(self, xblock, user_id, structure_blocks):
         # persist the definition if persisted != passed
         new_def_data = xblock.xblock_kvs().get_data()
-        if (xblock.definition_locator is None or xblock.definition_locator.def_id is None):
+        if (xblock.definition_locator is None or xblock.definition_locator.definition_id is None):
             xblock.definition_locator = self.create_definition_from_data(new_def_data,
                 xblock.category, user_id)
             is_updated = True
@@ -1186,7 +930,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             structure_blocks[usage_id] = {
                 "children": children,
                 "category": xblock.category,
-                "definition": xblock.definition_locator.def_id,
+                "definition": xblock.definition_locator.definition_id,
                 "metadata": metadata if metadata else {},
                 'previous_version': structure_blocks.get(usage_id, {}).get('update_version'),
                 'edited_by': user_id,
@@ -1255,7 +999,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
         """
-        BlockUsageLocator.ensure_fully_specified(usage_locator)
+        assert isinstance(usage_locator, BlockUsageLocator) and usage_locator.is_initialized()
         original_structure = self._lookup_course(usage_locator)
         if original_structure['root'] == usage_locator.usage_id:
             raise ValueError("Cannot delete the root of a course")
@@ -1488,17 +1232,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
                 return True
         return False
 
-    def _version_agnostic(self, block_locator):
-        """
-        We don't care if the locator's version is not the current head; so, avoid version conflict
-        by reducing info.
-
-        :param block_locator:
-        """
-        if block_locator.course_id and block_locator.version_guid:
-            block_locator = BlockUsageLocator(block_locator)
-            block_locator.course_id = None
-        return block_locator
 
     def _update_head(self, index_entry, revision, new_id):
         """
