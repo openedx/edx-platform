@@ -1,7 +1,7 @@
 header.global {
   border-bottom: 1px solid $m-gray;
   @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
-  background: $white;
+  background: $header-bg;
   height: 76px;
   position: relative;
   width: 100%;
