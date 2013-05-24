@@ -888,8 +888,8 @@ class CapaModule(CapaFields, XModule):
         self.system.track_function('problem_regrade', event_info)
 
         # TODO: figure out if psychometrics should be called on regrading requests
-        if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
-            self.system.psychometrics_handler(self.get_instance_state())
+        # if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
+        #     self.system.psychometrics_handler(self.get_state_for_lcp())
 
         return {'success': success}
 
