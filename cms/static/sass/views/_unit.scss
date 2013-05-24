@@ -80,7 +80,7 @@ body.course.unit {
       letter-spacing: 1px;
       text-transform: uppercase;
     }
-    
+
     // Component List Meta
     // ====================
     // TODO: clean up organization of this page, to many levels/duplication
@@ -185,7 +185,7 @@ body.course.unit {
             &.new-component-problem {
               padding-bottom:10px;
 
-              .ss-icon, .editor-indicator {
+              [class^="icon-"], .editor-indicator {
                 display: inline-block;
               }
 
@@ -245,7 +245,7 @@ body.course.unit {
               }
             }
 
-            a{
+            a {
               display: block;
               padding: 15px 25px;
               font-size: 15px;
@@ -299,7 +299,7 @@ body.course.unit {
               .name {
                 float: left;
 
-                .ss-icon {
+                [class^="icon-"] {
                   @include transition(opacity .15s);
                   display: inline-block;
                   top: 1px;
@@ -320,14 +320,14 @@ body.course.unit {
                 opacity: 0.3;
               }
 
-              .ss-icon, .editor-indicator {
+              [class^="icon-"], .editor-indicator {
                 display: none;
               }
 
               &:hover {
                 color: #fff;
 
-                .ss-icon {
+                [class^="icon-"] {
                   opacity: 1.0;
                 }
 
@@ -457,7 +457,7 @@ body.course.unit {
         margin-bottom: 0px;
       }
 
-      // Module Actions, also used for Static Pages 
+      // Module Actions, also used for Static Pages
       .module-actions {
         @include box-shadow(inset 0 1px 1px $shadow);
         padding: 0px 0 10px 10px;
@@ -553,7 +553,7 @@ body.course.unit {
   }
 
   //settings-list
-  .list-input.settings-list { 
+  .list-input.settings-list {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -574,7 +574,7 @@ body.course.unit {
       background-color: rgba(0, 0, 0, .5);
     }
 
-    //component-setting-entry 
+    //component-setting-entry
     .field.comp-setting-entry {
       background-color: $white;
       padding: 20px;
@@ -612,7 +612,7 @@ body.course.unit {
         .setting-input {
           color: $blue-l1;
         }
-        
+
         //setting-clear
         .setting-clear { }
       }
@@ -675,7 +675,7 @@ body.course.unit {
 
         width: 38.5%;
         @include box-shadow(0 1px 2px $shadow-l1 inset);
-        //For webkit browsers which render number fields differently, make input wider. 
+        //For webkit browsers which render number fields differently, make input wider.
         -moz-column-width: {
           width: 32%;
         }
@@ -738,7 +738,7 @@ body.course.unit {
   }
 }
 
-// Editing Units from Courseware  
+// Editing Units from Courseware
 // ====================
 
 body.unit {
@@ -763,7 +763,7 @@ body.unit {
   }
 }
 
-// Unit Page Sidebar  
+// Unit Page Sidebar
 // ====================
 
 .unit-settings {
