@@ -30,6 +30,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml import XMLModuleStore
+import datetime
 
 log = logging.getLogger("mitx." + __name__)
 
@@ -610,9 +611,9 @@ class TestViewAuth(LoginEnrollmentTestCase):
         """Actually do the test, relying on settings to be right."""
 
         # Make courses start in the future
-        tomorrow = time.time() + 24 * 3600
-        self.toy.lms.start = time.gmtime(tomorrow)
-        self.full.lms.start = time.gmtime(tomorrow)
+        tomorrow = datetime.timedelta(days=1)
+        self.toy.lms.start = datetime.datetime.utcnow() + tomorrow
+        self.full.lms.start = datetime.datetime.utcnow() + tomorrow
 
         self.assertFalse(self.toy.has_started())
         self.assertFalse(self.full.has_started())
@@ -644,7 +645,7 @@ class TestViewAuth(LoginEnrollmentTestCase):
             urls = reverse_urls(['about_course'], course)
             urls.append(reverse('courses'))
             # Need separate test for change_enrollment, since it's a POST view
-            #urls.append(reverse('change_enrollment'))
+            # urls.append(reverse('change_enrollment'))
 
             return urls
 
@@ -787,12 +788,9 @@ class TestViewAuth(LoginEnrollmentTestCase):
         self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
 
         # Make courses start in the future
-        tomorrow = time.time() + 24 * 3600
-        # nextday = tomorrow + 24 * 3600
-        # yesterday = time.time() - 24 * 3600
+        tomorrow = datetime.timedelta(days=1)
+        self.toy.lms.start = datetime.datetime.utcnow() + tomorrow
 
-        # toy course's hasn't started
-        self.toy.lms.start = time.gmtime(tomorrow)
         self.assertFalse(self.toy.has_started())
 
         # but should be accessible for beta testers
@@ -932,7 +930,7 @@ class TestCourseGrader(LoginEnrollmentTestCase):
         # Only get half of the first problem correct
         self.submit_question_answer('H1P1', ['Correct', 'Incorrect'])
         self.check_grade_percent(0.06)
-        self.assertEqual(earned_hw_scores(), [1.0, 0, 0])   # Order matters
+        self.assertEqual(earned_hw_scores(), [1.0, 0, 0])  # Order matters
         self.assertEqual(score_for_hw('Homework1'), [1.0, 0.0])
 
         # Get both parts of the first problem correct
@@ -965,13 +963,13 @@ class TestCourseGrader(LoginEnrollmentTestCase):
 
         # Third homework
         self.submit_question_answer('H3P1', ['Correct', 'Correct'])
-        self.check_grade_percent(0.42)   # Score didn't change
+        self.check_grade_percent(0.42)  # Score didn't change
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 2.0])
 
         self.submit_question_answer('H3P2', ['Correct', 'Correct'])
-        self.check_grade_percent(0.5)   # Now homework2 dropped. Score changes
+        self.check_grade_percent(0.5)  # Now homework2 dropped. Score changes
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 4.0])
 
         # Now we answer the final question (worth half of the grade)
         self.submit_question_answer('FinalQuestion', ['Correct', 'Correct'])
-        self.check_grade_percent(1.0)   # Hooray! We got 100%
+        self.check_grade_percent(1.0)  # Hooray! We got 100%

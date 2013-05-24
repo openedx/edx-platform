@@ -52,7 +52,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
         xmlstore: the XMLModuleStore to store the loaded modules in
         """
-        self.unnamed = defaultdict(int)     # category -> num of new url_names for that category
+        self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
         self.org, self.course, self.url_name = course_id.split('/')
         # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
@@ -123,7 +123,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
-                        #error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
+                        # error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
                         pass
 
                 # Make sure everything is unique
@@ -463,7 +463,7 @@ class XMLModuleStore(ModuleStoreBase):
                     # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
                     slug = os.path.splitext(os.path.basename(filepath))[0]
                     loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
-                    module = HtmlDescriptor(system, loc, {'data': html})
+                    module = HtmlDescriptor(system, category, loc, None, {'data': html})
                     # VS[compat]:
                     # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                     # from the course policy

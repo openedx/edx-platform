@@ -76,53 +76,50 @@
                               </li>
                             </ul>
                     % endif
-                        <div class="tab current" id="tab1">
-                          <ul class="new-component-template">
-                              % for name, location, has_markdown, is_empty in templates:
-                                % if has_markdown or type != "problem":
-                                    % if is_empty:
-                                      <li class="editor-md empty">
-                                        <a href="#" data-location="${location}">
-                                          <span class="name"> ${name}</span>
-                                        </a>
-                                      </li>
+                    <div class="tab current" id="tab1">
+                      <ul class="new-component-template">
+                          % for name, category, has_markdown, is_empty, boilerplate_data, boiler_meta in templates:
+                            % if has_markdown or type != "problem":
+                                % if is_empty:
+                                  <li class="editor-md empty">
+                                    <a href="#" data-category="${category}">
+                                      <span class="name"> ${name}</span>
+                                    </a>
+                                  </li>
 
-                                    % else:
-                                      <li class="editor-md">
-                                        <a href="#" data-location="${location}">
-                                          <span class="name"> ${name}</span>
-                                        </a>
-                                      </li>
-                                    % endif
+                                % else:
+                                  <li class="editor-md">
+                                    <a href="#" data-category="${category}" 
+                                       data-data="${boilerplate_data}" data-metadata="${boiler_meta}">
+                                      <span class="name"> ${name}</span>
+                                    </a>
+                                  </li>
                                 % endif
+                            % endif
 
-                              %endfor
+                          %endfor
+                      </ul>
+                    </div>
+                    % if type == "problem":
+                        <div class="tab" id="tab2">
+                          <ul class="new-component-template">
+                              <li class="editor-manual empty">
+                                <a href="#" data-category="problem" data-metadata="{markdown: null}">
+                                  <span class="name">Blank</span>
+                                </a>
+                              </li>
+                              % for name, category, has_markdown, is_empty, boilerplate_data, boiler_meta in templates:
+                                % if not has_markdown:
+                                  <li class="editor-manual">
+                                    <a href="#" data-category="${category}" 
+                                       data-data="${boilerplate_data}" data-metadata="${boiler_meta}">
+                                      <span class="name"> ${name}</span>
+                                    </a>
+                                  </li>
+                                % endif
+                              % endfor
                           </ul>
                         </div>
-                    % if type == "problem":
-                            <div class="tab" id="tab2">
-                              <ul class="new-component-template">
-                                  % for name, location, has_markdown, is_empty in templates:
-                                    % if not has_markdown:
-                                        % if is_empty:
-                                          <li class="editor-manual empty">
-                                            <a href="#" data-location="${location}">
-                                              <span class="name">${name}</span>
-                                            </a>
-                                          </li>
-
-                                        % else:
-                                          <li class="editor-manual">
-                                            <a href="#" data-location="${location}">
-                                              <span class="name"> ${name}</span>
-                                            </a>
-
-                                          </li>
-                                        % endif
-                                    % endif
-                                  % endfor
-                              </ul>
-                            </div>
                     </div>
                     % endif
                     <a href="#" class="cancel-button">Cancel</a>

@@ -707,7 +707,8 @@ class TestCourseCreation(SplitModuleTest):
         """
         The simplest case but probing all expected results from it.
         """
-        pre_time = datetime.datetime.utcnow()
+        # Oddly getting differences of 200nsec
+        pre_time = datetime.datetime.utcnow() - datetime.timedelta(milliseconds=1)
         new_course = modulestore().create_course('test_org', 'test_course', 'create_user')
         new_locator = new_course.location
         # check index entry

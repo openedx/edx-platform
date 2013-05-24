@@ -5,12 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 
-from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 
 from ..utils import get_modulestore, get_url_reverse
 from .requests import get_request_method
 from .access import get_location_and_verify_access
+import uuid
+import copy
 
 __all__ = ['get_checklists', 'update_checklist']
 
@@ -27,12 +28,13 @@ def get_checklists(request, org, course, name):
 
     modulestore = get_modulestore(location)
     course_module = modulestore.get_item(location)
-    new_course_template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
-    template_module = modulestore.get_item(new_course_template)
 
     # If course was created before checklists were introduced, copy them over from the template.
     copied = False
     if not course_module.checklists:
+        # find out the default checklist by creating a fake new not persisted course
+        fake_course_loc = course_module.location._replace(course=str(uuid.uuid4())[:7])
+        template_module = modulestore.create_xmodule(fake_course_loc)
         course_module.checklists = template_module.checklists
         copied = True
 
@@ -66,8 +68,10 @@ def update_checklist(request, org, course, name, checklist_index=None):
     if real_method == 'POST' or real_method == 'PUT':
         if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
             index = int(checklist_index)
+            # seeming noop which triggers kvs to record that the metadata is not default
+            course_module.checklists = course_module.checklists
             course_module.checklists[index] = json.loads(request.body)
-            checklists, modified = expand_checklist_action_urls(course_module)
+            checklists, _ = expand_checklist_action_urls(course_module)
             modulestore.update_metadata(location, own_metadata(course_module))
             return HttpResponse(json.dumps(checklists[index]), mimetype="application/json")
         else:

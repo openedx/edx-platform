@@ -5,14 +5,10 @@ from xmodule.modulestore import Location
 
 def get_module_info(store, location, parent_location=None, rewrite_static_links=False):
     try:
-        if location.revision is None:
-            module = store.get_item(location)
-        else:
-            module = store.get_item(location)
+        module = store.get_item(location)
     except ItemNotFoundError:
         # create a new one
-        template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])
-        module = store.clone_item(template_location, location)
+        module = store.create_and_save_xmodule(location)
 
     data = module.data
     if rewrite_static_links:
@@ -39,18 +35,11 @@ def get_module_info(store, location, parent_location=None, rewrite_static_links=
 def set_module_info(store, location, post_data):
     module = None
     try:
-        if location.revision is None:
-            module = store.get_item(location)
-        else:
-            module = store.get_item(location)
+        module = store.get_item(location)
     except:
-        pass
-
-    if module is None:
         # new module at this location
         # presume that we have an 'Empty' template
-        template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])
-        module = store.clone_item(template_location, location)
+        module = store.create_and_save_xmodule(location)
 
     if post_data.get('data') is not None:
         data = post_data['data']

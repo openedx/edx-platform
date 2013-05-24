@@ -90,7 +90,7 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     editor.cloneTemplate(
       @$el.data('id'),
-      $(event.currentTarget).data('location')
+      $(event.currentTarget).data()
     )
 
     analytics.track "Added a Component",

@@ -35,7 +35,6 @@ class InternationalizationTest(ModuleStoreTestCase):
         self.user.save()
 
         self.course_data = {
-            'template': 'i4x://edx/templates/course/Empty',
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',

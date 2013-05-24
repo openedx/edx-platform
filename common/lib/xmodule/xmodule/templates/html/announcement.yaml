@@ -1,5 +1,6 @@
 ---
-display_name: Announcement
+metadata:
+    display_name: Announcement
 data: |
       <ol>
       <li>  

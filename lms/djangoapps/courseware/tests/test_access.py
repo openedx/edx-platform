@@ -13,6 +13,7 @@ from xmodule.timeparse import parse_time
 from xmodule.x_module import XModule, XModuleDescriptor
 import courseware.access as access
 from .factories import CourseEnrollmentAllowedFactory
+import datetime
 
 
 class AccessTestCase(TestCase):
@@ -77,7 +78,7 @@ class AccessTestCase(TestCase):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         u = Mock()
         d = Mock()
-        d.start = time.gmtime(time.time() - 86400)   # make sure the start time is in the past
+        d.start = datetime.datetime.utcnow() - datetime.timedelta(days=1)  # make sure the start time is in the past
 
         # Always returns true because DISABLE_START_DATES is set in test.py
         self.assertTrue(access._has_access_descriptor(u, d, 'load'))
@@ -85,8 +86,8 @@ class AccessTestCase(TestCase):
 
     def test__has_access_course_desc_can_enroll(self):
         u = Mock()
-        yesterday = time.gmtime(time.time() - 86400)
-        tomorrow = time.gmtime(time.time() + 86400)
+        yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
         c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow)
 
         # User can enroll if it is between the start and end dates

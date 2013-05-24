@@ -1,5 +1,6 @@
 ---
-display_name: Image Mapped Input
+metadata:
+    display_name: Image Mapped Input
 data: |
   <problem>
   <p>

@@ -1,6 +1,7 @@
 ---
-display_name: Problem with Adaptive Hint
-source_code: |
+metadata:
+    display_name: Problem with Adaptive Hint
+    source_code: |
         \subsection{Problem With Adaptive Hint}
 
         % Adaptive hints are messages provided to students which depend on
