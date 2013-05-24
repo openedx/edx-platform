@@ -1,4 +1,5 @@
 footer {
-	border: none;
-	box-shadow: none;
+	border: $courseware-footer-border;
+	box-shadow: $courseware-footer-shadow;
+	margin-top: $courseware-footer-margin;
 }

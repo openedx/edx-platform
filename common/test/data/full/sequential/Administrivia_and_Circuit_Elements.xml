@@ -12,4 +12,13 @@
     <html slug="html_95">Minor correction: Six elements (five resistors)…</html>
     <customtag tag="S1" slug="discuss_96" impl="discuss"/>
   </vertical>
+
+  <randomize url_name="PS1_Q4" display_name="Problem 4: Read a Molecule">
+    <vertical>
+  <html slug="html_900">
+    <!-- UTF-8 characters are acceptable… HTML entities are not -->
+    <h1>Inline content…</h1>
+  </html>
+</vertical>
+   </randomize>
 </sequential>

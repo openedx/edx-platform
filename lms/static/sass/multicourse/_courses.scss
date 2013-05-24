@@ -1,12 +1,13 @@
 .find-courses, .university-profile {
-  background: rgb(252,252,252);
+  background: $course-profile-bg;
   padding-bottom: 60px;
 
   header.search {
-    background: rgb(240,240,240);
+    background: $course-profile-bg;
     background-size: cover;
+    @include background-image(url($homepage-bg-image));
     background-position: center top !important;
-    border-bottom: 1px solid rgb(100,100,100);
+    border-bottom: 1px solid $border-color-3;
     @include box-shadow(inset 0 -1px 8px 0 rgba(0,0,0, 0.2), inset 0 1px 12px 0 rgba(0,0,0, 0.3));
     height: 430px;
     margin-top: -69px;
@@ -24,8 +25,8 @@
 
       > hgroup {
         background: #FFF;
-        background: rgba(255,255,255, 0.93);
-        border: 1px solid rgb(100,100,100);
+        background: $course-header-bg;
+        border: 1px solid $border-color-3;
         @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
         padding: 20px 30px;
         position: relative;
@@ -83,7 +84,7 @@
   }
 
   section.message {
-    border-top: 1px solid rgb(220,220,220);
+    border-top: 1px solid $border-color-2;
     @include clearfix;
     margin-top: 20px;
     padding-top: 60px;

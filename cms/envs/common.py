@@ -323,6 +323,9 @@ INSTALLED_APPS = (
     'pipeline',
     'staticfiles',
     'static_replace',
+
+    # comment common
+    'django_comment_common',
 )
 
 ################# EDX MARKETING SITE ##################################

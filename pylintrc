@@ -110,7 +110,9 @@ generated-members=
     get_url,
     size,
     content,
-    status_code
+    status_code,
+# For factory_body factories
+    create
 
 
 [BASIC]

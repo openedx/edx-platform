@@ -13,11 +13,12 @@ def as_draft(location):
     """
     return Location(location)._replace(revision=DRAFT)
 
+
 def as_published(location):
     """
     Returns the Location that is the published version for `location`
     """
-    return Location(location)._replace(revision=None)    
+    return Location(location)._replace(revision=None)
 
 
 def wrap_draft(item):
