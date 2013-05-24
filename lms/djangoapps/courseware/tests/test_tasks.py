@@ -4,12 +4,16 @@ Test for LMS courseware background tasks
 import logging
 import json
 from mock import Mock, patch
+import textwrap
+import random
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory, CodeResponseXMLFactory
+from capa.tests.response_xml_factory import (OptionResponseXMLFactory, 
+                                             CodeResponseXMLFactory, 
+                                             CustomResponseXMLFactory)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -220,6 +224,7 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 class TestRegrading(TestRegradingBase):
+    """Test regrading problems in a background task."""
 
     def setUp(self):
         self.initialize_course()
@@ -270,18 +275,6 @@ class TestRegrading(TestRegradingBase):
         self.check_state('u3', descriptor, 1, 2, 1)
         self.check_state('u4', descriptor, 2, 2, 1)
 
-    def define_code_response_problem(self, problem_url_name):
-        factory = CodeResponseXMLFactory()
-        grader_payload = json.dumps({"grader": "ps04/grade_square.py"})
-        problem_xml = factory.build_xml(initial_display="def square(x):",
-                                        answer_display="answer",
-                                        grader_payload=grader_payload,
-                                        num_responses=2)
-        ItemFactory.create(parent_location=self.problem_section.location,
-                           template="i4x://edx/templates/problem/Blank_Common_Problem",
-                           display_name=str(problem_url_name),
-                           data=problem_xml)
-
     def test_regrading_failure(self):
         """Simulate a failure in regrading a problem"""
         problem_url_name = 'H1P1'
@@ -321,8 +314,24 @@ class TestRegrading(TestRegradingBase):
         with self.assertRaises(ItemNotFoundError):
             self.regrade_all_student_answers('instructor', problem_url_name)
 
+    def define_code_response_problem(self, problem_url_name):
+        """Define an arbitrary code-response problem.
+
+        We'll end up mocking its evaluation later.
+        """
+        factory = CodeResponseXMLFactory()
+        grader_payload = json.dumps({"grader": "ps04/grade_square.py"})
+        problem_xml = factory.build_xml(initial_display="def square(x):",
+                                        answer_display="answer",
+                                        grader_payload=grader_payload,
+                                        num_responses=2)
+        ItemFactory.create(parent_location=self.problem_section.location,
+                           template="i4x://edx/templates/problem/Blank_Common_Problem",
+                           display_name=str(problem_url_name),
+                           data=problem_xml)
+
     def test_regrading_code_problem(self):
-        '''Run regrade scenario on problem with code submission'''
+        """Run regrade scenario on problem with code submission"""
         problem_url_name = 'H1P2'
         self.define_code_response_problem(problem_url_name)
         # we fully create the CodeResponse problem, but just pretend that we're queuing it:
@@ -341,8 +350,97 @@ class TestRegrading(TestRegradingBase):
         status = json.loads(response.content)
         self.assertEqual(status['message'], "Problem's definition does not support regrading")
 
+    def define_randomized_custom_response_problem(self, problem_url_name, redefine=False):
+        """
+        Defines a custom response problem that uses a random value to determine correctness.
+
+        Generated answer is also returned as the `msg`, so that the value can be used as a
+        correct answer by a test.
+
+        If the `redefine` flag is set, then change the definition of correctness (from equals
+        to not-equals).
+        """
+        factory = CustomResponseXMLFactory()
+        if redefine:
+            script = textwrap.dedent("""
+                def check_func(expect, answer_given):
+                    expected = str(random.randint(0, 100))
+                    return {'ok': answer_given != expected, 'msg': expected}
+            """)
+        else:
+            script = textwrap.dedent("""
+                def check_func(expect, answer_given):
+                    expected = str(random.randint(0, 100))
+                    return {'ok': answer_given == expected, 'msg': expected}
+            """)
+        problem_xml = factory.build_xml(script=script, cfn="check_func", expect="42", num_responses=1)
+        if redefine:
+            self.module_store.update_item(TestRegradingBase.problem_location(problem_url_name), problem_xml)
+        else:
+            # Use "per-student" rerandomization so that check-problem can be called more than once.
+            # Using "always" means we cannot check a problem twice, but we want to call once to get the
+            # correct answer, and call a second time with that answer to confirm it's graded as correct.
+            # Per-student rerandomization will at least generate different seeds for different users, so
+            # we get a little more test coverage.
+            ItemFactory.create(parent_location=self.problem_section.location,
+                               template="i4x://edx/templates/problem/Blank_Common_Problem",
+                               display_name=str(problem_url_name),
+                               data=problem_xml,
+                               metadata={"rerandomize": "per_student"})
+
+    def test_regrading_randomized_problem(self):
+        """Run regrade scenario on custom problem that uses randomize"""
+        # First define the custom response problem:
+        problem_url_name = 'H1P1'
+        self.define_randomized_custom_response_problem(problem_url_name)
+        location = TestRegrading.problem_location(problem_url_name)
+        descriptor = self.module_store.get_instance(self.course.id, location)
+        # run with more than one user
+        userlist = ['u1', 'u2', 'u3', 'u4']
+        for username in userlist:
+            # first render the problem, so that a seed will be created for this user
+            self.render_problem(username, problem_url_name)
+            # submit a bogus answer, in order to get the problem to tell us its real answer
+            dummy_answer = "1000"
+            self.submit_student_answer(username, problem_url_name, [dummy_answer, dummy_answer])
+            # we should have gotten the problem wrong, since we're way out of range:
+            self.check_state(username, descriptor, 0, 1, 1)
+            # dig the correct answer out of the problem's message
+            module = self.get_student_module(username, descriptor)
+            state = json.loads(module.state)
+            correct_map = state['correct_map']
+            log.info("Correct Map: %s", correct_map)
+            # only one response, so pull it out:
+            answer = correct_map[correct_map.keys()[0]]['msg']
+            self.submit_student_answer(username, problem_url_name, [answer, answer])
+            # we should now get the problem right, with a second attempt:
+            self.check_state(username, descriptor, 1, 1, 2)
+
+        # redefine the problem (as stored in Mongo) so that the definition of correct changes
+        self.define_randomized_custom_response_problem(problem_url_name, redefine=True)
+        # confirm that simply rendering the problem again does not result in a change
+        # in the grade (or the attempts):
+        self.render_problem('u1', problem_url_name)
+        self.check_state('u1', descriptor, 1, 1, 2)
+
+        # regrade the problem for only one student -- only that student's grade should change
+        # (and none of the attempts):
+        self.regrade_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
+        self.check_state('u1', descriptor, 0, 1, 2)
+        self.check_state('u2', descriptor, 1, 1, 2)
+        self.check_state('u3', descriptor, 1, 1, 2)
+        self.check_state('u4', descriptor, 1, 1, 2)
+
+        # regrade the problem for all students
+        self.regrade_all_student_answers('instructor', problem_url_name)
+
+        # all grades should change to being wrong (with no change in attempts)
+        for username in userlist:
+            self.check_state(username, descriptor, 0, 1, 2)
+
 
 class TestResetAttempts(TestRegradingBase):
+    """Test resetting problem attempts in a background task."""
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
@@ -424,6 +522,7 @@ class TestResetAttempts(TestRegradingBase):
 
 
 class TestDeleteProblem(TestRegradingBase):
+    """Test deleting problem state in a background task."""
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
