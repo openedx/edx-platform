@@ -88,7 +88,7 @@ because the `capa` package handles problem XML.
 
 Before running tests, ensure that you have all the dependencies.  You can install dependencies using:
 
-    pip install -r requirements.txt
+    rake install_prereqs
 
 
 ## Running Python Unit tests
@@ -182,12 +182,6 @@ To start the debugger on failure, add the `--pdb` option:
 
 To run tests faster by not collecting static files, you can use
 `rake fasttest_acceptance_lms` and `rake fasttest_acceptance_cms`.
-
-
-**Troubleshooting**: If you get an error message that says something about harvest not being a command, you probably are missing a requirement.
-Try running:
-
-    pip install -r requirements.txt
 
 **Note**: The acceptance tests can *not* currently run in parallel.
 
