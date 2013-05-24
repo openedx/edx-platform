@@ -1,0 +1,203 @@
+// studio - views - textbooks
+// ====================
+
+body.course.textbooks {
+
+    form {
+      @include box-sizing(border-box);
+      @include box-shadow(0 1px 2px $shadow-l1);
+      @include border-radius(2px);
+      width: 100%;
+      border: 1px solid $gray-l2;
+      padding: $baseline ($baseline*1.5);
+      background: $white;
+
+      .actions {
+        margin-top: $baseline;
+
+        .action-add-chapter {
+            @extend .btn-flat-blue;
+            @extend .t-action2;
+            @include transition(all .15s);
+            display: block;
+            width: 100%;
+            margin-bottom: ($baseline*1.5);
+            padding: ($baseline/5) $baseline;
+            font-weight: 600;
+        }
+
+        .action-primary {
+          @include blue-button;
+          @extend .t-action2;
+          @include transition(all .15s);
+          display: inline-block;
+          padding: ($baseline/5) $baseline ($baseline/4) $baseline;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+
+        .action-secondary {
+          @include grey-button;
+          @extend .t-action2;
+          @include transition(all .15s);
+          display: inline-block;
+          padding: ($baseline/5) $baseline ($baseline/4) $baseline;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+
+
+      }
+
+      .list-input {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        .field {
+          margin: 0 0 ($baseline*0.75) 0;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          &.required {
+
+            label {
+              font-weight: 600;
+            }
+
+            label:after {
+              margin-left: ($baseline/4);
+              content: "*";
+            }
+          }
+
+          label, input, textarea {
+            display: block;
+          }
+
+          label {
+            @extend  .t-copy-sub1;
+            @include transition(color, 0.15s, ease-in-out);
+            margin: 0 0 ($baseline/4) 0;
+
+            &.is-focused {
+              color: $blue;
+            }
+          }
+
+          input, textarea {
+            @extend .t-copy-base;
+            height: 100%;
+            width: 100%;
+            padding: ($baseline/2);
+
+            &.long {
+              width: 100%;
+            }
+
+            &.short {
+              width: 25%;
+            }
+
+            ::-webkit-input-placeholder {
+               color: $gray-l4;
+            }
+
+            :-moz-placeholder {
+               color: $gray-l3;
+            }
+
+            ::-moz-placeholder {
+               color: $gray-l3;
+            }
+
+            :-ms-input-placeholder {
+               color: $gray-l3;
+            }
+
+            &:focus {
+
+              + .tip {
+                color: $gray;
+              }
+            }
+          }
+
+          textarea.long {
+            height: ($baseline*5);
+          }
+
+          input[type="checkbox"] {
+            display: inline-block;
+            margin-right: ($baseline/4);
+            width: auto;
+            height: auto;
+
+            & + label {
+              display: inline-block;
+            }
+          }
+
+          .tip {
+            @extend .t-copy-sub2;
+            @include transition(color, 0.15s, ease-in-out);
+            display: block;
+            margin-top: ($baseline/4);
+            color: $gray-l3;
+          }
+        }
+
+        .field-group {
+          @include clearfix();
+          margin: 0 0 ($baseline/2) 0;
+
+          .field {
+            display: block;
+            width: 46%;
+            border-bottom: none;
+            margin: 0 $baseline 0 0;
+            padding: ($baseline/4) 0 0 0;
+            float: left;
+            position: relative;
+
+            input, textarea {
+              width: 100%;
+            }
+
+            .action-uploadasset {
+                @extend .t-action4;
+                @extend .btn-flat-blue;
+                @include transition(all .15s);
+                font-weight: 600;
+                text-align: center;
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: ($baseline/5) ($baseline/2) ($baseline/10) ($baseline/2);
+            }
+
+          }
+
+          .action-close {
+              @include white-button;
+              @include font-size(18);
+              margin-top: ($baseline*2);
+              border: 0;
+              padding: 0;
+              background: transparent;
+
+              &:hover {
+                color: $blue;
+                background: transparent;
+                box-shadow: none;
+              }
+          }
+
+        }
+      }
+    }
+
+
+}

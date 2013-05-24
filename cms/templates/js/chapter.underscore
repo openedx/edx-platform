@@ -1,14 +1,14 @@
-<li>
-  <div class="input-wrap">
-    <label for="chapter-<%= order %>-name"><%= gettext("Chapter Name") %></label>
-    <input id="chapter-<%= order %>-name" name="chapter-<%= order %>-name" placeholder="<%= _.str.sprintf(gettext("Chapter %s"), order) %>" value="<%= name %>">
-    <p class="help_text"><%= gettext("the title/name of the chapter that will be used in navigating") %></p>
+<li class="chapter chapter<%= order %> field-group">
+  <div class="input-wrap field text required field-add-chapter-name chapter<%= order %>-name">
+    <label for="chapter<%= order %>-name"><%= gettext("Chapter Name") %></label>
+    <input id="chapter<%= order %>-name" name="chapter<%= order %>-name" class="short" placeholder="<%= _.str.sprintf(gettext("Chapter %s"), order) %>" value="<%= name %>" type="text">
+    <span class="tip tip-stacked"><%= gettext("the title/name of the chapter that will be used in navigating") %></span>
   </div>
-  <div class="input-wrap">
-    <label for="chapter-<%= order %>-asset-path"><%= gettext("Chapter Asset") %>:</label>
-    <input id="chapter-<%= order %>-asset-path" name="chapter-<%= order %>-asset-path" placeholder="<%= _.str.sprintf(gettext("path/to/introductionToCookieBaking-CH%d.pdf"), order) %>" value="<%= asset_path %>">
-    <p class="help_text"><%= gettext("provide the path for a file or asset already added to this course") %></p>
+  <div class="input-wrap field text required field-add-chapter-asset chapter<%= order %>-asset">
+    <label for="chapter<%= order %>-asset-path"><%= gettext("Chapter Asset") %>:</label>
+    <input id="chapter<%= order %>-asset-path" name="chapter<%= order %>-asset-path" placeholder="<%= _.str.sprintf(gettext("path/to/introductionToCookieBaking-CH%d.pdf"), order) %>" value="<%= asset_path %>" type="text">
+    <span class="tip tip-stacked"><%= gettext("provide the path for a file or asset already added to this course") %></span>
+  <button class="action action-uploadasset"><%= gettext("Upload Asset") %></button>
   </div>
-  <input type="button" value="<%= gettext("Upload Asset") %>">
-  <a class="action-close">close-button</a>
+  <a class="action action-close"><i class="icon-remove-sign"></i> <span class="sr">delete chapter</span></a>
 </li>
