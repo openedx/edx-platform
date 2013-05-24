@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <%block name="title"><title>edX</title></%block>
+  <%block name="title"><title>Home | class.stanford.edu</title></%block>
   <script type="text/javascript">
   /* immediately break out of an iframe if coming
      from the marketing website */
@@ -14,12 +14,13 @@
   })(this);
   </script>
 
-  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
+  <link rel="icon" type="image/x-icon" href="${static.url('themes/' + settings.THEME_NAME + '/images/favicon.ico')}" />
 
   <%static:css group='application'/>
 
   <%static:js group='main_vendor'/>
   <%block name="headextra"/>
+  <%include file="lms/theme-head-extra.html" />
 
   <!--[if lt IE 9]>
   <script src="${static.url('js/html5shiv.js')}"></script>
@@ -32,25 +33,21 @@
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   % if not course:
-  <%include file="google_analytics.html" />
+    <%include file="lms/theme-google-analytics.html" />
   % endif
 
 </head>
 
 <body class="<%block name='bodyclass'/>">
 
-% if not suppress_toplevel_navigation:
-  <%include file="navigation.html" />
-% endif
+  <%include file="lms/theme-header.html" />
 
   <section class="content-wrapper">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
 
-% if not suppress_toplevel_navigation:
-  <%include file="footer.html" />
-% endif
+  <%include file="lms/theme-footer.html" />
 
   <%static:js group='application'/>
   <%static:js group='module-js'/>
