@@ -9,6 +9,7 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
   <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/jquery.tinymce.js')}"></script>
 
 </%block>
 
@@ -110,7 +111,8 @@ function goto( mode)
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> |
           <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a> |
           <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">DataDump</a> |
-          <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a>
+          <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a> |
+	  <a href="#" onclick="goto('Email')" class="${modeflag.get('Email')}">Email</a>
           %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
              | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">Analytics</a> 
           %endif
@@ -363,6 +365,54 @@ function goto( mode)
     %endif
 
   %endif
+%endif
+
+##-----------------------------------------------------------------------------
+
+%if modeflag.get('Email'):
+    <p>
+    <label for="id_to">Send to:</label>
+    <select id="id_to" name="to">
+      <option value="students">All Students</option>
+      <option value="staff">All Course Staff</option>
+      <option value="all">All (students and staff)</option>
+    </select>
+    <label for="id_subject">Subject: </label>
+    <input type="text" id="id_subject" name="subject" maxlength="100" size="75">
+    <label for="id_message">Message:</label>
+    <textarea class="tiny-mce" id="id_message" name="message"></textarea>
+    </p>
+    <p>
+    <input type="submit" name="action" value="Send email">
+    </p>
+    <script type="text/javascript">
+    $(function() {
+        $(".tiny-mce").tinymce({
+          script_url: "${static.url('js/vendor/tiny_mce/tiny_mce.js')}",
+          theme: "advanced",
+          skin: 'studio',
+          schema: "html5",
+          convert_urls: false,
+          content_css: "${static.url('css/tiny-mce.css')}",
+          formats: {
+            h4: {},
+            h5: {},
+            h6: {},
+            code: {
+              inline: 'code'
+            }
+          },
+          theme_advanced_buttons1: "formatselect,bold,italic,underline,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink",
+          theme_advanced_toolbar_location: "top",
+          theme_advanced_toolbar_align: "left",
+          theme_advanced_statusbar_location: "none",
+          theme_advanced_resizing: true,
+          theme_advanced_blockformats: "p,pre,h1,h2,h3",
+          width: '100%',
+          height: '400px',
+        });
+    });
+    </script>
 %endif
 
     </form>

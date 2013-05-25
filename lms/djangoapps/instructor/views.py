@@ -40,6 +40,11 @@ import track.views
 
 from .offline_gradecalc import student_grades, offline_grades_available
 
+from bulk_email.models import CourseEmail
+import datetime
+from hashlib import md5
+from bulk_email.tasks import delegate_emails
+
 log = logging.getLogger(__name__)
 
 # internal commands for managing forum roles:
@@ -589,7 +594,24 @@ def instructor_dashboard(request, course_id):
             ret = _do_enroll_students(course, course_id, students, overload=overload)
             datatable = ret['datatable']
 
+    #----------------------------------------
+    # email
 
+    elif action == 'Send email':
+        to = request.POST.get("to")
+        subject = request.POST.get("subject")
+        html_message = request.POST.get("message")
+
+        email = CourseEmail(course_id=course_id,
+                            sender=request.user,
+                            to=to,
+                            subject=subject,
+                            html_message=html_message,
+                            hash=md5((html_message+subject+datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
+        email.save()
+
+        delegate_emails(email.hash, email.to, course)
+        
     #----------------------------------------
     # psychometrics
 

@@ -1,0 +1,140 @@
+@font-face{font-family:'Open Sans';font-style:normal;font-weight:700;src:local("Open Sans Bold"),local("OpenSans-Bold"),url(http://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzKRDOzjiPcYnFooOUGCOsRk.woff) format("woff")}@font-face{font-family:'Open Sans';font-style:normal;font-weight:300;src:local("Open Sans Light"),local("OpenSans-Light"),url(http://themes.googleusercontent.com/static/fonts/opensans/v6/DXI1ORHCpsQm3Vp6mXoaTaRDOzjiPcYnFooOUGCOsRk.woff) format("woff")}@font-face{font-family:'Open Sans';font-style:italic;font-weight:700;src:local("Open Sans Bold Italic"),local("OpenSans-BoldItalic"),url(http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxhbnBKKEOwRKgsHDreGcocg.woff) format("woff")}@font-face{font-family:'Open Sans';font-style:italic;font-weight:300;src:local("Open Sans Light Italic"),local("OpenSansLight-Italic"),url(http://themes.googleusercontent.com/static/fonts/opensans/v6/PRmiXeptR36kaC0GEAetxvR_54zmj3SbGZQh3vCOwvY.woff) format("woff")}@font-face{font-family:'Open Sans';font-style:italic;font-weight:400;src:local("Open Sans Italic"),local("OpenSans-Italic"),url(http://themes.googleusercontent.com/static/fonts/opensans/v6/xjAJXh38I15wypJXxuGMBrrIa-7acMAeDBVuclsi6Gc.woff) format("woff")}@font-face{font-family:'Open Sans';font-style:normal;font-weight:400;src:local("Open Sans"),local("OpenSans"),url(http://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff) format("woff")}
+
+.mceContentBody {
+    padding: 10px;
+    background-color: #fff;
+    font-family: 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #3c3c3c;
+    scrollbar-3dlight-color: #F0F0EE;
+    scrollbar-arrow-color: #676662;
+    scrollbar-base-color: #F0F0EE;
+    scrollbar-darkshadow-color: #DDDDDD;
+    scrollbar-face-color: #E0E0DD;
+    scrollbar-highlight-color: #F0F0EE;
+    scrollbar-shadow-color: #F0F0EE;
+    scrollbar-track-color: #F5F5F5;
+}
+
+h1 {
+    color: #3c3c3c;
+    font-weight: normal;
+    font-size: 2em;
+    line-height: 1.4em;
+    letter-spacing: 1px;
+    margin: 0 0 1.416em 0;
+}
+
+h2 {
+    color: #646464;
+    font-weight: normal;
+    font-size: 1.2em;
+    line-height: 1.2em;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    -webkit-font-smoothing: antialiased;
+}
+
+h3, h4, h5, h6 {
+    margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.2em;
+}
+
+h4 {
+    font-size: 1em;
+}
+
+h5 {
+    font-size: .83em;
+}
+
+h6 {
+    font-size: 0.75em;
+}
+
+p {
+    margin-bottom: 1.416em;
+    font-size: 1em;
+    line-height: 1.6em !important;
+    color: #3c3c3c;
+}
+
+em, i {
+    font-style: italic;
+}
+
+strong, b {
+    font-style: bold;
+}
+
+p + p, ul + p, ol + p {
+    margin-top: 20px;
+}
+
+ol, ul {
+    margin: 1em 0;
+    padding: 0 0 0 1em;
+    color: #3c3c3c;
+
+}
+
+ol li, ul li {
+    margin-bottom: 0.708em;
+}
+
+ol {
+    list-style: decimal outside none;
+}
+
+ul {
+    list-style: disc outside none;
+}
+
+a, a:link, a:visited, a:hover, a:active {
+    color: #1d9dd9;
+}
+
+img {
+    max-width: 100%;
+}
+
+pre {
+  margin: 1em 0;
+  color: #3c3c3c;
+  font-family: monospace, serif;
+  font-size: 1em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+code {
+    font-family: monospace, serif;
+    background: none;
+    color: #3c3c3c;
+    padding: 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+th {
+    background: #eee;
+    font-weight: bold;
+}
+
+table td, th {
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px solid #ccc !important;
+    text-align: left;
+    font-size: 14px;
+}
