@@ -1,6 +1,6 @@
-# TODO: figure out why failing
-xdescribe 'VideoSpeedControl', ->
+describe 'VideoSpeedControl', ->
   beforeEach ->
+    window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn false
     jasmine.stubVideoPlayer @
     $('.speeds').remove()
 
@@ -25,7 +25,7 @@ xdescribe 'VideoSpeedControl', ->
 
     describe 'when running on touch based device', ->
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn true
+        window.onTouchBasedDevice.andReturn true
         $('.speeds').removeClass 'open'
         @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
@@ -37,7 +37,6 @@ xdescribe 'VideoSpeedControl', ->
 
     describe 'when running on non-touch based device', ->
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn false
         $('.speeds').removeClass 'open'
         @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
