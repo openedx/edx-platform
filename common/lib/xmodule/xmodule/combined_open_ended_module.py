@@ -54,21 +54,22 @@ class CombinedOpenEndedFields(object):
     state = String(help="Which step within the current task that the student is on.", default="initial",
                    scope=Scope.user_state)
     student_attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0,
-                               scope=Scope.user_state)
+                                      scope=Scope.user_state)
     ready_to_reset = StringyBoolean(help="If the problem is ready to be reset or not.", default=False,
-                             scope=Scope.user_state)
+                                    scope=Scope.user_state)
     attempts = StringyInteger(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
     is_graded = StringyBoolean(help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
     accept_file_upload = StringyBoolean(help="Whether or not the problem accepts file uploads.", default=False,
-                                 scope=Scope.settings)
+                                        scope=Scope.settings)
     skip_spelling_checks = StringyBoolean(help="Whether or not to skip initial spelling checks.", default=True,
-                                   scope=Scope.settings)
+                                          scope=Scope.settings)
     due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
                          scope=Scope.settings)
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
@@ -213,11 +214,36 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     """
     Module for adding combined open ended questions
     """
-    mako_template = "widgets/raw-edit.html"
+    mako_template = "widgets/open-ended-edit.html"
     module_class = CombinedOpenEndedModule
-    filename_extension = "xml"
 
     stores_state = True
     has_score = True
     always_recalculate_grades = True
     template_dir_name = "combinedopenended"
+
+    #Specify whether or not to pass in S3 interface
+    needs_s3_interface = True
+
+    #Specify whether or not to pass in open ended interface
+    needs_open_ended_interface = True
+
+    metadata_attributes = RawDescriptor.metadata_attributes
+
+    js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/edit.coffee')]}
+    js_module_name = "OpenEndedMarkdownEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/combinedopenended/edit.scss')]}
+
+    def get_context(self):
+        _context = RawDescriptor.get_context(self)
+        _context.update({'markdown': self.markdown,
+                         'enable_markdown': self.markdown is not None})
+        return _context
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
+                                    CombinedOpenEndedDescriptor.markdown])
+        return non_editable_fields
+

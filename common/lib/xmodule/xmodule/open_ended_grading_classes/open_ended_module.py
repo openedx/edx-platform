@@ -168,7 +168,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             #This is a student_facing_error
             return {'success': False, 'msg': "There was an error saving your feedback.  Please contact course staff."}
 
-        qinterface = system.xqueue['interface']
+        xqueue = system.get('xqueue')
+        if xqueue is None:
+            return {'success': False, 'msg': "Couldn't submit feedback."}
+        qinterface = xqueue['interface']
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
         anonymous_student_id = system.anonymous_student_id
         queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
@@ -176,7 +179,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                                                  str(len(self.child_history)))
 
         xheader = xqueue_interface.make_xheader(
-            lms_callback_url=system.xqueue['construct_callback'](),
+            lms_callback_url=xqueue['construct_callback'](),
             lms_key=queuekey,
             queue_name=self.message_queue_name
         )
@@ -219,7 +222,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         # Prepare xqueue request
         #------------------------------------------------------------
 
-        qinterface = system.xqueue['interface']
+        xqueue = system.get('xqueue')
+        if xqueue is None:
+            return False
+        qinterface = xqueue['interface']
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
 
         anonymous_student_id = system.anonymous_student_id
@@ -230,7 +236,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                                                  str(len(self.child_history)))
 
         xheader = xqueue_interface.make_xheader(
-            lms_callback_url=system.xqueue['construct_callback'](),
+            lms_callback_url=xqueue['construct_callback'](),
             lms_key=queuekey,
             queue_name=self.queue_name
         )
