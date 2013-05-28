@@ -17,7 +17,7 @@
   <p class="copy"><%= gettext("Note: <strong>It's best practice to break your course's textbook into multiple chapters</strong> to reduce loading times for students. Breaking up textbooks into chapters can also help with students more easily finding a concept or topic-based information.") %></p>
   </fieldset>
   <div class="actions">
-    <button class="action action-add-chapter"><%= gettext("Add a Chapter") %></button>
+    <button class="action action-add-chapter"><i class="icon-plus"></i> <%= gettext("Add a Chapter") %></button>
     <button class="action action-primary" type="submit"><%= gettext("Save") %></button>
     <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
   </div>
