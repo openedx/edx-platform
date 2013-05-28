@@ -2,7 +2,7 @@
 generate and view word cloud.
 
 On the client side we show:
-If student does not yet anwered - `num_inputs` numbers of text inputs.
+If student does not yet answered - `num_inputs` numbers of text inputs.
 If student have answered - words he entered and cloud.
 """
 
@@ -34,21 +34,21 @@ class WordCloudFields(object):
     """XFields for word cloud."""
     num_inputs = StringyInteger(
         display_name="Inputs",
-        help="Number of inputs.",
+        help="Number of text boxes for student to input words/sentences.",
         scope=Scope.settings,
         default=5,
         values = {"min" : 1 }
     )
     num_top_words = StringyInteger(
         display_name="Maximum Words",
-        help="Number of max words, which will be displayed.",
+        help="Maximum number of words to be displayed in generated word cloud.",
         scope=Scope.settings,
         default=250,
         values = {"min" : 1 }
     )
     display_student_percents = StringyBoolean(
-        display_name="Show Usage",
-        help="Display usage percents for each word?",
+        display_name="Show Percents",
+        help="Show statistics for entered words near every word separately at the top.",
         scope=Scope.settings,
         default=True
     )
