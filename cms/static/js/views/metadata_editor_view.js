@@ -5,45 +5,44 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
     // Model is simply a Backbone.Model instance.
 
     initialize : function() {
+        var tpl = $("#metadata-editor-tpl").text();
+        if(!tpl) {
+            console.error("Couldn't load metadata editor template");
+        }
+        this.template = _.template(tpl);
+
+        this.$el.html(this.template({metadata_entries: this.model.attributes}));
+        var counter = 0;
+
+        // Sort entries by display name.
+        var sortedObject = _.sortBy(this.model.attributes,
+            function (val) {
+                return val.display_name
+            });
+
+        this.models = [];
+
         var self = this;
-        // instantiates an editor template for each update in the collection
-        window.templateLoader.loadRemoteTemplate("metadata_editor",
-            "/static/client_templates/metadata_editor.html",
-            function (raw_template) {
-                self.template = _.template(raw_template);
-                self.$el.append(self.template({metadata_entries: self.model.attributes}));
-                var counter = 0;
-
-                // Sort entries by display name.
-                var sortedObject = _.sortBy(self.model.attributes,
-                    function (val) {
-                        return val.display_name
-                    });
-
-                self.models = [];
-
-                _.each(sortedObject,
-                    function (item) {
-                        var model = new CMS.Models.Metadata(item);
-                        self.models.push(model);
-                        var data = {
-                            el: self.$el.find('.metadata_entry')[counter++],
-                            model: model
-                        };
-                        if (item.type === CMS.Models.Metadata.SELECT_TYPE) {
-                            new CMS.Views.Metadata.Option(data);
-                        }
-                        else if (item.type === CMS.Models.Metadata.INTEGER_TYPE ||
-                            item.type === CMS.Models.Metadata.FLOAT_TYPE) {
-                            new CMS.Views.Metadata.Number(data);
-                        }
-                        else {
-                            // Everything else is treated as GENERIC_TYPE, which uses String editor.
-                            new CMS.Views.Metadata.String(data);
-                        }
-                    });
-            }
-        );
+        _.each(sortedObject,
+            function (item) {
+                var model = new CMS.Models.Metadata(item);
+                self.models.push(model);
+                var data = {
+                    el: self.$el.find('.metadata_entry')[counter++],
+                    model: model
+                };
+                if (item.type === CMS.Models.Metadata.SELECT_TYPE) {
+                    new CMS.Views.Metadata.Option(data);
+                }
+                else if (item.type === CMS.Models.Metadata.INTEGER_TYPE ||
+                    item.type === CMS.Models.Metadata.FLOAT_TYPE) {
+                    new CMS.Views.Metadata.Number(data);
+                }
+                else {
+                    // Everything else is treated as GENERIC_TYPE, which uses String editor.
+                    new CMS.Views.Metadata.String(data);
+                }
+            });
     },
 
     getModifiedMetadataValues: function () {
@@ -73,14 +72,14 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
         var self = this;
         var templateName = this.getTemplateName();
         this.uniqueId = _.uniqueId(templateName + "_");
-        window.templateLoader.loadRemoteTemplate(templateName,
-            "/static/client_templates/" + templateName + ".html",
-            function (raw_template) {
-                self.template = _.template(raw_template);
-                self.$el.append(self.template({model: self.model, uniqueId: self.uniqueId}));
-                self.render();
-            }
-        );
+
+        var tpl = $("#"+templateName).text();
+        if(!tpl) {
+            console.error("Couldn't load template: " + templateName);
+        }
+        this.template = _.template(tpl);
+        this.$el.append(this.template({model: this.model, uniqueId: this.uniqueId}));
+        this.render();
     },
 
     getTemplateName : function () {},
@@ -136,7 +135,7 @@ CMS.Views.Metadata.String = CMS.Views.Metadata.AbstractEditor.extend({
     },
 
     getTemplateName : function () {
-        return "metadata_string_entry";
+        return "metadata-string-entry";
     },
 
     getValueFromEditor : function () {
@@ -187,15 +186,18 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
                 this.$el.find('input').attr(step, stepValue);
             }
 
-            //   Manually runs polyfill for input number types to correct for Firefox non-support
-            this.$el.find('.setting-input-number').inputNumber();
+            // Manually runs polyfill for input number types to correct for Firefox non-support.
+            // inputNumber will be undefined when unit test is running.
+            if ($.fn.inputNumber) {
+                this.$el.find('.setting-input-number').inputNumber();
+            }
 
             this.initialized = true;
         }
     },
 
     getTemplateName : function () {
-        return "metadata_number_entry";
+        return "metadata-number-entry";
     },
 
     getValueFromEditor : function () {
@@ -240,7 +242,6 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
 
 });
 
-
 CMS.Views.Metadata.Option = CMS.Views.Metadata.AbstractEditor.extend({
 
     events : {
@@ -249,7 +250,7 @@ CMS.Views.Metadata.Option = CMS.Views.Metadata.AbstractEditor.extend({
     },
 
     getTemplateName : function () {
-        return "metadata_option_entry";
+        return "metadata-option-entry";
     },
 
     getValueFromEditor : function () {

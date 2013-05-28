@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
 
 <%
   import hashlib
@@ -6,6 +7,23 @@
   import json
   hlskey = hashlib.md5(module.location.url()).hexdigest()
 %>
+
+## js templates
+<script id="metadata-editor-tpl" type="text/template">
+    <%static:include path="js/metadata-editor.underscore" />
+</script>
+
+<script id="metadata-number-entry" type="text/template">
+    <%static:include path="js/metadata-number-entry.underscore" />
+</script>
+
+<script id="metadata-string-entry" type="text/template">
+    <%static:include path="js/metadata-string-entry.underscore" />
+</script>
+
+<script id="metadata-option-entry" type="text/template">
+    <%static:include path="js/metadata-option-entry.underscore" />
+</script>
 
 <% showHighLevelSource='source_code' in editable_metadata_fields and editable_metadata_fields['source_code']['explicitly_set'] %>
 <% metadata_field_copy = copy.deepcopy(editable_metadata_fields) %>
