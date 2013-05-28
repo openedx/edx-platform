@@ -75,7 +75,7 @@ class CombinedOpenEndedFields(object):
     weight = StringyFloat(display_name="Problem Weight",
         help="The number of points the problem is worth. By default, each problem is worth one point.",
         scope=Scope.settings, values = {"min" : 0 , "step": ".1"})
-    markdown = String(help="Markdown source of this module", default="", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):

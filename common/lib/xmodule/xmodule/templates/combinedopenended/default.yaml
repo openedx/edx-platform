@@ -1,6 +1,7 @@
 ---
 metadata:
     display_name: Open Ended Response
+    markdown: ""
 data: |
   <combinedopenended>
   	<rubric>
