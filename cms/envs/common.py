@@ -39,9 +39,8 @@ MITX_FEATURES = {
     'STUDIO_NPS_SURVEY': True,
     'SEGMENT_IO': True,
 
-    # Enable URL that shows information about the status of variuous services
-    'ENABLE_SERVICE_STATUS': False,
-    'PREVIEW_LMS_BASE' : None
+    # Enable URL that shows information about the status of various services
+    'ENABLE_SERVICE_STATUS': False
 }
 ENABLE_JASMINE = False
 

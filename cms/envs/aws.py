@@ -81,7 +81,7 @@ with open(ENV_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
-MITX_FEATURES['PREVIEW_LMS_BASE'] = ENV_TOKENS.get('PREVIEW_LMS_BASE')
+# Note that MITX_FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 
