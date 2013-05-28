@@ -14,7 +14,8 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
-from xblock.core import Scope, String, Object, Boolean, List, Integer
+from xblock.core import Scope, Object, Boolean, List
+from fields import StringyBoolean, StringyInteger
 
 log = logging.getLogger(__name__)
 
@@ -31,21 +32,22 @@ def pretty_bool(value):
 
 class WordCloudFields(object):
     """XFields for word cloud."""
-    display_name = String(
-        help="Display name for this module",
-        scope=Scope.settings
-    )
-    num_inputs = Integer(
+    num_inputs = StringyInteger(
+        display_name="Inputs",
         help="Number of inputs.",
         scope=Scope.settings,
-        default=5
+        default=5,
+        values = {"min" : 1 }
     )
-    num_top_words = Integer(
+    num_top_words = StringyInteger(
+        display_name="Maximum Words",
         help="Number of max words, which will be displayed.",
         scope=Scope.settings,
-        default=250
+        default=250,
+        values = {"min" : 1 }
     )
-    display_student_percents = Boolean(
+    display_student_percents = StringyBoolean(
+        display_name="Show Usage",
         help="Display usage percents for each word?",
         scope=Scope.settings,
         default=True
