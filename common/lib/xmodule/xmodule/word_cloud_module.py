@@ -207,7 +207,7 @@ class WordCloudModule(WordCloudFields, XModule):
             # Update top_words.
             self.top_words = self.top_dict(
                 temp_all_words,
-                int(self.num_top_words)
+                self.num_top_words
             )
 
             # Save all_words in database.
@@ -228,7 +228,7 @@ class WordCloudModule(WordCloudFields, XModule):
             'element_id': self.location.html_id(),
             'element_class': self.location.category,
             'ajax_url': self.system.ajax_url,
-            'num_inputs': int(self.num_inputs),
+            'num_inputs': self.num_inputs,
             'submitted': self.submitted
         }
         self.content = self.system.render_template('word_cloud.html', context)
