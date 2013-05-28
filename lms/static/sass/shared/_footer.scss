@@ -71,7 +71,7 @@
 
         p {
           float: left;
-          width: flex-grid(9,12);
+          width: flex-grid(6,8);
           margin-left: $baseline;
           padding-left: $baseline;
           font-size: em(13);
@@ -153,10 +153,6 @@
 
     .colophon-about img {
       margin-top: ($baseline*1.5);
-    }
-
-    .colophon-about p {
-      width: 360px;
     }
   }
 }
