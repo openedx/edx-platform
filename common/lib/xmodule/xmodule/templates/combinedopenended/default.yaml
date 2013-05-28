@@ -7,6 +7,7 @@ metadata:
     skip_spelling_checks: False
     accept_file_upload: False
     weight: ""
+    markdown: ""
 data: |
   <combinedopenended>
   	<rubric>
@@ -38,6 +39,5 @@ data: |
   		</openended>
   	</task>
   </combinedopenended>
-
 
 children: []

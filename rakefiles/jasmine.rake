@@ -48,6 +48,7 @@ def template_jasmine_runner(lib)
         sh("node_modules/.bin/coffee -c #{coffee_files.join(' ')}")
     end
     phantom_jasmine_path = File.expand_path("node_modules/phantom-jasmine")
+    jasmine_reporters_path = File.expand_path("node_modules/jasmine-reporters")
     common_js_root = File.expand_path("common/static/js")
     common_coffee_root = File.expand_path("common/static/coffee/src")
 
@@ -58,12 +59,18 @@ def template_jasmine_runner(lib)
     js_specs = Dir[spec_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
     js_source = Dir[src_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
 
+    report_dir = report_dir_path("#{lib}/jasmine")
     template = ERB.new(File.read("common/templates/jasmine/jasmine_test_runner.html.erb"))
     template_output = "#{lib}/jasmine_test_runner.html"
     File.open(template_output, 'w') do |f|
         f.write(template.result(binding))
     end
     yield File.expand_path(template_output)
+end
+
+def run_phantom_js(url)
+    phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
+    sh("#{phantomjs} node_modules/jasmine-reporters/test/phantomjs-testrunner.js #{url}")
 end
 
 [:lms, :cms].each do |system|
@@ -78,14 +85,16 @@ end
 
     desc "Use phantomjs to run jasmine tests for #{system} from the console"
     task "phantomjs_jasmine_#{system}" => :assets do
-        phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
         django_for_jasmine(system, false) do |jasmine_url|
-            sh("#{phantomjs} node_modules/phantom-jasmine/lib/run_jasmine_test.coffee #{jasmine_url}")
+            run_phantom_js(jasmine_url)
         end
     end
 end
 
-Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
+STATIC_JASMINE_TESTS = Dir["common/lib/*"].select{|lib| File.directory?(lib)}
+STATIC_JASMINE_TESTS << 'common/static/coffee'
+
+STATIC_JASMINE_TESTS.each do |lib|
     desc "Open jasmine tests for #{lib} in your default browser"
     task "browse_jasmine_#{lib}" do
         template_jasmine_runner(lib) do |f|
@@ -97,26 +106,14 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
 
     desc "Use phantomjs to run jasmine tests for #{lib} from the console"
     task "phantomjs_jasmine_#{lib}" do
-        phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
         template_jasmine_runner(lib) do |f|
-            sh("#{phantomjs} node_modules/phantom-jasmine/lib/run_jasmine_test.coffee #{f}")
+            run_phantom_js(f)
         end
     end
 end
 
 desc "Open jasmine tests for discussion in your default browser"
-task "browse_jasmine_discussion" do
-    template_jasmine_runner("common/static/coffee") do |f|
-        sh("python -m webbrowser -t 'file://#{f}'")
-        puts "Press ENTER to terminate".red
-        $stdin.gets
-    end
-end
+task "browse_jasmine_discussion" => "browse_jasmine_common/static/coffee"
 
 desc "Use phantomjs to run jasmine tests for discussion from the console"
-task "phantomjs_jasmine_discussion" do
-    phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
-    template_jasmine_runner("common/static/coffee") do |f|
-        sh("#{phantomjs} node_modules/phantom-jasmine/lib/run_jasmine_test.coffee #{f}")
-    end
-end
+task "phantomjs_jasmine_discussion" => "phantomjs_jasmine_common/static/coffee"

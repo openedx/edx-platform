@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 from django.utils import simplejson
-from django_comment_client.models import Role
+from django_comment_common.models import Role
 from django_comment_client.permissions import check_permissions_by_view
 from xmodule.modulestore.exceptions import NoPathToItem
 
