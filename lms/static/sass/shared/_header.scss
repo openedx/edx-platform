@@ -281,11 +281,11 @@ header.global {
 
       a {
         @include border-radius(0);
-        @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
+        @include linear-gradient(shade($link-color,15%) 5%, saturate($link-color,15%) 95%);
         display: inline-block;
         padding: $baseline/2 $baseline*2.5;
         text-transform: lowercase;
-        color: $white;
+        color: $very-light-text;
         letter-spacing: 0.1rem;
         font-weight: 300;
         cursor: pointer;

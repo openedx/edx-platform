@@ -65,7 +65,7 @@ $header-image: linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0
 $header-bg: rgb(255, 255, 255);
 $courseware-header-image: linear-gradient(top, #fff, #eee);
 $courseware-header-bg: transparent;
-$footer-bg: transparent;
+$footer-bg: $white;
 $courseware-footer-border: none;
 $courseware-footer-shadow: none;
 $courseware-footer-margin: 0px;
