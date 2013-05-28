@@ -847,8 +847,8 @@ class CombinedOpenEndedV1Descriptor():
             if len(xml_object.xpath(child)) == 0:
                 #This is a staff_facing_error
                 raise ValueError(
-                    "Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance.".format(
-                        child))
+                    "Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance. {1}".format(
+                        child, xml_object))
 
         def parse_task(k):
             """Assumes that xml_object has child k"""
