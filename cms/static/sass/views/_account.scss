@@ -272,9 +272,9 @@ body.signup, body.signin {
   background: $yellow-d1;
   color: $white;
 
-  .ss-icon {
+  [class^="icon-"] {
     position: relative;
-    top: 3px;
+    top: 1px;
     @include font-size(16);
     display: inline-block;
     margin-right: ($baseline/2);

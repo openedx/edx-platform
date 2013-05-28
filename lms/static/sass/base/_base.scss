@@ -1,5 +1,9 @@
+// html {
+//   overflow-y: scroll;
+// }
+
 html, body {
-  background: rgb(250,250,250);
+  background: $body-bg;
   font-family: $sans-serif;
   font-size: 1em;
   font-style: normal;
@@ -57,20 +61,20 @@ p + p, ul + p, ol + p {
 
 p {
   a:link, a:visited {
-    color: $blue;
+    color: $link-color;
     font: normal 1em/1em $serif;
     text-decoration: none;
     @include transition(all, 0.1s, linear);
 
     &:hover {
-      color: $blue;
+      color: $link-color;
       text-decoration: underline;
     }
   }
 }
 
 a:link, a:visited {
-  color: $blue;
+  color: $link-color;
   font: normal 1em/1em $sans-serif;
   text-decoration: none;
   @include transition(all, 0.1s, linear);
@@ -81,9 +85,10 @@ a:link, a:visited {
 }
 
 .content-wrapper {
-  background: rgb(255,255,255);
-  margin: 0 auto 0;
   width: flex-grid(12);
+  margin: 0 auto;
+  background: $content-wrapper-bg;
+  padding-bottom: ($baseline*2);
 }
 
 .container {
@@ -92,6 +97,7 @@ a:link, a:visited {
   padding: 0px 30px;
   max-width: grid-width(12);
   min-width: 760px;
+  width: flex-grid(12);
 }
 
 span.edx {
@@ -158,7 +164,7 @@ mark {
   display: none;
   padding: 10px;
   @include linear-gradient(top, rgba(0, 0, 0, .1), rgba(0, 0, 0, .0));
-  background-color: $pink;
+  background-color: $site-status-color;
   box-shadow: 0 -1px 0 rgba(0, 0, 0, .3) inset;
   font-size: 14px;
 
@@ -200,6 +206,10 @@ mark {
   strong {
     font-weight: 700;
   }
+}
+
+.sr {
+  @include text-sr();
 }
 
 .help-tab {

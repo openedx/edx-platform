@@ -13,13 +13,10 @@ real time, next to the input box.
 <p>This is a correct answer which may be entered below: </p>
 <p><tt>cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]</tt></p>
 
-<script>
-from symmath import *
-</script>
   <text>Compute [mathjax] U = \exp\left( i \theta \left[ \begin{matrix} 0 &amp; 1 \\ 1 &amp; 0 \end{matrix} \right] \right) [/mathjax]
       and give the resulting \(2 \times 2\) matrix. <br/>
       Your input should be typed in as a list of lists, eg <tt>[[1,2],[3,4]]</tt>. <br/>
-       [mathjax]U=[/mathjax] <symbolicresponse cfn="symmath_check" answer="[[cos(theta),I*sin(theta)],[I*sin(theta),cos(theta)]]" options="matrix,imaginaryi" id="filenamedogi0VpEBOWedxsymmathresponse_1" state="unsubmitted">
+       [mathjax]U=[/mathjax] <symbolicresponse cfn="symmath_check" answer="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]" options="matrix,imaginary" id="filenamedogi0VpEBOWedxsymmathresponse_1" state="unsubmitted">
           <textline size="80" math="1" response_id="2" answer_id="1" id="filenamedogi0VpEBOWedxsymmathresponse_2_1"/>
         </symbolicresponse>
       <br/>

@@ -26,22 +26,41 @@
             // chapters, and it should be in-bounds.
             chapterToLoad = options.chapterNum;
         }
+        var anchorToLoad = null;
+        if (options.chapters) {
+            anchorToLoad = options.anchor_id;
+        }
 
-        loadUrl = function htmlViewLoadUrl(url) {
+        var onComplete = function() {};
+        if(options.notesEnabled) {
+            onComplete = function(url) {
+                return function() {
+                    $('#viewerContainer').trigger('notes:init', [url]);
+                }
+            };
+        }
+
+        loadUrl = function htmlViewLoadUrl(url, anchorId) {
             // clear out previous load, if any:
             parentElement = document.getElementById('bookpage');
             while (parentElement.hasChildNodes())
                 parentElement.removeChild(parentElement.lastChild);
 	    // load new URL in:
-            $('#bookpage').load(url);
-        };
+            $('#bookpage').load(url, null, onComplete(url));
 
-        loadChapterUrl = function htmlViewLoadChapterUrl(chapterNum) {
+	    // if there is an anchor set, then go to that location:
+            if (anchorId != null) {
+		// TODO: add implementation....
+            } 
+
+        }; 
+
+        loadChapterUrl = function htmlViewLoadChapterUrl(chapterNum, anchorId) {
             if (chapterNum < 1 || chapterNum > chapterUrls.length) {
                 return;
             }
             var chapterUrl = chapterUrls[chapterNum-1];
-            loadUrl(chapterUrl);
+            loadUrl(chapterUrl, anchorId);
         };
 
         // define navigation links for chapters:  
@@ -54,15 +73,15 @@
             };
             for (var index = 1; index <= chapterUrls.length; index += 1) {
                 $("#htmlchapter-" + index).click(loadChapterUrlHelper(index));
-            }
+            }   
         }
 
         // finally, load the appropriate url/page
         if (urlToLoad != null) {
-            loadUrl(urlToLoad);
+            loadUrl(urlToLoad, anchorToLoad);
         } else {
-            loadChapterUrl(chapterToLoad);
-        }
+            loadChapterUrl(chapterToLoad, anchorToLoad);
+        }       
 
     }
 })(jQuery);
@@ -81,6 +100,14 @@
         %endif
         %if chapter is not None:
             options.chapterNum = ${chapter};
+        %endif
+        %if anchor_id is not UNDEFINED and anchor_id is not None:
+            options.anchor_id = ${anchor_id};
+        %endif
+
+        options.notesEnabled = false;
+        %if notes_enabled is not UNDEFINED and notes_enabled:
+            options.notesEnabled = true;
         %endif
 
         $('#outerContainer').myHTMLViewer(options);

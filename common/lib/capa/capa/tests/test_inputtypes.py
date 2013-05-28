@@ -45,7 +45,7 @@ class OptionInputTest(unittest.TestCase):
         state = {'value': 'Down',
                  'id': 'sky_input',
                  'status': 'answered'}
-        option_input = lookup_tag('optioninput')(test_system, element, state)
+        option_input = lookup_tag('optioninput')(test_system(), element, state)
 
         context = option_input._get_render_context()
 
@@ -92,7 +92,7 @@ class ChoiceGroupTest(unittest.TestCase):
                  'id': 'sky_input',
                  'status': 'answered'}
 
-        the_input = lookup_tag(tag)(test_system, element, state)
+        the_input = lookup_tag(tag)(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -142,7 +142,7 @@ class JavascriptInputTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': '3', }
-        the_input = lookup_tag('javascriptinput')(test_system, element, state)
+        the_input = lookup_tag('javascriptinput')(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -170,7 +170,7 @@ class TextLineTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'BumbleBee', }
-        the_input = lookup_tag('textline')(test_system, element, state)
+        the_input = lookup_tag('textline')(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -198,7 +198,7 @@ class TextLineTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'BumbleBee', }
-        the_input = lookup_tag('textline')(test_system, element, state)
+        the_input = lookup_tag('textline')(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -236,7 +236,7 @@ class TextLineTest(unittest.TestCase):
             element = etree.fromstring(xml_str)
 
             state = {'value': 'BumbleBee', }
-            the_input = lookup_tag('textline')(test_system, element, state)
+            the_input = lookup_tag('textline')(test_system(), element, state)
 
             context = the_input._get_render_context()
 
@@ -274,7 +274,7 @@ class FileSubmissionTest(unittest.TestCase):
                  'status': 'incomplete',
                  'feedback': {'message': '3'}, }
         input_class = lookup_tag('filesubmission')
-        the_input = input_class(test_system, element, state)
+        the_input = input_class(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -319,7 +319,7 @@ class CodeInputTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
 
         input_class = lookup_tag('codeinput')
-        the_input = input_class(test_system, element, state)
+        the_input = input_class(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -368,7 +368,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
 
         self.input_class = lookup_tag('matlabinput')
-        self.the_input = self.input_class(test_system, elt, state)
+        self.the_input = self.input_class(test_system(), elt, state)
 
     def test_rendering(self):
         context = self.the_input._get_render_context()
@@ -396,7 +396,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_system, elt, state)
+        the_input = self.input_class(test_system(), elt, state)
         context = the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
@@ -423,7 +423,7 @@ class MatlabTest(unittest.TestCase):
                      }
             elt = etree.fromstring(self.xml)
 
-            the_input = self.input_class(test_system, elt, state)
+            the_input = self.input_class(test_system(), elt, state)
             context = the_input._get_render_context()
             expected = {'id': 'prob_1_2',
                         'value': 'print "good evening"',
@@ -448,7 +448,7 @@ class MatlabTest(unittest.TestCase):
                  }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_system, elt, state)
+        the_input = self.input_class(test_system(), elt, state)
         context = the_input._get_render_context()
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
@@ -470,7 +470,7 @@ class MatlabTest(unittest.TestCase):
         get = {'submission': 'x = 1234;'}
         response = self.the_input.handle_ajax("plot", get)
 
-        test_system.xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
+        test_system().xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
 
         self.assertTrue(response['success'])
         self.assertTrue(self.the_input.input_state['queuekey'] is not None)
@@ -479,13 +479,12 @@ class MatlabTest(unittest.TestCase):
     def test_plot_data_failure(self):
         get = {'submission': 'x = 1234;'}
         error_message = 'Error message!'
-        test_system.xqueue['interface'].send_to_queue.return_value = (1, error_message)
+        test_system().xqueue['interface'].send_to_queue.return_value = (1, error_message)
         response = self.the_input.handle_ajax("plot", get)
         self.assertFalse(response['success'])
         self.assertEqual(response['message'], error_message)
         self.assertTrue('queuekey' not in self.the_input.input_state)
         self.assertTrue('queuestate' not in self.the_input.input_state)
-        test_system.xqueue['interface'].send_to_queue.return_value = (0, 'Success!')
 
     def test_ungraded_response_success(self):
         queuekey = 'abcd'
@@ -496,7 +495,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_system, elt, state)
+        the_input = self.input_class(test_system(), elt, state)
         inner_msg = 'hello!'
         queue_msg = json.dumps({'msg': inner_msg})
 
@@ -514,7 +513,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_system, elt, state)
+        the_input = self.input_class(test_system(), elt, state)
         inner_msg = 'hello!'
         queue_msg = json.dumps({'msg': inner_msg})
 
@@ -553,7 +552,7 @@ class SchematicTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('schematic')(test_system, element, state)
+        the_input = lookup_tag('schematic')(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -592,7 +591,7 @@ class ImageInputTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('imageinput')(test_system, element, state)
+        the_input = lookup_tag('imageinput')(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -643,7 +642,7 @@ class CrystallographyTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('crystallography')(test_system, element, state)
+        the_input = lookup_tag('crystallography')(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -681,7 +680,7 @@ class VseprTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('vsepr_input')(test_system, element, state)
+        the_input = lookup_tag('vsepr_input')(test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -708,7 +707,7 @@ class ChemicalEquationTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'H2OYeah', }
-        self.the_input = lookup_tag('chemicalequationinput')(test_system, element, state)
+        self.the_input = lookup_tag('chemicalequationinput')(test_system(), element, state)
 
     def test_rendering(self):
         ''' Verify that the render context matches the expected render context'''
@@ -783,7 +782,7 @@ class DragAndDropTest(unittest.TestCase):
                                     ]
                     }
 
-        the_input = lookup_tag('drag_and_drop_input')(test_system, element, state)
+        the_input = lookup_tag('drag_and_drop_input')(test_system(), element, state)
 
         context = the_input._get_render_context()
         expected = {'id': 'prob_1_2',
@@ -832,7 +831,7 @@ class AnnotationInputTest(unittest.TestCase):
 
         tag = 'annotationinput'
 
-        the_input = lookup_tag(tag)(test_system, element, state)
+        the_input = lookup_tag(tag)(test_system(), element, state)
 
         context = the_input._get_render_context()
 

@@ -113,7 +113,7 @@ def delete_item(request):
     delete_children = request.POST.get('delete_children', False)
     delete_all_versions = request.POST.get('delete_all_versions', False)
 
-    store = modulestore()
+    store = get_modulestore(item_location)
 
     item = store.get_item(item_location)
 

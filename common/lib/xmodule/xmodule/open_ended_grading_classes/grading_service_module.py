@@ -53,8 +53,9 @@ class GradingService(object):
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             #This is a dev_facing_error
-            log.error("Problem posting data to the grading controller.  URL: {0}, data: {1}".format(url, data))
-            raise GradingServiceError, str(err), sys.exc_info()[2]
+            error_string = "Problem posting data to the grading controller.  URL: {0}, data: {1}".format(url, data)
+            log.error(error_string)
+            raise GradingServiceError(error_string)
 
         return r.text
 
@@ -71,8 +72,9 @@ class GradingService(object):
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             #This is a dev_facing_error
-            log.error("Problem getting data from the grading controller.  URL: {0}, params: {1}".format(url, params))
-            raise GradingServiceError, str(err), sys.exc_info()[2]
+            error_string = "Problem getting data from the grading controller.  URL: {0}, params: {1}".format(url, params)
+            log.error(error_string)
+            raise GradingServiceError(error_string)
 
         return r.text
 

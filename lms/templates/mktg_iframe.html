@@ -1,0 +1,53 @@
+<%namespace name='static' file='static_content.html'/>
+<!DOCTYPE html>
+<html>
+<head>
+  <%block name="title"></%block>
+
+  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
+  <meta name="path_prefix" content="${MITX_ROOT_URL}" />
+  <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
+
+  <%static:css group='application'/>
+  <%static:js group='main_vendor'/>
+
+  <!--[if IE]>
+    <script src="${static.url('js/html5shiv.js')}"></script>
+  <![endif]-->
+
+  <!--[if lte IE 9]>
+    <%static:css group='ie-fixes'/>
+  <![endif]-->
+
+  <%block name="headextra"/>
+
+  % if not course:
+  <%include file="google_analytics.html" />
+  % endif
+
+  <!-- repeated button styles needed for IE (copied from _shame.scss) -->
+  <style type="text/css" media="screen">
+
+    .view-partial-mktgregister{background:transparent}.view-partial-mktgregister .wrapper-view{overflow:hidden}.view-partial-mktgregister .btn,.view-partial-mktgregister .btn-primary,.view-partial-mktgregister .action.action-register,.view-partial-mktgregister .action.access-courseware,.view-partial-mktgregister .btn-secondary,.view-partial-mktgregister .action.is-registered,.view-partial-mktgregister .action.registration-closed,.view-partial-mktgregister .btn-tertiary,.view-partial-mktgregister .action.coming-soon{-webkit-box-sizing:"border-box";-moz-box-sizing:"border-box";box-sizing:"border-box";display:block;padding:10px;text-transform:lowercase;color:#fff;letter-spacing:0.1rem;cursor:pointer;text-align:center;border:none !important;text-decoration:none;text-shadow:none;letter-spacing:0.1rem;font-size:17px;font-weight:300;box-shadow:0 !important}.view-partial-mktgregister .btn strong,.view-partial-mktgregister .btn-primary strong,.view-partial-mktgregister .action.action-register strong,.view-partial-mktgregister .action.access-courseware strong,.view-partial-mktgregister .btn-secondary strong,.view-partial-mktgregister .action.is-registered strong,.view-partial-mktgregister .action.registration-closed strong,.view-partial-mktgregister .btn-tertiary strong,.view-partial-mktgregister .action.coming-soon strong{font-weight:400;text-transform:none}.view-partial-mktgregister .btn-primary,.view-partial-mktgregister .action.action-register,.view-partial-mktgregister .action.access-courseware{background-color:#4697ec;background-image:-webkit-gradient(linear, left top, left bottom, color-stop(5%, #4697ec),color-stop(95%, #4880bb));background-image:-webkit-linear-gradient(#4697ec 5%,#4880bb 95%);background-image:linear-gradient(#4697ec 5%,#4880bb 95%)}.view-partial-mktgregister .btn-secondary,.view-partial-mktgregister .action.is-registered,.view-partial-mktgregister .action.registration-closed{background-color:#999;background-image:-webkit-gradient(linear, left top, left bottom, color-stop(5%, #999),color-stop(95%, #666));background-image:-webkit-linear-gradient(#999 5%,#666 95%);background-image:linear-gradient(#999 5%,#666 95%)}.view-partial-mktgregister .btn-tertiary,.view-partial-mktgregister .action.coming-soon{background:#e6f5fc;color:#5597dd}.view-partial-mktgregister .list-actions{list-style:none;margin:0;padding:0}.view-partial-mktgregister .list-actions .item{margin:0}.view-partial-mktgregister .action.is-registered,.view-partial-mktgregister .action.registration-closed{pointer-events:none !important}.view-partial-mktgregister .action.coming-soon{pointer-events:none !important;outline:none}
+
+
+
+
+
+
+
+  </style>
+</head>
+
+<body class="<%block name='bodyclass'></%block>">
+
+  <!-- view -->
+  <div class="wrapper wrapper-view">
+
+    <%block name="content"></%block>
+  </div>
+
+  <%static:js group='application'/>
+  <%block name="js_extra"></%block>
+</body>
+</html>

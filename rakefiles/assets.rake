@@ -1,3 +1,31 @@
+# Theming constants
+THEME_NAME = ENV_TOKENS['THEME_NAME']
+USE_CUSTOM_THEME = !(THEME_NAME.nil? || THEME_NAME.empty?)
+if USE_CUSTOM_THEME
+    THEME_ROOT = File.join(ENV_ROOT, "themes", THEME_NAME)
+    THEME_SASS = File.join(THEME_ROOT, "static", "sass")
+end
+
+# Run the specified file through the Mako templating engine, providing
+# the ENV_TOKENS to the templating context.
+def preprocess_with_mako(filename)
+    # simple command-line invocation of Mako engine
+    mako = "from mako.template import Template;" +
+           "print Template(filename=\"#{filename}\")" +
+           # Total hack. It works because a Python dict literal has
+           # the same format as a JSON object.
+           ".render(env=#{ENV_TOKENS.to_json});"
+
+    # strip off the .mako extension
+    output_filename = filename.chomp(File.extname(filename))
+
+    # just pipe from stdout into the new file, exiting on failure
+    File.open(output_filename, 'w') do |file|
+      file.write(`python -c '#{mako}'`)
+      exit_code = $?.to_i
+      abort "#{mako} failed with #{exit_code}" if exit_code.to_i != 0
+    end
+end
 
 def xmodule_cmd(watch=false, debug=false)
     xmodule_cmd = 'xmodule_assets common/static/xmodule'
@@ -13,14 +41,36 @@ def xmodule_cmd(watch=false, debug=false)
 end
 
 def coffee_cmd(watch=false, debug=false)
-    "node_modules/.bin/coffee #{watch ? '--watch' : ''} --compile */static"
+    if watch
+        # On OSx, coffee fails with EMFILE when
+        # trying to watch all of our coffee files at the same
+        # time.
+        #
+        # Ref: https://github.com/joyent/node/issues/2479
+        #
+        # Instead, watch 50 files per process in parallel
+        cmds = []
+        Dir['*/static/**/*.coffee'].each_slice(50) do |coffee_files|
+            cmds << "node_modules/.bin/coffee --watch --compile #{coffee_files.join(' ')}"
+        end
+        cmds
+    else
+        'node_modules/.bin/coffee --compile */static'
+    end
 end
 
 def sass_cmd(watch=false, debug=false)
+    sass_load_paths = ["./common/static/sass"]
+    sass_watch_paths = ["*/static"]
+    if USE_CUSTOM_THEME
+      sass_load_paths << THEME_SASS
+      sass_watch_paths << THEME_SASS
+    end
+
     "sass #{debug ? '--debug-info' : '--style compressed'} " +
-          "--load-path ./common/static/sass " +
+          "--load-path #{sass_load_paths.join(' ')} " +
           "--require ./common/static/sass/bourbon/lib/bourbon.rb " +
-          "#{watch ? '--watch' : '--update'} */static"
+          "#{watch ? '--watch' : '--update'} #{sass_watch_paths.join(' ')}"
 end
 
 desc "Compile all assets"
@@ -31,6 +81,13 @@ namespace :assets do
     desc "Compile all assets in debug mode"
     multitask :debug
 
+    desc "Preprocess all static assets that have the .mako extension"
+    task :preprocess do
+      # Run assets through the Mako templating engine. Right now we
+      # just hardcode the asset filenames.
+      preprocess_with_mako("lms/static/sass/application.scss.mako")
+    end
+
     desc "Watch all assets for changes and automatically recompile"
     task :watch => 'assets:_watch' do
         puts "Press ENTER to terminate".red
@@ -39,11 +96,15 @@ namespace :assets do
 
     {:xmodule => :install_python_prereqs,
      :coffee => :install_node_prereqs,
-     :sass => :install_ruby_prereqs}.each_pair do |asset_type, prereq_task|
+     :sass => [:install_ruby_prereqs, :preprocess]}.each_pair do |asset_type, prereq_tasks|
         desc "Compile all #{asset_type} assets"
-        task asset_type => prereq_task do
+        task asset_type => prereq_tasks do
             cmd = send(asset_type.to_s + "_cmd", watch=false, debug=false)
-            sh(cmd)
+            if cmd.kind_of?(Array)
+                cmd.each {|c| sh(c)}
+            else
+                sh(cmd)
+            end
         end
 
         multitask :all => asset_type
@@ -52,7 +113,7 @@ namespace :assets do
 
         namespace asset_type do
             desc "Compile all #{asset_type} assets in debug mode"
-            task :debug => prereq_task do
+            task :debug => prereq_tasks do
                 cmd = send(asset_type.to_s + "_cmd", watch=false, debug=true)
                 sh(cmd)
             end
@@ -63,9 +124,13 @@ namespace :assets do
                 $stdin.gets
             end
 
-            task :_watch => prereq_task do
+            task :_watch => prereq_tasks do
                 cmd = send(asset_type.to_s + "_cmd", watch=true, debug=true)
-                background_process(cmd)
+                if cmd.kind_of?(Array)
+                    cmd.each {|c| background_process(c)}
+                else
+                    background_process(cmd)
+                end
             end
         end
     end

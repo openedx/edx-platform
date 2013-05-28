@@ -1,0 +1,30 @@
+<%!
+  from django.core.urlresolvers import reverse
+  from courseware.courses import course_image_url, get_course_about_section
+  from courseware.access import has_access
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../mktg_iframe.html" />
+
+<%block name="title"><title>About ${course_id}</title></%block>
+
+<%block name="bodyclass">view-partial-mktgregister</%block>
+
+
+<%block name="headextra">
+  <%include file="../google_analytics.html" />
+</%block>
+
+<%block name="content">
+
+  <script src="${static.url('js/course_info.js')}"></script>
+
+
+  <ul class="list-actions register">
+    <li class="item">
+      <a class="action coming-soon" href="">Coming Soon</a>
+    </li>
+  </ul>
+
+</%block>

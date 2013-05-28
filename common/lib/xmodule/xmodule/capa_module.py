@@ -3,7 +3,9 @@ import datetime
 import hashlib
 import json
 import logging
+import os
 import traceback
+import struct
 import sys
 
 from pkg_resources import resource_string
@@ -23,8 +25,10 @@ from xmodule.util.date_utils import time_to_datetime
 log = logging.getLogger("mitx.courseware")
 
 
-# Generated this many different variants of problems with rerandomize=per_student
+# Generate this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
+# Never produce more than this many different seeds, no matter what.
+MAX_RANDOMIZATION_BINS = 1000
 
 
 def randomization_bin(seed, problem_id):
@@ -109,11 +113,7 @@ class CapaModule(CapaFields, XModule):
             self.close_date = due_date
 
         if self.seed is None:
-            if self.rerandomize == 'never':
-                self.seed = 1
-            elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
-                # see comment on randomization_bin
-                self.seed = randomization_bin(system.seed, self.location.url)
+            self.choose_new_seed()
 
         # Need the problem location in openendedresponse to send out.  Adding
         # it to the system here seems like the least clunky way to get it
@@ -157,6 +157,22 @@ class CapaModule(CapaFields, XModule):
 
             self.set_state_from_lcp()
 
+        assert self.seed is not None
+
+    def choose_new_seed(self):
+        """Choose a new seed."""
+        if self.rerandomize == 'never':
+            self.seed = 1
+        elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
+            # see comment on randomization_bin
+            self.seed = randomization_bin(self.system.seed, self.location.url)
+        else:
+            self.seed = struct.unpack('i', os.urandom(4))[0]
+
+            # So that sandboxed code execution can be cached, but still have an interesting
+            # number of possibilities, cap the number of different random seeds.
+            self.seed %= MAX_RANDOMIZATION_BINS
+
     def new_lcp(self, state, text=None):
         if text is None:
             text = self.data
@@ -165,6 +181,7 @@ class CapaModule(CapaFields, XModule):
             problem_text=text,
             id=self.location.html_id(),
             state=state,
+            seed=self.seed,
             system=self.system,
         )
 
@@ -832,14 +849,11 @@ class CapaModule(CapaFields, XModule):
                     'error': "Refresh the page and make an attempt before resetting."}
 
         if self.rerandomize in ["always", "onreset"]:
-            # reset random number generator seed (note the self.lcp.get_state()
-            # in next line)
-            seed = None
-        else:
-            seed = self.lcp.seed
+            # Reset random number generator seed.
+            self.choose_new_seed()
 
         # Generate a new problem with either the previous seed or a new seed
-        self.lcp = self.new_lcp({'seed': seed})
+        self.lcp = self.new_lcp(None)
 
         # Pull in the new problem seed
         self.set_state_from_lcp()

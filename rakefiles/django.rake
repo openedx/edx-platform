@@ -5,7 +5,7 @@ default_options = {
 
 task :predjango => :install_python_prereqs do
     sh("find . -type f -name *.pyc -delete")
-    sh('pip install -q --no-index -r requirements/local.txt')
+    sh('pip install -q --no-index -r requirements/edx/local.txt')
 end
 
 
@@ -23,6 +23,14 @@ end
     task system, [:env, :options] => [:install_prereqs, 'assets:_watch', :predjango] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
         sh(django_admin(system, args.env, 'runserver', args.options))
+    end
+
+    desc "Start #{system} Celery worker"
+    task "#{system}_worker", [:options] => [:predjango] do |t, args|
+      args.with_defaults(:options => default_options[system])
+      django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
+      command = 'celery worker'
+      sh("#{django_admin} #{command} --loglevel=INFO --settings=#{system}.envs.dev_with_worker --pythonpath=. #{args.join(' ')}")
     end
 
     # Per environment tasks
