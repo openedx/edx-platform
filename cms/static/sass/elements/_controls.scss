@@ -133,27 +133,7 @@
   }
 }
 
-// blue small/inline button
-.btn-flat-blue {
-  @extend .btn-flat;
-  color: $white;
-  background-color: $blue;
 
-  &:hover, &:active {
-    background: $blue-l4;
-    color: $blue-s2;
-  }
-
-  &.current, &.active {
-    border-color: $blue-l3;
-    background: $blue-l3;
-    color: $blue-d1;
-
-    &:hover, &:active {
-
-    }
-  }
-}
 
 // ====================
 
