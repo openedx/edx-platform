@@ -5,7 +5,7 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, Boolean, List
+from xblock.core import Integer, Scope, String, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
 from .fields import Date, StringyFloat, StringyInteger, StringyBoolean
@@ -57,24 +57,16 @@ class CombinedOpenEndedFields(object):
                                       scope=Scope.user_state)
     ready_to_reset = StringyBoolean(help="If the problem is ready to be reset or not.", default=False,
                              scope=Scope.user_state)
-    // do merge
     attempts = StringyInteger(display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.", default=1,
         scope=Scope.settings, values = {"min" : 1 })
-    is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
-    accept_file_upload = Boolean(display_name="Allow File Uploads",
+    is_graded = StringyBoolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
+    accept_file_upload = StringyBoolean(display_name="Allow File Uploads",
         help="Whether or not the student can submit files as a response.", default=False, scope=Scope.settings)
-    skip_spelling_checks = Boolean(display_name="Disable Quality Filter",
+    skip_spelling_checks = StringyBoolean(display_name="Disable Quality Filter",
         # TODO: passing of text failed with "won't". Need to make our code more robust.
         help="If False, submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
         default=False, scope=Scope.settings)
-    
-    attempts = StringyInteger(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
-    is_graded = StringyBoolean(help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
-    accept_file_upload = StringyBoolean(help="Whether or not the problem accepts file uploads.", default=False,
-                                 scope=Scope.settings)
-    skip_spelling_checks = StringyBoolean(help="Whether or not to skip initial spelling checks.", default=True,
-                                   scope=Scope.settings)
     due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
     graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
                          scope=Scope.settings)
@@ -83,7 +75,7 @@ class CombinedOpenEndedFields(object):
     weight = StringyFloat(display_name="Problem Weight",
         help="The number of points the problem is worth. By default, each problem is worth one point.",
         scope=Scope.settings, values = {"min" : 0 , "step": ".1"})
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", default="", scope=Scope.settings)
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):

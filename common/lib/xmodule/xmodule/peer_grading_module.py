@@ -10,7 +10,7 @@ from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.django import modulestore
 from .timeinfo import TimeInfo
-from xblock.core import Object, Integer, Boolean, String, Scope
+from xblock.core import Object, String, Scope
 from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
@@ -32,20 +32,12 @@ class PeerGradingFields(object):
         help='When True, only the single problem specified by "Link to Problem Location" is shown. '
              'When False, a panel is displayed with all problems available for peer grading.',
         default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
-link_to_location = String(display_name="Link to Problem Location",
-    help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
-    default=LINK_TO_LOCATION, scope=Scope.settings)
-# TODO: move boolean default into xfields
-is_graded = StringyBoolean(display_name="Graded",
-    help='Whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
-    default=IS_GRADED, scope=Scope.settings)
-
-    
-    use_for_single_location = StringyBoolean(help="Whether to use this for a single location or as a panel.",
-                                      default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
-    link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION,
-                              scope=Scope.settings)
-    is_graded = StringyBoolean(help="Whether or not this module is scored.", default=IS_GRADED, scope=Scope.settings)
+    link_to_location = String(display_name="Link to Problem Location",
+        help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
+        default=LINK_TO_LOCATION, scope=Scope.settings)
+    is_graded = StringyBoolean(display_name="Graded",
+        help='Whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
+        default=IS_GRADED, scope=Scope.settings)
     due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
     max_grade = StringyInteger(help="The maximum grade that a student can receive for this problem.", default=MAX_SCORE,
