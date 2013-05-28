@@ -33,7 +33,7 @@
 
     // colophon
     .colophon {
-      //margin-right: flex-gutter(2);
+      margin-right: flex-gutter();
       width: flex-grid(8,12);
       float: left;
 
@@ -91,7 +91,6 @@
         text-align: right;
 
         li {
-          //margin-right: ($baseline/10);
           display: inline-block;
 
           &:last-child {
