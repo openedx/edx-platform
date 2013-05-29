@@ -66,12 +66,15 @@ class ComplexEncoder(json.JSONEncoder):
 
 class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
-    max_attempts = StringyInteger(display_name="Maximum Attempts",
+    max_attempts = StringyInteger(
+        display_name="Maximum Attempts",
         help="This specifies the number of times the student can try to answer this problem. If unset, infinite attempts are allowed.",
-        values = {"min" : 1 }, scope=Scope.settings)
+        values = {"min" : 1 }, scope=Scope.settings
+    )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
-    showanswer = String(display_name="Show Answer",
+    showanswer = String(
+        display_name="Show Answer",
         help="Specifies when to show the answer to this problem. A default value can be set course-wide in Advanced Settings.",
         scope=Scope.settings, default="closed",
         values=[
@@ -81,26 +84,33 @@ class CapaFields(object):
             {"display_name": "Closed", "value": "closed"},
             {"display_name": "Finished", "value": "finished"},
             {"display_name": "Past Due", "value": "past_due"},
-            {"display_name": "Never", "value": "never"}])
+            {"display_name": "Never", "value": "never"}]
+    )
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
-    rerandomize = Randomization(display_name="Randomization", help="Specifies whether variable inputs for this problem are randomized each time a student loads the problem. This only applies to problems that have randomly generated numeric variables. A default value can be set course-wide in Advanced Settings.",
+    rerandomize = Randomization(
+        display_name="Randomization", help="Specifies whether variable inputs for this problem are randomized each time a student loads the problem. This only applies to problems that have randomly generated numeric variables. A default value can be set course-wide in Advanced Settings.",
         default="always", scope=Scope.settings, values=[{"display_name": "Always", "value": "always"},
                                                         {"display_name": "On Reset", "value": "onreset"},
                                                         {"display_name": "Never", "value": "never"},
-                                                        {"display_name": "Per Student", "value": "per_student"}])
+                                                        {"display_name": "Per Student", "value": "per_student"}]
+    )
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
     input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
-    weight = StringyFloat(display_name="Problem Weight",
+    weight = StringyFloat(
+        display_name="Problem Weight",
         help="Specifies the number of points the problem is worth. If unset, each response field in the problem is worth one point.",
         values = {"min" : 0 , "step": .1},
-        scope=Scope.settings)
+        scope=Scope.settings
+    )
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
-    source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.",
-        scope=Scope.settings)
+    source_code = String(
+        help="Source code for LaTeX and Word problems. This feature is not well-supported.",
+        scope=Scope.settings
+    )
 
 
 class CapaModule(CapaFields, XModule):

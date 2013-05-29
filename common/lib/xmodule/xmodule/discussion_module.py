@@ -8,12 +8,16 @@ from xblock.core import String, Scope
 
 class DiscussionFields(object):
     discussion_id = String(scope=Scope.settings)
-    discussion_category = String(display_name="Category",
+    discussion_category = String(
+        display_name="Category",
         help="Specifies a category name for this discussion. This name appears in the left pane of the discussion forum for your course.",
-        scope=Scope.settings)
-    discussion_target = String(display_name="Subcategory",
+        scope=Scope.settings
+    )
+    discussion_target = String(
+        display_name="Subcategory",
         help="Specifies a subcategory name for this discussion. This name appears in the left pane of the discussion forum for your course.",
-        scope=Scope.settings)
+        scope=Scope.settings
+    )
     sort_key = String(scope=Scope.settings)
 
 

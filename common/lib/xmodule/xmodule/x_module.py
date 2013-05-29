@@ -82,7 +82,7 @@ class HTMLSnippet(object):
 class XModuleFields(object):
     display_name = String(
         display_name="Display Name",
-        help="Specifies the name for this component. The name appears as a tooltip in the course ribbon at the top of the page.",
+        help="Specifies the name for this component. The name appears in the course navigation at the top of the page.",
         scope=Scope.settings,
         default=None
     )
