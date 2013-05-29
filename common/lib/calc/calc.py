@@ -8,11 +8,11 @@ import numpy
 import numbers
 import scipy.constants
 
-from pyparsing import Word, alphas, nums, oneOf, Literal
-from pyparsing import ZeroOrMore, OneOrMore, StringStart
-from pyparsing import StringEnd, Optional, Forward
-from pyparsing import CaselessLiteral, Group, StringEnd
-from pyparsing import NoMatch, stringEnd, alphanums
+from pyparsing import Word, nums, Literal
+from pyparsing import ZeroOrMore, MatchFirst
+from pyparsing import Optional, Forward
+from pyparsing import CaselessLiteral
+from pyparsing import NoMatch, stringEnd, Suppress, Combine
 
 default_functions = {'sin': numpy.sin,
                      'cos': numpy.cos,
@@ -179,17 +179,19 @@ def evaluator(variables, functions, string, cs=False):
         return float('nan')
 
     # SI suffixes and percent
-    number_suffix = reduce(lambda a, b: a | b, map(Literal, suffixes.keys()), NoMatch())
-    (dot, minus, plus, times, div, lpar, rpar, exp) = map(Literal, ".-+*/()^")
+    number_suffix = MatchFirst([Literal(k) for k in suffixes.keys()])
+    plus_minus = Literal('+') | Literal('-')
+    times_div = Literal('*') | Literal('/')
 
     number_part = Word(nums)
 
     # 0.33 or 7 or .34 or 16.
     inner_number = (number_part + Optional("." + Optional(number_part))) | ("." + number_part)
+    inner_number = Combine(inner_number)  # by default pyparsing allows spaces between tokens--this prevents that
 
     # 0.33k or -17
-    number = (Optional(minus | plus) + inner_number
-              + Optional(CaselessLiteral("E") + Optional((plus | minus)) + number_part)
+    number = (inner_number
+              + Optional(CaselessLiteral("E") + Optional(plus_minus) + number_part)
               + Optional(number_suffix))
     number = number.setParseAction(number_parse_action)  # Convert to number
 
@@ -197,40 +199,34 @@ def evaluator(variables, functions, string, cs=False):
     expr = Forward()
     factor = Forward()
 
-    def sreduce(f, l):
-        ''' Same as reduce, but handle len 1 and len 0 lists sensibly '''
-        if len(l) == 0:
-            return NoMatch()
-        if len(l) == 1:
-            return l[0]
-        return reduce(f, l)
-
     # Handle variables passed in. E.g. if we have {'R':0.5}, we make the substitution.
     # Special case for no variables because of how we understand PyParsing is put together
     if len(all_variables) > 0:
         # We sort the list so that var names (like "e2") match before
         # mathematical constants (like "e"). This is kind of a hack.
         all_variables_keys = sorted(all_variables.keys(), key=len, reverse=True)
-        varnames = sreduce(lambda x, y: x | y, map(lambda x: CasedLiteral(x), all_variables_keys))
-        varnames.setParseAction(lambda x: map(lambda y: all_variables[y], x))
+        literal_all_vars = [CasedLiteral(k) for k in all_variables_keys]
+        varnames = MatchFirst(literal_all_vars)
+        varnames.setParseAction(lambda x: [all_variables[k] for k in x])
     else:
         varnames = NoMatch()
 
     # Same thing for functions.
     if len(all_functions) > 0:
-        funcnames = sreduce(lambda x, y: x | y,
-                            map(lambda x: CasedLiteral(x), all_functions.keys()))
-        function = funcnames + lpar.suppress() + expr + rpar.suppress()
+        funcnames = MatchFirst([CasedLiteral(k) for k in all_functions.keys()])
+        function = funcnames + Suppress("(") + expr + Suppress(")")
         function.setParseAction(func_parse_action)
     else:
         function = NoMatch()
 
-    atom = number | function | varnames | lpar + expr + rpar
-    factor << (atom + ZeroOrMore(exp + atom)).setParseAction(exp_parse_action)  # 7^6
+    atom = number | function | varnames | Suppress("(") + expr + Suppress(")")
+
+    # Do the following in the correct order to preserve order of operation
+    factor << (atom + ZeroOrMore("^" + atom)).setParseAction(exp_parse_action)  # 7^6
     paritem = factor + ZeroOrMore(Literal('||') + factor)  # 5k || 4k
     paritem = paritem.setParseAction(parallel)
-    term = paritem + ZeroOrMore((times | div) + paritem)  # 7 * 5 / 4 - 3
+    term = paritem + ZeroOrMore(times_div + paritem)  # 7 * 5 / 4 - 3
     term = term.setParseAction(prod_parse_action)
-    expr << Optional((plus | minus)) + term + ZeroOrMore((plus | minus) + term)  # -5 + 4 - 3
+    expr << Optional(plus_minus) + term + ZeroOrMore(plus_minus + term)  # -5 + 4 - 3
     expr = expr.setParseAction(sum_parse_action)
     return (expr + stringEnd).parseString(string)[0]
