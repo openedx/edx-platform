@@ -86,6 +86,7 @@ namespace :assets do
       # Run assets through the Mako templating engine. Right now we
       # just hardcode the asset filenames.
       preprocess_with_mako("lms/static/sass/application.scss.mako")
+      preprocess_with_mako("lms/static/sass/course.scss.mako")
     end
 
     desc "Watch all assets for changes and automatically recompile"
