@@ -39,3 +39,9 @@
   <p>Download subtitles <a href="${track}">here</a>.</p>
 </div>
 % endif
+
+%if in_lms:
+<div id="in_lms" class="true" style="display: none;"></div>
+%else:
+<div id="in_lms" class="false" style="display: none;"></div>
+%endif

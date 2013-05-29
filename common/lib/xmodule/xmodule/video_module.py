@@ -139,7 +139,8 @@ class VideoModule(VideoFields, XModule):
             'show_captions': self.show_captions,
             'start': self.start_time,
             'end': self.end_time,
-            'normal_speed_video_id': normal_speed_video_id
+            'normal_speed_video_id': normal_speed_video_id,
+            'in_lms': True if self.system.course_id is not None else False
         })
 
 
