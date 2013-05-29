@@ -86,7 +86,7 @@ describe 'VideoPlayer', ->
         expect($(@player.volumeControl)).toHandleWith 'volumeChange', @player.onVolumeChange
 
       it 'bind to key press', ->
-        expect($(document)).toHandleWith 'keyup', @player.bindExitFullScreen
+        expect($(document.documentElement)).toHandleWith 'keyup', @player.bindExitFullScreen
 
       it 'bind to fullscreen switching button', ->
         expect($('.add-fullscreen')).toHandleWith 'click', @player.toggleFullScreen
