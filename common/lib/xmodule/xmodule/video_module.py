@@ -140,7 +140,7 @@ class VideoModule(VideoFields, XModule):
             'start': self.start_time,
             'end': self.end_time,
             'normal_speed_video_id': normal_speed_video_id,
-            'in_lms': self.system.debug
+            'in_lms': not self.system.debug
         })
 
 
