@@ -271,7 +271,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
         self.assertTrue(getattr(draft_problem, 'is_draft', False))
 
-        #now requery with depth
+        # now requery with depth
         course = modulestore('draft').get_item(
             Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
             depth=None
@@ -539,7 +539,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             on_disk = loads(grading_policy.read())
             self.assertEqual(on_disk, course.grading_policy)
 
-        #check for policy.json
+        # check for policy.json
         self.assertTrue(filesystem.exists('policy.json'))
 
         # compare what's on disk to what we have in the course module
@@ -990,7 +990,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_metadata_inheritance(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        import_from_xml(module_store, 'common/test/data/', ['full'], verbose=True)
 
         course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
 

@@ -11,7 +11,7 @@ import sys
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
-from capa.responsetypes import StudentInputError,\
+from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
@@ -20,7 +20,7 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.core import Scope, String, Boolean, Object
 from .fields import Timedelta, Date, StringyInteger, StringyFloat
-from xmodule.util.date_utils import time_to_datetime
+from django.utils.timezone import UTC
 
 log = logging.getLogger("mitx.courseware")
 
@@ -134,7 +134,7 @@ class CapaModule(CapaFields, XModule):
     def __init__(self, system, location, descriptor, model_data):
         XModule.__init__(self, system, location, descriptor, model_data)
 
-        due_date = time_to_datetime(self.due)
+        due_date = self.due
 
         if self.graceperiod is not None and due_date:
             self.close_date = due_date + self.graceperiod
@@ -502,7 +502,7 @@ class CapaModule(CapaFields, XModule):
         Is it now past this problem's due date, including grace period?
         """
         return (self.close_date is not None and
-                datetime.datetime.utcnow() > self.close_date)
+                datetime.datetime.now(UTC()) > self.close_date)
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
