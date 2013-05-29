@@ -148,8 +148,8 @@
     }
 
     &:hover, &:active {
-      border-bottom: 1px dotted $m-blue-s1;
-      color: $m-blue-s1;
+      border-bottom: 1px dotted $m-blue-l1;
+      color: $m-blue-l1;
     }
   }
 
@@ -339,11 +339,11 @@
       &.is-focused {
 
         label {
-          color: $m-blue-s1;
+          color: $m-blue-l1;
         }
 
         .tip {
-          color: $m-blue-s1;
+          color: $m-blue-l1;
         }
       }
 
