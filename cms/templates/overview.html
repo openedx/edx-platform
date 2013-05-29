@@ -154,8 +154,12 @@
               <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
               <div class="section-published-date">
                 <%
-                  start_date_str = section.lms.start.strftime('%m/%d/%Y')
-                  start_time_str = section.lms.start.strftime('%H:%M')
+                  if section.lms.start is not None:
+                      start_date_str = section.lms.start.strftime('%m/%d/%Y')
+                      start_time_str = section.lms.start.strftime('%H:%M')
+                  else:
+                      start_date_str = ''
+                      start_time_str = ''
                 %>
                 %if section.lms.start is None:
                   <span class="published-status">This section has not been released.</span>
