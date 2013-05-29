@@ -66,7 +66,7 @@ class @VideoPlayer extends Subview
         at: 'top center'
 
   onReady: (event) =>
-    unless onTouchBasedDevice()
+    unless onTouchBasedDevice() or $('#in_lms').hasClass('false')
       $('.video-load-complete:first').data('video').player.play()
 
   onStateChange: (event) =>
