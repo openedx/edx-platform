@@ -26,7 +26,7 @@ class LMSLinksTestCase(TestCase):
         link = utils.get_lms_link_for_item(location, True)
         self.assertEquals(
             link,
-            "//preview.localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
+            "//preview/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
         )
 
 

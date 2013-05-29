@@ -55,6 +55,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
+MITX_FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"
 
 REPOS = {
     'edx4edx': {
