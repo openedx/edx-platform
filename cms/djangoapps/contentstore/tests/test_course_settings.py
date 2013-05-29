@@ -151,22 +151,16 @@ class CourseDetailsViewTest(CourseTestCase):
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
 
-    @staticmethod
-    def struct_to_datetime(struct_time):
-        return datetime.datetime(*struct_time[:6], tzinfo=UTC())
-
     def compare_date_fields(self, details, encoded, context, field):
         if details[field] is not None:
             date = Date()
             if field in encoded and encoded[field] is not None:
-                encoded_encoded = date.from_json(encoded[field])
-                dt1 = CourseDetailsViewTest.struct_to_datetime(encoded_encoded)
+                dt1 = date.from_json(encoded[field])
 
                 if isinstance(details[field], datetime.datetime):
                     dt2 = details[field]
                 else:
-                    details_encoded = date.from_json(details[field])
-                    dt2 = CourseDetailsViewTest.struct_to_datetime(details_encoded)
+                    dt2 = date.from_json(details[field])
 
                 expected_delta = datetime.timedelta(0)
                 self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)

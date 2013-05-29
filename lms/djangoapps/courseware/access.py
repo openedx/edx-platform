@@ -16,6 +16,7 @@ from xmodule.x_module import XModule, XModuleDescriptor
 
 from student.models import CourseEnrollmentAllowed
 from courseware.masquerade import is_masquerading_as_student
+from django.utils.timezone import UTC
 
 DEBUG_ACCESS = False
 
@@ -133,7 +134,7 @@ def _has_access_course_desc(user, course, action):
         (staff can always enroll)
         """
 
-        now = time.gmtime()
+        now = datetime.now(UTC())
         start = course.enrollment_start
         end = course.enrollment_end
 
@@ -242,7 +243,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
 
         # Check start date
         if descriptor.lms.start is not None:
-            now = time.gmtime()
+            now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
             if now > effective_start:
                 # after start date, everyone can see it
@@ -365,7 +366,7 @@ def _course_org_staff_group_name(location, course_context=None):
 
 
 def group_names_for(role, location, course_context=None):
-    """Returns the group names for a given role with this location. Plural 
+    """Returns the group names for a given role with this location. Plural
     because it will return both the name we expect now as well as the legacy
     group name we support for backwards compatibility. This should not check
     the DB for existence of a group (like some of its callers do) because that's
@@ -483,8 +484,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
        non-None start date.
 
     Returns:
-        A time, in the same format as returned by time.gmtime().  Either the same as
-        start, or earlier for beta testers.
+        A datetime.  Either the same as start, or earlier for beta testers.
 
     NOTE: number of days to adjust should be cached to avoid looking it up thousands of
     times per query.
@@ -505,15 +505,11 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
     beta_group = course_beta_test_group_name(descriptor.location)
     if beta_group in user_groups:
         debug("Adjust start time: user in group %s", beta_group)
-        # time_structs don't support subtraction, so convert to datetimes,
-        # subtract, convert back.
-        # (fun fact: datetime(*a_time_struct[:6]) is the beautiful syntax for
-        # converting time_structs into datetimes)
-        start_as_datetime = datetime(*descriptor.lms.start[:6])
+        start_as_datetime = descriptor.lms.start
         delta = timedelta(descriptor.lms.days_early_for_beta)
         effective = start_as_datetime - delta
         # ...and back to time_struct
-        return effective.timetuple()
+        return effective
 
     return descriptor.lms.start
 
@@ -564,7 +560,7 @@ def _has_access_to_location(user, location, access_level, course_context):
                 return True
         debug("Deny: user not in groups %s", staff_groups)
 
-    if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
+    if access_level == 'instructor' or access_level == 'staff':  # instructors get staff privileges
         instructor_groups = group_names_for_instructor(location, course_context) + \
                             [_course_org_instructor_group_name(location, course_context)]
         for instructor_group in instructor_groups:

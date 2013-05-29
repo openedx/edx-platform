@@ -8,7 +8,6 @@ from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
 from xblock.core import Scope, Integer, String
 from .fields import Date
-from xmodule.util.date_utils import time_to_datetime
 
 
 log = logging.getLogger(__name__)
@@ -29,17 +28,15 @@ class FolditModule(FolditFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/foldit/leaderboard.scss')]}
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
         """
-
         Example:
          <foldit show_basic_score="true"
             required_level="4"
             required_sublevel="3"
             show_leaderboard="false"/>
         """
-
-        self.due_time = time_to_datetime(self.due)
+        XModule.__init__(self, *args, **kwargs)
+        self.due_time = self.due
 
     def is_complete(self):
         """
@@ -82,7 +79,7 @@ class FolditModule(FolditFields, XModule):
         from foldit.models import Score
 
         leaders = [(e['username'], e['score']) for e in Score.get_tops_n(10)]
-        leaders.sort(key=lambda x: -x[1])
+        leaders.sort(key=lambda x:-x[1])
 
         return leaders
 
