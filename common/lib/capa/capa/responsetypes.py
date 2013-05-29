@@ -140,6 +140,8 @@ class LoncapaResponse(object):
         self.context = context
         self.system = system
 
+        self.id = xml.get('id')
+
         for abox in inputfields:
             if abox.tag not in self.allowed_inputfields:
                 msg = "%s: cannot have input field %s" % (
@@ -935,7 +937,6 @@ class CustomResponse(LoncapaResponse):
         # if <customresponse> has an "expect" (or "answer") attribute then save
         # that
         self.expect = xml.get('expect') or xml.get('answer')
-        self.myid = xml.get('id')
 
         log.debug('answer_ids=%s' % self.answer_ids)
 
@@ -981,7 +982,7 @@ class CustomResponse(LoncapaResponse):
         if not self.code:
             if answer is None:
                 log.error("[courseware.capa.responsetypes.customresponse] missing"
-                          " code checking script! id=%s" % self.myid)
+                          " code checking script! id=%s" % self.id)
                 self.code = ''
             else:
                 answer_src = answer.get('src')
@@ -1034,7 +1035,7 @@ class CustomResponse(LoncapaResponse):
         # note that this doesn't help the "cfn" version - only the exec version
         self.context.update({
             # my ID
-            'response_id': self.myid,
+            'response_id': self.id,
 
             # expected answer (if given as attribute)
             'expect': self.expect,
