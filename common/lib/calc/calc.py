@@ -1,3 +1,9 @@
+"""
+Parser and evaluator for FormulaResponse and NumericalResponse
+
+Uses pyparsing to parse. Main function as of now is evaluator().
+"""
+
 import copy
 import logging
 import math
@@ -56,6 +62,10 @@ log = logging.getLogger("mitx.courseware.capa")
 
 
 class UndefinedVariable(Exception):
+    """
+    Used to indicate the student input of a variable, which was unused by the
+    instructor.
+    """
     pass
     # unused for now
     # def raiseself(self):
@@ -67,7 +77,8 @@ general_whitespace = re.compile('[^\\w]+')
 
 
 def check_variables(string, variables):
-    '''Confirm the only variables in string are defined.
+    """
+    Confirm the only variables in string are defined.
 
     Pyparsing uses a left-to-right parser, which makes the more
     elegant approach pretty hopeless.
@@ -76,7 +87,7 @@ def check_variables(string, variables):
     undefined_variable = achar + Word(alphanums)
     undefined_variable.setParseAction(lambda x:UndefinedVariable("".join(x)).raiseself())
     varnames = varnames | undefined_variable
-    '''
+    """
     possible_variables = re.split(general_whitespace, string)  # List of all alnums in string
     bad_variables = list()
     for v in possible_variables:
@@ -90,26 +101,59 @@ def check_variables(string, variables):
         raise UndefinedVariable(' '.join(bad_variables))
 
 def lower_dict(d):
+    """
+    takes each key in the dict and makes it lowercase, still mapping to the
+    same value.
+
+    keep in mind that it is possible (but not useful?) to define different
+    variables that have the same lowercase representation. It would be hard to
+    tell which is used in the final dict and which isn't.
+    """
     return dict([(k.lower(), d[k]) for k in d])
 
+# The following few functions define parse actions, which are run on lists of
+# results from each parse component. They convert the strings and (previously
+# calculated) numbers into the number that component represents.
+
 def super_float(text):
-    ''' Like float, but with si extensions. 1k goes to 1000'''
+    """
+    Like float, but with si extensions. 1k goes to 1000
+    """
     if text[-1] in suffixes:
         return float(text[:-1]) * suffixes[text[-1]]
     else:
         return float(text)
 
-def number_parse_action(x):  # [ '7' ] ->  [ 7 ]
+def number_parse_action(x):
+    """
+    Create a float out of its string parts
+
+    e.g. [ '7', '.', '13' ] ->  [ 7.13 ]
+    Calls super_float above
+    """
     return [super_float("".join(x))]
 
-def exp_parse_action(x):  # [ 2 ^ 3 ^ 2 ] -> 512
+def exp_parse_action(x):
+    """
+    Take a list of numbers and exponentiate them, right to left
+
+    e.g. [ 3, 2, 3 ] (which is 3^2^3 = 3^(2^3)) -> 6561
+    """
     x = [e for e in x if isinstance(e, numbers.Number)]  # Ignore ^
     x.reverse()
     x = reduce(lambda a, b: b ** a, x)
     return x
 
-def parallel(x):  # Parallel resistors [ 1 2 ] => 2/3
-    # convert from pyparsing.ParseResults, which doesn't support '0 in x'
+def parallel(x):
+    """
+    Compute numbers according to the parallel resistors operator
+
+    BTW it is commutative. Its formula is given by
+      out = 1 / (1/in1 + 1/in2 + ...)
+    e.g. [ 1, 2 ] => 2/3
+
+    Return NaN if there is a zero among the inputs
+    """
     x = list(x)
     if len(x) == 1:
         return x[0]
@@ -119,6 +163,13 @@ def parallel(x):  # Parallel resistors [ 1 2 ] => 2/3
     return 1. / sum(x)
 
 def sum_parse_action(x):  # [ 1 + 2 - 3 ] -> 0
+    """
+    Add the inputs
+
+    [ 1, '+', 2, '-', 3 ] -> 0
+
+    Allow a leading + or -
+    """
     total = 0.0
     op = ops['+']
     for e in x:
@@ -129,6 +180,11 @@ def sum_parse_action(x):  # [ 1 + 2 - 3 ] -> 0
     return total
 
 def prod_parse_action(x):  # [ 1 * 2 / 3 ] => 0.66
+    """
+    Multiply the inputs
+
+    [ 1, '*', 2, '/', 3 ] => 0.66
+    """
     prod = 1.0
     op = ops['*']
     for e in x:
@@ -139,14 +195,13 @@ def prod_parse_action(x):  # [ 1 * 2 / 3 ] => 0.66
     return prod
 
 def evaluator(variables, functions, string, cs=False):
-    '''
+    """
     Evaluate an expression. Variables are passed as a dictionary
     from string to value. Unary functions are passed as a dictionary
     from string to function. Variables must be floats.
     cs: Case sensitive
 
-    TODO: Fix it so we can pass integers and complex numbers in variables dict
-    '''
+    """
     # log.debug("variables: {0}".format(variables))
     # log.debug("functions: {0}".format(functions))
     # log.debug("string: {0}".format(string))
@@ -187,7 +242,8 @@ def evaluator(variables, functions, string, cs=False):
 
     # 0.33 or 7 or .34 or 16.
     inner_number = (number_part + Optional("." + Optional(number_part))) | ("." + number_part)
-    inner_number = Combine(inner_number)  # by default pyparsing allows spaces between tokens--this prevents that
+    # by default pyparsing allows spaces between tokens--Combine prevents that
+    inner_number = Combine(inner_number)
 
     # 0.33k or -17
     number = (inner_number
@@ -209,6 +265,8 @@ def evaluator(variables, functions, string, cs=False):
         varnames = MatchFirst(literal_all_vars)
         varnames.setParseAction(lambda x: [all_variables[k] for k in x])
     else:
+        # all_variables includes DEFAULT_VARIABLES, which isn't empty
+        # this is unreachable. Get rid of it?
         varnames = NoMatch()
 
     # Same thing for functions.
@@ -217,6 +275,7 @@ def evaluator(variables, functions, string, cs=False):
         function = funcnames + Suppress("(") + expr + Suppress(")")
         function.setParseAction(func_parse_action)
     else:
+        # see note above (this is unreachable)
         function = NoMatch()
 
     atom = number | function | varnames | Suppress("(") + expr + Suppress(")")
