@@ -40,4 +40,4 @@
     <%include file="source-edit.html" />
 % endif
 
-<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy)}'/>
+<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy) | h}'/>

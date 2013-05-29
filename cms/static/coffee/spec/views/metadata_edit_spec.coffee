@@ -4,7 +4,7 @@ stringEntryTemplate = readFixtures('metadata-string-entry.underscore')
 optionEntryTemplate = readFixtures('metadata-option-entry.underscore')
 
 beforeEach ->
-    setFixtures($("<script>", {id: "metadata-editor-tpl", type: "text/template"}).text(editorTemplate))
+    appendSetFixtures($("<script>", {id: "metadata-editor-tpl", type: "text/template"}).text(editorTemplate))
     appendSetFixtures($("<script>", {id: "metadata-number-entry", type: "text/template"}).text(numberEntryTemplate))
     appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate))
     appendSetFixtures($("<script>", {id: "metadata-option-entry", type: "text/template"}).text(optionEntryTemplate))
@@ -178,7 +178,7 @@ describe "CMS.Views.Metadata.String is a basic string input with clear functiona
         assertValueInView(@view, 'Word cloud')
 
     it "can update its value in the view", ->
-        assertCanUpdateView(@view, "updated")
+        assertCanUpdateView(@view, "updated ' \" &")
 
     it "has a clear method to revert to the model default", ->
         assertClear(@view, 'default value')

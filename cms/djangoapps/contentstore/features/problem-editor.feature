@@ -13,6 +13,12 @@ Feature: Problem Editor
     Then I can modify the display name
     And my display name change is persisted on save
 
+  Scenario: User can specify special characters in String values
+    Given I have created a Blank Common Problem
+    And I edit and select Settings
+    Then I can specify special characters in the display name
+    And my special characters and persisted on save
+
   Scenario: User can revert display name to unset
     Given I have created a Blank Common Problem
     And I edit and select Settings
@@ -59,4 +65,3 @@ Feature: Problem Editor
     Given I have created a LaTeX Problem
     And I edit and select Settings
     Then Edit High Level Source is visible
-

@@ -41,6 +41,16 @@ def my_display_name_change_is_persisted_on_save(step):
     world.save_component_and_reopen(step)
     verify_modified_display_name()
 
+@step('I can specify special characters in the display name')
+def i_can_modify_the_display_name_with_special_chars(step):
+    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill("updated ' \" &")
+    verify_modified_display_name_with_special_chars()
+
+@step('my special characters and persisted on save')
+def special_chars_persisted_on_save(step):
+    world.save_component_and_reopen(step)
+    verify_modified_display_name_with_special_chars()
+
 @step('I can revert the display name to unset')
 def can_revert_display_name_to_unset(step):
     world.revert_setting_entry(DISPLAY_NAME)
@@ -141,6 +151,9 @@ def verify_modified_randomization():
 
 def verify_modified_display_name():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'modified', True)
+
+def verify_modified_display_name_with_special_chars():
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, "updated ' \" &", True)
 
 def verify_unset_display_name():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
