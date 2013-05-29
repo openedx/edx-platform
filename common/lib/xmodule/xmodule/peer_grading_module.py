@@ -56,7 +56,7 @@ class PeerGradingFields(object):
     )
     weight = StringyFloat(
         display_name="Problem Weight",
-        help="Specifies the number of points the problem is worth. By default, each problem is worth one point.",
+        help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings, values={"min": 0, "step": ".1"}
     )
 

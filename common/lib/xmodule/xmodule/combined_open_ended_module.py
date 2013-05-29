@@ -50,7 +50,7 @@ class VersionInteger(Integer):
 class CombinedOpenEndedFields(object):
     display_name = String(
         display_name="Display Name",
-        help="Specifies the name for this component.",
+        help="This name appears in the horizontal navigation at the top of the page.",
         default="Open Ended Grading", scope=Scope.settings
     )
     current_task_number = StringyInteger(help="Current task that the student is on.", default=0, scope=Scope.user_state)
@@ -88,7 +88,7 @@ class CombinedOpenEndedFields(object):
     data = String(help="XML data for the problem", scope=Scope.content)
     weight = StringyFloat(
         display_name="Problem Weight",
-        help="The number of points the problem is worth. By default, each problem is worth one point.",
+        help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings, values = {"min" : 0 , "step": ".1"}
     )
     markdown = String(help="Markdown source of this module", scope=Scope.settings)

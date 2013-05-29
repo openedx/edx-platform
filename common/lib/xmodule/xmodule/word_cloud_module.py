@@ -34,7 +34,7 @@ class WordCloudFields(object):
     """XFields for word cloud."""
     num_inputs = StringyInteger(
         display_name="Inputs",
-        help="Number of text boxes for student to input words/sentences.",
+        help="Number of text boxes available for students to input words/sentences.",
         scope=Scope.settings,
         default=5,
         values = {"min" : 1 }
@@ -48,7 +48,7 @@ class WordCloudFields(object):
     )
     display_student_percents = StringyBoolean(
         display_name="Show Percents",
-        help="Show statistics for entered words near every word separately at the top.",
+        help="Statistics are shown for entered words near that word.",
         scope=Scope.settings,
         default=True
     )

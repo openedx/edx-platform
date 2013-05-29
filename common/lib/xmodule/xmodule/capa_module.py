@@ -68,14 +68,14 @@ class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
     max_attempts = StringyInteger(
         display_name="Maximum Attempts",
-        help="This specifies the number of times the student can try to answer this problem. If unset, infinite attempts are allowed.",
+        help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
         values = {"min" : 1 }, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     showanswer = String(
         display_name="Show Answer",
-        help="Specifies when to show the answer to this problem. A default value can be set course-wide in Advanced Settings.",
+        help="Defines when to show the answer to the problem. A default value can be set in Advanced Settings.",
         scope=Scope.settings, default="closed",
         values=[
             {"display_name": "Always", "value": "always"},
@@ -88,7 +88,7 @@ class CapaFields(object):
     )
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
     rerandomize = Randomization(
-        display_name="Randomization", help="Specifies whether variable inputs for this problem are randomized each time a student loads the problem. This only applies to problems that have randomly generated numeric variables. A default value can be set course-wide in Advanced Settings.",
+        display_name="Randomization", help="Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings.",
         default="always", scope=Scope.settings, values=[{"display_name": "Always", "value": "always"},
                                                         {"display_name": "On Reset", "value": "onreset"},
                                                         {"display_name": "Never", "value": "never"},
@@ -102,7 +102,7 @@ class CapaFields(object):
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
     weight = StringyFloat(
         display_name="Problem Weight",
-        help="Specifies the number of points the problem is worth. If unset, each response field in the problem is worth one point.",
+        help="Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point.",
         values = {"min" : 0 , "step": .1},
         scope=Scope.settings
     )
