@@ -18,6 +18,7 @@ import json
 from xblock.core import Scope, List, String, Object, Boolean
 from .fields import Date
 from django.utils.timezone import UTC
+from xmodule.util import date_utils
 
 
 log = logging.getLogger(__name__)
@@ -743,15 +744,15 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         @property
         def first_eligible_appointment_date_text(self):
-            return datetime.strftime("%b %d, %Y", self.first_eligible_appointment_date)
+            return self.first_eligible_appointment_date.strftime("%b %d, %Y")
 
         @property
         def last_eligible_appointment_date_text(self):
-            return datetime.strftime("%b %d, %Y", self.last_eligible_appointment_date)
+            return self.last_eligible_appointment_date.strftime("%b %d, %Y")
 
         @property
         def registration_end_date_text(self):
-            return datetime.strftime("%b %d, %Y at %H:%M UTC", self.registration_end_date)
+            return date_utils.get_default_time_display(self.registration_end_date)
 
     @property
     def current_test_center_exam(self):
