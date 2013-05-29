@@ -527,12 +527,12 @@ def _do_create_account(post_vars):
         js = {'success': False}
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = "An account with this username already exists."
+            js['value'] = "An account with the Public Username  '" + post_vars['username'] + "' already exists."
             js['field'] = 'username'
             return HttpResponse(json.dumps(js))
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = "An account with this e-mail already exists."
+            js['value'] = "An account with the Email '" + post_vars['email'] + "' already exists."
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
