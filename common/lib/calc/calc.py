@@ -37,16 +37,33 @@ default_variables = {'j': numpy.complex(0, 1),
                      'q': scipy.constants.e
                      }
 
+
+ops = {"^": operator.pow,
+       "*": operator.mul,
+       "/": operator.truediv,
+       "+": operator.add,
+       "-": operator.sub,
+}
+# We eliminated extreme ones, since they're rarely used, and potentially
+# confusing. They may also conflict with variables if we ever allow e.g.
+# 5R instead of 5*R
+suffixes = {'%': 0.01, 'k': 1e3, 'M': 1e6, 'G': 1e9,
+            'T': 1e12,  # 'P':1e15,'E':1e18,'Z':1e21,'Y':1e24,
+            'c': 1e-2, 'm': 1e-3, 'u': 1e-6,
+            'n': 1e-9, 'p': 1e-12}  # ,'f':1e-15,'a':1e-18,'z':1e-21,'y':1e-24}
+
 log = logging.getLogger("mitx.courseware.capa")
 
 
 class UndefinedVariable(Exception):
-    def raiseself(self):
-        ''' Helper so we can use inside of a lambda '''
-        raise self
+    pass
+    # unused for now
+    # def raiseself(self):
+    #     ''' Helper so we can use inside of a lambda '''
+    #     raise self
 
 
-general_whitespace = re.compile('[^\w]+')
+general_whitespace = re.compile('[^\\w]+')
 
 
 def check_variables(string, variables):
@@ -65,13 +82,61 @@ def check_variables(string, variables):
     for v in possible_variables:
         if len(v) == 0:
             continue
-        if v[0] <= '9' and '0' <= 'v':  # Skip things that begin with numbers
+        if v[0] <= '9' and '0' <= v:  # Skip things that begin with numbers
             continue
         if v not in variables:
             bad_variables.append(v)
     if len(bad_variables) > 0:
         raise UndefinedVariable(' '.join(bad_variables))
 
+def lower_dict(d):
+    return dict([(k.lower(), d[k]) for k in d])
+
+def super_float(text):
+    ''' Like float, but with si extensions. 1k goes to 1000'''
+    if text[-1] in suffixes:
+        return float(text[:-1]) * suffixes[text[-1]]
+    else:
+        return float(text)
+
+def number_parse_action(x):  # [ '7' ] ->  [ 7 ]
+    return [super_float("".join(x))]
+
+def exp_parse_action(x):  # [ 2 ^ 3 ^ 2 ] -> 512
+    x = [e for e in x if isinstance(e, numbers.Number)]  # Ignore ^
+    x.reverse()
+    x = reduce(lambda a, b: b ** a, x)
+    return x
+
+def parallel(x):  # Parallel resistors [ 1 2 ] => 2/3
+    # convert from pyparsing.ParseResults, which doesn't support '0 in x'
+    x = list(x)
+    if len(x) == 1:
+        return x[0]
+    if 0 in x:
+        return float('nan')
+    x = [1. / e for e in x if isinstance(e, numbers.Number)]  # Ignore ||
+    return 1. / sum(x)
+
+def sum_parse_action(x):  # [ 1 + 2 - 3 ] -> 0
+    total = 0.0
+    op = ops['+']
+    for e in x:
+        if e in set('+-'):
+            op = ops[e]
+        else:
+            total = op(total, e)
+    return total
+
+def prod_parse_action(x):  # [ 1 * 2 / 3 ] => 0.66
+    prod = 1.0
+    op = ops['*']
+    for e in x:
+        if e in set('*/'):
+            op = ops[e]
+        else:
+            prod = op(prod, e)
+    return prod
 
 def evaluator(variables, functions, string, cs=False):
     '''
@@ -86,11 +151,11 @@ def evaluator(variables, functions, string, cs=False):
     # log.debug("functions: {0}".format(functions))
     # log.debug("string: {0}".format(string))
 
-    def lower_dict(d):
-        return dict([(k.lower(), d[k]) for k in d])
-
     all_variables = copy.copy(default_variables)
     all_functions = copy.copy(default_functions)
+
+    def func_parse_action(x):
+        return [all_functions[x[0]](x[1])]
 
     if not cs:
         all_variables = lower_dict(all_variables)
@@ -112,69 +177,6 @@ def evaluator(variables, functions, string, cs=False):
 
     if string.strip() == "":
         return float('nan')
-
-    ops = {"^": operator.pow,
-           "*": operator.mul,
-           "/": operator.truediv,
-           "+": operator.add,
-           "-": operator.sub,
-           }
-    # We eliminated extreme ones, since they're rarely used, and potentially
-    # confusing. They may also conflict with variables if we ever allow e.g.
-    # 5R instead of 5*R
-    suffixes = {'%': 0.01, 'k': 1e3, 'M': 1e6, 'G': 1e9,
-                'T': 1e12,  # 'P':1e15,'E':1e18,'Z':1e21,'Y':1e24,
-                'c': 1e-2, 'm': 1e-3, 'u': 1e-6,
-                'n': 1e-9, 'p': 1e-12}  # ,'f':1e-15,'a':1e-18,'z':1e-21,'y':1e-24}
-
-    def super_float(text):
-        ''' Like float, but with si extensions. 1k goes to 1000'''
-        if text[-1] in suffixes:
-            return float(text[:-1]) * suffixes[text[-1]]
-        else:
-            return float(text)
-
-    def number_parse_action(x):  # [ '7' ] ->  [ 7 ]
-        return [super_float("".join(x))]
-
-    def exp_parse_action(x):  # [ 2 ^ 3 ^ 2 ] -> 512
-        x = [e for e in x if isinstance(e, numbers.Number)]  # Ignore ^
-        x.reverse()
-        x = reduce(lambda a, b: b ** a, x)
-        return x
-
-    def parallel(x):  # Parallel resistors [ 1 2 ] => 2/3
-        # convert from pyparsing.ParseResults, which doesn't support '0 in x'
-        x = list(x)
-        if len(x) == 1:
-            return x[0]
-        if 0 in x:
-            return float('nan')
-        x = [1. / e for e in x if isinstance(e, numbers.Number)]  # Ignore ||
-        return 1. / sum(x)
-
-    def sum_parse_action(x):  # [ 1 + 2 - 3 ] -> 0
-        total = 0.0
-        op = ops['+']
-        for e in x:
-            if e in set('+-'):
-                op = ops[e]
-            else:
-                total = op(total, e)
-        return total
-
-    def prod_parse_action(x):  # [ 1 * 2 / 3 ] => 0.66
-        prod = 1.0
-        op = ops['*']
-        for e in x:
-            if e in set('*/'):
-                op = ops[e]
-            else:
-                prod = op(prod, e)
-        return prod
-
-    def func_parse_action(x):
-        return [all_functions[x[0]](x[1])]
 
     # SI suffixes and percent
     number_suffix = reduce(lambda a, b: a | b, map(Literal, suffixes.keys()), NoMatch())
