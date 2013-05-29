@@ -469,6 +469,7 @@ class LoncapaProblem(object):
                     random_seed=self.seed,
                     python_path=python_path,
                     cache=self.system.cache,
+                    slug=self.problem_id,
                 )
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
