@@ -37,13 +37,13 @@
           <div class="field field-start-date">
             <label for="start_date">Release Day</label>
             <input type="text" id="start_date" name="start_date" 
-                value="${subsection.lms.start.strftime('%m/%d/%Y')}" 
+                value="${subsection.lms.start.strftime('%m/%d/%Y') if subsection.lms.start else ''}" 
                 placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
           </div>
           <div class="field field-start-time">
             <label for="start_time">Release Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
             <input type="text" id="start_time" name="start_time" 
-                value="${subsection.lms.start.strftime('%H:%M')}" 
+                value="${subsection.lms.start.strftime('%H:%M') if subsection.lms.start else ''}" 
                 placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
           </div>
         </div>
