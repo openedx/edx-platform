@@ -3,7 +3,6 @@ if (!CMS.Views['Metadata']) CMS.Views.Metadata = {};
 CMS.Views.Metadata.Editor = Backbone.View.extend({
 
     // Model is simply a Backbone.Model instance.
-
     initialize : function() {
         var tpl = $("#metadata-editor-tpl").text();
         if(!tpl) {
@@ -45,6 +44,9 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
             });
     },
 
+    /**
+     * Returns the just the modified metadata values, in the format used to persist to the server.
+     */
     getModifiedMetadataValues: function () {
         var modified_values = {};
         _.each(this.models,
@@ -57,8 +59,16 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
         return modified_values;
     },
 
+    /**
+     * Returns a display name for the component related to this metadata. This method looks to see
+     * if there is a metadata entry called 'display_name', and if so, it returns its value. If there
+     * is no such entry, or if display_name does not have a value set, it returns an empty string.
+     */
     getDisplayName: function () {
         // It is possible that there is no display name set. In that case, return empty string.
+        if (this.model.get('display_name') === undefined) {
+            return '';
+        }
         var displayNameValue = this.model.get('display_name').value;
         return displayNameValue ? displayNameValue : '';
     }
@@ -67,7 +77,6 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
 CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
 
     // Model is CMS.Models.Metadata.
-
     initialize : function() {
         var self = this;
         var templateName = this.getTemplateName();
@@ -82,22 +91,42 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
         this.render();
     },
 
+    /**
+     * Returns the ID/name of the template. Subclasses should implement this method.
+     */
     getTemplateName : function () {},
 
+    /**
+     * Returns the value currently displayed in the editor/view. Subclasses should implement this method.
+     */
     getValueFromEditor : function () {},
 
+    /**
+     * Sets the value currently displayed in the editor/view. Subclasses should implement this method.
+     */
     setValueInEditor : function (value) {},
 
+    /**
+     * Sets the value in the model, using the value currently displayed in the view. Afterward,
+     * this method re-renders to update the clear button.
+     */
     updateModel: function () {
         this.model.setValue(this.getValueFromEditor());
         this.render();
     },
 
+    /**
+     * Clears the value currently set in the model (reverting to the default). Afterward, this method
+     * re-renders the view.
+     */
     clear: function () {
         this.model.clear();
         this.render();
     },
 
+    /**
+     * Shows the clear button, if it is not already showing.
+     */
     showClearButton: function() {
         if (!this.$el.hasClass('is-set')) {
             this.$el.addClass('is-set');
@@ -106,10 +135,17 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
         }
     },
 
+    /**
+     * Returns the clear button.
+     */
     getClearButton: function () {
         return this.$el.find('.setting-clear');
     },
 
+    /**
+     * Renders the editor, updating the value displayed in the view, as well as the state of
+     * the clear button.
+     */
     render: function () {
         if (!this.template) return;
 
@@ -172,7 +208,7 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
             }
             if (options.hasOwnProperty(max)) {
                 this.max = Number(options[max]);
-                this.$el.find('input').attr(max, numToString(this.max.toFixed));
+                this.$el.find('input').attr(max, numToString(this.max));
             }
             var stepValue = undefined;
             if (options.hasOwnProperty(step)) {
@@ -208,6 +244,9 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
         this.$el.find('input').val(value);
     },
 
+    /**
+     * Returns true if this view is restricted to integers, as opposed to floating points values.
+     */
     isIntegerField : function () {
         return this.model.getType() === 'Integer';
     },
@@ -275,7 +314,7 @@ CMS.Views.Metadata.Option = CMS.Views.Metadata.AbstractEditor.extend({
                 value = modelValue['display_name'];
             }
         });
-        $('#' + this.uniqueId + " option").filter(function() {
+        this.$el.find('#' + this.uniqueId + " option").filter(function() {
             return $(this).text() === value;
         }).prop('selected', true);
     }
