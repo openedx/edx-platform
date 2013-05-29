@@ -55,12 +55,11 @@ describe 'VideoCaption', ->
         @caption = @player.caption
 
       it 'render the caption', ->
-        expect($('.subtitles').html()).toMatch new RegExp('''
-          <li data-index="0" data-start="0">Caption at 0</li>
-          <li data-index="1" data-start="10000">Caption at 10000</li>
-          <li data-index="2" data-start="20000">Caption at 20000</li>
-          <li data-index="3" data-start="30000">Caption at 30000</li>
-        '''.replace(/\n/g, ''))
+        captionsData = jasmine.stubbedCaption
+        $('.subtitles li[data-index]').each (index, link) =>
+          expect($(link)).toHaveData 'index', index
+          expect($(link)).toHaveData 'start', captionsData.start[index]
+          expect($(link)).toHaveText captionsData.text[index]
 
       it 'add a padding element to caption', ->
         expect($('.subtitles li:first')).toBe '.spacing'
@@ -179,12 +178,11 @@ describe 'VideoCaption', ->
         @caption.play()
 
       it 'render the caption', ->
-        expect($('.subtitles').html()).toMatch new RegExp(
-          '''<li data-index="0" data-start="0">Caption at 0</li>''' +
-          '''<li data-index="1" data-start="10000">Caption at 10000</li>''' +
-          '''<li data-index="2" data-start="20000">Caption at 20000</li>''' +
-          '''<li data-index="3" data-start="30000">Caption at 30000</li>'''
-        )
+        captionsData = jasmine.stubbedCaption
+        $('.subtitles li[data-index]').each (index, link) =>
+          expect($(link)).toHaveData 'index', index
+          expect($(link)).toHaveData 'start', captionsData.start[index]
+          expect($(link)).toHaveText captionsData.text[index]
 
       it 'add a padding element to caption', ->
         expect($('.subtitles li:first')).toBe '.spacing'
@@ -268,13 +266,12 @@ describe 'VideoCaption', ->
       @caption.resize()
 
     it 'set the height of caption container', ->
-      expect(parseInt($('.subtitles').css('maxHeight'))).toBeCloseTo $('.video-wrapper').height(), 5
+      expect(parseInt($('.subtitles').css('maxHeight'))).toBeCloseTo $('.video-wrapper').height(), 2
 
     it 'set the height of caption spacing', ->
-      expect(parseInt($('.subtitles .spacing:first').css('height'))).toEqual(
-        $('.video-wrapper').height() / 2 - $('.subtitles li:not(.spacing):first').height() / 2)
-      expect(parseInt($('.subtitles .spacing:last').css('height'))).toEqual(
-        $('.video-wrapper').height() / 2 - $('.subtitles li:not(.spacing):last').height() / 2)
+      expect(Math.abs(parseInt($('.subtitles .spacing:first').css('height')) - @caption.topSpacingHeight())).toBeLessThan 1
+      expect(Math.abs(parseInt($('.subtitles .spacing:last').css('height')) - @caption.bottomSpacingHeight())).toBeLessThan 1
+
 
     it 'scroll caption to new position', ->
       expect($.fn.scrollTo).toHaveBeenCalled()
