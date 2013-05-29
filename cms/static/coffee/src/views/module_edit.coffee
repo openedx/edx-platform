@@ -126,7 +126,6 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   hideDataEditor: =>
     editorModeButtonParent =  @$el.find('#editor-mode')
-    # Can it be enough to just remove active-mode?
     editorModeButtonParent.addClass('inactive-mode')
     editorModeButtonParent.removeClass('active-mode')
     @$el.find('.wrapper-comp-settings').addClass('is-active')

@@ -7,7 +7,8 @@ from lettuce import world, step
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
     world.create_component_instance(
-        step, '.large-video-icon', 'i4x://edx/templates/video/default',
+        step, '.large-video-icon',
+        'i4x://edx/templates/video/default',
         '.xmodule_VideoModule'
     )
 

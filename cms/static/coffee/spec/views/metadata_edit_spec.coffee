@@ -142,7 +142,7 @@ describe "CMS.Views.Metadata.Editor creates editors for each field", ->
         })
 
 # Tests for individual views.
-assertInputType  =  (view, expectedType) ->
+assertInputType = (view, expectedType) ->
     input = view.$el.find('.setting-input')
     expect(input.length).toBe(1)
     expect(input[0].type).toBe(expectedType)

@@ -311,14 +311,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
-                score, feedback, submission_key, rubric_scores, submission_flagged)
+                                               score, feedback, submission_key, rubric_scores, submission_flagged)
             return response
         except GradingServiceError:
             #This is a dev_facing_error
             log.exception("""Error saving grade to open ended grading service.  server url: {0}, location: {1}, submission_id:{2},
                             submission_key: {3}, score: {4}"""
             .format(self.peer_gs.url,
-                location, submission_id, submission_key, score)
+                    location, submission_id, submission_key, score)
             )
             #This is a student_facing_error
             return {
@@ -449,7 +449,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
-                submission_key, score, feedback, rubric_scores)
+                                                           submission_key, score, feedback, rubric_scores)
             if 'actual_rubric' in response:
                 rubric_renderer = combined_open_ended_rubric.CombinedOpenEndedRubric(self.system, True)
                 response['actual_rubric'] = rubric_renderer.render_rubric(response['actual_rubric'])['html']
