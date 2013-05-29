@@ -11,7 +11,6 @@ from contentstore import utils
 <%block name="jsextra">
 
 <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
-<script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
 <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
 <script type="text/javascript" src="${static.url('js/models/settings/advanced.js')}"></script>
 <script type="text/javascript" src="${static.url('js/views/settings/advanced_view.js')}"></script>
@@ -44,10 +43,10 @@ editor.render();
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
-    <div class="title">
-      <span class="title-sub">Settings</span>
-      <h1 class="title-1">Advanced Settings</h1>
-    </div>
+    <h1 class="page-header">
+      <small class="subtitle">Settings</small>
+      <span class="sr">&gt; </span>Advanced Settings
+    </h1>
   </header>
 </div>
 
@@ -110,7 +109,7 @@ editor.render();
 <!-- notification: change has been made and a save is needed -->
 <div class="wrapper wrapper-notification wrapper-notification-warning" aria-hidden="true" role="dialog" aria-labelledby="notification-changesMade-title" aria-describedby="notification-changesMade-description">
   <div class="notification warning has-actions">
-    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+    <i class="icon-warning-sign"></i>
 
     <div class="copy">
       <h2 class="title title-3" id="notification-changesMade-title">You've Made Some Changes</h2>
@@ -136,7 +135,7 @@ editor.render();
 <!-- alert: save confirmed with close -->
 <div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
   <div class="alert confirmation">
-    <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+    <i class="icon-ok"></i>
 
     <div class="copy">
       <h2 class="title title-3">Your policy changes have been saved.</h2>
@@ -144,7 +143,7 @@ editor.render();
     </div>
 
     <a href="" rel="view" class="action action-alert-close">
-      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
+      <i class="icon-remove-sign"></i>
       <span class="label">close alert</span>
     </a>
   </div>
@@ -153,7 +152,7 @@ editor.render();
 <!-- alert: error -->
 <div class="wrapper wrapper-alert wrapper-alert-error" role="status">
   <div class="alert error">
-    <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
+    <i class="icon-warning-sign"></i>
 
     <div class="copy">
       <h2 class="title title-3">There was an error saving your information</h2>

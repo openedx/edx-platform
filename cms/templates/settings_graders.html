@@ -12,7 +12,6 @@ from contentstore import utils
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
 
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
@@ -41,10 +40,10 @@ from contentstore import utils
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
-    <div class="title">
-      <span class="title-sub">Settings</span>
-      <h1 class="title-1">Grading</h1>
-    </div>
+    <h1 class="page-header">
+      <small class="subtitle">Settings</small>
+      <span class="sr">&gt; </span>Grading
+    </h1>
   </header>
 </div>
 
@@ -117,7 +116,7 @@ from contentstore import utils
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <span class="plus-icon white"></span>New Assignment Type
+              <i class="icon-plus"></i>New Assignment Type
             </a>
           </div>
         </section>

@@ -8,8 +8,8 @@
   padding: $baseline;
 
   footer.primary {
+    @extend .t-copy-sub2;
     @include clearfix();
-    @include font-size(13);
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
@@ -48,7 +48,7 @@
           padding: ($baseline/2) ($baseline*0.75);
           background: transparent;
 
-          .ss-icon {
+          [class^="icon-"] {
             @include transition(top .25s ease-in-out .25s);
             @include font-size(15);
             display: inline-block;
@@ -60,7 +60,7 @@
           &:hover, &:active {
             color: $gray-d2;
 
-            .ss-icon {
+            [class^="icon-"] {
               color: $gray-d2;
             }
           }

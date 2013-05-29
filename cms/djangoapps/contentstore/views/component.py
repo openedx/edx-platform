@@ -28,9 +28,15 @@ from .access import has_access
 from xmodule import templates
 from xmodule.x_module import XModuleDescriptor
 
-# TODO: should explicitly enumerate exports with __all__
-
-# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
+__all__ = ['OPEN_ENDED_COMPONENT_TYPES',
+           'ADVANCED_COMPONENT_POLICY_KEY',
+           'edit_subsection',
+           'edit_unit',
+           'assignment_type_update',
+           'create_draft',
+           'publish_draft',
+           'unpublish_unit',
+           'module_info']
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +44,8 @@ log = logging.getLogger(__name__)
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
-ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud'] + OPEN_ENDED_COMPONENT_TYPES
+NOTE_COMPONENT_TYPES = ['notes']
+ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud'] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 

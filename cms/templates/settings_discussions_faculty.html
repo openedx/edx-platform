@@ -6,27 +6,26 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-from contentstore import utils 
+from contentstore import utils
 %>
 
 
 <%block name="jsextra">
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
-  
+
   <script type="text/javascript">
     $(document).ready(function(){
     });
-      
+
   </script>
 </%block>
 
 <%block name="content">
   <!-- -->
   <div class="main-wrapper">
-    <div class="inner-wrapper">      
+    <div class="inner-wrapper">
       <h1>Settings</h1>
       <article class="settings-overview">
         <div class="settings-page-section main-column">
@@ -74,7 +73,7 @@ from contentstore import utils
                         <div class="field">
                           <textarea class="long tall edit-box tinymce" id="course-faculty-1-bio"></textarea>
                           <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
-                        </div>      
+                        </div>
                       </div>
 
                       <a href="#" class="remove-item remove-faculty-data"><span class="delete-icon"></span> Delete Faculty Member</a>
@@ -102,7 +101,7 @@ from contentstore import utils
                             <a href="#" class="new-item new-faculty-photo add-faculty-photo-data" id="course-faculty-2-photo">
                               <span class="upload-icon"></span>Upload Faculty Photo
                             </a>
-                            <span class="tip tip-inline">Max size: 30KB</span>          
+                            <span class="tip tip-inline">Max size: 30KB</span>
                           </div>
                         </div>
                       </div>
@@ -114,7 +113,7 @@ from contentstore import utils
                             <textarea class="long tall edit-box tinymce" id="course-faculty-2-bio"></textarea>
                             <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
                           </div>
-                        </div>      
+                        </div>
                       </div>
                     </li>
                   </ul>
@@ -143,7 +142,7 @@ from contentstore import utils
                 <div class="field">
                   <div class="input input-radio">
                     <input checked="checked" type="radio" name="course-problems-general-randomization" id="course-problems-general-randomization-always" value="Always">
-                    
+
                     <div class="copy">
                       <label for="course-problems-general-randomization-always">Always</label>
                     <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
@@ -217,7 +216,7 @@ from contentstore import utils
                 <div class="field">
                   <div class="input input-radio">
                     <input checked="checked" type="radio" name="course-problems-assignment-1-randomization" id="course-problems-assignment-1-randomization-always" value="Always">
-                    
+
                     <div class="copy">
                       <label for="course-problems-assignment-1-randomization-always">Always</label>
                     <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
@@ -283,7 +282,7 @@ from contentstore import utils
 
           <section class="settings-discussions">
             <h2 class="title">Discussions</h2>
-            
+
             <section class="settings-discussions-general">
               <header>
                 <h3>General Settings</h3>
@@ -296,7 +295,7 @@ from contentstore import utils
                 <div class="field">
                   <div class="input input-radio">
                     <input type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-allow" value="Allow">
-                    
+
                     <div class="copy">
                       <label for="course-discussions-anonymous-allow">Allow</label>
                     <span class="tip tip-stacked">Students and faculty <strong>will be able to post anonymously</strong></span>
@@ -320,7 +319,7 @@ from contentstore import utils
                 <div class="field">
                   <div class="input input-radio">
                     <input checked="checked" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-allow" value="Allow">
-                    
+
                     <div class="copy">
                       <label for="course-discussions-anonymous-allow">Allow</label>
                       <span class="tip tip-stacked">Students and faculty <strong>will be able to post anonymously</strong></span>
@@ -329,7 +328,7 @@ from contentstore import utils
 
                   <div class="input input-radio">
                     <input disabled="disabled" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-dontallow" value="Do Not Allow">
-                    
+
                     <div class="copy">
                       <label for="course-discussions-anonymous-dontallow">Do not allow</label>
                       <span class="tip tip-stacked">This option is disabled since there are previous discussions that are anonymous.</span>
@@ -351,7 +350,7 @@ from contentstore import utils
 
                       <a href="#" class="drag-handle"></a>
                     </li>
-                    
+
                     <li class="input input-existing input-default course-discussions-categories-list-item sortable-item">
                       <div class="group">
                         <label for="course-discussions-categories-2-name">Category Name: </label>

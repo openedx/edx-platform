@@ -3,7 +3,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
-import time
 from contentstore.utils import get_modulestore
 from models.settings import course_grading
 from contentstore.utils import update_item
@@ -182,7 +181,7 @@ class CourseSettingsEncoder(json.JSONEncoder):
             return obj.__dict__
         elif isinstance(obj, Location):
             return obj.dict()
-        elif isinstance(obj, time.struct_time):
+        elif isinstance(obj, datetime.datetime):
             return Date().to_json(obj)
         elif isinstance(obj, datetime.datetime):
             if obj.utcoffset() is None:

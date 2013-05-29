@@ -15,6 +15,7 @@ from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
 from open_ended_grading_classes import combined_open_ended_rubric
+from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
@@ -101,7 +102,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
 
-        #StringyInteger could return None, so keep this check.
+        # StringyInteger could return None, so keep this check.
         if not isinstance(self.max_grade, int):
             raise TypeError("max_grade needs to be an integer.")
 
@@ -109,7 +110,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         return self._closed(self.timeinfo)
 
     def _closed(self, timeinfo):
-        if timeinfo.close_date is not None and datetime.utcnow() > timeinfo.close_date:
+        if timeinfo.close_date is not None and datetime.now(UTC()) > timeinfo.close_date:
             return True
         return False
 

@@ -19,14 +19,15 @@ from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 
-from mitxmako.shortcuts import render_to_response, render_to_string
-from courseware.courses import get_course_with_access
+from mitxmako.shortcuts import render_to_string
+from courseware.courses import get_course_with_access, get_course_by_id
 from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 
 from django_comment_client.utils import JsonResponse, JsonError, extract, get_courseware_context
 
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
-from django_comment_client.models import Role
+from django_comment_common.models import Role
+from courseware.access import has_access
 
 log = logging.getLogger(__name__)
 
@@ -68,6 +69,10 @@ def ajax_content_response(request, course_id, content, template_name):
 @login_required
 @permitted
 def create_thread(request, course_id, commentable_id):
+    """
+    Given a course and commentble ID, create the thread
+    """
+    
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
     course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
@@ -119,7 +124,7 @@ def create_thread(request, course_id, commentable_id):
     #patch for backward compatibility to comments service
     if not 'pinned' in thread.attributes:
         thread['pinned'] = False
-    
+
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
@@ -137,6 +142,9 @@ def create_thread(request, course_id, commentable_id):
 @login_required
 @permitted
 def update_thread(request, course_id, thread_id):
+    """
+    Given a course id and thread id, update a existing thread, used for both static and ajax submissions
+    """
     thread = cc.Thread.find(thread_id)
     thread.update_attributes(**extract(request.POST, ['body', 'title', 'tags']))
     thread.save()
@@ -147,6 +155,10 @@ def update_thread(request, course_id, thread_id):
 
 
 def _create_comment(request, course_id, thread_id=None, parent_id=None):
+    """
+    given a course_id, thread_id, and parent_id, create a comment,
+    called from create_comment to do the actual creation
+    """
     post = request.POST
     comment = cc.Comment(**extract(post, ['body']))
 
@@ -183,6 +195,10 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
 @login_required
 @permitted
 def create_comment(request, course_id, thread_id):
+    """
+    given a course_id and thread_id, test for comment depth. if not too deep,
+    call _create_comment to create the actual comment.
+    """
     if cc_settings.MAX_COMMENT_DEPTH is not None:
         if cc_settings.MAX_COMMENT_DEPTH < 0:
             return JsonError("Comment level too deep")
@@ -193,6 +209,10 @@ def create_comment(request, course_id, thread_id):
 @login_required
 @permitted
 def delete_thread(request, course_id, thread_id):
+    """
+    given a course_id and thread_id, delete this thread
+    this is ajax only
+    """
     thread = cc.Thread.find(thread_id)
     thread.delete()
     return JsonResponse(utils.safe_content(thread.to_dict()))
@@ -202,6 +222,10 @@ def delete_thread(request, course_id, thread_id):
 @login_required
 @permitted
 def update_comment(request, course_id, comment_id):
+    """
+    given a course_id and comment_id, update the comment with payload attributes
+    handles static and ajax submissions
+    """
     comment = cc.Comment.find(comment_id)
     comment.update_attributes(**extract(request.POST, ['body']))
     comment.save()
@@ -215,6 +239,10 @@ def update_comment(request, course_id, comment_id):
 @login_required
 @permitted
 def endorse_comment(request, course_id, comment_id):
+    """
+    given a course_id and comment_id, toggle the endorsement of this comment,
+    ajax only
+    """
     comment = cc.Comment.find(comment_id)
     comment.endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
     comment.save()
@@ -225,6 +253,10 @@ def endorse_comment(request, course_id, comment_id):
 @login_required
 @permitted
 def openclose_thread(request, course_id, thread_id):
+    """
+    given a course_id and thread_id, toggle the status of this thread
+    ajax only
+    """
     thread = cc.Thread.find(thread_id)
     thread.closed = request.POST.get('closed', 'false').lower() == 'true'
     thread.save()
@@ -239,6 +271,10 @@ def openclose_thread(request, course_id, thread_id):
 @login_required
 @permitted
 def create_sub_comment(request, course_id, comment_id):
+    """
+    given a course_id and comment_id, create a response to a comment
+    after checking the max depth allowed, if allowed
+    """
     if cc_settings.MAX_COMMENT_DEPTH is not None:
         if cc_settings.MAX_COMMENT_DEPTH <= cc.Comment.find(comment_id).depth:
             return JsonError("Comment level too deep")
@@ -249,6 +285,10 @@ def create_sub_comment(request, course_id, comment_id):
 @login_required
 @permitted
 def delete_comment(request, course_id, comment_id):
+    """
+    given a course_id and comment_id delete this comment
+    ajax only
+    """
     comment = cc.Comment.find(comment_id)
     comment.delete()
     return JsonResponse(utils.safe_content(comment.to_dict()))
@@ -258,6 +298,9 @@ def delete_comment(request, course_id, comment_id):
 @login_required
 @permitted
 def vote_for_comment(request, course_id, comment_id, value):
+    """
+    given a course_id and comment_id,
+    """
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     user.vote(comment, value)
@@ -268,6 +311,10 @@ def vote_for_comment(request, course_id, comment_id, value):
 @login_required
 @permitted
 def undo_vote_for_comment(request, course_id, comment_id):
+    """
+    given a course id and comment id, remove vote
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     user.unvote(comment)
@@ -278,6 +325,10 @@ def undo_vote_for_comment(request, course_id, comment_id):
 @login_required
 @permitted
 def vote_for_thread(request, course_id, thread_id, value):
+    """
+    given a course id and thread id vote for this thread
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.vote(thread, value)
@@ -287,25 +338,99 @@ def vote_for_thread(request, course_id, thread_id, value):
 @require_POST
 @login_required
 @permitted
+def flag_abuse_for_thread(request, course_id, thread_id):
+    """
+    given a course_id and thread_id flag this thread for abuse
+    ajax only
+    """
+    user = cc.User.from_django_user(request.user)
+    thread = cc.Thread.find(thread_id)
+    thread.flagAbuse(user, thread)
+    return JsonResponse(utils.safe_content(thread.to_dict()))
+
+
+@require_POST
+@login_required
+@permitted
+def un_flag_abuse_for_thread(request, course_id, thread_id):
+    """
+    given a course id and thread id, remove abuse flag for this thread
+    ajax only
+    """
+    user = cc.User.from_django_user(request.user)
+    course = get_course_by_id(course_id)
+    thread = cc.Thread.find(thread_id)
+    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
+    thread.unFlagAbuse(user, thread, removeAll)
+    return JsonResponse(utils.safe_content(thread.to_dict()))
+
+
+@require_POST
+@login_required
+@permitted
+def flag_abuse_for_comment(request, course_id, comment_id):
+    """
+    given a course and comment id, flag comment for abuse
+    ajax only
+    """
+    user = cc.User.from_django_user(request.user)
+    comment = cc.Comment.find(comment_id)
+    comment.flagAbuse(user, comment)
+    return JsonResponse(utils.safe_content(comment.to_dict()))
+
+
+@require_POST
+@login_required
+@permitted
+def un_flag_abuse_for_comment(request, course_id, comment_id):
+    """
+    given a course_id and comment id, unflag comment for abuse
+    ajax only
+    """
+    user = cc.User.from_django_user(request.user)
+    course = get_course_by_id(course_id)
+    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
+    comment = cc.Comment.find(comment_id)
+    comment.unFlagAbuse(user, comment, removeAll)
+    return JsonResponse(utils.safe_content(comment.to_dict()))
+
+
+@require_POST
+@login_required
+@permitted
 def undo_vote_for_thread(request, course_id, thread_id):
+    """
+    given a course id and thread id, remove users vote for thread
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unvote(thread)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
+
 @require_POST
 @login_required
 @permitted
 def pin_thread(request, course_id, thread_id):
+    """
+    given a course id and thread id, pin this thread
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.pin(user,thread_id)
+    thread.pin(user, thread_id)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
+
 def un_pin_thread(request, course_id, thread_id):
+    """
+    given a course id and thread id, remove pin from this thread
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.un_pin(user,thread_id)
+    thread.un_pin(user, thread_id)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 
@@ -323,6 +448,10 @@ def follow_thread(request, course_id, thread_id):
 @login_required
 @permitted
 def follow_commentable(request, course_id, commentable_id):
+    """
+    given a course_id and commentable id, follow this commentable
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
     user.follow(commentable)
@@ -343,6 +472,10 @@ def follow_user(request, course_id, followed_user_id):
 @login_required
 @permitted
 def unfollow_thread(request, course_id, thread_id):
+    """
+    given a course id and thread id, stop following this thread
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unfollow(thread)
@@ -353,6 +486,10 @@ def unfollow_thread(request, course_id, thread_id):
 @login_required
 @permitted
 def unfollow_commentable(request, course_id, commentable_id):
+    """
+    given a course id and commentable id stop following commentable
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
     user.unfollow(commentable)
@@ -363,6 +500,10 @@ def unfollow_commentable(request, course_id, commentable_id):
 @login_required
 @permitted
 def unfollow_user(request, course_id, followed_user_id):
+    """
+    given a course id and user id, stop following this user
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     followed_user = cc.User.find(followed_user_id)
     user.unfollow(followed_user)
@@ -373,6 +514,10 @@ def unfollow_user(request, course_id, followed_user_id):
 @login_required
 @permitted
 def update_moderator_status(request, course_id, user_id):
+    """
+    given a course id and user id, check if the user has moderator
+    and send back a user profile
+    """
     is_moderator = request.POST.get('is_moderator', '').lower()
     if is_moderator not in ["true", "false"]:
         return JsonError("Must provide is_moderator as boolean value")
@@ -402,6 +547,10 @@ def update_moderator_status(request, course_id, user_id):
 
 @require_GET
 def search_similar_threads(request, course_id, commentable_id):
+    """
+    given a course id and commentable id, run query given in text get param
+    of request
+    """
     text = request.GET.get('text', None)
     if text:
         query_params = {
@@ -452,16 +601,11 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         if not file_extension in cc_settings.ALLOWED_UPLOAD_FILE_TYPES:
             file_types = "', '".join(cc_settings.ALLOWED_UPLOAD_FILE_TYPES)
             msg = _("allowed file types are '%(file_types)s'") % \
-                    {'file_types': file_types}
+                {'file_types': file_types}
             raise exceptions.PermissionDenied(msg)
 
         # generate new file name
-        new_file_name = str(
-                            time.time()
-                        ).replace(
-                            '.',
-                            str(random.randint(0, 100000))
-                        ) + file_extension
+        new_file_name = str(time.time()).replace('.', str(random.randint(0, 100000))) + file_extension
 
         file_storage = get_storage_class()()
         # use default storage to store file
@@ -472,14 +616,14 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         if size > cc_settings.MAX_UPLOAD_FILE_SIZE:
             file_storage.delete(new_file_name)
             msg = _("maximum upload file size is %(file_size)sK") % \
-                    {'file_size': cc_settings.MAX_UPLOAD_FILE_SIZE}
+                {'file_size': cc_settings.MAX_UPLOAD_FILE_SIZE}
             raise exceptions.PermissionDenied(msg)
 
-    except exceptions.PermissionDenied, e:
+    except exceptions.PermissionDenied, err:
         error = unicode(e)
-    except Exception, e:
-        print e
-        logging.critical(unicode(e))
+    except Exception, err:
+        print err
+        logging.critical(unicode(err))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 
     if error == '':

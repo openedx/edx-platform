@@ -6,6 +6,7 @@ from .inheritance import own_metadata
 from xmodule.modulestore.mongo import location_to_query, get_course_id_no_run, MongoModuleStore
 import pymongo
 from xmodule.modulestore.exceptions import DuplicateItemError
+from pytz import UTC
 
 DRAFT = 'draft'
 
@@ -15,6 +16,7 @@ def as_draft(location):
     Returns the Location that is the draft for `location`
     """
     return Location(location)._replace(revision=DRAFT)
+
 
 def as_published(location):
     """
@@ -213,7 +215,7 @@ class DraftModuleStore(MongoModuleStore):
         """
         draft = self.get_item(location)
 
-        draft.cms.published_date = datetime.utcnow()
+        draft.cms.published_date = datetime.now(UTC)
         draft.cms.published_by = published_by_id
         super(DraftModuleStore, self).update_item(location, draft._model_data._kvs._data)
         super(DraftModuleStore, self).update_children(location, draft._model_data._kvs._children)

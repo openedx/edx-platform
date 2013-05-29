@@ -14,6 +14,7 @@ from xmodule.fields import Date
 
 from .test_export import DATA_DIR
 import datetime
+from django.utils.timezone import UTC
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -41,8 +42,8 @@ class DummySystem(ImportSystem):
             load_error_modules=load_error_modules,
         )
 
-    def render_template(self, template, context):
-            raise Exception("Shouldn't be called")
+    def render_template(self, _template, _context):
+        raise Exception("Shouldn't be called")
 
 
 class BaseCourseTestCase(unittest.TestCase):
@@ -63,6 +64,7 @@ class BaseCourseTestCase(unittest.TestCase):
 
 
 class ImportTestCase(BaseCourseTestCase):
+    date = Date()
 
     def test_fallback(self):
         '''Check that malformed xml loads as an ErrorDescriptor.'''
@@ -146,15 +148,18 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor = system.process_xml(start_xml)
         compute_inherited_metadata(descriptor)
 
+        # pylint: disable=W0212
         print(descriptor, descriptor._model_data)
-        self.assertEqual(descriptor.lms.due, Date().from_json(v))
+        self.assertEqual(descriptor.lms.due, ImportTestCase.date.from_json(v))
 
         # Check that the child inherits due correctly
         child = descriptor.get_children()[0]
-        self.assertEqual(child.lms.due, Date().from_json(v))
+        self.assertEqual(child.lms.due, ImportTestCase.date.from_json(v))
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
         self.assertEqual(2, len(child._inherited_metadata))
-        self.assertLessEqual(child._inherited_metadata['start'], datetime.datetime.utcnow())
+        self.assertLessEqual(ImportTestCase.date.from_json(
+            child._inherited_metadata['start']),
+            datetime.datetime.now(UTC()))
         self.assertEqual(v, child._inherited_metadata['due'])
 
         # Now export and check things
@@ -210,10 +215,13 @@ class ImportTestCase(BaseCourseTestCase):
         # Check that the child does not inherit a value for due
         child = descriptor.get_children()[0]
         self.assertEqual(child.lms.due, None)
+        # pylint: disable=W0212
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
         self.assertEqual(1, len(child._inherited_metadata))
         # why do these tests look in the internal structure v just calling child.start?
-        self.assertLessEqual(child._inherited_metadata['start'], datetime.datetime.utcnow())
+        self.assertLessEqual(
+            ImportTestCase.date.from_json(child._inherited_metadata['start']),
+            datetime.datetime.now(UTC()))
 
     def test_metadata_override_default(self):
         """
@@ -232,14 +240,17 @@ class ImportTestCase(BaseCourseTestCase):
         </course>'''.format(due=course_due, org=ORG, course=COURSE, url_name=url_name)
         descriptor = system.process_xml(start_xml)
         child = descriptor.get_children()[0]
+        # pylint: disable=W0212
         child._model_data['due'] = child_due
         compute_inherited_metadata(descriptor)
 
-        self.assertEqual(descriptor.lms.due, Date().from_json(course_due))
-        self.assertEqual(child.lms.due, Date().from_json(child_due))
+        self.assertEqual(descriptor.lms.due, ImportTestCase.date.from_json(course_due))
+        self.assertEqual(child.lms.due, ImportTestCase.date.from_json(child_due))
         # Test inherited metadata. Due does not appear here (because explicitly set on child).
         self.assertEqual(1, len(child._inherited_metadata))
-        self.assertLessEqual(child._inherited_metadata['start'], datetime.datetime.utcnow())
+        self.assertLessEqual(
+            ImportTestCase.date.from_json(child._inherited_metadata['start']),
+            datetime.datetime.now(UTC()))
         # Test inheritable metadata. This has the course inheritable value for due.
         self.assertEqual(2, len(child._inheritable_metadata))
         self.assertEqual(course_due, child._inheritable_metadata['due'])

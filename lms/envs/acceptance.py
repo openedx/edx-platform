@@ -2,19 +2,28 @@
 This config file extends the test environment configuration
 so that we can run the lettuce acceptance tests.
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .test import *
 
 # You need to start the server in debug mode,
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
+# Disable warnings for acceptance tests, to make the logs readable
+import logging
+logging.disable(logging.ERROR)
+
 # Use the mongo store for acceptance tests
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'modulestore',
-    'fs_root': GITHUB_REPO_ROOT,
+    'collection': 'acceptance_modulestore',
+    'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
@@ -33,7 +42,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db': 'test_xcontent',
+        'db': 'test_xmodule',
     }
 }
 
@@ -43,8 +52,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "test_mitx.db",
-        'TEST_NAME': ENV_ROOT / "db" / "test_mitx.db",
+        'NAME': TEST_ROOT / "db" / "test_mitx.db",
+        'TEST_NAME': TEST_ROOT / "db" / "test_mitx.db",
     }
 }
 

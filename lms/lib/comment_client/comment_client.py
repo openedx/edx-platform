@@ -29,7 +29,6 @@ def search_trending_tags(course_id, query_params={}, *args, **kwargs):
 def tags_autocomplete(value, *args, **kwargs):
     return perform_request('get', _url_for_threads_tags_autocomplete(), {'value': value}, *args, **kwargs)
 
-
 def _url_for_search_similar_threads():
     return "{prefix}/search/threads/more_like_this".format(prefix=settings.PREFIX)
 

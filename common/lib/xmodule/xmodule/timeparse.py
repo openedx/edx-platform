@@ -1,9 +1,8 @@
 """
 Helper functions for handling time in the format we like.
 """
-import time
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 TIME_FORMAT = "%Y-%m-%dT%H:%M"
 
@@ -17,14 +16,14 @@ def parse_time(time_str):
 
     Raises ValueError if the string is not in the right format.
     """
-    return time.strptime(time_str, TIME_FORMAT)
+    return datetime.strptime(time_str, TIME_FORMAT)
 
 
-def stringify_time(time_struct):
+def stringify_time(dt):
     """
-    Convert a time struct to a string
+    Convert a datetime struct to a string
     """
-    return time.strftime(TIME_FORMAT, time_struct)
+    return dt.isoformat()
 
 def parse_timedelta(time_str):
     """

@@ -255,7 +255,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
         module_store = modulestore('direct')
-        found = False
 
         items = module_store.get_items(['i4x', 'edX', 'full', 'poll_question', None, None])
         found = len(items) > 0
@@ -353,7 +352,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         clone_items = module_store.get_items(Location(['i4x', 'MITx', '999', 'vertical', None]))
         self.assertGreater(len(clone_items), 0)
         for descriptor in items:
-            new_loc = descriptor.location._replace(org='MITx', course='999')
+            new_loc = descriptor.location.replace(org='MITx', course='999')
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
             self.assertEqual(resp.status_code, 200)
@@ -423,7 +422,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # add private to list of children
         sequential = module_store.get_item(Location(['i4x', 'edX', 'full',
                                            'sequential', 'Administrivia_and_Circuit_Elements', None]))
-        private_location_no_draft = private_vertical.location._replace(revision=None)
+        private_location_no_draft = private_vertical.location.replace(revision=None)
         module_store.update_children(sequential.location, sequential.children +
                                      [private_location_no_draft.url()])
 
@@ -614,6 +613,14 @@ class ContentStoreTest(ModuleStoreTestCase):
         data = parse_json(resp)
         self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
 
+    def test_create_course_check_forum_seeding(self):
+        """Test new course creation and verify forum seeding """
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertTrue(are_permissions_roles_seeded('MITx/999/Robot_Super_Course'))
+
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         resp = self.client.post(reverse('create_new_course'), self.course_data)
@@ -650,7 +657,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.get(reverse('index'))
         self.assertContains(
             resp,
-            '<h1 class="title-1">My Courses</h1>',
+            '<h1 class="page-header">My Courses</h1>',
             status_code=200,
             html=True
         )
@@ -807,37 +814,37 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(200, resp.status_code)
 
         # go look at a subsection page
-        subsection_location = loc._replace(category='sequential', name='test_sequence')
+        subsection_location = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.get(reverse('edit_subsection',
                                        kwargs={'location': subsection_location.url()}))
         self.assertEqual(200, resp.status_code)
 
         # go look at the Edit page
-        unit_location = loc._replace(category='vertical', name='test_vertical')
+        unit_location = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.get(reverse('edit_unit',
                                        kwargs={'location': unit_location.url()}))
         self.assertEqual(200, resp.status_code)
 
         # delete a component
-        del_loc = loc._replace(category='html', name='test_html')
+        del_loc = loc.replace(category='html', name='test_html')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
 
         # delete a unit
-        del_loc = loc._replace(category='vertical', name='test_vertical')
+        del_loc = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
 
         # delete a unit
-        del_loc = loc._replace(category='sequential', name='test_sequence')
+        del_loc = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
 
         # delete a chapter
-        del_loc = loc._replace(category='chapter', name='chapter_2')
+        del_loc = loc.replace(category='chapter', name='chapter_2')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)

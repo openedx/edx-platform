@@ -8,7 +8,7 @@ from mitxmako.shortcuts import render_to_response
 from external_auth.views import ssl_login_shortcut
 from .user import index
 
-__all__ = ['signup', 'old_login_redirect', 'login_page', 'howitworks', 'ux_alerts']
+__all__ = ['signup', 'old_login_redirect', 'login_page', 'howitworks']
 
 """
 Public views
@@ -49,10 +49,3 @@ def howitworks(request):
         return index(request)
     else:
         return render_to_response('howitworks.html', {})
-
-
-def ux_alerts(request):
-    """
-    static/proof-of-concept views
-    """
-    return render_to_response('ux-alerts.html', {})

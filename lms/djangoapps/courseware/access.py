@@ -16,6 +16,7 @@ from xmodule.x_module import XModule, XModuleDescriptor
 
 from student.models import CourseEnrollmentAllowed
 from courseware.masquerade import is_masquerading_as_student
+from django.utils.timezone import UTC
 
 DEBUG_ACCESS = False
 
@@ -133,7 +134,7 @@ def _has_access_course_desc(user, course, action):
         (staff can always enroll)
         """
 
-        now = datetime.utcnow()
+        now = datetime.now(UTC())
         start = course.enrollment_start
         end = course.enrollment_end
 
@@ -242,7 +243,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
 
         # Check start date
         if descriptor.lms.start is not None:
-            now = datetime.utcnow()
+            now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
             if now > effective_start:
                 # after start date, everyone can see it
@@ -483,8 +484,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
        non-None start date.
 
     Returns:
-        A time, in the same format as returned by time.gmtime().  Either the same as
-        start, or earlier for beta testers.
+        A datetime.  Either the same as start, or earlier for beta testers.
 
     NOTE: number of days to adjust should be cached to avoid looking it up thousands of
     times per query.

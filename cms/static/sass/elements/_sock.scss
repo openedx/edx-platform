@@ -28,13 +28,14 @@
 
     .cta-show-sock {
       @extend .btn-pill;
-      @extend .t-action3;
+      @extend .t-action4;
       background: $gray-l5;
       padding: ($baseline/2) $baseline;
       color: $gray;
 
-      .icon {
-        @include font-size(16);
+      [class^="icon-"] {
+        @include font-size(14);
+        margin-right: ($baseline/4);
       }
 
       &:hover {
@@ -59,13 +60,9 @@
     header {
 
       .title {
-        @extend .t-title-2;
+        @extend .t-title4;
       }
 
-      .ss-icon {
-        @extend .t-icon;
-        @extend .icon-inline;
-      }
     }
 
     // shared elements
@@ -73,12 +70,13 @@
       @include box-sizing(border-box);
 
       .title {
-        @extend .t-title-3;
+        @extend .t-title6;
         color: $white;
         margin-bottom: ($baseline/2);
       }
 
       .copy {
+        @extend .t-copy-sub2;
         margin: 0 0 $baseline 0;
       }
 
@@ -94,10 +92,14 @@
           }
 
           .action {
+            @extend .t-action4;
             display: block;
 
-            .icon {
+            [class^="icon-"] {
               @include font-size(18);
+              vertical-align: middle;
+              margin-right: $baseline/4;
+
             }
 
             &:hover, &:active {

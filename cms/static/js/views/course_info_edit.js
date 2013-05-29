@@ -105,7 +105,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var targetModel = this.eventModel(event);
         targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change
-        targetModel.save({}, {error : CMS.ServerError});
+        targetModel.save({});
         this.closeEditor(this);
 
         analytics.track('Saved Course Update', {
@@ -160,11 +160,15 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var targetModel = this.eventModel(event);
         this.modelDom(event).remove();
         var cacheThis = this;
-        targetModel.destroy({success : function (model, response) {
-            cacheThis.collection.fetch({success : function() {cacheThis.render();},
-                error : CMS.ServerError});
-        },
-        error : CMS.ServerError
+        targetModel.destroy({
+            success: function (model, response) {
+                cacheThis.collection.fetch({
+                    success: function() {
+                        cacheThis.render();
+                    },
+                    reset: true
+                });
+            }
         });
     },
 
@@ -238,20 +242,18 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
 
     initialize: function() {
         var self = this;
-        this.model.fetch(
-            {
-                complete: function() {
-                    window.templateLoader.loadRemoteTemplate("course_info_handouts",
-                        "/static/client_templates/course_info_handouts.html",
-                        function (raw_template) {
-                            self.template = _.template(raw_template);
-                            self.render();
-                        }
-                    );
-                },
-                error : CMS.ServerError
-            }
-        );
+        this.model.fetch({
+            complete: function() {
+                window.templateLoader.loadRemoteTemplate("course_info_handouts",
+                    "/static/client_templates/course_info_handouts.html",
+                    function (raw_template) {
+                        self.template = _.template(raw_template);
+                        self.render();
+                    }
+                );
+            },
+            reset: true
+        });
     },
 
     render: function () {
@@ -291,7 +293,7 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     onSave: function(event) {
         this.model.set('data', this.$codeMirror.getValue());
         this.render();
-        this.model.save({}, {error: CMS.ServerError});
+        this.model.save({});
         this.$form.hide();
         this.closeEditor(this);
 

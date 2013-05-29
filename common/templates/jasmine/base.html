@@ -12,6 +12,7 @@
     <script  src="{% static 'jasmine-latest/jasmine-html.js' %}"></script>
     <script  src="{% static 'js/vendor/jasmine-jquery.js' %}"></script>
     <script  src="{% static 'console-runner.js' %}"></script>
+    <script  src="{% static 'jasmine.junit_reporter.js' %}"></script>
 
     {% load compressed %}
     {# static files #}
@@ -37,15 +38,14 @@
 
 <script>
     {% block jasmine %}
-    var console_reporter = new jasmine.ConsoleReporter();
     (function() {
         var jasmineEnv = jasmine.getEnv();
         jasmineEnv.updateInterval = 1000;
 
-        var trivialReporter = new jasmine.TrivialReporter();
-
+        var trivialReporter = new jasmine.TrivialReporter()
         jasmineEnv.addReporter(trivialReporter);
-        jasmine.getEnv().addReporter(console_reporter);
+        jasmineEnv.addReporter(new jasmine.ConsoleReporter());
+        jasmineEnv.addReporter(new jasmine.JUnitXmlReporter('{{ JASMINE_REPORT_DIR }}/'));
 
         jasmineEnv.specFilter = function(spec) {
             return trivialReporter.specFilter(spec);

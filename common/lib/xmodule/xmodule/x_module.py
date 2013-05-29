@@ -758,7 +758,10 @@ class ModuleSystem(object):
                  anonymous_student_id='',
                  course_id=None,
                  open_ended_grading_interface=None,
-                 s3_interface=None):
+                 s3_interface=None,
+                 cache=None,
+                 can_execute_unsafe_code=None,
+                ):
         '''
         Create a closure around the system environment.
 
@@ -800,6 +803,14 @@ class ModuleSystem(object):
 
         xblock_model_data - A dict-like object containing the all data available to this
             xblock
+
+        cache - A cache object with two methods:
+            .get(key) returns an object from the cache or None.
+            .set(key, value, timeout_secs=None) stores a value in the cache with a timeout.
+
+        can_execute_unsafe_code - A function returning a boolean, whether or
+            not to allow the execution of unsafe, unsandboxed code.
+
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -824,6 +835,9 @@ class ModuleSystem(object):
         self.open_ended_grading_interface = open_ended_grading_interface
         self.s3_interface = s3_interface
 
+        self.cache = cache or DoNothingCache()
+        self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
+
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
         return self.__dict__.get(attr)
@@ -837,3 +851,12 @@ class ModuleSystem(object):
 
     def __str__(self):
         return str(self.__dict__)
+
+
+class DoNothingCache(object):
+    """A duck-compatible object to use in ModuleSystem when there's no cache."""
+    def get(self, key):
+        return None
+
+    def set(self, key, value, timeout=None):
+        pass

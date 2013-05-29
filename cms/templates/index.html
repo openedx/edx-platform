@@ -37,9 +37,7 @@
 <%block name="content">
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions">
-      <div  class="title">
-        <h1 class="title-1">${_("My Courses")}</h1>
-      </div>
+      <h1 class="page-header">${_("My Courses")}</h1>
 
       % if user.is_active:
       <nav class="nav-actions">
@@ -47,7 +45,7 @@
         <ul>
           <li class="nav-item">
             % if not disable_course_creation:
-              <a href="#" class="button new-button new-course-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> ${_("New Course")}</a>
+              <a href="#" class="button new-button new-course-button"><i class="icon-plus"></i> ${_("New Course")}</a>
 	    % elif settings.MITX_FEATURES.get('STAFF_EMAIL',''):
 	      <a href="mailto:${settings.MITX_FEATURES.get('STAFF_EMAIL','')}">${_("Email staff to create course")}</a>
             % endif
@@ -78,7 +76,7 @@
             <a class="class-link" href="${url}" class="class-name">
               <span class="class-name">${course}</span>
             </a>
-            <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button">View Live</a>
           </li>
             %endfor
         </ul>

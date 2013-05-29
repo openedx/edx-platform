@@ -1,6 +1,7 @@
 import json
 import logging
 import pyparsing
+import re
 import sys
 import static_replace
 
@@ -8,6 +9,7 @@ from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -273,6 +275,14 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
 
         statsd.increment("lms.courseware.question_answered", tags=tags)
 
+    def can_execute_unsafe_code():
+        # To decide if we can run unsafe code, we check the course id against
+        # a list of regexes configured on the server.
+        for regex in settings.COURSES_WITH_UNSAFE_CODE:
+            if re.match(regex, course_id):
+                return True
+        return False
+
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
@@ -299,6 +309,8 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
                           course_id=course_id,
                           open_ended_grading_interface=open_ended_grading_interface,
                           s3_interface=s3_interface,
+                          cache=cache,
+                          can_execute_unsafe_code=can_execute_unsafe_code,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
@@ -402,6 +414,11 @@ def modx_dispatch(request, dispatch, location, course_id):
            through the part before the first '?'.
       - location -- the module location. Used to look up the XModule instance
       - course_id -- defines the course context for this request.
+
+    Raises PermissionDenied if the user is not logged in. Raises Http404 if
+    the location and course_id do not identify a valid module, the module is
+    not accessible by the user, or the module raises NotFoundError. If the
+    module raises any other error, it will escape this function.
     '''
     # ''' (fix emacs broken parsing)
 
@@ -430,8 +447,19 @@ def modx_dispatch(request, dispatch, location, course_id):
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
 
+    try:
+        descriptor = modulestore().get_instance(course_id, location)
+    except ItemNotFoundError:
+        log.warn(
+            "Invalid location for course id {course_id}: {location}".format(
+                course_id=course_id,
+                location=location
+            )
+        )
+        raise Http404
+
     model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
-        request.user, modulestore().get_instance(course_id, location))
+        request.user, descriptor)
 
     instance = get_module(request.user, request, location, model_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:

@@ -290,7 +290,6 @@ class XMLModuleStore(ModuleStoreBase):
         if course_dirs is None:
             course_dirs = sorted([d for d in os.listdir(self.data_dir) if
                                   os.path.exists(self.data_dir / d / "course.xml")])
-
         for course_dir in course_dirs:
             self.try_load_course(course_dir)
 
@@ -447,7 +446,7 @@ class XMLModuleStore(ModuleStoreBase):
     def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
         self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
 
-         # then look in a override folder based on the course run
+        # then look in a override folder based on the course run
         if os.path.isdir(base_dir / url_name):
             self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)
 

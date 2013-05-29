@@ -165,7 +165,7 @@ define('WordCloudMain', ['logme'], function (logme) {
         d3.layout.cloud().size([this.width, this.height])
             .words(words)
             .rotate(function () {
-                return Math.floor((Math.random() * 2) * 90);
+                return Math.floor((Math.random() * 2)) * 90;
             })
             .font('Impact')
             .fontSize(function (d) {

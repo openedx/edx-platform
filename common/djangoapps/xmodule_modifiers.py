@@ -1,6 +1,5 @@
 import json
 import logging
-import time
 import static_replace
 
 from django.conf import settings
@@ -9,6 +8,7 @@ from mitxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
 from xmodule.vertical_module import VerticalModule
 import datetime
+from django.utils.timezone import UTC
 
 log = logging.getLogger("mitx.xmodule_modifiers")
 
@@ -132,7 +132,7 @@ def add_histogram(get_html, module, user):
 
         # useful to indicate to staff if problem has been released or not
         # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(UTC())
         is_released = "unknown"
         mstart = module.descriptor.lms.start
 

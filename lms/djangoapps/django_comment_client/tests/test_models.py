@@ -1,4 +1,4 @@
-import django_comment_client.models as models
+import django_comment_common.models as models
 import django_comment_client.permissions as permissions
 from django.test import TestCase
 
@@ -9,24 +9,20 @@ class RoleClassTestCase(TestCase):
         # because xmodel.course_module.id_to_location looks for a string to split
 
         self.course_id = "edX/toy/2012_Fall"
-        self.student_role = models.Role.objects.get_or_create(name="Student", \
-                                                         course_id=self.course_id)[0]
+        self.student_role = models.Role.objects.get_or_create(name="Student",
+                                                              course_id=self.course_id)[0]
         self.student_role.add_permission("delete_thread")
-        self.student_2_role = models.Role.objects.get_or_create(name="Student", \
+        self.student_2_role = models.Role.objects.get_or_create(name="Student",
+                                                                course_id=self.course_id)[0]
+        self.TA_role = models.Role.objects.get_or_create(name="Community TA",
                                                          course_id=self.course_id)[0]
-        self.TA_role = models.Role.objects.get_or_create(name="Community TA",\
-                                                  course_id=self.course_id)[0]
         self.course_id_2 = "edx/6.002x/2012_Fall"
-        self.TA_role_2 = models.Role.objects.get_or_create(name="Community TA",\
-                                                  course_id=self.course_id_2)[0]
+        self.TA_role_2 = models.Role.objects.get_or_create(name="Community TA",
+                                                           course_id=self.course_id_2)[0]
+
         class Dummy():
             def render_template():
                 pass
-        d = {"data": {
-                "textbooks": [],
-                'wiki_slug': True,
-                }
-             }
 
     def testHasPermission(self):
         # Whenever you add a permission to student_role,
@@ -47,7 +43,6 @@ class RoleClassTestCase(TestCase):
 
 
 class PermissionClassTestCase(TestCase):
-
     def setUp(self):
         self.permission = permissions.Permission.objects.get_or_create(name="test")[0]
 

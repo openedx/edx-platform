@@ -16,7 +16,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from urllib import urlencode
 import zendesk
 
-import capa.calc
+import calc
 import track.views
 
 
@@ -27,7 +27,7 @@ def calculate(request):
     ''' Calculator in footer of every page. '''
     equation = request.GET['equation']
     try:
-        result = capa.calc.evaluator({}, {}, equation)
+        result = calc.evaluator({}, {}, equation)
     except:
         event = {'error': map(str, sys.exc_info()),
                  'equation': equation}
@@ -161,7 +161,7 @@ def submit_feedback_via_zendesk(request):
     try:
         ticket_id = zendesk_api.create_ticket(new_ticket)
     except zendesk.ZendeskError as err:
-        log.error("%s", str(err))
+        log.error("Error creating Zendesk ticket: %s", str(err))
         return HttpResponse(status=500)
 
     # Additional information is provided as a private update so the information
@@ -170,7 +170,7 @@ def submit_feedback_via_zendesk(request):
     try:
         zendesk_api.update_ticket(ticket_id, ticket_update)
     except zendesk.ZendeskError as err:
-        log.error("%s", str(err))
+        log.error("Error updating Zendesk ticket: %s", str(err))
         # The update is not strictly necessary, so do not indicate failure to the user
         pass
 
