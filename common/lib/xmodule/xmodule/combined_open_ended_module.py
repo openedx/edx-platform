@@ -48,7 +48,11 @@ class VersionInteger(Integer):
 
 
 class CombinedOpenEndedFields(object):
-    display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
+    display_name = String(
+        display_name="Display Name",
+        help="Specifies the name for this component.",
+        default="Open Ended Grading", scope=Scope.settings
+    )
     current_task_number = StringyInteger(help="Current task that the student is on.", default=0, scope=Scope.user_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
     state = String(help="Which step within the current task that the student is on.", default="initial",
