@@ -9,7 +9,7 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>Register for edX</title></%block>
+<%block name="title"><title>Register</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -67,7 +67,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Create my edX Account');
+          html('Create my Account');
       }
       else {
         $submitButton.
@@ -81,7 +81,7 @@
 
 <section class="introduction">
   <header>
-    <h1 class="sr">Register for edX</h1>
+    <h1 class="sr">Register</h1>
   </header>
 </section>
 
@@ -95,7 +95,7 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">We're sorry, edX enrollment is not available in your region</h3>
+        <h3 class="message-title">We're sorry, enrollment is not available in your region</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
@@ -105,7 +105,7 @@
       </div>
 
       <p class="instructions">
-        Please complete the following fields to register for an edX account. <br />
+        Please complete the following fields to register for an account. <br />
         Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
       </p>
 
@@ -201,7 +201,7 @@
           </li>
 
           <li class="field text" id="field-goals">
-            <label for="goals">Please share with us your reasons for registering with edX</label>
+            <label for="goals">Please share with us your reasons for registering</label>
             <textarea id="goals" name="goals" value=""></textarea>
           </li>
         </ol>
@@ -250,23 +250,9 @@
       </p>
     </div>
 
-    <div class="cta cta-welcome">
-      <h3>Welcome to edX</h3>
-      <p>Registering with edX gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list – we will update you as courses are added.</p>
-    </div>
-
     <div class="cta cta-nextsteps">
       <h3>Next Steps</h3>
-      <p>As part of joining edX, you will receive an activation email.  You must click on the activation link to complete the process.  Don’t see the email?  Check your spam folder and mark edX emails as ‘not spam’.  At edX, we communicate mostly through email.</p>
-    </div>
-
-    <div class="cta cta-help">
-      <h3>Need Help?</h3>
-      <p>Need help in registering with edX? 
-        <a href="${marketing_link('FAQ')}">
-            View our FAQs for answers to commonly asked questions.
-        </a>  
-        Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.</p>
+      <p>You will receive an activation email.  You must click on the activation link to complete the process.  Don’t see the email?  Check your spam folder and mark emails from class.stanford.edu as ‘not spam’, since you'll want to be able to receive email from your courses.</p>
     </div>
   </aside>
 </section>

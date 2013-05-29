@@ -2,7 +2,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title"><title>Log into your edX Account</title></%block>
+<%block name="title"><title>Log into your Account</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -63,7 +63,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Log into My edX Account <span class="orn-plus">+</span> Access My Courses');
+          html('Log into My Account <span class="orn-plus">+</span> Access My Courses');
       }
       else {
         $submitButton.
@@ -91,7 +91,7 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">We're Sorry, edX accounts are unavailable currently</h3>
+        <h3 class="message-title">We're Sorry, accounts are unavailable currently</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
@@ -103,7 +103,7 @@
       </div>
 
       <p class="instructions sr">
-        Please provide the following information to log into your edX account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
+        Please provide the following information to log into your account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
@@ -161,13 +161,7 @@
 
     <div class="cta cta-help">
       <h3>Not Enrolled?</h3>
-      <p><a href="${reverse('register_user')}">Sign up for edX today!</a></p>
-
-      <h3>Need Help?</h3>
-      <p>Looking for help in logging in or with your edX account?
-      <a href="${marketing_link('FAQ')}">
-          View our help section for answers to commonly asked questions.
-      </a></p>
+      <p><a href="${reverse('register_user')}">Sign up today!</a></p>
 
     </div>
   </aside>
