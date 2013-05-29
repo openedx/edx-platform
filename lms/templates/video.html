@@ -16,7 +16,7 @@
            width="640" height="390"></embed>
   </object>
 %else:
-  <div id="video_${id}" class="video" data-streams="${streams}" data-show-captions="${show_captions}" data-start="${start}" data-end="${end}" data-caption-asset-path="${caption_asset_path}">
+  <div id="video_${id}" class="video" data-streams="${streams}" data-show-captions="${show_captions}" data-start="${start}" data-end="${end}" data-caption-asset-path="${caption_asset_path}" data-in-cms="${settings.MITX_FEATURES.get('IN_CMS', False)}">
     <div class="tc-wrapper">
       <article class="video-wrapper">
         <section class="video-player">
@@ -39,9 +39,3 @@
   <p>Download subtitles <a href="${track}">here</a>.</p>
 </div>
 % endif
-
-%if in_lms:
-<div id="in_lms" class="true" style="display: none;"></div>
-%else:
-<div id="in_lms" class="false" style="display: none;"></div>
-%endif
