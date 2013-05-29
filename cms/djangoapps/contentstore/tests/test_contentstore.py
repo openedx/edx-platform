@@ -990,7 +990,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_metadata_inheritance(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'], verbose=True)
+        import_from_xml(module_store, 'common/test/data/', ['full'])
 
         course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
 
