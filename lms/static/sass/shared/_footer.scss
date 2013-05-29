@@ -39,7 +39,7 @@
 
       .nav-colophon {
         @include clearfix();
-        margin: ($baseline/4) 0 ($baseline*1.5) 0;
+        margin: ($baseline/4) 0;
 
         li {
           float: left;

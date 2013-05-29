@@ -247,12 +247,12 @@ header.global {
       a {
         display:block;
         padding: ($baseline/4);
-        color: $m-gray-d1;
+        color: $lighter-base-font-color;
         font-weight: 600;
 
         &:hover, &:active {
           text-decoration: none;
-          color: $m-blue-s1;
+          color: $link_color;
         }
       }
 
@@ -260,7 +260,7 @@ header.global {
 
         a {
           text-decoration: none;
-          color: $m-blue-s1;
+          color: $link_color;
         }
       }
     }
@@ -325,6 +325,6 @@ header.global {
 
   a {
     text-decoration: none;
-    color: $m-blue-s1 !important;
+    color: $link-color !important;
   } 
 }
