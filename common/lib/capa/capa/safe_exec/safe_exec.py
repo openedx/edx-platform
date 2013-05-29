@@ -71,7 +71,7 @@ def update_hash(hasher, obj):
 
 
 @statsd.timed('capa.safe_exec.time')
-def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None):
+def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None, slug=None):
     """
     Execute python code safely.
 
@@ -86,6 +86,9 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
     `cache` is an object with .get(key) and .set(key, value) methods.  It will be used
     to cache the execution, taking into account the code, the values of the globals,
     and the random seed.
+
+    `slug` is an arbitrary string, a description that's meaningful to the
+    caller, that will be used in log messages.
 
     """
     # Check the cache for a previous result.
@@ -112,7 +115,7 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
     try:
         codejail_safe_exec(
             code_prolog + LAZY_IMPORTS + code, globals_dict,
-            python_path=python_path,
+            python_path=python_path, slug=slug,
         )
     except SafeExecException as e:
         emsg = e.message
