@@ -119,30 +119,17 @@ task :test do
     end
 end
 
-namespace :coverage do
-    desc "Build the html coverage reports"
-    task :html => :report_dirs do
-        TEST_TASK_DIRS.each do |dir|
-            report_dir = report_dir_path(dir)
+desc "Build the html, xml, and diff coverage reports"
+task :coverage => :report_dirs do
+    TEST_TASK_DIRS.each do |dir|
+        report_dir = report_dir_path(dir)
 
-            if !File.file?("#{report_dir}/.coverage")
-                next
-            end
-
-            sh("coverage html --rcfile=#{dir}/.coveragerc")
+        if !File.file?("#{report_dir}/.coverage")
+            next
         end
-    end
 
-    desc "Build the xml coverage reports"
-    task :xml => :report_dirs do
-        TEST_TASK_DIRS.each do |dir|
-            report_dir = report_dir_path(dir)
-
-            if !File.file?("#{report_dir}/.coverage")
-                next
-            end
-            # Why doesn't the rcfile control the xml output file properly??
-            sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
-        end
+        sh("coverage html --rcfile=#{dir}/.coveragerc")
+        sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
+        sh("diff-cover #{report_dir}/coverage.xml --html-report #{report_dir}/diff_cover.html --git-branch master...HEAD")
     end
 end
