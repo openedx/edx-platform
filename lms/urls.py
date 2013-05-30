@@ -22,10 +22,6 @@ urlpatterns = ('',  # nopep8
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
 
-    # Adding to allow debugging issues when prod is mysteriously different from staging
-    # (specifically missing get parameters in certain cases)
-    url(r'^debug_request$', 'util.views.debug_request'),
-
     url(r'^change_email$', 'student.views.change_email_request', name="change_email"),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request', name="change_name"),
@@ -333,6 +329,13 @@ if settings.ENABLE_JASMINE:
 if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin
     urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
+
+if settings.DEBUG:
+    # Originally added to allow debugging issues when prod is
+    # mysteriously different from staging (specifically missing get
+    # parameters in certain cases), but removing from prod because
+    # it's a security risk.
+    urlpatterns += (url(r'^debug_request$', 'util.views.debug_request'),)
 
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (

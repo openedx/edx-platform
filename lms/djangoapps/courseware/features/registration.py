@@ -25,8 +25,15 @@ def i_should_see_that_course_in_my_dashboard(step, course):
     assert world.is_css_present(course_link_css)
 
 
-@step(u'I press the "([^"]*)" button in the Unenroll dialog')
-def i_press_the_button_in_the_unenroll_dialog(step, value):
-    button_css = 'section#unenroll-modal input[value="%s"]' % value
+@step(u'I should NOT see the course numbered "([^"]*)" in my dashboard$')
+def i_should_not_see_that_course_in_my_dashboard(step, course):
+    course_link_css = 'section.my-courses a[href*="%s"]' % course
+    assert not world.is_css_present(course_link_css)
+
+
+@step(u'I unregister for the course numbered "([^"]*)"')
+def i_unregister_for_that_course(step, course):
+    unregister_css = 'section.info a[href*="#unenroll-modal"][data-course-number*="%s"]' % course
+    world.css_click(unregister_css)
+    button_css = 'section#unenroll-modal input[value="Unregister"]'
     world.css_click(button_css)
-    assert world.is_css_present('section.container.dashboard')
