@@ -10,7 +10,9 @@ class DebugFileUploader(FileUploadHandler):
     def receive_data_chunk(self, raw_data, start):
         time.sleep(1)
         self.count = self.count + len(raw_data)
-        fail_at = self.request.GET.get('fail_at', None)
+        fail_at = None
+        if 'fail_at' in self.request.GET:
+            fail_at = int(self.request.GET.get('fail_at'))
         if fail_at and self.count > fail_at:
             raise Exception('Triggered fail')
 
