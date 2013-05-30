@@ -33,6 +33,9 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django_comment_common.utils import are_permissions_roles_seeded
+import datetime
+from xmodule.fields import Date
+from pytz import UTC
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
@@ -186,7 +189,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
 
     def test_get_depth_with_drafts(self):
-        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+        import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
 
         course = modulestore('draft').get_item(
             Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
@@ -270,7 +273,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_delete(self):
         direct_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        import_from_xml(direct_store, 'common/test/data/', ['full'])
 
         sequential = direct_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
 
@@ -462,7 +465,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         with fs.open('policy.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
             self.assertIn('course/6.002_Spring_2012', on_disk)
-            self.assertEqual(on_disk['course/6.002_Spring_2012'], own_metadata(course))
+            ownmeta = own_metadata(course)
+            date_proxy = Date()
+            for k, v in on_disk['course/6.002_Spring_2012'].iteritems():
+                self.assertIn(k, ownmeta)
+                if isinstance(ownmeta[k], datetime.datetime):
+                    owntime = ownmeta[k]
+                    if owntime.tzinfo is None:
+                        owntime = owntime.replace(tzinfo=UTC)
+                    self.assertLessEqual(
+                        abs(date_proxy.from_json(v) - owntime),
+                        datetime.timedelta(seconds=1))
+                else:
+                    self.assertEqual(v, ownmeta[k])
+            self.assertEqual(len(on_disk['course/6.002_Spring_2012']), len(ownmeta))
 
         # remove old course
         delete_course(module_store, content_store, location)

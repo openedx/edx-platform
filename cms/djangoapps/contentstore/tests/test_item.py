@@ -14,7 +14,7 @@ class DeleteItem(CourseTestCase):
         # Add static tab
         data = {
             'parent_location': 'i4x://mitX/333/course/Dummy_Course',
-            'template': 'i4x://edx/templates/static_tab/Empty'
+            'category': 'static_tab'
         }
 
         resp = self.client.post(reverse('clone_item'), data)

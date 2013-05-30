@@ -161,8 +161,8 @@ class CourseDetailsViewTest(CourseTestCase):
                 else:
                     dt2 = date.from_json(details[field])
 
-                expected_delta = datetime.timedelta(0)
-                self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
+                expected_delta = datetime.timedelta(seconds=1)
+                self.assertLessEqual(abs(dt1 - dt2), expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
@@ -248,7 +248,7 @@ class CourseMetadataEditingTest(CourseTestCase):
     def setUp(self):
         CourseTestCase.setUp(self)
         # add in the full class too
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        import_from_xml(modulestore('direct'), 'common/test/data/', ['full'])
         self.fullcourse_location = Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None])
 
     def test_fetch_initial_fields(self):

@@ -4,7 +4,6 @@ Created on Mar 13, 2013
 @author: dmitchell
 """
 from __future__ import absolute_import
-import re
 import logging
 import inspect
 from abc import ABCMeta, abstractmethod
@@ -13,10 +12,9 @@ from urllib import quote
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
-from xmodule.modulestore.exceptions import InvalidLocationError, \
-    InsufficientSpecificationError, OverSpecificationError
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverSpecificationError
 
-from .parsers import parse_url, parse_guid, parse_course_id, parse_block_ref
+from .parsers import parse_url, parse_course_id, parse_block_ref
 
 log = logging.getLogger(__name__)
 
@@ -122,7 +120,7 @@ class CourseLocator(Locator):
         elif self.version_guid:
             return '@' + str(self.version_guid)
         else:
-            #raise InsufficientSpecificationError("missing course_id or version_guid")
+            # raise InsufficientSpecificationError("missing course_id or version_guid")
             return '<InsufficientSpecificationError: missing course_id or version_guid>'
 
     def url(self):
@@ -131,6 +129,8 @@ class CourseLocator(Locator):
         """
         return 'edx://' + unicode(self)
 
+    # -- unused args which are used via inspect
+    # pylint: disable= W0613
     def validate_args(self, url, version_guid, course_id, revision):
         """
         Validate provided arguments.
@@ -138,7 +138,6 @@ class CourseLocator(Locator):
         need_oneof = set(('url', 'version_guid', 'course_id'))
         args, _, _, values = inspect.getargvalues(inspect.currentframe())
         provided_args = [a for a in args if a != 'self' and values[a] is not None]
-        arg_dict = dict([(a, values[a]) for a in provided_args])
         if len(need_oneof.intersection(provided_args)) == 0:
             raise InsufficientSpecificationError("Must provide one of these args: %s " %
                                                  list(need_oneof))
@@ -284,6 +283,17 @@ class CourseLocator(Locator):
         Returns the ObjectId referencing this specific location.
         """
         return self.version_guid
+
+    def html_id(self):
+        """
+        Generate a discussion group id based on course
+
+        To make compatible with old Location object functionality. I don't believe this behavior fits at this
+        place, but I have no way to override. If this is really needed, it should probably use the pretty_id to seed
+        the name although that's mutable. We should also clearly define the purpose and restrictions of this
+        (e.g., I'm assuming periods are fine).
+        """
+        return self.course_id
 
 
 class BlockUsageLocator(CourseLocator):

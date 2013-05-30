@@ -98,7 +98,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
     def from_json(cls, json_data, system, location, error_msg='Error not available'):
         return cls._construct(
             system,
-            json.dumps(json_data, indent=4, skipkeys=True),
+            json.dumps(json_data, skipkeys=True, indent=4),
             error_msg,
             location=location
         )
