@@ -376,12 +376,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         items = module_store.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
         self.assertEqual(len(items), 0)
 
-    def verify_content_existence(self, modulestore, root_dir, location, dirname, category_name, filename_suffix=''):
+    def verify_content_existence(self, store, root_dir, location, dirname, category_name, filename_suffix=''):
         fs = OSFS(root_dir / 'test_export')
         self.assertTrue(fs.exists(dirname))
 
         query_loc = Location('i4x', location.org, location.course, category_name, None)
-        items = modulestore.get_items(query_loc)
+        items = store.get_items(query_loc)
 
         for item in items:
             fs = OSFS(root_dir / ('test_export/' + dirname))
@@ -470,11 +470,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             for k, v in on_disk['course/6.002_Spring_2012'].iteritems():
                 self.assertIn(k, ownmeta)
                 if isinstance(ownmeta[k], datetime.datetime):
-                    owntime = ownmeta[k]
-                    if owntime.tzinfo is None:
-                        owntime = owntime.replace(tzinfo=UTC)
                     self.assertLessEqual(
-                        abs(date_proxy.from_json(v) - owntime),
+                        abs(date_proxy.from_json(v) - ownmeta[k]),
                         datetime.timedelta(seconds=1))
                 else:
                     self.assertEqual(v, ownmeta[k])
