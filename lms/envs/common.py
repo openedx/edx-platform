@@ -92,6 +92,8 @@ MITX_FEATURES = {
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
 
+    'ENABLE_INSTRUCTOR_EMAIL': False,
+
     # Flip to True when the YouTube iframe API breaks (again)
     'USE_YOUTUBE_OBJECT_API': False,
 
