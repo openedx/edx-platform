@@ -5,12 +5,12 @@ from lettuce import world
 from nose.tools import assert_equal
 from terrain.steps import reload_the_page
 
-import time
 
 @world.absorb
 def create_component_instance(step, component_button_css, instance_id, expected_css):
     click_new_component_button(step, component_button_css)
     click_component_from_menu(instance_id, expected_css)
+
 
 @world.absorb
 def click_new_component_button(step, component_button_css):
@@ -20,19 +20,20 @@ def click_new_component_button(step, component_button_css):
     world.css_click('a.new-unit-item')
     world.css_click(component_button_css)
 
+
 @world.absorb
 def click_component_from_menu(instance_id, expected_css):
-    new_instance = world.browser.find_by_id(instance_id)
-    assert_equal(1, len(new_instance))
-    # TODO: why is this sleep necessary?
-    time.sleep(float(1))
-    new_instance[0].click()
+    elem_css = "a[data-location='%s']" % instance_id
+    assert_equal(1, len(world.css_find(elem_css)))
+    world.css_click(elem_css)
     assert_equal(1, len(world.css_find(expected_css)))
+
 
 @world.absorb
 def edit_component_and_select_settings():
     world.css_click('a.edit-button')
     world.css_click('#settings-mode')
+
 
 @world.absorb
 def verify_setting_entry(setting, display_name, value, explicitly_set):
@@ -42,13 +43,15 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
     assert_equal(explicitly_set, settingClearButton.has_class('active'))
     assert_equal(not explicitly_set, settingClearButton.has_class('inactive'))
 
+
 @world.absorb
 def verify_all_setting_entries(expected_entries):
     settings = world.browser.find_by_css('.wrapper-comp-setting')
     assert_equal(len(expected_entries), len(settings))
     for (counter, setting) in enumerate(settings):
         world.verify_setting_entry(setting, expected_entries[counter][0],
-            expected_entries[counter][1], expected_entries[counter][2])
+                                   expected_entries[counter][1], expected_entries[counter][2])
+
 
 @world.absorb
 def save_component_and_reopen(step):
@@ -58,6 +61,7 @@ def save_component_and_reopen(step):
     reload_the_page(step)
     edit_component_and_select_settings()
 
+
 @world.absorb
 def cancel_component(step):
     world.css_click("a.cancel-button")
@@ -65,9 +69,11 @@ def cancel_component(step):
     # they are not persisted. Refresh the browser to make sure the changes were not persisted.
     reload_the_page(step)
 
+
 @world.absorb
 def revert_setting_entry(label):
     get_setting_entry(label).find_by_css('.setting-clear')[0].click()
+
 
 @world.absorb
 def get_setting_entry(label):
@@ -76,5 +82,3 @@ def get_setting_entry(label):
         if setting.find_by_css('.setting-label')[0].value == label:
             return setting
     return None
-
-
