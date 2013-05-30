@@ -10,7 +10,6 @@ import random
 import unittest
 import textwrap
 import mock
-import textwrap
 
 from . import new_loncapa_problem, test_system
 
@@ -190,7 +189,7 @@ class SymbolicResponseTest(ResponseTest):
 
     def test_grade_single_input(self):
         problem = self.build_problem(math_display=True,
-                                    expect="2*x+3*y")
+                                     expect="2*x+3*y")
 
         # Correct answers
         correct_inputs = [
@@ -223,7 +222,6 @@ class SymbolicResponseTest(ResponseTest):
         for (input_str, input_mathml) in incorrect_inputs:
             self._assert_symbolic_grade(problem, input_str, input_mathml, 'incorrect')
 
-
     def test_complex_number_grade(self):
         problem = self.build_problem(math_display=True,
             expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
@@ -241,7 +239,7 @@ class SymbolicResponseTest(ResponseTest):
         # Correct answer
         with mock.patch.object(requests, 'post') as mock_post:
 
-            # Simulate what the LaTeX-to-MathML server would 
+            # Simulate what the LaTeX-to-MathML server would
             # send for the correct response input
             mock_post.return_value.text = correct_snuggletex_response
 
@@ -323,7 +321,7 @@ class SymbolicResponseTest(ResponseTest):
                                 dynamath_input,
                                 expected_correctness):
         input_dict = {'1_2_1': str(student_input),
-                        '1_2_1_dynamath': str(dynamath_input) }
+                        '1_2_1_dynamath': str(dynamath_input)}
 
         correct_map = problem.grade_answers(input_dict)
 
@@ -349,10 +347,18 @@ class OptionResponseTest(ResponseTest):
 
 
 class FormulaResponseTest(ResponseTest):
+    """
+    Test the FormulaResponse class
+    """
     from response_xml_factory import FormulaResponseXMLFactory
     xml_factory_class = FormulaResponseXMLFactory
 
     def test_grade(self):
+        """
+        Test basic functionality of FormulaResponse
+
+        Specifically, if it can understand equivalence of formulae
+        """
         # Sample variables x and y in the range [-10, 10]
         sample_dict = {'x': (-10, 10), 'y': (-10, 10)}
 
@@ -373,6 +379,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_hint(self):
+        """
+        Test the hint-giving functionality of FormulaResponse
+        """
         # Sample variables x and y in the range [-10, 10]
         sample_dict = {'x': (-10, 10), 'y': (-10, 10)}
 
@@ -401,6 +410,10 @@ class FormulaResponseTest(ResponseTest):
                           'Try including the variable x')
 
     def test_script(self):
+        """
+        Test if python script can be used to generate answers
+        """
+
         # Calculate the answer using a script
         script = "calculated_ans = 'x+x'"
 
@@ -419,7 +432,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, '3*x', 'incorrect')
 
     def test_parallel_resistors(self):
-        """Test parallel resistors"""
+        """
+        Test parallel resistors
+        """
         sample_dict = {'R1': (10, 10), 'R2': (2, 2), 'R3': (5, 5), 'R4': (1, 1)}
 
         # Test problem
@@ -440,8 +455,11 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_default_variables(self):
-        """Test the default variables provided in common/lib/capa/capa/calc.py"""
-        # which are: j (complex number), e, pi, k, c, T, q
+        """
+        Test the default variables provided in calc.py
+
+        which are: j (complex number), e, pi, k, c, T, q
+        """
 
         # Sample x in the range [-10,10]
         sample_dict = {'x': (-10, 10)}
@@ -464,11 +482,14 @@ class FormulaResponseTest(ResponseTest):
                               msg="Failed on variable {0}; the given, incorrect answer was {1} but graded 'correct'".format(var, incorrect))
 
     def test_default_functions(self):
-        """Test the default functions provided in common/lib/capa/capa/calc.py"""
-        # which are: sin, cos, tan, sqrt, log10, log2, ln,
-        # arccos, arcsin, arctan, abs,
-        # fact, factorial
+        """
+        Test the default functions provided in common/lib/capa/capa/calc.py
 
+        which are:
+          sin, cos, tan, sqrt, log10, log2, ln,
+          arccos, arcsin, arctan, abs,
+          fact, factorial
+        """
         w = random.randint(3, 10)
         sample_dict = {'x': (-10, 10),  # Sample x in the range [-10,10]
                        'y': (1, 10),    # Sample y in the range [1,10] - logs, arccos need positive inputs
@@ -496,8 +517,10 @@ class FormulaResponseTest(ResponseTest):
                               msg="Failed on function {0}; the given, incorrect answer was {1} but graded 'correct'".format(func, incorrect))
 
     def test_grade_infinity(self):
-        # This resolves a bug where a problem with relative tolerance would
-        # pass with any arbitrarily large student answer.
+        """
+        Test that a large input on a problem with relative tolerance isn't
+        erroneously marked as correct.
+        """
 
         sample_dict = {'x': (1, 2)}
 
@@ -514,8 +537,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_grade_nan(self):
-        # Attempt to produce a value which causes the student's answer to be
-        # evaluated to nan. See if this is resolved correctly.
+        """
+        Test that expressions that evaluate to NaN are not marked as correct.
+        """
 
         sample_dict = {'x': (1, 2)}
 
@@ -531,6 +555,18 @@ class FormulaResponseTest(ResponseTest):
         # Expect an correct answer (+ nan) to be marked incorrect
         input_formula = "x + 0*1e999"
         self.assert_grade(problem, input_formula, "incorrect")
+
+    def test_raises_zero_division_err(self):
+        """
+        See if division by zero raises an error.
+        """
+        sample_dict = {'x': (1, 2)}
+        problem = self.build_problem(sample_dict=sample_dict,
+                                     num_samples=10,
+                                     tolerance="1%",
+                                     answer="x")  # Answer doesn't matter
+        input_dict = {'1_2_1': '1/0'}
+        self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
 
 
 class StringResponseTest(ResponseTest):
@@ -592,7 +628,7 @@ class StringResponseTest(ResponseTest):
         problem = self.build_problem(
             answer="Michigan",
             hintfn="gimme_a_hint",
-            script = textwrap.dedent("""
+            script=textwrap.dedent("""
                 def gimme_a_hint(answer_ids, student_answers, new_cmap, old_cmap):
                     aid = answer_ids[0]
                     answer = student_answers[aid]
@@ -898,6 +934,14 @@ class NumericalResponseTest(ResponseTest):
         incorrect_responses = ["", "3.9", "4.1", "0", "5.01e1"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
+    def test_raises_zero_division_err(self):
+        """See if division by zero is handled correctly"""
+        problem = self.build_problem(question_text="What 5 * 10?",
+                                     explanation="The answer is 50",
+                                     answer="5e+1")  # Answer doesn't matter
+        input_dict = {'1_2_1': '1/0'}
+        self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
+
 
 class CustomResponseTest(ResponseTest):
     from response_xml_factory import CustomResponseXMLFactory
@@ -947,8 +991,8 @@ class CustomResponseTest(ResponseTest):
         #
         #   'answer_given' is the answer the student gave (if there is just one input)
         #       or an ordered list of answers (if there are multiple inputs)
-        #   
-        # The function should return a dict of the form 
+        #
+        # The function should return a dict of the form
         # { 'ok': BOOL, 'msg': STRING }
         #
         script = textwrap.dedent("""
