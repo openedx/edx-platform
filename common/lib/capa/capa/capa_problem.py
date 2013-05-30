@@ -469,17 +469,17 @@ class LoncapaProblem(object):
                     random_seed=self.seed,
                     python_path=python_path,
                     cache=self.system.cache,
+                    slug=self.problem_id,
                 )
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
                 msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
                 raise responsetypes.LoncapaProblemError(msg)
 
-        # store code source in context
+        # Store code source in context, along with the Python path needed to run it correctly.
         context['script_code'] = all_code
+        context['python_path'] = python_path
         return context
-
-
 
     def _extract_html(self, problemtree):  # private
         '''

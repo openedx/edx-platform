@@ -1,7 +1,7 @@
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-from django_comment_client.models import Role
+from django_comment_common.models import Role
 from django.contrib.auth.models import User
 
 

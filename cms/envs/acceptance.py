@@ -2,6 +2,11 @@
 This config file extends the test environment configuration
 so that we can run the lettuce acceptance tests.
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .test import *
 
 # You need to start the server in debug mode,
@@ -23,7 +28,7 @@ MODULESTORE_OPTIONS = {
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {

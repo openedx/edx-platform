@@ -179,8 +179,7 @@ def edit_unit(request, location):
             break
         index = index + 1
 
-    preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE',
-                                                  'preview.' + settings.LMS_BASE)
+    preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE')
 
     preview_lms_link = '//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
         preview_lms_base=preview_lms_base,

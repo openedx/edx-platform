@@ -19,7 +19,7 @@ from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
@@ -655,7 +655,7 @@ def create_account(request, post_override=None):
         elif not settings.GENERATE_RANDOM_USER_CREDENTIALS:
             res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
-        log.exception(sys.exc_info())
+        log.warning('Unable to send activation email to user', exc_info=True)
         js['value'] = 'Could not send activation e-mail.'
         return HttpResponse(json.dumps(js))
 
@@ -975,7 +975,11 @@ def reactivation_email_for_user(user):
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', d)
 
-    res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    try:
+        res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    except:
+        log.warning('Unable to send reactivation email', exc_info=True)
+        return HttpResponse(json.dumps({'success': False, 'error': 'Unable to send reactivation email'}))
 
     return HttpResponse(json.dumps({'success': True}))
 
@@ -1001,7 +1005,7 @@ def change_email_request(request):
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'Valid e-mail address required.'}))
 
-    if len(User.objects.filter(email=new_email)) != 0:
+    if User.objects.filter(email=new_email).count() != 0:
         ## CRITICAL TODO: Handle case sensitivity for e-mails
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'An account with this e-mail already exists.'}))
@@ -1036,41 +1040,63 @@ def change_email_request(request):
 
 
 @ensure_csrf_cookie
+@transaction.commit_manually
 def confirm_email_change(request, key):
     ''' User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     '''
     try:
-        pec = PendingEmailChange.objects.get(activation_key=key)
-    except PendingEmailChange.DoesNotExist:
-        return render_to_response("invalid_email_key.html", {})
+        try:
+            pec = PendingEmailChange.objects.get(activation_key=key)
+        except PendingEmailChange.DoesNotExist:
+            transaction.rollback()
+            return render_to_response("invalid_email_key.html", {})
 
-    user = pec.user
-    d = {'old_email': user.email,
-         'new_email': pec.new_email}
+        user = pec.user
+        address_context = {
+            'old_email': user.email,
+            'new_email': pec.new_email
+        }
 
-    if len(User.objects.filter(email=pec.new_email)) != 0:
-        return render_to_response("email_exists.html", d)
+        if len(User.objects.filter(email=pec.new_email)) != 0:
+            transaction.rollback()
+            return render_to_response("email_exists.html", {})
 
-    subject = render_to_string('emails/email_change_subject.txt', d)
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/confirm_email_change.txt', d)
-    up = UserProfile.objects.get(user=user)
-    meta = up.get_meta()
-    if 'old_emails' not in meta:
-        meta['old_emails'] = []
-    meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
-    up.set_meta(meta)
-    up.save()
-    # Send it to the old email...
-    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-    user.email = pec.new_email
-    user.save()
-    pec.delete()
-    # And send it to the new email...
-    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        subject = render_to_string('emails/email_change_subject.txt', address_context)
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/confirm_email_change.txt', address_context)
+        up = UserProfile.objects.get(user=user)
+        meta = up.get_meta()
+        if 'old_emails' not in meta:
+            meta['old_emails'] = []
+        meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
+        up.set_meta(meta)
+        up.save()
+        # Send it to the old email...
+        try:
+            user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        except Exception:
+            transaction.rollback()
+            log.warning('Unable to send confirmation email to old address', exc_info=True)
+            return render_to_response("email_change_failed.html", {'email': user.email})
 
-    return render_to_response("email_change_successful.html", d)
+        user.email = pec.new_email
+        user.save()
+        pec.delete()
+        # And send it to the new email...
+        try:
+            user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        except Exception:
+            transaction.rollback()
+            log.warning('Unable to send confirmation email to new address', exc_info=True)
+            return render_to_response("email_change_failed.html", {'email': pec.new_email})
+
+        transaction.commit()
+        return render_to_response("email_change_successful.html", address_context)
+    except Exception:
+        # If we get an unexpected exception, be sure to rollback the transaction
+        transaction.rollback()
+        raise
 
 
 @ensure_csrf_cookie

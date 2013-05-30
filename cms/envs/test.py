@@ -7,6 +7,11 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .common import *
 import os
 from path import path
@@ -77,6 +82,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
+MITX_FEATURES['PREVIEW_LMS_BASE'] = "preview"
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a

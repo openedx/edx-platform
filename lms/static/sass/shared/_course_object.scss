@@ -31,8 +31,8 @@
     }
 
     .course {
-      background: rgb(250,250,250);
-      border: 1px solid rgb(180,180,180);
+      background: $body-bg;
+      border: 1px solid $border-color-1;
       @include border-radius(2px);
       @include box-sizing(border-box);
       @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9));
@@ -42,7 +42,7 @@
       @include transition(all, 0.15s, linear);
 
       .status {
-        background: $blue;
+        background: $link-color;
         color: white;
         font-size: 10px;
         left: 10px;
@@ -55,7 +55,7 @@
       }
 
       .status:after {
-        border-bottom: 6px solid shade($blue, 50%);
+        border-bottom: 6px solid shade($link-color, 50%);
         border-right: 6px solid transparent;
         content: "";
         display: block;
@@ -90,7 +90,7 @@
       }
 
       .inner-wrapper {
-        border: 1px solid rgba(255,255,255, 1);
+        border: 1px solid $border-color-4;
         height: 100%;
         height: 200px;
         overflow: hidden;
@@ -116,12 +116,12 @@
             text-decoration: none;
 
             .info-link {
-              color: $blue;
+              color: $link-color;
               opacity: 1;
             }
 
             h2 {
-              color: $blue;
+              color: $link-color;
             }
           }
 
@@ -176,7 +176,7 @@
       // }
 
       .info {
-        background: rgb(255,255,255);
+        background: $content-wrapper-bg;
         height: 220px + 130px;
         left: 0px;
         position: absolute;
@@ -221,14 +221,14 @@
           width: 100%;
 
           .university {
-            border-right: 1px solid rgb(200,200,200);
+            border-right: 1px solid $border-color-2;
             color: $lighter-base-font-color;
             letter-spacing: 1px;
             margin-right: 10px;
             padding-right: 10px;
 
             &:hover {
-              color: $blue;
+              color: $link-color;
             }
           }
 
@@ -240,9 +240,9 @@
       }
 
       &:hover {
-        background: rgb(245,245,245);
-        border-color: rgb(170,170,170);
-        @include box-shadow(0 1px 16px 0 rgba($blue, 0.4));
+        background: $course-profile-bg;
+        border-color: $border-color-1;
+        @include box-shadow(0 1px 16px 0 rgba($shadow-color, 0.4));
 
         .info {
           top: -150px;

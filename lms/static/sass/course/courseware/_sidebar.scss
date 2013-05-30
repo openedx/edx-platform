@@ -2,7 +2,7 @@ section.course-index {
   @extend .sidebar;
   @extend .tran;
   @include border-radius(3px 0 0 3px);
-  border-right: 1px solid #ddd;
+  border-right: 1px solid $border-color-2;
 
   #open_close_accordion {
     display: none;
@@ -70,8 +70,8 @@ section.course-index {
       width: 100% !important;
       @include box-sizing(border-box);
       padding: 11px 14px;
-      @include linear-gradient(top, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0));
-      background-color: #eee;
+      @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
+      background-color: $sidebar-chapter-bg;
       @include box-shadow(0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset);
       @include transition(background-color .1s);
 
@@ -169,9 +169,9 @@ section.course-index {
           }
 
           > a {
-            border: 1px solid #bbb;
+            border: 1px solid $border-color-1;
             @include box-shadow(0 1px 0 rgba(255, 255, 255, .35) inset);
-            @include linear-gradient(top, #e6e6e6, #d6d6d6);
+            background: $sidebar-active-image;
 
             &:after {
               opacity: 1;

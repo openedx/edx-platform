@@ -115,9 +115,6 @@ urlpatterns += (
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
 
     url(r'^logout$', 'student.views.logout_user', name='logout'),
-
-    # static/proof-of-concept views
-    url(r'^ux-alerts$', 'contentstore.views.ux_alerts', name='ux-alerts')
 )
 
 js_info_dict = {

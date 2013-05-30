@@ -1,3 +1,7 @@
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 # Settings for edx4edx production instance
 from .aws import *
 COURSE_NAME = "edx4edx"

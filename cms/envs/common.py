@@ -19,6 +19,10 @@ Longer TODO:
    multiple sites, but we do need a way to map their data assets.
 """
 
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 import sys
 import lms.envs.common
 from path import path
@@ -35,8 +39,8 @@ MITX_FEATURES = {
     'STUDIO_NPS_SURVEY': True,
     'SEGMENT_IO': True,
 
-    # Enable URL that shows information about the status of variuous services
-    'ENABLE_SERVICE_STATUS': False,
+    # Enable URL that shows information about the status of various services
+    'ENABLE_SERVICE_STATUS': False
 }
 ENABLE_JASMINE = False
 
@@ -217,7 +221,9 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.js') +
             rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.js')
-        ) + ['js/hesitate.js', 'js/base.js'],
+        ) + ['js/hesitate.js', 'js/base.js',
+             'js/models/feedback.js', 'js/views/feedback.js',
+             'js/models/section.js', 'js/views/section.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
     },
@@ -316,6 +322,9 @@ INSTALLED_APPS = (
     'pipeline',
     'staticfiles',
     'static_replace',
+
+    # comment common
+    'django_comment_common',
 )
 
 ################# EDX MARKETING SITE ##################################

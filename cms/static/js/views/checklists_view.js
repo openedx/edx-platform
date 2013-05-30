@@ -22,8 +22,7 @@ CMS.Views.Checklists = Backbone.View.extend({
                         }
                     );
                 },
-                reset: true,
-                error: CMS.ServerError
+                reset: true
             }
         );
     },
@@ -90,8 +89,7 @@ CMS.Views.Checklists = Backbone.View.extend({
                         'task': model.attributes.items[task_index].short_description,
                         'state': model.attributes.items[task_index].is_checked
                     });
-                },
-                error : CMS.ServerError
+                }
             });
     }
 });

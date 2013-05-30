@@ -34,6 +34,8 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from django_comment_common.utils import are_permissions_roles_seeded
+
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
@@ -45,7 +47,7 @@ class MongoCollectionFindWrapper(object):
         self.counter = 0
 
     def find(self, query, *args, **kwargs):
-        self.counter = self.counter+1
+        self.counter = self.counter + 1
         return self.original(query, *args, **kwargs)
 
 
@@ -352,7 +354,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         clone_items = module_store.get_items(Location(['i4x', 'MITx', '999', 'vertical', None]))
         self.assertGreater(len(clone_items), 0)
         for descriptor in items:
-            new_loc = descriptor.location._replace(org='MITx', course='999')
+            new_loc = descriptor.location.replace(org='MITx', course='999')
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
             self.assertEqual(resp.status_code, 200)
@@ -375,15 +377,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(len(items), 0)
 
     def verify_content_existence(self, modulestore, root_dir, location, dirname, category_name, filename_suffix=''):
-        fs = OSFS(root_dir / 'test_export')
-        self.assertTrue(fs.exists(dirname))
+        filesystem = OSFS(root_dir / 'test_export')
+        self.assertTrue(filesystem.exists(dirname))
 
         query_loc = Location('i4x', location.org, location.course, category_name, None)
         items = modulestore.get_items(query_loc)
 
         for item in items:
-            fs = OSFS(root_dir / ('test_export/' + dirname))
-            self.assertTrue(fs.exists(item.location.name + filename_suffix))
+            filesystem = OSFS(root_dir / ('test_export/' + dirname))
+            self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
     def test_export_course(self):
         module_store = modulestore('direct')
@@ -415,7 +417,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # add private to list of children
         sequential = module_store.get_item(Location(['i4x', 'edX', 'full',
                                            'sequential', 'Administrivia_and_Circuit_Elements', None]))
-        private_location_no_draft = private_vertical.location._replace(revision=None)
+        private_location_no_draft = private_vertical.location.replace(revision=None)
         module_store.update_children(sequential.location, sequential.children +
                                      [private_location_no_draft.url()])
 
@@ -440,20 +442,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.verify_content_existence(module_store, root_dir, location, 'custom_tags', 'custom_tag_template')
 
         # check for graiding_policy.json
-        fs = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
-        self.assertTrue(fs.exists('grading_policy.json'))
+        filesystem = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
+        self.assertTrue(filesystem.exists('grading_policy.json'))
 
         course = module_store.get_item(location)
         # compare what's on disk compared to what we have in our course
-        with fs.open('grading_policy.json', 'r') as grading_policy:
+        with filesystem.open('grading_policy.json', 'r') as grading_policy:
             on_disk = loads(grading_policy.read())
             self.assertEqual(on_disk, course.grading_policy)
 
         #check for policy.json
-        self.assertTrue(fs.exists('policy.json'))
+        self.assertTrue(filesystem.exists('policy.json'))
 
         # compare what's on disk to what we have in the course module
-        with fs.open('policy.json', 'r') as course_policy:
+        with filesystem.open('policy.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
             self.assertIn('course/6.002_Spring_2012', on_disk)
             self.assertEqual(on_disk['course/6.002_Spring_2012'], own_metadata(course))
@@ -607,6 +609,14 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+
+    def test_create_course_check_forum_seeding(self):
+        """Test new course creation and verify forum seeding """
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertTrue(are_permissions_roles_seeded('MITx/999/Robot_Super_Course'))
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
@@ -801,37 +811,37 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(200, resp.status_code)
 
         # go look at a subsection page
-        subsection_location = loc._replace(category='sequential', name='test_sequence')
+        subsection_location = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.get(reverse('edit_subsection',
                                        kwargs={'location': subsection_location.url()}))
         self.assertEqual(200, resp.status_code)
 
         # go look at the Edit page
-        unit_location = loc._replace(category='vertical', name='test_vertical')
+        unit_location = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.get(reverse('edit_unit',
                                        kwargs={'location': unit_location.url()}))
         self.assertEqual(200, resp.status_code)
 
         # delete a component
-        del_loc = loc._replace(category='html', name='test_html')
+        del_loc = loc.replace(category='html', name='test_html')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
 
         # delete a unit
-        del_loc = loc._replace(category='vertical', name='test_vertical')
+        del_loc = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
 
         # delete a unit
-        del_loc = loc._replace(category='sequential', name='test_sequence')
+        del_loc = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
 
         # delete a chapter
-        del_loc = loc._replace(category='chapter', name='chapter_2')
+        del_loc = loc.replace(category='chapter', name='chapter_2')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)

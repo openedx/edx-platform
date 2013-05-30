@@ -18,6 +18,11 @@ Longer TODO:
 3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 import sys
 import os
 
@@ -67,6 +72,7 @@ MITX_FEATURES = {
 
     'ENABLE_PSYCHOMETRICS': False,  	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
+    'ENABLE_DJANGO_ADMIN_SITE': False,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
@@ -105,6 +111,9 @@ MITX_FEATURES = {
 
     # Enable URL that shows information about the status of variuous services
     'ENABLE_SERVICE_STATUS': False,
+
+    # Toggle to indicate use of a custom theme
+    'USE_CUSTOM_THEME': False
 }
 
 # Used for A/B testing
@@ -162,12 +171,12 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
 
 # This is where Django Template lookup is defined. There are a few of these
 # still left lying around.
-TEMPLATE_DIRS = (
+TEMPLATE_DIRS = [
     PROJECT_ROOT / "templates",
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
-)
+]
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
@@ -691,8 +700,7 @@ INSTALLED_APPS = (
 
     # Discussion forums
     'django_comment_client',
-
-    # Student notes
+    'django_comment_common',
     'notes',
 )
 
@@ -709,3 +717,31 @@ MKTG_URL_LINK_MAP = {
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
 }
+
+############################### THEME ################################
+def enable_theme(theme_name):
+    """
+    Enable the settings for a custom theme, whose files should be stored
+    in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
+
+    The THEME_NAME setting should be configured separately since it can't
+    be set here (this function closes too early). An idiom for doing this
+    is:
+
+    THEME_NAME = "stanford"
+    enable_theme(THEME_NAME)
+    """
+    MITX_FEATURES['USE_CUSTOM_THEME'] = True
+
+    # Calculate the location of the theme's files
+    theme_root = ENV_ROOT / "themes" / theme_name
+
+    # Include the theme's templates in the template search paths
+    TEMPLATE_DIRS.append(theme_root / 'templates')
+    MAKO_TEMPLATES['main'].append(theme_root / 'templates')
+
+    # Namespace the theme's static files to 'themes/<theme_name>' to
+    # avoid collisions with default edX static files
+    STATICFILES_DIRS.append((u'themes/%s' % theme_name,
+                             theme_root / 'static'))
+

@@ -2,22 +2,22 @@
 // ====================
 
 .modal-cover {
+	@extend .depth3;
 	display: none;
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 1000;
 	width: 100%;
 	height: 100%;
 	background: rgba(0, 0, 0, .8);
 }
 
 .modal {
+	@extend .depth4;
 	display: none;
 	position: fixed;
 	top: 60px;
 	left: 50%;
-	z-index: 1001;
 	width: 930px;
 	height: 540px;
 	margin-left: -465px;
@@ -61,8 +61,8 @@
 
 // lean modal alternative
 #lean_overlay {
+	@extend .depth4;
 	position: fixed;
-	z-index: 10000;
 	top: 0px;
 	left: 0px;
 	display: none;

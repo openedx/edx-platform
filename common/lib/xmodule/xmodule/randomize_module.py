@@ -4,6 +4,8 @@ import random
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 
+from lxml import etree
+
 from xblock.core import Scope, Integer
 
 log = logging.getLogger('mitx.' + __name__)
