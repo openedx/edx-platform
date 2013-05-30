@@ -14,8 +14,6 @@ SHOW_ANSWER = "Show Answer"
 ############### ACTIONS ####################
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
-    world.create_component_instance(step, '.large-problem-icon', 'i4x://edx/templates/problem/Blank_Common_Problem',
-                                    '.xmodule_CapaModule')
     world.create_component_instance(
         step,
         '.large-problem-icon',
@@ -96,7 +94,6 @@ def i_can_revert_to_default_for_randomization(step):
     world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Always", False)
 
 
-
 @step('I can set the weight to 3.5')
 def i_can_set_weight_to_3_5(step):
     world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill('3.5')
@@ -104,17 +101,16 @@ def i_can_set_weight_to_3_5(step):
 
 
 @step('my change to weight is persisted')
-def my_change_to_randomization_is_persisted(step):
+def my_change_to_weight_is_persisted(step):
     world.save_component_and_reopen(step)
     verify_modified_weight()
 
 
 @step('I can revert to the default value of unset for weight')
-def i_can_revert_to_default_for_randomization(step):
+def i_can_revert_to_default_for_unset_weight(step):
     world.revert_setting_entry(PROBLEM_WEIGHT)
     world.save_component_and_reopen(step)
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
-
 
 
 @step('if I set the weight to abc, it remains unset')
@@ -127,14 +123,12 @@ def set_the_weight_to_abc(step):
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
 
 
-
 @step('if I set the max attempts to 2.34, the max attempts are persisted as 234')
-def set_the_weight_to_abc(step):
+def set_the_max_attempts_234(step):
     world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css('.setting-input')[0].fill('2.34')
     world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "234", True)
     world.save_component_and_reopen(step)
     world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "234", True)
-
 
 
 @step('I set the max attempts to -3, the max attempts are persisted as 1')
@@ -143,7 +137,6 @@ def set_max_attempts_to_neg_3(step):
     world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "-3", True)
     world.save_component_and_reopen(step)
     world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "1", True)
-
 
 
 @step('Edit High Level Source is not visible')
@@ -182,10 +175,8 @@ def verify_modified_weight():
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "3.5", True)
 
 
-
 def verify_modified_randomization():
     world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Per Student", True)
-
 
 
 def verify_modified_display_name():
