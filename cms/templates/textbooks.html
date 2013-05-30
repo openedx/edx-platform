@@ -176,6 +176,9 @@ CMS.Views.UploadDialog = Backbone.View.extend({
             success: _.bind(this.success, this),
             error: _.bind(this.error, this),
             uploadProgress: _.bind(this.progress, this),
+            data: {
+                notifyOnError: false
+            }
         });
     },
     progress: function(event, position, total, percentComplete) {
@@ -198,7 +201,11 @@ CMS.Views.UploadDialog = Backbone.View.extend({
         this.remove();
     },
     error: function() {
-        this.model.set("uploading", false);
+        this.model.set({
+            "uploading": false,
+            "uploadedBytes": 0,
+            "title": gettext("We're sorry, there was an error"),
+        });
     }
 })
 var section = new CMS.Models.Section({
