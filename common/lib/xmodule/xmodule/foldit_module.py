@@ -16,8 +16,10 @@ log = logging.getLogger(__name__)
 
 class FolditFields(object):
     # default to what Spring_7012x uses
-    required_level = Integer(default=4, scope=Scope.settings)
-    required_sublevel = Integer(default=5, scope=Scope.settings)
+    required_level_half = Integer(default=3, scope=Scope.settings)
+    required_sublevel_half = Integer(default=5, scope=Scope.settings)
+    required_level_full = Integer(default=4, scope=Scope.settings)
+    required_sublevel_full = Integer(default=5, scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
 
     show_basic_score = String(scope=Scope.settings, default='false')
@@ -52,10 +54,25 @@ class FolditModule(FolditFields, XModule):
 
         complete = PuzzleComplete.is_level_complete(
             self.system.anonymous_student_id,
-            self.required_level,
-            self.required_sublevel,
+            self.required_level_full,
+            self.required_sublevel_full,
             self.due_time)
         return complete
+
+    def is_half_complete(self):
+        """
+        Did the user reach the required level for half credit?
+
+        Ideally this would be more flexible than just 0, 0.5, or 1 credit. On
+        the other hand, the xml attributes for specifying more specific
+        cut-offs and partial grades can get more confusing.
+        """
+        from foldit.models import PuzzleComplete
+        complete = PuzzleComplete.is_level_complete(
+            self.system.anonymous_student_id,
+            self.required_level_half,
+            self.required_sublevel_half,
+            self.due_time)
 
     def completed_puzzles(self):
         """
@@ -91,8 +108,8 @@ class FolditModule(FolditFields, XModule):
         Render the html for the module.
         """
         goal_level = '{0}-{1}'.format(
-            self.required_level,
-            self.required_sublevel)
+            self.required_level_full,
+            self.required_sublevel_full)
 
         showbasic = (self.show_basic_score.lower() == "true")
         showleader = (self.show_leaderboard.lower() == "true")
@@ -116,8 +133,8 @@ class FolditModule(FolditFields, XModule):
         Render html for the basic puzzle section.
         """
         goal_level = '{0}-{1}'.format(
-            self.required_level,
-            self.required_sublevel)
+            self.required_level_full,
+            self.required_sublevel_full)
 
         context = {
             'due': self.due,
@@ -139,9 +156,16 @@ class FolditModule(FolditFields, XModule):
 
     def get_score(self):
         """
-        0 / 1 based on whether student has gotten far enough.
+        0 if fewer than level 3-5 reached
+        0.5 if >= 3-5 and < 4-5
+        1 if 4-5
         """
-        score = 1 if self.is_complete() else 0
+        if self.is_complete():
+            score = 1
+        elif self.is_half_complete():
+            score = 0.5
+        else:
+            score = 0
         return {'score': score,
                 'total': self.max_score()}
 
