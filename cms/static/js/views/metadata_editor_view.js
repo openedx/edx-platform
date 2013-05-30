@@ -10,7 +10,7 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
         }
         this.template = _.template(tpl);
 
-        this.$el.html(this.template({metadata_entries: this.model.attributes}));
+        this.$el.html(this.template({numEntries: this.model.keys().length}));
         var counter = 0;
 
         // Sort entries by display name.
@@ -79,10 +79,11 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
     // Model is CMS.Models.Metadata.
     initialize : function() {
         var self = this;
-        var templateName = this.getTemplateName();
+        var templateName = _.result(this, 'templateName');
+        // Backbone model cid is only unique within the collection.
         this.uniqueId = _.uniqueId(templateName + "_");
 
-        var tpl = $("#"+templateName).text();
+        var tpl = document.getElementById(templateName).text;
         if(!tpl) {
             console.error("Couldn't load template: " + templateName);
         }
@@ -92,9 +93,9 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
     },
 
     /**
-     * Returns the ID/name of the template. Subclasses should implement this method.
+     * The ID/name of the template. Subclasses must override this.
      */
-    getTemplateName : function () {},
+    templateName: '',
 
     /**
      * Returns the value currently displayed in the editor/view. Subclasses should implement this method.
@@ -170,9 +171,7 @@ CMS.Views.Metadata.String = CMS.Views.Metadata.AbstractEditor.extend({
         "click .setting-clear" : "clear"
     },
 
-    getTemplateName : function () {
-        return "metadata-string-entry";
-    },
+    templateName: "metadata-string-entry",
 
     getValueFromEditor : function () {
         return this.$el.find('#' + this.uniqueId).val();
@@ -232,9 +231,7 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
         }
     },
 
-    getTemplateName : function () {
-        return "metadata-number-entry";
-    },
+    templateName: "metadata-number-entry",
 
     getValueFromEditor : function () {
         return this.$el.find('#' + this.uniqueId).val();
@@ -288,9 +285,7 @@ CMS.Views.Metadata.Option = CMS.Views.Metadata.AbstractEditor.extend({
         "click .setting-clear" : "clear"
     },
 
-    getTemplateName : function () {
-        return "metadata-option-entry";
-    },
+    templateName: "metadata-option-entry",
 
     getValueFromEditor : function () {
         var selectedText = this.$el.find('#' + this.uniqueId).find(":selected").text();
