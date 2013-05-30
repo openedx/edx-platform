@@ -286,9 +286,11 @@ esac
 
 clone_repos
 
+# Sanity check to make sure the repo layout hasn't changed
+if [[ -d $BASE/edx_platform/scripts]]; then
+    ouput "Installing system-level dependencies"
+
 # Install system-level dependencies
-if [[ -d $BASE/edx_platform/scripts/install-system-req.sh]]; then
-    
 bash $BASE/edx_platform/scripts/install-system-req.sh
 
 output "Installing RVM, Ruby, and required gems"

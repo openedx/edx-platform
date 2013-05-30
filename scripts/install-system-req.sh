@@ -16,10 +16,11 @@ output() {
 
 ### START
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BREW_FILE=$DIR/"brew-formulas.txt"
-APT_REPOS_FILE=$DIR/"apt-repos.txt"
-APT_PKGS_FILE=$DIR/"apt-packages.txt"
+SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REQUIREMENTS_DIR=$DIR/"requirements/system"
+BREW_FILE=$REQUIREMENTS_DIR/"mac_os_x/brew-formulas.txt"
+APT_REPOS_FILE=$REQUIREMENTS_DIR/"ubuntu/apt-repos.txt"
+APT_PKGS_FILE=$REQUIREMENTS_DIR/"ubuntu/apt-packages.txt"
 
 case `uname -s` in
     [Ll]inux)
