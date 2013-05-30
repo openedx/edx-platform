@@ -1,0 +1,83 @@
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="title"><title>About edX</title></%block>
+
+<section class="container about">
+  <nav>
+    <a href="#about" class="active">About</a>
+    <a href="#faq">Faq</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <section class="vision">
+    <section class="message left" id="about">
+      <div class="photo">
+        <img src="${static.url('themes/stanford/images/quad.jpg')}">
+          <!-- Image Copyright owned by Giulio Gratta -->
+      </div>
+      <article>
+        <h2>About <span class="edx">Stanford Online</span></h2>
+        <p>Stanford has a range of courses accessible to the public, and you can find out more about them, and about Stanford's online initiatives, at <a href="http://online.stanford.edu">online.stanford.edu</a></p>
+        <p>The engineering team at Stanford's office of the Vice Provost for Online Learning is running and developing on an instance of the edX platform, which will be open source on June 1.  More details are in <a href="http://news.stanford.edu/news/2013/april/edx-collaborate-platform-030313.html">this press release</a>.</p>
+      </article>
+      <hr class="fade-right-hr-divider">
+    </section>
+    
+    <section class="message left" id="faq">
+      <div class="photo">
+        <img src="${static.url('themes/stanford/images/memchu.jpg')}">
+          <!-- Image Copyright owned by Giulio Gratta -->
+      </div>
+      <article>
+        <h2>FAQs</h2>
+        <p><strong>Has Stanford joined the edX consortium?</strong><br />
+        No.  We're partnering on the open source software.</p>
+        
+        <p><strong>If I'm a Stanford faculty member, and I'd like to use the platform to host content for an on-campus or public course, who should I get in touch with?</strong><br />
+        <a href="mailto:c2g-facsupport@cs.stanford.edu">Click here to get in touch</a></p>
+        
+        <p><strong>If I'm at another university, and I'd like to find out about using the open source platform, who should I get in touch with?</strong><br />
+        <a href="mailto:c2g-facsupport@cs.stanford.edu">Click here to get in touch</a></p>
+      </article>
+      <hr class="fade-right-hr-divider">
+    </section>
+    
+    <section class="message left" id="contact">
+      <div class="photo">
+        <img src="${static.url('themes/stanford/images/dish.jpg')}">
+          <!-- Image Copyright owned by Stanford University -->
+      </div>
+      <article>
+        <h2>Contact Information</h2>
+        <p><strong>For general information email us at:</strong><br />
+        <a href="mailto:contact@class.stanford.edu">contact@class.stanford.edu</a></p>
+        
+        <p><strong>For copyright concerns email us at:</strong><br />
+        <a href="mailto:copyright@class.stanford.edu">copyright@class.stanford.edu</a></p>
+        
+        <p><strong>For bug reports email us at:</strong><br />
+        <a href="mailto:bugs@class.stanford.edu">bugs@class.stanford.edu</a></p>
+        
+        <p><strong>When submitting a bug report, please include the following in the email body:</strong><br />
+        <script>document.write(navigator.userAgent);</script></p>
+        
+        <p><strong>For suggestions email us at:</strong><br />
+        <a href="mailto:suggestions@class.stanford.edu">suggestions@class.stanford.edu</a></p>
+        
+        <p><strong>For technical support reports email us at:</strong><br />
+        <a href="mailto:techsupport@class.stanford.edu">techsupport@class.stanford.edu</a></p>
+        
+        <p><strong>For disability-related questions email us at:</strong><br />
+        <a href="mailto:accessibility@class.stanford.edu">accessibility@class.stanford.edu</a></p>
+        
+        <p><strong>For questions about privacy-related issues email us at:</strong><br />
+        <a href="mailto:privacy@class.stanford.edu">privacy@class.stanford.edu</a></p>
+      </article>
+      <hr class="fade-right-hr-divider">
+    </section>
+  </section>
+
+</section>

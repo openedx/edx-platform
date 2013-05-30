@@ -54,6 +54,8 @@ site_status_msg = get_site_status_msg(course_id)
     % if user.is_authenticated():
 
     <ol class="left nav-global authenticated">
+      <%block name="custom_nav_login"/>
+      
       <li class="nav-global-01">
       <a href="${marketing_link('COURSES')}">Find Courses</a>
       </li>
@@ -79,6 +81,8 @@ site_status_msg = get_site_status_msg(course_id)
 
     % else:
     <ol class="left nav-global">
+      <%block name="custom_nav_logout"/>
+      
       % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
       <li class="nav-global-01">
         <a href="${marketing_link('HOW_IT_WORKS')}">How it Works</a>
