@@ -30,8 +30,9 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            maya|lisa|natty|oneiric|precise|quantal)
-                output "Installing Ubuntu requirements"
+            #Tries to install the same 
+            squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+                output "Installing Debian family requirements"
 
                 # DEBIAN_FRONTEND=noninteractive is required for silent mysql-server installation
                 export DEBIAN_FRONTEND=noninteractive

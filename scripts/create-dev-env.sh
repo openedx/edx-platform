@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+#Exit if any commands return a non-zero status
 set -e
 
 # posix compliant sanity check
@@ -27,10 +29,17 @@ EOL
 
 }
 
+#Setting error color to red before reset
 error() {
       printf '\E[31m'; echo "$@"; printf '\E[0m'
 }
 
+#Setting warning color to magenta before reset
+warning() {
+      printf '\E[35m'; echo "$@"; printf '\E[0m'
+}
+
+#Setting output color to cyan before reset
 output() {
       printf '\E[36m'; echo "$@"; printf '\E[0m'
 }
@@ -51,7 +60,7 @@ EO
 
 info() {
     cat<<EO
-    MITx base dir : $BASE
+    edX base dir : $BASE
     Python virtualenv dir : $PYTHON_DIR
     Ruby RVM dir : $RUBY_DIR
     Ruby ver : $RUBY_VER
@@ -59,22 +68,37 @@ info() {
 EO
 }
 
+change_git_push_defaults() {
+
+    #Set git push defaults to upstream rather than master
+    output "Changing git defaults"
+    git config --global push.default upstream
+    
+}
+
 clone_repos() {
+
+    change_git_push_defaults
+
     cd "$BASE"
 
-    if [[ -d "$BASE/mitx/.git" ]]; then
-        output "Pulling mitx"
-        cd "$BASE/mitx"
+    if [[ -d "$BASE/edx_platform/.git" ]]; then
+        output "Pulling edx platform"
+        cd "$BASE/edx_platform"
         git pull
     else
-        output "Cloning mitx"
-        if [[ -d "$BASE/mitx" ]]; then
-            mv "$BASE/mitx" "${BASE}/mitx.bak.$$"
+        output "Cloning edx platform"
+        if [[ -d "$BASE/edx_platform" ]]; then
+            output "Creating backup for existing edx platform"
+            mv "$BASE/edx_platform" "${BASE}/edx_platform.bak.$$"
         fi
-        git clone git@github.com:MITx/mitx.git
+        git clone https://github.com/edx/edx-platform.git
     fi
 
     # By default, dev environments start with a copy of 6.002x
+    # Not certain if these are making it in to the open source release.
+    # If there's a github permissions error, remove this section of code.
+    # You should get a working environment sans a demo course.
     cd "$BASE"
     mkdir -p "$BASE/data"
     REPO="content-mit-6002x"
@@ -85,10 +109,11 @@ clone_repos() {
     else
         output "Cloning $REPO"
         if [[ -d "$BASE/data/$REPO" ]]; then
+            output "Creating backup for existing demo course"
             mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
         fi
         cd "$BASE/data"
-        git clone git@github.com:MITx/$REPO
+        git clone https://github.com/MITx/content-mit-6002x.git
     fi
 }
 
@@ -98,7 +123,7 @@ clone_repos() {
 PROG=${0##*/}
 
 # Adjust this to wherever you'd like to place the codebase
-BASE="${PROJECT_HOME:-$HOME}/mitx_all"
+BASE="${PROJECT_HOME:-$HOME}/edx_all"
 
 # Use a sensible default (~/.virtualenvs) for your Python virtualenvs
 # unless you've already got one set up with virtualenvwrapper.
@@ -161,7 +186,7 @@ done
 
 cat<<EO
 
-  This script will setup a local MITx environment, this
+  This script will setup a local edX environment, this
   includes
 
        * Django
@@ -202,9 +227,19 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            maya|lisa|natty|oneiric|precise|quantal)
+            wheezy|jessie|maya|olivia|nadia|natty|precise|quantal|raring)
                 sudo apt-get install git
                 ;;
+        case $distro in
+            squeeze|lisa|katya|oneiric|natty)
+                warning "It seems like you're using $distro which has been deprecated.
+                          While we don't technically support this release, the install
+                          script will probably still work.
+
+                          Press return to continue or control-C to abort"
+                read dummy
+                sudo apt-get install git
+                ;; 
             *)
                 error "Unsupported distribution - $distro"
                 exit 1
@@ -241,7 +276,7 @@ EO
 
         ;;
     *)
-        error "Unsupported platform"
+        error "Unsupported platform. Try switching to either Mac or a Debian-based linux distribution (Ubuntu or Mint)"
         exit 1
         ;;
 esac
@@ -251,10 +286,10 @@ esac
 
 clone_repos
 
-
 # Install system-level dependencies
-
-bash $BASE/mitx/install-system-req.sh
+if [[ -d $BASE/edx_platform/scripts/install-system-req.sh]]; then
+    
+bash $BASE/edx_platform/scripts/install-system-req.sh
 
 output "Installing RVM, Ruby, and required gems"
 
