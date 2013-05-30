@@ -1,0 +1,23 @@
+from bento.commands import hooks
+
+@hooks.pre_build
+def pre_build(context):
+    default_builder = context.default_builder
+
+    def builder(extension):
+        return default_builder(extension,
+                               features="c pyext bento cshlib",
+                               use="minpack rootfind FLAPACK CLIB")
+    def builder_f2py(extension):
+        return default_builder(extension,
+                               features="c pyext bento cshlib f2py",
+                               use="minpack rootfind FLAPACK CLIB")
+    context.register_builder("_lbfgsb", builder_f2py)
+    context.register_builder("_cobyla", builder_f2py)
+    context.register_builder("minpack2", builder_f2py)
+    context.register_builder("_nnls", builder_f2py)
+    context.register_builder("_slsqp", builder_f2py)
+
+    context.register_builder("_zeros", builder)
+    context.register_builder("_minpack", builder)
+    context.register_builder("moduleTNC", builder)

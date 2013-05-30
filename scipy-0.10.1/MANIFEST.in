@@ -1,0 +1,26 @@
+# Use .add_data_files and .add_data_dir methods in a appropriate
+# setup.py files to include non-python files such as documentation,
+# data, etc files to distribution. Avoid using MANIFEST.in for that.
+#
+include MANIFEST.in
+include *.txt
+include setupscons.py
+include setupegg.py
+include setup.py
+include scipy/*.py
+# Adding scons build related files not found by distutils
+recursive-include scipy SConstruct SConscript
+# Add files to allow Bento build
+include f2py.py
+include interface_gen.py
+include bscript bento.info
+recursive-include scipy bscript bento.info
+# Add py3tool
+include tools/py3tool.py
+# Add documentation: we don't use add_data_dir since we do not want to include
+# this at installation, only for sdist-generated tarballs
+include doc/Makefile doc/postprocess.py
+recursive-include doc/release *
+recursive-include doc/source *
+recursive-include doc/sphinxext *
+prune scipy/special/tests/data/boost

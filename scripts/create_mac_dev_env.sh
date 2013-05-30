@@ -25,6 +25,10 @@ echo "Cloning edx-platform repo"
 cd $BASE
 git clone https://github.com/edx/edx-platform.git
 
+#Set git push defaults to upstream rather than master
+echo "Changing git defaults"
+git config --global push.default upstream
+
 # Install system prereqs
 echo "Installing Mac OS X prereqs"
 BREW_FILE=$PLATFORM_REPO/requirements/system/mac_os_x/brew-formulas.txt
@@ -75,17 +79,22 @@ python setup.py install
 cd "$BASE"
 rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
 
+# Activate the new Virtualenv for pip fixes
+VIRTUALENV=$HOME/.virtualenvs/edx-platform/bin
+cd $VIRTUALENV
+source activate
+
 # building correct version of distribute from source
+DISTRIBUTE_VER="0.6.28"
 echo "Building Distribute"
 SITE_PACKAGES=$HOME/.virtualenvs/edx-platform/lib/python2.7/site-packages
 cd $SITE_PACKAGES
-curl -O http://pypi.python.org/packages/source/d/distribute/distribute-0.6.28.tar.gz
-tar -xzvf distribute-0.6.28.tar.gz
-cd distribute-0.6.28
+curl -O http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
+tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
+cd distribute-${DISTRIBUTE_VER}
 python setup.py install
 cd ..
-rm distribute-0.6.28.tar.gz
-rm -rf distribute-0.6.28-py*
+rm distribute-${DISTRIBUTE_VER}.tar.gz
 
 # on mac os x get the latest pip
 pip install -U pip
@@ -97,17 +106,11 @@ pip install cython
 # fixes problem with scipy on 10.8
 pip install -e git+https://github.com/scipy/scipy#egg=scipy-dev
 
-
 # Install prereqs
 echo "Installing prereqs"
 cd $PLATFORM_REPO
 rvm use 1.9.3-p374
 rake install_prereqs
-
-# Activate the new Virtualenv for pip fixes
-VIRTUALENV=$HOME/.virtualenvs/edx-platform/bin
-cd $VIRTUALENV
-source activate
 
 # Final dependecy
 echo "Finishing Touches"

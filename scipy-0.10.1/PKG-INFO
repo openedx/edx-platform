@@ -1,0 +1,41 @@
+Metadata-Version: 1.0
+Name: scipy
+Version: 0.10.1
+Summary: SciPy: Scientific Library for Python
+Home-page: http://www.scipy.org
+Author: SciPy Developers
+Author-email: scipy-dev@scipy.org
+License: BSD
+Download-URL: http://sourceforge.net/project/showfiles.php?group_id=27747&package_id=19531
+Description: SciPy (pronounced "Sigh Pie") is open-source software for mathematics,
+        science, and engineering. The SciPy library
+        depends on NumPy, which provides convenient and fast N-dimensional
+        array manipulation. The SciPy library is built to work with NumPy
+        arrays, and provides many user-friendly and efficient numerical
+        routines such as routines for numerical integration and optimization.
+        Together, they run on all popular operating systems, are quick to
+        install, and are free of charge.  NumPy and SciPy are easy to use,
+        but powerful enough to be depended upon by some of the world's
+        leading scientists and engineers. If you need to manipulate
+        numbers on a computer and display or publish the results,
+        give SciPy a try!
+        
+        
+Platform: Windows
+Platform: Linux
+Platform: Solaris
+Platform: Mac OS-X
+Platform: Unix
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved
+Classifier: Programming Language :: C
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Software Development
+Classifier: Topic :: Scientific/Engineering
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
