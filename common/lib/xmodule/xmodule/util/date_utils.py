@@ -12,7 +12,7 @@ def get_default_time_display(dt, show_timezone=True):
     if dt is not None and show_timezone:
         if dt.tzinfo is not None:
             try:
-                timezone = dt.tzinfo.tzname(dt)
+                timezone = " " + dt.tzinfo.tzname(dt)
             except NotImplementedError:
                 timezone = " UTC"
         else:

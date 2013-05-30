@@ -11,7 +11,6 @@ from ..utils import get_modulestore, get_url_reverse
 from .requests import get_request_method
 from .access import get_location_and_verify_access
 import uuid
-import copy
 
 __all__ = ['get_checklists', 'update_checklist']
 
@@ -33,7 +32,7 @@ def get_checklists(request, org, course, name):
     copied = False
     if not course_module.checklists:
         # find out the default checklist by creating a fake new not persisted course
-        fake_course_loc = course_module.location._replace(course=str(uuid.uuid4())[:7])
+        fake_course_loc = course_module.location.replace(course=str(uuid.uuid4())[:7])
         template_module = modulestore.create_xmodule(fake_course_loc)
         course_module.checklists = template_module.checklists
         copied = True
@@ -68,9 +67,9 @@ def update_checklist(request, org, course, name, checklist_index=None):
     if real_method == 'POST' or real_method == 'PUT':
         if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
             index = int(checklist_index)
+            course_module.checklists[index] = json.loads(request.body)
             # seeming noop which triggers kvs to record that the metadata is not default
             course_module.checklists = course_module.checklists
-            course_module.checklists[index] = json.loads(request.body)
             checklists, _ = expand_checklist_action_urls(course_module)
             modulestore.update_metadata(location, own_metadata(course_module))
             return HttpResponse(json.dumps(checklists[index]), mimetype="application/json")

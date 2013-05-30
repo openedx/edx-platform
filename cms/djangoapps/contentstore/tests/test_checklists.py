@@ -104,7 +104,8 @@ class ChecklistTestCase(CourseTestCase):
 
         returned_checklist = json.loads(self.client.post(update_url, json.dumps(payload), "application/json").content)
         self.assertTrue(returned_checklist['items'][0].get('is_checked'))
-        self.compare_checklists(self.get_persisted_checklists()[2], returned_checklist)
+        pers = self.get_persisted_checklists()
+        self.compare_checklists(pers[2], returned_checklist)
 
     def test_update_checklists_delete_unsupported(self):
         """ Delete operation is not supported. """

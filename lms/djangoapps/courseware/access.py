@@ -2,7 +2,6 @@
 Ideally, it will be the only place that needs to know about any special settings
 like DISABLE_START_DATES"""
 import logging
-import time
 from datetime import datetime, timedelta
 from functools import partial
 
