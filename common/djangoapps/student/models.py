@@ -625,7 +625,6 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self.user.save()
-        # self.delete()
 
 
 class PendingNameChange(models.Model):

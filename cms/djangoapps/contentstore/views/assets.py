@@ -227,11 +227,9 @@ def generate_export_course(request, org, course, name):
     root_dir = path(mkdtemp())
 
     # export out to a tempdir
-
     logging.debug('root = {0}'.format(root_dir))
 
     export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
-    # filename = root_dir / name + '.tar.gz'
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
     tar_file = tarfile.open(name=export_file.name, mode='w:gz')
