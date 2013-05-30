@@ -16,8 +16,10 @@ log = logging.getLogger(__name__)
 
 class FolditFields(object):
     # default to what Spring_7012x uses
-    required_level = Integer(default=4, scope=Scope.settings)
-    required_sublevel = Integer(default=5, scope=Scope.settings)
+    required_level_half = Integer(default=2, scope=Scope.settings)
+    required_sublevel_half = Integer(default=5, scope=Scope.settings)
+    required_level= Integer(default=4, scope=Scope.settings)
+    required_sublevel= Integer(default=5, scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
 
     show_basic_score = String(scope=Scope.settings, default='false')
@@ -36,6 +38,8 @@ class FolditModule(FolditFields, XModule):
          <foldit show_basic_score="true"
             required_level="4"
             required_sublevel="3"
+            required_level_half="2"
+            required_sublevel_half="3"
             show_leaderboard="false"/>
         """
 
@@ -54,6 +58,22 @@ class FolditModule(FolditFields, XModule):
             self.system.anonymous_student_id,
             self.required_level,
             self.required_sublevel,
+            self.due_time)
+        return complete
+
+    def is_half_complete(self):
+        """
+        Did the user reach the required level for half credit?
+
+        Ideally this would be more flexible than just 0, 0.5, or 1 credit. On
+        the other hand, the xml attributes for specifying more specific
+        cut-offs and partial grades can get more confusing.
+        """
+        from foldit.models import PuzzleComplete
+        complete = PuzzleComplete.is_level_complete(
+            self.system.anonymous_student_id,
+            self.required_level_half,
+            self.required_sublevel_half,
             self.due_time)
         return complete
 
@@ -139,14 +159,21 @@ class FolditModule(FolditFields, XModule):
 
     def get_score(self):
         """
-        0 / 1 based on whether student has gotten far enough.
+        0 if fewer than level 3-5 reached
+        1/2 if >= 3-5 and < 4-5
+        2/2 if 4-5
         """
-        score = 1 if self.is_complete() else 0
+        if self.is_complete():
+            score = 2
+        elif self.is_half_complete():
+            score = 1
+        else:
+            score = 0
         return {'score': score,
                 'total': self.max_score()}
 
     def max_score(self):
-        return 1
+        return 2
 
 
 class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):
