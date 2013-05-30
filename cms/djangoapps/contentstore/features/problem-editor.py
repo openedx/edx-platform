@@ -14,17 +14,14 @@ SHOW_ANSWER = "Show Answer"
 ############### ACTIONS ####################
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
-<<<<<<< HEAD
     world.create_component_instance(step, '.large-problem-icon', 'i4x://edx/templates/problem/Blank_Common_Problem',
                                     '.xmodule_CapaModule')
-=======
     world.create_component_instance(
         step,
         '.large-problem-icon',
         'i4x://edx/templates/problem/Blank_Common_Problem',
         '.xmodule_CapaModule'
     )
->>>>>>> a0efd3a5d7045dd9369869fd15fc2cc4ecdb6cc1
 
 
 @step('I edit and select Settings$')
@@ -56,8 +53,6 @@ def my_display_name_change_is_persisted_on_save(step):
     verify_modified_display_name()
 
 
-<<<<<<< HEAD
-=======
 @step('I can specify special characters in the display name')
 def i_can_modify_the_display_name_with_special_chars(step):
     world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill("updated ' \" &")
@@ -70,7 +65,6 @@ def special_chars_persisted_on_save(step):
     verify_modified_display_name_with_special_chars()
 
 
->>>>>>> a0efd3a5d7045dd9369869fd15fc2cc4ecdb6cc1
 @step('I can revert the display name to unset')
 def can_revert_display_name_to_unset(step):
     world.revert_setting_entry(DISPLAY_NAME)
@@ -198,12 +192,9 @@ def verify_modified_display_name():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'modified', True)
 
 
-<<<<<<< HEAD
-=======
 def verify_modified_display_name_with_special_chars():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, "updated ' \" &", True)
 
 
->>>>>>> a0efd3a5d7045dd9369869fd15fc2cc4ecdb6cc1
 def verify_unset_display_name():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
