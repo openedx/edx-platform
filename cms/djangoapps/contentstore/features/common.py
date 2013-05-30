@@ -5,8 +5,6 @@ from lettuce import world, step
 from nose.tools import assert_true
 from nose.tools import assert_equal
 
-from xmodule.modulestore.django import _MODULESTORES, modulestore
-from xmodule.templates import update_templates
 from auth.authz import get_user_by_email
 
 from selenium.webdriver.common.keys import Keys
@@ -154,3 +152,12 @@ def set_date_and_time(date_css, desired_date, time_css, desired_time):
     e = world.css_find(time_css).first
     e._element.send_keys(Keys.TAB)
     time.sleep(float(1))
+
+
+@step('I have created a Video component$')
+def i_created_a_video_component(step):
+    world.create_component_instance(
+        step, '.large-video-icon',
+        'i4x://edx/templates/video/default',
+        '.xmodule_VideoModule'
+    )
