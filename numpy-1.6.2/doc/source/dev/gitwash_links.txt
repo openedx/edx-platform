@@ -1,3 +1,0 @@
-.. _NumPy: http://numpy.scipy.org
-.. _`NumPy github`: http://github.com/numpy/numpy
-.. _`NumPy mailing list`: http://scipy.org/Mailing_Lists

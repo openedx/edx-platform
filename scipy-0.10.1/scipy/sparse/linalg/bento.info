@@ -1,7 +1,0 @@
-Recurse: isolve, dsolve, eigen
-
-Library:
-    Packages:
-        dsolve,
-        eigen,
-        isolve
