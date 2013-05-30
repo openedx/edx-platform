@@ -111,7 +111,12 @@ def _update_task(course_task_log, task_result):
 
     Autocommit annotation makes sure the database entry is committed.
     """
+    # we at least update the entry with the task_id, and for EAGER mode,
+    # we update other status as well.  (For non-EAGER modes, the entry
+    # should not have changed except for setting PENDING state and the
+    # addition of the task_id.)
     _update_course_task_log(course_task_log, task_result)
+    course_task_log.save()
 
 
 def _get_xmodule_instance_args(request):
@@ -169,27 +174,31 @@ def _update_course_task_log(course_task_log_entry, task_result):
         output['task_progress'] = returned_result
 
     elif result_state == 'SUCCESS':
-        output['task_progress'] = returned_result
+        # save progress into the entry, even if it's not being saved here -- for EAGER,
+        # it needs to go back with the entry passed in.
         course_task_log_entry.task_progress = json.dumps(returned_result)
+        output['task_progress'] = returned_result
         log.info("task succeeded: %s", returned_result)
-        entry_needs_saving = True
 
     elif result_state == 'FAILURE':
         # on failure, the result's result contains the exception that caused the failure
         exception = returned_result
         traceback = result_traceback if result_traceback is not None else ''
-        entry_needs_saving = True
         task_progress = {'exception': type(exception).__name__, 'message': str(exception.message)}
         output['message'] = exception.message
         log.warning("background task (%s) failed: %s %s", task_id, returned_result, traceback)
         if result_traceback is not None:
             output['task_traceback'] = result_traceback
             task_progress['traceback'] = result_traceback
+        # save progress into the entry, even if it's not being saved -- for EAGER,
+        # it needs to go back with the entry passed in.
         course_task_log_entry.task_progress = json.dumps(task_progress)
         output['task_progress'] = task_progress
 
     elif result_state == 'REVOKED':
         # on revocation, the result's result doesn't contain anything
+        # but we cannot rely on the worker thread to set this status,
+        # so we set it here.
         entry_needs_saving = True
         message = 'Task revoked before running'
         output['message'] = message
@@ -202,7 +211,6 @@ def _update_course_task_log(course_task_log_entry, task_result):
     if result_state != course_task_log_entry.task_state:
         course_task_log_entry.task_state = result_state
         course_task_log_entry.task_id = task_id
-        entry_needs_saving = True
 
     if entry_needs_saving:
         course_task_log_entry.save()
@@ -358,7 +366,7 @@ def submit_regrade_problem_for_student(request, course_id, problem_url, student)
     course_task_log = _reserve_task(course_id, task_name, problem_url, request.user, student)
 
     # Submit task:
-    task_args = [course_id, problem_url, student.username, _get_xmodule_instance_args(request)]
+    task_args = [course_task_log.id, course_id, problem_url, student.username, _get_xmodule_instance_args(request)]
     task_result = regrade_problem_for_student.apply_async(task_args)
 
     # Update info in table with the resulting task_id (and state).
@@ -387,7 +395,7 @@ def submit_regrade_problem_for_all_students(request, course_id, problem_url):
     course_task_log = _reserve_task(course_id, task_name, problem_url, request.user)
 
     # Submit task:
-    task_args = [course_id, problem_url, _get_xmodule_instance_args(request)]
+    task_args = [course_task_log.id, course_id, problem_url, _get_xmodule_instance_args(request)]
     task_result = regrade_problem_for_all_students.apply_async(task_args)
 
     # Update info in table with the resulting task_id (and state).
@@ -419,7 +427,7 @@ def submit_reset_problem_attempts_for_all_students(request, course_id, problem_u
     course_task_log = _reserve_task(course_id, task_name, problem_url, request.user)
 
     # Submit task:
-    task_args = [course_id, problem_url, _get_xmodule_instance_args(request)]
+    task_args = [course_task_log.id, course_id, problem_url, _get_xmodule_instance_args(request)]
     task_result = reset_problem_attempts_for_all_students.apply_async(task_args)
 
     # Update info in table with the resulting task_id (and state).
@@ -451,7 +459,7 @@ def submit_delete_problem_state_for_all_students(request, course_id, problem_url
     course_task_log = _reserve_task(course_id, task_name, problem_url, request.user)
 
     # Submit task:
-    task_args = [course_id, problem_url, _get_xmodule_instance_args(request)]
+    task_args = [course_task_log.id, course_id, problem_url, _get_xmodule_instance_args(request)]
     task_result = delete_problem_state_for_all_students.apply_async(task_args)
 
     # Update info in table with the resulting task_id (and state).
