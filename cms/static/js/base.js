@@ -825,6 +825,3 @@ function saveSetSectionScheduleDate(e) {
         hideModal();
     });
 }
-
-
-

@@ -49,8 +49,10 @@ def verify_all_setting_entries(expected_entries):
     settings = world.browser.find_by_css('.wrapper-comp-setting')
     assert_equal(len(expected_entries), len(settings))
     for (counter, setting) in enumerate(settings):
-        world.verify_setting_entry(setting, expected_entries[counter][0],
-                                   expected_entries[counter][1], expected_entries[counter][2])
+        world.verify_setting_entry(
+            setting, expected_entries[counter][0],
+            expected_entries[counter][1], expected_entries[counter][2]
+        )
 
 
 @world.absorb

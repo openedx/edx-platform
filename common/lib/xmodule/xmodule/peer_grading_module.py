@@ -28,25 +28,37 @@ EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please 
 
 
 class PeerGradingFields(object):
-    use_for_single_location = StringyBoolean(display_name="Show Single Problem",
+    use_for_single_location = StringyBoolean(
+        display_name="Show Single Problem",
         help='When True, only the single problem specified by "Link to Problem Location" is shown. '
              'When False, a panel is displayed with all problems available for peer grading.',
-        default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
-    link_to_location = String(display_name="Link to Problem Location",
+        default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings
+    )
+    link_to_location = String(
+        display_name="Link to Problem Location",
         help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
-        default=LINK_TO_LOCATION, scope=Scope.settings)
-    is_graded = StringyBoolean(display_name="Graded",
-        help='Whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
-        default=IS_GRADED, scope=Scope.settings)
+        default=LINK_TO_LOCATION, scope=Scope.settings
+    )
+    is_graded = StringyBoolean(
+        display_name="Graded",
+        help='Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
+        default=IS_GRADED, scope=Scope.settings
+    )
     due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
-    max_grade = StringyInteger(help="The maximum grade that a student can receive for this problem.", default=MAX_SCORE,
-                        scope=Scope.settings, values={"min" : 0 })
-    student_data_for_location = Object(help="Student data for a given peer grading problem.",
-                                       scope=Scope.user_state)
-    weight = StringyFloat(display_name="Problem Weight",
-        help="Specifies the number of points the problem is worth. By default, each problem is worth one point.",
-        scope=Scope.settings, values = {"min" : 0 , "step": ".1"})
+    max_grade = StringyInteger(
+        help="The maximum grade that a student can receive for this problem.", default=MAX_SCORE,
+        scope=Scope.settings, values={"min": 0}
+    )
+    student_data_for_location = Object(
+        help="Student data for a given peer grading problem.",
+        scope=Scope.user_state
+    )
+    weight = StringyFloat(
+        display_name="Problem Weight",
+        help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
+        scope=Scope.settings, values={"min": 0, "step": ".1"}
+    )
 
 
 class PeerGradingModule(PeerGradingFields, XModule):

@@ -4,7 +4,7 @@ describe "CMS.Views.ModuleEdit", ->
     @stubModule.id = 'stub-id'
 
 
-    setFixtures """
+    appendSetFixtures """
     <li class="component" id="stub-id">
       <div class="component-editor">
         <div class="module-editor">

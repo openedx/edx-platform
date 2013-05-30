@@ -6,8 +6,10 @@ from lettuce import world, step
 
 @step('I have created a Blank HTML Page$')
 def i_created_blank_html_page(step):
-    world.create_component_instance(step, '.large-html-icon', 'i4x://edx/templates/html/Blank_HTML_Page',
-                                    '.xmodule_HtmlModule')
+    world.create_component_instance(
+        step, '.large-html-icon', 'i4x://edx/templates/html/Blank_HTML_Page',
+        '.xmodule_HtmlModule'
+    )
 
 
 @step('I see only the HTML display name setting$')

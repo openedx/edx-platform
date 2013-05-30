@@ -14,8 +14,17 @@ SHOW_ANSWER = "Show Answer"
 ############### ACTIONS ####################
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
+<<<<<<< HEAD
     world.create_component_instance(step, '.large-problem-icon', 'i4x://edx/templates/problem/Blank_Common_Problem',
                                     '.xmodule_CapaModule')
+=======
+    world.create_component_instance(
+        step,
+        '.large-problem-icon',
+        'i4x://edx/templates/problem/Blank_Common_Problem',
+        '.xmodule_CapaModule'
+    )
+>>>>>>> a0efd3a5d7045dd9369869fd15fc2cc4ecdb6cc1
 
 
 @step('I edit and select Settings$')
@@ -47,6 +56,21 @@ def my_display_name_change_is_persisted_on_save(step):
     verify_modified_display_name()
 
 
+<<<<<<< HEAD
+=======
+@step('I can specify special characters in the display name')
+def i_can_modify_the_display_name_with_special_chars(step):
+    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill("updated ' \" &")
+    verify_modified_display_name_with_special_chars()
+
+
+@step('my special characters and persisted on save')
+def special_chars_persisted_on_save(step):
+    world.save_component_and_reopen(step)
+    verify_modified_display_name_with_special_chars()
+
+
+>>>>>>> a0efd3a5d7045dd9369869fd15fc2cc4ecdb6cc1
 @step('I can revert the display name to unset')
 def can_revert_display_name_to_unset(step):
     world.revert_setting_entry(DISPLAY_NAME)
@@ -75,7 +99,8 @@ def my_change_to_randomization_is_persisted(step):
 def i_can_revert_to_default_for_randomization(step):
     world.revert_setting_entry(RANDOMIZATION)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION,  "Always", False)
+    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Always", False)
+
 
 
 @step('I can set the weight to 3.5')
@@ -94,33 +119,37 @@ def my_change_to_randomization_is_persisted(step):
 def i_can_revert_to_default_for_randomization(step):
     world.revert_setting_entry(PROBLEM_WEIGHT)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT,  "", False)
+    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
+
 
 
 @step('if I set the weight to abc, it remains unset')
 def set_the_weight_to_abc(step):
     world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill('abc')
     # We show the clear button immediately on type, hence the "True" here.
-    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT,  "", True)
+    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", True)
     world.save_component_and_reopen(step)
     # But no change was actually ever sent to the model, so on reopen, explicitly_set is False
-    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT,  "", False)
+    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
+
 
 
 @step('if I set the max attempts to 2.34, the max attempts are persisted as 234')
 def set_the_weight_to_abc(step):
     world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css('.setting-input')[0].fill('2.34')
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS,  "234", True)
+    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "234", True)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS,  "234", True)
+    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "234", True)
+
 
 
 @step('I set the max attempts to -3, the max attempts are persisted as 1')
 def set_max_attempts_to_neg_3(step):
     world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css('.setting-input')[0].fill('-3')
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS,  "-3", True)
+    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "-3", True)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS,  "1", True)
+    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "1", True)
+
 
 
 @step('Edit High Level Source is not visible')
@@ -156,16 +185,25 @@ def verify_high_level_source(step, visible):
 
 
 def verify_modified_weight():
-    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT,  "3.5", True)
+    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "3.5", True)
+
 
 
 def verify_modified_randomization():
-    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION,  "Per Student", True)
+    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Per Student", True)
+
 
 
 def verify_modified_display_name():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'modified', True)
 
 
+<<<<<<< HEAD
+=======
+def verify_modified_display_name_with_special_chars():
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, "updated ' \" &", True)
+
+
+>>>>>>> a0efd3a5d7045dd9369869fd15fc2cc4ecdb6cc1
 def verify_unset_display_name():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
