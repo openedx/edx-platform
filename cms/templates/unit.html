@@ -82,14 +82,14 @@
                                 % if has_markdown or type != "problem":
                                     % if is_empty:
                                       <li class="editor-md empty">
-                                        <a href="#" data-location="${location}">
+                                        <a href="#" data-location="${location}" id="${location}">
                                           <span class="name"> ${name}</span>
                                         </a>
                                       </li>
 
                                     % else:
                                       <li class="editor-md">
-                                        <a href="#" data-location="${location}">
+                                        <a href="#" data-location="${location}" id="${location}">
                                           <span class="name"> ${name}</span>
                                         </a>
                                       </li>
@@ -106,14 +106,14 @@
                                     % if not has_markdown:
                                         % if is_empty:
                                           <li class="editor-manual empty">
-                                            <a href="#" data-location="${location}">
+                                            <a href="#" data-location="${location}" id="${location}">
                                               <span class="name">${name}</span>
                                             </a>
                                           </li>
 
                                         % else:
                                           <li class="editor-manual">
-                                            <a href="#" data-location="${location}">
+                                            <a href="#" data-location="${location}" id="${location}">
                                               <span class="name"> ${name}</span>
                                             </a>
 

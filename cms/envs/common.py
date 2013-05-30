@@ -42,8 +42,8 @@ MITX_FEATURES = {
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
 
-    # We're in the CMS.
-    'IN_CMS': True
+    # Don't autoplay videos for course authors
+    'AUTOPLAY_VIDEOS': False
 }
 ENABLE_JASMINE = False
 
