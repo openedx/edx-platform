@@ -1,7 +1,7 @@
 tpl = readFixtures('system-feedback.underscore')
 
 beforeEach ->
-    appendSetFixtures(sandbox({id: "page-alert"}))
+    setFixtures(sandbox({id: "page-alert"}))
     appendSetFixtures(sandbox({id: "page-notification"}))
     appendSetFixtures(sandbox({id: "page-prompt"}))
     appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(tpl))

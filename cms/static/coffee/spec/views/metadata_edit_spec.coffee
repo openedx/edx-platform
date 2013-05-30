@@ -1,298 +1,299 @@
-editorTemplate = readFixtures('metadata-editor.underscore')
-numberEntryTemplate = readFixtures('metadata-number-entry.underscore')
-stringEntryTemplate = readFixtures('metadata-string-entry.underscore')
-optionEntryTemplate = readFixtures('metadata-option-entry.underscore')
+describe "Test Metadata Editor", ->
+    editorTemplate = readFixtures('metadata-editor.underscore')
+    numberEntryTemplate = readFixtures('metadata-number-entry.underscore')
+    stringEntryTemplate = readFixtures('metadata-string-entry.underscore')
+    optionEntryTemplate = readFixtures('metadata-option-entry.underscore')
 
-beforeEach ->
-    appendSetFixtures($("<script>", {id: "metadata-editor-tpl", type: "text/template"}).text(editorTemplate))
-    appendSetFixtures($("<script>", {id: "metadata-number-entry", type: "text/template"}).text(numberEntryTemplate))
-    appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate))
-    appendSetFixtures($("<script>", {id: "metadata-option-entry", type: "text/template"}).text(optionEntryTemplate))
-
-genericEntry = {
-    default_value: 'default value',
-    display_name: "Display Name",
-    explicitly_set: true,
-    field_name: "display_name",
-    help: "Specifies the name for this component.",
-    inheritable: false,
-    options: [],
-    type: CMS.Models.Metadata.GENERIC_TYPE,
-    value: "Word cloud"
-}
-
-selectEntry = {
-    default_value: "answered",
-    display_name: "Show Answer",
-    explicitly_set: false,
-    field_name: "show_answer",
-    help: "When should you show the answer",
-    inheritable: true,
-    options: [
-        {"display_name": "Always", "value": "always"},
-        {"display_name": "Answered", "value": "answered"},
-        {"display_name": "Never", "value": "never"}
-    ],
-    type: CMS.Models.Metadata.SELECT_TYPE,
-    value: "always"
-}
-
-integerEntry = {
-    default_value: 5,
-    display_name: "Inputs",
-    explicitly_set: false,
-    field_name: "num_inputs",
-    help: "Number of text boxes for student to input words/sentences.",
-    inheritable: false,
-    options: {min: 1},
-    type: CMS.Models.Metadata.INTEGER_TYPE,
-    value: 5
-}
-
-floatEntry = {
-    default_value: 2.7,
-    display_name: "Weight",
-    explicitly_set: true,
-    field_name: "weight",
-    help: "Weight for this problem",
-    inheritable: true,
-    options: {min: 1.3, max:100.2, step:0.1},
-    type: CMS.Models.Metadata.FLOAT_TYPE,
-    value: 10.2
-}
-
-# Test for the editor that creates the individual views.
-describe "CMS.Views.Metadata.Editor creates editors for each field", ->
     beforeEach ->
-        @model = new Backbone.Model({
-            num_inputs: integerEntry,
-            weight: floatEntry,
-            show_answer: selectEntry,
-            display_name: genericEntry,
-            unknown_type: {
-                default_value: null,
-                display_name: "Unknown",
-                explicitly_set: true,
-                field_name: "unknown_type",
-                help: "Mystery property.",
-                inheritable: false,
-                options: [
-                    {"display_name": "Always", "value": "always"},
-                    {"display_name": "Answered", "value": "answered"},
-                    {"display_name": "Never", "value": "never"}],
-                type: "unknown type",
-                value: null
-            }
-        })
+        setFixtures($("<script>", {id: "metadata-editor-tpl", type: "text/template"}).text(editorTemplate))
+        appendSetFixtures($("<script>", {id: "metadata-number-entry", type: "text/template"}).text(numberEntryTemplate))
+        appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate))
+        appendSetFixtures($("<script>", {id: "metadata-option-entry", type: "text/template"}).text(optionEntryTemplate))
 
-    it "creates child views on initialize, and sorts them alphabetically", ->
-        view = new CMS.Views.Metadata.Editor({model: @model})
-        childModels = view.models
-        expect(childModels.length).toBe(5)
-        childViews = view.$el.find('.setting-input')
-        expect(childViews.length).toBe(5)
+    genericEntry = {
+        default_value: 'default value',
+        display_name: "Display Name",
+        explicitly_set: true,
+        field_name: "display_name",
+        help: "Specifies the name for this component.",
+        inheritable: false,
+        options: [],
+        type: CMS.Models.Metadata.GENERIC_TYPE,
+        value: "Word cloud"
+    }
 
-        verifyEntry = (index, display_name, type) ->
-            expect(childModels[index].get('display_name')).toBe(display_name)
-            expect(childViews[index].type).toBe(type)
+    selectEntry = {
+        default_value: "answered",
+        display_name: "Show Answer",
+        explicitly_set: false,
+        field_name: "show_answer",
+        help: "When should you show the answer",
+        inheritable: true,
+        options: [
+            {"display_name": "Always", "value": "always"},
+            {"display_name": "Answered", "value": "answered"},
+            {"display_name": "Never", "value": "never"}
+        ],
+        type: CMS.Models.Metadata.SELECT_TYPE,
+        value: "always"
+    }
 
-        verifyEntry(0, 'Display Name', 'text')
-        verifyEntry(1, 'Inputs', 'number')
-        verifyEntry(2, 'Show Answer', 'select-one')
-        verifyEntry(3, 'Unknown', 'text')
-        verifyEntry(4, 'Weight', 'number')
+    integerEntry = {
+        default_value: 5,
+        display_name: "Inputs",
+        explicitly_set: false,
+        field_name: "num_inputs",
+        help: "Number of text boxes for student to input words/sentences.",
+        inheritable: false,
+        options: {min: 1},
+        type: CMS.Models.Metadata.INTEGER_TYPE,
+        value: 5
+    }
 
-    it "returns its display name", ->
-        view = new CMS.Views.Metadata.Editor({model: @model})
-        expect(view.getDisplayName()).toBe("Word cloud")
+    floatEntry = {
+        default_value: 2.7,
+        display_name: "Weight",
+        explicitly_set: true,
+        field_name: "weight",
+        help: "Weight for this problem",
+        inheritable: true,
+        options: {min: 1.3, max:100.2, step:0.1},
+        type: CMS.Models.Metadata.FLOAT_TYPE,
+        value: 10.2
+    }
 
-    it "returns an empty string if there is no display name property with a valid value", ->
-        view = new CMS.Views.Metadata.Editor({model: new Backbone.Model()})
-        expect(view.getDisplayName()).toBe("")
-
-        view = new CMS.Views.Metadata.Editor({model: new Backbone.Model({
-            display_name:
-                {
-                default_value: null,
-                display_name: "Display Name",
-                explicitly_set: false,
-                field_name: "display_name",
-                help: "",
-                inheritable: false,
-                options: [],
-                type: CMS.Models.Metadata.GENERIC_TYPE,
-                value: null
+    # Test for the editor that creates the individual views.
+    describe "CMS.Views.Metadata.Editor creates editors for each field", ->
+        beforeEach ->
+            @model = new Backbone.Model({
+                num_inputs: integerEntry,
+                weight: floatEntry,
+                show_answer: selectEntry,
+                display_name: genericEntry,
+                unknown_type: {
+                    default_value: null,
+                    display_name: "Unknown",
+                    explicitly_set: true,
+                    field_name: "unknown_type",
+                    help: "Mystery property.",
+                    inheritable: false,
+                    options: [
+                        {"display_name": "Always", "value": "always"},
+                        {"display_name": "Answered", "value": "answered"},
+                        {"display_name": "Never", "value": "never"}],
+                    type: "unknown type",
+                    value: null
                 }
             })
-        })
-        expect(view.getDisplayName()).toBe("")
 
-    it "has no modified values by default", ->
-        view = new CMS.Views.Metadata.Editor({model: @model})
-        expect(view.getModifiedMetadataValues()).toEqual({})
+        it "creates child views on initialize, and sorts them alphabetically", ->
+            view = new CMS.Views.Metadata.Editor({model: @model})
+            childModels = view.models
+            expect(childModels.length).toBe(5)
+            childViews = view.$el.find('.setting-input')
+            expect(childViews.length).toBe(5)
 
-    it "returns modified values only", ->
-        view = new CMS.Views.Metadata.Editor({model: @model})
-        childModels = view.models
-        childModels[0].setValue('updated display name')
-        childModels[1].setValue(20)
-        expect(view.getModifiedMetadataValues()).toEqual({
-            display_name : 'updated display name',
-            num_inputs: 20
-        })
+            verifyEntry = (index, display_name, type) ->
+                expect(childModels[index].get('display_name')).toBe(display_name)
+                expect(childViews[index].type).toBe(type)
 
-# Tests for individual views.
-assertInputType = (view, expectedType) ->
-    input = view.$el.find('.setting-input')
-    expect(input.length).toBe(1)
-    expect(input[0].type).toBe(expectedType)
+            verifyEntry(0, 'Display Name', 'text')
+            verifyEntry(1, 'Inputs', 'number')
+            verifyEntry(2, 'Show Answer', 'select-one')
+            verifyEntry(3, 'Unknown', 'text')
+            verifyEntry(4, 'Weight', 'number')
 
-assertValueInView = (view, expectedValue) ->
-    expect(view.getValueFromEditor()).toBe(expectedValue)
+        it "returns its display name", ->
+            view = new CMS.Views.Metadata.Editor({model: @model})
+            expect(view.getDisplayName()).toBe("Word cloud")
 
-assertCanUpdateView = (view, newValue) ->
-    view.setValueInEditor(newValue)
-    expect(view.getValueFromEditor()).toBe(newValue)
+        it "returns an empty string if there is no display name property with a valid value", ->
+            view = new CMS.Views.Metadata.Editor({model: new Backbone.Model()})
+            expect(view.getDisplayName()).toBe("")
 
-assertClear = (view, modelValue, editorValue=modelValue) ->
-    view.clear()
-    expect(view.model.getValue()).toBe(null)
-    expect(view.model.getDisplayValue()).toBe(modelValue)
-    expect(view.getValueFromEditor()).toBe(editorValue)
+            view = new CMS.Views.Metadata.Editor({model: new Backbone.Model({
+                display_name:
+                    {
+                    default_value: null,
+                    display_name: "Display Name",
+                    explicitly_set: false,
+                    field_name: "display_name",
+                    help: "",
+                    inheritable: false,
+                    options: [],
+                    type: CMS.Models.Metadata.GENERIC_TYPE,
+                    value: null
+                    }
+                })
+            })
+            expect(view.getDisplayName()).toBe("")
 
-assertUpdateModel = (view, originalValue, newValue) ->
-    view.setValueInEditor(newValue)
-    expect(view.model.getValue()).toBe(originalValue)
-    view.updateModel()
-    expect(view.model.getValue()).toBe(newValue)
+        it "has no modified values by default", ->
+            view = new CMS.Views.Metadata.Editor({model: @model})
+            expect(view.getModifiedMetadataValues()).toEqual({})
 
-describe "CMS.Views.Metadata.String is a basic string input with clear functionality", ->
-    beforeEach ->
-        model = new CMS.Models.Metadata(genericEntry)
-        @view = new CMS.Views.Metadata.String({model: model})
+        it "returns modified values only", ->
+            view = new CMS.Views.Metadata.Editor({model: @model})
+            childModels = view.models
+            childModels[0].setValue('updated display name')
+            childModels[1].setValue(20)
+            expect(view.getModifiedMetadataValues()).toEqual({
+                display_name : 'updated display name',
+                num_inputs: 20
+            })
 
-    it "uses a text input type", ->
-        assertInputType(@view, 'text')
+    # Tests for individual views.
+    assertInputType = (view, expectedType) ->
+        input = view.$el.find('.setting-input')
+        expect(input.length).toBe(1)
+        expect(input[0].type).toBe(expectedType)
 
-    it "returns the intial value upon initialization", ->
-        assertValueInView(@view, 'Word cloud')
+    assertValueInView = (view, expectedValue) ->
+        expect(view.getValueFromEditor()).toBe(expectedValue)
 
-    it "can update its value in the view", ->
-        assertCanUpdateView(@view, "updated ' \" &")
+    assertCanUpdateView = (view, newValue) ->
+        view.setValueInEditor(newValue)
+        expect(view.getValueFromEditor()).toBe(newValue)
 
-    it "has a clear method to revert to the model default", ->
-        assertClear(@view, 'default value')
+    assertClear = (view, modelValue, editorValue=modelValue) ->
+        view.clear()
+        expect(view.model.getValue()).toBe(null)
+        expect(view.model.getDisplayValue()).toBe(modelValue)
+        expect(view.getValueFromEditor()).toBe(editorValue)
 
-    it "has an update model method", ->
-        assertUpdateModel(@view, 'Word cloud', 'updated')
+    assertUpdateModel = (view, originalValue, newValue) ->
+        view.setValueInEditor(newValue)
+        expect(view.model.getValue()).toBe(originalValue)
+        view.updateModel()
+        expect(view.model.getValue()).toBe(newValue)
 
-describe "CMS.Views.Metadata.Option is an option input type with clear functionality", ->
-    beforeEach ->
-        model = new CMS.Models.Metadata(selectEntry)
-        @view = new CMS.Views.Metadata.Option({model: model})
+    describe "CMS.Views.Metadata.String is a basic string input with clear functionality", ->
+        beforeEach ->
+            model = new CMS.Models.Metadata(genericEntry)
+            @view = new CMS.Views.Metadata.String({model: model})
 
-    it "uses a select input type", ->
-        assertInputType(@view, 'select-one')
+        it "uses a text input type", ->
+            assertInputType(@view, 'text')
 
-    it "returns the intial value upon initialization", ->
-        assertValueInView(@view, 'always')
+        it "returns the intial value upon initialization", ->
+            assertValueInView(@view, 'Word cloud')
 
-    it "can update its value in the view", ->
-        assertCanUpdateView(@view, "never")
+        it "can update its value in the view", ->
+            assertCanUpdateView(@view, "updated ' \" &")
 
-    it "has a clear method to revert to the model default", ->
-        assertClear(@view, 'answered')
+        it "has a clear method to revert to the model default", ->
+            assertClear(@view, 'default value')
 
-    it "has an update model method", ->
-        assertUpdateModel(@view, null, 'never')
+        it "has an update model method", ->
+            assertUpdateModel(@view, 'Word cloud', 'updated')
 
-    it "does not update to a value that is not an option", ->
-        @view.setValueInEditor("not an option")
-        expect(@view.getValueFromEditor()).toBe('always')
+    describe "CMS.Views.Metadata.Option is an option input type with clear functionality", ->
+        beforeEach ->
+            model = new CMS.Models.Metadata(selectEntry)
+            @view = new CMS.Views.Metadata.Option({model: model})
 
-describe "CMS.Views.Metadata.Number supports integer or float type and has clear functionality", ->
-    beforeEach ->
-        integerModel = new CMS.Models.Metadata(integerEntry)
-        @integerView = new CMS.Views.Metadata.Number({model: integerModel})
+        it "uses a select input type", ->
+            assertInputType(@view, 'select-one')
 
-        floatModel = new CMS.Models.Metadata(floatEntry)
-        @floatView = new CMS.Views.Metadata.Number({model: floatModel})
+        it "returns the intial value upon initialization", ->
+            assertValueInView(@view, 'always')
 
-    it "uses a number input type", ->
-        assertInputType(@integerView, 'number')
-        assertInputType(@floatView, 'number')
+        it "can update its value in the view", ->
+            assertCanUpdateView(@view, "never")
 
-    it "returns the intial value upon initialization", ->
-        assertValueInView(@integerView, '5')
-        assertValueInView(@floatView, '10.2')
+        it "has a clear method to revert to the model default", ->
+            assertClear(@view, 'answered')
 
-    it "can update its value in the view", ->
-        assertCanUpdateView(@integerView, "12")
-        assertCanUpdateView(@floatView, "-2.4")
+        it "has an update model method", ->
+            assertUpdateModel(@view, null, 'never')
 
-    it "has a clear method to revert to the model default", ->
-        assertClear(@integerView, 5, '5')
-        assertClear(@floatView, 2.7, '2.7')
+        it "does not update to a value that is not an option", ->
+            @view.setValueInEditor("not an option")
+            expect(@view.getValueFromEditor()).toBe('always')
 
-    it "has an update model method", ->
-        assertUpdateModel(@integerView, null, '90')
-        assertUpdateModel(@floatView, 10.2, '-9.5')
+    describe "CMS.Views.Metadata.Number supports integer or float type and has clear functionality", ->
+        beforeEach ->
+            integerModel = new CMS.Models.Metadata(integerEntry)
+            @integerView = new CMS.Views.Metadata.Number({model: integerModel})
 
-    it "knows the difference between integer and float", ->
-        expect(@integerView.isIntegerField()).toBeTruthy()
-        expect(@floatView.isIntegerField()).toBeFalsy()
+            floatModel = new CMS.Models.Metadata(floatEntry)
+            @floatView = new CMS.Views.Metadata.Number({model: floatModel})
 
-    it "sets attribtues related to min, max, and step", ->
-        verifyAttributes = (view, min, step, max=null) ->
-            inputEntry =  view.$el.find('input')
-            expect(Number(inputEntry.attr('min'))).toEqual(min)
-            expect(Number(inputEntry.attr('step'))).toEqual(step)
-            if max is not null
-                expect(Number(inputEntry.attr('max'))).toEqual(max)
+        it "uses a number input type", ->
+            assertInputType(@integerView, 'number')
+            assertInputType(@floatView, 'number')
 
-        verifyAttributes(@integerView, 1, 1)
-        verifyAttributes(@floatView, 1.3, .1, 100.2)
+        it "returns the intial value upon initialization", ->
+            assertValueInView(@integerView, '5')
+            assertValueInView(@floatView, '10.2')
 
-    it "corrects values that are out of range", ->
-        verifyValueAfterChanged = (view, value, expectedResult) ->
-            view.setValueInEditor(value)
-            view.changed()
-            expect(view.getValueFromEditor()).toBe(expectedResult)
+        it "can update its value in the view", ->
+            assertCanUpdateView(@integerView, "12")
+            assertCanUpdateView(@floatView, "-2.4")
 
-        verifyValueAfterChanged(@integerView, '-4', '1')
-        verifyValueAfterChanged(@integerView, '1', '1')
-        verifyValueAfterChanged(@integerView, '0', '1')
-        verifyValueAfterChanged(@integerView, '3001', '3001')
+        it "has a clear method to revert to the model default", ->
+            assertClear(@integerView, 5, '5')
+            assertClear(@floatView, 2.7, '2.7')
 
-        verifyValueAfterChanged(@floatView, '-4', '1.3')
-        verifyValueAfterChanged(@floatView, '1.3', '1.3')
-        verifyValueAfterChanged(@floatView, '1.2', '1.3')
-        verifyValueAfterChanged(@floatView, '100.2', '100.2')
-        verifyValueAfterChanged(@floatView, '100.3', '100.2')
+        it "has an update model method", ->
+            assertUpdateModel(@integerView, null, '90')
+            assertUpdateModel(@floatView, 10.2, '-9.5')
 
-    it "disallows invalid characters", ->
-        verifyValueAfterKeyPressed = (view, character, reject) ->
-            event = {
-                type : 'keypress',
-                which : character.charCodeAt(0),
-                keyCode:  character.charCodeAt(0),
-                preventDefault : () -> 'no op'
-            }
-            spyOn(event, 'preventDefault')
-            view.$el.find('input').trigger(event)
-            if (reject)
-                expect(event.preventDefault).toHaveBeenCalled()
-            else
-                expect(event.preventDefault).not.toHaveBeenCalled()
+        it "knows the difference between integer and float", ->
+            expect(@integerView.isIntegerField()).toBeTruthy()
+            expect(@floatView.isIntegerField()).toBeFalsy()
 
-        verifyDisallowedChars = (view) ->
-            verifyValueAfterKeyPressed(view, 'a', true)
-            verifyValueAfterKeyPressed(view, '.', view.isIntegerField())
-            verifyValueAfterKeyPressed(view, '[', true)
-            verifyValueAfterKeyPressed(view, '@', true)
+        it "sets attribtues related to min, max, and step", ->
+            verifyAttributes = (view, min, step, max=null) ->
+                inputEntry =  view.$el.find('input')
+                expect(Number(inputEntry.attr('min'))).toEqual(min)
+                expect(Number(inputEntry.attr('step'))).toEqual(step)
+                if max is not null
+                    expect(Number(inputEntry.attr('max'))).toEqual(max)
 
-            for i in [0...9]
-                verifyValueAfterKeyPressed(view, String(i), false)
+            verifyAttributes(@integerView, 1, 1)
+            verifyAttributes(@floatView, 1.3, .1, 100.2)
 
-        verifyDisallowedChars(@integerView)
-        verifyDisallowedChars(@floatView)
+        it "corrects values that are out of range", ->
+            verifyValueAfterChanged = (view, value, expectedResult) ->
+                view.setValueInEditor(value)
+                view.changed()
+                expect(view.getValueFromEditor()).toBe(expectedResult)
+
+            verifyValueAfterChanged(@integerView, '-4', '1')
+            verifyValueAfterChanged(@integerView, '1', '1')
+            verifyValueAfterChanged(@integerView, '0', '1')
+            verifyValueAfterChanged(@integerView, '3001', '3001')
+
+            verifyValueAfterChanged(@floatView, '-4', '1.3')
+            verifyValueAfterChanged(@floatView, '1.3', '1.3')
+            verifyValueAfterChanged(@floatView, '1.2', '1.3')
+            verifyValueAfterChanged(@floatView, '100.2', '100.2')
+            verifyValueAfterChanged(@floatView, '100.3', '100.2')
+
+        it "disallows invalid characters", ->
+            verifyValueAfterKeyPressed = (view, character, reject) ->
+                event = {
+                    type : 'keypress',
+                    which : character.charCodeAt(0),
+                    keyCode:  character.charCodeAt(0),
+                    preventDefault : () -> 'no op'
+                }
+                spyOn(event, 'preventDefault')
+                view.$el.find('input').trigger(event)
+                if (reject)
+                    expect(event.preventDefault).toHaveBeenCalled()
+                else
+                    expect(event.preventDefault).not.toHaveBeenCalled()
+
+            verifyDisallowedChars = (view) ->
+                verifyValueAfterKeyPressed(view, 'a', true)
+                verifyValueAfterKeyPressed(view, '.', view.isIntegerField())
+                verifyValueAfterKeyPressed(view, '[', true)
+                verifyValueAfterKeyPressed(view, '@', true)
+
+                for i in [0...9]
+                    verifyValueAfterKeyPressed(view, String(i), false)
+
+            verifyDisallowedChars(@integerView)
+            verifyDisallowedChars(@floatView)

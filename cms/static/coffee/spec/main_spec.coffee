@@ -27,7 +27,7 @@ describe "AJAX Errors", ->
   tpl = readFixtures('system-feedback.underscore')
 
   beforeEach ->
-    appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(tpl))
+    setFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(tpl))
     appendSetFixtures(sandbox({id: "page-notification"}))
     @requests = requests = []
     @xhr = sinon.useFakeXMLHttpRequest()

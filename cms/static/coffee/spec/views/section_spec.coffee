@@ -29,7 +29,7 @@ describe "CMS.Views.SectionEdit", ->
         feedback_tpl = readFixtures('system-feedback.underscore')
 
         beforeEach ->
-            appendSetFixtures($("<script>", {id: "section-name-edit-tpl", type: "text/template"}).text(tpl))
+            setFixtures($("<script>", {id: "section-name-edit-tpl", type: "text/template"}).text(tpl))
             appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedback_tpl))
             spyOn(CMS.Views.SectionEdit.prototype, "switchToShowView")
                 .andCallThrough()
