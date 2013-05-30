@@ -1,0 +1,27 @@
+import sys
+
+from bento.commands import hooks
+
+@hooks.pre_build
+def pre_build(context):
+    default_builder = context.default_builder
+
+    def builder(extension):
+        source = extension.sources[:]
+        if sys.platform == "darwin":
+            source.pop(source.index("fblaswrap.f.src"))
+            source.append("fblaswrap_veclib_c.c.src")
+        return default_builder(extension,
+                               features="c fc pyext bento cshlib f2py",
+                               source=source,
+                               use="FBLAS CLIB")
+    context.register_builder("fblas", builder)
+
+    def builder(extension):
+        kw = {}
+        if context.waf_context.env.HAS_CBLAS:
+            kw["use"] = "CBLAS"
+        return default_builder(extension,
+                               features="c fc pyext bento cshlib f2py",
+                               **kw)
+    context.register_builder("cblas", builder)

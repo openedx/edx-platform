@@ -1,0 +1,24 @@
+import sys
+
+from bento.commands import hooks
+
+@hooks.pre_build
+def pre_build(context):
+    default_builder = context.default_builder
+
+    def builder(extension):
+        if sys.platform == "darwin":
+            use_c_calling = True
+        else:
+            use_c_calling = False
+        sources = extension.sources[:]
+        if use_c_calling:
+            sources.append("iterative/FWRAPPERS/veclib_cabi_f.f")
+            sources.append("iterative/FWRAPPERS/veclib_cabi_c.c")
+        else:
+            sources.append("iterative/FWRAPPERS/dummy.f")
+        return default_builder(extension,
+                               features="c pyext fc bento cshlib f2py",
+                               source=sources,
+                               use="FLAPACK")
+    context.register_builder("_iterative", builder)
