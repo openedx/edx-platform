@@ -89,6 +89,7 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
         }
         this.template = _.template(tpl);
         this.$el.append(this.template({model: this.model, uniqueId: this.uniqueId}));
+        this.listenTo(this.model, 'change', this.render);
         this.render();
     },
 
@@ -108,21 +109,17 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
     setValueInEditor : function (value) {},
 
     /**
-     * Sets the value in the model, using the value currently displayed in the view. Afterward,
-     * this method re-renders to update the clear button.
+     * Sets the value in the model, using the value currently displayed in the view.
      */
     updateModel: function () {
         this.model.setValue(this.getValueFromEditor());
-        this.render();
     },
 
     /**
-     * Clears the value currently set in the model (reverting to the default). Afterward, this method
-     * re-renders the view.
+     * Clears the value currently set in the model (reverting to the default).
      */
     clear: function () {
         this.model.clear();
-        this.render();
     },
 
     /**
@@ -160,6 +157,8 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
             this.getClearButton().addClass('inactive');
             this.getClearButton().removeClass('active');
         }
+
+        return this;
     }
 });
 
@@ -229,6 +228,8 @@ CMS.Views.Metadata.Number = CMS.Views.Metadata.AbstractEditor.extend({
 
             this.initialized = true;
         }
+
+        return this;
     },
 
     templateName: "metadata-number-entry",

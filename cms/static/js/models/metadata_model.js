@@ -60,8 +60,10 @@ CMS.Models.Metadata = Backbone.Model.extend({
      * Sets the displayed value.
      */
     setValue: function (value) {
-        this.set('explicitly_set', true);
-        this.set('value', value);
+        this.set({
+            explicitly_set: true,
+            value: value
+        });
     },
 
     /**
@@ -93,8 +95,10 @@ CMS.Models.Metadata = Backbone.Model.extend({
      * explicitly_set property.
      */
     clear: function() {
-        this.set('explicitly_set', false);
-        this.set('value', this.get('default_value'));
+        this.set({
+            explicitly_set: false,
+            value: this.get('default_value')
+        });
     }
 });
 

@@ -1,5 +1,5 @@
+# disable missing docstring
 #pylint: disable=C0111
-#pylint: disable=W0621
 
 from xmodule.x_module import XModuleFields
 from xblock.core import Scope, String, Object, Boolean
