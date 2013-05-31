@@ -94,27 +94,6 @@ clone_repos() {
         fi
         git clone https://github.com/edx/edx-platform.git
     fi
-
-    # By default, dev environments start with a copy of 6.002x
-    # Not certain if these are making it in to the open source release.
-    # If there's a github permissions error, remove this section of code.
-    # You should get a working environment sans a demo course.
-#     cd "$BASE"
-#     mkdir -p "$BASE/data"
-#     REPO="content-mit-6002x"
-#     if [[ -d "$BASE/data/$REPO/.git" ]]; then
-#         output "Pulling $REPO"
-#         cd "$BASE/data/$REPO"
-#         git pull
-#     else
-#         output "Cloning $REPO"
-#         if [[ -d "$BASE/data/$REPO" ]]; then
-#             output "Creating backup for existing demo course"
-#             mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
-#         fi
-#         cd "$BASE/data"
-#         git clone https://github.com/MITx/content-mit-6002x.git
-#     fi
 }
 
 
@@ -381,7 +360,7 @@ fi
 LESS="-E" rvm install $RUBY_VER --with-readline
 
 # Create the "edx" gemset
-rvm use "$RUBY_VER" --create
+rvm use "$RUBY_VER@edx-platform" --create
 rvm rubygems latest
 
 output "Installing gem bundler"
@@ -444,18 +423,18 @@ SCIPY_VER="0.10.1"
 if [[ -n $compile ]]; then
     output "Downloading numpy and scipy"
     curl -sL -o numpy.tar.gz http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_VER}/numpy-${NUMPY_VER}.tar.gz
-    #curl -sL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
+    curl -sL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
     tar xf numpy.tar.gz
-    #tar xf scipy.tar.gz
-    rm -f numpy.tar.gz #scipy.tar.gz
+    tar xf scipy.tar.gz
+    rm -f numpy.tar.gz scipy.tar.gz
     output "Compiling numpy"
     cd "$BASE/numpy-${NUMPY_VER}"
     python setup.py install
-    #output "Compiling scipy"
-    #cd "$BASE/scipy-${SCIPY_VER}"
-    #python setup.py install
+    output "Compiling scipy"
+    cd "$BASE/scipy-${SCIPY_VER}"
+    python setup.py install
     cd "$BASE"
-    rm -rf numpy-${NUMPY_VER} #scipy-${SCIPY_VER}
+    rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
 fi
 
 # building correct version of distribute from source
