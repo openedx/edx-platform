@@ -105,6 +105,8 @@ pip install -U numpy
 pip install cython
 # fixes problem with scipy on 10.8
 pip install -e git+https://github.com/scipy/scipy#egg=scipy-dev
+#Installing django
+pip install django
 
 # Install prereqs
 echo "Installing prereqs"

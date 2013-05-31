@@ -72,10 +72,13 @@ EO
 
         output "Installing OSX requirements"
         if [[ ! -r $BREW_FILE ]]; then
-            error "$BREW_FILE does not exist, needed to install brew"
+            error "$BREW_FILE does not exist, please include the brew formulas file in the requirements/system/mac_os_x directory"
             exit 1
         fi
 
+        # for some reason openssl likes to be installed by itself first
+        brew install openssl
+        
         # brew errors if the package is already installed
         for pkg in $(cat $BREW_FILE); do
             grep $pkg <(brew list) &>/dev/null || {

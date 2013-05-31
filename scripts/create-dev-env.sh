@@ -82,15 +82,15 @@ clone_repos() {
 
     cd "$BASE"
 
-    if [[ -d "$BASE/edx_platform/.git" ]]; then
+    if [[ -d "$BASE/edx-platform/.git" ]]; then
         output "Pulling edx platform"
-        cd "$BASE/edx_platform"
+        cd "$BASE/edx-platform"
         git pull
     else
         output "Cloning edx platform"
-        if [[ -d "$BASE/edx_platform" ]]; then
+        if [[ -d "$BASE/edx-platform" ]]; then
             output "Creating backup for existing edx platform"
-            mv "$BASE/edx_platform" "${BASE}/edx_platform.bak.$$"
+            mv "$BASE/edx-platform" "${BASE}/edx-platform.bak.$$"
         fi
         git clone https://github.com/edx/edx-platform.git
     fi
@@ -276,7 +276,7 @@ EO
 
         ;;
     *)
-        error "Unsupported platform. Try switching to either Mac or a Debian-based linux distribution (Ubuntu or Mint)"
+        error "Unsupported platform. Try switching to either Mac or a Debian-based linux distribution (Ubuntu, Debian, or Mint)"
         exit 1
         ;;
 esac
@@ -287,11 +287,16 @@ esac
 clone_repos
 
 # Sanity check to make sure the repo layout hasn't changed
-if [[ -d $BASE/edx_platform/scripts]]; then
-    ouput "Installing system-level dependencies"
+if [[ -d $BASE/edx-platform/scripts]]; then
+    output "Installing system-level dependencies"
+    bash $BASE/edx-platform/scripts/install-system-req.sh
+else 
+    error "It appears that our directory structure has changed and somebody failed to update this script.
+            raise an issue on Github and someone should fix it."
+    exit 1
+fi
 
 # Install system-level dependencies
-bash $BASE/edx_platform/scripts/install-system-req.sh
 
 output "Installing RVM, Ruby, and required gems"
 
@@ -331,8 +336,8 @@ case `uname -s` in
 esac
 
 # Let the repo override the version of Ruby to install
-if [[ -r $BASE/mitx/.ruby-version ]]; then
-  RUBY_VER=`cat $BASE/mitx/.ruby-version`
+if [[ -r $BASE/edx-platform/.ruby-version ]]; then
+  RUBY_VER=`cat $BASE/edx-platform/.ruby-version`
 fi
 
 # Current stable version of RVM (1.19.0) requires the following to build Ruby:
@@ -348,14 +353,15 @@ fi
 # any required libs are missing.
 LESS="-E" rvm install $RUBY_VER --with-readline
 
-# Create the "mitx" gemset
-rvm use "$RUBY_VER@mitx" --create
+# Create the "edx" gemset
+rvm use "$RUBY_VER" --create
+rvm rubygems latest
 
 output "Installing gem bundler"
 gem install bundler
 
 output "Installing ruby packages"
-bundle install --gemfile $BASE/mitx/Gemfile
+bundle install --gemfile $BASE/edx-platform/Gemfile
 
 
 # Install Python virtualenv
@@ -378,17 +384,17 @@ if [[ `type -t mkvirtualenv` != "function" ]]; then
   source `which virtualenvwrapper.sh`
 fi
 
-# Create MITx virtualenv and link it to repo
+# Create edX virtualenv and link it to repo
 # virtualenvwrapper automatically sources the activation script
 if [[ $systempkgs ]]; then
-    mkvirtualenv -a "$BASE/mitx" --system-site-packages mitx || {
+    mkvirtualenv -a "$BASE/edx-platform" --system-site-packages edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
 else
     # default behavior for virtualenv>1.7 is
     # --no-site-packages
-    mkvirtualenv -a "$BASE/mitx" mitx || {
+    mkvirtualenv -a "$BASE/edx-platform" edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
@@ -417,10 +423,30 @@ if [[ -n $compile ]]; then
     rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
 fi
 
+output "Building correct version of distribute"
+# building correct version of distribute from source
+DISTRIBUTE_VER="0.6.28"
+output "Building Distribute"
+SITE_PACKAGES = $PYTHON_DIR/edx-platform/lib/python2.7/site-packages
+cd $SITE_PACKAGES
+curl -O http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
+tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
+cd distribute-${DISTRIBUTE_VER}
+python setup.py install
+cd ..
+rm distribute-${DISTRIBUTE_VER}.tar.gz
+
+DISTRIBUTE_VERSION=`pip freeze | grep distribute`
+
+if [[ "$DISTRIBUTE_VERSION" == "distribute==0.6.28" ]]; then
+  output "Distribute successfully installed"
+else
+  error "Distribute failed to build correctly. This script requires a working version of Distribute 0.6.28 in your virtualenv's python installation"
+fi
+
 case `uname -s` in
     Darwin)
         # on mac os x get the latest distribute and pip
-        curl http://python-distribute.org/distribute_setup.py | python
         pip install -U pip
         # need latest pytz before compiling numpy and scipy
         pip install -U pytz
@@ -432,13 +458,21 @@ case `uname -s` in
         ;;
 esac
 
-output "Installing MITx pre-requirements"
-pip install -r $BASE/mitx/pre-requirements.txt
+output "Installing edX pre-requirements"
+pip install -r $BASE/edx-platform/requirements/pre.txt
 
-output "Installing MITx requirements"
-# Need to be in the mitx dir to get the paths to local modules right
-cd $BASE/mitx
-pip install -r requirements.txt
+output "Installing edX requirements"
+# Install prereqs
+cd $BASE/edx-platform
+rvm use $RUBY_VER
+rake install_prereqs
+
+# Final dependecy
+output "Finishing Touches"
+cd $BASE
+pip install argcomplete
+cd $BASE/edx-platform
+bundle install
 
 mkdir "$BASE/log" || true
 mkdir "$BASE/db" || true
