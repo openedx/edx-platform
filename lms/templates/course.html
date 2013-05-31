@@ -1,4 +1,5 @@
 <%namespace name='static' file='static_content.html'/>
+<%namespace file='main.html' import="stanford_theme_enabled"/>
 <%!
     from django.core.urlresolvers import reverse
     from courseware.courses import course_image_url, get_course_about_section
@@ -24,7 +25,11 @@
           <p>${get_course_about_section(course, 'short_description')}</p>
         </div>
         <div class="bottom">
-          <a href="${reverse('university_profile', args=[course.org])}" class="university">${get_course_about_section(course, 'university')}</a>
+          % if stanford_theme_enabled():
+            <span class="university">${get_course_about_section(course, 'university')}</span>
+          % else:
+            <a href="${reverse('university_profile', args=[course.org])}" class="university">${get_course_about_section(course, 'university')}</a>
+          % endif
           <span class="start-date">${course.start_date_text}</span>
         </div>
       </section>
