@@ -122,7 +122,11 @@ MITX_FEATURES = {
     'USE_CUSTOM_THEME': False,
 
     # Do autoplay videos for students
-    'AUTOPLAY_VIDEOS': True
+    'AUTOPLAY_VIDEOS': True,
+
+    # Toggle to enable chat availability (configured on a per-course
+    # basis in Studio)
+    'ENABLE_CHAT': False
 }
 
 # Used for A/B testing
