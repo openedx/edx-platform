@@ -6,7 +6,7 @@
 
 // page-level
 .view-register, .view-login, .view-passwordreset {
-  background: $white;
+  background: $body-bg;
 
 
 
@@ -20,16 +20,16 @@
   .heading-2 {
     font-size: 25px;
     margin: 0 0 $baseline 0;
-    font-weight: 300;
+    font-weight: bold;
     text-transform: uppercase;
-    color: $m-blue;
+    color: $link-color;
   }
 
   .heading-3 {
     font-size: 21px;
     margin: 0 0 $baseline 0;
     font-weight: 300;
-    color: $m-gray-d2;
+    color: $base-font-color;
   }
 
   .heading-4 {
@@ -37,7 +37,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0 !important;
-    color: $m-blue-s1;
+    color: saturate($link-color,15%);
   }
 
   .heading-5 {
@@ -48,7 +48,7 @@
     font-size: 18px;
     margin: 0 0 $baseline 0;
     font-weight: 300;
-    color: $m-gray-a1;
+    color: $base-font-color;
     font-family: 'Open Sans', sans-serif;
     line-height: lh(1.1);
   }
@@ -56,18 +56,18 @@
   .body-text {
     font-size: 15px;
     margin: 0 0 $baseline 0;
-    color: $m-gray-a1;
+    color: $base-font-color;
     line-height: lh(1);
   }
 
   // specific examples - buttons
   .button-primary {
     @include border-radius(0);
-    @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
+    @include linear-gradient(saturate($link-color,15%) 5%, shade($link-color,15%) 95%);
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
     text-transform: lowercase;
-    color: $white;
+    color: $very-light-text;
     letter-spacing: 0.1rem;
     font-weight: 500;
     cursor: pointer;
@@ -80,11 +80,11 @@
   }
 
   .button-secondary {
-    @include linear-gradient($m-gray 5%, $m-gray-d1 95%);
+    @include linear-gradient($outer-border-color 5%, $lighter-base-font-color 95%);
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
     text-transform: lowercase;
-    color: $white;
+    color: $very-light-text;
     letter-spacing: 0.1rem;
     font-weight: 600;
     cursor: pointer;
@@ -98,7 +98,7 @@
 
   // layout
   .content-wrapper {
-    background: $m-gray-l2;
+    background: $content-wrapper-bg;
     padding-bottom: 0;
   }
 
@@ -107,7 +107,7 @@
     @include clearfix;
     margin: 0 auto;
     width: 960px;
-    background: $white;
+    background: $body-bg;
   }
 
   .container {
@@ -139,17 +139,18 @@
   }
 
   a {
-    @include transition(color 0.15s ease-in-out, border 0.15s ease-in-out);
+    @include transition($link-color 0.15s ease-in-out, border 0.15s ease-in-out);
 
     &:link, &:visited, &:hover, &:active {
-      color: $m-blue;
+      color: $link-color;
+      font-weight: bold;
       text-decoration: none !important;
       font-family: $sans-serif;
     }
 
     &:hover, &:active {
-      border-bottom: 1px dotted $m-blue-l1;
-      color: $m-blue-l1;
+      border-bottom: 1px solid saturate($link-color,15%);
+      color: saturate($link-color,15%);
     }
   }
 
@@ -254,20 +255,20 @@
         font-family: $sans-serif;
         font-style: normal;
         font-weight: 500;
-        color: $m-gray-d2;
+        color: $base-font-color;
       }
 
       label {
-        @include transition(color 0.15s ease-in-out);
+        @include transition($link-color 0.15s ease-in-out);
         margin: 0 0 ($baseline/4) 0;
         color: tint($black, 20%);
       }
 
       .tip {
-        @include transition(color 0.15s ease-in-out);
+        @include transition($link-color 0.15s ease-in-out);
         display: block;
         margin-top: ($baseline/4);
-        color: tint($m-gray, 50%);
+        color: tint($outer-border-color, 50%);
         font-size: em(13);
       }
 
@@ -330,7 +331,7 @@
         }
 
         textarea, input {
-          background: $white;
+          background: $body-bg;
           color: rgba(0,0,0,.25);
         }
       }
@@ -339,11 +340,11 @@
       &.is-focused {
 
         label {
-          color: $m-blue-l1;
+          color: saturate($link-color,15%);
         }
 
         .tip {
-          color: $m-blue-l1;
+          color: saturate($link-color,15%);
         }
       }
 
@@ -461,7 +462,7 @@
 
   // misc
   .orn-plus {
-    color: $white;
+    color: $very-light-text;
     padding: 0 $baseline/4;
   }
 
@@ -492,7 +493,11 @@
     header {
       height: 120px;
       border-bottom: 1px solid $m-gray;
-      background: transparent url("../images/bg-banner-login.png") 0 0 no-repeat;
+      background: $login-banner-image;
+      
+      h1 {
+        @include login_register_h1_style;
+      }
     }
   }
 }
@@ -507,13 +512,17 @@
       height: 120px;
       border-bottom: 1px solid $m-gray;
       background: transparent url("../images/bg-banner-register.png") 0 0 no-repeat;
+      
+      h1 {
+        @include login_register_h1_style;
+      }
     }
   }
 }
 
 // password reset
 .view-passwordreset {
-  background: $m-gray-l2;
+  background: $sidebar-color;
 
   header.global {
 
@@ -543,7 +552,7 @@
 
   .inner-wrapper {
     @include border-radius(2px);
-    background: $white;
+    background: $body-bg;
     padding-bottom: 0 !important;
   }
 

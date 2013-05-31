@@ -11,7 +11,7 @@
     border-bottom: 1px solid $border-color-3;
     @include box-shadow(inset 0 1px 5px 0 rgba(0,0,0, 0.1));
     height: 280px;
-    margin-top: -69px;
+    margin-top: $header_image_margin;
     padding-top: 150px;
     overflow: hidden;
     position: relative;
