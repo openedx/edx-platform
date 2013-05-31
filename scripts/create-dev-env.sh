@@ -410,25 +410,25 @@ fi
 
 # compile numpy and scipy if requested
 
-NUMPY_VER="1.6.2"
-SCIPY_VER="0.10.1"
+# NUMPY_VER="1.6.2"
+# SCIPY_VER="0.10.1"
 
-if [[ -n $compile ]]; then
-    output "Downloading numpy and scipy"
-    curl -sL -o numpy.tar.gz http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_VER}/numpy-${NUMPY_VER}.tar.gz
-    #curl -sL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
-    tar xf numpy.tar.gz
-    #tar xf scipy.tar.gz
-    rm -f numpy.tar.gz #scipy.tar.gz
-    output "Compiling numpy"
-    cd "$BASE/numpy-${NUMPY_VER}"
-    python setup.py install
-    #output "Compiling scipy"
-    #cd "$BASE/scipy-${SCIPY_VER}"
-    #python setup.py install
-    cd "$BASE"
-    rm -rf numpy-${NUMPY_VER} #scipy-${SCIPY_VER}
-fi
+# if [[ -n $compile ]]; then
+#     output "Downloading numpy and scipy"
+#     curl -sL -o numpy.tar.gz http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_VER}/numpy-${NUMPY_VER}.tar.gz
+#     #curl -sL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
+#     tar xf numpy.tar.gz
+#     #tar xf scipy.tar.gz
+#     rm -f numpy.tar.gz #scipy.tar.gz
+#     output "Compiling numpy"
+#     cd "$BASE/numpy-${NUMPY_VER}"
+#     python setup.py install
+#     #output "Compiling scipy"
+#     #cd "$BASE/scipy-${SCIPY_VER}"
+#     #python setup.py install
+#     cd "$BASE"
+#     rm -rf numpy-${NUMPY_VER} #scipy-${SCIPY_VER}
+# fi
 
 # building correct version of distribute from source
 DISTRIBUTE_VER="0.6.28"
