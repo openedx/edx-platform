@@ -330,6 +330,8 @@ STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
 ]
 
+FAVICON_PATH = 'images/favicon.ico'
+
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'   # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'   # http://www.i18nguy.com/unicode/language-identifiers.html
