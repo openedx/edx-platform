@@ -115,6 +115,9 @@ CMS.Views.ChapterEdit = Backbone.View.extend({
         })
         var view = new CMS.Views.UploadDialog({model: msg, chapter: this.model})
         $(".wrapper-view").append(view.render().el)
+
+        $body.addClass('prompt-is-shown');
+        $('.wrapper-prompt').addClass('is-shown').attr('aria-hidden','false');
     }
 })
 CMS.Models.FileUpload = Backbone.Model.extend({
@@ -169,6 +172,9 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     removeSelf: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.remove();
+
+        $body.removeClass('prompt-is-shown');
+        $('.wrapper-prompt').removeClass('is-shown').attr('aria-hidden','true');
     },
     upload: function(e) {
         this.model.set('uploading', true);
@@ -220,6 +226,8 @@ $(function() {
     })
 })
 </script>
+
+
 </%block>
 
 <%block name="content">
@@ -253,7 +261,17 @@ $(function() {
             </ul>
           </nav>
         </div>
+
+        <div class="no-textbook-content">
+            <p>You haven't added any textbooks to this course yet.</p>
+            <p><a href="#" class="button upload-button new-button">Add your first textbook</a></p>
+        </div>
+
     </div>
     </section>
   </div>
+
+
+
+
 </%block>

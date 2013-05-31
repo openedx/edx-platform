@@ -1,7 +1,7 @@
 <form id="edit_textbook_form" class="edit-textbook">
   <div id="edit_textbook_error" class="message message-status message-status error" name="edit_textbook_error"></div>
   <fieldset>
-  <legend class="sr">Required information to edit or add a textbook and chapters</legend>
+  <legend class="sr"><%= gettext("Required information to edit or add a textbook and chapters") %></legend>
     <ol class="list-input">
       <li class="add-textbook-name field text required">
         <div class="input-wrap">

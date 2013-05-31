@@ -3,6 +3,13 @@
 
 body.course.textbooks {
 
+  .no-textbook-content {
+    margin: $baseline*2;
+    padding: $baseline*2;
+    background-color: #ddd;
+    text-align: center;
+  }
+
     form {
       @include box-sizing(border-box);
       @include box-shadow(0 1px 2px $shadow-l1);
@@ -17,14 +24,22 @@ body.course.textbooks {
 
         .action-add-chapter {
             @extend .t-action2;
-            @include grey-button;
+            //@include grey-button;
             @include transition(all .15s);
             display: block;
             width: 100%;
             margin-bottom: ($baseline*1.5);
-            border: 1px solid #B3C4DA;
-            padding: ($baseline/5) $baseline;
+            border-radius: 5px;
+            border: none;
+            padding: $baseline;
+            background-color: #DFE5EF;
+            color: #8EABBE;
             font-weight: 600;
+
+            &:hover {
+              background: #5597DD;
+              color: #fff;
+            }
         }
 
         .action-primary {
@@ -212,6 +227,17 @@ body.course.textbooks {
 
         }
       }
+    }
+
+    .wrapper-prompt-assetupload .prompt  {
+      width: $baseline*20;
+
+        h2 {
+            color: $gray;
+            font-weight: bold;
+        }
+
+
     }
 
 

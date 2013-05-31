@@ -1,6 +1,10 @@
+  <div id="prompt-assetupload" class="wrapper wrapper-prompt wrapper-prompt-assetupload" aria-describedby="prompt-assetupload-description" aria-labelledby="prompt-assetupload-title" role="dialog" aria-hidden="false">
+    <div class="prompt confirm">
+      <div class="copy">
+
 <form class="upload-dialog" method="POST" action="<%= url %>" enctype="multipart/form-data">
-  <h3><%= title %></h3>
-  <p><%= message %></p>
+  <h2><%= title %></h2>
+  <p id="prompt-assetupload-description" class="message"><%= message %></p>
   <input type="file" name="file" />
   <% if(uploading) { %>
     <% if (uploadedBytes && totalBytes) { %>
@@ -10,7 +14,17 @@
     <% } %>
   <% } %>
   <div class="actions">
-    <input type="button" class="button action-upload" value="Upload" <% if (!selectedFile) { %>disabled="disabled"<% } %> />
-    <input type="button" class="button action-cancel" value="Cancel" />
+    <h3 class="sr"><%= gettext('Form Actions') %></h3>
+  <ul>
+  <li class="nav-item">
+    <input type="button" class="button action-upload" value="<%= gettext('Upload') %>" <% if (!selectedFile) { %>disabled="disabled"<% } %> />
+  </li>
+  <li class="nav-item">
+    <input type="button" class="button action-cancel" value="<%= gettext('Cancel') %>" />
+  </li>
+  </ul>
   </div>
 </form>
+
+    </div>
+</div>

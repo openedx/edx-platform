@@ -10,5 +10,5 @@
     <span class="tip tip-stacked"><%= gettext("provide the path to a file added to this course or upload a new one") %></span>
   <button class="action action-uploadasset"><%= gettext("Upload Asset") %></button>
   </div>
-  <a class="action action-close"><i class="icon-remove-sign"></i> <span class="sr">delete chapter</span></a>
+  <a class="action action-close"><i class="icon-remove-sign"></i> <span class="sr"><%= gettext("delete chapter") %></span></a>
 </li>
