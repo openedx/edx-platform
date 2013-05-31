@@ -9,23 +9,26 @@ from common import *
 
 @step('when I view it it does autoplay')
 def does_autoplay(step):
-    assert world.css_find('.video')[0]['data-autoplay'] == 'True'
-    assert world.css_find('.video_control')[0].has_class('pause')
+    assert(world.css_find('.video')[0]['data-autoplay'] == 'True')
+
 
 @step('the course has a Video component')
 def view_video(step):
-    model_course = 'model_course'
     coursename = TEST_COURSE_NAME.replace(' ', '_')
     i_am_registered_for_the_course(step, coursename)
+    
     # Make sure we have a video
-    video = create_video_component(coursename)
-    url = django_url('/courses/edx/%s/Test_Course/courseware/' % model_course)
+    video = add_video_to_course(coursename)
+    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    section_name = chapter_name
+    url = django_url('/courses/edx/Test_Course/Test_Course/courseware/%s/%s' %
+                     (chapter_name, section_name))
+    
     world.browser.visit(url)
-    print('\n\n\n')
-    print world.browser.html
-    print('\n\n\n')
 
 
-def create_video_component(course):
-    return world.ItemFactory.create(parent_location=section_location(course),
-                                    template='i4x://edx/templates/video/default')
+def add_video_to_course(course):
+    template_name = 'i4x://edx/templates/video/default'
+    world.ItemFactory.create(parent_location=section_location(course),
+                             template=template_name,
+                             display_name='Video')

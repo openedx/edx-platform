@@ -1,10 +1,9 @@
+# disable missing docstring
 #pylint: disable=C0111
-#pylint: disable=W0621
 
 from lettuce import world
 from nose.tools import assert_equal
-
-import time
+from terrain.steps import reload_the_page
 
 
 @world.absorb
@@ -24,9 +23,7 @@ def click_new_component_button(step, component_button_css):
 
 @world.absorb
 def click_component_from_menu(instance_id, expected_css):
-    new_instance = world.browser.find_by_id(instance_id)
-    assert_equal(1, len(new_instance))
-    # TODO: why is this sleep necessary?
-    time.sleep(float(1))
-    new_instance[0].click()
+    elem_css = "a[data-location='%s']" % instance_id
+    assert_equal(1, len(world.css_find(elem_css)))
+    world.css_click(elem_css)
     assert_equal(1, len(world.css_find(expected_css)))
