@@ -4,6 +4,7 @@ curl
 git
 python-virtualenv
 python-scipy
+python-numpy
 build-essential
 python-dev
 gfortran
