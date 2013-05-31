@@ -31,6 +31,9 @@ from path import path
 from .discussionsettings import *
 
 ################################### FEATURES ###################################
+# The display name of the platform to be used in templates/emails/etc.
+PLATFORM_NAME = "edX"
+
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
