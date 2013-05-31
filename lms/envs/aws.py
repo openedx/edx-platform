@@ -124,6 +124,8 @@ SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 if not THEME_NAME is None:
     enable_theme(THEME_NAME)
+    FAVICON_PATH = 'themes/%s/images/favicon.ico' % THEME_NAME
+
 
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
