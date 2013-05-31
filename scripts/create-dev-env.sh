@@ -228,6 +228,16 @@ case `uname -s` in
         distro=`lsb_release -cs`
         case $distro in
             wheezy|jessie|maya|olivia|nadia|precise|quantal) 
+                warning "Debian support is not fully debugged. Assuming you have standard
+                        development packages already working like scipy rvm, the 
+                        installation should go fine, but this is still a work in progress.
+
+                        Please report issues you have and let us know if you are able to figure
+                        out any workarounds or solutions
+
+                        Press return to continue or control-C to abort"
+
+                read dummy
                 sudo apt-get install git ;;  
             squeeze|lisa|katya|oneiric|natty|raring)
                 warning "It seems like you're using $distro which has been deprecated.
