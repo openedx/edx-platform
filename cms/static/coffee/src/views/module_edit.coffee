@@ -24,9 +24,13 @@ class CMS.Views.ModuleEdit extends Backbone.View
       @module = XModule.loadModule(@$el.find('.xmodule_edit'))
       # At this point, metadata-edit.html will be loaded, and the metadata (as JSON) is available.
       metadataEditor = @$el.find('.metadata_edit')
+      metadataData = metadataEditor.data('metadata')
+      models = [];
+      for key of metadataData
+        models.push(metadataData[key])
       @metadataEditor = new CMS.Views.Metadata.Editor({
           el: metadataEditor,
-          model: new Backbone.Model(metadataEditor.data('metadata'))
+          collection: new CMS.Models.MetadataCollection(models)
           })
 
       # Need to update set "active" class on data editor if there is one.

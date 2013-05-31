@@ -65,30 +65,32 @@ describe "Test Metadata Editor", ->
     # Test for the editor that creates the individual views.
     describe "CMS.Views.Metadata.Editor creates editors for each field", ->
         beforeEach ->
-            @model = new Backbone.Model({
-                num_inputs: integerEntry,
-                weight: floatEntry,
-                show_answer: selectEntry,
-                display_name: genericEntry,
-                unknown_type: {
-                    default_value: null,
-                    display_name: "Unknown",
-                    explicitly_set: true,
-                    field_name: "unknown_type",
-                    help: "Mystery property.",
-                    inheritable: false,
-                    options: [
-                        {"display_name": "Always", "value": "always"},
-                        {"display_name": "Answered", "value": "answered"},
-                        {"display_name": "Never", "value": "never"}],
-                    type: "unknown type",
-                    value: null
-                }
-            })
+            @model = new CMS.Models.MetadataCollection(
+                [
+                    integerEntry,
+                    floatEntry,
+                    selectEntry,
+                    genericEntry,
+                    {
+                        default_value: null,
+                        display_name: "Unknown",
+                        explicitly_set: true,
+                        field_name: "unknown_type",
+                        help: "Mystery property.",
+                        inheritable: false,
+                        options: [
+                            {"display_name": "Always", "value": "always"},
+                            {"display_name": "Answered", "value": "answered"},
+                            {"display_name": "Never", "value": "never"}],
+                        type: "unknown type",
+                        value: null
+                    }
+                ]
+            )
 
         it "creates child views on initialize, and sorts them alphabetically", ->
-            view = new CMS.Views.Metadata.Editor({model: @model})
-            childModels = view.models
+            view = new CMS.Views.Metadata.Editor({collection: @model})
+            childModels = view.collection.models
             expect(childModels.length).toBe(5)
             childViews = view.$el.find('.setting-input')
             expect(childViews.length).toBe(5)
@@ -104,16 +106,15 @@ describe "Test Metadata Editor", ->
             verifyEntry(4, 'Weight', 'number')
 
         it "returns its display name", ->
-            view = new CMS.Views.Metadata.Editor({model: @model})
+            view = new CMS.Views.Metadata.Editor({collection: @model})
             expect(view.getDisplayName()).toBe("Word cloud")
 
         it "returns an empty string if there is no display name property with a valid value", ->
-            view = new CMS.Views.Metadata.Editor({model: new Backbone.Model()})
+            view = new CMS.Views.Metadata.Editor({collection: new CMS.Models.MetadataCollection()})
             expect(view.getDisplayName()).toBe("")
 
-            view = new CMS.Views.Metadata.Editor({model: new Backbone.Model({
-                display_name:
-                    {
+            view = new CMS.Views.Metadata.Editor({collection: new CMS.Models.MetadataCollection([
+                {
                     default_value: null,
                     display_name: "Display Name",
                     explicitly_set: false,
@@ -123,18 +124,18 @@ describe "Test Metadata Editor", ->
                     options: [],
                     type: CMS.Models.Metadata.GENERIC_TYPE,
                     value: null
-                    }
-                })
+
+                }])
             })
             expect(view.getDisplayName()).toBe("")
 
         it "has no modified values by default", ->
-            view = new CMS.Views.Metadata.Editor({model: @model})
+            view = new CMS.Views.Metadata.Editor({collection: @model})
             expect(view.getModifiedMetadataValues()).toEqual({})
 
         it "returns modified values only", ->
-            view = new CMS.Views.Metadata.Editor({model: @model})
-            childModels = view.models
+            view = new CMS.Views.Metadata.Editor({collection: @model})
+            childModels = view.collection.models
             childModels[0].setValue('updated display name')
             childModels[1].setValue(20)
             expect(view.getModifiedMetadataValues()).toEqual({

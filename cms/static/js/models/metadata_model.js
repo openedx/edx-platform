@@ -102,6 +102,11 @@ CMS.Models.Metadata = Backbone.Model.extend({
     }
 });
 
+CMS.Models.MetadataCollection = Backbone.Collection.extend({
+    model : CMS.Models.Metadata,
+    comparator: "display_name"
+});
+
 CMS.Models.Metadata.SELECT_TYPE = "Select";
 CMS.Models.Metadata.INTEGER_TYPE = "Integer";
 CMS.Models.Metadata.FLOAT_TYPE = "Float";

@@ -2,7 +2,7 @@ if (!CMS.Views['Metadata']) CMS.Views.Metadata = {};
 
 CMS.Views.Metadata.Editor = Backbone.View.extend({
 
-    // Model is simply a Backbone.Model instance.
+    // Model is CMS.Models.MetadataCollection,
     initialize : function() {
         var tpl = $("#metadata-editor-tpl").text();
         if(!tpl) {
@@ -10,31 +10,21 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
         }
         this.template = _.template(tpl);
 
-        this.$el.html(this.template({numEntries: this.model.keys().length}));
+        this.$el.html(this.template({numEntries: this.collection.length}));
         var counter = 0;
 
-        // Sort entries by display name.
-        var sortedObject = _.sortBy(this.model.attributes,
-            function (val) {
-                return val.display_name
-            });
-
-        this.models = [];
-
         var self = this;
-        _.each(sortedObject,
-            function (item) {
-                var model = new CMS.Models.Metadata(item);
-                self.models.push(model);
+        this.collection.each(
+            function (model) {
                 var data = {
                     el: self.$el.find('.metadata_entry')[counter++],
                     model: model
                 };
-                if (item.type === CMS.Models.Metadata.SELECT_TYPE) {
+                if (model.getType() === CMS.Models.Metadata.SELECT_TYPE) {
                     new CMS.Views.Metadata.Option(data);
                 }
-                else if (item.type === CMS.Models.Metadata.INTEGER_TYPE ||
-                    item.type === CMS.Models.Metadata.FLOAT_TYPE) {
+                else if (model.getType() === CMS.Models.Metadata.INTEGER_TYPE ||
+                    model.getType() === CMS.Models.Metadata.FLOAT_TYPE) {
                     new CMS.Views.Metadata.Number(data);
                 }
                 else {
@@ -49,7 +39,7 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
      */
     getModifiedMetadataValues: function () {
         var modified_values = {};
-        _.each(this.models,
+        this.collection.each(
             function (model) {
                 if (model.isModified()) {
                     modified_values[model.getFieldName()] = model.getValue();
@@ -65,12 +55,17 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
      * is no such entry, or if display_name does not have a value set, it returns an empty string.
      */
     getDisplayName: function () {
-        // It is possible that there is no display name set. In that case, return empty string.
-        if (this.model.get('display_name') === undefined) {
-            return '';
-        }
-        var displayNameValue = this.model.get('display_name').value;
-        return displayNameValue ? displayNameValue : '';
+        var displayName = '';
+        this.collection.each(
+            function (model) {
+                if (model.get('field_name') === 'display_name') {
+                    var displayNameValue = model.get('value');
+                    // It is possible that there is no display name value set. In that case, return empty string.
+                    displayName = displayNameValue ? displayNameValue : '';
+                }
+            }
+        );
+        return displayName;
     }
 });
 
