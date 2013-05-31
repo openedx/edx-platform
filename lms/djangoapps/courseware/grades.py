@@ -219,7 +219,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                 if graded_total.possible > 0:
                     format_scores.append(graded_total)
 
-                log.exception("Unable to grade a section with a total possible score of zero. " +
+                log.warning("Unable to grade a section with a total possible score of zero. " +
                               str(section_descriptor.location))
 
         totaled_scores[section_format] = format_scores
