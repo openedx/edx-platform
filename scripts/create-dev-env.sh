@@ -115,7 +115,7 @@ clone_repos() {
 #         cd "$BASE/data"
 #         git clone https://github.com/MITx/content-mit-6002x.git
 #     fi
-# }
+}
 
 
 ### START
