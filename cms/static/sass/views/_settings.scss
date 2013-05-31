@@ -703,7 +703,7 @@ body.course.settings {
 
           .tip {
             @include transition (opacity 0.5s ease-in-out 0s);
-            opacity: 0;
+            opacity: 0.0;
             position: absolute;
             bottom: ($baseline*1.25);
           }
@@ -718,7 +718,7 @@ body.course.settings {
           input.error {
 
             & + .tip {
-              opacity: 0;
+              opacity: 0.0;
             }
           }
         }

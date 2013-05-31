@@ -149,11 +149,11 @@ abbr[title] {
 		margin-left: 20px;
 	}
 	li {
-		opacity: .8;
+		opacity: 0.8;
 
 		&:ui-state-active {
 			background-color: rgba(255, 255, 255, .3);
-			opacity: 1;
+			opacity: 1.0;
 			font-weight: 400;
 		}
 		a:focus {
