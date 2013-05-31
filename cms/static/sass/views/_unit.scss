@@ -13,10 +13,6 @@ body.course.unit {
   }
   //end problem selector reqs
 
-
-  // Unit Page Main Column
-  // ====================
-
   .main-column {
     clear: both;
     float: left;
@@ -28,18 +24,15 @@ body.course.unit {
       border: none;
 
       .rendered-component {
-        padding: 0 20px;
+        padding: 0 $baseline;
       }
     }
   }
 
   .unit-body {
 
-    // Unit Page Name
-    // ====================
-
     .unit-name-input {
-      padding: 20px 40px;
+      padding: $baseline 2*$baseline;
 
       label {
         display: block;
@@ -80,17 +73,15 @@ body.course.unit {
       letter-spacing: 1px;
       text-transform: uppercase;
     }
+    // ====================
 
     // Component List Meta
-    // ====================
-    // TODO: clean up organization of this page, to many levels/duplication
-
     .components {
 
       > li {
         position: relative;
         z-index: 10;
-        margin: 20px 40px;
+        margin: $baseline 2*$baseline;
 
         .title {
           margin: 0 0 15px 0;
@@ -100,26 +91,26 @@ body.course.unit {
           }
         }
 
-        // New Components
         // ====================
 
+        // New Components
         &.new-component-item {
-          margin: 20px 0px;
+          margin: $baseline 0px;
           border-top: 1px solid $mediumGrey;
           box-shadow: 0 2px 1px rgba(182, 182, 182, 0.75) inset;
           background-color: $lightGrey;
           margin-bottom: 0px;
-          padding-bottom: 20px;
+          padding-bottom: $baseline;
 
           .new-component-button {
             display: block;
-            padding: 20px;
+            padding: $baseline;
             text-align: center;
             color: #edf1f5;
           }
 
           h5 {
-            margin: 20px 0px;
+            margin: $baseline 0px;
             color: #fff;
             font-weight: 600;
             font-size: 18px;
@@ -144,7 +135,7 @@ body.course.unit {
               height: 100px;
               color: #fff;
               margin-right: 15px;
-              margin-bottom: 20px;
+              margin-bottom: $baseline;
               border-radius: 8px;
               font-size: 15px;
               line-height: 14px;
@@ -156,7 +147,7 @@ body.course.unit {
                 bottom: 5px;
                 left: 0;
                 width: 100%;
-                padding: 10px;
+                padding: $baseline/2;
                 @include box-sizing(border-box);
                 color: #fff;
               }
@@ -165,7 +156,7 @@ body.course.unit {
 
           .new-component-templates {
             display: none;
-            margin: 20px 40px 20px 40px;
+            margin: $baseline 2*$baseline;
             border-radius: 3px;
             border: 1px solid $mediumGrey;
             background-color: #fff;
@@ -173,7 +164,7 @@ body.course.unit {
             @include clearfix;
 
             .cancel-button {
-              margin: 20px 0px 10px 10px;
+              margin: $baseline 0px $baseline/2 $baseline/2;
               @include white-button;
             }
 
@@ -183,7 +174,7 @@ body.course.unit {
 
             // specific menu types
             &.new-component-problem {
-              padding-bottom:10px;
+              padding-bottom: $baseline/2;
 
               [class^="icon-"], .editor-indicator {
                 display: inline-block;
@@ -220,7 +211,7 @@ body.course.unit {
             @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
 
             li:first-child {
-              margin-left: 20px;
+              margin-left: $baseline;
             }
 
             li {
@@ -231,17 +222,17 @@ body.course.unit {
               @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
               background-color: tint($lightBluishGrey, 10%);
               @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
-              opacity:.8;
+              opacity: 0.8;
 
               &:hover {
-                opacity:.9;
+                opacity: 0.9;
                 background-color: tint($lightBluishGrey, 20%);
               }
 
               &.ui-state-active {
                 border: 0px;
                 @include active;
-                opacity:1;
+                opacity: 1.0;
               }
             }
 
@@ -292,7 +283,7 @@ body.course.unit {
             a {
               @include clearfix();
               display: block;
-              padding: 7px 20px;
+              padding: 7px $baseline;
               border-bottom: none;
               font-weight: 500;
 
@@ -367,9 +358,9 @@ body.course.unit {
       }
     }
 
-    // Component Drag and Drop, Non-Edit Module Rendering, Styling
     // ====================
 
+    // Component Drag and Drop, Non-Edit Module Rendering, Styling
     .component {
       border: 1px solid $lightBluishGrey2;
       border-radius: 3px;
@@ -416,7 +407,7 @@ body.course.unit {
     }
 
     .xmodule_display {
-      padding: 40px 20px 20px;
+      padding: 2*$baseline $baseline $baseline;
       overflow-x: auto;
 
       h1 {
@@ -424,10 +415,9 @@ body.course.unit {
         margin-left: 0;
       }
     }
-
-    // Component Editing
     // ====================
 
+    // Component Editing
     .wrapper-component-editor {
       z-index: 9999;
       position: relative;
@@ -442,7 +432,7 @@ body.course.unit {
       border-radius: 2px 2px 0 0;
 
       h3 {
-        margin-bottom: 10px;
+        margin-bottom: $baseline/2;
         font-size: 18px;
         font-weight: 700;
       }
@@ -460,24 +450,21 @@ body.course.unit {
       // Module Actions, also used for Static Pages
       .module-actions {
         @include box-shadow(inset 0 1px 1px $shadow);
-        padding: 0px 0 10px 10px;
+        padding: 0 0 $baseline $baseline;
         background-color: $gray-l6;
 
         .save-button {
         margin: ($baseline/2) 8px 0 0;
         }
       }
-
-
     }
   }
 }
 
 // Edit Header (Component Name, Mode-Editor, Mode-Settings)
-
 .component-edit-header {
   @include box-sizing(border-box);
-  padding: 18px 0 18px 20px;
+  padding: 18px 0 18px $baseline;
   top: 0;
   right: 0;
   background-color: $blue;
@@ -580,9 +567,9 @@ body.course.unit {
     //component-setting-entry
     .field.comp-setting-entry {
       background-color: $white;
-      padding: 20px;
+      padding: $baseline;
       border-bottom: 1px solid $gray-l2;
-      opacity: .8;
+      opacity: 0.7;
 
       &:last-child {
         //margin-bottom: 0;
@@ -601,23 +588,16 @@ body.course.unit {
 
       &:hover {
         @include transition(opacity 0.25s ease-in-out);
-        opacity: 1;
+        opacity: 1.0;
       }
 
       &.is-set {
-        opacity: 1;
+        opacity: 1.0;
         background-color: $white;
 
-        //setting-label
-        .setting-label { }
-
-        //setting-input
         .setting-input {
           color: $blue-l1;
         }
-
-        //setting-clear
-        .setting-clear { }
       }
 
       .wrapper-comp-setting{
@@ -694,11 +674,11 @@ body.course.unit {
         &:focus {
           @include box-shadow(0 0 1px $shadow);
           @include transition(opacity 0.25s ease-in-out);
-          background-color: #FFFCF1;
+          background-color: $yellow;
         }
 
         &:active {
-          background-color: #FFFCF1;
+          background-color: $yellow;
         }
       }
 
@@ -710,7 +690,7 @@ body.course.unit {
         vertical-align: middle;
         padding: 5px;
         border-radius: 50%;
-        margin: 0 10px;
+        margin: 0 $baseline/2;
         box-shadow: none;
         text-shadow: none;
         border: 1px solid $gray-l1;
@@ -740,10 +720,9 @@ body.course.unit {
     }
   }
 }
-
-// Editing Units from Courseware
 // ====================
 
+// Editing Units from Courseware
 body.unit {
 
   .component {
@@ -765,13 +744,12 @@ body.unit {
     }
   }
 }
-
-// Unit Page Sidebar
 // ====================
 
+// Unit Page Sidebar
 .unit-settings {
   .window-contents {
-    padding: 10px 20px;
+    padding: $baseline/2 $baseline;
   }
 
   .unit-actions {
@@ -781,7 +759,7 @@ body.unit {
 
   .published-alert {
     display: none;
-    padding: 10px;
+    padding: $baseline/2;
     border: 1px solid #edbd3c;
     border-radius: 3px;
     background: #fbf6e1;
@@ -807,7 +785,7 @@ body.unit {
 
   .preview-button, .view-button {
     @include white-button;
-    margin-bottom: 10px;
+    margin-bottom: $baseline/2;
   }
 
   .publish-button {
@@ -827,7 +805,7 @@ body.unit {
   .publish-button,
   .view-button {
     font-size: 11px;
-    margin-top: 10px;
+    margin-top: $baseline/2;
     padding: 6px 15px 8px;
   }
 }
@@ -849,7 +827,7 @@ body.unit {
 
     li {
       display: block;
-      padding: 6px 8px 8px 10px;
+      padding: 6px 8px 8px $baseline/2;
       background: #edf1f5;
       font-size: 12px;
 
@@ -880,7 +858,7 @@ body.unit {
   .url {
     @include box-shadow(none);
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: $baseline/2;
   }
 
   .draft-tag,
@@ -906,11 +884,11 @@ body.unit {
 
     ol {
       .section-item {
-        padding-left: 20px;
+        padding-left: $baseline;
       }
 
       .new-unit-item {
-        margin-left: 20px;
+        margin-left: $baseline;
       }
     }
 
@@ -920,7 +898,7 @@ body.unit {
       }
 
       .new-unit-item {
-        margin: 0 0 10px 41px;
+        margin: 0 0 $baseline 41px;
       }
     }
   }
@@ -967,23 +945,23 @@ body.unit {
     display: none;
   }
 }
+// ====================
 
 // Latex Compiler
-// ====================
 .launch-latex-compiler {
   background-color: $white;
-  padding: 10px 0 10px 20px;
+  padding: $baseline/2 0 $baseline/2 $baseline;
   border-bottom: 1px solid $gray-l2;
-  opacity: .8;
+  opacity: 0.8;
 
 
   &:hover {
     @include transition(opacity 0.25s ease-in-out);
-    opacity: 1;
+    opacity: 1.0s;
   }
 }
 
-//hides latex compiler button if settings mode is-active
+//  hides latex compiler button if settings mode is-active
 div.wrapper-comp-editor.is-inactive + div.launch-latex-compiler{
  display: none;
 }

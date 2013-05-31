@@ -85,8 +85,8 @@
 }
 
 @-webkit-keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% { opacity: 0.0; }
+  100% { opacity: 1.0; }
 }
 
 
@@ -736,11 +736,11 @@ body.discussion {
 
       &.is-open {
         .browse-topic-drop-btn span {
-          opacity: 1;
+          opacity: 1.0;
         }
 
         .browse-topic-drop-icon {
-          opacity: 0;
+          opacity: 0.0;
         }
 
         &.is-dropped {
@@ -788,7 +788,7 @@ body.discussion {
           &::-webkit-input-placeholder,
           &:-moz-placeholder,
           &:-ms-input-placeholder {
-            opacity: 1;
+            opacity: 1.0;
           }
         }
       }
@@ -818,7 +818,7 @@ body.discussion {
         line-height: 58px;
         color: #333;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
-        opacity: 0;
+        opacity: 0.0;
         @include transition(opacity .2s);
       }
     }
@@ -833,7 +833,7 @@ body.discussion {
       height: 16px;
       margin-left: -12px;
       background: url(../images/browse-icon.png) no-repeat;
-      opacity: 1;
+      opacity: 1.0;
       @include transition(none);
     }
 
@@ -967,7 +967,7 @@ body.discussion {
       &::-webkit-input-placeholder,
       &:-moz-placeholder,
       &:-ms-input-placeholder {
-        opacity: 0;
+        opacity: 0.0;
         @include transition(opacity .2s);
       }
 
@@ -2454,7 +2454,7 @@ body.discussion {
       font-style: italic;
       cursor:pointer; 
       margin-right: 10px;
-      opacity:.8;
+      opacity: 0.8;
 
       span {
         cursor: pointer;
@@ -2462,7 +2462,7 @@ body.discussion {
 
       &:hover {
         @include transition(opacity .2s);
-        opacity: 1;
+        opacity: 1.0;
       }
     }  
 
@@ -2475,7 +2475,7 @@ body.discussion {
       top:-13px;
       margin-right:35px;
       margin-top:13px;
-      opacity: 1;
+      opacity: 1.0;
     }  
 
 .notpinned .icon {
@@ -2523,11 +2523,11 @@ display:none;
       padding-right: 5px;
       font-style: italic;
       cursor:pointer;
-      opacity:.8;
+      opacity: 0.8;
 
       &:hover {
         @include transition(opacity .2s);
-        opacity: 1;
+        opacity: 1.0;
       }
 
     }  
