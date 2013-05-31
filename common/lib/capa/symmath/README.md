@@ -10,7 +10,7 @@ expressions typeset correctly, but may not be mathematically legal, like "5 /
 (1 = 2)".  The PMathML is converted into "Content MathML" (CMathML), which is
 by definition mathematically legal, using an XSLT 2.0 stylesheet, via a module
 in SnuggleTeX. CMathML is then converted into a sympy expression.  This work is
-all done in `lms/lib/symmath/formula.py`
+all done in `symmath/formula.py`.
 
 (2) Simplifying the expression and checking against what is expected is done by
 using sympy, and a set of heuristics based on options flags provided by the
@@ -21,7 +21,7 @@ checked numerically in addition to symbolically.  The checking is done in
 stages, first with no simplification, then with increasing levels of testing;
 if a match is found at any stage, then an "ok" is returned.  Helpful messages
 are also returned, eg if the input expression is of a different type than the
-expected.  This work is all done in `lms/lib/symmath/symmath_check.py`
+expected.  This work is all done in `symmath/symmath_check.py`.
 
 Links:
 
