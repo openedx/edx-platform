@@ -392,8 +392,12 @@ if [[ `type -t mkvirtualenv` != "function" ]]; then
             source `which virtualenvwrapper.sh`
         ;;
 
-        *)
+        squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+        if [[ -f "/etc/bash_completion.d/virtualenvwrapper"]]; then
             source /etc/bash_completion.d/virtualenvwrapper
+        else
+            error "Could not find virtualenvwrapper"
+            exit 1
         ;;
     esac
 fi
@@ -420,7 +424,7 @@ fi
 NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 
-if [[ -n $compile ]]; then
+if [[ ! -n $compile ]]; then
     output "Downloading numpy and scipy"
     curl -sL -o numpy.tar.gz http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_VER}/numpy-${NUMPY_VER}.tar.gz
     curl -sL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
@@ -455,6 +459,7 @@ if [[ "$DISTRIBUTE_VERSION" == "distribute==0.6.28" ]]; then
   output "Distribute successfully installed"
 else
   error "Distribute failed to build correctly. This script requires a working version of Distribute 0.6.28 in your virtualenv's python installation"
+  exit 1
 fi
 
 case `uname -s` in
