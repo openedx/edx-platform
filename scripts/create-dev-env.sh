@@ -236,7 +236,7 @@ case `uname -s` in
 
                           Raring requires an install of rvm to work correctly as the raring
                           package manager does not yet include a package for rvm
-                          
+
                           Press return to continue or control-C to abort"
                 read dummy
                 sudo apt-get install git
@@ -412,14 +412,14 @@ fi
 # Create edX virtualenv and link it to repo
 # virtualenvwrapper automatically sources the activation script
 if [[ $systempkgs ]]; then
-    mkvirtualenv -a "$BASE/edx-platform" --system-site-packages edx-platform || {
+    mkvirtualenv -a "$HOME/.virtualenvs" --system-site-packages edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
 else
     # default behavior for virtualenv>1.7 is
     # --no-site-packages
-    mkvirtualenv -a "$BASE/edx-platform" edx-platform || {
+    mkvirtualenv -a "$HOME/.virtualenvs" edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
