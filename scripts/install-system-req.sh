@@ -41,7 +41,9 @@ case `uname -s` in
                 # add repositories
                 cat $APT_REPOS_FILE | xargs -n 1 sudo add-apt-repository -y
                 sudo apt-get -y update
-
+                sudo apt-get -y install gfortran
+                sudo apt-get -y install graphviz libgraphviz-dev graphviz-dev
+                sudo apt-get -y install libatlas-dev libblas-dev 
                 # install packages listed in APT_PKGS_FILE
                 cat $APT_PKGS_FILE | xargs sudo apt-get -y install
                 ;;

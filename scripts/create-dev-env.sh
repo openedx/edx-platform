@@ -227,7 +227,7 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            wheezy|jessie|maya|olivia|nadia|natty|precise|quantal|raring) 
+            wheezy|jessie|maya|olivia|nadia|precise|quantal|raring) 
                 sudo apt-get install git ;;  
             squeeze|lisa|katya|oneiric|natty)
                 warning "It seems like you're using $distro which has been deprecated.
@@ -312,7 +312,22 @@ if [ "$HOME/.rvm" != $RUBY_DIR ]; then
   fi
 fi
 
-curl -sL get.rvm.io | bash -s -- --version 1.15.7
+# rvm has issues in debian family, this is taken from stack overflow
+case `uname -s` in
+    Darwin)
+        curl -sL get.rvm.io | bash -s -- --version 1.15.7
+    ;;
+
+    squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+        warning "Setting up rvm on linux. This is a known pain point. If the script fails here
+                refer to the following stack overflow question: 
+                http://stackoverflow.com/questions/9056008/installed-ruby-1-9-3-with-rvm-but-command-line-doesnt-show-ruby-v/9056395#9056395"
+        sudo apt-get --purge remove ruby-rvm
+        sudo rm -rf /usr/share/ruby-rvm /etc/rvmrc /etc/profile.d/rvm.sh
+        curl -sL https://get.rvm.io | bash -s stable --ruby --autolibs=enable --autodotfiles
+    ;;
+esac
+        
 
 # Ensure we have RVM available as a shell function so that it can mess
 # with the environment and set everything up properly. The RVM install
@@ -410,25 +425,25 @@ fi
 
 # compile numpy and scipy if requested
 
-# NUMPY_VER="1.6.2"
-# SCIPY_VER="0.10.1"
+NUMPY_VER="1.6.2"
+SCIPY_VER="0.10.1"
 
-# if [[ -n $compile ]]; then
-#     output "Downloading numpy and scipy"
-#     curl -sL -o numpy.tar.gz http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_VER}/numpy-${NUMPY_VER}.tar.gz
-#     #curl -sL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
-#     tar xf numpy.tar.gz
-#     #tar xf scipy.tar.gz
-#     rm -f numpy.tar.gz #scipy.tar.gz
-#     output "Compiling numpy"
-#     cd "$BASE/numpy-${NUMPY_VER}"
-#     python setup.py install
-#     #output "Compiling scipy"
-#     #cd "$BASE/scipy-${SCIPY_VER}"
-#     #python setup.py install
-#     cd "$BASE"
-#     rm -rf numpy-${NUMPY_VER} #scipy-${SCIPY_VER}
-# fi
+if [[ -n $compile ]]; then
+    output "Downloading numpy and scipy"
+    curl -sL -o numpy.tar.gz http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_VER}/numpy-${NUMPY_VER}.tar.gz
+    #curl -sL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
+    tar xf numpy.tar.gz
+    #tar xf scipy.tar.gz
+    rm -f numpy.tar.gz #scipy.tar.gz
+    output "Compiling numpy"
+    cd "$BASE/numpy-${NUMPY_VER}"
+    python setup.py install
+    #output "Compiling scipy"
+    #cd "$BASE/scipy-${SCIPY_VER}"
+    #python setup.py install
+    cd "$BASE"
+    rm -rf numpy-${NUMPY_VER} #scipy-${SCIPY_VER}
+fi
 
 # building correct version of distribute from source
 DISTRIBUTE_VER="0.6.28"
