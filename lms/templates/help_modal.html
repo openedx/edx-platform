@@ -20,17 +20,18 @@
 <%
 discussion_link = get_discussion_link(course) if course else None
 %>
-% if discussion_link:
-    <p>
-      Have a course-specific question?
-      <a href="${discussion_link}" target="_blank"/>
-        Post it on the course forums.
-      </a>
-    </p>
-    <hr>
-% endif
 
-    <p>Have a general question about edX? <a href="/help" target="_blank">Check the FAQ</a>.</p>
+% if discussion_link:
+    <p>If you have a question, problem, or suggestion specific to this course (regarding the
+       lectures, homework, tools, or other materials), please post it on the
+       <a href="${discussion_link}" target="_blank"/>course discussion forum</a>.
+    </p>
+% endif
+    <p>If you have a general question regarding edX or use of the site, please check the
+       <a href="/help" target="_blank">FAQ</a>!</p>
+
+    <p>If you would like to contact the edX general support team directly, please use one of
+       the buttons below:</p>
     <hr>
 
     <div class="help-buttons">
@@ -58,9 +59,10 @@ discussion_link = get_discussion_link(course) if course else None
       <label data-field="email">E-mail*</label>
       <input name="email" type="text">
 % endif
-      <label data-field="subject">Subject*</label>
+      <label data-field="subject">Brief description of the problem*</label>
       <input name="subject" type="text">
-      <label data-field="details">Details*</label>
+      <label data-field="details">Details of the problem you are encountering.
+      Please include any error messages, steps which led to the issue, etc.*</label>
       <textarea name="details"></textarea>
       <input name="tag" type="hidden">
       <div class="submit">
