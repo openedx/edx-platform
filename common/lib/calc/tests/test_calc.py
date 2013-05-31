@@ -37,6 +37,13 @@ class EvaluatorTest(unittest.TestCase):
         self.assertEqual(easy_eval("-3.14"), -3.14)
         self.assertEqual(easy_eval("-.618033989"), -0.618033989)
 
+    def test_period(self):
+        """
+        The string '.' should not evaluate to anything.
+        """
+        self.assertRaises(ParseException, calc.evaluator, {}, {}, '.')
+        self.assertRaises(ParseException, calc.evaluator, {}, {}, '1+.')
+
     def test_trailing_period(self):
         """
         Test that things like '4.' will be 4 and not throw an error
