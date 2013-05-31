@@ -227,10 +227,8 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            wheezy|jessie|maya|olivia|nadia|natty|precise|quantal|raring)
-                sudo apt-get install git
-                ;;
-        case $distro in
+            wheezy|jessie|maya|olivia|nadia|natty|precise|quantal|raring) 
+                sudo apt-get install git ;;  
             squeeze|lisa|katya|oneiric|natty)
                 warning "It seems like you're using $distro which has been deprecated.
                           While we don't technically support this release, the install
@@ -240,6 +238,7 @@ case `uname -s` in
                 read dummy
                 sudo apt-get install git
                 ;; 
+
             *)
                 error "Unsupported distribution - $distro"
                 exit 1
@@ -287,7 +286,7 @@ esac
 clone_repos
 
 # Sanity check to make sure the repo layout hasn't changed
-if [[ -d $BASE/edx-platform/scripts]]; then
+if [[ -d $BASE/edx-platform/scripts ]]; then
     output "Installing system-level dependencies"
     bash $BASE/edx-platform/scripts/install-system-req.sh
 else 
