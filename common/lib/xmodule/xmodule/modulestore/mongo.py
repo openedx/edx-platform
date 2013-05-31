@@ -268,7 +268,7 @@ class MongoModuleStore(ModuleStoreBase):
         query = {'_id.org': location.org,
                  '_id.course': location.course,
                  '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical',
-                                          'wrapper', 'problemset', 'conditional']}
+                                          'wrapper', 'problemset', 'conditional', 'randomize']}
                  }
         # we just want the Location, children, and inheritable metadata
         record_filter = {'_id': 1, 'definition.children': 1}
