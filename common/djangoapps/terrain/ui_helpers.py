@@ -32,8 +32,13 @@ def url_equals(url):
 
 
 @world.absorb
-def is_css_present(css_selector):
-    return world.browser.is_element_present_by_css(css_selector, wait_time=4)
+def is_css_present(css_selector, wait_time=5):
+    return world.browser.is_element_present_by_css(css_selector, wait_time=wait_time)
+
+
+@world.absorb
+def is_css_not_present(css_selector, wait_time=5):
+    return world.browser.is_element_not_present_by_css(css_selector, wait_time=wait_time)
 
 
 @world.absorb

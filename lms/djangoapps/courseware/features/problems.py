@@ -120,7 +120,7 @@ def reset_problem(step):
 def action_button_present(step, buttonname, doesnt_appear):
     button_css = 'section.action input[value*="%s"]' % buttonname
     if doesnt_appear:
-        assert not world.is_css_present(button_css)
+        assert world.is_css_not_present(button_css)
     else:
         assert world.is_css_present(button_css)
 

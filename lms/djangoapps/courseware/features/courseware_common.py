@@ -19,11 +19,6 @@ def i_visit_the_course_info_url(step):
     world.visit('/courses/MITx/6.002x/2012_Fall/courseware')
 
 
-@step(u'I do not see "([^"]*)" anywhere on the page')
-def i_do_not_see_text_anywhere_on_the_page(step, text):
-    assert world.browser.is_text_not_present(text)
-
-
 @step(u'I am on the dashboard page$')
 def i_am_on_the_dashboard_page(step):
     assert world.is_css_present('section.courses')
