@@ -3,6 +3,12 @@
 
 <%namespace name='static' file='../static_content.html'/>
 
+%if not user_logged_in: 
+<%block name="bodyclass">
+  not-signedin 
+</%block>
+%endif
+
 <%block name="content">
 <section class="container activation">
 
