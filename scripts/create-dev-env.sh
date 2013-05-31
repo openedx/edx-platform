@@ -227,13 +227,16 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            wheezy|jessie|maya|olivia|nadia|precise|quantal|raring) 
+            wheezy|jessie|maya|olivia|nadia|precise|quantal) 
                 sudo apt-get install git ;;  
-            squeeze|lisa|katya|oneiric|natty)
+            squeeze|lisa|katya|oneiric|natty|raring)
                 warning "It seems like you're using $distro which has been deprecated.
                           While we don't technically support this release, the install
                           script will probably still work.
 
+                          Raring requires an install of rvm to work correctly as the raring
+                          package manager does not yet include a package for rvm
+                          
                           Press return to continue or control-C to abort"
                 read dummy
                 sudo apt-get install git

@@ -44,6 +44,7 @@ case `uname -s` in
                 sudo apt-get -y install gfortran
                 sudo apt-get -y install graphviz libgraphviz-dev graphviz-dev
                 sudo apt-get -y install libatlas-dev libblas-dev 
+                sudo apt-get -y install ruby-rvm
                 # install packages listed in APT_PKGS_FILE
                 cat $APT_PKGS_FILE | xargs sudo apt-get -y install
                 ;;
