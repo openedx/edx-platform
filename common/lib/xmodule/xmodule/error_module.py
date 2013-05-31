@@ -63,8 +63,10 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
     @classmethod
     def _construct(self, system, contents, error_msg, location):
 
+        if isinstance(location, dict) and 'course' in location:
+            location = Location(location)
         if isinstance(location, Location) and location.name is None:
-            location = location._replace(
+            location = location.replace(
                 category='error',
                 # Pick a unique url_name -- the sha1 hash of the contents.
                 # NOTE: We could try to pull out the url_name of the errored descriptor,

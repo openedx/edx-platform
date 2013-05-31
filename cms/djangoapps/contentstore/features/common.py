@@ -1,12 +1,10 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from nose.tools import assert_true
 from nose.tools import assert_equal
 
-from xmodule.modulestore.django import _MODULESTORES, modulestore
-from xmodule.templates import update_templates
 from auth.authz import get_user_by_email
 
 from selenium.webdriver.common.keys import Keys
@@ -18,7 +16,7 @@ logger = getLogger(__name__)
 ###########  STEP HELPERS ##############
 
 @step('I (?:visit|access|open) the Studio homepage$')
-def i_visit_the_studio_homepage(step):
+def i_visit_the_studio_homepage(_step):
     # To make this go to port 8001, put
     # LETTUCE_SERVER_PORT = 8001
     # in your settings.py file.
@@ -28,17 +26,17 @@ def i_visit_the_studio_homepage(step):
 
 
 @step('I am logged into Studio$')
-def i_am_logged_into_studio(step):
+def i_am_logged_into_studio(_step):
     log_into_studio()
 
 
 @step('I confirm the alert$')
-def i_confirm_with_ok(step):
+def i_confirm_with_ok(_step):
     world.browser.get_alert().accept()
 
 
 @step(u'I press the "([^"]*)" delete icon$')
-def i_press_the_category_delete_icon(step, category):
+def i_press_the_category_delete_icon(_step, category):
     if category == 'section':
         css = 'a.delete-button.delete-section-button span.delete-icon'
     elif category == 'subsection':
@@ -49,7 +47,7 @@ def i_press_the_category_delete_icon(step, category):
 
 
 @step('I have opened a new course in Studio$')
-def i_have_opened_a_new_course(step):
+def i_have_opened_a_new_course(_step):
     world.clear_courses()
     log_into_studio()
     create_a_course()
@@ -73,7 +71,7 @@ def create_studio_user(
     registration.register(studio_user)
     registration.activate()
 
-    user_profile = world.UserProfileFactory(user=studio_user)
+    world.UserProfileFactory(user=studio_user)
 
 
 def fill_in_course_info(
@@ -109,7 +107,7 @@ def log_into_studio(
 
 
 def create_a_course():
-    c = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
@@ -149,8 +147,9 @@ def set_date_and_time(date_css, desired_date, time_css, desired_time):
     world.css_fill(date_css, desired_date)
     # hit TAB to get to the time field
     e = world.css_find(date_css).first
+    # pylint: disable=W0212
     e._element.send_keys(Keys.TAB)
     world.css_fill(time_css, desired_time)
     e = world.css_find(time_css).first
     e._element.send_keys(Keys.TAB)
-    time.sleep(float(1))    
+    time.sleep(float(1))

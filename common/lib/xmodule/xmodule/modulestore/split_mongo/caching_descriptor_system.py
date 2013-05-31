@@ -54,7 +54,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             course_entry.get('blocks', {})
             .get(course_entry.get('root')))
 
-    def _load_item(self, usage_id):
+    def _load_item(self, usage_id, course_entry_override=None):
         # TODO ensure all callers of system.load_item pass just the id
         json_data = self.module_data.get(usage_id)
         if json_data is None:
@@ -68,46 +68,48 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             json_data.get('category'),
             self.default_class
         )
-        return self.xblock_from_json(class_, usage_id, json_data)
+        return self.xblock_from_json(class_, usage_id, json_data, course_entry_override)
 
-    def xblock_from_json(self, class_, usage_id, json_data):
+    def xblock_from_json(self, class_, usage_id, json_data, course_entry_override=None):
+        if course_entry_override is None:
+            course_entry_override = self.course_entry
+        # most likely a lazy loader but not the id directly
+        definition = json_data.get('definition', {})
+        metadata = json_data.get('metadata', {})
+
+        kvs = SplitMongoKVS(definition,
+            json_data.get('children', []),
+            metadata, json_data.get('_inherited_metadata'))
+
+        block_locator = BlockUsageLocator(
+            version_guid=course_entry_override['_id'],
+            usage_id=usage_id,
+            course_id=course_entry_override.get('course_id'),
+            revision=course_entry_override.get('revision')
+        )
+        model_data = DbModel(kvs, class_, None,
+            SplitMongoKVSid(
+                # DbModel req's that these support .url()
+                block_locator,
+                self.modulestore.definition_locator(definition)))
         try:
-            # most likely a lazy loader but not the id directly
-            definition = json_data.get('definition', {})
-            metadata = json_data.get('metadata', {})
-
-            kvs = SplitMongoKVS(definition,
-                json_data.get('children', []),
-                metadata, json_data.get('_inherited_metadata'))
-
-            block_locator = BlockUsageLocator(
-                version_guid=self.course_entry['_id'],
-                usage_id=usage_id,
-                course_id=self.course_entry.get('course_id'), 
-                revision=self.course_entry.get('revision')
-            )
-            model_data = DbModel(kvs, class_, None,
-                SplitMongoKVSid(
-                    # DbModel req's that these support .url()
-                    block_locator,
-                    self.modulestore.definition_locator(definition)))
             module = class_(self, json_data.get('category'),
                 block_locator, self.modulestore.definition_locator(definition),
                 model_data)
-            module.edited_by = json_data.get('edited_by')
-            module.edited_on = json_data.get('edited_on')
-            module.previous_version = json_data.get('previous_version')
-            module.update_version = json_data.get('update_version')
-            return module
-        except:
+        except Exception:
             log.warning("Failed to load descriptor", exc_info=True)
             if usage_id is None:
                 usage_id = "MISSING"
-
             return ErrorDescriptor.from_json(
                 json_data,
                 self,
-                BlockUsageLocator(version_guid=self.course_entry['_id'],
+                BlockUsageLocator(version_guid=course_entry_override['_id'],
                     usage_id=usage_id),
                 error_msg=exc_info_to_str(sys.exc_info())
             )
+
+        module.edited_by = json_data.get('edited_by')
+        module.edited_on = json_data.get('edited_on')
+        module.previous_version = json_data.get('previous_version')
+        module.update_version = json_data.get('update_version')
+        return module

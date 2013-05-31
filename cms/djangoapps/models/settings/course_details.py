@@ -41,25 +41,25 @@ class CourseDetails(object):
         course.enrollment_start = descriptor.enrollment_start
         course.enrollment_end = descriptor.enrollment_end
 
-        temploc = course_location._replace(category='about', name='syllabus')
+        temploc = course_location.replace(category='about', name='syllabus')
         try:
             course.syllabus = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
-        temploc = temploc._replace(name='overview')
+        temploc = temploc.replace(name='overview')
         try:
             course.overview = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
-        temploc = temploc._replace(name='effort')
+        temploc = temploc.replace(name='effort')
         try:
             course.effort = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
-        temploc = temploc._replace(name='video')
+        temploc = temploc.replace(name='video')
         try:
             raw_video = get_modulestore(temploc).get_item(temploc).data
             course.intro_video = CourseDetails.parse_video_tag(raw_video)
@@ -73,9 +73,9 @@ class CourseDetails(object):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
-        # # TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
+        # TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
         course_location = Location(jsondict['course_location'])
-        # # Will probably want to cache the inflight courses because every blur generates an update
+        # Will probably want to cache the inflight courses because every blur generates an update
         descriptor = get_modulestore(course_location).get_item(course_location)
 
         dirty = False
@@ -126,16 +126,16 @@ class CourseDetails(object):
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
-        temploc = Location(course_location)._replace(category='about', name='syllabus')
+        temploc = Location(course_location).replace(category='about', name='syllabus')
         update_item(temploc, jsondict['syllabus'])
 
-        temploc = temploc._replace(name='overview')
+        temploc = temploc.replace(name='overview')
         update_item(temploc, jsondict['overview'])
 
-        temploc = temploc._replace(name='effort')
+        temploc = temploc.replace(name='effort')
         update_item(temploc, jsondict['effort'])
 
-        temploc = temploc._replace(name='video')
+        temploc = temploc.replace(name='video')
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
         update_item(temploc, recomposed_video_tag)
 

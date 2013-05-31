@@ -49,7 +49,7 @@ MODULESTORE_OPTIONS = {
     'db': 'test_xmodule',
     'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
     'fs_root': TEST_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string'
+    'render_template': 'mitxmako.shortcuts.render_to_string',
     'tz_aware': True
 }
 

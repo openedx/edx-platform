@@ -150,11 +150,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             )
             self._add_cache(course_entry['_id'], system)
             self.cache_items(system, usage_ids, depth, lazy)
-        elif 'course_id' in course_entry:
-            # HACK :-( if same version ref'd by more than one course in same thread, the
-            # caching of the course_id on the entry may be wrong. Force it here.
-            system.course_entry['course_id'] = course_entry['course_id']
-        return [system.load_item(usage_id) for usage_id in usage_ids]
+        return [system.load_item(usage_id, course_entry) for usage_id in usage_ids]
 
     def _get_cache(self, course_version_guid):
         """
@@ -676,8 +672,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
             course_parent = None
 
         # fetch and return the new item--fetching is unnecessary but a good qc step
-        return self.get_item(BlockUsageLocator(course_id=course_parent, 
-                                               usage_id=new_usage_id, 
+        return self.get_item(BlockUsageLocator(course_id=course_parent,
+                                               usage_id=new_usage_id,
                                                version_guid=new_id))
 
     def create_course(self, org, prettyid, user_id, id_root=None, metadata=None, course_data=None,

@@ -446,6 +446,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         # Load the global settings as a dictionary
         grading_policy = self.grading_policy
+        # BOY DO I HATE THIS grading_policy CODE ACROBATICS YET HERE I ADD MORE (dhm)--this fixes things persisted w/
+        # defective grading policy values (but not None)
+        if 'GRADER' not in grading_policy:
+            grading_policy['GRADER'] = CourseFields.grading_policy.default['GRADER']
+        if 'GRADE_CUTOFFS' not in grading_policy:
+            grading_policy['GRADE_CUTOFFS'] = CourseFields.grading_policy.default['GRADE_CUTOFFS']
 
         # Override any global settings with the course settings
         grading_policy.update(course_policy)

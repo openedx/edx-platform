@@ -226,7 +226,7 @@ def edit_unit(request, location):
         'section': containing_section,
         'new_unit_category': 'vertical',
         'unit_state': unit_state,
-        'published_date': item.cms.published_date.strftime('%B %d, %Y') if item.cms.published_date is not None else None,
+        'published_date': get_default_time_display(item.cms.published_date) if item.cms.published_date is not None else None
     })
 
 

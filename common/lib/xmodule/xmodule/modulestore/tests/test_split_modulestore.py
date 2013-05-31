@@ -13,7 +13,7 @@ from importlib import import_module
 
 from xblock.core import Scope
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError, VersionConflictError
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DescriptionLocator
 
 class SplitModuleTest(unittest.TestCase):
@@ -41,13 +41,13 @@ class SplitModuleTest(unittest.TestCase):
     # These version_guids correspond to values hard-coded in fixture files
     # used for these tests. The files live in mitx/fixtures/splitmongo_json/*
 
-    GUID_D0  = "1d00000000000000dddd0000"    # v12345d
-    GUID_D1  = "1d00000000000000dddd1111"    # v12345d1
-    GUID_D2  = "1d00000000000000dddd2222"    # v23456d
-    GUID_D3  = "1d00000000000000dddd3333"    # v12345d0
-    GUID_D4  = "1d00000000000000dddd4444"    # v23456d0
-    GUID_D5  = "1d00000000000000dddd5555"    # v345679d
-    GUID_P   = "1d00000000000000eeee0000"    # v23456p
+    GUID_D0 = "1d00000000000000dddd0000"  # v12345d
+    GUID_D1 = "1d00000000000000dddd1111"  # v12345d1
+    GUID_D2 = "1d00000000000000dddd2222"  # v23456d
+    GUID_D3 = "1d00000000000000dddd3333"  # v12345d0
+    GUID_D4 = "1d00000000000000dddd4444"  # v23456d0
+    GUID_D5 = "1d00000000000000dddd5555"  # v345679d
+    GUID_P = "1d00000000000000eeee0000"  # v23456p
 
     @classmethod
     def setUpClass(cls):
@@ -57,8 +57,7 @@ class SplitModuleTest(unittest.TestCase):
         '''
         dbname = cls.MODULESTORE['OPTIONS']['db']
         collection_prefix = cls.MODULESTORE['OPTIONS']['collection']
-        # TODO is it safe to assume mitx will be on the path?
-        match = re.search(r'(.*?/mitx)(?:$|/)', os.getcwd())
+        match = re.search(r'(.*?/(?:edx-platform|mitx))(?:$|/)', os.getcwd())
         cwd = match.group(1) + '/'
         processes = [
             # /usr/local/bin/mongoimport
@@ -309,8 +308,8 @@ class SplitModuleItemTests(SplitModuleTest):
 
         # try to look up other revisions
         self.assertRaises(ItemNotFoundError,
-                          modulestore().get_item, 
-                          BlockUsageLocator(course_id=locator.as_course_locator(), 
+                          modulestore().get_item,
+                          BlockUsageLocator(course_id=locator.as_course_locator(),
                                             usage_id=locator.usage_id,
                                             revision='published'))
         locator.revision = 'draft'
@@ -660,13 +659,15 @@ class TestItemCrud(SplitModuleTest):
 
         # delete a leaf
         problems = modulestore().get_items(reusable_location, {'category' : 'problem'})
-        new_course_loc = modulestore().delete_item(problems[0].location, 'deleting_user')
+        locn_to_del = problems[0].location
+        new_course_loc = modulestore().delete_item(locn_to_del, 'deleting_user')
         deleted = BlockUsageLocator(course_id=reusable_location.course_id,
                                     revision=reusable_location.revision,
-                                    usage_id=problems[0].location.usage_id)
+                                    usage_id=locn_to_del.usage_id)
         self.assertFalse(modulestore().has_item(deleted))
-        locator = BlockUsageLocator(problems[0].location)
-        locator.course_id = None
+        self.assertRaises(VersionConflictError, modulestore().has_item, locn_to_del)
+        locator = BlockUsageLocator(version_guid=locn_to_del.version_guid,
+            usage_id=locn_to_del.usage_id)
         self.assertTrue(modulestore().has_item(locator))
         self.assertNotEqual(new_course_loc.version_guid, course.location.version_guid)
 
@@ -676,10 +677,15 @@ class TestItemCrud(SplitModuleTest):
         # check subtree
         def check_subtree(node):
             if node:
-                self.assertFalse(modulestore().has_item(BlockUsageLocator(reusable_location,
-                    usage_id=node.location.usage_id)))
-                locator = BlockUsageLocator(node.location)
-                locator.course_id = None
+                node_loc = node.location
+                self.assertFalse(modulestore().has_item(
+                    BlockUsageLocator(
+                        course_id=node_loc.course_id,
+                        revision=node_loc.revision,
+                        usage_id=node.location.usage_id)))
+                locator = BlockUsageLocator(
+                    version_guid=node.location.version_guid,
+                    usage_id=node.location.usage_id)
                 self.assertTrue(modulestore().has_item(locator))
                 if node.has_children:
                     for sub in node.get_children():
@@ -693,7 +699,7 @@ class TestItemCrud(SplitModuleTest):
             course_id=course.location.course_id,
             usage_id=course.location.usage_id,
             revision='draft')
-        for i in range(4):
+        for _ in range(4):
             self.create_subtree_for_deletion(root, ['chapter', 'vertical', 'problem'])
         return modulestore().get_item(root)
 
@@ -702,7 +708,7 @@ class TestItemCrud(SplitModuleTest):
             return
         node = modulestore().create_item(parent, category_queue[0], 'deleting_user')
         node_loc = BlockUsageLocator(parent.as_course_locator(), usage_id=node.location.usage_id)
-        for i in range(4):
+        for _ in range(4):
             self.create_subtree_for_deletion(node_loc, category_queue[1:])
 
 class TestCourseCreation(SplitModuleTest):
