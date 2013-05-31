@@ -35,29 +35,29 @@ Feature: Problem Editor
   Scenario: User can modify float input values
     Given I have created a Blank Common Problem
     And I edit and select Settings
-    Then I can set the weight to 3.5
+    Then I can set the weight to "3.5"
     And my change to weight is persisted
     And I can revert to the default value of unset for weight
 
   Scenario: User cannot type letters in float number field
     Given I have created a Blank Common Problem
     And I edit and select Settings
-    Then if I set the weight to abc, it remains unset
+    Then if I set the weight to "abc", it remains unset
 
   Scenario: User cannot type decimal values integer number field
     Given I have created a Blank Common Problem
     And I edit and select Settings
-    Then if I set the max attempts to 2.34, the max attempts are persisted as 234
+    Then if I set the max attempts to "2.34", it displays initially as "234", and is persisted as "234"
 
   Scenario: User cannot type out of range values in an integer number field
     Given I have created a Blank Common Problem
     And I edit and select Settings
-    Then if I set the max attempts to -3, the max attempts are persisted as 1
+    Then if I set the max attempts to "-3", it displays initially as "-3", and is persisted as "1"
 
   Scenario: Settings changes are not saved on Cancel
     Given I have created a Blank Common Problem
     And I edit and select Settings
-    Then I can set the weight to 3.5
+    Then I can set the weight to "3.5"
     And I can modify the display name
     Then If I press Cancel my changes are not persisted
 
