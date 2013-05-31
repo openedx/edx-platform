@@ -8,5 +8,4 @@ def i_click_on_the_tab_and_check(step):
         tab_text = tab_title['TabName']
         title = tab_title['PageTitle']
         world.click_link(tab_text)
-        world.save_the_html()
         assert(title in world.browser.title)
