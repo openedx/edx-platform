@@ -70,7 +70,7 @@ class VideoModuleLogicTest(LogicTest):
     def test_get_timeframe_no_parameters(self):
         """Make sure that timeframe() works correctly w/o parameters"""
         xmltree = etree.fromstring('<video>test</video>')
-        output = self.xmodule._get_timeframe(xmltree)
+        output = self.xmodule.get_timeframe(xmltree)
         self.assertEqual(output, ('', ''))
 
     def test_get_timeframe_with_one_parameter(self):
@@ -78,7 +78,7 @@ class VideoModuleLogicTest(LogicTest):
         xmltree = etree.fromstring(
             '<video from="00:04:07">test</video>'
         )
-        output = self.xmodule._get_timeframe(xmltree)
+        output = self.xmodule.get_timeframe(xmltree)
         self.assertEqual(output, (247, ''))
 
     def test_get_timeframe_with_two_parameters(self):
@@ -89,7 +89,7 @@ class VideoModuleLogicTest(LogicTest):
                     to="13:04:39"
                 >test</video>'''
         )
-        output = self.xmodule._get_timeframe(xmltree)
+        output = self.xmodule.get_timeframe(xmltree)
         self.assertEqual(output, (247, 47079))
 
 
