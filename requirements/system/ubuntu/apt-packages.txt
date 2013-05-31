@@ -3,6 +3,7 @@ pkg-config
 curl
 git
 python-virtualenv
+python-scipy
 build-essential
 python-dev
 gfortran
