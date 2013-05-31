@@ -335,9 +335,8 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         else:
             err_descriptor_class = NonStaffErrorDescriptor
 
-        err_descriptor = err_descriptor_class.from_xml(
-            str(descriptor), descriptor.system,
-            org=descriptor.location.org, course=descriptor.location.course,
+        err_descriptor = err_descriptor_class.from_descriptor(
+            descriptor,
             error_msg=exc_info_to_str(sys.exc_info())
         )
 
