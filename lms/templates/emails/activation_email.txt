@@ -1,4 +1,4 @@
-Thank you for signing up for edX! To activate your account, 
+Thank you for signing up for Stanford Online! To activate your account,
 please copy and paste this address into your web browser's
 address bar:
 
@@ -10,4 +10,4 @@ address bar:
 
 If you didn't request this, you don't need to do anything; you won't
 receive any more email from us. Please do not reply to this e-mail; if
-you require assistance, check the help section of the edX web site.
+you require assistance, check the about section of the Stanford Online Courses web site.
