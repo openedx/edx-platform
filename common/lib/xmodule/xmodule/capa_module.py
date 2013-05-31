@@ -69,7 +69,7 @@ class CapaFields(object):
     max_attempts = StringyInteger(
         display_name="Maximum Attempts",
         help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
-        values = {"min" : 1 }, scope=Scope.settings
+        values={"min": 1}, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
@@ -103,7 +103,7 @@ class CapaFields(object):
     weight = StringyFloat(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point.",
-        values = {"min" : 0 , "step": .1},
+        values={"min": 0, "step": .1},
         scope=Scope.settings
     )
     markdown = String(help="Markdown source of this module", scope=Scope.settings)

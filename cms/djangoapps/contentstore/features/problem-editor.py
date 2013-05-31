@@ -94,9 +94,9 @@ def i_can_revert_to_default_for_randomization(step):
     world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Always", False)
 
 
-@step('I can set the weight to 3.5')
-def i_can_set_weight_to_3_5(step):
-    world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill('3.5')
+@step('I can set the weight to "(.*)"?')
+def i_can_set_weight(step, weight):
+    set_weight(weight)
     verify_modified_weight()
 
 
@@ -113,9 +113,9 @@ def i_can_revert_to_default_for_unset_weight(step):
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
 
 
-@step('if I set the weight to abc, it remains unset')
-def set_the_weight_to_abc(step):
-    world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill('abc')
+@step('if I set the weight to "(.*)", it remains unset')
+def set_the_weight_to_abc(step, bad_weight):
+    set_weight(bad_weight)
     # We show the clear button immediately on type, hence the "True" here.
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", True)
     world.save_component_and_reopen(step)
@@ -123,20 +123,12 @@ def set_the_weight_to_abc(step):
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
 
 
-@step('if I set the max attempts to 2.34, the max attempts are persisted as 234')
-def set_the_max_attempts_234(step):
-    world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css('.setting-input')[0].fill('2.34')
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "234", True)
+@step('if I set the max attempts to "(.*)", it displays initially as "(.*)", and is persisted as "(.*)"')
+def set_the_max_attempts(step, max_attempts_set, max_attempts_displayed, max_attempts_persisted):
+    world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css('.setting-input')[0].fill(max_attempts_set)
+    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_displayed, True)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "234", True)
-
-
-@step('I set the max attempts to -3, the max attempts are persisted as 1')
-def set_max_attempts_to_neg_3(step):
-    world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css('.setting-input')[0].fill('-3')
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "-3", True)
-    world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, "1", True)
+    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_persisted, True)
 
 
 @step('Edit High Level Source is not visible')
@@ -189,3 +181,7 @@ def verify_modified_display_name_with_special_chars():
 
 def verify_unset_display_name():
     world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
+
+
+def set_weight(weight):
+    world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill(weight)

@@ -37,14 +37,14 @@ class WordCloudFields(object):
         help="Number of text boxes available for students to input words/sentences.",
         scope=Scope.settings,
         default=5,
-        values = {"min" : 1 }
+        values={"min": 1}
     )
     num_top_words = StringyInteger(
         display_name="Maximum Words",
         help="Maximum number of words to be displayed in generated word cloud.",
         scope=Scope.settings,
         default=250,
-        values = {"min" : 1 }
+        values={"min": 1}
     )
     display_student_percents = StringyBoolean(
         display_name="Show Percents",

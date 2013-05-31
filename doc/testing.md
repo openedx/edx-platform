@@ -115,6 +115,11 @@ xmodule can be tested independently, with this:
 
     rake test_common/lib/xmodule
 
+other module level tests include
+
+* `rake test_common/lib/capa`
+* `rake test_common/lib/calc`
+
 To run a single django test class:
 
     rake test_lms[courseware.tests.tests:testViewAuth]
