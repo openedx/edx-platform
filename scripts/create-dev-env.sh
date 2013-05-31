@@ -422,12 +422,11 @@ if [[ -n $compile ]]; then
     rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
 fi
 
-output "Building correct version of distribute"
 # building correct version of distribute from source
 DISTRIBUTE_VER="0.6.28"
 output "Building Distribute"
-SITE_PACKAGES = "$PYTHON_DIR/edx-platform/lib/python2.7/site-packages"
-cd $SITE_PACKAGES
+SITE_PACKAGES="$HOME/.virtualenvs/edx-platform/lib/python2.7/site-packages"
+cd "$SITE_PACKAGES"
 curl -O http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
 tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
 cd distribute-${DISTRIBUTE_VER}
@@ -458,7 +457,7 @@ case `uname -s` in
 esac
 
 output "Installing edX pre-requirements"
-pip install -r $BASE/edx-platform/requirements/pre.txt
+pip install -r $BASE/edx-platform/requirements/edx/pre.txt
 
 output "Installing edX requirements"
 # Install prereqs
