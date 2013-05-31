@@ -212,6 +212,13 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
             else:
+                #Check if overriding subparts being graded lets possible > 0.
+                #This occurs if there's an error in the course data.
+                graded_total ,_ = graders.aggregate_scores(scores, section_name)
+
+                if graded_total.possible > 0:
+                    format_scores.append(graded_total)
+
                 log.exception("Unable to grade a section with a total possible score of zero. " +
                               str(section_descriptor.location))
 
