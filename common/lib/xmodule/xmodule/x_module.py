@@ -76,7 +76,7 @@ class HTMLSnippet(object):
         """
         raise NotImplementedError(
             "get_html() must be provided by specific modules - not present in {0}"
-                                  .format(self.__class__))
+            .format(self.__class__))
 
 
 class XModuleFields(object):
@@ -358,7 +358,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     metadata_translations = {
         'slug': 'url_name',
         'name': 'display_name',
-        }
+    }
 
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
@@ -460,7 +460,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return False
 
-
     # ================================= JSON PARSING ===========================
     @staticmethod
     def load_from_json(json_data, system, default_class=None):
@@ -525,10 +524,10 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # ================================= XML PARSING ============================
     @staticmethod
     def load_from_xml(xml_data,
-            system,
-            org=None,
-            course=None,
-            default_class=None):
+                      system,
+                      org=None,
+                      course=None,
+                      default_class=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
         on the contents of xml_data.
@@ -543,7 +542,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         class_ = XModuleDescriptor.load_class(
             etree.fromstring(xml_data).tag,
             default_class
-            )
+        )
         # leave next line, commented out - useful for low-level debugging
         # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
         #        etree.fromstring(xml_data).tag,class_))
@@ -665,11 +664,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 type = "Integer"
             elif isinstance(field, Float):
                 type = "Float"
-            metadata_fields[field.name] = {'field_name' : field.name,
-                                           'type' : type,
-                                           'display_name' : field.display_name,
+            metadata_fields[field.name] = {'field_name': field.name,
+                                           'type': type,
+                                           'display_name': field.display_name,
                                            'value': field.to_json(value),
-                                           'options' : values,
+                                           'options': values,
                                            'default_value': field.to_json(default_value),
                                            'inheritable': inheritable,
                                            'explicitly_set': explicitly_set,
@@ -768,7 +767,7 @@ class ModuleSystem(object):
                  s3_interface=None,
                  cache=None,
                  can_execute_unsafe_code=None,
-                ):
+    ):
         '''
         Create a closure around the system environment.
 
