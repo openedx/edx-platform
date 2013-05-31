@@ -482,8 +482,11 @@ bundle install
 
 mkdir "$BASE/log" || true
 mkdir "$BASE/db" || true
+mkdir "$BASE/data" || true
 
-
+rake django-admin[syncdb]
+rake django-admin[migrate]
+rake django-admin[update-templates]
 # Configure Git
 
 output "Fixing your git default settings"
