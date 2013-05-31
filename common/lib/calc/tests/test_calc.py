@@ -5,7 +5,7 @@ Unit tests for calc.py
 import unittest
 import numpy
 import calc
-
+from pyparsing import ParseException
 
 class EvaluatorTest(unittest.TestCase):
     """
@@ -20,6 +20,11 @@ class EvaluatorTest(unittest.TestCase):
     def test_number_input(self):
         """
         Test different kinds of float inputs
+
+        See also
+          test_trailing_period (slightly different)
+          test_exponential_answer
+          test_si_suffix
         """
         easy_eval = lambda x: calc.evaluator({}, {}, x)
 
@@ -30,7 +35,15 @@ class EvaluatorTest(unittest.TestCase):
         self.assertEqual(easy_eval("-13"), -13)
         self.assertEqual(easy_eval("-3.14"), -3.14)
         self.assertEqual(easy_eval("-.618033989"), -0.618033989)
-        # See also test_exponential_answer and test_si_suffix
+
+    def test_trailing_period(self):
+        """
+        Test that things like '4.' will be 4 and not throw an error
+        """
+        try:
+            self.assertEqual(4.0, calc.evaluator({}, {}, '4.'))
+        except ParseException:
+            self.fail("'4.' is a valid input, but threw an exception")
 
     def test_exponential_answer(self):
         """

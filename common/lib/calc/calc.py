@@ -183,7 +183,7 @@ def evaluator(variables, functions, string, cs=False):
     number_part = Word(nums)
 
     # 0.33 or 7 or .34
-    inner_number = (number_part + Optional("." + number_part)) | ("." + number_part)
+    inner_number = (number_part + Optional("." + Optional(number_part))) | ("." + number_part)
 
     # 0.33k or -17
     number = (Optional(minus | plus) + inner_number
