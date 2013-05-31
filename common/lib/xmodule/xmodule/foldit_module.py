@@ -16,10 +16,10 @@ log = logging.getLogger(__name__)
 
 class FolditFields(object):
     # default to what Spring_7012x uses
-    required_level_half = Integer(default=2, scope=Scope.settings)
+    required_level_half = Integer(default=3, scope=Scope.settings)
     required_sublevel_half = Integer(default=5, scope=Scope.settings)
-    required_level= Integer(default=4, scope=Scope.settings)
-    required_sublevel= Integer(default=5, scope=Scope.settings)
+    required_level = Integer(default=4, scope=Scope.settings)
+    required_sublevel = Integer(default=5, scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
 
     show_basic_score = String(scope=Scope.settings, default='false')
