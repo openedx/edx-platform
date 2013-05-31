@@ -129,9 +129,12 @@ def should_have_link_with_id_and_text(step, link_id, text):
     assert_equals(link.text, text)
 
 
-@step(r'should see "(.*)" (?:somewhere|anywhere) in (?:the|this) page')
-def should_see_in_the_page(step, text):
-    assert_in(text, world.css_text('body'))
+@step(r'should( not)? see "(.*)" (?:somewhere|anywhere) (?:in|on) (?:the|this) page')
+def should_see_in_the_page(step, doesnt_appear, text):
+    if doesnt_appear:
+        assert world.browser.is_text_not_present(text)
+    else:
+        assert_in(text, world.css_text('body'))
 
 
 @step('I am logged in$')

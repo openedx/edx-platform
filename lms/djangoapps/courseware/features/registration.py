@@ -19,16 +19,13 @@ def i_register_for_the_course(step, course):
     assert world.is_css_present('section.container.dashboard')
 
 
-@step(u'I should see the course numbered "([^"]*)" in my dashboard$')
-def i_should_see_that_course_in_my_dashboard(step, course):
+@step(u'I should( NOT)? see the course numbered "([^"]*)" in my dashboard$')
+def i_should_see_that_course_in_my_dashboard(step, doesnt_appear, course):
     course_link_css = 'section.my-courses a[href*="%s"]' % course
-    assert world.is_css_present(course_link_css)
-
-
-@step(u'I should NOT see the course numbered "([^"]*)" in my dashboard$')
-def i_should_not_see_that_course_in_my_dashboard(step, course):
-    course_link_css = 'section.my-courses a[href*="%s"]' % course
-    assert not world.is_css_present(course_link_css)
+    if doesnt_appear:
+        assert not world.is_css_present(course_link_css)
+    else:
+        assert world.is_css_present(course_link_css)
 
 
 @step(u'I unregister for the course numbered "([^"]*)"')

@@ -42,11 +42,11 @@ def css_has_text(css_selector, text):
 
 
 @world.absorb
-def css_find(css):
+def css_find(css, wait_time=5):
     def is_visible(driver):
         return EC.visibility_of_element_located((By.CSS_SELECTOR, css,))
 
-    world.browser.is_element_present_by_css(css, 5)
+    world.browser.is_element_present_by_css(css, wait_time=wait_time)
     wait_for(is_visible)
     return world.browser.find_by_css(css)
 
@@ -56,6 +56,7 @@ def css_click(css_selector):
     """
     Perform a click on a CSS selector, retrying if it initially fails
     """
+    assert is_css_present(css_selector)
     try:
         world.browser.find_by_css(css_selector).click()
 
@@ -81,6 +82,7 @@ def css_click_at(css, x=10, y=10):
 
 @world.absorb
 def css_fill(css_selector, text):
+    assert is_css_present(css_selector)
     world.browser.find_by_css(css_selector).first.fill(text)
 
 
@@ -101,6 +103,7 @@ def css_text(css_selector):
 
 @world.absorb
 def css_visible(css_selector):
+    assert is_css_present(css_selector)
     return world.browser.find_by_css(css_selector).visible
 
 

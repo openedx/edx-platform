@@ -8,7 +8,7 @@ Steps for problem.feature lettuce tests
 from lettuce import world, step
 from lettuce.django import django_url
 from common import i_am_registered_for_the_course, TEST_SECTION_NAME
-from problems_setup import *
+from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
 
 
 @step(u'I am viewing a "([^"]*)" problem with "([^"]*)" attempt')
@@ -116,21 +116,13 @@ def reset_problem(step):
     world.css_click('input.reset')
 
 
-@step(u'The "([^"]*)" button does not appear')
-def action_button_not_present(step, buttonname):
+@step(u'The "([^"]*)" button does( not)? appear')
+def action_button_present(step, buttonname, doesnt_appear):
     button_css = 'section.action input[value*="%s"]' % buttonname
-    assert not world.is_css_present(button_css)
-
-
-@step(u'The "([^"]*)" button does appear')
-def action_button_present(step, buttonname):
-    button_css = 'section.action input[value*="%s"]' % buttonname
-    assert world.is_css_present(button_css)
-
-
-@step(u'I do not see "([^"]*)" anywhere on the page')
-def i_do_not_see_text_anywhere_on_the_page(step, text):
-    assert world.browser.is_text_not_present(text)
+    if doesnt_appear:
+        assert not world.is_css_present(button_css)
+    else:
+        assert world.is_css_present(button_css)
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')

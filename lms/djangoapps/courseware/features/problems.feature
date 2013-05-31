@@ -86,51 +86,32 @@ Feature: Answer problems
         | script            | incorrect     |
 
 
-    Scenario: I can answer a problem with one attempt correctly
+    Scenario: I can answer a problem with one attempt correctly and not reset
         Given I am viewing a "multiple choice" problem with "1" attempt
-        Then I should see "You have used 0 of 1 submissions" somewhere in the page
-        And The "Final Check" button does appear
         When I answer a "multiple choice" problem "correctly"
-        Then My "multiple choice" answer is marked "correct"
-        And The "multiple choice" problem displays a "correct" answer
-        And The "Reset" button does not appear
+        Then The "Reset" button does not appear
 
-    Scenario: I can answer a problem with one attempt incorrectly
-        Given I am viewing a "multiple choice" problem with "1" attempt
-        When I answer a "multiple choice" problem "incorrectly"
-        Then My "multiple choice" answer is marked "incorrect"
-        And The "multiple choice" problem displays a "incorrect" answer
-        And The "Reset" button does not appear
-
-    Scenario: I can answer a problem with multiple attempts correctly
+    Scenario: I can answer a problem with multiple attempts correctly and still reset the problem
         Given I am viewing a "multiple choice" problem with "3" attempts
         Then I should see "You have used 0 of 3 submissions" somewhere in the page
         When I answer a "multiple choice" problem "correctly"
-        Then My "multiple choice" answer is marked "correct"
-        And The "multiple choice" problem displays a "correct" answer
-        And The "Reset" button does appear
+        Then The "Reset" button does appear
 
-    Scenario: I can answer a problem with multiple attempts correctly on final guess
+    Scenario: I can view how many attempts I have left on a problem
         Given I am viewing a "multiple choice" problem with "3" attempts
         Then I should see "You have used 0 of 3 submissions" somewhere in the page
         When I answer a "multiple choice" problem "incorrectly"
-        Then My "multiple choice" answer is marked "incorrect"
-        And The "multiple choice" problem displays a "incorrect" answer
-        When I reset the problem
+        And I reset the problem
         Then I should see "You have used 1 of 3 submissions" somewhere in the page
         When I answer a "multiple choice" problem "incorrectly"
-        Then My "multiple choice" answer is marked "incorrect"
-        And The "multiple choice" problem displays a "incorrect" answer
-        When I reset the problem
+        And I reset the problem
         Then I should see "You have used 2 of 3 submissions" somewhere in the page
         And The "Final Check" button does appear
         When I answer a "multiple choice" problem "correctly"
-        Then My "multiple choice" answer is marked "correct"
-        And The "multiple choice" problem displays a "correct" answer
-        And The "Reset" button does not appear
+        Then The "Reset" button does not appear
 
     Scenario: I can view and hide the answer if the problem has it:
-        Given I am viewing a "numerical" that shows the answer "always"
+        When I am viewing a "numerical" that shows the answer "always"
         Then The "Show Answer" button does appear
         When I press the "Show Answer" button
         Then The "Hide Answer" button does appear
@@ -138,4 +119,4 @@ Feature: Answer problems
         And I should see "4.14159" somewhere in the page
         When I press the "Hide Answer" button
         Then The "Show Answer" button does appear
-        And I do not see "4.14159" anywhere on the page
+        And I should not see "4.14159" anywhere on the page
