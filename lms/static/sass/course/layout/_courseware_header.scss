@@ -64,7 +64,7 @@ header.global.slim {
   @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
   height: 50px;
   border-bottom: 1px solid $outer-border-color;
-  background: $white;
+  background: $header-bg;
 
   .guest .secondary {
     margin-right: 0;
