@@ -114,10 +114,7 @@ CMS.Views.ChapterEdit = Backbone.View.extend({
             message: "[asset upload requirements]"
         })
         var view = new CMS.Views.UploadDialog({model: msg, chapter: this.model})
-        $(".wrapper-view").append(view.render().el)
-
-        $body.addClass('prompt-is-shown');
-        $('.wrapper-prompt').addClass('is-shown').attr('aria-hidden','false');
+        $(".wrapper-view").after(view.show().el)
     }
 })
 CMS.Models.FileUpload = Backbone.Model.extend({
@@ -131,6 +128,9 @@ CMS.Models.FileUpload = Backbone.Model.extend({
     }
 });
 CMS.Views.UploadDialog = Backbone.View.extend({
+    options: {
+        shown: true
+    },
     initialize: function() {
         this.template = _.template($("#upload-dialog-tpl").text());
         this.listenTo(this.model, "change", this.render);
@@ -147,6 +147,7 @@ CMS.Views.UploadDialog = Backbone.View.extend({
             selectedFile = oldInput.files[0];
         }
         this.$el.html(this.template({
+            shown: this.options.shown,
             url: UPLOAD_ASSET_CALLBACK_URL,
             title: this.model.escape('title'),
             message: this.model.escape('message'),
@@ -163,18 +164,27 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     },
     events: {
         "change input[type=file]": "selectFile",
-        "click .action-cancel": "removeSelf",
+        "click .action-cancel": "hideAndRemove",
         "click .action-upload": "upload"
     },
     selectFile: function(e) {
         this.model.set('fileList', e.target.files)
     },
-    removeSelf: function(e) {
+    show: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
-        this.remove();
-
+        this.options.shown = true;
+        $body.addClass('prompt-is-shown');
+        return this.render();
+    },
+    hide: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.options.shown = false;
         $body.removeClass('prompt-is-shown');
-        $('.wrapper-prompt').removeClass('is-shown').attr('aria-hidden','true');
+        return this.render();
+    },
+    hideAndRemove: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        return this.hide().remove();
     },
     upload: function(e) {
         this.model.set('uploading', true);

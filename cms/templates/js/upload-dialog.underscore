@@ -1,4 +1,9 @@
-  <div id="prompt-assetupload" class="wrapper wrapper-prompt wrapper-prompt-assetupload" aria-describedby="prompt-assetupload-description" aria-labelledby="prompt-assetupload-title" role="dialog" aria-hidden="false">
+  <div id="prompt-assetupload"
+    class="wrapper wrapper-prompt wrapper-prompt-assetupload <% if(shown) { print('is-shown') } %>"
+    aria-describedby="prompt-assetupload-description"
+    aria-labelledby="prompt-assetupload-title"
+    aria-hidden="<%= !shown %>"
+    role="dialog">
     <div class="prompt confirm">
       <div class="copy">
 
