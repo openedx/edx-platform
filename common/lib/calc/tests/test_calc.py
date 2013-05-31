@@ -7,6 +7,7 @@ import numpy
 import calc
 from pyparsing import ParseException
 
+
 class EvaluatorTest(unittest.TestCase):
     """
     Run tests for calc.evaluator
