@@ -6,7 +6,7 @@
     <div class="colophon">
       <p>&copy; 2013 <a href="http://www.edx.org" rel="external">edX</a>. ${ _("All rights reserved.")}</p>
     </div>
-    
+
     <nav class="nav-peripheral">
       <ol>
         <!-- <li class="nav-item nav-peripheral-tos">
@@ -17,9 +17,9 @@
         </li> -->
         % if user.is_authenticated():
         <li class="nav-item nav-peripheral-feedback">
-          <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
+          <a href="mailto:studio-users@googlegroups.com" rel="external" title="${_('Use our Google Group to share your feedback')}">${_("Contact Us")}</a>
         </li>
-        % endif    
+        % endif
       </ol>
     </nav>
   </footer>
