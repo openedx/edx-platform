@@ -6,7 +6,7 @@
 <%block name="headextra">
   <%static:css group='course'/>
   <%include file="../discussion/_js_head_dependencies.html" />
-  % if course.show_chat:
+  % if show_chat:
     <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
     ## It'd be better to have this in a place like lms/css/vendor/candy,
     ## but the candy_res/ folder contains images and other junk, and it
@@ -115,7 +115,7 @@
   </script>
 % endif
 
-% if course.show_chat:
+% if show_chat:
   <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
 
@@ -189,7 +189,7 @@
   </div>
 </section>
 
-% if course.show_chat:
+% if show_chat:
   <div id="chat-wrapper">
     <div id="chat-toggle" class="closed">
       <span id="chat-open">Open Chat <em class="icon-chevron-up"></em></span>
