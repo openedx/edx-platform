@@ -1,8 +1,10 @@
+ruby-rvm
+curl
 python-software-properties
 pkg-config
-curl
 git
 python-virtualenv
+virtualenvwraper
 build-essential
 python-dev
 gfortran

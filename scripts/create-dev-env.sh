@@ -380,7 +380,15 @@ export WORKON_HOME=$PYTHON_DIR
 
 # Load in the mkvirtualenv function if needed
 if [[ `type -t mkvirtualenv` != "function" ]]; then
-  source `which virtualenvwrapper.sh`
+    case `uname -s` in
+        Darwin)
+            source `which virtualenvwrapper.sh`
+        ;;
+
+        *)
+            source /etc/bash_completion.d/virtualenvwrapper
+        ;;
+    esac
 fi
 
 # Create edX virtualenv and link it to repo
