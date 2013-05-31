@@ -66,6 +66,7 @@ def mongo_store_config(data_dir):
                 'collection': 'modulestore_%s' % uuid4().hex,
                 'fs_root': data_dir,
                 'render_template': 'mitxmako.shortcuts.render_to_string',
+                'tz_aware': True
             }
         }
     }
@@ -288,7 +289,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         '''
         Choose a page in the course randomly, and assert that it loads
         '''
-       # enroll in the course before trying to access pages
+        # enroll in the course before trying to access pages
         courses = module_store.get_courses()
         self.assertEqual(len(courses), 1)
         course = courses[0]

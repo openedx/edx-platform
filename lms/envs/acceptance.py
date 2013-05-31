@@ -25,6 +25,7 @@ modulestore_options = {
     'collection': 'acceptance_modulestore',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
+    'tz_aware': True
 }
 
 MODULESTORE = {

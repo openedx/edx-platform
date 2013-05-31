@@ -55,6 +55,7 @@ class CourseDetailsTestCase(CourseTestCase):
     def test_virgin_fetch(self):
         details = CourseDetails.fetch(self.course_location)
         self.assertEqual(details.course_location, self.course_location, "Location not copied into")
+        self.assertIsNotNone(details.start_date.tzinfo)
         self.assertIsNone(details.end_date, "end date somehow initialized " + str(details.end_date))
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
         self.assertIsNone(details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end))
@@ -67,7 +68,6 @@ class CourseDetailsTestCase(CourseTestCase):
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
         self.assertTupleEqual(Location(jsondetails['course_location']), self.course_location, "Location !=")
-        # Note, start_date is being initialized someplace. I'm not sure why b/c the default will make no sense.
         self.assertIsNone(jsondetails['end_date'], "end date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")

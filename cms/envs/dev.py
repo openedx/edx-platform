@@ -23,6 +23,7 @@ modulestore_options = {
     'collection': 'modulestore',
     'fs_root': GITHUB_REPO_ROOT,
     'render_template': 'mitxmako.shortcuts.render_to_string'
+    'tz_aware': True
 }
 
 MODULESTORE = {
