@@ -30,3 +30,6 @@ libreadline6-dev
 mongodb
 nodejs
 coffeescript
+mysql
+libmysqlclient-dev
+virtualenvwrapper
