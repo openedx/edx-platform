@@ -426,7 +426,7 @@ output "Building correct version of distribute"
 # building correct version of distribute from source
 DISTRIBUTE_VER="0.6.28"
 output "Building Distribute"
-SITE_PACKAGES = $PYTHON_DIR/edx-platform/lib/python2.7/site-packages
+SITE_PACKAGES = "$PYTHON_DIR/edx-platform/lib/python2.7/site-packages"
 cd $SITE_PACKAGES
 curl -O http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
 tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
