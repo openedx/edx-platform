@@ -99,23 +99,23 @@ clone_repos() {
     # Not certain if these are making it in to the open source release.
     # If there's a github permissions error, remove this section of code.
     # You should get a working environment sans a demo course.
-    cd "$BASE"
-    mkdir -p "$BASE/data"
-    REPO="content-mit-6002x"
-    if [[ -d "$BASE/data/$REPO/.git" ]]; then
-        output "Pulling $REPO"
-        cd "$BASE/data/$REPO"
-        git pull
-    else
-        output "Cloning $REPO"
-        if [[ -d "$BASE/data/$REPO" ]]; then
-            output "Creating backup for existing demo course"
-            mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
-        fi
-        cd "$BASE/data"
-        git clone https://github.com/MITx/content-mit-6002x.git
-    fi
-}
+#     cd "$BASE"
+#     mkdir -p "$BASE/data"
+#     REPO="content-mit-6002x"
+#     if [[ -d "$BASE/data/$REPO/.git" ]]; then
+#         output "Pulling $REPO"
+#         cd "$BASE/data/$REPO"
+#         git pull
+#     else
+#         output "Cloning $REPO"
+#         if [[ -d "$BASE/data/$REPO" ]]; then
+#             output "Creating backup for existing demo course"
+#             mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
+#         fi
+#         cd "$BASE/data"
+#         git clone https://github.com/MITx/content-mit-6002x.git
+#     fi
+# }
 
 
 ### START
