@@ -99,6 +99,11 @@ class CourseDetailsTestCase(CourseTestCase):
             CourseDetails.update_from_json(jsondetails.__dict__).effort,
             jsondetails.effort, "After set effort"
         )
+        jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).start_date,
+            jsondetails.start_date
+        )
 
 
 class CourseDetailsViewTest(CourseTestCase):
@@ -115,11 +120,8 @@ class CourseDetailsViewTest(CourseTestCase):
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
 
     @staticmethod
-    def convert_datetime_to_iso(datetime):
-        if datetime is not None:
-            return datetime.isoformat("T")
-        else:
-            return None
+    def convert_datetime_to_iso(dt):
+        return Date().to_json(dt)
 
     def test_update_and_fetch(self):
         details = CourseDetails.fetch(self.course_location)
