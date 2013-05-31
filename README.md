@@ -8,8 +8,8 @@ Installation
 The installation process is a bit messy at the moment. Here's a high-level
 overview of what you should do to get started.
 
-**TLDR:** There is a `scripts/create-dev-env.sh` script that will attempt to set all
-of this up for you. If you're in a hurry, run that script. Otherwise, I suggest
+**TLDR:** There is a `scripts/create-dev-env.sh` that will attempt to set all of this up for you. 
+If you're in a hurry, run that script. Otherwise, I suggest
 that you understand what the script is doing, and why, by reading this document.
 
 Directory Hierarchy
