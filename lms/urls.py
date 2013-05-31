@@ -330,13 +330,6 @@ if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin
     urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 
-if settings.DEBUG:
-    # Originally added to allow debugging issues when prod is
-    # mysteriously different from staging (specifically missing get
-    # parameters in certain cases), but removing from prod because
-    # it's a security risk.
-    urlpatterns += (url(r'^debug_request$', 'util.views.debug_request'),)
-
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (
         url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
