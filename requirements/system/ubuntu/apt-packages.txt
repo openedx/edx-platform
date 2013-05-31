@@ -33,3 +33,4 @@ coffeescript
 mysql
 libmysqlclient-dev
 virtualenvwrapper
+libgeos-ruby1.8
