@@ -1,9 +1,5 @@
 ---
 metadata:
     display_name: Word cloud
-    version: 1
-    num_inputs: 5
-    num_top_words: 250
-    display_student_percents: True
 data: {}
 children: []

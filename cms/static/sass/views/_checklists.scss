@@ -254,7 +254,7 @@ body.course.checklists {
         .task-support {
           @extend .t-copy-sub2;
           @include transition(opacity .15s .25s ease-in-out);
-          opacity: 0;
+          opacity: 0.0;
           pointer-events: none;
         }
       }
@@ -267,7 +267,7 @@ body.course.checklists {
         float: right;
         width: flex-grid(2,9);
         margin: ($baseline/2) 0 0 flex-gutter();
-        opacity: 0;
+        opacity: 0.0;
         pointer-events: none;
         text-align: right;
 

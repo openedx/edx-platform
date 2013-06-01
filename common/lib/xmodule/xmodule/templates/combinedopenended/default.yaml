@@ -1,12 +1,6 @@
 ---
 metadata:
     display_name: Open Ended Response
-    attempts: 1
-    is_graded: False
-    version: 1
-    skip_spelling_checks: False
-    accept_file_upload: False
-    weight: ""
     markdown: ""
 data: |
   <combinedopenended>
