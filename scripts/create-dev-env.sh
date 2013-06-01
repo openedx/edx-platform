@@ -96,13 +96,27 @@ clone_repos() {
     fi
 }
 
+set_base_default() {  # if PROJECT_HOME not set
+    # 2 possibilities: this is from cloned repo, or not
+    # this script is in "./scripts" if a git clone
+    this_repo=$(cd "${BASH_SOURCE%/*}/.." && pwd)
+    if [[ "${this_repo##*/}" = "edx-platform" && -d "$this_repo/.git" ]]; then
+        # set BASE one-up from this_repo;
+        echo "${this_repo%/*}"
+    else
+        echo "$HOME/edx_all"
+    fi
+}
+
+
+
 
 ### START
 
 PROG=${0##*/}
 
 # Adjust this to wherever you'd like to place the codebase
-BASE="${PROJECT_HOME:-$HOME}/edx_all"
+BASE="${PROJECT_HOME:-$(set_base_default)}"
 
 # Use a sensible default (~/.virtualenvs) for your Python virtualenvs
 # unless you've already got one set up with virtualenvwrapper.
