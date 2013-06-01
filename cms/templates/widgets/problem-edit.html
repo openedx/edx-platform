@@ -1,27 +1,29 @@
-<%include file="metadata-edit.html" />
+<%! from django.utils.translation import ugettext as _ %>
+
+<div class="wrapper-comp-editor" id="editor-tab">
 <section class="problem-editor editor">
     <div class="row">
         %if enable_markdown:
         <div class="editor-bar">
             <ul class="format-buttons">
-                <li><a href="#" class="header-button" data-tooltip="Heading 1"><span
+                <li><a href="#" class="header-button" data-tooltip='${_("Heading 1")}'><span
                         class="problem-editor-icon heading1"></span></a></li>
-                <li><a href="#" class="multiple-choice-button" data-tooltip="Multiple Choice"><span
+                <li><a href="#" class="multiple-choice-button" data-tooltip='${_("Multiple Choice")}'><span
                         class="problem-editor-icon multiple-choice"></span></a></li>
-                <li><a href="#" class="checks-button" data-tooltip="Checkboxes"><span
+                <li><a href="#" class="checks-button" data-tooltip='${_("Checkboxes")}'><span
                         class="problem-editor-icon checks"></span></a></li>
-                <li><a href="#" class="string-button" data-tooltip="Text Input"><span
+                <li><a href="#" class="string-button" data-tooltip='${_("Text Input")}'><span
                         class="problem-editor-icon string"></span></a></li>
-                <li><a href="#" class="number-button" data-tooltip="Numerical Input"><span
+                <li><a href="#" class="number-button" data-tooltip='${_("Numerical Input")}'><span
                         class="problem-editor-icon number"></span></a></li>
-                <li><a href="#" class="dropdown-button" data-tooltip="Dropdown"><span
+                <li><a href="#" class="dropdown-button" data-tooltip='${_("Dropdown")}'><span
                         class="problem-editor-icon dropdown"></span></a></li>
-                <li><a href="#" class="explanation-button" data-tooltip="Explanation"><span
+                <li><a href="#" class="explanation-button" data-tooltip='${_("Explanation")}'><span
                         class="problem-editor-icon explanation"></span></a></li>
             </ul>
             <ul class="editor-tabs">
-                <li><a href="#" class="xml-tab advanced-toggle" data-tab="xml">Advanced Editor</a></li>
-                <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
+                <li><a href="#" class="xml-tab advanced-toggle" data-tab="xml">${_("Advanced Editor")}</a></li>
+                <li><a href="#" class="cheatsheet-toggle" data-tooltip='${_("Toggle Cheatsheet")}'>?</a></li>
             </ul>
         </div>
         <textarea class="markdown-box">${markdown | h}</textarea>
@@ -34,7 +36,7 @@
     <article class="simple-editor-cheatsheet">
         <div class="cheatsheet-wrapper">
             <div class="row">
-                <h6>Heading 1</h6>
+                <h6>${_("Heading 1")}</h6>
                 <div class="col sample heading-1">
                     <img src="/static/img/header-example.png" />
                 </div>
@@ -45,7 +47,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>Multiple Choice</h6>
+                <h6>${_("Multiple Choice")}</h6>
                 <div class="col sample multiple-choice">
                     <img src="/static/img/choice-example.png" />
                 </div>
@@ -56,7 +58,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>Checkboxes</h6>
+                <h6>${_("Checkboxes")}</h6>
                 <div class="col sample check-multiple">
                     <img src="/static/img/multi-example.png" />
                 </div>
@@ -67,7 +69,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>Text Input</h6>
+                <h6>${_("Text Input")}</h6>
                 <div class="col sample string-response">
                     <img src="/static/img/string-example.png" />
                 </div>
@@ -76,7 +78,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>Numerical Input</h6>
+                <h6>${_("Numerical Input")}</h6>
                 <div class="col sample numerical-response">
                     <img src="/static/img/number-example.png" />
                 </div>
@@ -85,7 +87,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>Dropdown</h6>
+                <h6>${_("Dropdown")}</h6>
                 <div class="col sample option-reponse">
                     <img src="/static/img/select-example.png" />
                 </div>
@@ -94,7 +96,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>Explanation</h6>
+                <h6>${_("Explanation")}</h6>
                 <div class="col sample explanation">
                     <img src="/static/img/explanation-example.png" />
                 </div>
@@ -105,3 +107,5 @@
         </div>
     </article>
 </script>
+</div>
+<%include file="metadata-edit.html" />

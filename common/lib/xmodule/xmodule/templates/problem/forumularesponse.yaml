@@ -2,9 +2,7 @@
 metadata:
     display_name: Math Expression Input
     rerandomize: never
-    showanswer: always
-    weight: ""
-    attempts: ""
+    showanswer: finished
 data: |
   <problem>
   <p>

@@ -460,8 +460,8 @@ class ImportTestCase(BaseCourseTestCase):
         )
         module = modulestore.get_instance(course.id, location)
         self.assertEqual(len(module.get_children()), 0)
-        self.assertEqual(module.num_inputs, '5')
-        self.assertEqual(module.num_top_words, '250')
+        self.assertEqual(module.num_inputs, 5)
+        self.assertEqual(module.num_top_words, 250)
 
     def test_cohort_config(self):
         """

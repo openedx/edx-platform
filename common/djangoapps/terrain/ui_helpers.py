@@ -4,7 +4,7 @@
 from lettuce import world
 import time
 from urllib import quote_plus
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -63,7 +63,7 @@ def css_click(css_selector):
         # Occassionally, MathJax or other JavaScript can cover up
         # an element  temporarily.
         # If this happens, wait a second, then try again
-        time.sleep(1)
+        world.wait(1)
         world.browser.find_by_css(css_selector).click()
 
 
@@ -77,6 +77,14 @@ def css_click_at(css, x=10, y=10):
     e.action_chains.move_to_element_with_offset(e._element, x, y)
     e.action_chains.click()
     e.action_chains.perform()
+
+
+@world.absorb
+def id_click(elem_id):
+    """
+    Perform a click on an element as specified by its id
+    """
+    world.css_click('#%s' % elem_id)
 
 
 @world.absorb
@@ -94,7 +102,12 @@ def css_text(css_selector):
 
     # Wait for the css selector to appear
     if world.is_css_present(css_selector):
-        return world.browser.find_by_css(css_selector).first.text
+        try:
+            return world.browser.find_by_css(css_selector).first.text
+        except StaleElementReferenceException:
+            # The DOM was still redrawing. Wait a second and try again.
+            world.wait(1)
+            return world.browser.find_by_css(css_selector).first.text
     else:
         return ""
 
