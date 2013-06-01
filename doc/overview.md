@@ -1,4 +1,4 @@
-# Documentation for edX code (mitx repo)
+# Documentation for edX code (edx-platform repo)
 
 This document explains the general structure of the edX platform, and defines some of the acronyms and terms you'll see flying around in the code.
 
