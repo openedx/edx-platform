@@ -483,7 +483,7 @@ pip install -r $BASE/edx-platform/requirements/edx/pre.txt
 output "Installing edX requirements"
 # Install prereqs
 cd $BASE/edx-platform
-rvm use $RUBY_VER
+rvm use "$RUBY_VER@edx-platform"
 rake install_prereqs
 
 # Final dependecy
