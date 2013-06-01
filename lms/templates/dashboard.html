@@ -294,13 +294,7 @@
                            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
                       % elif cert_status['status'] == 'restricted':
                           <p class="message-copy">
-                          <%
-                            if self.stanford_theme_enabled():
-                              contact_email = "contact@class.stanford.edu"
-                            else:
-                              contact_email = "info@edx.org"
-                          %>
-                          Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:${contact_email}">${contact_email}</a>.
+                          Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:${settings.CONTACT_EMAIL}">${settings.CONTACT_EMAIL}</a>.
                           </p>
                       % endif
                       </p>
