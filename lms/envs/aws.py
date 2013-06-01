@@ -125,6 +125,12 @@ if not THEME_NAME is None:
     enable_theme(THEME_NAME)
     FAVICON_PATH = 'themes/%s/images/favicon.ico' % THEME_NAME
 
+# Allow environments to remove unused marketing URLs. These need to
+# match *exactly* with the keys listed in the default dict (in
+# common.py)
+# TODO: decide on a better way to allow themes to override these
+for url in ENV_TOKENS.get('UNUSED_MKTG_URLS', UNUSED_MKTG_URLS):
+    del MKTG_URL_LINK_MAP[url]
 
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)

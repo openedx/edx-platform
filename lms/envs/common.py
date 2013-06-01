@@ -729,6 +729,7 @@ MKTG_URL_LINK_MAP = {
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
 }
+UNUSED_MKTG_URLS = []
 
 ############################### THEME ################################
 def enable_theme(theme_name):
