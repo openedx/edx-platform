@@ -1,7 +1,8 @@
 <%! from django.core.urlresolvers import reverse %>
-This is to confirm that you changed the e-mail associated with edX
-from ${old_email} to ${new_email}. If you did not make this request,
-please contact us immediately. Contact information is listed at:
+This is to confirm that you changed the e-mail associated with
+${settings.PLATFORM_NAME} from ${old_email} to ${new_email}. If you
+did not make this request, please contact us immediately. Contact
+information is listed at:
 
 % if is_secure:
   https://${ site }${reverse('contact')}
