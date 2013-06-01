@@ -131,6 +131,8 @@ if not THEME_NAME is None:
     enable_theme(THEME_NAME)
     FAVICON_PATH = 'themes/%s/images/favicon.ico' % THEME_NAME
 
+# Marketing link overrides
+MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
