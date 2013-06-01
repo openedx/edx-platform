@@ -1,9 +1,9 @@
-edX has launched! To log in, visit:
+${settings.PLATFORM_NAME} has launched! To log in, visit:
 
 % if is_secure:
- https://edx.org
+ https://${settings.SITE_NAME}
 % else:
- http://edx.org
+ http://${settings.SITE_NAME}
 % endif
 
 A login button will be at the top right-hand corner of the window.
@@ -14,7 +14,7 @@ place to reset it.
 
 Thanks for joining us for the ride!
 
-The edX team
+The ${settings.PLATFORM_NAME} team
 
 (Please note that this e-mail address does not receive e-mails --
 if you need assistance, please use the help section of the web
