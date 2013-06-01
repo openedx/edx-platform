@@ -83,7 +83,7 @@ CMS.Views.Metadata.AbstractEditor = Backbone.View.extend({
             console.error("Couldn't load template: " + templateName);
         }
         this.template = _.template(tpl);
-        this.$el.append(this.template({model: this.model, uniqueId: this.uniqueId}));
+        this.$el.html(this.template({model: this.model, uniqueId: this.uniqueId}));
         this.listenTo(this.model, 'change', this.render);
         this.render();
     },
