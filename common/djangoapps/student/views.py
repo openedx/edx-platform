@@ -1194,6 +1194,10 @@ def accept_name_change(request):
 def _get_news(top=None):
     "Return the n top news items on settings.RSS_URL"
 
+    # Don't return anything if we're in a themed site
+    if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
+        return None
+
     feed_data = cache.get("students_index_rss_feed_data")
     if feed_data is None:
         if hasattr(settings, 'RSS_URL'):
