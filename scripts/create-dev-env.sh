@@ -310,7 +310,7 @@ case `uname -s` in
         curl -sL get.rvm.io | bash -s -- --version 1.15.7
     ;;
 
-    squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+    [Ll]inux)
         warning "Setting up rvm on linux. This is a known pain point. If the script fails here
                 refer to the following stack overflow question: 
                 http://stackoverflow.com/questions/9056008/installed-ruby-1-9-3-with-rvm-but-command-line-doesnt-show-ruby-v/9056395#9056395"
@@ -392,7 +392,7 @@ if [[ `type -t mkvirtualenv` != "function" ]]; then
             source `which virtualenvwrapper.sh`
         ;;
 
-        squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+        [Ll]inux)
         if [[ -f "/etc/bash_completion.d/virtualenvwrapper" ]]; then
             source /etc/bash_completion.d/virtualenvwrapper
         else
