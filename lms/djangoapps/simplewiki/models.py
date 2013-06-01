@@ -68,7 +68,7 @@ class Article(models.Model):
         a Article.DoesNotExist if no matching article is found or ValueError if the
         article_path is not constructed properly.
         """
-        #TODO: Verify the path, throw a meaningful error?
+        # TODO: Verify the path, throw a meaningful error?
         namespace, slug = article_path.split("/")
         return Article.objects.get(slug__exact=slug, namespace__name__exact=namespace)
 
@@ -321,7 +321,9 @@ class Revision(models.Model):
         # Todo: difflib.HtmlDiff would look pretty for our history pages!
         diff = difflib.unified_diff(previous, self.contents.splitlines(1))
         # let's skip the preamble
-        diff.next(); diff.next(); diff.next()
+        diff.next()
+        diff.next()
+        diff.next()
 
         for d in diff:
             yield d
@@ -339,7 +341,7 @@ class Permission(models.Model):
     can_write = models.ManyToManyField(User, blank=True, null=True, related_name='write',
                                        help_text=_('Select none to grant anonymous access.'))
     can_read = models.ManyToManyField(User, blank=True, null=True, related_name='read',
-                                       help_text=_('Select none to grant anonymous access.'))
+                                      help_text=_('Select none to grant anonymous access.'))
 
     def __unicode__(self):
         return self.permission_name

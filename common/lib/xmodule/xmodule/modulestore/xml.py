@@ -123,7 +123,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
-                        #error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
+                        # error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
                         pass
 
                 # Make sure everything is unique

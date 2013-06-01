@@ -23,7 +23,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'GeneratedCertificate.name'
         db.delete_column('certificates_generatedcertificate', 'name')
@@ -33,7 +32,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'GeneratedCertificate.modified_date'
         db.delete_column('certificates_generatedcertificate', 'modified_date')
-
 
     models = {
         'auth.group': {

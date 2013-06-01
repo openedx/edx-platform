@@ -5,20 +5,21 @@ from django.utils.timezone import UTC
 from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
 import time
 
+
 class DateTest(unittest.TestCase):
     date = Date()
 
     @staticmethod
     def struct_to_datetime(struct_time):
         return datetime.datetime(struct_time.tm_year, struct_time.tm_mon,
-            struct_time.tm_mday, struct_time.tm_hour,
-            struct_time.tm_min, struct_time.tm_sec, tzinfo=UTC())
+                                 struct_time.tm_mday, struct_time.tm_hour,
+                                 struct_time.tm_min, struct_time.tm_sec, tzinfo=UTC())
 
     def compare_dates(self, date1, date2, expected_delta):
         dt1 = DateTest.struct_to_datetime(date1)
         dt2 = DateTest.struct_to_datetime(date2)
         self.assertEqual(dt1 - dt2, expected_delta, str(date1) + "-"
-                                                    + str(date2) + "!=" + str(expected_delta))
+                         + str(date2) + "!=" + str(expected_delta))
 
     def test_from_json(self):
         '''Test conversion from iso compatible date strings to struct_time'''
@@ -129,4 +130,3 @@ class StringyBooleanTest(unittest.TestCase):
 
     def test_pass_through(self):
         self.assertEquals(123, 123)
-

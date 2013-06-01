@@ -45,7 +45,7 @@ def check_sections(course):
         print "Checking all section includes are valid XML"
         for f in os.listdir(sections_dir):
             sectionfile = sections_dir + '/' + f
-            #print sectionfile
+            # print sectionfile
             # skip non-xml files:
             if not sectionfile.endswith('xml'):
                 continue

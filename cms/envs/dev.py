@@ -147,7 +147,7 @@ DEBUG_TOOLBAR_PANELS = (
     #  hit twice). So you can uncomment when you need to diagnose performance
     #  problems, but you shouldn't leave it on.
     #  'debug_toolbar.panels.profiling.ProfilingDebugPanel',
-    )
+)
 
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False

@@ -87,7 +87,6 @@ class Command(BaseCommand):
         base_options = set(option.dest for option in BaseCommand.option_list)
         return option_name not in base_options
 
-
     def handle(self, *args, **options):
         username = args[0]
         course_id = args[1]
@@ -122,9 +121,9 @@ class Command(BaseCommand):
             # otherwise use explicit values (so we don't have to define a course):
             exam_name = "Dummy Placeholder Name"
             exam_info = {'Exam_Series_Code': our_options['exam_series_code'],
-                          'First_Eligible_Appointment_Date': our_options['eligibility_appointment_date_first'],
-                          'Last_Eligible_Appointment_Date': our_options['eligibility_appointment_date_last'],
-                          }
+                         'First_Eligible_Appointment_Date': our_options['eligibility_appointment_date_first'],
+                         'Last_Eligible_Appointment_Date': our_options['eligibility_appointment_date_last'],
+                         }
             exam = CourseDescriptor.TestCenterExam(course_id, exam_name, exam_info)
             # update option values for date_first and date_last to use YYYY-MM-DD format
             # instead of YYYY-MM-DDTHH:MM
@@ -137,12 +136,12 @@ class Command(BaseCommand):
         exam_code = exam.exam_series_code
 
         UPDATE_FIELDS = ('accommodation_request',
-                          'accommodation_code',
-                          'client_authorization_id',
-                          'exam_series_code',
-                          'eligibility_appointment_date_first',
-                          'eligibility_appointment_date_last',
-                          )
+                         'accommodation_code',
+                         'client_authorization_id',
+                         'exam_series_code',
+                         'eligibility_appointment_date_first',
+                         'eligibility_appointment_date_last',
+                         )
 
         # create and save the registration:
         needs_updating = False
@@ -151,12 +150,11 @@ class Command(BaseCommand):
             registration = registrations[0]
             for fieldname in UPDATE_FIELDS:
                 if fieldname in our_options and registration.__getattribute__(fieldname) != our_options[fieldname]:
-                    needs_updating = True;
+                    needs_updating = True
         else:
             accommodation_request = our_options.get('accommodation_request', '')
             registration = TestCenterRegistration.create(testcenter_user, exam, accommodation_request)
             needs_updating = True
-
 
         if needs_updating:
             # first update the record with the new values, if any:

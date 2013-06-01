@@ -292,7 +292,7 @@ def get_ability(course_id, content, user):
         'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
     }
 
-#TODO: RENAME
+# TODO: RENAME
 
 
 def get_annotated_content_info(course_id, content, user, user_info):
@@ -310,7 +310,7 @@ def get_annotated_content_info(course_id, content, user, user_info):
         'ability': get_ability(course_id, content, user),
     }
 
-#TODO: RENAME
+# TODO: RENAME
 
 
 def get_annotated_content_infos(course_id, thread, user, user_info):

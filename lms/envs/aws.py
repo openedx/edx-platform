@@ -108,18 +108,18 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
-#Email overrides
+# Email overrides
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)
 ADMINS = ENV_TOKENS.get('ADMINS', ADMINS)
 SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
 
-#Theme overrides
+# Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 if not THEME_NAME is None:
     enable_theme(THEME_NAME)
 
-#Timezone overrides
+# Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
 for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():

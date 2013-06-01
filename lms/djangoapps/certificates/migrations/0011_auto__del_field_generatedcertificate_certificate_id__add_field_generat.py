@@ -21,7 +21,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default='', max_length=32, blank=True),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Adding field 'GeneratedCertificate.certificate_id'
         db.add_column('certificates_generatedcertificate', 'certificate_id',
@@ -33,7 +32,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'GeneratedCertificate.download_uuid'
         db.delete_column('certificates_generatedcertificate', 'download_uuid')
-
 
     models = {
         'auth.group': {

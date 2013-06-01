@@ -1,5 +1,6 @@
 import fs.osfs
-import os, os.path
+import os
+import os.path
 
 from capa.capa_problem import LoncapaProblem
 from mock import Mock, MagicMock
@@ -16,11 +17,13 @@ def tst_render_template(template, context):
     """
     return '<div>{0}</div>'.format(saxutils.escape(repr(context)))
 
-def calledback_url(dispatch = 'score_update'):
+
+def calledback_url(dispatch='score_update'):
     return dispatch
 
 xqueue_interface = MagicMock()
 xqueue_interface.send_to_queue.return_value = (0, 'Success!')
+
 
 def test_system():
     """
@@ -43,6 +46,7 @@ def test_system():
         can_execute_unsafe_code=lambda: False,
     )
     return the_system
+
 
 def new_loncapa_problem(xml, system=None):
     """Construct a `LoncapaProblem` suitable for unit tests."""

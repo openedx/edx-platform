@@ -76,7 +76,6 @@ class RandomizeModule(RandomizeFields, XModule):
 
         return [self.child_descriptor]
 
-
     def get_html(self):
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...

@@ -37,7 +37,7 @@ class PeerGradingService(GradingService):
 
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(self.get_next_submission_url,
-            {'location': problem_location, 'grader_id': grader_id})
+                            {'location': problem_location, 'grader_id': grader_id})
         return self.try_to_decode(self._render_rubric(response))
 
     def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores,

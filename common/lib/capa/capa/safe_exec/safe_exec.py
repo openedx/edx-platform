@@ -21,7 +21,7 @@ del random_module
 sys.modules['random'] = random
 """
 
-ASSUMED_IMPORTS=[
+ASSUMED_IMPORTS = [
     ("numpy", "numpy"),
     ("math", "math"),
     ("scipy", "scipy"),

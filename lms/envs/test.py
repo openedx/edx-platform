@@ -177,7 +177,7 @@ FILE_UPLOAD_HANDLERS = (
 
 ################### Make tests faster
 
-#http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
+# http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
 PASSWORD_HASHERS = (
     # 'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     # 'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',

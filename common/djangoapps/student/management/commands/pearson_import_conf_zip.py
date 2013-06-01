@@ -68,7 +68,7 @@ class Command(BaseCommand):
                     Command.datadog_error("Found authorization record for user {}".format(registration.testcenter_user.user.username), eacfile.name)
                     # now update the record:
                     registration.upload_status = row['Status']
-                    registration.upload_error_message =  row['Message']
+                    registration.upload_error_message = row['Message']
                     try:
                         registration.processed_at = strftime('%Y-%m-%d %H:%M:%S', strptime(row['Date'], '%Y/%m/%d %H:%M:%S'))
                     except ValueError as ve:

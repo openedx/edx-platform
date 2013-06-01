@@ -24,7 +24,7 @@ class SelfAssessmentTest(unittest.TestCase):
                   'prompt': prompt,
                   'submitmessage': 'Shall we submit now?',
                   'hintprompt': 'Consider this...',
-    }
+                  }
 
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
                          "SampleQuestion"])

@@ -833,13 +833,13 @@ class TestSubmittingProblems(LoginEnrollmentTestCase):
 
     def modx_url(self, problem_location, dispatch):
         return reverse(
-                    'modx_dispatch',
-                    kwargs={
-                        'course_id': self.course.id,
-                        'location': problem_location,
-                        'dispatch': dispatch,
-                        }
-                    )
+            'modx_dispatch',
+            kwargs={
+            'course_id': self.course.id,
+            'location': problem_location,
+            'dispatch': dispatch,
+            }
+        )
 
     def submit_question_answer(self, problem_url_name, responses):
         """
@@ -854,8 +854,8 @@ class TestSubmittingProblems(LoginEnrollmentTestCase):
         modx_url = self.modx_url(problem_location, 'problem_check')
         answer_key_prefix = 'input_i4x-edX-{}-problem-{}_'.format(self.course_slug, problem_url_name)
         resp = self.client.post(modx_url,
-            { (answer_key_prefix + k): v for k,v in responses.items() }
-            )
+                                {(answer_key_prefix + k): v for k, v in responses.items()}
+                                )
         return resp
 
     def reset_question_answer(self, problem_url_name):
@@ -979,37 +979,37 @@ class TestSchematicResponse(TestSubmittingProblems):
 
     def test_schematic(self):
         resp = self.submit_question_answer('schematic_problem',
-            { '2_1': json.dumps(
-                [['transient', {'Z': [
-                [0.0000004, 2.8],
-                [0.0000009, 2.8],
-                [0.0000014, 2.8],
-                [0.0000019, 2.8],
-                [0.0000024, 2.8],
-                [0.0000029, 0.2],
-                [0.0000034, 0.2],
-                [0.0000039, 0.2]
-                ]}]]
-                )
-            })
+                                           {'2_1': json.dumps(
+                                            [['transient', {'Z': [
+                                                            [0.0000004, 2.8],
+                                                            [0.0000009, 2.8],
+                                                            [0.0000014, 2.8],
+                                                            [0.0000019, 2.8],
+                                                            [0.0000024, 2.8],
+                                                            [0.0000029, 0.2],
+                                                            [0.0000034, 0.2],
+                                                            [0.0000039, 0.2]
+                                                            ]}]]
+                                            )
+                                            })
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'correct')
 
         self.reset_question_answer('schematic_problem')
         resp = self.submit_question_answer('schematic_problem',
-            { '2_1': json.dumps(
-                [['transient', {'Z': [
-                [0.0000004, 2.8],
-                [0.0000009, 0.0],       # wrong.
-                [0.0000014, 2.8],
-                [0.0000019, 2.8],
-                [0.0000024, 2.8],
-                [0.0000029, 0.2],
-                [0.0000034, 0.2],
-                [0.0000039, 0.2]
-                ]}]]
-                )
-            })
+                                           {'2_1': json.dumps(
+                                            [['transient', {'Z': [
+                                                            [0.0000004, 2.8],
+                                                            [0.0000009, 0.0],       # wrong.
+                                                            [0.0000014, 2.8],
+                                                            [0.0000019, 2.8],
+                                                            [0.0000024, 2.8],
+                                                            [0.0000029, 0.2],
+                                                            [0.0000034, 0.2],
+                                                            [0.0000039, 0.2]
+                                                            ]}]]
+                                            )
+                                            })
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'incorrect')
 

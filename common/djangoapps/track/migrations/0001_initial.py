@@ -23,11 +23,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('track', ['TrackingLog'])
 
-
     def backwards(self, orm):
         # Deleting model 'TrackingLog'
         db.delete_table('track_trackinglog')
-
 
     models = {
         'track.trackinglog': {

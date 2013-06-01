@@ -141,7 +141,7 @@ def add_histogram(get_html, module, user):
 
         staff_context = {'fields': [(field.name, getattr(module, field.name)) for field in module.fields],
                          'lms_fields': [(field.name, getattr(module.lms, field.name)) for field in module.lms.fields],
-                         'xml_attributes' : getattr(module.descriptor, 'xml_attributes', {}),
+                         'xml_attributes': getattr(module.descriptor, 'xml_attributes', {}),
                          'location': module.location,
                          'xqa_key': module.lms.xqa_key,
                          'source_file': source_file,

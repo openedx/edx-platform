@@ -1,10 +1,14 @@
-import os, string, random, re
+import os
+import string
+import random
+import re
 from polib import pofile
 from unittest import TestCase
 from datetime import datetime, timedelta
 
 import generate
 from config import CONFIGURATION
+
 
 class TestGenerate(TestCase):
     """
@@ -37,7 +41,7 @@ class TestGenerate(TestCase):
         generate.main()
         for locale in CONFIGURATION.locales:
             for filename in ('django', 'djangojs'):
-                mofile = filename+'.mo'
+                mofile = filename + '.mo'
                 path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
                 self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
@@ -49,7 +53,7 @@ class TestGenerate(TestCase):
         """
         This is invoked by test_main to ensure that it runs after
         calling generate.main().
-        
+
         There should be exactly three merge comment headers
         in our merged .po file. This counts them to be sure.
         A merge comment looks like this:
@@ -61,7 +65,7 @@ class TestGenerate(TestCase):
         pattern = re.compile('^#-#-#-#-#', re.M)
         match = pattern.findall(po.header)
         self.assertEqual(len(match), 3,
-                         msg="Found %s (should be 3) merge comments in the header for %s" % \
+                         msg="Found %s (should be 3) merge comments in the header for %s" %
                          (len(match), path))
 
 

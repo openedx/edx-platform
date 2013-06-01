@@ -3,6 +3,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
 class PluginNotFoundError(Exception):
     pass
 
@@ -34,15 +35,15 @@ class Plugin(object):
         if identifier not in cls._plugin_cache:
             identifier = identifier.lower()
             classes = list(pkg_resources.iter_entry_points(
-                    cls.entry_point, name=identifier))
+                cls.entry_point, name=identifier))
 
             if len(classes) > 1:
                 log.warning("Found multiple classes for {entry_point} with "
                             "identifier {id}: {classes}. "
                             "Returning the first one.".format(
-                    entry_point=cls.entry_point,
-                    id=identifier,
-                    classes=", ".join(
+                                entry_point=cls.entry_point,
+                                id=identifier,
+                                classes=", ".join(
                             class_.module_name for class_ in classes)))
 
             if len(classes) == 0:

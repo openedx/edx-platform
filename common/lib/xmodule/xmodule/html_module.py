@@ -26,8 +26,8 @@ class HtmlModule(HtmlFields, XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/html/display.coffee')
-                    ]
-         }
+                     ]
+          }
     js_module_name = "HTMLModule"
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
@@ -96,11 +96,11 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             # 'filename' in html pointers is a relative path
             # (not same as 'html/blah.html' when the pointer is in a directory itself)
             pointer_path = "{category}/{url_path}".format(category='html',
-                                                  url_path=name_to_pathname(location.name))
+                                                          url_path=name_to_pathname(location.name))
             base = path(pointer_path).dirname()
-            #log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
+            # log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
             filepath = "{base}/{name}.html".format(base=base, name=filename)
-            #log.debug("looking for html file for {0} at {1}".format(location, filepath))
+            # log.debug("looking for html file for {0} at {1}".format(location, filepath))
 
             # VS[compat]
             # TODO (cpennington): If the file doesn't exist at the right path,
@@ -109,7 +109,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath):
                 candidates = cls.backcompat_paths(filepath)
-                #log.debug("candidates = {0}".format(candidates))
+                # log.debug("candidates = {0}".format(candidates))
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
                         filepath = candidate
@@ -153,7 +153,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         # Not proper format.  Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
         filepath = u'{category}/{pathname}.html'.format(category=self.category,
-                                                    pathname=pathname)
+                                                        pathname=pathname)
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:

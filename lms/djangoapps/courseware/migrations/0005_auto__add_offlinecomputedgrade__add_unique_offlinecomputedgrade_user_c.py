@@ -32,7 +32,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('courseware', ['OfflineComputedGradeLog'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'OfflineComputedGrade', fields ['user', 'course_id']
         db.delete_unique('courseware_offlinecomputedgrade', ['user_id', 'course_id'])
@@ -42,7 +41,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'OfflineComputedGradeLog'
         db.delete_table('courseware_offlinecomputedgradelog')
-
 
     models = {
         'auth.group': {

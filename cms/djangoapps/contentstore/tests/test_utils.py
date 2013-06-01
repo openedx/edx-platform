@@ -147,4 +147,3 @@ class ExtraPanelTabTestCase(TestCase):
                 changed, actual_tabs = utils.remove_extra_panel_tab(tab_type, course)
                 self.assertFalse(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
-

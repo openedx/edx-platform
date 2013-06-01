@@ -105,7 +105,6 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
     # in the module
     icon_class = 'other'
 
-
     def __init__(self, system, location, descriptor, model_data):
         '''
         Construct a new xmodule
@@ -593,19 +592,19 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
         eq = (self.__class__ == other.__class__ and
-                all(getattr(self, attr, None) == getattr(other, attr, None)
-                    for attr in self.equality_attributes))
+              all(getattr(self, attr, None) == getattr(other, attr, None)
+                  for attr in self.equality_attributes))
 
         return eq
 
     def __repr__(self):
         return ("{class_}({system!r}, location={location!r},"
                 " model_data={model_data!r})".format(
-            class_=self.__class__.__name__,
-            system=self.system,
-            location=self.location,
-            model_data=self._model_data,
-        ))
+                    class_=self.__class__.__name__,
+                    system=self.system,
+                    location=self.location,
+                    model_data=self._model_data,
+                ))
 
     @property
     def non_editable_metadata_fields(self):

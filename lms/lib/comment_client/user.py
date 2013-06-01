@@ -11,7 +11,7 @@ class User(models.Model):
                          'subscribed_thread_ids', 'subscribed_commentable_ids',
                          'subscribed_course_ids', 'threads_count', 'comments_count',
                          'default_sort_key'
-                        ]
+                         ]
 
     updatable_fields = ['username', 'external_id', 'email', 'default_sort_key']
     initializable_fields = updatable_fields

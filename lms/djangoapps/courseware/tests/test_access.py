@@ -41,16 +41,16 @@ class AccessTestCase(TestCase):
         g.name = 'staff_edX/toy/2012_Fall'
         u.groups.all.return_value = [g]
         self.assertTrue(access._has_access_to_location(u, location,
-                                                        'staff', None))
+                                                       'staff', None))
         # A user has staff access if they are in the instructor group
         g.name = 'instructor_edX/toy/2012_Fall'
         self.assertTrue(access._has_access_to_location(u, location,
-                                                        'staff', None))
+                                                       'staff', None))
 
         # A user has instructor access if they are in the instructor group
         g.name = 'instructor_edX/toy/2012_Fall'
         self.assertTrue(access._has_access_to_location(u, location,
-                                                        'instructor', None))
+                                                       'instructor', None))
 
         # A user does not have staff access if they are
         # not in either the staff or the the instructor group

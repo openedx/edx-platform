@@ -66,8 +66,8 @@ class ViewsTestCase(TestCase):
         self.date = datetime.datetime(2013, 1, 22)
         self.course_id = 'edX/toy/2012_Fall'
         self.enrollment = CourseEnrollment.objects.get_or_create(user=self.user,
-                                                  course_id=self.course_id,
-                                                  created=self.date)[0]
+                                                                 course_id=self.course_id,
+                                                                 created=self.date)[0]
         self.location = ['tag', 'org', 'course', 'category', 'name']
         self._MODULESTORES = {}
         # This is a CourseDescriptor object

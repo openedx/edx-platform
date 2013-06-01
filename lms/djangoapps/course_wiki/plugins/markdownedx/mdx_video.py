@@ -172,21 +172,21 @@ class VideoExtension(markdown.Extension):
 
     def extendMarkdown(self, md, md_globals):
         self.add_inline(md, 'bliptv', Bliptv,
-            r'([^(]|^)http://(\w+\.|)blip.tv/file/get/(?P<bliptvfile>\S+.flv)')
+                        r'([^(]|^)http://(\w+\.|)blip.tv/file/get/(?P<bliptvfile>\S+.flv)')
         self.add_inline(md, 'dailymotion', Dailymotion,
-            r'([^(]|^)http://www\.dailymotion\.com/(?P<dailymotionid>\S+)')
+                        r'([^(]|^)http://www\.dailymotion\.com/(?P<dailymotionid>\S+)')
         self.add_inline(md, 'gametrailers', Gametrailers,
-            r'([^(]|^)http://www.gametrailers.com/video/[a-z0-9-]+/(?P<gametrailersid>\d+)')
+                        r'([^(]|^)http://www.gametrailers.com/video/[a-z0-9-]+/(?P<gametrailersid>\d+)')
         self.add_inline(md, 'metacafe', Metacafe,
-            r'([^(]|^)http://www\.metacafe\.com/watch/(?P<metacafeid>\S+)/')
+                        r'([^(]|^)http://www\.metacafe\.com/watch/(?P<metacafeid>\S+)/')
         self.add_inline(md, 'veoh', Veoh,
-            r'([^(]|^)http://www\.veoh\.com/\S*(#watch%3D|watch/)(?P<veohid>\w+)')
+                        r'([^(]|^)http://www\.veoh\.com/\S*(#watch%3D|watch/)(?P<veohid>\w+)')
         self.add_inline(md, 'vimeo', Vimeo,
-            r'([^(]|^)http://(www.|)vimeo\.com/(?P<vimeoid>\d+)\S*')
+                        r'([^(]|^)http://(www.|)vimeo\.com/(?P<vimeoid>\d+)\S*')
         self.add_inline(md, 'yahoo', Yahoo,
-            r'([^(]|^)http://video\.yahoo\.com/watch/(?P<yahoovid>\d+)/(?P<yahooid>\d+)')
+                        r'([^(]|^)http://video\.yahoo\.com/watch/(?P<yahoovid>\d+)/(?P<yahooid>\d+)')
         self.add_inline(md, 'youtube', Youtube,
-            r'([^(]|^)http://www\.youtube\.com/watch\?\S*v=(?P<youtubeargs>[A-Za-z0-9_&=-]+)\S*')
+                        r'([^(]|^)http://www\.youtube\.com/watch\?\S*v=(?P<youtubeargs>[A-Za-z0-9_&=-]+)\S*')
 
 
 class Bliptv(markdown.inlinepatterns.Pattern):
@@ -247,7 +247,7 @@ class Yahoo(markdown.inlinepatterns.Pattern):
         param = etree.Element('param')
         param.set('name', 'flashVars')
         param.set('value', "id=%s&vid=%s" % (m.group('yahooid'),
-                m.group('yahoovid')))
+                                             m.group('yahoovid')))
         obj.append(param)
         return obj
 
@@ -274,10 +274,10 @@ def flash_object(url, width, height):
         param.set('name', 'allowFullScreen')
         param.set('value', 'true')
         obj.append(param)
-        #param = etree.Element('param')
-        #param.set('name', 'allowScriptAccess')
-        #param.set('value', 'sameDomain')
-        #obj.append(param)
+        # param = etree.Element('param')
+        # param.set('name', 'allowScriptAccess')
+        # param.set('value', 'sameDomain')
+        # obj.append(param)
         return obj
 
 

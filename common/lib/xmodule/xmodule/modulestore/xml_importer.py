@@ -50,10 +50,10 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 if thumbnail_content is not None:
                     content.thumbnail_location = thumbnail_location
 
-                #then commit the content
+                # then commit the content
                 static_content_store.save(content)
 
-                #store the remapping information which will be needed to subsitute in the module data
+                # store the remapping information which will be needed to subsitute in the module data
                 remap_dict[fullname_with_subpath] = content_loc.name
             except:
                 raise
@@ -85,7 +85,7 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
                 if thumbnail_content is not None:
                     content.thumbnail_location = thumbnail_location
 
-                #then commit the content
+                # then commit the content
                 static_content_store.save(content)
 
                 new_link = StaticContent.get_url_path_from_location(content_loc)

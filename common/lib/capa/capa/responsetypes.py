@@ -1101,7 +1101,7 @@ class CustomResponse(LoncapaResponse):
             fn = self.code
             answer_given = submission[0] if (len(idset) == 1) else submission
             kwnames = self.xml.get("cfn_extra_args", "").split()
-            kwargs = {n:self.context.get(n) for n in kwnames}
+            kwargs = {n: self.context.get(n) for n in kwnames}
             log.debug(" submission = %s" % submission)
             try:
                 ret = fn(self.expect, answer_given, **kwargs)
@@ -1808,7 +1808,7 @@ class SchematicResponse(LoncapaResponse):
             self.code = answer.text
 
     def get_score(self, student_answers):
-        #from capa_problem import global_context
+        # from capa_problem import global_context
         submission = [
             json.loads(student_answers[k]) for k in sorted(self.answer_ids)
         ]
@@ -2003,9 +2003,9 @@ class AnnotationResponse(LoncapaResponse):
 
         for inputfield in self.inputfields:
             option_scoring = dict([(option['id'], {
-                    'correctness': choices.get(option['choice']),
-                    'points': scoring.get(option['choice'])
-                }) for option in self._find_options(inputfield)])
+                'correctness': choices.get(option['choice']),
+                'points': scoring.get(option['choice'])
+            }) for option in self._find_options(inputfield)])
 
             scoring_map[inputfield.get('id')] = option_scoring
 

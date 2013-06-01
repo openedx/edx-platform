@@ -66,9 +66,12 @@ class Command(BaseCommand):
 
     class DummyRequest(object):
         META = {}
+
         def __init__(self):
             return
+
         def get_host(self):
             return 'edx.mit.edu'
+
         def is_secure(self):
             return False

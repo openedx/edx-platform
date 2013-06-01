@@ -244,7 +244,7 @@ class ModelDataCache(object):
                 module_state_key=key.block_scope_id.url(),
                 defaults={'state': json.dumps({}),
                           'module_type': key.block_scope_id.category,
-                         },
+                          },
             )
         elif key.scope == Scope.content:
             field_object, _ = XModuleContentField.objects.get_or_create(

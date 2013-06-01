@@ -4,7 +4,7 @@
  See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
 
 
- This task merges and compiles the human-readable .pofiles on the 
+ This task merges and compiles the human-readable .pofiles on the
  local filesystem into machine-readable .mofiles. This is typically
  necessary as part of the build process since these .mofiles are
  needed by Django when serving the web app.
@@ -13,13 +13,16 @@
  languages to generate.
 """
 
-import os, sys, logging
+import os
+import sys
+import logging
 from polib import pofile
 
 from config import BASE_DIR, CONFIGURATION
 from execute import execute
 
 LOG = logging.getLogger(__name__)
+
 
 def merge(locale, target='django.po', fail_if_missing=True):
     """
@@ -50,7 +53,8 @@ def merge(locale, target='django.po', fail_if_missing=True):
 
     # rename merged.po -> django.po (default)
     django_filename = locale_directory.joinpath(target)
-    os.rename(merged_filename, django_filename) # can't overwrite file on Windows
+    os.rename(merged_filename, django_filename)  # can't overwrite file on Windows
+
 
 def clean_metadata(file):
     """
@@ -58,6 +62,7 @@ def clean_metadata(file):
     This reads in a PO file and simply saves it back out again.
     """
     pofile(file).save()
+
 
 def validate_files(dir, files_to_merge):
     """
@@ -71,7 +76,8 @@ def validate_files(dir, files_to_merge):
         if not pathname.exists():
             raise Exception("I18N: Cannot generate because file not found: {0}".format(pathname))
 
-def main ():
+
+def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     for locale in CONFIGURATION.locales:

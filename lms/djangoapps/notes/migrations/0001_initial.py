@@ -26,11 +26,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('notes', ['Note'])
 
-
     def backwards(self, orm):
         # Deleting model 'Note'
         db.delete_table('notes_note')
-
 
     models = {
         'auth.group': {

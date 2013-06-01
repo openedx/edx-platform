@@ -62,7 +62,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'TestCenterUser', fields ['client_candidate_id']
         db.create_unique('student_testcenteruser', ['client_candidate_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'TestCenterUser', fields ['client_candidate_id']
         db.delete_unique('student_testcenteruser', ['client_candidate_id'])
@@ -87,7 +86,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'TestCenterUser.confirmed_at'
         db.delete_column('student_testcenteruser', 'confirmed_at')
-
 
     models = {
         'auth.group': {

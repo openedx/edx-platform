@@ -232,7 +232,7 @@ class CourseGradingModel(object):
         # 5 hours 59 minutes 59 seconds => converted to iso format
         rawgrace = descriptor.lms.graceperiod
         if rawgrace:
-            hours_from_days = rawgrace.days*24
+            hours_from_days = rawgrace.days * 24
             seconds = rawgrace.seconds
             hours_from_seconds = int(seconds / 3600)
             hours = hours_from_days + hours_from_seconds

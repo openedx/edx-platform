@@ -239,7 +239,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
         self.assertTrue(getattr(draft_problem, 'is_draft', False))
 
-        #now requery with depth
+        # now requery with depth
         course = modulestore('draft').get_item(
             Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
             depth=None
@@ -478,7 +478,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             on_disk = loads(grading_policy.read())
             self.assertEqual(on_disk, course.grading_policy)
 
-        #check for policy.json
+        # check for policy.json
         self.assertTrue(filesystem.exists('policy.json'))
 
         # compare what's on disk to what we have in the course module
@@ -872,7 +872,6 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
-
 
     def test_import_metadata_with_attempts_empty_string(self):
         module_store = modulestore('direct')

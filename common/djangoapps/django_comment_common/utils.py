@@ -9,6 +9,7 @@ _MODERATOR_ROLE_PERMISSIONS = ["edit_content", "delete_thread", "openclose_threa
 
 _ADMINISTRATOR_ROLE_PERMISSIONS = ["manage_moderator"]
 
+
 def seed_permissions_roles(course_id):
     administrator_role = Role.objects.get_or_create(name="Administrator", course_id=course_id)[0]
     moderator_role = Role.objects.get_or_create(name="Moderator", course_id=course_id)[0]

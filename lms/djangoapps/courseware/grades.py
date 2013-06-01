@@ -197,7 +197,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
 
                     graded = module_descriptor.lms.graded
                     if not total > 0:
-                        #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
+                        # We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
 
                     scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
@@ -208,7 +208,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
             else:
                 graded_total = Score(0.0, 1.0, True, section_name)
 
-            #Add the graded total to totaled_scores
+            # Add the graded total to totaled_scores
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
             else:

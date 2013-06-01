@@ -32,6 +32,7 @@ from xmodule.tests import test_util_open_ended
 
 from courseware.tests import factories
 
+
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestStaffGradingService(LoginEnrollmentTestCase):
     '''

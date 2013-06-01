@@ -144,4 +144,3 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
         modulestore.delete_item(source_location)
 
     return True
-

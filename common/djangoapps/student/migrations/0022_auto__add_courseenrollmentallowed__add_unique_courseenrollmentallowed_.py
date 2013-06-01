@@ -20,14 +20,12 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'CourseEnrollmentAllowed', fields ['email', 'course_id']
         db.create_unique('student_courseenrollmentallowed', ['email', 'course_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'CourseEnrollmentAllowed', fields ['email', 'course_id']
         db.delete_unique('student_courseenrollmentallowed', ['email', 'course_id'])
 
         # Deleting model 'CourseEnrollmentAllowed'
         db.delete_table('student_courseenrollmentallowed')
-
 
     models = {
         'auth.group': {

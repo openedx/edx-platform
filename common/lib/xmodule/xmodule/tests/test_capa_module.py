@@ -1,8 +1,8 @@
 """Tests of the Capa XModule"""
-#pylint: disable=C0111
-#pylint: disable=R0904
-#pylint: disable=C0103
-#pylint: disable=C0302
+# pylint: disable=C0111
+# pylint: disable=R0904
+# pylint: disable=C0103
+# pylint: disable=C0302
 
 import datetime
 from mock import Mock, patch

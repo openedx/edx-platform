@@ -79,7 +79,7 @@ urlpatterns = ('',  # nopep8
     url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile',
         name="university_profile"),
 
-    #Semi-static views (these need to be rendered and have the login bar, but don't change)
+    # Semi-static views (these need to be rendered and have the login bar, but don't change)
     url(r'^404$', 'static_template_view.views.render',
         {'template': '404.html'}, name="404"),
     url(r'^about$', 'static_template_view.views.render',
@@ -106,7 +106,7 @@ urlpatterns = ('',  # nopep8
     url(r'^honor$', 'static_template_view.views.render',
         {'template': 'honor.html'}, name="honor"),
 
-    #Press releases
+    # Press releases
     url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
 
     # Favicon
@@ -177,19 +177,19 @@ if settings.COURSEWARE_ENABLED:
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
 
-        #About the course
+        # About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
             'courseware.views.course_about', name="about_course"),
-        #View for mktg site (kept for backwards compatibility TODO - remove before merge to master)
+        # View for mktg site (kept for backwards compatibility TODO - remove before merge to master)
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/mktg-about$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
-        #View for mktg site
+        # View for mktg site
         url(r'^mktg/(?P<course_id>.*)$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
 
 
 
-        #Inside the course
+        # Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
             'courseware.views.course_info', name="course_root"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
@@ -384,6 +384,6 @@ urlpatterns = patterns(*urlpatterns)
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-#Custom error pages
+# Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'

@@ -29,7 +29,7 @@ class TagRegistry(object):
                     continue
                 raise ValueError("Tag {0} already registered by class {1}."
                                  " Can't register for class {2}"
-                                     .format(t, other_cls.__name__, cls.__name__))
+                                 .format(t, other_cls.__name__, cls.__name__))
 
         # Ok, should be good to change state now.
         for t in cls.tags:

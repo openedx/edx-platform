@@ -224,8 +224,8 @@ class SymbolicResponseTest(ResponseTest):
 
     def test_complex_number_grade(self):
         problem = self.build_problem(math_display=True,
-            expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
-            options=["matrix", "imaginary"])
+                                     expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
+                                     options=["matrix", "imaginary"])
 
         # For LaTeX-style inputs, symmath_check() will try to contact
         # a server to convert the input to MathML.
@@ -244,8 +244,8 @@ class SymbolicResponseTest(ResponseTest):
             mock_post.return_value.text = correct_snuggletex_response
 
             self._assert_symbolic_grade(problem,
-                "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]",
-                textwrap.dedent("""
+                                        "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]",
+                                        textwrap.dedent("""
                 <math xmlns="http://www.w3.org/1998/Math/MathML">
                   <mstyle displaystyle="true">
                     <mrow>
@@ -290,7 +290,7 @@ class SymbolicResponseTest(ResponseTest):
                   </mstyle>
                 </math>
                 """),
-                'correct')
+                                        'correct')
 
         # Incorrect answer
         with mock.patch.object(requests, 'post') as mock_post:
@@ -300,12 +300,12 @@ class SymbolicResponseTest(ResponseTest):
             mock_post.return_value.text = wrong_snuggletex_response
 
             self._assert_symbolic_grade(problem, "2",
-                    textwrap.dedent("""
+                                        textwrap.dedent("""
                     <math xmlns="http://www.w3.org/1998/Math/MathML">
                       <mstyle displaystyle="true"><mn>2</mn></mstyle>
                     </math>
                     """),
-                'incorrect')
+                                        'incorrect')
 
     def test_multiple_inputs_exception(self):
 
@@ -313,20 +313,20 @@ class SymbolicResponseTest(ResponseTest):
         # only one "expect" value
         with self.assertRaises(Exception):
             problem = self.build_problem(math_display=True,
-                                        expect="2*x+3*y",
-                                        num_inputs=3)
+                                         expect="2*x+3*y",
+                                         num_inputs=3)
 
     def _assert_symbolic_grade(self, problem,
-                                student_input,
-                                dynamath_input,
-                                expected_correctness):
+                               student_input,
+                               dynamath_input,
+                               expected_correctness):
         input_dict = {'1_2_1': str(student_input),
-                        '1_2_1_dynamath': str(dynamath_input)}
+                      '1_2_1_dynamath': str(dynamath_input)}
 
         correct_map = problem.grade_answers(input_dict)
 
         self.assertEqual(correct_map.get_correctness('1_2_1'),
-                        expected_correctness)
+                         expected_correctness)
 
 
 class OptionResponseTest(ResponseTest):

@@ -3,6 +3,7 @@ from unittest import TestCase
 
 import converter
 
+
 class UpcaseConverter (converter.Converter):
     """
     Converts a string to uppercase. Just used for testing.
@@ -36,7 +37,7 @@ class TestConverter(TestCase):
             # both kinds of tags
             ('<strong>big</strong> %(adjective)s %(noun)s',
              '<strong>BIG</strong> %(adjective)s %(noun)s'),
-            )
+        )
         for (source, expected) in test_cases:
             result = c.convert(source)
             self.assertEquals(result, expected)

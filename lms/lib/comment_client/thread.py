@@ -100,7 +100,7 @@ class Thread(models.Model):
         else:
             raise CommentClientError("Can only flag/unflag for threads or comments")
         params = {'user_id': user.id}
-        #if you're an admin, when you unflag, remove ALL flags
+        # if you're an admin, when you unflag, remove ALL flags
         if removeAll:
             params['all'] = True
 

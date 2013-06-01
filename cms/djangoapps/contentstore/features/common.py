@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from nose.tools import assert_true
@@ -14,6 +14,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 ###########  STEP HELPERS ##############
+
 
 @step('I (?:visit|access|open) the Studio homepage$')
 def i_visit_the_studio_homepage(step):

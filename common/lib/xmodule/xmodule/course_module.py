@@ -163,7 +163,7 @@ class CourseFields(object):
     discussion_topics = Object(
         help="Map of topics names to ids",
         scope=Scope.settings
-        )
+    )
     testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
     cohort_config = Object(help="Dictionary defining cohort configuration", scope=Scope.settings)
@@ -282,10 +282,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     "drop_count": 0,
                     "weight": 0.4
                 }
-            ],
-            "GRADE_CUTOFFS": {
+                ],
+                "GRADE_CUTOFFS": {
                 "Pass": 0.5
-            }}
+                }}
 
     def set_grading_policy(self, course_policy):
         """
@@ -392,7 +392,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 textbook_xml_object.set('book_url', textbook.book_url)
 
             xml_object.append(textbook_xml_object)
-        
+
         return xml_object
 
     def has_ended(self):

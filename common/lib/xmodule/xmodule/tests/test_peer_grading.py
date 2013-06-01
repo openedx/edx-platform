@@ -139,6 +139,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         """
         self.peer_grading.get_instance_state()
 
+
 class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
     """
     Test peer grading xmodule at the unit level.  More detailed tests are difficult, as the module relies on an
@@ -146,6 +147,7 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
     """
     problem_location = Location(["i4x", "edX", "open_ended", "peergrading",
                                  "PeerGradingScored"])
+
     def setUp(self):
         """
         Create a peer grading module from a test system

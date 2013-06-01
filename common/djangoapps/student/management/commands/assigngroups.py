@@ -33,7 +33,7 @@ def group_from_value(groups, v):
 
 class Command(BaseCommand):
     help =  \
-''' Assign users to test groups. Takes a list
+        ''' Assign users to test groups. Takes a list
 of groups:
 a:0.3,b:0.4,c:0.3 file.txt "Testing something"
 Will assign each user to group a, b, or c with

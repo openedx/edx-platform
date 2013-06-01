@@ -26,12 +26,12 @@ def aggregate_scores(scores, section_name="summary"):
     total_correct = sum(score.earned for score in scores)
     total_possible = sum(score.possible for score in scores)
 
-    #regardless of whether or not it is graded
+    # regardless of whether or not it is graded
     all_total = Score(total_correct,
                       total_possible,
                       False,
                       section_name)
-    #selecting only graded things
+    # selecting only graded things
     graded_total = Score(total_correct_graded,
                          total_possible_graded,
                          True,
@@ -75,10 +75,10 @@ def grader_from_conf(conf):
         name = 'name'
         try:
             if 'min_count' in subgraderconf:
-                #This is an AssignmentFormatGrader
+                # This is an AssignmentFormatGrader
                 subgrader_class = AssignmentFormatGrader
             elif name in subgraderconf:
-                #This is an SingleSectionGrader
+                # This is an SingleSectionGrader
                 subgrader_class = SingleSectionGrader
             else:
                 raise ValueError("Configuration has no appropriate grader class.")
@@ -238,7 +238,7 @@ class SingleSectionGrader(CourseGrader):
 
         return {'percent': percent,
                 'section_breakdown': breakdown,
-                #No grade_breakdown here
+                # No grade_breakdown here
                 }
 
 
@@ -291,7 +291,7 @@ class AssignmentFormatGrader(CourseGrader):
     def grade(self, grade_sheet, generate_random_scores=False):
         def total_with_drops(breakdown, drop_count):
             '''calculates total score for a section while dropping lowest scores'''
-            #create an array of tuples with (index, mark), sorted by mark['percent'] descending
+            # create an array of tuples with (index, mark), sorted by mark['percent'] descending
             sorted_breakdown = sorted(enumerate(breakdown), key=lambda x: -x[1]['percent'])
             # A list of the indices of the dropped scores
             dropped_indices = []
@@ -307,7 +307,7 @@ class AssignmentFormatGrader(CourseGrader):
 
             return aggregate_score, dropped_indices
 
-        #Figure the homework scores
+        # Figure the homework scores
         scores = grade_sheet.get(self.type, [])
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
@@ -370,5 +370,5 @@ class AssignmentFormatGrader(CourseGrader):
 
         return {'percent': total_percent,
                 'section_breakdown': breakdown,
-                #No grade_breakdown here
+                # No grade_breakdown here
                 }

@@ -99,7 +99,7 @@ def view_revision(request, revision_number, article_path, course_id=None):
 def root_redirect(request, course_id=None):
     course = get_opt_course_with_access(request.user, course_id, 'load')
 
-    #TODO: Add a default namespace to settings.
+    # TODO: Add a default namespace to settings.
     namespace = "edX"
 
     try:
@@ -135,18 +135,18 @@ def create(request, article_path, course_id=None):
 
     # See if the article already exists
     article_slug = article_path_components[1] if len(article_path_components) >= 2 else ''
-    #TODO: Make sure the slug only contains legal characters (which is already done a bit by the url regex)
+    # TODO: Make sure the slug only contains legal characters (which is already done a bit by the url regex)
 
     try:
         existing_article = Article.objects.get(namespace=namespace, slug__exact=article_slug)
-        #It already exists, so we just redirect to view the article
+        # It already exists, so we just redirect to view the article
         return HttpResponseRedirect(wiki_reverse("wiki_view", existing_article, course))
     except Article.DoesNotExist:
-        #This is good. The article doesn't exist
+        # This is good. The article doesn't exist
         pass
 
-    #TODO: Once we have permissions for namespaces, we should check for create permissions
-    #check_permissions(request, #namespace#, check_locked=False, check_write=True, check_deleted=True)
+    # TODO: Once we have permissions for namespaces, we should check for create permissions
+    # check_permissions(request, #namespace#, check_locked=False, check_write=True, check_deleted=True)
 
     if request.method == 'POST':
         f = CreateArticleForm(request.POST)
@@ -260,11 +260,11 @@ def history(request, article_path, page=1, course_id=None):
                     article.save()
                 elif request.POST.__contains__('view'):
                     redirectURL = wiki_reverse('wiki_view_revision', course=course,
-                                    kwargs={'revision_number': revision.counter, 'article_path': article.get_path()})
-                #The rese of these are admin functions
+                                               kwargs={'revision_number': revision.counter, 'article_path': article.get_path()})
+                # The rese of these are admin functions
                 elif request.POST.__contains__('delete') and request.user.is_superuser:
                     if (revision.deleted == 0):
-                         revision.adminSetDeleted(2)
+                        revision.adminSetDeleted(2)
                 elif request.POST.__contains__('restore') and request.user.is_superuser:
                     if (revision.deleted == 2):
                         revision.adminSetDeleted(0)
@@ -296,10 +296,10 @@ def history(request, article_path, page=1, course_id=None):
     prev_page = p - 1 if p > 1 else None
 
     d = {'wiki_page': p,
-            'wiki_next_page': next_page,
-            'wiki_prev_page': prev_page,
-            'wiki_history': history[beginItem:beginItem + page_size],
-            'show_delete_revision': request.user.is_superuser}
+         'wiki_next_page': next_page,
+         'wiki_prev_page': prev_page,
+         'wiki_history': history[beginItem:beginItem + page_size],
+         'show_delete_revision': request.user.is_superuser}
     update_template_dictionary(d, request, course, article)
 
     return render_to_response('simplewiki/simplewiki_history.html', d)
@@ -328,11 +328,11 @@ def revision_feed(request, page=1, namespace=None, course_id=None):
     prev_page = p - 1 if p > 1 else None
 
     d = {'wiki_page': p,
-            'wiki_next_page': next_page,
-            'wiki_prev_page': prev_page,
-            'wiki_history': history[beginItem:beginItem + page_size],
-            'show_delete_revision': request.user.is_superuser,
-            'namespace': namespace}
+         'wiki_next_page': next_page,
+         'wiki_prev_page': prev_page,
+         'wiki_history': history[beginItem:beginItem + page_size],
+         'show_delete_revision': request.user.is_superuser,
+         'namespace': namespace}
     update_template_dictionary(d, request, course)
 
     return render_to_response('simplewiki/simplewiki_revision_feed.html', d)
@@ -370,7 +370,7 @@ def search_articles(request, namespace=None, course_id=None):
             else:
                 results._search = lambda x: results.filter(x)
 
-            results = results._search(Q(current_revision__contents__icontains=queryword) | \
+            results = results._search(Q(current_revision__contents__icontains=queryword) |
                                       Q(title__icontains=queryword))
 
     results = results.select_related('current_revision__deleted', 'namespace')
@@ -381,8 +381,8 @@ def search_articles(request, namespace=None, course_id=None):
         return HttpResponseRedirect(wiki_reverse('wiki_view', article=results[0], course=course))
     else:
         d = {'wiki_search_results': results,
-                'wiki_search_query': querystring,
-                'namespace': namespace}
+             'wiki_search_query': querystring,
+             'namespace': namespace}
         update_template_dictionary(d, request, course)
         return render_to_response('simplewiki/simplewiki_searchresults.html', d)
 
@@ -513,10 +513,10 @@ def check_permissions(request, article, course, check_read=False, check_write=Fa
 
     if read_err or write_err or locked_err or deleted_err:
         d = {'wiki_article': article,
-                'wiki_err_noread': read_err,
-                'wiki_err_nowrite': write_err,
-                'wiki_err_locked': locked_err,
-                'wiki_err_deleted': deleted_err, }
+             'wiki_err_noread': read_err,
+             'wiki_err_nowrite': write_err,
+             'wiki_err_locked': locked_err,
+             'wiki_err_deleted': deleted_err, }
         update_template_dictionary(d, request, course)
         # TODO: Make this a little less jarring by just displaying an error
         #       on the current page? (no such redirect happens for an anon upload yet)

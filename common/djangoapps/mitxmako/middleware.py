@@ -33,11 +33,11 @@ class MakoMiddleware(object):
 
         for location in template_locations:
             lookup[location] = TemplateLookup(directories=template_locations[location],
-                                module_directory=module_directory,
-                                output_encoding='utf-8',
-                                input_encoding='utf-8',
-                                encoding_errors='replace',
-                                )
+                                              module_directory=module_directory,
+                                              output_encoding='utf-8',
+                                              input_encoding='utf-8',
+                                              encoding_errors='replace',
+                                              )
 
         import mitxmako
         mitxmako.lookup = lookup

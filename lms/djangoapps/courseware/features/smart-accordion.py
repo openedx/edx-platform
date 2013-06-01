@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from re import sub
@@ -62,7 +62,7 @@ def browse_course(course_id):
     num_rendered_chapters = len(rendered_chapters)
 
     msg = '%d chapters expected, %d chapters found on page for %s' % (num_chapters, num_rendered_chapters, course_id)
-    #logger.debug(msg)
+    # logger.debug(msg)
     assert num_chapters == num_rendered_chapters, msg
 
     chapter_it = 0
@@ -85,7 +85,7 @@ def browse_course(course_id):
 
         msg = ('%d sections expected, %d sections found on page, %s - %d - %s' %
                (num_sections, num_rendered_sections, course_id, chapter_it, chapters[chapter_it]['chapter_name']))
-        #logger.debug(msg)
+        # logger.debug(msg)
         assert num_sections == num_rendered_sections, msg
 
         section_it = 0
@@ -116,7 +116,7 @@ def browse_course(course_id):
 
             msg = ('%d tabs expected, %d tabs found, %s - %d - %s' %
                    (num_tabs, num_rendered_tabs, course_id, section_it, sections[section_it]['section_name']))
-            #logger.debug(msg)
+            # logger.debug(msg)
 
             # Save the HTML to a file for later comparison
             world.save_the_course_content('/tmp/%s' % course_id)
@@ -141,7 +141,7 @@ def browse_course(course_id):
                     num_rendered_items = len(rendered_items)
                     msg = ('%d items expected, %d items found, %s - %d - %s - tab %d' %
                            (tab_children, num_rendered_items, course_id, section_it, sections[section_it]['section_name'], tab_it))
-                    #logger.debug(msg)
+                    # logger.debug(msg)
                     assert tab_children == num_rendered_items, msg
 
                 tab_it += 1

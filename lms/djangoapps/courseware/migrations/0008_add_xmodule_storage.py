@@ -65,7 +65,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'XModuleStudentPrefsField', fields ['student', 'module_type', 'field_name']
         db.create_unique('courseware_xmodulestudentprefsfield', ['student_id', 'module_type', 'field_name'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'XModuleStudentPrefsField', fields ['student', 'module_type', 'field_name']
         db.delete_unique('courseware_xmodulestudentprefsfield', ['student_id', 'module_type', 'field_name'])
@@ -90,7 +89,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'XModuleStudentPrefsField'
         db.delete_table('courseware_xmodulestudentprefsfield')
-
 
     models = {
         'auth.group': {

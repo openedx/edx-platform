@@ -208,4 +208,3 @@ def accepts(request, media_type):
     """Return whether this request has an Accept header that matches type"""
     accept = parse_accept_header(request.META.get("HTTP_ACCEPT", ""))
     return media_type in [t for (t, p, q) in accept]
-

@@ -50,6 +50,7 @@ class CircuitPreprocessor(markdown.preprocessors.Preprocessor):
 
     def run(self, lines):
         print "running circuit preprocessor"
+
         def convertLine(line):
             m = self.preRegex.match(line)
             if m:

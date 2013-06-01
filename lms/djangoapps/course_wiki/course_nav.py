@@ -44,7 +44,6 @@ class Middleware(object):
         referer = request.META.get('HTTP_REFERER')
         destination = request.path
 
-
         if request.method == 'GET':
             new_destination = self.get_redirected_url(request.user, referer, destination)
 
@@ -60,7 +59,6 @@ class Middleware(object):
             wiki_reverse._transform_url = lambda url: prepend_string + url
 
         return None
-
 
     def process_response(self, request, response):
         """
@@ -79,7 +77,6 @@ class Middleware(object):
                 response['LOCATION'] = new_url
 
         return response
-
 
     def get_redirected_url(self, user, referer, destination):
         """

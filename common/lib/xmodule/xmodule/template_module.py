@@ -62,7 +62,6 @@ class CustomTagDescriptor(RawDescriptor):
         template = Template(template_module_data)
         return template.render(**params)
 
-
     @property
     def rendered_html(self):
         return self.render_template(self.system, self.data)

@@ -1,4 +1,5 @@
-import os, json
+import os
+import json
 from path import path
 
 # BASE_DIR is the working directory to execute django-admin commands from.
@@ -7,7 +8,8 @@ BASE_DIR = path(__file__).abspath().dirname().joinpath('..').normpath()
 
 # LOCALE_DIR contains the locale files.
 # Typically this should be 'mitx/conf/locale'
-LOCALE_DIR =  BASE_DIR.joinpath('conf', 'locale')
+LOCALE_DIR = BASE_DIR.joinpath('conf', 'locale')
+
 
 class Configuration:
     """
@@ -50,7 +52,7 @@ class Configuration:
     def dummy_locale(self):
         """
         Returns a locale to use for the dummy text, e.g. 'fr'.
-        Throws exception if no dummy-locale is declared. 
+        Throws exception if no dummy-locale is declared.
         The locale is a string.
         """
         dummy = self._config.get('dummy-locale', None)

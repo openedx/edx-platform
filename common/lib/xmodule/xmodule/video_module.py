@@ -27,12 +27,12 @@ class VideoModule(VideoFields, XModule):
     icon_class = 'video'
 
     js = {'coffee':
-        [resource_string(__name__, 'js/src/time.coffee'),
-         resource_string(__name__, 'js/src/video/display.coffee')] +
-        [resource_string(__name__, 'js/src/video/display/' + filename)
-         for filename
-         in sorted(resource_listdir(__name__, 'js/src/video/display'))
-         if filename.endswith('.coffee')]}
+          [resource_string(__name__, 'js/src/time.coffee'),
+           resource_string(__name__, 'js/src/video/display.coffee')] +
+          [resource_string(__name__, 'js/src/video/display/' + filename)
+           for filename
+           in sorted(resource_listdir(__name__, 'js/src/video/display'))
+           if filename.endswith('.coffee')]}
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 
@@ -80,8 +80,8 @@ class VideoModule(VideoFields, XModule):
             else:
                 x = time.strptime(s, '%H:%M:%S')
                 return datetime.timedelta(hours=x.tm_hour,
-                                      minutes=x.tm_min,
-                                      seconds=x.tm_sec).total_seconds()
+                                          minutes=x.tm_min,
+                                          seconds=x.tm_sec).total_seconds()
 
         return parse_time(xmltree.get('from')), parse_time(xmltree.get('to'))
 
@@ -110,7 +110,7 @@ class VideoModule(VideoFields, XModule):
         return None
 
     def get_instance_state(self):
-        #log.debug(u"STATE POSITION {0}".format(self.position))
+        # log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
 
     def video_list(self):
@@ -120,7 +120,7 @@ class VideoModule(VideoFields, XModule):
         # We normally let JS parse this, but in the case that we need a hacked
         # out <object> player because YouTube has broken their <iframe> API for
         # the third time in a year, we need to extract it server side.
-        normal_speed_video_id = None # The 1.0 speed video
+        normal_speed_video_id = None  # The 1.0 speed video
 
         # video_list() example:
         #   "0.75:nugHYNiD3fI,1.0:7m8pab1MfYY,1.25:3CxdPGXShq8,1.50:F-D7bOFCnXA"

@@ -1,4 +1,6 @@
-import os, string, random
+import os
+import string
+import random
 from unittest import TestCase
 from polib import POEntry
 
@@ -22,10 +24,10 @@ class TestDummy(TestCase):
                        u'h\xe9ll\xf6 my n\xe4m\xe9 \xefs B\xf6nd, J\xe4m\xe9s B\xf6nd Lorem i#'),
 
                       ('don\'t convert <a href="href">tag ids</a>',
-                        u'd\xf6n\'t \xe7\xf6nv\xe9rt <a href="href">t\xe4g \xefds</a> Lorem ipsu#'),
-                      
+                       u'd\xf6n\'t \xe7\xf6nv\xe9rt <a href="href">t\xe4g \xefds</a> Lorem ipsu#'),
+
                       ('don\'t convert %(name)s tags on %(date)s',
-                        u"d\xf6n't \xe7\xf6nv\xe9rt %(name)s t\xe4gs \xf6n %(date)s Lorem ips#")
+                       u"d\xf6n't \xe7\xf6nv\xe9rt %(name)s t\xe4gs \xf6n %(date)s Lorem ips#")
                       )
         for (source, expected) in test_cases:
             result = self.converter.convert(source)

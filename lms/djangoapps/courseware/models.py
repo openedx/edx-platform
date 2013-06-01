@@ -17,6 +17,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 class StudentModule(models.Model):
     """
     Keeps student state for a particular module in a particular course.
@@ -49,9 +50,9 @@ class StudentModule(models.Model):
     grade = models.FloatField(null=True, blank=True, db_index=True)
     max_grade = models.FloatField(null=True, blank=True)
     DONE_TYPES = (('na', 'NOT_APPLICABLE'),
-                    ('f', 'FINISHED'),
-                    ('i', 'INCOMPLETE'),
-                    )
+                 ('f', 'FINISHED'),
+                 ('i', 'INCOMPLETE'),
+                  )
     done = models.CharField(max_length=8, choices=DONE_TYPES, default='na', db_index=True)
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)

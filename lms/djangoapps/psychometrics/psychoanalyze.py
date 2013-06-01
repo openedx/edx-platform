@@ -18,8 +18,8 @@ from psychometrics.models import *
 
 log = logging.getLogger("mitx.psychometrics")
 
-#db = "ocwtutor"        # for debugging
-#db = "default"
+# db = "ocwtutor"        # for debugging
+# db = "default"
 
 db = getattr(settings, 'DATABASE_FOR_PSYCHOMETRICS', 'default')
 
@@ -293,7 +293,7 @@ def generate_plots_for_problem(problem):
                           'cmd': '[%s], %s' % (','.join(jsplots), axisopts),
                           })
 
-    #log.debug('plots = %s' % plots)
+    # log.debug('plots = %s' % plots)
     return msg, plots
 
 #-----------------------------------------------------------------------------
@@ -305,11 +305,11 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
     the PsychometricsData instance for the given StudentModule instance.
     """
     sm, status = StudentModule.objects.get_or_create(
-                       course_id=course_id,
-                       student=user,
-                       module_state_key=module_state_key,
-                       defaults={'state': '{}', 'module_type': 'problem'},
-                 )
+        course_id=course_id,
+        student=user,
+        module_state_key=module_state_key,
+        defaults={'state': '{}', 'module_type': 'problem'},
+    )
 
     try:
         pmd = PsychometricData.objects.using(db).get(studentmodule=sm)

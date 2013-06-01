@@ -241,12 +241,12 @@ WIKI_ENABLED = False
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number': '6.002x',
-                                          'title': 'Circuits and Electronics',
-                                          'xmlpath': '6002x/',
-                                          'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-                                          }
-                    }
+COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
+                                        'title': 'Circuits and Electronics',
+                                        'xmlpath': '6002x/',
+                                        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
+                                        }
+                   }
 
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
@@ -386,16 +386,16 @@ ZENDESK_API_KEY = None
 
 ################################# open ended grading config  #####################
 
-#By setting up the default settings with an incorrect user name and password,
+# By setting up the default settings with an incorrect user name and password,
 # will get an error when attempting to connect
 OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
-    'staff_grading' : 'staff_grading',
-    'peer_grading' : 'peer_grading',
-    'grading_controller' : 'grading_controller'
-    }
+    'staff_grading': 'staff_grading',
+    'peer_grading': 'peer_grading',
+    'grading_controller': 'grading_controller'
+}
 
 # Used for testing, debugging peer grading
 MOCK_PEER_GRADING = False
@@ -466,17 +466,17 @@ courseware_js = (
 # 'js/vendor/RequireJS.js' - Require JS wrapper.
 # See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 main_vendor_js = [
-  'js/vendor/RequireJS.js',
-  'js/vendor/json2.js',
-  'js/vendor/jquery.min.js',
-  'js/vendor/jquery-ui.min.js',
-  'js/vendor/jquery.cookie.js',
-  'js/vendor/jquery.qtip.min.js',
-  'js/vendor/swfobject/swfobject.js',
-  'js/vendor/jquery.ba-bbq.min.js',
-  'js/vendor/annotator.min.js',
-  'js/vendor/annotator.store.min.js',
-  'js/vendor/annotator.tags.min.js'
+    'js/vendor/RequireJS.js',
+    'js/vendor/json2.js',
+    'js/vendor/jquery.min.js',
+    'js/vendor/jquery-ui.min.js',
+    'js/vendor/jquery.cookie.js',
+    'js/vendor/jquery.qtip.min.js',
+    'js/vendor/swfobject/swfobject.js',
+    'js/vendor/jquery.ba-bbq.min.js',
+    'js/vendor/annotator.min.js',
+    'js/vendor/annotator.store.min.js',
+    'js/vendor/annotator.tags.min.js'
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
@@ -581,7 +581,7 @@ if os.path.isdir(DATA_DIR):
                 new_filename = os.path.splitext(filename)[0] + ".js"
                 if os.path.exists(js_dir / new_filename):
                     coffee_timestamp = os.stat(js_dir / filename).st_mtime
-                    js_timestamp     = os.stat(js_dir / new_filename).st_mtime
+                    js_timestamp = os.stat(js_dir / new_filename).st_mtime
                     if coffee_timestamp <= js_timestamp:
                         continue
                 os.system("rm %s" % (js_dir / new_filename))
@@ -684,7 +684,7 @@ INSTALLED_APPS = (
     'licenses',
     'course_groups',
 
-    #For the wiki
+    # For the wiki
     'wiki',   # The new django-wiki from benjaoming
     'django_notify',
     'course_wiki',   # Our customizations
@@ -723,6 +723,8 @@ MKTG_URL_LINK_MAP = {
 }
 
 ############################### THEME ################################
+
+
 def enable_theme(theme_name):
     """
     Enable the settings for a custom theme, whose files should be stored
@@ -748,4 +750,3 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
-

@@ -24,7 +24,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default=False, max_length=32),
                       keep_default=False)
 
-
         # Changing field 'GeneratedCertificate.grade'
         db.alter_column('certificates_generatedcertificate', 'grade', self.gf('django.db.models.fields.CharField')(max_length=5))
 
@@ -66,7 +65,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'GeneratedCertificate.key'
         db.delete_column('certificates_generatedcertificate', 'key')
-
 
         # Changing field 'GeneratedCertificate.grade'
         db.alter_column('certificates_generatedcertificate', 'grade', self.gf('django.db.models.fields.CharField')(max_length=5, null=True))

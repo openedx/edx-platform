@@ -61,7 +61,7 @@ def user_track(request):
         "page": request.GET['page'],
         "time": datetime.datetime.utcnow().isoformat(),
         "host": request.META['SERVER_NAME'],
-        }
+    }
     log_event(event)
     return HttpResponse('success')
 
@@ -87,7 +87,7 @@ def server_track(request, event_type, event, page=None):
         "page": page,
         "time": datetime.datetime.utcnow().isoformat(),
         "host": request.META['SERVER_NAME'],
-        }
+    }
 
     if event_type.startswith("/event_logs") and request.user.is_staff:  	# don't log
         return

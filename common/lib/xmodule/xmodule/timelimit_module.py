@@ -39,11 +39,11 @@ class TimeLimitModule(TimeLimitFields, XModule):
     # (For proctored exams, it is possible to have multiple accommodations
     # apply to an exam, so they require accommodating a multi-choice.)
     TIME_ACCOMMODATION_CODES = (('NONE', 'No Time Accommodation'),
-                      ('ADDHALFTIME', 'Extra Time - 1 1/2 Time'),
-                      ('ADD30MIN', 'Extra Time - 30 Minutes'),
-                      ('DOUBLE', 'Extra Time - Double Time'),
-                      ('TESTING', 'Extra Time -- Large amount for testing purposes')
-                    )
+                               ('ADDHALFTIME', 'Extra Time - 1 1/2 Time'),
+                               ('ADD30MIN', 'Extra Time - 30 Minutes'),
+                               ('DOUBLE', 'Extra Time - Double Time'),
+                               ('TESTING', 'Extra Time -- Large amount for testing purposes')
+                                )
 
     def _get_accommodated_duration(self, duration):
         '''
@@ -119,6 +119,7 @@ class TimeLimitModule(TimeLimitFields, XModule):
         else:
             return "other"
 
+
 class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
 
     module_class = TimeLimitModule
@@ -145,4 +146,3 @@ class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
             xml_object.append(
                 etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
-

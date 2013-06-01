@@ -128,12 +128,12 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     icon_class = 'problem'
 
     js = {
-            'coffee':
-            [
-                resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
-                resource_string(__name__, 'js/src/collapsible.coffee'),
-                resource_string(__name__, 'js/src/javascript_loader.coffee'),
-            ]
+        'coffee':
+        [
+        resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
+        resource_string(__name__, 'js/src/collapsible.coffee'),
+        resource_string(__name__, 'js/src/javascript_loader.coffee'),
+        ]
     }
     js_module_name = "CombinedOpenEnded"
 
@@ -244,10 +244,10 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     always_recalculate_grades = True
     template_dir_name = "combinedopenended"
 
-    #Specify whether or not to pass in S3 interface
+    # Specify whether or not to pass in S3 interface
     needs_s3_interface = True
 
-    #Specify whether or not to pass in open ended interface
+    # Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True
 
     metadata_attributes = RawDescriptor.metadata_attributes
@@ -268,4 +268,3 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
         non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
                                     CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
         return non_editable_fields
-

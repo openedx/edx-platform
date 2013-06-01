@@ -90,9 +90,9 @@ class UserProfile(models.Model):
                                   ('none', "None"),
                                   ('other', "Other"))
     level_of_education = models.CharField(
-                            blank=True, null=True, max_length=6, db_index=True,
-                            choices=LEVEL_OF_EDUCATION_CHOICES
-                         )
+        blank=True, null=True, max_length=6, db_index=True,
+        choices=LEVEL_OF_EDUCATION_CHOICES
+    )
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
@@ -248,8 +248,8 @@ class TestCenterUserForm(ModelForm):
     class Meta:
         model = TestCenterUser
         fields = ('first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
-                'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
-                'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name')
+                  'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
+                  'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name')
 
     def update_and_save(self):
         new_user = self.save(commit=False)
@@ -318,7 +318,7 @@ ACCOMMODATION_CODES = (
                       ('SRRECR', 'Separate Room and Recorder'),
                       ('SRSEAN', 'Separate Room and Service Animal'),
                       ('SRSGNR', 'Separate Room and Sign Language Interpreter'),
-                      )
+)
 
 ACCOMMODATION_CODE_DICT = {code: name for (code, name) in ACCOMMODATION_CODES}
 
@@ -572,7 +572,6 @@ class TestCenterRegistrationForm(ModelForm):
         return code
 
 
-
 def get_testcenter_registration(user, course_id, exam_series_code):
     try:
         tcu = TestCenterUser.objects.get(user=user)
@@ -626,7 +625,7 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self.user.save()
-        #self.delete()
+        # self.delete()
 
 
 class PendingNameChange(models.Model):
@@ -671,7 +670,7 @@ class CourseEnrollmentAllowed(models.Model):
     def __unicode__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
-#cache_relation(User.profile)
+# cache_relation(User.profile)
 
 #### Helper methods for use from python manage.py shell and other classes.
 

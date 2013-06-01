@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-  
+
 """
 See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
 
@@ -12,10 +12,12 @@ See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
  This task will clobber any existing django.po file.
  This is because django-admin.py makemessages hardcodes this filename
  and it cannot be overridden.
- 
+
 """
 
-import os, sys, logging
+import os
+import sys
+import logging
 from datetime import datetime
 from polib import pofile
 
@@ -34,7 +36,8 @@ SOURCE_WARN = 'This English source file is machine-generated. Do not check it in
 
 LOG = logging.getLogger(__name__)
 
-def main ():
+
+def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
@@ -43,7 +46,6 @@ def main ():
     generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
     for filename in generated_files:
         remove_file(source_msgs_dir.joinpath(filename))
-
 
     # Extract strings from mako templates
     babel_mako_cmd = 'pybabel extract -F %s -c "TRANSLATORS:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
@@ -59,7 +61,7 @@ def main ():
     execute(make_django_cmd, working_directory=BASE_DIR)
     # makemessages creates 'django.po'. This filename is hardcoded.
     # Rename it to django-partial.po to enable merging into django.po later.
-    os.rename(source_msgs_dir.joinpath('django.po'), 
+    os.rename(source_msgs_dir.joinpath('django.po'),
               source_msgs_dir.joinpath('django-partial.po'))
     execute(make_djangojs_cmd, working_directory=BASE_DIR)
 
@@ -82,6 +84,7 @@ This file is distributed under the same license as the PACKAGE package.
 FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 """
 
+
 def fix_header(po):
     """
     Replace default headers with edX headers
@@ -100,7 +103,7 @@ def fix_header(po):
          'This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.'),
         ('FIRST AUTHOR <EMAIL@ADDRESS>',
          'EdX Team <info@edx.org>')
-        )
+    )
     for (src, dest) in fixes:
         header = header.replace(src, dest)
     po.header = header
@@ -112,12 +115,13 @@ def fix_header(po):
  u'Content-Transfer-Encoding': u'8bit',
  u'Project-Id-Version': u'PACKAGE VERSION',
  u'Report-Msgid-Bugs-To': u'',
- u'Last-Translator': u'FULL NAME <EMAIL@ADDRESS>', 
+ u'Last-Translator': u'FULL NAME <EMAIL@ADDRESS>',
  u'Language-Team': u'LANGUAGE <LL@li.org>',
  u'POT-Creation-Date': u'2013-04-25 14:14-0400',
  u'Content-Type': u'text/plain; charset=UTF-8',
  u'MIME-Version': u'1.0'}
-""" 
+"""
+
 
 def fix_metadata(po):
     """
@@ -126,11 +130,12 @@ def fix_metadata(po):
     fixes = {'PO-Revision-Date': datetime.utcnow(),
              'Report-Msgid-Bugs-To': 'translation_team@edx.org',
              'Project-Id-Version': '0.1a',
-             'Language' : 'en',
-             'Last-Translator' : '',
+             'Language': 'en',
+             'Last-Translator': '',
              'Language-Team': 'translation team <translation_team@edx.org>',
              }
     po.metadata.update(fixes)
+
 
 def strip_key_strings(po):
     """
@@ -141,12 +146,13 @@ def strip_key_strings(po):
     del po[:]
     po += newlist
 
+
 def is_key_string(string):
     """
     returns True if string is a key string.
     Key strings begin with underscore.
     """
-    return len(string)>1 and string[0]=='_'
+    return len(string) > 1 and string[0] == '_'
 
 if __name__ == '__main__':
     main()

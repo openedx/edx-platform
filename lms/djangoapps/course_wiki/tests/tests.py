@@ -6,6 +6,7 @@ import xmodule.modulestore.django
 from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE
 from xmodule.modulestore.django import modulestore
 
+
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class WikiRedirectTestCase(LoginEnrollmentTestCase):
     def setUp(self):
@@ -54,10 +55,8 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
 
         self.assertEqual(resp['Location'], 'http://testserver' + redirected_to)
 
-
         # Now we test that the student will be redirected away from that page if the course doesn't exist
         # We do this in the same test because we want to make sure the redirected_to is constructed correctly
-
         # This is a location like /courses/*/wiki/* , but with an invalid course ID
         bad_course_wiki_page = redirected_to.replace(self.toy.location.course, "bad_course")
 

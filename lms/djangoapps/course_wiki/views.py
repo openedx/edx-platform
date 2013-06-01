@@ -32,7 +32,6 @@ def course_wiki_redirect(request, course_id):
 
     course_slug = course.wiki_slug
 
-
     # cdodge: fix for cases where self.location.course can be interpreted as an number rather than
     # a string. We're seeing in Studio created courses that people often will enter in a stright number
     # for 'course' (e.g. 201). This Wiki library expects a string to "do the right thing". We haven't noticed this before
@@ -44,7 +43,6 @@ def course_wiki_redirect(request, course_id):
     except:
         pass
 
-
     valid_slug = True
     if not course_slug:
         log.exception("This course is improperly configured. The slug cannot be empty.")
@@ -55,7 +53,6 @@ def course_wiki_redirect(request, course_id):
 
     if not valid_slug:
         return redirect("wiki:get", path="")
-
 
     # The wiki needs a Site object created. We make sure it exists here
     try:
@@ -124,12 +121,12 @@ def get_or_create_root():
         pass
 
     starting_content = "\n".join((
-    "Welcome to the edX Wiki",
-    "===",
-    "Visit a course wiki to add an article."))
+                                 "Welcome to the edX Wiki",
+                                 "===",
+                                 "Visit a course wiki to add an article."))
 
     root = URLPath.create_root(title="Wiki",
-                        content=starting_content)
+                               content=starting_content)
     article = root.article
     article.group = None
     article.group_read = True

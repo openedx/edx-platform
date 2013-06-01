@@ -19,12 +19,14 @@ class ContentTest(unittest.TestCase):
 
         content = StaticContent('loc', 'name', 'content_type', 'data')
         self.assertIsNone(content.thumbnail_location)
+
     def test_generate_thumbnail_image(self):
         contentStore = ContentStore()
         content = Content(Location(u'c4x', u'mitX', u'800', u'asset', u'monsters__.jpg'), None)
         (thumbnail_content, thumbnail_file_location) = contentStore.generate_thumbnail(content)
         self.assertIsNone(thumbnail_content)
         self.assertEqual(Location(u'c4x', u'mitX', u'800', u'thumbnail', u'monsters__.jpg'), thumbnail_file_location)
+
     def test_compute_location(self):
         # We had a bug that __ got converted into a single _. Make sure that substitution of INVALID_CHARS (like space)
         # still happen.

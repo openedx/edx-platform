@@ -2,8 +2,8 @@
 Steps for problem.feature lettuce tests
 '''
 
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -67,8 +67,8 @@ def set_external_grader_response(step, correctness):
     assert(correctness in ['correct', 'incorrect'])
 
     response_dict = {'correct': True if correctness == 'correct' else False,
-                    'score': 1 if correctness == 'correct' else 0,
-                    'msg': 'Your problem was graded %s' % correctness}
+                     'score': 1 if correctness == 'correct' else 0,
+                     'msg': 'Your problem was graded %s' % correctness}
 
     # Set the fake xqueue server to always respond
     # correct/incorrect when asked to grade a problem

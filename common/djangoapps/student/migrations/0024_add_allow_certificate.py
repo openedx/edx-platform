@@ -13,11 +13,9 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.BooleanField')(default=True),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'UserProfile.allow_certificate'
         db.delete_column('auth_userprofile', 'allow_certificate')
-
 
     models = {
         'auth.group': {

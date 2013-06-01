@@ -9,6 +9,7 @@ from student.models import unique_id_for_user
 
 log = logging.getLogger(__name__)
 
+
 class Score(models.Model):
     """
     This model stores the scores of different users on FoldIt problems.
@@ -38,7 +39,6 @@ class Score(models.Model):
         """
         return (-score) * 10 + 8000 * sum_of
 
-
     @staticmethod
     def get_tops_n(n, puzzles=['994559']):
         """
@@ -64,7 +64,7 @@ class Score(models.Model):
 
         return [{'username': s.user.username,
                  'score': Score.display_score(s.total_score, num)}
-                 for s in scores]
+                for s in scores]
 
 
 class PuzzleComplete(models.Model):
@@ -97,7 +97,6 @@ class PuzzleComplete(models.Model):
             self.puzzle_set, self.puzzle_subset,
             self.created)
 
-
     @staticmethod
     def completed_puzzles(anonymous_user_id):
         """
@@ -112,7 +111,6 @@ class PuzzleComplete(models.Model):
         return [{'set': c.puzzle_set,
                  'subset': c.puzzle_subset,
                  'created': c.created} for c in complete]
-
 
     @staticmethod
     def is_level_complete(anonymous_user_id, level, sub_level, due=None):
@@ -133,4 +131,3 @@ class PuzzleComplete(models.Model):
             complete = complete.filter(created__lte=due)
 
         return complete.exists()
-

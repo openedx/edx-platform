@@ -1,8 +1,11 @@
-import os, subprocess, logging
+import os
+import subprocess
+import logging
 
 from config import CONFIGURATION, BASE_DIR
 
 LOG = logging.getLogger(__name__)
+
 
 def execute(command, working_directory=BASE_DIR):
     """
@@ -25,7 +28,8 @@ def call(command, working_directory=BASE_DIR):
     p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory)
     out, err = p.communicate()
     return (out, err)
-    
+
+
 def create_dir_if_necessary(pathname):
     dirname = os.path.dirname(pathname)
     if not os.path.exists(dirname):

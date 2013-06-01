@@ -44,9 +44,9 @@ def staff_grading_notifications(course, user):
             if notifications['staff_needs_to_grade']:
                 pending_grading = True
     except:
-        #Non catastrophic error, so no real action
+        # Non catastrophic error, so no real action
         notifications = {}
-        #This is a dev_facing_error
+        # This is a dev_facing_error
         log.info(
             "Problem with getting notifications from staff grading service for course {0} user {1}.".format(course_id,
                                                                                                             student_id))
@@ -65,10 +65,10 @@ def peer_grading_notifications(course, user):
     system = ModuleSystem(
         ajax_url=None,
         track_function=None,
-        get_module = None,
+        get_module=None,
         render_template=render_to_string,
         replace_urls=None,
-        xblock_model_data= {}
+        xblock_model_data={}
     )
     peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
@@ -87,9 +87,9 @@ def peer_grading_notifications(course, user):
             if notifications['student_needs_to_peer_grade']:
                 pending_grading = True
     except:
-        #Non catastrophic error, so no real action
+        # Non catastrophic error, so no real action
         notifications = {}
-        #This is a dev_facing_error
+        # This is a dev_facing_error
         log.info(
             "Problem with getting notifications from peer grading service for course {0} user {1}.".format(course_id,
                                                                                                            student_id))
@@ -113,55 +113,55 @@ def combined_notifications(course, user):
     @return: A dictionary with boolean pending_grading (true if there is pending grading), img_path (for notification
     image), and response (actual response from grading controller server).
     """
-    #Set up return values so that we can return them for error cases
+    # Set up return values so that we can return them for error cases
     pending_grading = False
     img_path = ""
-    notifications={}
+    notifications = {}
     notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
 
-    #We don't want to show anonymous users anything.
+    # We don't want to show anonymous users anything.
     if not user.is_authenticated():
         return notification_dict
 
-    #Define a mock modulesystem
+    # Define a mock modulesystem
     system = ModuleSystem(
         ajax_url=None,
         track_function=None,
-        get_module = None,
+        get_module=None,
         render_template=render_to_string,
         replace_urls=None,
-        xblock_model_data= {}
+        xblock_model_data={}
     )
-    #Initialize controller query service using our mock system
+    # Initialize controller query service using our mock system
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, course, 'staff')
     course_id = course.id
     notification_type = "combined"
 
-    #See if we have a stored value in the cache
+    # See if we have a stored value in the cache
     success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
     if success:
         return notification_dict
 
-    #Get the time of the last login of the user
+    # Get the time of the last login of the user
     last_login = user.last_login
 
-    #Find the modules they have seen since they logged in
+    # Find the modules they have seen since they logged in
     last_module_seen = StudentModule.objects.filter(student=user, course_id=course_id,
                                                     modified__gt=last_login).values('modified').order_by(
-        '-modified')
+                                                        '-modified')
     last_module_seen_count = last_module_seen.count()
 
     if last_module_seen_count > 0:
-        #The last time they viewed an updated notification (last module seen minus how long notifications are cached)
+        # The last time they viewed an updated notification (last module seen minus how long notifications are cached)
         last_time_viewed = last_module_seen[0]['modified'] - datetime.timedelta(seconds=(NOTIFICATION_CACHE_TIME + 60))
     else:
-        #If they have not seen any modules since they logged in, then don't refresh
+        # If they have not seen any modules since they logged in, then don't refresh
         return {'pending_grading': False, 'img_path': img_path, 'response': notifications}
 
     try:
-        #Get the notifications from the grading controller
+        # Get the notifications from the grading controller
         controller_response = controller_qs.check_combined_notifications(course.id, student_id, user_is_staff,
                                                                          last_time_viewed)
         notifications = json.loads(controller_response)
@@ -169,8 +169,8 @@ def combined_notifications(course, user):
             if notifications['overall_need_to_check']:
                 pending_grading = True
     except:
-        #Non catastrophic error, so no real action
-        #This is a dev_facing_error
+        # Non catastrophic error, so no real action
+        # This is a dev_facing_error
         log.exception(
             "Problem with getting notifications from controller query service for course {0} user {1}.".format(
                 course_id, student_id))
@@ -180,7 +180,7 @@ def combined_notifications(course, user):
 
     notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
 
-    #Store the notifications in the cache
+    # Store the notifications in the cache
     set_value_in_cache(student_id, course_id, notification_type, notification_dict)
 
     return notification_dict

@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from common import *
@@ -38,7 +38,7 @@ def i_click_the_edit_link_for_the_release_date(step):
 @step('I save a new section release date$')
 def i_save_a_new_section_release_date(step):
     set_date_and_time('input.start-date.date.hasDatepicker', '12/25/2013',
-        'input.start-time.time.ui-timepicker-input', '00:00')
+                      'input.start-time.time.ui-timepicker-input', '00:00')
     world.browser.click_link_by_text('Save')
 
 

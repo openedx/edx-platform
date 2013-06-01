@@ -17,11 +17,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('certificates', ['CertificateWhitelist'])
 
-
     def backwards(self, orm):
         # Deleting model 'CertificateWhitelist'
         db.delete_table('certificates_certificatewhitelist')
-
 
     models = {
         'auth.group': {

@@ -59,7 +59,7 @@ class MyFetcher(HTTPFetcher):
             final_url=final_url,
             headers=response_headers,
             status=status,
-            )
+        )
 
 
 class OpenIdProviderTest(TestCase):
@@ -150,31 +150,30 @@ class OpenIdProviderTest(TestCase):
             # <input name="openid.return_to" type="hidden" value="http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H" />
             # <input name="openid.assoc_handle" type="hidden" value="{HMAC-SHA1}{50ff8120}{rh87+Q==}" />
 
-
     def testOpenIdSetup(self):
         if not settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
             return
         url = reverse('openid-provider-login')
         post_args = {
-                     "openid.mode": "checkid_setup",
-                     "openid.return_to": "http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H",
-                     "openid.assoc_handle": "{HMAC-SHA1}{50ff8120}{rh87+Q==}",
-                     "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
-                     "openid.ns": "http://specs.openid.net/auth/2.0",
-                     "openid.realm": "http://testserver/",
-                     "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
-                     "openid.ns.ax": "http://openid.net/srv/ax/1.0",
-                     "openid.ax.mode": "fetch_request",
-                     "openid.ax.required": "email,fullname,old_email,firstname,old_nickname,lastname,old_fullname,nickname",
-                     "openid.ax.type.fullname": "http://axschema.org/namePerson",
-                     "openid.ax.type.lastname": "http://axschema.org/namePerson/last",
-                     "openid.ax.type.firstname": "http://axschema.org/namePerson/first",
-                     "openid.ax.type.nickname": "http://axschema.org/namePerson/friendly",
-                     "openid.ax.type.email": "http://axschema.org/contact/email",
-                     "openid.ax.type.old_email": "http://schema.openid.net/contact/email",
-                     "openid.ax.type.old_nickname": "http://schema.openid.net/namePerson/friendly",
-                     "openid.ax.type.old_fullname": "http://schema.openid.net/namePerson",
-                     }
+            "openid.mode": "checkid_setup",
+            "openid.return_to": "http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H",
+            "openid.assoc_handle": "{HMAC-SHA1}{50ff8120}{rh87+Q==}",
+            "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
+            "openid.ns": "http://specs.openid.net/auth/2.0",
+            "openid.realm": "http://testserver/",
+            "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
+            "openid.ns.ax": "http://openid.net/srv/ax/1.0",
+            "openid.ax.mode": "fetch_request",
+            "openid.ax.required": "email,fullname,old_email,firstname,old_nickname,lastname,old_fullname,nickname",
+            "openid.ax.type.fullname": "http://axschema.org/namePerson",
+            "openid.ax.type.lastname": "http://axschema.org/namePerson/last",
+            "openid.ax.type.firstname": "http://axschema.org/namePerson/first",
+            "openid.ax.type.nickname": "http://axschema.org/namePerson/friendly",
+            "openid.ax.type.email": "http://axschema.org/contact/email",
+            "openid.ax.type.old_email": "http://schema.openid.net/contact/email",
+            "openid.ax.type.old_nickname": "http://schema.openid.net/namePerson/friendly",
+            "openid.ax.type.old_fullname": "http://schema.openid.net/namePerson",
+        }
         resp = self.client.post(url, post_args)
         code = 200
         self.assertEqual(resp.status_code, code,

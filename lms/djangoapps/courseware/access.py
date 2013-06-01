@@ -178,7 +178,7 @@ def _has_access_course_desc(user, course, action):
         'see_exists': see_exists,
         'staff': lambda: _has_staff_access_to_descriptor(user, course),
         'instructor': lambda: _has_instructor_access_to_descriptor(user, course),
-        }
+    }
 
     return _dispatch(checkers, action, user, course)
 
@@ -195,8 +195,6 @@ def _get_access_group_name_course_desc(course, action):
     return []
 
 
-
-
 def _has_access_error_desc(user, descriptor, action, course_context):
     """
     Only staff should see error descriptors.
@@ -211,7 +209,7 @@ def _has_access_error_desc(user, descriptor, action, course_context):
     checkers = {
         'load': check_for_staff,
         'staff': check_for_staff
-        }
+    }
 
     return _dispatch(checkers, action, user, descriptor)
 
@@ -258,7 +256,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
     checkers = {
         'load': can_load,
         'staff': lambda: _has_staff_access_to_descriptor(user, descriptor, course_context)
-        }
+    }
 
     return _dispatch(checkers, action, user, descriptor)
 
@@ -289,7 +287,7 @@ def _has_access_location(user, location, action, course_context):
     """
     checkers = {
         'staff': lambda: _has_staff_access_to_location(user, location, course_context)
-        }
+    }
 
     return _dispatch(checkers, action, user, location)
 
@@ -313,7 +311,7 @@ def _has_access_string(user, perm, action, course_context):
 
     checkers = {
         'staff': check_staff
-        }
+    }
 
     return _dispatch(checkers, action, user, perm)
 
@@ -365,7 +363,7 @@ def _course_org_staff_group_name(location, course_context=None):
 
 
 def group_names_for(role, location, course_context=None):
-    """Returns the group names for a given role with this location. Plural 
+    """Returns the group names for a given role with this location. Plural
     because it will return both the name we expect now as well as the legacy
     group name we support for backwards compatibility. This should not check
     the DB for existence of a group (like some of its callers do) because that's
@@ -388,6 +386,7 @@ def group_names_for(role, location, course_context=None):
 group_names_for_staff = partial(group_names_for, 'staff')
 group_names_for_instructor = partial(group_names_for, 'instructor')
 
+
 def _course_staff_group_name(location, course_context=None):
     """
     Get the name of the staff group for a location in the context of a course run.
@@ -406,6 +405,7 @@ def _course_staff_group_name(location, course_context=None):
         return legacy_group_name
 
     return group_name
+
 
 def _course_org_instructor_group_name(location, course_context=None):
     """
@@ -448,6 +448,7 @@ def _course_instructor_group_name(location, course_context=None):
 
     return group_name
 
+
 def course_beta_test_group_name(location):
     """
     Get the name of the beta tester group for a location.  Right now, that's
@@ -460,7 +461,6 @@ def course_beta_test_group_name(location):
 # nosetests thinks that anything with _test_ in the name is a test.
 # Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
 course_beta_test_group_name.__test__ = False
-
 
 
 def _has_global_staff_access(user):
@@ -557,7 +557,7 @@ def _has_access_to_location(user, location, access_level, course_context):
 
     if access_level == 'staff':
         staff_groups = group_names_for_staff(location, course_context) + \
-                       [_course_org_staff_group_name(location, course_context)]
+            [_course_org_staff_group_name(location, course_context)]
         for staff_group in staff_groups:
             if staff_group in user_groups:
                 debug("Allow: user in group %s", staff_group)
@@ -566,7 +566,7 @@ def _has_access_to_location(user, location, access_level, course_context):
 
     if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
         instructor_groups = group_names_for_instructor(location, course_context) + \
-                            [_course_org_instructor_group_name(location, course_context)]
+            [_course_org_instructor_group_name(location, course_context)]
         for instructor_group in instructor_groups:
             if instructor_group in user_groups:
                 debug("Allow: user in group %s", instructor_group)

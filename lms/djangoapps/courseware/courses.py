@@ -187,7 +187,6 @@ def get_course_about_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-
 def get_course_info_section(request, course, section_key):
     """
     This returns the snippet of html to be rendered on the course info page,
@@ -199,7 +198,6 @@ def get_course_info_section(request, course, section_key):
     - updates
     - guest_updates
     """
-
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
 

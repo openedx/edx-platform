@@ -56,7 +56,7 @@ def get_metadata_from_xml(xml_object, remove=True):
     if meta is None:
         return ''
     dmdata = meta.text
-    #log.debug('meta for %s loaded: %s' % (xml_object,dmdata))
+    # log.debug('meta for %s loaded: %s' % (xml_object,dmdata))
     if remove:
         xml_object.remove(meta)
     return dmdata
@@ -85,7 +85,7 @@ class XmlDescriptor(XModuleDescriptor):
     """
 
     xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export",
-        default={}, scope=Scope.settings)
+                            default={}, scope=Scope.settings)
 
     # Extension to append to filename paths
     filename_extension = 'xml'
@@ -100,23 +100,23 @@ class XmlDescriptor(XModuleDescriptor):
     # understand?  And if we do, is this the place?
     # Related: What's the right behavior for clean_metadata?
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
-        'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
-        'ispublic', 	# if True, then course is listed for all users; see
-        'xqa_key',  	# for xqaa server access
-        'giturl',	# url of git server for origin of file
-        # information about testcenter exams is a dict (of dicts), not a string,
-        # so it cannot be easily exportable as a course element's attribute.
-        'testcenter_info',
-        # VS[compat] Remove once unused.
-        'name', 'slug')
+                           'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
+                           'ispublic', 	# if True, then course is listed for all users; see
+                           'xqa_key',  	# for xqaa server access
+                           'giturl',  # url of git server for origin of file
+                           # information about testcenter exams is a dict (of dicts), not a string,
+                           # so it cannot be easily exportable as a course element's attribute.
+                           'testcenter_info',
+                           # VS[compat] Remove once unused.
+                           'name', 'slug')
 
     metadata_to_strip = ('data_dir',
-            'tabs', 'grading_policy', 'published_by', 'published_date',
-            'discussion_blackouts', 'testcenter_info',
-           # VS[compat] -- remove the below attrs once everything is in the CMS
-           'course', 'org', 'url_name', 'filename',
-           # Used for storing xml attributes between import and export, for roundtrips
-           'xml_attributes')
+                         'tabs', 'grading_policy', 'published_by', 'published_date',
+                         'discussion_blackouts', 'testcenter_info',
+                         # VS[compat] -- remove the below attrs once everything is in the CMS
+                         'course', 'org', 'url_name', 'filename',
+                         # Used for storing xml attributes between import and export, for roundtrips
+                         'xml_attributes')
 
     metadata_to_export_to_policy = ('discussion_topics')
 
@@ -138,7 +138,6 @@ class XmlDescriptor(XModuleDescriptor):
         'allow_anonymous_to_peers': bool_map,
         'show_timezone': bool_map,
     }
-
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -188,7 +187,6 @@ class XmlDescriptor(XModuleDescriptor):
                 filepath, location.url(), str(err))
             raise Exception, msg, sys.exc_info()[2]
 
-
     @classmethod
     def load_definition(cls, xml_object, system, location):
         '''Load a descriptor definition from the specified xml_object.
@@ -224,7 +222,7 @@ class XmlDescriptor(XModuleDescriptor):
         definition, children = cls.definition_from_xml(definition_xml, system)
         if definition_metadata:
             definition['definition_metadata'] = definition_metadata
-        definition['filename'] = [ filepath, filename ]     
+        definition['filename'] = [filepath, filename]
 
         return definition, children
 
@@ -249,7 +247,6 @@ class XmlDescriptor(XModuleDescriptor):
                 attr_map = cls.xml_attribute_map.get(attr, AttrMap())
                 metadata[attr] = attr_map.from_xml(val)
         return metadata
-
 
     @classmethod
     def apply_policy(cls, metadata, policy):
@@ -318,7 +315,7 @@ class XmlDescriptor(XModuleDescriptor):
         model_data['children'] = children
 
         model_data['xml_attributes'] = {}
-        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None]) # for git link
+        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None])  # for git link
         for key, value in metadata.items():
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value
@@ -343,7 +340,6 @@ class XmlDescriptor(XModuleDescriptor):
         specifically for customtag...
         """
         return True
-
 
     def export_to_xml(self, resource_fs):
         """
@@ -380,7 +376,7 @@ class XmlDescriptor(XModuleDescriptor):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
-                #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
+                # logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
                 try:
                     xml_object.set(attr, val)
                 except Exception, e:

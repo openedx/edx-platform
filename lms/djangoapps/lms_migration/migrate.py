@@ -39,13 +39,13 @@ def getip(request):
 
 
 def get_commit_id(course):
-    #return course.metadata.get('GIT_COMMIT_ID', 'No commit id')
+    # return course.metadata.get('GIT_COMMIT_ID', 'No commit id')
     return getattr(course, 'GIT_COMMIT_ID', 'No commit id')
     # getattr(def_ms.courses[reload_dir], 'GIT_COMMIT_ID','No commit id')
 
 
 def set_commit_id(course, commit_id):
-    #course.metadata['GIT_COMMIT_ID'] = commit_id
+    # course.metadata['GIT_COMMIT_ID'] = commit_id
     setattr(course, 'GIT_COMMIT_ID', commit_id)
     # setattr(def_ms.courses[reload_dir], 'GIT_COMMIT_ID', new_commit_id)
 
@@ -119,14 +119,14 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
     html += '<ol>'
     for cdir, course in def_ms.courses.items():
         html += '<li><a href="%s/migrate/reload/%s">%s</a> (%s)</li>' % (settings.MITX_ROOT_URL,
-                                                            escape(cdir),
-                                                            escape(cdir),
-                                                            course.location.url())
+                                                                         escape(cdir),
+                                                                         escape(cdir),
+                                                                         course.location.url())
     html += '</ol>'
 
     #----------------------------------------
 
-    #dumpfields = ['definition', 'location', 'metadata']
+    # dumpfields = ['definition', 'location', 'metadata']
     dumpfields = ['location', 'metadata']
 
     for cdir, course in def_ms.courses.items():
@@ -146,9 +146,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
             else:
                 html += '<ul><li>%s</li></ul>' % escape(data)
 
-
     #----------------------------------------
-
     html += '<hr width="100%"/>'
     html += "courses: <pre>%s</pre>" % escape(courses)
 

@@ -11,6 +11,7 @@ from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
 from xmodule.videoalpha_module import VideoAlphaDescriptor
 
+
 class PostData:
     """Class which emulate postdata."""
     def __init__(self, dict_data):
@@ -118,7 +119,7 @@ class WordCloudModuleTest(LogicTest):
              {'text': 'cat', 'size': 12, 'percent': 54.0}]
         )
 
-        self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']) )
+        self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']))
 
 
 class VideoAlphaModuleTest(LogicTest):

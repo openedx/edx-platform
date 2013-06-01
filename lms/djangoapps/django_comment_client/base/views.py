@@ -72,7 +72,7 @@ def create_thread(request, course_id, commentable_id):
     """
     Given a course and commentble ID, create the thread
     """
-    
+
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
     course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
@@ -98,9 +98,9 @@ def create_thread(request, course_id, commentable_id):
 
     user = cc.User.from_django_user(request.user)
 
-    #kevinchugh because the new requirement is that all groups will be determined
-    #by the group id in the request this all goes away
-    #not anymore, only for admins
+    # kevinchugh because the new requirement is that all groups will be determined
+    # by the group id in the request this all goes away
+    # not anymore, only for admins
 
     # Cohort the thread if the commentable is cohorted.
     if is_commentable_cohorted(course_id, commentable_id):
@@ -121,7 +121,7 @@ def create_thread(request, course_id, commentable_id):
 
     thread.save()
 
-    #patch for backward compatibility to comments service
+    # patch for backward compatibility to comments service
     if not 'pinned' in thread.attributes:
         thread['pinned'] = False
 
@@ -588,12 +588,12 @@ def upload(request, course_id):  # ajax upload file to a question or answer
     new_file_name = ''
     try:
         # TODO authorization
-        #may raise exceptions.PermissionDenied
-        #if request.user.is_anonymous():
+        # may raise exceptions.PermissionDenied
+        # if request.user.is_anonymous():
         #    msg = _('Sorry, anonymous users cannot upload files')
         #    raise exceptions.PermissionDenied(msg)
 
-        #request.user.assert_can_upload_file()
+        # request.user.assert_can_upload_file()
 
         # check file type
         f = request.FILES['file-upload']

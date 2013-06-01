@@ -98,24 +98,24 @@ def find_peer_grading_module(course):
     @param course: A course object.
     @return: boolean found_module, string problem_url
     """
-    #Reverse the base course url
+    # Reverse the base course url
     base_course_url = reverse('courses')
     found_module = False
     problem_url = ""
 
-    #Get the course id and split it
+    # Get the course id and split it
     course_id_parts = course.id.split("/")
     log.info("COURSE ID PARTS")
     log.info(course_id_parts)
-    #Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
+    # Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
     items = modulestore().get_items(['i4x', course_id_parts[0], course_id_parts[1], 'peergrading', None],
                                     course_id=course.id)
-    #See if any of the modules are centralized modules (ie display info from multiple problems)
+    # See if any of the modules are centralized modules (ie display info from multiple problems)
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
-    #Get the first one
+    # Get the first one
     if len(items) > 0:
         item_location = items[0].location
-        #Generate a url for the first module and redirect the user to it
+        # Generate a url for the first module and redirect the user to it
         problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
         found_module = True
@@ -130,18 +130,18 @@ def peer_grading(request, course_id):
     xmodule in the course.
     '''
 
-    #Get the current course
+    # Get the current course
     course = get_course_with_access(request.user, course_id, 'load')
 
     found_module, problem_url = find_peer_grading_module(course)
     if not found_module:
-        #This is a student_facing_error
+        # This is a student_facing_error
         error_message = """
         Error with initializing peer grading.
         There has not been a peer grading module created in the courseware that would allow you to grade others.
         Please check back later for this.
         """
-        #This is a dev_facing_error
+        # This is a dev_facing_error
         log.exception(error_message + "Current course is: {0}".format(course_id))
         return HttpResponse(error_message)
 
@@ -181,7 +181,7 @@ def student_problem_list(request, course_id):
     base_course_url = reverse('courses')
 
     try:
-        #Get list of all open ended problems that the grading server knows about
+        # Get list of all open ended problems that the grading server knows about
         problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
         problem_list_dict = json.loads(problem_list_json)
         success = problem_list_dict['success']
@@ -191,20 +191,20 @@ def student_problem_list(request, course_id):
         else:
             problem_list = problem_list_dict['problem_list']
 
-        #A list of problems to remove (problems that can't be found in the course)
+        # A list of problems to remove (problems that can't be found in the course)
         list_to_remove = []
         for i in xrange(0, len(problem_list)):
             try:
-                #Try to load each problem in the courseware to get links to them
+                # Try to load each problem in the courseware to get links to them
                 problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
             except ItemNotFoundError:
-                #If the problem cannot be found at the location received from the grading controller server, it has been deleted by the course author.
-                #Continue with the rest of the location to construct the list
+                # If the problem cannot be found at the location received from the grading controller server, it has been deleted by the course author.
+                # Continue with the rest of the location to construct the list
                 error_message = "Could not find module for course {0} at location {1}".format(course.id,
                                                                                               problem_list[i][
                                                                                                   'location'])
                 log.error(error_message)
-                #Mark the problem for removal from the list
+                # Mark the problem for removal from the list
                 list_to_remove.append(i)
                 continue
             problem_url = generate_problem_url(problem_url_parts, base_course_url)
@@ -218,25 +218,25 @@ def student_problem_list(request, course_id):
                 try:
                     eta_string = convert_seconds_to_human_readable(int(problem_list[i]['eta']))
                 except:
-                    #This is a student_facing_error
+                    # This is a student_facing_error
                     eta_string = "Error getting ETA."
             problem_list[i].update({'eta_string': eta_string})
 
     except GradingServiceError:
-        #This is a student_facing_error
+        # This is a student_facing_error
         error_text = STUDENT_ERROR_MESSAGE
-        #This is a dev facing error
+        # This is a dev facing error
         log.error("Problem contacting open ended grading service.")
         success = False
     # catch error if if the json loads fails
     except ValueError:
-        #This is a student facing error
+        # This is a student facing error
         error_text = STUDENT_ERROR_MESSAGE
-        #This is a dev_facing_error
+        # This is a dev_facing_error
         log.error("Problem with results from external grading service for open ended.")
         success = False
 
-    #Remove problems that cannot be found in the courseware from the list
+    # Remove problems that cannot be found in the courseware from the list
     problem_list = [problem_list[i] for i in xrange(0, len(problem_list)) if i not in list_to_remove]
     ajax_url = _reverse_with_slash('open_ended_problems', course_id)
 
@@ -276,16 +276,16 @@ def flagged_problem_list(request, course_id):
             problem_list = problem_list_dict['flagged_submissions']
 
     except GradingServiceError:
-        #This is a staff_facing_error
+        # This is a staff_facing_error
         error_text = STAFF_ERROR_MESSAGE
-        #This is a dev_facing_error
+        # This is a dev_facing_error
         log.error("Could not get flagged problem list from external grading service for open ended.")
         success = False
     # catch error if if the json loads fails
     except ValueError:
-        #This is a staff_facing_error
+        # This is a staff_facing_error
         error_text = STAFF_ERROR_MESSAGE
-        #This is a dev_facing_error
+        # This is a dev_facing_error
         log.error("Could not parse problem list from external grading service response.")
         success = False
 
@@ -341,10 +341,10 @@ def combined_notifications(request, course_id):
                 'description': description,
                 'alert_message': alert_message
             }
-            #The open ended panel will need to link the "peer grading" button in the panel to a peer grading
-            #xmodule defined in the course.  This checks to see if the human name of the server notification
-            #that we are currently processing is "peer grading".  If it is, it looks for a peer grading
-            #module in the course.  If none exists, it removes the peer grading item from the panel.
+            # The open ended panel will need to link the "peer grading" button in the panel to a peer grading
+            # xmodule defined in the course.  This checks to see if the human name of the server notification
+            # that we are currently processing is "peer grading".  If it is, it looks for a peer grading
+            # module in the course.  If none exists, it removes the peer grading item from the panel.
             if human_name == "Peer Grading":
                 found_module, problem_url = find_peer_grading_module(course)
                 if found_module:
@@ -376,7 +376,7 @@ def take_action_on_flags(request, course_id):
     required = ['submission_id', 'action_type', 'student_id']
     for key in required:
         if key not in request.POST:
-            #This is a staff_facing_error
+            # This is a staff_facing_error
             return HttpResponse(json.dumps({'success': False,
                                             'error': STAFF_ERROR_MESSAGE + 'Missing key {0} from submission.  Please reload and try again.'.format(
                                                 key)}),
@@ -393,7 +393,7 @@ def take_action_on_flags(request, course_id):
         response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
-        #This is a dev_facing_error
+        # This is a dev_facing_error
         log.exception(
             "Error taking action on flagged peer grading submissions, submission_id: {0}, action_type: {1}, grader_id: {2}".format(
                 submission_id, action_type, grader_id))

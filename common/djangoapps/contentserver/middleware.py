@@ -20,7 +20,7 @@ class StaticContentServer(object):
                 # return a 'Bad Request' to browser as we have a malformed Location
                 response = HttpResponse()
                 response.status_code = 400
-                return response     
+                return response
 
             # first look in our cache so we don't have to round-trip to the DB
             content = get_cached_content(loc)

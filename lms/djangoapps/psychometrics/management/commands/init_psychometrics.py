@@ -16,8 +16,8 @@ from xmodule.modulestore import Location
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-#db = "ocwtutor"	# for debugging
-#db = "default"
+# db = "ocwtutor"	# for debugging
+# db = "default"
 
 db = getattr(settings, 'DATABASE_FOR_PSYCHOMETRICS', 'default')
 
@@ -30,8 +30,8 @@ class Command(BaseCommand):
 
         # delete all pmd
 
-        #PsychometricData.objects.all().delete()
-        #PsychometricData.objects.using(db).all().delete()
+        # PsychometricData.objects.all().delete()
+        # PsychometricData.objects.using(db).all().delete()
 
         smset = StudentModule.objects.using(db).exclude(max_grade=None)
 
@@ -66,7 +66,7 @@ class Command(BaseCommand):
                 if not len(checktimes) == pmd.attempts:
                     print "Oops, mismatch in number of attempts and check times for %s" % pmd
 
-                #print pmd
+                # print pmd
                 pmd.save(using=db)
 
         print "%d PMD entries" % PsychometricData.objects.using(db).all().count()

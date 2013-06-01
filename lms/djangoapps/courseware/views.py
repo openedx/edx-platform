@@ -90,7 +90,7 @@ def render_accordion(request, course, chapter, section, model_data_cache):
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
-    request.user = user	# keep just one instance of User
+    request.user = user  # keep just one instance of User
     toc = toc_for_course(user, request, course, chapter, section, model_data_cache)
 
     context = dict([('toc', toc),
@@ -262,7 +262,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
-    request.user = user	# keep just one instance of User
+    request.user = user  # keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
     staff_access = has_access(user, course, 'staff')
     registered = registered_for_course(course, user)
@@ -296,7 +296,7 @@ def index(request, course_id, chapter=None, section=None,
             'staff_access': staff_access,
             'masquerade': masq,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
-            }
+        }
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
@@ -307,7 +307,7 @@ def index(request, course_id, chapter=None, section=None,
         chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
-            if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+            if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
                 log.debug('staff masq as student: no chapter %s' % chapter)
                 return redirect(reverse('courseware', args=[course.id]))
             raise Http404
@@ -316,7 +316,7 @@ def index(request, course_id, chapter=None, section=None,
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
-                if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+                if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
                     log.debug('staff masq as student: no section %s' % section)
                     return redirect(reverse('courseware', args=[course.id]))
                 raise Http404
@@ -330,8 +330,8 @@ def index(request, course_id, chapter=None, section=None,
             section_model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
                 course_id, user, section_descriptor, depth=None)
             section_module = get_module(request.user, request,
-                                section_descriptor.location,
-                                section_model_data_cache, course_id, position, depth=None)
+                                        section_descriptor.location,
+                                        section_model_data_cache, course_id, position, depth=None)
 
             if section_module is None:
                 # User may be trying to be clever and access something
@@ -389,7 +389,7 @@ def index(request, course_id, chapter=None, section=None,
                               chapter=chapter,
                               section=section,
                               position=position
-                              ))
+                          ))
             try:
                 result = render_to_response('courseware/courseware-error.html',
                                             {'staff_access': staff_access,
@@ -452,7 +452,7 @@ def course_info(request, course_id):
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
 
     return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
-            'course': course, 'staff_access': staff_access, 'masquerade': masq})
+                                                       'course': course, 'staff_access': staff_access, 'masquerade': masq})
 
 
 @ensure_csrf_cookie
@@ -497,7 +497,7 @@ def syllabus(request, course_id):
     staff_access = has_access(request.user, course, 'staff')
 
     return render_to_response('courseware/syllabus.html', {'course': course,
-                                            'staff_access': staff_access, })
+                                                           'staff_access': staff_access, })
 
 
 def registered_for_course(course, user):
@@ -534,6 +534,8 @@ def course_about(request, course_id):
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link': show_courseware_link})
+
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def mktg_course_about(request, course_id):
@@ -544,7 +546,7 @@ def mktg_course_about(request, course_id):
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response('courseware/mktg_coming_soon.html',
-                              {'course_id': course_id})
+                                  {'course_id': course_id})
 
     registered = registered_for_course(course, request.user)
 
@@ -564,7 +566,6 @@ def mktg_course_about(request, course_id):
                                'allow_registration': allow_registration,
                                'course_target': course_target,
                                'show_courseware_link': show_courseware_link})
-
 
 
 @ensure_csrf_cookie
@@ -674,7 +675,7 @@ def progress(request, course_id, student_id=None):
     grade_summary = grades.grade(student, request, course, model_data_cache)
 
     if courseware_summary is None:
-        #This means the student didn't have access to the course (which the instructor requested)
+        # This means the student didn't have access to the course (which the instructor requested)
         raise Http404
 
     context = {'course': course,
@@ -715,13 +716,13 @@ def submission_history(request, course_id, student_username, location):
                             .format(student_username, location))
 
     history_entries = StudentModuleHistory.objects \
-                      .filter(student_module=student_module).order_by('-id')
+        .filter(student_module=student_module).order_by('-id')
 
     # If no history records exist, let's force a save to get history started.
     if not history_entries:
         student_module.save()
         history_entries = StudentModuleHistory.objects \
-                          .filter(student_module=student_module).order_by('-id')
+            .filter(student_module=student_module).order_by('-id')
 
     context = {
         'history_entries': history_entries,

@@ -26,7 +26,7 @@ def chunks(l, n):
 
 class Command(BaseCommand):
     help = \
-'''Sends an e-mail to all users in a text file.
+        '''Sends an e-mail to all users in a text file.
 E.g.
 manage.py userlist.txt message logfile.txt rate
 userlist.txt -- list of all users

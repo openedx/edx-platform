@@ -36,7 +36,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'PuzzleComplete', fields ['user', 'puzzle_id', 'puzzle_set', 'puzzle_subset']
         db.create_unique('foldit_puzzlecomplete', ['user_id', 'puzzle_id', 'puzzle_set', 'puzzle_subset'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'PuzzleComplete', fields ['user', 'puzzle_id', 'puzzle_set', 'puzzle_subset']
         db.delete_unique('foldit_puzzlecomplete', ['user_id', 'puzzle_id', 'puzzle_set', 'puzzle_subset'])
@@ -46,7 +45,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'PuzzleComplete'
         db.delete_table('foldit_puzzlecomplete')
-
 
     models = {
         'auth.group': {

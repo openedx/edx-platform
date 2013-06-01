@@ -13,7 +13,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default='', max_length=64, blank=True),
                       keep_default=False)
 
-
         # Changing field 'TrackingLog.event_type'
         db.alter_column('track_trackinglog', 'event_type', self.gf('django.db.models.fields.CharField')(max_length=512))
 
@@ -23,7 +22,6 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         # Deleting field 'TrackingLog.host'
         db.delete_column('track_trackinglog', 'host')
-
 
         # Changing field 'TrackingLog.event_type'
         db.alter_column('track_trackinglog', 'event_type', self.gf('django.db.models.fields.CharField')(max_length=32))

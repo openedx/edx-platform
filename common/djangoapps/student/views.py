@@ -177,7 +177,7 @@ def _cert_info(user, course, cert_status):
         CertificateStatuses.downloadable: 'ready',
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
-        }
+    }
 
     status = template_state.get(cert_status['status'], default_status)
 
@@ -186,10 +186,10 @@ def _cert_info(user, course, cert_status):
          'show_disabled_download_button': status == 'generating', }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
-        course.end_of_course_survey_url is not None):
+            course.end_of_course_survey_url is not None):
         d.update({
-         'show_survey_button': True,
-         'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
+                 'show_survey_button': True,
+                 'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
     else:
         d['show_survey_button'] = False
 
@@ -263,7 +263,6 @@ def dashboard(request):
     message = ""
     if not user.is_active:
         message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
-
 
     # Global staff can see what courses errored on their dashboard
     staff_access = False
@@ -355,7 +354,7 @@ def change_enrollment(request):
             course = course_from_id(course_id)
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
-                      .format(user.username, course_id))
+                        .format(user.username, course_id))
             return HttpResponseBadRequest("Course id is invalid")
 
         if not has_access(user, course, 'enroll'):
@@ -363,9 +362,9 @@ def change_enrollment(request):
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
-                        tags=["org:{0}".format(org),
-                              "course:{0}".format(course_num),
-                              "run:{0}".format(run)])
+                         tags=["org:{0}".format(org),
+                               "course:{0}".format(course_num),
+                               "run:{0}".format(run)])
 
         try:
             enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
@@ -382,9 +381,9 @@ def change_enrollment(request):
 
             org, course_num, run = course_id.split("/")
             statsd.increment("common.student.unenrollment",
-                            tags=["org:{0}".format(org),
-                                  "course:{0}".format(course_num),
-                                  "run:{0}".format(run)])
+                             tags=["org:{0}".format(org),
+                                   "course:{0}".format(course_num),
+                                   "run:{0}".format(run)])
 
             return HttpResponse()
         except CourseEnrollment.DoesNotExist:
@@ -454,7 +453,6 @@ def login_user(request, error=""):
             expires_time = time.time() + max_age
             expires = cookie_date(expires_time)
 
-
         response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
                             'true', max_age=max_age,
                             expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
@@ -515,8 +513,8 @@ def _do_create_account(post_vars):
     Note: this function is also used for creating test users.
     """
     user = User(username=post_vars['username'],
-             email=post_vars['email'],
-             is_active=False)
+                email=post_vars['email'],
+                is_active=False)
     user.set_password(post_vars['password'])
     registration = Registration()
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
@@ -698,7 +696,6 @@ def create_account(request, post_override=None):
         expires_time = time.time() + max_age
         expires = cookie_date(expires_time)
 
-
     response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
                         'true', max_age=max_age,
                         expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
@@ -706,7 +703,6 @@ def create_account(request, post_override=None):
                         secure=None,
                         httponly=None)
     return response
-
 
 
 def exam_registration_info(user, course):
@@ -849,7 +845,6 @@ def create_exam_registration(request, post_override=None):
             response_data['non_field_errors'] = form.non_field_errors()
             return HttpResponse(json.dumps(response_data), mimetype="application/json")
 
-
     # only do the following if there is accommodation text to send,
     # and a destination to which to send it.
     # TODO: still need to create the accommodation email templates
@@ -871,8 +866,6 @@ def create_exam_registration(request, post_override=None):
 #            response_data = {'success': False}
 #            response_data['non_field_errors'] =  [ 'Could not send accommodation e-mail.', ]
 #            return HttpResponse(json.dumps(response_data), mimetype="application/json")
-
-
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
@@ -890,8 +883,8 @@ def get_random_post_override():
             'password': id_generator(),
             'name': (id_generator(size=5, chars=string.ascii_lowercase) + " " +
                      id_generator(size=7, chars=string.ascii_lowercase)),
-                     'honor_code': u'true',
-                     'terms_of_service': u'true', }
+            'honor_code': u'true',
+            'terms_of_service': u'true', }
 
 
 def create_random_account(create_account_function):

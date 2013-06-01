@@ -92,7 +92,7 @@ class ConditionalModule(ConditionalFields, XModule):
         if xml_value and self.required_modules:
             for module in self.required_modules:
                 if not hasattr(module, attr_name):
-                    # We don't throw an exception here because it is possible for 
+                    # We don't throw an exception here because it is possible for
                     # the descriptor of a required module to have a property but
                     # for the resulting module to be a (flavor of) ErrorModule.
                     # So just log and return false.

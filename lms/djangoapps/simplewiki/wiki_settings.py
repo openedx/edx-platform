@@ -80,18 +80,18 @@ WIKI_CONTEXT_PREPROCESSORS = getattr(settings, 'SIMPLE_WIKI_CONTEXT_PREPROCESSOR
 # For more information, see
 # http://www.freewisdom.org/projects/python-markdown/Available_Extensions
 WIKI_MARKDOWN_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_MARKDOWN_EXTENSIONS',
-                           ['footnotes',
-                            'tables',
-                            'headerid',
-                            'fenced_code',
-                            'def_list',
-                            #'codehilite', #This was throwing errors
-                            'abbr',
-                            'toc',
-                            'mathjax',
-                            'video',      # In-line embedding for YouTube, etc.
-                            'circuit',
-                            ])
+                                   ['footnotes',
+                                    'tables',
+                                    'headerid',
+                                    'fenced_code',
+                                    'def_list',
+                                    #'codehilite', #This was throwing errors
+                                    'abbr',
+                                    'toc',
+                                    'mathjax',
+                                    'video',      # In-line embedding for YouTube, etc.
+                                    'circuit',
+                                    ])
 
 
 WIKI_IMAGE_EXTENSIONS = getattr(settings,
@@ -99,13 +99,13 @@ WIKI_IMAGE_EXTENSIONS = getattr(settings,
                                 ('jpg', 'jpeg', 'gif', 'png', 'tiff', 'bmp'))
 # Planned features
 WIKI_PAGE_WIDTH = getattr(settings,
-                                'SIMPLE_WIKI_PAGE_WIDTH', "100%")
+                          'SIMPLE_WIKI_PAGE_WIDTH', "100%")
 
 WIKI_PAGE_ALIGN = getattr(settings,
-                                'SIMPLE_WIKI_PAGE_ALIGN', "center")
+                          'SIMPLE_WIKI_PAGE_ALIGN', "center")
 
 WIKI_IMAGE_THUMB_SIZE = getattr(settings,
                                 'SIMPLE_WIKI_IMAGE_THUMB_SIZE', (200, 150))
 
 WIKI_IMAGE_THUMB_SIZE_SMALL = getattr(settings,
-                                'SIMPLE_WIKI_IMAGE_THUMB_SIZE_SMALL', (100, 100))
+                                      'SIMPLE_WIKI_IMAGE_THUMB_SIZE_SMALL', (100, 100))

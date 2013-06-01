@@ -93,7 +93,7 @@ def _discussion(tab, user, course, active_page):
     """
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         link = reverse('django_comment_client.forum.views.forum_form_discussion',
-                              args=[course.id])
+                       args=[course.id])
         return [CourseTab(tab['name'], link, active_page == 'discussion')]
     return []
 
@@ -120,6 +120,7 @@ def _textbooks(tab, user, course, active_page):
                 for index, textbook in enumerate(course.textbooks)]
     return []
 
+
 def _pdf_textbooks(tab, user, course, active_page):
     """
     Generates one tab per textbook.  Only displays if user is authenticated.
@@ -130,6 +131,7 @@ def _pdf_textbooks(tab, user, course, active_page):
                           active_page == "pdftextbook/{0}".format(index))
                 for index, textbook in enumerate(course.pdf_textbooks)]
     return []
+
 
 def _html_textbooks(tab, user, course, active_page):
     """
@@ -142,13 +144,14 @@ def _html_textbooks(tab, user, course, active_page):
                 for index, textbook in enumerate(course.html_textbooks)]
     return []
 
+
 def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])
 
         tab_name = "Staff grading"
 
-        notifications  = open_ended_notifications.staff_grading_notifications(course, user)
+        notifications = open_ended_notifications.staff_grading_notifications(course, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
@@ -177,13 +180,14 @@ def _combined_open_ended_grading(tab, user, course, active_page):
         link = reverse('open_ended_notifications', args=[course.id])
         tab_name = "Open Ended Panel"
 
-        notifications  = open_ended_notifications.combined_notifications(course, user)
+        notifications = open_ended_notifications.combined_notifications(course, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
         tab = [CourseTab(tab_name, link, active_page == "open_ended", pending_grading, img_path)]
         return tab
     return []
+
 
 def _notes_tab(tab, user, course, active_page):
     if user.is_authenticated() and settings.MITX_FEATURES.get('ENABLE_STUDENT_NOTES'):
@@ -233,7 +237,7 @@ VALID_TAB_TYPES = {
     'staff_grading': TabImpl(null_validator, _staff_grading),
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
     'notes': TabImpl(null_validator, _notes_tab)
-    }
+}
 
 
 ### External interface below this.
@@ -370,7 +374,7 @@ def get_static_tab_contents(request, course, tab):
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
     model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course.id,
-        request.user, modulestore().get_instance(course.id, loc), depth=0)
+                                                                       request.user, modulestore().get_instance(course.id, loc), depth=0)
     tab_module = get_module(request.user, request, loc, model_data_cache, course.id)
 
     logging.debug('course_module = {0}'.format(tab_module))

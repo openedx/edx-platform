@@ -55,11 +55,11 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         cc_user.default_sort_key = request.GET.get('sort_key')
         cc_user.save()
 
-    #there are 2 dimensions to consider when executing a search with respect to group id
-    #is user a moderator
-    #did the user request a group
+    # there are 2 dimensions to consider when executing a search with respect to group id
+    # is user a moderator
+    # did the user request a group
 
-    #if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
+    # if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
 
     group_id = request.GET.get('group_id')
 
@@ -73,7 +73,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     if group_id:
         default_query_params["group_id"] = group_id
 
-    #so by default, a moderator sees all items, and a student sees his cohort
+    # so by default, a moderator sees all items, and a student sees his cohort
 
     query_params = merge_dict(default_query_params,
                               strip_none(extract(request.GET,
@@ -83,7 +83,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     threads, page, num_pages = cc.Thread.search(query_params)
 
-    #now add the group name if the thread has a group id
+    # now add the group name if the thread has a group id
     for thread in threads:
 
         if thread.get('group_id'):
@@ -93,7 +93,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
             thread['group_name'] = ""
             thread['group_string'] = "This post visible to everyone."
 
-        #patch for backward compatibility to comments service
+        # patch for backward compatibility to comments service
         if not 'pinned' in thread:
             thread['pinned'] = False
 
@@ -126,9 +126,9 @@ def inline_discussion(request, course_id, discussion_id):
     allow_anonymous = course.allow_anonymous
     allow_anonymous_to_peers = course.allow_anonymous_to_peers
 
-    #since inline is all one commentable, only show or allow the choice of cohorts
-    #if the commentable is cohorted, otherwise everything is not cohorted
-    #and no one has the option of choosing a cohort
+    # since inline is all one commentable, only show or allow the choice of cohorts
+    # if the commentable is cohorted, otherwise everything is not cohorted
+    # and no one has the option of choosing a cohort
     is_cohorted = is_course_cohorted(course_id) and is_commentable_cohorted(course_id, discussion_id)
     is_moderator = cached_has_permission(request.user, "see_all_cohorts", course_id)
 
@@ -137,7 +137,7 @@ def inline_discussion(request, course_id, discussion_id):
     if is_cohorted:
         cohorts_list.append({'name': 'All Groups', 'id': None})
 
-        #if you're a mod, send all cohorts and let you pick
+        # if you're a mod, send all cohorts and let you pick
 
         if is_moderator:
             cohorts = get_course_cohorts(course_id)
@@ -145,7 +145,7 @@ def inline_discussion(request, course_id, discussion_id):
                 cohorts_list.append({'name': c.name, 'id': c.id})
 
         else:
-            #students don't get to choose
+            # students don't get to choose
             cohorts_list = None
 
     return utils.JsonResponse({
@@ -198,13 +198,13 @@ def forum_form_discussion(request, course_id):
             'page': query_params['page'],
         })
     else:
-        #recent_active_threads = cc.search_recent_active_threads(
+        # recent_active_threads = cc.search_recent_active_threads(
         #    course_id,
         #    recursive=False,
         #    query_params={'follower_id': request.user.id},
         #)
 
-        #trending_tags = cc.search_trending_tags(
+        # trending_tags = cc.search_trending_tags(
         #    course_id,
         #)
         cohorts = get_course_cohorts(course_id)
@@ -282,19 +282,19 @@ def single_thread(request, course_id, discussion_id, thread_id):
             if thread.get('group_id') and not thread.get('group_name'):
                 thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
 
-            #patch for backward compatibility with comments service
+            # patch for backward compatibility with comments service
             if not "pinned" in thread:
                 thread["pinned"] = False
 
         threads = [utils.safe_content(thread) for thread in threads]
 
-        #recent_active_threads = cc.search_recent_active_threads(
+        # recent_active_threads = cc.search_recent_active_threads(
         #    course_id,
         #    recursive=False,
         #    query_params={'follower_id': request.user.id},
         #)
 
-        #trending_tags = cc.search_trending_tags(
+        # trending_tags = cc.search_trending_tags(
         #    course_id,
         #)
 
@@ -332,7 +332,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
 @login_required
 def user_profile(request, course_id, user_id):
-    #TODO: Allow sorting?
+    # TODO: Allow sorting?
     course = get_course_with_access(request.user, course_id, 'load')
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)

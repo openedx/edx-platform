@@ -22,16 +22,16 @@ log = logging.getLogger(__name__)
 def create_tc_user(username):
     user = User.objects.create_user(username, '{}@edx.org'.format(username), 'fakepass')
     options = {
-                   'first_name': 'TestFirst',
-                   'last_name': 'TestLast',
-                   'address_1': 'Test Address',
-                   'city': 'TestCity',
-                   'state': 'Alberta',
-                   'postal_code': 'A0B 1C2',
-                   'country': 'CAN',
+        'first_name': 'TestFirst',
+        'last_name': 'TestLast',
+        'address_1': 'Test Address',
+        'city': 'TestCity',
+        'state': 'Alberta',
+        'postal_code': 'A0B 1C2',
+        'country': 'CAN',
                    'phone': '252-1866',
                    'phone_country_code': '1',
-                    }
+    }
     call_command('pearson_make_tc_user', username, **options)
     return TestCenterUser.objects.get(user=user)
 

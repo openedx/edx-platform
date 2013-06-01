@@ -134,7 +134,6 @@ class LoncapaProblem(object):
 
         self.extracted_tree = self._extract_html(self.tree)
 
-
     def do_reset(self):
         '''
         Reset internal state to unfinished, with no answers
@@ -220,7 +219,7 @@ class LoncapaProblem(object):
     def ungraded_response(self, xqueue_msg, queuekey):
         '''
         Handle any responses from the xqueue that do not contain grades
-        Will try to pass the queue message to all inputtypes that can handle ungraded responses 
+        Will try to pass the queue message to all inputtypes that can handle ungraded responses
 
         Does not return any value
         '''
@@ -230,14 +229,12 @@ class LoncapaProblem(object):
             if hasattr(the_input, 'ungraded_response'):
                 the_input.ungraded_response(xqueue_msg, queuekey)
 
-
     def is_queued(self):
         '''
         Returns True if any part of the problem has been submitted to an external queue
         (e.g. for grading.)
         '''
         return any(self.correct_map.is_queued(answer_id) for answer_id in self.correct_map)
-
 
     def get_recentmost_queuetime(self):
         '''
@@ -255,7 +252,6 @@ class LoncapaProblem(object):
                       for qt_str in queuetime_strs]
 
         return max(queuetimes)
-
 
     def grade_answers(self, answers):
         '''
@@ -331,7 +327,6 @@ class LoncapaProblem(object):
         html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
         return html
 
-
     def handle_input_ajax(self, get):
         '''
         InputTypes can support specialized AJAX calls. Find the correct input and pass along the correct data
@@ -348,10 +343,7 @@ class LoncapaProblem(object):
             log.warning("Could not find matching input for id: %s" % input_id)
             return {}
 
-
-
     # ======= Private Methods Below ========
-
     def _process_includes(self):
         '''
         Handle any <include file="foo"> tags by reading in the specified file and inserting it
@@ -366,9 +358,9 @@ class LoncapaProblem(object):
                     ifp = self.system.filestore.open(file)
                 except Exception as err:
                     log.warning('Error %s in problem xml include: %s' % (
-                            err, etree.tostring(inc, pretty_print=True)))
+                        err, etree.tostring(inc, pretty_print=True)))
                     log.warning('Cannot find file %s in %s' % (
-                            file, self.system.filestore))
+                        file, self.system.filestore))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): need real error handling, display to users
                     if not self.system.get('DEBUG'):
@@ -380,7 +372,7 @@ class LoncapaProblem(object):
                     incxml = etree.XML(ifp.read())
                 except Exception as err:
                     log.warning('Error %s in problem xml include: %s' % (
-                            err, etree.tostring(inc, pretty_print=True)))
+                        err, etree.tostring(inc, pretty_print=True)))
                     log.warning('Cannot parse XML in %s' % (file))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): same as above
@@ -492,7 +484,7 @@ class LoncapaProblem(object):
         Used by get_html.
         '''
         if (problemtree.tag == 'script' and problemtree.get('type')
-            and 'javascript' in problemtree.get('type')):
+                and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
             return deepcopy(problemtree)
 
@@ -518,18 +510,18 @@ class LoncapaProblem(object):
             value = ""
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
-            
+
             if input_id not in self.input_state:
                 self.input_state[input_id] = {}
-                
+
             # do the rendering
             state = {'value': value,
-                   'status': status,
-                   'id': input_id,
-                   'input_state': self.input_state[input_id],
-                   'feedback': {'message': msg,
-                                'hint': hint,
-                                'hintmode': hintmode, }}
+                     'status': status,
+                     'id': input_id,
+                     'input_state': self.input_state[input_id],
+                     'feedback': {'message': msg,
+                                  'hint': hint,
+                                  'hintmode': hintmode, }}
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             # save the input type so that we can make ajax calls on it if we need to
@@ -540,7 +532,7 @@ class LoncapaProblem(object):
         if problemtree in self.responders:
             overall_msg = self.correct_map.get_overall_message()
             return self.responders[problemtree].render_html(self._extract_html,
-                                                response_msg=overall_msg)
+                                                            response_msg=overall_msg)
 
         # let each custom renderer render itself:
         if problemtree.tag in customrender.registry.registered_tags():
@@ -590,7 +582,7 @@ class LoncapaProblem(object):
             input_tags = inputtypes.registry.registered_tags()
             inputfields = tree.xpath("|".join(['//' + response.tag + '[@id=$id]//' + x
                                                for x in (input_tags + solution_tags)]),
-                                    id=response_id_str)
+                                     id=response_id_str)
 
             # assign one answer_id for each input type or solution type
             for entry in inputfields:

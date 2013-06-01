@@ -20,14 +20,14 @@ import re
 
 log = logging.getLogger(__name__)
 
-#Domains where any image linked to can be trusted to have acceptable content.
+# Domains where any image linked to can be trusted to have acceptable content.
 TRUSTED_IMAGE_DOMAINS = [
     'wikipedia',
     'edxuploads.s3.amazonaws.com',
     'wikimedia',
 ]
 
-#Suffixes that are allowed in image urls
+# Suffixes that are allowed in image urls
 ALLOWABLE_IMAGE_SUFFIXES = [
     'jpg',
     'png',
@@ -35,16 +35,16 @@ ALLOWABLE_IMAGE_SUFFIXES = [
     'jpeg'
 ]
 
-#Maximum allowed dimensions (x and y) for an uploaded image
+# Maximum allowed dimensions (x and y) for an uploaded image
 MAX_ALLOWED_IMAGE_DIM = 2000
 
-#Dimensions to which image is resized before it is evaluated for color count, etc
+# Dimensions to which image is resized before it is evaluated for color count, etc
 MAX_IMAGE_DIM = 150
 
-#Maximum number of colors that should be counted in ImageProperties
+# Maximum number of colors that should be counted in ImageProperties
 MAX_COLORS_TO_COUNT = 16
 
-#Maximum number of colors allowed in an uploaded image
+# Maximum number of colors allowed in an uploaded image
 MAX_COLORS = 400
 
 
@@ -125,7 +125,7 @@ class ImageProperties(object):
         """
         image_is_okay = False
         try:
-            #image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+            # image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
             image_is_okay = not self.image_too_large
         except:
             log.exception("Could not run image tests.")
@@ -133,7 +133,7 @@ class ImageProperties(object):
         if not ENABLE_PIL:
             image_is_okay = True
 
-        #log.debug("Image OK: {0}".format(image_is_okay))
+        # log.debug("Image OK: {0}".format(image_is_okay))
 
         return image_is_okay
 
@@ -227,12 +227,12 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
         public_url: URL to access uploaded file
     '''
 
-    #This commented out code is kept here in case we change the uploading method and require images to be
-    #converted before they are sent to S3.
-    #TODO: determine if commented code is needed and remove
-    #im = Image.open(file_to_upload)
-    #out_im = cStringIO.StringIO()
-    #im.save(out_im, 'PNG')
+    # This commented out code is kept here in case we change the uploading method and require images to be
+    # converted before they are sent to S3.
+    # TODO: determine if commented code is needed and remove
+    # im = Image.open(file_to_upload)
+    # out_im = cStringIO.StringIO()
+    # im.save(out_im, 'PNG')
 
     try:
         conn = S3Connection(s3_interface['access_key'], s3_interface['secret_access_key'])
@@ -244,17 +244,17 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
         k.set_metadata('filename', file_to_upload.name)
         k.set_contents_from_file(file_to_upload)
 
-        #This commented out code is kept here in case we change the uploading method and require images to be
-        #converted before they are sent to S3.
-        #k.set_contents_from_string(out_im.getvalue())
-        #k.set_metadata("Content-Type", 'images/png')
+        # This commented out code is kept here in case we change the uploading method and require images to be
+        # converted before they are sent to S3.
+        # k.set_contents_from_string(out_im.getvalue())
+        # k.set_metadata("Content-Type", 'images/png')
 
         k.set_acl("public-read")
         public_url = k.generate_url(60 * 60 * 24 * 365)   # URL timeout in seconds.
 
         return True, public_url
     except:
-        #This is a dev_facing_error
+        # This is a dev_facing_error
         error_message = "Could not connect to S3 to upload peer grading image.  Trying to utilize bucket: {0}".format(
             bucketname.lower())
         log.error(error_message)

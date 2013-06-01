@@ -26,20 +26,20 @@ def update_certificate(request):
 
         try:
             cert = GeneratedCertificate.objects.get(
-                   user__username=xqueue_body['username'],
-                   course_id=xqueue_body['course_id'],
-                   key=xqueue_header['lms_key'])
+                user__username=xqueue_body['username'],
+                course_id=xqueue_body['course_id'],
+                key=xqueue_header['lms_key'])
 
         except GeneratedCertificate.DoesNotExist:
             logger.critical('Unable to lookup certificate\n'
-                         'xqueue_body: {0}\n'
-                         'xqueue_header: {1}'.format(
-                                      xqueue_body, xqueue_header))
+                            'xqueue_body: {0}\n'
+                            'xqueue_header: {1}'.format(
+                            xqueue_body, xqueue_header))
 
             return HttpResponse(json.dumps({
-                            'return_code': 1,
-                            'content': 'unable to lookup key'}),
-                             mimetype='application/json')
+                'return_code': 1,
+                'content': 'unable to lookup key'}),
+                mimetype='application/json')
 
         if 'error' in xqueue_body:
             cert.status = status.error
@@ -55,7 +55,6 @@ def update_certificate(request):
                 #  HTTP error (reason=error(32, 'Broken pipe'), filename=None) :
                 #  certificate_agent.py:175
 
-
                 cert.error_reason = xqueue_body['error_reason']
         else:
             if cert.status in [status.generating, status.regenerating]:
@@ -69,9 +68,9 @@ def update_certificate(request):
                 logger.critical('Invalid state for cert update: {0}'.format(
                     cert.status))
                 return HttpResponse(json.dumps({
-                            'return_code': 1,
-                            'content': 'invalid cert status'}),
-                             mimetype='application/json')
+                    'return_code': 1,
+                    'content': 'invalid cert status'}),
+                    mimetype='application/json')
         cert.save()
         return HttpResponse(json.dumps({'return_code': 0}),
-                             mimetype='application/json')
+                            mimetype='application/json')

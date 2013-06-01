@@ -29,7 +29,7 @@ class MyCompleter(object):  # Custom completer
         if state == 0:  # on first trigger, build possible matches
             if text:  # cache matches (entries that start with entered text)
                 self.matches = [s for s in self.options
-                                    if s and s.startswith(text)]
+                                if s and s.startswith(text)]
             else:  # no text entered, all matches possible
                 self.matches = self.options[:]
 
@@ -98,7 +98,6 @@ class Command(BaseCommand):
 
             name = raw_input('Full name: ')
 
-
         user = User(username=uname, email=email, is_active=True)
         user.set_password(password)
         try:
@@ -122,7 +121,7 @@ class Command(BaseCommand):
                                     external_name=name,
                                     internal_password=password,
                                     external_credentials=json.dumps(credentials),
-                )
+                                    )
             eamap.user = user
             eamap.dtsignup = datetime.datetime.now()
             eamap.save()

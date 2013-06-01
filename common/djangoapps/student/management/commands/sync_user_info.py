@@ -9,7 +9,7 @@ import comment_client as cc
 
 class Command(BaseCommand):
     help = \
-'''
+        '''
 Sync all user ids, usernames, and emails to the discussion
 service'''
 

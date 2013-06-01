@@ -69,7 +69,6 @@ class Command(BaseCommand):
             if not os.path.isdir(dest_dir):
                 os.makedirs(dest_dir)
 
-
         def sftp(files_from, files_to, mode, deleteAfterCopy=False):
             with dog_stats_api.timer('pearson.{0}'.format(mode), tags='sftp'):
                 try:

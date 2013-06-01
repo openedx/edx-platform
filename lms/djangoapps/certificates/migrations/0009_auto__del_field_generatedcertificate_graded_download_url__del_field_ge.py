@@ -22,7 +22,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'GeneratedCertificate', fields ['course_id', 'user']
         db.create_unique('certificates_generatedcertificate', ['course_id', 'user_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'GeneratedCertificate', fields ['course_id', 'user']
         db.delete_unique('certificates_generatedcertificate', ['course_id', 'user_id'])
@@ -39,7 +38,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'GeneratedCertificate.distinction'
         db.delete_column('certificates_generatedcertificate', 'distinction')
-
 
     models = {
         'auth.group': {

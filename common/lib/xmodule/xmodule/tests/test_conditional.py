@@ -43,6 +43,7 @@ class DummySystem(ImportSystem):
     def render_template(self, template, context):
             raise Exception("Shouldn't be called")
 
+
 class ConditionalFactory(object):
     """
     A helper class to create a conditional module and associated source and child modules
@@ -60,9 +61,9 @@ class ConditionalFactory(object):
         source_location = Location(["i4x", "edX", "conditional_test", "problem", "SampleProblem"])
         if source_is_error_module:
             # Make an error descriptor and module
-            source_descriptor = NonStaffErrorDescriptor.from_xml('some random xml data', 
+            source_descriptor = NonStaffErrorDescriptor.from_xml('some random xml data',
                                                                  system,
-                                                                 org=source_location.org, 
+                                                                 org=source_location.org,
                                                                  course=source_location.course,
                                                                  error_msg='random error message')
             source_module = source_descriptor.xmodule(system)
@@ -93,7 +94,7 @@ class ConditionalFactory(object):
         # return dict:
         return {'cond_module': cond_module,
                 'source_module': source_module,
-                'child_module': child_module }
+                'child_module': child_module}
 
 
 class ConditionalModuleBasicTest(unittest.TestCase):
@@ -106,14 +107,13 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         self.test_system = test_system()
 
     def test_icon_class(self):
-        '''verify that get_icon_class works independent of condition satisfaction''' 
+        '''verify that get_icon_class works independent of condition satisfaction'''
         modules = ConditionalFactory.create(self.test_system)
         for attempted in ["false", "true"]:
-            for icon_class in [ 'other', 'problem', 'video']:
+            for icon_class in ['other', 'problem', 'video']:
                 modules['source_module'].is_attempted = attempted
                 modules['child_module'].get_icon_class = lambda: icon_class
                 self.assertEqual(modules['cond_module'].get_icon_class(), icon_class)
-
 
     def test_get_html(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -225,4 +225,3 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         print "post-attempt ajax: ", ajax
         html = ajax['html']
         self.assertTrue(any(['This is a secret' in item for item in html]))
-

@@ -133,7 +133,6 @@ class Command(BaseCommand):
         base_options = set(option.dest for option in BaseCommand.option_list)
         return option_name not in base_options
 
-
     def handle(self, *args, **options):
         username = args[0]
         print username

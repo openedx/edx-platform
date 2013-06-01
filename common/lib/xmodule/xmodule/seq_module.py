@@ -35,7 +35,6 @@ class SequenceModule(SequenceFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
-
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
 

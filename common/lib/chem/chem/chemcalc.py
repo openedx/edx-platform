@@ -138,7 +138,7 @@ def _merge_children(tree, tags):
 
     merged_children = []
     done = False
-    #print '00000', tree
+    # print '00000', tree
     ## Merge current tag
     while not done:
         done = True
@@ -150,14 +150,14 @@ def _merge_children(tree, tags):
                 merged_children = merged_children + [child]
         tree = nltk.tree.Tree(tree.node, merged_children)
         merged_children = []
-    #print '======',tree
+    # print '======',tree
 
     # And recurse
     children = []
     for child in tree:
         children.append(_merge_children(child, tags))
 
-    #return tree
+    # return tree
     return nltk.tree.Tree(tree.node, children)
 
 
@@ -201,7 +201,6 @@ def _render_to_html(tree):
             return children.replace(' ', '')
 
 
-
 def render_to_html(eq):
     '''
     Render a chemical equation string to html.
@@ -239,7 +238,6 @@ def render_to_html(eq):
     if arrow == '':
         # only one side
         return spanify(render_expression(left))
-
 
     return spanify(render_expression(left) + render_arrow(arrow) + render_expression(right))
 
@@ -351,7 +349,7 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
             return False
 
     if any(map(lambda x, y: x / y - treedic['1 factors'][0] / treedic['2 factors'][0],
-                                         treedic['1 factors'], treedic['2 factors'])):
+               treedic['1 factors'], treedic['2 factors'])):
         # factors are not proportional
         return False
     else:
