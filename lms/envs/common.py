@@ -319,6 +319,8 @@ DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'
 TECH_SUPPORT_EMAIL = 'technical@edx.org'
+CONTACT_EMAIL = 'info@edx.org'
+BUGS_EMAIL = 'bugs@edx.org'
 ADMINS = (
     ('edX Admins', 'admin@edx.org'),
 )
