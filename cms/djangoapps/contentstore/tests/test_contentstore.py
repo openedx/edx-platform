@@ -34,7 +34,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from contentstore.views.component import ADVANCED_COMPONENT_TYPES, ADVANCED_COMPONENT_POLICY_KEY
+from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 
 from django_comment_common.utils import are_permissions_roles_seeded
 
