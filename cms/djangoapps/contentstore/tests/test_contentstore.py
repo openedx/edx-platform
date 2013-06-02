@@ -100,6 +100,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertIn('Word cloud', resp.content)
         self.assertIn('Annotation', resp.content)
         self.assertIn('Open Ended Response', resp.content)
+        self.assertIn('Peer Grading Interface', resp.content)
 
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
