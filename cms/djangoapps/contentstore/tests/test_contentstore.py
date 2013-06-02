@@ -34,6 +34,8 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from contentstore.views.component import ADVANCED_COMPONENT_TYPES
+
 from django_comment_common.utils import are_permissions_roles_seeded
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
@@ -74,6 +76,31 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.client = Client()
         self.client.login(username=uname, password=password)
+
+    def test_advanced_components_in_edit_unit(self):
+        store = modulestore('direct')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        course = store.get_item(Location(['i4x', 'edX', 'simple',
+                                          'course', '2012_Fall', None]), depth=None)
+
+        course.advanced_modules = ADVANCED_COMPONENT_TYPES
+
+        store.update_metadata(course.location, own_metadata(course))
+
+        # just pick one vertical
+        descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
+
+        resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+        self.assertEqual(resp.status_code, 200)
+
+        # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page
+        # response HTML
+        self.assertIn('Video Alpha', resp.content)
+        self.assertIn('Word cloud', resp.content)
+        self.assertIn('Annotation', resp.content)
+        self.assertIn('Open Ended Response', resp.content)
+        self.assertIn('Peer Grading Interface', resp.content)
 
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
