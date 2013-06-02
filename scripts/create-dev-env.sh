@@ -104,9 +104,10 @@ PROG=${0##*/}
 # Adjust this to wherever you'd like to place the codebase
 BASE="${PROJECT_HOME:-$HOME}/edx_all"
 
-# Use a sensible default (~/.virtualenvs) for your Python virtualenvs
+# Use a sensible default for your Python virtualenvs
+# (~/Envs, per http://virtualenvwrapper.readthedocs.org/ )
 # unless you've already got one set up with virtualenvwrapper.
-PYTHON_DIR=${WORKON_HOME:-"$HOME/.virtualenvs"}
+PYTHON_DIR=${WORKON_HOME:-"$HOME/Envs"}
 
 # RVM defaults its install to ~/.rvm, but use the overridden rvm_path
 # if that's what's preferred.
@@ -310,13 +311,15 @@ case `uname -s` in
         curl -sL get.rvm.io | bash -s -- --version 1.15.7
     ;;
 
-    squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+    Linux)
+    # later, can add an `lsb_release -cs` test, if desired:
+    #squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
         warning "Setting up rvm on linux. This is a known pain point. If the script fails here
                 refer to the following stack overflow question: 
                 http://stackoverflow.com/questions/9056008/installed-ruby-1-9-3-with-rvm-but-command-line-doesnt-show-ruby-v/9056395#9056395"
         sudo apt-get --purge remove ruby-rvm
         sudo rm -rf /usr/share/ruby-rvm /etc/rvmrc /etc/profile.d/rvm.sh
-        curl -sL https://get.rvm.io | bash -s stable --ruby --autolibs=enable --autodotfiles
+        curl -sL https://get.rvm.io | bash -s stable --ruby --autolibs=enable --auto-dotfiles
     ;;
 esac
         
@@ -389,16 +392,24 @@ export WORKON_HOME=$PYTHON_DIR
 if [[ `type -t mkvirtualenv` != "function" ]]; then
     case `uname -s` in
         Darwin)
-            source `which virtualenvwrapper.sh`
+            source $(which virtualenvwrapper.sh)
         ;;
 
-        squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
-        if [[ -f "/etc/bash_completion.d/virtualenvwrapper" ]]; then
-            source /etc/bash_completion.d/virtualenvwrapper
-        else
-            error "Could not find virtualenvwrapper"
-            exit 1
-        fi
+        Linux)
+	    # later, can add an `lsb_release -cs` test, if desired:
+            # |squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+            command -v virtualenvwrapper.sh &>/dev/null && {
+                source $(which virtualenvwrapper.sh)
+            } || {
+                # this will be an older one; newer ones are installed
+                #  in /usr/local/bin/virtualenvwrapper.sh
+                if [[ -f "/etc/bash_completion.d/virtualenvwrapper" ]]; then
+                    source /etc/bash_completion.d/virtualenvwrapper
+                else
+                    error "Could not find virtualenvwrapper"
+                    exit 1
+                fi
+            }
         ;;
     esac
 fi
@@ -406,14 +417,14 @@ fi
 # Create edX virtualenv and link it to repo
 # virtualenvwrapper automatically sources the activation script
 if [[ $systempkgs ]]; then
-    mkvirtualenv -a "$HOME/.virtualenvs" --system-site-packages edx-platform || {
+    mkvirtualenv -a "$WORKON_HOME" --system-site-packages edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
 else
     # default behavior for virtualenv>1.7 is
     # --no-site-packages
-    mkvirtualenv -a "$HOME/.virtualenvs" edx-platform || {
+    mkvirtualenv -a "$WORKON_HOME" edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
@@ -445,7 +456,7 @@ fi
 # building correct version of distribute from source
 DISTRIBUTE_VER="0.6.28"
 output "Building Distribute"
-SITE_PACKAGES="$HOME/.virtualenvs/edx-platform/lib/python2.7/site-packages"
+SITE_PACKAGES="$WORKON_HOME/edx-platform/lib/python2.7/site-packages"
 cd "$SITE_PACKAGES"
 curl -O http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
 tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
