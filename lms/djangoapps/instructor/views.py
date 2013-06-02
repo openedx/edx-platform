@@ -239,22 +239,22 @@ def instructor_dashboard(request, course_id):
         track.views.server_track(request, action, {}, page='idashboard')
         msg += dump_grading_context(course)
 
-    elif "Regrade ALL students' problem submissions" in action:
+    elif "Rescore ALL students' problem submissions" in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         try:
-            course_task_log_entry = task_queue.submit_regrade_problem_for_all_students(request, course_id, problem_url)
+            course_task_log_entry = task_queue.submit_rescore_problem_for_all_students(request, course_id, problem_url)
             if course_task_log_entry is None:
-                msg += '<font color="red">Failed to create a background task for regrading "{0}".</font>'.format(problem_url)
+                msg += '<font color="red">Failed to create a background task for rescoring "{0}".</font>'.format(problem_url)
             else:
-                track_msg = 'regrade problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
+                track_msg = 'rescore problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
                 track.views.server_track(request, track_msg, {}, page='idashboard')
         except ItemNotFoundError as e:
-            log.error('Failure to regrade: unknown problem "{0}"'.format(e))
-            msg += '<font color="red">Failed to create a background task for regrading "{0}": problem not found.</font>'.format(problem_url)
+            log.error('Failure to rescore: unknown problem "{0}"'.format(e))
+            msg += '<font color="red">Failed to create a background task for rescoring "{0}": problem not found.</font>'.format(problem_url)
         except Exception as e:
-            log.error("Encountered exception from regrade: {0}".format(e))
-            msg += '<font color="red">Failed to create a background task for regrading "{0}": {1}.</font>'.format(problem_url, e.message)
+            log.error("Encountered exception from rescore: {0}".format(e))
+            msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(problem_url, e.message)
 
     elif "Reset ALL students' attempts" in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
@@ -301,7 +301,7 @@ def instructor_dashboard(request, course_id):
 
     elif "Reset student's attempts" in action \
             or "Delete student state for module" in action \
-            or "Regrade student's problem submission" in action:
+            or "Rescore student's problem submission" in action:
         # get the form data
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
         problem_urlname = request.POST.get('problem_for_student', '')
@@ -356,15 +356,15 @@ def instructor_dashboard(request, course_id):
                     msg += "<font color='red'>Couldn't reset module state.  </font>"
             else:
                 try:
-                    course_task_log_entry = task_queue.submit_regrade_problem_for_student(request, course_id, module_state_key, student)
+                    course_task_log_entry = task_queue.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
                     if course_task_log_entry is None:
-                        msg += '<font color="red">Failed to create a background task for regrading "{0}" for student {1}.</font>'.format(module_state_key, unique_student_identifier)
+                        msg += '<font color="red">Failed to create a background task for rescoring "{0}" for student {1}.</font>'.format(module_state_key, unique_student_identifier)
                     else:
-                        track_msg = 'regrade problem {problem} for student {student} in {course}'.format(problem=module_state_key, student=unique_student_identifier, course=course_id)
+                        track_msg = 'rescore problem {problem} for student {student} in {course}'.format(problem=module_state_key, student=unique_student_identifier, course=course_id)
                         track.views.server_track(request, track_msg, {}, page='idashboard')
                 except Exception as e:
-                    log.error("Encountered exception from regrade: {0}".format(e))
-                    msg += '<font color="red">Failed to create a background task for regrading "{0}": {1}.</font>'.format(module_state_key, e.message)
+                    log.error("Encountered exception from rescore: {0}".format(e))
+                    msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(module_state_key, e.message)
 
     elif "Get link to student's progress page" in action:
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
@@ -1288,17 +1288,13 @@ def get_background_task_table(course_id, problem_url, student=None):
     Construct the "datatable" structure to represent background task history.
 
     Filters the background task history to the specified course and problem.
-    If a student is provided, filters to only those tasks for which that student 
+    If a student is provided, filters to only those tasks for which that student
     was specified.
 
     Returns a tuple of (msg, datatable), where the msg is a possible error message,
     and the datatable is the datatable to be used for display.
     """
-    course_tasks = CourseTaskLog.objects.filter(course_id=course_id, task_args=problem_url)
-    if student is not None:
-        course_tasks = course_tasks.filter(student=student)
-
-    history_entries = course_tasks.order_by('-id')
+    history_entries = task_queue.get_course_task_history(course_id, problem_url, student)
     datatable = None
     msg = ""
     # first check to see if there is any history at all
@@ -1315,24 +1311,23 @@ def get_background_task_table(course_id, problem_url, student=None):
     else:
         datatable = {}
         datatable['header'] = ["Order",
-            "Task Name",
-            "Student",
+            "Task Type",
             "Task Id",
             "Requester",
             "Submitted",
-            "Duration",
+            "Duration (ms)",
             "Task State",
             "Task Status",
-            "Message"]
+            "Task Output"]
 
         datatable['data'] = []
         for i, course_task in enumerate(history_entries):
             # get duration info, if known:
             duration_ms = 'unknown'
-            if hasattr(course_task, 'task_progress'):
-                task_progress = json.loads(course_task.task_progress)
-                if 'duration_ms' in task_progress:
-                    duration_ms = task_progress['duration_ms']
+            if hasattr(course_task, 'task_outputs'):
+                task_outputs = json.loads(course_task.task_output)
+                if 'duration_ms' in task_outputs:
+                    duration_ms = task_outputs['duration_ms']
             # get progress status message:
             success, message = task_queue.get_task_completion_message(course_task)
             if success:
@@ -1341,17 +1336,14 @@ def get_background_task_table(course_id, problem_url, student=None):
                 status = "Incomplete"
             # generate row for this task:
             row = ["#{0}".format(len(history_entries) - i),
-                str(course_task.task_name),
-                str(course_task.student),
+                str(course_task.task_type),
                 str(course_task.task_id),
                 str(course_task.requester),
                 course_task.created.strftime("%Y/%m/%d %H:%M:%S"),
                 duration_ms,
-                #course_task.updated.strftime("%Y/%m/%d %H:%M:%S"),
                 str(course_task.task_state),
                 status,
                 message]
             datatable['data'].append(row)
 
     return msg, datatable
-

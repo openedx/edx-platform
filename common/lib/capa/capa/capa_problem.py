@@ -269,22 +269,22 @@ class LoncapaProblem(object):
         self.student_answers = convert_files_to_filenames(answers)
         return self._grade_answers(answers)
 
-    def supports_regrading(self):
+    def supports_rescoring(self):
         """
-        Checks that the current problem definition permits regrading.
+        Checks that the current problem definition permits rescoring.
 
         More precisely, it checks that there are no response types in
-        the current problem that are not fully supported (yet) for regrading.
+        the current problem that are not fully supported (yet) for rescoring.
 
         This includes responsetypes for which the student's answer
         is not properly stored in state, i.e. file submissions.  At present,
         we have no way to know if an existing response was actually a real
         answer or merely the filename of a file submitted as an answer.
 
-        It turns out that because regrading is a background task, limiting
+        It turns out that because rescoring is a background task, limiting
         it to responsetypes that don't support file submissions also means
         that the responsetypes are synchronous.  This is convenient as it
-        permits regrading to be complete when the regrading call returns.
+        permits rescoring to be complete when the rescoring call returns.
         """
         # We check for synchronous grading and no file submissions by
         # screening out all problems with a CodeResponse type.
@@ -294,16 +294,16 @@ class LoncapaProblem(object):
 
         return True
 
-    def regrade_existing_answers(self):
+    def rescore_existing_answers(self):
         '''
-        Regrade student responses.  Called by capa_module.regrade_problem.
+        Rescore student responses.  Called by capa_module.rescore_problem.
         '''
         return self._grade_answers(None)
 
     def _grade_answers(self, answers):
         '''
         Internal grading call used for checking new student answers and also
-        regrading existing student answers.
+        rescoring existing student answers.
 
         answers is a dict of all the entries from request.POST, but with the first part
         of each key removed (the string before the first "_").
@@ -324,9 +324,9 @@ class LoncapaProblem(object):
             # for file submissions.  But we have no way of knowing if
             # student_answers contains a proper answer or the filename of
             # an earlier submission, so for now skip these entirely.
-            # TODO: figure out where to get file submissions when regrading.
+            # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and answers is None:
-                raise Exception("Cannot regrade problems with possible file submissions")
+                raise Exception("Cannot rescore problems with possible file submissions")
 
             # use 'answers' if it is provided, otherwise use the saved student_answers.
             if answers is not None:

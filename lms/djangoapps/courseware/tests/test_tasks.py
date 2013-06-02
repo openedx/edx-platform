@@ -20,8 +20,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminFactory
 
 from courseware.model_data import StudentModule
-from courseware.task_queue import (submit_regrade_problem_for_all_students,
-                                   submit_regrade_problem_for_student,
+from courseware.task_queue import (submit_rescore_problem_for_all_students,
+                                   submit_rescore_problem_for_student,
                                    course_task_log_status,
                                    submit_reset_problem_attempts_for_all_students,
                                    submit_delete_problem_state_for_all_students)
@@ -38,9 +38,9 @@ TEST_SECTION_NAME = "Problem"
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
-    Test that all students' answers to a problem can be regraded after the
+    Test that all students' answers to a problem can be rescored after the
     definition of the problem has been redefined.
     """
     course = None
@@ -69,11 +69,11 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         return '{0}@test.com'.format(username)
 
     def login_username(self, username):
-        self.login(TestRegradingBase.get_user_email(username), "test")
+        self.login(TestRescoringBase.get_user_email(username), "test")
         self.current_user = username
 
     def _create_user(self, username, is_staff=False):
-        email = TestRegradingBase.get_user_email(username)
+        email = TestRescoringBase.get_user_email(username)
         if (is_staff):
             AdminFactory.create(username=username, email=email)
         else:
@@ -121,7 +121,7 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
                         'correct_option': 'Option 2',
                         'num_responses': 2}
         problem_xml = factory.build_xml(**factory_args)
-        location = TestRegrading.problem_location(problem_url_name)
+        location = TestRescoring.problem_location(problem_url_name)
         self.module_store.update_item(location, problem_xml)
 
     def render_problem(self, username, problem_url_name):
@@ -135,7 +135,7 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # make ajax call:
         modx_url = reverse('modx_dispatch',
                            kwargs={'course_id': self.course.id,
-                                   'location': TestRegrading.problem_location(problem_url_name),
+                                   'location': TestRescoring.problem_location(problem_url_name),
                                    'dispatch': 'problem_get', })
         resp = self.client.post(modx_url, {})
         return resp
@@ -158,7 +158,7 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # make ajax call:
         modx_url = reverse('modx_dispatch',
                            kwargs={'course_id': self.course.id,
-                                   'location': TestRegrading.problem_location(problem_url_name),
+                                   'location': TestRescoring.problem_location(problem_url_name),
                                    'dispatch': 'problem_check', })
 
         resp = self.client.post(modx_url, {
@@ -176,21 +176,21 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         request.is_secure = Mock(return_value=False)
         return request
 
-    def regrade_all_student_answers(self, instructor, problem_url_name):
-        """Submits the current problem for regrading"""
-        return submit_regrade_problem_for_all_students(self.create_task_request(instructor), self.course.id,
-                                                       TestRegradingBase.problem_location(problem_url_name))
+    def rescore_all_student_answers(self, instructor, problem_url_name):
+        """Submits the current problem for rescoring"""
+        return submit_rescore_problem_for_all_students(self.create_task_request(instructor), self.course.id,
+                                                       TestRescoringBase.problem_location(problem_url_name))
 
-    def regrade_one_student_answer(self, instructor, problem_url_name, student):
-        """Submits the current problem for regrading for a particular student"""
-        return submit_regrade_problem_for_student(self.create_task_request(instructor), self.course.id,
-                                                  TestRegradingBase.problem_location(problem_url_name),
+    def rescore_one_student_answer(self, instructor, problem_url_name, student):
+        """Submits the current problem for rescoring for a particular student"""
+        return submit_rescore_problem_for_student(self.create_task_request(instructor), self.course.id,
+                                                  TestRescoringBase.problem_location(problem_url_name),
                                                   student)
 
     def show_correct_answer(self, problem_url_name):
         modx_url = reverse('modx_dispatch',
                            kwargs={'course_id': self.course.id,
-                                   'location': TestRegradingBase.problem_location(problem_url_name),
+                                   'location': TestRescoringBase.problem_location(problem_url_name),
                                    'dispatch': 'problem_show', })
         return self.client.post(modx_url, {})
 
@@ -215,8 +215,8 @@ class TestRegradingBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertGreater(len(state['student_answers']), 0)
 
 
-class TestRegrading(TestRegradingBase):
-    """Test regrading problems in a background task."""
+class TestRescoring(TestRescoringBase):
+    """Test rescoring problems in a background task."""
 
     def setUp(self):
         self.initialize_course()
@@ -227,12 +227,12 @@ class TestRegrading(TestRegradingBase):
         self.create_student('u4')
         self.logout()
 
-    def test_regrading_option_problem(self):
-        '''Run regrade scenario on option problem'''
+    def test_rescoring_option_problem(self):
+        '''Run rescore scenario on option problem'''
         # get descriptor:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
-        location = TestRegrading.problem_location(problem_url_name)
+        location = TestRescoring.problem_location(problem_url_name)
         descriptor = self.module_store.get_instance(self.course.id, location)
 
         # first store answers for each of the separate users:
@@ -253,38 +253,39 @@ class TestRegrading(TestRegradingBase):
         self.render_problem('u1', problem_url_name)
         self.check_state('u1', descriptor, 2, 2, 1)
 
-        # regrade the problem for only one student -- only that student's grade should change:
-        self.regrade_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
+        # rescore the problem for only one student -- only that student's grade should change:
+        self.rescore_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
         self.check_state('u1', descriptor, 0, 2, 1)
         self.check_state('u2', descriptor, 1, 2, 1)
         self.check_state('u3', descriptor, 1, 2, 1)
         self.check_state('u4', descriptor, 0, 2, 1)
 
-        # regrade the problem for all students
-        self.regrade_all_student_answers('instructor', problem_url_name)
+        # rescore the problem for all students
+        self.rescore_all_student_answers('instructor', problem_url_name)
         self.check_state('u1', descriptor, 0, 2, 1)
         self.check_state('u2', descriptor, 1, 2, 1)
         self.check_state('u3', descriptor, 1, 2, 1)
         self.check_state('u4', descriptor, 2, 2, 1)
 
-    def test_regrading_failure(self):
-        """Simulate a failure in regrading a problem"""
+    def test_rescoring_failure(self):
+        """Simulate a failure in rescoring a problem"""
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         self.submit_student_answer('u1', problem_url_name, ['Option 1', 'Option 1'])
 
         expected_message = "bad things happened"
-        with patch('capa.capa_problem.LoncapaProblem.regrade_existing_answers') as mock_regrade:
-            mock_regrade.side_effect = ZeroDivisionError(expected_message)
-            course_task_log = self.regrade_all_student_answers('instructor', problem_url_name)
+        with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
+            mock_rescore.side_effect = ZeroDivisionError(expected_message)
+            course_task_log = self.rescore_all_student_answers('instructor', problem_url_name)
 
         # check task_log returned
         self.assertEqual(course_task_log.task_state, 'FAILURE')
-        self.assertEqual(course_task_log.student, None)
         self.assertEqual(course_task_log.requester.username, 'instructor')
-        self.assertEqual(course_task_log.task_name, 'regrade_problem')
-        self.assertEqual(course_task_log.task_args, TestRegrading.problem_location(problem_url_name))
-        status = json.loads(course_task_log.task_progress)
+        self.assertEqual(course_task_log.task_type, 'rescore_problem')
+        task_input = json.loads(course_task_log.task_input)
+        self.assertFalse('student' in task_input)
+        self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
+        status = json.loads(course_task_log.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
 
@@ -294,17 +295,17 @@ class TestRegrading(TestRegradingBase):
         status = json.loads(response.content)
         self.assertEqual(status['message'], expected_message)
 
-    def test_regrading_non_problem(self):
+    def test_rescoring_non_problem(self):
         """confirm that a non-problem will not submit"""
         problem_url_name = self.problem_section.location.url()
         with self.assertRaises(NotImplementedError):
-            self.regrade_all_student_answers('instructor', problem_url_name)
+            self.rescore_all_student_answers('instructor', problem_url_name)
 
-    def test_regrading_nonexistent_problem(self):
+    def test_rescoring_nonexistent_problem(self):
         """confirm that a non-existent problem will not submit"""
         problem_url_name = 'NonexistentProblem'
         with self.assertRaises(ItemNotFoundError):
-            self.regrade_all_student_answers('instructor', problem_url_name)
+            self.rescore_all_student_answers('instructor', problem_url_name)
 
     def define_code_response_problem(self, problem_url_name):
         """Define an arbitrary code-response problem.
@@ -322,8 +323,8 @@ class TestRegrading(TestRegradingBase):
                            display_name=str(problem_url_name),
                            data=problem_xml)
 
-    def test_regrading_code_problem(self):
-        """Run regrade scenario on problem with code submission"""
+    def test_rescoring_code_problem(self):
+        """Run rescore scenario on problem with code submission"""
         problem_url_name = 'H1P2'
         self.define_code_response_problem(problem_url_name)
         # we fully create the CodeResponse problem, but just pretend that we're queuing it:
@@ -331,16 +332,16 @@ class TestRegrading(TestRegradingBase):
             mock_send_to_queue.return_value = (0, "Successfully queued")
             self.submit_student_answer('u1', problem_url_name, ["answer1", "answer2"])
 
-        course_task_log = self.regrade_all_student_answers('instructor', problem_url_name)
+        course_task_log = self.rescore_all_student_answers('instructor', problem_url_name)
         self.assertEqual(course_task_log.task_state, 'FAILURE')
-        status = json.loads(course_task_log.task_progress)
+        status = json.loads(course_task_log.task_output)
         self.assertEqual(status['exception'], 'NotImplementedError')
-        self.assertEqual(status['message'], "Problem's definition does not support regrading")
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring")
 
         mock_request = Mock()
         response = course_task_log_status(mock_request, task_id=course_task_log.task_id)
         status = json.loads(response.content)
-        self.assertEqual(status['message'], "Problem's definition does not support regrading")
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring")
 
     def define_randomized_custom_response_problem(self, problem_url_name, redefine=False):
         """
@@ -367,7 +368,7 @@ class TestRegrading(TestRegradingBase):
             """)
         problem_xml = factory.build_xml(script=script, cfn="check_func", expect="42", num_responses=1)
         if redefine:
-            self.module_store.update_item(TestRegradingBase.problem_location(problem_url_name), problem_xml)
+            self.module_store.update_item(TestRescoringBase.problem_location(problem_url_name), problem_xml)
         else:
             # Use "per-student" rerandomization so that check-problem can be called more than once.
             # Using "always" means we cannot check a problem twice, but we want to call once to get the
@@ -380,12 +381,12 @@ class TestRegrading(TestRegradingBase):
                                data=problem_xml,
                                metadata={"rerandomize": "per_student"})
 
-    def test_regrading_randomized_problem(self):
-        """Run regrade scenario on custom problem that uses randomize"""
+    def test_rescoring_randomized_problem(self):
+        """Run rescore scenario on custom problem that uses randomize"""
         # First define the custom response problem:
         problem_url_name = 'H1P1'
         self.define_randomized_custom_response_problem(problem_url_name)
-        location = TestRegrading.problem_location(problem_url_name)
+        location = TestRescoring.problem_location(problem_url_name)
         descriptor = self.module_store.get_instance(self.course.id, location)
         # run with more than one user
         userlist = ['u1', 'u2', 'u3', 'u4']
@@ -415,23 +416,23 @@ class TestRegrading(TestRegradingBase):
         self.render_problem('u1', problem_url_name)
         self.check_state('u1', descriptor, 1, 1, 2)
 
-        # regrade the problem for only one student -- only that student's grade should change
+        # rescore the problem for only one student -- only that student's grade should change
         # (and none of the attempts):
-        self.regrade_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
+        self.rescore_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
         self.check_state('u1', descriptor, 0, 1, 2)
         self.check_state('u2', descriptor, 1, 1, 2)
         self.check_state('u3', descriptor, 1, 1, 2)
         self.check_state('u4', descriptor, 1, 1, 2)
 
-        # regrade the problem for all students
-        self.regrade_all_student_answers('instructor', problem_url_name)
+        # rescore the problem for all students
+        self.rescore_all_student_answers('instructor', problem_url_name)
 
         # all grades should change to being wrong (with no change in attempts)
         for username in userlist:
             self.check_state(username, descriptor, 0, 1, 2)
 
 
-class TestResetAttempts(TestRegradingBase):
+class TestResetAttempts(TestRescoringBase):
     """Test resetting problem attempts in a background task."""
     userlist = ['u1', 'u2', 'u3', 'u4']
 
@@ -450,14 +451,14 @@ class TestResetAttempts(TestRegradingBase):
     def reset_problem_attempts(self, instructor, problem_url_name):
         """Submits the current problem for resetting"""
         return submit_reset_problem_attempts_for_all_students(self.create_task_request(instructor), self.course.id,
-                                                              TestRegradingBase.problem_location(problem_url_name))
+                                                              TestRescoringBase.problem_location(problem_url_name))
 
     def test_reset_attempts_on_problem(self):
         '''Run reset-attempts scenario on option problem'''
         # get descriptor:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
-        location = TestRegradingBase.problem_location(problem_url_name)
+        location = TestRescoringBase.problem_location(problem_url_name)
         descriptor = self.module_store.get_instance(self.course.id, location)
         num_attempts = 3
         # first store answers for each of the separate users:
@@ -486,11 +487,12 @@ class TestResetAttempts(TestRegradingBase):
 
         # check task_log returned
         self.assertEqual(course_task_log.task_state, 'FAILURE')
-        self.assertEqual(course_task_log.student, None)
         self.assertEqual(course_task_log.requester.username, 'instructor')
-        self.assertEqual(course_task_log.task_name, 'reset_problem_attempts')
-        self.assertEqual(course_task_log.task_args, TestRegrading.problem_location(problem_url_name))
-        status = json.loads(course_task_log.task_progress)
+        self.assertEqual(course_task_log.task_type, 'reset_problem_attempts')
+        task_input = json.loads(course_task_log.task_input)
+        self.assertFalse('student' in task_input)
+        self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
+        status = json.loads(course_task_log.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
 
@@ -513,7 +515,7 @@ class TestResetAttempts(TestRegradingBase):
             self.reset_problem_attempts('instructor', problem_url_name)
 
 
-class TestDeleteProblem(TestRegradingBase):
+class TestDeleteProblem(TestRescoringBase):
     """Test deleting problem state in a background task."""
     userlist = ['u1', 'u2', 'u3', 'u4']
 
@@ -527,14 +529,14 @@ class TestDeleteProblem(TestRegradingBase):
     def delete_problem_state(self, instructor, problem_url_name):
         """Submits the current problem for deletion"""
         return submit_delete_problem_state_for_all_students(self.create_task_request(instructor), self.course.id,
-                                                            TestRegradingBase.problem_location(problem_url_name))
+                                                            TestRescoringBase.problem_location(problem_url_name))
 
     def test_delete_problem_state(self):
         '''Run delete-state scenario on option problem'''
         # get descriptor:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
-        location = TestRegradingBase.problem_location(problem_url_name)
+        location = TestRescoringBase.problem_location(problem_url_name)
         descriptor = self.module_store.get_instance(self.course.id, location)
         # first store answers for each of the separate users:
         for username in self.userlist:
@@ -562,11 +564,12 @@ class TestDeleteProblem(TestRegradingBase):
 
         # check task_log returned
         self.assertEqual(course_task_log.task_state, 'FAILURE')
-        self.assertEqual(course_task_log.student, None)
         self.assertEqual(course_task_log.requester.username, 'instructor')
-        self.assertEqual(course_task_log.task_name, 'delete_problem_state')
-        self.assertEqual(course_task_log.task_args, TestRegrading.problem_location(problem_url_name))
-        status = json.loads(course_task_log.task_progress)
+        self.assertEqual(course_task_log.task_type, 'delete_problem_state')
+        task_input = json.loads(course_task_log.task_input)
+        self.assertFalse('student' in task_input)
+        self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
+        status = json.loads(course_task_log.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
 

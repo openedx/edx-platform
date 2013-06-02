@@ -14,9 +14,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from courseware.tests.factories import UserFactory, CourseTaskLogFactory
 from courseware.task_queue import (get_running_course_tasks,
                                    course_task_log_status,
+                                   _encode_problem_and_student_input,
                                    AlreadyRunningError,
-                                   submit_regrade_problem_for_all_students,
-                                   submit_regrade_problem_for_student,
+                                   submit_rescore_problem_for_all_students,
+                                   submit_rescore_problem_for_student,
                                    submit_reset_problem_attempts_for_all_students,
                                    submit_delete_problem_state_for_all_students)
 
@@ -52,15 +53,17 @@ class TaskQueueTestCase(TestCase):
                                                                             number='1.23x',
                                                                             problem_url_name=problem_url_name)
 
-    def _create_entry(self, task_state="QUEUED", task_progress=None, student=None):
+    def _create_entry(self, task_state="QUEUED", task_output=None, student=None):
         task_id = str(uuid4())
-        progress_json = json.dumps(task_progress)
-        course_task_log = CourseTaskLogFactory.create(student=student,
-                                                      requester=self.instructor,
-                                                      task_args=self.problem_url,
+        progress_json = json.dumps(task_output)
+        task_input, task_key = _encode_problem_and_student_input(self.problem_url, student)
+
+        course_task_log = CourseTaskLogFactory.create(requester=self.instructor,
+                                                      task_input=json.dumps(task_input),
+                                                      task_key=task_key,
                                                       task_id=task_id,
                                                       task_state=task_state,
-                                                      task_progress=progress_json)
+                                                      task_output=progress_json)
         return course_task_log
 
     def _create_failure_entry(self):
@@ -68,7 +71,7 @@ class TaskQueueTestCase(TestCase):
         progress = {'message': TEST_FAILURE_MESSAGE,
                     'exception': 'RandomCauseError',
                     }
-        return self._create_entry(task_state="FAILURE", task_progress=progress)
+        return self._create_entry(task_state="FAILURE", task_output=progress)
 
     def _create_success_entry(self, student=None):
         return self._create_progress_entry(student=None, task_state="SUCCESS")
@@ -78,10 +81,10 @@ class TaskQueueTestCase(TestCase):
         progress = {'attempted': 3,
                     'updated': 2,
                     'total': 10,
-                    'action_name': 'regraded',
+                    'action_name': 'rescored',
                     'message': 'some random string that should summarize the other info',
                     }
-        return self._create_entry(task_state=task_state, task_progress=progress, student=student)
+        return self._create_entry(task_state=task_state, task_output=progress, student=student)
 
     def test_fetch_running_tasks(self):
         # when fetching running tasks, we get all running tasks, and only running tasks
@@ -152,7 +155,7 @@ class TaskQueueTestCase(TestCase):
         mock_result.result = {'attempted': 5,
                               'updated': 4,
                               'total': 10,
-                              'action_name': 'regraded'}
+                              'action_name': 'rescored'}
         with patch('celery.result.AsyncResult.__new__') as mock_result_ctor:
             mock_result_ctor.return_value = mock_result
             response = course_task_log_status(Mock(), task_id=task_id)
@@ -206,7 +209,7 @@ class TaskQueueTestCase(TestCase):
         mock_result.result = {'attempted': attempted,
                               'updated': updated,
                               'total': total,
-                              'action_name': 'regraded'}
+                              'action_name': 'rescored'}
         with patch('celery.result.AsyncResult.__new__') as mock_result_ctor:
             mock_result_ctor.return_value = mock_result
             response = course_task_log_status(Mock(), task_id=task_id)
@@ -221,44 +224,44 @@ class TaskQueueTestCase(TestCase):
 
     def test_success_messages(self):
         _, output = self._get_output_for_task_success(0, 0, 10)
-        self.assertTrue("Unable to find any students with submissions to be regraded" in output['message'])
+        self.assertTrue("Unable to find any students with submissions to be rescored" in output['message'])
         self.assertFalse(output['succeeded'])
 
         _, output = self._get_output_for_task_success(10, 0, 10)
-        self.assertTrue("Problem failed to be regraded for any of 10 students" in output['message'])
+        self.assertTrue("Problem failed to be rescored for any of 10 students" in output['message'])
         self.assertFalse(output['succeeded'])
 
         _, output = self._get_output_for_task_success(10, 8, 10)
-        self.assertTrue("Problem regraded for 8 of 10 students" in output['message'])
+        self.assertTrue("Problem rescored for 8 of 10 students" in output['message'])
         self.assertFalse(output['succeeded'])
 
         _, output = self._get_output_for_task_success(10, 10, 10)
-        self.assertTrue("Problem successfully regraded for 10 students" in output['message'])
+        self.assertTrue("Problem successfully rescored for 10 students" in output['message'])
         self.assertTrue(output['succeeded'])
 
         _, output = self._get_output_for_task_success(0, 0, 1, student=self.student)
-        self.assertTrue("Unable to find submission to be regraded for student" in output['message'])
+        self.assertTrue("Unable to find submission to be rescored for student" in output['message'])
         self.assertFalse(output['succeeded'])
 
         _, output = self._get_output_for_task_success(1, 0, 1, student=self.student)
-        self.assertTrue("Problem failed to be regraded for student" in output['message'])
+        self.assertTrue("Problem failed to be rescored for student" in output['message'])
         self.assertFalse(output['succeeded'])
 
         _, output = self._get_output_for_task_success(1, 1, 1, student=self.student)
-        self.assertTrue("Problem successfully regraded for student" in output['message'])
+        self.assertTrue("Problem successfully rescored for student" in output['message'])
         self.assertTrue(output['succeeded'])
 
     def test_submit_nonexistent_modules(self):
-        # confirm that a regrade of a non-existent module returns an exception
-        # (Note that it is easier to test a non-regradable module in test_tasks,
+        # confirm that a rescore of a non-existent module returns an exception
+        # (Note that it is easier to test a non-rescorable module in test_tasks,
         # where we are creating real modules.
         problem_url = self.problem_url
         course_id = "something else"
         request = None
         with self.assertRaises(ItemNotFoundError):
-            submit_regrade_problem_for_student(request, course_id, problem_url, self.student)
+            submit_rescore_problem_for_student(request, course_id, problem_url, self.student)
         with self.assertRaises(ItemNotFoundError):
-            submit_regrade_problem_for_all_students(request, course_id, problem_url)
+            submit_rescore_problem_for_all_students(request, course_id, problem_url)
         with self.assertRaises(ItemNotFoundError):
             submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
         with self.assertRaises(ItemNotFoundError):
@@ -267,12 +270,12 @@ class TaskQueueTestCase(TestCase):
     def test_submit_when_running(self):
         # get exception when trying to submit a task that is already running
         course_task_log = self._create_progress_entry()
-        problem_url = course_task_log.task_args
+        problem_url = json.loads(course_task_log.task_input).get('problem_url')
         course_id = course_task_log.course_id
         # requester doesn't have to be the same when determining if a task is already running
         request = Mock()
         request.user = self.student
         with self.assertRaises(AlreadyRunningError):
             # just skip making the argument check, so we don't have to fake it deeper down
-            with patch('courseware.task_queue._check_arguments_for_regrading'):
-                submit_regrade_problem_for_all_students(request, course_id, problem_url)
+            with patch('courseware.task_queue._check_arguments_for_rescoring'):
+                submit_rescore_problem_for_all_students(request, course_id, problem_url)

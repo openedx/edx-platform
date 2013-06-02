@@ -312,7 +312,7 @@ function goto( mode)
     <p>
       Then select an action:
       <input type="submit" name="action" value="Reset ALL students' attempts">
-      <input type="submit" name="action" value="Regrade ALL students' problem submissions">
+      <input type="submit" name="action" value="Rescore ALL students' problem submissions">
     </p>
     <p>
     <p>These actions run in the background, and status for active tasks will appear in a table below.
@@ -349,7 +349,7 @@ function goto( mode)
       Then select an action:
       <input type="submit" name="action" value="Reset student's attempts">
       %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
-      <input type="submit" name="action" value="Regrade student's problem submission">
+      <input type="submit" name="action" value="Rescore student's problem submission">
       %endif
     </p>
 
@@ -360,7 +360,7 @@ function goto( mode)
     </p>
     %endif
     %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
-    <p>Regrading runs in the background, and status for active tasks will appear in a table below.
+    <p>Rescoring runs in the background, and status for active tasks will appear in a table below.
        To see status for all tasks submitted for this course and student, click on this button:
     </p>
     <p>
@@ -708,9 +708,8 @@ function goto( mode)
     <div id="task-progress-wrapper">
       <table class="stat_table">
         <tr>
-          <th>Task Name</th>
-          <th>Task Arg</th>
-          <th>Student</th>
+          <th>Task Type</th>
+          <th>Task inputs</th>
           <th>Task Id</th>
           <th>Requester</th>
           <th>Submitted</th>
@@ -722,9 +721,8 @@ function goto( mode)
         <tr id="task-progress-entry-${tasknum}" class="task-progress-entry" 
 	    data-task-id="${course_task.task_id}"
 	    data-in-progress="true">
-          <td>${course_task.task_name}</td>
-          <td>${course_task.task_args}</td>
-          <td>${course_task.student}</td>
+          <td>${course_task.task_type}</td>
+          <td>${course_task.task_input}</td>
           <td><div class="task-id">${course_task.task_id}</div></td>
           <td>${course_task.requester}</td>
           <td>${course_task.created}</td>

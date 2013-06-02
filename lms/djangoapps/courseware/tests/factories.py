@@ -91,11 +91,11 @@ class StudentInfoFactory(DjangoModelFactory):
 class CourseTaskLogFactory(DjangoModelFactory):
     FACTORY_FOR = CourseTaskLog
 
-    task_name = 'regrade_problem'
+    task_type = 'rescore_problem'
     course_id = "MITx/999/Robot_Super_Course"
-    student = SubFactory(UserFactory)
-    task_args = None
+    task_input = json.dumps({})
+    task_key = None
     task_id = None
     task_state = "QUEUED"
-    task_progress = None
+    task_output = None
     requester = SubFactory(UserFactory)

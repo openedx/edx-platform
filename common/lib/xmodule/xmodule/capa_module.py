@@ -812,7 +812,7 @@ class CapaModule(CapaFields, XModule):
                 'contents': html,
                 }
 
-    def regrade_problem(self):
+    def rescore_problem(self):
         """
         Checks whether the existing answers to a problem are correct.
 
@@ -823,23 +823,23 @@ class CapaModule(CapaFields, XModule):
             {'success' : 'correct' | 'incorrect' | AJAX alert msg string }
 
         Raises NotFoundError if called on a problem that has not yet been
-        answered, or NotImplementedError if it's a problem that cannot be regraded.
+        answered, or NotImplementedError if it's a problem that cannot be rescored.
 
         Returns the error messages for exceptions occurring while performing
-        the regrading, rather than throwing them.
+        the rescoring, rather than throwing them.
         """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
 
-        if not self.lcp.supports_regrading():
+        if not self.lcp.supports_rescoring():
             event_info['failure'] = 'unsupported'
-            self.system.track_function('problem_regrade_fail', event_info)
-            raise NotImplementedError("Problem's definition does not support regrading")
+            self.system.track_function('problem_rescore_fail', event_info)
+            raise NotImplementedError("Problem's definition does not support rescoring")
 
         if not self.done:
             event_info['failure'] = 'unanswered'
-            self.system.track_function('problem_regrade_fail', event_info)
+            self.system.track_function('problem_rescore_fail', event_info)
             raise NotFoundError('Problem must be answered before it can be graded again')
 
         # get old score, for comparison:
@@ -848,20 +848,20 @@ class CapaModule(CapaFields, XModule):
         event_info['orig_max_score'] = orig_score['total']
 
         try:
-            correct_map = self.lcp.regrade_existing_answers()
-            # regrading should have no effect on attempts, so don't
+            correct_map = self.lcp.rescore_existing_answers()
+            # rescoring should have no effect on attempts, so don't
             # need to increment here, or mark done.  Just save.
             self.set_state_from_lcp()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
-            log.warning("StudentInputError in capa_module:problem_regrade", exc_info=True)
+            log.warning("StudentInputError in capa_module:problem_rescore", exc_info=True)
             event_info['failure'] = 'student_input_error'
-            self.system.track_function('problem_regrade_fail', event_info)
+            self.system.track_function('problem_rescore_fail', event_info)
             return {'success': "Error: {0}".format(inst.message)}
 
         except Exception, err:
             event_info['failure'] = 'unexpected'
-            self.system.track_function('problem_regrade_fail', event_info)
+            self.system.track_function('problem_rescore_fail', event_info)
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
@@ -885,9 +885,9 @@ class CapaModule(CapaFields, XModule):
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
-        self.system.track_function('problem_regrade', event_info)
+        self.system.track_function('problem_rescore', event_info)
 
-        # psychometrics should be called on regrading requests in the same way as check-problem
+        # psychometrics should be called on rescoring requests in the same way as check-problem
         if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
             self.system.psychometrics_handler(self.get_state_for_lcp())
 
