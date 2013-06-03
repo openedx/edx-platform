@@ -1,3 +1,4 @@
+# pylint: disable=W0223
 """Video is ungraded Xmodule for support video content."""
 
 import json
@@ -94,27 +95,10 @@ class VideoModule(VideoFields, XModule):
         return parse_time(xmltree.get('from')), parse_time(xmltree.get('to'))
 
     def handle_ajax(self, dispatch, get):
-        """Handle ajax calls to this video.
-        TODO (vshnayder): This is not being called right now, so the position
-        is not being saved.
-        """
+        """This is not being called right now and we raise 404 error."""
         log.debug(u"GET {0}".format(get))
         log.debug(u"DISPATCH {0}".format(dispatch))
-        if dispatch == 'goto_position':
-            self.position = int(float(get['position']))
-            log.info(u"NEW POSITION {0}".format(self.position))
-            return json.dumps({'success': True})
         raise Http404()
-
-    def get_progress(self):
-        """TODO (vshnayder): Get and save duration of youtube video, then return
-        fraction watched.
-        (Be careful to notice when video link changes and update)
-
-        For now, we have no way of knowing if the video has even been watched, so
-        just return None.
-        """
-        return None
 
     def get_instance_state(self):
         """Return information about state (position)."""
