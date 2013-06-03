@@ -133,15 +133,3 @@ $login-banner-image: 'transparent url("../images/bg-banner-login.png") 0 0 no-re
 $register-banner-image: 'transparent url("../images/bg-banner-register.png") 0 0 no-repeat';
 
 $video-thumb-url: '../images/courses/video-thumb.jpg';
-
-//-----------------
-//  Mixin Styles
-//
-//  THIS MIGHT BE A GOOD WAY TO DEAL WITH LARGE CHUNKS OF SASS THAT WE WANT TO ALLOW THEMING ON...
-//  WE MAY WANT TO SEPERATE THEM OUT INTO ITS OWN "MIXINS" SCSS FILE
-//-----------------
-@mixin login_register_h1_style {}
-
-@mixin footer_references_style {
-    margin: -10px 0 0 0;
-}

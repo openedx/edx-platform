@@ -82,7 +82,7 @@
 
     // references
     .references {
-      @include footer_references_style;
+      margin: -10px 0 0 0;
       width: flex-grid(4,12);
       float: right;
 

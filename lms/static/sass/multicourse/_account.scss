@@ -20,7 +20,7 @@
   .heading-2 {
     font-size: 25px;
     margin: 0 0 $baseline 0;
-    font-weight: bold;
+    font-weight: 300;
     text-transform: uppercase;
     color: $link-color;
   }
@@ -143,7 +143,7 @@
 
     &:link, &:visited, &:hover, &:active {
       color: $link-color;
-      font-weight: bold;
+      font-weight: 400;
       text-decoration: none !important;
       font-family: $sans-serif;
     }
@@ -494,10 +494,6 @@
       height: 120px;
       border-bottom: 1px solid $m-gray;
       background: $login-banner-image;
-      
-      h1 {
-        @include login_register_h1_style;
-      }
     }
   }
 }
@@ -512,10 +508,6 @@
       height: 120px;
       border-bottom: 1px solid $m-gray;
       background: transparent url("../images/bg-banner-register.png") 0 0 no-repeat;
-      
-      h1 {
-        @include login_register_h1_style;
-      }
     }
   }
 }
