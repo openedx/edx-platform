@@ -8,10 +8,7 @@ Scenario: I can navigate to all high - level tabs in a course
         And The course "6.002x" has extra tab "Custom Tab"
         And I am logged in
         And I click on View Courseware
-        When I click on the "<TabName>" tab
-        Then the page title should contain "<PageTitle>"
-
-        Examples:
+        When I click on the tabs then the page title should contain the following titles:
         | TabName       | PageTitle             |
         | Courseware    | 6.002x Courseware     |
         | Course Info   | 6.002x Course Info    |
