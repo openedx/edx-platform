@@ -736,8 +736,16 @@ body.discussion {
         color: $gray-l1;
         font-size: 28px;
         z-index: 100;
+<<<<<<< HEAD
         opacity: 1;
         @include transition(all .2s ease-out);
+=======
+        width: 25px;
+        height: 25px;
+        //margin-left: -17px;
+        opacity: 1;
+        @include transition(none);
+>>>>>>> basic shell for discussion home page with both profile information and email notification settings
       }
     }
 
@@ -820,7 +828,6 @@ body.discussion {
       z-index: 50;
       width: 100%;
       height: 100%;
-      border-radius: 0 0 0 0;
       border: 1px solid transparent;
       text-align: center;
       overflow: hidden;
@@ -844,7 +851,7 @@ body.discussion {
         font-size: 16px;
       }
       .drop-arrow {
-        font-size:16px;
+        font-size: 16px;
       }
     }
 
@@ -878,13 +885,6 @@ body.discussion {
       .browse-topic-drop-menu {
         max-height: 400px;
         overflow-y: scroll;
-
-        .drop-menu-meta-category span,
-        .drop-menu-parent-category span {
-            margin: 10px 0; 
-            font-size: 14px;
-            font-weight: 700;
-        }
       }
 
 
@@ -920,7 +920,11 @@ body.discussion {
           float: left;
           width: 80%;
           margin: 13px 0;
+<<<<<<< HEAD
           color: $white;
+=======
+          color: #fff;
+>>>>>>> basic shell for discussion home page with both profile information and email notification settings
         }
 
         .unread {
@@ -937,14 +941,14 @@ body.discussion {
       li li {
         a {
           padding-left: 44px;
-          background: url(../images/nested-icon.png) no-repeat 22px 5px;
+          background: url(../images/nested-icon.png) no-repeat 22px 14px;
         }
       }
 
       li li li {
         a {
           padding-left: 68px;
-          background: url(../images/nested-icon.png) no-repeat 46px 5px;
+          background: url(../images/nested-icon.png) no-repeat 46px 14px;
         }
       }
     }
@@ -1303,6 +1307,7 @@ body.discussion {
     }
 
     .label {
+<<<<<<< HEAD
       display: block;
       font-size: 12px;
     }
@@ -1312,6 +1317,11 @@ body.discussion {
       padding-bottom: $baseline/2;
     }
 
+=======
+      font-size: 12px;
+    }
+
+>>>>>>> basic shell for discussion home page with both profile information and email notification settings
     .home-header {
       margin: 0;
     }
@@ -1327,22 +1337,34 @@ body.discussion {
       margin-bottom: $baseline/2;
     }
     .home-stats {
+<<<<<<< HEAD
       padding: $baseline 0;
+=======
+>>>>>>> basic shell for discussion home page with both profile information and email notification settings
       
       .label-area {
         display: inline-block;
         min-width: $baseline*5;
+<<<<<<< HEAD
         width: 25%;
         vertical-align: middle;
 
         .profile-link {
           font-weight: 700;
+=======
+        width: 20%;
+        vertical-align: middle;
+
+        .profile-link {
+          //something
+>>>>>>> basic shell for discussion home page with both profile information and email notification settings
         }
       }
 
       .stats-grouping {
         display: inline-block;
         width: 70%;
+<<<<<<< HEAD
         padding-left: $baseline;
 
         .profile-stat {
@@ -1361,6 +1383,13 @@ body.discussion {
           .profile-stat-label{
             vertical-align: middle;
           }
+=======
+
+        .profile-stat {
+          display: inline-block;
+          padding: $baseline;
+          vertical-align: middle;
+>>>>>>> basic shell for discussion home page with both profile information and email notification settings
         }
       }
     }
@@ -1370,6 +1399,7 @@ body.discussion {
       border-radius: 3px;
       border: 1px solid #b2b2b2;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+<<<<<<< HEAD
     }
   }
 
@@ -1443,6 +1473,34 @@ body.discussion {
     .icon-envelope {color: $gray;}
   }
 
+=======
+    }
+  }
+
+  .helpgrid-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+
+    .helpgrid-row {
+      border-bottom: 1px solid #b2b2b2;
+
+      .row-title {
+        padding: $baseline;
+        display: inline-block;
+        width: 20%;
+        background-color: $light-gray;
+      }
+
+      .row-item {
+        display: inline-block;
+        width: 20%;
+      }
+    }
+  }
+
+>>>>>>> basic shell for discussion home page with both profile information and email notification settings
   .discussion-article {
     position: relative;
     padding: $baseline*2;
