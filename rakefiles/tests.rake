@@ -46,7 +46,8 @@ directory REPORT_DIR
 
 task :clean_test_files do
 
-    # Delete all non-folder files in the reports directory
+    # Delete all files in the reports directory, while preserving
+    # the directory structure.
     sh("find #{REPORT_DIR} -type f -print0 | xargs -0 rm")
 
     # Reset the test fixtures
