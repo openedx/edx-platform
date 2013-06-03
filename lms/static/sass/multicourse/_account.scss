@@ -493,7 +493,7 @@
     header {
       height: 120px;
       border-bottom: 1px solid $m-gray;
-      background: $login-banner-image;
+      background: transparent url($login-banner-image) 0 0 no-repeat;
     }
   }
 }
@@ -507,7 +507,7 @@
     header {
       height: 120px;
       border-bottom: 1px solid $m-gray;
-      background: transparent url("../images/bg-banner-register.png") 0 0 no-repeat;
+      background: transparent url($register-banner-image) 0 0 no-repeat;
     }
   }
 }
