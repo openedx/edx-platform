@@ -54,16 +54,16 @@
                 <h5>Add New Component</h5>
                 <ul class="new-component-type">
                   % for type, templates in sorted(component_templates.items()):
-		           <li>
-		      % if type == 'advanced' or len(templates) > 1:
-			    <a href="#" class="multiple_templates" data-type="${type}">
-		      % else:
-                            <a href="#" class="single_template" data-type="${type}" data-location="${templates[0][1]}">
-		      % endif
-                              <span class="large-template-icon large-${type}-icon"></span>
-                              <span class="name">${type}</span>
-                            </a>
-                          </li>
+		  <li>
+		    % if type == 'advanced' or len(templates) > 1:
+		    <a href="#" class="multiple_templates" data-type="${type}">
+		    % else:
+                    <a href="#" class="single_template" data-type="${type}" data-location="${templates[0][1]}">
+		    % endif
+                      <span class="large-template-icon large-${type}-icon"></span>
+                      <span class="name">${type}</span>
+                    </a>
+                  </li>
                   % endfor
                 </ul>
               </div>

@@ -65,9 +65,6 @@ class CMS.Views.UnitEdit extends Backbone.View
     event.preventDefault()
 
     type = $(event.currentTarget).data('type')
-    if type == 'video'
-      $('.new-component-video .new-component-template a').click()
-      return
     @$newComponentTypePicker.slideUp(250)
     @$(".new-component-#{type}").slideDown(250)
     $('html, body').animate({ 

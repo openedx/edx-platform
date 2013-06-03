@@ -14,10 +14,6 @@ def create_component_instance(step, component_button_css, instance_id, expected_
 
 @world.absorb
 def click_new_component_button(step, component_button_css):
-    # step.given('I have opened a new course section in Studio')
-    # step.given('I have added a new subsection')
-    # step.given('I expand the first section')
-    # world.css_click('a.new-unit-item')
     step.given('I have clicked the new unit button')
     world.css_click(component_button_css)
 
