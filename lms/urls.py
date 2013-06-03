@@ -117,50 +117,31 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
         # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
     )
 
-# Only enable URLs for those links actually enabled in the settings
-# Customize templates for themes, assuming themes want to just
-# replace these templates altogether.
+# Only enable URLs for those marketing links actually enabled in the
+# settings. Disable URLs by marking them as None.
 for key, value in settings.MKTG_URL_LINK_MAP.items():
-    urlpattern = None
-    if key == "ABOUT" and value is not None:
-        template = "about.html"
-        if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
-            template = "theme-about.html"
-        urlpattern = url(r'^about$', 'static_template_view.views.render',
-                         {'template': template}, name="about_edx")
-    elif key == "CONTACT" and value is not None:
-        template = "contact.html"
-        if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
-            template = "theme-contact.html"
-        urlpattern = url(r'^contact$', 'static_template_view.views.render',
-                         {'template': template}, name="contact")
-    elif key == "FAQ" and value is not None:
-        template = "faq.html"
-        if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
-            template = "theme-faq.html"
-        urlpattern = url(r'^faq$', 'static_template_view.views.render',
-                         {'template': template}, name="faq_edx")
-    elif key == "TOS" and value is not None:
-        template = "tos.html"
-        if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
-            template = "theme-tos.html"
-        urlpattern = url(r'^tos$', 'static_template_view.views.render',
-                         {'template': template}, name="tos")
-    elif key == "HONOR" and value is not None:
-        template = "honor.html"
-        if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
-            template = "theme-honor.html"
-        urlpattern = url(r'^honor$', 'static_template_view.views.render',
-                         {'template': template}, name="honor")
-    elif key == "PRIVACY" and value is not None:
-        template = "privacy.html"
-        if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
-            template = "theme-privacy.html"
-        urlpattern = url(r'^privacy$', 'static_template_view.views.render',
-                         {'template': template}, name="privacy_edx")
+    # Skip disabled URLs
+    if value is None:
+        continue
 
-    if urlpattern is not None:
-        urlpatterns += (urlpattern,)
+    # These urls are enabled separately
+    if key == "ROOT" or key == "COURSES":
+        continue
+
+    # Make the assumptions that the templates are all in the same dir
+    # and that they all match the name of the key (plus extension)
+    template = "%s.html" % key.lower()
+
+    # To allow theme templates to inherit from default templates,
+    # prepend a standard prefix
+    if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
+        template = "theme-" + template
+
+    # Make the assumption that the URL we want is the lowercased
+    # version of the map key
+    urlpatterns += (url(r'^%s' % key.lower(),
+                        'static_template_view.views.render',
+                        {'template': template}, name=value),)
 
 
 if settings.PERFSTATS:
