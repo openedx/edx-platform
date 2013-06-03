@@ -98,3 +98,16 @@
     }
   }
 }
+
+//--------------------------------------
+//   The Following is to enable themes to
+//   display H1s on login and register pages
+//--------------------------------------
+.view-login .introduction header h1,
+.view-register .introduction header h1 {
+  @include login_register_h1_style;
+}
+
+footer .references {
+  @include footer_references_style;
+}
