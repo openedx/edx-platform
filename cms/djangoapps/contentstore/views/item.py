@@ -83,7 +83,7 @@ def clone_item(request):
         raise PermissionDenied()
 
     parent = get_modulestore(category).get_item(parent_location)
-    dest_location = parent_location._replace(category=category, name=uuid4().hex)
+    dest_location = parent_location.replace(category=category, name=uuid4().hex)
 
     # get the metadata, display_name, and definition from the request
     data = request.POST.get('data')
@@ -91,11 +91,11 @@ def clone_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
-    new_item = get_modulestore(category).create_and_save_xmodule(dest_location, definition_data=data,
+    get_modulestore(category).create_and_save_xmodule(dest_location, definition_data=data,
         metadata=metadata, system=parent.system)
 
-    if new_item.location.category not in DETACHED_CATEGORIES:
-        get_modulestore(parent.location).update_children(parent_location, parent.children + [new_item.location.url()])
+    if category not in DETACHED_CATEGORIES:
+        get_modulestore(parent.location).update_children(parent_location, parent.children + [dest_location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 

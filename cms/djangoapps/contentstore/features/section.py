@@ -8,7 +8,7 @@ from nose.tools import assert_equal
 ############### ACTIONS ####################
 
 
-@step('I click the new section link$')
+@step('I click the New Section link$')
 def i_click_new_section_link(_step):
     link_css = 'a.new-courseware-section-button'
     world.css_click(link_css)
@@ -84,8 +84,14 @@ def i_see_a_release_date_for_my_section(_step):
     # e.g. 11/06/2012 at 16:25
     msg = 'Will Release:'
     date_regex = r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d\d?, \d{4}'
+    if not re.search(date_regex, status_text):
+        print status_text, date_regex
     time_regex = r'[0-2]\d:[0-5]\d( \w{3})?'
-    match_string = r'%s %s at %s' % (msg, date_regex, time_regex)
+    if not re.search(time_regex, status_text):
+        print status_text, time_regex
+    match_string = r'%s\s+%s at %s' % (msg, date_regex, time_regex)
+    if not re.match(match_string, status_text):
+        print status_text, match_string
     assert re.match(match_string, status_text)
 
 

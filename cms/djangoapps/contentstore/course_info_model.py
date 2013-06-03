@@ -20,7 +20,8 @@ def get_course_updates(location):
     try:
         course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
-        course_updates = modulestore('direct').create_and_save_xmodule(location)
+        modulestore('direct').create_and_save_xmodule(location)
+        course_updates = modulestore('direct').get_item(location)
 
     # current db rep: {"_id" : locationjson, "definition" : { "data" : "<ol>[<li><h2>date</h2>content</li>]</ol>"} "metadata" : ignored}
     location_base = course_updates.location.url()

@@ -32,22 +32,23 @@ class XModuleCourseFactory(Factory):
             metadata = {}
         else:
             metadata = {'display_name': display_name}
-        new_course = store.create_and_save_xmodule(location, metadata=metadata, definition_data=kwargs.get('data'))
-
-        # clone a default 'about' module as well
-        dest_about_location = location._replace(category='about', name='overview')
-        store.create_and_save_xmodule(dest_about_location, system=new_course.system)
 
         # NOTE: these factories in general aren't really valid tests as this hardcoding shows.
-        new_course.discussion_link = kwargs.get('discussion_link')
-        new_course.tabs = kwargs.get('tabs',
+        if 'discussion_link' in kwargs:
+            metadata['discussion_link'] = kwargs.get('discussion_link')
+        metadata['tabs'] = kwargs.get('tabs',
             [{"type": "courseware"},
                 {"type": "course_info", "name": "Course Info"},
                 {"type": "discussion", "name": "Discussion"},
                 {"type": "wiki", "name": "Wiki"},
                 {"type": "progress", "name": "Progress"}])
 
-        store.update_metadata(new_course.location.url(), own_metadata(new_course))
+        store.create_and_save_xmodule(location, metadata=metadata, definition_data=kwargs.get('data'))
+        new_course = store.get_item(location)
+
+        # clone a default 'about' module as well
+        dest_about_location = location._replace(category='about', name='overview')
+        store.create_and_save_xmodule(dest_about_location, system=new_course.system)
 
         return new_course
 
@@ -104,8 +105,9 @@ class XModuleItemFactory(Factory):
 
         parent_location = Location(kwargs.get('parent_location'))
         data = kwargs.get('data')
-        display_name = kwargs.get('display_name')
+        display_name = kwargs.get('display_name', XModuleItemFactory().display_name)
         metadata = kwargs.get('metadata', {})
+        location = kwargs.get('location', XModuleItemFactory().location)
 
         store = modulestore('direct')
 
@@ -115,12 +117,14 @@ class XModuleItemFactory(Factory):
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
             metadata['display_name'] = display_name
-        new_item = store.create_and_save_xmodule(kwargs.get('location'), metadata=metadata, definition_data=data)
+        # note that location comes from above lazy_attribute
+        store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
 
-        if new_item.location.category not in DETACHED_CATEGORIES:
-            store.update_children(parent_location, parent.children + [new_item.location.url()])
+        if location.category not in DETACHED_CATEGORIES:
+            parent.children.append(location.url())
+            store.update_children(parent_location, parent.children)
 
-        return new_item
+        return store.get_item(location)
 
 
 class Item:

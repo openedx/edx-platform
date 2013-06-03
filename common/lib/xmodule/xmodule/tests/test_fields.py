@@ -2,7 +2,7 @@
 import datetime
 import unittest
 from django.utils.timezone import UTC
-from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean, DateTime
+from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
 
 class DateTest(unittest.TestCase):
     date = Date()

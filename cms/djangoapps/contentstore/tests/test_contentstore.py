@@ -920,6 +920,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # let's assert on the metadata_inheritance on an existing vertical
         for vertical in verticals:
             self.assertEqual(course.lms.xqa_key, vertical.lms.xqa_key)
+            self.assertEqual(course.start, vertical.lms.start)
 
         self.assertGreater(len(verticals), 0)
 
@@ -936,6 +937,8 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # check for grace period definition which should be defined at the course level
         self.assertEqual(parent.lms.graceperiod, new_module.lms.graceperiod)
+        self.assertEqual(parent.lms.start, new_module.lms.start)
+        self.assertEqual(course.start, new_module.lms.start)
 
         self.assertEqual(course.lms.xqa_key, new_module.lms.xqa_key)
 
@@ -950,3 +953,26 @@ class ContentStoreTest(ModuleStoreTestCase):
         new_module = module_store.get_item(new_component_location)
 
         self.assertEqual(timedelta(1), new_module.lms.graceperiod)
+
+    def test_default_metadata_inheritance(self):
+        course = CourseFactory.create()
+        vertical = ItemFactory.create(parent_location=course.location)
+        course.children.append(vertical)
+        # in memory
+        self.assertIsNotNone(course.start)
+        self.assertEqual(course.start, vertical.lms.start)
+        self.assertEqual(course.textbooks, [])
+        self.assertIn('GRADER', course.grading_policy)
+        self.assertIn('GRADE_CUTOFFS', course.grading_policy)
+        self.assertGreaterEqual(len(course.checklists), 4)
+
+        # by fetching
+        module_store = modulestore('direct')
+        fetched_course = module_store.get_item(course.location)
+        fetched_item = module_store.get_item(vertical.location)
+        self.assertIsNotNone(fetched_course.start)
+        self.assertEqual(course.start, fetched_course.start)
+        self.assertEqual(fetched_course.start, fetched_item.lms.start)
+        self.assertEqual(course.textbooks, fetched_course.textbooks)
+        # is this test too strict? i.e., it requires the dicts to be ==
+        self.assertEqual(course.checklists, fetched_course.checklists)

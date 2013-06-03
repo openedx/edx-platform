@@ -61,52 +61,7 @@ class Date(ModelType):
             else:
                 return value.isoformat()
 
-
-class DateTime(ModelType):
-    """
-    Returns datetime objects instead of timestructs for these fields
-    """
-    def from_json(self, field):
-        """
-        Parse an optional metadata key containing a time: if present, complain
-        if it doesn't parse.
-        Return None if not present or invalid.
-        """
-        if field is None:
-            return field
-        elif field is "":
-            return None
-        elif isinstance(field, basestring):
-            return dateutil.parser.parse(field)
-        elif isinstance(field, (int, long, float)):
-            return datetime.datetime.utcfromtimestamp(field / 1000)
-        elif isinstance(field, time.struct_time):
-            return datetime.datetime.utcfromtimestamp(time.mktime(field))
-        elif isinstance(field, datetime.datetime):
-            return field
-        else:
-            msg = "Field {0} has bad value '{1}'".format(
-                self._name, field)
-            log.warning(msg)
-            return None
-
-    def to_json(self, value):
-        """
-        Convert a time struct to a string
-        """
-        if value is None:
-            return None
-        if isinstance(value, time.struct_time):
-            # struct_times are always utc
-            return time.strftime('%Y-%m-%dT%H:%M:%SZ', value)
-        elif isinstance(value, datetime.datetime):
-            if value.utcoffset() is None:
-                return value.isoformat() + 'Z'
-            else:
-                return value.isoformat()
-
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
-
 
 class Timedelta(ModelType):
     def from_json(self, time_str):
@@ -119,6 +74,8 @@ class Timedelta(ModelType):
 
         Returns a datetime.timedelta parsed from the string
         """
+        if time_str is None:
+            return time_str
         parts = TIMEDELTA_REGEX.match(time_str)
         if not parts:
             return

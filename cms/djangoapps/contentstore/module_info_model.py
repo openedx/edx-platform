@@ -8,7 +8,12 @@ def get_module_info(store, location, parent_location=None, rewrite_static_links=
         module = store.get_item(location)
     except ItemNotFoundError:
         # create a new one
-        module = store.create_and_save_xmodule(location)
+        store.create_and_save_xmodule(location)
+        parent = store.get_item(parent_location)
+        if not isinstance(location, Location):
+            location = Location(location)
+        store.update_children(parent_location, parent.children + [location.url()])
+        module = store.get_item(location)
 
     data = module.data
     if rewrite_static_links:
@@ -28,6 +33,7 @@ def get_module_info(store, location, parent_location=None, rewrite_static_links=
         'id': module.location.url(),
         'data': data,
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
+        # will own_metadata suffice?
         'metadata': module._model_data._kvs._metadata
     }
 
@@ -37,9 +43,9 @@ def set_module_info(store, location, post_data):
     try:
         module = store.get_item(location)
     except:
-        # new module at this location
-        # presume that we have an 'Empty' template
-        module = store.create_and_save_xmodule(location)
+        # new module at this location??? What's the use case? Will it be meaningful w/o a parent (inherited info)?
+        store.create_and_save_xmodule(location)
+        module = store.get_item(location)
 
     if post_data.get('data') is not None:
         data = post_data['data']

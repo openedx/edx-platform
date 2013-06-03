@@ -176,7 +176,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
                     # so when we do the lookup, we should do so with a non-draft location
-                    non_draft_loc = location._replace(revision=None)
+                    non_draft_loc = location.replace(revision=None)
                     metadata_to_inherit = self.cached_metadata.get(non_draft_loc.url(), {})
                     inherit_metadata(module, metadata_to_inherit)
                 return module
@@ -288,7 +288,7 @@ class MongoModuleStore(ModuleStoreBase):
             location = Location(result['_id'])
             # We need to collate between draft and non-draft
             # i.e. draft verticals can have children which are not in non-draft versions
-            location = location._replace(revision=None)
+            location = location.replace(revision=None)
             location_url = location.url()
             if location_url in results_by_url:
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
@@ -581,7 +581,12 @@ class MongoModuleStore(ModuleStoreBase):
             )
         dbmodel = self._create_new_model_data(location.category, location, definition_data, metadata)
         xblock_class = XModuleDescriptor.load_class(location.category, self.default_class)
-        return xblock_class(system, location.category, location, None, dbmodel)
+        xmodule = xblock_class(system, location.category, location, None, dbmodel)
+        # force inherited fields w/ defaults to take the defaults so the children can inherit
+        for attr in INHERITABLE_METADATA:
+            if hasattr(xmodule, attr):
+                xmodule._model_data[attr] = getattr(xmodule, attr)
+        return xmodule
 
     def save_xmodule(self, xmodule):
         """
@@ -605,7 +610,8 @@ class MongoModuleStore(ModuleStoreBase):
 
     def create_and_save_xmodule(self, location, definition_data=None, metadata=None, system=None):
         """
-        Create the new xmodule and save it. Returns the new module (from persistence). The difference
+        Create the new xmodule and save it. Does not return the new module because if the caller
+        will insert it as a child, it's inherited metadata will completely change. The difference
         between this and just doing create_xmodule and save_xmodule is this ensures static_tabs get
         pointed to by the course.
 
@@ -634,7 +640,6 @@ class MongoModuleStore(ModuleStoreBase):
             })
             course.tabs = existing_tabs
             self.update_metadata(course.location, course.xblock_kvs()._metadata)
-        return self.get_item(location)
 
     def clone_item(self, source, location):
         """

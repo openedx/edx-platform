@@ -114,7 +114,8 @@ def create_new_course(request):
         metadata = {}
     else:
         metadata = {'display_name': display_name}
-    new_course = modulestore('direct').create_and_save_xmodule(dest_location, metadata=metadata)
+    modulestore('direct').create_and_save_xmodule(dest_location, metadata=metadata)
+    new_course = modulestore('direct').get_item(dest_location)
 
     # clone a default 'about' module as well
     dest_about_location = dest_location._replace(category='about', name='overview')
