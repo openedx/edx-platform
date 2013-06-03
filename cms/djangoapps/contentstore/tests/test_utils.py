@@ -30,6 +30,7 @@ class LMSLinksTestCase(TestCase):
         self.assertEquals(self.get_about_page_link(), None)
 
     def get_about_page_link(self):
+        """ create mock course and return the about page link """
         location = 'i4x', 'mitX', '101', 'course', 'test'
         utils.get_course_id = mock.Mock(return_value="mitX/101/test")
         return utils.get_lms_link_for_about_page(location)
