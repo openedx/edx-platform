@@ -30,7 +30,7 @@ end
         desc
     task system, [:env, :options] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
-        task(:runserver).invoke(system, args.env, args.options)
+        Rake::Task[:runserver].invoke(system, args.env, args.options)
     end
 
     desc "Start #{system} Celery worker"

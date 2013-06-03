@@ -147,7 +147,7 @@ end
         # env arguments to be passed to all dependent tasks.
         desc "Compile coffeescript and sass, and then run collectstatic in the specified environment"
         task "#{system}:gather_assets:#{env}" do
-          task(:gather_assets).invoke(system, env)
+          Rake::Task[:gather_assets].invoke(system, env)
         end
     end
 end

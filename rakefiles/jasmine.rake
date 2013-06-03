@@ -104,12 +104,12 @@ end
 [:lms, :cms].each do |system|
     desc "Open jasmine tests for #{system} in your default browser"
     task "browse_jasmine_#{system}" do
-        task(:browse_jasmine).invoke(system, 'jasmine')
+        Rake::Task[:browse_jasmine].invoke(system, 'jasmine')
     end
 
     desc "Use phantomjs to run jasmine tests for #{system} from the console"
     task "phantomjs_jasmine_#{system}" do
-        task(:phantomjs_jasmine).invoke(system, 'jasmine')
+        Rake::Task[:phantomjs_jasmine].invoke(system, 'jasmine')
     end
 end
 
