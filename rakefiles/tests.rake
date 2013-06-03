@@ -45,6 +45,11 @@ end
 directory REPORT_DIR
 
 task :clean_test_files do
+
+    # Delete all non-folder files in the reports directory
+    sh("find #{REPORT_DIR} -type f -print0 | xargs -0 rm")
+
+    # Reset the test fixtures
     sh("git clean -fqdx test_root")
 end
 
@@ -81,12 +86,11 @@ TEST_TASK_DIRS = []
 end
 
 Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
-    task_name = "test_#{lib}"
 
     report_dir = report_dir_path(lib)
 
     desc "Run tests for common lib #{lib}"
-    task task_name => report_dir do
+    task "test_#{lib}"  => ["clean_test_files", report_dir] do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         cmd = "nosetests #{lib}"
         sh(run_under_coverage(cmd, lib)) do |ok, res|
@@ -95,10 +99,13 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     end
     TEST_TASK_DIRS << lib
 
-    desc "Run tests for common lib #{lib} (without coverage)"
-    task "fasttest_#{lib}" do
-        sh("nosetests #{lib}")
-    end
+    # There used to be a fasttest_#{lib} command that ran without coverage.
+    # However, this is an inconsistent usage of "fast":
+    # When running tests for lms and cms, "fast" means skipping
+    # staticfiles collection, but still running under coverage.
+    # We keep the fasttest_#{lib} command for backwards compatibility,
+    # but make it an alias to the normal test command.
+    task "fasttest_#{lib}" => "test_#{lib}"
 end
 
 task :report_dirs
