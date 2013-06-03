@@ -13,6 +13,7 @@ from django.test.client import Client
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from xmodule.tests import test_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -30,7 +31,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
     Any xmodule should overwrite only next parameters for test:
         1. TEMPLATE_NAME
         2. DATA
-        3. COURSE_DATA and USER_COUNT if needed
+        3. MODEL_DATA
+        4. COURSE_DATA and USER_COUNT if needed
 
     This class should not contain any tests, because TEMPLATE_NAME
     should be defined in child class.
@@ -40,7 +42,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
     # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
     TEMPLATE_NAME = ""
-    DATA = {}
+    DATA = ''
+    MODEL_DATA = {'data': '<some_module></some_module>'}
 
     def setUp(self):
 
@@ -68,12 +71,20 @@ class BaseTestXmodule(ModuleStoreTestCase):
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
-        item = ItemFactory.create(
+        self.item_descriptor = ItemFactory.create(
             parent_location=section.location,
             template=self.TEMPLATE_NAME,
             data=self.DATA
         )
-        self.item_url = Location(item.location).url()
+
+        location = self.item_descriptor.location
+        system = test_system()
+        system.render_template = lambda template, context: context
+
+        self.item_module = self.item_descriptor.module_class(
+            system, location, self.item_descriptor, self.MODEL_DATA
+        )
+        self.item_url = Location(location).url()
 
         # login all users for acces to Xmodule
         self.clients = {user.username: Client() for user in self.users}
@@ -86,7 +97,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.assertTrue(all(self.login_statuses))
 
     def get_url(self, dispatch):
-        """Return word cloud url with dispatch."""
+        """Return item url with dispatch."""
         return reverse(
             'modx_dispatch',
             args=(self.course.id, self.item_url, dispatch)
