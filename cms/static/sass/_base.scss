@@ -814,7 +814,7 @@ hr.divide {
   line-height: 26px;
   color: $white;
   pointer-events: none;
-  opacity: 0;
+  opacity: 0.0;
 
   &:after {
     content: '▾';

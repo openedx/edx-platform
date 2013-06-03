@@ -1,0 +1,15 @@
+# .coveragerc for common/lib/calc
+[run]
+data_file = reports/common/lib/calc/.coverage
+source = common/lib/calc
+branch = true
+
+[report]
+ignore_errors = True
+
+[html]
+title = Calc Python Test Coverage Report
+directory = reports/common/lib/calc/cover
+
+[xml]
+output = reports/common/lib/calc/coverage.xml
