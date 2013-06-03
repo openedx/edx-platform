@@ -46,7 +46,7 @@ class VideoFactory(object):
     def create():
         """Method return Video Xmodule instance."""
         location = Location(["i4x", "edX", "video", "default",
-                             "SampleProblem{0}".format(1)])
+                             "SampleProblem1"])
         model_data = {'data': VideoFactory.sample_problem_xml_youtube}
 
         descriptor = Mock(weight="1")
@@ -107,7 +107,7 @@ class VideoModuleUnitTest(unittest.TestCase):
             'track': None,
             'show_captions': 'true',
             'display_name': 'SampleProblem1',
-            'id': 'i4x-edX-video-default-SampleProblem1',
+            'id': module.location.html_id(),
             'end': 3610.0,
             'caption_asset_path': '/static/subs/',
             'source': '.../mit-3091x/M-3091X-FA12-L21-3_100.mp4',
