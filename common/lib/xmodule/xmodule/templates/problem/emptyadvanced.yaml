@@ -2,10 +2,7 @@
 metadata:
     display_name: Blank Advanced Problem
     rerandomize: never
-    showanswer: always
-    weight: ""
-    attempts: ""
-    empty: True
+    showanswer: finished
 data: |
   <problem>
   </problem>

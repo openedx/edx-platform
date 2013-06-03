@@ -1,12 +1,14 @@
 class CMS.Views.ModuleEdit extends Backbone.View
   tagName: 'li'
   className: 'component'
+  editorMode: 'editor-mode'
 
   events:
     "click .component-editor .cancel-button": 'clickCancelButton'
     "click .component-editor .save-button": 'clickSaveButton'
     "click .component-actions .edit-button": 'clickEditButton'
     "click .component-actions .delete-button": 'onDelete'
+    "click .mode a": 'clickModeButton'
 
   initialize: ->
     @onDelete = @options.onDelete
@@ -20,29 +22,30 @@ class CMS.Views.ModuleEdit extends Backbone.View
   loadEdit: ->
     if not @module
       @module = XModule.loadModule(@$el.find('.xmodule_edit'))
-      @originalMetadata = @metadata()
+      # At this point, metadata-edit.html will be loaded, and the metadata (as JSON) is available.
+      metadataEditor = @$el.find('.metadata_edit')
+      metadataData = metadataEditor.data('metadata')
+      models = [];
+      for key of metadataData
+        models.push(metadataData[key])
+      @metadataEditor = new CMS.Views.Metadata.Editor({
+          el: metadataEditor,
+          collection: new CMS.Models.MetadataCollection(models)
+          })
 
-  metadata: ->
-    # cdodge: package up metadata which is separated into a number of input fields
-    # there's probably a better way to do this, but at least this lets me continue to move onwards
-    _metadata = {}
+      # Need to update set "active" class on data editor if there is one.
+      # If we are only showing settings, hide the data editor controls and update settings accordingly.
+      if @hasDataEditor()
+        @selectMode(@editorMode)
+      else
+        @hideDataEditor()
 
-    $metadata = @$component_editor().find('.metadata_edit')
-
-    if $metadata
-      # walk through the set of elments which have the 'xmetadata_name' attribute and
-      # build up a object to pass back to the server on the subsequent POST
-      _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]', $metadata)
-
-    return _metadata
+      title = interpolate(gettext('<em>Editing:</em> %s'),
+        [@metadataEditor.getDisplayName()])
+      @$el.find('.component-name').html(title)
 
   changedMetadata: ->
-    currentMetadata = @metadata()
-    changedMetadata = {}
-    for key of currentMetadata
-      if currentMetadata[key] != @originalMetadata[key]
-        changedMetadata[key] = currentMetadata[key]
-    return changedMetadata
+    return @metadataEditor.getModifiedMetadataValues()
 
   cloneTemplate: (parent, template) ->
     $.post("/clone_item", {
@@ -77,7 +80,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
       @render()
       @$el.removeClass('editing')
     ).fail( ->
-      showToastMessage("There was an error saving your changes. Please try again.", null, 3)
+      showToastMessage(gettext("There was an error saving your changes. Please try again."), null, 3)
     )
 
   clickCancelButton: (event) ->
@@ -96,3 +99,38 @@ class CMS.Views.ModuleEdit extends Backbone.View
     $modalCover.show().addClass('is-fixed')
     @$component_editor().slideDown(150)
     @loadEdit()
+
+  clickModeButton: (event) ->
+    event.preventDefault()
+    if not @hasDataEditor()
+      return
+    @selectMode(event.currentTarget.parentElement.id)
+
+  hasDataEditor: =>
+    return @$el.find('.wrapper-comp-editor').length > 0
+
+  selectMode: (mode) =>
+    dataEditor = @$el.find('.wrapper-comp-editor')
+    settingsEditor = @$el.find('.wrapper-comp-settings')
+    editorModeButton =  @$el.find('#editor-mode').find("a")
+    settingsModeButton = @$el.find('#settings-mode').find("a")
+
+    if mode == @editorMode
+      # Because of CodeMirror editor, cannot hide the data editor when it is first loaded. Therefore
+      # we have to use a class of is-inactive instead of is-active.
+      dataEditor.removeClass('is-inactive')
+      editorModeButton.addClass('is-set')
+      settingsEditor.removeClass('is-active')
+      settingsModeButton.removeClass('is-set')
+    else
+      dataEditor.addClass('is-inactive')
+      editorModeButton.removeClass('is-set')
+      settingsEditor.addClass('is-active')
+      settingsModeButton.addClass('is-set')
+
+  hideDataEditor: =>
+    editorModeButtonParent =  @$el.find('#editor-mode')
+    editorModeButtonParent.addClass('inactive-mode')
+    editorModeButtonParent.removeClass('active-mode')
+    @$el.find('.wrapper-comp-settings').addClass('is-active')
+    @$el.find('#settings-mode').find("a").addClass('is-set')

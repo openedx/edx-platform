@@ -36,6 +36,7 @@ system = ModuleSystem(
     replace_urls=None,
     xblock_model_data={}
 )
+
 controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
 
 """
