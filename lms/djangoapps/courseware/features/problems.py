@@ -33,7 +33,7 @@ def view_problem_with_show_answer(step, problem_type, answer):
     i_am_registered_for_the_course(step, 'model_course')
 
     # Ensure that the course has this problem type
-    add_problem_to_course('model_course', problem_type, {'show_answer': answer})
+    add_problem_to_course('model_course', problem_type, {'showanswer': answer})
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
