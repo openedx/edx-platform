@@ -133,5 +133,3 @@ class VideoModuleUnitTest(unittest.TestCase):
         self.assertDictEqual(
             json.loads(module.get_instance_state()),
             {'position': 0})
-
-        self.assertIsNone(module.get_progress())
