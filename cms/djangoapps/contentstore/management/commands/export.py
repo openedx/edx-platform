@@ -7,7 +7,6 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import Location
 from xmodule.course_module import CourseDescriptor
 
 
@@ -15,8 +14,7 @@ unnamed_modules = 0
 
 
 class Command(BaseCommand):
-    help = \
-'''Import the specified data directory into the default ModuleStore'''
+    help = 'Import the specified data directory into the default ModuleStore'
 
     def handle(self, *args, **options):
         if len(args) != 2:

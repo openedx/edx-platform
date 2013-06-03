@@ -131,6 +131,7 @@ class CombinedOpenEndedV1Module():
         self.state = instance_state.get('state', self.INITIAL)
 
         self.student_attempts = instance_state.get('student_attempts', 0)
+        self.weight = instance_state.get('weight', 1)
 
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.ready_to_reset = instance_state.get('ready_to_reset', False)
@@ -144,7 +145,7 @@ class CombinedOpenEndedV1Module():
         grace_period_string = self.instance_state.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(due_date, grace_period_string)
-        except:
+        except Exception:
             log.error("Error parsing due date information in location {0}".format(location))
             raise
         self.display_due_date = self.timeinfo.display_due_date
@@ -293,9 +294,8 @@ class CombinedOpenEndedV1Module():
             if self.current_task_number > 0:
                 last_response_data = self.get_last_response(self.current_task_number - 1)
                 current_response_data = self.get_current_attributes(self.current_task_number)
-
                 if (current_response_data['min_score_to_attempt'] > last_response_data['score']
-                    or current_response_data['max_score_to_attempt'] < last_response_data['score']):
+                        or current_response_data['max_score_to_attempt'] < last_response_data['score']):
                     self.state = self.DONE
                     self.ready_to_reset = True
 
@@ -362,7 +362,7 @@ class CombinedOpenEndedV1Module():
             # if link.startswith(XASSET_SRCREF_PREFIX):
             # Placing try except so that if the error is fixed, this code will start working again.
             return_html = rewrite_links(html, self.rewrite_content_links)
-        except:
+        except Exception:
             pass
         return return_html
 
@@ -402,6 +402,7 @@ class CombinedOpenEndedV1Module():
                                               self.static_data, instance_state=task_state)
         last_response = task.latest_answer()
         last_score = task.latest_score()
+        all_scores = task.all_scores()
         last_post_assessment = task.latest_post_assessment(self.system)
         last_post_feedback = ""
         feedback_dicts = [{}]
@@ -417,13 +418,18 @@ class CombinedOpenEndedV1Module():
             else:
                 last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
             last_post_assessment = last_post_evaluation
-            rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
-            rubric_scores = rubric_data['rubric_scores']
-            grader_types = rubric_data['grader_types']
-            feedback_items = rubric_data['feedback_items']
-            feedback_dicts = rubric_data['feedback_dicts']
-            grader_ids = rubric_data['grader_ids']
-            submission_ids = rubric_data['submission_ids']
+            try:
+                rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
+            except Exception:
+                log.debug("Could not parse rubric data from child history.  "
+                          "Likely we have not yet initialized a previous step, so this is perfectly fine.")
+                rubric_data = {}
+            rubric_scores = rubric_data.get('rubric_scores')
+            grader_types = rubric_data.get('grader_types')
+            feedback_items = rubric_data.get('feedback_items')
+            feedback_dicts = rubric_data.get('feedback_dicts')
+            grader_ids = rubric_data.get('grader_ids')
+            submission_ids = rubric_data.get('submission_ids')
         elif task_type == "selfassessment":
             rubric_scores = last_post_assessment
             grader_types = ['SA']
@@ -441,7 +447,7 @@ class CombinedOpenEndedV1Module():
             human_state = task.HUMAN_NAMES[state]
         else:
             human_state = state
-        if len(grader_types) > 0:
+        if grader_types is not None and len(grader_types) > 0:
             grader_type = grader_types[0]
         else:
             grader_type = "IN"
@@ -454,6 +460,7 @@ class CombinedOpenEndedV1Module():
         last_response_dict = {
             'response': last_response,
             'score': last_score,
+            'all_scores': all_scores,
             'post_assessment': last_post_assessment,
             'type': task_type,
             'max_score': max_score,
@@ -654,9 +661,10 @@ class CombinedOpenEndedV1Module():
             return {
                 'success': False,
                 #This is a student_facing_error
-                'error': ('You have attempted this question {0} times.  '
-                          'You are only allowed to attempt it {1} times.').format(
-                    self.student_attempts, self.attempts)
+                'error': (
+                    'You have attempted this question {0} times.  '
+                    'You are only allowed to attempt it {1} times.'
+                ).format(self.student_attempts, self.attempts)
             }
         self.state = self.INITIAL
         self.ready_to_reset = False
@@ -732,10 +740,37 @@ class CombinedOpenEndedV1Module():
         """
         max_score = None
         score = None
-        if self.check_if_done_and_scored():
-            last_response = self.get_last_response(self.current_task_number)
-            max_score = last_response['max_score']
-            score = last_response['score']
+        if self.is_scored and self.weight is not None:
+            #Finds the maximum score of all student attempts and keeps it.
+            score_mat = []
+            for i in xrange(0, len(self.task_states)):
+                #For each task, extract all student scores on that task (each attempt for each task)
+                last_response = self.get_last_response(i)
+                max_score = last_response.get('max_score', None)
+                score = last_response.get('all_scores', None)
+                if score is not None:
+                    #Convert none scores and weight scores properly
+                    for z in xrange(0, len(score)):
+                        if score[z] is None:
+                            score[z] = 0
+                        score[z] *= float(self.weight)
+                    score_mat.append(score)
+
+            if len(score_mat) > 0:
+                #Currently, assume that the final step is the correct one, and that those are the final scores.
+                #This will change in the future, which is why the machinery above exists to extract all scores on all steps
+                #TODO: better final score handling.
+                scores = score_mat[-1]
+                score = max(scores)
+            else:
+                score = 0
+
+            if max_score is not None:
+                #Weight the max score if it is not None
+                max_score *= float(self.weight)
+            else:
+                #Without a max_score, we cannot have a score!
+                score = None
 
         score_dict = {
             'score': score,
@@ -767,6 +802,17 @@ class CombinedOpenEndedV1Module():
         progress_object = Progress(self.current_task_number, len(self.task_xml))
 
         return progress_object
+
+    def out_of_sync_error(self, get, msg=''):
+        """
+        return dict out-of-sync error message, and also log.
+        """
+        #This is a dev_facing_error
+        log.warning("Combined module state out sync. state: %r, get: %r. %s",
+                    self.state, get, msg)
+        #This is a student_facing_error
+        return {'success': False,
+                'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
 
 
 class CombinedOpenEndedV1Descriptor():
@@ -801,8 +847,8 @@ class CombinedOpenEndedV1Descriptor():
             if len(xml_object.xpath(child)) == 0:
                 #This is a staff_facing_error
                 raise ValueError(
-                    "Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance.".format(
-                        child))
+                    "Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance. {1}".format(
+                        child, xml_object))
 
         def parse_task(k):
             """Assumes that xml_object has child k"""
@@ -813,7 +859,6 @@ class CombinedOpenEndedV1Descriptor():
             return xml_object.xpath(k)[0]
 
         return {'task_xml': parse_task('task'), 'prompt': parse('prompt'), 'rubric': parse('rubric')}
-
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''

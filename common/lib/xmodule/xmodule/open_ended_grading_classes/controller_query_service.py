@@ -6,7 +6,7 @@ log = logging.getLogger(__name__)
 
 class ControllerQueryService(GradingService):
     """
-    Interface to staff grading backend.
+    Interface to controller query backend.
     """
 
     def __init__(self, config, system):
@@ -76,6 +76,50 @@ class ControllerQueryService(GradingService):
         response = self.post(self.take_action_on_flags_url, params)
         return response
 
+
+class MockControllerQueryService(object):
+    """
+    Mock controller query service for testing
+    """
+
+    def __init__(self, config, system):
+        pass
+
+    def check_if_name_is_unique(self, *args, **kwargs):
+        """
+        Mock later if needed.  Stub function for now.
+        @param params:
+        @return:
+        """
+        pass
+
+    def check_for_eta(self, *args, **kwargs):
+        """
+        Mock later if needed.  Stub function for now.
+        @param params:
+        @return:
+        """
+        pass
+
+    def check_combined_notifications(self, *args, **kwargs):
+        combined_notifications = '{"flagged_submissions_exist": false, "version": 1, "new_student_grading_to_view": false, "success": true, "staff_needs_to_grade": false, "student_needs_to_peer_grade": true, "overall_need_to_check": true}'
+        return combined_notifications
+
+    def get_grading_status_list(self, *args, **kwargs):
+        grading_status_list = '{"version": 1, "problem_list": [{"problem_name": "Science Question -- Machine Assessed", "grader_type": "NA", "eta_available": true, "state": "Waiting to be Graded", "eta": 259200, "location": "i4x://MITx/oe101x/combinedopenended/Science_SA_ML"}, {"problem_name": "Humanities Question -- Peer Assessed", "grader_type": "NA", "eta_available": true, "state": "Waiting to be Graded", "eta": 259200, "location": "i4x://MITx/oe101x/combinedopenended/Humanities_SA_Peer"}], "success": true}'
+        return grading_status_list
+
+    def get_flagged_problem_list(self, *args, **kwargs):
+        flagged_problem_list = '{"version": 1, "success": false, "error": "No flagged submissions exist for course: MITx/oe101x/2012_Fall"}'
+        return flagged_problem_list
+
+    def take_action_on_flags(self, *args, **kwargs):
+        """
+        Mock later if needed.  Stub function for now.
+        @param params:
+        @return:
+        """
+        pass
 
 def convert_seconds_to_human_readable(seconds):
     if seconds < 60:

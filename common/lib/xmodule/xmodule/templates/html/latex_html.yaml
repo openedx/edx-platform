@@ -1,7 +1,6 @@
 ---
 metadata:
-    display_name: E-text Written in LaTeX 
-    source_processor_url: https://qisx.mit.edu:5443/latex2edx
+    display_name: E-text Written in LaTeX
     source_code: |
         \subsection{Example of E-text in LaTeX}
 

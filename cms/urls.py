@@ -6,7 +6,7 @@ from . import one_time_startup
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = ('',
+urlpatterns = ('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
     url(r'^listing', 'contentstore.views.index', name='index'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
@@ -115,19 +115,31 @@ urlpatterns += (
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
 
     url(r'^logout$', 'student.views.logout_user', name='logout'),
+)
 
-    # static/proof-of-concept views
-    url(r'^ux-alerts$', 'contentstore.views.ux_alerts', name='ux-alerts')
-    )
+js_info_dict = {
+    'domain': 'djangojs',
+    'packages': ('cms',),
+}
+
+urlpatterns += (
+    # Serve catalog of localized strings to be rendered by Javascript
+    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+)
+
 
 if settings.ENABLE_JASMINE:
     # # Jasmine
     urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
+
+
+if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
+    urlpatterns += (
+        url(r'^status/', include('service_status.urls')),
+    )
 
 urlpatterns = patterns(*urlpatterns)
 
 # Custom error pages
 handler404 = 'contentstore.views.render_404'
 handler500 = 'contentstore.views.render_500'
-
-

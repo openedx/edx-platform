@@ -1,6 +1,3 @@
-import logging
-import sys
-
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
 
@@ -131,7 +128,7 @@ def remove_user_from_course_group(caller, user, location, role):
         raise PermissionDenied
 
     # see if the user is actually in that role, if not then we don't have to do anything
-    if is_user_in_course_group_role(user, location, role) == True:
+    if is_user_in_course_group_role(user, location, role):
         groupname = get_course_groupname_for_role(location, role)
 
         group = Group.objects.get(name=groupname)

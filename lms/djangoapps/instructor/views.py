@@ -27,7 +27,7 @@ from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
 from courseware.courses import get_course_with_access
 from courseware.models import StudentModule
-from django_comment_client.models import (Role,
+from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
                                           FORUM_ROLE_COMMUNITY_TA)
@@ -961,11 +961,14 @@ def gradebook(request, course_id):
                      }
                      for student in enrolled_students]
 
-    return render_to_response('courseware/gradebook.html', {'students': student_info,
-                                                 'course': course,
-                                                 'course_id': course_id,
-                                                 # Checked above
-                                                 'staff_access': True, })
+    return render_to_response('courseware/gradebook.html', {
+        'students': student_info,
+        'course': course,
+        'course_id': course_id,
+        # Checked above
+        'staff_access': True,
+        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
+    })
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

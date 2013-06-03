@@ -1,12 +1,11 @@
 import logging
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
 from json import dumps
 
 
-def export_to_xml(modulestore, contentstore, course_location, root_dir, course_dir):
+def export_to_xml(modulestore, contentstore, course_location, root_dir, course_dir, draft_modulestore=None):
 
     course = modulestore.get_item(course_location)
 
@@ -39,6 +38,26 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     with course_run_policy_dir.open('policy.json', 'w') as course_policy:
         policy = {'course/' + course.location.name: own_metadata(course)}
         course_policy.write(dumps(policy))
+
+    # export draft content
+    # NOTE: this code assumes that verticals are the top most draftable container
+    # should we change the application, then this assumption will no longer
+    # be valid
+    if draft_modulestore is not None:
+        draft_verticals = draft_modulestore.get_items([None, course_location.org, course_location.course,
+                                                       'vertical', None, 'draft'])
+        if len(draft_verticals) > 0:
+            draft_course_dir = export_fs.makeopendir('drafts')
+            for draft_vertical in draft_verticals:
+                parent_locs = draft_modulestore.get_parent_locations(draft_vertical.location, course.location.course_id)
+                # Don't try to export orphaned items.
+                if len(parent_locs) > 0:
+                    logging.debug('parent_locs = {0}'.format(parent_locs))
+                    draft_vertical.xml_attributes['parent_sequential_url'] = Location(parent_locs[0]).url()
+                    sequential = modulestore.get_item(Location(parent_locs[0]))
+                    index = sequential.children.index(draft_vertical.location.url())
+                    draft_vertical.xml_attributes['index_in_children_list'] = str(index)
+                    draft_vertical.export_to_xml(draft_course_dir)
 
 
 def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):

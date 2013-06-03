@@ -161,6 +161,7 @@ class @PeerGradingProblem
   constructor: (backend) ->
     @prompt_wrapper = $('.prompt-wrapper')
     @backend = backend
+    @is_ctrl = false
 
 
     # get the location of the problem
@@ -183,6 +184,12 @@ class @PeerGradingProblem
     @grading_message.hide()
     @question_header = $('.question-header')
     @question_header.click @collapse_question
+    @flag_submission_confirmation = $('.flag-submission-confirmation')
+    @flag_submission_confirmation_button = $('.flag-submission-confirmation-button')
+    @flag_submission_removal_button = $('.flag-submission-removal-button')
+
+    @flag_submission_confirmation_button.click @close_dialog_box
+    @flag_submission_removal_button.click @remove_flag
 
     @grading_wrapper =$('.grading-wrapper')
     @calibration_feedback_panel = $('.calibration-feedback')
@@ -212,6 +219,7 @@ class @PeerGradingProblem
     @answer_unknown_checkbox = $('.answer-unknown-checkbox')
 
     $(window).keydown @keydown_handler
+    $(window).keyup @keyup_handler
 
     @collapse_question()
 
@@ -233,9 +241,13 @@ class @PeerGradingProblem
       @calibration_interstitial_page.hide()
       @is_calibrated_check()
 
+    @flag_student_checkbox.click =>
+      @flag_box_checked()
+
     @calibration_feedback_button.hide()
     @calibration_feedback_panel.hide()
     @error_container.hide()
+    @flag_submission_confirmation.hide()
 
     @is_calibrated_check()
 
@@ -282,6 +294,17 @@ class @PeerGradingProblem
   #  Callbacks for various events
   #
   ##########
+
+  remove_flag: () =>
+    @flag_student_checkbox.removeAttr("checked")
+    @close_dialog_box()
+
+  close_dialog_box: () =>
+    $( ".flag-submission-confirmation" ).dialog('close')
+
+  flag_box_checked: () =>
+    if @flag_student_checkbox.is(':checked')
+      $( ".flag-submission-confirmation" ).dialog({ height: 400, width: 400 })
 
   # called after we perform an is_student_calibrated check
   calibration_check_callback: (response) =>
@@ -338,13 +361,19 @@ class @PeerGradingProblem
       @grade = Rubric.get_total_score()
 
   keydown_handler: (event) =>
-    if event.which == 13 && @submit_button.is(':visible')
+    #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
+    if event.which == 17 && @is_ctrl==false
+      @is_ctrl=true
+    else if event.which == 13 && @submit_button.is(':visible') && @is_ctrl==true
       if @calibration
         @submit_calibration_essay()
       else
         @submit_grade()
 
-
+  keyup_handler: (event) =>
+    #Handle keyup event when ctrl key is released
+    if event.which == 17 && @is_ctrl==true
+      @is_ctrl=false
 
 
   ##########
@@ -443,7 +472,6 @@ class @PeerGradingProblem
     calibration_wrapper = $('.calibration-feedback-wrapper')
     calibration_wrapper.html("<p>The score you gave was: #{@grade}. The actual score is: #{response.actual_score}</p>")
 
-
     score = parseInt(@grade)
     actual_score = parseInt(response.actual_score)
 
@@ -451,6 +479,11 @@ class @PeerGradingProblem
       calibration_wrapper.append("<p>Your score matches the actual score!</p>")
     else
       calibration_wrapper.append("<p>You may want to review the rubric again.</p>")
+
+    if response.actual_rubric != undefined
+      calibration_wrapper.append("<div>Instructor Scored Rubric: #{response.actual_rubric}</div>")
+    if response.actual_feedback!=undefined
+      calibration_wrapper.append("<div>Instructor Feedback: #{response.actual_feedback}</div>")
 
     # disable score selection and submission from the grading interface
     $("input[name='score-selection']").attr('disabled', true)

@@ -1,9 +1,8 @@
 CMS.Views.ValidatingView = Backbone.View.extend({
-    // Intended as an abstract class which catches validation errors on the model and 
-    // decorates the fields. Needs wiring per class, but this initialization shows how 
+    // Intended as an abstract class which catches validation errors on the model and
+    // decorates the fields. Needs wiring per class, but this initialization shows how
     // either have your init call this one or copy the contents
     initialize : function() {
-        this.listenTo(this.model, 'error', CMS.ServerError);
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
     },
@@ -15,7 +14,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
         "change textarea" : "clearValidationErrors"
     },
     fieldToSelectorMap : {
-        // Your subclass must populate this w/ all of the model keys and dom selectors 
+        // Your subclass must populate this w/ all of the model keys and dom selectors
         // which may be the subjects of validation errors
     },
     _cacheValidationErrors : [],

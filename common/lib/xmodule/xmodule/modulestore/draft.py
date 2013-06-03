@@ -3,7 +3,6 @@ from datetime import datetime
 from . import ModuleStoreBase, Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
-import logging
 
 DRAFT = 'draft'
 
@@ -13,6 +12,13 @@ def as_draft(location):
     Returns the Location that is the draft for `location`
     """
     return Location(location)._replace(revision=DRAFT)
+
+
+def as_published(location):
+    """
+    Returns the Location that is the published version for `location`
+    """
+    return Location(location)._replace(revision=None)
 
 
 def wrap_draft(item):
@@ -107,7 +113,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         return wrap_draft(super(DraftModuleStore, self).clone_item(source, as_draft(location)))
 
-    def update_item(self, location, data):
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data
@@ -116,9 +122,13 @@ class DraftModuleStore(ModuleStoreBase):
         data: A nested dictionary of problem data
         """
         draft_loc = as_draft(location)
-        draft_item = self.get_item(location)
-        if not getattr(draft_item, 'is_draft', False):
-            self.clone_item(location, draft_loc)
+        try:
+            draft_item = self.get_item(location)
+            if not getattr(draft_item, 'is_draft', False):
+                self.clone_item(location, draft_loc)
+        except ItemNotFoundError, e:
+            if not allow_not_found:
+                raise e
 
         return super(DraftModuleStore, self).update_item(draft_loc, data)
 
@@ -156,14 +166,17 @@ class DraftModuleStore(ModuleStoreBase):
 
         return super(DraftModuleStore, self).update_metadata(draft_loc, metadata)
 
-    def delete_item(self, location):
+    def delete_item(self, location, delete_all_versions=False):
         """
         Delete an item from this modulestore
 
         location: Something that can be passed to Location
         """
-        return super(DraftModuleStore, self).delete_item(as_draft(location))
+        super(DraftModuleStore, self).delete_item(as_draft(location))
+        if delete_all_versions:
+            super(DraftModuleStore, self).delete_item(as_published(location))
 
+        return
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location.  Needed
@@ -178,6 +191,7 @@ class DraftModuleStore(ModuleStoreBase):
         Save a current draft to the underlying modulestore
         """
         draft = self.get_item(location)
+
         draft.cms.published_date = datetime.utcnow()
         draft.cms.published_by = published_by_id
         super(DraftModuleStore, self).update_item(location, draft._model_data._kvs._data)
@@ -221,6 +235,6 @@ class DraftModuleStore(ModuleStoreBase):
 
         # convert the dict - which is used for look ups - back into a list
         for key, value in to_process_dict.iteritems():
-            queried_children.append(value)  
+            queried_children.append(value)
 
         return queried_children

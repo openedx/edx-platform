@@ -44,7 +44,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
             self.render();
         }
         );
-        this.listenTo(this.model, 'error', CMS.ServerError);
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.model.get('graders').on('remove', this.render, this);
         this.model.get('graders').on('reset', this.render, this);
@@ -65,7 +64,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         gradeCollection.each(function(gradeModel) {
             $(gradelist).append(self.template({model : gradeModel }));
             var newEle = gradelist.children().last();
-            var newView = new CMS.Views.Settings.GraderView({el: newEle, 
+            var newView = new CMS.Views.Settings.GraderView({el: newEle,
                 model : gradeModel, collection : gradeCollection });
         });
 
@@ -119,7 +118,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     gradeBarWidth : null, // cache of value since it won't change (more certain)
 
     renderCutoffBar: function() {
-        var gradeBar =this.$el.find('.grade-bar'); 
+        var gradeBar =this.$el.find('.grade-bar');
         this.gradeBarWidth = gradeBar.width();
         var gradelist = gradeBar.children('.grades');
         // HACK fixing a duplicate call issue by undoing previous call effect. Need to figure out why called 2x
@@ -128,11 +127,11 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         // Can probably be simplified to one variable now.
         var removable = false;
         var draggable = false; // first and last are not removable, first is not draggable
-        _.each(this.descendingCutoffs, 
+        _.each(this.descendingCutoffs,
                 function(cutoff, index) {
-            var newBar = this.gradeCutoffTemplate({ 
-                descriptor : cutoff['designation'] , 
-                width : nextWidth, 
+            var newBar = this.gradeCutoffTemplate({
+                descriptor : cutoff['designation'] ,
+                width : nextWidth,
                 removable : removable });
             gradelist.append(newBar);
             if (draggable) {
@@ -152,7 +151,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         },
         this);
         // add fail which is not in data
-        var failBar = this.gradeCutoffTemplate({ descriptor : this.failLabel(), 
+        var failBar = this.gradeCutoffTemplate({ descriptor : this.failLabel(),
             width : nextWidth, removable : false});
         $(failBar).find("span[contenteditable=true]").attr("contenteditable", false);
         gradelist.append(failBar);
@@ -221,12 +220,12 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     },
 
     saveCutoffs: function() {
-        this.model.save('grade_cutoffs', 
-                _.reduce(this.descendingCutoffs, 
-                        function(object, cutoff) { 
+        this.model.save('grade_cutoffs',
+                _.reduce(this.descendingCutoffs,
+                        function(object, cutoff) {
                     object[cutoff['designation']] = cutoff['cutoff'] / 100.0;
                     return object;
-                }, 
+                },
                 {}));
     },
 
@@ -244,7 +243,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         this.descendingCutoffs.push({designation: this.GRADES[gradeLength], cutoff: failBarWidth});
         this.descendingCutoffs[gradeLength - 1]['cutoff'] = Math.round(targetWidth);
 
-        var $newGradeBar = this.gradeCutoffTemplate({ descriptor : this.GRADES[gradeLength], 
+        var $newGradeBar = this.gradeCutoffTemplate({ descriptor : this.GRADES[gradeLength],
             width : targetWidth, removable : true });
         var gradeDom = this.$el.find('.grades');
         gradeDom.children().last().before($newGradeBar);
@@ -317,7 +316,6 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
         'blur :input' : "inputUnfocus"
     },
     initialize : function() {
-        this.listenTo(this.model, 'error', CMS.ServerError);
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
         this.render();
@@ -362,8 +360,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
         }
     },
     deleteModel : function(e) {
-        this.model.destroy(
-                { error : CMS.ServerError});
+        this.model.destroy();
         e.preventDefault();
     }
 

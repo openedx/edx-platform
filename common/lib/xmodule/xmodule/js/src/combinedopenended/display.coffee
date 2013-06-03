@@ -90,6 +90,7 @@ class @CombinedOpenEnded
     @element=element
     @reinitialize(element)
     $(window).keydown @keydown_handler
+    $(window).keyup @keyup_handler
 
   reinitialize: (element) ->
     @wrapper=$(element).find('section.xmodule_CombinedOpenEndedModule')
@@ -104,6 +105,7 @@ class @CombinedOpenEnded
     @location = @el.data('location')
     # set up handlers for click tracking
     Rubric.initialize(@location)
+    @is_ctrl = false
 
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
@@ -287,6 +289,9 @@ class @CombinedOpenEnded
       if @child_type == "openended"
         @submit_button.hide()
         @queueing()
+        if @task_number==1 and @task_count==1
+          @grader_status = $('.grader-status')
+          @grader_status.html("<p>Response submitted for scoring.</p>")
     else if @child_state == 'post_assessment'
       if @child_type=="openended"
         @skip_button.show()
@@ -309,6 +314,8 @@ class @CombinedOpenEnded
       if @task_number<@task_count
         @next_problem()
       else
+        if @task_number==1 and @task_count==1
+          @show_combined_rubric_current()
         @show_results_current()
         @reset_button.show()
 
@@ -322,6 +329,7 @@ class @CombinedOpenEnded
   save_answer: (event) =>
     event.preventDefault()
     max_filesize = 2*1000*1000 #2MB
+    pre_can_upload_files = @can_upload_files
     if @child_state == 'initial'
       files = ""
       if @can_upload_files == true
@@ -353,6 +361,7 @@ class @CombinedOpenEnded
             @find_assessment_elements()
             @rebind()
           else
+            @can_upload_files = pre_can_upload_files
             @gentle_alert response.error
 
       $.ajaxWithPrefix("#{@ajax_url}/save_answer",settings)
@@ -360,10 +369,17 @@ class @CombinedOpenEnded
     else
       @errors_area.html(@out_of_sync_message)
 
-  keydown_handler: (e) =>
-    # only do anything when the key pressed is the 'enter' key
-    if e.which == 13 && @child_state == 'assessing' && Rubric.check_complete()
-      @save_assessment(e)
+  keydown_handler: (event) =>
+    #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
+    if event.which == 17 && @is_ctrl==false
+      @is_ctrl=true
+    else if @is_ctrl==true && event.which == 13 && @child_state == 'assessing' && Rubric.check_complete()
+      @save_assessment(event)
+
+  keyup_handler: (event) =>
+    #Handle keyup event when ctrl key is released
+    if event.which == 17 && @is_ctrl==true
+      @is_ctrl=false
 
   save_assessment: (event) =>
     event.preventDefault()
@@ -482,8 +498,10 @@ class @CombinedOpenEnded
     if @accept_file_upload == "True"
       if window.File and window.FileReader and window.FileList and window.Blob
         @can_upload_files = true
-        @file_upload_area.html('<input type="file" class="file-upload-box">')
+        @file_upload_area.html('<input type="file" class="file-upload-box"><img class="file-upload-preview" src="#" alt="Uploaded image" />')
         @file_upload_area.show()
+        $('.file-upload-preview').hide()
+        $('.file-upload-box').change @preview_image
       else
         @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
 
@@ -539,3 +557,28 @@ class @CombinedOpenEnded
   log_feedback_selection: (event) ->
     target_selection = $(event.target).val()
     Logger.log 'oe_feedback_response_selected', {value: target_selection}
+
+  remove_attribute: (name) =>
+    if $('.file-upload-preview').attr(name)
+      $('.file-upload-preview')[0].removeAttribute(name)
+
+  preview_image: () =>
+    if $('.file-upload-box')[0].files && $('.file-upload-box')[0].files[0]
+      reader = new FileReader()
+      reader.onload = (e) =>
+        max_dim = 150
+        @remove_attribute('src')
+        @remove_attribute('height')
+        @remove_attribute('width')
+        $('.file-upload-preview').attr('src', e.target.result)
+        height_px = $('.file-upload-preview')[0].height
+        width_px = $('.file-upload-preview')[0].width
+        scale_factor = 0
+        if height_px>width_px
+          scale_factor = height_px/max_dim
+        else
+          scale_factor = width_px/max_dim
+        $('.file-upload-preview')[0].width = width_px/scale_factor
+        $('.file-upload-preview')[0].height = height_px/scale_factor
+        $('.file-upload-preview').show()
+      reader.readAsDataURL($('.file-upload-box')[0].files[0])

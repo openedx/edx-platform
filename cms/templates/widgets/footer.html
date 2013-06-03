@@ -1,8 +1,10 @@
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+
 <div class="wrapper-footer wrapper">  
   <footer class="primary" role="contentinfo">
     <div class="colophon">
-      <p>&copy; 2013 <a href="http://www.edx.org" rel="external">edX</a>. All rights reserved.</p>
+      <p>&copy; 2013 <a href="http://www.edx.org" rel="external">edX</a>. ${ _("All rights reserved.")}</p>
     </div>
     
     <nav class="nav-peripheral">
@@ -15,10 +17,11 @@
         </li> -->
         % if user.is_authenticated():
         <li class="nav-item nav-peripheral-feedback">
-          <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to share your feedback">Contact Us</a>
+          <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
         </li>
         % endif    
       </ol>
     </nav>
   </footer>
 </div>
+

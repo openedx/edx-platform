@@ -1,30 +1,8 @@
-import json
-import shutil
 from django.test.client import Client
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from path import path
-import json
-from fs.osfs import OSFS
-import copy
 
-from contentstore.utils import get_modulestore
-
-from xmodule.modulestore import Location
-from xmodule.modulestore.store_utilities import clone_course
-from xmodule.modulestore.store_utilities import delete_course
-from xmodule.modulestore.django import modulestore, _MODULESTORES
-from xmodule.contentstore.django import contentstore
-from xmodule.templates import update_templates
-from xmodule.modulestore.xml_exporter import export_to_xml
-from xmodule.modulestore.xml_importer import import_from_xml
-
-from xmodule.capa_module import CapaDescriptor
-from xmodule.course_module import CourseDescriptor
-from xmodule.seq_module import SequenceDescriptor
-
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from .utils import ModuleStoreTestCase, parse_json, user, registration
+from .utils import parse_json, user, registration
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):
@@ -84,6 +62,7 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         # Now make sure that the user is now actually activated
         self.assertTrue(user(email).is_active)
 
+
 class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
 
@@ -101,9 +80,9 @@ class AuthTestCase(ContentStoreTestCase):
     def test_public_pages_load(self):
         """Make sure pages that don't require login load without error."""
         pages = (
-                 reverse('login'),
-                 reverse('signup'),
-                 )
+            reverse('login'),
+            reverse('signup'),
+        )
         for page in pages:
             print "Checking '{0}'".format(page)
             self.check_page_get(page, 200)
@@ -132,17 +111,29 @@ class AuthTestCase(ContentStoreTestCase):
         # Now login should work
         self.login(self.email, self.pw)
 
+    def test_login_link_on_activation_age(self):
+        self.create_account(self.username, self.email, self.pw)
+        # we want to test the rendering of the activation page when the user isn't logged in
+        self.client.logout()
+        resp = self._activate_user(self.email)
+        self.assertEqual(resp.status_code, 200)
+
+        # check the the HTML has links to the right login page. Note that this is merely a content
+        # check and thus could be fragile should the wording change on this page
+        expected = 'You can now <a href="' + reverse('login') + '">login</a>.'
+        self.assertIn(expected, resp.content)
+
     def test_private_pages_auth(self):
         """Make sure pages that do require login work."""
         auth_pages = (
             reverse('index'),
-            )
+        )
 
         # These are pages that should just load when the user is logged in
         # (no data needed)
         simple_auth_pages = (
             reverse('index'),
-            )
+        )
 
         # need an activated user
         self.test_create_account()

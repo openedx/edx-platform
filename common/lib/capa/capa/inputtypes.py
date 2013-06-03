@@ -46,7 +46,7 @@ import sys
 import pyparsing
 
 from .registry import TagRegistry
-from capa.chem import chemcalc
+from chem import chemcalc
 import xqueue_interface
 from datetime import datetime
 
@@ -150,8 +150,8 @@ class InputTypeBase(object):
         ## we can swap this around in the future if there's a more logical
         ## order.
 
-        self.id = state.get('id', xml.get('id'))
-        if self.id is None:
+        self.input_id = state.get('id', xml.get('id'))
+        if self.input_id is None:
             raise ValueError("input id state is None. xml is {0}".format(
                 etree.tostring(xml)))
 
@@ -249,7 +249,7 @@ class InputTypeBase(object):
         and don't need to override this method.
         """
         context = {
-            'id': self.id,
+            'id': self.input_id,
             'value': self.value,
             'status': self.status,
             'msg': self.msg,
@@ -457,8 +457,21 @@ class TextLine(InputTypeBase):
     """
     A text line input.  Can do math preview if "math"="1" is specified.
 
-    If the hidden attribute is specified, the textline is hidden and the input id is stored in a div with name equal
-    to the value of the hidden attribute.  This is used e.g. for embedding simulations turned into questions.
+    If "trailing_text" is set to a value, then the textline will be shown with
+    the value after the text input, and before the checkmark or any input-specific
+    feedback. HTML will not work, but properly escaped HTML characters will. This
+    feature is useful if you would like to specify a specific type of units for the
+    text input.
+
+    If the hidden attribute is specified, the textline is hidden and the input id
+    is stored in a div with name equal to the value of the hidden attribute.  This
+    is used e.g. for embedding simulations turned into questions.
+
+    Example:
+        <texline math="1" trailing_text="m/s" />
+
+    This example will render out a text line with a math preview and the text 'm/s'
+    after the end of the text line.
     """
 
     template = "textline.html"
@@ -483,6 +496,7 @@ class TextLine(InputTypeBase):
             Attribute('dojs', None, render=False),
             Attribute('preprocessorClassName', None, render=False),
             Attribute('preprocessorSrc', None, render=False),
+            Attribute('trailing_text', ''),
         ]
 
     def setup(self):
@@ -609,7 +623,6 @@ class CodeInput(InputTypeBase):
             self.queue_len = self.msg
             self.msg = self.submitted_msg
 
-
     def setup(self):
         ''' setup this input type '''
         self.setup_code_response_rendering()
@@ -641,7 +654,7 @@ class MatlabInput(CodeInput):
     tags = ['matlabinput']
 
     plot_submitted_msg = ("Submitted. As soon as a response is returned, "
-                    "this message will be replaced by that feedback.")
+                          "this message will be replaced by that feedback.")
 
     def setup(self):
         '''
@@ -655,6 +668,8 @@ class MatlabInput(CodeInput):
         # Check if problem has been queued
         self.queuename = 'matlab'
         self.queue_msg = ''
+        # this is only set if we don't have a graded response
+        # the graded response takes precedence
         if 'queue_msg' in self.input_state and self.status in ['queued', 'incomplete', 'unsubmitted']:
             self.queue_msg = self.input_state['queue_msg']
         if 'queuestate' in self.input_state and self.input_state['queuestate'] == 'queued':
@@ -662,16 +677,16 @@ class MatlabInput(CodeInput):
             self.queue_len = 1
             self.msg = self.plot_submitted_msg
 
-
     def handle_ajax(self, dispatch, get):
-        ''' 
+        '''
         Handle AJAX calls directed to this input
 
         Args:
             - dispatch (str) - indicates how we want this ajax call to be handled
             - get (dict) - dictionary of key-value pairs that contain useful data
         Returns:
-            
+            dict - 'success' - whether or not we successfully queued this submission
+                 - 'message' - message to be rendered in case of error
         '''
 
         if dispatch == 'plot':
@@ -679,7 +694,7 @@ class MatlabInput(CodeInput):
         return {}
 
     def ungraded_response(self, queue_msg, queuekey):
-        ''' 
+        '''
         Handle the response from the XQueue
         Stores the response in the input_state so it can be rendered later
 
@@ -691,7 +706,7 @@ class MatlabInput(CodeInput):
             nothing
         '''
         # check the queuekey against the saved queuekey
-        if('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued' 
+        if('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued'
                 and self.input_state['queuekey'] == queuekey):
             msg = self._parse_data(queue_msg)
             # save the queue message so that it can be rendered later
@@ -699,12 +714,24 @@ class MatlabInput(CodeInput):
             self.input_state['queuestate'] = None
             self.input_state['queuekey'] = None
 
+    def button_enabled(self):
+        """ Return whether or not we want the 'Test Code' button visible
+
+        Right now, we only want this button to show up when a problem has not been
+        checked.
+        """
+        if self.status in ['correct', 'incorrect']:
+            return False
+        else:
+            return True
+
     def _extra_context(self):
         ''' Set up additional context variables'''
         extra_context = {
-                'queue_len': str(self.queue_len),
-                'queue_msg': self.queue_msg
-                }
+            'queue_len': str(self.queue_len),
+            'queue_msg': self.queue_msg,
+            'button_enabled': self.button_enabled(),
+        }
         return extra_context
 
     def _parse_data(self, queue_msg):
@@ -719,20 +746,19 @@ class MatlabInput(CodeInput):
             result = json.loads(queue_msg)
         except (TypeError, ValueError):
             log.error("External message should be a JSON serialized dict."
-                    " Received queue_msg = %s" % queue_msg)
+                      " Received queue_msg = %s" % queue_msg)
             raise
         msg = result['msg']
         return msg
 
-
     def _plot_data(self, get):
-        ''' 
+        '''
         AJAX handler for the plot button
         Args:
             get (dict) - should have key 'submission' which contains the student submission
         Returns:
             dict - 'success' - whether or not we successfully queued this submission
-                 - 'message' - message to be rendered in case of error 
+                 - 'message' - message to be rendered in case of error
         '''
         # only send data if xqueue exists
         if self.system.xqueue is None:
@@ -748,26 +774,25 @@ class MatlabInput(CodeInput):
         anonymous_student_id = self.system.anonymous_student_id
         queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
                                                  anonymous_student_id +
-                                                 self.id)
+                                                 self.input_id)
         xheader = xqueue_interface.make_xheader(
-                lms_callback_url = callback_url,
-                lms_key = queuekey,
-                queue_name = self.queuename)
-
-        # save the input state
-        self.input_state['queuekey'] = queuekey
-        self.input_state['queuestate'] = 'queued'
-
+            lms_callback_url=callback_url,
+            lms_key=queuekey,
+            queue_name=self.queuename)
 
         # construct xqueue body
         student_info = {'anonymous_student_id': anonymous_student_id,
-                'submission_time': qtime}
+                        'submission_time': qtime}
         contents = {'grader_payload': self.plot_payload,
                     'student_info': json.dumps(student_info),
                     'student_response': response}
 
         (error, msg) = qinterface.send_to_queue(header=xheader,
-                                                body = json.dumps(contents))
+                                                body=json.dumps(contents))
+        # save the input state if successful
+        if error == 0:
+            self.input_state['queuekey'] = queuekey
+            self.input_state['queuestate'] = 'queued'
 
         return {'success': error == 0, 'message': msg}
 
@@ -1026,7 +1051,7 @@ class DragAndDropInput(InputTypeBase):
 
             if tag_type == 'draggable':
                 dic['target_fields'] = [parse(target, 'target') for target in
-                                                tag.iterchildren('target')]
+                                        tag.iterchildren('target')]
 
             return dic
 

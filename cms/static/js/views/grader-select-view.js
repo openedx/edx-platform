@@ -16,7 +16,7 @@ CMS.Models.AssignmentGrade = Backbone.Model.extend({
 	urlRoot : function() {
 		if (this.has('location')) {
 			var location = this.get('location');
-			return '/' + location.get('org') + "/" + location.get('course') + '/' + location.get('category') + '/' 
+			return '/' + location.get('org') + "/" + location.get('course') + '/' + location.get('category') + '/'
 			+ location.get('name') + '/gradeas/';
 		}
 		else return "";
@@ -35,16 +35,16 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 				// TODO move to a template file
 				'<h4 class="status-label"><%= assignmentType %></h4>' +
 				'<a data-tooltip="Mark/unmark this subsection as graded" class="menu-toggle" href="#">' +
-					'<% if (!hideSymbol) {%><span class="ss-icon ss-standard">&#x2713;</span><%};%>' +
+					'<% if (!hideSymbol) {%><i class="icon-ok"></i><%};%>' +
 				'</a>' +
-				'<ul class="menu">' + 
+				'<ul class="menu">' +
 					'<% graders.each(function(option) { %>' +
 						'<li><a <% if (option.get("type") == assignmentType) {%>class="is-selected" <%}%> href="#"><%= option.get("type") %></a></li>' +
 					'<% }) %>' +
 					'<li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>' +
 				'</ul>');
 		this.assignmentGrade = new CMS.Models.AssignmentGrade({
-			assignmentUrl : this.$el.closest('.id-holder').data('id'), 
+			assignmentUrl : this.$el.closest('.id-holder').data('id'),
 			graderType : this.$el.data('initial-status')});
 		// TODO throw exception if graders is null
 		this.graders = this.options['graders'];
@@ -78,13 +78,13 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 	},
 	selectGradeType : function(e) {
 	      e.preventDefault();
-	      
+
 	      this.removeMenu(e);
 
 	      // TODO I'm not happy with this string fetch via the html for what should be an id. I'd rather use the id attr
 	      // of the CourseGradingPolicy model or null for Not Graded (NOTE, change template's if check for is-selected accordingly)
 	      this.assignmentGrade.save('graderType', $(e.target).text());
-	      
+
 	      this.render();
 	}
 })

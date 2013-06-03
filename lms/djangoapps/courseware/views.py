@@ -20,6 +20,7 @@ from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
+from courseware.masquerade import setup_masquerade
 from courseware.model_data import ModelDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
@@ -89,6 +90,7 @@ def render_accordion(request, course, chapter, section, model_data_cache):
 
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    request.user = user	# keep just one instance of User
     toc = toc_for_course(user, request, course, chapter, section, model_data_cache)
 
     context = dict([('toc', toc),
@@ -260,6 +262,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
+    request.user = user	# keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)
     staff_access = has_access(user, course, 'staff')
     registered = registered_for_course(course, user)
@@ -267,6 +270,8 @@ def index(request, course_id, chapter=None, section=None,
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug('User %s tried to view course %s but is not enrolled' % (user, course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
+
+    masq = setup_masquerade(request, staff_access)
 
     try:
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
@@ -289,6 +294,7 @@ def index(request, course_id, chapter=None, section=None,
             'init': '',
             'content': '',
             'staff_access': staff_access,
+            'masquerade': masq,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
@@ -301,12 +307,18 @@ def index(request, course_id, chapter=None, section=None,
         chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
+            if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+                log.debug('staff masq as student: no chapter %s' % chapter)
+                return redirect(reverse('courseware', args=[course.id]))
             raise Http404
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
+                if masq=='student':  # if staff is masquerading as student be kinder, don't 404
+                    log.debug('staff masq as student: no section %s' % section)
+                    return redirect(reverse('courseware', args=[course.id]))
                 raise Http404
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
@@ -437,9 +449,10 @@ def course_info(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
+    masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
 
     return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
-            'course': course, 'staff_access': staff_access})
+            'course': course, 'staff_access': staff_access, 'masquerade': masq})
 
 
 @ensure_csrf_cookie
@@ -502,6 +515,9 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
+    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+        raise Http404
+
     course = get_course_with_access(request.user, course_id, 'see_exists')
     registered = registered_for_course(course, request.user)
 
@@ -518,6 +534,37 @@ def course_about(request, course_id):
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link': show_courseware_link})
+@ensure_csrf_cookie
+@cache_if_anonymous
+def mktg_course_about(request, course_id):
+
+    try:
+        course = get_course_with_access(request.user, course_id, 'see_exists')
+    except (ValueError, Http404) as e:
+        # if a course does not exist yet, display a coming
+        # soon button
+        return render_to_response('courseware/mktg_coming_soon.html',
+                              {'course_id': course_id})
+
+    registered = registered_for_course(course, request.user)
+
+    if has_access(request.user, course, 'load'):
+        course_target = reverse('info', args=[course.id])
+    else:
+        course_target = reverse('about_course', args=[course.id])
+
+    allow_registration = has_access(request.user, course, 'enroll')
+
+    show_courseware_link = (has_access(request.user, course, 'load') or
+                            settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+
+    return render_to_response('courseware/mktg_course_about.html',
+                              {'course': course,
+                               'registered': registered,
+                               'allow_registration': allow_registration,
+                               'course_target': course_target,
+                               'show_courseware_link': show_courseware_link})
+
 
 
 @ensure_csrf_cookie

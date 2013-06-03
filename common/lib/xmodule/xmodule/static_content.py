@@ -1,3 +1,4 @@
+# /usr/bin/env python
 """
 This module has utility functions for gathering up the static content
 that is defined by XModules and XModuleDescriptors (javascript and css)
@@ -6,40 +7,43 @@ that is defined by XModules and XModuleDescriptors (javascript and css)
 import hashlib
 import os
 import errno
+import sys
 from collections import defaultdict
+from docopt import docopt
+from path import path
 
-from .x_module import XModuleDescriptor
-
-
-def write_module_styles(output_root, extra_descriptors):
-    return _write_styles('.xmodule_display', output_root, _list_modules(extra_descriptors))
+from xmodule.x_module import XModuleDescriptor
 
 
-def write_module_js(output_root, extra_descriptors):
-    return _write_js(output_root, _list_modules(extra_descriptors))
+def write_module_styles(output_root):
+    return _write_styles('.xmodule_display', output_root, _list_modules())
 
 
-def write_descriptor_styles(output_root, extra_descriptors):
-    return _write_styles('.xmodule_edit', output_root, _list_descriptors(extra_descriptors))
+def write_module_js(output_root):
+    return _write_js(output_root, _list_modules())
 
 
-def write_descriptor_js(output_root, extra_descriptors):
-    return _write_js(output_root, _list_descriptors(extra_descriptors))
+def write_descriptor_styles(output_root):
+    return _write_styles('.xmodule_edit', output_root, _list_descriptors())
 
 
-def _list_descriptors(extra_descriptors):
+def write_descriptor_js(output_root):
+    return _write_js(output_root, _list_descriptors())
+
+
+def _list_descriptors():
     return [
         desc for desc in [
             desc for (_, desc) in XModuleDescriptor.load_classes()
-        ] + extra_descriptors
+        ]
     ]
 
 
-def _list_modules(extra_descriptors):
+def _list_modules():
     return [
         desc.module_class
         for desc
-        in _list_descriptors(extra_descriptors)
+        in _list_descriptors()
     ]
 
 
@@ -64,7 +68,7 @@ def _write_styles(selector, output_root, classes):
                 css_fragments[idx, filetype, fragment].add(class_.__name__)
     css_imports = defaultdict(set)
     for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
-        fragment_name = "{idx}-{hash}.{type}".format(
+        fragment_name = "{idx:0=3d}-{hash}.{type}".format(
             idx=idx,
             hash=hashlib.md5(fragment).hexdigest(),
             type=filetype)
@@ -76,9 +80,12 @@ def _write_styles(selector, output_root, classes):
             css_imports[class_].add(fragment_name)
 
     with open(output_root / '_module-styles.scss', 'w') as module_styles:
+
+        module_styles.write("@import 'bourbon/bourbon';\n")
+        module_styles.write("@import 'bourbon/addons/button';\n")
         for class_, fragment_names in css_imports.items():
             imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
-            module_styles.write("""{selector}.xmodule_{class_} {{ {imports} }}""".format(
+            module_styles.write("""{selector}.xmodule_{class_} {{ {imports} }}\n""".format(
                 class_=class_, imports=imports, selector=selector
             ))
 
@@ -95,7 +102,7 @@ def _write_js(output_root, classes):
 
     module_js = []
     for idx, filetype, fragment in sorted(js_fragments):
-        path = output_root / "{idx}-{hash}.{type}".format(
+        path = output_root / "{idx:0=3d}-{hash}.{type}".format(
             idx=idx,
             hash=hashlib.md5(fragment).hexdigest(),
             type=filetype)
@@ -105,3 +112,22 @@ def _write_js(output_root, classes):
         module_js.append(path)
 
     return module_js
+
+
+def main():
+    """
+    Generate
+    Usage: static_content.py <output_root>
+    """
+    args = docopt(main.__doc__)
+    root = path(args['<output_root>'])
+
+    root.rmtree(ignore_errors=True)
+    write_descriptor_js(root / 'descriptors/js')
+    write_descriptor_styles(root / 'descriptors/css')
+    write_module_js(root / 'modules/js')
+    write_module_styles(root / 'modules/css')
+
+
+if __name__ == '__main__':
+    sys.exit(main())

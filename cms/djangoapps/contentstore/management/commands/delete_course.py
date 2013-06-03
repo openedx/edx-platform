@@ -5,7 +5,6 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import Location
 from xmodule.course_module import CourseDescriptor
 from .prompt import query_yes_no
 
@@ -38,7 +37,7 @@ class Command(BaseCommand):
         if query_yes_no("Deleting course {0}. Confirm?".format(loc_str), default="no"):
             if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
                 loc = CourseDescriptor.id_to_location(loc_str)
-                if delete_course(ms, cs, loc, commit) == True:
+                if delete_course(ms, cs, loc, commit):
                     print 'removing User permissions from course....'
                     # in the django layer, we need to remove all the user permissions groups associated with this course
                     if commit:

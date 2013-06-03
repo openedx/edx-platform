@@ -2,16 +2,15 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_equal
+from nose.tools import assert_true, assert_equal, assert_in
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import StaleElementReferenceException
+
 
 ############### ACTIONS ####################
 @step('I select Checklists from the Tools menu$')
 def i_select_checklists(step):
-    expand_icon_css = 'li.nav-course-tools i.icon-expand'
-    if world.browser.is_element_present_by_css(expand_icon_css):
-        world.css_click(expand_icon_css)
+    world.click_tools()
     link_css = 'li.nav-course-tools-checklists a'
     world.css_click(link_css)
 
@@ -62,7 +61,7 @@ def i_select_a_link_to_the_course_outline(step):
 
 @step('I am brought to the course outline page$')
 def i_am_brought_to_course_outline(step):
-    assert_equal('Course Outline', world.css_find('.outline .title-1')[0].text)
+    assert_in('Course Outline', world.css_find('.outline .page-header')[0].text)
     assert_equal(1, len(world.browser.windows))
 
 
@@ -88,8 +87,6 @@ def i_am_brought_to_help_page_in_new_window(step):
     assert_equal('http://help.edge.edx.org/', world.browser.url)
 
 
-
-
 ############### HELPER METHODS ####################
 def verifyChecklist2Status(completed, total, percentage):
     def verify_count(driver):
@@ -106,9 +103,11 @@ def verifyChecklist2Status(completed, total, percentage):
 
 
 def toggleTask(checklist, task):
-    world.css_click('#course-checklist' + str(checklist) +'-task' + str(task))
+    world.css_click('#course-checklist' + str(checklist) + '-task' + str(task))
 
 
+# TODO: figure out a way to do this in phantom and firefox
+# For now we will mark the scenerios that use this method as skipped
 def clickActionLink(checklist, task, actionText):
     # toggle checklist item to make sure that the link button is showing
     toggleTask(checklist, task)
@@ -120,4 +119,3 @@ def clickActionLink(checklist, task, actionText):
 
     world.wait_for(verify_action_link_text)
     action_link.click()
-

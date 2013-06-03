@@ -1,0 +1,2 @@
+# This must be installed after distribute has been updated.
+MySQL-python==1.2.4

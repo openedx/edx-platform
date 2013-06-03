@@ -3,6 +3,7 @@ if Backbone?
 
     events:
       "click .discussion-vote": "toggleVote"
+      "click .discussion-flag-abuse": "toggleFlagAbuse"
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
       "click .action-edit": "edit"
@@ -25,6 +26,7 @@ if Backbone?
       @delegateEvents()
       @renderDogear()
       @renderVoted()
+      @renderFlagged()
       @renderPinned()
       @renderAttrs()
       @$("span.timeago").timeago()
@@ -42,6 +44,16 @@ if Backbone?
         @$("[data-role=discussion-vote]").addClass("is-cast")
       else
         @$("[data-role=discussion-vote]").removeClass("is-cast")
+        
+    renderFlagged: =>
+      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
+        @$("[data-role=thread-flag]").addClass("flagged")  
+        @$("[data-role=thread-flag]").removeClass("notflagged")
+        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
+      else
+        @$("[data-role=thread-flag]").removeClass("flagged")  
+        @$("[data-role=thread-flag]").addClass("notflagged")      
+        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")
 
     renderPinned: =>
       if @model.get("pinned")
@@ -56,6 +68,7 @@ if Backbone?
 
     updateModelDetails: =>
       @renderVoted()
+      @renderFlagged()
       @renderPinned()
       @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"])
 
@@ -96,6 +109,7 @@ if Backbone?
           if textStatus == 'success'
             @model.set(response, {silent: true})
 
+
     unvote: ->
       window.user.unvote(@model)
       url = @model.urlFor("unvote")
@@ -106,6 +120,7 @@ if Backbone?
         success: (response, textStatus) =>
           if textStatus == 'success'
             @model.set(response, {silent: true})
+
 
     edit: (event) ->
       @trigger "thread:edit", event

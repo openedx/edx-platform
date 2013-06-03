@@ -1,4 +1,5 @@
 import logging
+import copy
 import yaml
 import os
 
@@ -9,7 +10,7 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from xblock.core import XBlock, Scope, String
+from xblock.core import XBlock, Scope, String, Integer, Float
 
 log = logging.getLogger(__name__)
 
@@ -45,17 +46,13 @@ class HTMLSnippet(object):
         # cdodge: We've moved the xmodule.coffee script from an outside directory into the xmodule area of common
         # this means we need to make sure that all xmodules include this dependency which had been previously implicitly
         # fulfilled in a different area of code
-        js = cls.js
+        coffee = cls.js.setdefault('coffee', [])
+        fragment = resource_string(__name__, 'js/src/xmodule.coffee')
 
-        if js is None:
-            js = {}
+        if fragment not in coffee:
+            coffee.insert(0, fragment)
 
-        if 'coffee' not in js:
-            js['coffee'] = []
-
-        js['coffee'].append(resource_string(__name__, 'js/src/xmodule.coffee'))
-
-        return js
+        return cls.js
 
     @classmethod
     def get_css(cls):
@@ -79,14 +76,15 @@ class HTMLSnippet(object):
         """
         raise NotImplementedError(
             "get_html() must be provided by specific modules - not present in {0}"
-                                  .format(self.__class__))
+            .format(self.__class__))
 
 
 class XModuleFields(object):
     display_name = String(
-        help="Display name for this module",
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
         scope=Scope.settings,
-        default=None,
+        default=None
     )
 
 
@@ -338,10 +336,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # (like a practice problem).
     has_score = False
 
-    # cdodge: this is a list of metadata names which are 'system' metadata
-    # and should not be edited by an end-user
-    system_metadata_fields = ['data_dir', 'published_date', 'published_by', 'is_draft', 'xml_attributes']
-
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
     equality_attributes = ('_model_data', 'location')
@@ -364,7 +358,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     metadata_translations = {
         'slug': 'url_name',
         'name': 'display_name',
-        }
+    }
 
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
@@ -466,7 +460,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return False
 
-
     # ================================= JSON PARSING ===========================
     @staticmethod
     def load_from_json(json_data, system, default_class=None):
@@ -531,10 +524,10 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # ================================= XML PARSING ============================
     @staticmethod
     def load_from_xml(xml_data,
-            system,
-            org=None,
-            course=None,
-            default_class=None):
+                      system,
+                      org=None,
+                      course=None,
+                      default_class=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
         on the contents of xml_data.
@@ -549,7 +542,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         class_ = XModuleDescriptor.load_class(
             etree.fromstring(xml_data).tag,
             default_class
-            )
+        )
         # leave next line, commented out - useful for low-level debugging
         # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
         #        etree.fromstring(xml_data).tag,class_))
@@ -613,6 +606,75 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             location=self.location,
             model_data=self._model_data,
         ))
+
+    @property
+    def non_editable_metadata_fields(self):
+        """
+        Return the list of fields that should not be editable in Studio.
+
+        When overriding, be sure to append to the superclasses' list.
+        """
+        # We are not allowing editing of xblock tag and name fields at this time (for any component).
+        return [XBlock.tags, XBlock.name]
+
+    @property
+    def editable_metadata_fields(self):
+        """
+        Returns the metadata fields to be edited in Studio. These are fields with scope `Scope.settings`.
+
+        Can be limited by extending `non_editable_metadata_fields`.
+        """
+        inherited_metadata = getattr(self, '_inherited_metadata', {})
+        inheritable_metadata = getattr(self, '_inheritable_metadata', {})
+        metadata_fields = {}
+        for field in self.fields:
+
+            if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
+                continue
+
+            inheritable = False
+            value = getattr(self, field.name)
+            default_value = field.default
+            explicitly_set = field.name in self._model_data
+            if field.name in inheritable_metadata:
+                inheritable = True
+                default_value = field.from_json(inheritable_metadata.get(field.name))
+                if field.name in inherited_metadata:
+                    explicitly_set = False
+
+            # We support the following editors:
+            # 1. A select editor for fields with a list of possible values (includes Booleans).
+            # 2. Number editors for integers and floats.
+            # 3. A generic string editor for anything else (editing JSON representation of the value).
+            type = "Generic"
+            values = [] if field.values is None else copy.deepcopy(field.values)
+            if isinstance(values, tuple):
+                values = list(values)
+            if isinstance(values, list):
+                if len(values) > 0:
+                    type = "Select"
+                for index, choice in enumerate(values):
+                    json_choice = copy.deepcopy(choice)
+                    if isinstance(json_choice, dict) and 'value' in json_choice:
+                        json_choice['value'] = field.to_json(json_choice['value'])
+                    else:
+                        json_choice = field.to_json(json_choice)
+                    values[index] = json_choice
+            elif isinstance(field, Integer):
+                type = "Integer"
+            elif isinstance(field, Float):
+                type = "Float"
+            metadata_fields[field.name] = {'field_name': field.name,
+                                           'type': type,
+                                           'display_name': field.display_name,
+                                           'value': field.to_json(value),
+                                           'options': values,
+                                           'default_value': field.to_json(default_value),
+                                           'inheritable': inheritable,
+                                           'explicitly_set': explicitly_set,
+                                           'help': field.help}
+
+        return metadata_fields
 
 
 class DescriptorSystem(object):
@@ -702,7 +764,10 @@ class ModuleSystem(object):
                  anonymous_student_id='',
                  course_id=None,
                  open_ended_grading_interface=None,
-                 s3_interface=None):
+                 s3_interface=None,
+                 cache=None,
+                 can_execute_unsafe_code=None,
+    ):
         '''
         Create a closure around the system environment.
 
@@ -744,6 +809,14 @@ class ModuleSystem(object):
 
         xblock_model_data - A dict-like object containing the all data available to this
             xblock
+
+        cache - A cache object with two methods:
+            .get(key) returns an object from the cache or None.
+            .set(key, value, timeout_secs=None) stores a value in the cache with a timeout.
+
+        can_execute_unsafe_code - A function returning a boolean, whether or
+            not to allow the execution of unsafe, unsandboxed code.
+
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -768,6 +841,9 @@ class ModuleSystem(object):
         self.open_ended_grading_interface = open_ended_grading_interface
         self.s3_interface = s3_interface
 
+        self.cache = cache or DoNothingCache()
+        self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
+
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
         return self.__dict__.get(attr)
@@ -781,3 +857,12 @@ class ModuleSystem(object):
 
     def __str__(self):
         return str(self.__dict__)
+
+
+class DoNothingCache(object):
+    """A duck-compatible object to use in ModuleSystem when there's no cache."""
+    def get(self, key):
+        return None
+
+    def set(self, key, value, timeout=None):
+        pass

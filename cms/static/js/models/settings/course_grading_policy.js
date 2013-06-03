@@ -1,9 +1,9 @@
 if (!CMS.Models['Settings']) CMS.Models.Settings = new Object();
 
 CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
-    defaults : {	
+    defaults : {
         course_location : null,
-        graders : null,  // CourseGraderCollection 
+        graders : null,  // CourseGraderCollection
         grade_cutoffs : null,  // CourseGradeCutoff model
         grace_period : null // either null or { hours: n, minutes: m, ...}
     },
@@ -54,7 +54,7 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
         "type" : "",	// must be unique w/in collection (ie. w/in course)
         "min_count" : 1,
         "drop_count" : 0,
-        "short_label" : "",	// what to use in place of type if space is an issue 
+        "short_label" : "",	// what to use in place of type if space is an issue
         "weight" : 0 // int 0..100
     },
     parse : function(attrs) {

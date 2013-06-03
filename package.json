@@ -1,0 +1,9 @@
+{
+    "name": "mitx",
+    "version": "0.1.0",
+    "dependencies": {
+      "coffee-script": "1.6.X",
+      "phantom-jasmine": "0.1.0",
+      "jasmine-reporters": "0.2.1"
+    }
+}

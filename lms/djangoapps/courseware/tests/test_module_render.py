@@ -69,19 +69,38 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
                           json.dumps({'success': 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
                                       (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))}))
         mock_request_3 = MagicMock()
-        mock_request_3.POST.copy.return_value = {}
+        mock_request_3.POST.copy.return_value = {'position': 1}
         mock_request_3.FILES = False
         mock_request_3.user = UserFactory()
         inputfile_2 = Stub()
         inputfile_2.size = 1
         inputfile_2.name = 'name'
-        self.assertRaises(ItemNotFoundError, render.modx_dispatch,
-                          mock_request_3, 'dummy', self.location, 'toy')
-        self.assertRaises(Http404, render.modx_dispatch, mock_request_3, 'dummy',
-                          self.location, self.course_id)
-        mock_request_3.POST.copy.return_value = {'position': 1}
         self.assertIsInstance(render.modx_dispatch(mock_request_3, 'goto_position',
                                                    self.location, self.course_id), HttpResponse)
+        self.assertRaises(
+            Http404,
+            render.modx_dispatch,
+            mock_request_3,
+            'goto_position',
+            self.location,
+            'bad_course_id'
+        )
+        self.assertRaises(
+            Http404,
+            render.modx_dispatch,
+            mock_request_3,
+            'goto_position',
+            ['i4x', 'edX', 'toy', 'chapter', 'bad_location'],
+            self.course_id
+        )
+        self.assertRaises(
+            Http404,
+            render.modx_dispatch,
+            mock_request_3,
+            'bad_dispatch',
+            self.location,
+            self.course_id
+        )
 
     def test_get_score_bucket(self):
         self.assertEquals(render.get_score_bucket(0, 10), 'incorrect')

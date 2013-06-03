@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from student.models import CourseEnrollment
 from django_comment_client.permissions import has_permission
-from django_comment_client.models import Role
+from django_comment_common.models import Role
 
 
 class PermissionsTestCase(TestCase):
@@ -21,9 +21,9 @@ class PermissionsTestCase(TestCase):
         self.student_role = Role.objects.get_or_create(name="Student", course_id=self.course_id)[0]
 
         self.student = User.objects.create(username=self.random_str(),
-                            password="123456", email="john@yahoo.com")
+                                           password="123456", email="john@yahoo.com")
         self.moderator = User.objects.create(username=self.random_str(),
-                            password="123456", email="staff@edx.org")
+                                             password="123456", email="staff@edx.org")
         self.moderator.is_staff = True
         self.moderator.save()
         self.student_enrollment = CourseEnrollment.objects.create(user=self.student, course_id=self.course_id)

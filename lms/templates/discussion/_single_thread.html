@@ -6,7 +6,7 @@
   <div class="discussion-post">
   
     <header>
-    %if thread['group_id']
+    %if thread['group_id']:
       <div class="group-visibility-label">This post visible only to group ${cohort_dictionary[thread['group_id']]}. </div>
     %endif
       

@@ -1,15 +1,19 @@
-import factory
 import json
 from mock import Mock
-from django.contrib.auth.models import User
-
 from functools import partial
 
-from courseware.model_data import LmsKeyValueStore, InvalidWriteError, InvalidScopeError, ModelDataCache
-from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField, XModuleStudentInfoField, XModuleStudentPrefsField
+from courseware.model_data import LmsKeyValueStore, InvalidWriteError
+from courseware.model_data import InvalidScopeError, ModelDataCache
+from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField
+from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
+
+from student.tests.factories import UserFactory
+from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory
+from courseware.tests.factories import ContentFactory, SettingsFactory
+from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
+
 from xblock.core import Scope, BlockScope
 from xmodule.modulestore import Location
-
 from django.test import TestCase
 
 
@@ -18,6 +22,7 @@ def mock_field(scope, name):
     field.scope = scope
     field.name = name
     return field
+
 
 def mock_descriptor(fields=[], lms_fields=[]):
     descriptor = Mock()
@@ -37,53 +42,9 @@ prefs_key = partial(LmsKeyValueStore.Key, Scope.preferences, 'user', 'problem')
 user_info_key = partial(LmsKeyValueStore.Key, Scope.user_info, 'user', None)
 
 
-class UserFactory(factory.Factory):
-    FACTORY_FOR = User
-
-    username = 'user'
-
-
-class StudentModuleFactory(factory.Factory):
-    FACTORY_FOR = StudentModule
-
-    module_type = 'problem'
+class StudentModuleFactory(cmfStudentModuleFactory):
     module_state_key = location('def_id').url()
-    student = factory.SubFactory(UserFactory)
     course_id = course_id
-    state = None
-
-
-class ContentFactory(factory.Factory):
-    FACTORY_FOR = XModuleContentField
-
-    field_name = 'existing_field'
-    value = json.dumps('old_value')
-    definition_id = location('def_id').url()
-
-
-class SettingsFactory(factory.Factory):
-    FACTORY_FOR = XModuleSettingsField
-
-    field_name = 'existing_field'
-    value = json.dumps('old_value')
-    usage_id = '%s-%s' % (course_id, location('def_id').url())
-
-
-class StudentPrefsFactory(factory.Factory):
-    FACTORY_FOR = XModuleStudentPrefsField
-
-    field_name = 'existing_field'
-    value = json.dumps('old_value')
-    student = factory.SubFactory(UserFactory)
-    module_type = 'problem'
-
-
-class StudentInfoFactory(factory.Factory):
-    FACTORY_FOR = XModuleStudentInfoField
-
-    field_name = 'existing_field'
-    value = json.dumps('old_value')
-    student = factory.SubFactory(UserFactory)
 
 
 class TestDescriptorFallback(TestCase):
@@ -114,7 +75,7 @@ class TestDescriptorFallback(TestCase):
 class TestInvalidScopes(TestCase):
     def setUp(self):
         self.desc_md = {}
-        self.user = UserFactory.create()
+        self.user = UserFactory.create(username='user')
         self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
         self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
@@ -180,7 +141,7 @@ class TestStudentModuleStorage(TestCase):
 
 class TestMissingStudentModule(TestCase):
     def setUp(self):
-        self.user = UserFactory.create()
+        self.user = UserFactory.create(username='user')
         self.desc_md = {}
         self.mdc = ModelDataCache([mock_descriptor()], course_id, self.user)
         self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)

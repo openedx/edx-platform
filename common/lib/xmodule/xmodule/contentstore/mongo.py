@@ -6,7 +6,6 @@ from gridfs.errors import NoFile
 from xmodule.modulestore.mongo import location_to_query, Location
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 
-import sys
 import logging
 
 from .content import StaticContent, ContentStore
@@ -26,7 +25,6 @@ class MongoContentStore(ContentStore):
         self.fs = gridfs.GridFS(_db)
         self.fs_files = _db["fs.files"]   # the underlying collection GridFS uses
 
-
     def save(self, content):
         id = content.get_id()
 
@@ -34,7 +32,8 @@ class MongoContentStore(ContentStore):
         self.delete(id)
 
         with self.fs.new_file(_id=id, filename=content.get_url_path(), content_type=content.content_type,
-            displayname=content.name, thumbnail_location=content.thumbnail_location, import_path=content.import_path) as fp:
+                              displayname=content.name, thumbnail_location=content.thumbnail_location,
+                              import_path=content.import_path) as fp:
 
             fp.write(content.data)
 
@@ -49,8 +48,9 @@ class MongoContentStore(ContentStore):
         try:
             with self.fs.get(id) as fp:
                 return StaticContent(location, fp.displayname, fp.content_type, fp.read(),
-                    fp.uploadDate, thumbnail_location=fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
-                    import_path=fp.import_path if hasattr(fp, 'import_path') else None)
+                                     fp.uploadDate,
+                                     thumbnail_location=fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
+                                     import_path=fp.import_path if hasattr(fp, 'import_path') else None)
         except NoFile:
             raise NotFoundError()
 
@@ -102,7 +102,7 @@ class MongoContentStore(ContentStore):
             ]
         '''
         course_filter = Location(XASSET_LOCATION_TAG, category="asset" if not get_thumbnails else "thumbnail",
-            course=location.course, org=location.org)
+                                 course=location.course, org=location.org)
         # 'borrow' the function 'location_to_query' from the Mongo modulestore implementation
         items = self.fs_files.find(location_to_query(course_filter))
         return list(items)

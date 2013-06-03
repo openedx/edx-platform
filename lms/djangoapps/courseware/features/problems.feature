@@ -15,6 +15,7 @@ Feature: Answer problems
         | drop down         |
         | multiple choice   |
         | checkbox          |
+        | radio             |
         | string            |
         | numerical         |
         | formula           |
@@ -33,6 +34,7 @@ Feature: Answer problems
         | drop down         |
         | multiple choice   |
         | checkbox          |
+        | radio             |
         | string            |
         | numerical         |
         | formula           |
@@ -50,6 +52,7 @@ Feature: Answer problems
         | drop down         |
         | multiple choice   |
         | checkbox          |
+        | radio             |
         | string            |
         | numerical         |
         | formula           |
@@ -71,6 +74,8 @@ Feature: Answer problems
         | multiple choice   | incorrect     |
         | checkbox          | correct       |
         | checkbox          | incorrect     |
+        | radio             | correct       |
+        | radio             | incorrect     |
         | string            | correct       |
         | string            | incorrect     |
         | numerical         | correct       |

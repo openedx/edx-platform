@@ -7,19 +7,20 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .common import *
 import os
 from path import path
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
-NOSE_ARGS = ['--with-xunit']
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 TEST_ROOT = path('test_root')
-
-# Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
 
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
@@ -28,7 +29,7 @@ GITHUB_REPO_ROOT = TEST_ROOT / "data"
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 
 # Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
+SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
@@ -41,27 +42,27 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
-modulestore_options = {
+MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'modulestore',
-    'fs_root': GITHUB_REPO_ROOT,
+    'collection': 'test_modulestore',
+    'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
+        'OPTIONS': MODULESTORE_OPTIONS
     },
     'draft': {
         'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
-        'OPTIONS': modulestore_options
+        'OPTIONS': MODULESTORE_OPTIONS
     }
 }
 
@@ -76,11 +77,12 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "cms.db",
+        'NAME': TEST_ROOT / "db" / "cms.db",
     },
 }
 
 LMS_BASE = "localhost:8000"
+MITX_FEATURES['PREVIEW_LMS_BASE'] = "preview"
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
@@ -112,6 +114,12 @@ CACHES = {
     }
 }
 
+################################# CELERY ######################################
+
+CELERY_ALWAYS_EAGER = True
+CELERY_RESULT_BACKEND = 'cache'
+BROKER_TRANSPORT = 'memory'
+
 ################### Make tests faster
 #http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
 PASSWORD_HASHERS = (
@@ -121,3 +129,8 @@ PASSWORD_HASHERS = (
 
 # dummy segment-io key
 SEGMENT_IO_KEY = '***REMOVED***'
+
+# disable NPS survey in test mode
+MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
+
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True

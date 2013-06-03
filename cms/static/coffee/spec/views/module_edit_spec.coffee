@@ -72,3 +72,4 @@ describe "CMS.Views.ModuleEdit", ->
       it "loads the .xmodule-display inside the module editor", ->
         expect(XModule.loadModule).toHaveBeenCalled()
         expect(XModule.loadModule.mostRecentCall.args[0]).toBe($('.xmodule_display'))
+

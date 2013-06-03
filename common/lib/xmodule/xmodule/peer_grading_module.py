@@ -10,11 +10,11 @@ from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.django import modulestore
 from .timeinfo import TimeInfo
-from xblock.core import Object, Integer, Boolean, String, Scope
-from xmodule.open_ended_grading_classes.xblock_field_types import StringyFloat
-from xmodule.fields import Date
+from xblock.core import Object, String, Scope
+from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
+from open_ended_grading_classes import combined_open_ended_rubric
 
 log = logging.getLogger(__name__)
 
@@ -22,24 +22,43 @@ USE_FOR_SINGLE_LOCATION = False
 LINK_TO_LOCATION = ""
 TRUE_DICT = [True, "True", "true", "TRUE"]
 MAX_SCORE = 1
-IS_GRADED = True
+IS_GRADED = False
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
 
 
 class PeerGradingFields(object):
-    use_for_single_location = Boolean(help="Whether to use this for a single location or as a panel.",
-                                      default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
-    link_to_location = String(help="The location this problem is linked to.", default=LINK_TO_LOCATION,
-                              scope=Scope.settings)
-    is_graded = Boolean(help="Whether or not this module is scored.", default=IS_GRADED, scope=Scope.settings)
+    use_for_single_location = StringyBoolean(
+        display_name="Show Single Problem",
+        help='When True, only the single problem specified by "Link to Problem Location" is shown. '
+             'When False, a panel is displayed with all problems available for peer grading.',
+        default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings
+    )
+    link_to_location = String(
+        display_name="Link to Problem Location",
+        help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
+        default=LINK_TO_LOCATION, scope=Scope.settings
+    )
+    is_graded = StringyBoolean(
+        display_name="Graded",
+        help='Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
+        default=IS_GRADED, scope=Scope.settings
+    )
     due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
-    max_grade = Integer(help="The maximum grade that a student can receieve for this problem.", default=MAX_SCORE,
-                        scope=Scope.settings)
-    student_data_for_location = Object(help="Student data for a given peer grading problem.",
-                                       scope=Scope.user_state)
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    max_grade = StringyInteger(
+        help="The maximum grade that a student can receive for this problem.", default=MAX_SCORE,
+        scope=Scope.settings, values={"min": 0}
+    )
+    student_data_for_location = Object(
+        help="Student data for a given peer grading problem.",
+        scope=Scope.user_state
+    )
+    weight = StringyFloat(
+        display_name="Problem Weight",
+        help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
+        scope=Scope.settings, values={"min": 0, "step": ".1"}
+    )
 
 
 class PeerGradingModule(PeerGradingFields, XModule):
@@ -93,9 +112,9 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
 
-        if not isinstance(self.max_grade, (int, long)):
-            #This could result in an exception, but not wrapping in a try catch block so it moves up the stack
-            self.max_grade = int(self.max_grade)
+        #StringyInteger could return None, so keep this check.
+        if not isinstance(self.max_grade, int):
+            raise TypeError("max_grade needs to be an integer.")
 
     def closed(self):
         return self._closed(self.timeinfo)
@@ -178,8 +197,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
         pass
 
     def get_score(self):
+        max_score = None
+        score = None
+        score_dict = {
+            'score': score,
+            'total': max_score,
+        }
         if self.use_for_single_location not in TRUE_DICT or self.is_graded not in TRUE_DICT:
-            return None
+            return score_dict
 
         try:
             count_graded = self.student_data_for_location['count_graded']
@@ -198,10 +223,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 #Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
-        score_dict = {
-            'score': int(count_graded >= count_required and count_graded>0) * int(self.weight),
-            'total': self.max_grade * int(self.weight),
-        }
+        if self.weight is not None:
+            score = int(count_graded >= count_required and count_graded > 0) * float(self.weight)
+            total = self.max_grade * float(self.weight)
+            score_dict['score'] = score
+            score_dict['total'] = total
 
         return score_dict
 
@@ -384,8 +410,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError:
             #This is a dev_facing_error
-            log.exception("Cannot parse rubric string. Raw string: {0}"
-            .format(rubric))
+            log.exception("Cannot parse rubric string.")
             #This is a student_facing_error
             return {'success': False,
                     'error': 'Error displaying submission.  Please notify course staff.'}
@@ -425,12 +450,15 @@ class PeerGradingModule(PeerGradingFields, XModule):
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
                                                            submission_key, score, feedback, rubric_scores)
+            if 'actual_rubric' in response:
+                rubric_renderer = combined_open_ended_rubric.CombinedOpenEndedRubric(self.system, True)
+                response['actual_rubric'] = rubric_renderer.render_rubric(response['actual_rubric'])['html']
             return response
         except GradingServiceError:
             #This is a dev_facing_error
             log.exception(
-                "Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(
-                    location, submission_id, submission_key, grader_id))
+                "Error saving calibration grade, location: {0}, submission_key: {1}, grader_id: {2}".format(
+                    location, submission_key, grader_id))
             #This is a student_facing_error
             return self._err_response('There was an error saving your score.  Please notify course staff.')
 
@@ -488,7 +516,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 # the linked problem doesn't exist
                 log.error("Problem {0} does not exist in this course".format(location))
                 raise
-
 
         for problem in problem_list:
             problem_location = problem['location']
@@ -577,5 +604,16 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
 
     stores_state = True
     has_score = True
-    always_recalculate_grades=True
+    always_recalculate_grades = True
     template_dir_name = "peer_grading"
+
+    #Specify whether or not to pass in open ended interface
+    needs_open_ended_interface = True
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([PeerGradingFields.due_date, PeerGradingFields.grace_period_string,
+                                    PeerGradingFields.max_grade])
+        return non_editable_fields
+

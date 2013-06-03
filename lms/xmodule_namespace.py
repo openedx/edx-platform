@@ -1,33 +1,8 @@
 """
 Namespace that defines fields common to all blocks used in the LMS
 """
-from xblock.core import Namespace, Boolean, Scope, String, Float
-from xmodule.fields import Date, Timedelta
-
-
-class StringyBoolean(Boolean):
-    """
-    Reads strings from JSON as booleans.
-
-    'true' (case insensitive) return True, other strings return False
-    Other types are returned unchanged
-    """
-    def from_json(self, value):
-        if isinstance(value, basestring):
-            return value.lower() == 'true'
-        return value
-
-
-class StringyFloat(Float):
-    """
-    Reads values as floats. If the value parses as a float, returns
-    that, otherwise returns None
-    """
-    def from_json(self, value):
-        try:
-            return float(value)
-        except:
-            return None
+from xblock.core import Namespace, Boolean, Scope, String
+from xmodule.fields import Date, Timedelta, StringyFloat, StringyBoolean
 
 
 class LmsNamespace(Namespace):

@@ -20,27 +20,31 @@
 
         <div class="input-group">
 	  % if has_extauth_info is UNDEFINED:
-          <label data-field="email">E-mail*</label>
-          <input name="email" type="email" placeholder="eg. yourname@domain.com">
-          <label data-field="password">Password*</label>
-          <input name="password" type="password" placeholder="****">
-          <label data-field="username">Public Username*</label>
-          <input name="username" type="text" placeholder="Shown on forums">
-          <label data-field="name">Full Name*</label>
-          <input name="name" type="text" placeholder="For your certificate">
+          <label data-field="email" for="signup_email">E-mail *</label>
+	    <input id="signup_email" type="email" name="email" placeholder="e.g. yourname@domain.com" required />
+	  
+          <label data-field="password" for="signup_password">Password *</label>
+	    <input id="signup_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required />
+          
+	  <label data-field="username" for="signup_username">Public Username *</label>
+	    <input id="signup_username" type="text" name="username" placeholder="e.g. yourname (shown on forums)" required />
+	  
+          <label data-field="name" for="signup_fullname">Full Name *</label>
+	    <input id="signup_fullname" type="text" name="name" placeholder="e.g. Your Name (for certificates)" required />
 	  % else:
 	  <p><i>Welcome</i> ${extauth_email}</p><br/>
 	  <p><i>Enter a public username:</i></p>
-          <label data-field="username">Public Username*</label>
-          <input name="username" type="text" value="${extauth_username}" placeholder="Shown on forums">
+	  
+          <label data-field="username" for="signup_username">Public Username *</label>
+	    <input id="signup_username" type="text" name="username" value="${extauth_username}" placeholder="e.g. yourname (shown on forums)" required />
 	  % endif
         </div>
 
         <div class="input-group">
           <section class="citizenship">
-            <label data-field="level_of_education">Ed. completed</label>
+            <label data-field="level_of_education" for="signup_ed_level">Ed. Completed</label>
             <div class="input-wrapper">
-              <select name="level_of_education">
+              <select id="signup_ed_level" name="level_of_education">
                   <option value="">--</option>
                   %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
                       <option value="${code}">${ed_level}</option>
@@ -50,9 +54,9 @@
           </section>
 
           <section class="gender">
-            <label data-field="gender">Gender</label>
+            <label data-field="gender" for="signup_gender">Gender</label>
             <div class="input-wrapper">
-              <select name="gender">
+              <select id="signup_gender" name="gender">
                   <option value="">--</option>
                   %for code, gender in UserProfile.GENDER_CHOICES:
                       <option value="${code}">${gender}</option>
@@ -62,9 +66,9 @@
           </section>
 
           <section class="date-of-birth">
-            <label data-field="date-of-birth">Year of birth</label>
+            <label data-field="date-of-birth" for="signup_birth_year">Year of birth</label>
             <div class="input-wrapper">
-              <select name="year_of_birth">
+              <select id="signup_birth_year" name="year_of_birth">
                 <option value="">--</option>
                 %for year in UserProfile.VALID_YEARS:
                   <option value="${year}">${year}</option>
@@ -74,22 +78,23 @@
             </div>
           </section>
 
-          <label data-field="mailing_address">Mailing address</label>
-          <textarea name="mailing_address"></textarea>
-          <label data-field="goals">Goals in signing up for edX</label>
-          <textarea name="goals"></textarea>
+          <label data-field="mailing_address" for="signup_mailing_address">Mailing address</label>
+	    <textarea id="signup_mailing_address" name="mailing_address"></textarea>
+	  
+          <label data-field="goals" for="signup_goals">Goals in signing up for edX</label>
+	    <textarea name="goals" id="signup_goals"></textarea>
 
         </div>
 
         <div class="input-group">
-          <label data-field="terms_of_service" class="terms-of-service">
-            <input name="terms_of_service" type="checkbox" value="true">
+          <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
+            <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
             I agree to the
             <a href="${reverse('tos')}" target="_blank">Terms of Service</a>*
           </label>
 
-          <label data-field="honor_code" class="honor-code">
-            <input name="honor_code" type="checkbox" value="true">
+          <label data-field="honor_code" class="honor-code" for="signup_honor">
+            <input id="signup_honor" name="honor_code" type="checkbox" value="true">
             I agree to the
             <a href="${reverse('honor')}" target="_blank">Honor Code</a>*
           </label>
@@ -110,11 +115,11 @@
 
     </div>
 
-    <div class="close-modal">
+    <a href="#" class="close-modal" title="Close Modal">
       <div class="inner">
         <p>&#10005;</p>
       </div>
-    </div>
+    </a>
   </div>
 </section>
 
@@ -129,5 +134,10 @@
        $("[data-field='"+json.field+"']").addClass('field-error')
      }
     });
+   
+   // removing close link's default behavior
+   $('#login-modal .close-modal').click(function(e) {
+    e.preventDefault();
+   });
   })(this)
 </script>

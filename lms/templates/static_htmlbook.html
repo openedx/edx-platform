@@ -31,13 +31,22 @@
             anchorToLoad = options.anchor_id;
         }
 
+        var onComplete = function() {};
+        if(options.notesEnabled) {
+            onComplete = function(url) {
+                return function() {
+                    $('#viewerContainer').trigger('notes:init', [url]);
+                }
+            };
+        }
+
         loadUrl = function htmlViewLoadUrl(url, anchorId) {
             // clear out previous load, if any:
             parentElement = document.getElementById('bookpage');
             while (parentElement.hasChildNodes())
                 parentElement.removeChild(parentElement.lastChild);
 	    // load new URL in:
-            $('#bookpage').load(url);
+            $('#bookpage').load(url, null, onComplete(url));
 
 	    // if there is an anchor set, then go to that location:
             if (anchorId != null) {
@@ -92,8 +101,13 @@
         %if chapter is not None:
             options.chapterNum = ${chapter};
         %endif
-        %if anchor_id is not None:
+        %if anchor_id is not UNDEFINED and anchor_id is not None:
             options.anchor_id = ${anchor_id};
+        %endif
+
+        options.notesEnabled = false;
+        %if notes_enabled is not UNDEFINED and notes_enabled:
+            options.notesEnabled = true;
         %endif
 
         $('#outerContainer').myHTMLViewer(options);

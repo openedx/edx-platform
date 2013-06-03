@@ -162,8 +162,7 @@ class CourseFields(object):
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
     discussion_topics = Object(
         help="Map of topics names to ids",
-        scope=Scope.settings,
-        computed_default=lambda c: {'General': {'id': c.location.html_id()}},
+        scope=Scope.settings
         )
     testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
@@ -211,7 +210,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     template_dir_name = 'course'
 
-
     def __init__(self, *args, **kwargs):
         super(CourseDescriptor, self).__init__(*args, **kwargs)
 
@@ -233,7 +231,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
         self._grading_policy = {}
+
         self.set_grading_policy(self.grading_policy)
+        if self.discussion_topics == {}:
+            self.discussion_topics = {'General': {'id': self.location.html_id()}}
 
         self.test_center_exams = []
         test_center_info = self.testcenter_info
@@ -381,6 +382,19 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         return definition, children
 
+    def definition_to_xml(self, resource_fs):
+        xml_object = super(CourseDescriptor, self).definition_to_xml(resource_fs)
+
+        if len(self.textbooks) > 0:
+            textbook_xml_object = etree.Element('textbook')
+            for textbook in self.textbooks:
+                textbook_xml_object.set('title', textbook.title)
+                textbook_xml_object.set('book_url', textbook.book_url)
+
+            xml_object.append(textbook_xml_object)
+        
+        return xml_object
+
     def has_ended(self):
         """
         Returns True if the current time is after the specified course end date.
@@ -421,7 +435,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         policy['GRADE_CUTOFFS'] = value
         self.grading_policy = policy
 
-
     @property
     def lowest_passing_grade(self):
         return min(self._grading_policy['GRADE_CUTOFFS'].values())
@@ -460,7 +473,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         else:
             return self.cohort_config.get("auto_cohort_groups", [])
 
-
     @property
     def top_level_discussion_topic_ids(self):
         """
@@ -468,7 +480,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         topics = self.discussion_topics
         return [d["id"] for d in topics.values()]
-
 
     @property
     def cohorted_discussions(self):
@@ -482,8 +493,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return set()
 
         return set(config.get("cohorted_discussions", []))
-
-
 
     @property
     def is_newish(self):
@@ -585,7 +594,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     yield module_descriptor
 
         for c in self.get_children():
-            sections = []
             for s in c.get_children():
                 if s.lms.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
@@ -601,8 +609,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     all_descriptors.append(s)
 
         return {'graded_sections': graded_sections,
-                 'all_descriptors': all_descriptors, }
-
+                'all_descriptors': all_descriptors, }
 
     @staticmethod
     def make_id(org, course, url_name):

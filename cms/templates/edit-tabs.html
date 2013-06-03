@@ -18,16 +18,16 @@
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
-    <div class="title">
-      <span class="title-sub">Course Content</span>
-      <h1 class="title-1">Static Pages</h1>
-    </div>
+    <h1 class="page-header">
+      <small class="subtitle">Course Content</small>
+      <span class="sr">&gt; </span>Static Pages
+    </h1>
 
     <nav class="nav-actions">
       <h3 class="sr">Page Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button new-button new-tab"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Page</a>
+          <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> New Page</a>
         </li>
       </ul>
     </nav>
@@ -41,7 +41,7 @@
       <nav class="nav-introduction-supplementary">
         <ul>
           <li class="nav-item">
-            <a rel="modal" href="#preview-lms-staticpages"><i class="ss-icon ss-symbolicons-block icon icon-information">&#x2753;</i>How do Static Pages look to students in my course?</a>
+            <a rel="modal" href="#preview-lms-staticpages"><i class="icon-question-sign"></i>How do Static Pages look to students in my course?</a>
           </li>
         </ul>
       </nav>
@@ -52,17 +52,17 @@
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <article class="unit-body">
-      
+
       <div class="tab-list">
         <ol class='components'>
           % for id in components:
           <li class="component" data-id="${id}"/>
           % endfor
-                   
+
           <li class="new-component-item">
-            
+
           </li>
-        </ol>      
+        </ol>
       </div>
     </article>
   </div>
@@ -76,7 +76,7 @@
   </figure>
 
   <a href="#" rel="view" class="action action-modal-close">
-    <i class="ss-icon ss-symbolicons-block icon-close icon">&#x2421;</i>
+    <i class="icon-remove-sign"></i>
     <span class="label">close modal</span>
   </a>
 </div>

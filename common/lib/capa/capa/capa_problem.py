@@ -13,33 +13,19 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 '''
 
-from __future__ import division
-
 from datetime import datetime
 import logging
 import math
 import numpy
-import os
-import random
+import os.path
 import re
-import scipy
-import struct
 import sys
 
 from lxml import etree
 from xml.sax.saxutils import unescape
 from copy import deepcopy
 
-import chem
-import chem.miller
-import chem.chemcalc
-import chem.chemtools
-import verifiers
-import verifiers.draganddrop
-
-import calc
 from .correctmap import CorrectMap
-import eia
 import inputtypes
 import customrender
 from .util import contextualize_text, convert_files_to_filenames
@@ -47,6 +33,7 @@ import xqueue_interface
 
 # to be replaced with auto-registering
 import responsetypes
+import safe_exec
 
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
@@ -62,17 +49,6 @@ html_transforms = {'problem': {'tag': 'div'},
                    "text": {'tag': 'span'},
                    "math": {'tag': 'span'},
                    }
-
-global_context = {'random': random,
-                  'numpy': numpy,
-                  'math': math,
-                  'scipy': scipy,
-                  'calc': calc,
-                  'eia': eia,
-                  'chemcalc': chem.chemcalc,
-                  'chemtools': chem.chemtools,
-                  'miller': chem.miller,
-                  'draganddrop': verifiers.draganddrop}
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam", "openendedrubric"]
@@ -96,7 +72,7 @@ class LoncapaProblem(object):
 
          - problem_text (string): xml defining the problem
          - id           (string): identifier for this problem; often a filename (no spaces)
-         - seed         (int): random number generator seed (int) 
+         - seed         (int): random number generator seed (int)
          - state        (dict): containing the following keys:
                                 - 'seed' - (int) random number generator seed
                                 - 'student_answers' - (dict) maps input id to the stored answer for that input
@@ -115,22 +91,19 @@ class LoncapaProblem(object):
         if self.system is None:
             raise Exception()
 
-        state = state if state else {}
+        state = state or {}
 
         # Set seed according to the following priority:
         #       1. Contained in problem's state
         #       2. Passed into capa_problem via constructor
-        #       3. Assign from the OS's random number generator
         self.seed = state.get('seed', seed)
-        if self.seed is None:
-            self.seed = struct.unpack('i', os.urandom(4))[0]
+        assert self.seed is not None, "Seed must be provided for LoncapaProblem."
+
         self.student_answers = state.get('student_answers', {})
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])
         self.done = state.get('done', False)
         self.input_state = state.get('input_state', {})
-
-
 
         # Convert startouttext and endouttext to proper <text></text>
         problem_text = re.sub("startouttext\s*/", "text", problem_text)
@@ -144,7 +117,7 @@ class LoncapaProblem(object):
         self._process_includes()
 
         # construct script processor context (eg for customresponse problems)
-        self.context = self._extract_context(self.tree, seed=self.seed)
+        self.context = self._extract_context(self.tree)
 
         # Pre-parse the XML tree: modifies it to add ID's and perform some in-place
         # transformations.  This also creates the dict (self.responders) of Response
@@ -440,18 +413,23 @@ class LoncapaProblem(object):
         path = []
 
         for dir in raw_path:
-
             if not dir:
                 continue
 
             # path is an absolute path or a path relative to the data dir
             dir = os.path.join(self.system.filestore.root_path, dir)
+            # Check that we are within the filestore tree.
+            reldir = os.path.relpath(dir, self.system.filestore.root_path)
+            if ".." in reldir:
+                log.warning("Ignoring Python directory outside of course: %r" % dir)
+                continue
+
             abs_dir = os.path.normpath(dir)
             path.append(abs_dir)
 
         return path
 
-    def _extract_context(self, tree, seed=struct.unpack('i', os.urandom(4))[0]):  # private
+    def _extract_context(self, tree):
         '''
         Extract content of <script>...</script> from the problem.xml file, and exec it in the
         context of this problem.  Provides ability to randomize problems, and also set
@@ -459,57 +437,49 @@ class LoncapaProblem(object):
 
         Problem XML goes to Python execution context. Runs everything in script tags.
         '''
-        random.seed(self.seed)
-        # save global context in here also
-        context = {'global_context': global_context}
+        context = {}
+        context['seed'] = self.seed
+        all_code = ''
 
-        # initialize context to have stuff in global_context
-        context.update(global_context)
+        python_path = []
 
-        # put globals there also
-        context['__builtins__'] = globals()['__builtins__']
-
-        # pass instance of LoncapaProblem in
-        context['the_lcp'] = self
-        context['script_code'] = ''
-
-        self._execute_scripts(tree.findall('.//script'), context)
-
-        return context
-
-    def _execute_scripts(self, scripts, context):
-        '''
-        Executes scripts in the given context.
-        '''
-        original_path = sys.path
-
-        for script in scripts:
-            sys.path = original_path + self._extract_system_path(script)
+        for script in tree.findall('.//script'):
 
             stype = script.get('type')
-
             if stype:
                 if 'javascript' in stype:
                     continue    # skip javascript
                 if 'perl' in stype:
                     continue        # skip perl
             # TODO: evaluate only python
-            code = script.text
+
+            for d in self._extract_system_path(script):
+                if d not in python_path and os.path.exists(d):
+                    python_path.append(d)
+
             XMLESC = {"&apos;": "'", "&quot;": '"'}
-            code = unescape(code, XMLESC)
-            # store code source in context
-            context['script_code'] += code
+            code = unescape(script.text, XMLESC)
+            all_code += code
+
+        if all_code:
             try:
-                # use "context" for global context; thus defs in code are global within code
-                exec code in context, context
+                safe_exec.safe_exec(
+                    all_code,
+                    context,
+                    random_seed=self.seed,
+                    python_path=python_path,
+                    cache=self.system.cache,
+                    slug=self.problem_id,
+                )
             except Exception as err:
-                log.exception("Error while execing script code: " + code)
+                log.exception("Error while execing script code: " + all_code)
                 msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
                 raise responsetypes.LoncapaProblemError(msg)
-            finally:
-                sys.path = original_path
 
-
+        # Store code source in context, along with the Python path needed to run it correctly.
+        context['script_code'] = all_code
+        context['python_path'] = python_path
+        return context
 
     def _extract_html(self, problemtree):  # private
         '''

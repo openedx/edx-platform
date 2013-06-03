@@ -3,10 +3,7 @@
 
 from lettuce import world, step
 from common import *
-import time
-from terrain.steps import reload_the_page
-
-from nose.tools import assert_true, assert_false, assert_equal
+from nose.tools import assert_false, assert_equal
 
 """
 http://selenium.googlecode.com/svn/trunk/docs/api/py/webdriver/selenium.webdriver.common.keys.html
@@ -18,13 +15,11 @@ VALUE_CSS = 'textarea.json'
 DISPLAY_NAME_KEY = "display_name"
 DISPLAY_NAME_VALUE = '"Robot Super Course"'
 
-############### ACTIONS ####################
 
+############### ACTIONS ####################
 @step('I select the Advanced Settings$')
 def i_select_advanced_settings(step):
-    expand_icon_css = 'li.nav-course-settings i.icon-expand'
-    if world.browser.is_element_present_by_css(expand_icon_css):
-        world.css_click(expand_icon_css)
+    world.click_course_settings()
     link_css = 'li.nav-course-settings-advanced a'
     world.css_click(link_css)
 
@@ -38,7 +33,7 @@ def i_am_on_advanced_course_settings(step):
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(step, name):
     css = 'a.%s-button' % name.lower()
-    world.css_click_at(css)
+    world.css_click(css)
 
 
 @step(u'I edit the value of a policy key$')
@@ -52,7 +47,7 @@ def edit_the_value_of_a_policy_key(step):
 
 
 @step(u'I edit the value of a policy key and save$')
-def edit_the_value_of_a_policy_key(step):
+def edit_the_value_of_a_policy_key_and_save(step):
     change_display_name_value(step, '"foo"')
 
 
@@ -90,7 +85,7 @@ def it_is_formatted(step):
 
 
 @step('it is displayed as a string')
-def it_is_formatted(step):
+def it_is_displayed_as_string(step):
     assert_policy_entries([DISPLAY_NAME_KEY], ['"quote me"'])
 
 

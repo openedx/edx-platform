@@ -291,7 +291,7 @@ class SelfAssessmentDescriptor():
     template_dir_name = "selfassessment"
 
     def __init__(self, system):
-        self.system =system
+        self.system = system
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

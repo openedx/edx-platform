@@ -1,18 +1,9 @@
-from factory import Factory
+from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from time import gmtime
 from uuid import uuid4
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.timeparse import stringify_time
 from xmodule.modulestore.inheritance import own_metadata
-
-
-def XMODULE_COURSE_CREATION(class_to_create, **kwargs):
-    return XModuleCourseFactory._create(class_to_create, **kwargs)
-
-
-def XMODULE_ITEM_CREATION(class_to_create, **kwargs):
-    return XModuleItemFactory._create(class_to_create, **kwargs)
 
 
 class XModuleCourseFactory(Factory):
@@ -21,7 +12,6 @@ class XModuleCourseFactory(Factory):
     """
 
     ABSTRACT_FACTORY = True
-    _creation_function = (XMODULE_COURSE_CREATION,)
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
@@ -33,7 +23,10 @@ class XModuleCourseFactory(Factory):
         location = Location('i4x', org, number,
                             'course', Location.clean(display_name))
 
-        store = modulestore('direct')
+        try:
+            store = modulestore('direct')
+        except KeyError:
+            store = modulestore()
 
         # Write the data to the mongo datastore
         new_course = store.clone_item(template, location)
@@ -43,14 +36,24 @@ class XModuleCourseFactory(Factory):
             new_course.display_name = display_name
 
         new_course.lms.start = gmtime()
-        new_course.tabs = [{"type": "courseware"},
-                           {"type": "course_info", "name": "Course Info"},
-                           {"type": "discussion", "name": "Discussion"},
-                           {"type": "wiki", "name": "Wiki"},
-                           {"type": "progress", "name": "Progress"}]
+        new_course.tabs = kwargs.get(
+            'tabs',
+            [
+                {"type": "courseware"},
+                {"type": "course_info", "name": "Course Info"},
+                {"type": "discussion", "name": "Discussion"},
+                {"type": "wiki", "name": "Wiki"},
+                {"type": "progress", "name": "Progress"}
+            ]
+        )
+        new_course.discussion_link = kwargs.get('discussion_link')
 
         # Update the data in the mongo datastore
         store.update_metadata(new_course.location.url(), own_metadata(new_course))
+
+        data = kwargs.get('data')
+        if data is not None:
+            store.update_item(new_course.location, data)
 
         return new_course
 
@@ -74,7 +77,19 @@ class XModuleItemFactory(Factory):
     """
 
     ABSTRACT_FACTORY = True
-    _creation_function = (XMODULE_ITEM_CREATION,)
+
+    display_name = None
+
+    @lazy_attribute
+    def category(attr):
+        template = Location(attr.template)
+        return template.category
+
+    @lazy_attribute
+    def location(attr):
+        parent = Location(attr.parent_location)
+        dest_name = attr.display_name.replace(" ", "_") if attr.display_name is not None else uuid4().hex
+        return parent._replace(category=attr.category, name=dest_name)
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
@@ -110,12 +125,7 @@ class XModuleItemFactory(Factory):
         # This code was based off that in cms/djangoapps/contentstore/views.py
         parent = store.get_item(parent_location)
 
-        # If a display name is set, use that
-        dest_name = display_name.replace(" ", "_") if display_name is not None else uuid4().hex
-        dest_location = parent_location._replace(category=template.category,
-                                                 name=dest_name)
-
-        new_item = store.clone_item(template, dest_location)
+        new_item = store.clone_item(template, kwargs.get('location'))
 
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
@@ -145,4 +155,7 @@ class ItemFactory(XModuleItemFactory):
 
     parent_location = 'i4x://MITx/999/course/Robot_Super_Course'
     template = 'i4x://edx/templates/chapter/Empty'
-    display_name = 'Section One'
+
+    @lazy_attribute_sequence
+    def display_name(attr, n):
+        return "{} {}".format(attr.category.title(), n)

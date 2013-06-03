@@ -2,12 +2,22 @@
 // ====================
 
 body.course.static-pages {
-  
+
   .new-static-page-button {
     @include grey-button;
     display: block;
     text-align: center;
     padding: 12px 0;
+  }
+
+  .nav-introduction-supplementary {
+
+    .icon-question-sign {
+      display: inline-block;
+      vertical-align: baseline;
+      margin-right: ($baseline/4);
+    }
+
   }
 
   .unit-body {
@@ -31,38 +41,23 @@ body.course.static-pages {
       @include edit-box;
       @include box-shadow(none);
       display: none;
-      padding: 20px;
+      padding: 0;
       border-radius: 2px 2px 0 0;
 
-      .metadata_edit {
-        margin-bottom: 20px;
-        font-size: 13px;
+      //Overrides general edit-box mixin
+      .row {
+        margin-bottom: 0px;
+      }
 
-        li {
-          margin-bottom: 10px;
+      // This duplicates the styling from Unit page editing
+      .module-actions {
+        @include box-shadow(inset 0 1px 1px $shadow);
+        padding: 0px 0 10px 10px;
+        background-color: $gray-l6;
+
+        .save-button {
+        margin: ($baseline/2) 8px 0 0;
         }
-
-        label {
-          display: inline-block;
-          margin-right: 10px;  
-        }
-      }
-
-      h3 {
-        margin-bottom: 10px;
-        font-size: 18px;
-        font-weight: 700;
-      }
-
-      h5 {
-        margin-bottom: 8px;
-        color: #fff;
-        font-weight: 700;
-      }
-
-      .save-button {
-        margin-top: 10px;
-        margin: 15px 8px 0 0;
       }
     }
   }
@@ -123,7 +118,7 @@ body.course.static-pages {
 
     .component-actions {
       position: absolute;
-      top: 26px;
+      top: 20px;
       right: 44px;
     }
   }
@@ -150,12 +145,12 @@ body.course.static-pages {
   }
 
   .static-page-item {
-    position: relative;    
+    position: relative;
     margin: 10px 0;
     padding: 22px 20px;
     border: 1px solid $darkGrey;
     border-radius: 3px;
-    background: #fff;    
+    background: #fff;
     @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
 
     .page-name {
@@ -205,3 +200,4 @@ body.course.static-pages {
     outline: 0;
   }
 }
+

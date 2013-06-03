@@ -13,6 +13,7 @@ class UserFactory(sf.UserFactory):
     """
     User account for lms / cms
     """
+    FACTORY_DJANGO_GET_OR_CREATE = ('username',)
     pass
 
 
@@ -21,6 +22,7 @@ class UserProfileFactory(sf.UserProfileFactory):
     """
     Demographics etc for the User
     """
+    FACTORY_DJANGO_GET_OR_CREATE = ('user',)
     pass
 
 
@@ -29,6 +31,7 @@ class RegistrationFactory(sf.RegistrationFactory):
     """
     Activation key for registering the user account
     """
+    FACTORY_DJANGO_GET_OR_CREATE = ('user',)
     pass
 
 

@@ -73,7 +73,7 @@ def _create_license(user, software):
             license.save()
     except IndexError:
         # there are no free licenses
-        log.error('No serial numbers available for {0}', software)
+        log.error('No serial numbers available for %s', software)
         license = None
         # TODO [rocha]look if someone has unenrolled from the class
         # and already has a serial number

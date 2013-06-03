@@ -75,7 +75,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 # tags that really need unique names--they store (or should store) state.
                 need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter',
-                                    'videosequence', 'poll_question', 'timelimit')
+                                   'videosequence', 'poll_question', 'timelimit')
 
                 attr = xml_data.attrib
                 tag = xml_data.tag
@@ -168,7 +168,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 # Didn't load properly.  Fall back on loading as an error
                 # descriptor.  This should never error due to formatting.
-
 
                 msg = "Error loading from xml. " + str(err)[:200]
                 log.warning(msg)
@@ -291,7 +290,6 @@ class XMLModuleStore(ModuleStoreBase):
         if course_dirs is None:
             course_dirs = sorted([d for d in os.listdir(self.data_dir) if
                                   os.path.exists(self.data_dir / d / "course.xml")])
-
         for course_dir in course_dirs:
             self.try_load_course(course_dir)
 
@@ -367,7 +365,7 @@ class XMLModuleStore(ModuleStoreBase):
 
             if org is None:
                 msg = ("No 'org' attribute set for course in {dir}. "
-                          "Using default 'edx'".format(dir=course_dir))
+                       "Using default 'edx'".format(dir=course_dir))
                 log.warning(msg)
                 tracker(msg)
                 org = 'edx'
@@ -376,10 +374,10 @@ class XMLModuleStore(ModuleStoreBase):
 
             if course is None:
                 msg = ("No 'course' attribute set for course in {dir}."
-                          " Using default '{default}'".format(
-                        dir=course_dir,
-                        default=course_dir
-                        ))
+                       " Using default '{default}'".format(dir=course_dir,
+                                                           default=course_dir
+                                                           )
+                       )
                 log.warning(msg)
                 tracker(msg)
                 course = course_dir
@@ -445,14 +443,12 @@ class XMLModuleStore(ModuleStoreBase):
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 
-
     def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
         self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
 
          # then look in a override folder based on the course run
         if os.path.isdir(base_dir / url_name):
             self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)
-
 
     def _load_extra_content(self, system, course_descriptor, category, path, course_dir):
 
@@ -479,7 +475,6 @@ class XMLModuleStore(ModuleStoreBase):
                 except Exception, e:
                     logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
                     system.error_tracker("ERROR: " + str(e))
-
 
     def get_instance(self, course_id, location, depth=0):
         """
@@ -542,7 +537,6 @@ class XMLModuleStore(ModuleStoreBase):
 
         return items
 
-
     def get_courses(self, depth=0):
         """
         Returns a list of course descriptors.  If there were errors on loading,
@@ -567,7 +561,6 @@ class XMLModuleStore(ModuleStoreBase):
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 
-
     def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
@@ -577,7 +570,6 @@ class XMLModuleStore(ModuleStoreBase):
         children: A list of child item identifiers
         """
         raise NotImplementedError("XMLModuleStores are read-only")
-
 
     def update_metadata(self, location, metadata):
         """

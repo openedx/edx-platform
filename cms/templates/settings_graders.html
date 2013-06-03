@@ -4,20 +4,19 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-from contentstore import utils 
+from contentstore import utils
 %>
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-  
+
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/settings/settings_grading_view.js')}"></script>
-  
+
   <script type="text/javascript">
     $(document).ready(function(){
 
@@ -26,25 +25,25 @@ from contentstore import utils
       }).blur(function() {
         $("label").removeClass("is-focused");
       });
-    
+
       var editor = new CMS.Views.Settings.Grading({
           el: $('.settings-grading'),
           model : new CMS.Models.Settings.CourseGradingPolicy(${course_details|n},{parse:true})
       });
-      
+
       editor.render();
     });
-      
+
   </script>
 </%block>
 
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
-    <div class="title">
-      <span class="title-sub">Settings</span>
-      <h1 class="title-1">Grading</h1>
-    </div>
+    <h1 class="page-header">
+      <small class="subtitle">Settings</small>
+      <span class="sr">&gt; </span>Grading
+    </h1>
   </header>
 </div>
 
@@ -97,7 +96,7 @@ from contentstore import utils
           <ol class="list-input">
             <li class="field text" id="field-course-grading-graceperiod">
               <label for="course-grading-graceperiod">Grace Period on Deadline:</label>
-              <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
+              <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="HH:MM" autocomplete="off" />
               <span class="tip tip-inline">Leeway on due dates</span>
             </li>
           </ol>
@@ -112,13 +111,13 @@ from contentstore import utils
           </header>
 
           <ol class="list-input course-grading-assignment-list enum">
-              
-          </ol> 
+
+          </ol>
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <span class="plus-icon white"></span>New Assignment Type
-            </a>            
+              <i class="icon-plus"></i>New Assignment Type
+            </a>
           </div>
         </section>
       </form>

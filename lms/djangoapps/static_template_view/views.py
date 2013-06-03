@@ -4,9 +4,10 @@
 # security reasons.
 
 from mitxmako.shortcuts import render_to_response, render_to_string
+from mako.exceptions import TopLevelLookupException
 from django.shortcuts import redirect
 from django.conf import settings
-from django.http import HttpResponseNotFound, HttpResponseServerError
+from django.http import HttpResponseNotFound, HttpResponseServerError, Http404
 from django_future.csrf import ensure_csrf_cookie
 
 from util.cache import cache_if_anonymous
@@ -38,6 +39,25 @@ def render(request, template):
     url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs.html'}, name="jobs")
     """
     return render_to_response('static_templates/' + template, {})
+
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def render_press_release(request, slug):
+    """
+    Render a press release given a slug.  Similar to the "render" function above,
+    but takes a slug and does a basic conversion to convert it to a template file.
+    a) all lower case,
+    b) convert dashes to underscores, and
+    c) appending ".html"
+    """
+    template = slug.lower().replace('-', '_') + ".html"
+    try:
+        resp = render_to_response('static_templates/press_releases/' + template, {})
+    except TopLevelLookupException:
+        raise Http404
+    else:
+        return resp
 
 
 def render_404(request):

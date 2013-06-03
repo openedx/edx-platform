@@ -43,8 +43,8 @@
           <p>Please include some written feedback as well.</p>
           <textarea name="feedback" placeholder="Feedback for student"
                     class="feedback-area" cols="70" ></textarea>
-          <div class="flag-student-container"> <input type="checkbox" class="flag-checkbox" value="student_is_flagged"> Flag this submission for review by course staff (use if the submission contains inappropriate content) </div>
-          <div class="answer-unknown-container"> <input type="checkbox" class="answer-unknown-checkbox" value="answer_is_unknown"> I do not know how to grade this question </div>
+          <div class="flag-student-container"> This submission has explicit or pornographic content : <input type="checkbox" class="flag-checkbox" value="student_is_flagged"> </div>
+          <div class="answer-unknown-container"> I do not know how to grade this question : <input type="checkbox" class="answer-unknown-checkbox" value="answer_is_unknown"></div>
         </div>
           
 
@@ -82,6 +82,19 @@
         <input type="button" class="calibration-interstitial-page-button" value="Start learning to grade" name="calibration-interstitial-page-button" />
     </section>
 
-    <input type="button" value="Go Back" class="action-button" name="back" />
+    <!-- Flag submission confirmation dialog -->
+    <section class="flag-submission-confirmation">
+        <h4> Are you sure that you want to flag this submission?</h4>
+        <p>
+        You are about to flag a submission. You should only flag a submission that contains explicit or offensive content. If the submission is not addressed to the question or is incorrect, you should give it a score of zero and accompanying feedback instead of flagging it.
+        </p>
+        <div>
+        <input type="button" class="flag-submission-removal-button" value="Remove Flag" name="calibration-interstitial-page-button" />
+        <input type="button" class="flag-submission-confirmation-button" value="Keep Flag" name="calibration-interstitial-page-button" />
+        </div>
+    </section>
+
+
+        <input type="button" value="Go Back" class="action-button" name="back" />
     </div>
 </section>

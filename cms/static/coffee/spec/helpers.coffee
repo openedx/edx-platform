@@ -1,3 +1,5 @@
+jasmine.getFixtures().fixturesPath = 'fixtures'
+
 # Stub jQuery.cookie
 @stubCookies =
   csrftoken: "stubCSRFToken"

@@ -26,7 +26,8 @@ Feature: Create Section
     And I save a new section release date
     Then the section release date is updated
 
-  @skip-phantom
+  # Skipped because Ubuntu ChromeDriver hangs on alert
+  @skip
   Scenario: Delete section
     Given I have opened a new course in Studio
     And I have added a new section

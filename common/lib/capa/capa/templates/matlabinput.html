@@ -33,9 +33,11 @@
     ${queue_msg|n}
   </div>
 
+  % if button_enabled:
   <div class="plot-button">
-      <input type="button" class="save" name="plot-button" id="plot_${id}" value="Plot" />
+      <input type="button" class="save" name="plot-button" id="plot_${id}" value="Run Code" />
   </div>
+  %endif
 
   <script>
     // Note: We need to make the area follow the CodeMirror for this to work.
@@ -91,7 +93,7 @@
                   window.location.reload();
               }
               else {
-                  gentle_alert(problem_elt, msg);
+                  gentle_alert(problem_elt, response.message);
               }
           }
 
@@ -102,7 +104,7 @@
                         {'submission': submission}, plot_callback);
                   }
                   else {
-                      gentle_alert(problem_elt, msg);
+                      gentle_alert(problem_elt, response.message);
                   }
           }
 

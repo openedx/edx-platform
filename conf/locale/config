@@ -1,0 +1,4 @@
+{
+ "locales" : ["en", "es"],
+ "dummy-locale" : "fr"
+}

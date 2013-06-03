@@ -23,7 +23,7 @@
       %if user_logged_in:
         Visit your <a href="${reverse('dashboard')}">dashboard</a> to see your courses.
       %else:
-        You can now <a href="#login-modal" rel="leanModal">login</a>.
+        You can now <a href="${reverse('signin_user')}">log in</a>.
       %endif
     </p>
   </section>

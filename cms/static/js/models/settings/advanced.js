@@ -11,7 +11,7 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
     validate: function (attrs) {
         // Keys can no longer be edited. We are currently not validating values.
     },
-    
+
     save : function (attrs, options) {
         // wraps the save call w/ the deletion of the removed keys after we know the saved ones worked
         options = options ? _.clone(options) : {};
@@ -23,7 +23,7 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
         };
         Backbone.Model.prototype.save.call(this, attrs, options);
     },
-    
+
     afterSave : function(self) {
         // remove deleted attrs
         if (!_.isEmpty(self.deleteKeys)) {
@@ -40,7 +40,6 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
                 // data
                 data : JSON.stringify({ deleteKeys : self.deleteKeys})
             })
-            .fail(function(hdr, status, error) { CMS.ServerError(self, "Deleting keys:" + status); })
             .done(function(data, status, error) {
                 // clear deleteKeys on success
                 self.deleteKeys = [];

@@ -15,6 +15,7 @@ from xmodule.modulestore import Location
 from xmodule.x_module import XModule, XModuleDescriptor
 
 from student.models import CourseEnrollmentAllowed
+from courseware.masquerade import is_masquerading_as_student
 
 DEBUG_ACCESS = False
 
@@ -235,7 +236,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         don't have to hit the enrollments table on every module load.
         """
         # If start dates are off, can always load
-        if settings.MITX_FEATURES['DISABLE_START_DATES']:
+        if settings.MITX_FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
             debug("Allow: DISABLE_START_DATES")
             return True
 
@@ -543,6 +544,10 @@ def _has_access_to_location(user, location, access_level, course_context):
     if user is None or (not user.is_authenticated()):
         debug("Deny: no user or anon user")
         return False
+
+    if is_masquerading_as_student(user):
+        return False
+
     if user.is_staff:
         debug("Allow: user.is_staff")
         return True

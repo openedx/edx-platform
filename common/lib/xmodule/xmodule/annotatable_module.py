@@ -1,11 +1,10 @@
 import logging
 
 from lxml import etree
-from pkg_resources import resource_string, resource_listdir
+from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.contentstore.content import StaticContent
 from xblock.core import Scope, String
 
 log = logging.getLogger(__name__)
@@ -24,7 +23,6 @@ class AnnotatableModule(AnnotatableFields, XModule):
     js_module_name = "Annotatable"
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'annotatable'
-
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)

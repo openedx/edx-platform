@@ -53,8 +53,9 @@ class GradingService(object):
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             #This is a dev_facing_error
-            log.error("Problem posting data to the grading controller.  URL: {0}, data: {1}".format(url, data))
-            raise GradingServiceError, str(err), sys.exc_info()[2]
+            error_string = "Problem posting data to the grading controller.  URL: {0}, data: {1}".format(url, data)
+            log.error(error_string)
+            raise GradingServiceError(error_string)
 
         return r.text
 
@@ -71,11 +72,11 @@ class GradingService(object):
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             #This is a dev_facing_error
-            log.error("Problem getting data from the grading controller.  URL: {0}, params: {1}".format(url, params))
-            raise GradingServiceError, str(err), sys.exc_info()[2]
+            error_string = "Problem getting data from the grading controller.  URL: {0}, params: {1}".format(url, params)
+            log.error(error_string)
+            raise GradingServiceError(error_string)
 
         return r.text
-
 
     def _try_with_login(self, operation):
         """
@@ -87,7 +88,7 @@ class GradingService(object):
         """
         response = operation()
         if (response.json
-            and response.json.get('success') == False
+            and response.json.get('success') is False
             and response.json.get('error') == 'login_required'):
             # apparrently we aren't logged in.  Try to fix that.
             r = self._login()

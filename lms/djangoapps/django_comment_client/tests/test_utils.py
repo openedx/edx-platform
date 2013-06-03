@@ -1,44 +1,8 @@
-import string
-import random
-import collections
-
 from django.test import TestCase
-
-import factory
-from django.contrib.auth.models import User
-from student.models import UserProfile, CourseEnrollment
-from django_comment_client.models import Role, Permission
-
-import django_comment_client.models as models
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from django_comment_common.models import Role, Permission
+from factories import RoleFactory
 import django_comment_client.utils as utils
-
-import xmodule.modulestore.django as django
-
-
-class UserFactory(factory.Factory):
-    FACTORY_FOR = User
-    username = 'robot'
-    password = '123456'
-    email = 'robot@edx.org'
-    is_active = True
-    is_staff = False
-
-
-class CourseEnrollmentFactory(factory.Factory):
-    FACTORY_FOR = CourseEnrollment
-    user = factory.SubFactory(UserFactory)
-    course_id = 'edX/toy/2012_Fall'
-
-
-class RoleFactory(factory.Factory):
-    FACTORY_FOR = Role
-    name = 'Student'
-    course_id = 'edX/toy/2012_Fall'
-
-
-class PermissionFactory(factory.Factory):
-    FACTORY_FOR = Permission
-    name = 'create_comment'
 
 
 class DictionaryTestCase(TestCase):

@@ -18,9 +18,13 @@ Longer TODO:
 3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 import sys
 import os
-from xmodule.static_content import write_module_styles, write_module_js
 
 from path import path
 
@@ -36,6 +40,7 @@ PERFSTATS = False
 DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
+
 
 # Features
 MITX_FEATURES = {
@@ -67,9 +72,12 @@ MITX_FEATURES = {
 
     'ENABLE_PSYCHOMETRICS': False,  	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
+    'ENABLE_DJANGO_ADMIN_SITE': False,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
+
+    'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
@@ -89,7 +97,26 @@ MITX_FEATURES = {
 
     # Give a UI to show a student's submission history in a problem by the
     # Staff Debug tool.
-    'ENABLE_STUDENT_HISTORY_VIEW': True
+    'ENABLE_STUDENT_HISTORY_VIEW': True,
+
+    # Enables the student notes API and UI.
+    'ENABLE_STUDENT_NOTES': True,
+
+    # Provide a UI to allow users to submit feedback from the LMS
+    'ENABLE_FEEDBACK_SUBMISSION': False,
+
+    # Turn on a page that lets staff enter Python code to be run in the
+    # sandbox, for testing whether it's enabled properly.
+    'ENABLE_DEBUG_RUN_PYTHON': False,
+
+    # Enable URL that shows information about the status of variuous services
+    'ENABLE_SERVICE_STATUS': False,
+
+    # Toggle to indicate use of a custom theme
+    'USE_CUSTOM_THEME': False,
+
+    # Do autoplay videos for students
+    'AUTOPLAY_VIDEOS': True
 }
 
 # Used for A/B testing
@@ -119,9 +146,7 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 # For Node.js
 
-system_node_path = os.environ.get("NODE_PATH", None)
-if system_node_path is None:
-    system_node_path = "/usr/local/lib/node_modules"
+system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
 
 node_paths = [COMMON_ROOT / "static/js/vendor",
               COMMON_ROOT / "static/coffee/src",
@@ -149,12 +174,12 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
 
 # This is where Django Template lookup is defined. There are a few of these
 # still left lying around.
-TEMPLATE_DIRS = (
+TEMPLATE_DIRS = [
     PROJECT_ROOT / "templates",
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
-)
+]
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
@@ -170,6 +195,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'sekizai.context_processors.sekizai',
     'course_wiki.course_nav.context_processor',
+
+    # Hack to get required link URLs to password reset templates
+    'mitxmako.shortcuts.marketing_link_context_processor',
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000   # 4 MB
@@ -241,6 +269,31 @@ MODULESTORE = {
 }
 CONTENTSTORE = None
 
+#################### Python sandbox ############################################
+
+CODE_JAIL = {
+    # Path to a sandboxed Python executable.  None means don't bother.
+    'python_bin': None,
+    # User to run as in the sandbox.
+    'user': 'sandbox',
+
+    # Configurable limits.
+    'limits': {
+        # How many CPU seconds can jailed code use?
+        'CPU': 1,
+    },
+}
+
+# Some courses are allowed to run unsafe code. This is a list of regexes, one
+# of them must match the course id for that course to run unsafe code.
+#
+# For example:
+#
+#   COURSES_WITH_UNSAFE_CODE = [
+#       r"Harvard/XY123.1/.*"
+#   ]
+COURSES_WITH_UNSAFE_CODE = []
+
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
 import monitoring.exceptions  # noqa
@@ -261,6 +314,7 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
+SERVER_EMAIL = 'devops@edx.org'
 ADMINS = (
     ('edX Admins', 'admin@edx.org'),
 )
@@ -321,6 +375,14 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 
 PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
 # TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+
+##### Feedback submission mechanism #####
+FEEDBACK_SUBMISSION_EMAIL = None
+
+##### Zendesk #####
+ZENDESK_URL = None
+ZENDESK_USER = None
+ZENDESK_API_KEY = None
 
 ################################# open ended grading config  #####################
 
@@ -384,27 +446,21 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
+    'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
 
 ############################### Pipeline #######################################
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
-from xmodule.hidden_module import HiddenDescriptor
-from rooted_paths import rooted_glob, remove_root
-
-write_module_styles(PROJECT_ROOT / 'static/sass/module', [HiddenDescriptor])
-module_js = remove_root(
-    PROJECT_ROOT / 'static',
-    write_module_js(PROJECT_ROOT / 'static/coffee/module', [HiddenDescriptor])
-)
+from rooted_paths import rooted_glob
 
 courseware_js = (
     [
-        'coffee/src/' + pth + '.coffee'
+        'coffee/src/' + pth + '.js'
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
-    sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.coffee'))
+    sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
 # 'js/vendor/RequireJS.js' - Require JS wrapper.
@@ -418,15 +474,19 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
   'js/vendor/swfobject/swfobject.js',
   'js/vendor/jquery.ba-bbq.min.js',
+  'js/vendor/annotator.min.js',
+  'js/vendor/annotator.store.min.js',
+  'js/vendor/annotator.tags.min.js'
 ]
 
-discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
-staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.coffee'))
-open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.coffee'))
+discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
+open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
+notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
 
 PIPELINE_CSS = {
     'application': {
-        'source_filenames': ['sass/application.scss'],
+        'source_filenames': ['sass/application.css'],
         'output_filename': 'css/lms-application.css',
     },
     'course': {
@@ -435,25 +495,29 @@ PIPELINE_CSS = {
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
-            'sass/course.scss'
+            'css/vendor/annotator.min.css',
+            'sass/course.css',
+            'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-course.css',
     },
     'ie-fixes': {
-        'source_filenames': ['sass/ie.scss'],
+        'source_filenames': ['sass/ie.css'],
         'output_filename': 'css/lms-ie.css',
     },
 }
 
-PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss', 'sass/course.scss']
+
+# test_order: Determines the position of this chunk of javascript on
+# the jasmine test page
 PIPELINE_JS = {
     'application': {
 
         # Application will contain all paths not in courseware_only_js
         'source_filenames': sorted(
-            set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.coffee') +
-                rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.coffee')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js)
+            set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
+                rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -461,32 +525,45 @@ PIPELINE_JS = {
             'js/sticky_filter.js',
             'js/query-params.js',
         ],
-        'output_filename': 'js/lms-application.js'
+        'output_filename': 'js/lms-application.js',
+
+        'test_order': 1,
     },
     'courseware': {
         'source_filenames': courseware_js,
-        'output_filename': 'js/lms-courseware.js'
+        'output_filename': 'js/lms-courseware.js',
+        'test_order': 2,
     },
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
+        'test_order': 0,
     },
     'module-js': {
-        'source_filenames': module_js,
+        'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
         'output_filename': 'js/lms-modules.js',
+        'test_order': 3,
     },
     'discussion': {
         'source_filenames': discussion_js,
-        'output_filename': 'js/discussion.js'
+        'output_filename': 'js/discussion.js',
+        'test_order': 4,
     },
     'staff_grading': {
         'source_filenames': staff_grading_js,
-        'output_filename': 'js/staff_grading.js'
+        'output_filename': 'js/staff_grading.js',
+        'test_order': 5,
     },
     'open_ended': {
         'source_filenames': open_ended_js,
-        'output_filename': 'js/open_ended.js'
-    }
+        'output_filename': 'js/open_ended.js',
+        'test_order': 6,
+    },
+    'notes': {
+        'source_filenames': notes_js,
+        'output_filename': 'js/notes.js',
+        'test_order': 7
+    },
 }
 
 PIPELINE_DISABLE_WRAPPER = True
@@ -510,12 +587,6 @@ if os.path.isdir(DATA_DIR):
                 os.system("rm %s" % (js_dir / new_filename))
                 os.system("coffee -c %s" % (js_dir / filename))
 
-PIPELINE_COMPILERS = [
-    'pipeline.compilers.sass.SASSCompiler',
-    'pipeline.compilers.coffee.CoffeeScriptCompiler',
-]
-
-PIPELINE_SASS_ARGUMENTS = '-t compressed -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
@@ -526,13 +597,56 @@ STATICFILES_IGNORE_PATTERNS = (
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
-PIPELINE_SASS_BINARY = 'sass'
-PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
 
 # Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
-################################### APPS #######################################
+################################# CELERY ######################################
+
+# Message configuration
+
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERY_MESSAGE_COMPRESSION = 'gzip'
+
+# Results configuration
+
+CELERY_IGNORE_RESULT = False
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+
+# Events configuration
+
+CELERY_TRACK_STARTED = True
+
+CELERY_SEND_EVENTS = True
+CELERY_SEND_TASK_SENT_EVENT = True
+
+# Exchange configuration
+
+CELERY_DEFAULT_EXCHANGE = 'edx.core'
+CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
+
+# Queues configuration
+
+HIGH_PRIORITY_QUEUE = 'edx.core.high'
+DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
+LOW_PRIORITY_QUEUE = 'edx.core.low'
+
+CELERY_QUEUE_HA_POLICY = 'all'
+
+CELERY_CREATE_MISSING_QUEUES = True
+
+CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
+CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+
+CELERY_QUEUES = {
+    HIGH_PRIORITY_QUEUE: {},
+    LOW_PRIORITY_QUEUE: {},
+    DEFAULT_PRIORITY_QUEUE: {}
+}
+
+################################### APPS ######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...
     'django.contrib.auth',
@@ -541,7 +655,11 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'djcelery',
     'south',
+
+    # Monitor the status of services
+    'service_status',
 
     # For asset pipelining
     'pipeline',
@@ -581,7 +699,52 @@ INSTALLED_APPS = (
 
     # For testing
     'django.contrib.admin',   # only used in DEBUG mode
+    'debug',
 
     # Discussion forums
     'django_comment_client',
+    'django_comment_common',
+    'notes',
 )
+
+######################### MARKETING SITE ###############################
+EDXMKTG_COOKIE_NAME = 'edxloggedin'
+MKTG_URLS = {}
+MKTG_URL_LINK_MAP = {
+    'ABOUT': 'about_edx',
+    'CONTACT': 'contact',
+    'FAQ': 'help_edx',
+    'COURSES': 'courses',
+    'ROOT': 'root',
+    'TOS': 'tos',
+    'HONOR': 'honor',
+    'PRIVACY': 'privacy_edx',
+}
+
+############################### THEME ################################
+def enable_theme(theme_name):
+    """
+    Enable the settings for a custom theme, whose files should be stored
+    in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
+
+    The THEME_NAME setting should be configured separately since it can't
+    be set here (this function closes too early). An idiom for doing this
+    is:
+
+    THEME_NAME = "stanford"
+    enable_theme(THEME_NAME)
+    """
+    MITX_FEATURES['USE_CUSTOM_THEME'] = True
+
+    # Calculate the location of the theme's files
+    theme_root = ENV_ROOT / "themes" / theme_name
+
+    # Include the theme's templates in the template search paths
+    TEMPLATE_DIRS.append(theme_root / 'templates')
+    MAKO_TEMPLATES['main'].append(theme_root / 'templates')
+
+    # Namespace the theme's static files to 'themes/<theme_name>' to
+    # avoid collisions with default edX static files
+    STATICFILES_DIRS.append((u'themes/%s' % theme_name,
+                             theme_root / 'static'))
+

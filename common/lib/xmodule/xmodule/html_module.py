@@ -19,6 +19,7 @@ log = logging.getLogger("mitx.courseware")
 
 class HtmlFields(object):
     data = String(help="Html contents to display for this module", scope=Scope.content)
+    source_code = String(help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
 
 
 class HtmlModule(HtmlFields, XModule):
@@ -118,8 +119,8 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
                 with system.resources_fs.open(filepath) as file:
                     html = file.read().decode('utf-8')
                     # Log a warning if we can't parse the file, but don't error
-                    if not check_html(html):
-                        msg = "Couldn't parse html in {0}.".format(filepath)
+                    if not check_html(html) and len(html) > 0:
+                        msg = "Couldn't parse html in {0}, content = {1}".format(filepath, html)
                         log.warning(msg)
                         system.error_tracker("Warning: " + msg)
 
@@ -156,7 +157,8 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
-            file.write(self.data.encode('utf-8'))
+            html_data = self.data.encode('utf-8')
+            file.write(html_data)
 
         # write out the relative name
         relname = path(pathname).basename()
@@ -164,16 +166,6 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         elt = etree.Element('html')
         elt.set("filename", relname)
         return elt
-
-    @property
-    def editable_metadata_fields(self):
-        """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
-        subset = super(HtmlDescriptor, self).editable_metadata_fields
-
-        if 'empty' in subset:
-            del subset['empty']
-
-        return subset
 
 
 class AboutDescriptor(HtmlDescriptor):

@@ -1,0 +1,171 @@
+// studio animations & keyframes
+// ====================
+
+// rotate clockwise
+@mixin rotateClockwise {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  100% {
+    @include transform(rotate(360deg));
+  }
+}
+
+@-moz-keyframes rotateClockwise { @include rotateClockwise(); }
+@-webkit-keyframes rotateClockwise { @include rotateClockwise(); }
+@-o-keyframes rotateClockwise { @include rotateClockwise(); }
+@keyframes rotateClockwise { @include rotateClockwise();}
+
+@mixin anim-rotateClockwise($duration, $timing: ease-in-out, $count: 1, $delay: 0) {
+  @include animation-name(rotateClockwise);
+  @include animation-duration($duration);
+  @include animation-delay($delay);
+  @include animation-timing-function($timing);
+  @include animation-iteration-count($count);
+  @include animation-fill-mode(both);
+
+}
+
+// ====================
+
+// notifications slide up
+@mixin notificationsSlideUp {
+  0% {
+    @include transform(translateY(0));
+  }
+
+  90% {
+    @include transform(translateY(-($notification-height)));
+  }
+
+  100% {
+    @include transform(translateY(-($notification-height*0.99)));
+  }
+}
+
+@-moz-keyframes notificationsSlideUp { @include notificationsSlideUp(); }
+@-webkit-keyframes notificationsSlideUp { @include notificationsSlideUp(); }
+@-o-keyframes notificationsSlideUp { @include notificationsSlideUp(); }
+@keyframes notificationsSlideUp { @include notificationsSlideUp();}
+
+@mixin anim-notificationsSlideUp($duration, $timing: ease-in-out, $count: 1, $delay: 0) {
+  @include animation-name(notificationsSlideUp);
+  @include animation-duration($duration);
+  @include animation-delay($delay);
+  @include animation-timing-function($timing);
+  @include animation-iteration-count($count);
+  @include animation-fill-mode(both);
+
+}
+
+// ====================
+
+// notifications slide down
+@mixin notificationsSlideDown {
+  0% {
+    @include transform(translateY(-($notification-height*0.99)));
+  }
+
+  10% {
+    @include transform(translateY(-($notification-height)));
+  }
+
+  100% {
+    @include transform(translateY(0));
+  }
+}
+
+@-moz-keyframes notificationsSlideDown { @include notificationsSlideDown(); }
+@-webkit-keyframes notificationsSlideDown { @include notificationsSlideDown(); }
+@-o-keyframes notificationsSlideDown { @include notificationsSlideDown(); }
+@keyframes notificationsSlideDown { @include notificationsSlideDown();}
+
+@mixin anim-notificationsSlideDown($duration, $timing: ease-in-out, $count: 1, $delay: 0) {
+  @include animation-name(notificationsSlideDown);
+  @include animation-duration($duration);
+  @include animation-delay($delay);
+  @include animation-timing-function($timing);
+  @include animation-iteration-count($count);
+  @include animation-fill-mode(both);
+}
+
+// ====================
+
+// bounce in
+@mixin bounceIn {
+  0% {
+    opacity: 0.0;
+    @include transform(scale(0.3));
+  }
+
+  50% {
+    opacity: 1.0;
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    @include transform(scale(1));
+  }
+}
+
+@-moz-keyframes bounceIn { @include bounceIn(); }
+@-webkit-keyframes bounceIn { @include bounceIn(); }
+@-o-keyframes bounceIn { @include bounceIn(); }
+@keyframes bounceIn { @include bounceIn();}
+
+@mixin anim-bounceIn($duration, $timing: ease-in-out, $count: 1, $delay: 0) {
+  @include animation-name(bounceIn);
+  @include animation-duration($duration);
+  @include animation-delay($delay);
+  @include animation-timing-function($timing);
+  @include animation-iteration-count($count);
+  @include animation-fill-mode(both);
+}
+
+// ====================
+
+// bounce in
+@mixin bounceOut {
+  0% {
+    opacity: 0.0;
+    @include transform(scale(0.3));
+  }
+
+  50% {
+    opacity: 1.0;
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    @include transform(scale(1));
+  }
+
+  0% {
+    @include transform(scale(1));
+  }
+
+  50% {
+    opacity: 1.0;
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    opacity: 0.0;
+    @include transform(scale(0.3));
+  }
+}
+
+@-moz-keyframes bounceOut { @include bounceOut(); }
+@-webkit-keyframes bounceOut { @include bounceOut(); }
+@-o-keyframes bounceOut { @include bounceOut(); }
+@keyframes bounceOut { @include bounceOut();}
+
+@mixin anim-bounceOut($duration, $timing: ease-in-out, $count: 1, $delay: 0) {
+  @include animation-name(bounceOut);
+  @include animation-duration($duration);
+  @include animation-delay($delay);
+  @include animation-timing-function($timing);
+  @include animation-iteration-count($count);
+  @include animation-fill-mode(both);
+}

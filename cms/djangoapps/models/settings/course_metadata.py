@@ -6,6 +6,7 @@ from xblock.core import Scope
 from xmodule.course_module import CourseDescriptor
 import copy
 
+
 class CourseMetadata(object):
     '''
     For CRUD operations on metadata fields which do not have specific editors
@@ -13,8 +14,14 @@ class CourseMetadata(object):
     The objects have no predefined attrs but instead are obj encodings of the
     editable metadata.
     '''
-    FILTERED_LIST = XModuleDescriptor.system_metadata_fields + ['start', 'end',
-        'enrollment_start', 'enrollment_end', 'tabs', 'graceperiod', 'checklists']
+    FILTERED_LIST = ['xml_attributes',
+                     'start',
+                     'end',
+                     'enrollment_start',
+                     'enrollment_end',
+                     'tabs',
+                     'graceperiod',
+                     'checklists']
 
     @classmethod
     def fetch(cls, course_location):
@@ -48,7 +55,7 @@ class CourseMetadata(object):
         descriptor = get_modulestore(course_location).get_item(course_location)
 
         dirty = False
-		
+
         #Copy the filtered list to avoid permanently changing the class attribute
         filtered_list = copy.copy(cls.FILTERED_LIST)
         #Don't filter on the tab attribute if filter_tabs is False
@@ -71,7 +78,7 @@ class CourseMetadata(object):
 
         if dirty:
             get_modulestore(course_location).update_metadata(course_location,
-                own_metadata(descriptor))
+                                                             own_metadata(descriptor))
 
         # Could just generate and return a course obj w/o doing any db reads,
         # but I put the reads in as a means to confirm it persisted correctly
@@ -92,6 +99,6 @@ class CourseMetadata(object):
                 delattr(descriptor.lms, key)
 
         get_modulestore(course_location).update_metadata(course_location,
-            own_metadata(descriptor))
+                                                         own_metadata(descriptor))
 
         return cls.fetch(course_location)

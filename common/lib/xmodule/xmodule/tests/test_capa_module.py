@@ -1,17 +1,19 @@
+"""Tests of the Capa XModule"""
+#pylint: disable=C0111
+#pylint: disable=R0904
+#pylint: disable=C0103
+#pylint: disable=C0302
+
 import datetime
-import json
-from mock import Mock, MagicMock, patch
-from pprint import pprint
+from mock import Mock, patch
 import unittest
 import random
 
 import xmodule
-import capa
 from capa.responsetypes import StudentInputError, \
-                                LoncapaProblemError, ResponseError
+    LoncapaProblemError, ResponseError
 from xmodule.capa_module import CapaModule
 from xmodule.modulestore import Location
-from lxml import etree
 
 from django.http import QueryDict
 
@@ -384,7 +386,7 @@ class CapaModuleTest(unittest.TestCase):
         # what the input is, by patching CorrectMap.is_correct()
         # Also simulate rendering the HTML
         # TODO: pep8 thinks the following line has invalid syntax
-        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct,\
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct, \
                 patch('xmodule.capa_module.CapaModule.get_problem_html') as mock_html:
             mock_is_correct.return_value = True
             mock_html.return_value = "Test HTML"
@@ -435,32 +437,38 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(module.attempts, 3)
 
     def test_check_problem_resubmitted_with_randomize(self):
-        # Randomize turned on
-        module = CapaFactory.create(rerandomize='always', attempts=0)
+        rerandomize_values = ['always', 'true']
 
-        # Simulate that the problem is completed
-        module.done = True
+        for rerandomize in rerandomize_values:
+            # Randomize turned on
+            module = CapaFactory.create(rerandomize=rerandomize, attempts=0)
 
-        # Expect that we cannot submit
-        with self.assertRaises(xmodule.exceptions.NotFoundError):
-            get_request_dict = {CapaFactory.input_key(): '3.14'}
-            module.check_problem(get_request_dict)
+            # Simulate that the problem is completed
+            module.done = True
 
-        # Expect that number of attempts NOT incremented
-        self.assertEqual(module.attempts, 0)
+            # Expect that we cannot submit
+            with self.assertRaises(xmodule.exceptions.NotFoundError):
+                get_request_dict = {CapaFactory.input_key(): '3.14'}
+                module.check_problem(get_request_dict)
+
+            # Expect that number of attempts NOT incremented
+            self.assertEqual(module.attempts, 0)
 
     def test_check_problem_resubmitted_no_randomize(self):
-        # Randomize turned off
-        module = CapaFactory.create(rerandomize='never', attempts=0, done=True)
+        rerandomize_values = ['never', 'false', 'per_student']
 
-        # Expect that we can submit successfully
-        get_request_dict = {CapaFactory.input_key(): '3.14'}
-        result = module.check_problem(get_request_dict)
+        for rerandomize in rerandomize_values:
+            # Randomize turned off
+            module = CapaFactory.create(rerandomize=rerandomize, attempts=0, done=True)
 
-        self.assertEqual(result['success'], 'correct')
+            # Expect that we can submit successfully
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+            result = module.check_problem(get_request_dict)
 
-        # Expect that number of attempts IS incremented
-        self.assertEqual(module.attempts, 1)
+            self.assertEqual(result['success'], 'correct')
+
+            # Expect that number of attempts IS incremented
+            self.assertEqual(module.attempts, 1)
 
     def test_check_problem_queued(self):
         module = CapaFactory.create(attempts=1)
@@ -542,6 +550,7 @@ class CapaModuleTest(unittest.TestCase):
     def test_reset_problem(self):
         module = CapaFactory.create(done=True)
         module.new_lcp = Mock(wraps=module.new_lcp)
+        module.choose_new_seed = Mock(wraps=module.choose_new_seed)
 
         # Stub out HTML rendering
         with patch('xmodule.capa_module.CapaModule.get_problem_html') as mock_html:
@@ -559,7 +568,8 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(result['html'], "<div>Test HTML</div>")
 
         # Expect that the problem was reset
-        module.new_lcp.assert_called_once_with({'seed': None})
+        module.new_lcp.assert_called_once_with(None)
+        module.choose_new_seed.assert_called_once_with()
 
     def test_reset_problem_closed(self):
         module = CapaFactory.create()
@@ -615,24 +625,34 @@ class CapaModuleTest(unittest.TestCase):
         self.assertTrue('success' in result and not result['success'])
 
     def test_save_problem_submitted_with_randomize(self):
-        module = CapaFactory.create(rerandomize='always', done=True)
 
-        # Try to save
-        get_request_dict = {CapaFactory.input_key(): '3.14'}
-        result = module.save_problem(get_request_dict)
+        # Capa XModule treats 'always' and 'true' equivalently
+        rerandomize_values = ['always', 'true']
 
-        # Expect that we cannot save
-        self.assertTrue('success' in result and not result['success'])
+        for rerandomize in rerandomize_values:
+            module = CapaFactory.create(rerandomize=rerandomize, done=True)
+
+            # Try to save
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+            result = module.save_problem(get_request_dict)
+
+            # Expect that we cannot save
+            self.assertTrue('success' in result and not result['success'])
 
     def test_save_problem_submitted_no_randomize(self):
-        module = CapaFactory.create(rerandomize='never', done=True)
 
-        # Try to save
-        get_request_dict = {CapaFactory.input_key(): '3.14'}
-        result = module.save_problem(get_request_dict)
+        # Capa XModule treats 'false' and 'per_student' equivalently
+        rerandomize_values = ['never', 'false', 'per_student']
 
-        # Expect that we succeed
-        self.assertTrue('success' in result and result['success'])
+        for rerandomize in rerandomize_values:
+            module = CapaFactory.create(rerandomize=rerandomize, done=True)
+
+            # Try to save
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+            result = module.save_problem(get_request_dict)
+
+            # Expect that we succeed
+            self.assertTrue('success' in result and result['success'])
 
     def test_check_button_name(self):
 
@@ -681,8 +701,11 @@ class CapaModuleTest(unittest.TestCase):
 
         # If user submitted a problem but hasn't reset,
         # do NOT show the check button
-        # Note:  we can only reset when rerandomize="always"
+        # Note:  we can only reset when rerandomize="always" or "true"
         module = CapaFactory.create(rerandomize="always", done=True)
+        self.assertFalse(module.should_show_check_button())
+
+        module = CapaFactory.create(rerandomize="true", done=True)
         self.assertFalse(module.should_show_check_button())
 
         # Otherwise, DO show the check button
@@ -691,9 +714,15 @@ class CapaModuleTest(unittest.TestCase):
 
         # If the user has submitted the problem
         # and we do NOT have a reset button, then we can show the check button
-        # Setting rerandomize to "never" ensures that the reset button
+        # Setting rerandomize to "never" or "false" ensures that the reset button
         # is not shown
         module = CapaFactory.create(rerandomize="never", done=True)
+        self.assertTrue(module.should_show_check_button())
+
+        module = CapaFactory.create(rerandomize="false", done=True)
+        self.assertTrue(module.should_show_check_button())
+
+        module = CapaFactory.create(rerandomize="per_student", done=True)
         self.assertTrue(module.should_show_check_button())
 
     def test_should_show_reset_button(self):
@@ -710,6 +739,14 @@ class CapaModuleTest(unittest.TestCase):
 
         # If we're NOT randomizing, then do NOT show the reset button
         module = CapaFactory.create(rerandomize="never", done=True)
+        self.assertFalse(module.should_show_reset_button())
+
+        # If we're NOT randomizing, then do NOT show the reset button
+        module = CapaFactory.create(rerandomize="per_student", done=True)
+        self.assertFalse(module.should_show_reset_button())
+
+        # If we're NOT randomizing, then do NOT show the reset button
+        module = CapaFactory.create(rerandomize="false", done=True)
         self.assertFalse(module.should_show_reset_button())
 
         # If the user hasn't submitted an answer yet,
@@ -742,13 +779,19 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(rerandomize="always", done=True)
         self.assertFalse(module.should_show_save_button())
 
+        module = CapaFactory.create(rerandomize="true", done=True)
+        self.assertFalse(module.should_show_save_button())
+
         # If the user has unlimited attempts and we are not randomizing,
         # then do NOT show a save button
         # because they can keep using "Check"
         module = CapaFactory.create(max_attempts=None, rerandomize="never", done=False)
         self.assertFalse(module.should_show_save_button())
 
-        module = CapaFactory.create(max_attempts=None, rerandomize="never", done=True)
+        module = CapaFactory.create(max_attempts=None, rerandomize="false", done=True)
+        self.assertFalse(module.should_show_save_button())
+
+        module = CapaFactory.create(max_attempts=None, rerandomize="per_student", done=True)
         self.assertFalse(module.should_show_save_button())
 
         # Otherwise, DO show the save button
@@ -757,6 +800,12 @@ class CapaModuleTest(unittest.TestCase):
 
         # If we're not randomizing and we have limited attempts,  then we can save
         module = CapaFactory.create(rerandomize="never", max_attempts=2, done=True)
+        self.assertTrue(module.should_show_save_button())
+
+        module = CapaFactory.create(rerandomize="false", max_attempts=2, done=True)
+        self.assertTrue(module.should_show_save_button())
+
+        module = CapaFactory.create(rerandomize="per_student", max_attempts=2, done=True)
         self.assertTrue(module.should_show_save_button())
 
         # If survey question for capa (max_attempts = 0),
@@ -788,9 +837,15 @@ class CapaModuleTest(unittest.TestCase):
                                     done=True)
         self.assertTrue(module.should_show_save_button())
 
+        module = CapaFactory.create(force_save_button="true",
+                                    rerandomize="true",
+                                    done=True)
+        self.assertTrue(module.should_show_save_button())
+
     def test_no_max_attempts(self):
         module = CapaFactory.create(max_attempts='')
         html = module.get_problem_html()
+        self.assertTrue(html is not None)
         # assert that we got here without exploding
 
     def test_get_problem_html(self):
@@ -875,6 +930,8 @@ class CapaModuleTest(unittest.TestCase):
         # Try to render the module with DEBUG turned off
         html = module.get_problem_html()
 
+        self.assertTrue(html is not None)
+
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
         context = render_args[1]
@@ -886,7 +943,9 @@ class CapaModuleTest(unittest.TestCase):
     def test_random_seed_no_change(self):
 
         # Run the test for each possible rerandomize value
-        for rerandomize in ['never', 'per_student', 'always', 'onreset']:
+        for rerandomize in ['false', 'never',
+                            'per_student', 'always',
+                            'true', 'onreset']:
             module = CapaFactory.create(rerandomize=rerandomize)
 
             # Get the seed
@@ -896,8 +955,9 @@ class CapaModuleTest(unittest.TestCase):
 
             # If we're not rerandomizing, the seed is always set
             # to the same value (1)
-            if rerandomize == 'never':
-                self.assertEqual(seed, 1)
+            if rerandomize in ['never']:
+                self.assertEqual(seed, 1,
+                                 msg="Seed should always be 1 when rerandomize='%s'" % rerandomize)
 
             # Check the problem
             get_request_dict = {CapaFactory.input_key(): '3.14'}
@@ -947,7 +1007,8 @@ class CapaModuleTest(unittest.TestCase):
             return success
 
         # Run the test for each possible rerandomize value
-        for rerandomize in ['never', 'per_student', 'always', 'onreset']:
+        for rerandomize in ['never', 'false', 'per_student',
+                            'always', 'true', 'onreset']:
             module = CapaFactory.create(rerandomize=rerandomize)
 
             # Get the seed
@@ -959,7 +1020,7 @@ class CapaModuleTest(unittest.TestCase):
             # is set to 'never' -- it should still be 1
             # The seed also stays the same if we're randomizing
             # 'per_student': the same student should see the same problem
-            if rerandomize in ['never', 'per_student']:
+            if rerandomize in ['never', 'false', 'per_student']:
                 self.assertEqual(seed, _reset_and_get_seed(module))
 
             # Otherwise, we expect the seed to change
@@ -969,10 +1030,18 @@ class CapaModuleTest(unittest.TestCase):
                 # Since there's a small chance we might get the
                 # same seed again, give it 5 chances
                 # to generate a different seed
-                success = _retry_and_check(5,
-                                           lambda: _reset_and_get_seed(module) != seed)
+                success = _retry_and_check(5, lambda: _reset_and_get_seed(module) != seed)
 
-                # TODO: change this comparison to module.seed is not None?
-                self.assertTrue(module.seed != None)
+                self.assertTrue(module.seed is not None)
                 msg = 'Could not get a new seed from reset after 5 tries'
                 self.assertTrue(success, msg)
+
+    def test_random_seed_bins(self):
+        # Assert that we are limiting the number of possible seeds.
+
+        # Check the conditions that generate random seeds
+        for rerandomize in ['always', 'per_student', 'true', 'onreset']:
+            # Get a bunch of seeds, they should all be in 0-999.
+            for i in range(200):
+                module = CapaFactory.create(rerandomize=rerandomize)
+                assert 0 <= module.seed < 1000

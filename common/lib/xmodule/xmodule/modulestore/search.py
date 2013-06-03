@@ -3,7 +3,7 @@ from itertools import repeat
 from xmodule.course_module import CourseDescriptor
 
 from .exceptions import (ItemNotFoundError, NoPathToItem)
-from . import ModuleStore, Location
+from . import Location
 
 
 def path_to_location(modulestore, course_id, location):
@@ -106,7 +106,7 @@ def path_to_location(modulestore, course_id, location):
         position_list = []
         for path_index in range(2, n - 1):
             category = path[path_index].category
-            if  category == 'sequential' or category == 'videosequence':
+            if category == 'sequential' or category == 'videosequence':
                 section_desc = modulestore.get_instance(course_id, path[path_index])
                 child_locs = [c.location for c in section_desc.get_children()]
                 # positions are 1-indexed, and should be strings to be consistent with

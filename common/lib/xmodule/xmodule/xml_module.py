@@ -84,7 +84,8 @@ class XmlDescriptor(XModuleDescriptor):
     Mixin class for standardized parsing of from xml
     """
 
-    xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export", default={}, scope=Scope.settings)
+    xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export",
+        default={}, scope=Scope.settings)
 
     # Extension to append to filename paths
     filename_extension = 'xml'
@@ -110,8 +111,7 @@ class XmlDescriptor(XModuleDescriptor):
         'name', 'slug')
 
     metadata_to_strip = ('data_dir',
-            # cdodge: @TODO: We need to figure out a way to export out 'tabs' and 'grading_policy' which is on the course
-            'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date',
+            'tabs', 'grading_policy', 'published_by', 'published_date',
             'discussion_blackouts', 'testcenter_info',
            # VS[compat] -- remove the below attrs once everything is in the CMS
            'course', 'org', 'url_name', 'filename',
@@ -135,7 +135,8 @@ class XmlDescriptor(XModuleDescriptor):
         'graded': bool_map,
         'hide_progress_tab': bool_map,
         'allow_anonymous': bool_map,
-        'allow_anonymous_to_peers': bool_map
+        'allow_anonymous_to_peers': bool_map,
+        'show_timezone': bool_map,
     }
 
 
@@ -419,3 +420,9 @@ class XmlDescriptor(XModuleDescriptor):
         """
         raise NotImplementedError(
             "%s does not implement definition_to_xml" % self.__class__.__name__)
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(XmlDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(XmlDescriptor.xml_attributes)
+        return non_editable_fields

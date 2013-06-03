@@ -174,7 +174,6 @@ class CourseDetails(object):
         return result
 
 
-
 # TODO move to a more general util? Is there a better way to do the isinstance model check?
 class CourseSettingsEncoder(json.JSONEncoder):
     def default(self, obj):

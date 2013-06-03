@@ -8,18 +8,17 @@ from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 
 from xmodule.modulestore import Location
-from models.settings.course_details import (CourseDetails,
-                                                    CourseSettingsEncoder)
+from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
 from models.settings.course_grading import CourseGradingModel
 from contentstore.utils import get_modulestore
 
-from .utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.django import modulestore
 from xmodule.fields import Date
+
 
 class CourseTestCase(ModuleStoreTestCase):
     def setUp(self):
@@ -47,12 +46,8 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-        t = 'i4x://edx/templates/course/Empty'
-        o = 'MITx'
-        n = '999'
-        dn = 'Robot Super Course'
-        self.course_location = Location('i4x', o, n, 'course', 'Robot_Super_Course')
-        CourseFactory.create(template=t, org=o, number=n, display_name=dn)
+        course = CourseFactory.create(template='i4x://edx/templates/course/Empty', org='MITx', number='999', display_name='Robot Super Course')
+        self.course_location = course.location
 
 
 class CourseDetailsTestCase(CourseTestCase):
@@ -86,17 +81,25 @@ class CourseDetailsTestCase(CourseTestCase):
         jsondetails = CourseDetails.fetch(self.course_location)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
-        self.assertEqual(CourseDetails.update_from_json(jsondetails.__dict__).syllabus,
-                             jsondetails.syllabus, "After set syllabus")
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).syllabus,
+            jsondetails.syllabus, "After set syllabus"
+        )
         jsondetails.overview = "Overview"
-        self.assertEqual(CourseDetails.update_from_json(jsondetails.__dict__).overview,
-                             jsondetails.overview, "After set overview")
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).overview,
+            jsondetails.overview, "After set overview"
+        )
         jsondetails.intro_video = "intro_video"
-        self.assertEqual(CourseDetails.update_from_json(jsondetails.__dict__).intro_video,
-                             jsondetails.intro_video, "After set intro_video")
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).intro_video,
+            jsondetails.intro_video, "After set intro_video"
+        )
         jsondetails.effort = "effort"
-        self.assertEqual(CourseDetails.update_from_json(jsondetails.__dict__).effort,
-                             jsondetails.effort, "After set effort")
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).effort,
+            jsondetails.effort, "After set effort"
+        )
 
 
 class CourseDetailsViewTest(CourseTestCase):
@@ -150,9 +153,7 @@ class CourseDetailsViewTest(CourseTestCase):
 
     @staticmethod
     def struct_to_datetime(struct_time):
-        return datetime.datetime(struct_time.tm_year, struct_time.tm_mon,
-            struct_time.tm_mday, struct_time.tm_hour,
-            struct_time.tm_min, struct_time.tm_sec, tzinfo=UTC())
+        return datetime.datetime(*struct_time[:6], tzinfo=UTC())
 
     def compare_date_fields(self, details, encoded, context, field):
         if details[field] is not None:
@@ -249,13 +250,13 @@ class CourseGradingTest(CourseTestCase):
         altered_grader = CourseGradingModel.update_grader_from_json(test_grader.course_location, test_grader.graders[1])
         self.assertDictEqual(test_grader.graders[1], altered_grader, "drop_count[1] + 2")
 
+
 class CourseMetadataEditingTest(CourseTestCase):
     def setUp(self):
         CourseTestCase.setUp(self)
         # add in the full class too
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        import_from_xml(get_modulestore(self.course_location), 'common/test/data/', ['full'])
         self.fullcourse_location = Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None])
-
 
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course_location)
@@ -271,18 +272,20 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('xqa_key', test_model, 'xqa_key field ')
 
     def test_update_from_json(self):
-        test_model = CourseMetadata.update_from_json(self.course_location,
-            { "advertised_start" : "start A",
-              "testcenter_info" : { "c" : "test" },
-              "days_early_for_beta" : 2})
+        test_model = CourseMetadata.update_from_json(self.course_location, {
+            "advertised_start": "start A",
+            "testcenter_info": {"c": "test"},
+            "days_early_for_beta": 2
+        })
         self.update_check(test_model)
         # try fresh fetch to ensure persistence
         test_model = CourseMetadata.fetch(self.course_location)
         self.update_check(test_model)
         # now change some of the existing metadata
-        test_model = CourseMetadata.update_from_json(self.course_location,
-            { "advertised_start" : "start B",
-              "display_name" : "jolly roger"})
+        test_model = CourseMetadata.update_from_json(self.course_location, {
+            "advertised_start": "start B",
+            "display_name": "jolly roger"}
+        )
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name'], 'jolly roger', "not expected value")
         self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
@@ -294,13 +297,12 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('advertised_start', test_model, 'Missing new advertised_start metadata field')
         self.assertEqual(test_model['advertised_start'], 'start A', "advertised_start not expected value")
         self.assertIn('testcenter_info', test_model, 'Missing testcenter_info metadata field')
-        self.assertDictEqual(test_model['testcenter_info'], { "c" : "test" }, "testcenter_info not expected value")
+        self.assertDictEqual(test_model['testcenter_info'], {"c": "test"}, "testcenter_info not expected value")
         self.assertIn('days_early_for_beta', test_model, 'Missing days_early_for_beta metadata field')
         self.assertEqual(test_model['days_early_for_beta'], 2, "days_early_for_beta not expected value")
 
-
     def test_delete_key(self):
-        test_model = CourseMetadata.delete_key(self.fullcourse_location, { 'deleteKeys' : ['doesnt_exist', 'showanswer', 'xqa_key']})
+        test_model = CourseMetadata.delete_key(self.fullcourse_location, {'deleteKeys': ['doesnt_exist', 'showanswer', 'xqa_key']})
         # ensure no harm
         self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
         self.assertIn('display_name', test_model, 'full missing editable metadata field')
