@@ -90,10 +90,6 @@
 }
 
 
-
-
-
-
 body.discussion {
   
   .new-post-form-errors {
@@ -740,13 +736,8 @@ body.discussion {
         width: 25px;
         height: 25px;
         //margin-left: -17px;
-        background: url(../images/home-discussion-icon.png) no-repeat;
         opacity: 1;
         @include transition(none);
-      }
-
-      .home-btn {
-        //nothing here yet
       }
     }
 
@@ -828,7 +819,6 @@ body.discussion {
       z-index: 50;
       width: 100%;
       height: 100%;
-      border-radius: 0 0 0 0;
       border: 1px solid transparent;
       text-align: center;
       overflow: hidden;
@@ -848,7 +838,7 @@ body.discussion {
         @include transition(opacity .2s);
       }
       .drop-arrow {
-        font-size:16px;
+        font-size: 16px;
       }
     }
 
@@ -882,13 +872,6 @@ body.discussion {
       .browse-topic-drop-menu {
         max-height: 400px;
         overflow-y: scroll;
-
-        .drop-menu-meta-category span,
-        .drop-menu-parent-category span {
-            margin: 10px 0; 
-            font-size: 14px;
-            font-weight: 700;
-        }
       }
 
 
@@ -923,7 +906,7 @@ body.discussion {
         .board-name {
           float: left;
           width: 80%;
-          margin: 5px 0;
+          margin: 13px 0;
           color: #fff;
         }
 
@@ -941,14 +924,14 @@ body.discussion {
       li li {
         a {
           padding-left: 44px;
-          background: url(../images/nested-icon.png) no-repeat 22px 5px;
+          background: url(../images/nested-icon.png) no-repeat 22px 14px;
         }
       }
 
       li li li {
         a {
           padding-left: 68px;
-          background: url(../images/nested-icon.png) no-repeat 46px 5px;
+          background: url(../images/nested-icon.png) no-repeat 46px 14px;
         }
       }
     }
@@ -1278,9 +1261,6 @@ body.discussion {
     }
   }
 
-
-
-
   .bottom-post-status {
     padding: 30px;
     font-size: 20px;
@@ -1288,9 +1268,6 @@ body.discussion {
     color: #ccc;
     text-align: center;
   }
-
-
-
 
   .discussion-column {
     float: right;
@@ -1309,34 +1286,85 @@ body.discussion {
   }
 
   .blank-slate {
-    //nothing here
-    .section {
+
+    section {
       border-bottom: 1px solid #ccc;
-      margin-top: 15px;
     }
+
+    .label {
+      font-size: 12px;
+    }
+
     .home-header {
       //nothing here
     }
 
     .home-title {
       font-size: 18px;
-      color: #000;
+      color: $black;
       margin-bottom: 5px;
     }
     .home-description {
       font-size: 12px;
       line-height: 1;
-      margin-bottom: 10px;
+      margin-bottom: $baseline/2;
     }
     .home-stats {
-      //nothing
+      
+      .label-area {
+        display: inline-block;
+        min-width: $baseline*5;
+        width: 20%;
+        vertical-align: middle;
+
+        .profile-link {
+          //something
+        }
+      }
+
+      .stats-grouping {
+        display: inline-block;
+        width: 70%;
+
+        .profile-stat {
+          display: inline-block;
+          padding: $baseline;
+          vertical-align: middle;
+        }
+      }
     }
-    .home-emailsettings {
-      //nothing here
+
+    .home-helpgrid {
+      border-bottom: none;
+      border-radius: 3px;
+      border: 1px solid #b2b2b2;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
     }
   }
 
-  .blank-slate,
+  .helpgrid-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+
+    .helpgrid-row {
+      border-bottom: 1px solid #b2b2b2;
+
+      .row-title {
+        padding: $baseline;
+        display: inline-block;
+        width: 20%;
+        background-color: $light-gray;
+      }
+
+      .row-item {
+        display: inline-block;
+        width: 20%;
+      }
+    }
+  }
+
   .discussion-article {
     position: relative;
     padding: 40px;
@@ -1445,7 +1473,7 @@ body.discussion {
 
   .responses {
     list-style: none;
-    margin-top: 40px;
+    margin-top: $baseline;
     padding: 0;
 
     > li {
