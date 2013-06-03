@@ -2,9 +2,7 @@
 metadata:
     display_name: Image Mapped Input
     rerandomize: never
-    showanswer: always
-    weight: ""
-    attempts: ""
+    showanswer: finished
 data: |
   <problem>
   <p>

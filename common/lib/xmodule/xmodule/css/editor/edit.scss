@@ -10,8 +10,6 @@
     position: relative;
     @include linear-gradient(top, #d4dee8, #c9d5e2);
     padding: 5px;
-    border: 1px solid #3c3c3c;
-    border-radius: 3px 3px 0 0;
     border-bottom-color: #a5aaaf;
     @include clearfix;
 

@@ -3,6 +3,12 @@
 
 <%namespace name='static' file='../static_content.html'/>
 
+%if not user_logged_in: 
+<%block name="bodyclass">
+  not-signedin 
+</%block>
+%endif
+
 <%block name="content">
 <section class="container activation">
 
@@ -18,7 +24,7 @@
       %if user_logged_in:
         Visit your <a href="/">dashboard</a> to see your courses.
       %else:
-        You can now <a href="#login-modal" rel="leanModal">login</a>.
+        You can now <a href="${reverse('login')}">login</a>.
       %endif
     </p>
   </section>
