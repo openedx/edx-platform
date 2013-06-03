@@ -44,7 +44,8 @@ case `uname -s` in
                 sudo apt-get -y install gfortran
                 sudo apt-get -y install graphviz libgraphviz-dev graphviz-dev
                 sudo apt-get -y install libatlas-dev libblas-dev 
-                sudo apt-get -y install ruby-rvm
+		# This gets uninstalled later in create-dev-env.sh:
+                # sudo apt-get -y install ruby-rvm
                 # install packages listed in APT_PKGS_FILE
                 cat $APT_PKGS_FILE | xargs sudo apt-get -y install
                 ;;
@@ -92,25 +93,26 @@ EO
 
         # paths where brew likes to install python scripts
         PATH=/usr/local/share/python:/usr/local/bin:$PATH
-
-        command -v pip &>/dev/null || {
-            output "Installing pip"
-            easy_install pip
-        }
-
-        if ! grep -Eq ^1.7 <(virtualenv --version 2>/dev/null); then
-            output "Installing virtualenv >1.7"
-            pip install 'virtualenv>1.7' virtualenvwrapper
-        fi
-
-        command -v coffee &>/dev/null || {
-            output "Installing coffee script"
-            curl --insecure https://npmjs.org/install.sh | sh
-            npm install -g coffee-script
-        }
-        ;;
+	;;
     *)
         error "Unsupported platform"
         exit 1
         ;;
 esac
+
+command -v pip &>/dev/null && {
+    output "Upgrading pip"
+	sudo pip install -U pip
+} || {
+    output "Installing pip"
+    sudo easy_install pip
+}
+
+output "Installing / upgrading virtualenv >1.7"
+sudo pip install -U 'virtualenv>1.7' virtualenvwrapper
+
+command -v coffee &>/dev/null || {
+    output "Installing coffee script"
+    curl --insecure https://npmjs.org/install.sh | sh
+    npm install -g coffee-script
+}
