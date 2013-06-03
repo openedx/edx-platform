@@ -201,9 +201,9 @@ class EvaluatorTest(unittest.TestCase):
         which are: sec, csc, cot, arcsec, arccsc, arccot
         """
         angles = ['-pi/4', 'pi/6', 'pi/5', '5*pi/4', '9*pi/4', '1 + j']
-        sec_values = [1.414, 1.155, 1.236, -1.414, 1.414, 0.498+0.591j]
-        csc_values = [-1.414, 2, 1.701, -1.414, 1.414, 0.622-0.304j]
-        cot_values = [-1, 1.732, 1.376, 1, 1, 0.218-0.868j]
+        sec_values = [1.414, 1.155, 1.236, -1.414, 1.414, 0.498 + 0.591j]
+        csc_values = [-1.414, 2, 1.701, -1.414, 1.414, 0.622 - 0.304j]
+        cot_values = [-1, 1.732, 1.376, 1, 1, 0.218 - 0.868j]
 
         self.assert_function_values('sec', angles, sec_values)
         self.assert_function_values('csc', angles, csc_values)
@@ -272,7 +272,7 @@ class EvaluatorTest(unittest.TestCase):
 
         which are of the form arc[X]h
         """
-        results = [0, 0.5, 1, 2, 1+1j]
+        results = [0, 0.5, 1, 2, 1 + 1j]
 
         sinh_vals = ['0', '0.5211', '1.1752', '3.6269', '0.635+1.2985*j']
         self.assert_function_values('arcsinh', sinh_vals, results)

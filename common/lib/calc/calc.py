@@ -12,6 +12,7 @@ import re
 
 import numpy
 import scipy.constants
+import calcfunctions
 
 # have numpy raise errors on functions outside its domain
 # See http://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
@@ -26,16 +27,35 @@ from pyparsing import (Word, nums, Literal,
 DEFAULT_FUNCTIONS = {'sin': numpy.sin,
                      'cos': numpy.cos,
                      'tan': numpy.tan,
+                     'sec': calcfunctions.sec,
+                     'csc': calcfunctions.csc,
+                     'cot': calcfunctions.cot,
                      'sqrt': numpy.sqrt,
                      'log10': numpy.log10,
                      'log2': numpy.log2,
                      'ln': numpy.log,
+                     'exp': numpy.exp,
                      'arccos': numpy.arccos,
                      'arcsin': numpy.arcsin,
                      'arctan': numpy.arctan,
+                     'arcsec': calcfunctions.arcsec,
+                     'arccsc': calcfunctions.arccsc,
+                     'arccot': calcfunctions.arccot,
                      'abs': numpy.abs,
                      'fact': math.factorial,
-                     'factorial': math.factorial
+                     'factorial': math.factorial,
+                     'sinh': numpy.sinh,
+                     'cosh': numpy.cosh,
+                     'tanh': numpy.tanh,
+                     'sech': calcfunctions.sech,
+                     'csch': calcfunctions.csch,
+                     'coth': calcfunctions.coth,
+                     'arcsinh': numpy.arcsinh,
+                     'arccosh': numpy.arccosh,
+                     'arctanh': numpy.arctanh,
+                     'arcsech': calcfunctions.arcsech,
+                     'arccsch': calcfunctions.arccsch,
+                     'arccoth': calcfunctions.arccoth
                      }
 DEFAULT_VARIABLES = {'j': numpy.complex(0, 1),
                      'e': numpy.e,
