@@ -14,19 +14,23 @@ def create_component_instance(step, component_button_css, instance_id, expected_
 
 @world.absorb
 def click_new_component_button(step, component_button_css):
-    step.given('I have opened a new course section in Studio')
-    step.given('I have added a new subsection')
-    step.given('I expand the first section')
-    world.css_click('a.new-unit-item')
+    # step.given('I have opened a new course section in Studio')
+    # step.given('I have added a new subsection')
+    # step.given('I expand the first section')
+    # world.css_click('a.new-unit-item')
+    step.given('I have clicked the new unit button')
     world.css_click(component_button_css)
 
 
 @world.absorb
 def click_component_from_menu(instance_id, expected_css):
     elem_css = "a[data-location='%s']" % instance_id
-    assert_equal(1, len(world.css_find(elem_css)))
-    world.css_click(elem_css)
-    assert_equal(1, len(world.css_find(expected_css)))
+    elements = world.css_find(elem_css)
+    if len(elements) == 1: # Multiple templates
+        world.css_click(elem_css)
+        assert_equal(1, len(world.css_find(expected_css)))
+    else: # Single template
+        assert(len(filter(lambda ele: ele.has_class('single_template'), elements)) == 1)
 
 @world.absorb
 def edit_component_and_select_settings():
