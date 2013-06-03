@@ -33,8 +33,8 @@
 
     // colophon
     .colophon {
-      margin-right: flex-gutter(2);
-      width: flex-grid(6,12);
+      margin-right: flex-gutter();
+      width: flex-grid(8,12);
       float: left;
 
       .nav-colophon {
@@ -71,7 +71,7 @@
 
         p {
           float: left;
-          width: 460px;
+          width: flex-grid(6,8);
           margin-left: $baseline;
           padding-left: $baseline;
           font-size: em(13);
@@ -91,7 +91,6 @@
         text-align: right;
 
         li {
-          margin-right: ($baseline/10);
           display: inline-block;
 
           &:last-child {
@@ -153,10 +152,6 @@
 
     .colophon-about img {
       margin-top: ($baseline*1.5);
-    }
-
-    .colophon-about p {
-      width: 360px;
     }
   }
 }
