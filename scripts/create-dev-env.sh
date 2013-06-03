@@ -207,7 +207,8 @@ case `uname -s` in
         distro=`lsb_release -cs`
         case $distro in
             wheezy|jessie|maya|olivia|nadia|precise|quantal) 
-                warning "Debian support is not fully debugged. Assuming you have standard
+                warning "
+                        Debian support is not fully debugged. Assuming you have standard
                         development packages already working like scipy rvm, the 
                         installation should go fine, but this is still a work in progress.
 
@@ -219,7 +220,8 @@ case `uname -s` in
                 read dummy
                 sudo apt-get install git ;;  
             squeeze|lisa|katya|oneiric|natty|raring)
-                warning "It seems like you're using $distro which has been deprecated.
+                warning "
+                          It seems like you're using $distro which has been deprecated.
                           While we don't technically support this release, the install
                           script will probably still work.
 
@@ -499,7 +501,7 @@ mkdir "$BASE/data" || true
 
 rake django-admin[syncdb]
 rake django-admin[migrate]
-rake django-admin[update-templates]
+rake cms:update_templates
 # Configure Git
 
 output "Fixing your git default settings"
