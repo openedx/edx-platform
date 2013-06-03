@@ -109,7 +109,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         course = store.get_item(Location(['i4x', 'edX', 'simple',
                                           'course', '2012_Fall', None]), depth=None)
 
-        # Just add one advanced module to make sure that it
+        # Just add one advanced module to make sure that it does show templates even if there's only one.
         course.advanced_modules = ['videoalpha']
 
         store.update_metadata(course.location, own_metadata(course))
