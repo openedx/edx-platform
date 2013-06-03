@@ -664,6 +664,7 @@ INSTALLED_APPS = (
     'service_status',
 
     # For asset pipelining
+    'mitxmako',
     'pipeline',
     'staticfiles',
     'static_replace',

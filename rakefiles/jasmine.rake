@@ -73,21 +73,43 @@ def run_phantom_js(url)
     sh("#{phantomjs} node_modules/jasmine-reporters/test/phantomjs-testrunner.js #{url}")
 end
 
+# Open jasmine tests for :system in the default browser. The :env
+# should (always?) be 'jasmine', but it's passed as an arg so that
+# the :assets dependency gets it.
+#
+# This task should be invoked via the wrapper below, so we don't
+# include a description to keep it from showing up in rake -T.
+task :browse_jasmine, [:system, :env] => :assets do |t, args|
+    django_for_jasmine(args.system, true) do |jasmine_url|
+        Launchy.open(jasmine_url)
+        puts "Press ENTER to terminate".red
+        $stdin.gets
+    end
+end
+
+# Use phantomjs to run jasmine tests from the console. The :env
+# should (always?) be 'jasmine', but it's passed as an arg so that
+# the :assets dependency gets it.
+#
+# This task should be invoked via the wrapper below, so we don't
+# include a description to keep it from showing up in rake -T.
+task :phantomjs_jasmine, [:system, :env] => :assets do |t, args|
+    django_for_jasmine(args.system, false) do |jasmine_url|
+        run_phantom_js(jasmine_url)
+    end
+end
+
+# Wrapper tasks for the real browse_jasmine and phantomjs_jasmine
+# tasks above. These have a nicer UI since there's no arg passing.
 [:lms, :cms].each do |system|
     desc "Open jasmine tests for #{system} in your default browser"
-    task "browse_jasmine_#{system}" => :assets do
-        django_for_jasmine(system, true) do |jasmine_url|
-            Launchy.open(jasmine_url)
-            puts "Press ENTER to terminate".red
-            $stdin.gets
-        end
+    task "browse_jasmine_#{system}" do
+        Rake::Task[:browse_jasmine].invoke(system, 'jasmine')
     end
 
     desc "Use phantomjs to run jasmine tests for #{system} from the console"
-    task "phantomjs_jasmine_#{system}" => :assets do
-        django_for_jasmine(system, false) do |jasmine_url|
-            run_phantom_js(jasmine_url)
-        end
+    task "phantomjs_jasmine_#{system}" do
+        Rake::Task[:phantomjs_jasmine].invoke(system, 'jasmine')
     end
 end
 
