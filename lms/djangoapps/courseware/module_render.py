@@ -165,19 +165,19 @@ def get_xqueue_callback_url_prefix(request):
     """
     Calculates default prefix based on request, but allows override via settings
 
-    This is separated so that it can be called by the LMS before submitting
-    background tasks to run.  The xqueue callbacks should go back to the LMS,
-    not to the worker.
+    This is separated from get_module_for_descriptor so that it can be called
+    by the LMS before submitting background tasks to run.  The xqueue callbacks
+    should go back to the LMS, not to the worker.
     """
-    default_xqueue_callback_url_prefix = '{proto}://{host}'.format(
+    prefix = '{proto}://{host}'.format(
             proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
             host=request.get_host()
         )
-    return settings.XQUEUE_INTERFACE.get('callback_url', default_xqueue_callback_url_prefix)
+    return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
 
 
 def get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
-                position=None, wrap_xmodule_display=True, grade_bucket_type=None):
+                              position=None, wrap_xmodule_display=True, grade_bucket_type=None):
     """
     Implements get_module, extracting out the request-specific functionality.
 
@@ -192,14 +192,12 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
 
     return get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
                                               track_function, xqueue_callback_url_prefix,
-                                              position=position,
-                                              wrap_xmodule_display=wrap_xmodule_display,
-                                              grade_bucket_type=grade_bucket_type)
+                                              position, wrap_xmodule_display, grade_bucket_type)
 
 
 def get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
-                track_function, xqueue_callback_url_prefix,
-                position=None, wrap_xmodule_display=True, grade_bucket_type=None):
+                                       track_function, xqueue_callback_url_prefix,
+                                       position=None, wrap_xmodule_display=True, grade_bucket_type=None):
     """
     Actually implement get_module, without requiring a request.
 
@@ -267,15 +265,15 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
 
     def inner_get_module(descriptor):
         """
-        Delegate to get_module.  It does an access check, so may return None
+        Delegate to get_module_for_descriptor_internal() with all values except `descriptor` set.
+
+        Because it does an access check, it may return None.
         """
         # TODO: fix this so that make_xqueue_callback uses the descriptor passed into
         # inner_get_module, not the parent's callback.  Add it as an argument....
         return get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
                                                   track_function, make_xqueue_callback,
-                                                  position=position,
-                                                  wrap_xmodule_display=wrap_xmodule_display,
-                                                  grade_bucket_type=grade_bucket_type)
+                                                  position, wrap_xmodule_display, grade_bucket_type)
 
     def xblock_model_data(descriptor):
         return DbModel(

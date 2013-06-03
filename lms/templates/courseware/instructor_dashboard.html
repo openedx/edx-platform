@@ -12,6 +12,13 @@
  
 %if course_tasks is not None:
   <script type="text/javascript">
+// Define a CourseTaskProgress object for updating a table on the instructor
+// dashboard that shows the current background tasks that are currently running
+// for the instructor's course.  Any tasks that were running when the page is 
+// first displayed are passed in as course_tasks, and populate the "Pending Course
+// Task" table. The CourseTaskProgress is bound to this table, and periodically
+// polls the LMS to see if any of the tasks has completed.  Once a task is complete,
+// it is not included in any further polling.
 
 (function() {
 
@@ -24,7 +31,7 @@
         // then don't set the timeout at all.)
         var refresh_interval = 5000;
 
-        // Hardcode the initial delay, for the first refresh, to two seconds:
+        // Hardcode the initial delay before the first refresh to two seconds:
         var initial_refresh_delay = 2000;
 
         function CourseTaskProgress(element) {
@@ -328,7 +335,7 @@ function goto( mode)
     <H2>Student-specific grade inspection and adjustment</h2>
     <p>
       Specify the edX email address or username of a student here:
-      <input type="text" name="unique_student_identifier"> 
+      <input type="text" name="unique_student_identifier">
     </p>
     <p>
       Click this, and a link to student's progress page will appear below:
@@ -336,7 +343,7 @@ function goto( mode)
     </p>
     <p>
       Specify a particular problem in the course here by its url:
-      <input type="text" name="problem_for_student" size="60"> 
+      <input type="text" name="problem_for_student" size="60">
     </p>
     <p>
       You may use just the "urlname" if a problem, or "modulename/urlname" if not.
@@ -491,10 +498,6 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 
 %if modeflag.get('Data'):
-    <p>
-    <input type="submit" name="action" value="Test Celery">      
-    <p>
-
     <hr width="40%" style="align:left">
     <p>
     <input type="submit" name="action" value="Download CSV of all student profile data">
@@ -700,6 +703,30 @@ function goto( mode)
 
 ##----------------------------------------------------------------------------- 
 
+%if datatable and modeflag.get('Psychometrics') is None:
+
+    <br/>
+    <br/>
+    <p>
+      <hr width="100%">
+      <h2>${datatable['title'] | h}</h2>
+      <table class="stat_table">
+        <tr>
+	%for hname in datatable['header']:
+	  <th>${hname}</th>
+	%endfor
+	</tr>
+        %for row in datatable['data']:
+          <tr>
+	    %for value in row:
+	      <td>${value}</td>
+	    %endfor
+	  </tr>
+        %endfor
+      </table>
+    </p>
+%endif
+
 ## Output tasks in progress
 
 %if course_tasks is not None and len(course_tasks) > 0:
@@ -718,17 +745,17 @@ function goto( mode)
           <th>Task Progress</th>
         </tr>
       %for tasknum, course_task in enumerate(course_tasks):
-        <tr id="task-progress-entry-${tasknum}" class="task-progress-entry" 
+        <tr id="task-progress-entry-${tasknum}" class="task-progress-entry"
 	    data-task-id="${course_task.task_id}"
 	    data-in-progress="true">
           <td>${course_task.task_type}</td>
           <td>${course_task.task_input}</td>
-          <td><div class="task-id">${course_task.task_id}</div></td>
+          <td class="task-id">${course_task.task_id}</td>
           <td>${course_task.requester}</td>
           <td>${course_task.created}</td>
-          <td><div class="task-state">${course_task.task_state}</div></td>
-          <td><div class="task-duration">unknown</div></td>
-          <td><div class="task-progress">unknown</div></td>
+          <td class="task-state">${course_task.task_state}</td>
+          <td class="task-duration">unknown</td>
+          <td class="task-progress">unknown</td>
         </tr>
       %endfor
       </table>
@@ -739,20 +766,20 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 
-%if datatable and modeflag.get('Psychometrics') is None:
+%if course_stats and modeflag.get('Psychometrics') is None:
 
     <br/>
     <br/>
     <p>
       <hr width="100%">
-      <h2>${datatable['title'] | h}</h2>
+      <h2>${course_stats['title']}</h2>
       <table class="stat_table">
         <tr>
-	%for hname in datatable['header']:
-	  <th>${hname | h}</th>
+	%for hname in course_stats['header']:
+	  <th>${hname}</th>
 	%endfor
 	</tr>
-        %for row in datatable['data']:
+        %for row in course_stats['data']:
           <tr>
 	    %for value in row:
 	      <td>${value | h}</td>

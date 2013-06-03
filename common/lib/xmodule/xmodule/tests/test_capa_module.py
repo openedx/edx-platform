@@ -618,10 +618,11 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(module.attempts, 1)
 
     def test_rescore_problem_incorrect(self):
-
+        # make sure it also works when attempts have been reset,
+        # so add this to the test:
         module = CapaFactory.create(attempts=0, done=True)
 
-        # Simulate that all answers are marked correct, no matter
+        # Simulate that all answers are marked incorrect, no matter
         # what the input is, by patching LoncapaResponse.evaluate_answers()
         with patch('capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
             mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'incorrect')
@@ -650,27 +651,31 @@ class CapaModuleTest(unittest.TestCase):
             with self.assertRaises(NotImplementedError):
                 module.rescore_problem()
 
-    def test_rescore_problem_error(self):
+    def _rescore_problem_error_helper(self, exception_class):
+        """Helper to allow testing all errors that rescoring might return."""
+        # Create the module
+        module = CapaFactory.create(attempts=1, done=True)
 
-        # Try each exception that capa_module should handle
-        for exception_class in [StudentInputError,
-                                LoncapaProblemError,
-                                ResponseError]:
+        # Simulate answering a problem that raises the exception
+        with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
+            mock_rescore.side_effect = exception_class('test error')
+            result = module.rescore_problem()
 
-            # Create the module
-            module = CapaFactory.create(attempts=1, done=True)
+        # Expect an AJAX alert message in 'success'
+        expected_msg = 'Error: test error'
+        self.assertEqual(result['success'], expected_msg)
 
-            # Simulate answering a problem that raises the exception
-            with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
-                mock_rescore.side_effect = exception_class('test error')
-                result = module.rescore_problem()
+        # Expect that the number of attempts is NOT incremented
+        self.assertEqual(module.attempts, 1)
 
-            # Expect an AJAX alert message in 'success'
-            expected_msg = 'Error: test error'
-            self.assertEqual(result['success'], expected_msg)
+    def test_rescore_problem_student_input_error(self):
+        self._rescore_problem_error_helper(StudentInputError)
 
-            # Expect that the number of attempts is NOT incremented
-            self.assertEqual(module.attempts, 1)
+    def test_rescore_problem_problem_error(self):
+        self._rescore_problem_error_helper(LoncapaProblemError)
+
+    def test_rescore_problem_response_error(self):
+        self._rescore_problem_error_helper(ResponseError)
 
     def test_save_problem(self):
         module = CapaFactory.create(done=False)

@@ -5,7 +5,9 @@ import logging
 import json
 from mock import Mock, patch
 import textwrap
+from uuid import uuid4
 
+from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -21,14 +23,15 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminF
 
 from courseware.model_data import StudentModule
 from courseware.task_submit import (submit_rescore_problem_for_all_students,
-                                   submit_rescore_problem_for_student,
-                                   course_task_log_status,
-                                   submit_reset_problem_attempts_for_all_students,
-                                   submit_delete_problem_state_for_all_students)
+                                    submit_rescore_problem_for_student,
+                                    course_task_status,
+                                    submit_reset_problem_attempts_for_all_students,
+                                    submit_delete_problem_state_for_all_students)
 from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.factories import CourseTaskFactory
 
 
-log = logging.getLogger("mitx." + __name__)
+log = logging.getLogger(__name__)
 
 
 TEST_COURSE_ORG = 'edx'
@@ -66,13 +69,16 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     @staticmethod
     def get_user_email(username):
+        """Generate email address based on username"""
         return '{0}@test.com'.format(username)
 
     def login_username(self, username):
+        """Login the user, given the `username`."""
         self.login(TestRescoringBase.get_user_email(username), "test")
         self.current_user = username
 
     def _create_user(self, username, is_staff=False):
+        """Creates a user and enrolls them in the test course."""
         email = TestRescoringBase.get_user_email(username)
         if (is_staff):
             AdminFactory.create(username=username, email=email)
@@ -83,9 +89,11 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         return thisuser
 
     def create_instructor(self, username):
+        """Creates an instructor for the test course."""
         return self._create_user(username, is_staff=True)
 
     def create_student(self, username):
+        """Creates a student for the test course."""
         return self._create_user(username, is_staff=False)
 
     @staticmethod
@@ -147,6 +155,7 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         Assumes the input list of responses has two values.
         """
         def get_input_id(response_id):
+            """Creates input id using information about the test course and the current problem."""
             return 'input_i4x-{0}-{1}-problem-{2}_{3}'.format(TEST_COURSE_ORG.lower(),
                                                               TEST_COURSE_NUMBER.replace('.', '_'),
                                                               problem_url_name, response_id)
@@ -176,25 +185,38 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         request.is_secure = Mock(return_value=False)
         return request
 
-    def rescore_all_student_answers(self, instructor, problem_url_name):
-        """Submits the current problem for rescoring"""
+    def submit_rescore_all_student_answers(self, instructor, problem_url_name):
+        """Submits the particular problem for rescoring"""
         return submit_rescore_problem_for_all_students(self.create_task_request(instructor), self.course.id,
                                                        TestRescoringBase.problem_location(problem_url_name))
 
-    def rescore_one_student_answer(self, instructor, problem_url_name, student):
-        """Submits the current problem for rescoring for a particular student"""
+    def submit_rescore_one_student_answer(self, instructor, problem_url_name, student):
+        """Submits the particular problem for rescoring for a particular student"""
         return submit_rescore_problem_for_student(self.create_task_request(instructor), self.course.id,
                                                   TestRescoringBase.problem_location(problem_url_name),
                                                   student)
 
-    def show_correct_answer(self, problem_url_name):
-        modx_url = reverse('modx_dispatch',
-                           kwargs={'course_id': self.course.id,
-                                   'location': TestRescoringBase.problem_location(problem_url_name),
-                                   'dispatch': 'problem_show', })
-        return self.client.post(modx_url, {})
+    def _create_course_task(self, task_state="QUEUED", task_input=None, student=None):
+        """Creates a CourseTask entry for testing."""
+        task_id = str(uuid4())
+        task_key = "dummy value"
+        course_task = CourseTaskFactory.create(requester=self.instructor,
+                                                      task_input=json.dumps(task_input),
+                                                      task_key=task_key,
+                                                      task_id=task_id,
+                                                      task_state=task_state)
+        return course_task
+
+    def rescore_all_student_answers(self, instructor, problem_url_name):
+        """Runs the task to rescore the current problem"""
+#TODO: fix this...
+#        task_input = {'problem_url': TestRescoringBase.problem_location(problem_url_name)}
+#       rescore_problem(entry_id, self.course_id, task_input, xmodule_instance_args)
+        return submit_rescore_problem_for_all_students(self.create_task_request(instructor), self.course.id,
+                                                       TestRescoringBase.problem_location(problem_url_name))
 
     def get_student_module(self, username, descriptor):
+        """Get StudentModule object for test course, given the `username` and the problem's `descriptor`."""
         return StudentModule.objects.get(course_id=self.course.id,
                                          student=User.objects.get(username=username),
                                          module_type=descriptor.location.category,
@@ -202,6 +224,13 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
                                          )
 
     def check_state(self, username, descriptor, expected_score, expected_max_score, expected_attempts):
+        """
+        Check that the StudentModule state contains the expected values.
+
+        The student module is found for the test course, given the `username` and problem `descriptor`.
+
+        Values checked include the number of attempts, the score, and the max score for a problem.
+        """
         module = self.get_student_module(username, descriptor)
         self.assertEqual(module.grade, expected_score, "Scores were not equal")
         self.assertEqual(module.max_grade, expected_max_score, "Max scores were not equal")
@@ -254,14 +283,14 @@ class TestRescoring(TestRescoringBase):
         self.check_state('u1', descriptor, 2, 2, 1)
 
         # rescore the problem for only one student -- only that student's grade should change:
-        self.rescore_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
+        self.submit_rescore_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
         self.check_state('u1', descriptor, 0, 2, 1)
         self.check_state('u2', descriptor, 1, 2, 1)
         self.check_state('u3', descriptor, 1, 2, 1)
         self.check_state('u4', descriptor, 0, 2, 1)
 
         # rescore the problem for all students
-        self.rescore_all_student_answers('instructor', problem_url_name)
+        self.submit_rescore_all_student_answers('instructor', problem_url_name)
         self.check_state('u1', descriptor, 0, 2, 1)
         self.check_state('u2', descriptor, 1, 2, 1)
         self.check_state('u3', descriptor, 1, 2, 1)
@@ -276,22 +305,23 @@ class TestRescoring(TestRescoringBase):
         expected_message = "bad things happened"
         with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
             mock_rescore.side_effect = ZeroDivisionError(expected_message)
-            course_task_log = self.rescore_all_student_answers('instructor', problem_url_name)
+            course_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
         # check task_log returned
-        self.assertEqual(course_task_log.task_state, 'FAILURE')
-        self.assertEqual(course_task_log.requester.username, 'instructor')
-        self.assertEqual(course_task_log.task_type, 'rescore_problem')
-        task_input = json.loads(course_task_log.task_input)
+        self.assertEqual(course_task.task_state, 'FAILURE')
+        self.assertEqual(course_task.requester.username, 'instructor')
+        self.assertEqual(course_task.task_type, 'rescore_problem')
+        task_input = json.loads(course_task.task_input)
         self.assertFalse('student' in task_input)
         self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
-        status = json.loads(course_task_log.task_output)
+        status = json.loads(course_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
 
         # check status returned:
         mock_request = Mock()
-        response = course_task_log_status(mock_request, task_id=course_task_log.task_id)
+        mock_request.REQUEST = {'task_id': course_task.task_id}
+        response = course_task_status(mock_request)
         status = json.loads(response.content)
         self.assertEqual(status['message'], expected_message)
 
@@ -299,16 +329,17 @@ class TestRescoring(TestRescoringBase):
         """confirm that a non-problem will not submit"""
         problem_url_name = self.problem_section.location.url()
         with self.assertRaises(NotImplementedError):
-            self.rescore_all_student_answers('instructor', problem_url_name)
+            self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
     def test_rescoring_nonexistent_problem(self):
         """confirm that a non-existent problem will not submit"""
         problem_url_name = 'NonexistentProblem'
         with self.assertRaises(ItemNotFoundError):
-            self.rescore_all_student_answers('instructor', problem_url_name)
+            self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
     def define_code_response_problem(self, problem_url_name):
-        """Define an arbitrary code-response problem.
+        """
+        Define an arbitrary code-response problem.
 
         We'll end up mocking its evaluation later.
         """
@@ -332,14 +363,15 @@ class TestRescoring(TestRescoringBase):
             mock_send_to_queue.return_value = (0, "Successfully queued")
             self.submit_student_answer('u1', problem_url_name, ["answer1", "answer2"])
 
-        course_task_log = self.rescore_all_student_answers('instructor', problem_url_name)
-        self.assertEqual(course_task_log.task_state, 'FAILURE')
-        status = json.loads(course_task_log.task_output)
+        course_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
+        self.assertEqual(course_task.task_state, FAILURE)
+        status = json.loads(course_task.task_output)
         self.assertEqual(status['exception'], 'NotImplementedError')
         self.assertEqual(status['message'], "Problem's definition does not support rescoring")
 
         mock_request = Mock()
-        response = course_task_log_status(mock_request, task_id=course_task_log.task_id)
+        mock_request.REQUEST = {'task_id': course_task.task_id}
+        response = course_task_status(mock_request)
         status = json.loads(response.content)
         self.assertEqual(status['message'], "Problem's definition does not support rescoring")
 
@@ -418,14 +450,14 @@ class TestRescoring(TestRescoringBase):
 
         # rescore the problem for only one student -- only that student's grade should change
         # (and none of the attempts):
-        self.rescore_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
+        self.submit_rescore_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
         self.check_state('u1', descriptor, 0, 1, 2)
         self.check_state('u2', descriptor, 1, 1, 2)
         self.check_state('u3', descriptor, 1, 1, 2)
         self.check_state('u4', descriptor, 1, 1, 2)
 
         # rescore the problem for all students
-        self.rescore_all_student_answers('instructor', problem_url_name)
+        self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
         # all grades should change to being wrong (with no change in attempts)
         for username in userlist:
@@ -444,6 +476,7 @@ class TestResetAttempts(TestRescoringBase):
         self.logout()
 
     def get_num_attempts(self, username, descriptor):
+        """returns number of attempts stored for `username` on problem `descriptor` for test course"""
         module = self.get_student_module(username, descriptor)
         state = json.loads(module.state)
         return state['attempts']
@@ -483,30 +516,31 @@ class TestResetAttempts(TestRescoringBase):
         expected_message = "bad things happened"
         with patch('courseware.models.StudentModule.save') as mock_save:
             mock_save.side_effect = ZeroDivisionError(expected_message)
-            course_task_log = self.reset_problem_attempts('instructor', problem_url_name)
+            course_task = self.reset_problem_attempts('instructor', problem_url_name)
 
         # check task_log returned
-        self.assertEqual(course_task_log.task_state, 'FAILURE')
-        self.assertEqual(course_task_log.requester.username, 'instructor')
-        self.assertEqual(course_task_log.task_type, 'reset_problem_attempts')
-        task_input = json.loads(course_task_log.task_input)
+        self.assertEqual(course_task.task_state, FAILURE)
+        self.assertEqual(course_task.requester.username, 'instructor')
+        self.assertEqual(course_task.task_type, 'reset_problem_attempts')
+        task_input = json.loads(course_task.task_input)
         self.assertFalse('student' in task_input)
         self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
-        status = json.loads(course_task_log.task_output)
+        status = json.loads(course_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
 
         # check status returned:
         mock_request = Mock()
-        response = course_task_log_status(mock_request, task_id=course_task_log.task_id)
+        mock_request.REQUEST = {'task_id': course_task.task_id}
+        response = course_task_status(mock_request)
         status = json.loads(response.content)
         self.assertEqual(status['message'], expected_message)
 
     def test_reset_non_problem(self):
         """confirm that a non-problem can still be successfully reset"""
         problem_url_name = self.problem_section.location.url()
-        course_task_log = self.reset_problem_attempts('instructor', problem_url_name)
-        self.assertEqual(course_task_log.task_state, 'SUCCESS')
+        course_task = self.reset_problem_attempts('instructor', problem_url_name)
+        self.assertEqual(course_task.task_state, SUCCESS)
 
     def test_reset_nonexistent_problem(self):
         """confirm that a non-existent problem will not submit"""
@@ -560,30 +594,31 @@ class TestDeleteProblem(TestRescoringBase):
         expected_message = "bad things happened"
         with patch('courseware.models.StudentModule.delete') as mock_delete:
             mock_delete.side_effect = ZeroDivisionError(expected_message)
-            course_task_log = self.delete_problem_state('instructor', problem_url_name)
+            course_task = self.delete_problem_state('instructor', problem_url_name)
 
         # check task_log returned
-        self.assertEqual(course_task_log.task_state, 'FAILURE')
-        self.assertEqual(course_task_log.requester.username, 'instructor')
-        self.assertEqual(course_task_log.task_type, 'delete_problem_state')
-        task_input = json.loads(course_task_log.task_input)
+        self.assertEqual(course_task.task_state, FAILURE)
+        self.assertEqual(course_task.requester.username, 'instructor')
+        self.assertEqual(course_task.task_type, 'delete_problem_state')
+        task_input = json.loads(course_task.task_input)
         self.assertFalse('student' in task_input)
         self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
-        status = json.loads(course_task_log.task_output)
+        status = json.loads(course_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
 
         # check status returned:
         mock_request = Mock()
-        response = course_task_log_status(mock_request, task_id=course_task_log.task_id)
+        mock_request.REQUEST = {'task_id': course_task.task_id}
+        response = course_task_status(mock_request)
         status = json.loads(response.content)
         self.assertEqual(status['message'], expected_message)
 
     def test_delete_non_problem(self):
         """confirm that a non-problem can still be successfully deleted"""
         problem_url_name = self.problem_section.location.url()
-        course_task_log = self.delete_problem_state('instructor', problem_url_name)
-        self.assertEqual(course_task_log.task_state, 'SUCCESS')
+        course_task = self.delete_problem_state('instructor', problem_url_name)
+        self.assertEqual(course_task.task_state, SUCCESS)
 
     def test_delete_nonexistent_module(self):
         """confirm that a non-existent module will not submit"""

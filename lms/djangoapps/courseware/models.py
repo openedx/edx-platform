@@ -265,7 +265,7 @@ class OfflineComputedGradeLog(models.Model):
         return "[OCGLog] %s: %s" % (self.course_id, self.created)
 
 
-class CourseTaskLog(models.Model):
+class CourseTask(models.Model):
     """
     Stores information about background tasks that have been submitted to
     perform course-specific work.
@@ -295,11 +295,11 @@ class CourseTaskLog(models.Model):
     task_state = models.CharField(max_length=50, null=True, db_index=True)  # max_length from celery_taskmeta
     task_output = models.CharField(max_length=1024, null=True)
     requester = models.ForeignKey(User, db_index=True)
-    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
-    updated = models.DateTimeField(auto_now=True, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __repr__(self):
-        return 'CourseTaskLog<%r>' % ({
+        return 'CourseTask<%r>' % ({
             'task_type': self.task_type,
             'course_id': self.course_id,
             'task_input': self.task_input,

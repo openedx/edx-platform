@@ -424,7 +424,7 @@ class CapaModule(CapaFields, XModule):
 
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
-        except Exception, err:
+        except Exception as err:
             html = self.handle_problem_html_error(err)
 
         # The convention is to pass the name of the check button
@@ -780,7 +780,7 @@ class CapaModule(CapaFields, XModule):
 
             return {'success': msg}
 
-        except Exception, err:
+        except Exception as err:
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
@@ -845,13 +845,10 @@ class CapaModule(CapaFields, XModule):
         # get old score, for comparison:
         orig_score = self.lcp.get_score()
         event_info['orig_score'] = orig_score['score']
-        event_info['orig_max_score'] = orig_score['total']
+        event_info['orig_total'] = orig_score['total']
 
         try:
             correct_map = self.lcp.rescore_existing_answers()
-            # rescoring should have no effect on attempts, so don't
-            # need to increment here, or mark done.  Just save.
-            self.set_state_from_lcp()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
             log.warning("StudentInputError in capa_module:problem_rescore", exc_info=True)
@@ -859,7 +856,7 @@ class CapaModule(CapaFields, XModule):
             self.system.track_function('problem_rescore_fail', event_info)
             return {'success': "Error: {0}".format(inst.message)}
 
-        except Exception, err:
+        except Exception as err:
             event_info['failure'] = 'unexpected'
             self.system.track_function('problem_rescore_fail', event_info)
             if self.system.DEBUG:
@@ -868,11 +865,15 @@ class CapaModule(CapaFields, XModule):
                 return {'success': msg}
             raise
 
+        # rescoring should have no effect on attempts, so don't
+        # need to increment here, or mark done.  Just save.
+        self.set_state_from_lcp()
+
         self.publish_grade()
 
         new_score = self.lcp.get_score()
         event_info['new_score'] = new_score['score']
-        event_info['new_max_score'] = new_score['total']
+        event_info['new_total'] = new_score['total']
 
         # success = correct if ALL questions in this problem are correct
         success = 'correct'

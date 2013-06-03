@@ -15,25 +15,22 @@ This is used by capa_module.
 
 from datetime import datetime
 import logging
-import math
-import numpy
 import os.path
 import re
-import sys
 
 from lxml import etree
 from xml.sax.saxutils import unescape
 from copy import deepcopy
 
 from .correctmap import CorrectMap
-import inputtypes
-import customrender
+import capa.inputtypes as inputtypes
+import capa.customrender as customrender
 from .util import contextualize_text, convert_files_to_filenames
-import xqueue_interface
+import capa.xqueue_interface as xqueue_interface
 
 # to be replaced with auto-registering
-import responsetypes
-import safe_exec
+import capa.responsetypes as responsetypes
+from capa.safe_exec import safe_exec
 
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
@@ -134,7 +131,6 @@ class LoncapaProblem(object):
 
         self.extracted_tree = self._extract_html(self.tree)
 
-
     def do_reset(self):
         '''
         Reset internal state to unfinished, with no answers
@@ -175,7 +171,7 @@ class LoncapaProblem(object):
         Return the maximum score for this problem.
         '''
         maxscore = 0
-        for response, responder in self.responders.iteritems():
+        for responder in self.responders.values():
             maxscore += responder.get_max_score()
         return maxscore
 
@@ -220,7 +216,7 @@ class LoncapaProblem(object):
     def ungraded_response(self, xqueue_msg, queuekey):
         '''
         Handle any responses from the xqueue that do not contain grades
-        Will try to pass the queue message to all inputtypes that can handle ungraded responses 
+        Will try to pass the queue message to all inputtypes that can handle ungraded responses
 
         Does not return any value
         '''
@@ -257,7 +253,8 @@ class LoncapaProblem(object):
     def grade_answers(self, answers):
         '''
         Grade student responses.  Called by capa_module.check_problem.
-        answers is a dict of all the entries from request.POST, but with the first part
+
+        `answers` is a dict of all the entries from request.POST, but with the first part
         of each key removed (the string before the first "_").
 
         Thus, for example, input_ID123 -> ID123, and input_fromjs_ID123 -> fromjs_ID123
@@ -286,13 +283,12 @@ class LoncapaProblem(object):
         that the responsetypes are synchronous.  This is convenient as it
         permits rescoring to be complete when the rescoring call returns.
         """
-        # We check for synchronous grading and no file submissions by
-        # screening out all problems with a CodeResponse type.
-        for responder in self.responders.values():
-            if 'filesubmission' in responder.allowed_inputfields:
-                return False
-
-        return True
+        return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
+#         for responder in self.responders.values():
+#             if 'filesubmission' in responder.allowed_inputfields:
+#                 return False
+#
+#         return True
 
     def rescore_existing_answers(self):
         '''
@@ -300,15 +296,17 @@ class LoncapaProblem(object):
         '''
         return self._grade_answers(None)
 
-    def _grade_answers(self, answers):
+    def _grade_answers(self, student_answers):
         '''
-        Internal grading call used for checking new student answers and also
-        rescoring existing student answers.
+        Internal grading call used for checking new 'student_answers' and also
+        rescoring existing student_answers.
 
-        answers is a dict of all the entries from request.POST, but with the first part
-        of each key removed (the string before the first "_").
+        For new student_answers being graded, `student_answers` is a dict of all the
+        entries from request.POST, but with the first part of each key removed
+        (the string before the first "_").  Thus, for example,
+        input_ID123 -> ID123, and input_fromjs_ID123 -> fromjs_ID123.
 
-        Thus, for example, input_ID123 -> ID123, and input_fromjs_ID123 -> fromjs_ID123
+        For rescoring, `student_answers` is None.
 
         Calls the Response for each question in this problem, to do the actual grading.
         '''
@@ -325,18 +323,19 @@ class LoncapaProblem(object):
             # student_answers contains a proper answer or the filename of
             # an earlier submission, so for now skip these entirely.
             # TODO: figure out where to get file submissions when rescoring.
-            if 'filesubmission' in responder.allowed_inputfields and answers is None:
+            if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
                 raise Exception("Cannot rescore problems with possible file submissions")
 
-            # use 'answers' if it is provided, otherwise use the saved student_answers.
-            if answers is not None:
-                results = responder.evaluate_answers(answers, oldcmap)
+            # use 'student_answers' only if it is provided, and if it might contain a file
+            # submission that would not exist in the persisted "student_answers".
+            if 'filesubmission' in responder.allowed_inputfields and student_answers is not None:
+                results = responder.evaluate_answers(student_answers, oldcmap)
             else:
                 results = responder.evaluate_answers(self.student_answers, oldcmap)
             newcmap.update(results)
 
         self.correct_map = newcmap
-        # log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
+        # log.debug('%s: in grade_answers, student_answers=%s, cmap=%s' % (self,student_answers,newcmap))
         return newcmap
 
     def get_question_answers(self):
@@ -380,7 +379,6 @@ class LoncapaProblem(object):
         html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
         return html
 
-
     def handle_input_ajax(self, get):
         '''
         InputTypes can support specialized AJAX calls. Find the correct input and pass along the correct data
@@ -397,8 +395,6 @@ class LoncapaProblem(object):
             log.warning("Could not find matching input for id: %s" % input_id)
             return {}
 
-
-
     # ======= Private Methods Below ========
 
     def _process_includes(self):
@@ -408,16 +404,16 @@ class LoncapaProblem(object):
         '''
         includes = self.tree.findall('.//include')
         for inc in includes:
-            file = inc.get('file')
-            if file is not None:
+            filename = inc.get('file')
+            if filename is not None:
                 try:
                     # open using ModuleSystem OSFS filestore
-                    ifp = self.system.filestore.open(file)
+                    ifp = self.system.filestore.open(filename)
                 except Exception as err:
                     log.warning('Error %s in problem xml include: %s' % (
                             err, etree.tostring(inc, pretty_print=True)))
                     log.warning('Cannot find file %s in %s' % (
-                            file, self.system.filestore))
+                            filename, self.system.filestore))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): need real error handling, display to users
                     if not self.system.get('DEBUG'):
@@ -430,7 +426,7 @@ class LoncapaProblem(object):
                 except Exception as err:
                     log.warning('Error %s in problem xml include: %s' % (
                             err, etree.tostring(inc, pretty_print=True)))
-                    log.warning('Cannot parse XML in %s' % (file))
+                    log.warning('Cannot parse XML in %s' % (filename))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): same as above
                     if not self.system.get('DEBUG'):
@@ -438,11 +434,11 @@ class LoncapaProblem(object):
                     else:
                         continue
 
-                # insert new XML into tree in place of inlcude
+                # insert new XML into tree in place of include
                 parent = inc.getparent()
                 parent.insert(parent.index(inc), incxml)
                 parent.remove(inc)
-                log.debug('Included %s into %s' % (file, self.problem_id))
+                log.debug('Included %s into %s' % (filename, self.problem_id))
 
     def _extract_system_path(self, script):
         """
@@ -512,7 +508,7 @@ class LoncapaProblem(object):
 
         if all_code:
             try:
-                safe_exec.safe_exec(
+                safe_exec(
                     all_code,
                     context,
                     random_seed=self.seed,
@@ -568,18 +564,18 @@ class LoncapaProblem(object):
             value = ""
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
-            
+
             if input_id not in self.input_state:
                 self.input_state[input_id] = {}
-                
+
             # do the rendering
             state = {'value': value,
-                   'status': status,
-                   'id': input_id,
-                   'input_state': self.input_state[input_id],
-                   'feedback': {'message': msg,
-                                'hint': hint,
-                                'hintmode': hintmode, }}
+                     'status': status,
+                     'id': input_id,
+                     'input_state': self.input_state[input_id],
+                     'feedback': {'message': msg,
+                                  'hint': hint,
+                                  'hintmode': hintmode, }}
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             # save the input type so that we can make ajax calls on it if we need to
@@ -603,7 +599,7 @@ class LoncapaProblem(object):
         for item in problemtree:
             item_xhtml = self._extract_html(item)
             if item_xhtml is not None:
-                    tree.append(item_xhtml)
+                tree.append(item_xhtml)
 
         if tree.tag in html_transforms:
             tree.tag = html_transforms[problemtree.tag]['tag']

@@ -29,7 +29,7 @@ from courseware import task_submit
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
 from courseware.courses import get_course_with_access
-from courseware.models import StudentModule, CourseTaskLog
+from courseware.models import StudentModule
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
@@ -69,7 +69,8 @@ def instructor_dashboard(request, course_id):
     msg = ''
     problems = []
     plots = []
-
+    datatable = None
+    
     # the instructor dashboard page is modal: grades, psychometrics, admin
     # keep that state in request.session (defaults to grades mode)
     idash_mode = request.POST.get('idash_mode', '')
@@ -79,26 +80,29 @@ def instructor_dashboard(request, course_id):
         idash_mode = request.session.get('idash_mode', 'Grades')
 
     # assemble some course statistics for output to instructor
-    datatable = {'header': ['Statistic', 'Value'],
-                 'title': 'Course Statistics At A Glance',
-                 }
-    data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
-    data += compute_course_stats(course).items()
-    if request.user.is_staff:
-        for field in course.fields:
-            if getattr(field.scope, 'user', False):
-                continue
-
-            data.append([field.name, json.dumps(field.read_json(course))])
-        for namespace in course.namespaces:
-            for field in getattr(course, namespace).fields:
+    def get_course_stats_table():
+        datatable = {'header': ['Statistic', 'Value'],
+                     'title': 'Course Statistics At A Glance',
+                     }
+        data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
+        data += compute_course_stats(course).items()
+        if request.user.is_staff:
+            for field in course.fields:
                 if getattr(field.scope, 'user', False):
                     continue
 
-                data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
-    datatable['data'] = data
+                data.append([field.name, json.dumps(field.read_json(course))])
+            for namespace in course.namespaces:
+                for field in getattr(course, namespace).fields:
+                    if getattr(field.scope, 'user', False):
+                        continue
+
+                    data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
+        datatable['data'] = data
+        return datatable
 
     def return_csv(fn, datatable, fp=None):
+        """Outputs a CSV file from the contents of a datatable."""
         if fp is None:
             response = HttpResponse(mimetype='text/csv')
             response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
@@ -112,12 +116,15 @@ def instructor_dashboard(request, course_id):
         return response
 
     def get_staff_group(course):
+        """Get or create the staff access group"""
         return get_group(course, 'staff')
 
     def get_instructor_group(course):
+        """Get or create the instructor access group"""
         return get_group(course, 'instructor')
 
     def get_group(course, groupname):
+        """Get or create an access group"""
         grpname = get_access_group_name(course, groupname)
         try:
             group = Group.objects.get(name=grpname)
@@ -157,7 +164,7 @@ def instructor_dashboard(request, course_id):
         return "i4x://" + org + "/" + course_name + "/" + urlname
 
     def get_student_from_identifier(unique_student_identifier):
-        # try to uniquely id student by email address or username
+        """Gets a student object using either an email address or username"""
         msg = ""
         try:
             if "@" in unique_student_identifier:
@@ -243,14 +250,13 @@ def instructor_dashboard(request, course_id):
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         try:
-            course_task_log_entry = task_submit.submit_rescore_problem_for_all_students(request, course_id, problem_url)
-            if course_task_log_entry is None:
+            course_task = task_submit.submit_rescore_problem_for_all_students(request, course_id, problem_url)
+            if course_task is None:
                 msg += '<font color="red">Failed to create a background task for rescoring "{0}".</font>'.format(problem_url)
             else:
                 track_msg = 'rescore problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
                 track.views.server_track(request, track_msg, {}, page='idashboard')
         except ItemNotFoundError as e:
-            log.error('Failure to rescore: unknown problem "{0}"'.format(e))
             msg += '<font color="red">Failed to create a background task for rescoring "{0}": problem not found.</font>'.format(problem_url)
         except Exception as e:
             log.error("Encountered exception from rescore: {0}".format(e))
@@ -260,8 +266,8 @@ def instructor_dashboard(request, course_id):
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         try:
-            course_task_log_entry = task_submit.submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
-            if course_task_log_entry is None:
+            course_task = task_submit.submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
+            if course_task is None:
                 msg += '<font color="red">Failed to create a background task for resetting "{0}".</font>'.format(problem_url)
             else:
                 track_msg = 'reset problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
@@ -286,9 +292,6 @@ def instructor_dashboard(request, course_id):
             msg += message
             if task_datatable is not None:
                 datatable = task_datatable
-                datatable['title'] = "{course_id} > {location} > {student}".format(course_id=course_id,
-                                                                                   location=problem_url,
-                                                                                   student=student.username)
 
     elif "Show Background Task History" in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
@@ -297,11 +300,10 @@ def instructor_dashboard(request, course_id):
         msg += message
         if task_datatable is not None:
             datatable = task_datatable
-            datatable['title'] = "{course_id} > {location}".format(course_id=course_id, location=problem_url)
 
-    elif "Reset student's attempts" in action \
-            or "Delete student state for module" in action \
-            or "Rescore student's problem submission" in action:
+    elif ("Reset student's attempts" in action or
+          "Delete student state for module" in action or
+          "Rescore student's problem submission" in action):
         # get the form data
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
         problem_urlname = request.POST.get('problem_for_student', '')
@@ -326,8 +328,8 @@ def instructor_dashboard(request, course_id):
                 try:
                     student_module.delete()
                     msg += "<font color='red'>Deleted student module state for %s!</font>" % module_state_key
-                    track_msg = 'delete student module state for problem {problem} for student {student} in {course}'
-                    track_msg = track_msg.format(problem=problem_url, student=unique_student_identifier, course=course_id)
+                    track_format = 'delete student module state for problem {problem} for student {student} in {course}'
+                    track_msg = track_format.format(problem=problem_url, student=unique_student_identifier, course=course_id)
                     track.views.server_track(request, track_msg, {}, page='idashboard')
                 except:
                     msg += "Failed to delete module state for %s/%s" % (unique_student_identifier, problem_urlname)
@@ -342,28 +344,27 @@ def instructor_dashboard(request, course_id):
                     # save
                     student_module.state = json.dumps(problem_state)
                     student_module.save()
-                    track.views.server_track(request,
-                                             '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
-                                                 old_attempts=old_number_of_attempts,
-                                                 student=student,
-                                                 problem=student_module.module_state_key,
-                                                 instructor=request.user,
-                                                 course=course_id),
-                                             {},
-                                             page='idashboard')
+                    track_format = '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'
+                    track_msg = track_format.format(old_attempts=old_number_of_attempts,
+                                                    student=student,
+                                                    problem=student_module.module_state_key,
+                                                    instructor=request.user,
+                                                    course=course_id)
+                    track.views.server_track(request, track_msg, {}, page='idashboard')
                     msg += "<font color='green'>Module state successfully reset!</font>"
                 except:
                     msg += "<font color='red'>Couldn't reset module state.  </font>"
             else:
+                # "Rescore student's problem submission" case
                 try:
-                    course_task_log_entry = task_submit.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
-                    if course_task_log_entry is None:
+                    course_task = task_submit.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
+                    if course_task is None:
                         msg += '<font color="red">Failed to create a background task for rescoring "{0}" for student {1}.</font>'.format(module_state_key, unique_student_identifier)
                     else:
                         track_msg = 'rescore problem {problem} for student {student} in {course}'.format(problem=module_state_key, student=unique_student_identifier, course=course_id)
                         track.views.server_track(request, track_msg, {}, page='idashboard')
                 except Exception as e:
-                    log.error("Encountered exception from rescore: {0}".format(e))
+                    log.exception("Encountered exception from rescore: {0}")
                     msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(module_state_key, e.message)
 
     elif "Get link to student's progress page" in action:
@@ -725,6 +726,9 @@ def instructor_dashboard(request, course_id):
     else:
         course_tasks = None
 
+    course_stats = None
+    if datatable is None:
+        course_stats = get_course_stats_table()
     #----------------------------------------
     # context for rendering
 
@@ -734,6 +738,7 @@ def instructor_dashboard(request, course_id):
                'instructor_access': instructor_access,
                'forum_admin_access': forum_admin_access,
                'datatable': datatable,
+               'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
                'problems': problems,		# psychometrics
@@ -1302,48 +1307,48 @@ def get_background_task_table(course_id, problem_url, student=None):
     # just won't find any entries.)
     if (history_entries.count()) == 0:
         if student is not None:
-            log.debug("Found no background tasks for request: {course}, {problem}, and student {student}".format(course=course_id, problem=problem_url, student=student.username))
             template = '<font color="red">Failed to find any background tasks for course "{course}", module "{problem}" and student "{student}".</font>'
             msg += template.format(course=course_id, problem=problem_url, student=student.username)
         else:
-            log.debug("Found no background tasks for request: {course}, {problem}".format(course=course_id, problem=problem_url))
             msg += '<font color="red">Failed to find any background tasks for course "{course}" and module "{problem}".</font>'.format(course=course_id, problem=problem_url)
     else:
         datatable = {}
-        datatable['header'] = ["Order",
-            "Task Type",
-            "Task Id",
-            "Requester",
-            "Submitted",
-            "Duration (ms)",
-            "Task State",
-            "Task Status",
-            "Task Output"]
+        datatable['header'] = ["Task Type",
+                               "Task Id",
+                               "Requester",
+                               "Submitted",
+                               "Duration (ms)",
+                               "Task State",
+                               "Task Status",
+                               "Task Output"]
 
         datatable['data'] = []
-        for i, course_task in enumerate(history_entries):
+        for course_task in history_entries:
             # get duration info, if known:
             duration_ms = 'unknown'
-            if hasattr(course_task, 'task_outputs'):
-                task_outputs = json.loads(course_task.task_output)
-                if 'duration_ms' in task_outputs:
-                    duration_ms = task_outputs['duration_ms']
+            if hasattr(course_task, 'task_output'):
+                task_output = json.loads(course_task.task_output)
+                if 'duration_ms' in task_output:
+                    duration_ms = task_output['duration_ms']
             # get progress status message:
-            success, message = task_submit.get_task_completion_message(course_task)
-            if success:
-                status = "Complete"
-            else:
-                status = "Incomplete"
+            success, task_message = task_submit.get_task_completion_info(course_task)
+            status = "Complete" if success else "Incomplete"
             # generate row for this task:
-            row = ["#{0}".format(len(history_entries) - i),
-                str(course_task.task_type),
-                str(course_task.task_id),
-                str(course_task.requester),
-                course_task.created.strftime("%Y/%m/%d %H:%M:%S"),
-                duration_ms,
-                str(course_task.task_state),
-                status,
-                message]
+            row = [str(course_task.task_type),
+                   str(course_task.task_id),
+                   str(course_task.requester),
+                   course_task.created.isoformat(' '),
+                   duration_ms,
+                   str(course_task.task_state),
+                   status,
+                   task_message]
             datatable['data'].append(row)
+
+        if student is not None:
+            datatable['title'] = "{course_id} > {location} > {student}".format(course_id=course_id,
+                                                                               location=problem_url,
+                                                                               student=student.username)
+        else:
+            datatable['title'] = "{course_id} > {location}".format(course_id=course_id, location=problem_url)
 
     return msg, datatable
