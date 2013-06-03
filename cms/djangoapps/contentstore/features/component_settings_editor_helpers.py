@@ -28,7 +28,6 @@ def click_component_from_menu(instance_id, expected_css):
     world.css_click(elem_css)
     assert_equal(1, len(world.css_find(expected_css)))
 
-
 @world.absorb
 def edit_component_and_select_settings():
     world.css_click('a.edit-button')

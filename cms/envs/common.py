@@ -40,7 +40,10 @@ MITX_FEATURES = {
     'SEGMENT_IO': True,
 
     # Enable URL that shows information about the status of various services
-    'ENABLE_SERVICE_STATUS': False
+    'ENABLE_SERVICE_STATUS': False,
+
+    # Don't autoplay videos for course authors
+    'AUTOPLAY_VIDEOS': False
 }
 ENABLE_JASMINE = False
 
