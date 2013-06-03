@@ -167,7 +167,7 @@
       <p><a href="${reverse('register_user')}">Sign up for ${settings.PLATFORM_NAME} today!</a></p>
 
       ## Disable help unless the FAQ marketing link is enabled
-      % if settings.MKTG_URL_LINK_MAP.get('FAQ', None) is not None:
+      % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
         <h3>Need Help?</h3>
         <p>Looking for help in logging in or with your ${settings.PLATFORM_NAME} account?
         <a href="${marketing_link('FAQ')}">
