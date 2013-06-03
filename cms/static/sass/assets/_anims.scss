@@ -95,12 +95,12 @@
 // bounce in
 @mixin bounceIn {
   0% {
-    opacity: 0;
+    opacity: 0.0;
     @include transform(scale(0.3));
   }
 
   50% {
-    opacity: 1;
+    opacity: 1.0;
     @include transform(scale(1.05));
   }
 
@@ -128,12 +128,12 @@
 // bounce in
 @mixin bounceOut {
   0% {
-    opacity: 0;
+    opacity: 0.0;
     @include transform(scale(0.3));
   }
 
   50% {
-    opacity: 1;
+    opacity: 1.0;
     @include transform(scale(1.05));
   }
 
@@ -146,12 +146,12 @@
   }
 
   50% {
-    opacity: 1;
+    opacity: 1.0;
     @include transform(scale(1.05));
   }
 
   100% {
-    opacity: 0;
+    opacity: 0.0;
     @include transform(scale(0.3));
   }
 }

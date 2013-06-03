@@ -162,7 +162,7 @@ body.index {
               position: absolute;
               bottom: -30px;
               right: ($baseline/2);
-              opacity: 0;
+              opacity: 0.0;
 
               [class^="icon-"] {
                 @include font-size(18);
