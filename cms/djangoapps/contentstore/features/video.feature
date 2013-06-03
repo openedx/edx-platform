@@ -3,4 +3,4 @@ Feature: Video Component
 
   Scenario: Autoplay is disabled in Studio
     Given I have created a Video component
-    Then when I view it it does not autoplay
+    Then when I view the video it does not have autoplay enabled

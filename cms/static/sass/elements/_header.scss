@@ -243,7 +243,7 @@
     left: -7px;
     top: 47px;
     width: 140px;
-    opacity: 0;
+    opacity: 0.0;
     pointer-events: none;
   }
 
@@ -558,7 +558,7 @@ body.signin .nav-not-signedin-signup {
 
   .wrapper-nav-sub {
     @include transition (opacity 1.0s ease-in-out 0s);
-    opacity: 0;
+    opacity: 0.0;
     pointer-events: none;
 
     &.is-shown {

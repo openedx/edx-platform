@@ -1,13 +1,13 @@
 #pylint: disable=C0111
-#pylint: disable=W0621
 
 from lettuce import world, step
-from common import *
+from lettuce.django import django_url
+from common import TEST_COURSE_NAME, TEST_SECTION_NAME, i_am_registered_for_the_course, section_location
 
 ############### ACTIONS ####################
 
 
-@step('when I view it it does autoplay')
+@step('when I view the video it has autoplay enabled')
 def does_autoplay(step):
     assert(world.css_find('.video')[0]['data-autoplay'] == 'True')
 
@@ -16,14 +16,14 @@ def does_autoplay(step):
 def view_video(step):
     coursename = TEST_COURSE_NAME.replace(' ', '_')
     i_am_registered_for_the_course(step, coursename)
-    
+
     # Make sure we have a video
-    video = add_video_to_course(coursename)
+    add_video_to_course(coursename)
     chapter_name = TEST_SECTION_NAME.replace(" ", "_")
     section_name = chapter_name
     url = django_url('/courses/edx/Test_Course/Test_Course/courseware/%s/%s' %
                      (chapter_name, section_name))
-    
+
     world.browser.visit(url)
 
 

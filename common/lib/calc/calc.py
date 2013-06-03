@@ -144,6 +144,8 @@ def evaluator(variables, functions, string, cs=False):
         return x
 
     def parallel(x):  # Parallel resistors [ 1 2 ] => 2/3
+        # convert from pyparsing.ParseResults, which doesn't support '0 in x'
+        x = list(x)
         if len(x) == 1:
             return x[0]
         if 0 in x:
@@ -180,8 +182,8 @@ def evaluator(variables, functions, string, cs=False):
 
     number_part = Word(nums)
 
-    # 0.33 or 7 or .34
-    inner_number = (number_part + Optional("." + number_part)) | ("." + number_part)
+    # 0.33 or 7 or .34 or 16.
+    inner_number = (number_part + Optional("." + Optional(number_part))) | ("." + number_part)
 
     # 0.33k or -17
     number = (Optional(minus | plus) + inner_number
@@ -230,27 +232,3 @@ def evaluator(variables, functions, string, cs=False):
     expr << Optional((plus | minus)) + term + ZeroOrMore((plus | minus) + term)  # -5 + 4 - 3
     expr = expr.setParseAction(sum_parse_action)
     return (expr + stringEnd).parseString(string)[0]
-
-if __name__ == '__main__':
-    variables = {'R1': 2.0, 'R3': 4.0}
-    functions = {'sin': numpy.sin, 'cos': numpy.cos}
-    print "X", evaluator(variables, functions, "10000||sin(7+5)-6k")
-    print "X", evaluator(variables, functions, "13")
-    print evaluator({'R1': 2.0, 'R3': 4.0}, {}, "13")
-
-    print evaluator({'e1': 1, 'e2': 1.0, 'R3': 7, 'V0': 5, 'R5': 15, 'I1': 1, 'R4': 6}, {}, "e2")
-
-    print evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5")
-    print evaluator({}, {}, "-1")
-    print evaluator({}, {}, "-(7+5)")
-    print evaluator({}, {}, "-0.33")
-    print evaluator({}, {}, "-.33")
-    print evaluator({}, {}, "5+1*j")
-    print evaluator({}, {}, "j||1")
-    print evaluator({}, {}, "e^(j*pi)")
-    print evaluator({}, {}, "fact(5)")
-    print evaluator({}, {}, "factorial(5)")
-    try:
-        print evaluator({}, {}, "5+7 QWSEKO")
-    except UndefinedVariable:
-        print "Successfully caught undefined variable"

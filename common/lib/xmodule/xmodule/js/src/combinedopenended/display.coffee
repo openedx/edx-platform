@@ -289,6 +289,9 @@ class @CombinedOpenEnded
       if @child_type == "openended"
         @submit_button.hide()
         @queueing()
+        if @task_number==1 and @task_count==1
+          @grader_status = $('.grader-status')
+          @grader_status.html("<p>Response submitted for scoring.</p>")
     else if @child_state == 'post_assessment'
       if @child_type=="openended"
         @skip_button.show()
@@ -311,6 +314,8 @@ class @CombinedOpenEnded
       if @task_number<@task_count
         @next_problem()
       else
+        if @task_number==1 and @task_count==1
+          @show_combined_rubric_current()
         @show_results_current()
         @reset_button.show()
 

@@ -27,7 +27,7 @@ div.calc-main {
     width: 16px;
 
     &:hover {
-      opacity: .8;
+      opacity: 0.8;
     }
 
     &.closed {
@@ -136,7 +136,7 @@ div.calc-main {
 
             &.shown {
               display: block;
-              opacity: 1;
+              opacity: 1.0;
             }
 
             dt {
