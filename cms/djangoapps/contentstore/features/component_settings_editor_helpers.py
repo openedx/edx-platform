@@ -26,11 +26,12 @@ def click_new_component_button(step, component_button_css):
 def click_component_from_menu(instance_id, expected_css):
     elem_css = "a[data-location='%s']" % instance_id
     elements = world.css_find(elem_css)
-    if len(elements) == 1: # Multiple templates
+    if len(elements) == 1:  # Multiple templates
         world.css_click(elem_css)
         assert_equal(1, len(world.css_find(expected_css)))
-    else: # Single template
+    else:  # Single template
         assert(len(filter(lambda ele: ele.has_class('single_template'), elements)) == 1)
+
 
 @world.absorb
 def edit_component_and_select_settings():
