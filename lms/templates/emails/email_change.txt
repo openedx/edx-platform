@@ -1,6 +1,8 @@
-We received a request to change the e-mail associated with your edX
-account from ${old_email} to ${new_email}. If this is correct, please
-confirm your new e-mail address by visiting:
+<%namespace file="../main.html" import="stanford_theme_enabled" />
+We received a request to change the e-mail associated with your
+${settings.PLATFORM_NAME} account from ${old_email} to ${new_email}.
+If this is correct, please confirm your new e-mail address by
+visiting:
 
 % if is_secure:
  https://${ site }/email_confirm/${ key }
@@ -8,6 +10,15 @@ confirm your new e-mail address by visiting:
  http://${ site }/email_confirm/${ key }
 % endif
 
-If you didn't request this, you don't need to do anything; you won't
-receive any more email from us. Please do not reply to this e-mail; if
-you require assistance, check the help section of the edX web site.
+## TODO: fix this ugly hack
+% if stanford_theme_enabled():
+  If you didn't request this, you don't need to do anything; you won't
+  receive any more email from us. Please do not reply to this e-mail;
+  if you require assistance, check the about section of the
+  ${settings.PLATFORM_NAME} Courses web site.
+% else:
+  If you didn't request this, you don't need to do anything; you won't
+  receive any more email from us. Please do not reply to this e-mail;
+  if you require assistance, check the help section of the
+  ${settings.PLATFORM_NAME} web site.
+% endif

@@ -58,65 +58,91 @@ urlpatterns = ('',  # nopep8
         name='auth_password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
+)
 
-    ##
-    ## Only universities without courses should be included here.  If
-    ## courses exist, the dynamic profile rule below should win.
-    ##
-    url(r'^(?i)university_profile/WellesleyX$', 'courseware.views.static_university_profile',
-        name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
-    url(r'^(?i)university_profile/McGillX$', 'courseware.views.static_university_profile',
-        name="static_university_profile", kwargs={'org_id': 'McGillX'}),
-    url(r'^(?i)university_profile/TorontoX$', 'courseware.views.static_university_profile',
-        name="static_university_profile", kwargs={'org_id': 'TorontoX'}),
-    url(r'^(?i)university_profile/RiceX$', 'courseware.views.static_university_profile',
-        name="static_university_profile", kwargs={'org_id': 'RiceX'}),
-    url(r'^(?i)university_profile/ANUx$', 'courseware.views.static_university_profile',
-        name="static_university_profile", kwargs={'org_id': 'ANUx'}),
-    url(r'^(?i)university_profile/EPFLx$', 'courseware.views.static_university_profile',
-        name="static_university_profile", kwargs={'org_id': 'EPFLx'}),
+# University profiles only make sense in the default edX context
+if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
+    urlpatterns += (
+        ##
+        ## Only universities without courses should be included here.  If
+        ## courses exist, the dynamic profile rule below should win.
+        ##
+        url(r'^(?i)university_profile/WellesleyX$', 'courseware.views.static_university_profile',
+            name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
+        url(r'^(?i)university_profile/McGillX$', 'courseware.views.static_university_profile',
+            name="static_university_profile", kwargs={'org_id': 'McGillX'}),
+        url(r'^(?i)university_profile/TorontoX$', 'courseware.views.static_university_profile',
+            name="static_university_profile", kwargs={'org_id': 'TorontoX'}),
+        url(r'^(?i)university_profile/RiceX$', 'courseware.views.static_university_profile',
+            name="static_university_profile", kwargs={'org_id': 'RiceX'}),
+        url(r'^(?i)university_profile/ANUx$', 'courseware.views.static_university_profile',
+            name="static_university_profile", kwargs={'org_id': 'ANUx'}),
+        url(r'^(?i)university_profile/EPFLx$', 'courseware.views.static_university_profile',
+            name="static_university_profile", kwargs={'org_id': 'EPFLx'}),
 
-    url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile',
-        name="university_profile"),
+        url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile',
+            name="university_profile"),
+    )
 
-    #Semi-static views (these need to be rendered and have the login bar, but don't change)
+#Semi-static views (these need to be rendered and have the login bar, but don't change)
+urlpatterns += (
     url(r'^404$', 'static_template_view.views.render',
         {'template': '404.html'}, name="404"),
-    url(r'^about$', 'static_template_view.views.render',
-        {'template': 'about.html'}, name="about_edx"),
-    url(r'^jobs$', 'static_template_view.views.render',
-        {'template': 'jobs.html'}, name="jobs"),
-    url(r'^contact$', 'static_template_view.views.render',
-        {'template': 'contact.html'}, name="contact"),
-    url(r'^press$', 'student.views.press', name="press"),
-    url(r'^media-kit$', 'static_template_view.views.render',
-        {'template': 'media-kit.html'}, name="media-kit"),
-    url(r'^faq$', 'static_template_view.views.render',
-        {'template': 'faq.html'}, name="faq_edx"),
-    url(r'^help$', 'static_template_view.views.render',
-        {'template': 'help.html'}, name="help_edx"),
-
-    url(r'^tos$', 'static_template_view.views.render',
-        {'template': 'tos.html'}, name="tos"),
-    url(r'^privacy$', 'static_template_view.views.render',
-        {'template': 'privacy.html'}, name="privacy_edx"),
-    # TODO: (bridger) The copyright has been removed until it is updated for edX
-    # url(r'^copyright$', 'static_template_view.views.render',
-    #     {'template': 'copyright.html'}, name="copyright"),
-    url(r'^honor$', 'static_template_view.views.render',
-        {'template': 'honor.html'}, name="honor"),
-
-    #Press releases
-    url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
-
-    # Favicon
-    (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
-
-    url(r'^submit_feedback$', 'util.views.submit_feedback_via_zendesk'),
-
-    # TODO: These urls no longer work. They need to be updated before they are re-enabled
-    # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
 )
+
+# Semi-static views only used by edX, not by themes
+if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
+    urlpatterns += (
+        url(r'^jobs$', 'static_template_view.views.render',
+            {'template': 'jobs.html'}, name="jobs"),
+        url(r'^press$', 'student.views.press', name="press"),
+        url(r'^media-kit$', 'static_template_view.views.render',
+            {'template': 'media-kit.html'}, name="media-kit"),
+        url(r'^help$', 'static_template_view.views.render',
+            {'template': 'help.html'}, name="help_edx"),
+
+        # TODO: (bridger) The copyright has been removed until it is updated for edX
+        # url(r'^copyright$', 'static_template_view.views.render',
+        #     {'template': 'copyright.html'}, name="copyright"),
+
+        #Press releases
+        url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
+
+        # Favicon
+        (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
+
+        url(r'^submit_feedback$', 'util.views.submit_feedback_via_zendesk'),
+
+        # TODO: These urls no longer work. They need to be updated before they are re-enabled
+        # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
+    )
+
+# Only enable URLs for those marketing links actually enabled in the
+# settings. Disable URLs by marking them as None.
+for key, value in settings.MKTG_URL_LINK_MAP.items():
+    # Skip disabled URLs
+    if value is None:
+        continue
+
+    # These urls are enabled separately
+    if key == "ROOT" or key == "COURSES":
+        continue
+
+    # Make the assumptions that the templates are all in the same dir
+    # and that they all match the name of the key (plus extension)
+    template = "%s.html" % key.lower()
+
+    # To allow theme templates to inherit from default templates,
+    # prepend a standard prefix
+    if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
+        template = "theme-" + template
+
+    # Make the assumption that the URL we want is the lowercased
+    # version of the map key
+    urlpatterns += (url(r'^%s' % key.lower(),
+                        'static_template_view.views.render',
+                        {'template': template}, name=value),)
+
 
 if settings.PERFSTATS:
     urlpatterns += (url(r'^reprofile$', 'perfstats.views.end_profile'),)

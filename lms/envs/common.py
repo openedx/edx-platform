@@ -31,6 +31,9 @@ from path import path
 from .discussionsettings import *
 
 ################################### FEATURES ###################################
+# The display name of the platform to be used in templates/emails/etc.
+PLATFORM_NAME = "edX"
+
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
@@ -315,6 +318,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'
+TECH_SUPPORT_EMAIL = 'technical@edx.org'
+CONTACT_EMAIL = 'info@edx.org'
+BUGS_EMAIL = 'bugs@edx.org'
 ADMINS = (
     ('edX Admins', 'admin@edx.org'),
 )
@@ -329,6 +335,8 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 ]
+
+FAVICON_PATH = 'images/favicon.ico'
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'   # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
