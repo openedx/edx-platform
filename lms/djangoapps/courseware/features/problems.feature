@@ -111,8 +111,7 @@ Feature: Answer problems
         Then The "Reset" button does not appear
 
     Scenario: I can view and hide the answer if the problem has it:
-        When I am viewing a "numerical" that shows the answer "always"
-        Then The "Show Answer" button does appear
+        Given I am viewing a "numerical" that shows the answer "always"
         When I press the "Show Answer" button
         Then The "Hide Answer" button does appear
         And The "Show Answer" button does not appear
