@@ -32,7 +32,7 @@ def click_component_from_menu(instance_id, expected_css):
     if len(elements) == 1:  # Multiple templates
         world.css_click(elem_css)
     else:  # Single template
-        assert(len(filter(lambda ele: ele.has_class('single_template'), elements)) == 1)
+        assert(len(filter(lambda ele: ele.has_class('single-template'), elements)) == 1)
     assert_equal(1, len(world.css_find(expected_css)))
 
 
