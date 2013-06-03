@@ -161,9 +161,9 @@ class FolditModule(FolditFields, XModule):
         """
         0 if required_level_half_credit - required_sublevel_half_credit not
         reached.
-        1/2 if required_level_half_credit and required_sublevel_half_credit
+        0.5 if required_level_half_credit and required_sublevel_half_credit
         reached.
-        2/2 if requred_level and required_sublevel reached.
+        1 if requred_level and required_sublevel reached.
         """
         if self.is_complete():
             score = 1
