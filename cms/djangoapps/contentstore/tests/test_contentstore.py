@@ -102,6 +102,25 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertIn('Open Ended Response', resp.content)
         self.assertIn('Peer Grading Interface', resp.content)
 
+    def test_advanced_components_require_two_clicks(self):
+        store = modulestore('direct')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        course = store.get_item(Location(['i4x', 'edX', 'simple',
+                                          'course', '2012_Fall', None]), depth=None)
+
+        # Just add one advanced module to make sure that it
+        course.advanced_modules = ['videoalpha']
+
+        store.update_metadata(course.location, own_metadata(course))
+
+        descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
+
+        resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertIn('Video Alpha', resp.content)
+
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
 
