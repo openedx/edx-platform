@@ -20,7 +20,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminFactory
 
 from courseware.model_data import StudentModule
-from courseware.task_queue import (submit_rescore_problem_for_all_students,
+from courseware.task_submit import (submit_rescore_problem_for_all_students,
                                    submit_rescore_problem_for_student,
                                    course_task_log_status,
                                    submit_reset_problem_attempts_for_all_students,

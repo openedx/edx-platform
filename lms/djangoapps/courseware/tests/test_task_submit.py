@@ -12,14 +12,14 @@ from django.test.testcases import TestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from courseware.tests.factories import UserFactory, CourseTaskLogFactory
-from courseware.task_queue import (get_running_course_tasks,
-                                   course_task_log_status,
-                                   _encode_problem_and_student_input,
-                                   AlreadyRunningError,
-                                   submit_rescore_problem_for_all_students,
-                                   submit_rescore_problem_for_student,
-                                   submit_reset_problem_attempts_for_all_students,
-                                   submit_delete_problem_state_for_all_students)
+from courseware.task_submit import (get_running_course_tasks,
+                                    course_task_log_status,
+                                    _encode_problem_and_student_input,
+                                    AlreadyRunningError,
+                                    submit_rescore_problem_for_all_students,
+                                    submit_rescore_problem_for_student,
+                                    submit_reset_problem_attempts_for_all_students,
+                                    submit_delete_problem_state_for_all_students)
 
 
 log = logging.getLogger("mitx." + __name__)
@@ -277,5 +277,5 @@ class TaskQueueTestCase(TestCase):
         request.user = self.student
         with self.assertRaises(AlreadyRunningError):
             # just skip making the argument check, so we don't have to fake it deeper down
-            with patch('courseware.task_queue._check_arguments_for_rescoring'):
+            with patch('courseware.task_submit._check_arguments_for_rescoring'):
                 submit_rescore_problem_for_all_students(request, course_id, problem_url)
