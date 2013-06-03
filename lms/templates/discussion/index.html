@@ -26,22 +26,48 @@
         <div class="sidebar"></div>
         <div class="discussion-column">
         	<div class="discussion-article blank-slate">
-	        	<div class="home-header section">
-	        		<h1 class="home-title">${course.display_name_with_default} Discussion Home</h1>
+	        	<section class="home-header">
+	        		<span class="label">DISCUSSION HOME:</span>
+	        		<h1 class="home-title">${course.display_name_with_default}</h1>
 	        		<p class="home-description">Welcome to ${course.display_name_with_default}'s Discussion Home. Select a discussion from the left, or review your profile, participation and email notification settings below.  
 	        		</p>
-	        	</div>
-	        	<div class="home-stats section">
-	        		The home-stats
-	        	</div>
-	        	<div class="home-emailsettings section">
-	        		The home-emailsettings
-	        	</div>
+	        	</section>
+	        	<section class="home-stats">
+	        		<div class="label-area">
+		        		<span class="label"> PROFILE, PARTICIPATION</span>
+		        		<a href="#" class="profile-link">Your profile Name</a>
+	        		</div>
+	        		<div class="stats-grouping">
+		        		<div class="profile-stat profile-stat-posts">5 POSTS</div>
+		        		<div class="profile-stat profile-stat-comments">12 COMMENTS</div>
+		        		<div class="profile-stat profile-stat-following">9 POSTS I'M FOLLOWING</div>
+		        	</div>
+	        	</section>
+	        	<span class="label">HOW TO USE EDX DISCUSSIONS</span>
+	        	<section class="home-helpgrid">
+		        	<ul class="helpgrid-list">
+		        		<li class="helpgrid-row helpgrid-row-navigation">
+		        			<span class="row-title">Navigation</span>
+		        			<div class="row-item">Focus in on specific topics</div>
+		        			<div class="row-item">Search for specific posts</div>
+		        			<div class="row-item">Sort by date, vote, or comments</div>
+		        		</li>
+		        		<li class="helpgrid-row helpgrid-row-participation">
+		        			<span class="row-title">Participation</span>
+		        			<div class="row-item">Upvote posts and good responses</div>
+		        			<div class="row-item">Report Forum Misuse</div>
+		        			<div class="row-item">Follow posts for updates</div>
+		        		</li>
+		        		<li class="helpgrid-row helpgrid-row-notification">
+		        			<span class="row-title">Notification</span>
+		        		</li>
+		        	</ul>
+	        	</section>
 
         	</div>
         </div>
     </div>
-</section>
+</section> 
 
 <%include file="_underscore_templates.html" />
 <%include file="_thread_list_template.html" />
