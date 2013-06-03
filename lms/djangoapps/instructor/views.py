@@ -5,6 +5,7 @@ from collections import defaultdict
 import csv
 import json
 import logging
+from markupsafe import escape
 import os
 import re
 import requests
@@ -75,10 +76,6 @@ def instructor_dashboard(request, course_id):
         request.session['idash_mode'] = idash_mode
     else:
         idash_mode = request.session.get('idash_mode', 'Grades')
-
-    def escape(s):
-        """escape HTML special characters in string"""
-        return str(s).replace('<', '&lt;').replace('>', '&gt;')
 
     # assemble some course statistics for output to instructor
     datatable = {'header': ['Statistic', 'Value'],
@@ -316,7 +313,7 @@ def instructor_dashboard(request, course_id):
         datatable = {'header': ['Student  email', 'Match?']}
         rg_students = [x['email'] for x in rg_stud_data['retdata']]
         def domatch(x):
-            return '<font color="green">yes</font>' if x.email in rg_students else '<font color="red">No</font>'
+            return 'yes' if x.email in rg_students else 'No'
         datatable['data'] = [[x.email, domatch(x)] for x in stud_data['students']]
         datatable['title'] = action
 
