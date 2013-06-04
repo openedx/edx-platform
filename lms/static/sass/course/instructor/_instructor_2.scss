@@ -26,3 +26,24 @@
     }
   }
 }
+
+
+.instructor-dashboard-wrapper-2 section.idash-section#course-info {
+  .error-log {
+    margin-top: 1em;
+
+    .course-error {
+      margin-bottom: 1em;
+
+      code {
+        &.course-error-first {
+          color: red;
+        }
+
+        &.course-error-second {
+          color: black;
+        }
+      }
+    }
+  }
+}

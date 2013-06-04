@@ -12,6 +12,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
+from django.utils.html import escape
 
 from django.conf import settings
 from courseware.access import has_access, get_access_group_name, course_beta_test_group_name
@@ -44,10 +45,8 @@ def instructor_dashboard_2(request, course_id):
         'admin_access': request.user.is_staff,
         'instructor_access': instructor_access,
         'forum_admin_access': forum_admin_access,
-        'course_errors': modulestore().get_item_errors(course.location),
         'djangopid': os.getpid(),
         'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
-        'offline_grade_log': offline_grades_available(course_id),
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
         'section_data': section_data
     }
@@ -64,6 +63,13 @@ def _section_course_info(request, course_id):
     section_data['has_started'] = course.has_started()
     section_data['has_ended'] = course.has_ended()
     section_data['grade_cutoffs'] = "[" + reduce(lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo , course.grade_cutoffs.items(), "")[:-2] + "]"
+    section_data['offline_grades'] = offline_grades_available(course_id)
+
+    try:
+        section_data['course_errors'] = [(escape(a), escape(b)) for (a,b) in modulestore().get_item_errors(course.location)]
+    except Exception:
+        section_data['course_errors'] = [('Error fetching errors', '')]
+
     return section_data
 
 
