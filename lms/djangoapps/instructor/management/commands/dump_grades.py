@@ -16,7 +16,8 @@ class Command(BaseCommand):
     help = "dump grades to CSV file.  Usage: dump_grades course_id_or_dir filename dump_type\n"
     help += "   course_id_or_dir: either course_id or course_dir\n"
     help += "   filename: where the output CSV is to be stored\n"
-    # help += "   start_date: end date as M/D/Y H:M (defaults to end of available data)"
+    # help += "   start_date: end date as M/D/Y H:M (defaults to end of
+    # available data)"
     help += "   dump_type: 'all' or 'raw' (see instructor dashboard)"
 
     def handle(self, *args, **options):
@@ -51,11 +52,13 @@ class Command(BaseCommand):
 
         print "-----------------------------------------------------------------------------"
         print "Dumping grades from %s to file %s (get_raw_scores=%s)" % (course.id, fn, get_raw_scores)
-        datatable = get_student_grade_summary_data(request, course, course.id, get_raw_scores=get_raw_scores)
+        datatable = get_student_grade_summary_data(
+            request, course, course.id, get_raw_scores=get_raw_scores)
 
         fp = open(fn, 'w')
 
-        writer = csv.writer(fp, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
+        writer = csv.writer(
+            fp, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
             encoded_row = [unicode(s).encode('utf-8') for s in datarow]
@@ -66,9 +69,12 @@ class Command(BaseCommand):
 
     class DummyRequest(object):
         META = {}
+
         def __init__(self):
             return
+
         def get_host(self):
             return 'edx.mit.edu'
+
         def is_secure(self):
             return False

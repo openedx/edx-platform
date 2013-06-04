@@ -11,16 +11,26 @@ class Migration(SchemaMigration):
 
         # Adding model 'RevokedCertificate'
         db.create_table('certificates_revokedcertificate', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('explanation', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('certificate_id', self.gf('django.db.models.fields.CharField')(default=None, max_length=32, null=True)),
-            ('graded_certificate_id', self.gf('django.db.models.fields.CharField')(default=None, max_length=32, null=True)),
-            ('download_url', self.gf('django.db.models.fields.CharField')(max_length=128, null=True)),
-            ('graded_download_url', self.gf('django.db.models.fields.CharField')(max_length=128, null=True)),
-            ('grade', self.gf('django.db.models.fields.CharField')(max_length=5, null=True)),
-            ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('explanation', self.gf(
+                'django.db.models.fields.TextField')(blank=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
+            ('name', self.gf('django.db.models.fields.CharField')(
+                max_length=255, blank=True)),
+            ('certificate_id', self.gf('django.db.models.fields.CharField')(
+                default=None, max_length=32, null=True)),
+            ('graded_certificate_id', self.gf('django.db.models.fields.CharField')(
+                default=None, max_length=32, null=True)),
+            ('download_url', self.gf('django.db.models.fields.CharField')(
+                max_length=128, null=True)),
+            ('graded_download_url', self.gf(
+                'django.db.models.fields.CharField')(max_length=128, null=True)),
+            ('grade', self.gf('django.db.models.fields.CharField')(
+                max_length=5, null=True)),
+            ('enabled', self.gf(
+                'django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal('certificates', ['RevokedCertificate'])
 

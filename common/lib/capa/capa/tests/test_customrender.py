@@ -43,14 +43,16 @@ class SolutionRenderTest(unittest.TestCase):
 
     def test_rendering(self):
         solution = 'To compute unicorns, count them.'
-        xml_str = """<solution id="solution_12">{s}</solution>""".format(s=solution)
+        xml_str = """<solution id="solution_12">{s}</solution>""".format(
+            s=solution)
         element = etree.fromstring(xml_str)
 
         renderer = lookup_tag('solution')(test_system(), element)
 
         self.assertEqual(renderer.id, 'solution_12')
 
-        # Our test_system "renders" templates to a div with the repr of the context.
+        # Our test_system "renders" templates to a div with the repr of the
+        # context.
         xml = renderer.get_html()
         context = extract_context(xml)
         self.assertEqual(context, {'id': 'solution_12'})
@@ -75,4 +77,5 @@ class MathRenderTest(unittest.TestCase):
         self.check_parse(r'$\displaystyle 2+2$', '[mathjax] 2+2[/mathjax]')
 
 
-    # NOTE: not testing get_html yet because I don't understand why it's doing what it's doing.
+    # NOTE: not testing get_html yet because I don't understand why it's doing
+    # what it's doing.

@@ -27,10 +27,12 @@ def get_checklists(request, org, course, name):
 
     modulestore = get_modulestore(location)
     course_module = modulestore.get_item(location)
-    new_course_template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
+    new_course_template = Location(
+        'i4x', 'edx', 'templates', 'course', 'Empty')
     template_module = modulestore.get_item(new_course_template)
 
-    # If course was created before checklists were introduced, copy them over from the template.
+    # If course was created before checklists were introduced, copy them over
+    # from the template.
     copied = False
     if not course_module.checklists:
         course_module.checklists = template_module.checklists
@@ -75,7 +77,8 @@ def update_checklist(request, org, course, name, checklist_index=None):
                 "Could not save checklist state because the checklist index was out of range or unspecified.",
                 content_type="text/plain")
     elif request.method == 'GET':
-        # In the JavaScript view initialize method, we do a fetch to get all the checklists.
+        # In the JavaScript view initialize method, we do a fetch to get all
+        # the checklists.
         checklists, modified = expand_checklist_action_urls(course_module)
         if modified:
             modulestore.update_metadata(location, own_metadata(course_module))
@@ -97,7 +100,8 @@ def expand_checklist_action_urls(course_module):
     for checklist in checklists:
         if not checklist.get('action_urls_expanded', False):
             for item in checklist.get('items'):
-                item['action_url'] = get_url_reverse(item.get('action_url'), course_module)
+                item['action_url'] = get_url_reverse(
+                    item.get('action_url'), course_module)
             checklist['action_urls_expanded'] = True
             modified = True
 

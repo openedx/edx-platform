@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from nose.tools import assert_true
@@ -14,6 +14,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 ###########  STEP HELPERS ##############
+
 
 @step('I (?:visit|access|open) the Studio homepage$')
 def i_visit_the_studio_homepage(step):
@@ -107,11 +108,13 @@ def log_into_studio(
 
 
 def create_a_course():
-    c = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    c = world.CourseFactory.create(
+        org='MITx', course='999', display_name='Robot Super Course')
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
-    g = world.GroupFactory.create(name='instructor_MITx/999/Robot_Super_Course')
+    g = world.GroupFactory.create(
+        name='instructor_MITx/999/Robot_Super_Course')
     u = get_user_by_email('robot+studio@edx.org')
     u.groups.add(g)
     u.save()

@@ -23,7 +23,8 @@ class DummySystem(ImportSystem):
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
     def __init__(self, load_error_modules):
 
-        xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
+        xmlstore = XMLModuleStore(
+            "data_dir", course_dirs=[], load_error_modules=load_error_modules)
         course_id = "/".join([ORG, COURSE, 'test_run'])
         course_dir = "test_dir"
         policy = {}
@@ -151,9 +152,11 @@ class ImportTestCase(BaseCourseTestCase):
         # Check that the child inherits due correctly
         child = descriptor.get_children()[0]
         self.assertEqual(child.lms.due, Date().from_json(v))
-        self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
+        self.assertEqual(
+            child._inheritable_metadata, child._inherited_metadata)
         self.assertEqual(2, len(child._inherited_metadata))
-        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        self.assertEqual(
+            '1970-01-01T00:00:00Z', child._inherited_metadata['start'])
         self.assertEqual(v, child._inherited_metadata['due'])
 
         # Now export and check things
@@ -209,9 +212,11 @@ class ImportTestCase(BaseCourseTestCase):
         # Check that the child does not inherit a value for due
         child = descriptor.get_children()[0]
         self.assertEqual(child.lms.due, None)
-        self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
+        self.assertEqual(
+            child._inheritable_metadata, child._inherited_metadata)
         self.assertEqual(1, len(child._inherited_metadata))
-        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        self.assertEqual(
+            '1970-01-01T00:00:00Z', child._inherited_metadata['start'])
 
     def test_metadata_override_default(self):
         """
@@ -235,10 +240,13 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertEqual(descriptor.lms.due, Date().from_json(course_due))
         self.assertEqual(child.lms.due, Date().from_json(child_due))
-        # Test inherited metadata. Due does not appear here (because explicitly set on child).
+        # Test inherited metadata. Due does not appear here (because explicitly
+        # set on child).
         self.assertEqual(1, len(child._inherited_metadata))
-        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
-        # Test inheritable metadata. This has the course inheritable value for due.
+        self.assertEqual(
+            '1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        # Test inheritable metadata. This has the course inheritable value for
+        # due.
         self.assertEqual(2, len(child._inheritable_metadata))
         self.assertEqual(course_due, child._inheritable_metadata['due'])
 
@@ -323,14 +331,17 @@ class ImportTestCase(BaseCourseTestCase):
         location = Location(["i4x", "edX", "toy", "video", "Welcome"])
         toy_video = modulestore.get_instance(toy_id, location)
         two_toy_video = modulestore.get_instance(two_toy_id, location)
-        self.assertEqual(etree.fromstring(toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh8")
-        self.assertEqual(etree.fromstring(two_toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh9")
+        self.assertEqual(etree.fromstring(
+            toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh8")
+        self.assertEqual(etree.fromstring(
+            two_toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh9")
 
     def test_colon_in_url_name(self):
         """Ensure that colons in url_names convert to file paths properly"""
 
         print("Starting import")
-        # Not using get_courses because we need the modulestore object too afterward
+        # Not using get_courses because we need the modulestore object too
+        # afterward
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
@@ -355,7 +366,8 @@ class ImportTestCase(BaseCourseTestCase):
 
         print("making sure html loaded")
         cloc = course.location
-        loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
+        loc = Location(
+            cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
         html = modulestore.get_instance(course_id, loc)
         self.assertEquals(html.display_name, "Toy lab")
 
@@ -383,7 +395,8 @@ class ImportTestCase(BaseCourseTestCase):
             self.assertEqual(len(video.url_name), len('video_') + 12)
 
     def test_poll_and_conditional_import(self):
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['conditional_and_poll'])
+        modulestore = XMLModuleStore(
+            DATA_DIR, course_dirs=['conditional_and_poll'])
 
         course = modulestore.get_courses()[0]
         chapters = course.get_children()
@@ -433,10 +446,12 @@ class ImportTestCase(BaseCourseTestCase):
         works properly.  Pulls data from the graphic_slider_tool directory
         in the test data directory.
         '''
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['graphic_slider_tool'])
+        modulestore = XMLModuleStore(
+            DATA_DIR, course_dirs=['graphic_slider_tool'])
 
         sa_id = "edX/gst_test/2012_Fall"
-        location = Location(["i4x", "edX", "gst_test", "graphical_slider_tool", "sample_gst"])
+        location = Location(
+            ["i4x", "edX", "gst_test", "graphical_slider_tool", "sample_gst"])
         gst_sample = modulestore.get_instance(sa_id, location)
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\

@@ -42,7 +42,8 @@ response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 solution_tags = ['solution']
 
 # these get captured as student responses
-response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
+response_properties = [
+    "codeparam", "responseparam", "answer", "openendedparam"]
 
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {'problem': {'tag': 'div'},
@@ -51,7 +52,8 @@ html_transforms = {'problem': {'tag': 'div'},
                    }
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam", "openendedrubric"]
+html_problem_semantics = ["codeparam", "responseparam", "answer",
+                          "script", "hintgroup", "openendedparam", "openendedrubric"]
 
 log = logging.getLogger(__name__)
 
@@ -133,7 +135,6 @@ class LoncapaProblem(object):
         self.inputs = {}
 
         self.extracted_tree = self._extract_html(self.tree)
-
 
     def do_reset(self):
         '''
@@ -220,7 +221,7 @@ class LoncapaProblem(object):
     def ungraded_response(self, xqueue_msg, queuekey):
         '''
         Handle any responses from the xqueue that do not contain grades
-        Will try to pass the queue message to all inputtypes that can handle ungraded responses 
+        Will try to pass the queue message to all inputtypes that can handle ungraded responses
 
         Does not return any value
         '''
@@ -230,14 +231,12 @@ class LoncapaProblem(object):
             if hasattr(the_input, 'ungraded_response'):
                 the_input.ungraded_response(xqueue_msg, queuekey)
 
-
     def is_queued(self):
         '''
         Returns True if any part of the problem has been submitted to an external queue
         (e.g. for grading.)
         '''
         return any(self.correct_map.is_queued(answer_id) for answer_id in self.correct_map)
-
 
     def get_recentmost_queuetime(self):
         '''
@@ -247,7 +246,8 @@ class LoncapaProblem(object):
         if not self.is_queued():
             return None
 
-        # Get a list of timestamps of all queueing requests, then convert it to a DateTime object
+        # Get a list of timestamps of all queueing requests, then convert it to
+        # a DateTime object
         queuetime_strs = [self.correct_map.get_queuetime_str(answer_id)
                           for answer_id in self.correct_map
                           if self.correct_map.is_queued(answer_id)]
@@ -255,7 +255,6 @@ class LoncapaProblem(object):
                       for qt_str in queuetime_strs]
 
         return max(queuetimes)
-
 
     def grade_answers(self, answers):
         '''
@@ -284,10 +283,12 @@ class LoncapaProblem(object):
             if 'filesubmission' in responder.allowed_inputfields:
                 results = responder.evaluate_answers(answers, oldcmap)
             else:
-                results = responder.evaluate_answers(convert_files_to_filenames(answers), oldcmap)
+                results = responder.evaluate_answers(
+                    convert_files_to_filenames(answers), oldcmap)
             newcmap.update(results)
         self.correct_map = newcmap
-        # log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
+        # log.debug('%s: in grade_answers, answers=%s, cmap=%s' %
+        # (self,answers,newcmap))
         return newcmap
 
     def get_question_answers(self):
@@ -307,7 +308,8 @@ class LoncapaProblem(object):
         for entry in self.tree.xpath("//" + "|//".join(solution_tags)):
             answer = etree.tostring(entry)
             if answer:
-                answer_map[entry.get('id')] = contextualize_text(answer, self.context)
+                answer_map[entry.get('id')] = contextualize_text(
+                    answer, self.context)
 
         log.debug('answer_map = %s' % answer_map)
         return answer_map
@@ -328,9 +330,9 @@ class LoncapaProblem(object):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        html = contextualize_text(etree.tostring(
+            self._extract_html(self.tree)), self.context)
         return html
-
 
     def handle_input_ajax(self, get):
         '''
@@ -348,10 +350,7 @@ class LoncapaProblem(object):
             log.warning("Could not find matching input for id: %s" % input_id)
             return {}
 
-
-
     # ======= Private Methods Below ========
-
     def _process_includes(self):
         '''
         Handle any <include file="foo"> tags by reading in the specified file and inserting it
@@ -366,11 +365,12 @@ class LoncapaProblem(object):
                     ifp = self.system.filestore.open(file)
                 except Exception as err:
                     log.warning('Error %s in problem xml include: %s' % (
-                            err, etree.tostring(inc, pretty_print=True)))
+                        err, etree.tostring(inc, pretty_print=True)))
                     log.warning('Cannot find file %s in %s' % (
-                            file, self.system.filestore))
+                        file, self.system.filestore))
                     # if debugging, don't fail - just log error
-                    # TODO (vshnayder): need real error handling, display to users
+                    # TODO (vshnayder): need real error handling, display to
+                    # users
                     if not self.system.get('DEBUG'):
                         raise
                     else:
@@ -380,7 +380,7 @@ class LoncapaProblem(object):
                     incxml = etree.XML(ifp.read())
                 except Exception as err:
                     log.warning('Error %s in problem xml include: %s' % (
-                            err, etree.tostring(inc, pretty_print=True)))
+                        err, etree.tostring(inc, pretty_print=True)))
                     log.warning('Cannot parse XML in %s' % (file))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): same as above
@@ -421,7 +421,8 @@ class LoncapaProblem(object):
             # Check that we are within the filestore tree.
             reldir = os.path.relpath(dir, self.system.filestore.root_path)
             if ".." in reldir:
-                log.warning("Ignoring Python directory outside of course: %r" % dir)
+                log.warning(
+                    "Ignoring Python directory outside of course: %r" % dir)
                 continue
 
             abs_dir = os.path.normpath(dir)
@@ -473,10 +474,12 @@ class LoncapaProblem(object):
                 )
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
-                msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
+                msg = "Error while executing script code: %s" % str(
+                    err).replace('<', '&lt;')
                 raise responsetypes.LoncapaProblemError(msg)
 
-        # Store code source in context, along with the Python path needed to run it correctly.
+        # Store code source in context, along with the Python path needed to
+        # run it correctly.
         context['script_code'] = all_code
         context['python_path'] = python_path
         return context
@@ -492,7 +495,7 @@ class LoncapaProblem(object):
         Used by get_html.
         '''
         if (problemtree.tag == 'script' and problemtree.get('type')
-            and 'javascript' in problemtree.get('type')):
+                and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
             return deepcopy(problemtree)
 
@@ -518,33 +521,37 @@ class LoncapaProblem(object):
             value = ""
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
-            
+
             if input_id not in self.input_state:
                 self.input_state[input_id] = {}
-                
+
             # do the rendering
             state = {'value': value,
-                   'status': status,
-                   'id': input_id,
-                   'input_state': self.input_state[input_id],
-                   'feedback': {'message': msg,
-                                'hint': hint,
-                                'hintmode': hintmode, }}
+                     'status': status,
+                     'id': input_id,
+                     'input_state': self.input_state[input_id],
+                     'feedback': {'message': msg,
+                                  'hint': hint,
+                                  'hintmode': hintmode, }}
 
-            input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
-            # save the input type so that we can make ajax calls on it if we need to
-            self.inputs[input_id] = input_type_cls(self.system, problemtree, state)
+            input_type_cls = inputtypes.registry.get_class_for_tag(
+                problemtree.tag)
+            # save the input type so that we can make ajax calls on it if we
+            # need to
+            self.inputs[input_id] = input_type_cls(
+                self.system, problemtree, state)
             return self.inputs[input_id].get_html()
 
         # let each Response render itself
         if problemtree in self.responders:
             overall_msg = self.correct_map.get_overall_message()
             return self.responders[problemtree].render_html(self._extract_html,
-                                                response_msg=overall_msg)
+                                                            response_msg=overall_msg)
 
         # let each custom renderer render itself:
         if problemtree.tag in customrender.registry.registered_tags():
-            renderer_class = customrender.registry.get_class_for_tag(problemtree.tag)
+            renderer_class = customrender.registry.get_class_for_tag(
+                problemtree.tag)
             renderer = renderer_class(self.system, problemtree)
             return renderer.get_html()
 
@@ -589,14 +596,16 @@ class LoncapaProblem(object):
             answer_id = 1
             input_tags = inputtypes.registry.registered_tags()
             inputfields = tree.xpath("|".join(['//' + response.tag + '[@id=$id]//' + x
-                                               for x in (input_tags + solution_tags)]),
-                                    id=response_id_str)
+                                               for x in (
+                                                   input_tags + solution_tags)]),
+                                     id=response_id_str)
 
             # assign one answer_id for each input type or solution type
             for entry in inputfields:
                 entry.attrib['response_id'] = str(response_id)
                 entry.attrib['answer_id'] = str(answer_id)
-                entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
+                entry.attrib['id'] = "%s_%i_%i" % (
+                    self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
             # instantiate capa Response
@@ -610,16 +619,20 @@ class LoncapaProblem(object):
         self.responder_answers = {}
         for response in self.responders.keys():
             try:
-                self.responder_answers[response] = self.responders[response].get_answers()
+                self.responder_answers[
+                    response] = self.responders[response].get_answers()
             except:
-                log.debug('responder %s failed to properly return get_answers()',
-                          self.responders[response])  # FIXME
+                log.debug(
+                    'responder %s failed to properly return get_answers()',
+                    self.responders[response])  # FIXME
                 raise
 
         # <solution>...</solution> may not be associated with any specific response; give
         # IDs for those separately
-        # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
+        # TODO: We should make the namespaces consistent and unique (e.g.
+        # %s_problem_%i).
         solution_id = 1
         for solution in tree.findall('.//solution'):
-            solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
+            solution.attrib['id'] = "%s_solution_%i" % (
+                self.problem_id, solution_id)
             solution_id += 1

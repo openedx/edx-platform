@@ -17,7 +17,8 @@ from track.models import TrackingLog
 
 log = logging.getLogger("tracking")
 
-LOGFIELDS = ['username', 'ip', 'event_source', 'event_type', 'event', 'agent', 'page', 'time', 'host']
+LOGFIELDS = ['username', 'ip', 'event_source',
+             'event_type', 'event', 'agent', 'page', 'time', 'host']
 
 
 def log_event(event):
@@ -40,7 +41,8 @@ def user_track(request):
 
     try:
         scookie = request.META['HTTP_COOKIE']  # Get cookies
-        scookie = ";".join([c.split('=')[1] for c in scookie.split(";") if "sessionid" in c]).strip()  # Extract session ID
+        scookie = ";".join([c.split('=')[1] for c in scookie.split(
+            ";") if "sessionid" in c]).strip()  # Extract session ID
     except:
         scookie = ""
 
@@ -61,7 +63,7 @@ def user_track(request):
         "page": request.GET['page'],
         "time": datetime.datetime.utcnow().isoformat(),
         "host": request.META['SERVER_NAME'],
-        }
+    }
     log_event(event)
     return HttpResponse('success')
 
@@ -87,7 +89,7 @@ def server_track(request, event_type, event, page=None):
         "page": page,
         "time": datetime.datetime.utcnow().isoformat(),
         "host": request.META['SERVER_NAME'],
-        }
+    }
 
     if event_type.startswith("/event_logs") and request.user.is_staff:  	# don't log
         return
@@ -116,6 +118,7 @@ def view_tracking_log(request, args=''):
     # fix dtstamp
     fmt = '%a %d-%b-%y %H:%M:%S'  # "%Y-%m-%d %H:%M:%S %Z%z"
     for rinst in record_instances:
-        rinst.dtstr = rinst.time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime(fmt)
+        rinst.dtstr = rinst.time.replace(tzinfo=pytz.utc).astimezone(
+            pytz.timezone('US/Eastern')).strftime(fmt)
 
     return render_to_response('tracking_log.html', {'records': record_instances})

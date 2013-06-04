@@ -81,16 +81,16 @@ class GeneratedCertificate(models.Model):
     course_id = models.CharField(max_length=255, blank=True, default='')
     verify_uuid = models.CharField(max_length=32, blank=True, default='')
     download_uuid = models.CharField(max_length=32, blank=True, default='')
-    download_url = models.CharField(max_length=128, blank=True,  default='')
+    download_url = models.CharField(max_length=128, blank=True, default='')
     grade = models.CharField(max_length=5, blank=True, default='')
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
     status = models.CharField(max_length=32, default='unavailable')
     name = models.CharField(blank=True, max_length=255)
     created_date = models.DateTimeField(
-            auto_now_add=True, default=datetime.now)
+        auto_now_add=True, default=datetime.now)
     modified_date = models.DateTimeField(
-            auto_now=True, default=datetime.now)
+        auto_now=True, default=datetime.now)
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
     class Meta:
@@ -128,7 +128,7 @@ def certificate_status_for_student(student, course_id):
 
     try:
         generated_certificate = GeneratedCertificate.objects.get(
-                user=student, course_id=course_id)
+            user=student, course_id=course_id)
         d = {'status': generated_certificate.status}
         if generated_certificate.grade:
             d['grade'] = generated_certificate.grade

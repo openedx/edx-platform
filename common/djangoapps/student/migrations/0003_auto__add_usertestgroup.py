@@ -11,19 +11,25 @@ class Migration(SchemaMigration):
 
         # Adding model 'UserTestGroup'
         db.create_table('student_usertestgroup', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=32, db_index=True)),
-            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(
+                max_length=32, db_index=True)),
+            ('description', self.gf(
+                'django.db.models.fields.TextField')(blank=True)),
         ))
         db.send_create_signal('student', ['UserTestGroup'])
 
         # Adding M2M table for field users on 'UserTestGroup'
         db.create_table('student_usertestgroup_users', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('usertestgroup', models.ForeignKey(orm['student.usertestgroup'], null=False)),
+            ('id', models.AutoField(verbose_name='ID',
+             primary_key=True, auto_created=True)),
+            ('usertestgroup', models.ForeignKey(orm[
+             'student.usertestgroup'], null=False)),
             ('user', models.ForeignKey(orm['auth.user'], null=False))
         ))
-        db.create_unique('student_usertestgroup_users', ['usertestgroup_id', 'user_id'])
+        db.create_unique('student_usertestgroup_users', [
+                         'usertestgroup_id', 'user_id'])
 
     def backwards(self, orm):
 

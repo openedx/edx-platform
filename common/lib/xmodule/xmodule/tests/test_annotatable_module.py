@@ -10,8 +10,10 @@ from xmodule.modulestore import Location
 
 from . import test_system
 
+
 class AnnotatableModuleTestCase(unittest.TestCase):
-    location = Location(["i4x", "edX", "toy", "annotatable", "guided_discussion"])
+    location = Location(
+        ["i4x", "edX", "toy", "annotatable", "guided_discussion"])
     sample_xml = '''
         <annotatable display_name="Iliad">
             <instructions>Read the text.</instructions>
@@ -32,13 +34,15 @@ class AnnotatableModuleTestCase(unittest.TestCase):
     module_data = {'data': sample_xml}
 
     def setUp(self):
-        self.annotatable = AnnotatableModule(test_system(), self.location, self.descriptor, self.module_data)
+        self.annotatable = AnnotatableModule(
+            test_system(), self.location, self.descriptor, self.module_data)
 
     def test_annotation_data_attr(self):
-        el = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')
+        el = etree.fromstring(
+            '<annotation title="bar" body="foo" problem="0">test</annotation>')
 
         expected_attr = {
-            'data-comment-body': {'value': 'foo', '_delete': 'body' },
+            'data-comment-body': {'value': 'foo', '_delete': 'body'},
             'data-comment-title': {'value': 'bar', '_delete': 'title'},
             'data-problem-id': {'value': '0', '_delete': 'problem'}
         }
@@ -52,7 +56,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
         xml = '<annotation title="x" body="y" problem="0">test</annotation>'
         el = etree.fromstring(xml)
 
-        expected_attr = { 'class': { 'value': 'annotatable-span highlight' } }
+        expected_attr = {'class': {'value': 'annotatable-span highlight'}}
         actual_attr = self.annotatable._get_annotation_class_attr(0, el)
 
         self.assertTrue(type(actual_attr) is dict)
@@ -63,11 +67,12 @@ class AnnotatableModuleTestCase(unittest.TestCase):
 
         for color in self.annotatable.highlight_colors:
             el = etree.fromstring(xml.format(highlight=color))
-            value = 'annotatable-span highlight highlight-{highlight}'.format(highlight=color)
+            value = 'annotatable-span highlight highlight-{highlight}'.format(
+                highlight=color)
 
-            expected_attr = { 'class': {
+            expected_attr = {'class': {
                 'value': value,
-                '_delete': 'highlight' }
+                '_delete': 'highlight'}
             }
             actual_attr = self.annotatable._get_annotation_class_attr(0, el)
 
@@ -79,9 +84,9 @@ class AnnotatableModuleTestCase(unittest.TestCase):
 
         for invalid_color in ['rainbow', 'blink', 'invisible', '', None]:
             el = etree.fromstring(xml.format(highlight=invalid_color))
-            expected_attr = { 'class': {
+            expected_attr = {'class': {
                 'value': 'annotatable-span highlight',
-                '_delete': 'highlight' }
+                '_delete': 'highlight'}
             }
             actual_attr = self.annotatable._get_annotation_class_attr(0, el)
 
@@ -92,7 +97,8 @@ class AnnotatableModuleTestCase(unittest.TestCase):
         expected_html = '<span class="annotatable-span highlight highlight-yellow" data-comment-title="x" data-comment-body="y" data-problem-id="0">z</span>'
         expected_el = etree.fromstring(expected_html)
 
-        actual_el = etree.fromstring('<annotation title="x" body="y" problem="0" highlight="yellow">z</annotation>')
+        actual_el = etree.fromstring(
+            '<annotation title="x" body="y" problem="0" highlight="yellow">z</annotation>')
         self.annotatable._render_annotation(0, actual_el)
 
         self.assertEqual(expected_el.tag, actual_el.tag)
@@ -106,8 +112,10 @@ class AnnotatableModuleTestCase(unittest.TestCase):
         self.assertEqual('div', el.tag, 'root tag is a div')
 
         expected_num_annotations = 5
-        actual_num_annotations = el.xpath('count(//span[contains(@class,"annotatable-span")])')
-        self.assertEqual(expected_num_annotations, actual_num_annotations, 'check number of annotations')
+        actual_num_annotations = el.xpath(
+            'count(//span[contains(@class,"annotatable-span")])')
+        self.assertEqual(expected_num_annotations,
+                         actual_num_annotations, 'check number of annotations')
 
     def test_get_html(self):
         context = self.annotatable.get_html()

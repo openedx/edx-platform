@@ -44,12 +44,13 @@ class Middleware(object):
         referer = request.META.get('HTTP_REFERER')
         destination = request.path
 
-
         if request.method == 'GET':
-            new_destination = self.get_redirected_url(request.user, referer, destination)
+            new_destination = self.get_redirected_url(
+                request.user, referer, destination)
 
             if new_destination != destination:
-                # We mark that we generated this redirection, so we don't modify it again
+                # We mark that we generated this redirection, so we don't
+                # modify it again
                 self.redirected = True
                 return redirect(new_destination)
 
@@ -61,7 +62,6 @@ class Middleware(object):
 
         return None
 
-
     def process_response(self, request, response):
         """
         If this is a redirect response going to /wiki/*, then we might need
@@ -72,14 +72,14 @@ class Middleware(object):
             destination_url = response['LOCATION']
             destination = urlparse(destination_url).path
 
-            new_destination = self.get_redirected_url(request.user, referer, destination)
+            new_destination = self.get_redirected_url(
+                request.user, referer, destination)
 
             if new_destination != destination:
                 new_url = destination_url.replace(destination, new_destination)
                 response['LOCATION'] = new_url
 
         return response
-
 
     def get_redirected_url(self, user, referer, destination):
         """
@@ -92,16 +92,19 @@ class Middleware(object):
         path_match = re.match(r'^/wiki/(?P<wiki_path>.*|)$', destination)
         if path_match:
             # We are going to the wiki. Check if we came from a course
-            course_match = re.match(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/.*', referer_path)
+            course_match = re.match(
+                r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/.*', referer_path)
             if course_match:
                 course_id = course_match.group('course_id')
 
-                # See if we are able to view the course. If we are, redirect to it
+                # See if we are able to view the course. If we are, redirect to
+                # it
                 try:
                     course = get_course_with_access(user, course_id, 'load')
                     return "/courses/" + course.id + "/wiki/" + path_match.group('wiki_path')
                 except Http404:
-                    # Even though we came from the course, we can't see it. So don't worry about it.
+                    # Even though we came from the course, we can't see it. So
+                    # don't worry about it.
                     pass
 
         else:
@@ -110,7 +113,8 @@ class Middleware(object):
             course_match = re.match(IN_COURSE_WIKI_REGEX, destination)
             if course_match:
                 course_id = course_match.group('course_id')
-                # See if we are able to view the course. If we aren't, redirect to regular wiki
+                # See if we are able to view the course. If we aren't, redirect
+                # to regular wiki
                 try:
                     course = get_course_with_access(user, course_id, 'load')
                     # Good, we can see the course. Carry on

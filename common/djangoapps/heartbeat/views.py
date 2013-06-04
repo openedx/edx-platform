@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from xmodule.modulestore.django import modulestore
 from dogapi import dog_stats_api
 
+
 @dog_stats_api.timed('edxapp.heartbeat')
 def heartbeat(request):
     """

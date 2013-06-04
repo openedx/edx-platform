@@ -114,11 +114,11 @@ class RoundTripTestCase(unittest.TestCase):
         self.check_export_roundtrip(DATA_DIR, "conditional_and_poll")
 
     def test_selfassessment_roundtrip(self):
-        #Test selfassessment xmodule to see if it exports correctly
+        # Test selfassessment xmodule to see if it exports correctly
         self.check_export_roundtrip(DATA_DIR, "self_assessment")
 
     def test_graphicslidertool_roundtrip(self):
-        #Test graphicslidertool xmodule to see if it exports correctly
+        # Test graphicslidertool xmodule to see if it exports correctly
         self.check_export_roundtrip(DATA_DIR, "graphic_slider_tool")
 
     def test_exam_registration_roundtrip(self):

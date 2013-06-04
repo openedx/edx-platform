@@ -12,7 +12,8 @@ from student.views import _do_create_account, get_random_post_override
 def create(n, course_id):
     """Create n users, enrolling them in course_id if it's not None"""
     for i in range(n):
-        (user, user_profile, _) = _do_create_account(get_random_post_override())
+        (user, user_profile, _) = _do_create_account(
+            get_random_post_override())
         if course_id is not None:
             CourseEnrollment.objects.create(user=user, course_id=course_id)
 

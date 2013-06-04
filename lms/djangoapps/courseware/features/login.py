@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import step, world
 from django.contrib.auth.models import User

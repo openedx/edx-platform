@@ -33,16 +33,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) < 1:
-            outputfile = datetime.utcnow().strftime("pearson-dump-%Y%m%d-%H%M%S.json")
+            outputfile = datetime.utcnow().strftime(
+                "pearson-dump-%Y%m%d-%H%M%S.json")
         else:
             outputfile = args[0]
 
         # construct the query object to dump:
         registrations = TestCenterRegistration.objects.all()
         if 'course_id' in options and options['course_id']:
-            registrations = registrations.filter(course_id=options['course_id'])
+            registrations = registrations.filter(
+                course_id=options['course_id'])
         if 'exam_series_code' in options and options['exam_series_code']:
-            registrations = registrations.filter(exam_series_code=options['exam_series_code'])
+            registrations = registrations.filter(
+                exam_series_code=options['exam_series_code'])
 
         # collect output:
         output = []
@@ -64,9 +67,11 @@ class Command(BaseCommand):
                       'accommodation_status': registration.accommodation_status(),
                       }
             if len(registration.upload_error_message) > 0:
-                record['registration_error'] = registration.upload_error_message
+                record[
+                    'registration_error'] = registration.upload_error_message
             if len(registration.testcenter_user.upload_error_message) > 0:
-                record['demographics_error'] = registration.testcenter_user.upload_error_message
+                record[
+                    'demographics_error'] = registration.testcenter_user.upload_error_message
             if registration.needs_uploading:
                 record['needs_uploading'] = True
 

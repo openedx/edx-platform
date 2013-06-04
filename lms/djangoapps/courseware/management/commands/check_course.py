@@ -45,7 +45,7 @@ def check_sections(course):
         print "Checking all section includes are valid XML"
         for f in os.listdir(sections_dir):
             sectionfile = sections_dir + '/' + f
-            #print sectionfile
+            # print sectionfile
             # skip non-xml files:
             if not sectionfile.endswith('xml'):
                 continue
@@ -72,7 +72,8 @@ class Command(BaseCommand):
         # The objects probably shouldn't be actual django users to avoid unneeded
         # dependency on django.
 
-        # TODO: use args as list of files to check.  Fix loading to work for other files.
+        # TODO: use args as list of files to check.  Fix loading to work for
+        # other files.
 
         print "This command needs updating before use"
         return

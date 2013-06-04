@@ -40,7 +40,8 @@ class LMSLinksTestCase(TestCase):
         location = 'i4x', 'mitX', '101', 'vertical', 'contacting_us'
         utils.get_course_id = mock.Mock(return_value="mitX/101/test")
         link = utils.get_lms_link_for_item(location, False)
-        self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
+        self.assertEquals(
+            link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
         link = utils.get_lms_link_for_item(location, True)
         self.assertEquals(
             link,
@@ -52,7 +53,8 @@ class UrlReverseTestCase(ModuleStoreTestCase):
     """ Tests for get_url_reverse """
     def test_course_page_names(self):
         """ Test the defined course pages. """
-        course = CourseFactory.create(org='mitX', number='666', display_name='URL Reverse Course')
+        course = CourseFactory.create(
+            org='mitX', number='666', display_name='URL Reverse Course')
 
         self.assertEquals(
             '/manage_users/i4x://mitX/666/course/URL_Reverse_Course',
@@ -81,14 +83,16 @@ class UrlReverseTestCase(ModuleStoreTestCase):
 
     def test_unknown_passes_through(self):
         """ Test that unknown values pass through. """
-        course = CourseFactory.create(org='mitX', number='666', display_name='URL Reverse Course')
+        course = CourseFactory.create(
+            org='mitX', number='666', display_name='URL Reverse Course')
         self.assertEquals(
             'foobar',
             utils.get_url_reverse('foobar', course)
         )
         self.assertEquals(
             'https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about',
-            utils.get_url_reverse('https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about', course)
+            utils.get_url_reverse(
+                'https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about', course)
         )
 
 
@@ -121,7 +125,8 @@ class ExtraPanelTabTestCase(TestCase):
                 course = self.get_course_with_tabs(tab_setup)
                 expected_tabs = copy.copy(course.tabs)
                 expected_tabs.append(tab)
-                changed, actual_tabs = utils.add_extra_panel_tab(tab_type, course)
+                changed, actual_tabs = utils.add_extra_panel_tab(
+                    tab_type, course)
                 self.assertTrue(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
 
@@ -129,13 +134,15 @@ class ExtraPanelTabTestCase(TestCase):
             tab_test_setup = [
                 [tab],
                 [tab, self.get_tab_type_dicts('x,y,z')],
-                [self.get_tab_type_dicts('x,y'), tab, self.get_tab_type_dicts('z')],
+                [self.get_tab_type_dicts(
+                    'x,y'), tab, self.get_tab_type_dicts('z')],
                 [self.get_tab_type_dicts('x,y,z'), tab]]
 
             for tab_setup in tab_test_setup:
                 course = self.get_course_with_tabs(tab_setup)
                 expected_tabs = copy.copy(course.tabs)
-                changed, actual_tabs = utils.add_extra_panel_tab(tab_type, course)
+                changed, actual_tabs = utils.add_extra_panel_tab(
+                    tab_type, course)
                 self.assertFalse(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
 
@@ -148,13 +155,16 @@ class ExtraPanelTabTestCase(TestCase):
             tab_test_setup = [
                 [tab],
                 [tab, self.get_tab_type_dicts('x,y,z')],
-                [self.get_tab_type_dicts('x,y'), tab, self.get_tab_type_dicts('z')],
+                [self.get_tab_type_dicts(
+                    'x,y'), tab, self.get_tab_type_dicts('z')],
                 [self.get_tab_type_dicts('x,y,z'), tab]]
 
             for tab_setup in tab_test_setup:
                 course = self.get_course_with_tabs(tab_setup)
-                expected_tabs = [t for t in course.tabs if t != utils.EXTRA_TAB_PANELS.get(tab_type)]
-                changed, actual_tabs = utils.remove_extra_panel_tab(tab_type, course)
+                expected_tabs = [
+                    t for t in course.tabs if t != utils.EXTRA_TAB_PANELS.get(tab_type)]
+                changed, actual_tabs = utils.remove_extra_panel_tab(
+                    tab_type, course)
                 self.assertTrue(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
 
@@ -162,7 +172,7 @@ class ExtraPanelTabTestCase(TestCase):
             for tab_setup in ['', 'x', 'x,y,z']:
                 course = self.get_course_with_tabs(tab_setup)
                 expected_tabs = copy.copy(course.tabs)
-                changed, actual_tabs = utils.remove_extra_panel_tab(tab_type, course)
+                changed, actual_tabs = utils.remove_extra_panel_tab(
+                    tab_type, course)
                 self.assertFalse(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
-

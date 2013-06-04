@@ -10,21 +10,26 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Adding field 'GeneratedCertificate.graded_certificate_id'
-        db.add_column('certificates_generatedcertificate', 'graded_certificate_id', self.gf('django.db.models.fields.CharField')(max_length=32, null=True), keep_default=False)
+        db.add_column('certificates_generatedcertificate', 'graded_certificate_id', self.gf(
+            'django.db.models.fields.CharField')(max_length=32, null=True), keep_default=False)
 
         # Adding field 'GeneratedCertificate.graded_download_url'
-        db.add_column('certificates_generatedcertificate', 'graded_download_url', self.gf('django.db.models.fields.CharField')(max_length=128, null=True), keep_default=False)
+        db.add_column('certificates_generatedcertificate', 'graded_download_url', self.gf(
+            'django.db.models.fields.CharField')(max_length=128, null=True), keep_default=False)
 
         # Adding field 'GeneratedCertificate.grade'
-        db.add_column('certificates_generatedcertificate', 'grade', self.gf('django.db.models.fields.CharField')(max_length=5, null=True), keep_default=False)
+        db.add_column('certificates_generatedcertificate', 'grade', self.gf(
+            'django.db.models.fields.CharField')(max_length=5, null=True), keep_default=False)
 
     def backwards(self, orm):
 
         # Deleting field 'GeneratedCertificate.graded_certificate_id'
-        db.delete_column('certificates_generatedcertificate', 'graded_certificate_id')
+        db.delete_column(
+            'certificates_generatedcertificate', 'graded_certificate_id')
 
         # Deleting field 'GeneratedCertificate.graded_download_url'
-        db.delete_column('certificates_generatedcertificate', 'graded_download_url')
+        db.delete_column(
+            'certificates_generatedcertificate', 'graded_download_url')
 
         # Deleting field 'GeneratedCertificate.grade'
         db.delete_column('certificates_generatedcertificate', 'grade')

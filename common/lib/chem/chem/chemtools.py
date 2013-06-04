@@ -100,7 +100,8 @@ def vsepr_grade(user_input, correct_answer, convert_to_peripheral=False):
         # convert user_input from (a,e,e1,e2) to (p)
         # correct_answer must be set in (p) using this flag
         c0 = user_input['atoms'].pop('c0')
-        user_input['atoms'] = {'p' + str(i): v for i, v in enumerate(user_input['atoms'].values())}
+        user_input['atoms'] = {'p' + str(
+            i): v for i, v in enumerate(user_input['atoms'].values())}
         user_input['atoms']['c0'] = c0
 
     # special case for AX6
@@ -108,10 +109,13 @@ def vsepr_grade(user_input, correct_answer, convert_to_peripheral=False):
         a_user = {}
         a_correct = {}
         for ea_position in ['a', 'e1', 'e2']:  # collecting positions:
-            a_user[ea_position] = [v for k, v in user_input['atoms'].items() if k.startswith(ea_position)]
-            a_correct[ea_position] = [v for k, v in correct_answer['atoms'].items() if k.startswith(ea_position)]
+            a_user[ea_position] = [v for k, v in user_input[
+                'atoms'].items() if k.startswith(ea_position)]
+            a_correct[ea_position] = [v for k, v in correct_answer[
+                'atoms'].items() if k.startswith(ea_position)]
 
-        correct = [sorted(a_correct['a'])] + [sorted(a_correct['e1'])] + [sorted(a_correct['e2'])]
+        correct = [sorted(a_correct['a'])] + [sorted(
+            a_correct['e1'])] + [sorted(a_correct['e2'])]
         for permutation in itertools.permutations(['a', 'e1', 'e2']):
             if correct == [sorted(a_user[permutation[0]])] + [sorted(a_user[permutation[1]])] + [sorted(a_user[permutation[2]])]:
                 return True
@@ -129,8 +133,10 @@ def vsepr_grade(user_input, correct_answer, convert_to_peripheral=False):
         # common case
         for ea_position in ['p', 'a', 'e']:
             # collecting atoms:
-            a_user = [v for k, v in user_input['atoms'].items() if k.startswith(ea_position)]
-            a_correct = [v for k, v in correct_answer['atoms'].items() if k.startswith(ea_position)]
+            a_user = [v for k, v in user_input[
+                'atoms'].items() if k.startswith(ea_position)]
+            a_correct = [v for k, v in correct_answer[
+                'atoms'].items() if k.startswith(ea_position)]
             # print a_user, a_correct
             if len(a_user) != len(a_correct):
                 return False
@@ -144,53 +150,75 @@ class Test_Grade(unittest.TestCase):
     ''' test grade function '''
 
     def test_incorrect_geometry(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX4E0", atoms={"c0": "N", "p0": "H", "p1": "(ep)", "p2": "H", "p3": "H"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX3E0","atoms":{"c0": "B","p0": "F","p1": "B","p2": "F"}}')
+        correct_answer = vsepr_build_correct_answer(geometry="AX4E0", atoms={
+                                                    "c0": "N", "p0": "H", "p1": "(ep)", "p2": "H", "p3": "H"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX3E0","atoms":{"c0": "B","p0": "F","p1": "B","p2": "F"}}')
         self.assertFalse(vsepr_grade(user_answer, correct_answer))
 
     def test_correct_answer_p(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX4E0", atoms={"c0": "N", "p0": "H", "p1": "(ep)", "p2": "H", "p3": "H"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX4E0","atoms":{"c0": "N","p0": "H","p1": "(ep)","p2": "H", "p3": "H"}}')
+        correct_answer = vsepr_build_correct_answer(geometry="AX4E0", atoms={
+                                                    "c0": "N", "p0": "H", "p1": "(ep)", "p2": "H", "p3": "H"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX4E0","atoms":{"c0": "N","p0": "H","p1": "(ep)","p2": "H", "p3": "H"}}')
         self.assertTrue(vsepr_grade(user_answer, correct_answer))
 
     def test_correct_answer_ae(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={"c0": "Br", "a0": "test", "a1": "(ep)", "e0": "H", "e1": "H", "e2": "(ep)", "e3": "(ep)"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "test","a1": "(ep)","e10": "H","e11": "H","e20": "(ep)","e21": "(ep)"}}')
+        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={
+                                                    "c0": "Br", "a0": "test", "a1": "(ep)", "e0": "H", "e1": "H", "e2": "(ep)", "e3": "(ep)"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "test","a1": "(ep)","e10": "H","e11": "H","e20": "(ep)","e21": "(ep)"}}')
         self.assertTrue(vsepr_grade(user_answer, correct_answer))
 
     def test_correct_answer_ae_convert_to_p_but_input_not_in_p(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={"c0": "Br", "a0": "(ep)", "a1": "test", "e0": "H", "e1": "H", "e2": "(ep)", "e3": "(ep)"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "test","a1": "(ep)","e10": "H","e11": "(ep)","e20": "H","e21": "(ep)"}}')
-        self.assertFalse(vsepr_grade(user_answer, correct_answer, convert_to_peripheral=True))
+        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={
+                                                    "c0": "Br", "a0": "(ep)", "a1": "test", "e0": "H", "e1": "H", "e2": "(ep)", "e3": "(ep)"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "test","a1": "(ep)","e10": "H","e11": "(ep)","e20": "H","e21": "(ep)"}}')
+        self.assertFalse(vsepr_grade(
+            user_answer, correct_answer, convert_to_peripheral=True))
 
     def test_correct_answer_ae_convert_to_p(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={"c0": "Br", "p0": "(ep)", "p1": "test", "p2": "H", "p3": "H", "p4": "(ep)", "p6": "(ep)"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "test","a1": "(ep)","e10": "H","e11": "(ep)","e20": "H","e21": "(ep)"}}')
-        self.assertTrue(vsepr_grade(user_answer, correct_answer, convert_to_peripheral=True))
+        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={
+                                                    "c0": "Br", "p0": "(ep)", "p1": "test", "p2": "H", "p3": "H", "p4": "(ep)", "p6": "(ep)"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "test","a1": "(ep)","e10": "H","e11": "(ep)","e20": "H","e21": "(ep)"}}')
+        self.assertTrue(vsepr_grade(
+            user_answer, correct_answer, convert_to_peripheral=True))
 
     def test_correct_answer_e1e2_in_a(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={"c0": "Br", "a0": "(ep)", "a1": "(ep)", "e10": "H", "e11": "H", "e20": "H", "e21": "H"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "(ep)","a1": "(ep)","e10": "H","e11": "H","e20": "H","e21": "H"}}')
+        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={
+                                                    "c0": "Br", "a0": "(ep)", "a1": "(ep)", "e10": "H", "e11": "H", "e20": "H", "e21": "H"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "(ep)","a1": "(ep)","e10": "H","e11": "H","e20": "H","e21": "H"}}')
         self.assertTrue(vsepr_grade(user_answer, correct_answer))
 
     def test_correct_answer_e1e2_in_e1(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={"c0": "Br", "a0": "(ep)", "a1": "(ep)", "e10": "H", "e11": "H", "e20": "H", "e21": "H"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "H","a1": "H","e10": "(ep)","e11": "(ep)","e20": "H","e21": "H"}}')
+        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={
+                                                    "c0": "Br", "a0": "(ep)", "a1": "(ep)", "e10": "H", "e11": "H", "e20": "H", "e21": "H"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "H","a1": "H","e10": "(ep)","e11": "(ep)","e20": "H","e21": "H"}}')
         self.assertTrue(vsepr_grade(user_answer, correct_answer))
 
     def test_correct_answer_e1e2_in_e2(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={"c0": "Br", "a0": "(ep)", "a1": "(ep)", "e10": "H", "e11": "H", "e20": "H", "e21": "H"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "H","a1": "H","e10": "H","e11": "H","e20": "(ep)","e21": "(ep)"}}')
+        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={
+                                                    "c0": "Br", "a0": "(ep)", "a1": "(ep)", "e10": "H", "e11": "H", "e20": "H", "e21": "H"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "H","a1": "H","e10": "H","e11": "H","e20": "(ep)","e21": "(ep)"}}')
         self.assertTrue(vsepr_grade(user_answer, correct_answer))
 
     def test_incorrect_answer_e1e2(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={"c0": "Br", "a0": "(ep)", "a1": "(ep)", "e10": "H", "e11": "H", "e20": "H", "e21": "H"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "H","a1": "H","e10": "(ep)","e11": "H","e20": "H","e21": "(ep)"}}')
+        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={
+                                                    "c0": "Br", "a0": "(ep)", "a1": "(ep)", "e10": "H", "e11": "H", "e20": "H", "e21": "H"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX6E0","atoms":{"c0": "Br","a0": "H","a1": "H","e10": "(ep)","e11": "H","e20": "H","e21": "(ep)"}}')
         self.assertFalse(vsepr_grade(user_answer, correct_answer))
 
     def test_incorrect_c0(self):
-        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={"c0": "Br", "a0": "(ep)", "a1": "test", "e0": "H", "e1": "H", "e2": "H", "e3": "(ep)"})
-        user_answer = vsepr_parse_user_answer(u'{"geometry": "AX6E0","atoms":{"c0": "H","a0": "test","a1": "(ep)","e0": "H","e1": "H","e2": "(ep)","e3": "H"}}')
+        correct_answer = vsepr_build_correct_answer(geometry="AX6E0", atoms={
+                                                    "c0": "Br", "a0": "(ep)", "a1": "test", "e0": "H", "e1": "H", "e2": "H", "e3": "(ep)"})
+        user_answer = vsepr_parse_user_answer(
+            u'{"geometry": "AX6E0","atoms":{"c0": "H","a0": "test","a1": "(ep)","e0": "H","e1": "H","e2": "(ep)","e3": "H"}}')
         self.assertFalse(vsepr_grade(user_answer, correct_answer))
 
 

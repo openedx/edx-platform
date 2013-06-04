@@ -11,22 +11,30 @@ class Migration(SchemaMigration):
 
         # NOTE (vshnayder): This constraint has the wrong field order, so it doesn't actually
         # do anything in sqlite.  Migration 0004 actually removes this index for sqlite.
-        # Removing unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
-        db.delete_unique('courseware_studentmodule', ['module_id', 'module_type', 'student_id'])
+        # Removing unique constraint on 'StudentModule', fields ['module_id',
+        # 'module_type', 'student']
+        db.delete_unique('courseware_studentmodule', [
+                         'module_id', 'module_type', 'student_id'])
 
         # Adding field 'StudentModule.max_grade'
-        db.add_column('courseware_studentmodule', 'max_grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('courseware_studentmodule', 'max_grade', self.gf(
+            'django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
 
         # Adding field 'StudentModule.done'
-        db.add_column('courseware_studentmodule', 'done', self.gf('django.db.models.fields.CharField')(default='na', max_length=8, db_index=True), keep_default=False)
+        db.add_column('courseware_studentmodule', 'done', self.gf('django.db.models.fields.CharField')(
+            default='na', max_length=8, db_index=True), keep_default=False)
 
-        # Adding unique constraint on 'StudentModule', fields ['module_id', 'student']
-        db.create_unique('courseware_studentmodule', ['module_id', 'student_id'])
+        # Adding unique constraint on 'StudentModule', fields ['module_id',
+        # 'student']
+        db.create_unique('courseware_studentmodule', [
+                         'module_id', 'student_id'])
 
     def backwards(self, orm):
 
-        # Removing unique constraint on 'StudentModule', fields ['module_id', 'student']
-        db.delete_unique('courseware_studentmodule', ['module_id', 'student_id'])
+        # Removing unique constraint on 'StudentModule', fields ['module_id',
+        # 'student']
+        db.delete_unique('courseware_studentmodule', [
+                         'module_id', 'student_id'])
 
         # Deleting field 'StudentModule.max_grade'
         db.delete_column('courseware_studentmodule', 'max_grade')
@@ -34,8 +42,10 @@ class Migration(SchemaMigration):
         # Deleting field 'StudentModule.done'
         db.delete_column('courseware_studentmodule', 'done')
 
-        # Adding unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
-        db.create_unique('courseware_studentmodule', ['module_id', 'module_type', 'student_id'])
+        # Adding unique constraint on 'StudentModule', fields ['module_id',
+        # 'module_type', 'student']
+        db.create_unique('courseware_studentmodule', [
+                         'module_id', 'module_type', 'student_id'])
 
     models = {
         'auth.group': {

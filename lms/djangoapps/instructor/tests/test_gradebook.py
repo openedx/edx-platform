@@ -18,6 +18,7 @@ from xmodule.modulestore.django import modulestore
 
 USER_COUNT = 11
 
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestGradebook(ModuleStoreTestCase):
     grading_policy = None
@@ -26,7 +27,8 @@ class TestGradebook(ModuleStoreTestCase):
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
 
-        modulestore().request_cache = modulestore().metadata_inheritance_cache_subsystem = None
+        modulestore().request_cache = modulestore(
+        ).metadata_inheritance_cache_subsystem = None
 
         course_data = {}
         if self.grading_policy is not None:
@@ -44,14 +46,15 @@ class TestGradebook(ModuleStoreTestCase):
         )
 
         self.users = [
-            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
+            UserFactory.create(username='robot%d' %
+                               i, email='robot+test+%d@edx.org' % i)
             for i in xrange(USER_COUNT)
         ]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
-        for i in xrange(USER_COUNT-1):
+        for i in xrange(USER_COUNT - 1):
             template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
             item = ItemFactory.create(
                 parent_location=section.location,
@@ -69,10 +72,12 @@ class TestGradebook(ModuleStoreTestCase):
                     module_state_key=Location(item.location).url()
                 )
 
-        self.response = self.client.get(reverse('gradebook', args=(self.course.id,)))
+        self.response = self.client.get(reverse(
+            'gradebook', args=(self.course.id,)))
 
     def test_response_code(self):
         self.assertEquals(self.response.status_code, 200)
+
 
 class TestDefaultGradingPolicy(TestGradebook):
     def test_all_users_listed(self):
@@ -93,6 +98,7 @@ class TestDefaultGradingPolicy(TestGradebook):
         # All other grades are None [29 categories * 11 users - 27 non-empty grades = 292]
         # One use at the top of the page [1]
         self.assertEquals(293, self.response.content.count('grade_None'))
+
 
 class TestLetterCutoffPolicy(TestGradebook):
     grading_policy = {

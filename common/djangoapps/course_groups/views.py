@@ -49,10 +49,10 @@ def list_cohorts(request, course_id):
     get_course_with_access(request.user, course_id, 'staff')
 
     all_cohorts = [{'name': c.name, 'id': c.id}
-               for c in cohorts.get_course_cohorts(course_id)]
+                   for c in cohorts.get_course_cohorts(course_id)]
 
     return json_http_response({'success': True,
-                            'cohorts': all_cohorts})
+                               'cohorts': all_cohorts})
 
 
 @ensure_csrf_cookie
@@ -74,19 +74,19 @@ def add_cohort(request, course_id):
     name = request.POST.get("name")
     if not name:
         return json_http_response({'success': False,
-                                'msg': "No name specified"})
+                                   'msg': "No name specified"})
 
     try:
         cohort = cohorts.add_cohort(course_id, name)
     except ValueError as err:
         return json_http_response({'success': False,
-                                'msg': str(err)})
+                                   'msg': str(err)})
 
     return json_http_response({'success': 'True',
-                            'cohort': {
-                                'id': cohort.id,
-                                'name': cohort.name
-                                }})
+                               'cohort': {
+                               'id': cohort.id,
+                               'name': cohort.name
+                               }})
 
 
 @ensure_csrf_cookie
@@ -125,12 +125,12 @@ def users_in_cohort(request, course_id, cohort_id):
     user_info = [{'username': u.username,
                   'email': u.email,
                   'name': '{0} {1}'.format(u.first_name, u.last_name)}
-                  for u in users]
+                 for u in users]
 
     return json_http_response({'success': True,
-                            'page': page,
-                            'num_pages': paginator.num_pages,
-                            'users': user_info})
+                               'page': page,
+                               'num_pages': paginator.num_pages,
+                               'users': user_info})
 
 
 @ensure_csrf_cookie
@@ -170,14 +170,13 @@ def add_users_to_cohort(request, course_id, cohort_id):
             unknown.append(username_or_email)
         except cohorts.CohortConflict as err:
             conflict.append({'username_or_email': username_or_email,
-                              'msg': str(err)})
-
+                             'msg': str(err)})
 
     return json_http_response({'success': True,
-                            'added': added,
-                            'present': present,
-                            'conflict': conflict,
-                            'unknown': unknown})
+                               'added': added,
+                               'present': present,
+                               'conflict': conflict,
+                               'unknown': unknown})
 
 
 @ensure_csrf_cookie
@@ -197,7 +196,7 @@ def remove_user_from_cohort(request, course_id, cohort_id):
     username = request.POST.get('username')
     if username is None:
         return json_http_response({'success': False,
-                                'msg': 'No username specified'})
+                                   'msg': 'No username specified'})
 
     cohort = cohorts.get_cohort_by_id(course_id, cohort_id)
     try:
@@ -207,7 +206,7 @@ def remove_user_from_cohort(request, course_id, cohort_id):
     except User.DoesNotExist:
         log.debug('no user')
         return json_http_response({'success': False,
-                                'msg': "No user '{0}'".format(username)})
+                                   'msg': "No user '{0}'".format(username)})
 
 
 def debug_cohort_mgmt(request, course_id):

@@ -5,7 +5,8 @@ from converter import Converter
 # 1. Every vowel is replaced with an equivalent with extra accent marks
 # 2. Every string is padded out to +30% length to simulate verbose languages (e.g. German)
 #    to see if layout and flows work properly
-# 3. Every string is terminated with a '#' character to make it easier to detect truncation
+# 3. Every string is terminated with a '#' character to make it easier to
+# detect truncation
 
 
 # --------------------------------
@@ -39,7 +40,6 @@ TABLE = {'A': u'\xC0',
          }
 
 
-
 # The print industry's standard dummy text, in use since the 1500s
 # see http://www.lipsum.com/
 LOREM = ' Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed ' \
@@ -65,38 +65,37 @@ class Dummy (Converter):
         return self.pad(result)
 
     def inner_convert_string(self, string):
-        for (k,v) in TABLE.items():
+        for (k, v) in TABLE.items():
             string = string.replace(k, v)
         return string
-
 
     def pad(self, string):
         """add some lorem ipsum text to the end of string"""
         size = len(string)
         if size < 7:
-            target = size*3
+            target = size * 3
         else:
-            target = int(size*PAD_FACTOR)
-        return string + self.terminate(LOREM[:(target-size)])
+            target = int(size * PAD_FACTOR)
+        return string + self.terminate(LOREM[:(target - size)])
 
     def terminate(self, string):
         """replaces the final char of string with #"""
-        return string[:-1]+'#'
+        return string[:-1] + '#'
 
     def init_msgs(self, msgs):
         """
         Make sure the first msg in msgs has a plural property.
         msgs is list of instances of polib.POEntry
         """
-        if len(msgs)==0:
+        if len(msgs) == 0:
             return
         headers = msgs[0].get_property('msgstr')
-        has_plural = len([header for header in headers if header.find('Plural-Forms:') == 0])>0
+        has_plural = len([header for header in headers if header.find(
+            'Plural-Forms:') == 0]) > 0
         if not has_plural:
             # Apply declaration for English pluralization rules
             plural = "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
             headers.append(plural)
-        
 
     def convert_msg(self, msg):
         """
@@ -104,12 +103,12 @@ class Dummy (Converter):
         msg is an instance of polib.POEntry
         """
         source = msg.msgid
-        if len(source)==0:
+        if len(source) == 0:
             # don't translate empty string
             return
 
         plural = msg.msgid_plural
-        if len(plural)>0:
+        if len(plural) > 0:
             # translate singular and plural
             foreign_single = self.convert(source)
             foreign_plural = self.convert(plural)
@@ -126,7 +125,7 @@ class Dummy (Converter):
             If last char of original is a newline, make sure translation
             has a newline too.
         """
-        if len(original)>1:
-            if original[-1]=='\n' and translated[-1]!='\n':
+        if len(original) > 1:
+            if original[-1] == '\n' and translated[-1] != '\n':
                 return translated + '\n'
         return translated

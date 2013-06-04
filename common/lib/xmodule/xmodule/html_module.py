@@ -18,16 +18,19 @@ log = logging.getLogger("mitx.courseware")
 
 
 class HtmlFields(object):
-    data = String(help="Html contents to display for this module", scope=Scope.content)
-    source_code = String(help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
+    data = String(
+        help="Html contents to display for this module", scope=Scope.content)
+    source_code = String(
+        help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
 
 
 class HtmlModule(HtmlFields, XModule):
-    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/html/display.coffee')
-                    ]
-         }
+    js = {
+        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                   resource_string(__name__, 'js/src/collapsible.coffee'),
+                   resource_string(__name__, 'js/src/html/display.coffee')
+                   ]
+    }
     js_module_name = "HTMLModule"
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
@@ -46,16 +49,19 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
-    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(
+        __name__, 'css/html/edit.scss')]}
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms
     @classmethod
     def backcompat_paths(cls, path):
         if path.endswith('.html.xml'):
-            path = path[:-9] + '.html'  # backcompat--look for html instead of xml
+            path = path[
+                :-9] + '.html'  # backcompat--look for html instead of xml
         if path.endswith('.html.html'):
-            path = path[:-5]            # some people like to include .html in filenames..
+            path = path[
+                :-5]            # some people like to include .html in filenames..
         candidates = []
         while os.sep in path:
             candidates.append(path)
@@ -96,11 +102,13 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             # 'filename' in html pointers is a relative path
             # (not same as 'html/blah.html' when the pointer is in a directory itself)
             pointer_path = "{category}/{url_path}".format(category='html',
-                                                  url_path=name_to_pathname(location.name))
+                                                          url_path=name_to_pathname(location.name))
             base = path(pointer_path).dirname()
-            #log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
+            # log.debug("base = {0}, base.dirname={1},
+            # filename={2}".format(base, base.dirname(), filename))
             filepath = "{base}/{name}.html".format(base=base, name=filename)
-            #log.debug("looking for html file for {0} at {1}".format(location, filepath))
+            # log.debug("looking for html file for {0} at {1}".format(location,
+            # filepath))
 
             # VS[compat]
             # TODO (cpennington): If the file doesn't exist at the right path,
@@ -109,7 +117,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath):
                 candidates = cls.backcompat_paths(filepath)
-                #log.debug("candidates = {0}".format(candidates))
+                # log.debug("candidates = {0}".format(candidates))
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
                         filepath = candidate
@@ -120,14 +128,16 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
                     html = file.read().decode('utf-8')
                     # Log a warning if we can't parse the file, but don't error
                     if not check_html(html) and len(html) > 0:
-                        msg = "Couldn't parse html in {0}, content = {1}".format(filepath, html)
+                        msg = "Couldn't parse html in {0}, content = {1}".format(
+                            filepath, html)
                         log.warning(msg)
                         system.error_tracker("Warning: " + msg)
 
                     definition = {'data': html}
 
                     # TODO (ichuang): remove this after migration
-                    # for Fall 2012 LMS migration: keep filename (and unmangled filename)
+                    # for Fall 2012 LMS migration: keep filename (and unmangled
+                    # filename)
                     definition['filename'] = [filepath, filename]
 
                     return definition, []
@@ -153,9 +163,10 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         # Not proper format.  Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
         filepath = u'{category}/{pathname}.html'.format(category=self.category,
-                                                    pathname=pathname)
+                                                        pathname=pathname)
 
-        resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
+        resource_fs.makedir(os.path.dirname(
+            filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
             html_data = self.data.encode('utf-8')
             file.write(html_data)

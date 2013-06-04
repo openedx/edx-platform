@@ -24,7 +24,7 @@ class SelfAssessmentTest(unittest.TestCase):
                   'prompt': prompt,
                   'submitmessage': 'Shall we submit now?',
                   'hintprompt': 'Consider this...',
-    }
+                  }
 
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
                          "SampleQuestion"])
@@ -32,11 +32,12 @@ class SelfAssessmentTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        state = json.dumps({'student_answers': ["Answer 1", "answer 2", "answer 3"],
-                            'scores': [0, 1],
-                            'hints': ['o hai'],
-                            'state': SelfAssessmentModule.INITIAL,
-                            'attempts': 2})
+        state = json.dumps(
+            {'student_answers': ["Answer 1", "answer 2", "answer 3"],
+             'scores': [0, 1],
+             'hints': ['o hai'],
+             'state': SelfAssessmentModule.INITIAL,
+             'attempts': 2})
 
         static_data = {
             'max_attempts': 10,

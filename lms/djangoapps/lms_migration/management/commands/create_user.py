@@ -29,7 +29,7 @@ class MyCompleter(object):  # Custom completer
         if state == 0:  # on first trigger, build possible matches
             if text:  # cache matches (entries that start with entered text)
                 self.matches = [s for s in self.options
-                                    if s and s.startswith(text)]
+                                if s and s.startswith(text)]
             else:  # no text entered, all matches possible
                 self.matches = self.options[:]
 
@@ -74,7 +74,8 @@ class Command(BaseCommand):
 
             # get name from kerberos
             try:
-                kname = os.popen("finger %s | grep 'name:'" % email).read().strip().split('name: ')[1].strip()
+                kname = os.popen("finger %s | grep 'name:'" %
+                                 email).read().strip().split('name: ')[1].strip()
             except:
                 kname = ''
             name = raw_input('Full name: [%s] ' % kname).strip()
@@ -98,7 +99,6 @@ class Command(BaseCommand):
 
             name = raw_input('Full name: ')
 
-
         user = User(username=uname, email=email, is_active=True)
         user.set_password(password)
         try:
@@ -115,14 +115,16 @@ class Command(BaseCommand):
         up.save()
 
         if make_eamap:
-            credentials = "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN=%s/emailAddress=%s" % (name, email)
+            credentials = "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN=%s/emailAddress=%s" % (
+                name, email)
             eamap = ExternalAuthMap(external_id=email,
                                     external_email=email,
                                     external_domain=mit_domain,
                                     external_name=name,
                                     internal_password=password,
-                                    external_credentials=json.dumps(credentials),
-                )
+                                    external_credentials=json.dumps(
+                                        credentials),
+                                    )
             eamap.user = user
             eamap.dtsignup = datetime.datetime.now()
             eamap.save()
@@ -142,7 +144,8 @@ class Command(BaseCommand):
         readline.parse_and_bind('tab: complete')
 
         while True:
-            gname = raw_input("Add group (tab to autocomplete, empty line to end): ")
+            gname = raw_input(
+                "Add group (tab to autocomplete, empty line to end): ")
             if not gname:
                 break
             if not gname in groups:

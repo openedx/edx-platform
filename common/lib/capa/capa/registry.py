@@ -19,17 +19,19 @@ class TagRegistry(object):
 
         # Do all checks and complain before changing any state.
         if len(cls.tags) == 0:
-            raise ValueError("No tags specified for class {0}".format(cls.__name__))
+            raise ValueError(
+                "No tags specified for class {0}".format(cls.__name__))
 
         for t in cls.tags:
             if t in self._mapping:
                 other_cls = self._mapping[t]
                 if cls == other_cls:
-                    # registering the same class multiple times seems silly, but ok
+                    # registering the same class multiple times seems silly,
+                    # but ok
                     continue
                 raise ValueError("Tag {0} already registered by class {1}."
                                  " Can't register for class {2}"
-                                     .format(t, other_cls.__name__, cls.__name__))
+                                 .format(t, other_cls.__name__, cls.__name__))
 
         # Ok, should be good to change state now.
         for t in cls.tags:

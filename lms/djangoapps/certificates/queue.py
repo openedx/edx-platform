@@ -57,7 +57,7 @@ class XQueueCertInterface(object):
 
         if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
             requests_auth = HTTPBasicAuth(
-                    *settings.XQUEUE_INTERFACE['basic_auth'])
+                *settings.XQUEUE_INTERFACE['basic_auth'])
         else:
             requests_auth = None
 
@@ -68,10 +68,10 @@ class XQueueCertInterface(object):
             self.request = request
 
         self.xqueue_interface = XQueueInterface(
-                settings.XQUEUE_INTERFACE['url'],
-                settings.XQUEUE_INTERFACE['django_auth'],
-                requests_auth,
-                )
+            settings.XQUEUE_INTERFACE['url'],
+            settings.XQUEUE_INTERFACE['django_auth'],
+            requests_auth,
+        )
         self.whitelist = CertificateWhitelist.objects.all()
         self.restricted = UserProfile.objects.filter(allow_certificate=False)
 
@@ -143,11 +143,11 @@ class XQueueCertInterface(object):
         """
 
         VALID_STATUSES = [status.generating,
-                status.unavailable, status.deleted, status.error,
-                status.notpassing]
+                          status.unavailable, status.deleted, status.error,
+                          status.notpassing]
 
         cert_status = certificate_status_for_student(
-                              student, course_id)['status']
+            student, course_id)['status']
 
         if cert_status in VALID_STATUSES:
             # grade the student
@@ -159,7 +159,7 @@ class XQueueCertInterface(object):
             profile = UserProfile.objects.get(user=student)
 
             cert, created = GeneratedCertificate.objects.get_or_create(
-                   user=student, course_id=course_id)
+                user=student, course_id=course_id)
 
             grade = grades.grade(student, self.request, course)
             is_whitelisted = self.whitelist.filter(
@@ -209,7 +209,7 @@ class XQueueCertInterface(object):
                 settings.SITE_NAME, key), key, settings.CERT_QUEUE)
 
         (error, msg) = self.xqueue_interface.send_to_queue(
-                header=xheader, body=json.dumps(contents))
+            header=xheader, body=json.dumps(contents))
         if error:
             logger.critical('Unable to add a request to the queue')
             raise Exception('Unable to send queue message')

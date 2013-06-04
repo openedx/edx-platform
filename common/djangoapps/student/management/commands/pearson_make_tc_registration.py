@@ -87,7 +87,6 @@ class Command(BaseCommand):
         base_options = set(option.dest for option in BaseCommand.option_list)
         return option_name not in base_options
 
-
     def handle(self, *args, **options):
         username = args[0]
         course_id = args[1]
@@ -103,60 +102,71 @@ class Command(BaseCommand):
         try:
             testcenter_user = TestCenterUser.objects.get(user=student)
         except TestCenterUser.DoesNotExist:
-            raise CommandError("User \"{}\" does not have an existing demographics record".format(username))
+            raise CommandError(
+                "User \"{}\" does not have an existing demographics record".format(username))
 
-        # get an "exam" object.  Check to see if a course_id was specified, and use information from that:
+        # get an "exam" object.  Check to see if a course_id was specified, and
+        # use information from that:
         exam = None
-        create_dummy_exam = 'create_dummy_exam' in our_options and our_options['create_dummy_exam']
+        create_dummy_exam = 'create_dummy_exam' in our_options and our_options[
+            'create_dummy_exam']
         if not create_dummy_exam:
             try:
                 course = course_from_id(course_id)
                 if 'ignore_registration_dates' in our_options:
-                    examlist = [exam for exam in course.test_center_exams if exam.exam_series_code == our_options.get('exam_series_code')]
+                    examlist = [exam for exam in course.test_center_exams if exam.exam_series_code == our_options.get(
+                        'exam_series_code')]
                     exam = examlist[0] if len(examlist) > 0 else None
                 else:
                     exam = course.current_test_center_exam
             except ItemNotFoundError:
                 pass
         else:
-            # otherwise use explicit values (so we don't have to define a course):
+            # otherwise use explicit values (so we don't have to define a
+            # course):
             exam_name = "Dummy Placeholder Name"
             exam_info = {'Exam_Series_Code': our_options['exam_series_code'],
-                          'First_Eligible_Appointment_Date': our_options['eligibility_appointment_date_first'],
-                          'Last_Eligible_Appointment_Date': our_options['eligibility_appointment_date_last'],
-                          }
-            exam = CourseDescriptor.TestCenterExam(course_id, exam_name, exam_info)
+                         'First_Eligible_Appointment_Date': our_options['eligibility_appointment_date_first'],
+                         'Last_Eligible_Appointment_Date': our_options['eligibility_appointment_date_last'],
+                         }
+            exam = CourseDescriptor.TestCenterExam(
+                course_id, exam_name, exam_info)
             # update option values for date_first and date_last to use YYYY-MM-DD format
             # instead of YYYY-MM-DDTHH:MM
-            our_options['eligibility_appointment_date_first'] = strftime("%Y-%m-%d", exam.first_eligible_appointment_date)
-            our_options['eligibility_appointment_date_last'] = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
+            our_options['eligibility_appointment_date_first'] = strftime(
+                "%Y-%m-%d", exam.first_eligible_appointment_date)
+            our_options['eligibility_appointment_date_last'] = strftime(
+                "%Y-%m-%d", exam.last_eligible_appointment_date)
 
         if exam is None:
-            raise CommandError("Exam for course_id {} does not exist".format(course_id))
+            raise CommandError(
+                "Exam for course_id {} does not exist".format(course_id))
 
         exam_code = exam.exam_series_code
 
         UPDATE_FIELDS = ('accommodation_request',
-                          'accommodation_code',
-                          'client_authorization_id',
-                          'exam_series_code',
-                          'eligibility_appointment_date_first',
-                          'eligibility_appointment_date_last',
-                          )
+                         'accommodation_code',
+                         'client_authorization_id',
+                         'exam_series_code',
+                         'eligibility_appointment_date_first',
+                         'eligibility_appointment_date_last',
+                         )
 
         # create and save the registration:
         needs_updating = False
-        registrations = get_testcenter_registration(student, course_id, exam_code)
+        registrations = get_testcenter_registration(
+            student, course_id, exam_code)
         if len(registrations) > 0:
             registration = registrations[0]
             for fieldname in UPDATE_FIELDS:
                 if fieldname in our_options and registration.__getattribute__(fieldname) != our_options[fieldname]:
-                    needs_updating = True;
+                    needs_updating = True
         else:
-            accommodation_request = our_options.get('accommodation_request', '')
-            registration = TestCenterRegistration.create(testcenter_user, exam, accommodation_request)
+            accommodation_request = our_options.get(
+                'accommodation_request', '')
+            registration = TestCenterRegistration.create(
+                testcenter_user, exam, accommodation_request)
             needs_updating = True
-
 
         if needs_updating:
             # first update the record with the new values, if any:
@@ -171,8 +181,10 @@ class Command(BaseCommand):
             form_options = dict(our_options)
             for propname in TestCenterRegistrationForm.Meta.fields:
                 if propname not in form_options:
-                    form_options[propname] = registration.__getattribute__(propname)
-            form = TestCenterRegistrationForm(instance=registration, data=form_options)
+                    form_options[
+                        propname] = registration.__getattribute__(propname)
+            form = TestCenterRegistrationForm(
+                instance=registration, data=form_options)
             if form.is_valid():
                 form.update_and_save()
                 print "Updated registration information for user's registration: username \"{}\" course \"{}\", examcode \"{}\"".format(student.username, course_id, exam_code)
@@ -194,10 +206,12 @@ class Command(BaseCommand):
         change_internal = False
         if 'exam_series_code' in our_options:
             exam_code = our_options['exam_series_code']
-        registration = get_testcenter_registration(student, course_id, exam_code)[0]
+        registration = get_testcenter_registration(
+            student, course_id, exam_code)[0]
         for internal_field in ['upload_error_message', 'upload_status', 'authorization_id']:
             if internal_field in our_options:
-                registration.__setattr__(internal_field, our_options[internal_field])
+                registration.__setattr__(
+                    internal_field, our_options[internal_field])
                 change_internal = True
 
         if change_internal:

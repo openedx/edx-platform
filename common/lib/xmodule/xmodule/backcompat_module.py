@@ -21,7 +21,8 @@ def process_includes(fn):
         xml_object = etree.fromstring(xml_data)
         next_include = xml_object.find('include')
         while next_include is not None:
-            system.error_tracker("WARNING: the <include> tag is deprecated, and will go away.")
+            system.error_tracker(
+                "WARNING: the <include> tag is deprecated, and will go away.")
             file = next_include.get('file')
             parent = next_include.getparent()
 

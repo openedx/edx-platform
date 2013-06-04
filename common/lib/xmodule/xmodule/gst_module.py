@@ -30,22 +30,24 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
     '''
 
     js = {
-      'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
-      'js': [
+        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
+        'js': [
         # 3rd party libraries used by graphic slider tool.
         # TODO - where to store them - outside xmodule?
         resource_string(__name__, 'js/src/graphical_slider_tool/gst_main.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/state.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/logme.js'),
-        resource_string(__name__, 'js/src/graphical_slider_tool/general_methods.js'),
+        resource_string(
+            __name__, 'js/src/graphical_slider_tool/general_methods.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/sliders.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/inputs.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/graph.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/el_output.js'),
-        resource_string(__name__, 'js/src/graphical_slider_tool/g_label_el_output.js'),
+        resource_string(
+            __name__, 'js/src/graphical_slider_tool/g_label_el_output.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')
 
-      ]
+        ]
     }
     js_module_name = "GraphicalSliderTool"
 
@@ -57,13 +59,13 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
         self.html_class = self.location.category
         self.configuration_json = self.build_configuration_json()
         params = {
-                  'gst_html': self.substitute_controls(self.render),
-                  'element_id': self.html_id,
-                  'element_class': self.html_class,
-                  'configuration_json': self.configuration_json
-                  }
+            'gst_html': self.substitute_controls(self.render),
+            'element_id': self.html_id,
+            'element_class': self.html_class,
+            'configuration_json': self.configuration_json
+        }
         content = self.system.render_template(
-                        'graphical_slider_tool.html', params)
+            'graphical_slider_tool.html', params)
         return content
 
     def substitute_controls(self, html_string):
@@ -84,18 +86,18 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
 
         xml = html.fromstring(html_string)
 
-        #substitute plot, if presented
+        # substitute plot, if presented
         plot_div = '<div class="{element_class}_plot" id="{element_id}_plot" \
                     style="{style}"></div>'
         plot_el = xml.xpath('//plot')
         if plot_el:
             plot_el = plot_el[0]
             plot_el.getparent().replace(plot_el, html.fromstring(
-                                plot_div.format(element_class=self.html_class,
-                                               element_id=self.html_id,
-                                               style=plot_el.get('style', ""))))
+                plot_div.format(element_class=self.html_class,
+                                element_id=self.html_id,
+                                style=plot_el.get('style', ""))))
 
-        #substitute sliders
+        # substitute sliders
         slider_div = '<div class="{element_class}_slider" \
                                    id="{element_id}_slider_{var}" \
                                    data-var="{var}" \
@@ -104,10 +106,10 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
         slider_els = xml.xpath('//slider')
         for slider_el in slider_els:
             slider_el.getparent().replace(slider_el, html.fromstring(
-                                slider_div.format(element_class=self.html_class,
-                                    element_id=self.html_id,
-                                    var=slider_el.get('var', ""),
-                                    style=slider_el.get('style', ""))))
+                slider_div.format(element_class=self.html_class,
+                                  element_id=self.html_id,
+                                  var=slider_el.get('var', ""),
+                                  style=slider_el.get('style', ""))))
 
         # substitute inputs aka textboxes
         input_div = '<input class="{element_class}_input" \
@@ -116,11 +118,11 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
         input_els = xml.xpath('//textbox')
         for input_index, input_el in enumerate(input_els):
             input_el.getparent().replace(input_el, html.fromstring(
-                                input_div.format(element_class=self.html_class,
-                                        element_id=self.html_id,
-                                        var=input_el.get('var', ""),
-                                        style=input_el.get('style', ""),
-                                        input_index=input_index)))
+                input_div.format(element_class=self.html_class,
+                                 element_id=self.html_id,
+                                 var=input_el.get('var', ""),
+                                 style=input_el.get('style', ""),
+                                 input_index=input_index)))
 
         return html.tostring(xml)
 
@@ -136,7 +138,7 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
         # <root> added for interface compatibility with xmltodict.parse
         # class added for javascript's part purposes
         return json.dumps(xmltodict.parse('<root class="' + self.html_class +
-                '">' + self.configuration + '</root>'))
+                                          '">' + self.configuration + '</root>'))
 
 
 class GraphicalSliderToolDescriptor(GraphicalSliderToolFields, MakoModuleDescriptor, XmlDescriptor):
@@ -172,16 +174,17 @@ class GraphicalSliderToolDescriptor(GraphicalSliderToolFields, MakoModuleDescrip
             """Assumes that xml_object has child k"""
             return stringify_children(xml_object.xpath(k)[0])
         return {
-                    'render': parse('render'),
-                    'configuration': parse('configuration')
-                }, []
+            'render': parse('render'),
+            'configuration': parse('configuration')
+        }, []
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
         xml_object = etree.Element('graphical_slider_tool')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
+            child_str = '<{tag}>{body}</{tag}>'.format(
+                tag=k, body=getattr(self, k))
             child_node = etree.fromstring(child_str)
             xml_object.append(child_node)
 

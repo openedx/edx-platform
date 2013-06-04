@@ -15,7 +15,7 @@ from .dev import *
 INSTALLED_APPS = tuple(e for e in INSTALLED_APPS if e != 'debug_toolbar')
 INSTALLED_APPS = tuple(e for e in INSTALLED_APPS if e != 'debug_toolbar_mongo')
 
-MIDDLEWARE_CLASSES = tuple(e for e in MIDDLEWARE_CLASSES \
+MIDDLEWARE_CLASSES = tuple(e for e in MIDDLEWARE_CLASSES
                            if e != 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 
@@ -25,4 +25,5 @@ MITX_FEATURES['DISPLAY_TOY_COURSES'] = True
 INSTALLED_APPS += ('lettuce.django',)
 # INSTALLED_APPS += ('portal',)
 
-LETTUCE_APPS = ('portal',)  # dummy app covers the home page, login, registration, and course enrollment
+LETTUCE_APPS = (
+    'portal',)  # dummy app covers the home page, login, registration, and course enrollment

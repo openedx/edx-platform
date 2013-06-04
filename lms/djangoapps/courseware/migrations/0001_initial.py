@@ -11,24 +11,36 @@ class Migration(SchemaMigration):
 
         # Adding model 'StudentModule'
         db.create_table('courseware_studentmodule', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('module_type', self.gf('django.db.models.fields.CharField')(default='problem', max_length=32)),
-            ('module_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('state', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('module_type', self.gf('django.db.models.fields.CharField')(
+                default='problem', max_length=32)),
+            ('module_id', self.gf(
+                'django.db.models.fields.CharField')(max_length=255)),
+            ('student', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
+            ('state', self.gf('django.db.models.fields.TextField')(
+                null=True, blank=True)),
+            ('grade', self.gf('django.db.models.fields.FloatField')(
+                null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, blank=True)),
+            ('modified', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now=True, blank=True)),
         ))
         db.send_create_signal('courseware', ['StudentModule'])
 
-        # Adding unique constraint on 'StudentModule', fields ['student', 'module_id', 'module_type']
-        db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
+        # Adding unique constraint on 'StudentModule', fields ['student',
+        # 'module_id', 'module_type']
+        db.create_unique('courseware_studentmodule', [
+                         'student_id', 'module_id', 'module_type'])
 
     def backwards(self, orm):
 
-        # Removing unique constraint on 'StudentModule', fields ['student', 'module_id', 'module_type']
-        db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
+        # Removing unique constraint on 'StudentModule', fields ['student',
+        # 'module_id', 'module_type']
+        db.delete_unique('courseware_studentmodule', [
+                         'student_id', 'module_id', 'module_type'])
 
         # Deleting model 'StudentModule'
         db.delete_table('courseware_studentmodule')

@@ -17,6 +17,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 class StudentModule(models.Model):
     """
     Keeps student state for a particular module in a particular course.
@@ -29,13 +30,15 @@ class StudentModule(models.Model):
                     ('timelimit', 'timelimit'),
                     )
     ## These three are the key for the object
-    module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
+    module_type = models.CharField(
+        max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
     # Key used to share state. By default, this is the module_id,
     # but for abtests and the like, this can be set to a shared value
     # for many instances of the module.
     # Filename for homeworks, etc.
-    module_state_key = models.CharField(max_length=255, db_index=True, db_column='module_id')
+    module_state_key = models.CharField(
+        max_length=255, db_index=True, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
     course_id = models.CharField(max_length=255, db_index=True)
 
@@ -49,10 +52,11 @@ class StudentModule(models.Model):
     grade = models.FloatField(null=True, blank=True, db_index=True)
     max_grade = models.FloatField(null=True, blank=True)
     DONE_TYPES = (('na', 'NOT_APPLICABLE'),
-                    ('f', 'FINISHED'),
-                    ('i', 'INCOMPLETE'),
-                    )
-    done = models.CharField(max_length=8, choices=DONE_TYPES, default='na', db_index=True)
+                 ('f', 'FINISHED'),
+                 ('i', 'INCOMPLETE'),
+                  )
+    done = models.CharField(
+        max_length=8, choices=DONE_TYPES, default='na', db_index=True)
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
@@ -81,7 +85,8 @@ class StudentModuleHistory(models.Model):
         get_latest_by = "created"
 
     student_module = models.ForeignKey(StudentModule, db_index=True)
-    version = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    version = models.CharField(
+        max_length=255, null=True, blank=True, db_index=True)
 
     # This should be populated from the modified field in StudentModule
     created = models.DateTimeField(db_index=True)
@@ -237,7 +242,8 @@ class OfflineComputedGrade(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     updated = models.DateTimeField(auto_now=True, db_index=True)
 
-    gradeset = models.TextField(null=True, blank=True)		# grades, stored as JSON
+    gradeset = models.TextField(
+        null=True, blank=True)		# grades, stored as JSON
 
     class Meta:
         unique_together = (('user', 'course_id'), )
@@ -257,7 +263,8 @@ class OfflineComputedGradeLog(models.Model):
 
     course_id = models.CharField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
-    seconds = models.IntegerField(default=0)  	# seconds elapsed for computation
+    seconds = models.IntegerField(
+        default=0)  	# seconds elapsed for computation
     nstudents = models.IntegerField(default=0)
 
     def __unicode__(self):

@@ -32,5 +32,6 @@ def has_access(user, location, role=STAFF_ROLE_NAME):
     _has_access = is_user_in_course_group_role(user, course_location, role)
     # if we're not in STAFF, perhaps we're in INSTRUCTOR groups
     if not _has_access and role == STAFF_ROLE_NAME:
-        _has_access = is_user_in_course_group_role(user, course_location, INSTRUCTOR_ROLE_NAME)
+        _has_access = is_user_in_course_group_role(
+            user, course_location, INSTRUCTOR_ROLE_NAME)
     return _has_access

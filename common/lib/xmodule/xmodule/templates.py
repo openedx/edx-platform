@@ -66,16 +66,20 @@ def update_templates(modulestore):
     """
 
     # cdodge: build up a list of all existing templates. This will be used to determine which
-    # templates have been removed from disk - and thus we need to remove from the DB
-    templates_to_delete = modulestore.get_items(['i4x', 'edx', 'templates', None, None, None])
+    # templates have been removed from disk - and thus we need to remove from
+    # the DB
+    templates_to_delete = modulestore.get_items(
+        ['i4x', 'edx', 'templates', None, None, None])
 
     for category, templates in all_templates().items():
         for template in templates:
             if 'display_name' not in template.metadata:
-                log.warning('No display_name specified in template {0}, skipping'.format(template))
+                log.warning(
+                    'No display_name specified in template {0}, skipping'.format(template))
                 continue
 
-            template_location = Location('i4x', 'edx', 'templates', category, Location.clean_for_url_name(template.metadata['display_name']))
+            template_location = Location('i4x', 'edx', 'templates', category, Location.clean_for_url_name(
+                template.metadata['display_name']))
 
             try:
                 json_data = {
@@ -87,7 +91,8 @@ def update_templates(modulestore):
                 }
                 json_data['location'] = template_location.dict()
 
-                XModuleDescriptor.load_from_json(json_data, TemplateTestSystem())
+                XModuleDescriptor.load_from_json(
+                    json_data, TemplateTestSystem())
             except:
                 log.warning('Unable to instantiate {cat} from template {template}, skipping'.format(
                     cat=category,
@@ -100,10 +105,12 @@ def update_templates(modulestore):
             modulestore.update_metadata(template_location, template.metadata)
 
             # remove template from list of templates to delete
-            templates_to_delete = [t for t in templates_to_delete if t.location != template_location]
+            templates_to_delete = [
+                t for t in templates_to_delete if t.location != template_location]
 
     # now remove all templates which appear to have removed from disk
     if len(templates_to_delete) > 0:
-        logging.debug('deleting dangling templates = {0}'.format(templates_to_delete))
+        logging.debug('deleting dangling templates = {0}'.format(
+            templates_to_delete))
         for template in templates_to_delete:
             modulestore.delete_item(template.location)

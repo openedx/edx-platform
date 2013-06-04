@@ -23,11 +23,13 @@ Compiler library and Java version 6 or later."""
 
     compiler = os.path.expanduser(options.compiler)
     if not os.path.exists(compiler):
-        sys.exit("Google Closure compiler jar file %s not found. Please use the -c option to specify the path." % compiler)
+        sys.exit("Google Closure compiler jar file %s not found. Please use the -c option to specify the path." %
+                 compiler)
 
     if not args:
         if options.verbose:
-            sys.stdout.write("No filenames given; defaulting to admin scripts\n")
+            sys.stdout.write(
+                "No filenames given; defaulting to admin scripts\n")
         args = [os.path.join(here, f) for f in [
             "actions.js", "collapse.js", "inlines.js", "prepopulate.js"]]
 
@@ -37,12 +39,14 @@ Compiler library and Java version 6 or later."""
         to_compress = os.path.expanduser(arg)
         if os.path.exists(to_compress):
             to_compress_min = "%s.min.js" % "".join(arg.rsplit(".js"))
-            cmd = "java -jar %s --js %s --js_output_file %s" % (compiler, to_compress, to_compress_min)
+            cmd = "java -jar %s --js %s --js_output_file %s" % (
+                compiler, to_compress, to_compress_min)
             if options.verbose:
                 sys.stdout.write("Running: %s\n" % cmd)
             subprocess.call(cmd.split())
         else:
-            sys.stdout.write("File %s not found. Sure it exists?\n" % to_compress)
+            sys.stdout.write(
+                "File %s not found. Sure it exists?\n" % to_compress)
 
 if __name__ == '__main__':
     main()

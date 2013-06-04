@@ -187,9 +187,11 @@ class WordCloudModule(WordCloudFields, XModule):
                 })
 
             # Student words from client.
-            # FIXME: we must use raw JSON, not a post data (multipart/form-data)
+            # FIXME: we must use raw JSON, not a post data (multipart/form-
+            # data)
             raw_student_words = post.getlist('student_words[]')
-            student_words = filter(None, map(self.good_word, raw_student_words))
+            student_words = filter(None, map(
+                self.good_word, raw_student_words))
 
             self.student_words = student_words
 

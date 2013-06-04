@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from .factories import *
@@ -76,7 +76,6 @@ def register_by_course_id(course_id, is_staff=False):
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id)
 
 
-
 @world.absorb
 def save_the_course_content(path='/tmp'):
     html = world.browser.html.encode('ascii', 'ignore')
@@ -110,7 +109,6 @@ def save_the_course_content(path='/tmp'):
     # use string slicing to grab everything after 'courseware/' in the URL
     u = world.browser.url
     section_url = u[u.find('courseware/') + 11:]
-
 
     if not os.path.exists(path):
         os.makedirs(path)

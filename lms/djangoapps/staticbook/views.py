@@ -64,10 +64,10 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     def remap_static_url(original_url, course):
         input_url = "'" + original_url + "'"
         output_url = replace_static_urls(
-                    input_url,
-                    getattr(course, 'data_dir', None),
-                    course_namespace=course.location
-                )
+            input_url,
+            getattr(course, 'data_dir', None),
+            course_namespace=course.location
+        )
         # strip off the quotes again...
         return output_url[1:-1]
 
@@ -113,10 +113,10 @@ def html_index(request, course_id, book_index, chapter=None):
     def remap_static_url(original_url, course):
         input_url = "'" + original_url + "'"
         output_url = replace_static_urls(
-                    input_url,
-                    getattr(course, 'data_dir', None),
-                    course_namespace=course.location
-                )
+            input_url,
+            getattr(course, 'data_dir', None),
+            course_namespace=course.location
+        )
         # strip off the quotes again...
         return output_url[1:-1]
 

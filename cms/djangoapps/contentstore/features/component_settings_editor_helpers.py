@@ -1,5 +1,5 @@
 # disable missing docstring
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 from lettuce import world
 from nose.tools import assert_equal
@@ -66,7 +66,8 @@ def verify_all_setting_entries(expected_entries):
 def save_component_and_reopen(step):
     world.css_click("a.save-button")
     # We have a known issue that modifications are still shown within the edit window after cancel (though)
-    # they are not persisted. Refresh the browser to make sure the changes WERE persisted after Save.
+    # they are not persisted. Refresh the browser to make sure the changes
+    # WERE persisted after Save.
     reload_the_page(step)
     edit_component_and_select_settings()
 
@@ -75,7 +76,8 @@ def save_component_and_reopen(step):
 def cancel_component(step):
     world.css_click("a.cancel-button")
     # We have a known issue that modifications are still shown within the edit window after cancel (though)
-    # they are not persisted. Refresh the browser to make sure the changes were not persisted.
+    # they are not persisted. Refresh the browser to make sure the changes
+    # were not persisted.
     reload_the_page(step)
 
 

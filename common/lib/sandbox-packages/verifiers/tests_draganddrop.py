@@ -9,13 +9,16 @@ class Test_PositionsCompare(unittest.TestCase):
     """ describe"""
 
     def test_nested_list_and_list1(self):
-        self.assertEqual(PositionsCompare([[1, 2], 40]), PositionsCompare([1, 3]))
+        self.assertEqual(PositionsCompare([[
+                         1, 2], 40]), PositionsCompare([1, 3]))
 
     def test_nested_list_and_list2(self):
-        self.assertNotEqual(PositionsCompare([1, 12]), PositionsCompare([1, 1]))
+        self.assertNotEqual(PositionsCompare(
+            [1, 12]), PositionsCompare([1, 1]))
 
     def test_list_and_list1(self):
-        self.assertNotEqual(PositionsCompare([[1, 2], 12]), PositionsCompare([1, 15]))
+        self.assertNotEqual(PositionsCompare([[
+                            1, 2], 12]), PositionsCompare([1, 15]))
 
     def test_list_and_list2(self):
         self.assertEqual(PositionsCompare([1, 11]), PositionsCompare([1, 1]))
@@ -33,10 +36,12 @@ class Test_PositionsCompare(unittest.TestCase):
         self.assertNotEqual(PositionsCompare("abd"), PositionsCompare("abe"))
 
     def test_float_and_string(self):
-        self.assertNotEqual(PositionsCompare([3.5, 5.7]), PositionsCompare(["1"]))
+        self.assertNotEqual(PositionsCompare(
+            [3.5, 5.7]), PositionsCompare(["1"]))
 
     def test_floats_and_ints(self):
-        self.assertEqual(PositionsCompare([3.5, 4.5]), PositionsCompare([5, 7]))
+        self.assertEqual(PositionsCompare(
+            [3.5, 4.5]), PositionsCompare([5, 7]))
 
 
 class Test_DragAndDrop_Grade(unittest.TestCase):
@@ -155,12 +160,18 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
             {'p': {'p_target': {'molecule': 'right_side_tagret'}}},
             {'s': {'s_target': {'molecule': 'left_side_tagret'}}},
             {'s': {'s_target': {'molecule': 'right_side_tagret'}}},
-            {'up': {'1': {'p': {'p_target': {'molecule': 'left_side_tagret'}}}}},
-            {'up': {'3': {'p': {'p_target': {'molecule': 'left_side_tagret'}}}}},
-            {'up': {'1': {'p': {'p_target': {'molecule': 'right_side_tagret'}}}}},
-            {'up': {'3': {'p': {'p_target': {'molecule': 'right_side_tagret'}}}}},
-            {'up_and_down': {'1': {'s': {'s_target': {'molecule': 'left_side_tagret'}}}}},
-            {'up_and_down': {'1': {'s': {'s_target': {'molecule': 'right_side_tagret'}}}}}
+            {'up': {'1': {'p': {'p_target': {
+                'molecule': 'left_side_tagret'}}}}},
+            {'up': {'3': {'p': {'p_target': {
+                'molecule': 'left_side_tagret'}}}}},
+            {'up': {'1': {'p': {'p_target': {
+                'molecule': 'right_side_tagret'}}}}},
+            {'up': {'3': {'p': {'p_target': {
+                'molecule': 'right_side_tagret'}}}}},
+            {'up_and_down': {'1': {'s': {'s_target': {
+                'molecule': 'left_side_tagret'}}}}},
+            {'up_and_down': {'1': {'s': {'s_target': {
+                'molecule': 'right_side_tagret'}}}}}
         ])
 
         correct_answer = [
@@ -753,7 +764,8 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {"name_with_icon":"t1"},{"name_with_icon":"t1"},{"name4":"t1"}, \
         {"name4":"t1"}]'
         correct_answer = [
-            {'draggables': ['name4'], 'targets': ['t1', 't1'], 'rule': 'exact'},
+            {'draggables': ['name4'], 'targets': [
+                't1', 't1'], 'rule': 'exact'},
             {'draggables': ['name_with_icon'], 'targets': ['t1', 't1', 't1'],
                 'rule': 'exact'}
         ]
@@ -768,7 +780,8 @@ class Test_DragAndDrop_Populate(unittest.TestCase):
         dnd = draganddrop.DragAndDrop(correct_answer, user_input)
 
         correct_groups = [['1'], ['name_with_icon']]
-        correct_positions = [{'exact': [[[40, 10], 29]]}, {'exact': [[20, 20]]}]
+        correct_positions = [{'exact': [[[
+            40, 10], 29]]}, {'exact': [[20, 20]]}]
         user_groups = [['1'], ['name_with_icon']]
         user_positions = [{'user': [[10, 10]]}, {'user': [[20, 20]]}]
 

@@ -10,12 +10,14 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'CourseEnrollment.course_id'
-        db.alter_column('student_courseenrollment', 'course_id', self.gf('django.db.models.fields.CharField')(max_length=255))
+        db.alter_column('student_courseenrollment', 'course_id', self.gf(
+            'django.db.models.fields.CharField')(max_length=255))
 
     def backwards(self, orm):
 
         # Changing field 'CourseEnrollment.course_id'
-        db.alter_column('student_courseenrollment', 'course_id', self.gf('django.db.models.fields.IntegerField')())
+        db.alter_column('student_courseenrollment', 'course_id', self.gf(
+            'django.db.models.fields.IntegerField')())
 
     models = {
         'auth.group': {

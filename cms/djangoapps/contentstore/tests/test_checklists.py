@@ -12,7 +12,8 @@ class ChecklistTestCase(CourseTestCase):
     def setUp(self):
         """ Creates the test course. """
         super(ChecklistTestCase, self).setUp()
-        self.course = CourseFactory.create(org='mitX', number='333', display_name='Checklists Course')
+        self.course = CourseFactory.create(
+            org='mitX', number='333', display_name='Checklists Course')
 
     def get_persisted_checklists(self):
         """ Returns the checklists as persisted in the modulestore. """
@@ -30,7 +31,8 @@ class ChecklistTestCase(CourseTestCase):
         # created before checklists were introduced).
         self.course.checklists = None
         modulestore = get_modulestore(self.course.location)
-        modulestore.update_metadata(self.course.location, own_metadata(self.course))
+        modulestore.update_metadata(
+            self.course.location, own_metadata(self.course))
         self.assertEquals(self.get_persisted_checklists(), None)
         response = self.client.get(checklists_url)
         self.assertEquals(payload, response.content)
@@ -43,54 +45,65 @@ class ChecklistTestCase(CourseTestCase):
             'name': self.course.location.name})
 
         returned_checklists = json.loads(self.client.get(update_url).content)
-        self.assertListEqual(self.get_persisted_checklists(), returned_checklists)
+        self.assertListEqual(
+            self.get_persisted_checklists(), returned_checklists)
 
     def test_update_checklists_index_ignored_on_get(self):
         """ Checklist index ignored on get. """
-        update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
-                                                           'course': self.course.location.course,
-                                                           'name': self.course.location.name,
-                                                           'checklist_index': 1})
+        update_url = reverse(
+            'checklists_updates', kwargs={'org': self.course.location.org,
+                                          'course': self.course.location.course,
+                                          'name': self.course.location.name,
+                                          'checklist_index': 1})
 
         returned_checklists = json.loads(self.client.get(update_url).content)
-        self.assertListEqual(self.get_persisted_checklists(), returned_checklists)
+        self.assertListEqual(
+            self.get_persisted_checklists(), returned_checklists)
 
     def test_update_checklists_post_no_index(self):
         """ No checklist index, will error on post. """
-        update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
-                                                           'course': self.course.location.course,
-                                                           'name': self.course.location.name})
+        update_url = reverse(
+            'checklists_updates', kwargs={'org': self.course.location.org,
+                                          'course': self.course.location.course,
+                                          'name': self.course.location.name})
         response = self.client.post(update_url)
-        self.assertContains(response, 'Could not save checklist', status_code=400)
+        self.assertContains(
+            response, 'Could not save checklist', status_code=400)
 
     def test_update_checklists_index_out_of_range(self):
         """ Checklist index out of range, will error on post. """
-        update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
-                                                           'course': self.course.location.course,
-                                                           'name': self.course.location.name,
-                                                           'checklist_index': 100})
+        update_url = reverse(
+            'checklists_updates', kwargs={'org': self.course.location.org,
+                                          'course': self.course.location.course,
+                                          'name': self.course.location.name,
+                                          'checklist_index': 100})
         response = self.client.post(update_url)
-        self.assertContains(response, 'Could not save checklist', status_code=400)
+        self.assertContains(
+            response, 'Could not save checklist', status_code=400)
 
     def test_update_checklists_index(self):
         """ Check that an update of a particular checklist works. """
-        update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
-                                                           'course': self.course.location.course,
-                                                           'name': self.course.location.name,
-                                                           'checklist_index': 2})
+        update_url = reverse(
+            'checklists_updates', kwargs={'org': self.course.location.org,
+                                          'course': self.course.location.course,
+                                          'name': self.course.location.name,
+                                          'checklist_index': 2})
         payload = self.course.checklists[2]
         self.assertFalse(payload.get('is_checked'))
         payload['is_checked'] = True
 
-        returned_checklist = json.loads(self.client.post(update_url, json.dumps(payload), "application/json").content)
+        returned_checklist = json.loads(self.client.post(
+            update_url, json.dumps(payload), "application/json").content)
         self.assertTrue(returned_checklist.get('is_checked'))
-        self.assertEqual(self.get_persisted_checklists()[2], returned_checklist)
+        self.assertEqual(self.get_persisted_checklists()[
+                         2], returned_checklist)
 
     def test_update_checklists_delete_unsupported(self):
         """ Delete operation is not supported. """
-        update_url = reverse('checklists_updates', kwargs={'org': self.course.location.org,
-                                                           'course': self.course.location.course,
-                                                           'name': self.course.location.name,
-                                                           'checklist_index': 100})
+        update_url = reverse(
+            'checklists_updates', kwargs={'org': self.course.location.org,
+                                          'course': self.course.location.course,
+                                          'name': self.course.location.name,
+                                          'checklist_index': 100})
         response = self.client.delete(update_url)
         self.assertContains(response, 'Unsupported request', status_code=400)

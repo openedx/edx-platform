@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from terrain.steps import reload_the_page
@@ -97,9 +97,12 @@ def test_i_clear_the_course_start_date(step):
 
 @step('I receive a warning about course start date$')
 def test_i_receive_a_warning_about_course_start_date(step):
-    assert_true(world.css_has_text('.message-error', 'The course must have an assigned start date.'))
-    assert_true('error' in world.css_find(COURSE_START_DATE_CSS).first._element.get_attribute('class'))
-    assert_true('error' in world.css_find(COURSE_START_TIME_CSS).first._element.get_attribute('class'))
+    assert_true(world.css_has_text('.message-error',
+                'The course must have an assigned start date.'))
+    assert_true('error' in world.css_find(
+        COURSE_START_DATE_CSS).first._element.get_attribute('class'))
+    assert_true('error' in world.css_find(
+        COURSE_START_TIME_CSS).first._element.get_attribute('class'))
 
 
 @step('The previously set start date is shown on refresh$')
@@ -125,8 +128,10 @@ def test_i_have_entered_a_new_course_start_date(step):
 @step('The warning about course start date goes away$')
 def test_the_warning_about_course_start_date_goes_away(step):
     assert_equal(0, len(world.css_find('.message-error')))
-    assert_false('error' in world.css_find(COURSE_START_DATE_CSS).first._element.get_attribute('class'))
-    assert_false('error' in world.css_find(COURSE_START_TIME_CSS).first._element.get_attribute('class'))
+    assert_false('error' in world.css_find(
+        COURSE_START_DATE_CSS).first._element.get_attribute('class'))
+    assert_false('error' in world.css_find(
+        COURSE_START_TIME_CSS).first._element.get_attribute('class'))
 
 
 @step('My new course start date is shown on refresh$')

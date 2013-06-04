@@ -20,21 +20,27 @@ def get_course_updates(location):
     try:
         course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
-        template = Location(['i4x', 'edx', "templates", 'course_info', "Empty"])
-        course_updates = modulestore('direct').clone_item(template, Location(location))
+        template = Location(
+            ['i4x', 'edx', "templates", 'course_info', "Empty"])
+        course_updates = modulestore(
+            'direct').clone_item(template, Location(location))
 
-    # current db rep: {"_id" : locationjson, "definition" : { "data" : "<ol>[<li><h2>date</h2>content</li>]</ol>"} "metadata" : ignored}
+    # current db rep: {"_id" : locationjson, "definition" : { "data" :
+    # "<ol>[<li><h2>date</h2>content</li>]</ol>"} "metadata" : ignored}
     location_base = course_updates.location.url()
 
-    # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
+    # purely to handle free formed updates not done via editor. Actually kills
+    # them, but at least doesn't break.
     try:
         course_html_parsed = html.fromstring(course_updates.data)
     except:
         log.error("Cannot parse: " + course_updates.data)
         escaped = django.utils.html.escape(course_updates.data)
-        course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
+        course_html_parsed = html.fromstring(
+            "<ol><li>" + escaped + "</li></ol>")
 
-    # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
+    # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and
+    # then rest of val
     course_upd_collection = []
     if course_html_parsed.tag == 'ol':
         # 0 is the newest
@@ -47,10 +53,12 @@ def get_course_updates(location):
             else:
                 content = "\n".join([html.tostring(ele) for ele in update[1:]])
 
-            # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
-            course_upd_collection.append({"id": location_base + "/" + str(len(course_html_parsed) - idx),
-                                          "date": update.findtext("h2"),
-                                          "content": content})
+            # make the id on the client be 1..len w/ 1 being the oldest and len
+            # being the newest
+            course_upd_collection.append(
+                {"id": location_base + "/" + str(len(course_html_parsed) - idx),
+                 "date": update.findtext("h2"),
+                 "content": content})
 
     return course_upd_collection
 
@@ -66,18 +74,22 @@ def update_course_updates(location, update, passed_id=None):
     except ItemNotFoundError:
         return HttpResponseBadRequest()
 
-    # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
+    # purely to handle free formed updates not done via editor. Actually kills
+    # them, but at least doesn't break.
     try:
         course_html_parsed = html.fromstring(course_updates.data)
     except:
         log.error("Cannot parse: " + course_updates.data)
         escaped = django.utils.html.escape(course_updates.data)
-        course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
+        course_html_parsed = html.fromstring(
+            "<ol><li>" + escaped + "</li></ol>")
 
     # No try/catch b/c failure generates an error back to client
-    new_html_parsed = html.fromstring('<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>')
+    new_html_parsed = html.fromstring('<li><h2>' + update[
+                                      'date'] + '</h2>' + update['content'] + '</li>')
 
-    # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
+    # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and
+    # then rest of val
     if course_html_parsed.tag == 'ol':
         # ??? Should this use the id in the json or in the url or does it matter?
         if passed_id is not None:
@@ -97,7 +109,8 @@ def update_course_updates(location, update, passed_id=None):
         if (len(new_html_parsed) == 1):
             content = new_html_parsed[0].tail
         else:
-            content = "\n".join([html.tostring(ele) for ele in new_html_parsed[1:]])
+            content = "\n".join([html.tostring(
+                ele) for ele in new_html_parsed[1:]])
 
         return {"id": passed_id,
                 "date": update['date'],
@@ -118,13 +131,15 @@ def delete_course_update(location, update, passed_id):
         return HttpResponseBadRequest()
 
     # TODO use delete_blank_text parser throughout and cache as a static var in a class
-    # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
+    # purely to handle free formed updates not done via editor. Actually kills
+    # them, but at least doesn't break.
     try:
         course_html_parsed = html.fromstring(course_updates.data)
     except:
         log.error("Cannot parse: " + course_updates.data)
         escaped = django.utils.html.escape(course_updates.data)
-        course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
+        course_html_parsed = html.fromstring(
+            "<ol><li>" + escaped + "</li></ol>")
 
     if course_html_parsed.tag == 'ol':
         # ??? Should this use the id in the json or in the url or does it matter?

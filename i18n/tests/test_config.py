@@ -3,6 +3,7 @@ from unittest import TestCase
 
 from config import Configuration, LOCALE_DIR, CONFIGURATION
 
+
 class TestConfiguration(TestCase):
     """
     Tests functionality of i18n/config.py
@@ -14,10 +15,11 @@ class TestConfiguration(TestCase):
         self.assertEqual(config.source_locale, 'en')
 
     def test_no_config(self):
-        config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'no_such_file'))
+        config_filename = os.path.normpath(
+            os.path.join(LOCALE_DIR, 'no_such_file'))
         with self.assertRaises(Exception):
             Configuration(config_filename)
-            
+
     def test_valid_configuration(self):
         """
         Make sure we have a valid configuration file,

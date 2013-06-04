@@ -7,7 +7,9 @@ from datetime import timedelta
 
 TIME_FORMAT = "%Y-%m-%dT%H:%M"
 
-TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+TIMEDELTA_REGEX = re.compile(
+    r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+
 
 def parse_time(time_str):
     """
@@ -25,6 +27,7 @@ def stringify_time(time_struct):
     Convert a time struct to a string
     """
     return time.strftime(TIME_FORMAT, time_struct)
+
 
 def parse_timedelta(time_str):
     """

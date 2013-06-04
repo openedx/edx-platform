@@ -135,8 +135,8 @@ class ResponseXMLFactory(object):
         """
         # Names of group elements
         group_element_names = {'checkbox': 'checkboxgroup',
-                                'radio': 'radiogroup',
-                                'multiple': 'choicegroup'}
+                               'radio': 'radiogroup',
+                               'multiple': 'choicegroup'}
 
         # Retrieve **kwargs
         choices = kwargs.get('choices', [True])
@@ -185,7 +185,8 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
             response_element.set('answer', str(answer))
 
         if tolerance:
-            responseparam_element = etree.SubElement(response_element, 'responseparam')
+            responseparam_element = etree.SubElement(
+                response_element, 'responseparam')
             responseparam_element.set('type', 'tolerance')
             responseparam_element.set('default', str(tolerance))
 
@@ -327,7 +328,8 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         """
         # Get **kwargs
         initial_display = kwargs.get("initial_display", "Enter code here")
-        answer_display = kwargs.get("answer_display", "This is the correct answer!")
+        answer_display = kwargs.get(
+            "answer_display", "This is the correct answer!")
         grader_payload = kwargs.get("grader_payload", '{}')
 
         # Create the <coderesponse> element
@@ -335,7 +337,8 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         codeparam_element = etree.SubElement(response_element, "codeparam")
 
         # Set the initial display text
-        initial_element = etree.SubElement(codeparam_element, "initial_display")
+        initial_element = etree.SubElement(
+            codeparam_element, "initial_display")
         initial_element.text = str(initial_display)
 
         # Set the answer display text
@@ -418,9 +421,9 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         sample_str = self._sample_str(sample_dict, num_samples, tolerance)
         response_element.set("samples", sample_str)
 
-
         # Set the tolerance
-        responseparam_element = etree.SubElement(response_element, "responseparam")
+        responseparam_element = etree.SubElement(
+            response_element, "responseparam")
         responseparam_element.set("type", "tolerance")
         responseparam_element.set("default", str(tolerance))
 
@@ -434,7 +437,8 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
             for (hint_prompt, hint_name, hint_text) in hint_list:
 
                 # For each hint, create a <formulahint> element
-                formulahint_element = etree.SubElement(hintgroup_element, "formulahint")
+                formulahint_element = etree.SubElement(
+                    hintgroup_element, "formulahint")
 
                 # We could sample a different range, but for simplicity,
                 # we use the same sample string for the hints
@@ -446,7 +450,8 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
 
                 # For each hint, create a <hintpart> element
                 # corresponding to the <formulahint>
-                hintpart_element = etree.SubElement(hintgroup_element, "hintpart")
+                hintpart_element = etree.SubElement(
+                    hintgroup_element, "hintpart")
                 hintpart_element.set("on", str(hint_name))
                 text_element = etree.SubElement(hintpart_element, "text")
                 text_element.text = str(hint_text)
@@ -465,9 +470,9 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         low_range_vals = [str(f[0]) for f in sample_dict.values()]
         high_range_vals = [str(f[1]) for f in sample_dict.values()]
         sample_str = (",".join(sample_dict.keys()) + "@" +
-                        ",".join(low_range_vals) + ":" +
-                        ",".join(high_range_vals) +
-                        "#" + str(num_samples))
+                      ",".join(low_range_vals) + ":" +
+                      ",".join(high_range_vals) +
+                      "#" + str(num_samples))
         return sample_str
 
 
@@ -477,7 +482,6 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
     def create_response_element(self, **kwargs):
         """ Create the <imageresponse> element."""
         return etree.Element("imageresponse")
-
 
     def create_input_element(self, **kwargs):
         """ Create the <imageinput> element.
@@ -555,7 +559,7 @@ class JavascriptResponseXMLFactory(ResponseXMLFactory):
         # Both display_src and display_class given,
         # or neither given
         assert((display_src and display_class) or
-                (not display_src and not display_class))
+              (not display_src and not display_class))
 
         # Create the <javascriptresponse> element
         response_element = etree.Element("javascriptresponse")
@@ -574,7 +578,8 @@ class JavascriptResponseXMLFactory(ResponseXMLFactory):
             display_element.set("src", str(display_src))
 
         for (param_name, param_val) in param_dict.items():
-            responseparam_element = etree.SubElement(response_element, "responseparam")
+            responseparam_element = etree.SubElement(
+                response_element, "responseparam")
             responseparam_element.set("name", str(param_name))
             responseparam_element.set("value", str(param_val))
 
@@ -693,14 +698,17 @@ class StringResponseXMLFactory(ResponseXMLFactory):
             if hint_list:
                 assert not hint_fn
                 for (hint_prompt, hint_name, hint_text) in hint_list:
-                    stringhint_element = etree.SubElement(hintgroup_element, "stringhint")
+                    stringhint_element = etree.SubElement(
+                        hintgroup_element, "stringhint")
                     stringhint_element.set("answer", str(hint_prompt))
                     stringhint_element.set("name", str(hint_name))
 
-                    hintpart_element = etree.SubElement(hintgroup_element, "hintpart")
+                    hintpart_element = etree.SubElement(
+                        hintgroup_element, "hintpart")
                     hintpart_element.set("on", str(hint_name))
 
-                    hint_text_element = etree.SubElement(hintpart_element, "text")
+                    hint_text_element = etree.SubElement(
+                        hintpart_element, "text")
                     hint_text_element.text = str(hint_text)
 
             if hint_fn:
@@ -725,22 +733,28 @@ class AnnotationResponseXMLFactory(ResponseXMLFactory):
         input_element = etree.Element("annotationinput")
 
         text_children = [
-            {'tag': 'title', 'text': kwargs.get('title', 'super cool annotation')},
+            {'tag': 'title', 'text': kwargs.get(
+                'title', 'super cool annotation')},
             {'tag': 'text', 'text': kwargs.get('text', 'texty text')},
-            {'tag': 'comment', 'text':kwargs.get('comment', 'blah blah erudite comment blah blah')},
-            {'tag': 'comment_prompt', 'text': kwargs.get('comment_prompt', 'type a commentary below')},
-            {'tag': 'tag_prompt', 'text': kwargs.get('tag_prompt', 'select one tag')}
+            {'tag': 'comment', 'text': kwargs.get(
+                'comment', 'blah blah erudite comment blah blah')},
+            {'tag': 'comment_prompt', 'text': kwargs.get(
+                'comment_prompt', 'type a commentary below')},
+            {'tag': 'tag_prompt', 'text': kwargs.get(
+                'tag_prompt', 'select one tag')}
         ]
 
         for child in text_children:
             etree.SubElement(input_element, child['tag']).text = child['text']
 
-        default_options = [('green', 'correct'),('eggs', 'incorrect'), ('ham', 'partially-correct')]
+        default_options = [('green', 'correct'), (
+            'eggs', 'incorrect'), ('ham', 'partially-correct')]
         options = kwargs.get('options', default_options)
         options_element = etree.SubElement(input_element, 'options')
 
         for (description, correctness) in options:
-            option_element = etree.SubElement(options_element, 'option', {'choice': correctness})
+            option_element = etree.SubElement(
+                options_element, 'option', {'choice': correctness})
             option_element.text = description
 
         return input_element

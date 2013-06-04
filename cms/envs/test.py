@@ -31,7 +31,8 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # Makes the tests run much faster...
 SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
-# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
+# TODO (cpennington): We need to figure out how envs/test.py can inject
+# things into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
@@ -121,7 +122,7 @@ CELERY_RESULT_BACKEND = 'cache'
 BROKER_TRANSPORT = 'memory'
 
 ################### Make tests faster
-#http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
+# http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',

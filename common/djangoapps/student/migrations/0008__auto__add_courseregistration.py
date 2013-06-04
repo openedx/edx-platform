@@ -10,8 +10,10 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'CourseRegistration'
         db.create_table('student_courseregistration', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.OneToOneField')(
+                to=orm['auth.User'], unique=True)),
             ('course_id', self.gf('django.db.models.fields.IntegerField')()),
         ))
         db.send_create_signal('student', ['CourseRegistration'])

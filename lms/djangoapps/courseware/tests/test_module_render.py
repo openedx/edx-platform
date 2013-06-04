@@ -53,10 +53,13 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
                           'invalid Location', 'dummy')
         mock_request = MagicMock()
         mock_request.FILES.keys.return_value = ['file_id']
-        mock_request.FILES.getlist.return_value = ['file'] * (settings.MAX_FILEUPLOADS_PER_INPUT + 1)
-        self.assertEquals(render.modx_dispatch(mock_request, 'dummy', self.location, 'dummy').content,
-                          json.dumps({'success': 'Submission aborted! Maximum %d files may be submitted at once' %
-                                      settings.MAX_FILEUPLOADS_PER_INPUT}))
+        mock_request.FILES.getlist.return_value = [
+            'file'] * (settings.MAX_FILEUPLOADS_PER_INPUT + 1)
+        self.assertEquals(
+            render.modx_dispatch(
+                mock_request, 'dummy', self.location, 'dummy').content,
+            json.dumps({'success': 'Submission aborted! Maximum %d files may be submitted at once' %
+                        settings.MAX_FILEUPLOADS_PER_INPUT}))
         mock_request_2 = MagicMock()
         mock_request_2.FILES.keys.return_value = ['file_id']
         inputfile = Stub()
@@ -64,10 +67,11 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
         inputfile.name = 'name'
         filelist = [inputfile]
         mock_request_2.FILES.getlist.return_value = filelist
-        self.assertEquals(render.modx_dispatch(mock_request_2, 'dummy', self.location,
-                                               'dummy').content,
-                          json.dumps({'success': 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
-                                      (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))}))
+        self.assertEquals(
+            render.modx_dispatch(mock_request_2, 'dummy', self.location,
+                                 'dummy').content,
+            json.dumps({'success': 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
+                         (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))}))
         mock_request_3 = MagicMock()
         mock_request_3.POST.copy.return_value = {'position': 1}
         mock_request_3.FILES = False
@@ -75,8 +79,9 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
         inputfile_2 = Stub()
         inputfile_2.size = 1
         inputfile_2.name = 'name'
-        self.assertIsInstance(render.modx_dispatch(mock_request_3, 'goto_position',
-                                                   self.location, self.course_id), HttpResponse)
+        self.assertIsInstance(
+            render.modx_dispatch(mock_request_3, 'goto_position',
+                                 self.location, self.course_id), HttpResponse)
         self.assertRaises(
             Http404,
             render.modx_dispatch,
@@ -156,7 +161,8 @@ class TestTOC(TestCase):
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
+        actual = render.toc_for_course(
+            self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
         self.assertEqual(expected, actual)
 
     def test_toc_toy_from_section(self):
@@ -183,5 +189,6 @@ class TestTOC(TestCase):
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, model_data_cache)
+        actual = render.toc_for_course(
+            self.portal_user, request, self.toy_course, chapter, section, model_data_cache)
         self.assertEqual(expected, actual)

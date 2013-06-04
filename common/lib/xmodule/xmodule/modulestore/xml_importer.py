@@ -15,8 +15,9 @@ from xmodule.errortracker import make_error_tracker
 log = logging.getLogger(__name__)
 
 
-def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace,
-                          subpath='static', verbose=False):
+def import_static_content(
+    modules, course_loc, course_data_path, static_content_store, target_location_namespace,
+        subpath='static', verbose=False):
 
     remap_dict = {}
 
@@ -31,29 +32,36 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
             try:
                 content_path = os.path.join(dirname, filename)
                 if verbose:
-                    log.debug('importing static content {0}...'.format(content_path))
+                    log.debug('importing static content {0}...'.format(
+                        content_path))
 
-                fullname_with_subpath = content_path.replace(static_dir, '')  # strip away leading path from the name
+                fullname_with_subpath = content_path.replace(
+                    static_dir, '')  # strip away leading path from the name
                 if fullname_with_subpath.startswith('/'):
                     fullname_with_subpath = fullname_with_subpath[1:]
-                content_loc = StaticContent.compute_location(target_location_namespace.org, target_location_namespace.course, fullname_with_subpath)
+                content_loc = StaticContent.compute_location(
+                    target_location_namespace.org, target_location_namespace.course, fullname_with_subpath)
                 mime_type = mimetypes.guess_type(filename)[0]
 
                 with open(content_path, 'rb') as f:
                     data = f.read()
 
-                content = StaticContent(content_loc, filename, mime_type, data, import_path=fullname_with_subpath)
+                content = StaticContent(
+                    content_loc, filename, mime_type, data, import_path=fullname_with_subpath)
 
-                # first let's save a thumbnail so we can get back a thumbnail location
-                (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
+                # first let's save a thumbnail so we can get back a thumbnail
+                # location
+                (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(
+                    content)
 
                 if thumbnail_content is not None:
                     content.thumbnail_location = thumbnail_location
 
-                #then commit the content
+                # then commit the content
                 static_content_store.save(content)
 
-                #store the remapping information which will be needed to subsitute in the module data
+                # store the remapping information which will be needed to
+                # subsitute in the module data
                 remap_dict[fullname_with_subpath] = content_loc.name
             except:
                 raise
@@ -70,32 +78,38 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
 
         if os.path.exists(static_pathname):
             try:
-                content_loc = StaticContent.compute_location(module.location.org, module.location.course, path)
+                content_loc = StaticContent.compute_location(
+                    module.location.org, module.location.course, path)
                 filename = os.path.basename(path)
                 mime_type = mimetypes.guess_type(filename)[0]
 
                 with open(static_pathname, 'rb') as f:
                     data = f.read()
 
-                content = StaticContent(content_loc, filename, mime_type, data, import_path=path)
+                content = StaticContent(
+                    content_loc, filename, mime_type, data, import_path=path)
 
-                # first let's save a thumbnail so we can get back a thumbnail location
-                (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
+                # first let's save a thumbnail so we can get back a thumbnail
+                # location
+                (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(
+                    content)
 
                 if thumbnail_content is not None:
                     content.thumbnail_location = thumbnail_location
 
-                #then commit the content
+                # then commit the content
                 static_content_store.save(content)
 
-                new_link = StaticContent.get_url_path_from_location(content_loc)
+                new_link = StaticContent.get_url_path_from_location(
+                    content_loc)
 
                 if remap_dict is not None:
                     remap_dict[link] = new_link
 
                 return new_link
             except Exception, e:
-                logging.exception('Skipping failed content load from {0}. Exception: {1}'.format(path, e))
+                logging.exception(
+                    'Skipping failed content load from {0}. Exception: {1}'.format(path, e))
 
     return link
 
@@ -106,11 +120,13 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
         # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
         # the caller passed in
         if module.location.category != 'course':
-            module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                                                       course=target_location_namespace.course)
+            module.location = module.location._replace(
+                tag=target_location_namespace.tag, org=target_location_namespace.org,
+                course=target_location_namespace.course)
         else:
-            module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                                                       course=target_location_namespace.course, name=target_location_namespace.name)
+            module.location = module.location._replace(
+                tag=target_location_namespace.tag, org=target_location_namespace.org,
+                course=target_location_namespace.course, name=target_location_namespace.name)
 
         # then remap children pointers since they too will be re-namespaced
         if module.has_children:
@@ -118,8 +134,9 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
             new_locs = []
             for child in children_locs:
                 child_loc = Location(child)
-                new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                                                   course=target_location_namespace.course)
+                new_child_loc = child_loc._replace(
+                    tag=target_location_namespace.tag, org=target_location_namespace.org,
+                    course=target_location_namespace.course)
 
                 new_locs.append(new_child_loc.url())
 
@@ -139,13 +156,15 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
             # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
             # no good, so we have to do this kludge
             if isinstance(module.data, str) or isinstance(module.data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                lxml_rewrite_links(module.data, lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
+                lxml_rewrite_links(module.data, lambda link: verify_content_links(
+                    module, course_data_path, static_content_store, link, remap_dict))
 
                 for key in remap_dict.keys():
                     module.data = module.data.replace(key, remap_dict[key])
 
         except Exception:
-            logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
+            logging.exception(
+                "failed to rewrite links on {0}. Continuing...".format(module.location))
 
         modulestore.update_item(module.location, module.data)
 
@@ -159,7 +178,8 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
     # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
     # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
     # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
-    # if there is *any* tabs - then there at least needs to be some predefined ones
+    # if there is *any* tabs - then there at least needs to be some predefined
+    # ones
     if module.tabs is None or len(module.tabs) == 0:
         module.tabs = [{"type": "courseware"},
                        {"type": "course_info", "name": "Course Info"},
@@ -167,9 +187,12 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
     # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
-    # so let's make sure we import in case there are no other references to it in the modules
-    verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
-    import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace, verbose=verbose)
+    # so let's make sure we import in case there are no other references to it
+    # in the modules
+    verify_content_links(module, course_data_path,
+                         static_content_store, '/static/images/course_image.jpg')
+    import_module_from_xml(modulestore, static_content_store,
+                           course_data_path, module, target_location_namespace, verbose=verbose)
 
 
 def import_from_xml(store, data_dir, course_dirs=None,
@@ -204,13 +227,16 @@ def import_from_xml(store, data_dir, course_dirs=None,
     for course_id in xml_module_store.modules.keys():
 
         if target_location_namespace is not None:
-            pseudo_course_id = '/'.join([target_location_namespace.org, target_location_namespace.course])
+            pseudo_course_id = '/'.join(
+                [target_location_namespace.org, target_location_namespace.course])
         else:
             course_id_components = course_id.split('/')
-            pseudo_course_id = '/'.join([course_id_components[0], course_id_components[1]])
+            pseudo_course_id = '/'.join([course_id_components[
+                                        0], course_id_components[1]])
 
         try:
-            # turn off all write signalling while importing as this is a high volume operation
+            # turn off all write signalling while importing as this is a high
+            # volume operation
             if pseudo_course_id not in store.ignore_write_events_on_courses:
                 store.ignore_write_events_on_courses.append(pseudo_course_id)
 
@@ -218,7 +244,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
             course_location = None
 
             if verbose:
-                log.debug("Scanning {0} for course module...".format(course_id))
+                log.debug("Scanning {0} for course module...".format(
+                    course_id))
 
             # Quick scan to get course module as we need some info from there. Also we need to make sure that the
             # course module is committed first into the store
@@ -232,18 +259,24 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
                     # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
                     # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
-                    # if there is *any* tabs - then there at least needs to be some predefined ones
+                    # if there is *any* tabs - then there at least needs to be
+                    # some predefined ones
                     if module.tabs is None or len(module.tabs) == 0:
                         module.tabs = [{"type": "courseware"},
-                                       {"type": "course_info", "name": "Course Info"},
-                                       {"type": "discussion", "name": "Discussion"},
+                                       {"type": "course_info",
+                                           "name": "Course Info"},
+                                       {"type": "discussion",
+                                           "name": "Discussion"},
                                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
-                    import_module(module, store, course_data_path, static_content_store)
+                    import_module(
+                        module, store, course_data_path, static_content_store)
 
                     # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
-                    # so let's make sure we import in case there are no other references to it in the modules
-                    verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
+                    # so let's make sure we import in case there are no other
+                    # references to it in the modules
+                    verify_content_links(
+                        module, course_data_path, static_content_store, '/static/images/course_image.jpg')
 
                     course_items.append(module)
 
@@ -252,8 +285,10 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 _namespace_rename = target_location_namespace if target_location_namespace is not None else course_location
 
                 # first pass to find everything in /static/
-                import_static_content(xml_module_store.modules[course_id], course_location, course_data_path, static_content_store,
-                                      _namespace_rename, subpath='static', verbose=verbose)
+                import_static_content(
+                    xml_module_store.modules[
+                        course_id], course_location, course_data_path, static_content_store,
+                    _namespace_rename, subpath='static', verbose=verbose)
 
             # finally loop through all the modules
             for module in xml_module_store.modules[course_id].itervalues():
@@ -268,15 +303,18 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     module = remap_namespace(module, target_location_namespace)
 
                 if verbose:
-                    log.debug('importing module location {0}'.format(module.location))
+                    log.debug('importing module location {0}'.format(
+                        module.location))
 
-                import_module(module, store, course_data_path, static_content_store)
+                import_module(
+                    module, store, course_data_path, static_content_store)
 
             # now import any 'draft' items
             if draft_store is not None:
-                import_course_draft(xml_module_store, store, draft_store, course_data_path,
-                                    static_content_store, target_location_namespace if target_location_namespace is not None
-                                    else course_location)
+                import_course_draft(
+                    xml_module_store, store, draft_store, course_data_path,
+                    static_content_store, target_location_namespace if target_location_namespace is not None
+                    else course_location)
 
         finally:
             # turn back on all write signalling
@@ -316,18 +354,21 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
             # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
             # no good, so we have to do this kludge
             if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
+                lxml_rewrite_links(module_data, lambda link: verify_content_links(
+                    module, course_data_path, static_content_store, link, remap_dict))
 
                 for key in remap_dict.keys():
                     module_data = module_data.replace(key, remap_dict[key])
 
         except Exception:
-            logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
+            logging.exception(
+                "failed to rewrite links on {0}. Continuing...".format(module.location))
     else:
         module_data = content
 
     if allow_not_found:
-        store.update_item(module.location, module_data, allow_not_found=allow_not_found)
+        store.update_item(
+            module.location, module_data, allow_not_found=allow_not_found)
     else:
         store.update_item(module.location, module_data)
 
@@ -362,7 +403,8 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
         None,
     )
 
-    # now walk the /vertical directory where each file in there will be a draft copy of the Vertical
+    # now walk the /vertical directory where each file in there will be a
+    # draft copy of the Vertical
     for dirname, dirnames, filenames in os.walk(draft_dir + "/vertical"):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
@@ -372,31 +414,41 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                     descriptor = system.process_xml(xml)
 
                     def _import_module(module):
-                        module.location = module.location._replace(revision='draft')
+                        module.location = module.location._replace(
+                            revision='draft')
                         # make sure our parent has us in its list of children
                         # this is to make sure private only verticals show up in the list of children since
-                        # they would have been filtered out from the non-draft store export
+                        # they would have been filtered out from the non-draft
+                        # store export
                         if module.location.category == 'vertical':
-                            module.location = module.location._replace(revision=None)
-                            sequential_url = module.xml_attributes['parent_sequential_url']
-                            index = int(module.xml_attributes['index_in_children_list'])
+                            module.location = module.location._replace(
+                                revision=None)
+                            sequential_url = module.xml_attributes[
+                                'parent_sequential_url']
+                            index = int(module.xml_attributes[
+                                        'index_in_children_list'])
 
                             seq_location = Location(sequential_url)
 
-                            # IMPORTANT: Be sure to update the sequential in the NEW namespace
-                            seq_location = seq_location._replace(org=target_location_namespace.org,
-                                                                 course=target_location_namespace.course
-                                                                 )
+                            # IMPORTANT: Be sure to update the sequential in
+                            # the NEW namespace
+                            seq_location = seq_location._replace(
+                                org=target_location_namespace.org,
+                                course=target_location_namespace.course
+                            )
                             sequential = store.get_item(seq_location)
 
                             if module.location.url() not in sequential.children:
-                                sequential.children.insert(index, module.location.url())
-                                store.update_children(sequential.location, sequential.children)
+                                sequential.children.insert(
+                                    index, module.location.url())
+                                store.update_children(
+                                    sequential.location, sequential.children)
 
                             del module.xml_attributes['parent_sequential_url']
                             del module.xml_attributes['index_in_children_list']
 
-                        import_module(module, draft_store, course_data_path, static_content_store, allow_not_found=True)
+                        import_module(
+                            module, draft_store, course_data_path, static_content_store, allow_not_found=True)
                         for child in module.get_children():
                             _import_module(child)
 
@@ -410,7 +462,8 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                     _import_module(descriptor)
 
                 except Exception, e:
-                    logging.exception('There was an error. {0}'.format(unicode(e)))
+                    logging.exception(
+                        'There was an error. {0}'.format(unicode(e)))
                     pass
 
 
@@ -421,11 +474,13 @@ def remap_namespace(module, target_location_namespace):
     # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
     # the caller passed in
     if module.location.category != 'course':
-        module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                                                   course=target_location_namespace.course)
+        module.location = module.location._replace(
+            tag=target_location_namespace.tag, org=target_location_namespace.org,
+            course=target_location_namespace.course)
     else:
-        module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                                                   course=target_location_namespace.course, name=target_location_namespace.name)
+        module.location = module.location._replace(
+            tag=target_location_namespace.tag, org=target_location_namespace.org,
+            course=target_location_namespace.course, name=target_location_namespace.name)
 
     # then remap children pointers since they too will be re-namespaced
     if hasattr(module, 'children'):
@@ -434,8 +489,9 @@ def remap_namespace(module, target_location_namespace):
             new_locs = []
             for child in children_locs:
                 child_loc = Location(child)
-                new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                                                   course=target_location_namespace.course)
+                new_child_loc = child_loc._replace(
+                    tag=target_location_namespace.tag, org=target_location_namespace.org,
+                    course=target_location_namespace.course)
 
                 new_locs.append(new_child_loc.url())
 
@@ -518,8 +574,9 @@ def validate_data_source_paths(data_dir, course_dir):
     err_cnt = 0
     warn_cnt = 0
     err_cnt += validate_data_source_path_existence(course_path / 'static')
-    warn_cnt += validate_data_source_path_existence(course_path / 'static/subs', is_err=False,
-                                                    extra_msg='Video captions (if they are used) will not work unless they are static/subs.')
+    warn_cnt += validate_data_source_path_existence(
+        course_path / 'static/subs', is_err=False,
+        extra_msg='Video captions (if they are used) will not work unless they are static/subs.')
     return err_cnt, warn_cnt
 
 
@@ -538,7 +595,8 @@ def perform_xlint(data_dir, course_dirs,
 
     # check all data source path information
     for course_dir in course_dirs:
-        _err_cnt, _warn_cnt = validate_data_source_paths(path(data_dir), course_dir)
+        _err_cnt, _warn_cnt = validate_data_source_paths(
+            path(data_dir), course_dir)
         err_cnt += _err_cnt
         warn_cnt += _warn_cnt
 
@@ -563,17 +621,23 @@ def perform_xlint(data_dir, course_dirs,
 
     for course_id in module_store.modules.keys():
         # constrain that courses only have 'chapter' children
-        err_cnt += validate_category_hierarchy(module_store, course_id, "course", "chapter")
+        err_cnt += validate_category_hierarchy(
+            module_store, course_id, "course", "chapter")
         # constrain that chapters only have 'sequentials'
-        err_cnt += validate_category_hierarchy(module_store, course_id, "chapter", "sequential")
+        err_cnt += validate_category_hierarchy(
+            module_store, course_id, "chapter", "sequential")
         # constrain that sequentials only have 'verticals'
-        err_cnt += validate_category_hierarchy(module_store, course_id, "sequential", "vertical")
+        err_cnt += validate_category_hierarchy(
+            module_store, course_id, "sequential", "vertical")
         # don't allow metadata on verticals, since we can't edit them in studio
-        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "vertical")
+        err_cnt += validate_no_non_editable_metadata(
+            module_store, course_id, "vertical")
         # don't allow metadata on chapters, since we can't edit them in studio
-        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "chapter")
+        err_cnt += validate_no_non_editable_metadata(
+            module_store, course_id, "chapter")
         # don't allow metadata on sequences that we can't edit
-        err_cnt += validate_no_non_editable_metadata(module_store, course_id, "sequential")
+        err_cnt += validate_no_non_editable_metadata(
+            module_store, course_id, "sequential")
 
         # check for a presence of a course marketing video
         location_elements = course_id.split('/')

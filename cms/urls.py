@@ -9,17 +9,26 @@ from . import one_time_startup
 urlpatterns = ('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
     url(r'^listing', 'contentstore.views.index', name='index'),
-    url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
-    url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
-    url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
+    url(r'^edit/(?P<location>.*?)$',
+        'contentstore.views.edit_unit', name='edit_unit'),
+    url(r'^subsection/(?P<location>.*?)$',
+        'contentstore.views.edit_subsection', name='edit_subsection'),
+    url(r'^preview_component/(?P<location>.*?)$',
+        'contentstore.views.preview_component', name='preview_component'),
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
-    url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),
+    url(r'^delete_item$',
+        'contentstore.views.delete_item', name='delete_item'),
     url(r'^clone_item$', 'contentstore.views.clone_item', name='clone_item'),
-    url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
-    url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
-    url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
-    url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course'),
-    url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
+    url(r'^create_draft$',
+        'contentstore.views.create_draft', name='create_draft'),
+    url(r'^publish_draft$',
+        'contentstore.views.publish_draft', name='publish_draft'),
+    url(r'^unpublish_unit$',
+        'contentstore.views.unpublish_unit', name='unpublish_unit'),
+    url(r'^create_new_course',
+        'contentstore.views.create_new_course', name='create_new_course'),
+    url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs',
+        name='reorder_static_tabs'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
         'contentstore.views.course_index', name='course_index'),
@@ -35,7 +44,8 @@ urlpatterns = ('',  # nopep8
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$',
         'contentstore.views.upload_asset', name='upload_asset'),
-    url(r'^manage_users/(?P<location>.*?)$', 'contentstore.views.manage_users', name='manage_users'),
+    url(r'^manage_users/(?P<location>.*?)$',
+        'contentstore.views.manage_users', name='manage_users'),
     url(r'^add_user/(?P<location>.*?)$',
         'contentstore.views.add_user', name='add_user'),
     url(r'^remove_user/(?P<location>.*?)$',
@@ -74,7 +84,8 @@ urlpatterns = ('',  # nopep8
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$',
         'contentstore.views.asset_index', name='asset_index'),
 
-    # this is a generic method to return the data/metadata associated with a xmodule
+    # this is a generic method to return the data/metadata associated with a
+    # xmodule
     url(r'^module_info/(?P<module_location>.*)$',
         'contentstore.views.module_info', name='module_info'),
 
@@ -84,7 +95,8 @@ urlpatterns = ('',  # nopep8
         'contentstore.views.landing', name='landing'),
 
     url(r'^not_found$', 'contentstore.views.not_found', name='not_found'),
-    url(r'^server_error$', 'contentstore.views.server_error', name='server_error'),
+    url(r'^server_error$',
+        'contentstore.views.server_error', name='server_error'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$',
         'contentstore.views.asset_index', name='asset_index'),
@@ -99,14 +111,16 @@ urlpatterns = ('',  # nopep8
 
 # User creation and updating views
 urlpatterns += (
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)$', 'contentstore.views.get_checklists', name='checklists'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)$',
+        'contentstore.views.get_checklists', name='checklists'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/checklists/(?P<name>[^/]+)/update(/)?(?P<checklist_index>.+)?.*$',
         'contentstore.views.update_checklist', name='checklists_updates'),
     url(r'^howitworks$', 'contentstore.views.howitworks', name='howitworks'),
     url(r'^signup$', 'contentstore.views.signup', name='signup'),
 
     url(r'^create_account$', 'student.views.create_account'),
-    url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name='activate'),
+    url(r'^activate/(?P<key>[^/]*)$',
+        'student.views.activate_account', name='activate'),
 
     # form page
     url(r'^login$', 'contentstore.views.old_login_redirect', name='old_login'),
@@ -130,7 +144,8 @@ urlpatterns += (
 
 if settings.ENABLE_JASMINE:
     # # Jasmine
-    urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
+    urlpatterns = urlpatterns + (url(
+        r'^_jasmine/', include('django_jasmine.urls')),)
 
 
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):

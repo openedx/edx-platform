@@ -10,21 +10,26 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'StudentModuleHistory'
         db.create_table('courseware_studentmodulehistory', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('student_module', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['courseware.StudentModule'])),
-            ('version', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(db_index=True)),
-            ('state', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
-            ('max_grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('student_module', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['courseware.StudentModule'])),
+            ('version', self.gf('django.db.models.fields.CharField')(
+                max_length=255, db_index=True)),
+            ('created', self.gf(
+                'django.db.models.fields.DateTimeField')(db_index=True)),
+            ('state', self.gf('django.db.models.fields.TextField')(
+                null=True, blank=True)),
+            ('grade', self.gf('django.db.models.fields.FloatField')(
+                null=True, blank=True)),
+            ('max_grade', self.gf('django.db.models.fields.FloatField')(
+                null=True, blank=True)),
         ))
         db.send_create_signal('courseware', ['StudentModuleHistory'])
-
 
     def backwards(self, orm):
         # Deleting model 'StudentModuleHistory'
         db.delete_table('courseware_studentmodulehistory')
-
 
     models = {
         'auth.group': {

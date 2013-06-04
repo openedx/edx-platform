@@ -15,11 +15,13 @@ class ProfileMiddleware:
 
     def process_response(self, request, response):
         # totalTime = time.time() - self.t
-        # tmpfile = tempfile.NamedTemporaryFile(prefix='sqlprof-t=' + str(totalTime) + "-", delete=False)
+        # tmpfile = tempfile.NamedTemporaryFile(prefix='sqlprof-t=' +
+        # str(totalTime) + "-", delete=False)
 
         # output = ""
         # for query in connection.queries:
-        #     output += "Time: " + str(query['time']) + "\nQuery: " + query['sql'] + "\n\n"
+        # output += "Time: " + str(query['time']) + "\nQuery: " + query['sql']
+        # + "\n\n"
 
         # tmpfile.write(output)
 

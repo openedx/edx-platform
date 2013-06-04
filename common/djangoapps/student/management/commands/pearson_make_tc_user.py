@@ -133,7 +133,6 @@ class Command(BaseCommand):
         base_options = set(option.dest for option in BaseCommand.option_list)
         return option_name not in base_options
 
-
     def handle(self, *args, **options):
         username = args[0]
         print username
@@ -157,8 +156,10 @@ class Command(BaseCommand):
             form_options = dict(our_options)
             for propname in TestCenterUser.user_provided_fields():
                 if propname not in form_options:
-                    form_options[propname] = testcenter_user.__getattribute__(propname)
-            form = TestCenterUserForm(instance=testcenter_user, data=form_options)
+                    form_options[
+                        propname] = testcenter_user.__getattribute__(propname)
+            form = TestCenterUserForm(
+                instance=testcenter_user, data=form_options)
             if form.is_valid():
                 form.update_and_save()
             else:
@@ -166,11 +167,13 @@ class Command(BaseCommand):
                 if (len(form.errors) > 0):
                     errorlist.append("Field Form errors encountered:")
                     for fielderror in form.errors:
-                        errorlist.append("Field Form Error:  {}".format(fielderror))
+                        errorlist.append(
+                            "Field Form Error:  {}".format(fielderror))
                 if (len(form.non_field_errors()) > 0):
                     errorlist.append("Non-field Form errors encountered:")
                     for nonfielderror in form.non_field_errors:
-                        errorlist.append("Non-field Form Error:  {}".format(nonfielderror))
+                        errorlist.append(
+                            "Non-field Form Error:  {}".format(nonfielderror))
                 raise CommandError("\n".join(errorlist))
         else:
             print "No changes necessary to make to existing user's demographics."
@@ -180,7 +183,8 @@ class Command(BaseCommand):
         testcenter_user = TestCenterUser.objects.get(user=student)
         for internal_field in ['upload_error_message', 'upload_status', 'client_candidate_id']:
             if internal_field in our_options:
-                testcenter_user.__setattr__(internal_field, our_options[internal_field])
+                testcenter_user.__setattr__(
+                    internal_field, our_options[internal_field])
                 change_internal = True
 
         if change_internal:

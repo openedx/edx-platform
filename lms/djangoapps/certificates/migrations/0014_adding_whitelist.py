@@ -10,18 +10,20 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'CertificateWhitelist'
         db.create_table('certificates_certificatewhitelist', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('course_id', self.gf('django.db.models.fields.CharField')(default='', max_length=255, blank=True)),
-            ('whitelist', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
+            ('course_id', self.gf('django.db.models.fields.CharField')(
+                default='', max_length=255, blank=True)),
+            ('whitelist', self.gf(
+                'django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal('certificates', ['CertificateWhitelist'])
-
 
     def backwards(self, orm):
         # Deleting model 'CertificateWhitelist'
         db.delete_table('certificates_certificatewhitelist')
-
 
     models = {
         'auth.group': {

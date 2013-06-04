@@ -48,12 +48,12 @@ class CorrectMap(object):
 
         if answer_id is not None:
             self.cmap[str(answer_id)] = {'correctness': correctness,
-                                    'npoints': npoints,
-                                    'msg': msg,
-                                    'hint': hint,
-                                    'hintmode': hintmode,
-                                    'queuestate': queuestate,
-                                    }
+                                         'npoints': npoints,
+                                         'msg': msg,
+                                         'hint': hint,
+                                         'hintmode': hintmode,
+                                         'queuestate': queuestate,
+                                         }
 
     def __repr__(self):
         return repr(self.cmap)
@@ -157,10 +157,10 @@ class CorrectMap(object):
         Update this CorrectMap with the contents of another CorrectMap
         '''
         if not isinstance(other_cmap, CorrectMap):
-            raise Exception('CorrectMap.update called with invalid argument %s' % other_cmap)
+            raise Exception(
+                'CorrectMap.update called with invalid argument %s' % other_cmap)
         self.cmap.update(other_cmap.get_dict())
         self.set_overall_message(other_cmap.get_overall_message())
-
 
     def set_overall_message(self, message_str):
         """ Set a message that applies to the question as a whole,

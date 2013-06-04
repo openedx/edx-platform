@@ -57,11 +57,13 @@ class UserProfile(models.Model):
     ## CRITICAL TODO/SECURITY
     # Sanitize all fields.
     # This is not visible to other users, but could introduce holes later
-    user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
+    user = models.OneToOneField(
+        User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
 
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
-    courseware = models.CharField(blank=True, max_length=255, default='course.xml')
+    courseware = models.CharField(
+        blank=True, max_length=255, default='course.xml')
 
     # Location is no longer used, but is held here for backwards compatibility
     # for users imported from our first class.
@@ -73,8 +75,9 @@ class UserProfile(models.Model):
     VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
-    gender = models.CharField(blank=True, null=True, max_length=6, db_index=True,
-                              choices=GENDER_CHOICES)
+    gender = models.CharField(
+        blank=True, null=True, max_length=6, db_index=True,
+        choices=GENDER_CHOICES)
 
     # [03/21/2013] removed these, but leaving comment since there'll still be
     # p_se and p_oth in the existing data in db.
@@ -85,14 +88,15 @@ class UserProfile(models.Model):
                                   ('b', "Bachelor's degree"),
                                   ('a', "Associate's degree"),
                                   ('hs', "Secondary/high school"),
-                                  ('jhs', "Junior secondary/junior high/middle school"),
+                                  ('jhs',
+                                   "Junior secondary/junior high/middle school"),
                                   ('el', "Elementary/primary school"),
                                   ('none', "None"),
                                   ('other', "Other"))
     level_of_education = models.CharField(
-                            blank=True, null=True, max_length=6, db_index=True,
-                            choices=LEVEL_OF_EDUCATION_CHOICES
-                         )
+        blank=True, null=True, max_length=6, db_index=True,
+        choices=LEVEL_OF_EDUCATION_CHOICES
+    )
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
@@ -142,7 +146,8 @@ class TestCenterUser(models.Model):
     user_updated_at = models.DateTimeField(db_index=True)
 
     # Unique ID we assign our user for the Test Center.
-    client_candidate_id = models.CharField(unique=True, max_length=50, db_index=True)
+    client_candidate_id = models.CharField(
+        unique=True, max_length=50, db_index=True)
 
     # Name
     first_name = models.CharField(max_length=30, db_index=True)
@@ -182,7 +187,8 @@ class TestCenterUser(models.Model):
     # on when they processed the request, and when we received
     # confirmation back.
     processed_at = models.DateTimeField(null=True, db_index=True)
-    upload_status = models.CharField(max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
+    upload_status = models.CharField(
+        max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
     upload_error_message = models.CharField(max_length=512, blank=True)
     # Unique ID given to us for this User by the Testing Center. It's null when
     # we first create the User entry, and may be assigned by Pearson later.
@@ -196,9 +202,10 @@ class TestCenterUser(models.Model):
 
     @staticmethod
     def user_provided_fields():
-        return ['first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
-                'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
-                'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name']
+        return [
+            'first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
+            'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
+            'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name']
 
     @property
     def email(self):
@@ -247,9 +254,10 @@ class TestCenterUser(models.Model):
 class TestCenterUserForm(ModelForm):
     class Meta:
         model = TestCenterUser
-        fields = ('first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
-                'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
-                'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name')
+        fields = (
+            'first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
+            'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
+            'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name')
 
     def update_and_save(self):
         new_user = self.save(commit=False)
@@ -257,14 +265,16 @@ class TestCenterUserForm(ModelForm):
         new_user.user_updated_at = datetime.utcnow()
         new_user.upload_status = ''
         new_user.save()
-        log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(new_user.user.username))
+        log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(
+            new_user.user.username))
 
     # add validation:
 
     def clean_country(self):
         code = self.cleaned_data['country']
         if code and (len(code) != 3 or not code.isalpha()):
-            raise forms.ValidationError(u'Must be three characters (ISO 3166-1):  e.g. USA, CAN, MNG')
+            raise forms.ValidationError(
+                u'Must be three characters (ISO 3166-1):  e.g. USA, CAN, MNG')
         return code.upper()
 
     def clean(self):
@@ -282,22 +292,26 @@ class TestCenterUserForm(ModelForm):
             country = cleaned_data.get('country')
             if country == 'USA' or country == 'CAN':
                 if 'state' in cleaned_data and len(cleaned_data['state']) == 0:
-                    self._errors['state'] = self.error_class([u'Required if country is USA or CAN.'])
+                    self._errors['state'] = self.error_class(
+                        [u'Required if country is USA or CAN.'])
                     del cleaned_data['state']
 
                 if 'postal_code' in cleaned_data and len(cleaned_data['postal_code']) == 0:
-                    self._errors['postal_code'] = self.error_class([u'Required if country is USA or CAN.'])
+                    self._errors['postal_code'] = self.error_class(
+                        [u'Required if country is USA or CAN.'])
                     del cleaned_data['postal_code']
 
         if 'fax' in cleaned_data and len(cleaned_data['fax']) > 0 and 'fax_country_code' in cleaned_data and len(cleaned_data['fax_country_code']) == 0:
-            self._errors['fax_country_code'] = self.error_class([u'Required if fax is specified.'])
+            self._errors['fax_country_code'] = self.error_class(
+                [u'Required if fax is specified.'])
             del cleaned_data['fax_country_code']
 
         # check encoding for all fields:
         cleaned_data_fields = [fieldname for fieldname in cleaned_data]
         for fieldname in cleaned_data_fields:
             if not _can_encode_as_latin(cleaned_data[fieldname]):
-                self._errors[fieldname] = self.error_class([u'Must only use characters in Latin-1 (iso-8859-1) encoding'])
+                self._errors[fieldname] = self.error_class(
+                    [u'Must only use characters in Latin-1 (iso-8859-1) encoding'])
                 del cleaned_data[fieldname]
 
         # Always return the full collection of cleaned data.
@@ -307,7 +321,8 @@ class TestCenterUserForm(ModelForm):
 ACCOMMODATION_REJECTED_CODE = 'NONE'
 
 ACCOMMODATION_CODES = (
-                      (ACCOMMODATION_REJECTED_CODE, 'No Accommodation Granted'),
+                      (ACCOMMODATION_REJECTED_CODE,
+                       'No Accommodation Granted'),
                       ('EQPMNT', 'Equipment'),
                       ('ET12ET', 'Extra Time - 1/2 Exam Time'),
                       ('ET30MN', 'Extra Time - 30 Minutes'),
@@ -317,8 +332,9 @@ ACCOMMODATION_CODES = (
                       ('SRRERC', 'Separate Room and Reader/Recorder'),
                       ('SRRECR', 'Separate Room and Recorder'),
                       ('SRSEAN', 'Separate Room and Service Animal'),
-                      ('SRSGNR', 'Separate Room and Sign Language Interpreter'),
-                      )
+                      ('SRSGNR',
+                       'Separate Room and Sign Language Interpreter'),
+)
 
 ACCOMMODATION_CODE_DICT = {code: name for (code, name) in ACCOMMODATION_CODES}
 
@@ -352,7 +368,8 @@ class TestCenterRegistration(models.Model):
     user_updated_at = models.DateTimeField(db_index=True)
     # "client_authorization_id" is our unique identifier for the authorization.
     # This must be present for an update or delete to be sent to Pearson.
-    client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
+    client_authorization_id = models.CharField(
+        max_length=20, unique=True, db_index=True)
 
     # information about the test, from the course policy:
     exam_series_code = models.CharField(max_length=15, db_index=True)
@@ -365,7 +382,8 @@ class TestCenterRegistration(models.Model):
     accommodation_code = models.CharField(max_length=64, blank=True)
 
     # store the original text of the accommodation request.
-    accommodation_request = models.CharField(max_length=1024, blank=True, db_index=True)
+    accommodation_request = models.CharField(
+        max_length=1024, blank=True, db_index=True)
 
     # time at which edX sent the registration to the test center
     uploaded_at = models.DateTimeField(null=True, db_index=True)
@@ -374,7 +392,8 @@ class TestCenterRegistration(models.Model):
     # on when they processed the request, and when we received
     # confirmation back.
     processed_at = models.DateTimeField(null=True, db_index=True)
-    upload_status = models.CharField(max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
+    upload_status = models.CharField(
+        max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
     upload_error_message = models.CharField(max_length=512, blank=True)
     # Unique ID given to us for this registration by the Testing Center. It's null when
     # we first create the registration entry, and may be assigned by Pearson later.
@@ -416,7 +435,8 @@ class TestCenterRegistration(models.Model):
     @property
     def exam_authorization_count(self):
         # Someday this could go in the database (with a default value).  But at present,
-        # we do not expect anyone to be authorized to take an exam more than once.
+        # we do not expect anyone to be authorized to take an exam more than
+        # once.
         return 1
 
     @property
@@ -429,10 +449,14 @@ class TestCenterRegistration(models.Model):
         registration.course_id = exam.course_id
         registration.accommodation_request = accommodation_request.strip()
         registration.exam_series_code = exam.exam_series_code
-        registration.eligibility_appointment_date_first = strftime("%Y-%m-%d", exam.first_eligible_appointment_date)
-        registration.eligibility_appointment_date_last = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
-        registration.client_authorization_id = cls._create_client_authorization_id()
-        # accommodation_code remains blank for now, along with Pearson confirmation information
+        registration.eligibility_appointment_date_first = strftime(
+            "%Y-%m-%d", exam.first_eligible_appointment_date)
+        registration.eligibility_appointment_date_last = strftime(
+            "%Y-%m-%d", exam.last_eligible_appointment_date)
+        registration.client_authorization_id = cls._create_client_authorization_id(
+        )
+        # accommodation_code remains blank for now, along with Pearson
+        # confirmation information
         return registration
 
     @staticmethod
@@ -445,7 +469,8 @@ class TestCenterRegistration(models.Model):
         Return a unique id for a registration, suitable for using as an authorization code
         for Pearson.  It must fit within 20 characters.
         """
-        # generate a random value, and check to see if it already is in use here
+        # generate a random value, and check to see if it already is in use
+        # here
         auth_id = TestCenterRegistration._generate_authorization_id()
         while TestCenterRegistration.objects.filter(client_authorization_id=auth_id).exists():
             auth_id = TestCenterRegistration._generate_authorization_id()
@@ -559,7 +584,8 @@ class TestCenterRegistrationForm(ModelForm):
         registration.user_updated_at = datetime.utcnow()
         registration.upload_status = ''
         registration.save()
-        log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.user.username, registration.course_id, registration.exam_series_code))
+        log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(
+            registration.testcenter_user.user.username, registration.course_id, registration.exam_series_code))
 
     def clean_accommodation_code(self):
         code = self.cleaned_data['accommodation_code']
@@ -568,9 +594,9 @@ class TestCenterRegistrationForm(ModelForm):
             codes = code.split('*')
             for codeval in codes:
                 if codeval not in ACCOMMODATION_CODE_DICT:
-                    raise forms.ValidationError(u'Invalid accommodation code specified: "{}"'.format(codeval))
+                    raise forms.ValidationError(
+                        u'Invalid accommodation code specified: "{}"'.format(codeval))
         return code
-
 
 
 def get_testcenter_registration(user, course_id, exam_series_code):
@@ -615,7 +641,8 @@ class Registration(models.Model):
         db_table = "auth_registration"
 
     user = models.ForeignKey(User, unique=True)
-    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+    activation_key = models.CharField((
+        'activation key'), max_length=32, unique=True, db_index=True)
 
     def register(self, user):
         # MINOR TODO: Switch to crypto-secure key
@@ -626,7 +653,7 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self.user.save()
-        #self.delete()
+        # self.delete()
 
 
 class PendingNameChange(models.Model):
@@ -638,7 +665,8 @@ class PendingNameChange(models.Model):
 class PendingEmailChange(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
-    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+    activation_key = models.CharField((
+        'activation key'), max_length=32, unique=True, db_index=True)
 
 
 class CourseEnrollment(models.Model):
@@ -671,7 +699,7 @@ class CourseEnrollmentAllowed(models.Model):
     def __unicode__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
-#cache_relation(User.profile)
+# cache_relation(User.profile)
 
 #### Helper methods for use from python manage.py shell and other classes.
 
@@ -747,10 +775,11 @@ def remove_user_from_group(user, group):
     utg.users.remove(User.objects.get(username=user))
     utg.save()
 
-default_groups = {'email_future_courses': 'Receive e-mails about future MITx courses',
-                  'email_helpers': 'Receive e-mails about how to help with MITx',
-                  'mitx_unenroll': 'Fully unenrolled -- no further communications',
-                  '6002x_unenroll': 'Took and dropped 6002x'}
+default_groups = {
+    'email_future_courses': 'Receive e-mails about future MITx courses',
+    'email_helpers': 'Receive e-mails about how to help with MITx',
+    'mitx_unenroll': 'Fully unenrolled -- no further communications',
+    '6002x_unenroll': 'Took and dropped 6002x'}
 
 
 def add_user_to_default_group(user, group):
@@ -768,7 +797,8 @@ def add_user_to_default_group(user, group):
 @receiver(post_save, sender=User)
 def update_user_information(sender, instance, created, **kwargs):
     if not settings.MITX_FEATURES['ENABLE_DISCUSSION_SERVICE']:
-        # Don't try--it won't work, and it will fill the logs with lots of errors
+        # Don't try--it won't work, and it will fill the logs with lots of
+        # errors
         return
     try:
         cc_user = cc.User.from_django_user(instance)
@@ -776,4 +806,5 @@ def update_user_information(sender, instance, created, **kwargs):
     except Exception as e:
         log = logging.getLogger("mitx.discussion")
         log.error(unicode(e))
-        log.error("update user info to discussion failed for user with id: " + str(instance.id))
+        log.error("update user info to discussion failed for user with id: " + str(
+            instance.id))

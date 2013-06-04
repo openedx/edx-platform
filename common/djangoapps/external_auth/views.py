@@ -651,7 +651,8 @@ def test_center_login(request):
     code = request.POST.get("code")
 
     # calculate SHA for query string
-    # TODO: figure out how to get the original query string, so we can hash it and compare.
+    # TODO: figure out how to get the original query string, so we can hash it
+    # and compare.
 
     if 'clientCandidateID' not in request.POST:
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientCandidateID"))
@@ -664,9 +665,11 @@ def test_center_login(request):
 
     # find testcenter_user that matches the provided ID:
     try:
-        testcenteruser = TestCenterUser.objects.get(client_candidate_id=client_candidate_id)
+        testcenteruser = TestCenterUser.objects.get(
+            client_candidate_id=client_candidate_id)
     except TestCenterUser.DoesNotExist:
-        log.error("not able to find demographics for cand ID {}".format(client_candidate_id))
+        log.error("not able to find demographics for cand ID {}".format(
+            client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"))
 
     # find testcenter_registration that matches the provided exam code:
@@ -677,13 +680,16 @@ def test_center_login(request):
         # we are not allowed to make up a new error code, according to Pearson,
         # so instead of "missingExamSeriesCode", we use a valid one that is
         # inaccurate but at least distinct.  (Sigh.)
-        log.error("missing exam series code for cand ID {}".format(client_candidate_id))
+        log.error("missing exam series code for cand ID {}".format(
+            client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingPartnerID"))
     exam_series_code = request.POST.get('vueExamSeriesCode')
 
-    registrations = TestCenterRegistration.objects.filter(testcenter_user=testcenteruser, exam_series_code=exam_series_code)
+    registrations = TestCenterRegistration.objects.filter(
+        testcenter_user=testcenteruser, exam_series_code=exam_series_code)
     if not registrations:
-        log.error("not able to find exam registration for exam {} and cand ID {}".format(exam_series_code, client_candidate_id))
+        log.error("not able to find exam registration for exam {} and cand ID {}".format(
+            exam_series_code, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "noTestsAssigned"))
 
     # TODO: figure out what to do if there are more than one registrations....
@@ -693,31 +699,40 @@ def test_center_login(request):
     course_id = registration.course_id
     course = course_from_id(course_id)  # assume it will be found....
     if not course:
-        log.error("not able to find course from ID {} for cand ID {}".format(course_id, client_candidate_id))
+        log.error("not able to find course from ID {} for cand ID {}".format(
+            course_id, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"))
     exam = course.get_test_center_exam(exam_series_code)
     if not exam:
-        log.error("not able to find exam {} for course ID {} and cand ID {}".format(exam_series_code, course_id, client_candidate_id))
+        log.error("not able to find exam {} for course ID {} and cand ID {}".format(
+            exam_series_code, course_id, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"))
     location = exam.exam_url
-    log.info("proceeding with test of cand {} on exam {} for course {}: URL = {}".format(client_candidate_id, exam_series_code, course_id, location))
+    log.info("proceeding with test of cand {} on exam {} for course {}: URL = {}".format(
+        client_candidate_id, exam_series_code, course_id, location))
 
     # check if the test has already been taken
-    timelimit_descriptor = modulestore().get_instance(course_id, Location(location))
+    timelimit_descriptor = modulestore().get_instance(
+        course_id, Location(location))
     if not timelimit_descriptor:
-        log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
+        log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(
+            client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
 
-    timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
-                                                                             timelimit_descriptor, depth=None)
-    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
-                                                 timelimit_module_cache, course_id, position=None)
+    timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id, testcenteruser.user,
+        timelimit_descriptor, depth=None)
+    timelimit_module = get_module_for_descriptor(
+        request.user, request, timelimit_descriptor,
+        timelimit_module_cache, course_id, position=None)
     if not timelimit_module.category == 'timelimit':
-        log.error("cand {} on exam {} for course {}: non-timelimit module at location {}".format(client_candidate_id, exam_series_code, course_id, location))
+        log.error("cand {} on exam {} for course {}: non-timelimit module at location {}".format(
+            client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
 
     if timelimit_module and timelimit_module.has_ended:
-        log.warning("cand {} on exam {} for course {}: test already over at {}".format(client_candidate_id, exam_series_code, course_id, timelimit_module.ending_at))
+        log.warning("cand {} on exam {} for course {}: test already over at {}".format(
+            client_candidate_id, exam_series_code, course_id, timelimit_module.ending_at))
         return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"))
 
     # check if we need to provide an accommodation:
@@ -732,7 +747,8 @@ def test_center_login(request):
 
     if time_accommodation_code:
         timelimit_module.accommodation_code = time_accommodation_code
-        log.info("cand {} on exam {} for course {}: receiving accommodation {}".format(client_candidate_id, exam_series_code, course_id, time_accommodation_code))
+        log.info("cand {} on exam {} for course {}: receiving accommodation {}".format(
+            client_candidate_id, exam_series_code, course_id, time_accommodation_code))
 
     # UGLY HACK!!!
     # Login assumes that authentication has occurred, and that there is a
@@ -743,8 +759,10 @@ def test_center_login(request):
     # without a password.  This could all be formalized in a backend object
     # that does the above checking.
     # TODO: (brian) create a backend class to do this.
-    # testcenteruser.user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
-    testcenteruser.user.backend = "%s.%s" % ("TestcenterAuthenticationModule", "TestcenterAuthenticationClass")
+    # testcenteruser.user.backend = "%s.%s" % (backend.__module__,
+    # backend.__class__.__name__)
+    testcenteruser.user.backend = "%s.%s" % (
+        "TestcenterAuthenticationModule", "TestcenterAuthenticationClass")
     login(request, testcenteruser.user)
 
     # And start the test:

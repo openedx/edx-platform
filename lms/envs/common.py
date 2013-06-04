@@ -30,7 +30,7 @@ from path import path
 
 from .discussionsettings import *
 
-################################### FEATURES ###################################
+################################### FEATURES #############################
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
@@ -65,7 +65,8 @@ MITX_FEATURES = {
     'SUBDOMAIN_BRANDING': False,
 
     'FORCE_UNIVERSITY_DOMAIN': False,  	# set this to the university domain to use, as an override to HTTP_HOST
-                                        # set to None to do no university selection
+                                        # set to None to do no university
+                                        # selection
 
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
@@ -122,14 +123,15 @@ MITX_FEATURES = {
 # Used for A/B testing
 DEFAULT_GROUPS = []
 
-# If this is true, random scores will be generated for the purpose of debugging the profile graphs
+# If this is true, random scores will be generated for the purpose of
+# debugging the profile graphs
 GENERATE_PROFILE_SCORES = False
 
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5   # seconds
 
 
-############################# SET PATH INFORMATION #############################
+############################# SET PATH INFORMATION #######################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
@@ -158,7 +160,7 @@ NODE_PATH = ':'.join(node_paths)
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
-############################ OpenID Provider  ##################################
+############################ OpenID Provider  ############################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
 ################################## MITXWEB #####################################
@@ -186,7 +188,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
-    'django.contrib.auth.context_processors.auth',   # this is required for admin
+    'django.contrib.auth.context_processors.auth',
+    # this is required for admin
     'django.core.context_processors.csrf',   # necessary for csrf protection
 
     # Added for django-wiki
@@ -241,23 +244,24 @@ WIKI_ENABLED = False
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number': '6.002x',
-                                          'title': 'Circuits and Electronics',
-                                          'xmlpath': '6002x/',
-                                          'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-                                          }
-                    }
+COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
+                                        'title': 'Circuits and Electronics',
+                                        'xmlpath': '6002x/',
+                                        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
+                                        }
+                   }
 
 # IP addresses that are allowed to reload the course, etc.
-# TODO (vshnayder): Will probably need to change as we get real access control in.
+# TODO (vshnayder): Will probably need to change as we get real access
+# control in.
 LMS_MIGRATION_ALLOWED_IPS = []
 
-######################## subdomain specific settings ###########################
+######################## subdomain specific settings #####################
 COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
 
 
-############################### XModule Store ##################################
+############################### XModule Store ############################
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
@@ -269,7 +273,7 @@ MODULESTORE = {
 }
 CONTENTSTORE = None
 
-#################### Python sandbox ############################################
+#################### Python sandbox ######################################
 
 CODE_JAIL = {
     # Path to a sandboxed Python executable.  None means don't bother.
@@ -295,7 +299,8 @@ CODE_JAIL = {
 COURSES_WITH_UNSAFE_CODE = []
 
 ############################ SIGNAL HANDLERS ################################
-# This is imported to register the exception signal handling that logs exceptions
+# This is imported to register the exception signal handling that logs
+# exceptions
 import monitoring.exceptions  # noqa
 
 ############################### DJANGO BUILT-INS ###############################
@@ -355,7 +360,7 @@ ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 # in the global settings.py
 AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60   # 10 years
 
-################################# SIMPLEWIKI ###################################
+################################# SIMPLEWIKI #############################
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
@@ -384,18 +389,18 @@ ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
-################################# open ended grading config  #####################
+################################# open ended grading config  #############
 
-#By setting up the default settings with an incorrect user name and password,
+# By setting up the default settings with an incorrect user name and password,
 # will get an error when attempting to connect
 OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
-    'staff_grading' : 'staff_grading',
-    'peer_grading' : 'peer_grading',
-    'grading_controller' : 'grading_controller'
-    }
+    'staff_grading': 'staff_grading',
+    'peer_grading': 'peer_grading',
+    'grading_controller': 'grading_controller'
+}
 
 # Used for testing, debugging peer grading
 MOCK_PEER_GRADING = False
@@ -449,7 +454,7 @@ MIDDLEWARE_CLASSES = (
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
 
-############################### Pipeline #######################################
+############################### Pipeline #################################
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
@@ -464,25 +469,30 @@ courseware_js = (
 )
 
 # 'js/vendor/RequireJS.js' - Require JS wrapper.
-# See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
+# See https://edx-
+# wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 main_vendor_js = [
-  'js/vendor/RequireJS.js',
-  'js/vendor/json2.js',
-  'js/vendor/jquery.min.js',
-  'js/vendor/jquery-ui.min.js',
-  'js/vendor/jquery.cookie.js',
-  'js/vendor/jquery.qtip.min.js',
-  'js/vendor/swfobject/swfobject.js',
-  'js/vendor/jquery.ba-bbq.min.js',
-  'js/vendor/annotator.min.js',
-  'js/vendor/annotator.store.min.js',
-  'js/vendor/annotator.tags.min.js'
+    'js/vendor/RequireJS.js',
+    'js/vendor/json2.js',
+    'js/vendor/jquery.min.js',
+    'js/vendor/jquery-ui.min.js',
+    'js/vendor/jquery.cookie.js',
+    'js/vendor/jquery.qtip.min.js',
+    'js/vendor/swfobject/swfobject.js',
+    'js/vendor/jquery.ba-bbq.min.js',
+    'js/vendor/annotator.min.js',
+    'js/vendor/annotator.store.min.js',
+    'js/vendor/annotator.tags.min.js'
 ]
 
-discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
-staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
-open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
-notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
+discussion_js = sorted(rooted_glob(
+    PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+staff_grading_js = sorted(rooted_glob(
+    PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
+open_ended_js = sorted(rooted_glob(
+    PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
+notes_js = sorted(rooted_glob(
+    PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
 
 PIPELINE_CSS = {
     'application': {
@@ -517,7 +527,8 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js)
+            set(courseware_js + discussion_js +
+                staff_grading_js + open_ended_js + notes_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -581,7 +592,7 @@ if os.path.isdir(DATA_DIR):
                 new_filename = os.path.splitext(filename)[0] + ".js"
                 if os.path.exists(js_dir / new_filename):
                     coffee_timestamp = os.stat(js_dir / filename).st_mtime
-                    js_timestamp     = os.stat(js_dir / new_filename).st_mtime
+                    js_timestamp = os.stat(js_dir / new_filename).st_mtime
                     if coffee_timestamp <= js_timestamp:
                         continue
                 os.system("rm %s" % (js_dir / new_filename))
@@ -598,7 +609,8 @@ STATICFILES_IGNORE_PATTERNS = (
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
 
-# Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
+# Setting that will only affect the MITx version of django-pipeline until
+# our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
 ################################# CELERY ######################################
@@ -684,7 +696,7 @@ INSTALLED_APPS = (
     'licenses',
     'course_groups',
 
-    #For the wiki
+    # For the wiki
     'wiki',   # The new django-wiki from benjaoming
     'django_notify',
     'course_wiki',   # Our customizations
@@ -723,6 +735,8 @@ MKTG_URL_LINK_MAP = {
 }
 
 ############################### THEME ################################
+
+
 def enable_theme(theme_name):
     """
     Enable the settings for a custom theme, whose files should be stored
@@ -748,4 +762,3 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
-

@@ -52,7 +52,8 @@ class ProgressTest(unittest.TestCase):
         self.assertEqual(self.half_done.percent(), 50)
         self.assertEqual(self.done.percent(), 100)
 
-        self.assertEqual(self.half_done.percent(), self.also_half_done.percent())
+        self.assertEqual(
+            self.half_done.percent(), self.also_half_done.percent())
 
     def test_started(self):
         self.assertFalse(self.not_started.started())
@@ -88,7 +89,8 @@ class ProgressTest(unittest.TestCase):
         '''Test the Progress.to_js_status_str() method'''
 
         self.assertEqual(Progress.to_js_status_str(self.not_started), "none")
-        self.assertEqual(Progress.to_js_status_str(self.half_done), "in_progress")
+        self.assertEqual(Progress.to_js_status_str(
+            self.half_done), "in_progress")
         self.assertEqual(Progress.to_js_status_str(self.done), "done")
         self.assertEqual(Progress.to_js_status_str(None), "NA")
 

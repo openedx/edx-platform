@@ -10,16 +10,26 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Article'
         db.create_table('simplewiki_article', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=512)),
-            ('slug', self.gf('django.db.models.fields.SlugField')(max_length=100, blank=True)),
-            ('created_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
-            ('created_on', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=1, blank=True)),
-            ('modified_on', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=1, blank=True)),
-            ('parent', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['simplewiki.Article'], null=True, blank=True)),
-            ('locked', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('permissions', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['simplewiki.Permission'], null=True, blank=True)),
-            ('current_revision', self.gf('django.db.models.fields.related.OneToOneField')(blank=True, related_name='current_rev', unique=True, null=True, to=orm['simplewiki.Revision'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('title', self.gf(
+                'django.db.models.fields.CharField')(max_length=512)),
+            ('slug', self.gf('django.db.models.fields.SlugField')(
+                max_length=100, blank=True)),
+            ('created_by', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'], null=True, blank=True)),
+            ('created_on', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=1, blank=True)),
+            ('modified_on', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=1, blank=True)),
+            ('parent', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['simplewiki.Article'], null=True, blank=True)),
+            ('locked', self.gf(
+                'django.db.models.fields.BooleanField')(default=False)),
+            ('permissions', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['simplewiki.Permission'], null=True, blank=True)),
+            ('current_revision', self.gf('django.db.models.fields.related.OneToOneField')(
+                blank=True, related_name='current_rev', unique=True, null=True, to=orm['simplewiki.Revision'])),
         ))
         db.send_create_signal('simplewiki', ['Article'])
 
@@ -28,59 +38,85 @@ class Migration(SchemaMigration):
 
         # Adding M2M table for field related on 'Article'
         db.create_table('simplewiki_article_related', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('from_article', models.ForeignKey(orm['simplewiki.article'], null=False)),
-            ('to_article', models.ForeignKey(orm['simplewiki.article'], null=False))
+            ('id', models.AutoField(verbose_name='ID',
+             primary_key=True, auto_created=True)),
+            ('from_article', models.ForeignKey(orm[
+             'simplewiki.article'], null=False)),
+            ('to_article', models.ForeignKey(orm[
+             'simplewiki.article'], null=False))
         ))
-        db.create_unique('simplewiki_article_related', ['from_article_id', 'to_article_id'])
+        db.create_unique('simplewiki_article_related', [
+                         'from_article_id', 'to_article_id'])
 
         # Adding model 'ArticleAttachment'
         db.create_table('simplewiki_articleattachment', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('article', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['simplewiki.Article'])),
-            ('file', self.gf('django.db.models.fields.files.FileField')(max_length=255)),
-            ('uploaded_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
-            ('uploaded_on', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('article', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['simplewiki.Article'])),
+            ('file', self.gf(
+                'django.db.models.fields.files.FileField')(max_length=255)),
+            ('uploaded_by', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'], null=True, blank=True)),
+            ('uploaded_on', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, blank=True)),
         ))
         db.send_create_signal('simplewiki', ['ArticleAttachment'])
 
         # Adding model 'Revision'
         db.create_table('simplewiki_revision', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('article', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['simplewiki.Article'])),
-            ('revision_text', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('revision_user', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='wiki_revision_user', null=True, to=orm['auth.User'])),
-            ('revision_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('article', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['simplewiki.Article'])),
+            ('revision_text', self.gf('django.db.models.fields.CharField')(
+                max_length=255, null=True, blank=True)),
+            ('revision_user', self.gf('django.db.models.fields.related.ForeignKey')(
+                blank=True, related_name='wiki_revision_user', null=True, to=orm['auth.User'])),
+            ('revision_date', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, blank=True)),
             ('contents', self.gf('django.db.models.fields.TextField')()),
-            ('contents_parsed', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('counter', self.gf('django.db.models.fields.IntegerField')(default=1)),
-            ('previous_revision', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['simplewiki.Revision'], null=True, blank=True)),
-            ('deleted', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('contents_parsed', self.gf(
+                'django.db.models.fields.TextField')(null=True, blank=True)),
+            ('counter', self.gf(
+                'django.db.models.fields.IntegerField')(default=1)),
+            ('previous_revision', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['simplewiki.Revision'], null=True, blank=True)),
+            ('deleted', self.gf(
+                'django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal('simplewiki', ['Revision'])
 
         # Adding model 'Permission'
         db.create_table('simplewiki_permission', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('permission_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('permission_name', self.gf(
+                'django.db.models.fields.CharField')(max_length=255)),
         ))
         db.send_create_signal('simplewiki', ['Permission'])
 
         # Adding M2M table for field can_write on 'Permission'
         db.create_table('simplewiki_permission_can_write', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('permission', models.ForeignKey(orm['simplewiki.permission'], null=False)),
+            ('id', models.AutoField(verbose_name='ID',
+             primary_key=True, auto_created=True)),
+            ('permission', models.ForeignKey(orm[
+             'simplewiki.permission'], null=False)),
             ('user', models.ForeignKey(orm['auth.user'], null=False))
         ))
-        db.create_unique('simplewiki_permission_can_write', ['permission_id', 'user_id'])
+        db.create_unique('simplewiki_permission_can_write', [
+                         'permission_id', 'user_id'])
 
         # Adding M2M table for field can_read on 'Permission'
         db.create_table('simplewiki_permission_can_read', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('permission', models.ForeignKey(orm['simplewiki.permission'], null=False)),
+            ('id', models.AutoField(verbose_name='ID',
+             primary_key=True, auto_created=True)),
+            ('permission', models.ForeignKey(orm[
+             'simplewiki.permission'], null=False)),
             ('user', models.ForeignKey(orm['auth.user'], null=False))
         ))
-        db.create_unique('simplewiki_permission_can_read', ['permission_id', 'user_id'])
+        db.create_unique('simplewiki_permission_can_read', [
+                         'permission_id', 'user_id'])
 
     def backwards(self, orm):
         # Removing unique constraint on 'Article', fields ['slug', 'parent']

@@ -14,18 +14,46 @@ sessions. Assumes structure:
 
 from .common import *
 from logsettings import get_logger_config
+import os
 
-STATIC_GRAB = True
+DEBUG = True
 
-LOGGING = get_logger_config(ENV_ROOT / "log",
+INSTALLED_APPS = [
+    app
+    for app
+    in INSTALLED_APPS
+]
+
+# Nose Test Runner
+INSTALLED_APPS += ['django_nose']
+# NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage',
+# '--cover-html', '--cover-inclusive']
+NOSE_ARGS = ['--cover-erase', '--with-xunit',
+             '--cover-html', '--cover-inclusive']
+for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
+    NOSE_ARGS += ['--cover-package', app]
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Local Directories
+TEST_ROOT = path("test_root")
+COURSES_ROOT = TEST_ROOT / "data"
+DATA_DIR = COURSES_ROOT
+MAKO_TEMPLATES['course'] = [DATA_DIR]
+MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
+MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
+MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
+                          DATA_DIR / 'info',
+                          DATA_DIR / 'problems']
+
+LOGGING = get_logger_config(TEST_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
-                            debug=False)
+                            debug=True)
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "mitx.db",
+        'NAME': PROJECT_ROOT / "db" / "mitx.db",
     }
 }
 
@@ -56,9 +84,10 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 ############################ FILE UPLOADS (for discussion forums) ########
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-MEDIA_ROOT = ENV_ROOT / "uploads"
-MEDIA_URL = "/discussion/upfiles/"
-FILE_UPLOAD_TEMP_DIR = ENV_ROOT / "uploads"
+MEDIA_ROOT = PROJECT_ROOT / "uploads"
+MEDIA_URL = "/static/uploads/"
+STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
+FILE_UPLOAD_TEMP_DIR = PROJECT_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',

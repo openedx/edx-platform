@@ -15,6 +15,7 @@ from django.conf import settings
 
 from mako.template import Template
 
+
 class Command(NoArgsCommand):
     """
     Basic management command to preprocess asset template files.
@@ -30,7 +31,8 @@ class Command(NoArgsCommand):
         """
         for staticfiles_dir in getattr(settings, "STATICFILES_DIRS", []):
             # Cribbed from the django-staticfiles app at:
-            # https://github.com/jezdez/django-staticfiles/blob/develop/staticfiles/finders.py#L52
+            # https://github.com/jezdez/django-
+            # staticfiles/blob/develop/staticfiles/finders.py#L52
             if isinstance(staticfiles_dir, (list, tuple)):
                 prefix, staticfiles_dir = staticfiles_dir
 
@@ -44,7 +46,6 @@ class Command(NoArgsCommand):
                         self.__preprocess(os.path.join(root, filename),
                                           os.path.join(root, outfile))
 
-
     def __context(self):
         """
         Return a dict that contains all of the available context
@@ -52,8 +53,7 @@ class Command(NoArgsCommand):
         """
         # TODO: do we need to include anything else?
         # TODO: do this with the django-settings-context-processor
-        return { "THEME_NAME" : getattr(settings, "THEME_NAME", None) }
-
+        return {"THEME_NAME": getattr(settings, "THEME_NAME", None)}
 
     def __preprocess(self, infile, outfile):
         """
@@ -61,5 +61,5 @@ class Command(NoArgsCommand):
         result in `outfile`.
         """
         with open(outfile, "w") as _outfile:
-            _outfile.write(Template(filename=str(infile)).render(env=self.__context()))
-
+            _outfile.write(Template(filename=str(
+                infile)).render(env=self.__context()))

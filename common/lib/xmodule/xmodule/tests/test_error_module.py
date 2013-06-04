@@ -40,7 +40,8 @@ class TestNonStaffErrorModule(TestErrorModule):
     def test_non_staff_error_module_create(self):
         descriptor = error_module.NonStaffErrorDescriptor.from_xml(
             self.fake_xml, self.system, self.org, self.course)
-        self.assertTrue(isinstance(descriptor, error_module.NonStaffErrorDescriptor))
+        self.assertTrue(isinstance(
+            descriptor, error_module.NonStaffErrorDescriptor))
 
     def test_non_staff_error_module_rendering(self):
         descriptor = error_module.NonStaffErrorDescriptor.from_xml(

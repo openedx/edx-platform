@@ -10,30 +10,38 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'XModuleContentField.value'
-        db.alter_column('courseware_xmodulecontentfield', 'value', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('courseware_xmodulecontentfield', 'value', self.gf(
+            'django.db.models.fields.TextField')())
 
         # Changing field 'XModuleStudentInfoField.value'
-        db.alter_column('courseware_xmodulestudentinfofield', 'value', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('courseware_xmodulestudentinfofield', 'value', self.gf(
+            'django.db.models.fields.TextField')())
 
         # Changing field 'XModuleSettingsField.value'
-        db.alter_column('courseware_xmodulesettingsfield', 'value', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('courseware_xmodulesettingsfield', 'value', self.gf(
+            'django.db.models.fields.TextField')())
 
         # Changing field 'XModuleStudentPrefsField.value'
-        db.alter_column('courseware_xmodulestudentprefsfield', 'value', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('courseware_xmodulestudentprefsfield', 'value', self.gf(
+            'django.db.models.fields.TextField')())
 
     def backwards(self, orm):
 
         # Changing field 'XModuleContentField.value'
-        db.alter_column('courseware_xmodulecontentfield', 'value', self.gf('django.db.models.fields.TextField')(null=True))
+        db.alter_column('courseware_xmodulecontentfield', 'value', self.gf(
+            'django.db.models.fields.TextField')(null=True))
 
         # Changing field 'XModuleStudentInfoField.value'
-        db.alter_column('courseware_xmodulestudentinfofield', 'value', self.gf('django.db.models.fields.TextField')(null=True))
+        db.alter_column('courseware_xmodulestudentinfofield', 'value', self.gf(
+            'django.db.models.fields.TextField')(null=True))
 
         # Changing field 'XModuleSettingsField.value'
-        db.alter_column('courseware_xmodulesettingsfield', 'value', self.gf('django.db.models.fields.TextField')(null=True))
+        db.alter_column('courseware_xmodulesettingsfield', 'value', self.gf(
+            'django.db.models.fields.TextField')(null=True))
 
         # Changing field 'XModuleStudentPrefsField.value'
-        db.alter_column('courseware_xmodulestudentprefsfield', 'value', self.gf('django.db.models.fields.TextField')(null=True))
+        db.alter_column('courseware_xmodulestudentprefsfield', 'value', self.gf(
+            'django.db.models.fields.TextField')(null=True))
 
     models = {
         'auth.group': {

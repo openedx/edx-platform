@@ -1,5 +1,6 @@
 ##
-## One-off script to sync all user information to the discussion service (later info will be synced automatically)
+# One-off script to sync all user information to the discussion service
+# (later info will be synced automatically)
 
 
 from django.core.management.base import BaseCommand
@@ -9,7 +10,7 @@ import comment_client as cc
 
 class Command(BaseCommand):
     help = \
-'''
+        '''
 Sync all user ids, usernames, and emails to the discussion
 service'''
 

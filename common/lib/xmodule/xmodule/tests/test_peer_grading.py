@@ -42,7 +42,8 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         self.test_system = test_system()
         self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
-        self.peer_grading = self.get_module_from_location(self.problem_location, COURSE)
+        self.peer_grading = self.get_module_from_location(
+            self.problem_location, COURSE)
 
     def test_module_closed(self):
         """
@@ -88,7 +89,8 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Test to see if we can get the next mock submission
         @return:
         """
-        success, next_submission = self.peer_grading.get_next_submission({'location': 'blah'})
+        success, next_submission = self.peer_grading.get_next_submission(
+            {'location': 'blah'})
         self.assertEqual(success, True)
 
     def test_save_grade(self):
@@ -105,7 +107,8 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         calibrated_dict = {'location': "blah"}
-        response = self.peer_grading.is_student_calibrated(self.calibrated_dict)
+        response = self.peer_grading.is_student_calibrated(
+            self.calibrated_dict)
         self.assertEqual(response['success'], True)
 
     def test_show_calibration_essay(self):
@@ -113,7 +116,8 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Test showing the calibration essay
         @return:
         """
-        response = self.peer_grading.show_calibration_essay(self.calibrated_dict)
+        response = self.peer_grading.show_calibration_essay(
+            self.calibrated_dict)
         self.assertEqual(response['success'], True)
 
     def test_save_calibration_essay(self):
@@ -139,6 +143,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         """
         self.peer_grading.get_instance_state()
 
+
 class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
     """
     Test peer grading xmodule at the unit level.  More detailed tests are difficult, as the module relies on an
@@ -146,6 +151,7 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
     """
     problem_location = Location(["i4x", "edX", "open_ended", "peergrading",
                                  "PeerGradingScored"])
+
     def setUp(self):
         """
         Create a peer grading module from a test system
@@ -156,5 +162,6 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
         self.setup_modulestore(COURSE)
 
     def test_metadata_load(self):
-        peer_grading = self.get_module_from_location(self.problem_location, COURSE)
+        peer_grading = self.get_module_from_location(
+            self.problem_location, COURSE)
         self.assertEqual(peer_grading.closed(), False)

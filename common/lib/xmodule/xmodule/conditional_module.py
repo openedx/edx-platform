@@ -57,10 +57,12 @@ class ConditionalModule(ConditionalFields, XModule):
 
     """
 
-    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     resource_string(__name__, 'js/src/conditional/display.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     ]}
+    js = {
+        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                   resource_string(
+                   __name__, 'js/src/conditional/display.coffee'),
+                   resource_string(__name__, 'js/src/collapsible.coffee'),
+                   ]}
 
     js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
@@ -81,7 +83,8 @@ class ConditionalModule(ConditionalFields, XModule):
             xml_value = self.descriptor.xml_attributes.get(xml_attr)
             if xml_value:
                 return xml_value, attr_name
-        raise Exception('Error in conditional module: unknown condition "%s"' % xml_attr)
+        raise Exception(
+            'Error in conditional module: unknown condition "%s"' % xml_attr)
 
     def is_condition_satisfied(self):
         self.required_modules = [self.system.get_module(descriptor) for
@@ -92,7 +95,7 @@ class ConditionalModule(ConditionalFields, XModule):
         if xml_value and self.required_modules:
             for module in self.required_modules:
                 if not hasattr(module, attr_name):
-                    # We don't throw an exception here because it is possible for 
+                    # We don't throw an exception here because it is possible for
                     # the descriptor of a required module to have a property but
                     # for the resulting module to be a (flavor of) ErrorModule.
                     # So just log and return false.

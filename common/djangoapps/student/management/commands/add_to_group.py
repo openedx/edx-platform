@@ -21,7 +21,7 @@ class Command(BaseCommand):
                     dest='remove',
                     default=False,
                     help='Remove the user from the group instead of adding it'),
-        )
+    )
 
     args = '<user|email> <group>'
     help = 'Add a user to a group'
@@ -53,7 +53,8 @@ class Command(BaseCommand):
                 group = Group(name=group_name)
                 group.save()
             else:
-                raise CommandError('Group {} does not exist'.format(group_name))
+                raise CommandError(
+                    'Group {} does not exist'.format(group_name))
 
         if options['remove']:
             user.groups.remove(group)

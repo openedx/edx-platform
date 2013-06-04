@@ -11,24 +11,33 @@ class Migration(SchemaMigration):
 
         # Adding model 'PendingEmailChange'
         db.create_table('student_pendingemailchange', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-            ('new_email', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, blank=True)),
-            ('activation_key', self.gf('django.db.models.fields.CharField')(unique=True, max_length=32, db_index=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.OneToOneField')(
+                to=orm['auth.User'], unique=True)),
+            ('new_email', self.gf('django.db.models.fields.CharField')(
+                db_index=True, max_length=255, blank=True)),
+            ('activation_key', self.gf('django.db.models.fields.CharField')(
+                unique=True, max_length=32, db_index=True)),
         ))
         db.send_create_signal('student', ['PendingEmailChange'])
 
         # Adding model 'PendingNameChange'
         db.create_table('student_pendingnamechange', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-            ('new_name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('rationale', self.gf('django.db.models.fields.CharField')(max_length=1024, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.OneToOneField')(
+                to=orm['auth.User'], unique=True)),
+            ('new_name', self.gf('django.db.models.fields.CharField')(
+                max_length=255, blank=True)),
+            ('rationale', self.gf('django.db.models.fields.CharField')(
+                max_length=1024, blank=True)),
         ))
         db.send_create_signal('student', ['PendingNameChange'])
 
         # Changing field 'UserProfile.user'
-        db.alter_column('auth_userprofile', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(unique=True, to=orm['auth.User']))
+        db.alter_column('auth_userprofile', 'user_id', self.gf(
+            'django.db.models.fields.related.OneToOneField')(unique=True, to=orm['auth.User']))
 
     def backwards(self, orm):
 
@@ -39,7 +48,8 @@ class Migration(SchemaMigration):
         db.delete_table('student_pendingnamechange')
 
         # Changing field 'UserProfile.user'
-        db.alter_column('auth_userprofile', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True))
+        db.alter_column('auth_userprofile', 'user_id', self.gf(
+            'django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True))
 
     models = {
         'auth.group': {

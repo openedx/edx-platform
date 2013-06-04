@@ -16,9 +16,9 @@ valid_templates = []
 
 if settings.STATIC_GRAB:
     valid_templates = valid_templates + ['server-down.html',
-                                       'server-error.html'
-                                       'server-overloaded.html',
-                                       ]
+                                         'server-error.html'
+                                         'server-overloaded.html',
+                                         ]
 
 
 def index(request, template):
@@ -53,7 +53,8 @@ def render_press_release(request, slug):
     """
     template = slug.lower().replace('-', '_') + ".html"
     try:
-        resp = render_to_response('static_templates/press_releases/' + template, {})
+        resp = render_to_response(
+            'static_templates/press_releases/' + template, {})
     except TopLevelLookupException:
         raise Http404
     else:

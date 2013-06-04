@@ -10,6 +10,7 @@ from mitxmako.shortcuts import render_to_response
 
 from codejail.safe_exec import safe_exec
 
+
 @login_required
 @ensure_csrf_cookie
 def run_python(request):

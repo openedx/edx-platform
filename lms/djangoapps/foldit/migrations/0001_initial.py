@@ -10,43 +10,58 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Score'
         db.create_table('foldit_score', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='foldit_scores', to=orm['auth.User'])),
-            ('unique_user_id', self.gf('django.db.models.fields.CharField')(max_length=50, db_index=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                related_name='foldit_scores', to=orm['auth.User'])),
+            ('unique_user_id', self.gf('django.db.models.fields.CharField')(
+                max_length=50, db_index=True)),
             ('puzzle_id', self.gf('django.db.models.fields.IntegerField')()),
-            ('best_score', self.gf('django.db.models.fields.FloatField')(db_index=True)),
-            ('current_score', self.gf('django.db.models.fields.FloatField')(db_index=True)),
-            ('score_version', self.gf('django.db.models.fields.IntegerField')()),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('best_score', self.gf(
+                'django.db.models.fields.FloatField')(db_index=True)),
+            ('current_score', self.gf(
+                'django.db.models.fields.FloatField')(db_index=True)),
+            ('score_version', self.gf(
+                'django.db.models.fields.IntegerField')()),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, blank=True)),
         ))
         db.send_create_signal('foldit', ['Score'])
 
         # Adding model 'PuzzleComplete'
         db.create_table('foldit_puzzlecomplete', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='foldit_puzzles_complete', to=orm['auth.User'])),
-            ('unique_user_id', self.gf('django.db.models.fields.CharField')(max_length=50, db_index=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                related_name='foldit_puzzles_complete', to=orm['auth.User'])),
+            ('unique_user_id', self.gf('django.db.models.fields.CharField')(
+                max_length=50, db_index=True)),
             ('puzzle_id', self.gf('django.db.models.fields.IntegerField')()),
-            ('puzzle_set', self.gf('django.db.models.fields.IntegerField')(db_index=True)),
-            ('puzzle_subset', self.gf('django.db.models.fields.IntegerField')(db_index=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('puzzle_set', self.gf(
+                'django.db.models.fields.IntegerField')(db_index=True)),
+            ('puzzle_subset', self.gf(
+                'django.db.models.fields.IntegerField')(db_index=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, blank=True)),
         ))
         db.send_create_signal('foldit', ['PuzzleComplete'])
 
-        # Adding unique constraint on 'PuzzleComplete', fields ['user', 'puzzle_id', 'puzzle_set', 'puzzle_subset']
-        db.create_unique('foldit_puzzlecomplete', ['user_id', 'puzzle_id', 'puzzle_set', 'puzzle_subset'])
-
+        # Adding unique constraint on 'PuzzleComplete', fields ['user',
+        # 'puzzle_id', 'puzzle_set', 'puzzle_subset']
+        db.create_unique('foldit_puzzlecomplete', [
+                         'user_id', 'puzzle_id', 'puzzle_set', 'puzzle_subset'])
 
     def backwards(self, orm):
-        # Removing unique constraint on 'PuzzleComplete', fields ['user', 'puzzle_id', 'puzzle_set', 'puzzle_subset']
-        db.delete_unique('foldit_puzzlecomplete', ['user_id', 'puzzle_id', 'puzzle_set', 'puzzle_subset'])
+        # Removing unique constraint on 'PuzzleComplete', fields ['user',
+        # 'puzzle_id', 'puzzle_set', 'puzzle_subset']
+        db.delete_unique('foldit_puzzlecomplete', [
+                         'user_id', 'puzzle_id', 'puzzle_set', 'puzzle_subset'])
 
         # Deleting model 'Score'
         db.delete_table('foldit_score')
 
         # Deleting model 'PuzzleComplete'
         db.delete_table('foldit_puzzlecomplete')
-
 
     models = {
         'auth.group': {

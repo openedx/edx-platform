@@ -41,7 +41,7 @@ def cache_if_anonymous(view_func):
     @wraps(view_func)
     def _decorated(request, *args, **kwargs):
         if not request.user.is_authenticated():
-            #Use the cache
+            # Use the cache
             # same view accessed through different domain names may
             # return different things, so include the domain name in the key.
             domain = str(request.META.get('HTTP_HOST')) + '.'
@@ -54,7 +54,7 @@ def cache_if_anonymous(view_func):
             return response
 
         else:
-            #Don't use the cache
+            # Don't use the cache
             return view_func(request, *args, **kwargs)
 
     return _decorated

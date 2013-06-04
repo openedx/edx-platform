@@ -1,10 +1,11 @@
 import re
 import itertools
 
+
 class Converter:
     """Converter is an abstract class that transforms strings.
        It hides embedded tags (HTML or Python sequences) from transformation
-  
+
        To implement Converter, provide implementation for inner_convert_string()
 
        Strategy:
@@ -16,16 +17,17 @@ class Converter:
          3. re-insert the extracted tags
 
     """
-    
+
     # matches tags like these:
     #   HTML:   <B>, </B>, <BR/>, <textformat leading="10">
     #   Python: %(date)s, %(name)s
-    tag_pattern = re.compile(r'(<[-\w" .:?=/]*>)|({[^}]*})|(%\([^)]*\)\w)', re.I)
+    tag_pattern = re.compile(
+        r'(<[-\w" .:?=/]*>)|({[^}]*})|(%\([^)]*\)\w)', re.I)
 
     def convert(self, string):
         """Returns: a converted tagged string
            param: string (contains html tags)
-    
+
            Don't replace characters inside tags
         """
         (string, tags) = self.detag_string(string)
@@ -35,7 +37,7 @@ class Converter:
 
     def detag_string(self, string):
         """Extracts tags from string.
-        
+
            returns (string, list) where
            string: string has tags replaced by indices (<BR>... => <0>, <1>, <2>, etc.)
            list: list of the removed tags ('<BR>', '<I>', '</I>')
@@ -46,7 +48,7 @@ class Converter:
         tags = [''.join(tag) for tag in tags]
         (new, nfound) = self.tag_pattern.subn(count, string)
         if len(tags) != nfound:
-            raise Exception('tags dont match:'+string)
+            raise Exception('tags dont match:' + string)
         return (new, tags)
 
     def retag_string(self, string, tags):
@@ -56,10 +58,7 @@ class Converter:
             string = re.sub(p, tag, string, 1)
         return string
 
-
     # ------------------------------
     # Customize this in subclasses of Converter
-
     def inner_convert_string(self, string):
         return string  # do nothing by default
-

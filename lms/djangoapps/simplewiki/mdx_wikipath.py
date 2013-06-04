@@ -33,8 +33,8 @@ class WikiPathExtension(markdown.Extension):
     def __init__(self, configs):
         # set extension defaults
         self.config = {
-                        'default_namespace': ['edX', 'Default namespace for when one isn\'t specified.'],
-                        'html_class': ['wikipath', 'CSS hook. Leave blank for none.']
+            'default_namespace': ['edX', 'Default namespace for when one isn\'t specified.'],
+            'html_class': ['wikipath', 'CSS hook. Leave blank for none.']
         }
 
         # Override defaults with user settings
@@ -63,7 +63,8 @@ class WikiPath(markdown.inlinepatterns.Pattern):
             article_title = article_title[1:]
 
         if not "/" in article_title:
-            article_title = self.config['default_namespace'][0] + "/" + article_title
+            article_title = self.config[
+                'default_namespace'][0] + "/" + article_title
 
         url = "../" + article_title
         label = m.group('linkTitle')
@@ -81,9 +82,9 @@ class WikiPath(markdown.inlinepatterns.Pattern):
         base_url = self.config['base_url'][0]
         html_class = self.config['html_class'][0]
         if hasattr(self.md, 'Meta'):
-            if self.md.Meta.has_key('wiki_base_url'):
+            if 'wiki_base_url' in self.md.Meta:
                 base_url = self.md.Meta['wiki_base_url'][0]
-            if self.md.Meta.has_key('wiki_html_class'):
+            if 'wiki_html_class' in self.md.Meta:
                 html_class = self.md.Meta['wiki_html_class'][0]
         return base_url, html_class
 

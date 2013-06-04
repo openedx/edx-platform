@@ -30,7 +30,8 @@ from ..utils import get_url_reverse
 from .access import get_location_and_verify_access
 
 
-__all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
+__all__ = ['asset_index', 'upload_asset', 'import_course',
+           'generate_export_course', 'export_course']
 
 
 @login_required
@@ -55,22 +56,29 @@ def asset_index(request, org, course, name):
     assets = contentstore().get_all_content_for_course(course_reference)
 
     # sort in reverse upload date order
-    assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
+    assets = sorted(assets, key=lambda asset: asset[
+                    'uploadDate'], reverse=True)
 
     asset_display = []
     for asset in assets:
         asset_id = asset['_id']
         display_info = {}
         display_info['displayname'] = asset['displayname']
-        display_info['uploadDate'] = get_default_time_display(asset['uploadDate'].timetuple())
+        display_info['uploadDate'] = get_default_time_display(
+            asset['uploadDate'].timetuple())
 
-        asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
-        display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
+        asset_location = StaticContent.compute_location(
+            asset_id['org'], asset_id['course'], asset_id['name'])
+        display_info['url'] = StaticContent.get_url_path_from_location(
+            asset_location)
 
-        # note, due to the schema change we may not have a 'thumbnail_location' in the result set
+        # note, due to the schema change we may not have a 'thumbnail_location'
+        # in the result set
         _thumbnail_location = asset.get('thumbnail_location', None)
-        thumbnail_location = Location(_thumbnail_location) if _thumbnail_location is not None else None
-        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None
+        thumbnail_location = Location(
+            _thumbnail_location) if _thumbnail_location is not None else None
+        display_info['thumb_url'] = StaticContent.get_url_path_from_location(
+            thumbnail_location) if thumbnail_location is not None else None
 
         asset_display.append(display_info)
 
@@ -94,7 +102,8 @@ def upload_asset(request, org, course, coursename):
     # construct a location from the passed in path
     location = get_location_and_verify_access(request, org, course, coursename)
 
-    # Does the course actually exist?!? Get anything from it to prove its existance
+    # Does the course actually exist?!? Get anything from it to prove its
+    # existance
 
     try:
         modulestore().get_item(location)
@@ -105,7 +114,8 @@ def upload_asset(request, org, course, coursename):
 
     # compute a 'filename' which is similar to the location formatting, we're using the 'filename'
     # nomenclature since we're using a FileSystem paradigm here. We're just imposing
-    # the Location string formatting expectations to keep things a bit more consistent
+    # the Location string formatting expectations to keep things a bit more
+    # consistent
 
     filename = request.FILES['file'].name
     mime_type = request.FILES['file'].content_type
@@ -115,9 +125,11 @@ def upload_asset(request, org, course, coursename):
     content = StaticContent(content_loc, filename, mime_type, filedata)
 
     # first let's see if a thumbnail can be created
-    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content)
+    (thumbnail_content,
+     thumbnail_location) = contentstore().generate_thumbnail(content)
 
-    # delete cached thumbnail even if one couldn't be created this time (else the old thumbnail will continue to show)
+    # delete cached thumbnail even if one couldn't be created this time (else
+    # the old thumbnail will continue to show)
     del_cached_content(thumbnail_location)
     # now store thumbnail location only if we could create it
     if thumbnail_content is not None:
@@ -138,7 +150,8 @@ def upload_asset(request, org, course, coursename):
                         }
 
     response = HttpResponse(json.dumps(response_payload))
-    response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
+    response['asset_url'] = StaticContent.get_url_path_from_location(
+        content.location)
     return response
 
 
@@ -192,11 +205,14 @@ def import_course(request, org, course, name):
             for fname in os.listdir(dirpath):
                 shutil.move(dirpath / fname, course_dir)
 
-        _module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-                                                      [course_subdir], load_error_modules=False,
-                                                      static_content_store=contentstore(),
-                                                      target_location_namespace=Location(location),
-                                                      draft_store=modulestore())
+        _module_store, course_items = import_from_xml(
+            modulestore('direct'), settings.GITHUB_REPO_ROOT,
+            [course_subdir], load_error_modules=False,
+            static_content_store=contentstore(
+            ),
+            target_location_namespace=Location(
+                location),
+            draft_store=modulestore())
 
         # we can blow this away when we're done importing.
         shutil.rmtree(course_dir)
@@ -230,8 +246,9 @@ def generate_export_course(request, org, course, name):
 
     logging.debug('root = {0}'.format(root_dir))
 
-    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
-    #filename = root_dir / name + '.tar.gz'
+    export_to_xml(modulestore(
+        'direct'), contentstore(), loc, root_dir, name, modulestore())
+    # filename = root_dir / name + '.tar.gz'
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
     tar_file = tarfile.open(name=export_file.name, mode='w:gz')
@@ -243,7 +260,8 @@ def generate_export_course(request, org, course, name):
 
     wrapper = FileWrapper(export_file)
     response = HttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
+    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(
+        export_file.name)
     response['Content-Length'] = os.path.getsize(export_file.name)
     return response
 

@@ -57,7 +57,8 @@ def ajax_content_response(request, course_id, content, template_name):
     }
     html = render_to_string(template_name, context)
     user_info = cc.User.from_django_user(request.user).to_dict()
-    annotated_content_info = utils.get_annotated_content_info(course_id, content, request.user, user_info)
+    annotated_content_info = utils.get_annotated_content_info(
+        course_id, content, request.user, user_info)
     return JsonResponse({
         'html': html,
         'content': utils.safe_content(content),
@@ -72,7 +73,7 @@ def create_thread(request, course_id, commentable_id):
     """
     Given a course and commentble ID, create the thread
     """
-    
+
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
     course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
@@ -83,7 +84,8 @@ def create_thread(request, course_id, commentable_id):
         anonymous = False
 
     if course.allow_anonymous_to_peers:
-        anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
+        anonymous_to_peers = post.get(
+            'anonymous_to_peers', 'false').lower() == 'true'
     else:
         anonymous_to_peers = False
 
@@ -98,9 +100,9 @@ def create_thread(request, course_id, commentable_id):
 
     user = cc.User.from_django_user(request.user)
 
-    #kevinchugh because the new requirement is that all groups will be determined
-    #by the group id in the request this all goes away
-    #not anymore, only for admins
+    # kevinchugh because the new requirement is that all groups will be determined
+    # by the group id in the request this all goes away
+    # not anymore, only for admins
 
     # Cohort the thread if the commentable is cohorted.
     if is_commentable_cohorted(course_id, commentable_id):
@@ -121,7 +123,7 @@ def create_thread(request, course_id, commentable_id):
 
     thread.save()
 
-    #patch for backward compatibility to comments service
+    # patch for backward compatibility to comments service
     if not 'pinned' in thread.attributes:
         thread['pinned'] = False
 
@@ -146,7 +148,8 @@ def update_thread(request, course_id, thread_id):
     Given a course id and thread id, update a existing thread, used for both static and ajax submissions
     """
     thread = cc.Thread.find(thread_id)
-    thread.update_attributes(**extract(request.POST, ['body', 'title', 'tags']))
+    thread.update_attributes(**extract(
+        request.POST, ['body', 'title', 'tags']))
     thread.save()
     if request.is_ajax():
         return ajax_content_response(request, course_id, thread.to_dict(), 'discussion/ajax_update_thread.html')
@@ -169,7 +172,8 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         anonymous = False
 
     if course.allow_anonymous_to_peers:
-        anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
+        anonymous_to_peers = post.get(
+            'anonymous_to_peers', 'false').lower() == 'true'
     else:
         anonymous_to_peers = False
 
@@ -360,7 +364,8 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     course = get_course_by_id(course_id)
     thread = cc.Thread.find(thread_id)
-    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
+    removeAll = cached_has_permission(
+        request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
     thread.unFlagAbuse(user, thread, removeAll)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
@@ -389,7 +394,8 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     """
     user = cc.User.from_django_user(request.user)
     course = get_course_by_id(course_id)
-    removeAll = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
+    removeAll = cached_has_permission(
+        request.user, 'openclose_thread', course_id) or has_access(request.user, course, 'staff')
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, removeAll)
     return JsonResponse(utils.safe_content(comment.to_dict()))
@@ -557,7 +563,8 @@ def search_similar_threads(request, course_id, commentable_id):
             'text': text,
             'commentable_id': commentable_id,
         }
-        threads = cc.search_similar_threads(course_id, recursive=False, query_params=query_params)
+        threads = cc.search_similar_threads(
+            course_id, recursive=False, query_params=query_params)
     else:
         theads = []
     context = {'threads': map(utils.extend_content, threads)}
@@ -588,12 +595,12 @@ def upload(request, course_id):  # ajax upload file to a question or answer
     new_file_name = ''
     try:
         # TODO authorization
-        #may raise exceptions.PermissionDenied
-        #if request.user.is_anonymous():
+        # may raise exceptions.PermissionDenied
+        # if request.user.is_anonymous():
         #    msg = _('Sorry, anonymous users cannot upload files')
         #    raise exceptions.PermissionDenied(msg)
 
-        #request.user.assert_can_upload_file()
+        # request.user.assert_can_upload_file()
 
         # check file type
         f = request.FILES['file-upload']
@@ -605,7 +612,8 @@ def upload(request, course_id):  # ajax upload file to a question or answer
             raise exceptions.PermissionDenied(msg)
 
         # generate new file name
-        new_file_name = str(time.time()).replace('.', str(random.randint(0, 100000))) + file_extension
+        new_file_name = str(time.time()).replace('.', str(
+            random.randint(0, 100000))) + file_extension
 
         file_storage = get_storage_class()()
         # use default storage to store file
@@ -624,7 +632,8 @@ def upload(request, course_id):  # ajax upload file to a question or answer
     except Exception, err:
         print err
         logging.critical(unicode(err))
-        error = _('Error uploading file. Please contact the site administrator. Thank you.')
+        error = _(
+            'Error uploading file. Please contact the site administrator. Thank you.')
 
     if error == '':
         result = 'Good'

@@ -22,7 +22,8 @@ log = logging.getLogger('capa.checker')
 
 class DemoSystem(object):
     def __init__(self):
-        self.lookup = TemplateLookup(directories=[path(__file__).dirname() / 'templates'])
+        self.lookup = TemplateLookup(directories=[
+                                     path(__file__).dirname() / 'templates'])
         self.DEBUG = True
 
     def render_template(self, template_filename, dictionary, context=None):
@@ -37,7 +38,8 @@ class DemoSystem(object):
 
 def main():
     parser = argparse.ArgumentParser(description='Check Problem Files')
-    parser.add_argument("command", choices=['test', 'show'])  # Watch? Render? Open?
+    parser.add_argument("command", choices=[
+                        'test', 'show'])  # Watch? Render? Open?
     parser.add_argument("files", nargs="+", type=argparse.FileType('r'))
     parser.add_argument("--seed", required=False, type=int)
     parser.add_argument("--log-level", required=False, default="INFO",
@@ -53,7 +55,8 @@ def main():
         log.info("Opening {0}".format(problem_file.name))
 
         try:
-            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, system=system)
+            problem = LoncapaProblem(
+                problem_file, "fakeid", seed=args.seed, system=system)
         except Exception as ex:
             log.error("Could not parse file {0}".format(problem_file.name))
             log.exception(ex)
@@ -100,7 +103,8 @@ def check_that_blanks_fail(problem):
                          for answer_id in problem.get_question_answers())
     grading_results = problem.grade_answers(blank_answers)
     try:
-        assert(all(result == 'incorrect' for result in grading_results.values()))
+        assert(all(
+            result == 'incorrect' for result in grading_results.values()))
     except AssertionError:
         log.error("Blank accepted as correct answer in {0} for {1}"
                   .format(problem,
@@ -146,7 +150,8 @@ def check_that_suggested_answers_work(problem):
                       .format(problem))
             for question_id, result in sorted(real_results.items()):
                 if result != 'correct':
-                    log.error("  {0} = {1}".format(question_id, real_answers[question_id]))
+                    log.error("  {0} = {1}".format(
+                        question_id, real_answers[question_id]))
         except Exception as ex:
             log.error("Uncaught error in {0}".format(problem))
             log.exception(ex)

@@ -3,7 +3,8 @@
 # Computing grades of a large number of students can take a long time.  These routines allow grades to
 # be computed offline, by a batch process (eg cronjob).
 #
-# The grades are stored in the OfflineComputedGrade table of the courseware model.
+# The grades are stored in the OfflineComputedGrade table of the
+# courseware model.
 
 import json
 import logging
@@ -35,16 +36,20 @@ def offline_grade_calculation(course_id):
     '''
 
     tstart = time.time()
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
+    enrolled_students = User.objects.filter(
+        courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
 
     enc = MyEncoder()
 
     class DummyRequest(object):
         META = {}
+
         def __init__(self):
             return
+
         def get_host(self):
             return 'edx.mit.edu'
+
         def is_secure(self):
             return False
 
@@ -56,7 +61,8 @@ def offline_grade_calculation(course_id):
     for student in enrolled_students:
         gradeset = grades.grade(student, request, course, keep_raw_scores=True)
         gs = enc.encode(gradeset)
-        ocg, created = models.OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_id)
+        ocg, created = models.OfflineComputedGrade.objects.get_or_create(
+            user=student, course_id=course_id)
         ocg.gradeset = gs
         ocg.save()
         print "%s done" % student  	# print statement used because this is run by a management command
@@ -64,7 +70,8 @@ def offline_grade_calculation(course_id):
     tend = time.time()
     dt = tend - tstart
 
-    ocgl = models.OfflineComputedGradeLog(course_id=course_id, seconds=dt, nstudents=len(enrolled_students))
+    ocgl = models.OfflineComputedGradeLog(
+        course_id=course_id, seconds=dt, nstudents=len(enrolled_students))
     ocgl.save()
     print ocgl
     print "All Done!"
@@ -91,7 +98,8 @@ def student_grades(student, request, course, keep_raw_scores=False, use_offline=
         return grades.grade(student, request, course, keep_raw_scores=keep_raw_scores)
 
     try:
-        ocg = models.OfflineComputedGrade.objects.get(user=student, course_id=course.id)
+        ocg = models.OfflineComputedGrade.objects.get(
+            user=student, course_id=course.id)
     except models.OfflineComputedGrade.DoesNotExist:
         return dict(raw_scores=[], section_breakdown=[],
                     msg='Error: no offline gradeset available for %s, %s' % (student, course.id))

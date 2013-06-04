@@ -9,6 +9,7 @@ import mock
 from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
 from . import test_system, new_loncapa_problem
 
+
 class CapaHtmlRenderTest(unittest.TestCase):
 
     def setUp(self):
@@ -32,7 +33,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
     def test_include_html(self):
         # Create a test file to include
         self._create_test_file('test_include.xml',
-                                '<test>Test include</test>')
+                               '<test>Test include</test>')
 
         # Generate some XML with an <include>
         xml_str = textwrap.dedent("""
@@ -85,7 +86,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
-        # Expect that the script element has been removed from the rendered HTML
+        # Expect that the script element has been removed from the rendered
+        # HTML
         script_element = rendered_html.find('script')
         self.assertEqual(None, script_element)
 
@@ -103,17 +105,16 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
-
         # expect the javascript is still present in the rendered html
-        self.assertTrue("<script type=\"text/javascript\">function(){}</script>" in etree.tostring(rendered_html))
-
+        self.assertTrue(
+            "<script type=\"text/javascript\">function(){}</script>" in etree.tostring(rendered_html))
 
     def test_render_response_xml(self):
         # Generate some XML for a string response
         kwargs = {'question_text': "Test question",
-                    'explanation_text': "Test explanation",
-                    'answer': 'Test answer',
-                    'hints': [('test prompt', 'test_hint', 'test hint text')]}
+                  'explanation_text': "Test explanation",
+                  'answer': 'Test answer',
+                  'hints': [('test prompt', 'test_hint', 'test hint text')]}
         xml_str = StringResponseXMLFactory().build_xml(**kwargs)
 
         # Mock out the template renderer
@@ -150,30 +151,32 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # arguments, once for the textline input and once for
         # the solution
         expected_textline_context = {'status': 'unsubmitted',
-                                        'value': '',
-                                        'preprocessor': None,
-                                        'msg': '',
-                                        'inline': False,
-                                        'hidden': False,
-                                        'do_math': False,
-                                        'id': '1_2_1',
-                                        'trailing_text': '',
-                                        'size': None}
+                                     'value': '',
+                                     'preprocessor': None,
+                                     'msg': '',
+                                     'inline': False,
+                                     'hidden': False,
+                                     'do_math': False,
+                                     'id': '1_2_1',
+                                     'trailing_text': '',
+                                     'size': None}
 
         expected_solution_context = {'id': '1_solution_1'}
 
-        expected_calls = [mock.call('textline.html', expected_textline_context),
-                mock.call('solutionspan.html', expected_solution_context),
-                mock.call('textline.html', expected_textline_context),
-                mock.call('solutionspan.html', expected_solution_context)]
+        expected_calls = [mock.call(
+            'textline.html', expected_textline_context),
+            mock.call(
+                'solutionspan.html', expected_solution_context),
+            mock.call(
+                'textline.html', expected_textline_context),
+            mock.call('solutionspan.html', expected_solution_context)]
 
         self.assertEqual(the_system.render_template.call_args_list,
-                            expected_calls)
-
+                         expected_calls)
 
     def test_render_response_with_overall_msg(self):
         # CustomResponse script that sets an overall_message
-        script=textwrap.dedent("""
+        script = textwrap.dedent("""
             def check_func(*args):
                 msg = '<p>Test message 1<br /></p><p>Test message 2</p>'
                 return {'overall_message': msg,
@@ -181,7 +184,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         """)
 
         # Generate some XML for a CustomResponse
-        kwargs = {'script':script, 'cfn': 'check_func'}
+        kwargs = {'script': script, 'cfn': 'check_func'}
         xml_str = CustomResponseXMLFactory().build_xml(**kwargs)
 
         # Create the problem and render the html
@@ -193,10 +196,10 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Render the html
         rendered_html = etree.XML(problem.get_html())
 
-
         # Expect that there is a <div> within the response <div>
         # with css class response_message
-        msg_div_element = rendered_html.find(".//div[@class='response_message']")
+        msg_div_element = rendered_html.find(
+            ".//div[@class='response_message']")
         self.assertEqual(msg_div_element.tag, "div")
         self.assertEqual(msg_div_element.get('class'), "response_message")
 
@@ -207,7 +210,6 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         self.assertEqual(msg_p_elements[1].tag, "p")
         self.assertEqual(msg_p_elements[1].text, "Test message 2")
-
 
     def test_substitute_python_vars(self):
         # Generate some XML with Python variables defined in a script

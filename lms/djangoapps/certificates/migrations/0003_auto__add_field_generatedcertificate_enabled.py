@@ -10,7 +10,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'GeneratedCertificate.enabled'
         db.add_column('certificates_generatedcertificate', 'enabled',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      self.gf('django.db.models.fields.BooleanField')(
+                          default=False),
                       keep_default=False)
 
     def backwards(self, orm):

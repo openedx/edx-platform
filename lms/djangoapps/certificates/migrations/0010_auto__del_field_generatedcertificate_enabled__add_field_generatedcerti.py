@@ -13,19 +13,19 @@ class Migration(SchemaMigration):
 
         # Adding field 'GeneratedCertificate.status'
         db.add_column('certificates_generatedcertificate', 'status',
-                      self.gf('django.db.models.fields.CharField')(default='unavailable', max_length=32),
+                      self.gf('django.db.models.fields.CharField')(
+                          default='unavailable', max_length=32),
                       keep_default=False)
-
 
     def backwards(self, orm):
         # Adding field 'GeneratedCertificate.enabled'
         db.add_column('certificates_generatedcertificate', 'enabled',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      self.gf('django.db.models.fields.BooleanField')(
+                          default=False),
                       keep_default=False)
 
         # Deleting field 'GeneratedCertificate.status'
         db.delete_column('certificates_generatedcertificate', 'status')
-
 
     models = {
         'auth.group': {

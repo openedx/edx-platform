@@ -20,7 +20,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1 and len(args) != 2:
-            raise CommandError("delete_course requires one or more arguments: <location> |commit|")
+            raise CommandError(
+                "delete_course requires one or more arguments: <location> |commit|")
 
         loc_str = args[0]
 
@@ -39,6 +40,7 @@ class Command(BaseCommand):
                 loc = CourseDescriptor.id_to_location(loc_str)
                 if delete_course(ms, cs, loc, commit):
                     print 'removing User permissions from course....'
-                    # in the django layer, we need to remove all the user permissions groups associated with this course
+                    # in the django layer, we need to remove all the user
+                    # permissions groups associated with this course
                     if commit:
                         _delete_course_group(loc)

@@ -16,12 +16,17 @@ log = logging.getLogger(__name__)
 
 
 class TimeLimitFields(object):
-    beginning_at = Float(help="The time this timer was started", scope=Scope.user_state)
-    ending_at = Float(help="The time this timer will end", scope=Scope.user_state)
-    accomodation_code = String(help="A code indicating accommodations to be given the student", scope=Scope.user_state)
-    time_expired_redirect_url = String(help="Url to redirect users to after the timelimit has expired", scope=Scope.settings)
+    beginning_at = Float(
+        help="The time this timer was started", scope=Scope.user_state)
+    ending_at = Float(
+        help="The time this timer will end", scope=Scope.user_state)
+    accomodation_code = String(
+        help="A code indicating accommodations to be given the student", scope=Scope.user_state)
+    time_expired_redirect_url = String(
+        help="Url to redirect users to after the timelimit has expired", scope=Scope.settings)
     duration = Float(help="The length of this timer", scope=Scope.settings)
-    suppress_toplevel_navigation = Boolean(help="Whether the toplevel navigation should be suppressed when viewing this module", scope=Scope.settings)
+    suppress_toplevel_navigation = Boolean(
+        help="Whether the toplevel navigation should be suppressed when viewing this module", scope=Scope.settings)
 
 
 class TimeLimitModule(TimeLimitFields, XModule):
@@ -39,11 +44,12 @@ class TimeLimitModule(TimeLimitFields, XModule):
     # (For proctored exams, it is possible to have multiple accommodations
     # apply to an exam, so they require accommodating a multi-choice.)
     TIME_ACCOMMODATION_CODES = (('NONE', 'No Time Accommodation'),
-                      ('ADDHALFTIME', 'Extra Time - 1 1/2 Time'),
-                      ('ADD30MIN', 'Extra Time - 30 Minutes'),
-                      ('DOUBLE', 'Extra Time - Double Time'),
-                      ('TESTING', 'Extra Time -- Large amount for testing purposes')
-                    )
+                               ('ADDHALFTIME', 'Extra Time - 1 1/2 Time'),
+                               ('ADD30MIN', 'Extra Time - 30 Minutes'),
+                               ('DOUBLE', 'Extra Time - Double Time'),
+                               ('TESTING',
+                                'Extra Time -- Large amount for testing purposes')
+                                )
 
     def _get_accommodated_duration(self, duration):
         '''
@@ -105,7 +111,8 @@ class TimeLimitModule(TimeLimitFields, XModule):
     def render(self):
         if self.rendered:
             return
-        # assumes there is one and only one child, so it only renders the first child
+        # assumes there is one and only one child, so it only renders the first
+        # child
         children = self.get_display_items()
         if children:
             child = children[0]
@@ -119,6 +126,7 @@ class TimeLimitModule(TimeLimitFields, XModule):
         else:
             return "other"
 
+
 class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
 
     module_class = TimeLimitModule
@@ -131,9 +139,11 @@ class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
         children = []
         for child in xml_object:
             try:
-                children.append(system.process_xml(etree.tostring(child, encoding='unicode')).location.url())
+                children.append(system.process_xml(etree.tostring(
+                    child, encoding='unicode')).location.url())
             except Exception as e:
-                log.exception("Unable to load child when parsing TimeLimit wrapper. Continuing...")
+                log.exception(
+                    "Unable to load child when parsing TimeLimit wrapper. Continuing...")
                 if system.error_tracker is not None:
                     system.error_tracker("ERROR: " + str(e))
                 continue
@@ -145,4 +155,3 @@ class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
             xml_object.append(
                 etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
-

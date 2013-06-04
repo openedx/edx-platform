@@ -16,7 +16,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) == 0:
-            raise CommandError("import requires at least one argument: <data directory> [<course dir>...]")
+            raise CommandError(
+                "import requires at least one argument: <data directory> [<course dir>...]")
 
         data_dir = args[0]
         if len(args) > 1:
@@ -26,5 +27,6 @@ class Command(BaseCommand):
         print "Importing.  Data_dir={data}, course_dirs={courses}".format(
             data=data_dir,
             courses=course_dirs)
-        import_from_xml(modulestore('direct'), data_dir, course_dirs, load_error_modules=False,
-                        static_content_store=contentstore(), verbose=True)
+        import_from_xml(
+            modulestore('direct'), data_dir, course_dirs, load_error_modules=False,
+            static_content_store=contentstore(), verbose=True)

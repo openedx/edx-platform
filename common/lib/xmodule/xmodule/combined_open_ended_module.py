@@ -12,18 +12,21 @@ from .fields import Date, StringyFloat, StringyInteger, StringyBoolean
 
 log = logging.getLogger("mitx.courseware")
 
-V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
-                          "skip_spelling_checks", "due", "graceperiod", "weight"]
+V1_SETTINGS_ATTRIBUTES = [
+    "display_name", "attempts", "is_graded", "accept_file_upload",
+    "skip_spelling_checks", "due", "graceperiod", "weight"]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
                          "student_attempts", "ready_to_reset"]
 
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 
-VersionTuple = namedtuple('VersionTuple', ['descriptor', 'module', 'settings_attributes', 'student_attributes'])
+VersionTuple = namedtuple('VersionTuple', [
+                          'descriptor', 'module', 'settings_attributes', 'student_attributes'])
 VERSION_TUPLES = {
-    1: VersionTuple(CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES,
-                    V1_STUDENT_ATTRIBUTES),
+    1: VersionTuple(
+        CombinedOpenEndedV1Descriptor, CombinedOpenEndedV1Module, V1_SETTINGS_ATTRIBUTES,
+        V1_STUDENT_ATTRIBUTES),
 }
 
 DEFAULT_VERSION = 1
@@ -53,12 +56,16 @@ class CombinedOpenEndedFields(object):
         help="This name appears in the horizontal navigation at the top of the page.",
         default="Open Ended Grading", scope=Scope.settings
     )
-    current_task_number = StringyInteger(help="Current task that the student is on.", default=0, scope=Scope.user_state)
-    task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
-    state = String(help="Which step within the current task that the student is on.", default="initial",
-                   scope=Scope.user_state)
-    student_attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0,
-                                      scope=Scope.user_state)
+    current_task_number = StringyInteger(
+        help="Current task that the student is on.", default=0, scope=Scope.user_state)
+    task_states = List(
+        help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
+    state = String(
+        help="Which step within the current task that the student is on.", default="initial",
+        scope=Scope.user_state)
+    student_attempts = StringyInteger(
+        help="Number of attempts taken by the student on this problem", default=0,
+        scope=Scope.user_state)
     ready_to_reset = StringyBoolean(
         help="If the problem is ready to be reset or not.", default=False,
         scope=Scope.user_state
@@ -66,9 +73,10 @@ class CombinedOpenEndedFields(object):
     attempts = StringyInteger(
         display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.", default=1,
-        scope=Scope.settings, values = {"min" : 1 }
+        scope=Scope.settings, values={"min": 1}
     )
-    is_graded = StringyBoolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
+    is_graded = StringyBoolean(
+        display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
     accept_file_upload = StringyBoolean(
         display_name="Allow File Uploads",
         help="Whether or not the student can submit files as a response.", default=False, scope=Scope.settings
@@ -78,20 +86,23 @@ class CombinedOpenEndedFields(object):
         help="If False, the Quality Filter is enabled and submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
         default=False, scope=Scope.settings
     )
-    due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
+    due = Date(help="Date that this problem is due by",
+               default=None, scope=Scope.settings)
     graceperiod = String(
         help="Amount of time after the due date that submissions will be accepted",
         default=None,
         scope=Scope.settings
     )
-    version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
+    version = VersionInteger(
+        help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     weight = StringyFloat(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
-        scope=Scope.settings, values = {"min" : 0 , "step": ".1"}
+        scope=Scope.settings, values={"min": 0, "step": ".1"}
     )
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+    markdown = String(
+        help="Markdown source of this module", scope=Scope.settings)
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
@@ -128,16 +139,17 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     icon_class = 'problem'
 
     js = {
-            'coffee':
-            [
-                resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
-                resource_string(__name__, 'js/src/collapsible.coffee'),
-                resource_string(__name__, 'js/src/javascript_loader.coffee'),
-            ]
+        'coffee':
+        [
+        resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
+        resource_string(__name__, 'js/src/collapsible.coffee'),
+        resource_string(__name__, 'js/src/javascript_loader.coffee'),
+        ]
     }
     js_module_name = "CombinedOpenEnded"
 
-    css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
+    css = {'scss': [resource_string(
+        __name__, 'css/combinedopenended/display.scss')]}
 
     def __init__(self, system, location, descriptor, model_data):
         XModule.__init__(self, system, location, descriptor, model_data)
@@ -194,10 +206,12 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         }
         instance_state = {k: getattr(self, k) for k in attributes}
         self.child_descriptor = version_tuple.descriptor(self.system)
-        self.child_definition = version_tuple.descriptor.definition_from_xml(etree.fromstring(self.data), self.system)
-        self.child_module = version_tuple.module(self.system, location, self.child_definition, self.child_descriptor,
-                                                 instance_state=instance_state, static_data=static_data,
-                                                 attributes=attributes)
+        self.child_definition = version_tuple.descriptor.definition_from_xml(
+            etree.fromstring(self.data), self.system)
+        self.child_module = version_tuple.module(
+            self.system, location, self.child_definition, self.child_descriptor,
+            instance_state=instance_state, static_data=static_data,
+            attributes=attributes)
         self.save_instance_data()
 
     def get_html(self):
@@ -244,17 +258,19 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     always_recalculate_grades = True
     template_dir_name = "combinedopenended"
 
-    #Specify whether or not to pass in S3 interface
+    # Specify whether or not to pass in S3 interface
     needs_s3_interface = True
 
-    #Specify whether or not to pass in open ended interface
+    # Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True
 
     metadata_attributes = RawDescriptor.metadata_attributes
 
-    js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/edit.coffee')]}
+    js = {'coffee': [resource_string(
+        __name__, 'js/src/combinedopenended/edit.coffee')]}
     js_module_name = "OpenEndedMarkdownEditingDescriptor"
-    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/combinedopenended/edit.scss')]}
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(
+        __name__, 'css/combinedopenended/edit.scss')]}
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)
@@ -264,8 +280,9 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
-                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
+        non_editable_fields = super(
+            CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend(
+            [CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
+             CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
         return non_editable_fields
-

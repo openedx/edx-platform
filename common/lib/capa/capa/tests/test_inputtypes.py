@@ -135,14 +135,15 @@ class JavascriptInputTest(unittest.TestCase):
 
         xml_str = """<javascriptinput id="prob_1_2" params="{params}" problem_state="{ps}"
                                       display_class="{dc}" display_file="{df}"/>""".format(
-                                          params=params,
-                                          ps=quote_attr(problem_state),
-                                          dc=display_class, df=display_file)
+            params=params,
+            ps=quote_attr(problem_state),
+            dc=display_class, df=display_file)
 
         element = etree.fromstring(xml_str)
 
         state = {'value': '3', }
-        the_input = lookup_tag('javascriptinput')(test_system(), element, state)
+        the_input = lookup_tag('javascriptinput')(
+            test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -165,7 +166,8 @@ class TextLineTest(unittest.TestCase):
 
     def test_rendering(self):
         size = "42"
-        xml_str = """<textline id="prob_1_2" size="{size}"/>""".format(size=size)
+        xml_str = """<textline id="prob_1_2" size="{size}"/>""".format(
+            size=size)
 
         element = etree.fromstring(xml_str)
 
@@ -470,7 +472,8 @@ class MatlabTest(unittest.TestCase):
         get = {'submission': 'x = 1234;'}
         response = self.the_input.handle_ajax("plot", get)
 
-        test_system().xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
+        test_system().xqueue['interface'].send_to_queue.assert_called_with(
+            header=ANY, body=ANY)
 
         self.assertTrue(response['success'])
         self.assertTrue(self.the_input.input_state['queuekey'] is not None)
@@ -479,7 +482,8 @@ class MatlabTest(unittest.TestCase):
     def test_plot_data_failure(self):
         get = {'submission': 'x = 1234;'}
         error_message = 'Error message!'
-        test_system().xqueue['interface'].send_to_queue.return_value = (1, error_message)
+        test_system().xqueue[
+            'interface'].send_to_queue.return_value = (1, error_message)
         response = self.the_input.handle_ajax("plot", get)
         self.assertFalse(response['success'])
         self.assertEqual(response['message'], error_message)
@@ -642,7 +646,8 @@ class CrystallographyTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('crystallography')(test_system(), element, state)
+        the_input = lookup_tag('crystallography')(
+            test_system(), element, state)
 
         context = the_input._get_render_context()
 
@@ -702,12 +707,14 @@ class ChemicalEquationTest(unittest.TestCase):
     '''
     def setUp(self):
         self.size = "42"
-        xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
+        xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(
+            size=self.size)
 
         element = etree.fromstring(xml_str)
 
         state = {'value': 'H2OYeah', }
-        self.the_input = lookup_tag('chemicalequationinput')(test_system(), element, state)
+        self.the_input = lookup_tag('chemicalequationinput')(
+            test_system(), element, state)
 
     def test_rendering(self):
         ''' Verify that the render context matches the expected render context'''
@@ -767,22 +774,30 @@ class DragAndDropTest(unittest.TestCase):
                         "target_outline": "false",
                         "base_image": "/static/images/about_1.png",
                         "draggables": [
-{"can_reuse": "", "label": "Label 1", "id": "1", "icon": "", "target_fields": []},
-{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/static/images/cc.jpg", "target_fields": []},
-{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/static/images/arrow-left.png", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/static/images/mute.png", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/static/images/spinner.gif", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/static/images/volume.png", "can_reuse": "", "target_fields": []},
+                            {"can_reuse": "", "label": "Label 1", "id":
+                                "1", "icon": "", "target_fields": []},
+{"can_reuse": "", "label": "cc", "id": "name_with_icon",
+    "icon": "/static/images/cc.jpg", "target_fields": []},
+{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon":
+    "/static/images/arrow-left.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Label2", "id": "5",
+    "icon": "", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Mute", "id": "2", "icon":
+    "/static/images/mute.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon":
+    "/static/images/spinner.gif", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Star", "id": "name4", "icon":
+    "/static/images/volume.png", "can_reuse": "", "target_fields": []},
 {"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "can_reuse": "", "target_fields": []}],
-                        "one_per_target": "True",
-                        "targets": [
+            "one_per_target": "True",
+            "targets": [
                 {"y": "90", "x": "210", "id": "t1", "w": "90", "h": "90"},
                 {"y": "160", "x": "370", "id": "t2", "w": "90", "h": "90"}
-                                    ]
-                    }
+            ]
+        }
 
-        the_input = lookup_tag('drag_and_drop_input')(test_system(), element, state)
+        the_input = lookup_tag('drag_and_drop_input')(
+            test_system(), element, state)
 
         context = the_input._get_render_context()
         expected = {'id': 'prob_1_2',

@@ -78,7 +78,8 @@ class SubmitFeedbackViaZendeskTest(TestCase):
         the invalid field and an error message, and the Zendesk API should not
         have been invoked.
         """
-        filtered_fields = {k: v for (k, v) in fields.items() if k != omit_field}
+        filtered_fields = {k: v for (
+            k, v) in fields.items() if k != omit_field}
         resp = self._test_request(user, filtered_fields)
         self._assert_bad_request(resp, omit_field, zendesk_mock_class)
 
@@ -110,23 +111,31 @@ class SubmitFeedbackViaZendeskTest(TestCase):
 
     def test_bad_request_anon_user_no_name(self, zendesk_mock_class):
         """Test a request from an anonymous user not specifying `name`."""
-        self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "name", zendesk_mock_class)
-        self._test_bad_request_empty_field(self._anon_user, self._anon_fields, "name", zendesk_mock_class)
+        self._test_bad_request_omit_field(
+            self._anon_user, self._anon_fields, "name", zendesk_mock_class)
+        self._test_bad_request_empty_field(
+            self._anon_user, self._anon_fields, "name", zendesk_mock_class)
 
     def test_bad_request_anon_user_no_email(self, zendesk_mock_class):
         """Test a request from an anonymous user not specifying `email`."""
-        self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "email", zendesk_mock_class)
-        self._test_bad_request_empty_field(self._anon_user, self._anon_fields, "email", zendesk_mock_class)
+        self._test_bad_request_omit_field(
+            self._anon_user, self._anon_fields, "email", zendesk_mock_class)
+        self._test_bad_request_empty_field(
+            self._anon_user, self._anon_fields, "email", zendesk_mock_class)
 
     def test_bad_request_anon_user_no_subject(self, zendesk_mock_class):
         """Test a request from an anonymous user not specifying `subject`."""
-        self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "subject", zendesk_mock_class)
-        self._test_bad_request_empty_field(self._anon_user, self._anon_fields, "subject", zendesk_mock_class)
+        self._test_bad_request_omit_field(
+            self._anon_user, self._anon_fields, "subject", zendesk_mock_class)
+        self._test_bad_request_empty_field(
+            self._anon_user, self._anon_fields, "subject", zendesk_mock_class)
 
     def test_bad_request_anon_user_no_details(self, zendesk_mock_class):
         """Test a request from an anonymous user not specifying `details`."""
-        self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "details", zendesk_mock_class)
-        self._test_bad_request_empty_field(self._anon_user, self._anon_fields, "details", zendesk_mock_class)
+        self._test_bad_request_omit_field(
+            self._anon_user, self._anon_fields, "details", zendesk_mock_class)
+        self._test_bad_request_empty_field(
+            self._anon_user, self._anon_fields, "details", zendesk_mock_class)
 
     def test_valid_request_anon_user(self, zendesk_mock_class):
         """
@@ -168,13 +177,17 @@ class SubmitFeedbackViaZendeskTest(TestCase):
 
     def test_bad_request_auth_user_no_subject(self, zendesk_mock_class):
         """Test a request from an authenticated user not specifying `subject`."""
-        self._test_bad_request_omit_field(self._auth_user, self._auth_fields, "subject", zendesk_mock_class)
-        self._test_bad_request_empty_field(self._auth_user, self._auth_fields, "subject", zendesk_mock_class)
+        self._test_bad_request_omit_field(
+            self._auth_user, self._auth_fields, "subject", zendesk_mock_class)
+        self._test_bad_request_empty_field(
+            self._auth_user, self._auth_fields, "subject", zendesk_mock_class)
 
     def test_bad_request_auth_user_no_details(self, zendesk_mock_class):
         """Test a request from an authenticated user not specifying `details`."""
-        self._test_bad_request_omit_field(self._auth_user, self._auth_fields, "details", zendesk_mock_class)
-        self._test_bad_request_empty_field(self._auth_user, self._auth_fields, "details", zendesk_mock_class)
+        self._test_bad_request_omit_field(
+            self._auth_user, self._auth_fields, "details", zendesk_mock_class)
+        self._test_bad_request_empty_field(
+            self._auth_user, self._auth_fields, "details", zendesk_mock_class)
 
     def test_valid_request_auth_user(self, zendesk_mock_class):
         """
@@ -217,7 +230,8 @@ class SubmitFeedbackViaZendeskTest(TestCase):
 
     def test_get_request(self, zendesk_mock_class):
         """Test that a GET results in a 405 even with all required fields"""
-        req = self._request_factory.get("/submit_feedback", data=self._anon_fields)
+        req = self._request_factory.get(
+            "/submit_feedback", data=self._anon_fields)
         req.user = self._anon_user
         resp = views.submit_feedback_via_zendesk(req)
         self.assertEqual(resp.status_code, 405)

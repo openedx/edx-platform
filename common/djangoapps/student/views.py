@@ -28,11 +28,12 @@ from django.utils.http import cookie_date
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
 
-from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm,
-                            TestCenterRegistration, TestCenterRegistrationForm,
-                            PendingNameChange, PendingEmailChange,
-                            CourseEnrollment, unique_id_for_user,
-                            get_testcenter_registration)
+from student.models import (
+    Registration, UserProfile, TestCenterUser, TestCenterUserForm,
+    TestCenterRegistration, TestCenterRegistrationForm,
+    PendingNameChange, PendingEmailChange,
+    CourseEnrollment, unique_id_for_user,
+    get_testcenter_registration)
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
@@ -51,7 +52,8 @@ from courseware.model_data import ModelDataCache
 from statsd import statsd
 
 log = logging.getLogger("mitx.student")
-Article = namedtuple('Article', 'title url author image deck publication publish_date')
+Article = namedtuple(
+    'Article', 'title url author image deck publication publish_date')
 
 
 def csrf_token(context):
@@ -77,7 +79,8 @@ def index(request, extra_context={}, user=None):
     '''
 
     # The course selection work is done in courseware.courses.
-    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')     # normally False
+    domain = settings.MITX_FEATURES.get(
+        'FORCE_UNIVERSITY_DOMAIN')     # normally False
     # do explicit check, because domain=None is valid
     if domain == False:
         domain = request.META.get('HTTP_HOST')
@@ -121,11 +124,13 @@ def press(request):
             content = urllib.urlopen(settings.PRESS_URL).read()
             json_articles = json.loads(content)
         else:
-            content = open(settings.PROJECT_ROOT / "templates" / "press.json").read()
+            content = open(
+                settings.PROJECT_ROOT / "templates" / "press.json").read()
             json_articles = json.loads(content)
         cache.set("student_press_json_articles", json_articles)
     articles = [Article(**article) for article in json_articles]
-    articles.sort(key=lambda item: get_date_for_press(item.publish_date), reverse=True)
+    articles.sort(key=lambda item: get_date_for_press(
+        item.publish_date), reverse=True)
     return render_to_response('static_templates/press.html', {'articles': articles})
 
 
@@ -177,7 +182,7 @@ def _cert_info(user, course, cert_status):
         CertificateStatuses.downloadable: 'ready',
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
-        }
+    }
 
     status = template_state.get(cert_status['status'], default_status)
 
@@ -186,17 +191,18 @@ def _cert_info(user, course, cert_status):
          'show_disabled_download_button': status == 'generating', }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
-        course.end_of_course_survey_url is not None):
+            course.end_of_course_survey_url is not None):
         d.update({
-         'show_survey_button': True,
-         'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
+                 'show_survey_button': True,
+                 'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
     else:
         d['show_survey_button'] = False
 
     if status == 'ready':
         if 'download_url' not in cert_status:
-            log.warning("User %s has a downloadable cert for %s, but no download url",
-                        user.username, course.id)
+            log.warning(
+                "User %s has a downloadable cert for %s, but no download url",
+                user.username, course.id)
             return default_info
         else:
             d['download_url'] = cert_status['download_url']
@@ -262,8 +268,8 @@ def dashboard(request):
 
     message = ""
     if not user.is_active:
-        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
-
+        message = render_to_string(
+            'registration/activate_account_notice.html', {'email': user.email})
 
     # Global staff can see what courses errored on their dashboard
     staff_access = False
@@ -276,12 +282,15 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course in courses
                                           if has_access(request.user, course, 'load'))
 
-    cert_statuses = {course.id: cert_info(request.user, course) for course in courses}
+    cert_statuses = {course.id: cert_info(
+        request.user, course) for course in courses}
 
-    exam_registrations = {course.id: exam_registration_info(request.user, course) for course in courses}
+    exam_registrations = {course.id: exam_registration_info(
+        request.user, course) for course in courses}
 
     # Get the 3 most recent news
-    top_news = _get_news(top=3) if not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False) else None
+    top_news = _get_news(top=3) if not settings.MITX_FEATURES.get(
+        'ENABLE_MKTG_SITE', False) else None
 
     context = {'courses': courses,
                'message': message,
@@ -308,7 +317,8 @@ def try_change_enrollment(request):
         try:
             enrollment_response = change_enrollment(request)
             # There isn't really a way to display the results to the user, so we just log it
-            # We expect the enrollment to be a success, and will show up on the dashboard anyway
+            # We expect the enrollment to be a success, and will show up on the
+            # dashboard anyway
             log.info(
                 "Attempted to automatically enroll after login. Response code: {0}; response body: {1}".format(
                     enrollment_response.status_code,
@@ -316,7 +326,8 @@ def try_change_enrollment(request):
                 )
             )
         except Exception, e:
-            log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
+            log.exception(
+                "Exception automatically enrolling after login: {0}".format(str(e)))
 
 
 def change_enrollment(request):
@@ -350,12 +361,13 @@ def change_enrollment(request):
 
     if action == "enroll":
         # Make sure the course exists
-        # We don't do this check on unenroll, or a bad course id can't be unenrolled from
+        # We don't do this check on unenroll, or a bad course id can't be
+        # unenrolled from
         try:
             course = course_from_id(course_id)
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
-                      .format(user.username, course_id))
+                        .format(user.username, course_id))
             return HttpResponseBadRequest("Course id is invalid")
 
         if not has_access(user, course, 'enroll'):
@@ -363,12 +375,13 @@ def change_enrollment(request):
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
-                        tags=["org:{0}".format(org),
-                              "course:{0}".format(course_num),
-                              "run:{0}".format(run)])
+                         tags=["org:{0}".format(org),
+                               "course:{0}".format(course_num),
+                               "run:{0}".format(run)])
 
         try:
-            enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+            enrollment, created = CourseEnrollment.objects.get_or_create(
+                user=user, course_id=course.id)
         except IntegrityError:
             # If we've already created this enrollment in a separate transaction,
             # then just continue
@@ -377,14 +390,15 @@ def change_enrollment(request):
 
     elif action == "unenroll":
         try:
-            enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            enrollment = CourseEnrollment.objects.get(
+                user=user, course_id=course_id)
             enrollment.delete()
 
             org, course_num, run = course_id.split("/")
             statsd.increment("common.student.unenrollment",
-                            tags=["org:{0}".format(org),
-                                  "course:{0}".format(course_num),
-                                  "run:{0}".format(run)])
+                             tags=["org:{0}".format(org),
+                                   "course:{0}".format(course_num),
+                                   "run:{0}".format(run)])
 
             return HttpResponse()
         except CourseEnrollment.DoesNotExist:
@@ -419,7 +433,8 @@ def login_user(request, error=""):
     username = user.username
     user = authenticate(username=username, password=password)
     if user is None:
-        log.warning(u"Login failed - password for {0} is invalid".format(email))
+        log.warning(
+            u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': 'Email or password is incorrect.'}))
 
@@ -432,7 +447,8 @@ def login_user(request, error=""):
             else:
                 request.session.set_expiry(0)
         except Exception as e:
-            log.critical("Login failed - Could not create session. Is memcached running?")
+            log.critical(
+                "Login failed - Could not create session. Is memcached running?")
             log.exception(e)
 
         log.info(u"Login success - {0} ({1})".format(username, email))
@@ -454,7 +470,6 @@ def login_user(request, error=""):
             expires_time = time.time() + max_age
             expires = cookie_date(expires_time)
 
-
         response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
                             'true', max_age=max_age,
                             expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
@@ -464,7 +479,8 @@ def login_user(request, error=""):
 
         return response
 
-    log.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
+    log.warning(
+        u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
     not_activated_msg = "This account has not been activated. We have " + \
@@ -496,7 +512,8 @@ def change_setting(request):
     ''' JSON call to change a profile setting: Right now, location
     '''
     # TODO (vshnayder): location is no longer used
-    up = UserProfile.objects.get(user=request.user)  # request.user.profile_cache
+    up = UserProfile.objects.get(
+        user=request.user)  # request.user.profile_cache
     if 'location' in request.POST:
         up.location = request.POST['location']
     up.save()
@@ -515,24 +532,27 @@ def _do_create_account(post_vars):
     Note: this function is also used for creating test users.
     """
     user = User(username=post_vars['username'],
-             email=post_vars['email'],
-             is_active=False)
+                email=post_vars['email'],
+                is_active=False)
     user.set_password(post_vars['password'])
     registration = Registration()
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
-    # Right now, we can have e.g. no registration e-mail sent out and a zombie account
+    # Right now, we can have e.g. no registration e-mail sent out and a zombie
+    # account
     try:
         user.save()
     except IntegrityError:
         js = {'success': False}
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = "An account with the Public Username  '" + post_vars['username'] + "' already exists."
+            js['value'] = "An account with the Public Username  '" + post_vars[
+                'username'] + "' already exists."
             js['field'] = 'username'
             return HttpResponse(json.dumps(js))
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = "An account with the Email '" + post_vars['email'] + "' already exists."
+            js['value'] = "An account with the Email '" + post_vars[
+                'email'] + "' already exists."
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
@@ -556,7 +576,8 @@ def _do_create_account(post_vars):
     try:
         profile.save()
     except Exception:
-        log.exception("UserProfile creation failed for user {0}.".format(user.id))
+        log.exception(
+            "UserProfile creation failed for user {0}.".format(user.id))
     return (user, profile, registration)
 
 
@@ -590,7 +611,8 @@ def create_account(request, post_override=None):
             return HttpResponse(json.dumps(js))
 
     if post_vars.get('honor_code', 'false') != u'true':
-        js['value'] = "To enroll, you must follow the honor code.".format(field=a)
+        js['value'] = "To enroll, you must follow the honor code.".format(
+            field=a)
         js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
@@ -606,8 +628,9 @@ def create_account(request, post_override=None):
     # TODO: Check password is sane
     for a in ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']:
         if len(post_vars[a]) < 2:
-            error_str = {'username': 'Username must be minimum of two characters long.',
-                         'email': 'A properly formatted e-mail is required.',
+            error_str = {
+                'username': 'Username must be minimum of two characters long.',
+                'email': 'A properly formatted e-mail is required.',
                          'name': 'Your legal name must be a minimum of two characters long.',
                          'password': 'A valid password is required.',
                          'terms_of_service': 'Accepting Terms of Service is required.',
@@ -626,7 +649,8 @@ def create_account(request, post_override=None):
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
-        js['value'] = "Username should only consist of A-Z and 0-9, with no spaces.".format(field=a)
+        js['value'] = "Username should only consist of A-Z and 0-9, with no spaces.".format(
+            field=a)
         js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
@@ -651,9 +675,11 @@ def create_account(request, post_override=None):
             dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
             message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
                        '-' * 80 + '\n\n' + message)
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [
+                      dest_addr], fail_silently=False)
         elif not settings.GENERATE_RANDOM_USER_CREDENTIALS:
-            res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            res = user.email_user(
+                subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
         log.warning('Unable to send activation email to user', exc_info=True)
         js['value'] = 'Could not send activation e-mail.'
@@ -662,7 +688,8 @@ def create_account(request, post_override=None):
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
     # the activation link from the email.
-    login_user = authenticate(username=post_vars['username'], password=post_vars['password'])
+    login_user = authenticate(username=post_vars[
+                              'username'], password=post_vars['password'])
     login(request, login_user)
     request.session.set_expiry(0)
 
@@ -672,7 +699,8 @@ def create_account(request, post_override=None):
         eamap.user = login_user
         eamap.dtsignup = datetime.datetime.now()
         eamap.save()
-        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'], eamap))
+        log.debug('Updated ExternalAuthMap for %s to be %s' %
+                  (post_vars['username'], eamap))
 
         if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.debug('bypassing activation email')
@@ -698,7 +726,6 @@ def create_account(request, post_override=None):
         expires_time = time.time() + max_age
         expires = cookie_date(expires_time)
 
-
     response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
                         'true', max_age=max_age,
                         expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
@@ -706,7 +733,6 @@ def create_account(request, post_override=None):
                         secure=None,
                         httponly=None)
     return response
-
 
 
 def exam_registration_info(user, course):
@@ -739,7 +765,8 @@ def begin_exam_registration(request, course_id):
     try:
         course = course_from_id(course_id)
     except ItemNotFoundError:
-        log.error("User {0} enrolled in non-existent course {1}".format(user.username, course_id))
+        log.error("User {0} enrolled in non-existent course {1}".format(
+            user.username, course_id))
         raise Http404
 
     # get the exam to be registered for:
@@ -795,18 +822,21 @@ def create_exam_registration(request, post_override=None):
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
         needs_updating = testcenter_user.needs_update(demographic_data)
-        log.info("User {0} enrolled in course {1} {2}updating demographic info for exam registration".format(user.username, course_id, "" if needs_updating else "not "))
+        log.info("User {0} enrolled in course {1} {2}updating demographic info for exam registration".format(
+            user.username, course_id, "" if needs_updating else "not "))
     except TestCenterUser.DoesNotExist:
         # do additional initialization here:
         testcenter_user = TestCenterUser.create(user)
         needs_updating = True
-        log.info("User {0} enrolled in course {1} creating demographic info for exam registration".format(user.username, course_id))
+        log.info("User {0} enrolled in course {1} creating demographic info for exam registration".format(
+            user.username, course_id))
 
     # perform validation:
     if needs_updating:
         # first perform validation on the user information
         # using a Django Form.
-        form = TestCenterUserForm(instance=testcenter_user, data=demographic_data)
+        form = TestCenterUserForm(
+            instance=testcenter_user, data=demographic_data)
         if form.is_valid():
             form.update_and_save()
         else:
@@ -833,13 +863,17 @@ def create_exam_registration(request, post_override=None):
 
     else:
         accommodation_request = post_vars.get('accommodation_request', '')
-        registration = TestCenterRegistration.create(testcenter_user, exam, accommodation_request)
+        registration = TestCenterRegistration.create(
+            testcenter_user, exam, accommodation_request)
         needs_saving = True
-        log.info("User {0} enrolled in course {1} creating new exam registration".format(user.username, course_id))
+        log.info("User {0} enrolled in course {1} creating new exam registration".format(
+            user.username, course_id))
 
     if needs_saving:
-        # do validation of registration.  (Mainly whether an accommodation request is too long.)
-        form = TestCenterRegistrationForm(instance=registration, data=post_vars)
+        # do validation of registration.  (Mainly whether an accommodation
+        # request is too long.)
+        form = TestCenterRegistrationForm(
+            instance=registration, data=post_vars)
         if form.is_valid():
             form.update_and_save()
         else:
@@ -848,7 +882,6 @@ def create_exam_registration(request, post_override=None):
             response_data['field_errors'] = form.errors
             response_data['non_field_errors'] = form.non_field_errors()
             return HttpResponse(json.dumps(response_data), mimetype="application/json")
-
 
     # only do the following if there is accommodation text to send,
     # and a destination to which to send it.
@@ -870,9 +903,8 @@ def create_exam_registration(request, post_override=None):
 #            log.exception(sys.exc_info())
 #            response_data = {'success': False}
 #            response_data['non_field_errors'] =  [ 'Could not send accommodation e-mail.', ]
-#            return HttpResponse(json.dumps(response_data), mimetype="application/json")
-
-
+# return HttpResponse(json.dumps(response_data),
+# mimetype="application/json")
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
@@ -890,8 +922,8 @@ def get_random_post_override():
             'password': id_generator(),
             'name': (id_generator(size=5, chars=string.ascii_lowercase) + " " +
                      id_generator(size=7, chars=string.ascii_lowercase)),
-                     'honor_code': u'true',
-                     'terms_of_service': u'true', }
+            'honor_code': u'true',
+            'terms_of_service': u'true', }
 
 
 def create_random_account(create_account_function):
@@ -916,7 +948,8 @@ def activate_account(request, key):
         if not r[0].user.is_active:
             r[0].activate()
             already_active = False
-        resp = render_to_response("registration/activation_complete.html", {'user_logged_in': user_logged_in, 'already_active': already_active})
+        resp = render_to_response("registration/activation_complete.html", {
+                                  'user_logged_in': user_logged_in, 'already_active': already_active})
         return resp
     if len(r) == 0:
         return render_to_response("registration/activation_invalid.html", {'csrf': csrf(request)['csrf_token']})
@@ -931,13 +964,15 @@ def password_reset(request):
 
     # By default, Django doesn't allow Users with is_active = False to reset their passwords,
     # but this bites people who signed up a long time ago, never activated, and forgot their
-    # password. So for their sake, we'll auto-activate a user for whom password_reset is called.
+    # password. So for their sake, we'll auto-activate a user for whom
+    # password_reset is called.
     try:
         user = User.objects.get(email=request.POST['email'])
         user.is_active = True
         user.save()
     except:
-        log.exception("Tried to auto-activate user to enable password reset, but failed.")
+        log.exception(
+            "Tried to auto-activate user to enable password reset, but failed.")
 
     form = PasswordResetForm(request.POST)
     if form.is_valid():
@@ -1034,7 +1069,8 @@ def change_email_request(request):
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/email_change.txt', d)
 
-    res = send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.new_email])
+    res = send_mail(
+        subject, message, settings.DEFAULT_FROM_EMAIL, [pec.new_email])
 
     return HttpResponse(json.dumps({'success': True}))
 
@@ -1062,14 +1098,17 @@ def confirm_email_change(request, key):
             transaction.rollback()
             return render_to_response("email_exists.html", {})
 
-        subject = render_to_string('emails/email_change_subject.txt', address_context)
+        subject = render_to_string(
+            'emails/email_change_subject.txt', address_context)
         subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/confirm_email_change.txt', address_context)
+        message = render_to_string(
+            'emails/confirm_email_change.txt', address_context)
         up = UserProfile.objects.get(user=user)
         meta = up.get_meta()
         if 'old_emails' not in meta:
             meta['old_emails'] = []
-        meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
+        meta['old_emails'].append(
+            [user.email, datetime.datetime.now().isoformat()])
         up.set_meta(meta)
         up.save()
         # Send it to the old email...
@@ -1077,7 +1116,8 @@ def confirm_email_change(request, key):
             user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
         except Exception:
             transaction.rollback()
-            log.warning('Unable to send confirmation email to old address', exc_info=True)
+            log.warning(
+                'Unable to send confirmation email to old address', exc_info=True)
             return render_to_response("email_change_failed.html", {'email': user.email})
 
         user.email = pec.new_email
@@ -1088,13 +1128,15 @@ def confirm_email_change(request, key):
             user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
         except Exception:
             transaction.rollback()
-            log.warning('Unable to send confirmation email to new address', exc_info=True)
+            log.warning(
+                'Unable to send confirmation email to new address', exc_info=True)
             return render_to_response("email_change_failed.html", {'email': pec.new_email})
 
         transaction.commit()
         return render_to_response("email_change_successful.html", address_context)
     except Exception:
-        # If we get an unexpected exception, be sure to rollback the transaction
+        # If we get an unexpected exception, be sure to rollback the
+        # transaction
         transaction.rollback()
         raise
 
@@ -1167,7 +1209,8 @@ def accept_name_change_by_id(id):
     meta = up.get_meta()
     if 'old_names' not in meta:
         meta['old_names'] = []
-    meta['old_names'].append([up.name, pnc.rationale, datetime.datetime.now().isoformat()])
+    meta['old_names'].append(
+        [up.name, pnc.rationale, datetime.datetime.now().isoformat()])
     up.set_meta(meta)
 
     up.name = pnc.new_name
@@ -1200,7 +1243,8 @@ def _get_news(top=None):
             feed_data = urllib.urlopen(settings.RSS_URL).read()
         else:
             feed_data = render_to_string("feed.rss", None)
-        cache.set("students_index_rss_feed_data", feed_data, settings.RSS_TIMEOUT)
+        cache.set("students_index_rss_feed_data",
+                  feed_data, settings.RSS_TIMEOUT)
 
     feed = feedparser.parse(feed_data)
     entries = feed['entries'][0:top]  # all entries if top is None

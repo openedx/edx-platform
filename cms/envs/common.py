@@ -27,7 +27,7 @@ import sys
 import lms.envs.common
 from path import path
 
-############################ FEATURE CONFIGURATION #############################
+############################ FEATURE CONFIGURATION #######################
 
 MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
@@ -51,7 +51,7 @@ ENABLE_JASMINE = False
 GENERATE_RANDOM_USER_CREDENTIALS = False
 
 
-############################# SET PATH INFORMATION #############################
+############################# SET PATH INFORMATION #######################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
@@ -92,13 +92,14 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
-    'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.contrib.auth.context_processors.auth',
+    # this is required for admin
     'django.core.context_processors.csrf',  # necessary for csrf protection
 )
 
 LMS_BASE = None
 
-#################### CAPA External Code Evaluation #############################
+#################### CAPA External Code Evaluation #######################
 XQUEUE_INTERFACE = {
     'url': 'http://localhost:8888',
     'django_auth': {'username': 'local',
@@ -136,14 +137,16 @@ MIDDLEWARE_CLASSES = (
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
 
-    # Detects user-requested locale from 'accept-language' header in http request
+    # Detects user-requested locale from 'accept-language' header in http
+    # request
     'django.middleware.locale.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware'
 )
 
 ############################ SIGNAL HANDLERS ################################
-# This is imported to register the exception signal handling that logs exceptions
+# This is imported to register the exception signal handling that logs
+# exceptions
 import monitoring.exceptions  # noqa
 
 ############################ DJANGO_BUILTINS ################################
@@ -177,8 +180,8 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 
-# This is how you would use the textbook images locally
-# ("book", ENV_ROOT / "book_images")
+    # This is how you would use the textbook images locally
+    # ("book", ENV_ROOT / "book_images")
 ]
 
 # Locale/Internationalization
@@ -197,7 +200,7 @@ TRACK_MAX_EVENT = 10000
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
-############################### Pipeline #######################################
+############################### Pipeline #################################
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 

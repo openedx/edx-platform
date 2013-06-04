@@ -52,8 +52,9 @@ class GradingService(object):
             r = self._try_with_login(op)
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
-            #This is a dev_facing_error
-            error_string = "Problem posting data to the grading controller.  URL: {0}, data: {1}".format(url, data)
+            # This is a dev_facing_error
+            error_string = "Problem posting data to the grading controller.  URL: {0}, data: {1}".format(
+                url, data)
             log.error(error_string)
             raise GradingServiceError(error_string)
 
@@ -71,8 +72,9 @@ class GradingService(object):
             r = self._try_with_login(op)
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
-            #This is a dev_facing_error
-            error_string = "Problem getting data from the grading controller.  URL: {0}, params: {1}".format(url, params)
+            # This is a dev_facing_error
+            error_string = "Problem getting data from the grading controller.  URL: {0}, params: {1}".format(
+                url, params)
             log.error(error_string)
             raise GradingServiceError(error_string)
 
@@ -89,12 +91,13 @@ class GradingService(object):
         response = operation()
         if (response.json
             and response.json.get('success') is False
-            and response.json.get('error') == 'login_required'):
+                and response.json.get('error') == 'login_required'):
             # apparrently we aren't logged in.  Try to fix that.
             r = self._login()
             if r and not r.get('success'):
-                log.warning("Couldn't log into staff_grading backend. Response: %s",
-                            r)
+                log.warning(
+                    "Couldn't log into staff_grading backend. Response: %s",
+                    r)
                 # try again
             response = operation()
             response.raise_for_status()
@@ -117,7 +120,8 @@ class GradingService(object):
         try:
             if 'rubric' in response_json:
                 rubric = response_json['rubric']
-                rubric_renderer = CombinedOpenEndedRubric(self.system, view_only)
+                rubric_renderer = CombinedOpenEndedRubric(
+                    self.system, view_only)
                 rubric_dict = rubric_renderer.render_rubric(rubric)
                 success = rubric_dict['success']
                 rubric_html = rubric_dict['html']
@@ -125,13 +129,13 @@ class GradingService(object):
             return response_json
         # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError, RubricParsingError:
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             log.exception("Cannot parse rubric string. Raw string: {0}"
-            .format(rubric))
+                          .format(rubric))
             return {'success': False,
                     'error': 'Error displaying submission'}
         except ValueError:
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             log.exception("Error parsing response: {0}".format(response))
             return {'success': False,
                     'error': "Error displaying submission"}

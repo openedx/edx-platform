@@ -56,23 +56,27 @@ class CombinedOpenEndedRubric(object):
                     category = rubric_categories[i]
                     for j in xrange(0, len(category['options'])):
                         if score_list[i] == j:
-                            rubric_categories[i]['options'][j]['selected'] = True
+                            rubric_categories[i]['options'][
+                                j]['selected'] = True
             rubric_scores = [cat['score'] for cat in rubric_categories]
-            max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+            max_scores = map((lambda cat: cat[
+                             'options'][-1]['points']), rubric_categories)
             max_score = max(max_scores)
-            rubric_template = '{0}/open_ended_rubric.html'.format(self.TEMPLATE_DIR)
+            rubric_template = '{0}/open_ended_rubric.html'.format(
+                self.TEMPLATE_DIR)
             if self.view_only:
-                rubric_template = '{0}/open_ended_view_only_rubric.html'.format(self.TEMPLATE_DIR)
+                rubric_template = '{0}/open_ended_view_only_rubric.html'.format(
+                    self.TEMPLATE_DIR)
             html = self.system.render_template(rubric_template,
                                                {'categories': rubric_categories,
                                                 'has_score': self.has_score,
                                                 'view_only': self.view_only,
                                                 'max_score': max_score,
                                                 'combined_rubric': False
-                                               })
+                                                })
             success = True
         except:
-            #This is a staff_facing_error
+            # This is a staff_facing_error
             error_message = "[render_rubric] Could not parse the rubric with xml: {0}. Contact the learning sciences group for assistance.".format(
                 rubric_xml)
             log.exception(error_message)
@@ -84,7 +88,7 @@ class CombinedOpenEndedRubric(object):
         success = rubric_dict['success']
         rubric_feedback = rubric_dict['html']
         if not success:
-            #This is a staff_facing_error
+            # This is a staff_facing_error
             error_message = "Could not parse rubric : {0} for location {1}. Contact the learning sciences group for assistance.".format(
                 rubric_string, location.url())
             log.error(error_message)
@@ -95,7 +99,7 @@ class CombinedOpenEndedRubric(object):
         for category in rubric_categories:
             total = total + len(category['options']) - 1
             if len(category['options']) > (max_score_allowed + 1):
-                #This is a staff_facing_error
+                # This is a staff_facing_error
                 error_message = "Number of score points in rubric {0} higher than the max allowed, which is {1}. Contact the learning sciences group for assistance.".format(
                     len(category['options']), max_score_allowed)
                 log.error(error_message)
@@ -120,7 +124,7 @@ class CombinedOpenEndedRubric(object):
         categories = []
         for category in element:
             if category.tag != 'category':
-                #This is a staff_facing_error
+                # This is a staff_facing_error
                 raise RubricParsingError(
                     "[extract_categories] Expected a <category> tag: got {0} instead. Contact the learning sciences group for assistance.".format(
                         category.tag))
@@ -148,15 +152,14 @@ class CombinedOpenEndedRubric(object):
             self.has_score = True
         # if we are missing the score tag and we are expecting one
         elif self.has_score:
-            #This is a staff_facing_error
+            # This is a staff_facing_error
             raise RubricParsingError(
                 "[extract_category] Category {0} is missing a score. Contact the learning sciences group for assistance.".format(
                     descriptionxml.text))
 
-
         # parse description
         if descriptionxml.tag != 'description':
-            #This is a staff_facing_error
+            # This is a staff_facing_error
             raise RubricParsingError(
                 "[extract_category]: expected description tag, got {0} instead. Contact the learning sciences group for assistance.".format(
                     descriptionxml.tag))
@@ -169,7 +172,7 @@ class CombinedOpenEndedRubric(object):
         # parse options
         for option in optionsxml:
             if option.tag != 'option':
-                #This is a staff_facing_error
+                # This is a staff_facing_error
                 raise RubricParsingError(
                     "[extract_category]: expected option tag, got {0} instead. Contact the learning sciences group for assistance.".format(
                         option.tag))
@@ -181,7 +184,7 @@ class CombinedOpenEndedRubric(object):
                     try:
                         points = int(pointstr)
                     except ValueError:
-                        #This is a staff_facing_error
+                        # This is a staff_facing_error
                         raise RubricParsingError(
                             "[extract_category]: expected points to have int, got {0} instead. Contact the learning sciences group for assistance.".format(
                                 pointstr))
@@ -195,7 +198,8 @@ class CombinedOpenEndedRubric(object):
 
                 selected = score == points
                 optiontext = option.text
-                options.append({'text': option.text, 'points': points, 'selected': selected})
+                options.append({
+                               'text': option.text, 'points': points, 'selected': selected})
 
         # sort and check for duplicates
         options = sorted(options, key=lambda option: option['points'])
@@ -204,10 +208,12 @@ class CombinedOpenEndedRubric(object):
         return {'description': description, 'options': options, 'score': score}
 
     def render_combined_rubric(self, rubric_xml, scores, score_types, feedback_types):
-        success, score_tuples = CombinedOpenEndedRubric.reformat_scores_for_rendering(scores, score_types,
-                                                                                      feedback_types)
+        success, score_tuples = CombinedOpenEndedRubric.reformat_scores_for_rendering(
+            scores, score_types,
+            feedback_types)
         rubric_categories = self.extract_categories(rubric_xml)
-        max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+        max_scores = map((lambda cat: cat[
+                         'options'][-1]['points']), rubric_categories)
         max_score = max(max_scores)
         for i in xrange(0, len(rubric_categories)):
             category = rubric_categories[i]
@@ -216,17 +222,19 @@ class CombinedOpenEndedRubric(object):
                 for tuple in score_tuples:
                     if tuple[1] == i and tuple[2] == j:
                         for grader_type in tuple[3]:
-                            rubric_categories[i]['options'][j]['grader_types'].append(grader_type)
+                            rubric_categories[i]['options'][j][
+                                'grader_types'].append(grader_type)
 
-        html = self.system.render_template('{0}/open_ended_combined_rubric.html'.format(self.TEMPLATE_DIR),
-                                           {'categories': rubric_categories,
-                                            'has_score': True,
-                                            'view_only': True,
-                                            'max_score': max_score,
-                                            'combined_rubric': True,
-                                            'grader_type_image_dict': GRADER_TYPE_IMAGE_DICT,
-                                            'human_grader_types': HUMAN_GRADER_TYPE,
-                                           })
+        html = self.system.render_template(
+            '{0}/open_ended_combined_rubric.html'.format(self.TEMPLATE_DIR),
+            {'categories': rubric_categories,
+             'has_score': True,
+             'view_only': True,
+             'max_score': max_score,
+             'combined_rubric': True,
+             'grader_type_image_dict': GRADER_TYPE_IMAGE_DICT,
+             'human_grader_types': HUMAN_GRADER_TYPE,
+             })
         return html
 
     @staticmethod
@@ -235,7 +243,7 @@ class CombinedOpenEndedRubric(object):
         Validates a set of options. This can and should be extended to filter out other bad edge cases
         '''
         if len(options) == 0:
-            #This is a staff_facing_error
+            # This is a staff_facing_error
             raise RubricParsingError(
                 "[extract_category]: no options associated with this category. Contact the learning sciences group for assistance.")
         if len(options) == 1:
@@ -243,7 +251,7 @@ class CombinedOpenEndedRubric(object):
         prev = options[0]['points']
         for option in options[1:]:
             if prev == option['points']:
-                #This is a staff_facing_error
+                # This is a staff_facing_error
                 raise RubricParsingError(
                     "[extract_category]: found duplicate point values between two different options. Contact the learning sciences group for assistance.")
             else:
@@ -261,12 +269,13 @@ class CombinedOpenEndedRubric(object):
         """
         success = False
         if len(scores) == 0:
-            #This is a dev_facing_error
-            log.error("Score length is 0 when trying to reformat rubric scores for rendering.")
+            # This is a dev_facing_error
+            log.error(
+                "Score length is 0 when trying to reformat rubric scores for rendering.")
             return success, ""
 
         if len(scores) != len(score_types) or len(feedback_types) != len(scores):
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             log.error("Length mismatches when trying to reformat rubric scores for rendering.  "
                       "Scores: {0}, Score Types: {1} Feedback Types: {2}".format(scores, score_types, feedback_types))
             return success, ""
@@ -292,7 +301,8 @@ class CombinedOpenEndedRubric(object):
         for i in xrange(0, len(score_lists)):
             for j in xrange(0, len(score_lists[i])):
                 tuple = [1, j, score_lists[i][j], [], []]
-                score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(score_tuples, tuple)
+                score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(
+                    score_tuples, tuple)
                 score_tuples[tup_ind][0] += 1
                 score_tuples[tup_ind][3].append(score_type_list[i])
                 score_tuples[tup_ind][4].append(feedback_type_list[i])

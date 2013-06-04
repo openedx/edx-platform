@@ -66,7 +66,8 @@ def cleanup(filepath, remove_meta):
         if 'url_name' in attrs:
             used_names[node.tag].add(attrs['url_name'])
         if 'name' in attrs:
-            # Replace name with an identical display_name, and a unique url_name
+            # Replace name with an identical display_name, and a unique
+            # url_name
             name = attrs['name']
             attrs['display_name'] = name
             attrs['url_name'] = clean_unique(node.tag, name)
@@ -76,7 +77,7 @@ def cleanup(filepath, remove_meta):
             print "WARNING: {0} has both slug and url_name".format(node)
 
         if ('url_name' in attrs and 'filename' in attrs and
-            len(attrs) == 2 and attrs['url_name'] == attrs['filename']):
+                len(attrs) == 2 and attrs['url_name'] == attrs['filename']):
             # This is a pointer tag in disguise.  Get rid of the filename.
             print 'turning {0}.{1} into a pointer tag'.format(node.tag, attrs['url_name'])
             del attrs['filename']
@@ -85,7 +86,6 @@ def cleanup(filepath, remove_meta):
             for attr in to_remove:
                 if attr in attrs:
                     del attrs[attr]
-
 
     with open(filepath, "w") as f:
         f.write(etree.tostring(xml))

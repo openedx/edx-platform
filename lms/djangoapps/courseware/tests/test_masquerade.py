@@ -19,6 +19,7 @@ from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
 import json
 
+
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
     '''
@@ -28,8 +29,8 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
-        #self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
-        #self.toy = modulestore().get_course("edX/toy/2012_Fall")
+        # self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
+        # self.toy = modulestore().get_course("edX/toy/2012_Fall")
         self.graded_course = modulestore().get_course("edX/graded/2012_Fall")
 
         # Create staff account
@@ -64,9 +65,8 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
     def test_staff_debug_for_staff(self):
         resp = self.get_cw_section()
         sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
-    
-        self.assertTrue(sdebug in resp.content)
 
+        self.assertTrue(sdebug in resp.content)
 
     def toggle_masquerade(self):
         '''
@@ -84,9 +84,9 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
 
         resp = self.get_cw_section()
         sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
-    
+
         self.assertFalse(sdebug in resp.content)
-        
+
     def get_problem(self):
         pun = 'H1P1'
         problem_location = "i4x://edX/graded/problem/%s" % pun

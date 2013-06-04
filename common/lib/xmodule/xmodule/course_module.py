@@ -105,7 +105,8 @@ class Textbook(object):
         try:
             r = requests.get(toc_url)
         except Exception as err:
-            msg = 'Error %s: Unable to retrieve textbook table of contents at %s' % (err, toc_url)
+            msg = 'Error %s: Unable to retrieve textbook table of contents at %s' % (
+                err, toc_url)
             log.error(msg)
             raise Exception(msg)
 
@@ -113,7 +114,8 @@ class Textbook(object):
         try:
             table_of_contents = etree.fromstring(r.text)
         except Exception as err:
-            msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
+            msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (
+                err, toc_url)
             log.error(msg)
             raise Exception(msg)
 
@@ -129,7 +131,8 @@ class TextbookList(List):
             except:
                 # If we can't get to S3 (e.g. on a train with no internet), don't break
                 # the rest of the courseware.
-                log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
+                log.exception("Couldn't load textbook ({0}, {1})".format(
+                    title, book_url))
                 continue
 
         return textbooks
@@ -147,39 +150,61 @@ class TextbookList(List):
 
 
 class CourseFields(object):
-    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course", scope=Scope.content)
-    wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
-    enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
-    enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
-    start = Date(help="Start time when this module is visible", scope=Scope.settings)
+    textbooks = TextbookList(
+        help="List of pairs of (title, url) for textbooks used in this course", scope=Scope.content)
+    wiki_slug = String(
+        help="Slug that points to the wiki for this course", scope=Scope.content)
+    enrollment_start = Date(
+        help="Date that enrollment for this class is opened", scope=Scope.settings)
+    enrollment_end = Date(
+        help="Date that enrollment for this class is closed", scope=Scope.settings)
+    start = Date(
+        help="Start time when this module is visible", scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
-    advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
-    grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
-    show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
-    display_name = String(help="Display name for this module", scope=Scope.settings)
-    tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
-    end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
-    discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
+    advertised_start = String(
+        help="Date that this course is advertised to start", scope=Scope.settings)
+    grading_policy = Object(
+        help="Grading policy definition for this class", scope=Scope.content)
+    show_calculator = Boolean(
+        help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
+    display_name = String(
+        help="Display name for this module", scope=Scope.settings)
+    tabs = List(
+        help="List of tabs to enable in this course", scope=Scope.settings)
+    end_of_course_survey_url = String(
+        help="Url for the end-of-course survey", scope=Scope.settings)
+    discussion_blackouts = List(
+        help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
     discussion_topics = Object(
         help="Map of topics names to ids",
         scope=Scope.settings
-        )
-    testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
-    announcement = Date(help="Date this course is announced", scope=Scope.settings)
-    cohort_config = Object(help="Dictionary defining cohort configuration", scope=Scope.settings)
-    is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
-    no_grade = Boolean(help="True if this course isn't graded", default=False, scope=Scope.settings)
-    disable_progress_graph = Boolean(help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
-    pdf_textbooks = List(help="List of dictionaries containing pdf_textbook configuration", scope=Scope.settings)
-    html_textbooks = List(help="List of dictionaries containing html_textbook configuration", scope=Scope.settings)
+    )
+    testcenter_info = Object(
+        help="Dictionary of Test Center info", scope=Scope.settings)
+    announcement = Date(
+        help="Date this course is announced", scope=Scope.settings)
+    cohort_config = Object(
+        help="Dictionary defining cohort configuration", scope=Scope.settings)
+    is_new = Boolean(
+        help="Whether this course should be flagged as new", scope=Scope.settings)
+    no_grade = Boolean(
+        help="True if this course isn't graded", default=False, scope=Scope.settings)
+    disable_progress_graph = Boolean(
+        help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
+    pdf_textbooks = List(
+        help="List of dictionaries containing pdf_textbook configuration", scope=Scope.settings)
+    html_textbooks = List(
+        help="List of dictionaries containing html_textbook configuration", scope=Scope.settings)
     remote_gradebook = Object(scope=Scope.settings)
     allow_anonymous = Boolean(scope=Scope.settings, default=True)
     allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
-    advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
+    advanced_modules = List(
+        help="Beta modules used in your course", scope=Scope.settings)
     has_children = True
     checklists = List(scope=Scope.settings)
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
-    show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
+    show_timezone = Boolean(
+        help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
 
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
@@ -225,16 +250,20 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             self.system.error_tracker(msg)
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
-        # init.  (Modulestore is in charge of figuring out where to load the policy from)
+        # init.  (Modulestore is in charge of figuring out where to load the
+        # policy from)
 
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
-        #   disable the syllabus content for courses that do not provide a syllabus
-        self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+        # disable the syllabus content for courses that do not provide a
+        # syllabus
+        self.syllabus_present = self.system.resources_fs.exists(
+            path('syllabus'))
         self._grading_policy = {}
 
         self.set_grading_policy(self.grading_policy)
         if self.discussion_topics == {}:
-            self.discussion_topics = {'General': {'id': self.location.html_id()}}
+            self.discussion_topics = {'General': {
+                'id': self.location.html_id()}}
 
         self.test_center_exams = []
         test_center_info = self.testcenter_info
@@ -242,11 +271,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             for exam_name in test_center_info:
                 try:
                     exam_info = test_center_info[exam_name]
-                    self.test_center_exams.append(self.TestCenterExam(self.id, exam_name, exam_info))
+                    self.test_center_exams.append(self.TestCenterExam(
+                        self.id, exam_name, exam_info))
                 except Exception as err:
                     # If we can't parse the test center exam info, don't break
                     # the rest of the courseware.
-                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (err, exam_name, self.id)
+                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (
+                        err, exam_name, self.id)
                     log.error(msg)
                     continue
 
@@ -282,10 +313,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     "drop_count": 0,
                     "weight": 0.4
                 }
-            ],
-            "GRADE_CUTOFFS": {
+                ],
+                "GRADE_CUTOFFS": {
                 "Pass": 0.5
-            }}
+                }}
 
     def set_grading_policy(self, course_policy):
         """
@@ -322,14 +353,16 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     # if we successfully read the file, stop looking at backups
                     break
             except (IOError):
-                msg = "Unable to load course settings file from '{0}'".format(policy_path)
+                msg = "Unable to load course settings file from '{0}'".format(
+                    policy_path)
                 log.warning(msg)
 
         return policy_str
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
-        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
+        instance = super(CourseDescriptor, cls).from_xml(
+            xml_data, system, org, course)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
@@ -353,10 +386,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             policy = {}
 
         # cdodge: import the grading policy information that is on disk and put into the
-        # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
+        # descriptor 'definition' bucket as a dictionary so that it is
+        # persisted in the DB
         instance.grading_policy = policy
 
-        # now set the current instance. set_grading_policy() will apply some inheritance rules
+        # now set the current instance. set_grading_policy() will apply some
+        # inheritance rules
         instance.set_grading_policy(policy)
 
         return instance
@@ -375,7 +410,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             wiki_slug = wiki_tag.attrib.get("slug", default=None)
             xml_object.remove(wiki_tag)
 
-        definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        definition, children = super(
+            CourseDescriptor, cls).definition_from_xml(xml_object, system)
 
         definition['textbooks'] = textbooks
         definition['wiki_slug'] = wiki_slug
@@ -383,7 +419,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return definition, children
 
     def definition_to_xml(self, resource_fs):
-        xml_object = super(CourseDescriptor, self).definition_to_xml(resource_fs)
+        xml_object = super(
+            CourseDescriptor, self).definition_to_xml(resource_fs)
 
         if len(self.textbooks) > 0:
             textbook_xml_object = etree.Element('textbook')
@@ -392,7 +429,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 textbook_xml_object.set('book_url', textbook.book_url)
 
             xml_object.append(textbook_xml_object)
-        
+
         return xml_object
 
     def has_ended(self):
@@ -418,7 +455,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @raw_grader.setter
     def raw_grader(self, value):
-        # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
+        # NOTE WELL: this change will not update the processed graders. If we
+        # need that, this needs to call grader_from_conf
         self._grading_policy['RAW_GRADER'] = value
         self.grading_policy['GRADER'] = value
 
@@ -599,11 +637,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
                     xmoduledescriptors.append(s)
 
-                    # The xmoduledescriptors included here are only the ones that have scores.
-                    section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)}
+                    # The xmoduledescriptors included here are only the ones
+                    # that have scores.
+                    section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(
+                        lambda child: child.has_score, xmoduledescriptors)}
 
                     section_format = s.lms.format if s.lms.format is not None else ''
-                    graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
+                    graded_sections[section_format] = graded_sections.get(
+                        section_format, []) + [section_description]
 
                     all_descriptors.extend(xmoduledescriptors)
                     all_descriptors.append(s)
@@ -678,7 +719,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 if start <= now <= end:
                     return False
         except:
-            log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
+            log.exception(
+                "Error parsing discussion_blackouts for course {0}".format(self.id))
 
         return True
 
@@ -687,27 +729,37 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             self.course_id = course_id
             self.exam_name = exam_name
             self.exam_info = exam_info
-            self.exam_series_code = exam_info.get('Exam_Series_Code') or exam_name
-            self.display_name = exam_info.get('Exam_Display_Name') or self.exam_series_code
-            self.first_eligible_appointment_date = self._try_parse_time('First_Eligible_Appointment_Date')
+            self.exam_series_code = exam_info.get(
+                'Exam_Series_Code') or exam_name
+            self.display_name = exam_info.get(
+                'Exam_Display_Name') or self.exam_series_code
+            self.first_eligible_appointment_date = self._try_parse_time(
+                'First_Eligible_Appointment_Date')
             if self.first_eligible_appointment_date is None:
                 raise ValueError("First appointment date must be specified")
             # TODO: If defaulting the last appointment date, it should be the
             # *end* of the same day, not the same time.  It's going to be used as the
             # end of the exam overall, so we don't want the exam to disappear too soon.
-            # It's also used optionally as the registration end date, so time matters there too.
-            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')  # or self.first_eligible_appointment_date
+            # It's also used optionally as the registration end date, so time
+            # matters there too.
+            self.last_eligible_appointment_date = self._try_parse_time(
+                'Last_Eligible_Appointment_Date')  # or self.first_eligible_appointment_date
             if self.last_eligible_appointment_date is None:
                 raise ValueError("Last appointment date must be specified")
-            self.registration_start_date = self._try_parse_time('Registration_Start_Date') or time.gmtime(0)
-            self.registration_end_date = self._try_parse_time('Registration_End_Date') or self.last_eligible_appointment_date
+            self.registration_start_date = self._try_parse_time(
+                'Registration_Start_Date') or time.gmtime(0)
+            self.registration_end_date = self._try_parse_time(
+                'Registration_End_Date') or self.last_eligible_appointment_date
             # do validation within the exam info:
             if self.registration_start_date > self.registration_end_date:
-                raise ValueError("Registration start date must be before registration end date")
+                raise ValueError(
+                    "Registration start date must be before registration end date")
             if self.first_eligible_appointment_date > self.last_eligible_appointment_date:
-                raise ValueError("First appointment date must be before last appointment date")
+                raise ValueError(
+                    "First appointment date must be before last appointment date")
             if self.registration_end_date > self.last_eligible_appointment_date:
-                raise ValueError("Registration end date must be before last appointment date")
+                raise ValueError(
+                    "Registration end date must be before last appointment date")
             self.exam_url = exam_info.get('Exam_URL')
 
         def _try_parse_time(self, key):
@@ -720,7 +772,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 try:
                     return parse_time(self.exam_info[key])
                 except ValueError as e:
-                    msg = "Exam {0} in course {1} loaded with a bad exam_info key '{2}': '{3}'".format(self.exam_name, self.course_id, self.exam_info[key], e)
+                    msg = "Exam {0} in course {1} loaded with a bad exam_info key '{2}': '{3}'".format(
+                        self.exam_name, self.course_id, self.exam_info[key], e)
                     log.warning(msg)
                 return None
 
@@ -754,7 +807,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def current_test_center_exam(self):
-        exams = [exam for exam in self.test_center_exams if exam.has_started_registration() and not exam.has_ended()]
+        exams = [
+            exam for exam in self.test_center_exams if exam.has_started_registration() and not exam.has_ended()]
         if len(exams) > 1:
             # TODO: output some kind of warning.  This should already be
             # caught if we decide to do validation at load time.
@@ -765,7 +819,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return None
 
     def get_test_center_exam(self, exam_series_code):
-        exams = [exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
+        exams = [
+            exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
         return exams[0] if len(exams) == 1 else None
 
     @property

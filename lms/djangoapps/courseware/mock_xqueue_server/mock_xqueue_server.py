@@ -67,8 +67,9 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
                 # Otherwise, the problem will not realize it's
                 # queued and it will keep waiting for a response
                 # indefinitely
-                delayed_grade_func = lambda: self._send_grade_response(callback_url,
-                                                                        xqueue_header)
+                delayed_grade_func = lambda: self._send_grade_response(
+                    callback_url,
+                    xqueue_header)
 
                 timer = threading.Timer(2, delayed_grade_func)
                 timer.start()
@@ -78,7 +79,6 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
         else:
             error_message = "Invalid request URL"
             self._send_immediate_response(False, message=error_message)
-
 
     def _send_head(self):
         '''
@@ -109,7 +109,7 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
             # If the list contains multiple entries,
             # we pick the first one
             post_dict = dict(map(lambda (key, list_val): (key, list_val[0]),
-                                post_dict.items()))
+                                 post_dict.items()))
 
         except:
             # We return an empty dict here, on the assumption
@@ -128,7 +128,7 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
 
         # Send the response indicating success/failure
         response_str = json.dumps({'return_code': 0 if success else 1,
-                                'content': message})
+                                   'content': message})
 
         # Log the response
         logger.debug("XQueue: sent response %s" % response_str)
@@ -141,7 +141,7 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
         using the response provided by the server configuration
         '''
         response_dict = {'xqueue_header': json.dumps(xqueue_header),
-                        'xqueue_body': json.dumps(self.server.grade_response())}
+                         'xqueue_body': json.dumps(self.server.grade_response())}
 
         # Log the response
         logger.debug("XQueue: sent grading response %s" % str(response_dict))
@@ -168,7 +168,7 @@ class MockXQueueServer(HTTPServer):
     '''
 
     def __init__(self, port_num,
-            grade_response_dict={'correct': True, 'score': 1, 'msg': ''}):
+                 grade_response_dict={'correct': True, 'score': 1, 'msg': ''}):
         '''
         Initialize the mock XQueue server instance.
 
@@ -201,11 +201,12 @@ class MockXQueueServer(HTTPServer):
 
         # Check that the grade response has the right keys
         assert('correct' in grade_response_dict and
-                'score' in grade_response_dict and
-                'msg' in grade_response_dict)
+               'score' in grade_response_dict and
+               'msg' in grade_response_dict)
 
         # Wrap the message in <div> tags to ensure that it is valid XML
-        grade_response_dict['msg'] = "<div>%s</div>" % grade_response_dict['msg']
+        grade_response_dict[
+            'msg'] = "<div>%s</div>" % grade_response_dict['msg']
 
         # Save the response dictionary
         self._grade_response = grade_response_dict

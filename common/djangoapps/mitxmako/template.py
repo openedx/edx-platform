@@ -20,7 +20,8 @@ from mitxmako import middleware
 
 django_variables = ['lookup', 'output_encoding', 'encoding_errors']
 
-# TODO: We should make this a Django Template subclass that simply has the MakoTemplate inside of it? (Intead of inheriting from MakoTemplate)
+# TODO: We should make this a Django Template subclass that simply has the
+# MakoTemplate inside of it? (Intead of inheriting from MakoTemplate)
 
 
 class Template(MakoTemplate):
@@ -33,7 +34,8 @@ class Template(MakoTemplate):
     def __init__(self, *args, **kwargs):
         """Overrides base __init__ to provide django variable overrides"""
         if not kwargs.get('no_django', False):
-            overrides = dict([(k, getattr(middleware, k, None),) for k in django_variables])
+            overrides = dict([(k, getattr(
+                middleware, k, None),) for k in django_variables])
             overrides['lookup'] = overrides['lookup']['main']
             kwargs.update(overrides)
         super(Template, self).__init__(*args, **kwargs)
@@ -46,7 +48,8 @@ class Template(MakoTemplate):
         # collapse context_instance to a single dictionary for mako
         context_dictionary = {}
 
-        # In various testing contexts, there might not be a current request context.
+        # In various testing contexts, there might not be a current request
+        # context.
         if middleware.requestcontext is not None:
             for d in middleware.requestcontext:
                 context_dictionary.update(d)

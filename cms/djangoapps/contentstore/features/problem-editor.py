@@ -1,5 +1,5 @@
 # disable missing docstring
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 from lettuce import world, step
 from nose.tools import assert_equal
@@ -41,7 +41,8 @@ def i_see_five_settings_with_values(step):
 
 @step('I can modify the display name')
 def i_can_modify_the_display_name(step):
-    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill('modified')
+    world.get_setting_entry(DISPLAY_NAME).find_by_css(
+        '.setting-input')[0].fill('modified')
     verify_modified_display_name()
 
 
@@ -53,7 +54,8 @@ def my_display_name_change_is_persisted_on_save(step):
 
 @step('I can specify special characters in the display name')
 def i_can_modify_the_display_name_with_special_chars(step):
-    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill("updated ' \" &")
+    world.get_setting_entry(DISPLAY_NAME).find_by_css(
+        '.setting-input')[0].fill("updated ' \" &")
     verify_modified_display_name_with_special_chars()
 
 
@@ -91,7 +93,8 @@ def my_change_to_randomization_is_persisted(step):
 def i_can_revert_to_default_for_randomization(step):
     world.revert_setting_entry(RANDOMIZATION)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Always", False)
+    world.verify_setting_entry(world.get_setting_entry(
+        RANDOMIZATION), RANDOMIZATION, "Always", False)
 
 
 @step('I can set the weight to "(.*)"?')
@@ -110,25 +113,32 @@ def my_change_to_weight_is_persisted(step):
 def i_can_revert_to_default_for_unset_weight(step):
     world.revert_setting_entry(PROBLEM_WEIGHT)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
+    world.verify_setting_entry(world.get_setting_entry(
+        PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
 
 
 @step('if I set the weight to "(.*)", it remains unset')
 def set_the_weight_to_abc(step, bad_weight):
     set_weight(bad_weight)
     # We show the clear button immediately on type, hence the "True" here.
-    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", True)
+    world.verify_setting_entry(world.get_setting_entry(
+        PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", True)
     world.save_component_and_reopen(step)
-    # But no change was actually ever sent to the model, so on reopen, explicitly_set is False
-    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
+    # But no change was actually ever sent to the model, so on reopen,
+    # explicitly_set is False
+    world.verify_setting_entry(world.get_setting_entry(
+        PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
 
 
 @step('if I set the max attempts to "(.*)", it displays initially as "(.*)", and is persisted as "(.*)"')
 def set_the_max_attempts(step, max_attempts_set, max_attempts_displayed, max_attempts_persisted):
-    world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css('.setting-input')[0].fill(max_attempts_set)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_displayed, True)
+    world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css(
+        '.setting-input')[0].fill(max_attempts_set)
+    world.verify_setting_entry(world.get_setting_entry(
+        MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_displayed, True)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_persisted, True)
+    world.verify_setting_entry(world.get_setting_entry(
+        MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_persisted, True)
 
 
 @step('Edit High Level Source is not visible')
@@ -154,7 +164,8 @@ def create_latex_problem(step):
     # Go to advanced tab (waiting for the tab to be visible)
     world.css_find('#ui-id-2')
     world.css_click('#ui-id-2')
-    world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
+    world.click_component_from_menu(
+        "i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
 
 
 def verify_high_level_source(step, visible):
@@ -164,24 +175,30 @@ def verify_high_level_source(step, visible):
 
 
 def verify_modified_weight():
-    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "3.5", True)
+    world.verify_setting_entry(world.get_setting_entry(
+        PROBLEM_WEIGHT), PROBLEM_WEIGHT, "3.5", True)
 
 
 def verify_modified_randomization():
-    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Per Student", True)
+    world.verify_setting_entry(world.get_setting_entry(
+        RANDOMIZATION), RANDOMIZATION, "Per Student", True)
 
 
 def verify_modified_display_name():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'modified', True)
+    world.verify_setting_entry(world.get_setting_entry(
+        DISPLAY_NAME), DISPLAY_NAME, 'modified', True)
 
 
 def verify_modified_display_name_with_special_chars():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, "updated ' \" &", True)
+    world.verify_setting_entry(world.get_setting_entry(
+        DISPLAY_NAME), DISPLAY_NAME, "updated ' \" &", True)
 
 
 def verify_unset_display_name():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
+    world.verify_setting_entry(world.get_setting_entry(
+        DISPLAY_NAME), DISPLAY_NAME, '', False)
 
 
 def set_weight(weight):
-    world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill(weight)
+    world.get_setting_entry(PROBLEM_WEIGHT).find_by_css(
+        '.setting-input')[0].fill(weight)

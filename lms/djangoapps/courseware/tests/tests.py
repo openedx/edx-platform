@@ -137,7 +137,8 @@ class LoginEnrollmentTestCase(TestCase):
                          % (response.status_code))
         url = response['Location']
 
-        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(
+            expected_url)
         if not (e_scheme or e_netloc):
             expected_url = urlunsplit(('http', 'testserver',
                                        e_path, e_query, e_fragment))
@@ -399,7 +400,8 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
         module_store = modulestore()
         import_from_xml(module_store, TEST_DATA_DIR, ['full'])
 
-        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+        course = module_store.get_item(Location(
+            ['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
 
         self.assertGreater(len(course.textbooks), 0)
 
@@ -833,13 +835,13 @@ class TestSubmittingProblems(LoginEnrollmentTestCase):
 
     def modx_url(self, problem_location, dispatch):
         return reverse(
-                    'modx_dispatch',
-                    kwargs={
-                        'course_id': self.course.id,
-                        'location': problem_location,
-                        'dispatch': dispatch,
-                        }
-                    )
+            'modx_dispatch',
+            kwargs={
+            'course_id': self.course.id,
+            'location': problem_location,
+            'dispatch': dispatch,
+            }
+        )
 
     def submit_question_answer(self, problem_url_name, responses):
         """
@@ -852,10 +854,12 @@ class TestSubmittingProblems(LoginEnrollmentTestCase):
         """
         problem_location = self.problem_location(problem_url_name)
         modx_url = self.modx_url(problem_location, 'problem_check')
-        answer_key_prefix = 'input_i4x-edX-{}-problem-{}_'.format(self.course_slug, problem_url_name)
+        answer_key_prefix = 'input_i4x-edX-{}-problem-{}_'.format(
+            self.course_slug, problem_url_name)
         resp = self.client.post(modx_url,
-            { (answer_key_prefix + k): v for k,v in responses.items() }
-            )
+                                {(answer_key_prefix + k):
+                                 v for k, v in responses.items()}
+                                )
         return resp
 
     def reset_question_answer(self, problem_url_name):
@@ -923,27 +927,31 @@ class TestCourseGrader(TestSubmittingProblems):
             return [s.earned for s in hw_section['scores']]
 
         # Only get half of the first problem correct
-        self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Incorrect'})
+        self.submit_question_answer('H1P1', {
+                                    '2_1': 'Correct', '2_2': 'Incorrect'})
         self.check_grade_percent(0.06)
         self.assertEqual(earned_hw_scores(), [1.0, 0, 0])   # Order matters
         self.assertEqual(score_for_hw('Homework1'), [1.0, 0.0])
 
         # Get both parts of the first problem correct
         self.reset_question_answer('H1P1')
-        self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.submit_question_answer('H1P1', {
+                                    '2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.13)
         self.assertEqual(earned_hw_scores(), [2.0, 0, 0])
         self.assertEqual(score_for_hw('Homework1'), [2.0, 0.0])
 
         # This problem is shown in an ABTest
-        self.submit_question_answer('H1P2', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.submit_question_answer('H1P2', {
+                                    '2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.25)
         self.assertEqual(earned_hw_scores(), [4.0, 0.0, 0])
         self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])
 
         # This problem is hidden in an ABTest.
         # Getting it correct doesn't change total grade
-        self.submit_question_answer('H1P3', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.submit_question_answer('H1P3', {
+                                    '2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.25)
         self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])
 
@@ -952,21 +960,25 @@ class TestCourseGrader(TestSubmittingProblems):
         # This problem is also weighted to be 4 points (instead of default of 2)
         # If the problem was unweighted the percent would have been 0.38 so we
         # know it works.
-        self.submit_question_answer('H2P1', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.submit_question_answer('H2P1', {
+                                    '2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.42)
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 0])
 
         # Third homework
-        self.submit_question_answer('H3P1', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.submit_question_answer('H3P1', {
+                                    '2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.42)   # Score didn't change
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 2.0])
 
-        self.submit_question_answer('H3P2', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.submit_question_answer('H3P2', {
+                                    '2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.5)   # Now homework2 dropped. Score changes
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 4.0])
 
         # Now we answer the final question (worth half of the grade)
-        self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.submit_question_answer('FinalQuestion', {
+                                    '2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(1.0)   # Hooray! We got 100%
 
 
@@ -979,42 +991,44 @@ class TestSchematicResponse(TestSubmittingProblems):
 
     def test_schematic(self):
         resp = self.submit_question_answer('schematic_problem',
-            { '2_1': json.dumps(
-                [['transient', {'Z': [
-                [0.0000004, 2.8],
-                [0.0000009, 2.8],
-                [0.0000014, 2.8],
-                [0.0000019, 2.8],
-                [0.0000024, 2.8],
-                [0.0000029, 0.2],
-                [0.0000034, 0.2],
-                [0.0000039, 0.2]
-                ]}]]
-                )
-            })
+                                           {'2_1': json.dumps(
+                                            [['transient', {'Z': [
+                                                            [0.0000004, 2.8],
+                                                            [0.0000009, 2.8],
+                                                            [0.0000014, 2.8],
+                                                            [0.0000019, 2.8],
+                                                            [0.0000024, 2.8],
+                                                            [0.0000029, 0.2],
+                                                            [0.0000034, 0.2],
+                                                            [0.0000039, 0.2]
+                                                            ]}]]
+                                            )
+                                            })
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'correct')
 
         self.reset_question_answer('schematic_problem')
         resp = self.submit_question_answer('schematic_problem',
-            { '2_1': json.dumps(
-                [['transient', {'Z': [
-                [0.0000004, 2.8],
-                [0.0000009, 0.0],       # wrong.
-                [0.0000014, 2.8],
-                [0.0000019, 2.8],
-                [0.0000024, 2.8],
-                [0.0000029, 0.2],
-                [0.0000034, 0.2],
-                [0.0000039, 0.2]
-                ]}]]
-                )
-            })
+                                           {'2_1': json.dumps(
+                                            [['transient', {'Z': [
+                                                            [0.0000004, 2.8],
+                                                            [0.0000009, 0.0],
+                                                            # wrong.
+                                                            [0.0000014, 2.8],
+                                                            [0.0000019, 2.8],
+                                                            [0.0000024, 2.8],
+                                                            [0.0000029, 0.2],
+                                                            [0.0000034, 0.2],
+                                                            [0.0000039, 0.2]
+                                                            ]}]]
+                                            )
+                                            })
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'incorrect')
 
     def test_check_function(self):
-        resp = self.submit_question_answer('cfn_problem', {'2_1': "0, 1, 2, 3, 4, 5, 'Outside of loop', 6"})
+        resp = self.submit_question_answer('cfn_problem', {
+                                           '2_1': "0, 1, 2, 3, 4, 5, 'Outside of loop', 6"})
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'correct')
 

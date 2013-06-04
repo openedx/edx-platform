@@ -73,9 +73,11 @@ class CourseDetails(object):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
-        ## TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
+        # TODO make it an error for this to be undefined & for it to not be
+        # retrievable from modulestore
         course_location = jsondict['course_location']
-        ## Will probably want to cache the inflight courses because every blur generates an update
+        # Will probably want to cache the inflight courses because every blur
+        # generates an update
         descriptor = get_modulestore(course_location).get_item(course_location)
 
         dirty = False
@@ -122,11 +124,14 @@ class CourseDetails(object):
             descriptor.enrollment_end = converted
 
         if dirty:
-            get_modulestore(course_location).update_metadata(course_location, own_metadata(descriptor))
+            get_modulestore(course_location).update_metadata(
+                course_location, own_metadata(descriptor))
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
-        # to make faster, could compare against db or could have client send over a list of which fields changed.
-        temploc = Location(course_location)._replace(category='about', name='syllabus')
+        # to make faster, could compare against db or could have client send
+        # over a list of which fields changed.
+        temploc = Location(course_location)._replace(
+            category='about', name='syllabus')
         update_item(temploc, jsondict['syllabus'])
 
         temploc = temploc._replace(name='overview')
@@ -136,7 +141,8 @@ class CourseDetails(object):
         update_item(temploc, jsondict['effort'])
 
         temploc = temploc._replace(name='video')
-        recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
+        recomposed_video_tag = CourseDetails.recompose_video_tag(
+            jsondict['intro_video'])
         update_item(temploc, recomposed_video_tag)
 
         # Could just generate and return a course obj w/o doing any db reads, but I put the reads in as a means to confirm
@@ -160,7 +166,8 @@ class CourseDetails(object):
         if keystring_matcher:
             return keystring_matcher.group(0)
         else:
-            logging.warn("ignoring the content because it doesn't not conform to expected pattern: " + raw_video)
+            logging.warn(
+                "ignoring the content because it doesn't not conform to expected pattern: " + raw_video)
             return None
 
     @staticmethod
@@ -170,11 +177,13 @@ class CourseDetails(object):
         result = None
         if video_key:
             result = '<iframe width="560" height="315" src="http://www.youtube.com/embed/' + \
-                video_key + '?autoplay=1&rel=0" frameborder="0" allowfullscreen=""></iframe>'
+                video_key + \
+                '?autoplay=1&rel=0" frameborder="0" allowfullscreen=""></iframe>'
         return result
 
 
-# TODO move to a more general util? Is there a better way to do the isinstance model check?
+# TODO move to a more general util? Is there a better way to do the
+# isinstance model check?
 class CourseSettingsEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, CourseDetails) or isinstance(obj, course_grading.CourseGradingModel):

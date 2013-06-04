@@ -16,10 +16,12 @@ def check_path_to_location(modulestore):
     course_id = "edX/toy/2012_Fall"
 
     for location, expected in should_work:
-        assert_equals(path_to_location(modulestore, course_id, location), expected)
+        assert_equals(path_to_location(
+            modulestore, course_id, location), expected)
 
     not_found = (
         "i4x://edX/toy/video/WelcomeX", "i4x://edX/toy/course/NotHome"
     )
     for location in not_found:
-        assert_raises(ItemNotFoundError, path_to_location, modulestore, course_id, location)
+        assert_raises(
+            ItemNotFoundError, path_to_location, modulestore, course_id, location)

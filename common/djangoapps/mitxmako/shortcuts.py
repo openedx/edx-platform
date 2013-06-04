@@ -43,7 +43,8 @@ def marketing_link(name):
     elif not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE') and name in link_map:
         return reverse(link_map[name])
     else:
-        log.warning("Cannot find corresponding link for name: {name}".format(name=name))
+        log.warning(
+            "Cannot find corresponding link for name: {name}".format(name=name))
         return '#'
 
 
@@ -77,7 +78,8 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_instance['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
     context_instance['marketing_link'] = marketing_link
 
-    # In various testing contexts, there might not be a current request context.
+    # In various testing contexts, there might not be a current request
+    # context.
     if middleware.requestcontext is not None:
         for d in middleware.requestcontext:
             context_dictionary.update(d)

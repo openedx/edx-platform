@@ -31,7 +31,8 @@ elements = ['Ac', 'Ag', 'Al', 'Am', 'Ar', 'As', 'At', 'Au', 'B', 'Ba', 'Be',
 digits = map(str, range(10))
 symbols = list("[](){}^+-/")
 phases = ["(s)", "(l)", "(g)", "(aq)"]
-tokens = reduce(lambda a, b: a ^ b, map(Literal, elements + digits + symbols + phases))
+tokens = reduce(lambda a, b: a ^ b, map(
+    Literal, elements + digits + symbols + phases))
 tokenizer = OneOrMore(tokens) + StringEnd()
 
 
@@ -91,14 +92,15 @@ def _clean_parse_tree(tree):
         else:
             return nltk.tree.Tree(n.node, n[1:])
 
-    dispatch = {'number': lambda x: nltk.tree.Tree("number", [unparse_number(x)]),
-                'unphased': null_tag,
-                'unsuffixed': null_tag,
-                'number_suffix': lambda x: nltk.tree.Tree('number_suffix', [unparse_number(x[0])]),
-                'suffixed': lambda x: len(x) > 1 and x or x[0],
-                'ion_suffix': ion_suffix,
-                'paren_group_square': lambda x: nltk.tree.Tree(x.node, x[1]),
-                'paren_group_round': lambda x: nltk.tree.Tree(x.node, x[1])}
+    dispatch = {
+        'number': lambda x: nltk.tree.Tree("number", [unparse_number(x)]),
+        'unphased': null_tag,
+        'unsuffixed': null_tag,
+        'number_suffix': lambda x: nltk.tree.Tree('number_suffix', [unparse_number(x[0])]),
+        'suffixed': lambda x: len(x) > 1 and x or x[0],
+        'ion_suffix': ion_suffix,
+        'paren_group_square': lambda x: nltk.tree.Tree(x.node, x[1]),
+        'paren_group_round': lambda x: nltk.tree.Tree(x.node, x[1])}
 
     if type(tree) == str:
         return tree
@@ -130,7 +132,8 @@ def _merge_children(tree, tags):
     '''
     if tree is None:
         # There was a problem--shouldn't have empty trees (NOTE: see this with input e.g. 'H2O(', or 'Xe+').
-        # Haven't grokked the code to tell if this is indeed the right thing to do.
+        # Haven't grokked the code to tell if this is indeed the right thing to
+        # do.
         raise ParseException("Shouldn't have empty trees")
 
     if type(tree) == str:
@@ -138,7 +141,7 @@ def _merge_children(tree, tags):
 
     merged_children = []
     done = False
-    #print '00000', tree
+    # print '00000', tree
     ## Merge current tag
     while not done:
         done = True
@@ -150,14 +153,14 @@ def _merge_children(tree, tags):
                 merged_children = merged_children + [child]
         tree = nltk.tree.Tree(tree.node, merged_children)
         merged_children = []
-    #print '======',tree
+    # print '======',tree
 
     # And recurse
     children = []
     for child in tree:
         children.append(_merge_children(child, tags))
 
-    #return tree
+    # return tree
     return nltk.tree.Tree(tree.node, children)
 
 
@@ -201,7 +204,6 @@ def _render_to_html(tree):
             return children.replace(' ', '')
 
 
-
 def render_to_html(eq):
     '''
     Render a chemical equation string to html.
@@ -239,7 +241,6 @@ def render_to_html(eq):
     if arrow == '':
         # only one side
         return spanify(render_expression(left))
-
 
     return spanify(render_expression(left) + render_arrow(arrow) + render_expression(right))
 
@@ -350,8 +351,10 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
         if treedic['1 phases'] != treedic['2 phases']:
             return False
 
-    if any(map(lambda x, y: x / y - treedic['1 factors'][0] / treedic['2 factors'][0],
-                                         treedic['1 factors'], treedic['2 factors'])):
+    if any(
+        map(lambda x, y: x / y - treedic[
+            '1 factors'][0] / treedic['2 factors'][0],
+            treedic['1 factors'], treedic['2 factors'])):
         # factors are not proportional
         return False
     else:
@@ -403,7 +406,8 @@ def chemical_equations_equal(eq1, eq2, exact=False):
     if arrow1 == '' or arrow2 == '':
         return False
 
-    # TODO: may want to be able to give student helpful feedback about why things didn't work.
+    # TODO: may want to be able to give student helpful feedback about why
+    # things didn't work.
     if arrow1 != arrow2:
         # arrows don't match
         return False
@@ -429,5 +433,6 @@ def chemical_equations_equal(eq1, eq2, exact=False):
 
         return True
     except ParseException:
-        # Don't want external users to have to deal with parsing exceptions.  Just return False.
+        # Don't want external users to have to deal with parsing exceptions.
+        # Just return False.
         return False

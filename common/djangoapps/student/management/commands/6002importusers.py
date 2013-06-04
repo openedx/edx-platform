@@ -50,7 +50,7 @@ def import_user(u):
 
 class Command(BaseCommand):
     help = \
-'''Exports all users and user profiles.
+        '''Exports all users and user profiles.
 Caveat: Should be looked over before any run
 for schema changes.
 

@@ -2,9 +2,9 @@
 Browser set up for acceptance tests.
 """
 
-#pylint: disable=E1101
-#pylint: disable=W0613
-#pylint: disable=W0611
+# pylint: disable=E1101
+# pylint: disable=W0613
+# pylint: disable=W0611
 
 from lettuce import before, after, world
 from splinter.browser import Browser

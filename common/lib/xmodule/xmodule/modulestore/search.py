@@ -107,11 +107,13 @@ def path_to_location(modulestore, course_id, location):
         for path_index in range(2, n - 1):
             category = path[path_index].category
             if category == 'sequential' or category == 'videosequence':
-                section_desc = modulestore.get_instance(course_id, path[path_index])
+                section_desc = modulestore.get_instance(
+                    course_id, path[path_index])
                 child_locs = [c.location for c in section_desc.get_children()]
                 # positions are 1-indexed, and should be strings to be consistent with
                 # url parsing.
-                position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
+                position_list.append(str(child_locs.index(
+                    path[path_index + 1]) + 1))
         position = "_".join(position_list)
 
     return (course_id, chapter, section, position)

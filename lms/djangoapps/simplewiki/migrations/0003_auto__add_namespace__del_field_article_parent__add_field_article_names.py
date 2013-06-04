@@ -13,8 +13,10 @@ class Migration(SchemaMigration):
 
         # Adding model 'Namespace'
         db.create_table('simplewiki_namespace', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('name', self.gf(
+                'django.db.models.fields.CharField')(max_length=30)),
         ))
         db.send_create_signal('simplewiki', ['Namespace'])
 
@@ -23,7 +25,8 @@ class Migration(SchemaMigration):
 
         # Adding field 'Article.namespace'
         db.add_column('simplewiki_article', 'namespace',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['simplewiki.Namespace']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(
+                          default=1, to=orm['simplewiki.Namespace']),
                       keep_default=False)
 
         # Adding unique constraint on 'Article', fields ['namespace', 'slug']
@@ -38,7 +41,8 @@ class Migration(SchemaMigration):
 
         # Adding field 'Article.parent'
         db.add_column('simplewiki_article', 'parent',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['simplewiki.Article'], null=True, blank=True),
+                      self.gf('django.db.models.fields.related.ForeignKey')(
+                          to=orm['simplewiki.Article'], null=True, blank=True),
                       keep_default=False)
 
         # Deleting field 'Article.namespace'

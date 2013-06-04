@@ -1,8 +1,11 @@
-import os, subprocess, logging
+import os
+import subprocess
+import logging
 
 from config import CONFIGURATION, BASE_DIR
 
 LOG = logging.getLogger(__name__)
+
 
 def execute(command, working_directory=BASE_DIR):
     """
@@ -22,10 +25,12 @@ def call(command, working_directory=BASE_DIR):
 
     """
     LOG.info(command)
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, cwd=working_directory)
     out, err = p.communicate()
     return (out, err)
-    
+
+
 def create_dir_if_necessary(pathname):
     dirname = os.path.dirname(pathname)
     if not os.path.exists(dirname):
@@ -42,6 +47,7 @@ def remove_file(filename, verbose=True):
     if verbose:
         LOG.info('Deleting file %s' % os.path.relpath(filename, BASE_DIR))
     if not os.path.exists(filename):
-        LOG.warn("File does not exist: %s" % os.path.relpath(filename, BASE_DIR))
+        LOG.warn("File does not exist: %s" %
+                 os.path.relpath(filename, BASE_DIR))
     else:
         os.remove(filename)

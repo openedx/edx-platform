@@ -159,7 +159,8 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             {'status': 'incorrect', 'input_type': 'radio', 'value': ''},
             {'status': 'incorrect', 'input_type': 'checkbox', 'value': []},
             {'status': 'incorrect', 'input_type': 'checkbox', 'value': ['2']},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': ['2', '3']},
+            {'status': 'incorrect', 'input_type':
+                'checkbox', 'value': ['2', '3']},
             {'status': 'incomplete', 'input_type': 'radio', 'value': ''},
             {'status': 'incomplete', 'input_type': 'checkbox', 'value': []},
             {'status': 'incomplete', 'input_type': 'checkbox', 'value': ['2']},
@@ -333,7 +334,8 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             xml = self.render_to_xml(self.context)
 
             # Expect that we do NOT see the message yet
-            self.assert_no_xpath(xml, "//div[@class='capa_alert']", self.context)
+            self.assert_no_xpath(
+                xml, "//div[@class='capa_alert']", self.context)
 
 
 class TextlineTemplateTest(TemplateTestCase):
@@ -510,7 +512,8 @@ class AnnotationInputTemplateTest(TemplateTestCase):
         # Since the HTML is unescaped, we can traverse the XML tree
         for id_num in range(0, 5):
             xpath = "//span[@data-id='{0}']/p/b".format(id_num)
-            self.assert_has_text(xml, xpath, 'HTML {0}'.format(id_num), exact=False)
+            self.assert_has_text(xml, xpath, 'HTML {0}'.format(
+                id_num), exact=False)
 
         # Expect that the correct option is selected
         xpath = "//span[contains(@class,'selected')]/p/b"
@@ -624,7 +627,8 @@ class OptionInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'optioninput.html'
 
     def setUp(self):
-        self.context = {'id': 2, 'options': [], 'status': 'unsubmitted', 'value': 0}
+        self.context = {
+            'id': 2, 'options': [], 'status': 'unsubmitted', 'value': 0}
         super(OptionInputTemplateTest, self).setUp()
 
     def test_select_options(self):

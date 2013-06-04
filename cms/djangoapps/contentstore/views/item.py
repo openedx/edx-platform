@@ -16,7 +16,8 @@ from .requests import _xmodule_recurse
 
 __all__ = ['save_item', 'clone_item', 'delete_item']
 
-# cdodge: these are categories which should not be parented, they are detached from the hierarchy
+# cdodge: these are categories which should not be parented, they are
+# detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 
@@ -53,11 +54,13 @@ def save_item(request):
         existing_item = modulestore().get_item(item_location)
 
         # update existing metadata with submitted metadata (which can be partial)
-        # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
+        # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece
+        # of metadata that means 'remove it'
         for metadata_key, value in posted_metadata.items():
 
             if posted_metadata[metadata_key] is None:
-                # remove both from passed in collection as well as the collection read in from the modulestore
+                # remove both from passed in collection as well as the
+                # collection read in from the modulestore
                 if metadata_key in existing_item._model_data:
                     del existing_item._model_data[metadata_key]
                 del posted_metadata[metadata_key]
@@ -65,7 +68,8 @@ def save_item(request):
                 existing_item._model_data[metadata_key] = value
 
         # commit to datastore
-        # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
+        # TODO (cpennington): This really shouldn't have to do this much
+        # reaching in to get the metadata
         store.update_metadata(item_location, own_metadata(existing_item))
 
     return HttpResponse()
@@ -83,18 +87,22 @@ def clone_item(request):
         raise PermissionDenied()
 
     parent = get_modulestore(template).get_item(parent_location)
-    dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
+    dest_location = parent_location._replace(
+        category=template.category, name=uuid4().hex)
 
     new_item = get_modulestore(template).clone_item(template, dest_location)
 
-    # replace the display name with an optional parameter passed in from the caller
+    # replace the display name with an optional parameter passed in from the
+    # caller
     if display_name is not None:
         new_item.display_name = display_name
 
-    get_modulestore(template).update_metadata(new_item.location.url(), own_metadata(new_item))
+    get_modulestore(template).update_metadata(
+        new_item.location.url(), own_metadata(new_item))
 
     if new_item.location.category not in DETACHED_CATEGORIES:
-        get_modulestore(parent.location).update_children(parent_location, parent.children + [new_item.location.url()])
+        get_modulestore(parent.location).update_children(
+            parent_location, parent.children + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
@@ -118,13 +126,16 @@ def delete_item(request):
     item = store.get_item(item_location)
 
     if delete_children:
-        _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions))
+        _xmodule_recurse(item, lambda i: store.delete_item(
+            i.location, delete_all_versions))
     else:
         store.delete_item(item.location, delete_all_versions)
 
-    # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
+    # cdodge: we need to remove our parent's pointer to us so that it is no
+    # longer dangling
     if delete_all_versions:
-        parent_locs = modulestore('direct').get_parent_locations(item_loc, None)
+        parent_locs = modulestore(
+            'direct').get_parent_locations(item_loc, None)
 
         for parent_loc in parent_locs:
             parent = modulestore('direct').get_item(parent_loc)
@@ -133,6 +144,7 @@ def delete_item(request):
                 children = parent.children
                 children.remove(item_url)
                 parent.children = children
-                modulestore('direct').update_children(parent.location, parent.children)
+                modulestore('direct').update_children(
+                    parent.location, parent.children)
 
     return HttpResponse()

@@ -10,23 +10,31 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'CourseSoftware'
         db.create_table('licenses_coursesoftware', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('full_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('url', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(
+                max_length=255)),
+            ('full_name', self.gf(
+                'django.db.models.fields.CharField')(max_length=255)),
+            ('url', self.gf('django.db.models.fields.CharField')(
+                max_length=255)),
+            ('course_id', self.gf(
+                'django.db.models.fields.CharField')(max_length=255)),
         ))
         db.send_create_signal('licenses', ['CourseSoftware'])
 
         # Adding model 'UserLicense'
         db.create_table('licenses_userlicense', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('software', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['licenses.CourseSoftware'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True)),
-            ('serial', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('software', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['licenses.CourseSoftware'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'], null=True)),
+            ('serial', self.gf(
+                'django.db.models.fields.CharField')(max_length=255)),
         ))
         db.send_create_signal('licenses', ['UserLicense'])
-
 
     def backwards(self, orm):
         # Deleting model 'CourseSoftware'
@@ -34,7 +42,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'UserLicense'
         db.delete_table('licenses_userlicense')
-
 
     models = {
         'auth.group': {

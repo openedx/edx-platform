@@ -19,7 +19,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 2:
-            raise CommandError("clone requires two arguments: <source-location> <dest-location>")
+            raise CommandError(
+                "clone requires two arguments: <source-location> <dest-location>")
 
         source_location_str = args[0]
         dest_location_str = args[1]

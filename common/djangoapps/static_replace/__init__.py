@@ -53,7 +53,6 @@ def replace_course_urls(text, course_id):
     returns: text with the links replaced
     """
 
-
     def replace_course_url(match):
         quote = match.group('quote')
         rest = match.group('rest')
@@ -87,17 +86,21 @@ def replace_static_urls(text, data_directory, course_namespace=None):
         # In debug mode, if we can find the url as is,
         if settings.DEBUG and finders.find(rest, True):
             return original
-        # if we're running with a MongoBacked store course_namespace is not None, then use studio style urls
-        elif  course_namespace is not None and not isinstance(modulestore(), XMLModuleStore):
+        # if we're running with a MongoBacked store course_namespace is not
+        # None, then use studio style urls
+        elif course_namespace is not None and not isinstance(modulestore(), XMLModuleStore):
             # first look in the static file pipeline and see if we are trying to reference
-            # a piece of static content which is in the mitx repo (e.g. JS associated with an xmodule)
+            # a piece of static content which is in the mitx repo (e.g. JS
+            # associated with an xmodule)
             if staticfiles_storage.exists(rest):
                 url = staticfiles_storage.url(rest)
             else:
                 # if not, then assume it's courseware specific content and then look in the
                 # Mongo-backed database
-                url = StaticContent.convert_legacy_static_url(rest, course_namespace)
-        # Otherwise, look the file up in staticfiles_storage, and append the data directory if needed
+                url = StaticContent.convert_legacy_static_url(
+                    rest, course_namespace)
+        # Otherwise, look the file up in staticfiles_storage, and append the
+        # data directory if needed
         else:
             course_path = "/".join((data_directory, rest))
 
@@ -106,7 +109,8 @@ def replace_static_urls(text, data_directory, course_namespace=None):
                     url = staticfiles_storage.url(rest)
                 else:
                     url = staticfiles_storage.url(course_path)
-            # And if that fails, assume that it's course content, and add manually data directory
+            # And if that fails, assume that it's course content, and add
+            # manually data directory
             except Exception as err:
                 log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
                     rest, str(err)))
@@ -115,7 +119,8 @@ def replace_static_urls(text, data_directory, course_namespace=None):
         return "".join([quote, url, quote])
 
     return re.sub(
-        _url_replace_regex('/static/(?!{data_dir})'.format(data_dir=data_directory)),
+        _url_replace_regex('/static/(?!{data_dir})'.format(
+            data_dir=data_directory)),
         replace_static_url,
         text
     )

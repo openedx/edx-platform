@@ -10,24 +10,31 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'TrackingLog'
         db.create_table('track_trackinglog', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('dtcreated', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('username', self.gf('django.db.models.fields.CharField')(max_length=32, blank=True)),
-            ('ip', self.gf('django.db.models.fields.CharField')(max_length=32, blank=True)),
-            ('event_source', self.gf('django.db.models.fields.CharField')(max_length=32)),
-            ('event_type', self.gf('django.db.models.fields.CharField')(max_length=32, blank=True)),
-            ('event', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('agent', self.gf('django.db.models.fields.CharField')(max_length=256, blank=True)),
-            ('page', self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('dtcreated', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, blank=True)),
+            ('username', self.gf('django.db.models.fields.CharField')(
+                max_length=32, blank=True)),
+            ('ip', self.gf('django.db.models.fields.CharField')(
+                max_length=32, blank=True)),
+            ('event_source', self.gf(
+                'django.db.models.fields.CharField')(max_length=32)),
+            ('event_type', self.gf('django.db.models.fields.CharField')(
+                max_length=32, blank=True)),
+            ('event', self.gf(
+                'django.db.models.fields.TextField')(blank=True)),
+            ('agent', self.gf('django.db.models.fields.CharField')(
+                max_length=256, blank=True)),
+            ('page', self.gf('django.db.models.fields.CharField')(
+                max_length=32, null=True, blank=True)),
             ('time', self.gf('django.db.models.fields.DateTimeField')()),
         ))
         db.send_create_signal('track', ['TrackingLog'])
 
-
     def backwards(self, orm):
         # Deleting model 'TrackingLog'
         db.delete_table('track_trackinglog')
-
 
     models = {
         'track.trackinglog': {

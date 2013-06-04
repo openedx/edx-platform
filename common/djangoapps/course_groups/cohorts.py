@@ -20,6 +20,7 @@ log = logging.getLogger(__name__)
 # code that messes with the global random module.
 _local_random = None
 
+
 def local_random():
     """
     Get the local random number generator.  In a function so that we don't run
@@ -27,11 +28,12 @@ def local_random():
     """
     # ironic, isn't it?
     global _local_random
-    
+
     if _local_random is None:
         _local_random = random.Random()
 
     return _local_random
+
 
 def is_course_cohorted(course_id):
     """
@@ -128,8 +130,8 @@ def get_cohort(user, course_id):
 
     try:
         return CourseUserGroup.objects.get(course_id=course_id,
-                                            group_type=CourseUserGroup.COHORT,
-                                            users__id=user.id)
+                                           group_type=CourseUserGroup.COHORT,
+                                           users__id=user.id)
     except CourseUserGroup.DoesNotExist:
         # Didn't find the group.  We'll go on to create one if needed.
         pass

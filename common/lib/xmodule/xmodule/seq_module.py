@@ -23,7 +23,8 @@ class SequenceFields(object):
 
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
-    position = Integer(help="Last tab viewed in this sequence", scope=Scope.user_state)
+    position = Integer(
+        help="Last tab viewed in this sequence", scope=Scope.user_state)
 
 
 class SequenceModule(SequenceFields, XModule):
@@ -34,7 +35,6 @@ class SequenceModule(SequenceFields, XModule):
           'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')]}
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
-
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -131,9 +131,11 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
         children = []
         for child in xml_object:
             try:
-                children.append(system.process_xml(etree.tostring(child, encoding='unicode')).location.url())
+                children.append(system.process_xml(etree.tostring(
+                    child, encoding='unicode')).location.url())
             except Exception as e:
-                log.exception("Unable to load child when parsing Sequence. Continuing...")
+                log.exception(
+                    "Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
                     system.error_tracker("ERROR: " + str(e))
                 continue

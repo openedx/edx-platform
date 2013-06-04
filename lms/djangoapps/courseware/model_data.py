@@ -59,12 +59,14 @@ class ModelDataCache(object):
         if user.is_authenticated():
             for scope, fields in self._fields_to_cache().items():
                 for field_object in self._retrieve_fields(scope, fields):
-                    self.cache[self._cache_key_from_field_object(scope, field_object)] = field_object
+                    self.cache[self._cache_key_from_field_object(
+                        scope, field_object)] = field_object
 
     @classmethod
-    def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
-                                         descriptor_filter=lambda descriptor: True,
-                                         select_for_update=False):
+    def cache_for_descriptor_descendents(
+        cls, course_id, user, descriptor, depth=None,
+        descriptor_filter=lambda descriptor: True,
+            select_for_update=False):
         """
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
@@ -95,11 +97,13 @@ class ModelDataCache(object):
                 new_depth = depth - 1 if depth is not None else depth
 
                 for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
-                    descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
+                    descriptors.extend(get_child_descriptors(
+                        child, new_depth, descriptor_filter))
 
             return descriptors
 
-        descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
+        descriptors = get_child_descriptors(
+            descriptor, depth, descriptor_filter)
 
         return ModelDataCache(descriptors, course_id, user, select_for_update)
 
@@ -123,7 +127,8 @@ class ModelDataCache(object):
         that can be put into a single query
         """
         res = chain.from_iterable(
-            self._query(model_class, **dict([(chunk_field, chunk)] + kwargs.items()))
+            self._query(model_class, **dict([(
+                chunk_field, chunk)] + kwargs.items()))
             for chunk in chunks(items, chunk_size)
         )
         return res
@@ -244,7 +249,7 @@ class ModelDataCache(object):
                 module_state_key=key.block_scope_id.url(),
                 defaults={'state': json.dumps({}),
                           'module_type': key.block_scope_id.category,
-                         },
+                          },
             )
         elif key.scope == Scope.content:
             field_object, _ = XModuleContentField.objects.get_or_create(
@@ -329,7 +334,8 @@ class LmsKeyValueStore(KeyValueStore):
 
     def set(self, key, value):
         if key.field_name in self._descriptor_model_data:
-            raise InvalidWriteError("Not allowed to overwrite descriptor model data", key.field_name)
+            raise InvalidWriteError(
+                "Not allowed to overwrite descriptor model data", key.field_name)
 
         field_object = self._model_data_cache.find_or_create(key)
 
@@ -347,7 +353,8 @@ class LmsKeyValueStore(KeyValueStore):
 
     def delete(self, key):
         if key.field_name in self._descriptor_model_data:
-            raise InvalidWriteError("Not allowed to deleted descriptor model data", key.field_name)
+            raise InvalidWriteError(
+                "Not allowed to deleted descriptor model data", key.field_name)
 
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key.scope)

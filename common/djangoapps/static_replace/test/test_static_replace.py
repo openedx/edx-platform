@@ -19,11 +19,13 @@ def test_multi_replace():
 
     assert_equals(
         replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY),
-        replace_static_urls(replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY), DATA_DIRECTORY)
+        replace_static_urls(replace_static_urls(
+            STATIC_SOURCE, DATA_DIRECTORY), DATA_DIRECTORY)
     )
     assert_equals(
         replace_course_urls(course_source, COURSE_ID),
-        replace_course_urls(replace_course_urls(course_source, COURSE_ID), COURSE_ID)
+        replace_course_urls(replace_course_urls(
+            course_source, COURSE_ID), COURSE_ID)
     )
 
 
@@ -32,7 +34,8 @@ def test_storage_url_exists(mock_storage):
     mock_storage.exists.return_value = True
     mock_storage.url.return_value = '/static/file.png'
 
-    assert_equals('"/static/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert_equals('"/static/file.png"', replace_static_urls(
+        STATIC_SOURCE, DATA_DIRECTORY))
     mock_storage.exists.called_once_with('file.png')
     mock_storage.url.called_once_with('data_dir/file.png')
 
@@ -42,7 +45,8 @@ def test_storage_url_not_exists(mock_storage):
     mock_storage.exists.return_value = False
     mock_storage.url.return_value = '/static/data_dir/file.png'
 
-    assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert_equals('"/static/data_dir/file.png"', replace_static_urls(
+        STATIC_SOURCE, DATA_DIRECTORY))
     mock_storage.exists.called_once_with('file.png')
     mock_storage.url.called_once_with('file.png')
 
@@ -55,7 +59,8 @@ def test_mongo_filestore(mock_modulestore, mock_static_content):
     mock_static_content.convert_legacy_static_url.return_value = "c4x://mock_url"
 
     # No namespace => no change to path
-    assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert_equals('"/static/data_dir/file.png"', replace_static_urls(
+        STATIC_SOURCE, DATA_DIRECTORY))
 
     # Namespace => content url
     assert_equals(
@@ -63,7 +68,8 @@ def test_mongo_filestore(mock_modulestore, mock_static_content):
         replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, NAMESPACE)
     )
 
-    mock_static_content.convert_legacy_static_url.assert_called_once_with('file.png', NAMESPACE)
+    mock_static_content.convert_legacy_static_url.assert_called_once_with(
+        'file.png', NAMESPACE)
 
 
 @patch('static_replace.settings')
@@ -74,10 +80,12 @@ def test_data_dir_fallback(mock_storage, mock_modulestore, mock_settings):
     mock_storage.url.side_effect = Exception
 
     mock_storage.exists.return_value = True
-    assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert_equals('"/static/data_dir/file.png"', replace_static_urls(
+        STATIC_SOURCE, DATA_DIRECTORY))
 
     mock_storage.exists.return_value = False
-    assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert_equals('"/static/data_dir/file.png"', replace_static_urls(
+        STATIC_SOURCE, DATA_DIRECTORY))
 
 
 def test_raw_static_check():

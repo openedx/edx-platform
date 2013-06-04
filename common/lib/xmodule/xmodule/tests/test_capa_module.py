@@ -1,8 +1,8 @@
 """Tests of the Capa XModule"""
-#pylint: disable=C0111
-#pylint: disable=R0904
-#pylint: disable=C0103
-#pylint: disable=C0302
+# pylint: disable=C0111
+# pylint: disable=R0904
+# pylint: disable=C0103
+# pylint: disable=C0302
 
 import datetime
 from mock import Mock, patch
@@ -111,11 +111,13 @@ class CapaFactory(object):
             model_data['attempts'] = int(attempts)
 
         system = test_system()
-        system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+        system.render_template = Mock(
+            return_value="<div>Test Template HTML</div>")
         module = CapaModule(system, location, descriptor, model_data)
 
         if correct:
-            # TODO: probably better to actually set the internal state properly, but...
+            # TODO: probably better to actually set the internal state
+            # properly, but...
             module.get_score = lambda: {'score': 1, 'total': 1}
         else:
             module.get_score = lambda: {'score': 0, 'total': 1}
@@ -334,7 +336,8 @@ class CapaModuleTest(unittest.TestCase):
             self.assertEqual(valid_get_dict[original_key], result[key])
 
         # Valid GET param dict with list keys
-        valid_get_dict = self._querydict_from_dict({'input_2[]': ['test1', 'test2']})
+        valid_get_dict = self._querydict_from_dict(
+            {'input_2[]': ['test1', 'test2']})
         result = CapaModule.make_dict_of_responses(valid_get_dict)
         self.assertTrue('2' in result)
         self.assertEqual(['test1', 'test2'], result['2'])
@@ -459,7 +462,8 @@ class CapaModuleTest(unittest.TestCase):
 
         for rerandomize in rerandomize_values:
             # Randomize turned off
-            module = CapaFactory.create(rerandomize=rerandomize, attempts=0, done=True)
+            module = CapaFactory.create(
+                rerandomize=rerandomize, attempts=0, done=True)
 
             # Expect that we can submit successfully
             get_request_dict = {CapaFactory.input_key(): '3.14'}
@@ -660,20 +664,24 @@ class CapaModuleTest(unittest.TestCase):
         # Just in case, we also check what happens if we have
         # more attempts than allowed.
         attempts = random.randint(1, 10)
-        module = CapaFactory.create(attempts=attempts - 1, max_attempts=attempts)
+        module = CapaFactory.create(
+            attempts=attempts - 1, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Final Check")
 
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Final Check")
 
-        module = CapaFactory.create(attempts=attempts + 1, max_attempts=attempts)
+        module = CapaFactory.create(
+            attempts=attempts + 1, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Final Check")
 
         # Otherwise, button name is "Check"
-        module = CapaFactory.create(attempts=attempts - 2, max_attempts=attempts)
+        module = CapaFactory.create(
+            attempts=attempts - 2, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Check")
 
-        module = CapaFactory.create(attempts=attempts - 3, max_attempts=attempts)
+        module = CapaFactory.create(
+            attempts=attempts - 3, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Check")
 
         # If no limit on attempts, then always show "Check"
@@ -734,7 +742,8 @@ class CapaModuleTest(unittest.TestCase):
         self.assertFalse(module.should_show_reset_button())
 
         # If the user is out of attempts, do NOT show the reset button
-        module = CapaFactory.create(attempts=attempts, max_attempts=attempts, done=True)
+        module = CapaFactory.create(
+            attempts=attempts, max_attempts=attempts, done=True)
         self.assertFalse(module.should_show_reset_button())
 
         # If we're NOT randomizing, then do NOT show the reset button
@@ -772,10 +781,12 @@ class CapaModuleTest(unittest.TestCase):
         self.assertFalse(module.should_show_save_button())
 
         # If the user is out of attempts, do NOT show the save button
-        module = CapaFactory.create(attempts=attempts, max_attempts=attempts, done=True)
+        module = CapaFactory.create(
+            attempts=attempts, max_attempts=attempts, done=True)
         self.assertFalse(module.should_show_save_button())
 
-        # If user submitted a problem but hasn't reset, do NOT show the save button
+        # If user submitted a problem but hasn't reset, do NOT show the save
+        # button
         module = CapaFactory.create(rerandomize="always", done=True)
         self.assertFalse(module.should_show_save_button())
 
@@ -785,27 +796,34 @@ class CapaModuleTest(unittest.TestCase):
         # If the user has unlimited attempts and we are not randomizing,
         # then do NOT show a save button
         # because they can keep using "Check"
-        module = CapaFactory.create(max_attempts=None, rerandomize="never", done=False)
+        module = CapaFactory.create(
+            max_attempts=None, rerandomize="never", done=False)
         self.assertFalse(module.should_show_save_button())
 
-        module = CapaFactory.create(max_attempts=None, rerandomize="false", done=True)
+        module = CapaFactory.create(
+            max_attempts=None, rerandomize="false", done=True)
         self.assertFalse(module.should_show_save_button())
 
-        module = CapaFactory.create(max_attempts=None, rerandomize="per_student", done=True)
+        module = CapaFactory.create(
+            max_attempts=None, rerandomize="per_student", done=True)
         self.assertFalse(module.should_show_save_button())
 
         # Otherwise, DO show the save button
         module = CapaFactory.create(done=False)
         self.assertTrue(module.should_show_save_button())
 
-        # If we're not randomizing and we have limited attempts,  then we can save
-        module = CapaFactory.create(rerandomize="never", max_attempts=2, done=True)
+        # If we're not randomizing and we have limited attempts,  then we can
+        # save
+        module = CapaFactory.create(
+            rerandomize="never", max_attempts=2, done=True)
         self.assertTrue(module.should_show_save_button())
 
-        module = CapaFactory.create(rerandomize="false", max_attempts=2, done=True)
+        module = CapaFactory.create(
+            rerandomize="false", max_attempts=2, done=True)
         self.assertTrue(module.should_show_save_button())
 
-        module = CapaFactory.create(rerandomize="per_student", max_attempts=2, done=True)
+        module = CapaFactory.create(
+            rerandomize="per_student", max_attempts=2, done=True)
         self.assertTrue(module.should_show_save_button())
 
         # If survey question for capa (max_attempts = 0),
@@ -862,7 +880,8 @@ class CapaModuleTest(unittest.TestCase):
         module.should_show_save_button = Mock(return_value=show_save_button)
 
         # Mock the system rendering function
-        module.system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+        module.system.render_template = Mock(
+            return_value="<div>Test Template HTML</div>")
 
         # Patch the capa problem's HTML rendering
         with patch('capa.capa_problem.LoncapaProblem.get_html') as mock_html:
@@ -885,7 +904,8 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(template_name, "problem.html")
 
         context = render_args[1]
-        self.assertEqual(context['problem']['html'], "<div>Test Problem HTML</div>")
+        self.assertEqual(context['problem'][
+                         'html'], "<div>Test Problem HTML</div>")
         self.assertEqual(bool(context['check_button']), show_check_button)
         self.assertEqual(bool(context['reset_button']), show_reset_button)
         self.assertEqual(bool(context['save_button']), show_save_button)
@@ -897,13 +917,15 @@ class CapaModuleTest(unittest.TestCase):
         module1 = CapaFactory.create()
         module2 = CapaFactory.create()
 
-        # check to make sure that the input_state and the keys have the same values
+        # check to make sure that the input_state and the keys have the same
+        # values
         module1.set_state_from_lcp()
         self.assertEqual(module1.lcp.inputs.keys(), module1.input_state.keys())
 
         module2.set_state_from_lcp()
 
-        intersection = set(module2.input_state.keys()).intersection(set(module1.input_state.keys()))
+        intersection = set(module2.input_state.keys()).intersection(
+            set(module1.input_state.keys()))
         self.assertEqual(len(intersection), 0)
 
     def test_get_problem_html_error(self):
@@ -922,7 +944,8 @@ class CapaModuleTest(unittest.TestCase):
         module.lcp.get_html = Mock(side_effect=Exception("Test"))
 
         # Stub out the test_system rendering function
-        module.system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+        module.system.render_template = Mock(
+            return_value="<div>Test Template HTML</div>")
 
         # Turn off DEBUG
         module.system.DEBUG = False
@@ -1030,7 +1053,8 @@ class CapaModuleTest(unittest.TestCase):
                 # Since there's a small chance we might get the
                 # same seed again, give it 5 chances
                 # to generate a different seed
-                success = _retry_and_check(5, lambda: _reset_and_get_seed(module) != seed)
+                success = _retry_and_check(
+                    5, lambda: _reset_and_get_seed(module) != seed)
 
                 self.assertTrue(module.seed is not None)
                 msg = 'Could not get a new seed from reset after 5 tries'

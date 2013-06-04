@@ -10,25 +10,30 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'UserProfile.name'
-        db.alter_column('auth_userprofile', 'name', self.gf('django.db.models.fields.CharField')(max_length=255))
+        db.alter_column('auth_userprofile', 'name', self.gf(
+            'django.db.models.fields.CharField')(max_length=255))
 
         # Adding index on 'UserProfile', fields ['name']
         db.create_index('auth_userprofile', ['name'])
 
         # Changing field 'UserProfile.language'
-        db.alter_column('auth_userprofile', 'language', self.gf('django.db.models.fields.CharField')(max_length=255))
+        db.alter_column('auth_userprofile', 'language', self.gf(
+            'django.db.models.fields.CharField')(max_length=255))
 
         # Adding index on 'UserProfile', fields ['language']
         db.create_index('auth_userprofile', ['language'])
 
         # Changing field 'UserProfile.courseware'
-        db.alter_column('auth_userprofile', 'courseware', self.gf('django.db.models.fields.CharField')(max_length=255))
+        db.alter_column('auth_userprofile', 'courseware', self.gf(
+            'django.db.models.fields.CharField')(max_length=255))
 
         # Changing field 'UserProfile.meta'
-        db.alter_column('auth_userprofile', 'meta', self.gf('django.db.models.fields.CharField')(max_length=255))
+        db.alter_column('auth_userprofile', 'meta', self.gf(
+            'django.db.models.fields.CharField')(max_length=255))
 
         # Changing field 'UserProfile.location'
-        db.alter_column('auth_userprofile', 'location', self.gf('django.db.models.fields.CharField')(max_length=255))
+        db.alter_column('auth_userprofile', 'location', self.gf(
+            'django.db.models.fields.CharField')(max_length=255))
 
         # Adding index on 'UserProfile', fields ['location']
         db.create_index('auth_userprofile', ['location'])
@@ -45,19 +50,24 @@ class Migration(SchemaMigration):
         db.delete_index('auth_userprofile', ['name'])
 
         # Changing field 'UserProfile.name'
-        db.alter_column('auth_userprofile', 'name', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('auth_userprofile', 'name', self.gf(
+            'django.db.models.fields.TextField')())
 
         # Changing field 'UserProfile.language'
-        db.alter_column('auth_userprofile', 'language', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('auth_userprofile', 'language', self.gf(
+            'django.db.models.fields.TextField')())
 
         # Changing field 'UserProfile.courseware'
-        db.alter_column('auth_userprofile', 'courseware', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('auth_userprofile', 'courseware', self.gf(
+            'django.db.models.fields.TextField')())
 
         # Changing field 'UserProfile.meta'
-        db.alter_column('auth_userprofile', 'meta', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('auth_userprofile', 'meta', self.gf(
+            'django.db.models.fields.TextField')())
 
         # Changing field 'UserProfile.location'
-        db.alter_column('auth_userprofile', 'location', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('auth_userprofile', 'location', self.gf(
+            'django.db.models.fields.TextField')())
 
     models = {
         'auth.group': {

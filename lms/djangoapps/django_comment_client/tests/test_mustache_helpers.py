@@ -10,9 +10,12 @@ class PluralizeTest(TestCase):
         self.content = 'unused argument'
 
     def test_pluralize(self):
-        self.assertEqual(mustache_helpers.pluralize(self.content, self.text1), 'goats')
-        self.assertEqual(mustache_helpers.pluralize(self.content, self.text2), 'goat')
-        self.assertEqual(mustache_helpers.pluralize(self.content, self.text3), 'goats')
+        self.assertEqual(mustache_helpers.pluralize(
+            self.content, self.text1), 'goats')
+        self.assertEqual(mustache_helpers.pluralize(
+            self.content, self.text2), 'goat')
+        self.assertEqual(mustache_helpers.pluralize(
+            self.content, self.text3), 'goats')
 
 
 class CloseThreadTextTest(TestCase):
@@ -21,5 +24,7 @@ class CloseThreadTextTest(TestCase):
         self.contentOpen = {'closed': False}
 
     def test_close_thread_text(self):
-        self.assertEqual(mustache_helpers.close_thread_text(self.contentClosed), 'Re-open thread')
-        self.assertEqual(mustache_helpers.close_thread_text(self.contentOpen), 'Close thread')
+        self.assertEqual(mustache_helpers.close_thread_text(
+            self.contentClosed), 'Re-open thread')
+        self.assertEqual(mustache_helpers.close_thread_text(
+            self.contentOpen), 'Close thread')

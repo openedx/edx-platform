@@ -98,14 +98,14 @@ class PositionsCompare(list):
             return False
 
         if (isinstance(self[0], (list, int, float)) and
-            isinstance(other[0], (list, int, float))):
+                isinstance(other[0], (list, int, float))):
             return self.coordinate_positions_compare(other)
 
         elif (isinstance(self[0], (unicode, str)) and
               isinstance(other[0], (unicode, str))):
             return ''.join(self) == ''.join(other)
         else:  # improper argument types: no (float / int or lists of list
-            #and float / int pair) or two string / unicode lists pair
+            # and float / int pair) or two string / unicode lists pair
             return False
 
     def __ne__(self, other):
@@ -170,7 +170,8 @@ class DragAndDrop(object):
                 rule_values = self.correct_positions[index][current_rule]
                 # clean rule, do not do clean duplicate items
                 self.correct_positions[index].pop(current_rule, None)
-                parsed_rule = current_rule.replace('+', '').replace('number', '')
+                parsed_rule = current_rule.replace(
+                    '+', '').replace('number', '')
                 self.correct_positions[index][parsed_rule] = rule_values
             else:  # remove dublicates
                 self.user_groups[index] = list(set(self.user_groups[index]))
@@ -352,8 +353,8 @@ class DragAndDrop(object):
         # correct_answer entries.  If the draggable is mentioned in at least one
         # correct_answer entry, the value is False.
         # default to consider every user answer excess until proven otherwise.
-        self.excess_draggables = dict((users_draggable.keys()[0],True)
-            for users_draggable in user_answer)
+        self.excess_draggables = dict((users_draggable.keys()[0], True)
+                                      for users_draggable in user_answer)
 
         # Convert nested `user_answer` to flat format.
         user_answer = flat_user_answer(user_answer)
@@ -368,7 +369,7 @@ class DragAndDrop(object):
                 if draggable_name in answer['draggables']:
                     user_groups_data.append(draggable_name)
                     user_positions_data.append(
-                                            draggable_dict[draggable_name])
+                        draggable_dict[draggable_name])
                     # proved that this is not excess
                     self.excess_draggables[draggable_name] = False
 

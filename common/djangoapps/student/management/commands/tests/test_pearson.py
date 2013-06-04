@@ -20,18 +20,19 @@ log = logging.getLogger(__name__)
 
 
 def create_tc_user(username):
-    user = User.objects.create_user(username, '{}@edx.org'.format(username), 'fakepass')
+    user = User.objects.create_user(
+        username, '{}@edx.org'.format(username), 'fakepass')
     options = {
-                   'first_name': 'TestFirst',
-                   'last_name': 'TestLast',
-                   'address_1': 'Test Address',
-                   'city': 'TestCity',
-                   'state': 'Alberta',
-                   'postal_code': 'A0B 1C2',
-                   'country': 'CAN',
+        'first_name': 'TestFirst',
+        'last_name': 'TestLast',
+        'address_1': 'Test Address',
+        'city': 'TestCity',
+        'state': 'Alberta',
+        'postal_code': 'A0B 1C2',
+        'country': 'CAN',
                    'phone': '252-1866',
                    'phone_country_code': '1',
-                    }
+    }
     call_command('pearson_make_tc_user', username, **options)
     return TestCenterUser.objects.get(user=user)
 
@@ -45,7 +46,8 @@ def create_tc_registration(username, course_id='org1/course1/term1', exam_code='
                'create_dummy_exam': True,
                }
 
-    call_command('pearson_make_tc_registration', username, course_id, **options)
+    call_command('pearson_make_tc_registration',
+                 username, course_id, **options)
     user = User.objects.get(username=username)
     registrations = get_testcenter_registration(user, course_id, exam_code)
     return registrations[0]
@@ -91,7 +93,8 @@ def get_command_error_text(*args, **options):
         sys.stderr = old_stderr
 
     if stderr_string is None:
-        raise Exception("Expected call to {} to fail, but it succeeded!".format(args[0]))
+        raise Exception(
+            "Expected call to {} to fail, but it succeeded!".format(args[0]))
     return stderr_string
 
 
@@ -122,7 +125,8 @@ def get_error_string_for_management_call(*args, **options):
         sys.stderr = old_stderr
 
     if stdout_string is None:
-        raise Exception("Expected call to {} to fail, but it succeeded!".format(args[0]))
+        raise Exception(
+            "Expected call to {} to fail, but it succeeded!".format(args[0]))
     return stdout_string, stderr_string
 
 
@@ -137,7 +141,8 @@ def get_file_info(dirpath):
             numlines = len(filecontents)
             return filepath, numlines
     else:
-        raise Exception("Expected to find a single file in {}, but found {}".format(dirpath, filelist))
+        raise Exception("Expected to find a single file in {}, but found {}".format(
+            dirpath, filelist))
 
 
 class PearsonTestCase(TestCase):
@@ -146,7 +151,8 @@ class PearsonTestCase(TestCase):
     '''
 
     def assertErrorContains(self, error_message, expected):
-        self.assertTrue(error_message.find(expected) >= 0, 'error message "{}" did not contain "{}"'.format(error_message, expected))
+        self.assertTrue(error_message.find(
+            expected) >= 0, 'error message "{}" did not contain "{}"'.format(error_message, expected))
 
     def setUp(self):
         self.import_dir = mkdtemp(prefix="import")
@@ -168,15 +174,20 @@ class PearsonCommandTestCase(PearsonTestCase):
         # It is enough to show that it works here, but deal with test cases for the form
         # validation in the student tests, not these management tests.
         username = 'baduser'
-        User.objects.create_user(username, '{}@edx.org'.format(username), 'fakepass')
+        User.objects.create_user(
+            username, '{}@edx.org'.format(username), 'fakepass')
         options = {}
-        error_string = get_command_error_text('pearson_make_tc_user', username, **options)
-        self.assertTrue(error_string.find('Field Form errors encountered:') >= 0)
+        error_string = get_command_error_text(
+            'pearson_make_tc_user', username, **options)
+        self.assertTrue(error_string.find(
+            'Field Form errors encountered:') >= 0)
         self.assertTrue(error_string.find('Field Form Error:  city') >= 0)
-        self.assertTrue(error_string.find('Field Form Error:  first_name') >= 0)
+        self.assertTrue(error_string.find(
+            'Field Form Error:  first_name') >= 0)
         self.assertTrue(error_string.find('Field Form Error:  last_name') >= 0)
         self.assertTrue(error_string.find('Field Form Error:  country') >= 0)
-        self.assertTrue(error_string.find('Field Form Error:  phone_country_code') >= 0)
+        self.assertTrue(error_string.find(
+            'Field Form Error:  phone_country_code') >= 0)
         self.assertTrue(error_string.find('Field Form Error:  phone') >= 0)
         self.assertTrue(error_string.find('Field Form Error:  address_1') >= 0)
         self.assertErrorContains(error_string, 'Field Form Error:  address_1')
@@ -193,19 +204,23 @@ class PearsonCommandTestCase(PearsonTestCase):
 
     def test_cdd_missing_option(self):
         error_string = get_command_error_text('pearson_export_cdd', **{})
-        self.assertErrorContains(error_string, 'Error: --destination or --dest-from-settings must be used')
+        self.assertErrorContains(
+            error_string, 'Error: --destination or --dest-from-settings must be used')
 
     def test_ead_missing_option(self):
         error_string = get_command_error_text('pearson_export_ead', **{})
-        self.assertErrorContains(error_string, 'Error: --destination or --dest-from-settings must be used')
+        self.assertErrorContains(
+            error_string, 'Error: --destination or --dest-from-settings must be used')
 
     def test_export_single_cdd(self):
-        # before we generate any tc_users, we expect there to be nothing to output:
+        # before we generate any tc_users, we expect there to be nothing to
+        # output:
         options = {'dest-from-settings': True}
         with self.settings(PEARSON={'LOCAL_EXPORT': self.export_dir}):
             call_command('pearson_export_cdd', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 1, "Expect cdd file to have no non-header lines")
+            self.assertEquals(
+                numlines, 1, "Expect cdd file to have no non-header lines")
             os.remove(filepath)
 
             # generating a tc_user should result in a line in the output
@@ -213,13 +228,15 @@ class PearsonCommandTestCase(PearsonTestCase):
             create_tc_user(username)
             call_command('pearson_export_cdd', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 2, "Expect cdd file to have one non-header line")
+            self.assertEquals(
+                numlines, 2, "Expect cdd file to have one non-header line")
             os.remove(filepath)
 
             # output after registration should not have any entries again.
             call_command('pearson_export_cdd', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 1, "Expect cdd file to have no non-header lines")
+            self.assertEquals(
+                numlines, 1, "Expect cdd file to have no non-header lines")
             os.remove(filepath)
 
             # if we modify the record, then it should be output again:
@@ -227,16 +244,19 @@ class PearsonCommandTestCase(PearsonTestCase):
             call_command('pearson_make_tc_user', username, **user_options)
             call_command('pearson_export_cdd', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 2, "Expect cdd file to have one non-header line")
+            self.assertEquals(
+                numlines, 2, "Expect cdd file to have one non-header line")
             os.remove(filepath)
 
     def test_export_single_ead(self):
-        # before we generate any registrations, we expect there to be nothing to output:
+        # before we generate any registrations, we expect there to be nothing
+        # to output:
         options = {'dest-from-settings': True}
         with self.settings(PEARSON={'LOCAL_EXPORT': self.export_dir}):
             call_command('pearson_export_ead', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 1, "Expect ead file to have no non-header lines")
+            self.assertEquals(
+                numlines, 1, "Expect ead file to have no non-header lines")
             os.remove(filepath)
 
             # generating a registration should result in a line in the output
@@ -245,20 +265,23 @@ class PearsonCommandTestCase(PearsonTestCase):
             create_tc_registration(username)
             call_command('pearson_export_ead', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 2, "Expect ead file to have one non-header line")
+            self.assertEquals(
+                numlines, 2, "Expect ead file to have one non-header line")
             os.remove(filepath)
 
             # output after registration should not have any entries again.
             call_command('pearson_export_ead', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 1, "Expect ead file to have no non-header lines")
+            self.assertEquals(
+                numlines, 1, "Expect ead file to have no non-header lines")
             os.remove(filepath)
 
             # if we modify the record, then it should be output again:
             create_tc_registration(username, accommodation_code='EQPMNT')
             call_command('pearson_export_ead', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 2, "Expect ead file to have one non-header line")
+            self.assertEquals(
+                numlines, 2, "Expect ead file to have one non-header line")
             os.remove(filepath)
 
     def test_export_multiple(self):
@@ -267,12 +290,14 @@ class PearsonCommandTestCase(PearsonTestCase):
             options = {'dest-from-settings': True}
             call_command('pearson_export_cdd', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 5, "Expect cdd file to have four non-header lines: total was {}".format(numlines))
+            self.assertEquals(
+                numlines, 5, "Expect cdd file to have four non-header lines: total was {}".format(numlines))
             os.remove(filepath)
 
             call_command('pearson_export_ead', **options)
             (filepath, numlines) = get_file_info(self.export_dir)
-            self.assertEquals(numlines, 7, "Expect ead file to have six non-header lines: total was {}".format(numlines))
+            self.assertEquals(
+                numlines, 7, "Expect ead file to have six non-header lines: total was {}".format(numlines))
             os.remove(filepath)
 
 
@@ -285,7 +310,8 @@ class PearsonCommandTestCase(PearsonTestCase):
 #    def test_missing_demographic_user(self):
 #        username = 'nonuser'
 #        output_string, error_string = get_error_string_for_management_call('pearson_make_tc_user', username, **{})
-#        self.assertErrorContains(error_string, 'User matching query does not exist')
+# self.assertErrorContains(error_string, 'User matching query does not
+# exist')
 
 # credentials for a test SFTP site:
 SFTP_HOSTNAME = 'ec2-23-20-150-101.compute-1.amazonaws.com'
@@ -305,7 +331,8 @@ class PearsonTransferTestCase(PearsonTestCase):
     def test_transfer_config(self):
         with self.settings(DATADOG_API='FAKE_KEY'):
             # TODO: why is this failing with the wrong error message?!
-            stderrmsg = get_command_error_text('pearson_transfer', **{'mode': 'garbage'})
+            stderrmsg = get_command_error_text(
+                'pearson_transfer', **{'mode': 'garbage'})
             self.assertErrorContains(stderrmsg, 'Error: No PEARSON entries')
         with self.settings(DATADOG_API='FAKE_KEY'):
             stderrmsg = get_command_error_text('pearson_transfer')
@@ -314,7 +341,8 @@ class PearsonTransferTestCase(PearsonTestCase):
                            PEARSON={'LOCAL_EXPORT': self.export_dir,
                                     'LOCAL_IMPORT': self.import_dir}):
             stderrmsg = get_command_error_text('pearson_transfer')
-            self.assertErrorContains(stderrmsg, 'Error: No entry in the PEARSON settings')
+            self.assertErrorContains(
+                stderrmsg, 'Error: No entry in the PEARSON settings')
 
     def test_transfer_export_missing_dest_dir(self):
         raise SkipTest()
@@ -331,7 +359,8 @@ class PearsonTransferTestCase(PearsonTestCase):
                            AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY):
             options = {'mode': 'export'}
             stderrmsg = get_command_error_text('pearson_transfer', **options)
-            self.assertErrorContains(stderrmsg, 'Error: SFTP destination path does not exist')
+            self.assertErrorContains(
+                stderrmsg, 'Error: SFTP destination path does not exist')
 
     def test_transfer_export(self):
         raise SkipTest()
@@ -349,7 +378,8 @@ class PearsonTransferTestCase(PearsonTestCase):
             options = {'mode': 'export'}
 #            call_command('pearson_transfer', **options)
 #            # confirm that the export directory is still empty:
-#            self.assertEqual(len(os.listdir(self.export_dir)), 0, "expected export directory to be empty")
+# self.assertEqual(len(os.listdir(self.export_dir)), 0, "expected export
+# directory to be empty")
 
     def test_transfer_import_missing_source_dir(self):
         raise SkipTest()
@@ -366,7 +396,8 @@ class PearsonTransferTestCase(PearsonTestCase):
                            AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY):
             options = {'mode': 'import'}
             stderrmsg = get_command_error_text('pearson_transfer', **options)
-            self.assertErrorContains(stderrmsg, 'Error: SFTP source path does not exist')
+            self.assertErrorContains(
+                stderrmsg, 'Error: SFTP source path does not exist')
 
     def test_transfer_import(self):
         raise SkipTest()
@@ -383,4 +414,5 @@ class PearsonTransferTestCase(PearsonTestCase):
                            AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY):
             options = {'mode': 'import'}
             call_command('pearson_transfer', **options)
-            self.assertEqual(len(os.listdir(self.import_dir)), 0, "expected import directory to be empty")
+            self.assertEqual(len(os.listdir(
+                self.import_dir)), 0, "expected import directory to be empty")

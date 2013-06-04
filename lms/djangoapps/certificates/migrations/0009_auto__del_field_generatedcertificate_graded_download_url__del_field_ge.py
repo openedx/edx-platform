@@ -9,37 +9,46 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Deleting field 'GeneratedCertificate.graded_download_url'
-        db.delete_column('certificates_generatedcertificate', 'graded_download_url')
+        db.delete_column(
+            'certificates_generatedcertificate', 'graded_download_url')
 
         # Deleting field 'GeneratedCertificate.graded_certificate_id'
-        db.delete_column('certificates_generatedcertificate', 'graded_certificate_id')
+        db.delete_column(
+            'certificates_generatedcertificate', 'graded_certificate_id')
 
         # Adding field 'GeneratedCertificate.distinction'
         db.add_column('certificates_generatedcertificate', 'distinction',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      self.gf('django.db.models.fields.BooleanField')(
+                          default=False),
                       keep_default=False)
 
-        # Adding unique constraint on 'GeneratedCertificate', fields ['course_id', 'user']
-        db.create_unique('certificates_generatedcertificate', ['course_id', 'user_id'])
-
+        # Adding unique constraint on 'GeneratedCertificate', fields
+        # ['course_id', 'user']
+        db.create_unique('certificates_generatedcertificate', [
+                         'course_id', 'user_id'])
 
     def backwards(self, orm):
-        # Removing unique constraint on 'GeneratedCertificate', fields ['course_id', 'user']
-        db.delete_unique('certificates_generatedcertificate', ['course_id', 'user_id'])
+        # Removing unique constraint on 'GeneratedCertificate', fields
+        # ['course_id', 'user']
+        db.delete_unique('certificates_generatedcertificate', [
+                         'course_id', 'user_id'])
 
         # Adding field 'GeneratedCertificate.graded_download_url'
-        db.add_column('certificates_generatedcertificate', 'graded_download_url',
-                      self.gf('django.db.models.fields.CharField')(default=False, max_length=128),
-                      keep_default=False)
+        db.add_column(
+            'certificates_generatedcertificate', 'graded_download_url',
+            self.gf('django.db.models.fields.CharField')(
+                default=False, max_length=128),
+            keep_default=False)
 
         # Adding field 'GeneratedCertificate.graded_certificate_id'
-        db.add_column('certificates_generatedcertificate', 'graded_certificate_id',
-                      self.gf('django.db.models.fields.CharField')(default=False, max_length=32),
-                      keep_default=False)
+        db.add_column(
+            'certificates_generatedcertificate', 'graded_certificate_id',
+            self.gf('django.db.models.fields.CharField')(
+                default=False, max_length=32),
+            keep_default=False)
 
         # Deleting field 'GeneratedCertificate.distinction'
         db.delete_column('certificates_generatedcertificate', 'distinction')
-
 
     models = {
         'auth.group': {

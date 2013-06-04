@@ -68,18 +68,23 @@ class Command(BaseCommand):
             try:
                 module = StudentModule.objects.get(id=student_module_id)
             except StudentModule.DoesNotExist:
-                LOG.error("Unable to find student module with id = {0}: skipping... ".format(student_module_id))
+                LOG.error("Unable to find student module with id = {0}: skipping... ".format(
+                    student_module_id))
                 continue
             self.remove_studentmodule_input_state(module, save_changes)
 
-            hist_modules = StudentModuleHistory.objects.filter(student_module_id=student_module_id)
+            hist_modules = StudentModuleHistory.objects.filter(
+                student_module_id=student_module_id)
             for hist_module in hist_modules:
-                self.remove_studentmodulehistory_input_state(hist_module, save_changes)
+                self.remove_studentmodulehistory_input_state(
+                    hist_module, save_changes)
 
             if self.num_visited % 1000 == 0:
-                LOG.info(" Progress: updated {0} of {1} student modules".format(self.num_changed, self.num_visited))
-                LOG.info(" Progress: updated {0} of {1} student history modules".format(self.num_hist_changed,
-                                                                                        self.num_hist_visited))
+                LOG.info(" Progress: updated {0} of {1} student modules".format(
+                    self.num_changed, self.num_visited))
+                LOG.info(
+                    " Progress: updated {0} of {1} student history modules".format(self.num_hist_changed,
+                                                                                   self.num_hist_visited))
 
     @transaction.autocommit
     def remove_studentmodule_input_state(self, module, save_changes):
@@ -88,8 +93,9 @@ class Command(BaseCommand):
         if module_state is None:
             # not likely, since we filter on it.  But in general...
             LOG.info("No state found for {type} module {id} for student {student} in course {course_id}"
-                     .format(type=module.module_type, id=module.module_state_key,
-                             student=module.student.username, course_id=module.course_id))
+                     .format(
+                         type=module.module_type, id=module.module_state_key,
+                     student=module.student.username, course_id=module.course_id))
             return
 
         state_dict = json.loads(module_state)
@@ -104,7 +110,8 @@ class Command(BaseCommand):
             module.save()
             self.num_changed += 1
         else:
-            # don't make the change, but increment the count indicating the change would be made
+            # don't make the change, but increment the count indicating the
+            # change would be made
             self.num_changed += 1
 
     @transaction.autocommit
@@ -114,8 +121,9 @@ class Command(BaseCommand):
         if module_state is None:
             # not likely, since we filter on it.  But in general...
             LOG.info("No state found for {type} module {id} for student {student} in course {course_id}"
-                     .format(type=module.module_type, id=module.module_state_key,
-                             student=module.student.username, course_id=module.course_id))
+                     .format(
+                         type=module.module_type, id=module.module_state_key,
+                     student=module.student.username, course_id=module.course_id))
             return
 
         state_dict = json.loads(module_state)
@@ -130,7 +138,8 @@ class Command(BaseCommand):
             module.save()
             self.num_hist_changed += 1
         else:
-            # don't make the change, but increment the count indicating the change would be made
+            # don't make the change, but increment the count indicating the
+            # change would be made
             self.num_hist_changed += 1
 
     def handle(self, *args, **options):
@@ -139,10 +148,13 @@ class Command(BaseCommand):
             raise CommandError("missing idlist file")
         idlist_path = args[0]
         save_changes = options['save_changes']
-        LOG.info("Starting run:  reading from idlist file {0}; save_changes = {1}".format(idlist_path, save_changes))
+        LOG.info("Starting run:  reading from idlist file {0}; save_changes = {1}".format(
+            idlist_path, save_changes))
 
         self.fix_studentmodules_in_list(save_changes, idlist_path)
 
-        LOG.info("Finished run:  updating {0} of {1} student modules".format(self.num_changed, self.num_visited))
-        LOG.info("Finished run:  updating {0} of {1} student history modules".format(self.num_hist_changed,
-                                                                                     self.num_hist_visited))
+        LOG.info("Finished run:  updating {0} of {1} student modules".format(
+            self.num_changed, self.num_visited))
+        LOG.info(
+            "Finished run:  updating {0} of {1} student history modules".format(self.num_hist_changed,
+                                                                                self.num_hist_visited))

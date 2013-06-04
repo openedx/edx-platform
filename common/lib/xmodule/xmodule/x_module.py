@@ -105,7 +105,6 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
     # in the module
     icon_class = 'other'
 
-
     def __init__(self, system, location, descriptor, model_data):
         '''
         Construct a new xmodule
@@ -150,7 +149,8 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         if self._loaded_children is None:
             child_descriptors = self.get_child_descriptors()
-            children = [self.system.get_module(descriptor) for descriptor in child_descriptors]
+            children = [self.system.get_module(
+                descriptor) for descriptor in child_descriptors]
             # get_module returns None if the current user doesn't have access
             # to the location.
             self._loaded_children = [c for c in children if c is not None]
@@ -255,7 +255,8 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         return ""
 
     # cdodge: added to support dynamic substitutions of
-    # links for courseware assets (e.g. images). <link> is passed through from lxml.html parser
+    # links for courseware assets (e.g. images). <link> is passed through from
+    # lxml.html parser
     def rewrite_content_links(self, link):
         # see if we start with our format, e.g. 'xasset:<filename>'
         if link.startswith(XASSET_SRCREF_PREFIX):
@@ -263,7 +264,8 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
             name = link[len(XASSET_SRCREF_PREFIX):]
             loc = Location(self.location)
             # resolve the reference to our internal 'filepath' which
-            link = StaticContent.compute_location_filename(loc.org, loc.course, name)
+            link = StaticContent.compute_location_filename(
+                loc.org, loc.course, name)
 
         return link
 
@@ -302,9 +304,11 @@ class ResourceTemplates(object):
 
         for template_file in resource_listdir(__name__, dirname):
             if not template_file.endswith('.yaml'):
-                log.warning("Skipping unknown template file %s" % template_file)
+                log.warning(
+                    "Skipping unknown template file %s" % template_file)
                 continue
-            template_content = resource_string(__name__, os.path.join(dirname, template_file))
+            template_content = resource_string(
+                __name__, os.path.join(dirname, template_file))
             template = yaml.safe_load(template_content)
             templates.append(Template(**template))
 
@@ -422,7 +426,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 try:
                     child = self.system.load_item(child_loc)
                 except ItemNotFoundError:
-                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                    log.exception('Unable to load item {loc}, skipping'.format(
+                        loc=child_loc))
                     continue
                 self._child_instances.append(child)
 
@@ -460,7 +465,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return False
 
-    # ================================= JSON PARSING ===========================
+    # ================================= JSON PARSING =========================
     @staticmethod
     def load_from_json(json_data, system, default_class=None):
         """
@@ -521,7 +526,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         'VS[compat]'
         return cls.metadata_translations.get(key, key)
 
-    # ================================= XML PARSING ============================
+    # ================================= XML PARSING ==========================
     @staticmethod
     def load_from_xml(xml_data,
                       system,
@@ -582,7 +587,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         raise NotImplementedError(
             'Modules must implement export_to_xml to enable xml export')
 
-    # =============================== Testing ==================================
+    # =============================== Testing ================================
     def get_sample_state(self):
         """
         Return a list of tuples of instance_state, shared_state. Each tuple
@@ -590,22 +595,22 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return [('{}', '{}')]
 
-    # =============================== BUILTIN METHODS ==========================
+    # =============================== BUILTIN METHODS ========================
     def __eq__(self, other):
         eq = (self.__class__ == other.__class__ and
-                all(getattr(self, attr, None) == getattr(other, attr, None)
-                    for attr in self.equality_attributes))
+              all(getattr(self, attr, None) == getattr(other, attr, None)
+                  for attr in self.equality_attributes))
 
         return eq
 
     def __repr__(self):
         return ("{class_}({system!r}, location={location!r},"
                 " model_data={model_data!r})".format(
-            class_=self.__class__.__name__,
-            system=self.system,
-            location=self.location,
-            model_data=self._model_data,
-        ))
+                    class_=self.__class__.__name__,
+                    system=self.system,
+                    location=self.location,
+                    model_data=self._model_data,
+                ))
 
     @property
     def non_editable_metadata_fields(self):
@@ -614,7 +619,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         When overriding, be sure to append to the superclasses' list.
         """
-        # We are not allowing editing of xblock tag and name fields at this time (for any component).
+        # We are not allowing editing of xblock tag and name fields at this
+        # time (for any component).
         return [XBlock.tags, XBlock.name]
 
     @property
@@ -638,16 +644,19 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             explicitly_set = field.name in self._model_data
             if field.name in inheritable_metadata:
                 inheritable = True
-                default_value = field.from_json(inheritable_metadata.get(field.name))
+                default_value = field.from_json(
+                    inheritable_metadata.get(field.name))
                 if field.name in inherited_metadata:
                     explicitly_set = False
 
             # We support the following editors:
             # 1. A select editor for fields with a list of possible values (includes Booleans).
             # 2. Number editors for integers and floats.
-            # 3. A generic string editor for anything else (editing JSON representation of the value).
+            # 3. A generic string editor for anything else (editing JSON
+            # representation of the value).
             type = "Generic"
-            values = [] if field.values is None else copy.deepcopy(field.values)
+            values = [] if field.values is None else copy.deepcopy(
+                field.values)
             if isinstance(values, tuple):
                 values = list(values)
             if isinstance(values, list):
@@ -656,7 +665,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 for index, choice in enumerate(values):
                     json_choice = copy.deepcopy(choice)
                     if isinstance(json_choice, dict) and 'value' in json_choice:
-                        json_choice['value'] = field.to_json(json_choice['value'])
+                        json_choice['value'] = field.to_json(
+                            json_choice['value'])
                     else:
                         json_choice = field.to_json(json_choice)
                     values[index] = json_choice
@@ -767,7 +777,7 @@ class ModuleSystem(object):
                  s3_interface=None,
                  cache=None,
                  can_execute_unsafe_code=None,
-    ):
+                 ):
         '''
         Create a closure around the system environment.
 
@@ -842,7 +852,8 @@ class ModuleSystem(object):
         self.s3_interface = s3_interface
 
         self.cache = cache or DoNothingCache()
-        self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
+        self.can_execute_unsafe_code = can_execute_unsafe_code or (
+            lambda: False)
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

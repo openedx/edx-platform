@@ -16,8 +16,8 @@ from xmodule.modulestore import Location
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-#db = "ocwtutor"	# for debugging
-#db = "default"
+# db = "ocwtutor"	# for debugging
+# db = "default"
 
 db = getattr(settings, 'DATABASE_FOR_PSYCHOMETRICS', 'default')
 
@@ -30,8 +30,8 @@ class Command(BaseCommand):
 
         # delete all pmd
 
-        #PsychometricData.objects.all().delete()
-        #PsychometricData.objects.using(db).all().delete()
+        # PsychometricData.objects.all().delete()
+        # PsychometricData.objects.using(db).all().delete()
 
         smset = StudentModule.objects.using(db).exclude(max_grade=None)
 
@@ -49,7 +49,8 @@ class Command(BaseCommand):
 
             if done:			# only keep if problem completed
                 try:
-                    pmd = PsychometricData.objects.using(db).get(studentmodule=sm)
+                    pmd = PsychometricData.objects.using(
+                        db).get(studentmodule=sm)
                 except PsychometricData.DoesNotExist:
                     pmd = PsychometricData(studentmodule=sm)
 
@@ -58,7 +59,8 @@ class Command(BaseCommand):
 
                 # get attempt times from tracking log
                 uname = sm.student.username
-                tset = TrackingLog.objects.using(db).filter(username=uname, event_type__contains='save_problem_check')
+                tset = TrackingLog.objects.using(db).filter(
+                    username=uname, event_type__contains='save_problem_check')
                 tset = tset.filter(event_source='server')
                 tset = tset.filter(event__contains="'%s'" % url)
                 checktimes = [x.dtcreated for x in tset]
@@ -66,7 +68,7 @@ class Command(BaseCommand):
                 if not len(checktimes) == pmd.attempts:
                     print "Oops, mismatch in number of attempts and check times for %s" % pmd
 
-                #print pmd
+                # print pmd
                 pmd.save(using=db)
 
         print "%d PMD entries" % PsychometricData.objects.using(db).all().count()

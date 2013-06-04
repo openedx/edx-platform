@@ -21,7 +21,8 @@ def initialize_course_tabs(course):
     # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
     # at least a list populated with the minimal times
     # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
-    # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
+    # place for this. Also rather than using a simple list of dictionaries a
+    # nice class model would be helpful here
 
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.
@@ -31,7 +32,8 @@ def initialize_course_tabs(course):
                    {"type": "wiki", "name": "Wiki"},
                    {"type": "progress", "name": "Progress"}]
 
-    modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
+    modulestore('direct').update_metadata(
+        course.location.url(), own_metadata(course))
 
 
 @login_required
@@ -47,7 +49,8 @@ def reorder_static_tabs(request):
     # make sure they are the same lengths (i.e. the number of passed in tabs equals the number
     # that we know about) otherwise we can drop some!
 
-    existing_static_tabs = [t for t in course.tabs if t['type'] == 'static_tab']
+    existing_static_tabs = [t for t in course.tabs if t[
+        'type'] == 'static_tab']
     if len(existing_static_tabs) != len(tabs):
         return HttpResponseBadRequest()
 
@@ -74,7 +77,8 @@ def reorder_static_tabs(request):
 
     # OK, re-assemble the static tabs in the new order
     course.tabs = reordered_tabs
-    modulestore('direct').update_metadata(course.location, own_metadata(course))
+    modulestore('direct').update_metadata(
+        course.location, own_metadata(course))
     return HttpResponse()
 
 
@@ -88,17 +92,21 @@ def edit_tabs(request, org, course, coursename):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    # see tabs have been uninitialized (e.g. supporing courses created before tab support in studio)
+    # see tabs have been uninitialized (e.g. supporing courses created before
+    # tab support in studio)
     if course_item.tabs is None or len(course_item.tabs) == 0:
         initialize_course_tabs(course_item)
 
     # first get all static tabs from the tabs list
-    # we do this because this is also the order in which items are displayed in the LMS
-    static_tabs_refs = [t for t in course_item.tabs if t['type'] == 'static_tab']
+    # we do this because this is also the order in which items are displayed
+    # in the LMS
+    static_tabs_refs = [t for t in course_item.tabs if t[
+        'type'] == 'static_tab']
 
     static_tabs = []
     for static_tab_ref in static_tabs_refs:
-        static_tab_loc = Location(location)._replace(category='static_tab', name=static_tab_ref['url_slug'])
+        static_tab_loc = Location(location)._replace(
+            category='static_tab', name=static_tab_ref['url_slug'])
         static_tabs.append(modulestore('direct').get_item(static_tab_loc))
 
     components = [

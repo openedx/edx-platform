@@ -39,7 +39,8 @@ class CircuitExtension(markdown.Extension):
         ## easier to match
         md.preprocessors.add('circuit', CircuitPreprocessor(md), "_begin")
 
-        pattern = CircuitLink(r'processed-schematic:(?P<data>.*?)processed-schematic-end')
+        pattern = CircuitLink(
+            r'processed-schematic:(?P<data>.*?)processed-schematic-end')
         pattern.md = md
         pattern.ext = self
         md.inlinePatterns.add('circuit', pattern, "<reference")
@@ -50,6 +51,7 @@ class CircuitPreprocessor(markdown.preprocessors.Preprocessor):
 
     def run(self, lines):
         print "running circuit preprocessor"
+
         def convertLine(line):
             m = self.preRegex.match(line)
             if m:

@@ -37,9 +37,11 @@ class ResponseTest(unittest.TestCase):
         input_dict = {'1_2_1': submission}
         correct_map = problem.grade_answers(input_dict)
         if msg is None:
-            self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness)
+            self.assertEquals(correct_map.get_correctness(
+                '1_2_1'), expected_correctness)
         else:
-            self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness, msg)
+            self.assertEquals(correct_map.get_correctness(
+                '1_2_1'), expected_correctness, msg)
 
     def assert_answer_format(self, problem):
         answers = problem.get_question_answers()
@@ -47,12 +49,14 @@ class ResponseTest(unittest.TestCase):
 
     def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):
         for input_str in correct_answers:
-            result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
+            result = problem.grade_answers({
+                                           '1_2_1': input_str}).get_correctness('1_2_1')
             self.assertEqual(result, 'correct',
                              msg="%s should be marked correct" % str(input_str))
 
         for input_str in incorrect_answers:
-            result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
+            result = problem.grade_answers({
+                                           '1_2_1': input_str}).get_correctness('1_2_1')
             self.assertEqual(result, 'incorrect',
                              msg="%s should be marked incorrect" % str(input_str))
 
@@ -91,7 +95,8 @@ class TrueFalseResponseTest(ResponseTest):
         self.assert_grade(problem, 'choice_0', 'incorrect')
         self.assert_grade(problem, 'choice_1', 'incorrect')
         self.assert_grade(problem, 'choice_2', 'incorrect')
-        self.assert_grade(problem, ['choice_0', 'choice_1', 'choice_2'], 'incorrect')
+        self.assert_grade(problem, [
+                          'choice_0', 'choice_1', 'choice_2'], 'incorrect')
         self.assert_grade(problem, ['choice_0', 'choice_2'], 'incorrect')
         self.assert_grade(problem, ['choice_0', 'choice_1'], 'incorrect')
         self.assert_grade(problem, ['choice_1', 'choice_2'], 'correct')
@@ -109,10 +114,14 @@ class TrueFalseResponseTest(ResponseTest):
         self.assert_grade(problem, 'choice_foil_1', 'incorrect')
         self.assert_grade(problem, 'choice_foil_2', 'incorrect')
         self.assert_grade(problem, 'choice_foil_3', 'incorrect')
-        self.assert_grade(problem, ['choice_foil_1', 'choice_foil_2', 'choice_foil_3'], 'incorrect')
-        self.assert_grade(problem, ['choice_foil_1', 'choice_foil_3'], 'incorrect')
-        self.assert_grade(problem, ['choice_foil_1', 'choice_foil_2'], 'incorrect')
-        self.assert_grade(problem, ['choice_foil_2', 'choice_foil_3'], 'correct')
+        self.assert_grade(problem, [
+                          'choice_foil_1', 'choice_foil_2', 'choice_foil_3'], 'incorrect')
+        self.assert_grade(problem, [
+                          'choice_foil_1', 'choice_foil_3'], 'incorrect')
+        self.assert_grade(problem, [
+                          'choice_foil_1', 'choice_foil_2'], 'incorrect')
+        self.assert_grade(problem, [
+                          'choice_foil_2', 'choice_foil_3'], 'correct')
 
         # Invalid choices should be marked incorrect
         self.assert_grade(problem, 'choice_foil_4', 'incorrect')
@@ -169,8 +178,10 @@ class ImageResponseTest(ResponseTest):
         rectangle_str = "(100,100)-(200,200)"
         region_str = "[[10,10], [20,10], [20, 30]]"
 
-        # Expect that only points inside the rectangle or region are marked correct
-        problem = self.build_problem(regions=region_str, rectangle=rectangle_str)
+        # Expect that only points inside the rectangle or region are marked
+        # correct
+        problem = self.build_problem(
+            regions=region_str, rectangle=rectangle_str)
         correct_inputs = ["[13,12]", "[110,112]"]
         incorrect_inputs = ["[0,0]", "[600,300]"]
         self.assert_multiple_grade(problem, correct_inputs, incorrect_inputs)
@@ -179,7 +190,8 @@ class ImageResponseTest(ResponseTest):
         rectangle_str = "(100,100)-(200,200)"
         region_str = "[[10,10], [20,10], [20, 30]]"
 
-        problem = self.build_problem(regions=region_str, rectangle=rectangle_str)
+        problem = self.build_problem(
+            regions=region_str, rectangle=rectangle_str)
         self.assert_answer_format(problem)
 
 
@@ -207,7 +219,8 @@ class SymbolicResponseTest(ResponseTest):
         ]
 
         for (input_str, input_mathml) in correct_inputs:
-            self._assert_symbolic_grade(problem, input_str, input_mathml, 'correct')
+            self._assert_symbolic_grade(
+                problem, input_str, input_mathml, 'correct')
 
         # Incorrect answers
         incorrect_inputs = [
@@ -220,12 +233,13 @@ class SymbolicResponseTest(ResponseTest):
         ]
 
         for (input_str, input_mathml) in incorrect_inputs:
-            self._assert_symbolic_grade(problem, input_str, input_mathml, 'incorrect')
+            self._assert_symbolic_grade(
+                problem, input_str, input_mathml, 'incorrect')
 
     def test_complex_number_grade(self):
         problem = self.build_problem(math_display=True,
-            expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
-            options=["matrix", "imaginary"])
+                                     expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
+                                     options=["matrix", "imaginary"])
 
         # For LaTeX-style inputs, symmath_check() will try to contact
         # a server to convert the input to MathML.
@@ -233,8 +247,10 @@ class SymbolicResponseTest(ResponseTest):
         # for this input.
         import requests
         dirpath = os.path.dirname(__file__)
-        correct_snuggletex_response = open(os.path.join(dirpath, "test_files/snuggletex_correct.html")).read().decode('utf8')
-        wrong_snuggletex_response = open(os.path.join(dirpath, "test_files/snuggletex_wrong.html")).read().decode('utf8')
+        correct_snuggletex_response = open(os.path.join(
+            dirpath, "test_files/snuggletex_correct.html")).read().decode('utf8')
+        wrong_snuggletex_response = open(os.path.join(
+            dirpath, "test_files/snuggletex_wrong.html")).read().decode('utf8')
 
         # Correct answer
         with mock.patch.object(requests, 'post') as mock_post:
@@ -244,8 +260,8 @@ class SymbolicResponseTest(ResponseTest):
             mock_post.return_value.text = correct_snuggletex_response
 
             self._assert_symbolic_grade(problem,
-                "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]",
-                textwrap.dedent("""
+                                        "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]",
+                                        textwrap.dedent("""
                 <math xmlns="http://www.w3.org/1998/Math/MathML">
                   <mstyle displaystyle="true">
                     <mrow>
@@ -290,7 +306,7 @@ class SymbolicResponseTest(ResponseTest):
                   </mstyle>
                 </math>
                 """),
-                'correct')
+                                        'correct')
 
         # Incorrect answer
         with mock.patch.object(requests, 'post') as mock_post:
@@ -300,12 +316,12 @@ class SymbolicResponseTest(ResponseTest):
             mock_post.return_value.text = wrong_snuggletex_response
 
             self._assert_symbolic_grade(problem, "2",
-                    textwrap.dedent("""
+                                        textwrap.dedent("""
                     <math xmlns="http://www.w3.org/1998/Math/MathML">
                       <mstyle displaystyle="true"><mn>2</mn></mstyle>
                     </math>
                     """),
-                'incorrect')
+                                        'incorrect')
 
     def test_multiple_inputs_exception(self):
 
@@ -313,20 +329,20 @@ class SymbolicResponseTest(ResponseTest):
         # only one "expect" value
         with self.assertRaises(Exception):
             problem = self.build_problem(math_display=True,
-                                        expect="2*x+3*y",
-                                        num_inputs=3)
+                                         expect="2*x+3*y",
+                                         num_inputs=3)
 
     def _assert_symbolic_grade(self, problem,
-                                student_input,
-                                dynamath_input,
-                                expected_correctness):
+                               student_input,
+                               dynamath_input,
+                               expected_correctness):
         input_dict = {'1_2_1': str(student_input),
-                        '1_2_1_dynamath': str(dynamath_input)}
+                      '1_2_1_dynamath': str(dynamath_input)}
 
         correct_map = problem.grade_answers(input_dict)
 
         self.assertEqual(correct_map.get_correctness('1_2_1'),
-                        expected_correctness)
+                         expected_correctness)
 
 
 class OptionResponseTest(ResponseTest):
@@ -435,7 +451,8 @@ class FormulaResponseTest(ResponseTest):
         """
         Test parallel resistors
         """
-        sample_dict = {'R1': (10, 10), 'R2': (2, 2), 'R3': (5, 5), 'R4': (1, 1)}
+        sample_dict = {'R1': (10, 10), 'R2': (
+            2, 2), 'R3': (5, 5), 'R4': (1, 1)}
 
         # Test problem
         problem = self.build_problem(sample_dict=sample_dict,
@@ -463,9 +480,11 @@ class FormulaResponseTest(ResponseTest):
 
         # Sample x in the range [-10,10]
         sample_dict = {'x': (-10, 10)}
-        default_variables = [('j', 2, 3), ('e', 2, 3), ('pi', 2, 3), ('c', 2, 3), ('T', 2, 3),
-                             ('k', 2 * 10 ** 23, 3 * 10 ** 23),   # note k = scipy.constants.k = 1.3806488e-23
-                             ('q', 2 * 10 ** 19, 3 * 10 ** 19)]   # note k = scipy.constants.e = 1.602176565e-19
+        default_variables = [(
+            'j', 2, 3), ('e', 2, 3), ('pi', 2, 3), ('c', 2, 3), ('T', 2, 3),
+            ('k', 2 * 10 ** 23, 3 * 10 ** 23),
+            # note k = scipy.constants.k = 1.3806488e-23
+            ('q', 2 * 10 ** 19, 3 * 10 ** 19)]   # note k = scipy.constants.e = 1.602176565e-19
         for (var, cscalar, iscalar) in default_variables:
             # The expected solution is numerically equivalent to cscalar*var
             correct = '{0}*x*{1}'.format(cscalar, var)
@@ -495,14 +514,19 @@ class FormulaResponseTest(ResponseTest):
                        'y': (1, 10),    # Sample y in the range [1,10] - logs, arccos need positive inputs
                        'z': (-1, 1),    # Sample z in the range [1,10] - for arcsin, arctan
                        'w': (w, w)}     # Sample w is a random, positive integer - factorial needs a positive, integer input,
-                                        # and the way formularesponse is defined, we can only specify a float range
+                                        # and the way formularesponse is
+                                        # defined, we can only specify a float
+                                        # range
 
-        default_functions = [('sin', 2, 3, 'x'), ('cos', 2, 3, 'x'), ('tan', 2, 3, 'x'), ('sqrt', 2, 3, 'y'), ('log10', 2, 3, 'y'),
-                             ('log2', 2, 3, 'y'), ('ln', 2, 3, 'y'), ('arccos', 2, 3, 'z'), ('arcsin', 2, 3, 'z'), ('arctan', 2, 3, 'x'),
-                             ('abs', 2, 3, 'x'), ('fact', 2, 3, 'w'), ('factorial', 2, 3, 'w')]
+        default_functions = [(
+            'sin', 2, 3, 'x'), ('cos', 2, 3, 'x'), ('tan', 2, 3, 'x'), ('sqrt', 2, 3, 'y'), ('log10', 2, 3, 'y'),
+            ('log2', 2, 3, 'y'), ('ln', 2, 3, 'y'), ('arccos', 2, 3, 'z'), (
+                'arcsin', 2, 3, 'z'), ('arctan', 2, 3, 'x'),
+            ('abs', 2, 3, 'x'), ('fact', 2, 3, 'w'), ('factorial', 2, 3, 'w')]
         for (func, cscalar, iscalar, var) in default_functions:
             print 'func is: {0}'.format(func)
-            # The expected solution is numerically equivalent to cscalar*func(var)
+            # The expected solution is numerically equivalent to
+            # cscalar*func(var)
             correct = '{0}*{1}({2})'.format(cscalar, func, var)
             incorrect = '{0}*{1}({2})'.format(iscalar, func, var)
             problem = self.build_problem(sample_dict=sample_dict,
@@ -549,7 +573,8 @@ class FormulaResponseTest(ResponseTest):
                                      tolerance="1%",
                                      answer="x")
         # Expect an incorrect answer (+ nan) to be marked incorrect
-        # Right now this evaluates to 'nan' for a given x (Python implementation-dependent)
+        # Right now this evaluates to 'nan' for a given x (Python
+        # implementation-dependent)
         input_formula = "10*x + 0*1e999"
         self.assert_grade(problem, input_formula, "incorrect")
         # Expect an correct answer (+ nan) to be marked incorrect
@@ -595,8 +620,9 @@ class StringResponseTest(ResponseTest):
         self.assert_grade(problem, "Other String", "incorrect")
 
     def test_hints(self):
-        hints = [("wisconsin", "wisc", "The state capital of Wisconsin is Madison"),
-                 ("minnesota", "minn", "The state capital of Minnesota is St. Paul")]
+        hints = [(
+            "wisconsin", "wisc", "The state capital of Wisconsin is Madison"),
+            ("minnesota", "minn", "The state capital of Minnesota is St. Paul")]
 
         problem = self.build_problem(answer="Michigan",
                                      case_sensitive=False,
@@ -666,7 +692,8 @@ class CodeResponseTest(ResponseTest):
 
         answer_ids = sorted(self.problem.get_question_answers())
 
-        # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
+        # CodeResponse requires internal CorrectMap state. Build it now in the
+        # unqueued state
         cmap = CorrectMap()
         for answer_id in answer_ids:
             cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
@@ -678,7 +705,8 @@ class CodeResponseTest(ResponseTest):
         cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuestate = CodeResponseTest.make_queuestate(i, datetime.now())
-            cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+            cmap.update(CorrectMap(answer_id=answer_ids[
+                        i], queuestate=queuestate))
         self.problem.correct_map.update(cmap)
 
         self.assertEquals(self.problem.is_queued(), True)
@@ -689,17 +717,22 @@ class CodeResponseTest(ResponseTest):
         '''
         answer_ids = sorted(self.problem.get_question_answers())
 
-        # CodeResponse requires internal CorrectMap state. Build it now in the queued state
+        # CodeResponse requires internal CorrectMap state. Build it now in the
+        # queued state
         old_cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
-            queuestate = CodeResponseTest.make_queuestate(1000 + i, datetime.now())
-            old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+            queuestate = CodeResponseTest.make_queuestate(
+                1000 + i, datetime.now())
+            old_cmap.update(CorrectMap(answer_id=answer_ids[
+                            i], queuestate=queuestate))
 
         # Message format common to external graders
         grader_msg = '<span>MESSAGE</span>'   # Must be valid XML
-        correct_score_msg = json.dumps({'correct': True, 'score': 1, 'msg': grader_msg})
-        incorrect_score_msg = json.dumps({'correct': False, 'score': 0, 'msg': grader_msg})
+        correct_score_msg = json.dumps({
+                                       'correct': True, 'score': 1, 'msg': grader_msg})
+        incorrect_score_msg = json.dumps({
+                                         'correct': False, 'score': 0, 'msg': grader_msg})
 
         xserver_msgs = {'correct': correct_score_msg,
                         'incorrect': incorrect_score_msg, }
@@ -710,10 +743,12 @@ class CodeResponseTest(ResponseTest):
             self.problem.correct_map.update(old_cmap)  # Deep copy
 
             self.problem.update_score(xserver_msgs[correctness], queuekey=0)
-            self.assertEquals(self.problem.correct_map.get_dict(), old_cmap.get_dict())  # Deep comparison
+            self.assertEquals(
+                self.problem.correct_map.get_dict(), old_cmap.get_dict())  # Deep comparison
 
             for answer_id in answer_ids:
-                self.assertTrue(self.problem.correct_map.is_queued(answer_id))  # Should be still queued, since message undelivered
+                self.assertTrue(self.problem.correct_map.is_queued(
+                    answer_id))  # Should be still queued, since message undelivered
 
         # Correct queuekey, state should be updated
         for correctness in ['correct', 'incorrect']:
@@ -724,16 +759,21 @@ class CodeResponseTest(ResponseTest):
                 new_cmap = CorrectMap()
                 new_cmap.update(old_cmap)
                 npoints = 1 if correctness == 'correct' else 0
-                new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None)
+                new_cmap.set(answer_id=answer_id, npoints=npoints,
+                             correctness=correctness, msg=grader_msg, queuestate=None)
 
-                self.problem.update_score(xserver_msgs[correctness], queuekey=1000 + i)
-                self.assertEquals(self.problem.correct_map.get_dict(), new_cmap.get_dict())
+                self.problem.update_score(xserver_msgs[
+                                          correctness], queuekey=1000 + i)
+                self.assertEquals(
+                    self.problem.correct_map.get_dict(), new_cmap.get_dict())
 
                 for j, test_id in enumerate(answer_ids):
                     if j == i:
-                        self.assertFalse(self.problem.correct_map.is_queued(test_id))  # Should be dequeued, message delivered
+                        self.assertFalse(self.problem.correct_map.is_queued(
+                            test_id))  # Should be dequeued, message delivered
                     else:
-                        self.assertTrue(self.problem.correct_map.is_queued(test_id))  # Should be queued, message undelivered
+                        self.assertTrue(self.problem.correct_map.is_queued(
+                            test_id))  # Should be queued, message undelivered
 
     def test_recentmost_queuetime(self):
         '''
@@ -741,7 +781,8 @@ class CodeResponseTest(ResponseTest):
         '''
         answer_ids = sorted(self.problem.get_question_answers())
 
-        # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
+        # CodeResponse requires internal CorrectMap state. Build it now in the
+        # unqueued state
         cmap = CorrectMap()
         for answer_id in answer_ids:
             cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
@@ -749,32 +790,39 @@ class CodeResponseTest(ResponseTest):
 
         self.assertEquals(self.problem.get_recentmost_queuetime(), None)
 
-        # CodeResponse requires internal CorrectMap state. Build it now in the queued state
+        # CodeResponse requires internal CorrectMap state. Build it now in the
+        # queued state
         cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
             latest_timestamp = datetime.now()
-            queuestate = CodeResponseTest.make_queuestate(1000 + i, latest_timestamp)
+            queuestate = CodeResponseTest.make_queuestate(
+                1000 + i, latest_timestamp)
             cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
         self.problem.correct_map.update(cmap)
 
         # Queue state only tracks up to second
-        latest_timestamp = datetime.strptime(datetime.strftime(latest_timestamp, dateformat), dateformat)
+        latest_timestamp = datetime.strptime(datetime.strftime(
+            latest_timestamp, dateformat), dateformat)
 
-        self.assertEquals(self.problem.get_recentmost_queuetime(), latest_timestamp)
+        self.assertEquals(
+            self.problem.get_recentmost_queuetime(), latest_timestamp)
 
     def test_convert_files_to_filenames(self):
         '''
         Test whether file objects are converted to filenames without altering other structures
         '''
-        problem_file = os.path.join(os.path.dirname(__file__), "test_files/filename_convert_test.txt")
+        problem_file = os.path.join(os.path.dirname(
+            __file__), "test_files/filename_convert_test.txt")
         with open(problem_file) as fp:
             answers_with_file = {'1_2_1': 'String-based answer',
                                  '1_3_1': ['answer1', 'answer2', 'answer3'],
                                  '1_4_1': [fp, fp]}
             answers_converted = convert_files_to_filenames(answers_with_file)
-            self.assertEquals(answers_converted['1_2_1'], 'String-based answer')
-            self.assertEquals(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
+            self.assertEquals(answers_converted[
+                              '1_2_1'], 'String-based answer')
+            self.assertEquals(answers_converted[
+                              '1_3_1'], ['answer1', 'answer2', 'answer3'])
             self.assertEquals(answers_converted['1_4_1'], [fp.name, fp.name])
 
 
@@ -816,7 +864,8 @@ class JavascriptResponseTest(ResponseTest):
 
     def test_grade(self):
         # Compile coffee files into javascript used by the response
-        coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
+        coffee_file_path = os.path.dirname(
+            __file__) + "/test_files/js/*.coffee"
         os.system("node_modules/.bin/coffee -c %s" % (coffee_file_path))
 
         system = test_system()
@@ -861,49 +910,58 @@ class NumericalResponseTest(ResponseTest):
                                      answer=4)
         correct_responses = ["4", "4.0", "4.00"]
         incorrect_responses = ["", "3.9", "4.1", "0"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(
+            problem, correct_responses, incorrect_responses)
 
     def test_grade_decimal_tolerance(self):
-        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
-                                     explanation="The answer is 4",
-                                     answer=4,
-                                     tolerance=0.1)
+        problem = self.build_problem(
+            question_text="What is 2 + 2 approximately?",
+            explanation="The answer is 4",
+            answer=4,
+            tolerance=0.1)
         correct_responses = ["4.0", "4.00", "4.09", "3.91"]
         incorrect_responses = ["", "4.11", "3.89", "0"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(
+            problem, correct_responses, incorrect_responses)
 
     def test_grade_percent_tolerance(self):
-        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
-                                     explanation="The answer is 4",
-                                     answer=4,
-                                     tolerance="10%")
+        problem = self.build_problem(
+            question_text="What is 2 + 2 approximately?",
+            explanation="The answer is 4",
+            answer=4,
+            tolerance="10%")
         correct_responses = ["4.0", "4.3", "3.7", "4.30", "3.70"]
         incorrect_responses = ["", "4.5", "3.5", "0"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(
+            problem, correct_responses, incorrect_responses)
 
     def test_grade_infinity(self):
         # This resolves a bug where a problem with relative tolerance would
         # pass with any arbitrarily large student answer.
-        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
-                                     explanation="The answer is 4",
-                                     answer=4,
-                                     tolerance="10%")
+        problem = self.build_problem(
+            question_text="What is 2 + 2 approximately?",
+            explanation="The answer is 4",
+            answer=4,
+            tolerance="10%")
         correct_responses = []
         incorrect_responses = ["1e999", "-1e999"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(
+            problem, correct_responses, incorrect_responses)
 
     def test_grade_nan(self):
         # Attempt to produce a value which causes the student's answer to be
         # evaluated to nan. See if this is resolved correctly.
-        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
-                                     explanation="The answer is 4",
-                                     answer=4,
-                                     tolerance="10%")
+        problem = self.build_problem(
+            question_text="What is 2 + 2 approximately?",
+            explanation="The answer is 4",
+            answer=4,
+            tolerance="10%")
         correct_responses = []
         # Right now these evaluate to `nan`
         # `4 + nan` should be incorrect
         incorrect_responses = ["0*1e999", "4 + 0*1e999"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(
+            problem, correct_responses, incorrect_responses)
 
     def test_grade_with_script(self):
         script_text = "computed_response = math.sqrt(4)"
@@ -913,7 +971,8 @@ class NumericalResponseTest(ResponseTest):
                                      script=script_text)
         correct_responses = ["2", "2.0"]
         incorrect_responses = ["", "2.01", "1.99", "0"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(
+            problem, correct_responses, incorrect_responses)
 
     def test_grade_with_script_and_tolerance(self):
         script_text = "computed_response = math.sqrt(4)"
@@ -924,7 +983,8 @@ class NumericalResponseTest(ResponseTest):
                                      script=script_text)
         correct_responses = ["2", "2.0", "2.05", "1.95"]
         incorrect_responses = ["", "2.11", "1.89", "0"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(
+            problem, correct_responses, incorrect_responses)
 
     def test_exponential_answer(self):
         problem = self.build_problem(question_text="What 5 * 10?",
@@ -932,7 +992,8 @@ class NumericalResponseTest(ResponseTest):
                                      answer="5e+1")
         correct_responses = ["50", "50.0", "5e1", "5e+1", "50e0", "500e-1"]
         incorrect_responses = ["", "3.9", "4.1", "0", "5.01e1"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+        self.assert_multiple_grade(
+            problem, correct_responses, incorrect_responses)
 
     def test_raises_zero_division_err(self):
         """See if division by zero is handled correctly"""
@@ -1000,7 +1061,8 @@ class CustomResponseTest(ResponseTest):
                 return {'ok': answer_given == expect, 'msg': 'Message text'}
         """)
 
-        problem = self.build_problem(script=script, cfn="check_func", expect="42")
+        problem = self.build_problem(
+            script=script, cfn="check_func", expect="42")
 
         # Correct answer
         input_dict = {'1_2_1': '42'}
@@ -1108,7 +1170,8 @@ class CustomResponseTest(ResponseTest):
                         return {'ok': answer_given == expect, 'msg': 'Message text'}
                     """)
 
-        problem = self.build_problem(script=script, cfn="check_func", expect="42", options="xyzzy", cfn_extra_args="options dynamath")
+        problem = self.build_problem(
+            script=script, cfn="check_func", expect="42", options="xyzzy", cfn_extra_args="options dynamath")
 
         # Correct answer
         input_dict = {'1_2_1': '42'}
@@ -1238,7 +1301,8 @@ class CustomResponseTest(ResponseTest):
                 problem.grade_answers({'1_2_1': '42'})
 
             except ResponseError:
-                self.fail("Could not use name '{0}s' in custom response".format(module_name))
+                self.fail("Could not use name '{0}s' in custom response".format(
+                    module_name))
 
     def test_module_imports_function(self):
         '''
@@ -1267,7 +1331,8 @@ class CustomResponseTest(ResponseTest):
                 problem.grade_answers({'1_2_1': '42'})
 
             except ResponseError:
-                self.fail("Could not use name '{0}s' in custom response".format(module_name))
+                self.fail("Could not use name '{0}s' in custom response".format(
+                    module_name))
 
 
 class SchematicResponseTest(ResponseTest):
@@ -1317,21 +1382,30 @@ class AnnotationResponseTest(ResponseTest):
     xml_factory_class = AnnotationResponseXMLFactory
 
     def test_grade(self):
-        (correct, partially, incorrect) = ('correct', 'partially-correct', 'incorrect')
+        (correct, partially, incorrect) = (
+            'correct', 'partially-correct', 'incorrect')
 
         answer_id = '1_2_1'
         options = (('x', correct), ('y', partially), ('z', incorrect))
-        make_answer = lambda option_ids: {answer_id: json.dumps({'options': option_ids})}
+        make_answer = lambda option_ids: {
+            answer_id: json.dumps({'options': option_ids})}
 
         tests = [
             {'correctness': correct, 'points': 2, 'answers': make_answer([0])},
-            {'correctness': partially, 'points': 1, 'answers': make_answer([1])},
-            {'correctness': incorrect, 'points': 0, 'answers': make_answer([2])},
-            {'correctness': incorrect, 'points': 0, 'answers': make_answer([0, 1, 2])},
-            {'correctness': incorrect, 'points': 0, 'answers': make_answer([])},
-            {'correctness': incorrect, 'points': 0, 'answers': make_answer('')},
-            {'correctness': incorrect, 'points': 0, 'answers': make_answer(None)},
-            {'correctness': incorrect, 'points': 0, 'answers': {answer_id: 'null'}},
+            {'correctness': partially, 'points':
+                1, 'answers': make_answer([1])},
+            {'correctness': incorrect, 'points':
+                0, 'answers': make_answer([2])},
+            {'correctness': incorrect, 'points':
+                0, 'answers': make_answer([0, 1, 2])},
+            {'correctness': incorrect, 'points':
+                0, 'answers': make_answer([])},
+            {'correctness': incorrect, 'points':
+                0, 'answers': make_answer('')},
+            {'correctness': incorrect, 'points':
+                0, 'answers': make_answer(None)},
+            {'correctness': incorrect, 'points':
+                0, 'answers': {answer_id: 'null'}},
         ]
 
         for (index, test) in enumerate(tests):

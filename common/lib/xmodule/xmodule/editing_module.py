@@ -35,7 +35,8 @@ class XMLEditingDescriptor(EditingDescriptor):
     any validation of its definition
     """
 
-    css = {'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')]}
+    css = {'scss': [resource_string(
+        __name__, 'css/codemirror/codemirror.scss')]}
 
     js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/xml.coffee')]}
     js_module_name = "XMLEditingDescriptor"
@@ -47,7 +48,8 @@ class MetadataOnlyEditingDescriptor(EditingDescriptor):
     not expose a UI for editing the module data
     """
 
-    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/metadata-only.coffee')]}
+    js = {'coffee': [resource_string(
+        __name__, 'js/src/raw/edit/metadata-only.coffee')]}
     js_module_name = "MetadataOnlyEditingDescriptor"
 
     mako_template = "widgets/metadata-only-edit.html"
@@ -59,7 +61,8 @@ class JSONEditingDescriptor(EditingDescriptor):
     any validation of its definition
     """
 
-    css = {'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')]}
+    css = {'scss': [resource_string(
+        __name__, 'css/codemirror/codemirror.scss')]}
 
     js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/json.coffee')]}
     js_module_name = "JSONEditingDescriptor"
