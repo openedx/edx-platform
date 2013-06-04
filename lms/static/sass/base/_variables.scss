@@ -46,8 +46,9 @@ $m-gray: rgb(153,153,153);
 $m-gray-d1: rgb(102,102,102);
 $m-gray-d2: rgb(51,51,51);
 $m-gray-a1: rgb(80,80,80);
-$m-blue: rgb(85, 151, 221);
-$m-blue-l1: rgb(230,245,252);
+$m-blue: rgb(65, 116, 170);
+// $m-blue: rgb(85, 151, 221); (used in marketing redesign)
+$m-blue-l1: rgb(85, 151, 221);
 $m-blue-d1: shade($m-blue,15%);
 $m-blue-s1: saturate($m-blue,15%);
 $m-pink: rgb(204,51,102);

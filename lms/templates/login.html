@@ -1,7 +1,10 @@
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
+
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+
 <%block name="title"><title>Log into your edX Account</title></%block>
 
 <%block name="js_extra">
@@ -77,14 +80,14 @@
 
 <section class="introduction">
   <header>
-    <h1 class="sr">Log Into Your Account</h1>
+    <h1 class="sr">${_("Log Into Your Account")}</h1>
   </header>
 </section>
 
 <section class="login container">
   <section role="main" class="content">
     <header>
-      <h2 class="sr">Login Form</h2>
+      <h2 class="sr">${_("Login Form")}</h2>
     </header>
 
     <form role="form" id="login-form" method="post" data-remote="true" action="/login_ajax">
