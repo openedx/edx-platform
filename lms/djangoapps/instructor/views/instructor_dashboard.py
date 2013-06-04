@@ -93,5 +93,4 @@ def _section_student_admin(course_id):
 def _section_data_download(course_id):
     """ Provide data for the corresponding dashboard section """
     section_data = {}
-    section_data['placeholder'] = "Data Download content."
     return section_data

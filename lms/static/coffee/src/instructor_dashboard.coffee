@@ -1,5 +1,4 @@
 # Instructor Dashboard Manager
-# TODO add deep linking
 
 log = -> console.log.apply console, arguments
 
@@ -7,6 +6,8 @@ CSS_INSTRUCTOR_CONTENT = 'instructor-dashboard-content-2'
 CSS_ACTIVE_SECTION = 'active-section'
 CSS_IDASH_SECTION = 'idash-section'
 CSS_IDASH_DEFAULT_SECTION = 'idash-default-section'
+
+HASH_LINK_PREFIX = '#viewing-'
 
 $ =>
   instructor_dashboard_content = $ ".#{CSS_INSTRUCTOR_CONTENT}"
@@ -19,7 +20,7 @@ setup_instructor_dashboard = (idash_content) =>
   for link in ($ link for link in links)
     log 'link', link
 
-    link.click ->
+    link.click (e) ->
       log 'link click', link
 
       idash_content.find(".#{CSS_IDASH_SECTION}").removeClass CSS_ACTIVE_SECTION
@@ -27,6 +28,16 @@ setup_instructor_dashboard = (idash_content) =>
       section = idash_content.find "##{section_name}"
       section.addClass CSS_ACTIVE_SECTION
 
-      log section_name
+      location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
 
-  links.filter(".#{CSS_IDASH_DEFAULT_SECTION}").click()
+      log section_name
+      e.preventDefault()
+
+  # click default or go to section specified by hash
+  if (new RegExp "^#{HASH_LINK_PREFIX}").test location.hash
+    rmatch = (new RegExp "^#{HASH_LINK_PREFIX}(.*)").exec location.hash
+    section_name = rmatch[1]
+    link = links.filter "[data-section='#{section_name}']"
+    link.click()
+  else
+    links.filter(".#{CSS_IDASH_DEFAULT_SECTION}").click()
