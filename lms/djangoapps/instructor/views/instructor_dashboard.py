@@ -21,6 +21,7 @@ from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
 from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from xmodule.modulestore.django import modulestore
+from student.models import CourseEnrollment
 
 
 @ensure_csrf_cookie
@@ -60,13 +61,14 @@ def _section_course_info(request, course_id):
     section_data = {}
     section_data['course_id'] = course_id
     section_data['display_name'] = course.display_name
+    section_data['enrollment_count'] = CourseEnrollment.objects.filter(course_id=course_id).count()
     section_data['has_started'] = course.has_started()
     section_data['has_ended'] = course.has_ended()
     section_data['grade_cutoffs'] = "[" + reduce(lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo , course.grade_cutoffs.items(), "")[:-2] + "]"
     section_data['offline_grades'] = offline_grades_available(course_id)
 
     try:
-        section_data['course_errors'] = [(escape(a), escape(b)) for (a,b) in modulestore().get_item_errors(course.location)]
+        section_data['course_errors'] = [(escape(a), '') for (a,b) in modulestore().get_item_errors(course.location)]
     except Exception:
         section_data['course_errors'] = [('Error fetching errors', '')]
 
