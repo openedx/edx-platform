@@ -16,13 +16,8 @@ $ =>
 
 setup_instructor_dashboard = (idash_content) =>
   links = idash_content.find('.instructor_nav').find('a')
-  log 'links', links
   for link in ($ link for link in links)
-    log 'link', link
-
     link.click (e) ->
-      log 'link click', link
-
       idash_content.find(".#{CSS_IDASH_SECTION}").removeClass CSS_ACTIVE_SECTION
       section_name = $(this).data 'section'
       section = idash_content.find "##{section_name}"
@@ -30,7 +25,7 @@ setup_instructor_dashboard = (idash_content) =>
 
       location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
 
-      log section_name
+      log "clicked #{section_name}"
       e.preventDefault()
 
   # click default or go to section specified by hash

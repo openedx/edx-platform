@@ -24,6 +24,10 @@
 <section class="instructor-dashboard-content-2">
 
   <h1>Instructor Dashboard</h1>
+  <div class="instructor_dash_glob_info">
+    <span id="djangopid">${djangopid}</span> |
+    <span id="mitxver">${mitx_version}</span>
+  </div>
 
   ## links which are tied to idash-sections below.
   ## the links are acativated and handled in instructor_dashboard.coffee
@@ -34,12 +38,6 @@
     <a href='#' data-section="student-admin"> Student Admin  </a> |
     <a href='#' data-section="data-download"> Data Download </a>
   ]</h2>
-
-  <div style="text-align:right">
-    <span id="djangopid">${djangopid}</span> |
-    <span id="mitxver">${mitx_version}</span>
-  </div>
-
 
   ## each section corresponds to a section_data sub-dictionary provided by the view
   ## to keep this short, sections can be pulled out into their own files

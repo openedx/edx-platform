@@ -6,9 +6,17 @@
     @extend .content;
     padding: 40px;
     width: 100%;
+    position: relative;
 
     h1 {
       @extend .top-header;
+    }
+
+    .instructor_dash_glob_info {
+      text-align: right;
+      position: absolute;
+      top: 46px;
+      right: 50px;
     }
 
     section.idash-section {
