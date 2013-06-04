@@ -129,17 +129,33 @@ end
 
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do
+
+    found_coverage_info = false
+
     TEST_TASK_DIRS.each do |dir|
         report_dir = report_dir_path(dir)
 
         if !File.file?("#{report_dir}/.coverage")
             next
+        else
+            found_coverage_info = true
         end
 
+        # Generate the coverage.py HTML report
         sh("coverage html --rcfile=#{dir}/.coveragerc")
+
+        # Generate the coverage.py XML report
         sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
+
+        # Generate the diff coverage HTML report, based on the XML report
         sh("diff-cover #{report_dir}/coverage.xml --html-report #{report_dir}/diff_cover.html")
+
+        # Print the diff coverage report to the console
         sh("diff-cover #{report_dir}/coverage.xml")
-        puts "\n\n"
+        puts "\n"
+    end
+
+    if not found_coverage_info
+        puts "No coverage info found.  Run `rake test` before running `rake coverage`."
     end
 end
