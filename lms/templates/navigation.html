@@ -39,7 +39,7 @@ site_status_msg = get_site_status_msg(course_id)
 
   <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
-        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/>
+        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="edX home" />
       </a></h1>
 
     % if course:
