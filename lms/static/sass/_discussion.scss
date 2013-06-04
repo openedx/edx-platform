@@ -731,10 +731,10 @@ body.discussion {
         position: absolute;
         top: 30%;
         left: 30%;
+        font-size: 28px;
         z-index: 100;
         width: 25px;
         height: 25px;
-        //margin-left: -17px;
         opacity: 1;
         @include transition(none);
       }
@@ -1286,6 +1286,7 @@ body.discussion {
 
     section {
       border-bottom: 1px solid #ccc;
+      margin: $baseline $baseline $baseline 0;
     }
 
     .label {
@@ -1294,7 +1295,7 @@ body.discussion {
     }
 
     .home-header {
-      //nothing here
+      margin: 0;
     }
 
     .home-title {
@@ -1310,7 +1311,6 @@ body.discussion {
     .home-stats {
       
       .label-area {
-        padding: $baseline;
         display: inline-block;
         min-width: $baseline*5;
         width: 25%;
@@ -1369,6 +1369,13 @@ body.discussion {
         font-size: 12px;
         width: 20%;
         vertical-align: middle;
+
+        i.icon {
+          padding: 0 $baseline/2;
+          font-size: 24px;
+          display: inline-block;
+        }
+
       }
     }
   }
