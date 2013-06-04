@@ -172,7 +172,7 @@ class TestInstructorEnrollsStudent(LoginEnrollmentTestCase):
         '''
         Clean user input test
         '''
-        
+
         string = "abc@test.com, def@test.com ghi@test.com \n \n jkl@test.com      "
         cleaned_string, cleaned_string_lc = get_and_clean_student_list(string)
         self.assertEqual(cleaned_string, ['abc@test.com', 'def@test.com', 'ghi@test.com', 'jkl@test.com'])

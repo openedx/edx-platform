@@ -9,7 +9,6 @@ import os
 import re
 import requests
 from requests.status_codes import codes
-import urllib
 from collections import OrderedDict
 
 from StringIO import StringIO
@@ -230,13 +229,13 @@ def instructor_dashboard(request, course_id):
         if student_to_reset is not None:
             # find the module in question
             if '/' not in problem_to_reset:				# allow state of modules other than problem to be reset
-                problem_to_reset = "problem/" + problem_to_reset	# but problem is the default
+                problem_to_reset = "problem/" + problem_to_reset    # but problem is the default
             try:
                 (org, course_name, _) = course_id.split("/")
                 module_state_key = "i4x://" + org + "/" + course_name + "/" + problem_to_reset
                 module_to_reset = StudentModule.objects.get(student_id=student_to_reset.id,
-                                                          course_id=course_id,
-                                                          module_state_key=module_state_key)
+                                                            course_id=course_id,
+                                                            module_state_key=module_state_key)
                 msg += "Found module to reset.  "
             except Exception:
                 msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
@@ -260,18 +259,17 @@ def instructor_dashboard(request, course_id):
                 module_to_reset.state = json.dumps(problem_state)
                 module_to_reset.save()
                 track.views.server_track(request,
-                                        '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
-                                            old_attempts=old_number_of_attempts,
-                                            student=student_to_reset,
-                                            problem=module_to_reset.module_state_key,
-                                            instructor=request.user,
-                                            course=course_id),
-                                        {},
-                                        page='idashboard')
+                                         '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
+                                             old_attempts=old_number_of_attempts,
+                                             student=student_to_reset,
+                                             problem=module_to_reset.module_state_key,
+                                             instructor=request.user,
+                                             course=course_id),
+                                         {},
+                                         page='idashboard')
                 msg += "<font color='green'>Module state successfully reset!</font>"
             except:
                 msg += "<font color='red'>Couldn't reset module state.  </font>"
-
 
     elif "Get link to student's progress page" in action:
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
@@ -282,12 +280,12 @@ def instructor_dashboard(request, course_id):
                 student_to_reset = User.objects.get(username=unique_student_identifier)
             progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student_to_reset.id})
             track.views.server_track(request,
-                                    '{instructor} requested progress page for {student} in {course}'.format(
-                                        student=student_to_reset,
-                                        instructor=request.user,
-                                        course=course_id),
-                                    {},
-                                    page='idashboard')
+                                     '{instructor} requested progress page for {student} in {course}'.format(
+                                         student=student_to_reset,
+                                         instructor=request.user,
+                                         course=course_id),
+                                     {},
+                                     page='idashboard')
             msg += "<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url, student_to_reset.username, student_to_reset.email)
         except:
             msg += "<font color='red'>Couldn't find student with that username.  </font>"
@@ -315,6 +313,7 @@ def instructor_dashboard(request, course_id):
         msg2, rg_stud_data = _do_remote_gradebook(request.user, course, 'get-membership')
         datatable = {'header': ['Student  email', 'Match?']}
         rg_students = [x['email'] for x in rg_stud_data['retdata']]
+
         def domatch(x):
             return '<font color="green">yes</font>' if x.email in rg_students else '<font color="red">No</font>'
         datatable['data'] = [[x.email, domatch(x)] for x in stud_data['students']]
@@ -349,7 +348,6 @@ def instructor_dashboard(request, course_id):
                     files = {'datafile': fp}
                     msg2, _ = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
                     msg += msg2
-
 
     #----------------------------------------
     # Admin
@@ -416,6 +414,7 @@ def instructor_dashboard(request, course_id):
         profkeys = ['name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education',
                     'mailing_address', 'goals']
         datatable = {'header': ['username', 'email'] + profkeys}
+
         def getdat(u):
             p = u.profile
             return [u.username, u.email] + [getattr(p, x, '') for x in profkeys]
@@ -424,9 +423,8 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'Student profile data for course %s' % course_id
         return return_csv('profiledata_%s.csv' % course_id, datatable)
 
-
     elif 'Download CSV of all responses to problem' in action:
-        problem_to_dump = request.POST.get('problem_to_dump','')
+        problem_to_dump = request.POST.get('problem_to_dump', '')
 
         if problem_to_dump[-4:] == ".xml":
             problem_to_dump = problem_to_dump[:-4]
@@ -444,7 +442,7 @@ def instructor_dashboard(request, course_id):
 
         if smdat:
             datatable = {'header': ['username', 'state']}
-            datatable['data'] = [ [x.student.username, x.state] for x in smdat ]
+            datatable['data'] = [[x.student.username, x.state] for x in smdat]
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
             return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
 
@@ -480,7 +478,6 @@ def instructor_dashboard(request, course_id):
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
-
 
     elif action == 'Remove forum admin':
         uname = request.POST['forumadmin']
@@ -571,7 +568,6 @@ def instructor_dashboard(request, course_id):
             ret = _do_enroll_students(course, course_id, students, overload=overload)
             datatable = ret['datatable']
 
-
     #----------------------------------------
     # psychometrics
 
@@ -591,9 +587,9 @@ def instructor_dashboard(request, course_id):
         logs and swallows errors.
         """
         url = settings.ANALYTICS_SERVER_URL + \
-              "get?aname={}&course_id={}&apikey={}".format(analytics_name,
-                                                           course_id,
-                                                           settings.ANALYTICS_API_KEY)
+            "get?aname={}&course_id={}&apikey={}".format(analytics_name,
+                                                         course_id,
+                                                         settings.ANALYTICS_API_KEY)
         try:
             res = requests.get(url)
         except Exception:
@@ -652,7 +648,7 @@ def instructor_dashboard(request, course_id):
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
                'analytics_results': analytics_results,
-            }
+               }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 
@@ -815,7 +811,7 @@ def _add_or_remove_user_group(request, username_or_email, group, group_title, ev
         action = "Added" if do_add else "Removed"
         prep = "to" if do_add else "from"
         msg = '<font color="green">{action} {0} {prep} {1} group = {2}</font>'.format(user, group_title, group.name,
-                                                                                  action=action, prep=prep)
+                                                                                      action=action, prep=prep)
         if do_add:
             user.groups.add(group)
         else:
@@ -941,7 +937,7 @@ def gradebook(request, course_id):
                      'grade_summary': student_grades(student, request, course),
                      'realname': student.profile.name,
                      }
-                     for student in enrolled_students]
+                    for student in enrolled_students]
 
     return render_to_response('courseware/gradebook.html', {
         'students': student_info,
@@ -1093,6 +1089,7 @@ def get_and_clean_student_list(students):
 #-----------------------------------------------------------------------------
 # answer distribution
 
+
 def get_answers_distribution(request, course_id):
     """
     Get the distribution of answers for all graded problems in the course.
@@ -1184,5 +1181,5 @@ def dump_grading_context(course):
             msg += "      %s (format=%s, Assignment=%s%s)\n" % (s.display_name, format, aname, notes)
     msg += "all descriptors:\n"
     msg += "length=%d\n" % len(gc['all_descriptors'])
-    msg = '<pre>%s</pre>' % msg.replace('<','&lt;')
+    msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')
     return msg
