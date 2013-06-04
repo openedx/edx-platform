@@ -204,6 +204,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # Hack to get required link URLs to password reset templates
     'mitxmako.shortcuts.marketing_link_context_processor',
+
+    # Include TEMPLATE_VISIBLE_SETTINGS in templates
+    'settings_context_processor.context_processors.settings'
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000   # 4 MB
@@ -667,6 +670,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'djcelery',
+    'settings_context_processor',
     'south',
 
     # Monitor the status of services
@@ -733,6 +737,16 @@ MKTG_URL_LINK_MAP = {
     'PRIVACY': 'privacy_edx',
 }
 
+######################### VISIBLE SETTINGS ###########################
+# These settings' values will be exposed to all templates
+TEMPLATE_VISIBLE_SETTINGS = [
+    "FAVICON_PATH",
+    "MITX_FEATURES",
+    "PLATFORM_NAME",
+    "SITE_NAME",
+    # TODO: augment me
+]
+
 ############################### THEME ################################
 def enable_theme(theme_name):
     """
@@ -747,6 +761,9 @@ def enable_theme(theme_name):
     enable_theme(THEME_NAME)
     """
     MITX_FEATURES['USE_CUSTOM_THEME'] = True
+
+    # Ensure the theme name is visible in templates
+    TEMPLATE_VISIBLE_SETTINGS.append("THEME_NAME")
 
     # Calculate the location of the theme's files
     theme_root = ENV_ROOT / "themes" / theme_name
