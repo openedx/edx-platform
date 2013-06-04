@@ -7,7 +7,7 @@ import string
 import sys
 import urllib
 import uuid
-
+import time
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -19,10 +19,11 @@ from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
-from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.db import IntegrityError, transaction
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
+from django.utils.http import cookie_date
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
@@ -212,6 +213,36 @@ def _cert_info(user, course, cert_status):
     return d
 
 
+@ensure_csrf_cookie
+def signin_user(request):
+    """
+    This view will display the non-modal login form
+    """
+    if request.user.is_authenticated():
+        return redirect(reverse('dashboard'))
+
+    context = {
+        'course_id': request.GET.get('course_id'),
+        'enrollment_action': request.GET.get('enrollment_action')
+    }
+    return render_to_response('login.html', context)
+
+
+@ensure_csrf_cookie
+def register_user(request):
+    """
+    This view will display the non-modal registration form
+    """
+    if request.user.is_authenticated():
+        return redirect(reverse('dashboard'))
+
+    context = {
+        'course_id': request.GET.get('course_id'),
+        'enrollment_action': request.GET.get('enrollment_action')
+    }
+    return render_to_response('register.html', context)
+
+
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
@@ -250,7 +281,7 @@ def dashboard(request):
     exam_registrations = {course.id: exam_registration_info(request.user, course) for course in courses}
 
     # Get the 3 most recent news
-    top_news = _get_news(top=3)
+    top_news = _get_news(top=3) if not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False) else None
 
     context = {'courses': courses,
                'message': message,
@@ -275,35 +306,47 @@ def try_change_enrollment(request):
     """
     if 'enrollment_action' in request.POST:
         try:
-            enrollment_output = change_enrollment(request)
+            enrollment_response = change_enrollment(request)
             # There isn't really a way to display the results to the user, so we just log it
             # We expect the enrollment to be a success, and will show up on the dashboard anyway
-            log.info("Attempted to automatically enroll after login. Results: {0}".format(enrollment_output))
+            log.info(
+                "Attempted to automatically enroll after login. Response code: {0}; response body: {1}".format(
+                    enrollment_response.status_code,
+                    enrollment_response.content
+                )
+            )
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
 
 
-@login_required
-def change_enrollment_view(request):
-    """Delegate to change_enrollment to actually do the work."""
-    return HttpResponse(json.dumps(change_enrollment(request)))
-
-
-
 def change_enrollment(request):
+    """
+    Modify the enrollment status for the logged-in user.
+
+    The request parameter must be a POST request (other methods return 405)
+    that specifies course_id and enrollment_action parameters. If course_id or
+    enrollment_action is not specified, if course_id is not valid, if
+    enrollment_action is something other than "enroll" or "unenroll", if
+    enrollment_action is "enroll" and enrollment is closed for the course, or
+    if enrollment_action is "unenroll" and the user is not enrolled in the
+    course, a 400 error will be returned. If the user is not logged in, 403
+    will be returned; it is important that only this case return 403 so the
+    front end can redirect the user to a registration or login page when this
+    happens. This function should only be called from an AJAX request or
+    as a post-login/registration helper, so the error messages in the responses
+    should never actually be user-visible.
+    """
     if request.method != "POST":
-        raise Http404
+        return HttpResponseNotAllowed(["POST"])
 
     user = request.user
     if not user.is_authenticated():
-        raise Http404
+        return HttpResponseForbidden()
 
-    action = request.POST.get("enrollment_action", "")
-
-    course_id = request.POST.get("course_id", None)
+    action = request.POST.get("enrollment_action")
+    course_id = request.POST.get("course_id")
     if course_id is None:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': 'There was an error receiving the course id.'}))
+        return HttpResponseBadRequest("Course id not specified")
 
     if action == "enroll":
         # Make sure the course exists
@@ -313,12 +356,10 @@ def change_enrollment(request):
         except ItemNotFoundError:
             log.warning("User {0} tried to enroll in non-existent course {1}"
                       .format(user.username, course_id))
-            return {'success': False, 'error': 'The course requested does not exist.'}
+            return HttpResponseBadRequest("Course id is invalid")
 
         if not has_access(user, course, 'enroll'):
-            return {'success': False,
-                    'error': 'enrollment in {} not allowed at this time'
-                    .format(course.display_name_with_default)}
+            return HttpResponseBadRequest("Enrollment is closed")
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
@@ -332,7 +373,7 @@ def change_enrollment(request):
             # If we've already created this enrollment in a separate transaction,
             # then just continue
             pass
-        return {'success': True}
+        return HttpResponse()
 
     elif action == "unenroll":
         try:
@@ -345,21 +386,17 @@ def change_enrollment(request):
                                   "course:{0}".format(course_num),
                                   "run:{0}".format(run)])
 
-            return {'success': True}
+            return HttpResponse()
         except CourseEnrollment.DoesNotExist:
-            return {'success': False, 'error': 'You are not enrolled for this course.'}
+            return HttpResponseBadRequest("You are not enrolled in this course")
     else:
-        return {'success': False, 'error': 'Invalid enrollment_action.'}
-
-    return {'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}
+        return HttpResponseBadRequest("Enrollment action is invalid")
 
 
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
 
-
-    return render_to_response('accounts_login.html', {'error': error})
-
+    return render_to_response('login.html', {'error': error})
 
 
 # Need different levels of logging
@@ -403,8 +440,29 @@ def login_user(request, error=""):
         try_change_enrollment(request)
 
         statsd.increment("common.student.successful_login")
+        response = HttpResponse(json.dumps({'success': True}))
 
-        return HttpResponse(json.dumps({'success': True}))
+        # set the login cookie for the edx marketing site
+        # we want this cookie to be accessed via javascript
+        # so httponly is set to None
+
+        if request.session.get_expire_at_browser_close():
+            max_age = None
+            expires = None
+        else:
+            max_age = request.session.get_expiry_age()
+            expires_time = time.time() + max_age
+            expires = cookie_date(expires_time)
+
+
+        response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
+                            'true', max_age=max_age,
+                            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                            path='/',
+                            secure=None,
+                            httponly=None)
+
+        return response
 
     log.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
@@ -418,9 +476,18 @@ def login_user(request, error=""):
 
 @ensure_csrf_cookie
 def logout_user(request):
-    ''' HTTP request to log out the user. Redirects to marketing page'''
+    '''
+    HTTP request to log out the user. Redirects to marketing page.
+    Deletes both the CSRF and sessionid cookies so the marketing
+    site can determine the logged in state of the user
+    '''
+
     logout(request)
-    return redirect('/')
+    response = redirect('/')
+    response.delete_cookie(settings.EDXMKTG_COOKIE_NAME,
+                           path='/',
+                           domain=settings.SESSION_COOKIE_DOMAIN)
+    return response
 
 
 @login_required
@@ -460,12 +527,12 @@ def _do_create_account(post_vars):
         js = {'success': False}
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = "An account with this username already exists."
+            js['value'] = "An account with the Public Username  '" + post_vars['username'] + "' already exists."
             js['field'] = 'username'
             return HttpResponse(json.dumps(js))
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = "An account with this e-mail already exists."
+            js['value'] = "An account with the Email '" + post_vars['email'] + "' already exists."
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
@@ -588,7 +655,7 @@ def create_account(request, post_override=None):
         elif not settings.GENERATE_RANDOM_USER_CREDENTIALS:
             res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
-        log.exception(sys.exc_info())
+        log.warning('Unable to send activation email to user', exc_info=True)
         js['value'] = 'Could not send activation e-mail.'
         return HttpResponse(json.dumps(js))
 
@@ -615,7 +682,31 @@ def create_account(request, post_override=None):
     statsd.increment("common.student.account_created")
 
     js = {'success': True}
-    return HttpResponse(json.dumps(js), mimetype="application/json")
+    HttpResponse(json.dumps(js), mimetype="application/json")
+
+    response = HttpResponse(json.dumps({'success': True}))
+
+    # set the login cookie for the edx marketing site
+    # we want this cookie to be accessed via javascript
+    # so httponly is set to None
+
+    if request.session.get_expire_at_browser_close():
+        max_age = None
+        expires = None
+    else:
+        max_age = request.session.get_expiry_age()
+        expires_time = time.time() + max_age
+        expires = cookie_date(expires_time)
+
+
+    response.set_cookie(settings.EDXMKTG_COOKIE_NAME,
+                        'true', max_age=max_age,
+                        expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                        path='/',
+                        secure=None,
+                        httponly=None)
+    return response
+
 
 
 def exam_registration_info(user, course):
@@ -701,7 +792,6 @@ def create_exam_registration(request, post_override=None):
     for fieldname in TestCenterUser.user_provided_fields():
         if fieldname in post_vars:
             demographic_data[fieldname] = (post_vars[fieldname]).strip()
-
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
         needs_updating = testcenter_user.needs_update(demographic_data)
@@ -894,7 +984,11 @@ def reactivation_email_for_user(user):
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', d)
 
-    res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    try:
+        res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    except:
+        log.warning('Unable to send reactivation email', exc_info=True)
+        return HttpResponse(json.dumps({'success': False, 'error': 'Unable to send reactivation email'}))
 
     return HttpResponse(json.dumps({'success': True}))
 
@@ -920,7 +1014,7 @@ def change_email_request(request):
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'Valid e-mail address required.'}))
 
-    if len(User.objects.filter(email=new_email)) != 0:
+    if User.objects.filter(email=new_email).count() != 0:
         ## CRITICAL TODO: Handle case sensitivity for e-mails
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'An account with this e-mail already exists.'}))
@@ -955,41 +1049,63 @@ def change_email_request(request):
 
 
 @ensure_csrf_cookie
+@transaction.commit_manually
 def confirm_email_change(request, key):
     ''' User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     '''
     try:
-        pec = PendingEmailChange.objects.get(activation_key=key)
-    except PendingEmailChange.DoesNotExist:
-        return render_to_response("invalid_email_key.html", {})
+        try:
+            pec = PendingEmailChange.objects.get(activation_key=key)
+        except PendingEmailChange.DoesNotExist:
+            transaction.rollback()
+            return render_to_response("invalid_email_key.html", {})
 
-    user = pec.user
-    d = {'old_email': user.email,
-         'new_email': pec.new_email}
+        user = pec.user
+        address_context = {
+            'old_email': user.email,
+            'new_email': pec.new_email
+        }
 
-    if len(User.objects.filter(email=pec.new_email)) != 0:
-        return render_to_response("email_exists.html", d)
+        if len(User.objects.filter(email=pec.new_email)) != 0:
+            transaction.rollback()
+            return render_to_response("email_exists.html", {})
 
-    subject = render_to_string('emails/email_change_subject.txt', d)
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/confirm_email_change.txt', d)
-    up = UserProfile.objects.get(user=user)
-    meta = up.get_meta()
-    if 'old_emails' not in meta:
-        meta['old_emails'] = []
-    meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
-    up.set_meta(meta)
-    up.save()
-    # Send it to the old email...
-    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-    user.email = pec.new_email
-    user.save()
-    pec.delete()
-    # And send it to the new email...
-    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        subject = render_to_string('emails/email_change_subject.txt', address_context)
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/confirm_email_change.txt', address_context)
+        up = UserProfile.objects.get(user=user)
+        meta = up.get_meta()
+        if 'old_emails' not in meta:
+            meta['old_emails'] = []
+        meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
+        up.set_meta(meta)
+        up.save()
+        # Send it to the old email...
+        try:
+            user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        except Exception:
+            transaction.rollback()
+            log.warning('Unable to send confirmation email to old address', exc_info=True)
+            return render_to_response("email_change_failed.html", {'email': user.email})
 
-    return render_to_response("email_change_successful.html", d)
+        user.email = pec.new_email
+        user.save()
+        pec.delete()
+        # And send it to the new email...
+        try:
+            user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        except Exception:
+            transaction.rollback()
+            log.warning('Unable to send confirmation email to new address', exc_info=True)
+            return render_to_response("email_change_failed.html", {'email': pec.new_email})
+
+        transaction.commit()
+        return render_to_response("email_change_successful.html", address_context)
+    except Exception:
+        # If we get an unexpected exception, be sure to rollback the transaction
+        transaction.rollback()
+        raise
 
 
 @ensure_csrf_cookie

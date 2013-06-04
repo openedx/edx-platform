@@ -5,6 +5,7 @@ if Backbone?
         "click .action-endorse": "toggleEndorse"
         "click .action-delete": "delete"
         "click .action-edit": "edit"
+        "click .discussion-flag-abuse": "toggleFlagAbuse"
 
     $: (selector) ->
         @$el.find(selector)
@@ -23,6 +24,7 @@ if Backbone?
       if window.user.voted(@model)
         @$(".vote-btn").addClass("is-cast")
       @renderAttrs()
+      @renderFlagged()
       @$el.find(".posted-details").timeago()
       @convertMath()
       @markAsStaff()
@@ -70,6 +72,7 @@ if Backbone?
         success: (response, textStatus) =>
           if textStatus == 'success'
             @model.set(response)
+            
 
     edit: (event) ->
         @trigger "response:edit", event
@@ -92,3 +95,17 @@ if Backbone?
         url: url
         data: data
         type: "POST"
+
+            
+    renderFlagged: =>
+      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
+        @$("[data-role=thread-flag]").addClass("flagged")  
+        @$("[data-role=thread-flag]").removeClass("notflagged")
+        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
+      else
+        @$("[data-role=thread-flag]").removeClass("flagged")  
+        @$("[data-role=thread-flag]").addClass("notflagged")      
+        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")   
+        
+    updateModelDetails: =>
+      @renderFlagged()

@@ -41,7 +41,8 @@ log = logging.getLogger(__name__)
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
-ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud'] + OPEN_ENDED_COMPONENT_TYPES
+NOTE_COMPONENT_TYPES = ['notes']
+ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud', 'videoalpha'] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -148,8 +149,7 @@ def edit_unit(request, location):
             component_templates[category].append((
                 template.display_name_with_default,
                 template.location.url(),
-                hasattr(template, 'markdown') and template.markdown is not None,
-                template.cms.empty,
+                hasattr(template, 'markdown') and template.markdown is not None
             ))
 
     components = [
@@ -178,8 +178,7 @@ def edit_unit(request, location):
             break
         index = index + 1
 
-    preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE',
-                                                  'preview.' + settings.LMS_BASE)
+    preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE')
 
     preview_lms_link = '//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
         preview_lms_base=preview_lms_base,

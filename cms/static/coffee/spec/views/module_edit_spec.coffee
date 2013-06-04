@@ -73,13 +73,3 @@ describe "CMS.Views.ModuleEdit", ->
         expect(XModule.loadModule).toHaveBeenCalled()
         expect(XModule.loadModule.mostRecentCall.args[0]).toBe($('.xmodule_display'))
 
-    describe "changedMetadata", ->
-      it "returns empty if no metadata loaded", ->
-        expect(@moduleEdit.changedMetadata()).toEqual({})
-
-      it "returns only changed values", ->
-        @moduleEdit.originalMetadata = {'foo', 'bar'}
-        spyOn(@moduleEdit, 'metadata').andReturn({'a': '', 'b': 'before', 'c': ''})
-        @moduleEdit.loadEdit()
-        @moduleEdit.metadata.andReturn({'a': '', 'b': 'after', 'd': 'only_after'})
-        expect(@moduleEdit.changedMetadata()).toEqual({'b' : 'after', 'd' : 'only_after'})

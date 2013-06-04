@@ -92,46 +92,15 @@
 
 // ====================
 
-// notifications slide up then down
-@mixin notificationsSlideUpDown {
-  0%, 100% {
-    @include transform(translateY(0));
-  }
-
-  15%, 85% {
-    @include transform(translateY(-($notification-height)));
-  }
-
-  20%, 80% {
-    @include transform(translateY(-($notification-height*0.99)));
-  }
-}
-
-@-moz-keyframes notificationsSlideUpDown { @include notificationsSlideUpDown(); }
-@-webkit-keyframes notificationsSlideUpDown { @include notificationsSlideUpDown(); }
-@-o-keyframes notificationsSlideUpDown { @include notificationsSlideUpDown(); }
-@keyframes notificationsSlideUpDown { @include notificationsSlideUpDown();}
-
-@mixin anim-notificationsSlideUpDown($duration, $timing: ease-in-out, $count: 1, $delay: 0) {
-  @include animation-name(notificationsSlideUpDown);
-  @include animation-duration($duration);
-  @include animation-delay($delay);
-  @include animation-timing-function($timing);
-  @include animation-iteration-count($count);
-  @include animation-fill-mode(both);
-}
-
-// ====================
-
 // bounce in
 @mixin bounceIn {
   0% {
-    opacity: 0;
+    opacity: 0.0;
     @include transform(scale(0.3));
   }
 
   50% {
-    opacity: 1;
+    opacity: 1.0;
     @include transform(scale(1.05));
   }
 
@@ -159,12 +128,12 @@
 // bounce in
 @mixin bounceOut {
   0% {
-    opacity: 0;
+    opacity: 0.0;
     @include transform(scale(0.3));
   }
 
   50% {
-    opacity: 1;
+    opacity: 1.0;
     @include transform(scale(1.05));
   }
 
@@ -177,12 +146,12 @@
   }
 
   50% {
-    opacity: 1;
+    opacity: 1.0;
     @include transform(scale(1.05));
   }
 
   100% {
-    opacity: 0;
+    opacity: 0.0;
     @include transform(scale(0.3));
   }
 }

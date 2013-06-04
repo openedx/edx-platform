@@ -1,7 +1,7 @@
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-from django_comment_client.models import Role
+from django_comment_common.models import Role
 from django.contrib.auth.models import User
 
 
@@ -12,7 +12,7 @@ class Command(BaseCommand):
                     dest='remove',
                     default=False,
                     help='Remove the role instead of adding it'),
-        )
+    )
 
     args = '<user|email> <role> <course_id>'
     help = 'Assign a discussion forum role to a user '

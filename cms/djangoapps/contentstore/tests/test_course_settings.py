@@ -17,7 +17,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.django import modulestore
 from xmodule.fields import Date
 
 
@@ -256,7 +255,7 @@ class CourseMetadataEditingTest(CourseTestCase):
     def setUp(self):
         CourseTestCase.setUp(self)
         # add in the full class too
-        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        import_from_xml(get_modulestore(self.course_location), 'common/test/data/', ['full'])
         self.fullcourse_location = Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None])
 
     def test_fetch_initial_fields(self):

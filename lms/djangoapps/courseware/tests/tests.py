@@ -220,25 +220,20 @@ class LoginEnrollmentTestCase(TestCase):
         # Now make sure that the user is now actually activated
         self.assertTrue(get_user(email).is_active)
 
-    def _enroll(self, course):
-        """Post to the enrollment view, and return the parsed json response"""
+    def try_enroll(self, course):
+        """Try to enroll.  Return bool success instead of asserting it."""
         resp = self.client.post('/change_enrollment', {
             'enrollment_action': 'enroll',
             'course_id': course.id,
         })
-        return parse_json(resp)
-
-    def try_enroll(self, course):
-        """Try to enroll.  Return bool success instead of asserting it."""
-        data = self._enroll(course)
-        print ('Enrollment in %s result: %s'
-               % (course.location.url(), str(data)))
-        return data['success']
+        print ('Enrollment in %s result status code: %s'
+               % (course.location.url(), str(resp.status_code)))
+        return resp.status_code == 200
 
     def enroll(self, course):
         """Enroll the currently logged-in user, and check that it worked."""
-        data = self._enroll(course)
-        self.assertTrue(data['success'])
+        result = self.try_enroll(course)
+        self.assertTrue(result)
 
     def unenroll(self, course):
         """Unenroll the currently logged-in user, and check that it worked."""
@@ -246,8 +241,7 @@ class LoginEnrollmentTestCase(TestCase):
             'enrollment_action': 'unenroll',
             'course_id': course.id,
         })
-        data = parse_json(resp)
-        self.assertTrue(data['success'])
+        self.assertTrue(resp.status_code == 200)
 
     def check_for_get_code(self, code, url):
         """
@@ -372,6 +366,7 @@ class TestCoursesLoadTestCase_XmlModulestore(PageLoaderTestCase):
     '''Check that all pages in test courses load properly from XML'''
 
     def setUp(self):
+        super(TestCoursesLoadTestCase_XmlModulestore, self).setUp()
         self.setup_viewtest_user()
         xmodule.modulestore.django._MODULESTORES = {}
 
@@ -390,6 +385,7 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
     '''Check that all pages in test courses load properly from Mongo'''
 
     def setUp(self):
+        super(TestCoursesLoadTestCase_MongoModulestore, self).setUp()
         self.setup_viewtest_user()
         xmodule.modulestore.django._MODULESTORES = {}
         modulestore().collection.drop()
@@ -486,9 +482,6 @@ class TestDraftModuleStore(TestCase):
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestViewAuth(LoginEnrollmentTestCase):
     """Check that view authentication works properly"""
-
-    # NOTE: setUpClass() runs before override_settings takes effect, so
-    # can't do imports there without manually hacking settings.
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
@@ -810,43 +803,85 @@ class TestViewAuth(LoginEnrollmentTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestCourseGrader(LoginEnrollmentTestCase):
+class TestSubmittingProblems(LoginEnrollmentTestCase):
     """Check that a course gets graded properly"""
 
-    # NOTE: setUpClass() runs before override_settings takes effect, so
-    # can't do imports there without manually hacking settings.
+    # Subclasses should specify the course slug
+    course_slug = "UNKNOWN"
+    course_when = "UNKNOWN"
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
-        courses = modulestore().get_courses()
 
-        def find_course(course_id):
-            """Assumes the course is present"""
-            return [c for c in courses if c.id == course_id][0]
-
-        self.graded_course = find_course("edX/graded/2012_Fall")
+        course_name = "edX/%s/%s" % (self.course_slug, self.course_when)
+        self.course = modulestore().get_course(course_name)
+        assert self.course, "Couldn't load course %r" % course_name
 
         # create a test student
         self.student = 'view@test.com'
         self.password = 'foo'
         self.create_account('u1', self.student, self.password)
         self.activate_user(self.student)
-        self.enroll(self.graded_course)
+        self.enroll(self.course)
 
         self.student_user = get_user(self.student)
 
         self.factory = RequestFactory()
 
+    def problem_location(self, problem_url_name):
+        return "i4x://edX/{}/problem/{}".format(self.course_slug, problem_url_name)
+
+    def modx_url(self, problem_location, dispatch):
+        return reverse(
+                    'modx_dispatch',
+                    kwargs={
+                        'course_id': self.course.id,
+                        'location': problem_location,
+                        'dispatch': dispatch,
+                        }
+                    )
+
+    def submit_question_answer(self, problem_url_name, responses):
+        """
+        Submit answers to a question.
+
+        Responses is a dict mapping problem ids (not sure of the right term)
+        to answers:
+            {'2_1': 'Correct', '2_2': 'Incorrect'}
+
+        """
+        problem_location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(problem_location, 'problem_check')
+        answer_key_prefix = 'input_i4x-edX-{}-problem-{}_'.format(self.course_slug, problem_url_name)
+        resp = self.client.post(modx_url,
+            { (answer_key_prefix + k): v for k,v in responses.items() }
+            )
+        return resp
+
+    def reset_question_answer(self, problem_url_name):
+        '''resets specified problem for current user'''
+        problem_location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(problem_location, 'problem_reset')
+        resp = self.client.post(modx_url)
+        return resp
+
+
+class TestCourseGrader(TestSubmittingProblems):
+    """Check that a course gets graded properly"""
+
+    course_slug = "graded"
+    course_when = "2012_Fall"
+
     def get_grade_summary(self):
         '''calls grades.grade for current user and course'''
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
-            self.graded_course.id, self.student_user, self.graded_course)
+            self.course.id, self.student_user, self.course)
 
         fake_request = self.factory.get(reverse('progress',
-                                        kwargs={'course_id': self.graded_course.id}))
+                                        kwargs={'course_id': self.course.id}))
 
         return grades.grade(self.student_user, fake_request,
-                            self.graded_course, model_data_cache)
+                            self.course, model_data_cache)
 
     def get_homework_scores(self):
         '''get scores for homeworks'''
@@ -855,14 +890,14 @@ class TestCourseGrader(LoginEnrollmentTestCase):
     def get_progress_summary(self):
         '''return progress summary structure for current user and course'''
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
-            self.graded_course.id, self.student_user, self.graded_course)
+            self.course.id, self.student_user, self.course)
 
         fake_request = self.factory.get(reverse('progress',
-                                        kwargs={'course_id': self.graded_course.id}))
+                                        kwargs={'course_id': self.course.id}))
 
         progress_summary = grades.progress_summary(self.student_user,
                                                    fake_request,
-                                                   self.graded_course,
+                                                   self.course,
                                                    model_data_cache)
         return progress_summary
 
@@ -870,46 +905,6 @@ class TestCourseGrader(LoginEnrollmentTestCase):
         '''assert that percent grade is as expected'''
         grade_summary = self.get_grade_summary()
         self.assertEqual(grade_summary['percent'], percent)
-
-    def submit_question_answer(self, problem_url_name, responses):
-        """
-        The field names of a problem are hard to determine. This method only works
-        for the problems used in the edX/graded course, which has fields named in the
-        following form:
-        input_i4x-edX-graded-problem-H1P3_2_1
-        input_i4x-edX-graded-problem-H1P3_2_2
-        """
-        problem_location = "i4x://edX/graded/problem/%s" % problem_url_name
-
-        modx_url = reverse('modx_dispatch',
-                           kwargs={'course_id': self.graded_course.id,
-                                   'location': problem_location,
-                                   'dispatch': 'problem_check', })
-
-        resp = self.client.post(modx_url, {
-                                'input_i4x-edX-graded-problem-%s_2_1' % problem_url_name: responses[0],
-                                'input_i4x-edX-graded-problem-%s_2_2' % problem_url_name: responses[1],
-                                })
-        print "modx_url", modx_url, "responses", responses
-        print "resp", resp
-
-        return resp
-
-    def problem_location(self, problem_url_name):
-        '''Get location string for problem, assuming hardcoded course_id'''
-        return "i4x://edX/graded/problem/{0}".format(problem_url_name)
-
-    def reset_question_answer(self, problem_url_name):
-        '''resets specified problem for current user'''
-        problem_location = self.problem_location(problem_url_name)
-
-        modx_url = reverse('modx_dispatch',
-                           kwargs={'course_id': self.graded_course.id,
-                                   'location': problem_location,
-                                   'dispatch': 'problem_reset', })
-
-        resp = self.client.post(modx_url)
-        return resp
 
     def test_get_graded(self):
         #### Check that the grader shows we have 0% in the course
@@ -928,27 +923,27 @@ class TestCourseGrader(LoginEnrollmentTestCase):
             return [s.earned for s in hw_section['scores']]
 
         # Only get half of the first problem correct
-        self.submit_question_answer('H1P1', ['Correct', 'Incorrect'])
+        self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Incorrect'})
         self.check_grade_percent(0.06)
         self.assertEqual(earned_hw_scores(), [1.0, 0, 0])   # Order matters
         self.assertEqual(score_for_hw('Homework1'), [1.0, 0.0])
 
         # Get both parts of the first problem correct
         self.reset_question_answer('H1P1')
-        self.submit_question_answer('H1P1', ['Correct', 'Correct'])
+        self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.13)
         self.assertEqual(earned_hw_scores(), [2.0, 0, 0])
         self.assertEqual(score_for_hw('Homework1'), [2.0, 0.0])
 
         # This problem is shown in an ABTest
-        self.submit_question_answer('H1P2', ['Correct', 'Correct'])
+        self.submit_question_answer('H1P2', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.25)
         self.assertEqual(earned_hw_scores(), [4.0, 0.0, 0])
         self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])
 
         # This problem is hidden in an ABTest.
         # Getting it correct doesn't change total grade
-        self.submit_question_answer('H1P3', ['Correct', 'Correct'])
+        self.submit_question_answer('H1P3', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.25)
         self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])
 
@@ -957,19 +952,85 @@ class TestCourseGrader(LoginEnrollmentTestCase):
         # This problem is also weighted to be 4 points (instead of default of 2)
         # If the problem was unweighted the percent would have been 0.38 so we
         # know it works.
-        self.submit_question_answer('H2P1', ['Correct', 'Correct'])
+        self.submit_question_answer('H2P1', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.42)
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 0])
 
         # Third homework
-        self.submit_question_answer('H3P1', ['Correct', 'Correct'])
+        self.submit_question_answer('H3P1', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.42)   # Score didn't change
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 2.0])
 
-        self.submit_question_answer('H3P2', ['Correct', 'Correct'])
+        self.submit_question_answer('H3P2', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.5)   # Now homework2 dropped. Score changes
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 4.0])
 
         # Now we answer the final question (worth half of the grade)
-        self.submit_question_answer('FinalQuestion', ['Correct', 'Correct'])
+        self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(1.0)   # Hooray! We got 100%
+
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestSchematicResponse(TestSubmittingProblems):
+    """Check that we can submit a schematic response, and it answers properly."""
+
+    course_slug = "embedded_python"
+    course_when = "2013_Spring"
+
+    def test_schematic(self):
+        resp = self.submit_question_answer('schematic_problem',
+            { '2_1': json.dumps(
+                [['transient', {'Z': [
+                [0.0000004, 2.8],
+                [0.0000009, 2.8],
+                [0.0000014, 2.8],
+                [0.0000019, 2.8],
+                [0.0000024, 2.8],
+                [0.0000029, 0.2],
+                [0.0000034, 0.2],
+                [0.0000039, 0.2]
+                ]}]]
+                )
+            })
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'correct')
+
+        self.reset_question_answer('schematic_problem')
+        resp = self.submit_question_answer('schematic_problem',
+            { '2_1': json.dumps(
+                [['transient', {'Z': [
+                [0.0000004, 2.8],
+                [0.0000009, 0.0],       # wrong.
+                [0.0000014, 2.8],
+                [0.0000019, 2.8],
+                [0.0000024, 2.8],
+                [0.0000029, 0.2],
+                [0.0000034, 0.2],
+                [0.0000039, 0.2]
+                ]}]]
+                )
+            })
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'incorrect')
+
+    def test_check_function(self):
+        resp = self.submit_question_answer('cfn_problem', {'2_1': "0, 1, 2, 3, 4, 5, 'Outside of loop', 6"})
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'correct')
+
+        self.reset_question_answer('cfn_problem')
+
+        resp = self.submit_question_answer('cfn_problem', {'2_1': "xyzzy!"})
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'incorrect')
+
+    def test_computed_answer(self):
+        resp = self.submit_question_answer('computed_answer', {'2_1': "Xyzzy"})
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'correct')
+
+        self.reset_question_answer('computed_answer')
+
+        resp = self.submit_question_answer('computed_answer', {'2_1': "NO!"})
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'incorrect')

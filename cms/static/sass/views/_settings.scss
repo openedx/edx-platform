@@ -21,7 +21,7 @@ body.course.settings {
     font-size: 14px;
   }
 
-  .message-status {
+  .message-status { 
     display: none;
     @include border-top-radius(2px);
     @include box-sizing(border-box);
@@ -328,11 +328,12 @@ body.course.settings {
             @extend .t-action-3;
             font-weight: 600;
 
-            .icon {
+            [class^="icon-"] {
               @extend .t-icon;
               @include font-size(16);
               display: inline-block;
               vertical-align: middle;
+              margin-top: -3px;
             }
           }
         }
@@ -384,6 +385,11 @@ body.course.settings {
 
       #course-overview {
         height: ($baseline*20);
+      }
+
+      //adds back in CodeMirror border removed due to Unit page styling of component editors
+      .CodeMirror {
+        border: 1px solid $gray-l2;
       }
     }
 
@@ -697,7 +703,7 @@ body.course.settings {
 
           .tip {
             @include transition (opacity 0.5s ease-in-out 0s);
-            opacity: 0;
+            opacity: 0.0;
             position: absolute;
             bottom: ($baseline*1.25);
           }
@@ -712,7 +718,7 @@ body.course.settings {
           input.error {
 
             & + .tip {
-              opacity: 0;
+              opacity: 0.0;
             }
           }
         }

@@ -2,7 +2,7 @@
 generate and view word cloud.
 
 On the client side we show:
-If student does not yet anwered - `num_inputs` numbers of text inputs.
+If student does not yet answered - `num_inputs` numbers of text inputs.
 If student have answered - words he entered and cloud.
 """
 
@@ -14,7 +14,8 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
-from xblock.core import Scope, String, Object, Boolean, List, Integer
+from xblock.core import Scope, Object, Boolean, List
+from fields import StringyBoolean, StringyInteger
 
 log = logging.getLogger(__name__)
 
@@ -31,22 +32,23 @@ def pretty_bool(value):
 
 class WordCloudFields(object):
     """XFields for word cloud."""
-    display_name = String(
-        help="Display name for this module",
-        scope=Scope.settings
-    )
-    num_inputs = Integer(
-        help="Number of inputs.",
+    num_inputs = StringyInteger(
+        display_name="Inputs",
+        help="Number of text boxes available for students to input words/sentences.",
         scope=Scope.settings,
-        default=5
+        default=5,
+        values={"min": 1}
     )
-    num_top_words = Integer(
-        help="Number of max words, which will be displayed.",
+    num_top_words = StringyInteger(
+        display_name="Maximum Words",
+        help="Maximum number of words to be displayed in generated word cloud.",
         scope=Scope.settings,
-        default=250
+        default=250,
+        values={"min": 1}
     )
-    display_student_percents = Boolean(
-        help="Display usage percents for each word?",
+    display_student_percents = StringyBoolean(
+        display_name="Show Percents",
+        help="Statistics are shown for entered words near that word.",
         scope=Scope.settings,
         default=True
     )
@@ -205,7 +207,7 @@ class WordCloudModule(WordCloudFields, XModule):
             # Update top_words.
             self.top_words = self.top_dict(
                 temp_all_words,
-                int(self.num_top_words)
+                self.num_top_words
             )
 
             # Save all_words in database.
@@ -226,7 +228,7 @@ class WordCloudModule(WordCloudFields, XModule):
             'element_id': self.location.html_id(),
             'element_class': self.location.category,
             'ajax_url': self.system.ajax_url,
-            'num_inputs': int(self.num_inputs),
+            'num_inputs': self.num_inputs,
             'submitted': self.submitted
         }
         self.content = self.system.render_template('word_cloud.html', context)

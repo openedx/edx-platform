@@ -93,7 +93,7 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
         return result
 
     def _get_timeframe(self, xmltree):
-        """ Converts 'from' and 'to' parameters in video tag to seconds.
+        """ Converts 'start_time' and 'end_time' parameters in video tag to seconds.
         If there are no parameters, returns empty string. """
 
         def parse_time(s):
@@ -103,11 +103,13 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
                 return ''
             else:
                 x = time.strptime(s, '%H:%M:%S')
-                return datetime.timedelta(hours=x.tm_hour,
-                                      minutes=x.tm_min,
-                                      seconds=x.tm_sec).total_seconds()
+                return datetime.timedelta(
+                    hours=x.tm_hour,
+                    minutes=x.tm_min,
+                    seconds=x.tm_sec
+                ).total_seconds()
 
-        return parse_time(xmltree.get('from')), parse_time(xmltree.get('to'))
+        return parse_time(xmltree.get('start_time')), parse_time(xmltree.get('end_time'))
 
     def handle_ajax(self, dispatch, get):
         """Handle ajax calls to this video.

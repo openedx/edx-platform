@@ -2,7 +2,6 @@
 Tests of responsetypes
 """
 
-
 from datetime import datetime
 import json
 from nose.plugins.skip import SkipTest
@@ -10,10 +9,10 @@ import os
 import random
 import unittest
 import textwrap
+import mock
 
-from . import test_system
+from . import new_loncapa_problem, test_system
 
-import capa.capa_problem as lcp
 from capa.responsetypes import LoncapaProblemError, \
     StudentInputError, ResponseError
 from capa.correctmap import CorrectMap
@@ -30,9 +29,9 @@ class ResponseTest(unittest.TestCase):
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
 
-    def build_problem(self, **kwargs):
+    def build_problem(self, system=None, **kwargs):
         xml = self.xml_factory.build_xml(**kwargs)
-        return lcp.LoncapaProblem(xml, '1', system=test_system)
+        return new_loncapa_problem(xml, system=system)
 
     def assert_grade(self, problem, submission, expected_correctness, msg=None):
         input_dict = {'1_2_1': submission}
@@ -184,94 +183,150 @@ class ImageResponseTest(ResponseTest):
         self.assert_answer_format(problem)
 
 
-class SymbolicResponseTest(unittest.TestCase):
-    def test_sr_grade(self):
-        raise SkipTest()  # This test fails due to dependencies on a local copy of snuggletex-webapp. Until we have figured that out, we'll just skip this test
-        symbolicresponse_file = os.path.dirname(__file__) + "/test_files/symbolicresponse.xml"
-        test_lcp = lcp.LoncapaProblem(open(symbolicresponse_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': 'cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]',
-                           '1_2_1_dynamath': '''
-                            <math xmlns="http://www.w3.org/1998/Math/MathML">
-                              <mstyle displaystyle="true">
-                                <mrow>
-                                  <mi>cos</mi>
-                                  <mrow>
-                                    <mo>(</mo>
-                                    <mi>&#x3B8;</mi>
-                                    <mo>)</mo>
-                                  </mrow>
-                                </mrow>
-                                <mo>&#x22C5;</mo>
-                                <mrow>
-                                  <mo>[</mo>
-                                  <mtable>
-                                    <mtr>
-                                      <mtd>
-                                        <mn>1</mn>
-                                      </mtd>
-                                      <mtd>
-                                        <mn>0</mn>
-                                      </mtd>
-                                    </mtr>
-                                    <mtr>
-                                      <mtd>
-                                        <mn>0</mn>
-                                      </mtd>
-                                      <mtd>
-                                        <mn>1</mn>
-                                      </mtd>
-                                    </mtr>
-                                  </mtable>
-                                  <mo>]</mo>
-                                </mrow>
-                                <mo>+</mo>
-                                <mi>i</mi>
-                                <mo>&#x22C5;</mo>
-                                <mrow>
-                                  <mi>sin</mi>
-                                  <mrow>
-                                    <mo>(</mo>
-                                    <mi>&#x3B8;</mi>
-                                    <mo>)</mo>
-                                  </mrow>
-                                </mrow>
-                                <mo>&#x22C5;</mo>
-                                <mrow>
-                                  <mo>[</mo>
-                                  <mtable>
-                                    <mtr>
-                                      <mtd>
-                                        <mn>0</mn>
-                                      </mtd>
-                                      <mtd>
-                                        <mn>1</mn>
-                                      </mtd>
-                                    </mtr>
-                                    <mtr>
-                                      <mtd>
-                                        <mn>1</mn>
-                                      </mtd>
-                                      <mtd>
-                                        <mn>0</mn>
-                                      </mtd>
-                                    </mtr>
-                                  </mtable>
-                                  <mo>]</mo>
-                                </mrow>
-                              </mstyle>
-                            </math>
-                            ''',
-                           }
-        wrong_answers = {'1_2_1': '2',
-                         '1_2_1_dynamath': '''
-                         <math xmlns="http://www.w3.org/1998/Math/MathML">
-                           <mstyle displaystyle="true">
-                             <mn>2</mn>
-                           </mstyle>
-                         </math>''',
-                         }
-        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(wrong_answers).get_correctness('1_2_1'), 'incorrect')
+class SymbolicResponseTest(ResponseTest):
+    from response_xml_factory import SymbolicResponseXMLFactory
+    xml_factory_class = SymbolicResponseXMLFactory
+
+    def test_grade_single_input(self):
+        problem = self.build_problem(math_display=True,
+                                     expect="2*x+3*y")
+
+        # Correct answers
+        correct_inputs = [
+            ('2x+3y', textwrap.dedent("""
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                    <mn>2</mn><mo>*</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
+                    </mstyle></math>""")),
+
+            ('x+x+3y', textwrap.dedent("""
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                    <mi>x</mi><mo>+</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
+                    </mstyle></math>""")),
+        ]
+
+        for (input_str, input_mathml) in correct_inputs:
+            self._assert_symbolic_grade(problem, input_str, input_mathml, 'correct')
+
+        # Incorrect answers
+        incorrect_inputs = [
+            ('0', ''),
+            ('4x+3y', textwrap.dedent("""
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                    <mstyle displaystyle="true">
+                    <mn>4</mn><mo>*</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
+                    </mstyle></math>""")),
+        ]
+
+        for (input_str, input_mathml) in incorrect_inputs:
+            self._assert_symbolic_grade(problem, input_str, input_mathml, 'incorrect')
+
+    def test_complex_number_grade(self):
+        problem = self.build_problem(math_display=True,
+            expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
+            options=["matrix", "imaginary"])
+
+        # For LaTeX-style inputs, symmath_check() will try to contact
+        # a server to convert the input to MathML.
+        # We mock out the server, simulating the response that it would give
+        # for this input.
+        import requests
+        dirpath = os.path.dirname(__file__)
+        correct_snuggletex_response = open(os.path.join(dirpath, "test_files/snuggletex_correct.html")).read().decode('utf8')
+        wrong_snuggletex_response = open(os.path.join(dirpath, "test_files/snuggletex_wrong.html")).read().decode('utf8')
+
+        # Correct answer
+        with mock.patch.object(requests, 'post') as mock_post:
+
+            # Simulate what the LaTeX-to-MathML server would
+            # send for the correct response input
+            mock_post.return_value.text = correct_snuggletex_response
+
+            self._assert_symbolic_grade(problem,
+                "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]",
+                textwrap.dedent("""
+                <math xmlns="http://www.w3.org/1998/Math/MathML">
+                  <mstyle displaystyle="true">
+                    <mrow>
+                      <mi>cos</mi>
+                      <mrow><mo>(</mo><mi>&#x3B8;</mi><mo>)</mo></mrow>
+                    </mrow>
+                    <mo>&#x22C5;</mo>
+                    <mrow>
+                      <mo>[</mo>
+                      <mtable>
+                        <mtr>
+                          <mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd>
+                        </mtr>
+                      </mtable>
+                      <mo>]</mo>
+                    </mrow>
+                    <mo>+</mo>
+                    <mi>i</mi>
+                    <mo>&#x22C5;</mo>
+                    <mrow>
+                      <mi>sin</mi>
+                      <mrow>
+                        <mo>(</mo><mi>&#x3B8;</mi><mo>)</mo>
+                      </mrow>
+                    </mrow>
+                    <mo>&#x22C5;</mo>
+                    <mrow>
+                      <mo>[</mo>
+                      <mtable>
+                        <mtr>
+                          <mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd>
+                        </mtr>
+                        <mtr>
+                          <mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd>
+                        </mtr>
+                      </mtable>
+                      <mo>]</mo>
+                    </mrow>
+                  </mstyle>
+                </math>
+                """),
+                'correct')
+
+        # Incorrect answer
+        with mock.patch.object(requests, 'post') as mock_post:
+
+            # Simulate what the LaTeX-to-MathML server would
+            # send for the incorrect response input
+            mock_post.return_value.text = wrong_snuggletex_response
+
+            self._assert_symbolic_grade(problem, "2",
+                    textwrap.dedent("""
+                    <math xmlns="http://www.w3.org/1998/Math/MathML">
+                      <mstyle displaystyle="true"><mn>2</mn></mstyle>
+                    </math>
+                    """),
+                'incorrect')
+
+    def test_multiple_inputs_exception(self):
+
+        # Should not allow multiple inputs, since we specify
+        # only one "expect" value
+        with self.assertRaises(Exception):
+            problem = self.build_problem(math_display=True,
+                                        expect="2*x+3*y",
+                                        num_inputs=3)
+
+    def _assert_symbolic_grade(self, problem,
+                                student_input,
+                                dynamath_input,
+                                expected_correctness):
+        input_dict = {'1_2_1': str(student_input),
+                        '1_2_1_dynamath': str(dynamath_input)}
+
+        correct_map = problem.grade_answers(input_dict)
+
+        self.assertEqual(correct_map.get_correctness('1_2_1'),
+                        expected_correctness)
 
 
 class OptionResponseTest(ResponseTest):
@@ -292,10 +347,18 @@ class OptionResponseTest(ResponseTest):
 
 
 class FormulaResponseTest(ResponseTest):
+    """
+    Test the FormulaResponse class
+    """
     from response_xml_factory import FormulaResponseXMLFactory
     xml_factory_class = FormulaResponseXMLFactory
 
     def test_grade(self):
+        """
+        Test basic functionality of FormulaResponse
+
+        Specifically, if it can understand equivalence of formulae
+        """
         # Sample variables x and y in the range [-10, 10]
         sample_dict = {'x': (-10, 10), 'y': (-10, 10)}
 
@@ -316,6 +379,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_hint(self):
+        """
+        Test the hint-giving functionality of FormulaResponse
+        """
         # Sample variables x and y in the range [-10, 10]
         sample_dict = {'x': (-10, 10), 'y': (-10, 10)}
 
@@ -344,6 +410,10 @@ class FormulaResponseTest(ResponseTest):
                           'Try including the variable x')
 
     def test_script(self):
+        """
+        Test if python script can be used to generate answers
+        """
+
         # Calculate the answer using a script
         script = "calculated_ans = 'x+x'"
 
@@ -362,7 +432,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, '3*x', 'incorrect')
 
     def test_parallel_resistors(self):
-        """Test parallel resistors"""
+        """
+        Test parallel resistors
+        """
         sample_dict = {'R1': (10, 10), 'R2': (2, 2), 'R3': (5, 5), 'R4': (1, 1)}
 
         # Test problem
@@ -383,8 +455,11 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_default_variables(self):
-        """Test the default variables provided in common/lib/capa/capa/calc.py"""
-        # which are: j (complex number), e, pi, k, c, T, q
+        """
+        Test the default variables provided in calc.py
+
+        which are: j (complex number), e, pi, k, c, T, q
+        """
 
         # Sample x in the range [-10,10]
         sample_dict = {'x': (-10, 10)}
@@ -407,11 +482,14 @@ class FormulaResponseTest(ResponseTest):
                               msg="Failed on variable {0}; the given, incorrect answer was {1} but graded 'correct'".format(var, incorrect))
 
     def test_default_functions(self):
-        """Test the default functions provided in common/lib/capa/capa/calc.py"""
-        # which are: sin, cos, tan, sqrt, log10, log2, ln,
-        # arccos, arcsin, arctan, abs,
-        # fact, factorial
+        """
+        Test the default functions provided in common/lib/capa/capa/calc.py
 
+        which are:
+          sin, cos, tan, sqrt, log10, log2, ln,
+          arccos, arcsin, arctan, abs,
+          fact, factorial
+        """
         w = random.randint(3, 10)
         sample_dict = {'x': (-10, 10),  # Sample x in the range [-10,10]
                        'y': (1, 10),    # Sample y in the range [1,10] - logs, arccos need positive inputs
@@ -439,8 +517,10 @@ class FormulaResponseTest(ResponseTest):
                               msg="Failed on function {0}; the given, incorrect answer was {1} but graded 'correct'".format(func, incorrect))
 
     def test_grade_infinity(self):
-        # This resolves a bug where a problem with relative tolerance would
-        # pass with any arbitrarily large student answer.
+        """
+        Test that a large input on a problem with relative tolerance isn't
+        erroneously marked as correct.
+        """
 
         sample_dict = {'x': (1, 2)}
 
@@ -457,8 +537,9 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, input_formula, "incorrect")
 
     def test_grade_nan(self):
-        # Attempt to produce a value which causes the student's answer to be
-        # evaluated to nan. See if this is resolved correctly.
+        """
+        Test that expressions that evaluate to NaN are not marked as correct.
+        """
 
         sample_dict = {'x': (1, 2)}
 
@@ -474,6 +555,18 @@ class FormulaResponseTest(ResponseTest):
         # Expect an correct answer (+ nan) to be marked incorrect
         input_formula = "x + 0*1e999"
         self.assert_grade(problem, input_formula, "incorrect")
+
+    def test_raises_zero_division_err(self):
+        """
+        See if division by zero raises an error.
+        """
+        sample_dict = {'x': (1, 2)}
+        problem = self.build_problem(sample_dict=sample_dict,
+                                     num_samples=10,
+                                     tolerance="1%",
+                                     answer="x")  # Answer doesn't matter
+        input_dict = {'1_2_1': '1/0'}
+        self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
 
 
 class StringResponseTest(ResponseTest):
@@ -530,6 +623,22 @@ class StringResponseTest(ResponseTest):
         input_dict = {'1_2_1': 'California'}
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_hint('1_2_1'), "")
+
+    def test_computed_hints(self):
+        problem = self.build_problem(
+            answer="Michigan",
+            hintfn="gimme_a_hint",
+            script=textwrap.dedent("""
+                def gimme_a_hint(answer_ids, student_answers, new_cmap, old_cmap):
+                    aid = answer_ids[0]
+                    answer = student_answers[aid]
+                    new_cmap.set_hint_and_mode(aid, answer+"??", "always")
+            """)
+        )
+
+        input_dict = {'1_2_1': 'Hello'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'), "Hello??")
 
 
 class CodeResponseTest(ResponseTest):
@@ -708,17 +817,38 @@ class JavascriptResponseTest(ResponseTest):
     def test_grade(self):
         # Compile coffee files into javascript used by the response
         coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
-        os.system("coffee -c %s" % (coffee_file_path))
+        os.system("node_modules/.bin/coffee -c %s" % (coffee_file_path))
 
-        problem = self.build_problem(generator_src="test_problem_generator.js",
-                                     grader_src="test_problem_grader.js",
-                                     display_class="TestProblemDisplay",
-                                     display_src="test_problem_display.js",
-                                     param_dict={'value': '4'})
+        system = test_system()
+        system.can_execute_unsafe_code = lambda: True
+        problem = self.build_problem(
+            system=system,
+            generator_src="test_problem_generator.js",
+            grader_src="test_problem_grader.js",
+            display_class="TestProblemDisplay",
+            display_src="test_problem_display.js",
+            param_dict={'value': '4'},
+        )
 
         # Test that we get graded correctly
         self.assert_grade(problem, json.dumps({0: 4}), "correct")
         self.assert_grade(problem, json.dumps({0: 5}), "incorrect")
+
+    def test_cant_execute_javascript(self):
+        # If the system says to disallow unsafe code execution, then making
+        # this problem will raise an exception.
+        system = test_system()
+        system.can_execute_unsafe_code = lambda: False
+
+        with self.assertRaises(LoncapaProblemError):
+            problem = self.build_problem(
+                system=system,
+                generator_src="test_problem_generator.js",
+                grader_src="test_problem_grader.js",
+                display_class="TestProblemDisplay",
+                display_src="test_problem_display.js",
+                param_dict={'value': '4'},
+            )
 
 
 class NumericalResponseTest(ResponseTest):
@@ -804,6 +934,14 @@ class NumericalResponseTest(ResponseTest):
         incorrect_responses = ["", "3.9", "4.1", "0", "5.01e1"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
+    def test_raises_zero_division_err(self):
+        """See if division by zero is handled correctly"""
+        problem = self.build_problem(question_text="What 5 * 10?",
+                                     explanation="The answer is 50",
+                                     answer="5e+1")  # Answer doesn't matter
+        input_dict = {'1_2_1': '1/0'}
+        self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
+
 
 class CustomResponseTest(ResponseTest):
     from response_xml_factory import CustomResponseXMLFactory
@@ -853,7 +991,6 @@ class CustomResponseTest(ResponseTest):
         #
         #   'answer_given' is the answer the student gave (if there is just one input)
         #       or an ordered list of answers (if there are multiple inputs)
-        #
         #
         # The function should return a dict of the form
         # { 'ok': BOOL, 'msg': STRING }
@@ -963,6 +1100,35 @@ class CustomResponseTest(ResponseTest):
         self.assertEqual(correct_map.get_msg('1_2_1'), 'Feedback 1')
         self.assertEqual(correct_map.get_msg('1_2_2'), 'Feedback 2')
         self.assertEqual(correct_map.get_msg('1_2_3'), 'Feedback 3')
+
+    def test_function_code_with_extra_args(self):
+        script = textwrap.dedent("""\
+                    def check_func(expect, answer_given, options, dynamath):
+                        assert options == "xyzzy", "Options was %r" % options
+                        return {'ok': answer_given == expect, 'msg': 'Message text'}
+                    """)
+
+        problem = self.build_problem(script=script, cfn="check_func", expect="42", options="xyzzy", cfn_extra_args="options dynamath")
+
+        # Correct answer
+        input_dict = {'1_2_1': '42'}
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        msg = correct_map.get_msg('1_2_1')
+
+        self.assertEqual(correctness, 'correct')
+        self.assertEqual(msg, "Message text")
+
+        # Incorrect answer
+        input_dict = {'1_2_1': '0'}
+        correct_map = problem.grade_answers(input_dict)
+
+        correctness = correct_map.get_correctness('1_2_1')
+        msg = correct_map.get_msg('1_2_1')
+
+        self.assertEqual(correctness, 'incorrect')
+        self.assertEqual(msg, "Message text")
 
     def test_multiple_inputs_return_one_status(self):
         # When given multiple inputs, the 'answer_given' argument

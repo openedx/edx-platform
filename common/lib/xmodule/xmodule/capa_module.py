@@ -3,7 +3,9 @@ import datetime
 import hashlib
 import json
 import logging
+import os
 import traceback
+import struct
 import sys
 
 from pkg_resources import resource_string
@@ -23,8 +25,10 @@ from xmodule.util.date_utils import time_to_datetime
 log = logging.getLogger("mitx.courseware")
 
 
-# Generated this many different variants of problems with rerandomize=per_student
+# Generate this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
+# Never produce more than this many different seeds, no matter what.
+MAX_RANDOMIZATION_BINS = 1000
 
 
 def randomization_bin(seed, problem_id):
@@ -62,22 +66,51 @@ class ComplexEncoder(json.JSONEncoder):
 
 class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
-    max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    max_attempts = StringyInteger(
+        display_name="Maximum Attempts",
+        help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
+        values={"min": 1}, scope=Scope.settings
+    )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
-    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed",
-                        values=["answered", "always", "attempted", "closed", "never"])
+    showanswer = String(
+        display_name="Show Answer",
+        help="Defines when to show the answer to the problem. A default value can be set in Advanced Settings.",
+        scope=Scope.settings, default="closed",
+        values=[
+            {"display_name": "Always", "value": "always"},
+            {"display_name": "Answered", "value": "answered"},
+            {"display_name": "Attempted", "value": "attempted"},
+            {"display_name": "Closed", "value": "closed"},
+            {"display_name": "Finished", "value": "finished"},
+            {"display_name": "Past Due", "value": "past_due"},
+            {"display_name": "Never", "value": "never"}]
+    )
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
-    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    rerandomize = Randomization(
+        display_name="Randomization", help="Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings.",
+        default="always", scope=Scope.settings, values=[{"display_name": "Always", "value": "always"},
+                                                        {"display_name": "On Reset", "value": "onreset"},
+                                                        {"display_name": "Never", "value": "never"},
+                                                        {"display_name": "Per Student", "value": "per_student"}]
+    )
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
     input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    weight = StringyFloat(
+        display_name="Problem Weight",
+        help="Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point.",
+        values={"min": 0, "step": .1},
+        scope=Scope.settings
+    )
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
-    source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.", scope=Scope.settings)
+    source_code = String(
+        help="Source code for LaTeX and Word problems. This feature is not well-supported.",
+        scope=Scope.settings
+    )
 
 
 class CapaModule(CapaFields, XModule):
@@ -109,11 +142,7 @@ class CapaModule(CapaFields, XModule):
             self.close_date = due_date
 
         if self.seed is None:
-            if self.rerandomize == 'never':
-                self.seed = 1
-            elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
-                # see comment on randomization_bin
-                self.seed = randomization_bin(system.seed, self.location.url)
+            self.choose_new_seed()
 
         # Need the problem location in openendedresponse to send out.  Adding
         # it to the system here seems like the least clunky way to get it
@@ -157,6 +186,22 @@ class CapaModule(CapaFields, XModule):
 
             self.set_state_from_lcp()
 
+        assert self.seed is not None
+
+    def choose_new_seed(self):
+        """Choose a new seed."""
+        if self.rerandomize == 'never':
+            self.seed = 1
+        elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
+            # see comment on randomization_bin
+            self.seed = randomization_bin(self.system.seed, self.location.url)
+        else:
+            self.seed = struct.unpack('i', os.urandom(4))[0]
+
+            # So that sandboxed code execution can be cached, but still have an interesting
+            # number of possibilities, cap the number of different random seeds.
+            self.seed %= MAX_RANDOMIZATION_BINS
+
     def new_lcp(self, state, text=None):
         if text is None:
             text = self.data
@@ -165,6 +210,7 @@ class CapaModule(CapaFields, XModule):
             problem_text=text,
             id=self.location.html_id(),
             state=state,
+            seed=self.seed,
             system=self.system,
         )
 
@@ -832,14 +878,11 @@ class CapaModule(CapaFields, XModule):
                     'error': "Refresh the page and make an attempt before resetting."}
 
         if self.rerandomize in ["always", "onreset"]:
-            # reset random number generator seed (note the self.lcp.get_state()
-            # in next line)
-            seed = None
-        else:
-            seed = self.lcp.seed
+            # Reset random number generator seed.
+            self.choose_new_seed()
 
         # Generate a new problem with either the previous seed or a new seed
-        self.lcp = self.new_lcp({'seed': seed})
+        self.lcp = self.new_lcp(None)
 
         # Pull in the new problem seed
         self.set_state_from_lcp()

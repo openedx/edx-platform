@@ -16,7 +16,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from urllib import urlencode
 import zendesk
 
-import capa.calc
+import calc
 import track.views
 
 
@@ -27,7 +27,7 @@ def calculate(request):
     ''' Calculator in footer of every page. '''
     equation = request.GET['equation']
     try:
-        result = capa.calc.evaluator({}, {}, equation)
+        result = calc.evaluator({}, {}, equation)
     except:
         event = {'error': map(str, sys.exc_info()),
                  'equation': equation}
@@ -209,30 +209,3 @@ def accepts(request, media_type):
     accept = parse_accept_header(request.META.get("HTTP_ACCEPT", ""))
     return media_type in [t for (t, p, q) in accept]
 
-
-def debug_request(request):
-    """Return a pretty printed version of the request"""
-
-    return HttpResponse("""<html>
-<h1>request:</h1>
-<pre>{0}</pre>
-
-<h1>request.GET</h1>:
-
-<pre>{1}</pre>
-
-<h1>request.POST</h1>:
-<pre>{2}</pre>
-
-<h1>request.REQUEST</h1>:
-<pre>{3}</pre>
-
-
-
-</html>
-""".format(
-    pprint.pformat(request),
-    pprint.pformat(dict(request.GET)),
-    pprint.pformat(dict(request.POST)),
-    pprint.pformat(dict(request.REQUEST)),
-    ))

@@ -115,9 +115,6 @@ urlpatterns += (
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
 
     url(r'^logout$', 'student.views.logout_user', name='logout'),
-
-    # static/proof-of-concept views
-    url(r'^ux-alerts$', 'contentstore.views.ux_alerts', name='ux-alerts')
 )
 
 js_info_dict = {
@@ -134,6 +131,12 @@ urlpatterns += (
 if settings.ENABLE_JASMINE:
     # # Jasmine
     urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
+
+
+if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
+    urlpatterns += (
+        url(r'^status/', include('service_status.urls')),
+    )
 
 urlpatterns = patterns(*urlpatterns)
 

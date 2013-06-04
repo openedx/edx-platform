@@ -1,7 +1,8 @@
 body {
   min-width: 980px;
   min-height: 100%;
-  background: url(../images/bg-texture.png) #d6d6d6;
+  background-image: $course-bg-image;
+  background-color: $course-bg-color;
 }
 
 body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
@@ -34,7 +35,7 @@ a {
     width: 100%;
     border-radius: 3px;
     border: 1px solid $outer-border-color;
-    background: #fff;
+    background: $body-bg;
     @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
   }
 }
@@ -49,8 +50,8 @@ textarea,
 input[type="text"],
 input[type="email"],
 input[type="password"] {
-  background: rgb(250,250,250);
-  border: 1px solid rgb(200,200,200);
+  background: $body-bg;
+  border: 1px solid $border-color-2;
   @include border-radius(0);
   @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6), inset 0 0 3px 0 rgba(0,0,0, 0.1));
   @include box-sizing(border-box);
@@ -65,7 +66,7 @@ input[type="password"] {
   }
 
   &:focus {
-    border-color: lighten($blue, 20%);
+    border-color: lighten($link-color, 20%);
     @include box-shadow(0 0 6px 0 rgba($blue, 0.4), inset 0 0 4px 0 rgba(0,0,0, 0.15));
     outline: none;
   }
@@ -94,7 +95,7 @@ img {
 }
 
 ::selection, ::-moz-selection, ::-webkit-selection {
-  background: #444;
+  background: $selection-color-2;
   color: #fff;
 }
 
@@ -143,7 +144,7 @@ img {
   max-width: 350px;
   padding: 15px 20px 17px;
   border-radius: 3px;
-  border: 1px solid #333;
+  border: 1px solid $border-color-3;
   background: -webkit-linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0)) rgba(30, 30, 30, .92);
   box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
   font-size: 13px;

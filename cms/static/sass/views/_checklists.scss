@@ -62,7 +62,7 @@ body.course.checklists {
 
         .ui-toggle-expansion {
           @include transition(rotate .15s ease-in-out .25s);
-          @include font-size(14);
+          @include font-size(21);
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/2);
@@ -91,10 +91,9 @@ body.course.checklists {
         color: $gray-l2;
 
 
-        .icon-confirm {
+        .icon-ok {
           @include font-size(20);
           display: inline-block;
-          vertical-align: middle;
           margin-left: ($baseline/2);
           color: $gray-l4;
         }
@@ -184,13 +183,13 @@ body.course.checklists {
 
       header {
 
-        .checklist-title, .icon-confirm {
+        .checklist-title, .icon-caret-down {
           color: $green;
         }
 
         .checklist-status {
 
-          .status-count, .status-amount, .icon-confirm {
+          .status-count, .status-amount, .icon-ok {
             color: $green;
           }
         }
@@ -255,7 +254,7 @@ body.course.checklists {
         .task-support {
           @extend .t-copy-sub2;
           @include transition(opacity .15s .25s ease-in-out);
-          opacity: 0;
+          opacity: 0.0;
           pointer-events: none;
         }
       }
@@ -268,7 +267,7 @@ body.course.checklists {
         float: right;
         width: flex-grid(2,9);
         margin: ($baseline/2) 0 0 flex-gutter();
-        opacity: 0;
+        opacity: 0.0;
         pointer-events: none;
         text-align: right;
 

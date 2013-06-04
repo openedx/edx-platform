@@ -9,12 +9,12 @@
 
 @mixin home-header-pop-up-keyframes {
   0% {
-    opacity: 0;
+    opacity: 0.0;
     top: 300px;
     //@include transform(scale(0.9));
   }
   45% {
-    opacity: 1;
+    opacity: 1.0;
   }
   65% {
     top: -40px;
@@ -43,19 +43,19 @@
 
 @mixin title-appear-keyframes {
   0% {
-    opacity: 0;
+    opacity: 0.0;
     top: 60px;
     @include transform(scale(0.9));
   }
   20% {
-    opacity: 1;
+    opacity: 1.0;
   }
   27% { // this % of total-time should be ~ 1.25s
     top: 40px;
     @include transform(scale(1));
   }
   90% { // this % of total-time is when 2nd half of animation starts
-    opacity: 1;
+    opacity: 1.0;
     top: 40px;
     @include transform(scale(1));
   }
@@ -79,24 +79,24 @@
 
 @mixin home-appear-keyframes {
   0% {
-    opacity: 0;
+    opacity: 0.0;
     top: 60px;
     @include transform(scale(0.9));
   }
   20% {
-    opacity: 1;
+    opacity: 1.0;
   }
   30% { // this % of total-time should be ~ 1.25s
     top: 40px;
     @include transform(scale(1));
   }
   80% { // this % of total-time is when 2nd half of animation starts
-    opacity: 1;
+    opacity: 1.0;
     top: 40px;
     @include transform(scale(1));
   }
   100% {
-    opacity: 0;
+    opacity: 0.0;
     top: 60px;
     @include transform(scale(0.7));
   }
@@ -117,10 +117,10 @@
 
 @mixin edx-appear-keyframes {
   0% {
-    opacity: 0;
+    opacity: 0.0;
   }
   100% {
-    opacity: 1;
+    opacity: 1.0;
   }
 }
 
@@ -231,7 +231,7 @@
     opacity: 0.9;
   }
   80% {
-    opacity: 1;
+    opacity: 1.0;
   }
   100% {
     bottom: 0px;

@@ -46,7 +46,7 @@ import sys
 import pyparsing
 
 from .registry import TagRegistry
-from capa.chem import chemcalc
+from chem import chemcalc
 import xqueue_interface
 from datetime import datetime
 

@@ -6,6 +6,11 @@ Common traits:
 * Use memcached, and cache-backed sessions
 * Use a MySQL 5.1 database
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 import json
 
 from .common import *
@@ -26,7 +31,8 @@ if SERVICE_VARIANT:
     CONFIG_PREFIX = SERVICE_VARIANT + "."
 
 
-################### ALWAYS THE SAME ################################
+################################ ALWAYS THE SAME ##############################
+
 DEBUG = False
 TEMPLATE_DEBUG = False
 
@@ -45,7 +51,49 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 # for other warnings.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-################# NON-SECURE ENV CONFIG ##############################
+###################################### CELERY  ################################
+
+# Don't use a connection pool, since connections are dropped by ELB.
+BROKER_POOL_LIMIT = 0
+BROKER_CONNECTION_TIMEOUT = 1
+
+# For the Result Store, use the django cache named 'celery'
+CELERY_RESULT_BACKEND = 'cache'
+CELERY_CACHE_BACKEND = 'celery'
+
+# When the broker is behind an ELB, use a heartbeat to refresh the
+# connection and to detect if it has been dropped.
+BROKER_HEARTBEAT = 10.0
+BROKER_HEARTBEAT_CHECKRATE = 2
+
+# Each worker should only fetch one message at a time
+CELERYD_PREFETCH_MULTIPLIER = 1
+
+# Skip djcelery migrations, since we don't use the database as the broker
+SOUTH_MIGRATION_MODULES = {
+    'djcelery': 'ignore',
+}
+
+# Rename the exchange and queues for each variant
+
+QUEUE_VARIANT = CONFIG_PREFIX.lower()
+
+CELERY_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
+
+HIGH_PRIORITY_QUEUE = 'edx.{0}core.high'.format(QUEUE_VARIANT)
+DEFAULT_PRIORITY_QUEUE = 'edx.{0}core.default'.format(QUEUE_VARIANT)
+LOW_PRIORITY_QUEUE = 'edx.{0}core.low'.format(QUEUE_VARIANT)
+
+CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
+CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+
+CELERY_QUEUES = {
+    HIGH_PRIORITY_QUEUE: {},
+    LOW_PRIORITY_QUEUE: {},
+    DEFAULT_PRIORITY_QUEUE: {}
+}
+
+########################## NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
 
 with open(ENV_ROOT / CONFIG_PREFIX + "env.json") as env_file:
@@ -65,6 +113,11 @@ DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)
 ADMINS = ENV_TOKENS.get('ADMINS', ADMINS)
 SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
+
+#Theme overrides
+THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
+if not THEME_NAME is None:
+    enable_theme(THEME_NAME)
 
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
@@ -91,9 +144,21 @@ COMMENTS_SERVICE_KEY = ENV_TOKENS.get("COMMENTS_SERVICE_KEY", '')
 CERT_QUEUE = ENV_TOKENS.get("CERT_QUEUE", 'test-pull')
 ZENDESK_URL = ENV_TOKENS.get("ZENDESK_URL")
 FEEDBACK_SUBMISSION_EMAIL = ENV_TOKENS.get("FEEDBACK_SUBMISSION_EMAIL")
+MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
+
+for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
+    oldvalue = CODE_JAIL.get(name)
+    if isinstance(oldvalue, dict):
+        for subname, subvalue in value.items():
+            oldvalue[subname] = subvalue
+    else:
+        CODE_JAIL[name] = value
+
+COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
+
 with open(ENV_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
@@ -112,7 +177,8 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 MODULESTORE = AUTH_TOKENS.get('MODULESTORE', MODULESTORE)
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 
-OPEN_ENDED_GRADING_INTERFACE = AUTH_TOKENS.get('OPEN_ENDED_GRADING_INTERFACE', OPEN_ENDED_GRADING_INTERFACE)
+OPEN_ENDED_GRADING_INTERFACE = AUTH_TOKENS.get('OPEN_ENDED_GRADING_INTERFACE',
+                                               OPEN_ENDED_GRADING_INTERFACE)
 
 PEARSON_TEST_USER = "pearsontest"
 PEARSON_TEST_PASSWORD = AUTH_TOKENS.get("PEARSON_TEST_PASSWORD")
@@ -127,5 +193,17 @@ DATADOG_API = AUTH_TOKENS.get("DATADOG_API")
 ANALYTICS_SERVER_URL = ENV_TOKENS.get("ANALYTICS_SERVER_URL")
 ANALYTICS_API_KEY = AUTH_TOKENS.get("ANALYTICS_API_KEY", "")
 
+# Zendesk
 ZENDESK_USER = AUTH_TOKENS.get("ZENDESK_USER")
 ZENDESK_API_KEY = AUTH_TOKENS.get("ZENDESK_API_KEY")
+
+# Celery Broker
+CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
+CELERY_BROKER_HOSTNAME = ENV_TOKENS.get("CELERY_BROKER_HOSTNAME", "")
+CELERY_BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
+CELERY_BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
+
+BROKER_URL = "{0}://{1}:{2}@{3}".format(CELERY_BROKER_TRANSPORT,
+                                        CELERY_BROKER_USER,
+                                        CELERY_BROKER_PASSWORD,
+                                        CELERY_BROKER_HOSTNAME)

@@ -40,7 +40,6 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
                 // data
                 data : JSON.stringify({ deleteKeys : self.deleteKeys})
             })
-            .fail(function(hdr, status, error) { CMS.ServerError(self, "Deleting keys:" + status); })
             .done(function(data, status, error) {
                 // clear deleteKeys on success
                 self.deleteKeys = [];

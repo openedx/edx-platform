@@ -23,6 +23,7 @@ import random
 import re
 import requests
 import subprocess
+import textwrap
 import traceback
 import xml.sax.saxutils as saxutils
 
@@ -30,15 +31,21 @@ from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
 # specific library imports
-from .calc import evaluator, UndefinedVariable
-from .correctmap import CorrectMap
+from calc import evaluator, UndefinedVariable
+from . import correctmap
 from datetime import datetime
 from .util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
 import capa.xqueue_interface as xqueue_interface
 
+import safe_exec
+
 log = logging.getLogger(__name__)
+
+
+CorrectMap = correctmap.CorrectMap
+CORRECTMAP_PY = None
 
 
 #-----------------------------------------------------------------------------
@@ -132,6 +139,8 @@ class LoncapaResponse(object):
         self.inputfields = inputfields
         self.context = context
         self.system = system
+
+        self.id = xml.get('id')
 
         for abox in inputfields:
             if abox.tag not in self.allowed_inputfields:
@@ -252,20 +261,41 @@ class LoncapaResponse(object):
 
             # We may extend this in the future to add another argument which provides a
             # callback procedure to a social hint generation system.
-            if not hintfn in self.context:
-                msg = 'missing specified hint function %s in script context' % hintfn
-                msg += "\nSee XML source line %s" % getattr(
-                    self.xml, 'sourceline', '<unavailable>')
-                raise LoncapaProblemError(msg)
+
+            global CORRECTMAP_PY
+            if CORRECTMAP_PY is None:
+                # We need the CorrectMap code for hint functions. No, this is not great.
+                CORRECTMAP_PY = inspect.getsource(correctmap)
+
+            code = (
+                CORRECTMAP_PY + "\n" +
+                self.context['script_code'] + "\n" +
+                textwrap.dedent("""
+                    new_cmap = CorrectMap()
+                    new_cmap.set_dict(new_cmap_dict)
+                    old_cmap = CorrectMap()
+                    old_cmap.set_dict(old_cmap_dict)
+                    {hintfn}(answer_ids, student_answers, new_cmap, old_cmap)
+                    new_cmap_dict.update(new_cmap.get_dict())
+                    old_cmap_dict.update(old_cmap.get_dict())
+                    """).format(hintfn=hintfn)
+            )
+            globals_dict = {
+                'answer_ids': self.answer_ids,
+                'student_answers': student_answers,
+                'new_cmap_dict': new_cmap.get_dict(),
+                'old_cmap_dict': old_cmap.get_dict(),
+            }
 
             try:
-                self.context[hintfn](
-                    self.answer_ids, student_answers, new_cmap, old_cmap)
+                safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'], slug=self.id)
             except Exception as err:
                 msg = 'Error %s in evaluating hint function %s' % (err, hintfn)
                 msg += "\nSee XML source line %s" % getattr(
                     self.xml, 'sourceline', '<unavailable>')
                 raise ResponseError(msg)
+
+            new_cmap.set_dict(globals_dict['new_cmap_dict'])
             return
 
         # hint specified by conditions and text dependent on conditions (a-la Loncapa design)
@@ -475,6 +505,10 @@ class JavascriptResponse(LoncapaResponse):
         return tmp_env
 
     def call_node(self, args):
+        # Node.js code is un-sandboxed. If the XModuleSystem says we aren't
+        # allowed to run unsafe code, then stop now.
+        if not self.system.can_execute_unsafe_code():
+            raise LoncapaProblemError("Execution of unsafe Javascript code is not allowed.")
 
         subprocess_args = ["node"]
         subprocess_args.extend(args)
@@ -488,7 +522,7 @@ class JavascriptResponse(LoncapaResponse):
         output = self.call_node([generator_file,
                                  self.generator,
                                  json.dumps(self.generator_dependencies),
-                                 json.dumps(str(self.context['the_lcp'].seed)),
+                                 json.dumps(str(self.context['seed'])),
                                  json.dumps(self.params)]).strip()
 
         return json.loads(output)
@@ -660,15 +694,6 @@ class ChoiceResponse(LoncapaResponse):
 
 class MultipleChoiceResponse(LoncapaResponse):
     # TODO: handle direction and randomize
-    snippets = [{'snippet': '''<multiplechoiceresponse direction="vertical" randomize="yes">
-     <choicegroup type="MultipleChoice">
-        <choice location="random" correct="false"><span>`a+b`<br/></span></choice>
-        <choice location="random" correct="true"><span><math>a+b^2</math><br/></span></choice>
-        <choice location="random" correct="false"><math>a+b+c</math></choice>
-        <choice location="bottom" correct="false"><math>a+b+d</math></choice>
-     </choicegroup>
-    </multiplechoiceresponse>
-    '''}]
 
     response_tag = 'multiplechoiceresponse'
     max_inputfields = 1
@@ -754,14 +779,6 @@ class OptionResponse(LoncapaResponse):
     '''
     TODO: handle direction and randomize
     '''
-    snippets = [{'snippet': """<optionresponse direction="vertical" randomize="yes">
-        <optioninput options="('Up','Down')" correct="Up">
-          <text>The location of the sky</text>
-        </optioninput>
-        <optioninput options="('Up','Down')" correct="Down">
-          <text>The location of the earth</text>
-        </optioninput>
-    </optionresponse>"""}]
 
     response_tag = 'optionresponse'
     hint_tag = 'optionhint'
@@ -905,39 +922,6 @@ class CustomResponse(LoncapaResponse):
     Custom response.  The python code to be run should be in <answer>...</answer>
     or in a <script>...</script>
     '''
-    snippets = [{'snippet': r"""<customresponse>
-    <text>
-    <br/>
-    Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
-    In the space provided below write an algebraic expression for \(I(t)\).
-    <br/>
-    <textline size="5" correct_answer="IS*u(t-t0)" />
-    </text>
-    <answer type="loncapa/python">
-    correct=['correct']
-    try:
-        r = str(submission[0])
-    except ValueError:
-        correct[0] ='incorrect'
-        r = '0'
-    if not(r=="IS*u(t-t0)"):
-        correct[0] ='incorrect'
-    </answer>
-    </customresponse>"""},
-                {'snippet': """<script type="loncapa/python"><![CDATA[
-
-def sympy_check2():
-  messages[0] = '%s:%s' % (submission[0],fromjs[0].replace('<','&lt;'))
-  #messages[0] = str(answers)
-  correct[0] = 'correct'
-
-]]>
-</script>
-
-  <customresponse cfn="sympy_check2" type="cs" expect="2.27E-39" dojs="math" size="30" answer="2.27E-39">
-    <textline size="40" dojs="math" />
-    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/>
-  </customresponse>"""}]
 
     response_tag = 'customresponse'
 
@@ -953,7 +937,6 @@ def sympy_check2():
         # if <customresponse> has an "expect" (or "answer") attribute then save
         # that
         self.expect = xml.get('expect') or xml.get('answer')
-        self.myid = xml.get('id')
 
         log.debug('answer_ids=%s' % self.answer_ids)
 
@@ -972,19 +955,34 @@ def sympy_check2():
             cfn = xml.get('cfn')
             if cfn:
                 log.debug("cfn = %s" % cfn)
-                if cfn in self.context:
-                    self.code = self.context[cfn]
-                else:
-                    msg = "%s: can't find cfn %s in context" % (
-                        unicode(self), cfn)
-                    msg += "\nSee XML source line %s" % getattr(self.xml, 'sourceline',
-                                                                '<unavailable>')
-                    raise LoncapaProblemError(msg)
+
+                # This is a bit twisty.  We used to grab the cfn function from
+                # the context, but now that we sandbox Python execution, we
+                # can't get functions from previous executions.  So we make an
+                # actual function that will re-execute the original script,
+                # and invoke the function with the data needed.
+                def make_check_function(script_code, cfn):
+                    def check_function(expect, ans, **kwargs):
+                        extra_args = "".join(", {0}={0}".format(k) for k in kwargs)
+                        code = (
+                            script_code + "\n" +
+                            "cfn_return = %s(expect, ans%s)\n" % (cfn, extra_args)
+                        )
+                        globals_dict = {
+                            'expect': expect,
+                            'ans': ans,
+                        }
+                        globals_dict.update(kwargs)
+                        safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'], slug=self.id)
+                        return globals_dict['cfn_return']
+                    return check_function
+
+                self.code = make_check_function(self.context['script_code'], cfn)
 
         if not self.code:
             if answer is None:
                 log.error("[courseware.capa.responsetypes.customresponse] missing"
-                          " code checking script! id=%s" % self.myid)
+                          " code checking script! id=%s" % self.id)
                 self.code = ''
             else:
                 answer_src = answer.get('src')
@@ -1036,11 +1034,8 @@ def sympy_check2():
         # put these in the context of the check function evaluator
         # note that this doesn't help the "cfn" version - only the exec version
         self.context.update({
-            # our subtree
-            'xml': self.xml,
-
             # my ID
-            'response_id': self.myid,
+            'response_id': self.id,
 
             # expected answer (if given as attribute)
             'expect': self.expect,
@@ -1075,65 +1070,63 @@ def sympy_check2():
         # pass self.system.debug to cfn
         self.context['debug'] = self.system.DEBUG
 
+        # Run the check function
+        self.execute_check_function(idset, submission)
+
+        # build map giving "correct"ness of the answer(s)
+        correct = self.context['correct']
+        messages = self.context['messages']
+        overall_message = self.clean_message_html(self.context['overall_message'])
+        correct_map = CorrectMap()
+        correct_map.set_overall_message(overall_message)
+
+        for k in range(len(idset)):
+            npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
+            correct_map.set(idset[k], correct[k], msg=messages[k],
+                            npoints=npoints)
+        return correct_map
+
+    def execute_check_function(self, idset, submission):
         # exec the check function
         if isinstance(self.code, basestring):
             try:
-                exec self.code in self.context['global_context'], self.context
-                correct = self.context['correct']
-                messages = self.context['messages']
-                overall_message = self.context['overall_message']
-
+                safe_exec.safe_exec(self.code, self.context, cache=self.system.cache, slug=self.id)
             except Exception as err:
                 self._handle_exec_exception(err)
 
         else:
-            # self.code is not a string; assume its a function
+            # self.code is not a string; it's a function we created earlier.
 
             # this is an interface to the Tutor2 check functions
             fn = self.code
-            ret = None
+            answer_given = submission[0] if (len(idset) == 1) else submission
+            kwnames = self.xml.get("cfn_extra_args", "").split()
+            kwargs = {n:self.context.get(n) for n in kwnames}
             log.debug(" submission = %s" % submission)
             try:
-                answer_given = submission[0] if (
-                    len(idset) == 1) else submission
-                # handle variable number of arguments in check function, for backwards compatibility
-                # with various Tutor2 check functions
-                args = [self.expect, answer_given,
-                        student_answers, self.answer_ids[0]]
-                argspec = inspect.getargspec(fn)
-                nargs = len(argspec.args) - len(argspec.defaults or [])
-                kwargs = {}
-                for argname in argspec.args[nargs:]:
-                    kwargs[argname] = self.context[
-                        argname] if argname in self.context else None
-
-                log.debug('[customresponse] answer_given=%s' % answer_given)
-                log.debug('nargs=%d, args=%s, kwargs=%s' % (
-                    nargs, args, kwargs))
-
-                ret = fn(*args[:nargs], **kwargs)
-
+                ret = fn(self.expect, answer_given, **kwargs)
             except Exception as err:
                 self._handle_exec_exception(err)
-
-            if type(ret) == dict:
-
+            log.debug(
+                "[courseware.capa.responsetypes.customresponse.get_score] ret = %s",
+                ret
+            )
+            if isinstance(ret, dict):
                 # One kind of dictionary the check function can return has the
                 # form {'ok': BOOLEAN, 'msg': STRING}
                 # If there are multiple inputs, they all get marked
                 # to the same correct/incorrect value
                 if 'ok' in ret:
-                    correct = ['correct'] * len(idset) if ret[
-                        'ok'] else ['incorrect'] * len(idset)
+                    correct = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
                     msg = ret.get('msg', None)
                     msg = self.clean_message_html(msg)
 
                     # If there is only one input, apply the message to that input
                     # Otherwise, apply the message to the whole problem
                     if len(idset) > 1:
-                        overall_message = msg
+                        self.context['overall_message'] = msg
                     else:
-                        messages[0] = msg
+                        self.context['messages'][0] = msg
 
                 # Another kind of dictionary the check function can return has
                 # the form:
@@ -1155,6 +1148,8 @@ def sympy_check2():
                         msg = (self.clean_message_html(input_dict['msg'])
                                if 'msg' in input_dict else None)
                         messages.append(msg)
+                    self.context['messages'] = messages
+                    self.context['overall_message'] = overall_message
 
                 # Otherwise, we do not recognize the dictionary
                 # Raise an exception
@@ -1163,25 +1158,10 @@ def sympy_check2():
                     raise ResponseError(
                         "CustomResponse: check function returned an invalid dict")
 
-            # The check function can return a boolean value,
-            # indicating whether all inputs should be marked
-            # correct or incorrect
             else:
-                n = len(idset)
-                correct = ['correct'] * n if ret else ['incorrect'] * n
+                correct = ['correct' if ret else 'incorrect'] * len(idset)
 
-        # build map giving "correct"ness of the answer(s)
-        correct_map = CorrectMap()
-
-        overall_message = self.clean_message_html(overall_message)
-        correct_map.set_overall_message(overall_message)
-
-        for k in range(len(idset)):
-            npoints = (self.maxpoints[idset[k]]
-                       if correct[k] == 'correct' else 0)
-            correct_map.set(idset[k], correct[k], msg=messages[k],
-                            npoints=npoints)
-        return correct_map
+            self.context['correct'] = correct
 
     def clean_message_html(self, msg):
 
@@ -1253,24 +1233,38 @@ class SymbolicResponse(CustomResponse):
     """
     Symbolic math response checking, using symmath library.
     """
-    snippets = [{'snippet': r'''<problem>
-      <text>Compute \[ \exp\left(-i \frac{\theta}{2} \left[ \begin{matrix} 0 & 1 \\ 1 & 0 \end{matrix} \right] \right) \]
-      and give the resulting \(2\times 2\) matrix: <br/>
-        <symbolicresponse answer="">
-          <textline size="40" math="1" />
-        </symbolicresponse>
-      <br/>
-      Your input should be typed in as a list of lists, eg <tt>[[1,2],[3,4]]</tt>.
-      </text>
-    </problem>'''}]
 
     response_tag = 'symbolicresponse'
+    max_inputfields = 1
 
     def setup_response(self):
+        # Symbolic response always uses symmath_check()
+        # If the XML did not specify this, then set it now
+        # Otherwise, we get an error from the superclass
         self.xml.set('cfn', 'symmath_check')
-        code = "from symmath import *"
-        exec code in self.context, self.context
-        CustomResponse.setup_response(self)
+
+        # Let CustomResponse do its setup
+        super(SymbolicResponse, self).setup_response()
+
+    def execute_check_function(self, idset, submission):
+        from symmath import symmath_check
+        try:
+            # Since we have limited max_inputfields to 1,
+            # we can assume that there is only one submission
+            answer_given = submission[0]
+
+            ret = symmath_check(
+                self.expect, answer_given,
+                dynamath=self.context.get('dynamath'),
+                options=self.context.get('options'),
+                debug=self.context.get('debug'),
+            )
+        except Exception as err:
+            log.error("oops in symbolicresponse (cfn) error %s" % err)
+            log.error(traceback.format_exc())
+            raise Exception("oops in symbolicresponse (cfn) error %s" % err)
+        self.context['messages'][0] = self.clean_message_html(ret['msg'])
+        self.context['correct'] = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
 
 #-----------------------------------------------------------------------------
 
@@ -1325,10 +1319,8 @@ class CodeResponse(LoncapaResponse):
         # Check if XML uses the ExternalResponse format or the generic
         # CodeResponse format
         codeparam = self.xml.find('codeparam')
-        if codeparam is None:
-            self._parse_externalresponse_xml()
-        else:
-            self._parse_coderesponse_xml(codeparam)
+        assert codeparam is not None, "Unsupported old format! <coderesponse> without <codeparam>"
+        self._parse_coderesponse_xml(codeparam)
 
     def _parse_coderesponse_xml(self, codeparam):
         '''
@@ -1347,62 +1339,6 @@ class CodeResponse(LoncapaResponse):
             codeparam, 'initial_display', '')
         self.answer = find_with_default(codeparam, 'answer_display',
                                         'No answer provided.')
-
-    def _parse_externalresponse_xml(self):
-        '''
-        VS[compat]: Suppport for old ExternalResponse XML format. When successful, sets:
-            self.initial_display
-            self.answer (an answer to display to the student in the LMS)
-            self.payload
-        '''
-        answer = self.xml.find('answer')
-
-        if answer is not None:
-            answer_src = answer.get('src')
-            if answer_src is not None:
-                code = self.system.filesystem.open('src/' + answer_src).read()
-            else:
-                code = answer.text
-        else:  # no <answer> stanza; get code from <script>
-            code = self.context['script_code']
-            if not code:
-                msg = '%s: Missing answer script code for coderesponse' % unicode(
-                    self)
-                msg += "\nSee XML source line %s" % getattr(
-                    self.xml, 'sourceline', '<unavailable>')
-                raise LoncapaProblemError(msg)
-
-        tests = self.xml.get('tests')
-
-        # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
-        #   (1) Internal edX code, i.e. NOT student submissions, and
-        #   (2) The code should only define the strings 'initial_display', 'answer',
-        #           'preamble', 'test_program'
-        #           following the ExternalResponse XML format
-        penv = {}
-        penv['__builtins__'] = globals()['__builtins__']
-        try:
-            exec(code, penv, penv)
-        except Exception as err:
-            log.error(
-                'Error in CodeResponse %s: Error in problem reference code' % err)
-            raise Exception(err)
-        try:
-            self.answer = penv['answer']
-            self.initial_display = penv['initial_display']
-        except Exception as err:
-            log.error("Error in CodeResponse %s: Problem reference code does not define"
-                      " 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
-            raise Exception(err)
-
-        # Finally, make the ExternalResponse input XML format conform to the generic
-        # exteral grader interface
-        #   The XML tagging of grader_payload is pyxserver-specific
-        grader_payload = '<pyxserver>'
-        grader_payload += '<tests>' + tests + '</tests>\n'
-        grader_payload += '<processor>' + code + '</processor>'
-        grader_payload += '</pyxserver>'
-        self.payload = {'grader_payload': grader_payload}
 
     def get_score(self, student_answers):
         try:
@@ -1583,44 +1519,6 @@ class ExternalResponse(LoncapaResponse):
     Typically used by coding problems.
 
     '''
-    snippets = [{'snippet': '''<externalresponse tests="repeat:10,generate">
-    <textbox rows="10" cols="70"  mode="python"/>
-    <answer><![CDATA[
-initial_display = """
-def inc(x):
-"""
-
-answer = """
-def inc(n):
-    return n+1
-"""
-preamble = """
-import sympy
-"""
-test_program = """
-import random
-
-def testInc(n = None):
-    if n is None:
-       n = random.randint(2, 20)
-    print 'Test is: inc(%d)'%n
-    return str(inc(n))
-
-def main():
-   f = os.fdopen(3,'w')
-   test = int(sys.argv[1])
-   rndlist = map(int,os.getenv('rndlist').split(','))
-   random.seed(rndlist[0])
-   if test == 1: f.write(testInc(0))
-   elif test == 2: f.write(testInc(1))
-   else:  f.write(testInc())
-   f.close()
-
-main()
-"""
-]]>
-    </answer>
-  </externalresponse>'''}]
 
     response_tag = 'externalresponse'
     allowed_inputfields = ['textline', 'textbox']
@@ -1766,23 +1664,6 @@ class FormulaResponse(LoncapaResponse):
     '''
     Checking of symbolic math response using numerical sampling.
     '''
-    snippets = [{'snippet': '''<problem>
-
-    <script type="loncapa/python">
-    I = "m*c^2"
-    </script>
-
-    <text>
-    <br/>
-    Give an equation for the relativistic energy of an object with mass m.
-    </text>
-    <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="$I">
-      <responseparam description="Numerical Tolerance" type="tolerance"
-                   default="0.00001" name="tol" />
-      <textline size="40" math="1" />
-    </formularesponse>
-
-    </problem>'''}]
 
     response_tag = 'formularesponse'
     hint_tag = 'formulahint'
@@ -1927,21 +1808,18 @@ class SchematicResponse(LoncapaResponse):
             self.code = answer.text
 
     def get_score(self, student_answers):
-        from capa_problem import global_context
-        submission = [json.loads(student_answers[
-                                 k]) for k in sorted(self.answer_ids)]
+        #from capa_problem import global_context
+        submission = [
+            json.loads(student_answers[k]) for k in sorted(self.answer_ids)
+        ]
         self.context.update({'submission': submission})
-
         try:
-            exec self.code in global_context, self.context
-
+            safe_exec.safe_exec(self.code, self.context, cache=self.system.cache, slug=self.id)
         except Exception as err:
-            _, _, traceback_obj = sys.exc_info()
-            raise ResponseError, ResponseError(err.message), traceback_obj
-
+            msg = 'Error %s in evaluating SchematicResponse' % err
+            raise ResponseError(msg)
         cmap = CorrectMap()
-        cmap.set_dict(dict(zip(sorted(
-            self.answer_ids), self.context['correct'])))
+        cmap.set_dict(dict(zip(sorted(self.answer_ids), self.context['correct'])))
         return cmap
 
     def get_answers(self):
@@ -1977,19 +1855,6 @@ class ImageResponse(LoncapaResponse):
     Returns:
         True, if click is inside any region or rectangle. Otherwise False.
     """
-    snippets = [{'snippet': '''<imageresponse>
-      <imageinput src="image1.jpg" width="200" height="100"
-      rectangle="(10,10)-(20,30)" />
-      <imageinput src="image2.jpg" width="210" height="130"
-      rectangle="(12,12)-(40,60)" />
-      <imageinput src="image3.jpg" width="210" height="130"
-      rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
-      <imageinput src="image4.jpg" width="811" height="610"
-      rectangle="(10,10)-(20,30);(12,12)-(40,60)"
-      regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
-      <imageinput src="image5.jpg" width="200" height="200"
-      regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
-    </imageresponse>'''}]
 
     response_tag = 'imageresponse'
     allowed_inputfields = ['imageinput']

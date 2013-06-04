@@ -23,7 +23,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // because these are outside of this.$el, they can't be in the event hash
         $('.save-button').on('click', this, this.saveView);
         $('.cancel-button').on('click', this, this.revertView);
-        this.listenTo(this.model, 'error', CMS.ServerError);
         this.listenTo(this.model, 'invalid', this.handleValidationError);
     },
     render: function() {
@@ -144,8 +143,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                     'course': course_location_analytics
                 });
 
-            },
-            error : CMS.ServerError
+            }
         });
     },
     revertView : function(event) {
@@ -155,8 +153,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         self.model.clear({silent : true});
         self.model.fetch({
             success : function() { self.render(); },
-            reset: true,
-            error : CMS.ServerError
+            reset: true
         });
     },
     renderTemplate: function (key, value) {

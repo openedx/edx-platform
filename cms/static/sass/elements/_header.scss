@@ -106,13 +106,19 @@
     width: 1px;
   }
 
-  .course-org {
-    margin-right: ($baseline/4);
-  }
-
   .course-number, .course-org {
     @include font-size(12);
     display: inline-block;
+    max-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+
+  .course-org {
+    margin-right: ($baseline/4);
+    max-width: 140px;
   }
 
   .course-title {
@@ -132,9 +138,9 @@
 
 // specific elements - course nav
 .nav-course {
-  width: 285px;
+  width: 290px;
+  @extend .t-copy-sub1;
   margin-top: -($baseline/4);
-  @include font-size(14);
 
   > ol > .nav-item {
     vertical-align: bottom;
@@ -152,8 +158,8 @@
       color: $gray-d3;
 
       .label-prefix {
-        display: block;
         @include font-size(11);
+        display: block;
         font-weight: 400;
       }
     }
@@ -213,10 +219,11 @@
   .nav-item {
     position: relative;
 
-    .icon-expand {
+    .icon-caret-down {
       @include font-size(14);
       @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
       display: inline-block;
+      vertical-align: middle;
       margin-left: 2px;
       opacity: 0.5;
       color: $gray-l2;
@@ -224,7 +231,7 @@
 
     &:hover {
 
-      .icon-expand {
+      .icon-caret-down {
         color: $blue;
         opacity: 1.0;
       }
@@ -236,7 +243,7 @@
     left: -7px;
     top: 47px;
     width: 140px;
-    opacity: 0;
+    opacity: 0.0;
     pointer-events: none;
   }
 
@@ -551,7 +558,7 @@ body.signin .nav-not-signedin-signup {
 
   .wrapper-nav-sub {
     @include transition (opacity 1.0s ease-in-out 0s);
-    opacity: 0;
+    opacity: 0.0;
     pointer-events: none;
 
     &.is-shown {

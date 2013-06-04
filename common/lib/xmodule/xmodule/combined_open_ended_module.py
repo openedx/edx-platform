@@ -5,10 +5,10 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, Boolean, List
+from xblock.core import Integer, Scope, String, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date, StringyFloat
+from .fields import Date, StringyFloat, StringyInteger, StringyBoolean
 
 log = logging.getLogger("mitx.courseware")
 
@@ -48,27 +48,50 @@ class VersionInteger(Integer):
 
 
 class CombinedOpenEndedFields(object):
-    display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
-    current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.user_state)
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        default="Open Ended Grading", scope=Scope.settings
+    )
+    current_task_number = StringyInteger(help="Current task that the student is on.", default=0, scope=Scope.user_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
     state = String(help="Which step within the current task that the student is on.", default="initial",
                    scope=Scope.user_state)
-    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
-                               scope=Scope.user_state)
-    ready_to_reset = Boolean(help="If the problem is ready to be reset or not.", default=False,
-                             scope=Scope.user_state)
-    attempts = Integer(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
-    is_graded = Boolean(help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
-    accept_file_upload = Boolean(help="Whether or not the problem accepts file uploads.", default=False,
-                                 scope=Scope.settings)
-    skip_spelling_checks = Boolean(help="Whether or not to skip initial spelling checks.", default=True,
-                                   scope=Scope.settings)
+    student_attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0,
+                                      scope=Scope.user_state)
+    ready_to_reset = StringyBoolean(
+        help="If the problem is ready to be reset or not.", default=False,
+        scope=Scope.user_state
+    )
+    attempts = StringyInteger(
+        display_name="Maximum Attempts",
+        help="The number of times the student can try to answer this problem.", default=1,
+        scope=Scope.settings, values = {"min" : 1 }
+    )
+    is_graded = StringyBoolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
+    accept_file_upload = StringyBoolean(
+        display_name="Allow File Uploads",
+        help="Whether or not the student can submit files as a response.", default=False, scope=Scope.settings
+    )
+    skip_spelling_checks = StringyBoolean(
+        display_name="Disable Quality Filter",
+        help="If False, the Quality Filter is enabled and submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
+        default=False, scope=Scope.settings
+    )
     due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
-    graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
-                         scope=Scope.settings)
+    graceperiod = String(
+        help="Amount of time after the due date that submissions will be accepted",
+        default=None,
+        scope=Scope.settings
+    )
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    weight = StringyFloat(
+        display_name="Problem Weight",
+        help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
+        scope=Scope.settings, values = {"min" : 0 , "step": ".1"}
+    )
+    markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
@@ -213,11 +236,36 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     """
     Module for adding combined open ended questions
     """
-    mako_template = "widgets/raw-edit.html"
+    mako_template = "widgets/open-ended-edit.html"
     module_class = CombinedOpenEndedModule
-    filename_extension = "xml"
 
     stores_state = True
     has_score = True
     always_recalculate_grades = True
     template_dir_name = "combinedopenended"
+
+    #Specify whether or not to pass in S3 interface
+    needs_s3_interface = True
+
+    #Specify whether or not to pass in open ended interface
+    needs_open_ended_interface = True
+
+    metadata_attributes = RawDescriptor.metadata_attributes
+
+    js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/edit.coffee')]}
+    js_module_name = "OpenEndedMarkdownEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/combinedopenended/edit.scss')]}
+
+    def get_context(self):
+        _context = RawDescriptor.get_context(self)
+        _context.update({'markdown': self.markdown,
+                         'enable_markdown': self.markdown is not None})
+        return _context
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
+                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
+        return non_editable_fields
+

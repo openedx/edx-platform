@@ -162,13 +162,13 @@ body.index {
               position: absolute;
               bottom: -30px;
               right: ($baseline/2);
-              opacity: 0;
+              opacity: 0.0;
 
-              .ss-icon {
+              [class^="icon-"] {
                 @include font-size(18);
                 @include border-top-radius(3px);
                 display: inline-block;
-                padding: ($baseline/4) ($baseline/2);
+                padding: ($baseline/2);
                 background: $blue;
                 color: $white;
                 text-align: center;

@@ -21,6 +21,7 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from mitxmako.shortcuts import render_to_string
@@ -30,11 +31,12 @@ log = logging.getLogger(__name__)
 system = ModuleSystem(
     ajax_url=None,
     track_function=None,
-    get_module = None,
+    get_module=None,
     render_template=render_to_string,
-    replace_urls = None,
-    xblock_model_data= {}
+    replace_urls=None,
+    xblock_model_data={}
 )
+
 controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
 
 """
@@ -90,39 +92,60 @@ def staff_grading(request, course_id):
         'staff_access': True, })
 
 
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def peer_grading(request, course_id):
-    '''
-    Show a peer grading interface
-    '''
-
-    #Get the current course
-    course = get_course_with_access(request.user, course_id, 'load')
-    course_id_parts = course.id.split("/")
-    false_dict = [False, "False", "false", "FALSE"]
-
+def find_peer_grading_module(course):
+    """
+    Given a course, finds the first peer grading module in it.
+    @param course: A course object.
+    @return: boolean found_module, string problem_url
+    """
     #Reverse the base course url
     base_course_url = reverse('courses')
-    try:
-        #TODO:  This will not work with multiple runs of a course.  Make it work.  The last key in the Location passed
-        #to get_items is called revision.  Is this the same as run?
-        #Get the peer grading modules currently in the course
-        items = modulestore().get_items(['i4x', None, course_id_parts[1], 'peergrading', None])
-        #See if any of the modules are centralized modules (ie display info from multiple problems)
-        items = [i for i in items if getattr(i,"use_for_single_location", True) in false_dict]
-        #Get the first one
+    found_module = False
+    problem_url = ""
+
+    #Get the course id and split it
+    course_id_parts = course.id.split("/")
+    log.info("COURSE ID PARTS")
+    log.info(course_id_parts)
+    #Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
+    items = modulestore().get_items(['i4x', course_id_parts[0], course_id_parts[1], 'peergrading', None],
+                                    course_id=course.id)
+    #See if any of the modules are centralized modules (ie display info from multiple problems)
+    items = [i for i in items if not getattr(i, "use_for_single_location", True)]
+    #Get the first one
+    if len(items) > 0:
         item_location = items[0].location
         #Generate a url for the first module and redirect the user to it
         problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
+        found_module = True
 
-        return HttpResponseRedirect(problem_url)
-    except:
+    return found_module, problem_url
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def peer_grading(request, course_id):
+    '''
+    When a student clicks on the "peer grading" button in the open ended interface, link them to a peer grading
+    xmodule in the course.
+    '''
+
+    #Get the current course
+    course = get_course_with_access(request.user, course_id, 'load')
+
+    found_module, problem_url = find_peer_grading_module(course)
+    if not found_module:
         #This is a student_facing_error
-        error_message = "Error with initializing peer grading.  Centralized module does not exist.  Please contact course staff."
+        error_message = """
+        Error with initializing peer grading.
+        There has not been a peer grading module created in the courseware that would allow you to grade others.
+        Please check back later for this.
+        """
         #This is a dev_facing_error
         log.exception(error_message + "Current course is: {0}".format(course_id))
         return HttpResponse(error_message)
+
+    return HttpResponseRedirect(problem_url)
 
 
 def generate_problem_url(problem_url_parts, base_course_url):
@@ -145,7 +168,8 @@ def generate_problem_url(problem_url_parts, base_course_url):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def student_problem_list(request, course_id):
     '''
-    Show a student problem list
+    Show a student problem list to a student.  Fetch the list from the grading controller server, get some metadata,
+    and then show it to the student.
     '''
     course = get_course_with_access(request.user, course_id, 'load')
     student_id = unique_id_for_user(request.user)
@@ -157,6 +181,7 @@ def student_problem_list(request, course_id):
     base_course_url = reverse('courses')
 
     try:
+        #Get list of all open ended problems that the grading server knows about
         problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
         problem_list_dict = json.loads(problem_list_json)
         success = problem_list_dict['success']
@@ -166,8 +191,22 @@ def student_problem_list(request, course_id):
         else:
             problem_list = problem_list_dict['problem_list']
 
+        #A list of problems to remove (problems that can't be found in the course)
+        list_to_remove = []
         for i in xrange(0, len(problem_list)):
-            problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
+            try:
+                #Try to load each problem in the courseware to get links to them
+                problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
+            except ItemNotFoundError:
+                #If the problem cannot be found at the location received from the grading controller server, it has been deleted by the course author.
+                #Continue with the rest of the location to construct the list
+                error_message = "Could not find module for course {0} at location {1}".format(course.id,
+                                                                                              problem_list[i][
+                                                                                                  'location'])
+                log.error(error_message)
+                #Mark the problem for removal from the list
+                list_to_remove.append(i)
+                continue
             problem_url = generate_problem_url(problem_url_parts, base_course_url)
             problem_list[i].update({'actual_url': problem_url})
             eta_available = problem_list[i]['eta_available']
@@ -197,6 +236,8 @@ def student_problem_list(request, course_id):
         log.error("Problem with results from external grading service for open ended.")
         success = False
 
+    #Remove problems that cannot be found in the courseware from the list
+    problem_list = [problem_list[i] for i in xrange(0, len(problem_list)) if i not in list_to_remove]
     ajax_url = _reverse_with_slash('open_ended_problems', course_id)
 
     return render_to_response('open_ended_problems/open_ended_problems.html', {
@@ -300,7 +341,16 @@ def combined_notifications(request, course_id):
                 'description': description,
                 'alert_message': alert_message
             }
-            notification_list.append(notification_item)
+            #The open ended panel will need to link the "peer grading" button in the panel to a peer grading
+            #xmodule defined in the course.  This checks to see if the human name of the server notification
+            #that we are currently processing is "peer grading".  If it is, it looks for a peer grading
+            #module in the course.  If none exists, it removes the peer grading item from the panel.
+            if human_name == "Peer Grading":
+                found_module, problem_url = find_peer_grading_module(course)
+                if found_module:
+                    notification_list.append(notification_item)
+            else:
+                notification_list.append(notification_item)
 
     ajax_url = _reverse_with_slash('open_ended_notifications', course_id)
     combined_dict = {
@@ -311,9 +361,7 @@ def combined_notifications(request, course_id):
         'ajax_url': ajax_url,
     }
 
-    return render_to_response('open_ended_problems/combined_notifications.html',
-                              combined_dict
-    )
+    return render_to_response('open_ended_problems/combined_notifications.html', combined_dict)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

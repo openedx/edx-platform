@@ -85,8 +85,8 @@
 }
 
 @-webkit-keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% { opacity: 0.0; }
+  100% { opacity: 1.0; }
 }
 
 
@@ -95,6 +95,7 @@
 
 
 body.discussion {
+  
   .new-post-form-errors {
     display: none;
     background: $error-red;
@@ -735,11 +736,11 @@ body.discussion {
 
       &.is-open {
         .browse-topic-drop-btn span {
-          opacity: 1;
+          opacity: 1.0;
         }
 
         .browse-topic-drop-icon {
-          opacity: 0;
+          opacity: 0.0;
         }
 
         &.is-dropped {
@@ -787,7 +788,7 @@ body.discussion {
           &::-webkit-input-placeholder,
           &:-moz-placeholder,
           &:-ms-input-placeholder {
-            opacity: 1;
+            opacity: 1.0;
           }
         }
       }
@@ -817,7 +818,7 @@ body.discussion {
         line-height: 58px;
         color: #333;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
-        opacity: 0;
+        opacity: 0.0;
         @include transition(opacity .2s);
       }
     }
@@ -832,7 +833,7 @@ body.discussion {
       height: 16px;
       margin-left: -12px;
       background: url(../images/browse-icon.png) no-repeat;
-      opacity: 1;
+      opacity: 1.0;
       @include transition(none);
     }
 
@@ -966,7 +967,7 @@ body.discussion {
       &::-webkit-input-placeholder,
       &:-moz-placeholder,
       &:-ms-input-placeholder {
-        opacity: 0;
+        opacity: 0.0;
         @include transition(opacity .2s);
       }
 
@@ -1280,8 +1281,8 @@ body.discussion {
   .discussion-article {
     position: relative;
     padding: 40px;
-    min-height: 468px;
-
+    min-height: 468px;         
+    
     a {
       word-wrap: break-word;
     }
@@ -1334,6 +1335,9 @@ body.discussion {
         background-position: 0 0;
       }
     }
+    
+    
+    
   }
 
   .discussion-post {
@@ -2436,7 +2440,6 @@ body.discussion {
   @extend .discussion-module
 }
 
-
 .group-visibility-label {
     font-size: 12px;
     color:#000;
@@ -2448,7 +2451,19 @@ body.discussion {
       font-size: 12px;
       float:right;
       padding-right: 5px;
-      font-style: italic; 
+      font-style: italic;
+      cursor:pointer; 
+      margin-right: 10px;
+      opacity: 0.8;
+
+      span {
+        cursor: pointer;
+      }
+
+      &:hover {
+        @include transition(opacity .2s);
+        opacity: 1.0;
+      }
     }  
 
 .discussion-pin-inline {
@@ -2458,20 +2473,25 @@ body.discussion {
       position: relative;
       right:-20px;
       top:-13px;
+      margin-right:35px;
+      margin-top:13px;
+      opacity: 1.0;
     }  
-    
-.notpinned .icon
-{
-  display: inline-block; 
+
+.notpinned .icon {
+  display: block; 
+  float: left;
+  margin: 3px;
   width: 10px; 
   height: 14px;
   padding-right: 3px;
   background: transparent url('../images/unpinned.png') no-repeat 0 0; 
 }
 
-.pinned .icon
-{
-  display: inline-block; 
+.pinned .icon {
+  display: block; 
+  float: left;
+  margin: 3px;
   width: 10px; 
   height: 14px; 
   padding-right: 3px;
@@ -2481,14 +2501,65 @@ body.discussion {
 .pinned span {
   color: #B82066;
   font-style: italic;
+  //cursor change is here since pins are read-only for inline discussions. 
+  cursor: default;
 }
 
 .notpinned span {
   color: #888;
   font-style: italic;
+  //cursor change is here since pins are read-only for inline discussions. 
+  cursor: default;
 }
 
 .pinned-false
 {
 display:none;
+}
+
+.discussion-flag-abuse {
+      font-size: 12px;
+      float:right;
+      padding-right: 5px;
+      font-style: italic;
+      cursor:pointer;
+      opacity: 0.8;
+
+      &:hover {
+        @include transition(opacity .2s);
+        opacity: 1.0;
+      }
+
+    }  
+    
+.notflagged .icon
+{
+  display: block; 
+  float: left;
+  margin: 3px;
+  width: 10px; 
+  height: 14px;
+  padding-right: 3px;
+  background: transparent url('../images/notflagged.png') no-repeat 0 0; 
+}
+
+.flagged .icon
+{
+  display: block; 
+  float: left;
+  margin: 3px;
+  width: 10px; 
+  height: 14px; 
+  padding-right: 3px;
+  background: transparent url('../images/flagged.png') no-repeat 0 0; 
+}
+
+.flagged span {
+  color: #B82066;
+  font-style: italic;
+}
+
+.notflagged span {
+  color: #888;
+  font-style: italic;
 }

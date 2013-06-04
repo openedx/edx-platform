@@ -8,7 +8,7 @@ and acceptance tests.
 ### Unit Tests
 
 * Each test case should be concise: setup, execute, check, and teardown.
-If you find yourself writing tests with many steps, consider refactoring 
+If you find yourself writing tests with many steps, consider refactoring
 the unit under tests into smaller units, and then testing those individually.
 
 * As a rule of thumb, your unit tests should cover every code branch.
@@ -16,19 +16,19 @@ the unit under tests into smaller units, and then testing those individually.
 * Mock or patch external dependencies.
 We use [voidspace mock](http://www.voidspace.org.uk/python/mock/).
 
-* We unit test Python code (using [unittest](http://docs.python.org/2/library/unittest.html)) and 
+* We unit test Python code (using [unittest](http://docs.python.org/2/library/unittest.html)) and
 Javascript (using [Jasmine](http://pivotal.github.io/jasmine/))
 
 ### Integration Tests
 * Test several units at the same time.
 Note that you can still mock or patch dependencies
-that are not under test!  For example, you might test that 
-`LoncapaProblem`, `NumericalResponse`, and `CorrectMap` in the 
+that are not under test!  For example, you might test that
+`LoncapaProblem`, `NumericalResponse`, and `CorrectMap` in the
 `capa` package work together, while still mocking out template rendering.
 
 * Use integration tests to ensure that units are hooked up correctly.
-You do not need to test every possible input--that's what unit 
-tests are for.  Instead, focus on testing the "happy path" 
+You do not need to test every possible input--that's what unit
+tests are for.  Instead, focus on testing the "happy path"
 to verify that the components work together correctly.
 
 * Many of our tests use the [Django test client](https://docs.djangoproject.com/en/dev/topics/testing/overview/) to simulate
@@ -43,8 +43,8 @@ these tests simulate user interactions through the browser using
 
 Overall, you want to write the tests that **maximize coverage**
 while **minimizing maintenance**.
-In practice, this usually means investing heavily 
-in unit tests, which tend to be the most robust to changes in the code base.  
+In practice, this usually means investing heavily
+in unit tests, which tend to be the most robust to changes in the code base.
 
 ![Test Pyramid](test_pyramid.png)
 
@@ -53,13 +53,13 @@ and acceptance tests.  Most of our tests are unit tests or integration tests.
 
 ## Test Locations
 
-* Python unit and integration tests: Located in 
+* Python unit and integration tests: Located in
 subpackages called `tests`.
-For example, the tests for the `capa` package are located in 
+For example, the tests for the `capa` package are located in
 `common/lib/capa/capa/tests`.
 
 * Javascript unit tests: Located in `spec` folders.  For example,
-`common/lib/xmodule/xmodule/js/spec` and `{cms,lms}/static/coffee/spec`  
+`common/lib/xmodule/xmodule/js/spec` and `{cms,lms}/static/coffee/spec`
 For consistency, you should use the same directory structure for implementation
 and test.  For example, the test for `src/views/module.coffee`
 should be written in `spec/views/module_spec.coffee`.
@@ -88,7 +88,7 @@ because the `capa` package handles problem XML.
 
 Before running tests, ensure that you have all the dependencies.  You can install dependencies using:
 
-    pip install -r requirements.txt
+    rake install_prereqs
 
 
 ## Running Python Unit tests
@@ -101,7 +101,7 @@ You can run tests using `rake` commands.  For example,
 
     rake test
 
-runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).  
+runs all the tests.  It also runs `collectstatic`, which prepares the static files used by the site (for example, compiling Coffeescript to Javascript).
 
 You can also run the tests without `collectstatic`, which tends to be faster:
 
@@ -115,14 +115,18 @@ xmodule can be tested independently, with this:
 
     rake test_common/lib/xmodule
 
+other module level tests include
+
+* `rake test_common/lib/capa`
+* `rake test_common/lib/calc`
+
 To run a single django test class:
 
-    django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/courseware/tests/tests.py:TestViewAuth
+    rake test_lms[courseware.tests.tests:testViewAuth]
 
 To run a single django test:
 
-    django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/courseware/tests/tests.py:TestViewAuth.test_dark_launch
-
+    rake test_lms[courseware.tests.tests:TestViewAuth.test_dark_launch]
 
 To run a single nose test file:
 
@@ -150,7 +154,7 @@ If the `phantomjs` binary is not on the path, set the `PHANTOMJS_PATH` environme
 
     PHANTOMJS_PATH=/path/to/phantomjs rake phantomjs_jasmine_{lms,cms}
 
-Once you have run the `rake` command, your browser should open to 
+Once you have run the `rake` command, your browser should open to
 to `http://localhost/_jasmine/`, which displays the test results.
 
 **Troubleshooting**: If you get an error message while running the `rake` task,
@@ -161,36 +165,30 @@ try running `bundle install` to install the required ruby gems.
 We use [Lettuce](http://lettuce.it/) for acceptance testing.
 Most of our tests use [Splinter](http://splinter.cobrateam.info/)
 to simulate UI browser interactions.  Splinter, in turn,
-uses [Selenium](http://docs.seleniumhq.org/) to control the browser.
+uses [Selenium](http://docs.seleniumhq.org/) to control the Chrome browser.
 
-**Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver) 
-installed to run the tests in Chrome.  
+**Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver)
+installed to run the tests in Chrome.  The tests are confirmed to run
+with Chrome (not Chromium) version 26.0.0.1410.63 with ChromeDriver
+version r195636.
 
-Before running the tests, you need to set up the test database:
+To run all the acceptance tests:
 
-    rm ../db/test_mitx.db
-    rake django-admin[syncdb,lms,acceptance,--noinput]
-    rake django-admin[migrate,lms,acceptance,--noinput]
-
-To run the acceptance tests:
-
-1. Start the Django server locally using the settings in **acceptance.py**:
-
-        rake lms[acceptance]
-
-2. In another shell, run the tests:
-
-        django-admin.py harvest --no-server --settings=lms.envs.acceptance --pythonpath=. lms/djangoapps/portal/features/
+    rake test_acceptance_lms
+    rake test_acceptance_cms
 
 To test only a specific feature:
 
-    django-admin.py harvest --no-server --settings=lms.envs.acceptance --pythonpath=. lms/djangoapps/courseware/features/high-level-tabs.feature
+    rake test_acceptance_lms[lms/djangoapps/courseware/features/problems.feature]
 
-**Troubleshooting**: If you get an error message that says something about harvest not being a command, you probably are missing a requirement.
-Try running:
+To start the debugger on failure, add the `--pdb` option:
 
-    pip install -r requirements.txt
+    rake test_acceptance_lms["lms/djangoapps/courseware/features/problems.feature --pdb"]
 
+To run tests faster by not collecting static files, you can use
+`rake fasttest_acceptance_lms` and `rake fasttest_acceptance_cms`.
+
+**Note**: The acceptance tests can *not* currently run in parallel.
 
 ## Viewing Test Coverage
 
