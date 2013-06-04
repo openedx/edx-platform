@@ -48,7 +48,7 @@ task :clean_test_files do
 
     # Delete all files in the reports directory, while preserving
     # the directory structure.
-    sh("find #{REPORT_DIR} -type f -print0 | xargs -0 rm")
+    sh("find #{REPORT_DIR} -type f -print0 | xargs --no-run-if-empty -0 rm")
 
     # Reset the test fixtures
     sh("git clean -fqdx test_root")
@@ -138,6 +138,6 @@ task :coverage => :report_dirs do
 
         sh("coverage html --rcfile=#{dir}/.coveragerc")
         sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
-        sh("diff-cover #{report_dir}/coverage.xml --html-report #{report_dir}/diff_cover.html --git-branch master...HEAD")
+        sh("diff-cover #{report_dir}/coverage.xml --html-report #{report_dir}/diff_cover.html")
     end
 end
