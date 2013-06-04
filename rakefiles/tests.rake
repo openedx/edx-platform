@@ -139,5 +139,7 @@ task :coverage => :report_dirs do
         sh("coverage html --rcfile=#{dir}/.coveragerc")
         sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
         sh("diff-cover #{report_dir}/coverage.xml --html-report #{report_dir}/diff_cover.html")
+        sh("diff-cover #{report_dir}/coverage.xml")
+        puts "\n\n"
     end
 end
