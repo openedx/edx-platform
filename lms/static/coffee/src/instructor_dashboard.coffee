@@ -6,6 +6,7 @@ log = -> console.log.apply console, arguments
 CSS_INSTRUCTOR_CONTENT = 'instructor-dashboard-content-2'
 CSS_ACTIVE_SECTION = 'active-section'
 CSS_IDASH_SECTION = 'idash-section'
+CSS_IDASH_DEFAULT_SECTION = 'idash-default-section'
 
 $ =>
   instructor_dashboard_content = $ ".#{CSS_INSTRUCTOR_CONTENT}"
@@ -27,3 +28,5 @@ setup_instructor_dashboard = (idash_content) =>
       section.addClass CSS_ACTIVE_SECTION
 
       log section_name
+
+  links.filter(".#{CSS_IDASH_DEFAULT_SECTION}").click()
