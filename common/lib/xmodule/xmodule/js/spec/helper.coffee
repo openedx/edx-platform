@@ -20,9 +20,24 @@ jasmine.stubbedMetadata =
   bogus:
     duration: 100
 
+jasmine.fireEvent = (el, eventName) ->
+  if document.createEvent
+    event = document.createEvent "HTMLEvents"
+    event.initEvent eventName, true, true
+  else
+    event = document.createEventObject()
+    event.eventType = eventName
+  event.eventName = eventName
+  if document.createEvent
+    el.dispatchEvent(event)
+  else
+    el.fireEvent("on" + event.eventType, event)
+
 jasmine.stubbedCaption =
   start: [0, 10000, 20000, 30000]
   text: ['Caption at 0', 'Caption at 10000', 'Caption at 20000', 'Caption at 30000']
+
+jasmine.stubbedHtml5Speeds = ['0.75', '1.0', '1.25', '1.50']
 
 jasmine.stubRequests = ->
   spyOn($, 'ajax').andCallFake (settings) ->
@@ -63,11 +78,13 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   if createPlayer
     return new VideoPlayer(video: context.video)
 
-jasmine.stubVideoPlayerAlpha = (context, enableParts, createPlayer=true) ->
+jasmine.stubVideoPlayerAlpha = (context, enableParts, createPlayer=true, html5=false) ->
   suite = context.suite
   currentPartName = suite.description while suite = suite.parentSuite
-
-  loadFixtures 'videoalpha.html'
+  if html5 == false
+    loadFixtures 'videoalpha.html'
+  else
+    loadFixtures 'videoalpha_html5.html'
   jasmine.stubRequests()
   YT.Player = undefined
   window.OldVideoPlayerAlpha = undefined
