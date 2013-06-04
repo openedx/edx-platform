@@ -83,6 +83,19 @@ class @VideoAlpha
   embed: ->
     @player = new VideoPlayerAlpha video: this
 
+    @attachEventDispatchToFunctions
+      onPlay: 'play_video'
+      onPause: 'pause_video'
+
+  attachEventDispatchToFunctions: (funcList) ->
+    $.each funcList, (funcName, eventName) =>
+      @player[funcName] = @attachEventDispatch(@player[funcName], eventName)  if @player.hasOwnProperty(funcName)
+
+  attachEventDispatch: (func, eventName) ->
+    =>
+      @log eventName
+      func.apply this, arguments
+
   fetchMetadata: (url) ->
     @metadata = {}
     $.each @videos, (speed, url) =>
@@ -92,6 +105,15 @@ class @VideoAlpha
     @metadata[@youtubeId()].duration
 
   log: (eventName)->
+    console.log 'log'
+    console.log 'this = ', this
+    console.log
+      id: @id
+      code: @youtubeId()
+      currentTime: @player.currentTime
+      speed: @speed
+    console.log ''
+
     logInfo =
       id: @id
       code: @youtubeId()

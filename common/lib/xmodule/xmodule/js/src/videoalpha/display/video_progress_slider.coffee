@@ -6,7 +6,11 @@ class @VideoProgressSliderAlpha extends SubviewAlpha
     @slider = @el.slider
       range: 'min'
       change: @onChange
-      slide: @onSlide
+
+      # We don't want to attach to 'slide' event because we already have 'change' event.
+      # If we have two events, then callback will be triggered twice, sending misinformation
+      # to the server.
+      # slide: @onSlide
       stop: @onStop
     @buildHandle()
 
