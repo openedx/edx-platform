@@ -1,14 +1,33 @@
-@import 'bourbon/bourbon';
+// lms - css application architecture
+// ====================
+
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+
+// VENDOR + REBASE *referenced/used vendor presentation and reset*
+// ====================
 
 @import 'base/reset';
-@import 'base/font_face';
+@import 'vendor/font-awesome';
+
+
+// BASE  *default edX offerings*
+// ====================
+// base - utilities
+
 @import 'base/mixins';
 @import 'base/variables';
 @import 'base/base';
-@import 'base/extends';
-@import 'base/animations';
 
-// Multicourse styles
+// base - assets
+@import 'base/font_face';
+@import 'base/extends';
+@import 'base/animations'; 	
+
+// base - starter
+@import 'base/base';
+
+// shared - course 
 @import 'shared/forms';
 @import 'shared/footer';
 @import 'shared/header';
@@ -17,6 +36,7 @@
 @import 'shared/modal';
 @import 'shared/activation_messages';
 
+// shared - platform
 @import 'multicourse/home';
 @import 'multicourse/dashboard';
 @import 'multicourse/account';
@@ -32,10 +52,11 @@
 @import 'multicourse/help';
 @import 'multicourse/edge';
 
+// applications 
 @import 'discussion';
 @import 'news';
 
-@import 'shame';
+@import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
 
 ## THEMING
 ## -------
