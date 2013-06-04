@@ -43,7 +43,7 @@ class TestErrorModule(unittest.TestCase):
         module = error_descriptor.xmodule(self.system)
         rendered_html = module.get_html()
         self.assertIn(self.error_msg, rendered_html)
-        self.assertIn(self.valid_xml, rendered_html)
+        self.assertIn(str(descriptor), rendered_html)
 
 
 class TestNonStaffErrorModule(TestErrorModule):
@@ -76,4 +76,4 @@ class TestNonStaffErrorModule(TestErrorModule):
         module = error_descriptor.xmodule(self.system)
         rendered_html = module.get_html()
         self.assertNotIn(self.error_msg, rendered_html)
-        self.assertNotIn(self.valid_xml, rendered_html)
+        self.assertNotIn(str(descriptor), rendered_html)
