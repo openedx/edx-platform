@@ -10,12 +10,14 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'UserProfile.meta'
-        db.alter_column('auth_userprofile', 'meta', self.gf('django.db.models.fields.TextField')())
+        db.alter_column('auth_userprofile', 'meta', self.gf(
+            'django.db.models.fields.TextField')())
 
     def backwards(self, orm):
 
         # Changing field 'UserProfile.meta'
-        db.alter_column('auth_userprofile', 'meta', self.gf('django.db.models.fields.CharField')(max_length=255))
+        db.alter_column('auth_userprofile', 'meta', self.gf(
+            'django.db.models.fields.CharField')(max_length=255))
 
     models = {
         'auth.group': {

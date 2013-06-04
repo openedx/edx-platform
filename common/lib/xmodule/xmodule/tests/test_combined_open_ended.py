@@ -202,9 +202,10 @@ class OpenEndedModuleTest(unittest.TestCase):
         def constructed_callback(dispatch="score_update"):
             return dispatch
 
-        self.test_system.xqueue = {'interface': self.mock_xqueue, 'construct_callback': constructed_callback,
-                                   'default_queuename': 'testqueue',
-                                   'waittime': 1}
+        self.test_system.xqueue = {
+            'interface': self.mock_xqueue, 'construct_callback': constructed_callback,
+            'default_queuename': 'testqueue',
+            'waittime': 1}
         self.openendedmodule = OpenEndedModule(self.test_system, self.location,
                                                self.definition, self.descriptor, self.static_data, self.metadata)
 
@@ -214,8 +215,9 @@ class OpenEndedModuleTest(unittest.TestCase):
                'grader_id': '1',
                'score': 3}
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
-                        'submission_time': qtime}
+        student_info = {
+            'anonymous_student_id': self.test_system.anonymous_student_id,
+            'submission_time': qtime}
         contents = {
             'feedback': get['feedback'],
             'submission_id': int(get['submission_id']),
@@ -227,7 +229,8 @@ class OpenEndedModuleTest(unittest.TestCase):
         result = self.openendedmodule.message_post(get, self.test_system)
         self.assertTrue(result['success'])
         # make sure it's actually sending something we want to the queue
-        self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
+        self.mock_xqueue.send_to_queue.assert_called_with(
+            body=json.dumps(contents), header=ANY)
 
         state = json.loads(self.openendedmodule.get_instance_state())
         self.assertIsNotNone(state['child_state'], OpenEndedModule.DONE)
@@ -235,17 +238,20 @@ class OpenEndedModuleTest(unittest.TestCase):
     def test_send_to_grader(self):
         submission = "This is a student submission"
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
-                        'submission_time': qtime}
+        student_info = {
+            'anonymous_student_id': self.test_system.anonymous_student_id,
+            'submission_time': qtime}
         contents = self.openendedmodule.payload.copy()
         contents.update({
             'student_info': json.dumps(student_info),
             'student_response': submission,
             'max_score': self.max_score
         })
-        result = self.openendedmodule.send_to_grader(submission, self.test_system)
+        result = self.openendedmodule.send_to_grader(
+            submission, self.test_system)
         self.assertTrue(result)
-        self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
+        self.mock_xqueue.send_to_queue.assert_called_with(
+            body=json.dumps(contents), header=ANY)
 
     def update_score_single(self):
         self.openendedmodule.new_history_entry("New Entry")
@@ -284,7 +290,8 @@ class OpenEndedModuleTest(unittest.TestCase):
 
     def test_latest_post_assessment(self):
         self.update_score_single()
-        assessment = self.openendedmodule.latest_post_assessment(self.test_system)
+        assessment = self.openendedmodule.latest_post_assessment(
+            self.test_system)
         self.assertFalse(assessment == '')
         # check for errors
         self.assertFalse('errors' in assessment)
@@ -366,8 +373,10 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                     <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
            </openendedparam>
     </openended>'''
-    definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
-    full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
+    definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(
+        rubric), 'task_xml': [task_xml1, task_xml2]}
+    full_definition = definition_template.format(
+        prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
     descriptor = Mock(data=full_definition)
     test_system = test_system()
     combinedoe_container = CombinedOpenEndedModule(test_system,
@@ -377,7 +386,8 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
 
     def setUp(self):
         # TODO: this constructor call is definitely wrong, but neither branch
-        # of the merge matches the module constructor.  Someone (Vik?) should fix this.
+        # of the merge matches the module constructor.  Someone (Vik?) should
+        # fix this.
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                     self.location,
                                                     self.definition,
@@ -394,7 +404,8 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         response_dict = self.combinedoe.get_last_response(0)
         self.assertEqual(response_dict['type'], "selfassessment")
         self.assertEqual(response_dict['max_score'], self.max_score)
-        self.assertEqual(response_dict['state'], CombinedOpenEndedV1Module.INITIAL)
+        self.assertEqual(response_dict[
+                         'state'], CombinedOpenEndedV1Module.INITIAL)
 
     def test_update_task_states(self):
         changed = self.combinedoe.update_task_states()
@@ -434,9 +445,11 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     def test_alternate_orderings(self):
         t1 = self.task_xml1
         t2 = self.task_xml2
-        xml_to_test = [[t1], [t2], [t1, t1], [t1, t2], [t2, t2], [t2, t1], [t1, t2, t1]]
+        xml_to_test = [[t1], [t2], [t1, t1], [
+            t1, t2], [t2, t2], [t2, t1], [t1, t2, t1]]
         for xml in xml_to_test:
-            definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric), 'task_xml': xml}
+            definition = {'prompt': etree.XML(
+                self.prompt), 'rubric': etree.XML(self.rubric), 'task_xml': xml}
             descriptor = Mock(data=definition)
             combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                    self.location,
@@ -465,8 +478,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             </rubric>
         </rubric>
         """
-        definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(rubric),
-                      'task_xml': [self.task_xml1, self.task_xml2]}
+        definition = {
+            'prompt': etree.XML(self.prompt), 'rubric': etree.XML(rubric),
+            'task_xml': [self.task_xml1, self.task_xml2]}
         descriptor = Mock(data=definition)
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                self.location,
@@ -484,7 +498,8 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     """
     Test the student flow in the combined open ended xmodule
     """
-    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
+    problem_location = Location(
+        ["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
     answer = "blah blah"
     assessment = [0, 1]
     hint = "blah"
@@ -507,11 +522,13 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         # Try saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
         task_one_json = json.loads(module.task_states[0])
-        self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
+        self.assertEqual(task_one_json[
+                         'child_history'][0]['answer'], self.answer)
 
         module = self.get_module_from_location(self.problem_location, COURSE)
         task_one_json = json.loads(module.task_states[0])
-        self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
+        self.assertEqual(task_one_json[
+                         'child_history'][0]['answer'], self.answer)
 
     def test_open_ended_flow_reset(self):
         """
@@ -528,10 +545,12 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         # Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        assessment_dict.update({'assessment': sum(
+            assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
-        self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
+        self.assertEqual(json.loads(task_one_json[
+                         'child_history'][0]['post_assessment']), assessment)
         status = module.handle_ajax("get_status", {})
         self.assertTrue(isinstance(status, basestring))
 
@@ -565,23 +584,27 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         # Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        assessment_dict.update({'assessment': sum(
+            assessment), 'score_list[]': assessment})
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
-        self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
+        self.assertEqual(json.loads(task_one_json[
+                         'child_history'][0]['post_assessment']), assessment)
         module.handle_ajax("get_status", {})
 
         # Move to the next step in the problem
         try:
             module.handle_ajax("next_problem", {})
         except GradingServiceError:
-            # This error is okay.  We don't have a grading service to connect to!
+            # This error is okay.  We don't have a grading service to connect
+            # to!
             pass
         self.assertEqual(module.current_task_number, 1)
         try:
             module.get_html()
         except GradingServiceError:
-            # This error is okay.  We don't have a grading service to connect to!
+            # This error is okay.  We don't have a grading service to connect
+            # to!
             pass
 
         # Try to get the rubric from the module

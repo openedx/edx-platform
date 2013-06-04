@@ -72,7 +72,8 @@ class Command(BaseCommand):
         def sftp(files_from, files_to, mode, deleteAfterCopy=False):
             with dog_stats_api.timer('pearson.{0}'.format(mode), tags='sftp'):
                 try:
-                    t = paramiko.Transport((settings.PEARSON['SFTP_HOSTNAME'], 22))
+                    t = paramiko.Transport((
+                        settings.PEARSON['SFTP_HOSTNAME'], 22))
                     t.connect(username=settings.PEARSON['SFTP_USERNAME'],
                               password=settings.PEARSON['SFTP_PASSWORD'])
                     sftp = paramiko.SFTPClient.from_transport(t)
@@ -81,7 +82,8 @@ class Command(BaseCommand):
                         try:
                             sftp.chdir(files_to)
                         except IOError:
-                            raise CommandError('SFTP destination path does not exist: {}'.format(files_to))
+                            raise CommandError(
+                                'SFTP destination path does not exist: {}'.format(files_to))
                         for filename in os.listdir(files_from):
                             sftp.put(files_from + '/' + filename, filename)
                             if deleteAfterCopy:
@@ -90,12 +92,14 @@ class Command(BaseCommand):
                         try:
                             sftp.chdir(files_from)
                         except IOError:
-                            raise CommandError('SFTP source path does not exist: {}'.format(files_from))
+                            raise CommandError(
+                                'SFTP source path does not exist: {}'.format(files_from))
                         for filename in sftp.listdir('.'):
                             # skip subdirectories
                             if not S_ISDIR(sftp.stat(filename).st_mode):
                                 sftp.get(filename, files_to + '/' + filename)
-                                # delete files from sftp server once they are successfully pulled off:
+                                # delete files from sftp server once they are
+                                # successfully pulled off:
                                 if deleteAfterCopy:
                                     sftp.remove(filename)
                 except:
@@ -112,7 +116,8 @@ class Command(BaseCommand):
                 try:
                     for filename in os.listdir(files_from):
                         source_file = os.path.join(files_from, filename)
-                        # use mode as name of directory into which to write files
+                        # use mode as name of directory into which to write
+                        # files
                         dest_file = os.path.join(mode, filename)
                         upload_file_to_s3(bucket, source_file, dest_file)
                         if deleteAfterCopy:
@@ -139,20 +144,25 @@ class Command(BaseCommand):
             call_command('pearson_export_cdd', **options)
             call_command('pearson_export_ead', **options)
             mode = 'export'
-            sftp(settings.PEARSON['LOCAL_EXPORT'], settings.PEARSON['SFTP_EXPORT'], mode, deleteAfterCopy=False)
-            s3(settings.PEARSON['LOCAL_EXPORT'], settings.PEARSON['S3_BUCKET'], mode, deleteAfterCopy=True)
+            sftp(settings.PEARSON['LOCAL_EXPORT'], settings.PEARSON[
+                 'SFTP_EXPORT'], mode, deleteAfterCopy=False)
+            s3(settings.PEARSON['LOCAL_EXPORT'], settings.PEARSON[
+               'S3_BUCKET'], mode, deleteAfterCopy=True)
 
         def import_pearson():
             mode = 'import'
             try:
-                sftp(settings.PEARSON['SFTP_IMPORT'], settings.PEARSON['LOCAL_IMPORT'], mode, deleteAfterCopy=True)
-                s3(settings.PEARSON['LOCAL_IMPORT'], settings.PEARSON['S3_BUCKET'], mode, deleteAfterCopy=False)
+                sftp(settings.PEARSON['SFTP_IMPORT'], settings.PEARSON[
+                     'LOCAL_IMPORT'], mode, deleteAfterCopy=True)
+                s3(settings.PEARSON['LOCAL_IMPORT'], settings.PEARSON[
+                   'S3_BUCKET'], mode, deleteAfterCopy=False)
             except Exception as e:
                 dog_http_api.event('Pearson Import failure', str(e))
                 raise e
             else:
                 for filename in os.listdir(settings.PEARSON['LOCAL_IMPORT']):
-                    filepath = os.path.join(settings.PEARSON['LOCAL_IMPORT'], filename)
+                    filepath = os.path.join(settings.PEARSON[
+                                            'LOCAL_IMPORT'], filename)
                     call_command('pearson_import_conf_zip', filepath)
                     os.remove(filepath)
 

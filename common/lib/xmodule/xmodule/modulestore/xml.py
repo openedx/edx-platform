@@ -52,10 +52,12 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
         xmlstore: the XMLModuleStore to store the loaded modules in
         """
-        self.unnamed = defaultdict(int)     # category -> num of new url_names for that category
+        self.unnamed = defaultdict(
+            int)     # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
         self.org, self.course, self.url_name = course_id.split('/')
-        # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
+        # cdodge: adding the course_id as passed in for later reference rather
+        # than having to recomine the org/course/url_name
         self.course_id = course_id
         self.load_error_modules = load_error_modules
 
@@ -71,16 +73,20 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 Removes 'slug' attribute if present, and adds or overwrites the 'url_name' attribute.
                 """
-                # VS[compat]. Take this out once course conversion is done (perhaps leave the uniqueness check)
+                # VS[compat]. Take this out once course conversion is done
+                # (perhaps leave the uniqueness check)
 
-                # tags that really need unique names--they store (or should store) state.
-                need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter',
-                                   'videosequence', 'poll_question', 'timelimit')
+                # tags that really need unique names--they store (or should
+                # store) state.
+                need_uniq_names = (
+                    'problem', 'sequential', 'video', 'course', 'chapter',
+                    'videosequence', 'poll_question', 'timelimit')
 
                 attr = xml_data.attrib
                 tag = xml_data.tag
                 id = lambda x: x
-                # Things to try to get a name, in order  (key, cleaning function, remove key after reading?)
+                # Things to try to get a name, in order  (key, cleaning
+                # function, remove key after reading?)
                 lookups = [('url_name', id, False),
                            ('slug', id, True),
                            ('name', Location.clean, False),
@@ -104,17 +110,21 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     """Return the fallback name for this module.  This is a function instead of a variable
                     because we want it to be lazy."""
                     if looks_like_fallback(orig_name):
-                        # We're about to re-hash, in case something changed, so get rid of the tag_ and hash
+                        # We're about to re-hash, in case something changed, so
+                        # get rid of the tag_ and hash
                         orig_name = orig_name[len(tag) + 1:-12]
-                    # append the hash of the content--the first 12 bytes should be plenty.
-                    orig_name = "_" + orig_name if orig_name not in (None, "") else ""
+                    # append the hash of the content--the first 12 bytes should
+                    # be plenty.
+                    orig_name = "_" + \
+                        orig_name if orig_name not in (None, "") else ""
                     return tag + orig_name + "_" + hashlib.sha1(xml).hexdigest()[:12]
 
                 # Fallback if there was nothing we could use:
                 if url_name is None or url_name == "":
                     url_name = fallback_name()
                     # Don't log a warning--we don't need this in the log.  Do
-                    # put it in the error tracker--content folks need to see it.
+                    # put it in the error tracker--content folks need to see
+                    # it.
 
                     if tag in need_uniq_names:
                         error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
@@ -123,7 +133,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
-                        # error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
+                        # error_tracker("WARNING: no name specified for module.
+                        # xml='{0}...'".format(xml[:100]))
                         pass
 
                 # Make sure everything is unique
@@ -137,7 +148,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                         error_tracker("PROBLEM: " + msg)
                         log.warning(msg)
                         # Just set name to fallback_name--if there are multiple things with the same fallback name,
-                        # they are actually identical, so it's fragile, but not immediately broken.
+                        # they are actually identical, so it's fragile, but not
+                        # immediately broken.
 
                         # TODO (vshnayder): if the tag is a pointer tag, this will
                         # break the content because we won't have the right link.
@@ -160,7 +172,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 make_name_unique(xml_data)
 
                 descriptor = XModuleDescriptor.load_from_xml(
-                    etree.tostring(xml_data, encoding='unicode'), self, self.org,
+                    etree.tostring(
+                        xml_data, encoding='unicode'), self, self.org,
                     self.course, xmlstore.default_class)
             except Exception as err:
                 if not self.load_error_modules:
@@ -192,7 +205,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
             if hasattr(descriptor, 'children'):
                 for child in descriptor.get_children():
-                    parent_tracker.add_parent(child.location, descriptor.location)
+                    parent_tracker.add_parent(
+                        child.location, descriptor.location)
             return descriptor
 
         render_template = lambda: ''
@@ -214,7 +228,8 @@ class ParentTracker(object):
         """
         Init
         """
-        # location -> set(parents).  Not using defaultdict because we care about the empty case.
+        # location -> set(parents).  Not using defaultdict because we care
+        # about the empty case.
         self._parents = dict()
 
     def add_parent(self, child, parent):
@@ -267,9 +282,11 @@ class XMLModuleStore(ModuleStoreBase):
         ModuleStoreBase.__init__(self)
 
         self.data_dir = path(data_dir)
-        self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)
+        self.modules = defaultdict(
+            dict)  # course_id -> dict(location -> XModuleDescriptor)
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
-        self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
+        self.errored_courses = {}
+            # course_dir -> errorlog, for dirs that failed to load
 
         self.load_error_modules = load_error_modules
 
@@ -306,14 +323,16 @@ class XMLModuleStore(ModuleStoreBase):
         try:
             course_descriptor = self.load_course(course_dir, errorlog.tracker)
         except Exception as e:
-            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir, str(e))
+            msg = "ERROR: Failed to load course '{0}': {1}".format(
+                course_dir, str(e))
             log.exception(msg)
             errorlog.tracker(msg)
 
         if course_descriptor is not None and not isinstance(course_descriptor, ErrorDescriptor):
             self.courses[course_dir] = course_descriptor
             self._location_errors[course_descriptor.location] = errorlog
-            self.parent_trackers[course_descriptor.id].make_known(course_descriptor.location)
+            self.parent_trackers[course_descriptor.id].make_known(
+                course_descriptor.location)
         else:
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
@@ -350,16 +369,19 @@ class XMLModuleStore(ModuleStoreBase):
 
         returns a CourseDescriptor for the course
         """
-        log.debug('========> Starting course import from {0}'.format(course_dir))
+        log.debug('========> Starting course import from {0}'.format(
+            course_dir))
 
         with open(self.data_dir / course_dir / "course.xml") as course_file:
 
             # VS[compat]
             # TODO (cpennington): Remove this once all fall 2012 courses have
             # been imported into the cms from xml
-            course_file = StringIO(clean_out_mako_templating(course_file.read()))
+            course_file = StringIO(
+                clean_out_mako_templating(course_file.read()))
 
-            course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
+            course_data = etree.parse(
+                course_file, parser=edx_xml_parser).getroot()
 
             org = course_data.get('org')
 
@@ -392,7 +414,8 @@ class XMLModuleStore(ModuleStoreBase):
 
                 # VS[compat]: remove once courses use the policy dirs.
                 if policy == {}:
-                    old_policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
+                    old_policy_path = self.data_dir / course_dir / \
+                        'policies' / '{0}.json'.format(url_name)
                     policy = self.load_policy(old_policy_path, tracker)
             else:
                 policy = {}
@@ -416,9 +439,11 @@ class XMLModuleStore(ModuleStoreBase):
                 self.load_error_modules,
             )
 
-            course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
+            course_descriptor = system.process_xml(
+                etree.tostring(course_data, encoding='unicode'))
 
-            # If we fail to load the course, then skip the rest of the loading steps
+            # If we fail to load the course, then skip the rest of the loading
+            # steps
             if isinstance(course_descriptor, ErrorDescriptor):
                 return course_descriptor
 
@@ -430,25 +455,33 @@ class XMLModuleStore(ModuleStoreBase):
 
             # now import all pieces of course_info which is expected to be stored
             # in <content_dir>/info or <content_dir>/info/<url_name>
-            self.load_extra_content(system, course_descriptor, 'course_info', self.data_dir / course_dir / 'info', course_dir, url_name)
+            self.load_extra_content(
+                system, course_descriptor, 'course_info', self.data_dir / course_dir / 'info', course_dir, url_name)
 
             # now import all static tabs which are expected to be stored in
             # in <content_dir>/tabs or <content_dir>/tabs/<url_name>
-            self.load_extra_content(system, course_descriptor, 'static_tab', self.data_dir / course_dir / 'tabs', course_dir, url_name)
+            self.load_extra_content(
+                system, course_descriptor, 'static_tab', self.data_dir / course_dir / 'tabs', course_dir, url_name)
 
-            self.load_extra_content(system, course_descriptor, 'custom_tag_template', self.data_dir / course_dir / 'custom_tags', course_dir, url_name)
+            self.load_extra_content(
+                system, course_descriptor, 'custom_tag_template',
+                self.data_dir / course_dir / 'custom_tags', course_dir, url_name)
 
-            self.load_extra_content(system, course_descriptor, 'about', self.data_dir / course_dir / 'about', course_dir, url_name)
+            self.load_extra_content(system, course_descriptor, 'about',
+                                    self.data_dir / course_dir / 'about', course_dir, url_name)
 
-            log.debug('========> Done with course import from {0}'.format(course_dir))
+            log.debug('========> Done with course import from {0}'.format(
+                course_dir))
             return course_descriptor
 
     def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
-        self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
+        self._load_extra_content(
+            system, course_descriptor, category, base_dir, course_dir)
 
          # then look in a override folder based on the course run
         if os.path.isdir(base_dir / url_name):
-            self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)
+            self._load_extra_content(
+                system, course_descriptor, category, base_dir / url_name, course_dir)
 
     def _load_extra_content(self, system, course_descriptor, category, path, course_dir):
 
@@ -459,9 +492,11 @@ class XMLModuleStore(ModuleStoreBase):
             with open(filepath) as f:
                 try:
                     html = f.read().decode('utf-8')
-                    # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
+                    # tabs are referenced in policy.json through a 'slug' which
+                    # is just the filename without the .html suffix
                     slug = os.path.splitext(os.path.basename(filepath))[0]
-                    loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
+                    loc = Location('i4x', course_descriptor.location.org,
+                                   course_descriptor.location.course, category, slug)
                     module = HtmlDescriptor(system, loc, {'data': html})
                     # VS[compat]:
                     # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
@@ -471,9 +506,11 @@ class XMLModuleStore(ModuleStoreBase):
                             if tab.get('url_slug') == slug:
                                 module.display_name = tab['name']
                     module.data_dir = course_dir
-                    self.modules[course_descriptor.id][module.location] = module
+                    self.modules[course_descriptor.id][
+                        module.location] = module
                 except Exception, e:
-                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
+                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(
+                        filepath, str(e)))
                     system.error_tracker("ERROR: " + str(e))
 
     def get_instance(self, course_id, location, depth=0):
@@ -590,6 +627,7 @@ class XMLModuleStore(ModuleStoreBase):
         '''
         location = Location.ensure_fully_specified(location)
         if not self.parent_trackers[course_id].is_known(location):
-            raise ItemNotFoundError("{0} not in {1}".format(location, course_id))
+            raise ItemNotFoundError(
+                "{0} not in {1}".format(location, course_id))
 
         return self.parent_trackers[course_id].parents(location)

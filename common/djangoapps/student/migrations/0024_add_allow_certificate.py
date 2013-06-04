@@ -10,7 +10,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'UserProfile.allow_certificate'
         db.add_column('auth_userprofile', 'allow_certificate',
-                      self.gf('django.db.models.fields.BooleanField')(default=True),
+                      self.gf('django.db.models.fields.BooleanField')(
+                          default=True),
                       keep_default=False)
 
     def backwards(self, orm):

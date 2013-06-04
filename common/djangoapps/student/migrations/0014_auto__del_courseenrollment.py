@@ -14,9 +14,12 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         # Adding model 'CourseEnrollment'
         db.create_table('student_courseenrollment', (
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('course_id', self.gf(
+                'django.db.models.fields.CharField')(max_length=255)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
         ))
         db.send_create_signal('student', ['CourseEnrollment'])
 

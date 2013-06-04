@@ -769,8 +769,10 @@ class MatlabInput(CodeInput):
 
         # construct xqueue headers
         qinterface = self.system.xqueue['interface']
-        qtime = datetime.strftime(datetime.utcnow(), xqueue_interface.dateformat)
-        callback_url = self.system.xqueue['construct_callback']('ungraded_response')
+        qtime = datetime.strftime(
+            datetime.utcnow(), xqueue_interface.dateformat)
+        callback_url = self.system.xqueue[
+            'construct_callback']('ungraded_response')
         anonymous_student_id = self.system.anonymous_student_id
         queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
                                                  anonymous_student_id +

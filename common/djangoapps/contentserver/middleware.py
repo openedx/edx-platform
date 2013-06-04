@@ -17,7 +17,8 @@ class StaticContentServer(object):
             try:
                 loc = StaticContent.get_location_from_path(request.path)
             except InvalidLocationError:
-                # return a 'Bad Request' to browser as we have a malformed Location
+                # return a 'Bad Request' to browser as we have a malformed
+                # Location
                 response = HttpResponse()
                 response.status_code = 400
                 return response
@@ -40,20 +41,24 @@ class StaticContentServer(object):
                 # measure the efficacy of our caches
                 pass
 
-            # see if the last-modified at hasn't changed, if not return a 302 (Not Modified)
+            # see if the last-modified at hasn't changed, if not return a 302
+            # (Not Modified)
 
             # convert over the DB persistent last modified timestamp to a HTTP compatible
             # timestamp, so we can simply compare the strings
-            last_modified_at_str = content.last_modified_at.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
+            last_modified_at_str = content.last_modified_at.strftime(
+                "%a, %d-%b-%Y %H:%M:%S GMT")
 
             # see if the client has cached this content, if so then compare the
-            # timestamps, if they are the same then just return a 304 (Not Modified)
+            # timestamps, if they are the same then just return a 304 (Not
+            # Modified)
             if 'HTTP_IF_MODIFIED_SINCE' in request.META:
                 if_modified_since = request.META['HTTP_IF_MODIFIED_SINCE']
                 if if_modified_since == last_modified_at_str:
                     return HttpResponseNotModified()
 
-            response = HttpResponse(content.data, content_type=content.content_type)
+            response = HttpResponse(
+                content.data, content_type=content.content_type)
             response['Last-Modified'] = last_modified_at_str
 
             return response

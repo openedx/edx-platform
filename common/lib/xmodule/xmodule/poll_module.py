@@ -26,13 +26,18 @@ log = logging.getLogger(__name__)
 
 class PollFields(object):
     # Name of poll to use in links to this poll
-    display_name = String(help="Display name for this module", scope=Scope.settings)
+    display_name = String(
+        help="Display name for this module", scope=Scope.settings)
 
-    voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.user_state, default=False)
-    poll_answer = String(help="Student answer", scope=Scope.user_state, default='')
-    poll_answers = Object(help="All possible answers for the poll fro other students", scope=Scope.content)
+    voted = Boolean(help="Whether this student has voted on the poll",
+                    scope=Scope.user_state, default=False)
+    poll_answer = String(
+        help="Student answer", scope=Scope.user_state, default='')
+    poll_answers = Object(
+        help="All possible answers for the poll fro other students", scope=Scope.content)
 
-    answers = List(help="Poll answers from xml", scope=Scope.content, default=[])
+    answers = List(
+        help="Poll answers from xml", scope=Scope.content, default=[])
     question = String(help="Poll question", scope=Scope.content, default='')
 
 

@@ -72,7 +72,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'accept_file_upload': self.accept_file_upload,
         }
 
-        html = system.render_template('{0}/self_assessment_prompt.html'.format(self.TEMPLATE_DIR), context)
+        html = system.render_template(
+            '{0}/self_assessment_prompt.html'.format(self.TEMPLATE_DIR), context)
         return html
 
     def handle_ajax(self, dispatch, get, system):
@@ -94,7 +95,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         if dispatch not in handlers:
             # This is a dev_facing_error
-            log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
+            log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(
+                dispatch))
             # This is a dev_facing_error
             return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
@@ -130,7 +132,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             context['read_only'] = True
         else:
             # This is a dev_facing_error
-            raise ValueError("Self assessment module is in an illegal state '{0}'".format(self.child_state))
+            raise ValueError("Self assessment module is in an illegal state '{0}'".format(
+                self.child_state))
 
         return system.render_template('{0}/self_assessment_rubric.html'.format(self.TEMPLATE_DIR), context)
 
@@ -156,7 +159,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             context['read_only'] = True
         else:
             # This is a dev_facing_error
-            raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.child_state))
+            raise ValueError("Self Assessment module is in an illegal state '{0}'".format(
+                self.child_state))
 
         return system.render_template('{0}/self_assessment_hint.html'.format(self.TEMPLATE_DIR), context)
 
@@ -184,9 +188,11 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         # add new history element with answer and empty score and hint.
         success, get = self.append_image_to_student_answer(get)
         if success:
-            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
+            success, allowed_to_submit, error_message = self.check_if_student_can_submit(
+            )
             if allowed_to_submit:
-                get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
+                get['student_answer'] = SelfAssessmentModule.sanitize_html(
+                    get['student_answer'])
                 self.new_history_entry(get['student_answer'])
                 self.change_state(self.ASSESSING)
             else:
@@ -228,7 +234,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
                 score_list[i] = int(score_list[i])
         except ValueError:
             # This is a dev_facing_error
-            log.error("Non-integer score value passed to save_assessment ,or no score list present.")
+            log.error(
+                "Non-integer score value passed to save_assessment ,or no score list present.")
             # This is a student_facing_error
             return {'success': False, 'error': "Error saving your score.  Please notify course staff."}
 
@@ -268,12 +275,14 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
                 'allow_reset': self._allow_reset()}
 
     def latest_post_assessment(self, system):
-        latest_post_assessment = super(SelfAssessmentModule, self).latest_post_assessment(system)
+        latest_post_assessment = super(
+            SelfAssessmentModule, self).latest_post_assessment(system)
         try:
             rubric_scores = json.loads(latest_post_assessment)
         except:
             # This is a dev_facing_error
-            log.error("Cannot parse rubric scores in self assessment module from {0}".format(latest_post_assessment))
+            log.error("Cannot parse rubric scores in self assessment module from {0}".format(
+                latest_post_assessment))
             rubric_scores = []
         return [rubric_scores]
 
@@ -323,7 +332,8 @@ class SelfAssessmentDescriptor():
         elt = etree.Element('selfassessment')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
+            child_str = '<{tag}>{body}</{tag}>'.format(
+                tag=k, body=getattr(self, k))
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

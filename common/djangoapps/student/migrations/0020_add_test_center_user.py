@@ -10,31 +10,56 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'TestCenterUser'
         db.create_table('student_testcenteruser', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['auth.User'], unique=True)),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, db_index=True, blank=True)),
-            ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
-            ('user_updated_at', self.gf('django.db.models.fields.DateTimeField')(db_index=True)),
-            ('candidate_id', self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True)),
-            ('client_candidate_id', self.gf('django.db.models.fields.CharField')(max_length=50, db_index=True)),
-            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=30, db_index=True)),
-            ('last_name', self.gf('django.db.models.fields.CharField')(max_length=50, db_index=True)),
-            ('middle_name', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
-            ('suffix', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('salutation', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('address_1', self.gf('django.db.models.fields.CharField')(max_length=40)),
-            ('address_2', self.gf('django.db.models.fields.CharField')(max_length=40, blank=True)),
-            ('address_3', self.gf('django.db.models.fields.CharField')(max_length=40, blank=True)),
-            ('city', self.gf('django.db.models.fields.CharField')(max_length=32, db_index=True)),
-            ('state', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=20, blank=True)),
-            ('postal_code', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=16, blank=True)),
-            ('country', self.gf('django.db.models.fields.CharField')(max_length=3, db_index=True)),
-            ('phone', self.gf('django.db.models.fields.CharField')(max_length=35)),
-            ('extension', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=8, blank=True)),
-            ('phone_country_code', self.gf('django.db.models.fields.CharField')(max_length=3, db_index=True)),
-            ('fax', self.gf('django.db.models.fields.CharField')(max_length=35, blank=True)),
-            ('fax_country_code', self.gf('django.db.models.fields.CharField')(max_length=3, blank=True)),
-            ('company_name', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                default=None, to=orm['auth.User'], unique=True)),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, db_index=True, blank=True)),
+            ('updated_at', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now=True, db_index=True, blank=True)),
+            ('user_updated_at', self.gf(
+                'django.db.models.fields.DateTimeField')(db_index=True)),
+            ('candidate_id', self.gf('django.db.models.fields.IntegerField')(
+                null=True, db_index=True)),
+            ('client_candidate_id', self.gf(
+                'django.db.models.fields.CharField')(max_length=50, db_index=True)),
+            ('first_name', self.gf('django.db.models.fields.CharField')(
+                max_length=30, db_index=True)),
+            ('last_name', self.gf('django.db.models.fields.CharField')(
+                max_length=50, db_index=True)),
+            ('middle_name', self.gf('django.db.models.fields.CharField')(
+                max_length=30, blank=True)),
+            ('suffix', self.gf('django.db.models.fields.CharField')(
+                max_length=255, blank=True)),
+            ('salutation', self.gf('django.db.models.fields.CharField')(
+                max_length=50, blank=True)),
+            ('address_1', self.gf(
+                'django.db.models.fields.CharField')(max_length=40)),
+            ('address_2', self.gf('django.db.models.fields.CharField')(
+                max_length=40, blank=True)),
+            ('address_3', self.gf('django.db.models.fields.CharField')(
+                max_length=40, blank=True)),
+            ('city', self.gf('django.db.models.fields.CharField')(
+                max_length=32, db_index=True)),
+            ('state', self.gf('django.db.models.fields.CharField')(
+                db_index=True, max_length=20, blank=True)),
+            ('postal_code', self.gf('django.db.models.fields.CharField')(
+                db_index=True, max_length=16, blank=True)),
+            ('country', self.gf('django.db.models.fields.CharField')(
+                max_length=3, db_index=True)),
+            ('phone', self.gf(
+                'django.db.models.fields.CharField')(max_length=35)),
+            ('extension', self.gf('django.db.models.fields.CharField')(
+                db_index=True, max_length=8, blank=True)),
+            ('phone_country_code', self.gf(
+                'django.db.models.fields.CharField')(max_length=3, db_index=True)),
+            ('fax', self.gf('django.db.models.fields.CharField')(
+                max_length=35, blank=True)),
+            ('fax_country_code', self.gf(
+                'django.db.models.fields.CharField')(max_length=3, blank=True)),
+            ('company_name', self.gf('django.db.models.fields.CharField')(
+                max_length=50, blank=True)),
         ))
         db.send_create_signal('student', ['TestCenterUser'])
 

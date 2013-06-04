@@ -28,7 +28,8 @@ class TimeInfo(object):
                 self.grace_period = parse_timedelta(grace_period_string)
                 self.close_date = self.display_due_date + self.grace_period
             except:
-                log.error("Error parsing the grace period {0}".format(grace_period_string))
+                log.error("Error parsing the grace period {0}".format(
+                    grace_period_string))
                 raise
         else:
             self.grace_period = None

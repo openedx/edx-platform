@@ -22,17 +22,20 @@ class Migration(SchemaMigration):
 
         # Adding field 'UserProfile.year_of_birth'
         db.add_column('auth_userprofile', 'year_of_birth',
-                      self.gf('django.db.models.fields.IntegerField')(db_index=True, null=True, blank=True),
+                      self.gf('django.db.models.fields.IntegerField')(
+                          db_index=True, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.level_of_education'
         db.add_column('auth_userprofile', 'level_of_education',
-                      self.gf('django.db.models.fields.CharField')(db_index=True, max_length=6, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          db_index=True, max_length=6, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.goals'
         db.add_column('auth_userprofile', 'goals',
-                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      self.gf('django.db.models.fields.TextField')(
+                          null=True, blank=True),
                       keep_default=False)
 
         # Adding index on 'UserProfile', fields ['gender']
@@ -44,22 +47,26 @@ class Migration(SchemaMigration):
 
         # Adding field 'UserProfile.occupation'
         db.add_column('auth_userprofile', 'occupation',
-                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          max_length=255, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.telephone_number'
         db.add_column('auth_userprofile', 'telephone_number',
-                      self.gf('django.db.models.fields.CharField')(max_length=25, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          max_length=25, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.date_of_birth'
         db.add_column('auth_userprofile', 'date_of_birth',
-                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
+                      self.gf('django.db.models.fields.DateField')(
+                          null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.country'
         db.add_column('auth_userprofile', 'country',
-                      self.gf('django_countries.fields.CountryField')(max_length=2, null=True, blank=True),
+                      self.gf('django_countries.fields.CountryField')(
+                          max_length=2, null=True, blank=True),
                       keep_default=False)
 
         # Deleting field 'UserProfile.year_of_birth'

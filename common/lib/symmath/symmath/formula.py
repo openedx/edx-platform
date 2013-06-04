@@ -80,7 +80,8 @@ def to_latex(x):
     # substitute back into latex form for scripts
     # literally something of the form
     # 'scriptN' becomes '\\mathcal{N}'
-    # note: can't use something akin to the _print_hat method above because we sometimes get 'script(N)__B' or more complicated terms
+    # note: can't use something akin to the _print_hat method above because we
+    # sometimes get 'script(N)__B' or more complicated terms
     xs = re.sub(r'script([a-zA-Z0-9]+)',
                 '\\mathcal{\\1}',
                 xs)
@@ -219,7 +220,8 @@ class formula(object):
         if type(xml) == str or type(xml) == unicode:
             xml = etree.fromstring(xml)		# TODO: wrap in try
 
-        xml = self.fix_greek_in_mathml(xml)	 # convert greek utf letters to greek spelled out in ascii
+        xml = self.fix_greek_in_mathml(
+            xml)	 # convert greek utf letters to greek spelled out in ascii
 
         def gettag(x):
             return re.sub('{http://[^}]+}', '', x.tag)
@@ -234,7 +236,8 @@ class formula(object):
                     if len(k) == 2:
                         if gettag(k[0]) == 'mi' and k[0].text in ['f', 'g'] and gettag(k[1]) == 'mo':
                             idx = xml.index(k)
-                            xml.insert(idx, deepcopy(k[0]))	 # drop the <mrow> container
+                            xml.insert(idx, deepcopy(k[
+                                       0]))	 # drop the <mrow> container
                             xml.insert(idx + 1, deepcopy(k[1]))
                             xml.remove(k)
                 fix_pmathml(k)
@@ -242,7 +245,8 @@ class formula(object):
         fix_pmathml(xml)
 
         # hat i is turned into <mover><mi>i</mi><mo>^</mo></mover> ; mangle this into <mi>hat(f)</mi>
-        # hat i also somtimes turned into <mover><mrow> <mi>j</mi> </mrow><mo>^</mo></mover>
+        # hat i also somtimes turned into <mover><mrow> <mi>j</mi>
+        # </mrow><mo>^</mo></mover>
 
         def fix_hat(xml):
             for k in xml:
@@ -346,7 +350,8 @@ class formula(object):
                     # replace the msup with 'X__Y'
                     k[1].remove(k[1][0])
                     newk = etree.Element('mi')
-                    newk.text = '%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]))
+                    newk.text = '%s__%s' % (flatten_pmathml(
+                        k[0]), flatten_pmathml(k[1]))
                     xml.replace(k, newk)
 
                 # match things like the middle example-
@@ -359,7 +364,8 @@ class formula(object):
                     # replace the msubsup with 'X_Y__Z'
                     k[2].remove(k[2][0])
                     newk = etree.Element('mi')
-                    newk.text = '%s_%s__%s' % (flatten_pmathml(k[0]), flatten_pmathml(k[1]), flatten_pmathml(k[2]))
+                    newk.text = '%s_%s__%s' % (flatten_pmathml(k[
+                                               0]), flatten_pmathml(k[1]), flatten_pmathml(k[2]))
                     xml.replace(k, newk)
 
                 fix_superscripts(k)
@@ -374,7 +380,8 @@ class formula(object):
                 if (gettag(child) == 'msubsup' and len(child) == 3):
                     newchild = etree.Element('msup')
                     newbase = etree.Element('mi')
-                    newbase.text = '%s_%s' % (flatten_pmathml(child[0]), flatten_pmathml(child[1]))
+                    newbase.text = '%s_%s' % (flatten_pmathml(
+                        child[0]), flatten_pmathml(child[1]))
                     newexp = child[2]
                     newchild.append(newbase)
                     newchild.append(newexp)
@@ -390,11 +397,13 @@ class formula(object):
         if self.the_cmathml:
             return self.the_cmathml
 
-        # pre-process the presentation mathml before sending it to snuggletex to convert to content mathml
+        # pre-process the presentation mathml before sending it to snuggletex
+        # to convert to content mathml
         try:
             xml = self.preprocess_pmathml(self.expr)
         except Exception, err:
-            log.warning('Err %s while preprocessing; expr=%s' % (err, self.expr))
+            log.warning('Err %s while preprocessing; expr=%s' % (
+                err, self.expr))
             return "<html>Error! Cannot process pmathml</html>"
         pmathml = etree.tostring(xml, pretty_print=True)
         self.the_pmathml = pmathml
@@ -403,7 +412,8 @@ class formula(object):
         self.the_cmathml = self.GetContentMathML(self.asciimath, pmathml)
         return self.the_cmathml
 
-    cmathml = property(get_content_mathml, None, None, 'content MathML representation')
+    cmathml = property(
+        get_content_mathml, None, None, 'content MathML representation')
 
     def make_sympy(self, xml=None):
         '''
@@ -429,7 +439,8 @@ class formula(object):
                     if 'conversion from Presentation MathML to Content MathML was not successful' in cmml:
                         msg = "Illegal math expression"
                     else:
-                        msg = 'Err %s while converting cmathml to xml; cmml=%s' % (err, cmml)
+                        msg = 'Err %s while converting cmathml to xml; cmml=%s' % (
+                            err, cmml)
                     raise Exception(msg)
                 xml = self.fix_greek_in_mathml(xml)
                 self.the_sympy = self.make_sympy(xml[0])
@@ -512,7 +523,8 @@ class formula(object):
                 return '_'.join([parsePresentationMathMLSymbol(y) for y in xml])
             elif tag == 'msup':
                 return '^'.join([parsePresentationMathMLSymbol(y) for y in xml])
-            raise Exception('[parsePresentationMathMLSymbol] unknown tag %s' % tag)
+            raise Exception(
+                '[parsePresentationMathMLSymbol] unknown tag %s' % tag)
 
         # parser tree for Content MathML
         tag = gettag(xml)
@@ -530,7 +542,8 @@ class formula(object):
                 except Exception, err:
                     self.args = args
                     self.op = op
-                    raise Exception('[formula] error=%s failed to apply %s to args=%s' % (err, opstr, args))
+                    raise Exception('[formula] error=%s failed to apply %s to args=%s' % (
+                        err, opstr, args))
                 return res
             else:
                 raise Exception('[formula]: unknown operator tag %s' % (opstr))
@@ -575,7 +588,8 @@ class formula(object):
 
     def GetContentMathML(self, asciimath, mathml):
         # URL = 'http://192.168.1.2:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
-        # URL = 'http://127.0.0.1:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
+        # URL = 'http://127.0.0.1:8080/snuggletex-
+        # webapp-1.2.2/ASCIIMathMLUpConversionDemo'
         URL = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
 
         if 1:
@@ -583,7 +597,8 @@ class formula(object):
                        'asciiMathML': mathml,
                        #'asciiMathML':unicode(mathml).encode('utf-8'),
                        }
-            headers = {'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"}
+            headers = {
+                'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"}
             r = requests.post(URL, data=payload, headers=headers, verify=False)
             r.encoding = 'utf-8'
             ret = r.text
@@ -604,7 +619,8 @@ class formula(object):
                 cmathml.append(k)
         # return '\n'.join(cmathml)
         cmathml = '\n'.join(cmathml[2:])
-        cmathml = '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' + unescape(cmathml) + '\n</math>'
+        cmathml = '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' + \
+            unescape(cmathml) + '\n</math>'
         # print cmathml
         # return unicode(cmathml)
         return cmathml

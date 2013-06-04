@@ -117,7 +117,8 @@ class CombinedOpenEndedV1Module():
 
         self.instance_state = instance_state
         self.display_name = instance_state.get('display_name', "Open Ended")
-        self.rewrite_content_links = static_data.get('rewrite_content_links', "")
+        self.rewrite_content_links = static_data.get(
+            'rewrite_content_links', "")
 
         # We need to set the location here so the child modules can use it
         system.set('location', location)
@@ -133,12 +134,16 @@ class CombinedOpenEndedV1Module():
         self.student_attempts = instance_state.get('student_attempts', 0)
         self.weight = instance_state.get('weight', 1)
 
-        # Allow reset is true if student has failed the criteria to move to the next child task
+        # Allow reset is true if student has failed the criteria to move to the
+        # next child task
         self.ready_to_reset = instance_state.get('ready_to_reset', False)
         self.attempts = self.instance_state.get('attempts', MAX_ATTEMPTS)
-        self.is_scored = self.instance_state.get('is_graded', IS_SCORED) in TRUE_DICT
-        self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
-        self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
+        self.is_scored = self.instance_state.get(
+            'is_graded', IS_SCORED) in TRUE_DICT
+        self.accept_file_upload = self.instance_state.get(
+            'accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
+        self.skip_basic_checks = self.instance_state.get(
+            'skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
         due_date = self.instance_state.get('due', None)
 
@@ -146,13 +151,15 @@ class CombinedOpenEndedV1Module():
         try:
             self.timeinfo = TimeInfo(due_date, grace_period_string)
         except Exception:
-            log.error("Error parsing due date information in location {0}".format(location))
+            log.error(
+                "Error parsing due date information in location {0}".format(location))
             raise
         self.display_due_date = self.timeinfo.display_due_date
 
         self.rubric_renderer = CombinedOpenEndedRubric(system, True)
         rubric_string = stringify_children(definition['rubric'])
-        self._max_score = self.rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED)
+        self._max_score = self.rubric_renderer.check_if_rubric_is_parseable(
+            rubric_string, location, MAX_SCORE_ALLOWED)
 
         # Static data is passed to the child modules to render
         self.static_data = {
@@ -187,14 +194,16 @@ class CombinedOpenEndedV1Module():
         Input: Task state json string
         Output: Task state json string
         """
-        last_response_data = self.get_last_response(self.current_task_number - 1)
+        last_response_data = self.get_last_response(
+            self.current_task_number - 1)
         last_response = last_response_data['response']
 
         loaded_task_state = json.loads(current_task_state)
         if loaded_task_state['child_state'] == self.INITIAL:
             loaded_task_state['child_state'] = self.ASSESSING
             loaded_task_state['child_created'] = True
-            loaded_task_state['child_history'].append({'answer': last_response})
+            loaded_task_state['child_history'].append(
+                {'answer': last_response})
             current_task_state = json.dumps(loaded_task_state)
         return current_task_state
 
@@ -242,14 +251,17 @@ class CombinedOpenEndedV1Module():
         children = self.child_modules()
         child_task_module = children['modules'][current_task_type]
 
-        self.current_task_descriptor = children['descriptors'][current_task_type](self.system)
+        self.current_task_descriptor = children[
+            'descriptors'][current_task_type](self.system)
 
-        # This is the xml object created from the xml definition of the current task
+        # This is the xml object created from the xml definition of the current
+        # task
         etree_xml = etree.fromstring(self.current_task_xml)
 
         # This sends the etree_xml object through the descriptor module of the current task, and
         # returns the xml parsed by the descriptor
-        self.current_task_parsed_xml = self.current_task_descriptor.definition_from_xml(etree_xml, self.system)
+        self.current_task_parsed_xml = self.current_task_descriptor.definition_from_xml(
+            etree_xml, self.system)
         if current_task_state is None and self.current_task_number == 0:
             self.current_task = child_task_module(self.system, self.location,
                                                   self.current_task_parsed_xml, self.current_task_descriptor,
@@ -257,7 +269,8 @@ class CombinedOpenEndedV1Module():
             self.task_states.append(self.current_task.get_instance_state())
             self.state = self.ASSESSING
         elif current_task_state is None and self.current_task_number > 0:
-            last_response_data = self.get_last_response(self.current_task_number - 1)
+            last_response_data = self.get_last_response(
+                self.current_task_number - 1)
             last_response = last_response_data['response']
             current_task_state = json.dumps({
                 'child_state': self.ASSESSING,
@@ -292,8 +305,10 @@ class CombinedOpenEndedV1Module():
         """
         if not self.ready_to_reset:
             if self.current_task_number > 0:
-                last_response_data = self.get_last_response(self.current_task_number - 1)
-                current_response_data = self.get_current_attributes(self.current_task_number)
+                last_response_data = self.get_last_response(
+                    self.current_task_number - 1)
+                current_response_data = self.get_current_attributes(
+                    self.current_task_number)
                 if (current_response_data['min_score_to_attempt'] > last_response_data['score']
                         or current_response_data['max_score_to_attempt'] < last_response_data['score']):
                     self.state = self.DONE
@@ -333,7 +348,8 @@ class CombinedOpenEndedV1Module():
         Output: rendered html
         """
         context = self.get_context()
-        html = self.system.render_template('{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
+        html = self.system.render_template(
+            '{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
 
     def get_html_nonsystem(self):
@@ -344,7 +360,8 @@ class CombinedOpenEndedV1Module():
         Output: HTML rendered directly via Mako
         """
         context = self.get_context()
-        html = self.system.render_template('{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
+        html = self.system.render_template(
+            '{0}/combined_open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
 
     def get_html_base(self):
@@ -360,7 +377,8 @@ class CombinedOpenEndedV1Module():
             # Without try except block, get this error:
             # File "/home/vik/mitx_all/mitx/common/lib/xmodule/xmodule/x_module.py", line 263, in rewrite_content_links
             # if link.startswith(XASSET_SRCREF_PREFIX):
-            # Placing try except so that if the error is fixed, this code will start working again.
+            # Placing try except so that if the error is fixed, this code will
+            # start working again.
             return_html = rewrite_links(html, self.rewrite_content_links)
         except Exception:
             pass
@@ -374,8 +392,10 @@ class CombinedOpenEndedV1Module():
         """
         task_xml = self.task_xml[task_number]
         etree_xml = etree.fromstring(task_xml)
-        min_score_to_attempt = int(etree_xml.attrib.get('min_score_to_attempt', 0))
-        max_score_to_attempt = int(etree_xml.attrib.get('max_score_to_attempt', self._max_score))
+        min_score_to_attempt = int(
+            etree_xml.attrib.get('min_score_to_attempt', 0))
+        max_score_to_attempt = int(etree_xml.attrib.get(
+            'max_score_to_attempt', self._max_score))
         return {'min_score_to_attempt': min_score_to_attempt, 'max_score_to_attempt': max_score_to_attempt}
 
     def get_last_response(self, task_number):
@@ -394,12 +414,16 @@ class CombinedOpenEndedV1Module():
         task_descriptor = children['descriptors'][task_type](self.system)
         etree_xml = etree.fromstring(task_xml)
 
-        min_score_to_attempt = int(etree_xml.attrib.get('min_score_to_attempt', 0))
-        max_score_to_attempt = int(etree_xml.attrib.get('max_score_to_attempt', self._max_score))
+        min_score_to_attempt = int(
+            etree_xml.attrib.get('min_score_to_attempt', 0))
+        max_score_to_attempt = int(etree_xml.attrib.get(
+            'max_score_to_attempt', self._max_score))
 
-        task_parsed_xml = task_descriptor.definition_from_xml(etree_xml, self.system)
-        task = children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor,
-                                              self.static_data, instance_state=task_state)
+        task_parsed_xml = task_descriptor.definition_from_xml(
+            etree_xml, self.system)
+        task = children[
+            'modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor,
+                                  self.static_data, instance_state=task_state)
         last_response = task.latest_answer()
         last_score = task.latest_score()
         all_scores = task.all_scores()
@@ -409,17 +433,21 @@ class CombinedOpenEndedV1Module():
         grader_ids = [0]
         submission_ids = [0]
         if task_type == "openended":
-            last_post_assessment = task.latest_post_assessment(self.system, short_feedback=False, join_feedback=False)
+            last_post_assessment = task.latest_post_assessment(
+                self.system, short_feedback=False, join_feedback=False)
             if isinstance(last_post_assessment, list):
                 eval_list = []
                 for i in xrange(0, len(last_post_assessment)):
-                    eval_list.append(task.format_feedback_with_evaluation(self.system, last_post_assessment[i]))
+                    eval_list.append(task.format_feedback_with_evaluation(
+                        self.system, last_post_assessment[i]))
                 last_post_evaluation = "".join(eval_list)
             else:
-                last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
+                last_post_evaluation = task.format_feedback_with_evaluation(
+                    self.system, last_post_assessment)
             last_post_assessment = last_post_evaluation
             try:
-                rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
+                rubric_data = task._parse_score_msg(task.child_history[
+                                                    -1].get('post_assessment', ""), self.system)
             except Exception:
                 log.debug("Could not parse rubric data from child history.  "
                           "Likely we have not yet initialized a previous step, so this is perfectly fine.")
@@ -489,8 +517,10 @@ class CombinedOpenEndedV1Module():
         """
         changed = False
         if not self.ready_to_reset:
-            self.task_states[self.current_task_number] = self.current_task.get_instance_state()
-            current_task_state = json.loads(self.task_states[self.current_task_number])
+            self.task_states[
+                self.current_task_number] = self.current_task.get_instance_state()
+            current_task_state = json.loads(
+                self.task_states[self.current_task_number])
             if current_task_state['child_state'] == self.DONE:
                 self.current_task_number += 1
                 if self.current_task_number >= (len(self.task_xml)):
@@ -533,9 +563,10 @@ class CombinedOpenEndedV1Module():
         feedback_items = [all_responses[i]['feedback_items'] for i in xrange(0, len(all_responses)) if
                           len(all_responses[i]['feedback_items']) > 0 and all_responses[i]['grader_types'][
                               0] in HUMAN_GRADER_TYPE.keys()]
-        rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']),
-                                                                  rubric_scores,
-                                                                  grader_types, feedback_items)
+        rubric_html = self.rubric_renderer.render_combined_rubric(
+            stringify_children(self.static_data['rubric']),
+            rubric_scores,
+            grader_types, feedback_items)
 
         response_dict = all_responses[-1]
         context = {
@@ -543,7 +574,8 @@ class CombinedOpenEndedV1Module():
             'task_name': 'Scored Rubric',
             'class_name': 'combined-rubric-container'
         }
-        html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
+        html = self.system.render_template(
+            '{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
     def get_legend(self, get):
@@ -555,7 +587,8 @@ class CombinedOpenEndedV1Module():
         context = {
             'legend_list': LEGEND_LIST,
         }
-        html = self.system.render_template('{0}/combined_open_ended_legend.html'.format(self.TEMPLATE_DIR), context)
+        html = self.system.render_template(
+            '{0}/combined_open_ended_legend.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
     def get_results(self, get):
@@ -573,8 +606,9 @@ class CombinedOpenEndedV1Module():
         for ri in all_responses:
             for i in xrange(0, len(ri['rubric_scores'])):
                 feedback = ri['feedback_dicts'][i].get('feedback', '')
-                rubric_data = self.rubric_renderer.render_rubric(stringify_children(self.static_data['rubric']),
-                                                                 ri['rubric_scores'][i])
+                rubric_data = self.rubric_renderer.render_rubric(
+                    stringify_children(self.static_data['rubric']),
+                    ri['rubric_scores'][i])
                 if rubric_data['success']:
                     rubric_html = rubric_data['html']
                 else:
@@ -599,7 +633,8 @@ class CombinedOpenEndedV1Module():
             'task_name': "Feedback",
             'class_name': "result-container",
         }
-        html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
+        html = self.system.render_template(
+            '{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
     def get_status_ajax(self, get):
@@ -632,7 +667,8 @@ class CombinedOpenEndedV1Module():
         }
 
         if dispatch not in handlers:
-            return_html = self.current_task.handle_ajax(dispatch, get, self.system)
+            return_html = self.current_task.handle_ajax(
+                dispatch, get, self.system)
             return self.update_task_states_ajax(return_html)
 
         d = handlers[dispatch](get)
@@ -672,7 +708,8 @@ class CombinedOpenEndedV1Module():
             self.current_task_number = i
             self.setup_next_task(reset=True)
             self.current_task.reset(self.system)
-            self.task_states[self.current_task_number] = self.current_task.get_instance_state()
+            self.task_states[
+                self.current_task_number] = self.current_task.get_instance_state()
         self.current_task_number = 0
         self.ready_to_reset = False
         self.setup_next_task()
@@ -714,8 +751,9 @@ class CombinedOpenEndedV1Module():
             'legend_list': LEGEND_LIST,
             'render_via_ajax': render_via_ajax,
         }
-        status_html = self.system.render_template("{0}/combined_open_ended_status.html".format(self.TEMPLATE_DIR),
-                                                  context)
+        status_html = self.system.render_template(
+            "{0}/combined_open_ended_status.html".format(self.TEMPLATE_DIR),
+            context)
 
         return status_html
 
@@ -744,7 +782,8 @@ class CombinedOpenEndedV1Module():
             # Finds the maximum score of all student attempts and keeps it.
             score_mat = []
             for i in xrange(0, len(self.task_states)):
-                # For each task, extract all student scores on that task (each attempt for each task)
+                # For each task, extract all student scores on that task (each
+                # attempt for each task)
                 last_response = self.get_last_response(i)
                 max_score = last_response.get('max_score', None)
                 score = last_response.get('all_scores', None)
@@ -799,7 +838,8 @@ class CombinedOpenEndedV1Module():
 
         If this module has no notion of progress, return None.
         '''
-        progress_object = Progress(self.current_task_number, len(self.task_xml))
+        progress_object = Progress(
+            self.current_task_number, len(self.task_xml))
 
         return progress_object
 
@@ -865,7 +905,8 @@ class CombinedOpenEndedV1Descriptor():
         elt = etree.Element('combinedopenended')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = '<{tag}>{body}</{tag}>'.format(
+                tag=k, body=self.definition[k])
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

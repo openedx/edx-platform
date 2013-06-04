@@ -68,12 +68,14 @@ class Command(BaseCommand):
         elif 'destination' in options and options['destination']:
             dest = options['destination']
         else:
-            raise CommandError('--destination or --dest-from-settings must be used')
+            raise CommandError(
+                '--destination or --dest-from-settings must be used')
 
         if not os.path.isdir(dest):
             os.makedirs(dest)
 
-        destfile = os.path.join(dest, uploaded_at.strftime("ead-%Y%m%d-%H%M%S.dat"))
+        destfile = os.path.join(dest, uploaded_at.strftime(
+            "ead-%Y%m%d-%H%M%S.dat"))
 
         dump_all = options['dump_all']
 
@@ -89,9 +91,12 @@ class Command(BaseCommand):
                     record = dict((csv_field, getattr(tcr, model_field))
                                   for csv_field, model_field
                                   in Command.CSV_TO_MODEL_FIELDS.items())
-                    record["LastUpdate"] = record["LastUpdate"].strftime("%Y/%m/%d %H:%M:%S")
-                    record["EligibilityApptDateFirst"] = record["EligibilityApptDateFirst"].strftime("%Y/%m/%d")
-                    record["EligibilityApptDateLast"] = record["EligibilityApptDateLast"].strftime("%Y/%m/%d")
+                    record["LastUpdate"] = record[
+                        "LastUpdate"].strftime("%Y/%m/%d %H:%M:%S")
+                    record["EligibilityApptDateFirst"] = record[
+                        "EligibilityApptDateFirst"].strftime("%Y/%m/%d")
+                    record["EligibilityApptDateLast"] = record[
+                        "EligibilityApptDateLast"].strftime("%Y/%m/%d")
                     if record["Accommodations"] == ACCOMMODATION_REJECTED_CODE:
                         record["Accommodations"] = ""
                     if options['force_add']:

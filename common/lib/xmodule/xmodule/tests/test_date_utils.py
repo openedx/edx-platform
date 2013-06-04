@@ -9,8 +9,10 @@ import time
 def test_get_time_struct_display():
     assert_equals("", date_utils.get_time_struct_display(None, ""))
     test_time = time.struct_time((1992, 3, 12, 15, 3, 30, 1, 71, 0))
-    assert_equals("03/12/1992", date_utils.get_time_struct_display(test_time, '%m/%d/%Y'))
-    assert_equals("15:03", date_utils.get_time_struct_display(test_time, '%H:%M'))
+    assert_equals("03/12/1992", date_utils.get_time_struct_display(
+        test_time, '%m/%d/%Y'))
+    assert_equals("15:03", date_utils.get_time_struct_display(
+        test_time, '%H:%M'))
 
 
 def test_get_default_time_display():

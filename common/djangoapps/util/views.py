@@ -147,7 +147,8 @@ def submit_feedback_via_zendesk(request):
 
     additional_info_string = (
         "Additional information:\n\n" +
-        "\n".join("%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
+        "\n".join("%s: %s" % (key, value) for (
+            key, value) in additional_info.items() if value is not None)
     )
 
     new_ticket = {
@@ -166,12 +167,14 @@ def submit_feedback_via_zendesk(request):
 
     # Additional information is provided as a private update so the information
     # is not visible to the user.
-    ticket_update = {"ticket": {"comment": {"public": False, "body": additional_info_string}}}
+    ticket_update = {"ticket": {"comment": {
+        "public": False, "body": additional_info_string}}}
     try:
         zendesk_api.update_ticket(ticket_id, ticket_update)
     except zendesk.ZendeskError as err:
         log.error("Error updating Zendesk ticket: %s", str(err))
-        # The update is not strictly necessary, so do not indicate failure to the user
+        # The update is not strictly necessary, so do not indicate failure to
+        # the user
         pass
 
     return HttpResponse()

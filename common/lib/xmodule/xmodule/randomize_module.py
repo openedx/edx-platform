@@ -12,7 +12,8 @@ log = logging.getLogger('mitx.' + __name__)
 
 
 class RandomizeFields(object):
-    choice = Integer(help="Which random child was chosen", scope=Scope.user_state)
+    choice = Integer(
+        help="Which random child was chosen", scope=Scope.user_state)
 
 
 class RandomizeModule(RandomizeFields, XModule):
@@ -50,7 +51,8 @@ class RandomizeModule(RandomizeFields, XModule):
             self.choice = None
 
         if self.choice is None:
-            # choose one based on the system seed, or randomly if that's not available
+            # choose one based on the system seed, or randomly if that's not
+            # available
             if num_choices > 0:
                 if self.system.seed is not None:
                     self.choice = self.system.seed % num_choices
@@ -78,7 +80,8 @@ class RandomizeModule(RandomizeFields, XModule):
 
     def get_html(self):
         if self.child is None:
-            # raise error instead?  In fact, could complain on descriptor load...
+            # raise error instead?  In fact, could complain on descriptor
+            # load...
             return "<div>Nothing to randomize between</div>"
 
         return self.child.get_html()
@@ -88,7 +91,8 @@ class RandomizeModule(RandomizeFields, XModule):
 
 
 class RandomizeDescriptor(RandomizeFields, SequenceDescriptor):
-    # the editing interface can be the same as for sequences -- just a container
+    # the editing interface can be the same as for sequences -- just a
+    # container
     module_class = RandomizeModule
 
     filename_extension = "xml"

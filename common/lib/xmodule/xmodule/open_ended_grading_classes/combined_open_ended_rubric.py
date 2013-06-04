@@ -56,13 +56,17 @@ class CombinedOpenEndedRubric(object):
                     category = rubric_categories[i]
                     for j in xrange(0, len(category['options'])):
                         if score_list[i] == j:
-                            rubric_categories[i]['options'][j]['selected'] = True
+                            rubric_categories[i]['options'][
+                                j]['selected'] = True
             rubric_scores = [cat['score'] for cat in rubric_categories]
-            max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+            max_scores = map((lambda cat: cat[
+                             'options'][-1]['points']), rubric_categories)
             max_score = max(max_scores)
-            rubric_template = '{0}/open_ended_rubric.html'.format(self.TEMPLATE_DIR)
+            rubric_template = '{0}/open_ended_rubric.html'.format(
+                self.TEMPLATE_DIR)
             if self.view_only:
-                rubric_template = '{0}/open_ended_view_only_rubric.html'.format(self.TEMPLATE_DIR)
+                rubric_template = '{0}/open_ended_view_only_rubric.html'.format(
+                    self.TEMPLATE_DIR)
             html = self.system.render_template(rubric_template,
                                                {'categories': rubric_categories,
                                                 'has_score': self.has_score,
@@ -194,7 +198,8 @@ class CombinedOpenEndedRubric(object):
 
                 selected = score == points
                 optiontext = option.text
-                options.append({'text': option.text, 'points': points, 'selected': selected})
+                options.append({
+                               'text': option.text, 'points': points, 'selected': selected})
 
         # sort and check for duplicates
         options = sorted(options, key=lambda option: option['points'])
@@ -203,10 +208,12 @@ class CombinedOpenEndedRubric(object):
         return {'description': description, 'options': options, 'score': score}
 
     def render_combined_rubric(self, rubric_xml, scores, score_types, feedback_types):
-        success, score_tuples = CombinedOpenEndedRubric.reformat_scores_for_rendering(scores, score_types,
-                                                                                      feedback_types)
+        success, score_tuples = CombinedOpenEndedRubric.reformat_scores_for_rendering(
+            scores, score_types,
+            feedback_types)
         rubric_categories = self.extract_categories(rubric_xml)
-        max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+        max_scores = map((lambda cat: cat[
+                         'options'][-1]['points']), rubric_categories)
         max_score = max(max_scores)
         for i in xrange(0, len(rubric_categories)):
             category = rubric_categories[i]
@@ -215,17 +222,19 @@ class CombinedOpenEndedRubric(object):
                 for tuple in score_tuples:
                     if tuple[1] == i and tuple[2] == j:
                         for grader_type in tuple[3]:
-                            rubric_categories[i]['options'][j]['grader_types'].append(grader_type)
+                            rubric_categories[i]['options'][j][
+                                'grader_types'].append(grader_type)
 
-        html = self.system.render_template('{0}/open_ended_combined_rubric.html'.format(self.TEMPLATE_DIR),
-                                           {'categories': rubric_categories,
-                                            'has_score': True,
-                                            'view_only': True,
-                                            'max_score': max_score,
-                                            'combined_rubric': True,
-                                            'grader_type_image_dict': GRADER_TYPE_IMAGE_DICT,
-                                            'human_grader_types': HUMAN_GRADER_TYPE,
-                                            })
+        html = self.system.render_template(
+            '{0}/open_ended_combined_rubric.html'.format(self.TEMPLATE_DIR),
+            {'categories': rubric_categories,
+             'has_score': True,
+             'view_only': True,
+             'max_score': max_score,
+             'combined_rubric': True,
+             'grader_type_image_dict': GRADER_TYPE_IMAGE_DICT,
+             'human_grader_types': HUMAN_GRADER_TYPE,
+             })
         return html
 
     @staticmethod
@@ -261,7 +270,8 @@ class CombinedOpenEndedRubric(object):
         success = False
         if len(scores) == 0:
             # This is a dev_facing_error
-            log.error("Score length is 0 when trying to reformat rubric scores for rendering.")
+            log.error(
+                "Score length is 0 when trying to reformat rubric scores for rendering.")
             return success, ""
 
         if len(scores) != len(score_types) or len(feedback_types) != len(scores):
@@ -291,7 +301,8 @@ class CombinedOpenEndedRubric(object):
         for i in xrange(0, len(score_lists)):
             for j in xrange(0, len(score_lists[i])):
                 tuple = [1, j, score_lists[i][j], [], []]
-                score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(score_tuples, tuple)
+                score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(
+                    score_tuples, tuple)
                 score_tuples[tup_ind][0] += 1
                 score_tuples[tup_ind][3].append(score_type_list[i])
                 score_tuples[tup_ind][4].append(feedback_type_list[i])

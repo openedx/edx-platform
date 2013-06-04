@@ -18,7 +18,8 @@ class Migration(SchemaMigration):
             """)
 
     def backwards(self, orm):
-        # Although this migration can't be undone, it is okay for it to be run backwards because it doesn't add/remove any fields
+        # Although this migration can't be undone, it is okay for it to be run
+        # backwards because it doesn't add/remove any fields
         pass
 
     models = {

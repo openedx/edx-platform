@@ -31,7 +31,8 @@ class XModuleCourseFactory(Factory):
         # Write the data to the mongo datastore
         new_course = store.clone_item(template, location)
 
-        # This metadata code was copied from cms/djangoapps/contentstore/views.py
+        # This metadata code was copied from
+        # cms/djangoapps/contentstore/views.py
         if display_name is not None:
             new_course.display_name = display_name
 
@@ -49,7 +50,8 @@ class XModuleCourseFactory(Factory):
         new_course.discussion_link = kwargs.get('discussion_link')
 
         # Update the data in the mongo datastore
-        store.update_metadata(new_course.location.url(), own_metadata(new_course))
+        store.update_metadata(
+            new_course.location.url(), own_metadata(new_course))
 
         data = kwargs.get('data')
         if data is not None:
@@ -88,7 +90,8 @@ class XModuleItemFactory(Factory):
     @lazy_attribute
     def location(attr):
         parent = Location(attr.parent_location)
-        dest_name = attr.display_name.replace(" ", "_") if attr.display_name is not None else uuid4().hex
+        dest_name = attr.display_name.replace(
+            " ", "_") if attr.display_name is not None else uuid4().hex
         return parent._replace(category=attr.category, name=dest_name)
 
     @classmethod
@@ -127,7 +130,8 @@ class XModuleItemFactory(Factory):
 
         new_item = store.clone_item(template, kwargs.get('location'))
 
-        # replace the display name with an optional parameter passed in from the caller
+        # replace the display name with an optional parameter passed in from
+        # the caller
         if display_name is not None:
             new_item.display_name = display_name
 
@@ -141,7 +145,8 @@ class XModuleItemFactory(Factory):
             store.update_item(new_item.location, data)
 
         if new_item.location.category not in DETACHED_CATEGORIES:
-            store.update_children(parent_location, parent.children + [new_item.location.url()])
+            store.update_children(parent_location, parent.children + [
+                                  new_item.location.url()])
 
         return new_item
 

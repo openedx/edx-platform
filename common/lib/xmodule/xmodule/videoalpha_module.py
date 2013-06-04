@@ -21,8 +21,10 @@ log = logging.getLogger(__name__)
 
 class VideoAlphaFields(object):
     data = String(help="XML data for the problem", scope=Scope.content)
-    position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
-    display_name = String(help="Display name for this module", scope=Scope.settings)
+    position = Integer(
+        help="Current position in the video", scope=Scope.user_state, default=0)
+    display_name = String(
+        help="Display name for this module", scope=Scope.settings)
 
 
 class VideoAlphaModule(VideoAlphaFields, XModule):
@@ -129,7 +131,8 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
 
     def get_html(self):
         if isinstance(modulestore(), MongoModuleStore):
-            caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
+            caption_asset_path = StaticContent.get_base_url_path_for_course_assets(
+                self.location) + '/subs_'
         else:
             # VS[compat]
             # cdodge: filesystem static content support.
@@ -142,7 +145,8 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
             'sources': self.sources,
             'track': self.track,
             'display_name': self.display_name_with_default,
-            # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
+            # TODO (cpennington): This won't work when we move to data that
+            # isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': caption_asset_path,
             'show_captions': self.show_captions,

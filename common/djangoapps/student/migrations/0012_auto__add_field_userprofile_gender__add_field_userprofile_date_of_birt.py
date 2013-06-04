@@ -10,32 +10,38 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'UserProfile.gender'
         db.add_column('auth_userprofile', 'gender',
-                      self.gf('django.db.models.fields.CharField')(max_length=6, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          max_length=6, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.date_of_birth'
         db.add_column('auth_userprofile', 'date_of_birth',
-                      self.gf('django.db.models.fields.DateField')(null=True, blank=True),
+                      self.gf('django.db.models.fields.DateField')(
+                          null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.mailing_address'
         db.add_column('auth_userprofile', 'mailing_address',
-                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      self.gf('django.db.models.fields.TextField')(
+                          null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.country'
         db.add_column('auth_userprofile', 'country',
-                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          max_length=255, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.telephone_number'
         db.add_column('auth_userprofile', 'telephone_number',
-                      self.gf('django.db.models.fields.CharField')(max_length=25, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          max_length=25, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'UserProfile.occupation'
         db.add_column('auth_userprofile', 'occupation',
-                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          max_length=255, null=True, blank=True),
                       keep_default=False)
 
     def backwards(self, orm):

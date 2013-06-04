@@ -254,7 +254,8 @@ class LoncapaResponse(object):
         hintfn = hintgroup.get('hintfn')
         if hintfn:
             # Hint is determined by a function defined in the <script> context; evaluate
-            # that function to obtain list of hint, hintmode for each answer_id.
+            # that function to obtain list of hint, hintmode for each
+            # answer_id.
 
             # The function should take arguments (answer_ids, student_answers, new_cmap, old_cmap)
             # and it should modify new_cmap as appropriate.
@@ -264,7 +265,8 @@ class LoncapaResponse(object):
 
             global CORRECTMAP_PY
             if CORRECTMAP_PY is None:
-                # We need the CorrectMap code for hint functions. No, this is not great.
+                # We need the CorrectMap code for hint functions. No, this is
+                # not great.
                 CORRECTMAP_PY = inspect.getsource(correctmap)
 
             code = (
@@ -288,7 +290,8 @@ class LoncapaResponse(object):
             }
 
             try:
-                safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'], slug=self.id)
+                safe_exec.safe_exec(code, globals_dict, python_path=self.context[
+                                    'python_path'], slug=self.id)
             except Exception as err:
                 msg = 'Error %s in evaluating hint function %s' % (err, hintfn)
                 msg += "\nSee XML source line %s" % getattr(
@@ -508,7 +511,8 @@ class JavascriptResponse(LoncapaResponse):
         # Node.js code is un-sandboxed. If the XModuleSystem says we aren't
         # allowed to run unsafe code, then stop now.
         if not self.system.can_execute_unsafe_code():
-            raise LoncapaProblemError("Execution of unsafe Javascript code is not allowed.")
+            raise LoncapaProblemError(
+                "Execution of unsafe Javascript code is not allowed.")
 
         subprocess_args = ["node"]
         subprocess_args.extend(args)
@@ -963,21 +967,25 @@ class CustomResponse(LoncapaResponse):
                 # and invoke the function with the data needed.
                 def make_check_function(script_code, cfn):
                     def check_function(expect, ans, **kwargs):
-                        extra_args = "".join(", {0}={0}".format(k) for k in kwargs)
+                        extra_args = "".join(
+                            ", {0}={0}".format(k) for k in kwargs)
                         code = (
                             script_code + "\n" +
-                            "cfn_return = %s(expect, ans%s)\n" % (cfn, extra_args)
+                            "cfn_return = %s(expect, ans%s)\n" % (
+                                cfn, extra_args)
                         )
                         globals_dict = {
                             'expect': expect,
                             'ans': ans,
                         }
                         globals_dict.update(kwargs)
-                        safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'], slug=self.id)
+                        safe_exec.safe_exec(code, globals_dict, python_path=self.context[
+                                            'python_path'], slug=self.id)
                         return globals_dict['cfn_return']
                     return check_function
 
-                self.code = make_check_function(self.context['script_code'], cfn)
+                self.code = make_check_function(
+                    self.context['script_code'], cfn)
 
         if not self.code:
             if answer is None:
@@ -1076,12 +1084,14 @@ class CustomResponse(LoncapaResponse):
         # build map giving "correct"ness of the answer(s)
         correct = self.context['correct']
         messages = self.context['messages']
-        overall_message = self.clean_message_html(self.context['overall_message'])
+        overall_message = self.clean_message_html(
+            self.context['overall_message'])
         correct_map = CorrectMap()
         correct_map.set_overall_message(overall_message)
 
         for k in range(len(idset)):
-            npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
+            npoints = self.maxpoints[idset[
+                k]] if correct[k] == 'correct' else 0
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
@@ -1090,7 +1100,8 @@ class CustomResponse(LoncapaResponse):
         # exec the check function
         if isinstance(self.code, basestring):
             try:
-                safe_exec.safe_exec(self.code, self.context, cache=self.system.cache, slug=self.id)
+                safe_exec.safe_exec(
+                    self.code, self.context, cache=self.system.cache, slug=self.id)
             except Exception as err:
                 self._handle_exec_exception(err)
 
@@ -1117,7 +1128,8 @@ class CustomResponse(LoncapaResponse):
                 # If there are multiple inputs, they all get marked
                 # to the same correct/incorrect value
                 if 'ok' in ret:
-                    correct = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
+                    correct = ['correct' if ret[
+                        'ok'] else 'incorrect'] * len(idset)
                     msg = ret.get('msg', None)
                     msg = self.clean_message_html(msg)
 
@@ -1264,7 +1276,8 @@ class SymbolicResponse(CustomResponse):
             log.error(traceback.format_exc())
             raise Exception("oops in symbolicresponse (cfn) error %s" % err)
         self.context['messages'][0] = self.clean_message_html(ret['msg'])
-        self.context['correct'] = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
+        self.context['correct'] = ['correct' if ret[
+            'ok'] else 'incorrect'] * len(idset)
 
 #-----------------------------------------------------------------------------
 
@@ -1740,12 +1753,14 @@ class FormulaResponse(LoncapaResponse):
                 if 'factorial' in ve.message:
                     # This is thrown when fact() or factorial() is used in a formularesponse answer
                     #   that tests on negative and/or non-integer inputs
-                    # ve.message will be: `factorial() only accepts integral values` or `factorial() not defined for negative values`
+                    # ve.message will be: `factorial() only accepts integral
+                    # values` or `factorial() not defined for negative values`
                     log.debug(
                         'formularesponse: factorial function used in response that tests negative and/or non-integer inputs. given={0}'.format(given))
                     raise StudentInputError(
                         "factorial function not permitted in answer for this problem. Provided answer was: {0}".format(given))
-                # If non-factorial related ValueError thrown, handle it the same as any other Exception
+                # If non-factorial related ValueError thrown, handle it the
+                # same as any other Exception
                 log.debug('formularesponse: error {0} in formula'.format(ve))
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
                                         cgi.escape(given))
@@ -1814,12 +1829,14 @@ class SchematicResponse(LoncapaResponse):
         ]
         self.context.update({'submission': submission})
         try:
-            safe_exec.safe_exec(self.code, self.context, cache=self.system.cache, slug=self.id)
+            safe_exec.safe_exec(
+                self.code, self.context, cache=self.system.cache, slug=self.id)
         except Exception as err:
             msg = 'Error %s in evaluating SchematicResponse' % err
             raise ResponseError(msg)
         cmap = CorrectMap()
-        cmap.set_dict(dict(zip(sorted(self.answer_ids), self.context['correct'])))
+        cmap.set_dict(dict(zip(sorted(
+            self.answer_ids), self.context['correct'])))
         return cmap
 
     def get_answers(self):

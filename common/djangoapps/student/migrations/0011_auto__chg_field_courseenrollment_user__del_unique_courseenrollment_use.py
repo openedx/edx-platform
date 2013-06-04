@@ -16,7 +16,8 @@ class Migration(SchemaMigration):
         #
         #
         # # Changing field 'CourseEnrollment.user'
-        # db.alter_column('student_courseenrollment', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
+        # db.alter_column('student_courseenrollment', 'user_id',
+        # self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
 
     def backwards(self, orm):
         pass

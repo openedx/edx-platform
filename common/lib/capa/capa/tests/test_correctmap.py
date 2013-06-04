@@ -50,7 +50,8 @@ class CorrectMapTest(unittest.TestCase):
         self.assertTrue(self.cmap.is_queued('1_2_1'))
         self.assertFalse(self.cmap.is_queued('2_2_1'))
 
-        self.assertEqual(self.cmap.get_queuetime_str('1_2_1'), '20130228100026')
+        self.assertEqual(self.cmap.get_queuetime_str(
+            '1_2_1'), '20130228100026')
         self.assertEqual(self.cmap.get_queuetime_str('2_2_1'), None)
 
         self.assertTrue(self.cmap.is_right_queuekey('1_2_1', 'secretstring'))

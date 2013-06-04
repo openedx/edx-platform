@@ -41,7 +41,8 @@ def cachedeterministic(parser, token):
     parser.delete_first_token()
     tokens = token.contents.split()
     if len(tokens) != 3:
-        raise TemplateSyntaxError(u"'%r' tag requires 2 arguments." % tokens[0])
+        raise TemplateSyntaxError(
+            u"'%r' tag requires 2 arguments." % tokens[0])
     return CacheNode(nodelist, tokens[1], tokens[2])
 
 

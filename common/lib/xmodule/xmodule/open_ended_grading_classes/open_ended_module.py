@@ -55,7 +55,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         self.url = definition.get('url', None)
         self.queue_name = definition.get('queuename', self.DEFAULT_QUEUE)
-        self.message_queue_name = definition.get('message-queuename', self.DEFAULT_MESSAGE_QUEUE)
+        self.message_queue_name = definition.get(
+            'message-queuename', self.DEFAULT_MESSAGE_QUEUE)
 
         # This is needed to attach feedback to specific responses later
         self.submission_id = None
@@ -86,7 +87,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
             self.answer - What to display when show answer is clicked
         '''
-        # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
+        # Note that OpenEndedResponse is agnostic to the specific contents of
+        # grader_payload
         prompt_string = stringify_children(prompt)
         rubric_string = stringify_children(rubric)
         self.child_prompt = prompt_string
@@ -95,7 +97,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
 
-        # Update grader payload with student id.  If grader payload not json, error.
+        # Update grader payload with student id.  If grader payload not json,
+        # error.
         try:
             parsed_grader_payload = json.loads(grader_payload)
             # NOTE: self.system.location is valid because the capa_module
@@ -107,8 +110,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 "Grader payload from external open ended grading server is not a json object! Object: {0}".format(
                     grader_payload))
 
-        self.initial_display = find_with_default(oeparam, 'initial_display', '')
-        self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
+        self.initial_display = find_with_default(
+            oeparam, 'initial_display', '')
+        self.answer = find_with_default(
+            oeparam, 'answer_display', 'No answer given.')
 
         parsed_grader_payload.update({
             'location': self.location_string,
@@ -155,7 +160,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         try:
             submission_id = int(survey_responses['submission_id'])
             grader_id = int(survey_responses['grader_id'])
-            feedback = str(survey_responses['feedback'].encode('ascii', 'ignore'))
+            feedback = str(survey_responses[
+                           'feedback'].encode('ascii', 'ignore'))
             score = int(survey_responses['score'])
         except:
             # This is a dev_facing_error
@@ -243,7 +249,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         contents = self.payload.copy()
 
-        # Metadata related to the student submission revealed to the external grader
+        # Metadata related to the student submission revealed to the external
+        # grader
         student_info = {
             'anonymous_student_id': anonymous_student_id,
             'submission_time': qtime,
@@ -256,7 +263,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'max_score': self.max_score(),
         })
 
-        # Submit request. When successful, 'msg' is the prior length of the queue
+        # Submit request. When successful, 'msg' is the prior length of the
+        # queue
         qinterface.send_to_queue(
             header=xheader,
             body=json.dumps(contents)
@@ -279,7 +287,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         new_score_msg = self._parse_score_msg(score_msg, system)
         if not new_score_msg['valid']:
-            new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
+            new_score_msg[
+                'feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
         self.record_latest_score(new_score_msg['score'])
         self.record_latest_post_assessment(score_msg)
@@ -292,7 +301,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         Gets and shows the answer for this problem.
         @return: Answer html
         """
-        anshtml = '<span class="openended-answer"><pre><code>{0}</code></pre></span>'.format(self.answer)
+        anshtml = '<span class="openended-answer"><pre><code>{0}</code></pre></span>'.format(
+            self.answer)
         return {self.answer_id: anshtml}
 
     def get_initial_display(self):
@@ -377,7 +387,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             feedback = json.loads(feedback_items)
         except (TypeError, ValueError):
             # This is a dev_facing_error
-            log.exception("feedback_items from external open ended grader have invalid json {0}".format(feedback_items))
+            log.exception("feedback_items from external open ended grader have invalid json {0}".format(
+                feedback_items))
             # This is a student_facing_error
             return format_feedback('errors', 'Error getting feedback from grader.')
 
@@ -391,10 +402,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     feedback.pop(tag)
 
             feedback_lst = sorted(feedback.items(), key=get_priority)
-            feedback_list_part1 = u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
+            feedback_list_part1 = u"\n".join(
+                format_feedback(k, v) for k, v in feedback_lst)
         else:
             # This is a student_facing_error
-            feedback_list_part1 = format_feedback('errors', response_items['feedback'])
+            feedback_list_part1 = format_feedback(
+                'errors', response_items['feedback'])
 
         feedback_list_part2 = (u"\n".join([format_feedback_hidden(feedback_type, value)
                                            for feedback_type, value in response_items.items()
@@ -415,7 +428,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         rubric_scores = []
         if response_items['rubric_scores_complete'] is True:
             rubric_renderer = CombinedOpenEndedRubric(system, True)
-            rubric_dict = rubric_renderer.render_rubric(response_items['rubric_xml'])
+            rubric_dict = rubric_renderer.render_rubric(
+                response_items['rubric_xml'])
             success = rubric_dict['success']
             rubric_feedback = rubric_dict['html']
             rubric_scores = rubric_dict['rubric_scores']
@@ -512,7 +526,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     'rubric_scores_complete': score_result['rubric_scores_complete'][i],
                     'rubric_xml': score_result['rubric_xml'][i],
                 }
-                feedback_template, rubric_score = self._format_feedback(new_score_result, system)
+                feedback_template, rubric_score = self._format_feedback(
+                    new_score_result, system)
                 feedback_items.append(feedback_template)
                 rubric_scores.append(rubric_score)
                 grader_types.append(score_result['grader_type'])
@@ -530,7 +545,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = int(median(score_result['score']))
         else:
             # This is for instructor and ML grading
-            feedback, rubric_score = self._format_feedback(score_result, system)
+            feedback, rubric_score = self._format_feedback(
+                score_result, system)
             score = score_result['score']
             rubric_scores = [rubric_score]
             grader_types = [score_result['grader_type']]
@@ -586,7 +602,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @return: Rendered html
         """
         context = {'msg': feedback, 'id': "1", 'rows': 50, 'cols': 50}
-        html = system.render_template('{0}/open_ended_evaluation.html'.format(self.TEMPLATE_DIR), context)
+        html = system.render_template(
+            '{0}/open_ended_evaluation.html'.format(self.TEMPLATE_DIR), context)
         return html
 
     def handle_ajax(self, dispatch, get, system):
@@ -609,7 +626,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         if dispatch not in handlers:
             # This is a dev_facing_error
-            log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
+            log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(
+                dispatch))
             # This is a dev_facing_error
             return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
@@ -652,9 +670,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         success, get = self.append_image_to_student_answer(get)
         error_message = ""
         if success:
-            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
+            success, allowed_to_submit, error_message = self.check_if_student_can_submit(
+            )
             if allowed_to_submit:
-                get['student_answer'] = OpenEndedModule.sanitize_html(get['student_answer'])
+                get['student_answer'] = OpenEndedModule.sanitize_html(
+                    get['student_answer'])
                 self.new_history_entry(get['student_answer'])
                 self.send_to_grader(get['student_answer'], system)
                 self.change_state(self.ASSESSING)
@@ -697,7 +717,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             previous_answer = latest if latest is not None else self.initial_display
             post_assessment = self.latest_post_assessment(system)
             score = self.latest_score()
-            correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
+            correct = 'correct' if self.is_submission_correct(
+                score) else 'incorrect'
             if self.child_state == self.ASSESSING:
                 eta_string = self.get_eta()
         else:
@@ -719,7 +740,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'accept_file_upload': self.accept_file_upload,
             'eta_message': eta_string,
         }
-        html = system.render_template('{0}/open_ended.html'.format(self.TEMPLATE_DIR), context)
+        html = system.render_template(
+            '{0}/open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
 
 
@@ -768,7 +790,8 @@ class OpenEndedDescriptor():
         elt = etree.Element('openended')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = '<{tag}>{body}</{tag}>'.format(
+                tag=k, body=self.definition[k])
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

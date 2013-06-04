@@ -20,8 +20,10 @@ def aggregate_scores(scores, section_name="summary"):
         all_total: A Score representing the total score summed over all input scores
         graded_total: A Score representing the score summed over all graded input scores
     """
-    total_correct_graded = sum(score.earned for score in scores if score.graded)
-    total_possible_graded = sum(score.possible for score in scores if score.graded)
+    total_correct_graded = sum(
+        score.earned for score in scores if score.graded)
+    total_possible_graded = sum(
+        score.possible for score in scores if score.graded)
 
     total_correct = sum(score.earned for score in scores)
     total_possible = sum(score.possible for score in scores)
@@ -81,7 +83,8 @@ def grader_from_conf(conf):
                 # This is an SingleSectionGrader
                 subgrader_class = SingleSectionGrader
             else:
-                raise ValueError("Configuration has no appropriate grader class.")
+                raise ValueError(
+                    "Configuration has no appropriate grader class.")
 
             bad_args = invalid_args(subgrader_class.__init__, subgraderconf)
             # See note above concerning 'name'.
@@ -180,14 +183,17 @@ class WeightedSubsectionsGrader(CourseGrader):
         grade_breakdown = []
 
         for subgrader, category, weight in self.sections:
-            subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
+            subgrade_result = subgrader.grade(
+                grade_sheet, generate_random_scores)
 
             weighted_percent = subgrade_result['percent'] * weight
-            section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(category, weighted_percent, weight)
+            section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(
+                category, weighted_percent, weight)
 
             total_percent += weighted_percent
             section_breakdown += subgrade_result['section_breakdown']
-            grade_breakdown.append({'percent': weighted_percent, 'detail': section_detail, 'category': category})
+            grade_breakdown.append({
+                                   'percent': weighted_percent, 'detail': section_detail, 'category': category})
 
         return {'percent': total_percent,
                 'section_breakdown': section_breakdown,
@@ -226,7 +232,8 @@ class SingleSectionGrader(CourseGrader):
             percent = earned / float(possible)
             detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(name=self.name,
                                                                                    percent=percent,
-                                                                                   earned=float(earned),
+                                                                                   earned=float(
+                                                                                       earned),
                                                                                    possible=float(possible))
 
         else:
@@ -276,8 +283,9 @@ class AssignmentFormatGrader(CourseGrader):
     min_count = 2 would produce the labels "Assignment 3", "Assignment 4"
 
     """
-    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None,
-                 show_only_average=False, hide_average=False, starting_index=1):
+    def __init__(
+        self, type, min_count, drop_count, category=None, section_type=None, short_label=None,
+            show_only_average=False, hide_average=False, starting_index=1):
         self.type = type
         self.min_count = min_count
         self.drop_count = drop_count
@@ -291,12 +299,15 @@ class AssignmentFormatGrader(CourseGrader):
     def grade(self, grade_sheet, generate_random_scores=False):
         def total_with_drops(breakdown, drop_count):
             '''calculates total score for a section while dropping lowest scores'''
-            # create an array of tuples with (index, mark), sorted by mark['percent'] descending
-            sorted_breakdown = sorted(enumerate(breakdown), key=lambda x: -x[1]['percent'])
+            # create an array of tuples with (index, mark), sorted by
+            # mark['percent'] descending
+            sorted_breakdown = sorted(enumerate(
+                breakdown), key=lambda x: -x[1]['percent'])
             # A list of the indices of the dropped scores
             dropped_indices = []
             if drop_count > 0:
-                dropped_indices = [x[0] for x in sorted_breakdown[-drop_count:]]
+                dropped_indices = [x[
+                    0] for x in sorted_breakdown[-drop_count:]]
             aggregate_score = 0
             for index, mark in enumerate(breakdown):
                 if index not in dropped_indices:
@@ -341,7 +352,8 @@ class AssignmentFormatGrader(CourseGrader):
             breakdown.append({'percent': percentage, 'label': short_label,
                               'detail': summary, 'category': self.category})
 
-        total_percent, dropped_indices = total_with_drops(breakdown, self.drop_count)
+        total_percent, dropped_indices = total_with_drops(
+            breakdown, self.drop_count)
 
         for dropped_index in dropped_indices:
             breakdown[dropped_index]['mark'] = {'detail': "The lowest {drop_count} {section_type} scores are dropped."
@@ -359,14 +371,16 @@ class AssignmentFormatGrader(CourseGrader):
         else:
             total_detail = "{section_type} Average = {percent:.0%}".format(percent=total_percent,
                                                                            section_type=self.section_type)
-            total_label = "{short_label} Avg".format(short_label=self.short_label)
+            total_label = "{short_label} Avg".format(
+                short_label=self.short_label)
 
             if self.show_only_average:
                 breakdown = []
 
             if not self.hide_average:
-                breakdown.append({'percent': total_percent, 'label': total_label,
-                                  'detail': total_detail, 'category': self.category, 'prominent': True})
+                breakdown.append(
+                    {'percent': total_percent, 'label': total_label,
+                     'detail': total_detail, 'category': self.category, 'prominent': True})
 
         return {'percent': total_percent,
                 'section_breakdown': breakdown,

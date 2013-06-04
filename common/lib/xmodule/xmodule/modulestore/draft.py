@@ -94,10 +94,13 @@ class DraftModuleStore(ModuleStoreBase):
         """
         draft_loc = as_draft(location)
 
-        draft_items = super(DraftModuleStore, self).get_items(draft_loc, course_id=course_id, depth=depth)
-        items = super(DraftModuleStore, self).get_items(location, course_id=course_id, depth=depth)
+        draft_items = super(DraftModuleStore, self).get_items(
+            draft_loc, course_id=course_id, depth=depth)
+        items = super(DraftModuleStore, self).get_items(
+            location, course_id=course_id, depth=depth)
 
-        draft_locs_found = set(item.location._replace(revision=None) for item in draft_items)
+        draft_locs_found = set(item.location._replace(
+            revision=None) for item in draft_items)
         non_draft_items = [
             item
             for item in items
@@ -194,9 +197,12 @@ class DraftModuleStore(ModuleStoreBase):
 
         draft.cms.published_date = datetime.utcnow()
         draft.cms.published_by = published_by_id
-        super(DraftModuleStore, self).update_item(location, draft._model_data._kvs._data)
-        super(DraftModuleStore, self).update_children(location, draft._model_data._kvs._children)
-        super(DraftModuleStore, self).update_metadata(location, own_metadata(draft))
+        super(DraftModuleStore, self).update_item(
+            location, draft._model_data._kvs._data)
+        super(DraftModuleStore, self).update_children(
+            location, draft._model_data._kvs._children)
+        super(DraftModuleStore, self).update_metadata(
+            location, own_metadata(draft))
         self.delete_item(location)
 
     def unpublish(self, location):
@@ -209,7 +215,8 @@ class DraftModuleStore(ModuleStoreBase):
     def _query_children_for_cache_children(self, items):
         # first get non-draft in a round-trip
         queried_children = []
-        to_process_non_drafts = super(DraftModuleStore, self)._query_children_for_cache_children(items)
+        to_process_non_drafts = super(
+            DraftModuleStore, self)._query_children_for_cache_children(items)
 
         to_process_dict = {}
         for non_draft in to_process_non_drafts:

@@ -60,7 +60,8 @@ def check_variables(string, variables):
     undefined_variable.setParseAction(lambda x:UndefinedVariable("".join(x)).raiseself())
     varnames = varnames | undefined_variable
     '''
-    possible_variables = re.split(general_whitespace, string)  # List of all alnums in string
+    possible_variables = re.split(
+        general_whitespace, string)  # List of all alnums in string
     bad_variables = list()
     for v in possible_variables:
         if len(v) == 0:
@@ -108,7 +109,8 @@ def evaluator(variables, functions, string, cs=False):
         string_cs = string
         CasedLiteral = Literal
 
-    check_variables(string_cs, set(all_variables.keys() + all_functions.keys()))
+    check_variables(string_cs, set(
+        all_variables.keys() + all_functions.keys()))
 
     if string.strip() == "":
         return float('nan')
@@ -177,17 +179,20 @@ def evaluator(variables, functions, string, cs=False):
         return [all_functions[x[0]](x[1])]
 
     # SI suffixes and percent
-    number_suffix = reduce(lambda a, b: a | b, map(Literal, suffixes.keys()), NoMatch())
+    number_suffix = reduce(lambda a, b: a | b, map(
+        Literal, suffixes.keys()), NoMatch())
     (dot, minus, plus, times, div, lpar, rpar, exp) = map(Literal, ".-+*/()^")
 
     number_part = Word(nums)
 
     # 0.33 or 7 or .34 or 16.
-    inner_number = (number_part + Optional("." + Optional(number_part))) | ("." + number_part)
+    inner_number = (number_part + Optional(
+        "." + Optional(number_part))) | ("." + number_part)
 
     # 0.33k or -17
     number = (Optional(minus | plus) + inner_number
-              + Optional(CaselessLiteral("E") + Optional((plus | minus)) + number_part)
+              + Optional(CaselessLiteral("E") + Optional(
+                  (plus | minus)) + number_part)
               + Optional(number_suffix))
     number = number.setParseAction(number_parse_action)  # Convert to number
 
@@ -204,12 +209,15 @@ def evaluator(variables, functions, string, cs=False):
         return reduce(f, l)
 
     # Handle variables passed in. E.g. if we have {'R':0.5}, we make the substitution.
-    # Special case for no variables because of how we understand PyParsing is put together
+    # Special case for no variables because of how we understand PyParsing is
+    # put together
     if len(all_variables) > 0:
         # We sort the list so that var names (like "e2") match before
         # mathematical constants (like "e"). This is kind of a hack.
-        all_variables_keys = sorted(all_variables.keys(), key=len, reverse=True)
-        varnames = sreduce(lambda x, y: x | y, map(lambda x: CasedLiteral(x), all_variables_keys))
+        all_variables_keys = sorted(
+            all_variables.keys(), key=len, reverse=True)
+        varnames = sreduce(lambda x, y: x | y, map(
+            lambda x: CasedLiteral(x), all_variables_keys))
         varnames.setParseAction(lambda x: map(lambda y: all_variables[y], x))
     else:
         varnames = NoMatch()
@@ -224,11 +232,13 @@ def evaluator(variables, functions, string, cs=False):
         function = NoMatch()
 
     atom = number | function | varnames | lpar + expr + rpar
-    factor << (atom + ZeroOrMore(exp + atom)).setParseAction(exp_parse_action)  # 7^6
+    factor << (atom + ZeroOrMore(
+        exp + atom)).setParseAction(exp_parse_action)  # 7^6
     paritem = factor + ZeroOrMore(Literal('||') + factor)  # 5k || 4k
     paritem = paritem.setParseAction(parallel)
     term = paritem + ZeroOrMore((times | div) + paritem)  # 7 * 5 / 4 - 3
     term = term.setParseAction(prod_parse_action)
-    expr << Optional((plus | minus)) + term + ZeroOrMore((plus | minus) + term)  # -5 + 4 - 3
+    expr << Optional((plus | minus)) + term + ZeroOrMore(
+        (plus | minus) + term)  # -5 + 4 - 3
     expr = expr.setParseAction(sum_parse_action)
     return (expr + stringEnd).parseString(string)[0]

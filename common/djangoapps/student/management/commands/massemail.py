@@ -22,8 +22,10 @@ body, and an _subject.txt for the subject. '''
         # text = open(args[0]).read()
         # subject = open(args[1]).read()
         users = User.objects.all()
-        text = middleware.lookup['main'].get_template('email/' + args[0] + ".txt").render()
-        subject = middleware.lookup['main'].get_template('email/' + args[0] + "_subject.txt").render().strip()
+        text = middleware.lookup['main'].get_template(
+            'email/' + args[0] + ".txt").render()
+        subject = middleware.lookup['main'].get_template(
+            'email/' + args[0] + "_subject.txt").render().strip()
         for user in users:
             if user.is_active:
                 user.email_user(subject, text)

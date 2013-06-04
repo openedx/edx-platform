@@ -84,8 +84,9 @@ class XmlDescriptor(XModuleDescriptor):
     Mixin class for standardized parsing of from xml
     """
 
-    xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export",
-                            default={}, scope=Scope.settings)
+    xml_attributes = Object(
+        help="Map of unhandled xml attributes, used only for storage between import and export",
+        default={}, scope=Scope.settings)
 
     # Extension to append to filename paths
     filename_extension = 'xml'
@@ -99,30 +100,37 @@ class XmlDescriptor(XModuleDescriptor):
     # TODO (vshnayder): Do we need a list of metadata we actually
     # understand?  And if we do, is this the place?
     # Related: What's the right behavior for clean_metadata?
-    metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
-                           'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
-                           'ispublic', 	# if True, then course is listed for all users; see
-                           'xqa_key',  	# for xqaa server access
-                           'giturl',  # url of git server for origin of file
-                           # information about testcenter exams is a dict (of dicts), not a string,
-                           # so it cannot be easily exportable as a course element's attribute.
-                           'testcenter_info',
-                           # VS[compat] Remove once unused.
-                           'name', 'slug')
+    metadata_attributes = (
+        'format', 'graceperiod', 'showanswer', 'rerandomize',
+        'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
+        'ispublic',
+        # if True, then course is listed for all users;
+        # see
+        'xqa_key',  	# for xqaa server access
+        'giturl',  # url of git server for origin of file
+        # information about testcenter exams is a dict (of dicts), not a string,
+        # so it cannot be easily exportable as a course
+        # element's attribute.
+        'testcenter_info',
+        # VS[compat] Remove once unused.
+        'name', 'slug')
 
     metadata_to_strip = ('data_dir',
                          'tabs', 'grading_policy', 'published_by', 'published_date',
                          'discussion_blackouts', 'testcenter_info',
-                         # VS[compat] -- remove the below attrs once everything is in the CMS
+                         # VS[compat] -- remove the below attrs once everything
+                         # is in the CMS
                          'course', 'org', 'url_name', 'filename',
-                         # Used for storing xml attributes between import and export, for roundtrips
+                         # Used for storing xml attributes between import and
+                         # export, for roundtrips
                          'xml_attributes')
 
     metadata_to_export_to_policy = ('discussion_topics')
 
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them
-    # Allow json to specify either the string "true", or the bool True.  The string is preferred.
+    # Allow json to specify either the string "true", or the bool True.  The
+    # string is preferred.
     to_bool = lambda val: val == 'true' or val == True
     from_bool = lambda val: str(val).lower()
     bool_map = AttrMap(to_bool, from_bool)
@@ -194,7 +202,8 @@ class XmlDescriptor(XModuleDescriptor):
         cases (e.g. html module)'''
 
         # VS[compat] -- the filename attr should go away once everything is
-        # converted.  (note: make sure html files still work once this goes away)
+        # converted.  (note: make sure html files still work once this goes
+        # away)
         filename = xml_object.get('filename')
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
@@ -215,7 +224,8 @@ class XmlDescriptor(XModuleDescriptor):
                         filepath = candidate
                         break
 
-            definition_xml = cls.load_file(filepath, system.resources_fs, location)
+            definition_xml = cls.load_file(
+                filepath, system.resources_fs, location)
 
         definition_metadata = get_metadata_from_xml(definition_xml)
         cls.clean_metadata_from_xml(definition_xml)
@@ -278,13 +288,17 @@ class XmlDescriptor(XModuleDescriptor):
         # VS[compat] -- detect new-style each-in-a-file mode
         if is_pointer_tag(xml_object):
             # new style:
-            # read the actual definition file--named using url_name.replace(':','/')
-            filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
-            definition_xml = cls.load_file(filepath, system.resources_fs, location)
+            # read the actual definition file--named using
+            # url_name.replace(':','/')
+            filepath = cls._format_filepath(
+                xml_object.tag, name_to_pathname(url_name))
+            definition_xml = cls.load_file(
+                filepath, system.resources_fs, location)
         else:
             definition_xml = xml_object  # this is just a pointer, not the real definition content
 
-        definition, children = cls.load_definition(definition_xml, system, location)  # note this removes metadata
+        definition, children = cls.load_definition(
+            definition_xml, system, location)  # note this removes metadata
 
         # VS[compat] -- make Ike's github preview links work in both old and
         # new file layouts
@@ -315,7 +329,8 @@ class XmlDescriptor(XModuleDescriptor):
         model_data['children'] = children
 
         model_data['xml_attributes'] = {}
-        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None])  # for git link
+        model_data['xml_attributes']['filename'] = definition.get(
+            'filename', ['', None])  # for git link
         for key, value in metadata.items():
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value
@@ -376,11 +391,13 @@ class XmlDescriptor(XModuleDescriptor):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
-                # logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
+                # logging.debug('location.category = {0}, attr =
+                # {1}'.format(self.location.category, attr))
                 try:
                     xml_object.set(attr, val)
                 except Exception, e:
-                    logging.exception('Failed to serialize metadata attribute {0} with value {1}. This could mean data loss!!!  Exception: {2}'.format(attr, val, e))
+                    logging.exception(
+                        'Failed to serialize metadata attribute {0} with value {1}. This could mean data loss!!!  Exception: {2}'.format(attr, val, e))
                     pass
 
         for key, value in self.xml_attributes.items():
@@ -391,9 +408,11 @@ class XmlDescriptor(XModuleDescriptor):
             # Write the definition to a file
             url_path = name_to_pathname(self.url_name)
             filepath = self.__class__._format_filepath(self.category, url_path)
-            resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
+            resource_fs.makedir(os.path.dirname(
+                filepath), recursive=True, allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
-                file.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8'))
+                file.write(etree.tostring(
+                    xml_object, pretty_print=True, encoding='utf-8'))
 
             # And return just a pointer with the category and filename.
             record_object = etree.Element(self.category)
@@ -419,6 +438,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(XmlDescriptor, self).non_editable_metadata_fields
+        non_editable_fields = super(
+            XmlDescriptor, self).non_editable_metadata_fields
         non_editable_fields.append(XmlDescriptor.xml_attributes)
         return non_editable_fields

@@ -9,7 +9,8 @@ import StringIO
 
 from xmodule.modulestore import Location
 from .django import contentstore
-# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
+# to install PIL on MacOSX: 'easy_install
+# http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
 
 
@@ -20,7 +21,8 @@ class StaticContent(object):
         self.content_type = content_type
         self.data = data
         self.last_modified_at = last_modified_at
-        self.thumbnail_location = Location(thumbnail_location) if thumbnail_location is not None else None
+        self.thumbnail_location = Location(
+            thumbnail_location) if thumbnail_location is not None else None
         # optional information about where this file was imported from. This is needed to support import/export
         # cycles
         self.import_path = import_path
@@ -36,8 +38,9 @@ class StaticContent(object):
     @staticmethod
     def compute_location(org, course, name, revision=None, is_thumbnail=False):
         name = name.replace('/', '_')
-        return Location([XASSET_LOCATION_TAG, org, course, 'asset' if not is_thumbnail else 'thumbnail',
-                         Location.clean_keeping_underscores(name), revision])
+        return Location(
+            [XASSET_LOCATION_TAG, org, course, 'asset' if not is_thumbnail else 'thumbnail',
+             Location.clean_keeping_underscores(name), revision])
 
     def get_id(self):
         return StaticContent.get_id_from_location(self.location)
@@ -59,9 +62,10 @@ class StaticContent(object):
 
     @staticmethod
     def get_id_from_location(location):
-        return {'tag': location.tag, 'org': location.org, 'course': location.course,
-                'category': location.category, 'name': location.name,
-                'revision': location.revision}
+        return {
+            'tag': location.tag, 'org': location.org, 'course': location.course,
+            'category': location.category, 'name': location.name,
+            'revision': location.revision}
 
     @staticmethod
     def get_location_from_path(path):
@@ -77,7 +81,8 @@ class StaticContent(object):
 
     @staticmethod
     def convert_legacy_static_url(path, course_namespace):
-        loc = StaticContent.compute_location(course_namespace.org, course_namespace.course, path)
+        loc = StaticContent.compute_location(
+            course_namespace.org, course_namespace.course, path)
         return StaticContent.get_url_path_from_location(loc)
 
 
@@ -116,10 +121,12 @@ class ContentStore(object):
     def generate_thumbnail(self, content):
         thumbnail_content = None
         # use a naming convention to associate originals with the thumbnail
-        thumbnail_name = StaticContent.generate_thumbnail_name(content.location.name)
+        thumbnail_name = StaticContent.generate_thumbnail_name(
+            content.location.name)
 
-        thumbnail_file_location = StaticContent.compute_location(content.location.org, content.location.course,
-                                                                 thumbnail_name, is_thumbnail=True)
+        thumbnail_file_location = StaticContent.compute_location(
+            content.location.org, content.location.course,
+            thumbnail_name, is_thumbnail=True)
 
         # if we're uploading an image, then let's generate a thumbnail so that we can
         # serve it up when needed without having to rescale on the fly
@@ -132,7 +139,8 @@ class ContentStore(object):
                 im = Image.open(StringIO.StringIO(content.data))
 
                 # I've seen some exceptions from the PIL library when trying to save palletted
-                # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
+                # PNG files to JPEG. Per the google-universe, they suggest
+                # converting to RGB first.
                 im = im.convert('RGB')
                 size = 128, 128
                 im.thumbnail(size, Image.ANTIALIAS)
@@ -141,13 +149,16 @@ class ContentStore(object):
                 thumbnail_file.seek(0)
 
                 # store this thumbnail as any other piece of content
-                thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
-                                                  'image/jpeg', thumbnail_file)
+                thumbnail_content = StaticContent(
+                    thumbnail_file_location, thumbnail_name,
+                    'image/jpeg', thumbnail_file)
 
                 contentstore().save(thumbnail_content)
 
             except Exception, e:
-                # log and continue as thumbnails are generally considered as optional
-                logging.exception("Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(e)))
+                # log and continue as thumbnails are generally considered as
+                # optional
+                logging.exception("Failed to generate thumbnail for {0}. Exception: {1}".format(
+                    content.location, str(e)))
 
         return thumbnail_content, thumbnail_file_location

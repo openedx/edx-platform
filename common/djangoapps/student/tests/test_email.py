@@ -134,7 +134,8 @@ class EmailChangeRequestTests(TestCase):
     def test_invalid_emails(self):
         for email in ('bad_email', 'bad_email@', '@bad_email'):
             self.request.POST['new_email'] = email
-            self.assertFailedRequest(self.run_request(), 'Valid e-mail address required.')
+            self.assertFailedRequest(
+                self.run_request(), 'Valid e-mail address required.')
 
     def check_duplicate_email(self, email):
         """Test that a request to change a users email to `email` fails"""
@@ -143,14 +144,16 @@ class EmailChangeRequestTests(TestCase):
             'password': 'test',
         })
         request.user = self.user
-        self.assertFailedRequest(self.run_request(request), 'An account with this e-mail already exists.')
+        self.assertFailedRequest(self.run_request(
+            request), 'An account with this e-mail already exists.')
 
     def test_duplicate_email(self):
         UserFactory.create(email=self.new_email)
         self.check_duplicate_email(self.new_email)
 
     def test_capitalized_duplicate_email(self):
-        raise SkipTest("We currently don't check for emails in a case insensitive way, but we should")
+        raise SkipTest(
+            "We currently don't check for emails in a case insensitive way, but we should")
         UserFactory.create(email=self.new_email)
         self.check_duplicate_email(self.new_email.capitalize())
 
@@ -169,13 +172,16 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.request = self.req_factory.get('unused_url')
         self.request.user = self.user
         self.user.email_user = Mock()
-        self.pending_change_request = PendingEmailChangeFactory.create(user=self.user)
+        self.pending_change_request = PendingEmailChangeFactory.create(
+            user=self.user)
         self.key = self.pending_change_request.activation_key
 
     def assertRolledBack(self):
         """Assert that no changes to user, profile, or pending email have been made to the db"""
-        self.assertEquals(self.user.email, User.objects.get(username=self.user.username).email)
-        self.assertEquals(self.profile.meta, UserProfile.objects.get(user=self.user).meta)
+        self.assertEquals(self.user.email, User.objects.get(
+            username=self.user.username).email)
+        self.assertEquals(self.profile.meta, UserProfile.objects.get(
+            user=self.user).meta)
         self.assertEquals(1, PendingEmailChange.objects.count())
 
     def assertFailedBeforeEmailing(self, email_user):
@@ -193,7 +199,8 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         """
         response = confirm_email_change(self.request, self.key)
         self.assertEquals(
-            mock_render_to_response(expected_template, expected_context).content,
+            mock_render_to_response(
+                expected_template, expected_context).content,
             response.content
         )
 

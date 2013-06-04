@@ -55,7 +55,8 @@ class UserFactory(DjangoModelFactory):
             obj.save()
             return UserProfileFactory.create(user=obj, **kwargs)
         elif kwargs:
-            raise Exception("Cannot build a user profile without saving the user")
+            raise Exception(
+                "Cannot build a user profile without saving the user")
         else:
             return None
 

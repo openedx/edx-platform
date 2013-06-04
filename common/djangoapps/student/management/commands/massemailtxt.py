@@ -37,7 +37,8 @@ rate -- messages per second
     log_file = None
 
     def hard_log(self, text):
-        self.log_file.write(datetime.datetime.utcnow().isoformat() + ' -- ' + text + '\n')
+        self.log_file.write(
+            datetime.datetime.utcnow().isoformat() + ' -- ' + text + '\n')
 
     def handle(self, *args, **options):
         global log_file
@@ -45,15 +46,18 @@ rate -- messages per second
 
         users = [u.strip() for u in open(user_file).readlines()]
 
-        message = middleware.lookup['main'].get_template('emails/' + message_base + "_body.txt").render()
-        subject = middleware.lookup['main'].get_template('emails/' + message_base + "_subject.txt").render().strip()
+        message = middleware.lookup['main'].get_template(
+            'emails/' + message_base + "_body.txt").render()
+        subject = middleware.lookup['main'].get_template(
+            'emails/' + message_base + "_subject.txt").render().strip()
         rate = int(ratestr)
 
         self.log_file = open(logfilename, "a+", buffering=0)
 
         i = 0
         for users in chunks(users, rate):
-            emails = [(subject, message, settings.DEFAULT_FROM_EMAIL, [u]) for u in users]
+            emails = [(subject, message, settings.DEFAULT_FROM_EMAIL, [
+                       u]) for u in users]
             self.hard_log(" ".join(users))
             send_mass_mail(emails, fail_silently=False)
             time.sleep(1)

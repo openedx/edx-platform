@@ -84,7 +84,8 @@ def _write_styles(selector, output_root, classes):
         module_styles.write("@import 'bourbon/bourbon';\n")
         module_styles.write("@import 'bourbon/addons/button';\n")
         for class_, fragment_names in css_imports.items():
-            imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
+            imports = "\n".join('@import "{0}";'.format(
+                name) for name in fragment_names)
             module_styles.write("""{selector}.xmodule_{class_} {{ {imports} }}\n""".format(
                 class_=class_, imports=imports, selector=selector
             ))

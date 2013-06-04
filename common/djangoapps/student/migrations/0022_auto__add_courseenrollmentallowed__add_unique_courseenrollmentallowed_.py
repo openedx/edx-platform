@@ -10,19 +10,27 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'CourseEnrollmentAllowed'
         db.create_table('student_courseenrollmentallowed', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('email', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('email', self.gf('django.db.models.fields.CharField')(
+                max_length=255, db_index=True)),
+            ('course_id', self.gf('django.db.models.fields.CharField')(
+                max_length=255, db_index=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, null=True, db_index=True, blank=True)),
         ))
         db.send_create_signal('student', ['CourseEnrollmentAllowed'])
 
-        # Adding unique constraint on 'CourseEnrollmentAllowed', fields ['email', 'course_id']
-        db.create_unique('student_courseenrollmentallowed', ['email', 'course_id'])
+        # Adding unique constraint on 'CourseEnrollmentAllowed', fields
+        # ['email', 'course_id']
+        db.create_unique('student_courseenrollmentallowed', [
+                         'email', 'course_id'])
 
     def backwards(self, orm):
-        # Removing unique constraint on 'CourseEnrollmentAllowed', fields ['email', 'course_id']
-        db.delete_unique('student_courseenrollmentallowed', ['email', 'course_id'])
+        # Removing unique constraint on 'CourseEnrollmentAllowed', fields
+        # ['email', 'course_id']
+        db.delete_unique('student_courseenrollmentallowed', [
+                         'email', 'course_id'])
 
         # Deleting model 'CourseEnrollmentAllowed'
         db.delete_table('student_courseenrollmentallowed')

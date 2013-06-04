@@ -46,7 +46,8 @@ class TestStatus(TestCase):
         (invalid_json, None, None, None),
         (global_only, "Hello, Globe", "Hello, Globe", "Hello, Globe"),
         (toy_only, None, "A toy story", None),
-        (global_and_toy, "Hello, Globe", "Hello, Globe<br>A toy story", "Hello, Globe"),
+        (global_and_toy, "Hello, Globe",
+         "Hello, Globe<br>A toy story", "Hello, Globe"),
     ]
 
     def setUp(self):

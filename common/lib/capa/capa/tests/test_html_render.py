@@ -86,7 +86,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
-        # Expect that the script element has been removed from the rendered HTML
+        # Expect that the script element has been removed from the rendered
+        # HTML
         script_element = rendered_html.find('script')
         self.assertEqual(None, script_element)
 
@@ -105,7 +106,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         rendered_html = etree.XML(problem.get_html())
 
         # expect the javascript is still present in the rendered html
-        self.assertTrue("<script type=\"text/javascript\">function(){}</script>" in etree.tostring(rendered_html))
+        self.assertTrue(
+            "<script type=\"text/javascript\">function(){}</script>" in etree.tostring(rendered_html))
 
     def test_render_response_xml(self):
         # Generate some XML for a string response
@@ -161,10 +163,13 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         expected_solution_context = {'id': '1_solution_1'}
 
-        expected_calls = [mock.call('textline.html', expected_textline_context),
-                          mock.call('solutionspan.html', expected_solution_context),
-                          mock.call('textline.html', expected_textline_context),
-                          mock.call('solutionspan.html', expected_solution_context)]
+        expected_calls = [mock.call(
+            'textline.html', expected_textline_context),
+            mock.call(
+                'solutionspan.html', expected_solution_context),
+            mock.call(
+                'textline.html', expected_textline_context),
+            mock.call('solutionspan.html', expected_solution_context)]
 
         self.assertEqual(the_system.render_template.call_args_list,
                          expected_calls)
@@ -193,7 +198,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Expect that there is a <div> within the response <div>
         # with css class response_message
-        msg_div_element = rendered_html.find(".//div[@class='response_message']")
+        msg_div_element = rendered_html.find(
+            ".//div[@class='response_message']")
         self.assertEqual(msg_div_element.tag, "div")
         self.assertEqual(msg_div_element.get('class'), "response_message")
 

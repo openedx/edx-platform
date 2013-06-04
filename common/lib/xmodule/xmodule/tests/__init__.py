@@ -51,7 +51,8 @@ def test_system():
         user=Mock(is_staff=False),
         filestore=Mock(),
         debug=True,
-        xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10, 'construct_callback': Mock(side_effect="/")},
+        xqueue={'interface': None, 'callback_url': '/', 'default_queuename':
+                'testqueue', 'waittime': 10, 'construct_callback': Mock(side_effect="/")},
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         xblock_model_data=lambda descriptor: descriptor._model_data,
         anonymous_student_id='student',
@@ -72,24 +73,34 @@ class ModelsTest(unittest.TestCase):
         variables = {'R1': 2.0, 'R3': 4.0}
         functions = {'sin': numpy.sin, 'cos': numpy.cos}
 
-        self.assertTrue(abs(calc.evaluator(variables, functions, "10000||sin(7+5)+0.5356")) < 0.01)
+        self.assertTrue(abs(calc.evaluator(
+            variables, functions, "10000||sin(7+5)+0.5356")) < 0.01)
         self.assertEqual(calc.evaluator({'R1': 2.0, 'R3': 4.0}, {}, "13"), 13)
         self.assertEqual(calc.evaluator(variables, functions, "13"), 13)
-        self.assertEqual(calc.evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5"), 5)
+        self.assertEqual(calc.evaluator({
+                         'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5"), 5)
         self.assertEqual(calc.evaluator({}, {}, "-1"), -1)
         self.assertEqual(calc.evaluator({}, {}, "-0.33"), -.33)
         self.assertEqual(calc.evaluator({}, {}, "-.33"), -.33)
         self.assertEqual(calc.evaluator(variables, functions, "R1*R3"), 8.0)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "sin(e)-0.41")) < 0.01)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "k*T/q-0.025")) < 0.001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "e^(j*pi)") + 1) < 0.00001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "j||1") - 0.5 - 0.5j) < 0.00001)
+        self.assertTrue(abs(calc.evaluator(
+            variables, functions, "sin(e)-0.41")) < 0.01)
+        self.assertTrue(abs(calc.evaluator(
+            variables, functions, "k*T/q-0.025")) < 0.001)
+        self.assertTrue(abs(calc.evaluator(
+            variables, functions, "e^(j*pi)") + 1) < 0.00001)
+        self.assertTrue(abs(calc.evaluator(
+            variables, functions, "j||1") - 0.5 - 0.5j) < 0.00001)
         variables['t'] = 1.0
         # Use self.assertAlmostEqual here...
-        self.assertTrue(abs(calc.evaluator(variables, functions, "t") - 1.0) < 0.00001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "T") - 1.0) < 0.00001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "t", cs=True) - 1.0) < 0.00001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "T", cs=True) - 298) < 0.2)
+        self.assertTrue(abs(calc.evaluator(
+            variables, functions, "t") - 1.0) < 0.00001)
+        self.assertTrue(abs(calc.evaluator(
+            variables, functions, "T") - 1.0) < 0.00001)
+        self.assertTrue(abs(calc.evaluator(
+            variables, functions, "t", cs=True) - 1.0) < 0.00001)
+        self.assertTrue(abs(calc.evaluator(
+            variables, functions, "T", cs=True) - 298) < 0.2)
         # Use self.assertRaises here...
         exception_happened = False
         try:

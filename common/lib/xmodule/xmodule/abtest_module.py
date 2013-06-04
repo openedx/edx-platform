@@ -32,10 +32,14 @@ def group_from_value(groups, v):
 
 
 class ABTestFields(object):
-    group_portions = Object(help="What proportions of students should go in each group", default={DEFAULT: 1}, scope=Scope.content)
-    group_assignments = Object(help="What group this user belongs to", scope=Scope.preferences, default={})
-    group_content = Object(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
-    experiment = String(help="Experiment that this A/B test belongs to", scope=Scope.content)
+    group_portions = Object(help="What proportions of students should go in each group", default={
+                            DEFAULT: 1}, scope=Scope.content)
+    group_assignments = Object(
+        help="What group this user belongs to", scope=Scope.preferences, default={})
+    group_content = Object(
+        help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
+    experiment = String(
+        help="Experiment that this A/B test belongs to", scope=Scope.content)
     has_children = True
 
 
@@ -113,9 +117,11 @@ class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
             child_content_urls = []
             for child in group:
                 try:
-                    child_content_urls.append(system.process_xml(etree.tostring(child)).location.url())
+                    child_content_urls.append(system.process_xml(
+                        etree.tostring(child)).location.url())
                 except:
-                    log.exception("Unable to load child when parsing ABTest. Continuing...")
+                    log.exception(
+                        "Unable to load child when parsing ABTest. Continuing...")
                     continue
 
             group_content[name] = child_content_urls
@@ -126,7 +132,8 @@ class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
         )
 
         if default_portion < 0:
-            raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
+            raise InvalidDefinitionError(
+                "ABTest portions must add up to less than or equal to 1")
 
         group_portions[DEFAULT] = default_portion
         children.sort()
@@ -150,7 +157,8 @@ class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
 
             for child_loc in group:
                 child = self.system.load_item(child_loc)
-                group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
+                group_elem.append(etree.fromstring(
+                    child.export_to_xml(resource_fs)))
 
         return xml_object
 

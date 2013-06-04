@@ -11,21 +11,29 @@ class Migration(SchemaMigration):
 
         # Adding model 'UserProfile'
         db.create_table('auth_userprofile', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'], unique=True)),
             ('name', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('language', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('location', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('language', self.gf(
+                'django.db.models.fields.TextField')(blank=True)),
+            ('location', self.gf(
+                'django.db.models.fields.TextField')(blank=True)),
             ('meta', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('courseware', self.gf('django.db.models.fields.TextField')(default='course.xml', blank=True)),
+            ('courseware', self.gf('django.db.models.fields.TextField')(
+                default='course.xml', blank=True)),
         ))
         db.send_create_signal('student', ['UserProfile'])
 
         # Adding model 'Registration'
         db.create_table('auth_registration', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
-            ('activation_key', self.gf('django.db.models.fields.CharField')(unique=True, max_length=32, db_index=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'], unique=True)),
+            ('activation_key', self.gf('django.db.models.fields.CharField')(
+                unique=True, max_length=32, db_index=True)),
         ))
         db.send_create_signal('student', ['Registration'])
 

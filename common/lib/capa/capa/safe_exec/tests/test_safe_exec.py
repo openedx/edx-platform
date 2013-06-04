@@ -38,7 +38,8 @@ class TestSafeExec(unittest.TestCase):
         self.assertNotEqual(g['rnums'], rnums)
 
         # With a seed, the results are predictable
-        safe_exec("rnums = [random.randint(0, 999) for _ in xrange(100)]", g, random_seed=17)
+        safe_exec(
+            "rnums = [random.randint(0, 999) for _ in xrange(100)]", g, random_seed=17)
         self.assertEqual(g['rnums'], rnums)
 
     def test_random_is_still_importable(self):
@@ -152,7 +153,8 @@ class TestSafeExecCaching(unittest.TestCase):
             try:
                 safe_exec(code_with_unichr, {}, cache=DictCache({}))
             except UnicodeEncodeError:
-                self.fail("Tried executing code with non-ASCII unicode: {0}".format(code))
+                self.fail(
+                    "Tried executing code with non-ASCII unicode: {0}".format(code))
 
 
 class TestUpdateHash(unittest.TestCase):

@@ -25,7 +25,8 @@ class MakoModuleDescriptor(XModuleDescriptor):
             raise TypeError('{system} must have a render_template function'
                             ' in order to use a MakoDescriptor'.format(
                                 system=system))
-        super(MakoModuleDescriptor, self).__init__(system, location, model_data)
+        super(MakoModuleDescriptor, self).__init__(
+            system, location, model_data)
 
     def get_context(self):
         """

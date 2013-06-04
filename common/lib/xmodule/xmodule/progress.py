@@ -34,10 +34,12 @@ class Progress(object):
               0 <= a <= b and b > 0
         '''
 
-        # Want to do all checking at construction time, so explicitly check types
+        # Want to do all checking at construction time, so explicitly check
+        # types
         if not (isinstance(a, numbers.Number) and
                 isinstance(b, numbers.Number)):
-            raise TypeError('a and b must be numbers.  Passed {0}/{1}'.format(a, b))
+            raise TypeError(
+                'a and b must be numbers.  Passed {0}/{1}'.format(a, b))
 
         if a > b:
             a = b
@@ -46,7 +48,8 @@ class Progress(object):
             a = 0
 
         if b <= 0:
-            raise ValueError('fraction a/b = {0}/{1} must have b > 0'.format(a, b))
+            raise ValueError(
+                'fraction a/b = {0}/{1} must have b > 0'.format(a, b))
 
         self._a = a
         self._b = b

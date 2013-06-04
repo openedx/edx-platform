@@ -89,9 +89,10 @@ Will log what happened to file.txt.
             v = random.uniform(0, 1)
             group = group_from_value(groups, v)
             group_objects[group].users.add(user)
-            f.write("Assigned user {name} ({id}) to {group}\n".format(name=user.username,
-                                                                      id=user.id,
-                                                                      group=group))
+            f.write(
+                "Assigned user {name} ({id}) to {group}\n".format(name=user.username,
+                                                                  id=user.id,
+                                                                  group=group))
 
         ## Save groups
         for group in group_objects:
@@ -99,4 +100,5 @@ Will log what happened to file.txt.
         f.close()
 
 # python manage.py assigngroups summary_test:0.3,skip_summary_test:0.7 log.txt "Do previews of future materials help?"
-# python manage.py assigngroups skip_capacitor:0.3,capacitor:0.7 log.txt "Do we show capacitor in linearity tutorial?"
+# python manage.py assigngroups skip_capacitor:0.3,capacitor:0.7 log.txt
+# "Do we show capacitor in linearity tutorial?"

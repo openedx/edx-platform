@@ -13,8 +13,10 @@ class Migration(SchemaMigration):
 
         # Adding model 'CourseEnrollment'
         db.create_table('student_courseenrollment', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.OneToOneField')(
+                to=orm['auth.User'], unique=True)),
             ('course_id', self.gf('django.db.models.fields.IntegerField')()),
         ))
         db.send_create_signal('student', ['CourseEnrollment'])
@@ -23,8 +25,10 @@ class Migration(SchemaMigration):
         # Adding model 'CourseRegistration'
         db.create_table('student_courseregistration', (
             ('course_id', self.gf('django.db.models.fields.IntegerField')()),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.OneToOneField')(
+                to=orm['auth.User'], unique=True)),
         ))
         db.send_create_signal('student', ['CourseRegistration'])
 

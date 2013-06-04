@@ -66,7 +66,8 @@ def cleanup(filepath, remove_meta):
         if 'url_name' in attrs:
             used_names[node.tag].add(attrs['url_name'])
         if 'name' in attrs:
-            # Replace name with an identical display_name, and a unique url_name
+            # Replace name with an identical display_name, and a unique
+            # url_name
             name = attrs['name']
             attrs['display_name'] = name
             attrs['url_name'] = clean_unique(node.tag, name)

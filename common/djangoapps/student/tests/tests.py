@@ -29,7 +29,8 @@ class CourseEndingTest(TestCase):
         self.assertEqual(process_survey_link(link1, user), link1)
 
         link2 = "http://www.mysurvey.com?unique={UNIQUE_ID}"
-        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=id)
+        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(
+            UNIQUE_ID=id)
         self.assertEqual(process_survey_link(link2, user), link2_expected)
 
     def test_cert_info(self):

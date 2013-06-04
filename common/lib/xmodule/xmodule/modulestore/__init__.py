@@ -42,7 +42,8 @@ INVALID_CHARS_NAME = re.compile(r"[^\w.:-]")
 # html ids can contain word chars and dashes
 INVALID_HTML_CHARS = re.compile(r"[^\w-]")
 
-_LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
+_LocationBase = namedtuple(
+    'LocationBase', 'tag org course category name revision')
 
 
 class Location(_LocationBase):
@@ -168,8 +169,10 @@ class Location(_LocationBase):
         def check_list(list_):
             def check(val, regexp):
                 if val is not None and regexp.search(val) is not None:
-                    log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
-                    raise InvalidLocationError("Invalid characters in '%s'." % (val))
+                    log.debug('invalid characters val="%s", list_="%s"' % (
+                        val, list_))
+                    raise InvalidLocationError(
+                        "Invalid characters in '%s'." % (val))
 
             list_ = list(list_)
             for val in list_[:4] + [list_[5]]:
@@ -182,10 +185,12 @@ class Location(_LocationBase):
             if match is None:
                 # cdodge:
                 # check for a dropped slash near the i4x:// element of the location string. This can happen with some
-                # redirects (e.g. edx.org -> www.edx.org which I think happens in Nginx)
+                # redirects (e.g. edx.org -> www.edx.org which I think happens
+                # in Nginx)
                 match = MISSING_SLASH_URL_RE.match(location)
                 if match is None:
-                    log.debug('location is instance of %s but no URL match' % basestring)
+                    log.debug(
+                        'location is instance of %s but no URL match' % basestring)
                     raise InvalidLocationError(location)
             groups = match.groupdict()
             check_dict(groups)

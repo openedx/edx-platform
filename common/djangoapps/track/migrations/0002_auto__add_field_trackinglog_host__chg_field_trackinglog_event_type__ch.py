@@ -10,24 +10,29 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'TrackingLog.host'
         db.add_column('track_trackinglog', 'host',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=64, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          default='', max_length=64, blank=True),
                       keep_default=False)
 
         # Changing field 'TrackingLog.event_type'
-        db.alter_column('track_trackinglog', 'event_type', self.gf('django.db.models.fields.CharField')(max_length=512))
+        db.alter_column('track_trackinglog', 'event_type', self.gf(
+            'django.db.models.fields.CharField')(max_length=512))
 
         # Changing field 'TrackingLog.page'
-        db.alter_column('track_trackinglog', 'page', self.gf('django.db.models.fields.CharField')(max_length=512, null=True))
+        db.alter_column('track_trackinglog', 'page', self.gf(
+            'django.db.models.fields.CharField')(max_length=512, null=True))
 
     def backwards(self, orm):
         # Deleting field 'TrackingLog.host'
         db.delete_column('track_trackinglog', 'host')
 
         # Changing field 'TrackingLog.event_type'
-        db.alter_column('track_trackinglog', 'event_type', self.gf('django.db.models.fields.CharField')(max_length=32))
+        db.alter_column('track_trackinglog', 'event_type', self.gf(
+            'django.db.models.fields.CharField')(max_length=32))
 
         # Changing field 'TrackingLog.page'
-        db.alter_column('track_trackinglog', 'page', self.gf('django.db.models.fields.CharField')(max_length=32, null=True))
+        db.alter_column('track_trackinglog', 'page', self.gf(
+            'django.db.models.fields.CharField')(max_length=32, null=True))
 
     models = {
         'track.trackinglog': {

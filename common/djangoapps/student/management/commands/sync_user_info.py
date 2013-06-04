@@ -1,5 +1,6 @@
 ##
-## One-off script to sync all user information to the discussion service (later info will be synced automatically)
+# One-off script to sync all user information to the discussion service
+# (later info will be synced automatically)
 
 
 from django.core.management.base import BaseCommand

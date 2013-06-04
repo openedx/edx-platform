@@ -37,12 +37,14 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
         resource_string(__name__, 'js/src/graphical_slider_tool/gst_main.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/state.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/logme.js'),
-        resource_string(__name__, 'js/src/graphical_slider_tool/general_methods.js'),
+        resource_string(
+            __name__, 'js/src/graphical_slider_tool/general_methods.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/sliders.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/inputs.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/graph.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/el_output.js'),
-        resource_string(__name__, 'js/src/graphical_slider_tool/g_label_el_output.js'),
+        resource_string(
+            __name__, 'js/src/graphical_slider_tool/g_label_el_output.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')
 
         ]
@@ -181,7 +183,8 @@ class GraphicalSliderToolDescriptor(GraphicalSliderToolFields, MakoModuleDescrip
         xml_object = etree.Element('graphical_slider_tool')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
+            child_str = '<{tag}>{body}</{tag}>'.format(
+                tag=k, body=getattr(self, k))
             child_node = etree.fromstring(child_str)
             xml_object.append(child_node)
 

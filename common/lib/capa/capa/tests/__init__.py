@@ -39,7 +39,8 @@ def test_system():
         user=Mock(),
         filestore=fs.osfs.OSFS(os.path.join(TEST_DIR, "test_files")),
         debug=True,
-        xqueue={'interface': xqueue_interface, 'construct_callback': calledback_url, 'default_queuename': 'testqueue', 'waittime': 10},
+        xqueue={'interface': xqueue_interface, 'construct_callback':
+                calledback_url, 'default_queuename': 'testqueue', 'waittime': 10},
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         anonymous_student_id='student',
         cache=None,

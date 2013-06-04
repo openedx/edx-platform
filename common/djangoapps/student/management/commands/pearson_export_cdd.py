@@ -75,12 +75,14 @@ class Command(BaseCommand):
         elif 'destination' in options and options['destination']:
             dest = options['destination']
         else:
-            raise CommandError('--destination or --dest-from-settings must be used')
+            raise CommandError(
+                '--destination or --dest-from-settings must be used')
 
         if not os.path.isdir(dest):
             os.makedirs(dest)
 
-        destfile = os.path.join(dest, uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
+        destfile = os.path.join(dest, uploaded_at.strftime(
+            "cdd-%Y%m%d-%H%M%S.dat"))
 
         # strings must be in latin-1 format.  CSV parser will
         # otherwise convert unicode objects to ascii.
@@ -104,7 +106,8 @@ class Command(BaseCommand):
                     record = dict((csv_field, ensure_encoding(getattr(tcu, model_field)))
                                   for csv_field, model_field
                                   in Command.CSV_TO_MODEL_FIELDS.items())
-                    record["LastUpdate"] = record["LastUpdate"].strftime("%Y/%m/%d %H:%M:%S")
+                    record["LastUpdate"] = record[
+                        "LastUpdate"].strftime("%Y/%m/%d %H:%M:%S")
                     writer.writerow(record)
                     tcu.uploaded_at = uploaded_at
                     tcu.save()

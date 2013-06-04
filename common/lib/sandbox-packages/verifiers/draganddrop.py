@@ -170,7 +170,8 @@ class DragAndDrop(object):
                 rule_values = self.correct_positions[index][current_rule]
                 # clean rule, do not do clean duplicate items
                 self.correct_positions[index].pop(current_rule, None)
-                parsed_rule = current_rule.replace('+', '').replace('number', '')
+                parsed_rule = current_rule.replace(
+                    '+', '').replace('number', '')
                 self.correct_positions[index][parsed_rule] = rule_values
             else:  # remove dublicates
                 self.user_groups[index] = list(set(self.user_groups[index]))

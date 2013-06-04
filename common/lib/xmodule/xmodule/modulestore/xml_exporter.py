@@ -17,16 +17,20 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
         course_xml.write(xml)
 
     # export the static assets
-    contentstore.export_all_for_course(course_location, root_dir + '/' + course_dir + '/static/')
+    contentstore.export_all_for_course(
+        course_location, root_dir + '/' + course_dir + '/static/')
 
     # export the static tabs
-    export_extra_content(export_fs, modulestore, course_location, 'static_tab', 'tabs', '.html')
+    export_extra_content(
+        export_fs, modulestore, course_location, 'static_tab', 'tabs', '.html')
 
     # export the custom tags
-    export_extra_content(export_fs, modulestore, course_location, 'custom_tag_template', 'custom_tags')
+    export_extra_content(
+        export_fs, modulestore, course_location, 'custom_tag_template', 'custom_tags')
 
     # export the course updates
-    export_extra_content(export_fs, modulestore, course_location, 'course_info', 'info', '.html')
+    export_extra_content(
+        export_fs, modulestore, course_location, 'course_info', 'info', '.html')
 
     # export the grading policy
     policies_dir = export_fs.makeopendir('policies')
@@ -44,24 +48,30 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     # should we change the application, then this assumption will no longer
     # be valid
     if draft_modulestore is not None:
-        draft_verticals = draft_modulestore.get_items([None, course_location.org, course_location.course,
-                                                       'vertical', None, 'draft'])
+        draft_verticals = draft_modulestore.get_items(
+            [None, course_location.org, course_location.course,
+             'vertical', None, 'draft'])
         if len(draft_verticals) > 0:
             draft_course_dir = export_fs.makeopendir('drafts')
             for draft_vertical in draft_verticals:
-                parent_locs = draft_modulestore.get_parent_locations(draft_vertical.location, course.location.course_id)
+                parent_locs = draft_modulestore.get_parent_locations(
+                    draft_vertical.location, course.location.course_id)
                 # Don't try to export orphaned items.
                 if len(parent_locs) > 0:
                     logging.debug('parent_locs = {0}'.format(parent_locs))
-                    draft_vertical.xml_attributes['parent_sequential_url'] = Location(parent_locs[0]).url()
+                    draft_vertical.xml_attributes[
+                        'parent_sequential_url'] = Location(parent_locs[0]).url()
                     sequential = modulestore.get_item(Location(parent_locs[0]))
-                    index = sequential.children.index(draft_vertical.location.url())
-                    draft_vertical.xml_attributes['index_in_children_list'] = str(index)
+                    index = sequential.children.index(
+                        draft_vertical.location.url())
+                    draft_vertical.xml_attributes[
+                        'index_in_children_list'] = str(index)
                     draft_vertical.export_to_xml(draft_course_dir)
 
 
 def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):
-    query_loc = Location('i4x', course_location.org, course_location.course, category_type, None)
+    query_loc = Location(
+        'i4x', course_location.org, course_location.course, category_type, None)
     items = modulestore.get_items(query_loc)
 
     if len(items) > 0:

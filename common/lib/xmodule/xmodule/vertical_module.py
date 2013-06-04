@@ -38,7 +38,8 @@ class VerticalModule(VerticalFields, XModule):
         return progress
 
     def get_icon_class(self):
-        child_classes = set(child.get_icon_class() for child in self.get_children())
+        child_classes = set(
+            child.get_icon_class() for child in self.get_children())
         new_class = 'other'
         for c in class_priority:
             if c in child_classes:

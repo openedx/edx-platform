@@ -95,4 +95,5 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
             request.user = User.get_cached(request.session[SESSION_KEY])
         except:
             # Fallback to constructing the User from the database.
-            super(CacheBackedAuthenticationMiddleware, self).process_request(request)
+            super(CacheBackedAuthenticationMiddleware,
+                  self).process_request(request)

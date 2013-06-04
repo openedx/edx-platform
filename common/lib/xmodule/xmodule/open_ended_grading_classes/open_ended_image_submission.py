@@ -38,7 +38,8 @@ ALLOWABLE_IMAGE_SUFFIXES = [
 # Maximum allowed dimensions (x and y) for an uploaded image
 MAX_ALLOWED_IMAGE_DIM = 2000
 
-# Dimensions to which image is resized before it is evaluated for color count, etc
+# Dimensions to which image is resized before it is evaluated for color
+# count, etc
 MAX_IMAGE_DIM = 150
 
 # Maximum number of colors that should be counted in ImageProperties
@@ -110,7 +111,8 @@ class ImageProperties(object):
         colors = self.image.getcolors(MAX_COLORS_TO_COUNT)
         is_okay = True
         if colors is not None:
-            skin = sum([count for count, rgb in colors if self.check_if_rgb_is_skin(rgb)])
+            skin = sum(
+                [count for count, rgb in colors if self.check_if_rgb_is_skin(rgb)])
             total_colored_pixels = sum([count for count, rgb in colors])
             bad_color_val = float(skin) / total_colored_pixels
             if bad_color_val > .4:
@@ -125,7 +127,8 @@ class ImageProperties(object):
         """
         image_is_okay = False
         try:
-            # image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+            # image_is_okay = self.count_colors() and self.get_skin_ratio() and
+            # not self.image_too_large
             image_is_okay = not self.image_too_large
         except:
             log.exception("Could not run image tests.")
@@ -235,7 +238,8 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
     # im.save(out_im, 'PNG')
 
     try:
-        conn = S3Connection(s3_interface['access_key'], s3_interface['secret_access_key'])
+        conn = S3Connection(s3_interface[
+                            'access_key'], s3_interface['secret_access_key'])
         bucketname = str(s3_interface['storage_bucket_name'])
         bucket = conn.create_bucket(bucketname.lower())
 
@@ -250,7 +254,8 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
         # k.set_metadata("Content-Type", 'images/png')
 
         k.set_acl("public-read")
-        public_url = k.generate_url(60 * 60 * 24 * 365)   # URL timeout in seconds.
+        public_url = k.generate_url(
+            60 * 60 * 24 * 365)   # URL timeout in seconds.
 
         return True, public_url
     except:

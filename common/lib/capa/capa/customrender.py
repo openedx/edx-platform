@@ -43,7 +43,8 @@ class MathRenderer(object):
         self.system = system
         self.xml = xml
 
-        mathstr = re.sub('\$(.*)\$', r'[mathjaxinline]\1[/mathjaxinline]', xml.text)
+        mathstr = re.sub(
+            '\$(.*)\$', r'[mathjaxinline]\1[/mathjaxinline]', xml.text)
         mtag = 'mathjax'
         if not r'\displaystyle' in mathstr:
             mtag += 'inline'
@@ -55,7 +56,8 @@ class MathRenderer(object):
         """
         Return the contents of this tag, rendered to html, as an etree element.
         """
-        # TODO: why are there nested html tags here??  Why are there html tags at all, in fact?
+        # TODO: why are there nested html tags here??  Why are there html tags
+        # at all, in fact?
         html = '<html><html>%s</html><html>%s</html></html>' % (
             self.mathstr, saxutils.escape(self.xml.tail))
         try:
