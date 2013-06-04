@@ -9,7 +9,7 @@
 
 <%block name="headextra">
 <%static:css group='course'/>
-<%include file="_js_head_dependencies.html" />
+<%include file="_js_head_dependencies.html" />	
 </%block>
 
 <%block name="js_extra">
@@ -29,8 +29,6 @@
 	        	<section class="home-header">
 	        		<span class="label">DISCUSSION HOME:</span>
 	        		<h1 class="home-title">${course.display_name_with_default}</h1>
-	        		<p class="home-description">Welcome to ${course.display_name_with_default}'s Discussion Home. Select a discussion from the left, or review your profile, participation and email notification settings below.  
-	        		</p>
 	        	</section>
 	        	<section class="home-stats">
 	        		<div class="label-area">
@@ -38,9 +36,9 @@
 		        		<a href="#" class="profile-link">Your profile Name</a>
 	        		</div>
 	        		<div class="stats-grouping">
-		        		<div class="profile-stat profile-stat-posts">5 POSTS</div>
-		        		<div class="profile-stat profile-stat-comments">12 COMMENTS</div>
-		        		<div class="profile-stat profile-stat-following">9 POSTS I'M FOLLOWING</div>
+		        		<div class="profile-stat profile-stat-posts"><span class="count count-posts">5</span>POSTS</div>
+		        		<div class="profile-stat profile-stat-comments"><span class="count count-comments">12</span> COMMENTS</div>
+		        		<div class="profile-stat profile-stat-following"><span class="count count-following">9</span> POSTS I'M FOLLOWING</div>
 		        	</div>
 	        	</section>
 	        	<span class="label">HOW TO USE EDX DISCUSSIONS</span>
@@ -48,7 +46,9 @@
 		        	<ul class="helpgrid-list">
 		        		<li class="helpgrid-row helpgrid-row-navigation">
 		        			<span class="row-title">Navigation</span>
-		        			<div class="row-item">Focus in on specific topics</div>
+		        			<div class="row-item">
+		        				<i class="icon-home"></i>Focus in on specific topics
+	        				</div>
 		        			<div class="row-item">Search for specific posts</div>
 		        			<div class="row-item">Sort by date, vote, or comments</div>
 		        		</li>
