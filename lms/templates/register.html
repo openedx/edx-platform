@@ -2,9 +2,11 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
+
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils import html %>
 <%! from django_countries.countries import COUNTRIES %>
+<%! from django.utils.translation import ugettext as _ %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
 <%! import calendar %>
@@ -81,14 +83,14 @@
 
 <section class="introduction">
   <header>
-    <h1 class="sr">Register for edX</h1>
+    <h1 class="sr">${_("Register for edX")}</h1>
   </header>
 </section>
 
 <section class="register container">
   <section role="main" class="content">
     <header>
-      <h2 class="sr">Registration Form</h2>
+      <h2 class="sr">${_("Welcome! Register below to create your edX account")}</h2>
     </header>
 
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account">
@@ -262,10 +264,10 @@
 
     <div class="cta cta-help">
       <h3>Need Help?</h3>
-      <p>Need help in registering with edX? 
+      <p>Need help in registering with edX?
         <a href="${marketing_link('FAQ')}">
             View our FAQs for answers to commonly asked questions.
-        </a>  
+        </a>
         Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.</p>
     </div>
   </aside>
