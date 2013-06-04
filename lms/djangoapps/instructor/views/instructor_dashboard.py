@@ -52,10 +52,11 @@ def instructor_dashboard_2(request, course_id):
         'section_data': section_data
     }
 
-    return render_to_response('courseware/instructor_dashboard_2.html', context)
+    return render_to_response('courseware/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
 def _section_course_info(request, course_id):
+    """ Provide data for the corresponding dashboard section """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     section_data = {}
@@ -76,18 +77,21 @@ def _section_course_info(request, course_id):
 
 
 def _section_enrollment(course_id):
+    """ Provide data for the corresponding dashboard section """
     section_data = {}
     section_data['placeholder'] = "Enrollment content."
     return section_data
 
 
 def _section_student_admin(course_id):
+    """ Provide data for the corresponding dashboard section """
     section_data = {}
     section_data['placeholder'] = "Student Admin content."
     return section_data
 
 
 def _section_data_download(course_id):
+    """ Provide data for the corresponding dashboard section """
     section_data = {}
     section_data['placeholder'] = "Data Download content."
     return section_data
