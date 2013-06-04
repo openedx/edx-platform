@@ -25,7 +25,8 @@ def call(command, working_directory=BASE_DIR):
 
     """
     LOG.info(command)
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, cwd=working_directory)
     out, err = p.communicate()
     return (out, err)
 
@@ -46,6 +47,7 @@ def remove_file(filename, verbose=True):
     if verbose:
         LOG.info('Deleting file %s' % os.path.relpath(filename, BASE_DIR))
     if not os.path.exists(filename):
-        LOG.warn("File does not exist: %s" % os.path.relpath(filename, BASE_DIR))
+        LOG.warn("File does not exist: %s" %
+                 os.path.relpath(filename, BASE_DIR))
     else:
         os.remove(filename)

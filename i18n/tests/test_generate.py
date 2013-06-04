@@ -25,7 +25,8 @@ class TestGenerate(TestCase):
         """
         Tests merge script on English source files.
         """
-        filename = os.path.join(CONFIGURATION.source_messages_dir, random_name())
+        filename = os.path.join(
+            CONFIGURATION.source_messages_dir, random_name())
         generate.merge(CONFIGURATION.source_locale, target=filename)
         self.assertTrue(os.path.exists(filename))
         os.remove(filename)
@@ -42,11 +43,15 @@ class TestGenerate(TestCase):
         for locale in CONFIGURATION.locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename + '.mo'
-                path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
+                path = os.path.join(
+                    CONFIGURATION.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
-                self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
-                self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path)) >= self.start_time,
-                                msg='File not recently modified: %s' % path)
+                self.assertTrue(exists, msg='Missing file in locale %s: %s' % (
+                    locale, mofile))
+                self.assertTrue(
+                    datetime.fromtimestamp(os.path.getmtime(
+                        path)) >= self.start_time,
+                    msg='File not recently modified: %s' % path)
             self.assert_merge_headers(locale)
 
     def assert_merge_headers(self, locale):
@@ -60,7 +65,8 @@ class TestGenerate(TestCase):
         # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 
         """
-        path = os.path.join(CONFIGURATION.get_messages_dir(locale), 'django.po')
+        path = os.path.join(CONFIGURATION.get_messages_dir(
+            locale), 'django.po')
         po = pofile(path)
         pattern = re.compile('^#-#-#-#-#', re.M)
         match = pattern.findall(po.header)

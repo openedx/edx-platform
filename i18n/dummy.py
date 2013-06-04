@@ -5,7 +5,8 @@ from converter import Converter
 # 1. Every vowel is replaced with an equivalent with extra accent marks
 # 2. Every string is padded out to +30% length to simulate verbose languages (e.g. German)
 #    to see if layout and flows work properly
-# 3. Every string is terminated with a '#' character to make it easier to detect truncation
+# 3. Every string is terminated with a '#' character to make it easier to
+# detect truncation
 
 
 # --------------------------------
@@ -89,7 +90,8 @@ class Dummy (Converter):
         if len(msgs) == 0:
             return
         headers = msgs[0].get_property('msgstr')
-        has_plural = len([header for header in headers if header.find('Plural-Forms:') == 0]) > 0
+        has_plural = len([header for header in headers if header.find(
+            'Plural-Forms:') == 0]) > 0
         if not has_plural:
             # Apply declaration for English pluralization rules
             plural = "Plural-Forms: nplurals=2; plural=(n != 1);\\n"

@@ -27,7 +27,8 @@ class Configuration:
         Returns data found in config file (as dict), or raises exception if file not found
         """
         if not os.path.exists(filename):
-            raise Exception("Configuration file cannot be found: %s" % filename)
+            raise Exception(
+                "Configuration file cannot be found: %s" % filename)
         with open(filename) as stream:
             return json.load(stream)
 
@@ -57,7 +58,8 @@ class Configuration:
         """
         dummy = self._config.get('dummy-locale', None)
         if not dummy:
-            raise Exception('Could not read dummy-locale from configuration file.')
+            raise Exception(
+                'Could not read dummy-locale from configuration file.')
         return dummy
 
     def get_messages_dir(self, locale):

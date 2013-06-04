@@ -54,8 +54,10 @@ class TestExtract(TestCase):
         """
 
         for path in self.get_files():
-            self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path)) > self.start_time,
-                            msg='File not recently modified: %s' % os.path.basename(path))
+            self.assertTrue(
+                datetime.fromtimestamp(os.path.getmtime(
+                    path)) > self.start_time,
+                msg='File not recently modified: %s' % os.path.basename(path))
 
     def test_is_keystring(self):
         """

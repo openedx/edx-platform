@@ -30,7 +30,8 @@ BABEL_CONFIG = BASE_DIR.relpathto(LOCALE_DIR.joinpath('babel.cfg'))
 
 # Strings from mako template files are written to BABEL_OUT
 # Use relpath to reduce noise in logs
-BABEL_OUT = BASE_DIR.relpathto(CONFIGURATION.source_messages_dir.joinpath('mako.po'))
+BABEL_OUT = BASE_DIR.relpathto(
+    CONFIGURATION.source_messages_dir.joinpath('mako.po'))
 
 SOURCE_WARN = 'This English source file is machine-generated. Do not check it into github'
 
@@ -48,7 +49,8 @@ def main():
         remove_file(source_msgs_dir.joinpath(filename))
 
     # Extract strings from mako templates
-    babel_mako_cmd = 'pybabel extract -F %s -c "TRANSLATORS:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
+    babel_mako_cmd = 'pybabel extract -F %s -c "TRANSLATORS:" . -o %s' % (
+        BABEL_CONFIG, BABEL_OUT)
 
     # Extract strings from django source files
     make_django_cmd = 'django-admin.py makemessages -l en --ignore=src/* --ignore=i18n/* ' \
@@ -93,7 +95,8 @@ def fix_header(po):
     header = po.header
     fixes = (
         ('SOME DESCRIPTIVE TITLE', 'edX translation file\n' + SOURCE_WARN),
-        ('Translations template for PROJECT.', 'edX translation file\n' + SOURCE_WARN),
+        ('Translations template for PROJECT.',
+         'edX translation file\n' + SOURCE_WARN),
         ('YEAR', '%s' % datetime.utcnow().year),
         ('ORGANIZATION', 'edX'),
         ("THE PACKAGE'S COPYRIGHT HOLDER", "EdX"),

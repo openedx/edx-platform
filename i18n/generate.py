@@ -53,7 +53,8 @@ def merge(locale, target='django.po', fail_if_missing=True):
 
     # rename merged.po -> django.po (default)
     django_filename = locale_directory.joinpath(target)
-    os.rename(merged_filename, django_filename)  # can't overwrite file on Windows
+    os.rename(merged_filename, django_filename)
+              # can't overwrite file on Windows
 
 
 def clean_metadata(file):
@@ -74,7 +75,8 @@ def validate_files(dir, files_to_merge):
     for path in files_to_merge:
         pathname = dir.joinpath(path)
         if not pathname.exists():
-            raise Exception("I18N: Cannot generate because file not found: {0}".format(pathname))
+            raise Exception(
+                "I18N: Cannot generate because file not found: {0}".format(pathname))
 
 
 def main():

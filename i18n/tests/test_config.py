@@ -15,7 +15,8 @@ class TestConfiguration(TestCase):
         self.assertEqual(config.source_locale, 'en')
 
     def test_no_config(self):
-        config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'no_such_file'))
+        config_filename = os.path.normpath(
+            os.path.join(LOCALE_DIR, 'no_such_file'))
         with self.assertRaises(Exception):
             Configuration(config_filename)
 

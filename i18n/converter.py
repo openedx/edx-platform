@@ -21,7 +21,8 @@ class Converter:
     # matches tags like these:
     #   HTML:   <B>, </B>, <BR/>, <textformat leading="10">
     #   Python: %(date)s, %(name)s
-    tag_pattern = re.compile(r'(<[-\w" .:?=/]*>)|({[^}]*})|(%\([^)]*\)\w)', re.I)
+    tag_pattern = re.compile(
+        r'(<[-\w" .:?=/]*>)|({[^}]*})|(%\([^)]*\)\w)', re.I)
 
     def convert(self, string):
         """Returns: a converted tagged string
