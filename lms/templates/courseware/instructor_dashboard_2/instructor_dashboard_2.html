@@ -1,0 +1,79 @@
+<%inherit file="/main.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+  <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='instructor_2'" />
+
+<style type="text/css"></style>
+
+<script language="JavaScript" type="text/javascript"></script>
+
+<section class="container">
+<div class="instructor-dashboard-wrapper-2">
+<section class="instructor-dashboard-content-2">
+
+  <h1>Instructor Dashboard</h1>
+  <div class="instructor_dash_glob_info">
+    <span id="djangopid">${djangopid}</span> |
+    <span id="mitxver">${mitx_version}</span>
+  </div>
+
+  ## links which are tied to idash-sections below.
+  ## the links are acativated and handled in instructor_dashboard.coffee
+  ## when the javascript loads, it clicks on idash-default-section
+  <h2 class="instructor-nav">[
+    <a href="" data-section="course-info" class="idash-default-section"> Course Info   </a> |
+    <a href="" data-section="enrollment"> Enrollment    </a> |
+    <a href="" data-section="student-admin"> Student Admin  </a> |
+    <a href="" data-section="data-download"> Data Download </a> |
+    <a href="" data-section="analytics"> Analytics </a>
+  ]</h2>
+
+  ## each section corresponds to a section_data sub-dictionary provided by the view
+  ## to keep this short, sections can be pulled out into their own files
+
+  <section id="course-info" class="idash-section">
+    <%include file="course_info.html"/>
+  </section>
+
+
+  <section id="enrollment" class="idash-section">
+    ${ section_data['enrollment']['placeholder'] }
+  </section>
+
+
+  <section id="student-admin" class="idash-section">
+    ${ section_data['student_admin']['placeholder'] }
+  </section>
+
+
+  <section id="data-download" class="idash-section">
+    <input type="submit" name="list-profiles" value="List enrolled students with profile information" data-endpoint="${ section_data['data_download']['enrolled_students_profiles_url'] }" ></input>
+    <input type="submit" name="list-profiles" value="[CSV]" data-csv="true" data-endpoint="${ section_data['data_download']['enrolled_students_profiles_url'] }" ></input>
+    <input type="submit" name="list-grades" value="Student grades"></input>
+    <input type="submit" name="list-answer-distributions" value="Answer distributions (x students got y points)"></input>
+    <input type="submit" name="dump-gradeconf" value="Grading Configuration" data-endpoint="${ section_data['data_download']['grading_config_url'] }"></input>
+    <div class="dumped-data-display"></div>
+  </section>
+
+  <section id="analytics" class="idash-section">
+    <select id="distributions" data-endpoint="${ section_data['analytics']['profile_distributions_url'] }">
+      <option> Getting available distributions... </option>
+    </select>
+    <div class="distribution-display"></div>
+  </section>
+
+</section>
+</div>
+</section>

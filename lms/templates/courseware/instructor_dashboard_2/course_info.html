@@ -1,0 +1,49 @@
+<div class="basic-data">
+  Course Name:
+  ${ section_data['course_info']['display_name'] }
+</div>
+
+<div class="basic-data">
+  Course ID:
+  ${ section_data['course_info']['course_id'] }
+</div>
+
+<div class="basic-data">
+  Students Enrolled:
+  ${ section_data['course_info']['enrollment_count'] }
+</div>
+
+<div class="basic-data">
+  Started:
+  ${ section_data['course_info']['has_started'] }
+</div>
+
+<div class="basic-data">
+  Ended:
+  ${ section_data['course_info']['has_ended'] }
+</div>
+
+<div class="basic-data">
+  Grade Cutoffs:
+  ${ section_data['course_info']['grade_cutoffs'] }
+</div>
+
+<div class="basic-data">
+  Offline Grades Available:
+  ${ section_data['course_info']['offline_grades'] }
+</div>
+
+<div class="error-log">
+  <h2>Course Errors:</h2>
+  %for error in section_data['course_info']['course_errors']:
+    <div class="course-error">
+      <code class=course-error-first>  ${ error[0] } </code><br>
+      <code class=course-error-second> ${ error[1] } </code>
+    </div>
+  %endfor
+</div>
+
+## <div class="basic-data">
+##   Section Dump<br>
+##   ${ section_data['course_info'] }
+## </div>

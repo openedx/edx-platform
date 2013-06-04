@@ -251,6 +251,18 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
             'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard"),
 
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
+            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
+
+        # api endpoints for instructor
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/grading_config$',
+            'instructor.views.api.grading_config', name="grading_config"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/enrolled_students_profiles(?P<csv>/csv)?$',
+            'instructor.views.api.enrolled_students_profiles', name="enrolled_students_profiles"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/profile_distribution$',
+            'instructor.views.api.profile_distribution', name="profile_distribution"),
+
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
             'instructor.views.legacy.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',

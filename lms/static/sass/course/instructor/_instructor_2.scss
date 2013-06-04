@@ -1,0 +1,77 @@
+.instructor-dashboard-wrapper-2 {
+  @extend .table-wrapper;
+  display: table;
+
+  section.instructor-dashboard-content-2 {
+    @extend .content;
+    padding: 40px;
+    width: 100%;
+    position: relative;
+
+    h1 {
+      @extend .top-header;
+    }
+
+    .instructor_dash_glob_info {
+      text-align: right;
+      position: absolute;
+      top: 46px;
+      right: 50px;
+    }
+
+    .instructor-nav {
+      .active-section {
+        color: #551A8B;
+      }
+    }
+
+    section.idash-section {
+      // background-color: #0f0;
+      display: none;
+
+      &.active-section {
+        // background-color: #ff0;
+        display: block;
+      }
+
+      .basic-data {
+        padding: 6px;
+      }
+    }
+  }
+}
+
+
+.instructor-dashboard-wrapper-2 section.idash-section#course-info {
+  .error-log {
+    margin-top: 1em;
+
+    .course-error {
+      margin-bottom: 1em;
+
+      code {
+        &.course-error-first {
+          color: #111;
+        }
+
+        &.course-error-second {
+          color: black;
+        }
+      }
+    }
+  }
+}
+
+
+.instructor-dashboard-wrapper-2 section.idash-section#data-download {
+  input {
+    display: block;
+    margin-bottom: 1em;
+  }
+}
+
+.instructor-dashboard-wrapper-2 section.idash-section#analytics {
+  .distribution-display {
+    margin-top: 1em;
+  }
+}
