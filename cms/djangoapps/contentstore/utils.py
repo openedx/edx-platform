@@ -5,12 +5,15 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from django.core.urlresolvers import reverse
 import copy
 
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
+DIRECT_ONLY_CATEGORIES = [
+    'course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
-# In order to instantiate an open ended tab automatically, need to have this data
+# In order to instantiate an open ended tab automatically, need to have
+# this data
 OPEN_ENDED_PANEL = {"name": "Open Ended Panel", "type": "open_ended"}
 NOTES_PANEL = {"name": "My Notes", "type": "notes"}
-EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
+EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [
+                        OPEN_ENDED_PANEL, NOTES_PANEL]])
 
 
 def get_modulestore(location):
@@ -39,17 +42,21 @@ def get_course_location_for_item(location):
     if item_loc.category != 'course':
         # @hack! We need to find the course location however, we don't
         # know the 'name' parameter in this context, so we have
-        # to assume there's only one item in this query even though we are not specifying a name
-        course_search_location = ['i4x', item_loc.org, item_loc.course, 'course', None]
+        # to assume there's only one item in this query even though we are not
+        # specifying a name
+        course_search_location = [
+            'i4x', item_loc.org, item_loc.course, 'course', None]
         courses = modulestore().get_items(course_search_location)
 
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)
         if found_cnt == 0:
-            raise Exception('Could not find course at {0}'.format(course_search_location))
+            raise Exception('Could not find course at {0}'.format(
+                course_search_location))
 
         if found_cnt > 1:
-            raise Exception('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+            raise Exception('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(
+                course_search_location, courses))
 
         location = courses[0].location
 
@@ -67,17 +74,21 @@ def get_course_for_item(location):
 
     # @hack! We need to find the course location however, we don't
     # know the 'name' parameter in this context, so we have
-    # to assume there's only one item in this query even though we are not specifying a name
-    course_search_location = ['i4x', item_loc.org, item_loc.course, 'course', None]
+    # to assume there's only one item in this query even though we are not
+    # specifying a name
+    course_search_location = [
+        'i4x', item_loc.org, item_loc.course, 'course', None]
     courses = modulestore().get_items(course_search_location)
 
     # make sure we found exactly one match on this above course search
     found_cnt = len(courses)
     if found_cnt == 0:
-        raise BaseException('Could not find course at {0}'.format(course_search_location))
+        raise BaseException('Could not find course at {0}'.format(
+            course_search_location))
 
     if found_cnt > 1:
-        raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+        raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(
+            course_search_location, courses))
 
     return courses[0]
 
@@ -122,7 +133,8 @@ def get_course_id(location):
     """
     Returns the course_id from a given the location tuple.
     """
-    # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
+    # TODO: These will need to be changed to point to the particular instance
+    # of this problem in the particular course
     return modulestore().get_containing_courses(Location(location))[0].id
 
 
@@ -178,8 +190,9 @@ def get_url_reverse(course_page_name, course_module):
 
     if CoursePageNames.ManageUsers == url_name:
         return reverse(url_name, kwargs={"location": ctx_loc})
-    elif url_name in [CoursePageNames.SettingsDetails, CoursePageNames.SettingsGrading,
-                      CoursePageNames.CourseOutline, CoursePageNames.Checklists]:
+    elif url_name in [
+        CoursePageNames.SettingsDetails, CoursePageNames.SettingsGrading,
+            CoursePageNames.CourseOutline, CoursePageNames.Checklists]:
         return reverse(url_name, kwargs={'org': ctx_loc.org, 'course': ctx_loc.course, 'name': ctx_loc.name})
     else:
         return course_page_name

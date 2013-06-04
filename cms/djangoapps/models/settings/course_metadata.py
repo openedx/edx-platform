@@ -56,14 +56,16 @@ class CourseMetadata(object):
 
         dirty = False
 
-        # Copy the filtered list to avoid permanently changing the class attribute
+        # Copy the filtered list to avoid permanently changing the class
+        # attribute
         filtered_list = copy.copy(cls.FILTERED_LIST)
         # Don't filter on the tab attribute if filter_tabs is False
         if not filter_tabs:
             filtered_list.remove("tabs")
 
         for k, v in jsondict.iteritems():
-            # should it be an error if one of the filtered list items is in the payload?
+            # should it be an error if one of the filtered list items is in the
+            # payload?
             if k in filtered_list:
                 continue
 

@@ -97,7 +97,8 @@ def create_new_course(request):
     display_name = request.POST.get('display_name')
 
     try:
-        dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+        dest_location = Location(
+            'i4x', org, number, 'course', Location.clean(display_name))
     except InvalidLocationError as error:
         return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" +
                                         display_name + "'.\n\n" + error.message}))
@@ -112,7 +113,8 @@ def create_new_course(request):
     if existing_course is not None:
         return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with this name.'}))
 
-    course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
+    course_search_location = [
+        'i4x', dest_location.org, dest_location.course, 'course', None]
     courses = modulestore().get_items(course_search_location)
 
     if len(courses) > 0:
@@ -122,9 +124,12 @@ def create_new_course(request):
 
     # clone a default 'about' module as well
 
-    about_template_location = Location(['i4x', 'edx', 'templates', 'about', 'overview'])
-    dest_about_location = dest_location._replace(category='about', name='overview')
-    modulestore('direct').clone_item(about_template_location, dest_about_location)
+    about_template_location = Location(
+        ['i4x', 'edx', 'templates', 'about', 'overview'])
+    dest_about_location = dest_location._replace(
+        category='about', name='overview')
+    modulestore('direct').clone_item(
+        about_template_location, dest_about_location)
 
     if display_name is not None:
         new_course.display_name = display_name
@@ -294,11 +299,15 @@ def course_settings_updates(request, org, course, name, section):
 
     if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
-        return HttpResponse(json.dumps(manager.fetch(Location(['i4x', org, course, 'course', name])), cls=CourseSettingsEncoder),
-                            mimetype="application/json")
+        return HttpResponse(
+            json.dumps(manager.fetch(Location(
+                ['i4x', org, course, 'course', name])), cls=CourseSettingsEncoder),
+            mimetype="application/json")
     elif request.method == 'POST':  # post or put, doesn't matter.
-        return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseSettingsEncoder),
-                            mimetype="application/json")
+        return HttpResponse(
+            json.dumps(manager.update_from_json(
+                request.POST), cls=CourseSettingsEncoder),
+            mimetype="application/json")
 
 
 @expect_json
@@ -318,15 +327,19 @@ def course_grader_updates(request, org, course, name, grader_index=None):
 
     if real_method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
-        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(location), grader_index)),
-                            mimetype="application/json")
+        return HttpResponse(
+            json.dumps(CourseGradingModel.fetch_grader(
+                Location(location), grader_index)),
+            mimetype="application/json")
     elif real_method == "DELETE":
         # ??? Should this return anything? Perhaps success fail?
         CourseGradingModel.delete_grader(Location(location), grader_index)
         return HttpResponse()
     elif request.method == 'POST':  # post or put, doesn't matter.
-        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(location), request.POST)),
-                            mimetype="application/json")
+        return HttpResponse(
+            json.dumps(CourseGradingModel.update_grader_from_json(
+                Location(location), request.POST)),
+            mimetype="application/json")
 
 
 # # NB: expect_json failed on ["key", "key2"] and json payload
@@ -348,11 +361,13 @@ def course_advanced_updates(request, org, course, name):
                             mimetype="application/json")
     elif real_method == 'DELETE':
         return HttpResponse(json.dumps(CourseMetadata.delete_key(location,
-                                                                 json.loads(request.body))),
+                                                                 json.loads(
+                                                                     request.body))),
                             mimetype="application/json")
     elif real_method == 'POST' or real_method == 'PUT':
         # NOTE: request.POST is messed up because expect_json
-        # cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
+        # cloned_request.POST.copy() is creating a defective entry w/ the whole
+        # payload as the key
         request_body = json.loads(request.body)
         # Whether or not to filter the tabs key out of the settings metadata
         filter_tabs = True
@@ -374,19 +389,23 @@ def course_advanced_updates(request, org, course, name):
                 'notes': NOTE_COMPONENT_TYPES,
             }
 
-            # Check to see if the user instantiated any notes or open ended components
+            # Check to see if the user instantiated any notes or open ended
+            # components
             for tab_type in tab_component_map.keys():
                 component_types = tab_component_map.get(tab_type)
                 found_ac_type = False
                 for ac_type in component_types:
                     if ac_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
                         # Add tab to the course if needed
-                        changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
-                        # If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
+                        changed, new_tabs = add_extra_panel_tab(
+                            tab_type, course_module)
+                        # If a tab has been added to the course, then send the
+                        # metadata along to CourseMetadata.update_from_json
                         if changed:
                             course_module.tabs = new_tabs
                             request_body.update({'tabs': new_tabs})
-                            # Indicate that tabs should not be filtered out of the metadata
+                            # Indicate that tabs should not be filtered out of
+                            # the metadata
                             filter_tabs = False
                         # Set this flag to avoid the tab removal code below.
                         found_ac_type = True
@@ -395,11 +414,13 @@ def course_advanced_updates(request, org, course, name):
                 # we may need to remove the tab from the course.
                 if not found_ac_type:
                     # Remove tab from the course if needed
-                    changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
+                    changed, new_tabs = remove_extra_panel_tab(
+                        tab_type, course_module)
                     if changed:
                         course_module.tabs = new_tabs
                         request_body.update({'tabs': new_tabs})
-                        # Indicate that tabs should *not* be filtered out of the metadata
+                        # Indicate that tabs should *not* be filtered out of
+                        # the metadata
                         filter_tabs = False
 
         response_json = json.dumps(CourseMetadata.update_from_json(location,

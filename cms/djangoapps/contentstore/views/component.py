@@ -42,7 +42,8 @@ COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
-ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud', 'videoalpha'] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
+ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud',
+                            'videoalpha'] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -56,10 +57,13 @@ def edit_subsection(request, location):
 
     item = modulestore().get_item(location, depth=1)
 
-    lms_link = get_lms_link_for_item(location, course_id=course.location.course_id)
-    preview_link = get_lms_link_for_item(location, course_id=course.location.course_id, preview=True)
+    lms_link = get_lms_link_for_item(
+        location, course_id=course.location.course_id)
+    preview_link = get_lms_link_for_item(
+        location, course_id=course.location.course_id, preview=True)
 
-    # make sure that location references a 'sequential', otherwise return BadRequest
+    # make sure that location references a 'sequential', otherwise return
+    # BadRequest
     if item.location.category != 'sequential':
         return HttpResponseBadRequest()
 
@@ -67,12 +71,15 @@ def edit_subsection(request, location):
 
     # we're for now assuming a single parent
     if len(parent_locs) != 1:
-        logging.error('Multiple (or none) parents have been found for {0}'.format(location))
+        logging.error(
+            'Multiple (or none) parents have been found for {0}'.format(location))
 
-    # this should blow up if we don't find any parents, which would be erroneous
+    # this should blow up if we don't find any parents, which would be
+    # erroneous
     parent = modulestore().get_item(parent_locs[0])
 
-    # remove all metadata from the generic dictionary that is presented in a more normalized UI
+    # remove all metadata from the generic dictionary that is presented in a
+    # more normalized UI
 
     policy_metadata = dict(
         (field.name, field.read_from(item))
@@ -119,7 +126,8 @@ def edit_unit(request, location):
 
     item = modulestore().get_item(location, depth=1)
 
-    lms_link = get_lms_link_for_item(item.location, course_id=course.location.course_id)
+    lms_link = get_lms_link_for_item(
+        item.location, course_id=course.location.course_id)
 
     component_templates = defaultdict(list)
 
@@ -131,11 +139,13 @@ def edit_unit(request, location):
     # Set component types according to course policy file
     component_types = list(COMPONENT_TYPES)
     if isinstance(course_advanced_keys, list):
-        course_advanced_keys = [c for c in course_advanced_keys if c in ADVANCED_COMPONENT_TYPES]
+        course_advanced_keys = [
+            c for c in course_advanced_keys if c in ADVANCED_COMPONENT_TYPES]
         if len(course_advanced_keys) > 0:
             component_types.append(ADVANCED_COMPONENT_CATEGORY)
     else:
-        log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
+        log.error("Improper format for course advanced keys! {0}".format(
+            course_advanced_keys))
 
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
@@ -162,16 +172,20 @@ def edit_unit(request, location):
     # this will need to change to check permissions correctly so as
     # to pick the correct parent subsection
 
-    containing_subsection_locs = modulestore().get_parent_locations(location, None)
-    containing_subsection = modulestore().get_item(containing_subsection_locs[0])
+    containing_subsection_locs = modulestore().get_parent_locations(
+        location, None)
+    containing_subsection = modulestore().get_item(
+        containing_subsection_locs[0])
 
-    containing_section_locs = modulestore().get_parent_locations(containing_subsection.location, None)
+    containing_section_locs = modulestore().get_parent_locations(
+        containing_subsection.location, None)
     containing_section = modulestore().get_item(containing_section_locs[0])
 
     # cdodge hack. We're having trouble previewing drafts via jump_to redirect
     # so let's generate the link url here
 
-    # need to figure out where this item is in the list of children as the preview will need this
+    # need to figure out where this item is in the list of children as the
+    # preview will need this
     index = 1
     for child in containing_subsection.get_children():
         if child.location == item.location:
@@ -222,11 +236,14 @@ def assignment_type_update(request, org, course, category, name):
         raise HttpResponseForbidden()
 
     if request.method == 'GET':
-        return HttpResponse(json.dumps(CourseGradingModel.get_section_grader_type(location)),
-                            mimetype="application/json")
+        return HttpResponse(
+            json.dumps(CourseGradingModel.get_section_grader_type(location)),
+            mimetype="application/json")
     elif request.method == 'POST':  # post or put, doesn't matter.
-        return HttpResponse(json.dumps(CourseGradingModel.update_section_grader_type(location, request.POST)),
-                            mimetype="application/json")
+        return HttpResponse(
+            json.dumps(CourseGradingModel.update_section_grader_type(
+                location, request.POST)),
+            mimetype="application/json")
 
 
 @login_required
@@ -255,7 +272,8 @@ def publish_draft(request):
         raise PermissionDenied()
 
     item = modulestore().get_item(location)
-    _xmodule_recurse(item, lambda i: modulestore().publish(i.location, request.user.id))
+    _xmodule_recurse(item, lambda i: modulestore().publish(
+        i.location, request.user.id))
 
     return HttpResponse()
 
@@ -287,8 +305,10 @@ def module_info(request, module_location):
 
     real_method = get_request_method(request)
 
-    rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
-    logging.debug('rewrite_static_links = {0} {1}'.format(request.GET.get('rewrite_url_links', 'False'), rewrite_static_links))
+    rewrite_static_links = request.GET.get(
+        'rewrite_url_links', 'True') in ['True', 'true']
+    logging.debug('rewrite_static_links = {0} {1}'.format(
+        request.GET.get('rewrite_url_links', 'False'), rewrite_static_links))
 
     # check that logged in user has permissions to this item
     if not has_access(request.user, location):

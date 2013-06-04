@@ -8,7 +8,8 @@ This code is somewhat duplicative of access.py in the LMS. We will unify the cod
 but this implementation should be data compatible with the LMS implementation
 '''
 
-# define a couple of simple roles, we just need ADMIN and EDITOR now for our purposes
+# define a couple of simple roles, we just need ADMIN and EDITOR now for
+# our purposes
 INSTRUCTOR_ROLE_NAME = 'instructor'
 STAFF_ROLE_NAME = 'staff'
 
@@ -65,12 +66,14 @@ asserted permissions
 
 def _delete_course_group(location):
     # remove all memberships
-    instructors = Group.objects.get(name=get_course_groupname_for_role(location, INSTRUCTOR_ROLE_NAME))
+    instructors = Group.objects.get(name=get_course_groupname_for_role(
+        location, INSTRUCTOR_ROLE_NAME))
     for user in instructors.user_set.all():
         user.groups.remove(instructors)
         user.save()
 
-    staff = Group.objects.get(name=get_course_groupname_for_role(location, STAFF_ROLE_NAME))
+    staff = Group.objects.get(name=get_course_groupname_for_role(
+        location, STAFF_ROLE_NAME))
     for user in staff.user_set.all():
         user.groups.remove(staff)
         user.save()
@@ -82,14 +85,18 @@ asserted permissions to do this action
 
 
 def _copy_course_group(source, dest):
-    instructors = Group.objects.get(name=get_course_groupname_for_role(source, INSTRUCTOR_ROLE_NAME))
-    new_instructors_group = Group.objects.get(name=get_course_groupname_for_role(dest, INSTRUCTOR_ROLE_NAME))
+    instructors = Group.objects.get(
+        name=get_course_groupname_for_role(source, INSTRUCTOR_ROLE_NAME))
+    new_instructors_group = Group.objects.get(
+        name=get_course_groupname_for_role(dest, INSTRUCTOR_ROLE_NAME))
     for user in instructors.user_set.all():
         user.groups.add(new_instructors_group)
         user.save()
 
-    staff = Group.objects.get(name=get_course_groupname_for_role(source, STAFF_ROLE_NAME))
-    new_staff_group = Group.objects.get(name=get_course_groupname_for_role(dest, STAFF_ROLE_NAME))
+    staff = Group.objects.get(
+        name=get_course_groupname_for_role(source, STAFF_ROLE_NAME))
+    new_staff_group = Group.objects.get(
+        name=get_course_groupname_for_role(dest, STAFF_ROLE_NAME))
     for user in staff.user_set.all():
         user.groups.add(new_staff_group)
         user.save()
@@ -127,7 +134,8 @@ def remove_user_from_course_group(caller, user, location, role):
     if not is_user_in_course_group_role(caller, location, INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied
 
-    # see if the user is actually in that role, if not then we don't have to do anything
+    # see if the user is actually in that role, if not then we don't have to
+    # do anything
     if is_user_in_course_group_role(user, location, role):
         groupname = get_course_groupname_for_role(location, role)
 

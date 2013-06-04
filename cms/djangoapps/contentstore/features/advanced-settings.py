@@ -81,7 +81,8 @@ def they_are_alphabetized(step):
 
 @step('it is displayed as formatted$')
 def it_is_formatted(step):
-    assert_policy_entries([DISPLAY_NAME_KEY], ['{\n    "key": "value",\n    "key_2": "value_2"\n}'])
+    assert_policy_entries([DISPLAY_NAME_KEY], [
+                          '{\n    "key": "value",\n    "key_2": "value_2"\n}'])
 
 
 @step('it is displayed as a string')
@@ -103,8 +104,10 @@ def the_policy_key_value_is_changed(step):
 def assert_policy_entries(expected_keys, expected_values):
     for counter in range(len(expected_keys)):
         index = get_index_of(expected_keys[counter])
-        assert_false(index == -1, "Could not find key: " + expected_keys[counter])
-        assert_equal(expected_values[counter], world.css_find(VALUE_CSS)[index].value, "value is incorrect")
+        assert_false(
+            index == -1, "Could not find key: " + expected_keys[counter])
+        assert_equal(expected_values[counter], world.css_find(
+            VALUE_CSS)[index].value, "value is incorrect")
 
 
 def get_index_of(expected_key):
@@ -128,5 +131,6 @@ def change_display_name_value(step, new_value):
     for count in range(len(display_name)):
         e._element.send_keys(Keys.TAB, Keys.END, Keys.BACK_SPACE)
         # Must delete "" before typing the JSON value
-    e._element.send_keys(Keys.TAB, Keys.END, Keys.BACK_SPACE, Keys.BACK_SPACE, new_value)
+    e._element.send_keys(
+        Keys.TAB, Keys.END, Keys.BACK_SPACE, Keys.BACK_SPACE, new_value)
     press_the_notification_button(step, "Save")

@@ -53,7 +53,8 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         activation_key = registration(email).activation_key
 
         # and now we try to activate
-        resp = self.client.get(reverse('activate', kwargs={'key': activation_key}))
+        resp = self.client.get(reverse(
+            'activate', kwargs={'key': activation_key}))
         return resp
 
     def activate_user(self, email):
@@ -113,13 +114,15 @@ class AuthTestCase(ContentStoreTestCase):
 
     def test_login_link_on_activation_age(self):
         self.create_account(self.username, self.email, self.pw)
-        # we want to test the rendering of the activation page when the user isn't logged in
+        # we want to test the rendering of the activation page when the user
+        # isn't logged in
         self.client.logout()
         resp = self._activate_user(self.email)
         self.assertEqual(resp.status_code, 200)
 
         # check the the HTML has links to the right login page. Note that this is merely a content
-        # check and thus could be fragile should the wording change on this page
+        # check and thus could be fragile should the wording change on this
+        # page
         expected = 'You can now <a href="' + reverse('login') + '">login</a>.'
         self.assertIn(expected, resp.content)
 

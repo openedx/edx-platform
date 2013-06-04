@@ -14,7 +14,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) == 0:
-            raise CommandError("import requires at least one argument: <data directory> [<course dir>...]")
+            raise CommandError(
+                "import requires at least one argument: <data directory> [<course dir>...]")
 
         data_dir = args[0]
         if len(args) > 1:

@@ -49,7 +49,8 @@ def i_can_check_and_uncheck_tasks(step):
 def tasks_correctly_selected_after_reload(step):
     reload_the_page(step)
     verifyChecklist2Status(2, 7, 29)
-    # verify that task 7 is still selected by toggling its checkbox state and making sure that it deselects
+    # verify that task 7 is still selected by toggling its checkbox state and
+    # making sure that it deselects
     toggleTask(1, 6)
     verifyChecklist2Status(1, 7, 14)
 
@@ -61,7 +62,8 @@ def i_select_a_link_to_the_course_outline(step):
 
 @step('I am brought to the course outline page$')
 def i_am_brought_to_course_outline(step):
-    assert_in('Course Outline', world.css_find('.outline .page-header')[0].text)
+    assert_in('Course Outline', world.css_find(
+        '.outline .page-header')[0].text)
     assert_equal(1, len(world.browser.windows))
 
 
@@ -69,7 +71,8 @@ def i_am_brought_to_course_outline(step):
 def i_am_brought_back_to_course_outline(step):
     step.given('I see the four default edX checklists')
     # In a previous step, we selected (1, 0) in order to click the 'Edit Course Outline' link.
-    # Make sure the task is still showing as selected (there was a caching bug with the collection).
+    # Make sure the task is still showing as selected (there was a caching bug
+    # with the collection).
     verifyChecklist2Status(1, 7, 14)
 
 
@@ -91,15 +94,18 @@ def i_am_brought_to_help_page_in_new_window(step):
 def verifyChecklist2Status(completed, total, percentage):
     def verify_count(driver):
         try:
-            statusCount = world.css_find('#course-checklist1 .status-count').first
+            statusCount = world.css_find(
+                '#course-checklist1 .status-count').first
             return statusCount.text == str(completed)
         except StaleElementReferenceException:
             return False
 
     world.wait_for(verify_count)
-    assert_equal(str(total), world.css_find('#course-checklist1 .status-amount').first.text)
+    assert_equal(str(total), world.css_find(
+        '#course-checklist1 .status-amount').first.text)
     # Would like to check the CSS width, but not sure how to do that.
-    assert_equal(str(percentage), world.css_find('#course-checklist1 .viz-checklist-status-value .int').first.text)
+    assert_equal(str(percentage), world.css_find(
+        '#course-checklist1 .viz-checklist-status-value .int').first.text)
 
 
 def toggleTask(checklist, task):
@@ -111,7 +117,8 @@ def toggleTask(checklist, task):
 def clickActionLink(checklist, task, actionText):
     # toggle checklist item to make sure that the link button is showing
     toggleTask(checklist, task)
-    action_link = world.css_find('#course-checklist' + str(checklist) + ' a')[task]
+    action_link = world.css_find(
+        '#course-checklist' + str(checklist) + ' a')[task]
 
     # text will be empty initially, wait for it to populate
     def verify_action_link_text(driver):

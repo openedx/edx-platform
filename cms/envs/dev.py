@@ -37,7 +37,8 @@ MODULESTORE = {
 }
 
 # cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
-# This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
+# This is for static content for courseware, not system static content
+# (e.g. javascript, css, edX branding, etc)
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
@@ -119,14 +120,15 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 ################################ PIPELINE #################################
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(
+    proj_dir=PROJECT_ROOT)
 
 ################################# CELERY ######################################
 
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 
-################################ DEBUG TOOLBAR #################################
+################################ DEBUG TOOLBAR ###########################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
@@ -154,7 +156,8 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 # To see stacktraces for MongoDB queries, set this to True.
-# Stacktraces slow down page loads drastically (for pages with lots of queries).
+# Stacktraces slow down page loads drastically (for pages with lots of
+# queries).
 DEBUG_TOOLBAR_MONGO_STACKTRACES = True
 
 # disable NPS survey in dev mode

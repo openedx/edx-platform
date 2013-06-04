@@ -25,7 +25,8 @@ class InternationalizationTest(ModuleStoreTestCase):
         self.password = 'foo'
 
         # Create the use so we can log them in.
-        self.user = User.objects.create_user(self.uname, self.email, self.password)
+        self.user = User.objects.create_user(
+            self.uname, self.email, self.password)
 
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.

@@ -51,7 +51,8 @@ DATABASES = {
     }
 }
 
-# Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
+# Include the lettuce app for acceptance testing, including the 'harvest'
+# django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
 LETTUCE_SERVER_PORT = 8001

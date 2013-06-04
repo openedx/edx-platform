@@ -12,7 +12,8 @@ for store_name in settings.MODULESTORE:
     store.metadata_inheritance_cache_subsystem = cache
     store.request_cache = RequestCache.get_request_cache()
 
-    modulestore_update_signal = Signal(providing_args=['modulestore', 'course_id', 'location'])
+    modulestore_update_signal = Signal(providing_args=[
+                                       'modulestore', 'course_id', 'location'])
     store.modulestore_update_signal = modulestore_update_signal
 if hasattr(settings, 'DATADOG_API'):
     dog_http_api.api_key = settings.DATADOG_API

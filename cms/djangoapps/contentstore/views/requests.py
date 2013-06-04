@@ -29,7 +29,8 @@ def get_request_method(request):
     Using HTTP_X_HTTP_METHOD_OVERRIDE, in the request metadata, determine
     what type of request came from the client, and return it.
     """
-    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    # NB: we're setting Backbone.emulateHTTP to true on the client so
+    # everything comes as a post!!!
     if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
         real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
     else:

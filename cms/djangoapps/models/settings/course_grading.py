@@ -9,9 +9,11 @@ class CourseGradingModel(object):
     """
     def __init__(self, course_descriptor):
         self.course_location = course_descriptor.location
-        self.graders = [CourseGradingModel.jsonize_grader(i, grader) for i, grader in enumerate(course_descriptor.raw_grader)]   # weights transformed to ints [0..100]
+        self.graders = [CourseGradingModel.jsonize_grader(i, grader) for i, grader in enumerate(
+            course_descriptor.raw_grader)]   # weights transformed to ints [0..100]
         self.grade_cutoffs = course_descriptor.grade_cutoffs
-        self.grace_period = CourseGradingModel.convert_set_grace_period(course_descriptor)
+        self.grace_period = CourseGradingModel.convert_set_grace_period(
+            course_descriptor)
 
     @classmethod
     def fetch(cls, course_location):
@@ -84,13 +86,16 @@ class CourseGradingModel(object):
         course_location = jsondict['course_location']
         descriptor = get_modulestore(course_location).get_item(course_location)
 
-        graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
+        graders_parsed = [CourseGradingModel.parse_grader(
+            jsonele) for jsonele in jsondict['graders']]
 
         descriptor.raw_grader = graders_parsed
         descriptor.grade_cutoffs = jsondict['grade_cutoffs']
 
-        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
-        CourseGradingModel.update_grace_period_from_json(course_location, jsondict['grace_period'])
+        get_modulestore(course_location).update_item(
+            course_location, descriptor._model_data._kvs._data)
+        CourseGradingModel.update_grace_period_from_json(
+            course_location, jsondict['grace_period'])
 
         return CourseGradingModel.fetch(course_location)
 
@@ -116,7 +121,8 @@ class CourseGradingModel(object):
         else:
             descriptor.raw_grader.append(grader)
 
-        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
+        get_modulestore(course_location).update_item(
+            course_location, descriptor._model_data._kvs._data)
 
         return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
 
@@ -131,7 +137,8 @@ class CourseGradingModel(object):
 
         descriptor = get_modulestore(course_location).get_item(course_location)
         descriptor.grade_cutoffs = cutoffs
-        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
+        get_modulestore(course_location).update_item(
+            course_location, descriptor._model_data._kvs._data)
 
         return cutoffs
 
@@ -154,9 +161,11 @@ class CourseGradingModel(object):
             # lms requires these to be in a fixed order
             grace_timedelta = timedelta(**graceperiodjson)
 
-            descriptor = get_modulestore(course_location).get_item(course_location)
+            descriptor = get_modulestore(
+                course_location).get_item(course_location)
             descriptor.lms.graceperiod = grace_timedelta
-            get_modulestore(course_location).update_metadata(course_location, descriptor._model_data._kvs._metadata)
+            get_modulestore(course_location).update_metadata(
+                course_location, descriptor._model_data._kvs._metadata)
 
     @staticmethod
     def delete_grader(course_location, index):
@@ -172,7 +181,8 @@ class CourseGradingModel(object):
             del descriptor.raw_grader[index]
             # force propagation to definition
             descriptor.raw_grader = descriptor.raw_grader
-            get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
+            get_modulestore(course_location).update_item(
+                course_location, descriptor._model_data._kvs._data)
 
     # NOTE cannot delete cutoffs. May be useful to reset
     @staticmethod
@@ -184,8 +194,10 @@ class CourseGradingModel(object):
             course_location = Location(course_location)
 
         descriptor = get_modulestore(course_location).get_item(course_location)
-        descriptor.grade_cutoffs = descriptor.defaut_grading_policy['GRADE_CUTOFFS']
-        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
+        descriptor.grade_cutoffs = descriptor.defaut_grading_policy[
+            'GRADE_CUTOFFS']
+        get_modulestore(course_location).update_item(
+            course_location, descriptor._model_data._kvs._data)
 
         return descriptor.grade_cutoffs
 
@@ -199,7 +211,8 @@ class CourseGradingModel(object):
 
         descriptor = get_modulestore(course_location).get_item(course_location)
         del descriptor.lms.graceperiod
-        get_modulestore(course_location).update_metadata(course_location, descriptor._model_data._kvs._metadata)
+        get_modulestore(course_location).update_metadata(
+            course_location, descriptor._model_data._kvs._metadata)
 
     @staticmethod
     def get_section_grader_type(location):
@@ -207,10 +220,11 @@ class CourseGradingModel(object):
             location = Location(location)
 
         descriptor = get_modulestore(location).get_item(location)
-        return {"graderType": descriptor.lms.format if descriptor.lms.format is not None else 'Not Graded',
-                "location": location,
-                "id": 99   # just an arbitrary value to
-                }
+        return {
+            "graderType": descriptor.lms.format if descriptor.lms.format is not None else 'Not Graded',
+            "location": location,
+            "id": 99   # just an arbitrary value to
+        }
 
     @staticmethod
     def update_section_grader_type(location, jsondict):
@@ -225,7 +239,8 @@ class CourseGradingModel(object):
             del descriptor.lms.format
             del descriptor.lms.graded
 
-        get_modulestore(location).update_metadata(location, descriptor._model_data._kvs._metadata)
+        get_modulestore(location).update_metadata(
+            location, descriptor._model_data._kvs._metadata)
 
     @staticmethod
     def convert_set_grace_period(descriptor):

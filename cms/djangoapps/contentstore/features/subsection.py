@@ -55,10 +55,12 @@ def i_see_complete_subsection_name_with_quote_in_editor(step):
 
 @step('I have set a release date and due date in different years$')
 def test_have_set_dates_in_different_years(step):
-    set_date_and_time('input#start_date', '12/25/2011', 'input#start_time', '03:00')
+    set_date_and_time(
+        'input#start_date', '12/25/2011', 'input#start_time', '03:00')
     world.css_click('.set-date')
     # Use a year in the past so that current year will always be different.
-    set_date_and_time('input#due_date', '01/02/2012', 'input#due_time', '04:00')
+    set_date_and_time(
+        'input#due_date', '01/02/2012', 'input#due_time', '04:00')
 
 
 @step('I mark it as Homework$')

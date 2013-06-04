@@ -38,7 +38,8 @@ def index(request):
     """
     List all courses available to the logged in user
     """
-    courses = modulestore('direct').get_items(['i4x', None, None, 'course', None])
+    courses = modulestore('direct').get_items(
+        ['i4x', None, None, 'course', None])
 
     # filter out courses that we don't have access too
     def course_filter(course):
@@ -139,6 +140,7 @@ def remove_user(request, location):
     if user.id == request.user.id:
         raise PermissionDenied()
 
-    remove_user_from_course_group(request.user, user, location, STAFF_ROLE_NAME)
+    remove_user_from_course_group(
+        request.user, user, location, STAFF_ROLE_NAME)
 
     return create_json_response()
