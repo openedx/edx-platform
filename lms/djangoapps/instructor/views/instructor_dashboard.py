@@ -95,6 +95,7 @@ def _section_student_admin(course_id):
 def _section_data_download(course_id):
     """ Provide data for the corresponding dashboard section """
     section_data = {
-        'grading_config_url': reverse('grading_config', kwargs={'course_id': course_id}),
+        'grading_config_url':             reverse('grading_config', kwargs={'course_id': course_id}),
+        'enrolled_students_profiles_url': reverse('enrolled_students_profiles', kwargs={'course_id': course_id}),
     }
     return section_data

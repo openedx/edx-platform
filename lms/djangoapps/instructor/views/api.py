@@ -28,6 +28,8 @@ from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_R
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 import xmodule.graders as xmgraders
+from django.contrib.auth.models import User, Group
+from student.models import CourseEnrollment
 
 
 @ensure_csrf_cookie
@@ -45,7 +47,7 @@ def grading_config(request, course_id):
         'course_id': course_id,
         'grading_config_summary': grading_config_summary,
     }
-    response = HttpResponse(json.dumps(response_payload))
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
 
 
@@ -59,6 +61,42 @@ def enrolled_students_profiles(request, course_id):
     TODO accept requests for different attribute sets
     """
 
+    enrollments = CourseEnrollment.objects.filter(course_id=course_id)
+    students = [enrollment.user for enrollment in enrollments]
+
+    STUDENT_FEATURES = ['username', 'first_name', 'last_name', 'is_staff', 'email']
+    PROFILE_FEATURES = ['year_of_birth', 'gender', 'level_of_education']
+
+    def extract_student(student):
+        student_dict = dict((feature, getattr(student, feature)) for feature in STUDENT_FEATURES)
+        profile = student.profile
+        profile_dict = dict((feature, getattr(profile, feature)) for feature in PROFILE_FEATURES)
+        student_dict.update(profile_dict)
+        return student_dict
+
+    response_payload = {
+        'course_id':        course_id,
+        'students':         [extract_student(student) for student in students],
+        'STUDENT_FEATURES': STUDENT_FEATURES,
+        'PROFILE_FEATURES': PROFILE_FEATURES,
+        'all_features':     STUDENT_FEATURES + PROFILE_FEATURES,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def enrolled_students_choices_numbers(request, course_id):
+    """
+    Respond with json of the distribution of students on fields select fields which have choices.
+
+    TODO respond to csv requests as well
+    TODO accept requests for different attribute sets
+    """
+
+    EASY_CHOICE_FEATURES = ['year_of_birth', 'gender', 'level_of_education', 'language']
+    OPEN_CHOICE_FEATURES = ['language', 'location/mailing_address']
     raise NotImplementedError()
 
 

@@ -58,7 +58,7 @@
 
 
   <section id="data-download" class="idash-section">
-    <input type="submit" name="action" value="List enrolled students with profile information"></input>
+    <input type="submit" name="action" data-endpoint="${ section_data['data_download']['enrolled_students_profiles_url'] }" value="List enrolled students with profile information"></input>
     <input type="submit" name="action" value="Student grades"></input>
     <input type="submit" name="action" value="Answer distributions (x students got y points)"></input>
     <input type="submit" name="action" data-endpoint="${ section_data['data_download']['grading_config_url'] }" value="Grading Configuration"></input>

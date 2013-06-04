@@ -58,3 +58,9 @@ setup_section_data_download = (section) ->
     log "fetching grading config"
     $.getJSON grade_config_btn.data('endpoint'), (data) ->
       section.find('.dumped-data-display').html data['grading_config_summary']
+
+  list_studs_btn = section.find("input[value='List enrolled students with profile information']'")
+  list_studs_btn.click (e) ->
+    log "fetching student list"
+    $.getJSON list_studs_btn.data('endpoint'), (data) ->
+      section.find('.dumped-data-display').text JSON.stringify(data)
