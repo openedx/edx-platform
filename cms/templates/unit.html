@@ -70,7 +70,7 @@
                 </ul>
               </div>
                 % for type, templates in sorted(component_templates.items()):
-	          % if len(templates) > 1 or type == 'advanced':
+                  % if len(templates) > 1 or type == 'advanced':
                 <div class="new-component-templates new-component-${type}">
                     % if type == "problem":
                       <div class="tab-group tabs">
@@ -115,7 +115,7 @@
                       % endif
                       <a href="#" class="cancel-button">Cancel</a>
                   </div>
-		  % endif
+                  % endif
                 % endfor
             </li>
           </ol>
