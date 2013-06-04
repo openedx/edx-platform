@@ -1,0 +1,58 @@
+<%inherit file="/main.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+  <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='instructor_2'" />
+
+<style type="text/css"></style>
+
+<script language="JavaScript" type="text/javascript"></script>
+
+<section class="container">
+<div class="instructor-dashboard-wrapper-2">
+<section class="instructor-dashboard-content-2">
+
+  <h1>Instructor Dashboard</h1>
+
+  <h2 class="instructor_nav">[
+    <a href='#' data-section="course-info"> Course Info   </a> |
+    <a href='#' data-section="enrollment"> Enrollment    </a> |
+    <a href='#' data-section="student-admin"> Student Admin  </a> |
+    <a href='#' data-section="data-download"> Data Download </a>
+  ]</h2>
+
+  <div style="text-align:right">
+    <span id="djangopid">${djangopid}</span> |
+    <span id="mitxver">${mitx_version}</span>
+  </div>
+
+  <section id="course-info" class="idash-section">
+    Course info content.
+  </section>
+
+  <section id="enrollment" class="idash-section">
+    Enrollment content.
+  </section>
+
+  <section id="student-admin" class="idash-section">
+    Student admin content.
+  </section>
+
+  <section id="data-download" class="idash-section">
+    Data download content.
+  </section>
+
+</section>
+</div>
+</section>

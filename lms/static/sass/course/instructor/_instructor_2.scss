@@ -1,0 +1,24 @@
+.instructor-dashboard-wrapper-2 {
+  @extend .table-wrapper;
+  display: table;
+
+  section.instructor-dashboard-content-2 {
+    @extend .content;
+    padding: 40px;
+    width: 100%;
+
+    h1 {
+      @extend .top-header;
+    }
+
+    section.idash-section {
+      // background-color: #0f0;
+      display: none;
+
+      &.active-section {
+        // background-color: #ff0;
+        display: block;
+      }
+    }
+  }
+}

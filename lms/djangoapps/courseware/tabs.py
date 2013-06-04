@@ -290,6 +290,11 @@ def get_course_tabs(user, course, active_page):
         tabs.append(CourseTab('Instructor',
                               reverse('instructor_dashboard', args=[course.id]),
                               active_page == 'instructor'))
+
+    if has_access(user, course, 'staff'):
+        tabs.append(CourseTab('Instructor 2',
+                              reverse('instructor_dashboard_2', args=[course.id]),
+                              active_page == 'instructor_2'))
     return tabs
 
 
@@ -340,6 +345,11 @@ def get_default_tabs(user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('instructor_dashboard', args=[course.id])
         tabs.append(CourseTab('Instructor', link, active_page == 'instructor'))
+
+    if has_access(user, course, 'staff'):
+        tabs.append(CourseTab('Instructor 2',
+                              reverse('instructor_dashboard_2', args=[course.id]),
+                              active_page == 'instructor_2'))
 
     return tabs
 
