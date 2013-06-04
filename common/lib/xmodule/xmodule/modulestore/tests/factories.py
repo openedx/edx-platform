@@ -1,9 +1,8 @@
-from factory import Factory, lazy_attribute_sequence, lazy_attribute
-from time import gmtime
+from factory import Factory
 from uuid import uuid4
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.inheritance import own_metadata
+import factory
 
 
 class XModuleCourseFactory(Factory):
@@ -72,14 +71,15 @@ class XModuleItemFactory(Factory):
 
     ABSTRACT_FACTORY = True
 
-    display_name = None
+    parent_location = 'i4x://MITx/999/course/Robot_Super_Course'
     category = 'problem'
+    display_name = factory.LazyAttributeSequence(lambda o, n: "{} {}".format(o.category, n))
 
-    @lazy_attribute
-    def location(attr):
-        parent = Location(attr.parent_location)
-        dest_name = attr.display_name.replace(" ", "_") if attr.display_name is not None else uuid4().hex
-        return parent._replace(category=attr.category, name=dest_name)
+    @staticmethod
+    def location(parent_location, category, display_name):
+        parent = Location(parent_location)
+        dest_name = display_name.replace(" ", "_") if display_name is not None else uuid4().hex
+        return parent._replace(category=category, name=dest_name)
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
@@ -105,9 +105,10 @@ class XModuleItemFactory(Factory):
 
         parent_location = Location(kwargs.get('parent_location'))
         data = kwargs.get('data')
-        display_name = kwargs.get('display_name', XModuleItemFactory().display_name)
+        category = kwargs.get('category')
+        display_name = kwargs.get('display_name')
         metadata = kwargs.get('metadata', {})
-        location = kwargs.get('location', XModuleItemFactory().location)
+        location = kwargs.get('location', XModuleItemFactory.location(parent_location, category, display_name))
 
         store = modulestore('direct')
 
@@ -133,10 +134,4 @@ class Item:
 
 class ItemFactory(XModuleItemFactory):
     FACTORY_FOR = Item
-
-    parent_location = 'i4x://MITx/999/course/Robot_Super_Course'
     category = 'chapter'
-
-    @lazy_attribute_sequence
-    def display_name(attr, n):
-        return "{} {}".format(attr.category.title(), n)
