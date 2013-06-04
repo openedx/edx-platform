@@ -6,17 +6,24 @@ import re
 import string
 import fnmatch
 
+from textwrap import dedent
 from external_auth.models import ExternalAuthMap
 from external_auth.djangostore import DjangoOpenIDStore
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+
 from student.models import UserProfile, TestCenterUser, TestCenterRegistration
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.utils.http import urlquote
 from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
+
 from mitxmako.shortcuts import render_to_response, render_to_string
 try:
     from django.views.decorators.csrf import csrf_exempt
@@ -40,6 +47,7 @@ from courseware.model_data import ModelDataCache
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger("mitx.external_auth")
 
@@ -157,7 +165,15 @@ def external_login_or_signup(request,
 
     login(request, user)
     request.session.set_expiry(0)
-    student_views.try_change_enrollment(request)
+
+    # Now to try enrollment
+    # Need to special case Shibboleth here because it logs in via a GET.
+    # testing request.method for extra paranoia
+    if 'shib:' in external_domain and request.method == 'GET':
+        enroll_request = make_shib_enrollment_request(request)
+        student_views.try_change_enrollment(enroll_request)
+    else:
+        student_views.try_change_enrollment(request)
     log.info("Login success - {0} ({1})".format(user.username, user.email))
     if retfun is None:
         return redirect('/')
@@ -188,14 +204,25 @@ def signup(request, eamap=None):
 
     context = {'has_extauth_info': True,
                'show_signup_immediately': True,
+               'extauth_id': eamap.external_id,
                'extauth_email': eamap.external_email,
                'extauth_username': username,
                'extauth_name': eamap.external_name,
                }
 
+    # detect if full name is blank and ask for it from user
+    context['ask_for_fullname'] = eamap.external_name.strip() == ''
+
+    # validate provided mail and if it's not valid ask the user
+    try:
+        validate_email(eamap.external_email)
+        context['ask_for_email'] = False
+    except ValidationError:
+        context['ask_for_email'] = True
+
     log.debug('Doing signup for %s' % eamap.external_email)
 
-    return student_views.index(request, extra_context=context)
+    return student_views.register_user(request, extra_context=context)
 
 
 # -----------------------------------------------------------------------------
@@ -302,6 +329,125 @@ def ssl_login(request):
                                     email=email,
                                     fullname=fullname,
                                     retfun=retfun)
+
+
+# -----------------------------------------------------------------------------
+# Shibboleth (Stanford and others.  Uses *Apache* environment variables)
+# -----------------------------------------------------------------------------
+def shib_login(request, retfun=None):
+    """
+        Uses Apache's REMOTE_USER environment variable as the external id.
+        This in turn typically uses EduPersonPrincipalName
+        http://www.incommonfederation.org/attributesummary.html#eduPersonPrincipal
+        but the configuration is in the shibboleth software.
+    """
+    shib_error_msg = _(dedent(
+        """
+        Your university identity server did not return your ID information to us.
+        Please try logging in again.  (You may need to restart your browser.)
+        """))
+
+    if not request.META.get('REMOTE_USER'):
+        return default_render_failure(request, shib_error_msg)
+    else:
+        #if we get here, the user has authenticated properly
+        attrs = ['REMOTE_USER', 'givenName', 'sn', 'mail',
+                 'Shib-Identity-Provider']
+        shib = {}
+
+        for attr in attrs:
+            shib[attr] = request.META.get(attr, '')
+
+        #Clean up first name, last name, and email address
+        #TODO: Make this less hardcoded re: format, but split will work
+        #even if ";" is not present since we are accessing 1st element
+        shib['sn'] = shib['sn'].split(";")[0].strip().capitalize()
+        shib['givenName'] = shib['givenName'].split(";")[0].strip().capitalize()
+
+    return external_login_or_signup(request,
+                                    external_id=shib['REMOTE_USER'],
+                                    external_domain="shib:" + shib['Shib-Identity-Provider'],
+                                    credentials=shib,
+                                    email=shib['mail'],
+                                    fullname="%s %s" % (shib['givenName'], shib['sn']),
+                                    retfun=retfun)
+
+
+def make_shib_enrollment_request(request):
+    """
+        Need this hack function because shibboleth logins don't happen over POST
+        but change_enrollment expects its request to be a POST, with
+        enrollment_action and course_id POST parameters.
+    """
+    enroll_request = HttpRequest()
+    enroll_request.user = request.user
+    enroll_request.session = request.session
+    enroll_request.method = "POST"
+
+    # copy() also makes GET and POST mutable
+    # See https://docs.djangoproject.com/en/dev/ref/request-response/#django.http.QueryDict.update
+    enroll_request.GET = request.GET.copy()
+    enroll_request.POST = request.POST.copy()
+
+    # also have to copy these GET parameters over to POST
+    if "enrollment_action" not in enroll_request.POST and "enrollment_action" in enroll_request.GET:
+        enroll_request.POST.setdefault('enrollment_action', enroll_request.GET.get('enrollment_action'))
+    if "course_id" not in enroll_request.POST and "course_id" in enroll_request.GET:
+        enroll_request.POST.setdefault('course_id', enroll_request.GET.get('course_id'))
+
+    return enroll_request
+
+
+def course_specific_login(request, course_id):
+    """
+       Dispatcher function for selecting the specific login method
+       required by the course
+    """
+    query_string = request.META.get("QUERY_STRING", '')
+
+    try:
+        course = course_from_id(course_id)
+    except ItemNotFoundError:
+        #couldn't find the course, will just return vanilla signin page
+        return redirect_with_querystring('signin_user', query_string)
+
+    #now the dispatching conditionals.  Only shib for now
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in course.enrollment_domain:
+        return redirect_with_querystring('shib-login', query_string)
+
+    #Default fallthrough to normal signin page
+    return redirect_with_querystring('signin_user', query_string)
+
+
+def course_specific_register(request, course_id):
+    """
+        Dispatcher function for selecting the specific registration method
+        required by the course
+    """
+    query_string = request.META.get("QUERY_STRING", '')
+
+    try:
+        course = course_from_id(course_id)
+    except ItemNotFoundError:
+        #couldn't find the course, will just return vanilla registration page
+        return redirect_with_querystring('register_user', query_string)
+
+    #now the dispatching conditionals.  Only shib for now
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in course.enrollment_domain:
+        #shib-login takes care of both registration and login flows
+        return redirect_with_querystring('shib-login', query_string)
+
+    #Default fallthrough to normal registration page
+    return redirect_with_querystring('register_user', query_string)
+
+
+def redirect_with_querystring(view_name, query_string):
+    """
+        Helper function to add query string to redirect views
+    """
+    if query_string:
+        return redirect("%s?%s" % (reverse(view_name), query_string))
+    return redirect(view_name)
 
 
 # -----------------------------------------------------------------------------
