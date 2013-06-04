@@ -33,6 +33,11 @@ import xmodule.graders as xmgraders
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def grading_config(request, course_id):
+    """
+    Respond with json which contains a html formatted grade summary.
+
+    TODO maybe this shouldn't be html already
+    """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
     grading_config_summary = _dump_grading_context(course)
 
@@ -42,7 +47,19 @@ def grading_config(request, course_id):
     }
     response = HttpResponse(json.dumps(response_payload))
     return response
-    # response = HttpResponse(json.dumps(response_payload), mimetype='application/json')
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def enrolled_students_profiles(request, course_id):
+    """
+    Respond with json which contains a summary of all enrolled students profile information.
+
+    TODO respond to csv requests as well
+    TODO accept requests for different attribute sets
+    """
+
+    raise NotImplementedError()
 
 
 def _dump_grading_context(course):

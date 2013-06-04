@@ -32,11 +32,11 @@
   ## links which are tied to idash-sections below.
   ## the links are acativated and handled in instructor_dashboard.coffee
   ## when the javascript loads, it clicks on idash-default-section
-  <h2 class="instructor_nav">[
-    <a href='#' data-section="course-info" class="idash-default-section"> Course Info   </a> |
-    <a href='#' data-section="enrollment"> Enrollment    </a> |
-    <a href='#' data-section="student-admin"> Student Admin  </a> |
-    <a href='#' data-section="data-download"> Data Download </a>
+  <h2 class="instructor-nav">[
+    <a href="#" data-section="course-info" class="idash-default-section"> Course Info   </a> |
+    <a href="#" data-section="enrollment"> Enrollment    </a> |
+    <a href="#" data-section="student-admin"> Student Admin  </a> |
+    <a href="#" data-section="data-download"> Data Download </a>
   ]</h2>
 
   ## each section corresponds to a section_data sub-dictionary provided by the view
@@ -61,7 +61,7 @@
     <input type="submit" name="action" value="List enrolled students with profile information"></input>
     <input type="submit" name="action" value="Student grades"></input>
     <input type="submit" name="action" value="Answer distributions (x students got y points)"></input>
-    <input type="submit" name="action" data-endpoint="${ section_data['data_download']['grading_config_url'] }" value="Grading configuration"></input>
+    <input type="submit" name="action" data-endpoint="${ section_data['data_download']['grading_config_url'] }" value="Grading Configuration"></input>
     <div class="dumped-data-display"></div>
   </section>
 
