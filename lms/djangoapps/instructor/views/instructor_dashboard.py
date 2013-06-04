@@ -1,5 +1,7 @@
 """
-Instructor Views
+Instructor Dashboard Views
+
+TODO add tracking
 """
 
 import csv
@@ -92,5 +94,7 @@ def _section_student_admin(course_id):
 
 def _section_data_download(course_id):
     """ Provide data for the corresponding dashboard section """
-    section_data = {}
+    section_data = {
+        'grading_config_url': reverse('grading_config', kwargs={'course_id': course_id}),
+    }
     return section_data

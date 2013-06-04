@@ -1,4 +1,4 @@
-# Instructor Dashboard Manager
+# Instructor Dashboard Tab Manager
 
 log = -> console.log.apply console, arguments
 
