@@ -37,10 +37,17 @@
 @import 'base/font_face';
 @import 'base/extends';
 @import 'base/animations'; 	
+<<<<<<< HEAD
 
 // base - starter
 @import 'base/base';
 
+=======
+
+// base - starter
+@import 'base/base';
+
+>>>>>>> cleaned up font-awesome integration to work with new mako file .scss compiling, added in initial icon references
 // shared - course 
 @import 'shared/forms';
 @import 'shared/footer';
@@ -70,5 +77,9 @@
 @import 'discussion';
 @import 'news';
 
+<<<<<<< HEAD
 @import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
 
+=======
+@import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
+>>>>>>> cleaned up font-awesome integration to work with new mako file .scss compiling, added in initial icon references

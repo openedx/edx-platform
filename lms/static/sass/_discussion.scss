@@ -733,7 +733,10 @@ body.discussion {
         position: absolute;
         top: 30%;
         left: 30%;
+<<<<<<< HEAD
         color: $gray-l1;
+=======
+>>>>>>> cleaned up font-awesome integration to work with new mako file .scss compiling, added in initial icon references
         font-size: 28px;
         z-index: 100;
 <<<<<<< HEAD
@@ -742,7 +745,6 @@ body.discussion {
 =======
         width: 25px;
         height: 25px;
-        //margin-left: -17px;
         opacity: 1;
         @include transition(none);
 >>>>>>> basic shell for discussion home page with both profile information and email notification settings
@@ -1304,6 +1306,7 @@ body.discussion {
 
     section {
       border-bottom: 1px solid #ccc;
+      margin: $baseline $baseline $baseline 0;
     }
 
     .label {
@@ -1346,7 +1349,6 @@ body.discussion {
 >>>>>>> basic shell for discussion home page with both profile information and email notification settings
       
       .label-area {
-        padding: $baseline;
         display: inline-block;
         min-width: $baseline*5;
 <<<<<<< HEAD
@@ -1520,6 +1522,13 @@ body.discussion {
         font-size: 12px;
         width: 20%;
         vertical-align: middle;
+
+        i.icon {
+          padding: 0 $baseline/2;
+          font-size: 24px;
+          display: inline-block;
+        }
+
       }
     }
   }
