@@ -142,7 +142,8 @@ def _has_access_course_desc(user, course, action):
             debug("Allow: in enrollment period")
             return True
 
-        # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
+        # if user is in CourseEnrollmentAllowed with right course_id then can
+        # also enroll
         if user is not None and user.is_authenticated() and CourseEnrollmentAllowed:
             if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
                 return True
@@ -241,7 +242,8 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         # Check start date
         if descriptor.lms.start is not None:
             now = time.gmtime()
-            effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
+            effective_start = _adjust_start_date_for_beta_testers(
+                user, descriptor)
             if now > effective_start:
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
@@ -329,7 +331,8 @@ def _dispatch(table, action, user, obj):
         debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              obj.location.url() if isinstance(obj, XModuleDescriptor) else str(obj)[:60],
+              obj.location.url() if isinstance(
+                  obj, XModuleDescriptor) else str(obj)[:60],
               action)
         return result
 
@@ -399,7 +402,8 @@ def _course_staff_group_name(location, course_context=None):
     using course_id rather than just the course number. So first check to see if the group name exists
     """
     loc = Location(location)
-    group_name, legacy_group_name = group_names_for_staff(location, course_context)
+    group_name, legacy_group_name = group_names_for_staff(
+        location, course_context)
 
     if _does_course_group_name_exist(legacy_group_name):
         return legacy_group_name
@@ -441,7 +445,8 @@ def _course_instructor_group_name(location, course_context=None):
     using course_id rather than just the course number. So first check to see if the group name exists
     """
     loc = Location(location)
-    group_name, legacy_group_name = group_names_for_instructor(location, course_context)
+    group_name, legacy_group_name = group_names_for_instructor(
+        location, course_context)
 
     if _does_course_group_name_exist(legacy_group_name):
         return legacy_group_name
@@ -573,7 +578,8 @@ def _has_access_to_location(user, location, access_level, course_context):
                 return True
         debug("Deny: user not in groups %s", instructor_groups)
     else:
-        log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
+        log.debug("Error in access._has_access_to_location access_level=%s unknown" %
+                  access_level)
 
     return False
 

@@ -25,22 +25,29 @@ class DictionaryTestCase(TestCase):
     def test_merge_dict(self):
         d1 = {'cats': 'meow', 'dogs': 'woof'}
         d2 = {'lions': 'roar', 'ducks': 'quack'}
-        expected = {'cats': 'meow', 'dogs': 'woof', 'lions': 'roar', 'ducks': 'quack'}
+        expected = {'cats': 'meow', 'dogs':
+                    'woof', 'lions': 'roar', 'ducks': 'quack'}
         self.assertEqual(utils.merge_dict(d1, d2), expected)
 
 
 class AccessUtilsTestCase(TestCase):
     def setUp(self):
         self.course_id = 'edX/toy/2012_Fall'
-        self.student_role = RoleFactory(name='Student', course_id=self.course_id)
-        self.moderator_role = RoleFactory(name='Moderator', course_id=self.course_id)
-        self.student1 = UserFactory(username='student', email='student@edx.org')
+        self.student_role = RoleFactory(
+            name='Student', course_id=self.course_id)
+        self.moderator_role = RoleFactory(
+            name='Moderator', course_id=self.course_id)
+        self.student1 = UserFactory(
+            username='student', email='student@edx.org')
         self.student1_enrollment = CourseEnrollmentFactory(user=self.student1)
         self.student_role.users.add(self.student1)
-        self.student2 = UserFactory(username='student2', email='student2@edx.org')
+        self.student2 = UserFactory(
+            username='student2', email='student2@edx.org')
         self.student2_enrollment = CourseEnrollmentFactory(user=self.student2)
-        self.moderator = UserFactory(username='moderator', email='staff@edx.org', is_staff=True)
-        self.moderator_enrollment = CourseEnrollmentFactory(user=self.moderator)
+        self.moderator = UserFactory(
+            username='moderator', email='staff@edx.org', is_staff=True)
+        self.moderator_enrollment = CourseEnrollmentFactory(
+            user=self.moderator)
         self.moderator_role.users.add(self.moderator)
 
     def test_get_role_ids(self):
@@ -52,7 +59,8 @@ class AccessUtilsTestCase(TestCase):
         ret = utils.has_forum_access('student', self.course_id, 'Student')
         self.assertTrue(ret)
 
-        ret = utils.has_forum_access('not_a_student', self.course_id, 'Student')
+        ret = utils.has_forum_access(
+            'not_a_student', self.course_id, 'Student')
         self.assertFalse(ret)
 
         ret = utils.has_forum_access('student', self.course_id, 'NotARole')

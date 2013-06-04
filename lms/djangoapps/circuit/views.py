@@ -30,7 +30,8 @@ def circuit_line(circuit):
     circuit_line.set('height', '480')
     circuit_line.set('name', 'schematic')
     circuit_line.set('id', 'schematic_' + circuit)
-    circuit_line.set('value', schematic)  # We do it this way for security -- guarantees users cannot put funny stuff in schematic.
+    circuit_line.set(
+        'value', schematic)  # We do it this way for security -- guarantees users cannot put funny stuff in schematic.
     return xml.etree.ElementTree.tostring(circuit_line)
 
 

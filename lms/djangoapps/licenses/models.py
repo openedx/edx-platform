@@ -43,7 +43,8 @@ def get_courses_licenses(user, courses):
 def get_license(user, software):
     try:
         # TODO: temporary fix for when somehow a user got more that one license.
-        # The proper fix should use Meta.unique_together in the UserLicense model.
+        # The proper fix should use Meta.unique_together in the UserLicense
+        # model.
         licenses = UserLicense.objects.filter(user=user, software=software)
         license = licenses[0] if licenses else None
     except UserLicense.DoesNotExist:

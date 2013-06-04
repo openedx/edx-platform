@@ -10,32 +10,45 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'StudentModule.course_id'
         db.add_column('courseware_studentmodule', 'course_id',
-                      self.gf('django.db.models.fields.CharField')(default="", max_length=255, db_index=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          default="", max_length=255, db_index=True),
                       keep_default=False)
 
-        # Removing unique constraint on 'StudentModule', fields ['module_id', 'student']
-        db.delete_unique('courseware_studentmodule', ['module_id', 'student_id'])
+        # Removing unique constraint on 'StudentModule', fields ['module_id',
+        # 'student']
+        db.delete_unique('courseware_studentmodule', [
+                         'module_id', 'student_id'])
 
         # NOTE: manually remove this constaint (from 0001)--0003 tries, but fails for sqlite.
-        # Removing unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
+        # Removing unique constraint on 'StudentModule', fields ['module_id',
+        # 'module_type', 'student']
         if db.backend_name == "sqlite3":
-            db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
+            db.delete_unique('courseware_studentmodule', [
+                             'student_id', 'module_id', 'module_type'])
 
-        # Adding unique constraint on 'StudentModule', fields ['course_id', 'module_state_key', 'student']
-        db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'course_id'])
+        # Adding unique constraint on 'StudentModule', fields ['course_id',
+        # 'module_state_key', 'student']
+        db.create_unique('courseware_studentmodule', [
+                         'student_id', 'module_id', 'course_id'])
 
     def backwards(self, orm):
-        # Removing unique constraint on 'StudentModule', fields ['studnet_id', 'module_state_key', 'course_id']
-        db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'course_id'])
+        # Removing unique constraint on 'StudentModule', fields ['studnet_id',
+        # 'module_state_key', 'course_id']
+        db.delete_unique('courseware_studentmodule', [
+                         'student_id', 'module_id', 'course_id'])
 
         # Deleting field 'StudentModule.course_id'
         db.delete_column('courseware_studentmodule', 'course_id')
 
-        # Adding unique constraint on 'StudentModule', fields ['module_id', 'student']
-        db.create_unique('courseware_studentmodule', ['module_id', 'student_id'])
+        # Adding unique constraint on 'StudentModule', fields ['module_id',
+        # 'student']
+        db.create_unique('courseware_studentmodule', [
+                         'module_id', 'student_id'])
 
-        # Adding unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
-        db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
+        # Adding unique constraint on 'StudentModule', fields ['module_id',
+        # 'module_type', 'student']
+        db.create_unique('courseware_studentmodule', [
+                         'student_id', 'module_id', 'module_type'])
 
     models = {
         'auth.group': {

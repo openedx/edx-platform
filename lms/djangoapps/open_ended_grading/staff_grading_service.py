@@ -46,16 +46,19 @@ class MockStaffGradingService(object):
         self.cnt += 1
         return json.dumps({'success': True,
                            'problem_list': [
-                               json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
-                                           'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5,
-                                           'min_for_ml': 10}),
-                               json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
-                                           'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5,
-                                           'min_for_ml': 10})
+                               json.dumps(
+                                   {'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
+                                    'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5,
+                                    'min_for_ml': 10}),
+                               json.dumps(
+                                   {'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
+                                    'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5,
+                                    'min_for_ml': 10})
                            ]})
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
-                   submission_flagged):
+    def save_grade(
+        self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
+            submission_flagged):
         return self.get_next(course_id, 'fake location', grader_id)
 
 
@@ -123,8 +126,9 @@ class StaffGradingService(GradingService):
                                     'grader_id': grader_id})
         return json.dumps(self._render_rubric(response))
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
-                   submission_flagged):
+    def save_grade(
+        self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
+            submission_flagged):
         """
         Save a score and feedback for a submission.
 
@@ -261,7 +265,8 @@ def get_problem_list(request, course_id):
     """
     _check_access(request.user, course_id)
     try:
-        response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user))
+        response = staff_grading_service().get_problem_list(
+            course_id, unique_id_for_user(request.user))
         return HttpResponse(response,
                             mimetype="application/json")
     except GradingServiceError:
@@ -307,7 +312,8 @@ def save_grade(request, course_id):
     if request.method != 'POST':
         raise Http404
     p = request.POST
-    required = set(['score', 'feedback', 'submission_id', 'location', 'submission_flagged'])
+    required = set(['score', 'feedback',
+                   'submission_id', 'location', 'submission_flagged'])
     skipped = 'skipped' in p
     # If the instructor has skipped grading the submission, then there will not be any rubric scores.
     # Only add in the rubric scores if the instructor has not skipped.
@@ -330,7 +336,8 @@ def save_grade(request, course_id):
                                                          p['score'],
                                                          p['feedback'],
                                                          skipped,
-                                                         p.getlist('rubric_scores[]'),
+                                                         p.getlist(
+                                                             'rubric_scores[]'),
                                                          p['submission_flagged'])
     except GradingServiceError:
         # This is a dev_facing_error

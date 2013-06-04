@@ -16,48 +16,66 @@ class Migration(SchemaMigration):
 
         # Adding field 'GeneratedCertificate.course_id'
         db.add_column('certificates_generatedcertificate', 'course_id',
-                      self.gf('django.db.models.fields.CharField')(default=False, max_length=255),
+                      self.gf('django.db.models.fields.CharField')(
+                          default=False, max_length=255),
                       keep_default=False)
 
         # Adding field 'GeneratedCertificate.key'
         db.add_column('certificates_generatedcertificate', 'key',
-                      self.gf('django.db.models.fields.CharField')(default=False, max_length=32),
+                      self.gf('django.db.models.fields.CharField')(
+                          default=False, max_length=32),
                       keep_default=False)
 
         # Changing field 'GeneratedCertificate.grade'
-        db.alter_column('certificates_generatedcertificate', 'grade', self.gf('django.db.models.fields.CharField')(max_length=5))
+        db.alter_column('certificates_generatedcertificate', 'grade', self.gf(
+            'django.db.models.fields.CharField')(max_length=5))
 
         # Changing field 'GeneratedCertificate.certificate_id'
-        db.alter_column('certificates_generatedcertificate', 'certificate_id', self.gf('django.db.models.fields.CharField')(max_length=32))
+        db.alter_column('certificates_generatedcertificate', 'certificate_id', self.gf(
+            'django.db.models.fields.CharField')(max_length=32))
 
         # Changing field 'GeneratedCertificate.download_url'
-        db.alter_column('certificates_generatedcertificate', 'download_url', self.gf('django.db.models.fields.CharField')(max_length=128))
+        db.alter_column('certificates_generatedcertificate', 'download_url', self.gf(
+            'django.db.models.fields.CharField')(max_length=128))
 
         # Changing field 'GeneratedCertificate.graded_download_url'
-        db.alter_column('certificates_generatedcertificate', 'graded_download_url', self.gf('django.db.models.fields.CharField')(max_length=128))
+        db.alter_column('certificates_generatedcertificate', 'graded_download_url', self.gf(
+            'django.db.models.fields.CharField')(max_length=128))
 
         # Changing field 'GeneratedCertificate.graded_certificate_id'
-        db.alter_column('certificates_generatedcertificate', 'graded_certificate_id', self.gf('django.db.models.fields.CharField')(max_length=32))
+        db.alter_column('certificates_generatedcertificate', 'graded_certificate_id', self.gf(
+            'django.db.models.fields.CharField')(max_length=32))
 
     def backwards(self, orm):
         # Adding model 'RevokedCertificate'
         db.create_table('certificates_revokedcertificate', (
-            ('grade', self.gf('django.db.models.fields.CharField')(max_length=5, null=True)),
-            ('certificate_id', self.gf('django.db.models.fields.CharField')(default=None, max_length=32, null=True)),
-            ('explanation', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('graded_download_url', self.gf('django.db.models.fields.CharField')(max_length=128, null=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('download_url', self.gf('django.db.models.fields.CharField')(max_length=128, null=True)),
-            ('graded_certificate_id', self.gf('django.db.models.fields.CharField')(default=None, max_length=32, null=True)),
+            ('grade', self.gf('django.db.models.fields.CharField')(
+                max_length=5, null=True)),
+            ('certificate_id', self.gf('django.db.models.fields.CharField')(
+                default=None, max_length=32, null=True)),
+            ('explanation', self.gf(
+                'django.db.models.fields.TextField')(blank=True)),
+            ('graded_download_url', self.gf(
+                'django.db.models.fields.CharField')(max_length=128, null=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(
+                max_length=255, blank=True)),
+            ('enabled', self.gf(
+                'django.db.models.fields.BooleanField')(default=False)),
+            ('download_url', self.gf('django.db.models.fields.CharField')(
+                max_length=128, null=True)),
+            ('graded_certificate_id', self.gf('django.db.models.fields.CharField')(
+                default=None, max_length=32, null=True)),
         ))
         db.send_create_signal('certificates', ['RevokedCertificate'])
 
         # Adding field 'GeneratedCertificate.name'
         db.add_column('certificates_generatedcertificate', 'name',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=255, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          default='', max_length=255, blank=True),
                       keep_default=False)
 
         # Deleting field 'GeneratedCertificate.course_id'
@@ -67,19 +85,24 @@ class Migration(SchemaMigration):
         db.delete_column('certificates_generatedcertificate', 'key')
 
         # Changing field 'GeneratedCertificate.grade'
-        db.alter_column('certificates_generatedcertificate', 'grade', self.gf('django.db.models.fields.CharField')(max_length=5, null=True))
+        db.alter_column('certificates_generatedcertificate', 'grade', self.gf(
+            'django.db.models.fields.CharField')(max_length=5, null=True))
 
         # Changing field 'GeneratedCertificate.certificate_id'
-        db.alter_column('certificates_generatedcertificate', 'certificate_id', self.gf('django.db.models.fields.CharField')(max_length=32, null=True))
+        db.alter_column('certificates_generatedcertificate', 'certificate_id', self.gf(
+            'django.db.models.fields.CharField')(max_length=32, null=True))
 
         # Changing field 'GeneratedCertificate.download_url'
-        db.alter_column('certificates_generatedcertificate', 'download_url', self.gf('django.db.models.fields.CharField')(max_length=128, null=True))
+        db.alter_column('certificates_generatedcertificate', 'download_url', self.gf(
+            'django.db.models.fields.CharField')(max_length=128, null=True))
 
         # Changing field 'GeneratedCertificate.graded_download_url'
-        db.alter_column('certificates_generatedcertificate', 'graded_download_url', self.gf('django.db.models.fields.CharField')(max_length=128, null=True))
+        db.alter_column('certificates_generatedcertificate', 'graded_download_url', self.gf(
+            'django.db.models.fields.CharField')(max_length=128, null=True))
 
         # Changing field 'GeneratedCertificate.graded_certificate_id'
-        db.alter_column('certificates_generatedcertificate', 'graded_certificate_id', self.gf('django.db.models.fields.CharField')(max_length=32, null=True))
+        db.alter_column('certificates_generatedcertificate', 'graded_certificate_id', self.gf(
+            'django.db.models.fields.CharField')(max_length=32, null=True))
 
     models = {
         'auth.group': {

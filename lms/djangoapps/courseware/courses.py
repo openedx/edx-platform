@@ -91,7 +91,8 @@ def course_image_url(course):
     if isinstance(modulestore(), XMLModuleStore):
         return '/static/' + course.data_dir + "/images/course_image.jpg"
     else:
-        loc = course.location._replace(tag='c4x', category='asset', name='images_course_image.jpg')
+        loc = course.location._replace(
+            tag='c4x', category='asset', name='images_course_image.jpg')
         path = StaticContent.get_url_path_from_location(loc)
         return path
 
@@ -142,11 +143,12 @@ def get_course_about_section(course, section_key):
     # good format for defining so many snippets of text/html.
 
 # TODO: Remove number, instructors from this list
-    if section_key in ['short_description', 'description', 'key_dates', 'video',
-                       'course_staff_short', 'course_staff_extended',
-                       'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
-                       'number', 'instructors', 'overview',
-                       'effort', 'end_date', 'prerequisites', 'ocw_links']:
+    if section_key in [
+        'short_description', 'description', 'key_dates', 'video',
+        'course_staff_short', 'course_staff_extended',
+        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
+        'number', 'instructors', 'overview',
+            'effort', 'end_date', 'prerequisites', 'ocw_links']:
 
         try:
 
@@ -199,7 +201,8 @@ def get_course_info_section(request, course, section_key):
     - guest_updates
     """
 
-    loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
+    loc = Location(course.location.tag, course.location.org,
+                   course.location.course, 'course_info', section_key)
 
     # Use an empty cache
     model_data_cache = ModelDataCache([], course.id, request.user)

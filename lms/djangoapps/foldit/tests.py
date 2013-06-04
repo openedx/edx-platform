@@ -25,7 +25,8 @@ class FolditTestCase(TestCase):
 
         pwd = 'abc'
         self.user = User.objects.create_user('testuser', 'test@test.com', pwd)
-        self.user2 = User.objects.create_user('testuser2', 'test2@test.com', pwd)
+        self.user2 = User.objects.create_user(
+            'testuser2', 'test2@test.com', pwd)
         self.unique_user_id = unique_id_for_user(self.user)
         self.unique_user_id2 = unique_id_for_user(self.user2)
         now = datetime.now()
@@ -58,7 +59,8 @@ class FolditTestCase(TestCase):
                     # current scores don't actually matter
                     "CurrentScore": best_score + 0.01,
                     "ScoreVersion": 23}
-        scores = [score_dict(pid, bs) for pid, bs in zip(puzzle_ids, best_scores)]
+        scores = [score_dict(pid, bs) for pid, bs in zip(
+            puzzle_ids, best_scores)]
         scores_str = json.dumps(scores)
 
         verify = {"Verify": verify_code(user.email, scores_str),
@@ -154,7 +156,8 @@ class FolditTestCase(TestCase):
         # There should now be a score in the db.
         top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 1)
-        self.assertEqual(top_10[0]['score'], Score.display_score(player1_score))
+        self.assertEqual(top_10[0][
+                         'score'], Score.display_score(player1_score))
 
         response2 = self.make_puzzle_score_request(puzzle_id, player2_score,
                                                    self.user2)

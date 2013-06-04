@@ -63,7 +63,8 @@ class WikiPath(markdown.inlinepatterns.Pattern):
             article_title = article_title[1:]
 
         if not "/" in article_title:
-            article_title = self.config['default_namespace'][0] + "/" + article_title
+            article_title = self.config[
+                'default_namespace'][0] + "/" + article_title
 
         url = "../" + article_title
         label = m.group('linkTitle')

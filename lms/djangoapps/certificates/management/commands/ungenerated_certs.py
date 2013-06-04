@@ -74,7 +74,8 @@ class Command(BaseCommand):
 
         for course_id in ended_courses:
             # prefetch all chapters/sequentials by saying depth=2
-            course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=2)
+            course = modulestore().get_instance(
+                course_id, CourseDescriptor.id_to_location(course_id), depth=2)
 
             print "Fetching enrolled students for {0}".format(course_id)
             enrolled_students = User.objects.filter(

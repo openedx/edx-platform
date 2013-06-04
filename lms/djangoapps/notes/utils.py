@@ -11,7 +11,8 @@ def notes_enabled_for_course(course):
         2) present in the course tab configuration.
     '''
 
-    tab_found = next((True for t in course.tabs if t['type'] == 'notes'), False)
+    tab_found = next((True for t in course.tabs if t[
+                     'type'] == 'notes'), False)
     feature_enabled = settings.MITX_FEATURES.get('ENABLE_STUDENT_NOTES')
 
     return feature_enabled and tab_found

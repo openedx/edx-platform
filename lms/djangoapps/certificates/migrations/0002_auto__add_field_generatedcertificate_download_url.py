@@ -10,7 +10,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'GeneratedCertificate.download_url'
         db.add_column('certificates_generatedcertificate', 'download_url',
-                      self.gf('django.db.models.fields.CharField')(max_length=128, null=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          max_length=128, null=True),
                       keep_default=False)
 
     def backwards(self, orm):

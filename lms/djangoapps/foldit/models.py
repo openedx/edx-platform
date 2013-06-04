@@ -107,7 +107,8 @@ class PuzzleComplete(models.Model):
            'subset': int,
            'created': datetime} ]
         """
-        complete = PuzzleComplete.objects.filter(unique_user_id=anonymous_user_id)
+        complete = PuzzleComplete.objects.filter(
+            unique_user_id=anonymous_user_id)
         return [{'set': c.puzzle_set,
                  'subset': c.puzzle_subset,
                  'created': c.created} for c in complete]
@@ -124,9 +125,10 @@ class PuzzleComplete(models.Model):
             sub_level: int
             due (optional): If specified, a datetime.  Ignored if None.
         """
-        complete = PuzzleComplete.objects.filter(unique_user_id=anonymous_user_id,
-                                                 puzzle_set=level,
-                                                 puzzle_subset=sub_level)
+        complete = PuzzleComplete.objects.filter(
+            unique_user_id=anonymous_user_id,
+            puzzle_set=level,
+            puzzle_subset=sub_level)
         if due is not None:
             complete = complete.filter(created__lte=due)
 

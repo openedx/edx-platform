@@ -10,17 +10,20 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'GeneratedCertificate.name'
         db.add_column('certificates_generatedcertificate', 'name',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=255, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          default='', max_length=255, blank=True),
                       keep_default=False)
 
         # Adding field 'GeneratedCertificate.created_date'
         db.add_column('certificates_generatedcertificate', 'created_date',
-                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now_add=True, blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(
+                          default=datetime.datetime.now, auto_now_add=True, blank=True),
                       keep_default=False)
 
         # Adding field 'GeneratedCertificate.modified_date'
         db.add_column('certificates_generatedcertificate', 'modified_date',
-                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, auto_now=True, blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(
+                          default=datetime.datetime.now, auto_now=True, blank=True),
                       keep_default=False)
 
     def backwards(self, orm):

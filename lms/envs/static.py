@@ -54,7 +54,7 @@ CACHES = {
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-############################ FILE UPLOADS (for discussion forums) #############################
+############################ FILE UPLOADS (for discussion forums) ########
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
 MEDIA_URL = "/discussion/upfiles/"

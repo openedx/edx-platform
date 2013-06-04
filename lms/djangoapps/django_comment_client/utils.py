@@ -26,7 +26,8 @@ from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
-# TODO these should be cached via django's caching rather than in-memory globals
+# TODO these should be cached via django's caching rather than in-memory
+# globals
 _FULLMODULES = None
 _DISCUSSIONINFO = defaultdict(dict)
 
@@ -44,7 +45,8 @@ def strip_blank(dic):
         return isinstance(v, str) and len(v.strip()) == 0
     return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
 
-# TODO should we be checking if d1 and d2 have the same keys with different values?
+# TODO should we be checking if d1 and d2 have the same keys with
+# different values?
 
 
 def merge_dict(dic1, dic2):
@@ -53,10 +55,12 @@ def merge_dict(dic1, dic2):
 
 def get_role_ids(course_id):
     roles = Role.objects.filter(course_id=course_id)
-    staff = list(User.objects.filter(is_staff=True).values_list('id', flat=True))
+    staff = list(User.objects.filter(
+        is_staff=True).values_list('id', flat=True))
     roles_with_ids = {'Staff': staff}
     for role in roles:
-        roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
+        roles_with_ids[role.name] = list(
+            role.users.values_list('id', flat=True))
     return roles_with_ids
 
 
@@ -87,7 +91,8 @@ def get_discussion_id_map(course):
 def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
     initialize_discussion_info(course)
-    title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
+    title = _DISCUSSIONINFO[course.id]['id_map'].get(
+        discussion_id, {}).get('title', '(no title)')
     return title
 
 
@@ -123,14 +128,16 @@ def filter_unstarted_categories(category_map):
                     filtered_map["entries"][child] = {}
                     for key in unfiltered_map["entries"][child]:
                         if key != "start_date":
-                            filtered_map["entries"][child][key] = unfiltered_map["entries"][child][key]
+                            filtered_map["entries"][child][
+                                key] = unfiltered_map["entries"][child][key]
                 else:
                     print "filtering %s" % child, unfiltered_map["entries"][child]["start_date"]
             else:
                 if unfiltered_map["subcategories"][child]["start_date"] < now:
                     filtered_map["children"].append(child)
                     filtered_map["subcategories"][child] = {}
-                    unfiltered_queue.append(unfiltered_map["subcategories"][child])
+                    unfiltered_queue.append(unfiltered_map[
+                                            "subcategories"][child])
                     filtered_queue.append(filtered_map["subcategories"][child])
 
     return result_map
@@ -143,7 +150,8 @@ def sort_map_entries(category_map):
     for title, category in category_map["subcategories"].items():
         things.append((title, category))
         sort_map_entries(category_map["subcategories"][title])
-    category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+    category_map["children"] = [x[0] for x in sorted(
+        things, key=lambda x: x[1]["sort_key"])]
 
 
 def initialize_discussion_info(course):
@@ -155,14 +163,16 @@ def initialize_discussion_info(course):
     unexpanded_category_map = defaultdict(list)
 
     # get all discussion models within this course_id
-    all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course,
-                                          'discussion', None], course_id=course_id)
+    all_modules = modulestore(
+    ).get_items(['i4x', course.location.org, course.location.course,
+                 'discussion', None], course_id=course_id)
 
     for module in all_modules:
         skip_module = False
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
             if getattr(module, key) is None:
-                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
+                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (
+                    key, module.location))
                 skip_module = True
 
         if skip_module:
@@ -174,10 +184,13 @@ def initialize_discussion_info(course):
         sort_key = module.sort_key
         category = " / ".join([x.strip() for x in category.split("/")])
         last_category = category.split("/")[-1]
-        discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
-        unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": module.lms.start})
+        discussion_id_map[id] = {
+            "location": module.location, "title": last_category + " / " + title}
+        unexpanded_category_map[category].append({
+                                                 "title": title, "id": id, "sort_key": sort_key, "start_date": module.lms.start})
 
-    category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
+    category_map = {"entries": defaultdict(
+        dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
         node = category_map["subcategories"]
         path = [x.strip() for x in category_path.split("/")]
@@ -278,7 +291,8 @@ class QueryCountDebugMiddleware(object):
                     query_time = query.get('duration', 0) / 1000
                 total_time += float(query_time)
 
-            log.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
+            log.info('%s queries run, total %s seconds' %
+                     (len(connection.queries), total_time))
         return response
 
 
@@ -320,7 +334,8 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
     infos = {}
 
     def annotate(content):
-        infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, user_info)
+        infos[str(content['id'])] = get_annotated_content_info(
+            course_id, content, user, user_info)
         for child in content.get('children', []):
             annotate(child)
     annotate(thread)
@@ -334,7 +349,8 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
     metadata = reduce(merge_dict, map(infogetter, threads), {})
     return metadata
 
-# put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
+# put this method in utils.py to avoid circular import dependency between
+# helpers and mustache_helpers
 
 
 def url_for_tags(course_id, tags):
@@ -360,9 +376,11 @@ def extend_content(content):
     if content.get('user_id'):
         try:
             user = User.objects.get(pk=content['user_id'])
-            roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
+            roles = dict(('name', role.name.lower()) for role in user.roles.filter(
+                course_id=content['course_id']))
         except user.DoesNotExist:
-            log.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
+            log.error('User ID {0} in comment content {1} but not in our DB.'.format(
+                content.get('user_id'), content.get('id')))
 
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
@@ -383,8 +401,9 @@ def get_courseware_context(content, course):
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
 
-        url = reverse('jump_to', kwargs={"course_id": course.location.course_id,
-                      "location": location})
+        url = reverse(
+            'jump_to', kwargs={"course_id": course.location.course_id,
+                               "location": location})
 
         content_info = {"courseware_url": url, "courseware_title": title}
     return content_info

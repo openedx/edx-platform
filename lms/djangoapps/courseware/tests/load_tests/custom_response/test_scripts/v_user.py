@@ -57,7 +57,8 @@ class TestContext(object):
 
             # Create a custom response problem
             xml_factory = CustomResponseXMLFactory()
-            xml = xml_factory.build_xml(script=TEST_SCRIPT, cfn="check_func", expect="42")
+            xml = xml_factory.build_xml(
+                script=TEST_SCRIPT, cfn="check_func", expect="42")
 
             # Create and store the context
             cls.SINGLETON = cls(system, xml)

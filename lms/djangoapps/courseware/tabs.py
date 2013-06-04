@@ -92,8 +92,9 @@ def _discussion(tab, user, course, active_page):
     This tab format only supports the new Berkeley discussion forums.
     """
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
-        link = reverse('django_comment_client.forum.views.forum_form_discussion',
-                       args=[course.id])
+        link = reverse(
+            'django_comment_client.forum.views.forum_form_discussion',
+            args=[course.id])
         return [CourseTab(tab['name'], link, active_page == 'discussion')]
     return []
 
@@ -114,9 +115,11 @@ def _textbooks(tab, user, course, active_page):
     Generates one tab per textbook.  Only displays if user is authenticated.
     """
     if user.is_authenticated() and settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
-        # since there can be more than one textbook, active_page is e.g. "book/0".
-        return [CourseTab(textbook.title, reverse('book', args=[course.id, index]),
-                          active_page == "textbook/{0}".format(index))
+        # since there can be more than one textbook, active_page is e.g.
+        # "book/0".
+        return [CourseTab(
+            textbook.title, reverse('book', args=[course.id, index]),
+                active_page == "textbook/{0}".format(index))
                 for index, textbook in enumerate(course.textbooks)]
     return []
 
@@ -126,10 +129,13 @@ def _pdf_textbooks(tab, user, course, active_page):
     Generates one tab per textbook.  Only displays if user is authenticated.
     """
     if user.is_authenticated():
-        # since there can be more than one textbook, active_page is e.g. "book/0".
-        return [CourseTab(textbook['tab_title'], reverse('pdf_book', args=[course.id, index]),
-                          active_page == "pdftextbook/{0}".format(index))
-                for index, textbook in enumerate(course.pdf_textbooks)]
+        # since there can be more than one textbook, active_page is e.g.
+        # "book/0".
+        return [CourseTab(
+            textbook['tab_title'], reverse(
+                'pdf_book', args=[course.id, index]),
+            active_page == "pdftextbook/{0}".format(index))
+            for index, textbook in enumerate(course.pdf_textbooks)]
     return []
 
 
@@ -138,10 +144,13 @@ def _html_textbooks(tab, user, course, active_page):
     Generates one tab per textbook.  Only displays if user is authenticated.
     """
     if user.is_authenticated():
-        # since there can be more than one textbook, active_page is e.g. "book/0".
-        return [CourseTab(textbook['tab_title'], reverse('html_book', args=[course.id, index]),
-                          active_page == "htmltextbook/{0}".format(index))
-                for index, textbook in enumerate(course.html_textbooks)]
+        # since there can be more than one textbook, active_page is e.g.
+        # "book/0".
+        return [CourseTab(
+            textbook['tab_title'], reverse(
+                'html_book', args=[course.id, index]),
+            active_page == "htmltextbook/{0}".format(index))
+            for index, textbook in enumerate(course.html_textbooks)]
     return []
 
 
@@ -151,11 +160,13 @@ def _staff_grading(tab, user, course, active_page):
 
         tab_name = "Staff grading"
 
-        notifications = open_ended_notifications.staff_grading_notifications(course, user)
+        notifications = open_ended_notifications.staff_grading_notifications(
+            course, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
-        tab = [CourseTab(tab_name, link, active_page == "staff_grading", pending_grading, img_path)]
+        tab = [CourseTab(
+            tab_name, link, active_page == "staff_grading", pending_grading, img_path)]
         return tab
     return []
 
@@ -166,11 +177,13 @@ def _peer_grading(tab, user, course, active_page):
         link = reverse('peer_grading', args=[course.id])
         tab_name = "Peer grading"
 
-        notifications = open_ended_notifications.peer_grading_notifications(course, user)
+        notifications = open_ended_notifications.peer_grading_notifications(
+            course, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
-        tab = [CourseTab(tab_name, link, active_page == "peer_grading", pending_grading, img_path)]
+        tab = [CourseTab(
+            tab_name, link, active_page == "peer_grading", pending_grading, img_path)]
         return tab
     return []
 
@@ -180,11 +193,13 @@ def _combined_open_ended_grading(tab, user, course, active_page):
         link = reverse('open_ended_notifications', args=[course.id])
         tab_name = "Open Ended Panel"
 
-        notifications = open_ended_notifications.combined_notifications(course, user)
+        notifications = open_ended_notifications.combined_notifications(
+            course, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
-        tab = [CourseTab(tab_name, link, active_page == "open_ended", pending_grading, img_path)]
+        tab = [CourseTab(
+            tab_name, link, active_page == "open_ended", pending_grading, img_path)]
         return tab
     return []
 
@@ -258,7 +273,8 @@ def validate_tabs(course):
         return
 
     if len(tabs) < 2:
-        raise InvalidTabsException("Expected at least two tabs.  tabs: '{0}'".format(tabs))
+        raise InvalidTabsException(
+            "Expected at least two tabs.  tabs: '{0}'".format(tabs))
     if tabs[0]['type'] != 'courseware':
         raise InvalidTabsException(
             "Expected first tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
@@ -296,10 +312,12 @@ def get_course_tabs(user, course, active_page):
         gen = VALID_TAB_TYPES[tab['type']].generator
         tabs.extend(gen(tab, user, course, active_page))
 
-    # Instructor tab is special--automatically added if user is staff for the course
+    # Instructor tab is special--automatically added if user is staff for the
+    # course
     if has_access(user, course, 'staff'):
         tabs.append(CourseTab('Instructor',
-                              reverse('instructor_dashboard', args=[course.id]),
+                              reverse('instructor_dashboard', args=[
+                                      course.id]),
                               active_page == 'instructor'))
     return tabs
 
@@ -331,7 +349,8 @@ def get_default_tabs(user, course, active_page):
     # first arg, since that's only used for dispatch
     tabs = []
     tabs.extend(_courseware({''}, user, course, active_page))
-    tabs.extend(_course_info({'name': 'Course Info'}, user, course, active_page))
+    tabs.extend(_course_info({
+                'name': 'Course Info'}, user, course, active_page))
 
     if hasattr(course, 'syllabus_present') and course.syllabus_present:
         link = reverse('syllabus', args=[course.id])
@@ -341,9 +360,11 @@ def get_default_tabs(user, course, active_page):
 
     discussion_link = get_discussion_link(course)
     if discussion_link:
-        tabs.append(CourseTab('Discussion', discussion_link, active_page == 'discussion'))
+        tabs.append(CourseTab(
+            'Discussion', discussion_link, active_page == 'discussion'))
 
-    tabs.extend(_wiki({'name': 'Wiki', 'type': 'wiki'}, user, course, active_page))
+    tabs.extend(_wiki({
+                'name': 'Wiki', 'type': 'wiki'}, user, course, active_page))
 
     if user.is_authenticated() and not course.hide_progress_tab:
         tabs.extend(_progress({'name': 'Progress'}, user, course, active_page))
@@ -372,10 +393,13 @@ def get_static_tab_by_slug(course, tab_slug):
 
 def get_static_tab_contents(request, course, tab):
 
-    loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course.id,
-                                                                       request.user, modulestore().get_instance(course.id, loc), depth=0)
-    tab_module = get_module(request.user, request, loc, model_data_cache, course.id)
+    loc = Location(course.location.tag, course.location.org,
+                   course.location.course, 'static_tab', tab['url_slug'])
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course.id,
+        request.user, modulestore().get_instance(course.id, loc), depth=0)
+    tab_module = get_module(
+        request.user, request, loc, model_data_cache, course.id)
 
     logging.debug('course_module = {0}'.format(tab_module))
 

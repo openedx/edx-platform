@@ -89,7 +89,8 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
     model_data_cache must include data from the course module and 2 levels of its descendents
     '''
 
-    course_module = get_module_for_descriptor(user, request, course, model_data_cache, course.id)
+    course_module = get_module_for_descriptor(
+        user, request, course, model_data_cache, course.id)
     if course_module is None:
         return None
 
@@ -105,13 +106,14 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
                       section.url_name == active_section)
 
             if not section.lms.hide_from_toc:
-                sections.append({'display_name': section.display_name_with_default,
-                                 'url_name': section.url_name,
-                                 'format': section.lms.format if section.lms.format is not None else '',
-                                 'due': section.lms.due,
-                                 'active': active,
-                                 'graded': section.lms.graded,
-                                 })
+                sections.append(
+                    {'display_name': section.display_name_with_default,
+                     'url_name': section.url_name,
+                     'format': section.lms.format if section.lms.format is not None else '',
+                     'due': section.lms.due,
+                     'active': active,
+                     'graded': section.lms.graded,
+                     })
 
         chapters.append({'display_name': chapter.display_name_with_default,
                          'url_name': chapter.url_name,
@@ -146,23 +148,27 @@ def get_module(user, request, location, model_data_cache, course_id,
     """
     try:
         location = Location(location)
-        descriptor = modulestore().get_instance(course_id, location, depth=depth)
-        return get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
-                                         position=position,
-                                         wrap_xmodule_display=wrap_xmodule_display,
-                                         grade_bucket_type=grade_bucket_type)
+        descriptor = modulestore().get_instance(
+            course_id, location, depth=depth)
+        return get_module_for_descriptor(
+            user, request, descriptor, model_data_cache, course_id,
+            position=position,
+            wrap_xmodule_display=wrap_xmodule_display,
+            grade_bucket_type=grade_bucket_type)
     except ItemNotFoundError:
         if not not_found_ok:
             log.exception("Error in get_module")
         return None
     except:
-        # Something has gone terribly wrong, but still not letting it turn into a 500.
+        # Something has gone terribly wrong, but still not letting it turn into
+        # a 500.
         log.exception("Error in get_module")
         return None
 
 
-def get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
-                              position=None, wrap_xmodule_display=True, grade_bucket_type=None):
+def get_module_for_descriptor(
+    user, request, descriptor, model_data_cache, course_id,
+        position=None, wrap_xmodule_display=True, grade_bucket_type=None):
     """
     Actually implement get_module.  See docstring there for details.
     """
@@ -171,7 +177,8 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     if has_access(user, descriptor, 'staff', course_id):
         setup_masquerade(request, True)
 
-    # Short circuit--if the user shouldn't have access, bail without doing any work
+    # Short circuit--if the user shouldn't have access, bail without doing any
+    # work
     if not has_access(user, descriptor, 'load', course_id):
         return None
 
@@ -181,29 +188,35 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
                                    location=descriptor.location.url(),
                                    dispatch=''),
                        )
-    # Intended use is as {ajax_url}/{dispatch_command}, so get rid of the trailing slash.
+    # Intended use is as {ajax_url}/{dispatch_command}, so get rid of the
+    # trailing slash.
     ajax_url = ajax_url.rstrip('/')
 
     def make_xqueue_callback(dispatch='score_update'):
         # Fully qualified callback URL for external queueing system
         xqueue_callback_url = '{proto}://{host}'.format(
             host=request.get_host(),
-            proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http')
+            proto=request.META.get(
+                'HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http')
         )
-        xqueue_callback_url = settings.XQUEUE_INTERFACE.get('callback_url', xqueue_callback_url)  # allow override
+        xqueue_callback_url = settings.XQUEUE_INTERFACE.get(
+            'callback_url', xqueue_callback_url)  # allow override
 
         xqueue_callback_url += reverse('xqueue_callback',
                                        kwargs=dict(course_id=course_id,
                                                    userid=str(user.id),
-                                                   id=descriptor.location.url(),
+                                                   id=descriptor.location.url(
+                                                   ),
                                                    dispatch=dispatch),
                                        )
         return xqueue_callback_url
 
     # Default queuename is course-specific and is derived from the course that
     #   contains the current module.
-    # TODO: Queuename should be derived from 'course_settings.json' of each course
-    xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
+    # TODO: Queuename should be derived from 'course_settings.json' of each
+    # course
+    xqueue_default_queuename = descriptor.location.org + \
+        '-' + descriptor.location.course
 
     xqueue = {'interface': xqueue_interface,
               'construct_callback': make_xqueue_callback,
@@ -214,10 +227,12 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     # This is a hacky way to pass settings to the combined open ended xmodule
     # It needs an S3 interface to upload images to S3
     # It needs the open ended grading interface in order to get peer grading to be done
-    # this first checks to see if the descriptor is the correct one, and only sends settings if it is
+    # this first checks to see if the descriptor is the correct one, and only
+    # sends settings if it is
 
     # Get descriptor metadata fields indicating needs for various settings
-    needs_open_ended_interface = getattr(descriptor, "needs_open_ended_interface", False)
+    needs_open_ended_interface = getattr(
+        descriptor, "needs_open_ended_interface", False)
     needs_s3_interface = getattr(descriptor, "needs_s3_interface", False)
 
     # Initialize interfaces to None
@@ -227,8 +242,10 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     # Create interfaces if needed
     if needs_open_ended_interface:
         open_ended_grading_interface = settings.OPEN_ENDED_GRADING_INTERFACE
-        open_ended_grading_interface['mock_peer_grading'] = settings.MOCK_PEER_GRADING
-        open_ended_grading_interface['mock_staff_grading'] = settings.MOCK_STAFF_GRADING
+        open_ended_grading_interface[
+            'mock_peer_grading'] = settings.MOCK_PEER_GRADING
+        open_ended_grading_interface[
+            'mock_staff_grading'] = settings.MOCK_STAFF_GRADING
     if needs_s3_interface:
         s3_interface = {
             'access_key': getattr(settings, 'AWS_ACCESS_KEY_ID', ''),
@@ -267,7 +284,8 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         student_module.save()
 
         # Bin score into range and increment stats
-        score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
+        score_bucket = get_score_bucket(
+            student_module.grade, student_module.max_grade)
         org, course_num, run = course_id.split("/")
 
         tags = ["org:{0}".format(org),
@@ -295,7 +313,8 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
                           render_template=render_to_string,
                           ajax_url=ajax_url,
                           xqueue=xqueue,
-                          # TODO (cpennington): Figure out how to share info between systems
+                          # TODO (cpennington): Figure out how to share info
+                          # between systems
                           filestore=descriptor.system.resources_fs,
                           get_module=inner_get_module,
                           user=user,
@@ -304,8 +323,10 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
                           # by the replace_static_urls code below
                           replace_urls=partial(
                               static_replace.replace_static_urls,
-                              data_directory=getattr(descriptor, 'data_dir', None),
-                              course_namespace=descriptor.location._replace(category=None, name=None),
+                              data_directory=getattr(
+                                  descriptor, 'data_dir', None),
+                              course_namespace=descriptor.location._replace(
+                                  category=None, name=None),
                           ),
                           node_path=settings.NODE_PATH,
                           xblock_model_data=xblock_model_data,
@@ -327,9 +348,11 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     try:
         module = descriptor.xmodule(system)
     except:
-        log.exception("Error creating module from descriptor {0}".format(descriptor))
+        log.exception(
+            "Error creating module from descriptor {0}".format(descriptor))
 
-        # make an ErrorDescriptor -- assuming that the descriptor's system is ok
+        # make an ErrorDescriptor -- assuming that the descriptor's system is
+        # ok
         if has_access(user, descriptor.location, 'staff', course_id):
             err_descriptor_class = ErrorDescriptor
         else:
@@ -344,11 +367,13 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         # Make an error module
         return err_descriptor.xmodule(system)
 
-    system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
+    system.set('user_is_staff', has_access(
+        user, descriptor.location, 'staff', course_id))
     _get_html = module.get_html
 
     if wrap_xmodule_display:
-        _get_html = wrap_xmodule(module.get_html, module, 'xmodule_display.html')
+        _get_html = wrap_xmodule(
+            module.get_html, module, 'xmodule_display.html')
 
     module.get_html = replace_static_urls(
         _get_html,
@@ -385,11 +410,14 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
 
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
-                                                                       user, modulestore().get_instance(course_id, id), depth=0, select_for_update=True)
-    instance = get_module(user, request, id, model_data_cache, course_id, grade_bucket_type='xqueue')
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id,
+        user, modulestore().get_instance(course_id, id), depth=0, select_for_update=True)
+    instance = get_module(
+        user, request, id, model_data_cache, course_id, grade_bucket_type='xqueue')
     if instance is None:
-        log.debug("No module {0} for user {1}--access denied?".format(id, user))
+        log.debug("No module {0} for user {1}--access denied?".format(
+            id, user))
         raise Http404
 
     # Transfer 'queuekey' from xqueue response header to 'get'. This is required to
@@ -448,7 +476,8 @@ def modx_dispatch(request, dispatch, location, course_id):
             for inputfile in inputfiles:
                 if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:   # Bytes
                     file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
-                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
+                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (
+                            1000 ** 2))
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
 
@@ -463,14 +492,17 @@ def modx_dispatch(request, dispatch, location, course_id):
         )
         raise Http404
 
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
-                                                                       request.user, descriptor)
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id,
+        request.user, descriptor)
 
-    instance = get_module(request.user, request, location, model_data_cache, course_id, grade_bucket_type='ajax')
+    instance = get_module(request.user, request, location,
+                          model_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module {0} for user {1}--access denied?".format(location, request.user))
+        log.debug("No module {0} for user {1}--access denied?".format(
+            location, request.user))
         raise Http404
 
     # Let the module handle the AJAX

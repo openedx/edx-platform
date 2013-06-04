@@ -82,7 +82,8 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
     def test_get_next(self):
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id})
+        url = reverse('staff_grading_get_next', kwargs={
+                      'course_id': self.course_id})
         data = {'location': self.location}
 
         response = self.check_for_post_code(200, url, data)
@@ -103,7 +104,8 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
     def save_grade_base(self, skip=False):
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
+        url = reverse('staff_grading_save_grade', kwargs={
+                      'course_id': self.course_id})
 
         data = {'score': '12',
                 'feedback': 'great!',
@@ -128,7 +130,8 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
     def test_get_problem_list(self):
         self.login(self.instructor, self.password)
 
-        url = reverse('staff_grading_get_problem_list', kwargs={'course_id': self.course_id})
+        url = reverse('staff_grading_get_problem_list', kwargs={
+                      'course_id': self.course_id})
         data = {}
 
         response = self.check_for_post_code(200, url, data)
@@ -173,9 +176,11 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
             s3_interface=test_util_open_ended.S3_INTERFACE,
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
         )
-        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, location, model_data)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor(
+            self.system, location, model_data)
         model_data = {}
-        self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, self.descriptor, model_data)
+        self.peer_module = peer_grading_module.PeerGradingModule(
+            self.system, location, self.descriptor, model_data)
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 
@@ -308,7 +313,8 @@ class TestPanel(LoginEnrollmentTestCase):
         Test to see if the peer grading module in the demo course is found
         @return:
         """
-        found_module, peer_grading_module = views.find_peer_grading_module(self.course)
+        found_module, peer_grading_module = views.find_peer_grading_module(
+            self.course)
         self.assertTrue(found_module)
 
     @patch('open_ended_grading.views.controller_qs', controller_query_service.MockControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, views.system))
@@ -319,4 +325,5 @@ class TestPanel(LoginEnrollmentTestCase):
         """
         request = Mock(user=self.user)
         response = views.student_problem_list(request, self.course.id)
-        self.assertRegexpMatches(response.content, "Here are a list of open ended problems for this course.")
+        self.assertRegexpMatches(
+            response.content, "Here are a list of open ended problems for this course.")

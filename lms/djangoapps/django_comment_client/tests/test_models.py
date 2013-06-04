@@ -6,7 +6,8 @@ from django.test import TestCase
 class RoleClassTestCase(TestCase):
     def setUp(self):
         # For course ID, syntax edx/classname/classdate is important
-        # because xmodel.course_module.id_to_location looks for a string to split
+        # because xmodel.course_module.id_to_location looks for a string to
+        # split
 
         self.course_id = "edX/toy/2012_Fall"
         self.student_role = models.Role.objects.get_or_create(name="Student",
@@ -44,7 +45,8 @@ class RoleClassTestCase(TestCase):
 
 class PermissionClassTestCase(TestCase):
     def setUp(self):
-        self.permission = permissions.Permission.objects.get_or_create(name="test")[0]
+        self.permission = permissions.Permission.objects.get_or_create(
+            name="test")[0]
 
     def testUnicode(self):
         self.assertEqual(str(self.permission), "test")

@@ -25,7 +25,8 @@ class CodeMirrorWidget(forms.Widget):
 
         final_attrs = self.build_attrs(attrs, name=name)
 
-        # TODO use the help_text field of edit form instead of rendering a template
+        # TODO use the help_text field of edit form instead of rendering a
+        # template
 
         return render_to_string('wiki/includes/editor_widget.html',
                                 {'attrs': mark_safe(flatatt(final_attrs)),

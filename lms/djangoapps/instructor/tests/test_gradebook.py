@@ -27,7 +27,8 @@ class TestGradebook(ModuleStoreTestCase):
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
 
-        modulestore().request_cache = modulestore().metadata_inheritance_cache_subsystem = None
+        modulestore().request_cache = modulestore(
+        ).metadata_inheritance_cache_subsystem = None
 
         course_data = {}
         if self.grading_policy is not None:
@@ -45,7 +46,8 @@ class TestGradebook(ModuleStoreTestCase):
         )
 
         self.users = [
-            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
+            UserFactory.create(username='robot%d' %
+                               i, email='robot+test+%d@edx.org' % i)
             for i in xrange(USER_COUNT)
         ]
 
@@ -70,7 +72,8 @@ class TestGradebook(ModuleStoreTestCase):
                     module_state_key=Location(item.location).url()
                 )
 
-        self.response = self.client.get(reverse('gradebook', args=(self.course.id,)))
+        self.response = self.client.get(reverse(
+            'gradebook', args=(self.course.id,)))
 
     def test_response_code(self):
         self.assertEquals(self.response.status_code, 200)

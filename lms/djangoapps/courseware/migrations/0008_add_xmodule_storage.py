@@ -10,73 +10,114 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'XModuleStudentInfoField'
         db.create_table('courseware_xmodulestudentinfofield', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('field_name', self.gf('django.db.models.fields.CharField')(max_length=64, db_index=True)),
-            ('value', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, db_index=True, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('field_name', self.gf('django.db.models.fields.CharField')(
+                max_length=64, db_index=True)),
+            ('value', self.gf('django.db.models.fields.TextField')(
+                null=True, blank=True)),
+            ('student', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, db_index=True, blank=True)),
+            ('modified', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now=True, db_index=True, blank=True)),
         ))
         db.send_create_signal('courseware', ['XModuleStudentInfoField'])
 
-        # Adding unique constraint on 'XModuleStudentInfoField', fields ['student', 'field_name']
-        db.create_unique('courseware_xmodulestudentinfofield', ['student_id', 'field_name'])
+        # Adding unique constraint on 'XModuleStudentInfoField', fields
+        # ['student', 'field_name']
+        db.create_unique('courseware_xmodulestudentinfofield', [
+                         'student_id', 'field_name'])
 
         # Adding model 'XModuleContentField'
         db.create_table('courseware_xmodulecontentfield', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('field_name', self.gf('django.db.models.fields.CharField')(max_length=64, db_index=True)),
-            ('definition_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('value', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, db_index=True, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('field_name', self.gf('django.db.models.fields.CharField')(
+                max_length=64, db_index=True)),
+            ('definition_id', self.gf('django.db.models.fields.CharField')(
+                max_length=255, db_index=True)),
+            ('value', self.gf('django.db.models.fields.TextField')(
+                null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, db_index=True, blank=True)),
+            ('modified', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now=True, db_index=True, blank=True)),
         ))
         db.send_create_signal('courseware', ['XModuleContentField'])
 
-        # Adding unique constraint on 'XModuleContentField', fields ['definition_id', 'field_name']
-        db.create_unique('courseware_xmodulecontentfield', ['definition_id', 'field_name'])
+        # Adding unique constraint on 'XModuleContentField', fields
+        # ['definition_id', 'field_name']
+        db.create_unique('courseware_xmodulecontentfield', [
+                         'definition_id', 'field_name'])
 
         # Adding model 'XModuleSettingsField'
         db.create_table('courseware_xmodulesettingsfield', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('field_name', self.gf('django.db.models.fields.CharField')(max_length=64, db_index=True)),
-            ('usage_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('value', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, db_index=True, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('field_name', self.gf('django.db.models.fields.CharField')(
+                max_length=64, db_index=True)),
+            ('usage_id', self.gf('django.db.models.fields.CharField')(
+                max_length=255, db_index=True)),
+            ('value', self.gf('django.db.models.fields.TextField')(
+                null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, db_index=True, blank=True)),
+            ('modified', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now=True, db_index=True, blank=True)),
         ))
         db.send_create_signal('courseware', ['XModuleSettingsField'])
 
-        # Adding unique constraint on 'XModuleSettingsField', fields ['usage_id', 'field_name']
-        db.create_unique('courseware_xmodulesettingsfield', ['usage_id', 'field_name'])
+        # Adding unique constraint on 'XModuleSettingsField', fields
+        # ['usage_id', 'field_name']
+        db.create_unique('courseware_xmodulesettingsfield', [
+                         'usage_id', 'field_name'])
 
         # Adding model 'XModuleStudentPrefsField'
         db.create_table('courseware_xmodulestudentprefsfield', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('field_name', self.gf('django.db.models.fields.CharField')(max_length=64, db_index=True)),
-            ('module_type', self.gf('django.db.models.fields.CharField')(max_length=64, db_index=True)),
-            ('value', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, db_index=True, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('field_name', self.gf('django.db.models.fields.CharField')(
+                max_length=64, db_index=True)),
+            ('module_type', self.gf('django.db.models.fields.CharField')(
+                max_length=64, db_index=True)),
+            ('value', self.gf('django.db.models.fields.TextField')(
+                null=True, blank=True)),
+            ('student', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, db_index=True, blank=True)),
+            ('modified', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now=True, db_index=True, blank=True)),
         ))
         db.send_create_signal('courseware', ['XModuleStudentPrefsField'])
 
-        # Adding unique constraint on 'XModuleStudentPrefsField', fields ['student', 'module_type', 'field_name']
-        db.create_unique('courseware_xmodulestudentprefsfield', ['student_id', 'module_type', 'field_name'])
+        # Adding unique constraint on 'XModuleStudentPrefsField', fields
+        # ['student', 'module_type', 'field_name']
+        db.create_unique('courseware_xmodulestudentprefsfield', [
+                         'student_id', 'module_type', 'field_name'])
 
     def backwards(self, orm):
-        # Removing unique constraint on 'XModuleStudentPrefsField', fields ['student', 'module_type', 'field_name']
-        db.delete_unique('courseware_xmodulestudentprefsfield', ['student_id', 'module_type', 'field_name'])
+        # Removing unique constraint on 'XModuleStudentPrefsField', fields
+        # ['student', 'module_type', 'field_name']
+        db.delete_unique('courseware_xmodulestudentprefsfield', [
+                         'student_id', 'module_type', 'field_name'])
 
-        # Removing unique constraint on 'XModuleSettingsField', fields ['usage_id', 'field_name']
-        db.delete_unique('courseware_xmodulesettingsfield', ['usage_id', 'field_name'])
+        # Removing unique constraint on 'XModuleSettingsField', fields
+        # ['usage_id', 'field_name']
+        db.delete_unique('courseware_xmodulesettingsfield', [
+                         'usage_id', 'field_name'])
 
-        # Removing unique constraint on 'XModuleContentField', fields ['definition_id', 'field_name']
-        db.delete_unique('courseware_xmodulecontentfield', ['definition_id', 'field_name'])
+        # Removing unique constraint on 'XModuleContentField', fields
+        # ['definition_id', 'field_name']
+        db.delete_unique('courseware_xmodulecontentfield', [
+                         'definition_id', 'field_name'])
 
-        # Removing unique constraint on 'XModuleStudentInfoField', fields ['student', 'field_name']
-        db.delete_unique('courseware_xmodulestudentinfofield', ['student_id', 'field_name'])
+        # Removing unique constraint on 'XModuleStudentInfoField', fields
+        # ['student', 'field_name']
+        db.delete_unique('courseware_xmodulestudentinfofield', [
+                         'student_id', 'field_name'])
 
         # Deleting model 'XModuleStudentInfoField'
         db.delete_table('courseware_xmodulestudentinfofield')

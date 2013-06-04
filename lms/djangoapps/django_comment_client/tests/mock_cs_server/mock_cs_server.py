@@ -30,7 +30,8 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         if 'api_key' in post_dict:
             response = self.server._response_str
             # Log the response
-            logger.debug("Comment Service: sending response %s" % json.dumps(response))
+            logger.debug("Comment Service: sending response %s" %
+                         json.dumps(response))
 
             # Send a response back to the client
             self.send_response(200)
@@ -65,7 +66,8 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         if 'api_key' in post_dict:
             response = self.server._response_str
             # Log the response
-            logger.debug("Comment Service: sending response %s" % json.dumps(response))
+            logger.debug("Comment Service: sending response %s" %
+                         json.dumps(response))
 
             # Send a response back to the client
             self.send_response(200)

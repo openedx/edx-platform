@@ -48,7 +48,8 @@ class Comment(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_flag_abuse_comment(voteable.id)
         else:
-            raise CommentClientError("Can only flag/unflag threads or comments")
+            raise CommentClientError(
+                "Can only flag/unflag threads or comments")
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)

@@ -13,7 +13,8 @@ class RevisionInline(admin.TabularInline):
 
 
 class RevisionAdmin(admin.ModelAdmin):
-    list_display = ('article', '__unicode__', 'revision_date', 'revision_user', 'revision_text')
+    list_display = ('article', '__unicode__',
+                    'revision_date', 'revision_user', 'revision_text')
     search_fields = ('article', 'counter')
 
 

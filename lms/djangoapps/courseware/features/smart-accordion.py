@@ -39,7 +39,8 @@ def i_verify_all_the_content_of_each_course(step):
         check_for_errors()
 
         # Get the course. E.g. 'MITx/6.002x/2012_Fall'
-        current_course = sub('/info', '', sub('.*/courses/', '', world.browser.url))
+        current_course = sub('/info', '', sub(
+            '.*/courses/', '', world.browser.url))
         validate_course(current_course, ids)
 
         world.click_link('Courseware')
@@ -61,7 +62,8 @@ def browse_course(course_id):
     rendered_chapters = world.browser.find_by_css('#accordion > nav > div')
     num_rendered_chapters = len(rendered_chapters)
 
-    msg = '%d chapters expected, %d chapters found on page for %s' % (num_chapters, num_rendered_chapters, course_id)
+    msg = '%d chapters expected, %d chapters found on page for %s' % (
+        num_chapters, num_rendered_chapters, course_id)
     # logger.debug(msg)
     assert num_chapters == num_rendered_chapters, msg
 
@@ -71,7 +73,8 @@ def browse_course(course_id):
     while chapter_it < num_chapters:
 
         ## click into a chapter
-        world.browser.find_by_css('#accordion > nav > div')[chapter_it].find_by_tag('h3').click()
+        world.browser.find_by_css('#accordion > nav > div')[
+            chapter_it].find_by_tag('h3').click()
 
         ## look for the "there was a server error" div
         check_for_errors()
@@ -80,7 +83,8 @@ def browse_course(course_id):
         sections = chapters[chapter_it]['sections']
         num_sections = len(sections)
 
-        rendered_sections = world.browser.find_by_css('#accordion > nav > div')[chapter_it].find_by_tag('li')
+        rendered_sections = world.browser.find_by_css(
+            '#accordion > nav > div')[chapter_it].find_by_tag('li')
         num_rendered_sections = len(rendered_sections)
 
         msg = ('%d sections expected, %d sections found on page, %s - %d - %s' %
@@ -94,7 +98,8 @@ def browse_course(course_id):
         while section_it < num_sections:
 
             ## click on a section
-            world.browser.find_by_css('#accordion > nav > div')[chapter_it].find_by_tag('li')[section_it].find_by_tag('a').click()
+            world.browser.find_by_css('#accordion > nav > div')[
+                chapter_it].find_by_tag('li')[section_it].find_by_tag('a').click()
 
             ## sometimes the course-content takes a long time to load
             assert world.is_css_present('.course-content')
@@ -105,10 +110,12 @@ def browse_course(course_id):
             ## count tabs from xml and page and compare
 
             ## count the number of tabs. If number of tabs is 0, there won't be anything rendered
-            ## so we explicitly set rendered_tabs because otherwise find_elements returns a None object with no length
+            # so we explicitly set rendered_tabs because otherwise
+            # find_elements returns a None object with no length
             num_tabs = sections[section_it]['clickable_tab_count']
             if num_tabs != 0:
-                rendered_tabs = world.browser.find_by_css('ol#sequence-list > li')
+                rendered_tabs = world.browser.find_by_css(
+                    'ol#sequence-list > li')
                 num_rendered_tabs = len(rendered_tabs)
             else:
                 rendered_tabs = 0
@@ -137,7 +144,8 @@ def browse_course(course_id):
                 tab_children = tabs[tab_it]['children_count']
                 tab_class = tabs[tab_it]['class']
                 if tab_children != 0:
-                    rendered_items = world.browser.find_by_css('div#seq_content > section > ol > li > section')
+                    rendered_items = world.browser.find_by_css(
+                        'div#seq_content > section > ol > li > section')
                     num_rendered_items = len(rendered_items)
                     msg = ('%d items expected, %d items found, %s - %d - %s - tab %d' %
                            (tab_children, num_rendered_items, course_id, section_it, sections[section_it]['section_name'], tab_it))

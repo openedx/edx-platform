@@ -42,9 +42,10 @@ def create_course(step, course):
     section = world.ItemFactory.create(parent_location=course.location,
                                        display_name=TEST_SECTION_NAME)
 
-    problem_section = world.ItemFactory.create(parent_location=section.location,
-                                               template='i4x://edx/templates/sequential/Empty',
-                                               display_name=TEST_SECTION_NAME)
+    problem_section = world.ItemFactory.create(
+        parent_location=section.location,
+        template='i4x://edx/templates/sequential/Empty',
+        display_name=TEST_SECTION_NAME)
 
 
 @step(u'I am registered for the course "([^"]*)"$')
@@ -65,9 +66,10 @@ def i_am_registered_for_the_course(step, course):
 
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
 def add_tab_to_course(step, course, extra_tab_name):
-    section_item = world.ItemFactory.create(parent_location=course_location(course),
-                                            template="i4x://edx/templates/static_tab/Empty",
-                                            display_name=str(extra_tab_name))
+    section_item = world.ItemFactory.create(
+        parent_location=course_location(course),
+        template="i4x://edx/templates/static_tab/Empty",
+        display_name=str(extra_tab_name))
 
 
 def course_id(course_num):
@@ -162,7 +164,8 @@ def get_courseware_with_tabs(course_id):
     """
 
     course = get_course_by_id(course_id)
-    chapters = [chapter for chapter in course.get_children() if not chapter.lms.hide_from_toc]
+    chapters = [
+        chapter for chapter in course.get_children() if not chapter.lms.hide_from_toc]
     courseware = [{'chapter_name': c.display_name_with_default,
                    'sections': [{'section_name': s.display_name_with_default,
                                 'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0,

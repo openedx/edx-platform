@@ -37,7 +37,8 @@ WIKI_ALLOW_ATTACHMENTS = getattr(settings, 'SIMPLE_WIKI_ALLOW_ATTACHMENTS',
                                  False)
 
 # If WIKI_REQUIRE_LOGIN_EDIT is False, then attachments can still be disallowed
-WIKI_ALLOW_ANON_ATTACHMENTS = getattr(settings, 'SIMPLE_WIKI_ALLOW_ANON_ATTACHMENTS', False)
+WIKI_ALLOW_ANON_ATTACHMENTS = getattr(
+    settings, 'SIMPLE_WIKI_ALLOW_ANON_ATTACHMENTS', False)
 
 # Attachments are automatically stored with a dummy extension and delivered
 # back to the user with their original extension.
@@ -45,8 +46,9 @@ WIKI_ALLOW_ANON_ATTACHMENTS = getattr(settings, 'SIMPLE_WIKI_ALLOW_ANON_ATTACHME
 # if set -- or force users to use standard formats, which might also
 # be a good idea.
 # Example: ('pdf', 'doc', 'gif', 'jpeg', 'jpg', 'png')
-WIKI_ATTACHMENTS_ALLOWED_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_ATTACHMENTS_ALLOWED_EXTENSIONS',
-                                              None)
+WIKI_ATTACHMENTS_ALLOWED_EXTENSIONS = getattr(
+    settings, 'SIMPLE_WIKI_ATTACHMENTS_ALLOWED_EXTENSIONS',
+    None)
 
 # At the moment this variable should not be modified, because
 # it breaks compatibility with the normal Django FileField and uploading
@@ -59,15 +61,17 @@ WIKI_ATTACHMENTS_MAX = getattr(settings, 'SIMPLE_WIKI_ATTACHMENTS_MAX',
 
 # Allow users to edit titles of pages
 # (warning! titles are not maintained in the revision system.)
-WIKI_ALLOW_TITLE_EDIT = getattr(settings, 'SIMPLE_WIKI_ALLOW_TITLE_EDIT', False)
+WIKI_ALLOW_TITLE_EDIT = getattr(
+    settings, 'SIMPLE_WIKI_ALLOW_TITLE_EDIT', False)
 
 # Global context processors
 # These are appended to TEMPLATE_CONTEXT_PROCESSORS in your Django settings
 # whenever the wiki is in use. It can be used as a simple, but effective
 # way of extending simplewiki without touching original code (and thus keeping
 # everything easily maintainable)
-WIKI_CONTEXT_PREPROCESSORS = getattr(settings, 'SIMPLE_WIKI_CONTEXT_PREPROCESSORS',
-                                     ())
+WIKI_CONTEXT_PREPROCESSORS = getattr(
+    settings, 'SIMPLE_WIKI_CONTEXT_PREPROCESSORS',
+    ())
 
 ####################
 # AESTHETICS       #
@@ -89,7 +93,8 @@ WIKI_MARKDOWN_EXTENSIONS = getattr(settings, 'SIMPLE_WIKI_MARKDOWN_EXTENSIONS',
                                     'abbr',
                                     'toc',
                                     'mathjax',
-                                    'video',      # In-line embedding for YouTube, etc.
+                                    'video',
+                                    # In-line embedding for YouTube, etc.
                                     'circuit',
                                     ])
 

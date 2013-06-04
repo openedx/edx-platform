@@ -47,16 +47,19 @@ class TestJumpTo(TestCase):
 
     def test_jumpto_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
-        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location)
+        jumpto_url = '%s/%s/jump_to/%s' % (
+            '/courses', self.course_name, location)
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
     def test_jumpto_from_chapter(self):
         location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location)
+        jumpto_url = '%s/%s/jump_to/%s' % (
+            '/courses', self.course_name, location)
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(
+            response, expected, status_code=302, target_status_code=302)
 
 
 class ViewsTestCase(TestCase):
@@ -65,9 +68,10 @@ class ViewsTestCase(TestCase):
                                         email='test@mit.edu')
         self.date = datetime.datetime(2013, 1, 22)
         self.course_id = 'edX/toy/2012_Fall'
-        self.enrollment = CourseEnrollment.objects.get_or_create(user=self.user,
-                                                                 course_id=self.course_id,
-                                                                 created=self.date)[0]
+        self.enrollment = CourseEnrollment.objects.get_or_create(
+            user=self.user,
+            course_id=self.course_id,
+            created=self.date)[0]
         self.location = ['tag', 'org', 'course', 'category', 'name']
         self._MODULESTORES = {}
         # This is a CourseDescriptor object
@@ -128,7 +132,8 @@ class ViewsTestCase(TestCase):
     def test_about_blob_end_date(self):
         # test_about_blob_end_date has both a course end date and an end_date HTML blob.
         # HTML blob wins
-        self.verify_end_date("edX/test_about_blob_end_date/2012_Fall", "Learning never ends")
+        self.verify_end_date(
+            "edX/test_about_blob_end_date/2012_Fall", "Learning never ends")
 
     def verify_end_date(self, course_id, expected_end_text=None):
         request = self.request_factory.get("foo")

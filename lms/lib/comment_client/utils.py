@@ -35,9 +35,11 @@ def perform_request(method, url, data_or_params=None, *args, **kwargs):
     try:
         with dog_stats_api.timer('comment_client.request.time'):
             if method in ['post', 'put', 'patch']:
-                response = requests.request(method, url, data=data_or_params, timeout=5)
+                response = requests.request(
+                    method, url, data=data_or_params, timeout=5)
             else:
-                response = requests.request(method, url, params=data_or_params, timeout=5)
+                response = requests.request(
+                    method, url, params=data_or_params, timeout=5)
     except Exception as err:
         # remove API key if it is in the params
         if 'api_key' in data_or_params:

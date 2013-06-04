@@ -25,4 +25,5 @@ MITX_FEATURES['DISPLAY_TOY_COURSES'] = True
 INSTALLED_APPS += ('lettuce.django',)
 # INSTALLED_APPS += ('portal',)
 
-LETTUCE_APPS = ('portal',)  # dummy app covers the home page, login, registration, and course enrollment
+LETTUCE_APPS = (
+    'portal',)  # dummy app covers the home page, login, registration, and course enrollment

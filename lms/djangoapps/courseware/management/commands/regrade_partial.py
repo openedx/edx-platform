@@ -40,9 +40,10 @@ class Command(BaseCommand):
 
     def fix_studentmodules(self, save_changes):
         '''Identify the list of StudentModule objects that might need fixing, and then fix each one'''
-        modules = StudentModule.objects.filter(modified__gt='2013-03-07 20:18:00',
-                                               created__lt='2013-03-08 15:45:00',
-                                               state__contains='"npoints": 0.')
+        modules = StudentModule.objects.filter(
+            modified__gt='2013-03-07 20:18:00',
+            created__lt='2013-03-08 15:45:00',
+            state__contains='"npoints": 0.')
 
         for module in modules:
             self.fix_studentmodule_grade(module, save_changes)
@@ -53,15 +54,17 @@ class Command(BaseCommand):
         if module_state is None:
             # not likely, since we filter on it.  But in general...
             LOG.info("No state found for {type} module {id} for student {student} in course {course_id}"
-                     .format(type=module.module_type, id=module.module_state_key,
-                             student=module.student.username, course_id=module.course_id))
+                     .format(
+                         type=module.module_type, id=module.module_state_key,
+                     student=module.student.username, course_id=module.course_id))
             return
 
         state_dict = json.loads(module_state)
         self.num_visited += 1
 
         # LoncapaProblem.get_score() checks student_answers -- if there are none, we will return a grade of 0
-        # Check that this is the case, but do so sooner, before we do any of the other grading work.
+        # Check that this is the case, but do so sooner, before we do any of
+        # the other grading work.
         student_answers = state_dict['student_answers']
         if (not student_answers) or len(student_answers) == 0:
             # we should not have a grade here:
@@ -91,8 +94,9 @@ class Command(BaseCommand):
         if module.grade == correct:
             # nothing to change
             LOG.debug("Grade matches for {type} module {id} for student {student} in course {course_id}"
-                      .format(type=module.module_type, id=module.module_state_key,
-                              student=module.student.username, course_id=module.course_id))
+                      .format(
+                          type=module.module_type, id=module.module_state_key,
+                      student=module.student.username, course_id=module.course_id))
         elif save_changes:
             # make the change
             LOG.info("Grade changing from {0} to {1} for {type} module {id} for student {student} "
@@ -119,4 +123,5 @@ class Command(BaseCommand):
 
         self.fix_studentmodules(save_changes)
 
-        LOG.info("Finished run:  updating {0} of {1} modules".format(self.num_changed, self.num_visited))
+        LOG.info("Finished run:  updating {0} of {1} modules".format(
+            self.num_changed, self.num_visited))

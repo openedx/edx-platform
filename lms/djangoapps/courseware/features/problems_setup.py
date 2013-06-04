@@ -1,7 +1,7 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
-#EVERY PROBLEM TYPE MUST HAVE THE FOLLOWING:
+# EVERY PROBLEM TYPE MUST HAVE THE FOLLOWING:
 # -Section in Dictionary containing:
 #   -factory
 #   -kwargs
@@ -164,7 +164,8 @@ def answer_problem(problem_type, correctness):
         inputfield('string').fill(textvalue)
 
     elif problem_type == 'numerical':
-        textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2, 2))
+        textvalue = "pi + 1" if correctness == 'correct' else str(
+            random.randint(-2, 2))
         inputfield('numerical').fill(textvalue)
 
     elif problem_type == 'formula':
@@ -199,7 +200,8 @@ def answer_problem(problem_type, correctness):
 def problem_has_answer(problem_type, answer_class):
     if problem_type == "drop down":
         if answer_class == 'blank':
-            assert world.browser.is_element_not_present_by_css('option[selected="true"]')
+            assert world.browser.is_element_not_present_by_css(
+                'option[selected="true"]')
         else:
             actual = world.browser.find_by_css('option[selected="true"]').value
             expected = 'Option 2' if answer_class == 'correct' else 'Option 3'
@@ -265,7 +267,8 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
     # Generate the problem XML using capa.tests.response_xml_factory
     factory_dict = PROBLEM_DICT[problem_type]
     problem_xml = factory_dict['factory'].build_xml(**factory_dict['kwargs'])
-    metadata = {'rerandomize': 'always'} if not 'metadata' in factory_dict else factory_dict['metadata']
+    metadata = {
+        'rerandomize': 'always'} if not 'metadata' in factory_dict else factory_dict['metadata']
     if extraMeta:
         metadata = dict(metadata, **extraMeta)
 
@@ -274,10 +277,10 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
     # will appear.
     template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
     world.ItemFactory.create(parent_location=section_location(course),
-                            template=template_name,
-                            display_name=str(problem_type),
-                            data=problem_xml,
-                            metadata=metadata)
+                             template=template_name,
+                             display_name=str(problem_type),
+                             data=problem_xml,
+                             metadata=metadata)
 
 
 def inputfield(problem_type, choice=None, input_num=1):

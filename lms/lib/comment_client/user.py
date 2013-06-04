@@ -6,12 +6,13 @@ import settings
 
 class User(models.Model):
 
-    accessible_fields = ['username', 'email', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
-                         'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
-                         'subscribed_thread_ids', 'subscribed_commentable_ids',
-                         'subscribed_course_ids', 'threads_count', 'comments_count',
-                         'default_sort_key'
-                         ]
+    accessible_fields = [
+        'username', 'email', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
+        'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
+        'subscribed_thread_ids', 'subscribed_commentable_ids',
+        'subscribed_course_ids', 'threads_count', 'comments_count',
+        'default_sort_key'
+    ]
 
     updatable_fields = ['username', 'external_id', 'email', 'default_sort_key']
     initializable_fields = updatable_fields
@@ -29,11 +30,13 @@ class User(models.Model):
 
     def follow(self, source):
         params = {'source_type': source.type, 'source_id': source.id}
-        response = perform_request('post', _url_for_subscription(self.id), params)
+        response = perform_request(
+            'post', _url_for_subscription(self.id), params)
 
     def unfollow(self, source):
         params = {'source_type': source.type, 'source_id': source.id}
-        response = perform_request('delete', _url_for_subscription(self.id), params)
+        response = perform_request(
+            'delete', _url_for_subscription(self.id), params)
 
     def vote(self, voteable, value):
         if voteable.type == 'thread':
@@ -41,7 +44,8 @@ class User(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_vote_comment(voteable.id)
         else:
-            raise CommentClientError("Can only vote / unvote for threads or comments")
+            raise CommentClientError(
+                "Can only vote / unvote for threads or comments")
         params = {'user_id': self.id, 'value': value}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)
@@ -52,14 +56,16 @@ class User(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_vote_comment(voteable.id)
         else:
-            raise CommentClientError("Can only vote / unvote for threads or comments")
+            raise CommentClientError(
+                "Can only vote / unvote for threads or comments")
         params = {'user_id': self.id}
         request = perform_request('delete', url, params)
         voteable.update_attributes(request)
 
     def active_threads(self, query_params={}):
         if not self.course_id:
-            raise CommentClientError("Must provide course_id when retrieving active threads for the user")
+            raise CommentClientError(
+                "Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
         params = {'course_id': self.course_id}
         params = merge_dict(params, query_params)
@@ -68,7 +74,8 @@ class User(models.Model):
 
     def subscribed_threads(self, query_params={}):
         if not self.course_id:
-            raise CommentClientError("Must provide course_id when retrieving subscribed threads for the user")
+            raise CommentClientError(
+                "Must provide course_id when retrieving subscribed threads for the user")
         url = _url_for_user_subscribed_threads(self.id)
         params = {'course_id': self.course_id}
         params = merge_dict(params, query_params)

@@ -49,7 +49,8 @@ class Command(BaseCommand):
 
             if done:			# only keep if problem completed
                 try:
-                    pmd = PsychometricData.objects.using(db).get(studentmodule=sm)
+                    pmd = PsychometricData.objects.using(
+                        db).get(studentmodule=sm)
                 except PsychometricData.DoesNotExist:
                     pmd = PsychometricData(studentmodule=sm)
 
@@ -58,7 +59,8 @@ class Command(BaseCommand):
 
                 # get attempt times from tracking log
                 uname = sm.student.username
-                tset = TrackingLog.objects.using(db).filter(username=uname, event_type__contains='save_problem_check')
+                tset = TrackingLog.objects.using(db).filter(
+                    username=uname, event_type__contains='save_problem_check')
                 tset = tset.filter(event_source='server')
                 tset = tset.filter(event__contains="'%s'" % url)
                 checktimes = [x.dtcreated for x in tset]

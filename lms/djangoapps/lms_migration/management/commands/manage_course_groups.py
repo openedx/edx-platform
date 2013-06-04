@@ -57,7 +57,8 @@ class Command(BaseCommand):
             for cnt, u in zip(range(len(uset)), uset):
                 print "%d. %s" % (cnt, u)
 
-            action = raw_input('Choose user to delete (enter #) or enter usernames (comma delim) to add: ')
+            action = raw_input(
+                'Choose user to delete (enter #) or enter usernames (comma delim) to add: ')
 
             m = re.match('^[0-9]+$', action)
             if m:

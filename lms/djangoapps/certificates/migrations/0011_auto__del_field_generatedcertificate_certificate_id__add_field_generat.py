@@ -13,18 +13,21 @@ class Migration(SchemaMigration):
 
         # Adding field 'GeneratedCertificate.verify_uuid'
         db.add_column('certificates_generatedcertificate', 'verify_uuid',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=32, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          default='', max_length=32, blank=True),
                       keep_default=False)
 
         # Adding field 'GeneratedCertificate.download_uuid'
         db.add_column('certificates_generatedcertificate', 'download_uuid',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=32, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          default='', max_length=32, blank=True),
                       keep_default=False)
 
     def backwards(self, orm):
         # Adding field 'GeneratedCertificate.certificate_id'
         db.add_column('certificates_generatedcertificate', 'certificate_id',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=32, blank=True),
+                      self.gf('django.db.models.fields.CharField')(
+                          default='', max_length=32, blank=True),
                       keep_default=False)
 
         # Deleting field 'GeneratedCertificate.verify_uuid'

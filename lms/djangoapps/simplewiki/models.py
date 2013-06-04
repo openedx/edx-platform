@@ -18,7 +18,8 @@ class ShouldHaveExactlyOneRootSlug(Exception):
 
 
 class Namespace(models.Model):
-    name = models.CharField(max_length=30, unique=True, verbose_name=_('namespace'))
+    name = models.CharField(
+        max_length=30, unique=True, verbose_name=_('namespace'))
     # TODO: We may want to add permissions, etc later
 
     @classmethod
@@ -39,21 +40,28 @@ class Article(models.Model):
     title = models.CharField(max_length=512, verbose_name=_('Article title'),
                              blank=False)
     slug = models.SlugField(max_length=100, verbose_name=_('slug'),
-                            help_text=_('Letters, numbers, underscore and hyphen.'),
+                            help_text=_(
+                                'Letters, numbers, underscore and hyphen.'),
                             blank=True)
     namespace = models.ForeignKey(Namespace, verbose_name=_('Namespace'))
-    created_by = models.ForeignKey(User, verbose_name=_('Created by'), blank=True, null=True)
+    created_by = models.ForeignKey(User, verbose_name=_(
+        'Created by'), blank=True, null=True)
     created_on = models.DateTimeField(auto_now_add=1)
     modified_on = models.DateTimeField(auto_now_add=1)
-    locked = models.BooleanField(default=False, verbose_name=_('Locked for editing'))
-    permissions = models.ForeignKey('Permission', verbose_name=_('Permissions'),
-                                    blank=True, null=True,
-                                    help_text=_('Permission group'))
-    current_revision = models.OneToOneField('Revision', related_name='current_rev',
-                                            blank=True, null=True, editable=True)
-    related = models.ManyToManyField('self', verbose_name=_('Related articles'), symmetrical=True,
-                                     help_text=_('Sets a symmetrical relation other articles'),
-                                     blank=True, null=True)
+    locked = models.BooleanField(
+        default=False, verbose_name=_('Locked for editing'))
+    permissions = models.ForeignKey(
+        'Permission', verbose_name=_('Permissions'),
+        blank=True, null=True,
+        help_text=_('Permission group'))
+    current_revision = models.OneToOneField(
+        'Revision', related_name='current_rev',
+        blank=True, null=True, editable=True)
+    related = models.ManyToManyField(
+        'self', verbose_name=_('Related articles'), symmetrical=True,
+        help_text=_(
+            'Sets a symmetrical relation other articles'),
+        blank=True, null=True)
 
     def attachments(self):
         return ArticleAttachment.objects.filter(article__exact=self)
@@ -149,9 +157,12 @@ def get_attachment_filepath(instance, filename):
 
 class ArticleAttachment(models.Model):
     article = models.ForeignKey(Article, verbose_name=_('Article'))
-    file = models.FileField(max_length=255, upload_to=get_attachment_filepath, verbose_name=_('Attachment'))
-    uploaded_by = models.ForeignKey(User, blank=True, verbose_name=_('Uploaded by'), null=True)
-    uploaded_on = models.DateTimeField(auto_now_add=True, verbose_name=_('Upload date'))
+    file = models.FileField(
+        max_length=255, upload_to=get_attachment_filepath, verbose_name=_('Attachment'))
+    uploaded_by = models.ForeignKey(
+        User, blank=True, verbose_name=_('Uploaded by'), null=True)
+    uploaded_on = models.DateTimeField(
+        auto_now_add=True, verbose_name=_('Upload date'))
 
     def download_url(self):
         return reverse('wiki_view_attachment', args=(self.article.get_url(), self.filename()))
@@ -195,7 +206,8 @@ class ArticleAttachment(models.Model):
 
         base_path = os.path.dirname(self.file.path)
         orig_name = self.filename().split('.')
-        thumb_filename = "%s__thumb__%d_%d.%s" % ('.'.join(orig_name[:-1]), width, height, orig_name[-1])
+        thumb_filename = "%s__thumb__%d_%d.%s" % ('.'.join(
+            orig_name[:-1]), width, height, orig_name[-1])
         thumb_filepath = "%s%s%s" % (base_path, os.sep, thumb_filename)
 
         if force or not os.path.exists(thumb_filepath):
@@ -221,8 +233,10 @@ class ArticleAttachment(models.Model):
         self.mk_thumb(width, height)
 
         orig_name = self.filename().split('.')
-        thumb_filename = "%s__thumb__%d_%d.%s" % ('.'.join(orig_name[:-1]), width, height, orig_name[-1])
-        thumb_url = settings.MEDIA_URL + WIKI_ATTACHMENTS + self.article.get_url() + '/' + thumb_filename
+        thumb_filename = "%s__thumb__%d_%d.%s" % ('.'.join(
+            orig_name[:-1]), width, height, orig_name[-1])
+        thumb_url = settings.MEDIA_URL + WIKI_ATTACHMENTS + \
+            self.article.get_url() + '/' + thumb_filename
 
         return thumb_url
 
@@ -237,11 +251,15 @@ class Revision(models.Model):
                                      verbose_name=_('Description of change'))
     revision_user = models.ForeignKey(User, verbose_name=_('Modified by'),
                                       blank=True, null=True, related_name='wiki_revision_user')
-    revision_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Revision date'))
-    contents = models.TextField(verbose_name=_('Contents (Use MarkDown format)'))
+    revision_date = models.DateTimeField(
+        auto_now_add=True, verbose_name=_('Revision date'))
+    contents = models.TextField(verbose_name=_(
+        'Contents (Use MarkDown format)'))
     contents_parsed = models.TextField(editable=False, blank=True, null=True)
-    counter = models.IntegerField(verbose_name=_('Revision#'), default=1, editable=False)
-    previous_revision = models.ForeignKey('self', blank=True, null=True, editable=False)
+    counter = models.IntegerField(verbose_name=_(
+        'Revision#'), default=1, editable=False)
+    previous_revision = models.ForeignKey(
+        'self', blank=True, null=True, editable=False)
 
     # Deleted has three values. 0 is normal, non-deleted. 1 is if it was deleted by a normal user. It should
     # be a NEW revision, so that it appears in the history. 2 is a special flag that can be applied or removed
@@ -253,7 +271,8 @@ class Revision(models.Model):
         return self.revision_user if self.revision_user else _('Anonymous')
 
     # Called after the deleted fied has been changed (between 0 and 2). This bypasses the normal checks put in
-    # save that update the revision or reject the save if contents haven't changed
+    # save that update the revision or reject the save if contents haven't
+    # changed
     def adminSetDeleted(self, deleted):
         self.deleted = deleted
         super(Revision, self).save()
@@ -269,7 +288,8 @@ class Revision(models.Model):
                 self.article.save()
 
         # Increment counter according to previous revision
-        previous_revision = Revision.objects.filter(article=self.article).order_by('-counter')
+        previous_revision = Revision.objects.filter(
+            article=self.article).order_by('-counter')
         if previous_revision.count() > 0:
             if previous_revision.count() > previous_revision[0].counter:
                 self.counter = previous_revision.count() + 1
@@ -337,11 +357,14 @@ class Revision(models.Model):
 
 
 class Permission(models.Model):
-    permission_name = models.CharField(max_length=255, verbose_name=_('Permission name'))
-    can_write = models.ManyToManyField(User, blank=True, null=True, related_name='write',
-                                       help_text=_('Select none to grant anonymous access.'))
-    can_read = models.ManyToManyField(User, blank=True, null=True, related_name='read',
-                                      help_text=_('Select none to grant anonymous access.'))
+    permission_name = models.CharField(
+        max_length=255, verbose_name=_('Permission name'))
+    can_write = models.ManyToManyField(
+        User, blank=True, null=True, related_name='write',
+        help_text=_('Select none to grant anonymous access.'))
+    can_read = models.ManyToManyField(
+        User, blank=True, null=True, related_name='read',
+        help_text=_('Select none to grant anonymous access.'))
 
     def __unicode__(self):
         return self.permission_name
@@ -352,7 +375,8 @@ class Permission(models.Model):
 
 
 class RevisionForm(forms.ModelForm):
-    contents = forms.CharField(label=_('Contents'), widget=forms.Textarea(attrs={'rows': 8, 'cols': 50}))
+    contents = forms.CharField(label=_(
+        'Contents'), widget=forms.Textarea(attrs={'rows': 8, 'cols': 50}))
 
     class Meta:
         model = Revision

@@ -63,13 +63,15 @@ class LicenseTestCase(TestCase):
         self.user = UserFactory(username='test',
                                 email='test@edx.org', password='test_password')
         self.client = Client()
-        assert_true(self.client.login(username='test', password='test_password'))
+        assert_true(self.client.login(
+            username='test', password='test_password'))
         self.software = CourseSoftwareFactory()
 
     def test_get_license(self):
         UserLicenseFactory(user=self.user, software=self.software)
         response = self.client.post(reverse('user_software_license'),
-                                    {'software': SOFTWARE_1, 'generate': 'false'},
+                                    {'software': SOFTWARE_1,
+                                        'generate': 'false'},
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest',
                                     HTTP_REFERER='/courses/{0}/some_page'.format(COURSE_1))
         self.assertEqual(200, response.status_code)
@@ -80,7 +82,8 @@ class LicenseTestCase(TestCase):
 
     def test_get_nonexistent_license(self):
         response = self.client.post(reverse('user_software_license'),
-                                    {'software': SOFTWARE_1, 'generate': 'false'},
+                                    {'software': SOFTWARE_1,
+                                        'generate': 'false'},
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest',
                                     HTTP_REFERER='/courses/{0}/some_page'.format(COURSE_1))
         self.assertEqual(200, response.status_code)
@@ -91,7 +94,8 @@ class LicenseTestCase(TestCase):
     def test_create_nonexistent_license(self):
         '''Should not assign a license to an unlicensed user when none are available'''
         response = self.client.post(reverse('user_software_license'),
-                                    {'software': SOFTWARE_1, 'generate': 'true'},
+                                    {'software': SOFTWARE_1,
+                                        'generate': 'true'},
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest',
                                     HTTP_REFERER='/courses/{0}/some_page'.format(COURSE_1))
         self.assertEqual(200, response.status_code)
@@ -104,7 +108,8 @@ class LicenseTestCase(TestCase):
         # create an unassigned license
         UserLicenseFactory(software=self.software)
         response = self.client.post(reverse('user_software_license'),
-                                    {'software': SOFTWARE_1, 'generate': 'true'},
+                                    {'software': SOFTWARE_1,
+                                        'generate': 'true'},
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest',
                                     HTTP_REFERER='/courses/{0}/some_page'.format(COURSE_1))
         self.assertEqual(200, response.status_code)
@@ -115,14 +120,16 @@ class LicenseTestCase(TestCase):
 
     def test_get_license_from_wrong_course(self):
         response = self.client.post(reverse('user_software_license'),
-                                    {'software': SOFTWARE_1, 'generate': 'false'},
+                                    {'software': SOFTWARE_1,
+                                        'generate': 'false'},
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest',
                                     HTTP_REFERER='/courses/{0}/some_page'.format('some/other/course'))
         self.assertEqual(404, response.status_code)
 
     def test_get_license_from_non_ajax(self):
         response = self.client.post(reverse('user_software_license'),
-                                    {'software': SOFTWARE_1, 'generate': 'false'},
+                                    {'software': SOFTWARE_1,
+                                        'generate': 'false'},
                                     HTTP_REFERER='/courses/{0}/some_page'.format(COURSE_1))
         self.assertEqual(404, response.status_code)
 
@@ -136,7 +143,8 @@ class LicenseTestCase(TestCase):
     def test_get_license_without_login(self):
         self.client.logout()
         response = self.client.post(reverse('user_software_license'),
-                                    {'software': SOFTWARE_1, 'generate': 'false'},
+                                    {'software': SOFTWARE_1,
+                                        'generate': 'false'},
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest',
                                     HTTP_REFERER='/courses/{0}/some_page'.format(COURSE_1))
         # if we're not logged in, we should be referred to the login page

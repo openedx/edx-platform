@@ -46,8 +46,10 @@ class MockCommentServiceServerTest(unittest.TestCase):
         values = {'username': u'user100', 'api_key': 'TEST_API_KEY',
                   'external_id': '4', 'email': u'user100@edx.org'}
         data = json.dumps(values)
-        headers = {'Content-Type': 'application/json', 'Content-Length': len(data)}
-        req = urllib2.Request(self.server_url + '/api/v1/users/4', data, headers)
+        headers = {
+            'Content-Type': 'application/json', 'Content-Length': len(data)}
+        req = urllib2.Request(
+            self.server_url + '/api/v1/users/4', data, headers)
 
         # Send the request to the mock cs server
         response = urllib2.urlopen(req)

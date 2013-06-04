@@ -191,7 +191,8 @@ class VideoExtension(markdown.Extension):
 
 class Bliptv(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
-        url = 'http://blip.tv/scripts/flash/showplayer.swf?file=http://blip.tv/file/get/%s' % m.group('bliptvfile')
+        url = 'http://blip.tv/scripts/flash/showplayer.swf?file=http://blip.tv/file/get/%s' % m.group(
+            'bliptvfile')
         width = self.ext.config['bliptv_width'][0]
         height = self.ext.config['bliptv_height'][0]
         return flash_object(url, width, height)
@@ -199,7 +200,8 @@ class Bliptv(markdown.inlinepatterns.Pattern):
 
 class Dailymotion(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
-        url = 'http://www.dailymotion.com/swf/%s' % m.group('dailymotionid').split('/')[-1]
+        url = 'http://www.dailymotion.com/swf/%s' % m.group(
+            'dailymotionid').split('/')[-1]
         width = self.ext.config['dailymotion_width'][0]
         height = self.ext.config['dailymotion_height'][0]
         return flash_object(url, width, height)
@@ -224,7 +226,8 @@ class Metacafe(markdown.inlinepatterns.Pattern):
 
 class Veoh(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
-        url = 'http://www.veoh.com/videodetails2.swf?permalinkId=%s' % m.group('veohid')
+        url = 'http://www.veoh.com/videodetails2.swf?permalinkId=%s' % m.group(
+            'veohid')
         width = self.ext.config['veoh_width'][0]
         height = self.ext.config['veoh_height'][0]
         return flash_object(url, width, height)
@@ -232,7 +235,8 @@ class Veoh(markdown.inlinepatterns.Pattern):
 
 class Vimeo(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
-        url = 'http://vimeo.com/moogaloop.swf?clip_id=%s&amp;server=vimeo.com' % m.group('vimeoid')
+        url = 'http://vimeo.com/moogaloop.swf?clip_id=%s&amp;server=vimeo.com' % m.group(
+            'vimeoid')
         width = self.ext.config['vimeo_width'][0]
         height = self.ext.config['vimeo_height'][0]
         return flash_object(url, width, height)

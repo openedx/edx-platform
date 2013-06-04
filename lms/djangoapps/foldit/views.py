@@ -112,7 +112,8 @@ def save_scores(user, puzzle_scores):
         score_version = score['ScoreVersion']
 
         # SetPlayerPuzzleScoreResponse object
-        # Score entries are unique on user/unique_user_id/puzzle_id/score_version
+        # Score entries are unique on
+        # user/unique_user_id/puzzle_id/score_version
         try:
             obj = Score.objects.get(
                 user=user,

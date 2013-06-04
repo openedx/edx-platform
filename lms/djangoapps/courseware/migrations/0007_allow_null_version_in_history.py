@@ -10,12 +10,15 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'StudentModuleHistory.version'
-        db.alter_column('courseware_studentmodulehistory', 'version', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))
+        db.alter_column('courseware_studentmodulehistory', 'version', self.gf(
+            'django.db.models.fields.CharField')(max_length=255, null=True))
 
     def backwards(self, orm):
 
-        # User chose to not deal with backwards NULL issues for 'StudentModuleHistory.version'
-        raise RuntimeError("Cannot reverse this migration. 'StudentModuleHistory.version' and its values cannot be restored.")
+        # User chose to not deal with backwards NULL issues for
+        # 'StudentModuleHistory.version'
+        raise RuntimeError(
+            "Cannot reverse this migration. 'StudentModuleHistory.version' and its values cannot be restored.")
 
     models = {
         'auth.group': {

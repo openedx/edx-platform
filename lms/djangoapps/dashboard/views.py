@@ -49,17 +49,20 @@ def dashboard(request):
 
     # count how many users we have
     results["scalars"]["Unique Usernames"] = User.objects.filter().count()
-    results["scalars"]["Activated Usernames"] = User.objects.filter(is_active=1).count()
+    results["scalars"]["Activated Usernames"] = User.objects.filter(
+        is_active=1).count()
 
     # count how many enrollments we have
-    results["scalars"]["Total Enrollments Across All Courses"] = CourseEnrollment.objects.count()
+    results["scalars"][
+        "Total Enrollments Across All Courses"] = CourseEnrollment.objects.count()
 
     # establish a direct connection to the database (for executing raw SQL)
     cursor = connection.cursor()
 
     # define the queries that will generate our user-facing tables
     # table queries need not take the form of raw SQL, but do in this case since
-    # the MySQL backend for django isn't very friendly with group by or distinct
+    # the MySQL backend for django isn't very friendly with group by or
+    # distinct
     table_queries = {}
     table_queries["course enrollments"] = \
         "select " + \
@@ -79,7 +82,8 @@ def dashboard(request):
     # add the result for each of the table_queries to the results object
     for query in table_queries.keys():
         cursor.execute(table_queries[query])
-        results["tables"][query] = SQL_query_to_list(cursor, table_queries[query])
+        results["tables"][query] = SQL_query_to_list(
+            cursor, table_queries[query])
 
     context = {"results": results}
 

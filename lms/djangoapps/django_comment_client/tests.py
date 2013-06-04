@@ -17,8 +17,10 @@ class PermissionsTestCase(TestCase):
 
         self.course_id = "edX/toy/2012_Fall"
 
-        self.moderator_role = Role.objects.get_or_create(name="Moderator", course_id=self.course_id)[0]
-        self.student_role = Role.objects.get_or_create(name="Student", course_id=self.course_id)[0]
+        self.moderator_role = Role.objects.get_or_create(
+            name="Moderator", course_id=self.course_id)[0]
+        self.student_role = Role.objects.get_or_create(
+            name="Student", course_id=self.course_id)[0]
 
         self.student = User.objects.create(username=self.random_str(),
                                            password="123456", email="john@yahoo.com")
@@ -26,8 +28,10 @@ class PermissionsTestCase(TestCase):
                                              password="123456", email="staff@edx.org")
         self.moderator.is_staff = True
         self.moderator.save()
-        self.student_enrollment = CourseEnrollment.objects.create(user=self.student, course_id=self.course_id)
-        self.moderator_enrollment = CourseEnrollment.objects.create(user=self.moderator, course_id=self.course_id)
+        self.student_enrollment = CourseEnrollment.objects.create(
+            user=self.student, course_id=self.course_id)
+        self.moderator_enrollment = CourseEnrollment.objects.create(
+            user=self.moderator, course_id=self.course_id)
 
     def tearDown(self):
         self.student_enrollment.delete()

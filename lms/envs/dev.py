@@ -21,11 +21,14 @@ TEMPLATE_DEBUG = True
 
 MITX_FEATURES['DISABLE_START_DATES'] = True
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
-MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
+MITX_FEATURES[
+    'SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
 MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
-MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
+MITX_FEATURES[
+    'FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
-MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+MITX_FEATURES[
+    'ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
@@ -145,7 +148,8 @@ if os.path.isdir(DATA_DIR):
 
 ################################# mitx revision string  #####################
 
-MITX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
+MITX_VERSION_STRING = os.popen(
+    'cd %s; git describe' % REPO_ROOT).read().strip()
 
 ############################ Open ended grading config  #####################
 
@@ -160,8 +164,10 @@ OPEN_ENDED_GRADING_INTERFACE = {
 
 ############################## LMS Migration ##################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
-MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
-MITX_FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.mitx.mit.edu/xqa'
+MITX_FEATURES[
+    'ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
+MITX_FEATURES[
+    'USE_XQA_SERVER'] = 'http://xqa:server@content-qa.mitx.mit.edu/xqa'
 
 INSTALLED_APPS += ('lms_migration',)
 
@@ -234,7 +240,8 @@ FILE_UPLOAD_HANDLERS = (
 
 ########################### PIPELINE #################################
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(
+    proj_dir=PROJECT_ROOT)
 
 ########################## PEARSON TESTING ###########################
 MITX_FEATURES['ENABLE_PEARSON_LOGIN'] = False

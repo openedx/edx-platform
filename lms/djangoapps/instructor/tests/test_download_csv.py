@@ -57,14 +57,17 @@ class TestInstructorDashboardGradeDownloadCSV(LoginEnrollmentTestCase):
         course = self.toy
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         msg = "url = {0}\n".format(url)
-        response = self.client.post(url, {'action': 'Download CSV of all student grades for this course'})
-        msg += "instructor dashboard download csv grades: response = '{0}'\n".format(response)
+        response = self.client.post(url, {
+                                    'action': 'Download CSV of all student grades for this course'})
+        msg += "instructor dashboard download csv grades: response = '{0}'\n".format(
+            response)
 
         self.assertEqual(response['Content-Type'], 'text/csv', msg)
 
         cdisp = response['Content-Disposition']
         msg += "Content-Disposition = '%s'\n" % cdisp
-        self.assertEqual(cdisp, 'attachment; filename=grades_{0}.csv'.format(course.id), msg)
+        self.assertEqual(
+            cdisp, 'attachment; filename=grades_{0}.csv'.format(course.id), msg)
 
         body = response.content.replace('\r', '')
         msg += "body = '{0}'\n".format(body)

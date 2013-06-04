@@ -8,7 +8,8 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        # We collect every article slug in a set. Any time we see a duplicate, we change the duplicate's name
+        # We collect every article slug in a set. Any time we see a duplicate,
+        # we change the duplicate's name
         unique_slugs = set()
         for article in orm.Article.objects.all():
             if article.slug in unique_slugs:

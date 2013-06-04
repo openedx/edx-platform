@@ -9,12 +9,14 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted,
-                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
+from course_groups.cohorts import (
+    is_course_cohorted, get_cohort_id, is_commentable_cohorted,
+    get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
-from django_comment_client.utils import (merge_dict, extract, strip_none, get_courseware_context)
+from django_comment_client.utils import (
+    merge_dict, extract, strip_none, get_courseware_context)
 import django_comment_client.utils as utils
 import comment_client as cc
 
@@ -47,8 +49,10 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         # If the user did not select a sort key, use their last used sort key
         cc_user = cc.User.from_django_user(request.user)
         cc_user.retrieve()
-        # TODO: After the comment service is updated this can just be user.default_sort_key because the service returns the default value
-        default_query_params['sort_key'] = cc_user.get('default_sort_key') or default_query_params['sort_key']
+        # TODO: After the comment service is updated this can just be
+        # user.default_sort_key because the service returns the default value
+        default_query_params['sort_key'] = cc_user.get(
+            'default_sort_key') or default_query_params['sort_key']
     else:
         # If the user clicked a sort key, update their default sort key
         cc_user = cc.User.from_django_user(request.user)
@@ -59,7 +63,8 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     # is user a moderator
     # did the user request a group
 
-    # if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
+    # if the user requested a group explicitly, give them that group,
+    # othewrise, if mod, show all, else if student, use cohort
 
     group_id = request.GET.get('group_id')
 
@@ -87,8 +92,10 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     for thread in threads:
 
         if thread.get('group_id'):
-            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
-            thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
+            thread['group_name'] = get_cohort_by_id(
+                course_id, thread.get('group_id')).name
+            thread['group_string'] = "This post visible only to Group %s." % (
+                thread['group_name'])
         else:
             thread['group_name'] = ""
             thread['group_string'] = "This post visible to everyone."
@@ -111,7 +118,8 @@ def inline_discussion(request, course_id, discussion_id):
     course = get_course_with_access(request.user, course_id, 'load')
 
     try:
-        threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
+        threads, query_params = get_threads(
+            request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict()
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
@@ -121,7 +129,8 @@ def inline_discussion(request, course_id, discussion_id):
         log.error("Error loading inline discussion threads.")
         raise Http404
 
-    annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+    annotated_content_info = utils.get_metadata_for_threads(
+        course_id, threads, request.user, user_info)
 
     allow_anonymous = course.allow_anonymous
     allow_anonymous_to_peers = course.allow_anonymous_to_peers
@@ -129,8 +138,10 @@ def inline_discussion(request, course_id, discussion_id):
     # since inline is all one commentable, only show or allow the choice of cohorts
     # if the commentable is cohorted, otherwise everything is not cohorted
     # and no one has the option of choosing a cohort
-    is_cohorted = is_course_cohorted(course_id) and is_commentable_cohorted(course_id, discussion_id)
-    is_moderator = cached_has_permission(request.user, "see_all_cohorts", course_id)
+    is_cohorted = is_course_cohorted(
+        course_id) and is_commentable_cohorted(course_id, discussion_id)
+    is_moderator = cached_has_permission(
+        request.user, "see_all_cohorts", course_id)
 
     cohorts_list = list()
 
@@ -172,7 +183,8 @@ def forum_form_discussion(request, course_id):
     category_map = utils.get_discussion_category_map(course)
 
     try:
-        unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
+        unsafethreads, query_params = get_threads(
+            request, course_id)   # This might process a search query
         threads = [utils.safe_content(thread) for thread in unsafethreads]
     except (cc.utils.CommentClientMaintenanceError) as err:
         log.warning("Forum is in maintenance mode")
@@ -184,7 +196,8 @@ def forum_form_discussion(request, course_id):
     user = cc.User.from_django_user(request.user)
     user_info = user.to_dict()
 
-    annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+    annotated_content_info = utils.get_metadata_for_threads(
+        course_id, threads, request.user, user_info)
 
     for thread in threads:
         courseware_context = get_courseware_context(thread, course)
@@ -243,17 +256,20 @@ def single_thread(request, course_id, discussion_id, thread_id):
     user_info = cc_user.to_dict()
 
     try:
-        thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
+        thread = cc.Thread.find(thread_id).retrieve(
+            recursive=True, user_id=request.user.id)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         log.error("Error loading single thread.")
         raise Http404
 
     if request.is_ajax():
         courseware_context = get_courseware_context(thread, course)
-        annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
+        annotated_content_info = utils.get_annotated_content_infos(
+            course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
-        # html = render_to_string('discussion/_ajax_single_thread.html', context)
+        # html = render_to_string('discussion/_ajax_single_thread.html',
+        # context)
         content = utils.safe_content(thread.to_dict())
         if courseware_context:
             content.update(courseware_context)
@@ -280,7 +296,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
             if courseware_context:
                 thread.update(courseware_context)
             if thread.get('group_id') and not thread.get('group_name'):
-                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+                thread['group_name'] = get_cohort_by_id(
+                    course_id, thread.get('group_id')).name
 
             # patch for backward compatibility with comments service
             if not "pinned" in thread:
@@ -298,7 +315,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #    course_id,
         #)
 
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        annotated_content_info = utils.get_metadata_for_threads(
+            course_id, threads, request.user, user_info)
 
         cohorts = get_course_cohorts(course_id)
         cohorted_commentables = get_cohorted_commentables(course_id)
@@ -347,7 +365,8 @@ def user_profile(request, course_id, user_id):
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
 
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        annotated_content_info = utils.get_metadata_for_threads(
+            course_id, threads, request.user, user_info)
 
         if request.is_ajax():
             return utils.JsonResponse({
@@ -385,12 +404,14 @@ def followed_threads(request, course_id, user_id):
             'sort_order': request.GET.get('sort_order', 'desc'),
         }
 
-        threads, page, num_pages = profiled_user.subscribed_threads(query_params)
+        threads, page, num_pages = profiled_user.subscribed_threads(
+            query_params)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
 
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        annotated_content_info = utils.get_metadata_for_threads(
+            course_id, threads, request.user, user_info)
         if request.is_ajax():
             return utils.JsonResponse({
                 'annotated_content_info': annotated_content_info,

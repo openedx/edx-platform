@@ -10,19 +10,30 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Note'
         db.create_table('notes_note', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('uri', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
+            ('course_id', self.gf('django.db.models.fields.CharField')(
+                max_length=255, db_index=True)),
+            ('uri', self.gf('django.db.models.fields.CharField')(
+                max_length=255, db_index=True)),
             ('text', self.gf('django.db.models.fields.TextField')(default='')),
-            ('quote', self.gf('django.db.models.fields.TextField')(default='')),
-            ('range_start', self.gf('django.db.models.fields.CharField')(max_length=2048)),
-            ('range_start_offset', self.gf('django.db.models.fields.IntegerField')()),
-            ('range_end', self.gf('django.db.models.fields.CharField')(max_length=2048)),
-            ('range_end_offset', self.gf('django.db.models.fields.IntegerField')()),
+            ('quote', self.gf(
+                'django.db.models.fields.TextField')(default='')),
+            ('range_start', self.gf(
+                'django.db.models.fields.CharField')(max_length=2048)),
+            ('range_start_offset', self.gf(
+                'django.db.models.fields.IntegerField')()),
+            ('range_end', self.gf(
+                'django.db.models.fields.CharField')(max_length=2048)),
+            ('range_end_offset', self.gf(
+                'django.db.models.fields.IntegerField')()),
             ('tags', self.gf('django.db.models.fields.TextField')(default='')),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
-            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, null=True, db_index=True, blank=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now=True, db_index=True, blank=True)),
         ))
         db.send_create_signal('notes', ['Note'])
 

@@ -74,7 +74,8 @@ class Command(BaseCommand):
 
             # get name from kerberos
             try:
-                kname = os.popen("finger %s | grep 'name:'" % email).read().strip().split('name: ')[1].strip()
+                kname = os.popen("finger %s | grep 'name:'" %
+                                 email).read().strip().split('name: ')[1].strip()
             except:
                 kname = ''
             name = raw_input('Full name: [%s] ' % kname).strip()
@@ -114,13 +115,15 @@ class Command(BaseCommand):
         up.save()
 
         if make_eamap:
-            credentials = "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN=%s/emailAddress=%s" % (name, email)
+            credentials = "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN=%s/emailAddress=%s" % (
+                name, email)
             eamap = ExternalAuthMap(external_id=email,
                                     external_email=email,
                                     external_domain=mit_domain,
                                     external_name=name,
                                     internal_password=password,
-                                    external_credentials=json.dumps(credentials),
+                                    external_credentials=json.dumps(
+                                        credentials),
                                     )
             eamap.user = user
             eamap.dtsignup = datetime.datetime.now()
@@ -141,7 +144,8 @@ class Command(BaseCommand):
         readline.parse_and_bind('tab: complete')
 
         while True:
-            gname = raw_input("Add group (tab to autocomplete, empty line to end): ")
+            gname = raw_input(
+                "Add group (tab to autocomplete, empty line to end): ")
             if not gname:
                 break
             if not gname in groups:

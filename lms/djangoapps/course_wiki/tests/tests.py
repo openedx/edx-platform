@@ -46,9 +46,11 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         self.enroll(self.toy)
 
         referer = reverse("progress", kwargs={'course_id': self.toy.id})
-        destination = reverse("wiki:get", kwargs={'path': 'some/fake/wiki/page/'})
+        destination = reverse("wiki:get", kwargs={
+                              'path': 'some/fake/wiki/page/'})
 
-        redirected_to = referer.replace("progress", "wiki/some/fake/wiki/page/")
+        redirected_to = referer.replace(
+            "progress", "wiki/some/fake/wiki/page/")
 
         resp = self.client.get(destination, HTTP_REFERER=referer)
         self.assertEqual(resp.status_code, 302)
@@ -57,8 +59,10 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
 
         # Now we test that the student will be redirected away from that page if the course doesn't exist
         # We do this in the same test because we want to make sure the redirected_to is constructed correctly
-        # This is a location like /courses/*/wiki/* , but with an invalid course ID
-        bad_course_wiki_page = redirected_to.replace(self.toy.location.course, "bad_course")
+        # This is a location like /courses/*/wiki/* , but with an invalid
+        # course ID
+        bad_course_wiki_page = redirected_to.replace(
+            self.toy.location.course, "bad_course")
 
         resp = self.client.get(bad_course_wiki_page, HTTP_REFERER=referer)
         self.assertEqual(resp.status_code, 302)
@@ -70,17 +74,21 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         The user must be enrolled in the course to see the page.
         """
 
-        course_wiki_home = reverse('course_wiki', kwargs={'course_id': course.id})
+        course_wiki_home = reverse(
+            'course_wiki', kwargs={'course_id': course.id})
         referer = reverse("progress", kwargs={'course_id': self.toy.id})
 
-        resp = self.client.get(course_wiki_home, follow=True, HTTP_REFERER=referer)
+        resp = self.client.get(
+            course_wiki_home, follow=True, HTTP_REFERER=referer)
 
-        course_wiki_page = referer.replace('progress', 'wiki/' + self.toy.wiki_slug + "/")
+        course_wiki_page = referer.replace(
+            'progress', 'wiki/' + self.toy.wiki_slug + "/")
 
         ending_location = resp.redirect_chain[-1][0]
         ending_status = resp.redirect_chain[-1][1]
 
-        self.assertEquals(ending_location, 'http://testserver' + course_wiki_page)
+        self.assertEquals(
+            ending_location, 'http://testserver' + course_wiki_page)
         self.assertEquals(resp.status_code, 200)
 
         self.has_course_navigator(resp)
@@ -101,9 +109,11 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         self.enroll(self.toy)
         self.create_course_page(self.toy)
 
-        course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
+        course_wiki_page = reverse('wiki:get', kwargs={
+                                   'path': self.toy.wiki_slug + '/'})
         referer = reverse("courseware", kwargs={'course_id': self.toy.id})
 
-        resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
+        resp = self.client.get(
+            course_wiki_page, follow=True, HTTP_REFERER=referer)
 
         self.has_course_navigator(resp)

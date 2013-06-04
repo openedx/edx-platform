@@ -10,9 +10,12 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'GeneratedCertificate'
         db.create_table('certificates_generatedcertificate', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('certificate_id', self.gf('django.db.models.fields.CharField')(max_length=32)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
+            ('certificate_id', self.gf(
+                'django.db.models.fields.CharField')(max_length=32)),
         ))
         db.send_create_signal('certificates', ['GeneratedCertificate'])
 

@@ -54,9 +54,12 @@ class ApiTest(TestCase):
 
         # Create two accounts
         self.password = 'abc'
-        self.student = User.objects.create_user('student', 'student@test.com', self.password)
-        self.student2 = User.objects.create_user('student2', 'student2@test.com', self.password)
-        self.instructor = User.objects.create_user('instructor', 'instructor@test.com', self.password)
+        self.student = User.objects.create_user(
+            'student', 'student@test.com', self.password)
+        self.student2 = User.objects.create_user(
+            'student2', 'student2@test.com', self.password)
+        self.instructor = User.objects.create_user(
+            'instructor', 'instructor@test.com', self.password)
         self.course_id = 'HarvardX/CB22x/The_Ancient_Greek_Hero'
         self.note = {
             'user': self.student,
@@ -160,7 +163,8 @@ class ApiTest(TestCase):
 
         note_dict = notes[0].as_dict()
         excluded_fields = ['id', 'user_id', 'created', 'updated']
-        note = dict([(k, v) for k, v in note_dict.items() if k not in excluded_fields])
+        note = dict([(
+            k, v) for k, v in note_dict.items() if k not in excluded_fields])
 
         resp = self.client.post(self.url('notes_api_notes'),
                                 json.dumps(note),
@@ -188,7 +192,8 @@ class ApiTest(TestCase):
         note_dict = notes[0].as_dict()
 
         excluded_fields = ['id', 'user_id', 'created', 'updated'] + ['ranges']
-        note = dict([(k, v) for k, v in note_dict.items() if k not in excluded_fields])
+        note = dict([(
+            k, v) for k, v in note_dict.items() if k not in excluded_fields])
 
         resp = self.client.post(self.url('notes_api_notes'),
                                 json.dumps(note),
@@ -203,7 +208,8 @@ class ApiTest(TestCase):
         self.assertEqual(len(notes), 3)
 
         for note in notes:
-            resp = self.client.get(self.url('notes_api_note', {'note_id': note.pk}))
+            resp = self.client.get(self.url(
+                'notes_api_note', {'note_id': note.pk}))
             self.assertEqual(resp.status_code, 200)
             self.assertNotEqual(resp.content, '')
 
@@ -224,9 +230,11 @@ class ApiTest(TestCase):
         self.assertEqual(len(notes), 1)
         note = notes[0]
 
-        # set the student id to a different student (not the one that created the notes)
+        # set the student id to a different student (not the one that created
+        # the notes)
         self.login(as_student=self.student2)
-        resp = self.client.get(self.url('notes_api_note', {'note_id': note.pk}))
+        resp = self.client.get(self.url(
+            'notes_api_note', {'note_id': note.pk}))
         self.assertEqual(resp.status_code, 403)
         self.assertEqual(resp.content, '')
 
@@ -270,7 +278,8 @@ class ApiTest(TestCase):
         try:
             models.Note.objects.get(pk=note.pk)
         except models.Note.DoesNotExist:
-            self.fail('note should exist and not be deleted because the student does not have permission to do so')
+            self.fail(
+                'note should exist and not be deleted because the student does not have permission to do so')
 
     def test_update_note(self):
         notes = self.create_notes(1)
@@ -283,10 +292,11 @@ class ApiTest(TestCase):
         })
 
         self.login()
-        resp = self.client.put(self.url('notes_api_note', {'note_id': note.pk}),
-                               json.dumps(updated_dict),
-                               content_type='application/json',
-                               HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        resp = self.client.put(
+            self.url('notes_api_note', {'note_id': note.pk}),
+            json.dumps(updated_dict),
+            content_type='application/json',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(resp.status_code, 303)
         self.assertEqual(resp.content, '')
 
@@ -344,7 +354,8 @@ class ApiTest(TestCase):
 class NoteTest(TestCase):
     def setUp(self):
         self.password = 'abc'
-        self.student = User.objects.create_user('student', 'student@test.com', self.password)
+        self.student = User.objects.create_user(
+            'student', 'student@test.com', self.password)
         self.course_id = 'HarvardX/CB22x/The_Ancient_Greek_Hero'
         self.note = {
             'user': self.student,
@@ -370,9 +381,11 @@ class NoteTest(TestCase):
             self.assertEqual(note.text, body['text'])
             self.assertEqual(note.quote, body['quote'])
             self.assertEqual(note.range_start, body['ranges'][0]['start'])
-            self.assertEqual(note.range_start_offset, body['ranges'][0]['startOffset'])
+            self.assertEqual(note.range_start_offset, body[
+                             'ranges'][0]['startOffset'])
             self.assertEqual(note.range_end, body['ranges'][0]['end'])
-            self.assertEqual(note.range_end_offset, body['ranges'][0]['endOffset'])
+            self.assertEqual(note.range_end_offset, body[
+                             'ranges'][0]['endOffset'])
             self.assertEqual(note.tags, ','.join(body['tags']))
         except ValidationError:
             self.fail('a valid note should not raise an exception')

@@ -26,8 +26,10 @@ INSTALLED_APPS = [
 
 # Nose Test Runner
 INSTALLED_APPS += ['django_nose']
-# NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html', '--cover-inclusive']
-NOSE_ARGS = ['--cover-erase', '--with-xunit', '--cover-html', '--cover-inclusive']
+# NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage',
+# '--cover-html', '--cover-inclusive']
+NOSE_ARGS = ['--cover-erase', '--with-xunit',
+             '--cover-html', '--cover-inclusive']
 for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
     NOSE_ARGS += ['--cover-package', app]
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -80,7 +82,7 @@ CACHES = {
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-############################ FILE UPLOADS (for discussion forums) #############################
+############################ FILE UPLOADS (for discussion forums) ########
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = PROJECT_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"

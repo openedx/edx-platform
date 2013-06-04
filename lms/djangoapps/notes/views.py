@@ -15,7 +15,8 @@ def notes(request, course_id):
     if not notes_enabled_for_course(course):
         raise Http404
 
-    notes = Note.objects.filter(course_id=course_id, user=request.user).order_by('-created', 'uri')
+    notes = Note.objects.filter(
+        course_id=course_id, user=request.user).order_by('-created', 'uri')
     context = {
         'course': course,
         'notes': notes

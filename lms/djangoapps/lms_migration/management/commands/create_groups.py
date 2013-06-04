@@ -38,14 +38,16 @@ def create_groups():
             print "Oops, cannot read %s, skipping" % cxfn
             continue
         cxmlroot = coursexml.getroot()
-        course = cxmlroot.get('course')		# TODO (vshnayder!!): read metadata from policy file(s) instead of from course.xml
+        course = cxmlroot.get(
+            'course')		# TODO (vshnayder!!): read metadata from policy file(s) instead of from course.xml
         if course is None:
             print "oops, can't get course id for %s" % course_dir
             continue
         print "course=%s for course_dir=%s" % (course, course_dir)
 
         create_group('staff_%s' % course)		# staff group
-        create_group('instructor_%s' % course)		# instructor group (can manage staff group list)
+        create_group('instructor_%s' %
+                     course)		# instructor group (can manage staff group list)
 
 
 def create_group(gname):

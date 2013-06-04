@@ -45,10 +45,12 @@ def course_wiki_redirect(request, course_id):
 
     valid_slug = True
     if not course_slug:
-        log.exception("This course is improperly configured. The slug cannot be empty.")
+        log.exception(
+            "This course is improperly configured. The slug cannot be empty.")
         valid_slug = False
     if re.match('^[-\w\.]+$', course_slug) is None:
-        log.exception("This course is improperly configured. The slug can only contain letters, numbers, periods or hyphens.")
+        log.exception(
+            "This course is improperly configured. The slug can only contain letters, numbers, periods or hyphens.")
         valid_slug = False
 
     if not valid_slug:
@@ -63,7 +65,8 @@ def course_wiki_redirect(request, course_id):
         new_site.name = "edX"
         new_site.save()
         if str(new_site.id) != str(settings.SITE_ID):
-            raise ImproperlyConfigured("No site object was created and the SITE_ID doesn't match the newly created one. " + str(new_site.id) + "!=" + str(settings.SITE_ID))
+            raise ImproperlyConfigured("No site object was created and the SITE_ID doesn't match the newly created one. " + str(
+                new_site.id) + "!=" + str(settings.SITE_ID))
 
     try:
         urlpath = URLPath.get_by_path(course_slug, select_related=True)
@@ -92,7 +95,8 @@ def course_wiki_redirect(request, course_id):
             root,
             course_slug,
             title=course_slug,
-            content="This is the wiki for **{0}**'s _{1}_.".format(course.org, course.display_name_with_default),
+            content="This is the wiki for **{0}**'s _{1}_.".format(
+                course.org, course.display_name_with_default),
             user_message="Course page automatically created.",
             user=None,
             ip_address=None,

@@ -10,31 +10,46 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'OfflineComputedGrade'
         db.create_table('courseware_offlinecomputedgrade', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
-            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
-            ('gradeset', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(
+                to=orm['auth.User'])),
+            ('course_id', self.gf('django.db.models.fields.CharField')(
+                max_length=255, db_index=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, null=True, db_index=True, blank=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now=True, db_index=True, blank=True)),
+            ('gradeset', self.gf('django.db.models.fields.TextField')(
+                null=True, blank=True)),
         ))
         db.send_create_signal('courseware', ['OfflineComputedGrade'])
 
-        # Adding unique constraint on 'OfflineComputedGrade', fields ['user', 'course_id']
-        db.create_unique('courseware_offlinecomputedgrade', ['user_id', 'course_id'])
+        # Adding unique constraint on 'OfflineComputedGrade', fields ['user',
+        # 'course_id']
+        db.create_unique('courseware_offlinecomputedgrade', [
+                         'user_id', 'course_id'])
 
         # Adding model 'OfflineComputedGradeLog'
         db.create_table('courseware_offlinecomputedgradelog', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
-            ('seconds', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('nstudents', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)),
+            ('course_id', self.gf('django.db.models.fields.CharField')(
+                max_length=255, db_index=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(
+                auto_now_add=True, null=True, db_index=True, blank=True)),
+            ('seconds', self.gf(
+                'django.db.models.fields.IntegerField')(default=0)),
+            ('nstudents', self.gf(
+                'django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal('courseware', ['OfflineComputedGradeLog'])
 
     def backwards(self, orm):
-        # Removing unique constraint on 'OfflineComputedGrade', fields ['user', 'course_id']
-        db.delete_unique('courseware_offlinecomputedgrade', ['user_id', 'course_id'])
+        # Removing unique constraint on 'OfflineComputedGrade', fields ['user',
+        # 'course_id']
+        db.delete_unique('courseware_offlinecomputedgrade', [
+                         'user_id', 'course_id'])
 
         # Deleting model 'OfflineComputedGrade'
         db.delete_table('courseware_offlinecomputedgrade')

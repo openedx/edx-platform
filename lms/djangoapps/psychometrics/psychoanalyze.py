@@ -125,9 +125,12 @@ def problems_with_psychometric_data(course_id):
     Return dict of {problems (location urls): count} for which psychometric data is available.
     Does this for a given course_id.
     '''
-    pmdset = PsychometricData.objects.using(db).filter(studentmodule__course_id=course_id)
-    plist = [p['studentmodule__module_state_key'] for p in pmdset.values('studentmodule__module_state_key').distinct()]
-    problems = dict((p, pmdset.filter(studentmodule__module_state_key=p).count()) for p in plist)
+    pmdset = PsychometricData.objects.using(
+        db).filter(studentmodule__course_id=course_id)
+    plist = [p['studentmodule__module_state_key'] for p in pmdset.values(
+        'studentmodule__module_state_key').distinct()]
+    problems = dict((p, pmdset.filter(
+        studentmodule__module_state_key=p).count()) for p in plist)
 
     return problems
 
@@ -136,7 +139,8 @@ def problems_with_psychometric_data(course_id):
 
 def generate_plots_for_problem(problem):
 
-    pmdset = PsychometricData.objects.using(db).filter(studentmodule__module_state_key=problem)
+    pmdset = PsychometricData.objects.using(
+        db).filter(studentmodule__module_state_key=problem)
     nstudents = pmdset.count()
     msg = ""
     plots = []
@@ -177,11 +181,13 @@ def generate_plots_for_problem(problem):
          }"""
 
     if gsv.max > max_grade:
-        msg += "<br/><p><font color='red'>Something is wrong: max_grade=%s, but max(grades)=%s</font></p>" % (max_grade, gsv.max)
+        msg += "<br/><p><font color='red'>Something is wrong: max_grade=%s, but max(grades)=%s</font></p>" % (
+            max_grade, gsv.max)
         max_grade = gsv.max
 
     if max_grade > 1:
-        ghist = make_histogram(grades, np.linspace(0, max_grade, max_grade + 1))
+        ghist = make_histogram(grades, np.linspace(
+            0, max_grade, max_grade + 1))
         ghist_json = json.dumps(ghist.items())
 
         plot = {'title': "Grade histogram for %s" % problem,
@@ -200,7 +206,8 @@ def generate_plots_for_problem(problem):
     dtsv = StatVar()
     for pmd in pmdset:
         try:
-            checktimes = eval(pmd.checktimes)                   # update log of attempt timestamps
+            checktimes = eval(pmd.checktimes)
+                              # update log of attempt timestamps
         except:
             continue
         if len(checktimes) < 2:
@@ -229,7 +236,8 @@ def generate_plots_for_problem(problem):
                 }
         plots.append(plot)
 
-    # one IRT plot curve for each grade received (TODO: this assumes integer grades)
+    # one IRT plot curve for each grade received (TODO: this assumes integer
+    # grades)
     for grade in range(1, int(max_grade) + 1):
         yset = {}
         gset = pmdset.filter(studentmodule__grade=grade)
@@ -246,10 +254,12 @@ def generate_plots_for_problem(problem):
 
         if len(ydat) > 3:         # try to fit to logistic function if enough data points
             try:
-                cfp = curve_fit(func_2pl, xdat, ydat, [1.0, max_attempts / 2.0])
+                cfp = curve_fit(func_2pl, xdat, ydat, [
+                                1.0, max_attempts / 2.0])
                 yset['fitparam'] = cfp
                 yset['fitpts'] = func_2pl(np.array(xdat), *cfp[0])
-                yset['fiterr'] = [yd - yf for (yd, yf) in zip(ydat, yset['fitpts'])]
+                yset['fiterr'] = [yd - yf for (
+                    yd, yf) in zip(ydat, yset['fitpts'])]
                 fitx = np.linspace(xdat[0], xdat[-1], 100)
                 yset['fitx'] = fitx
                 yset['fity'] = func_2pl(np.array(fitx), *cfp[0])
@@ -276,22 +286,27 @@ def generate_plots_for_problem(problem):
         gkey = 'grade_%d' % grade
         if gkey in dataset:
             yset = dataset[gkey]
-            jsdata += "var d%d = %s;\n" % (grade, json.dumps(zip(xdat, yset['ydat'])))
-            jsplots.append('{ data: d%d, lines: { show: false }, points: { show: true}, color: "red" }' % grade)
+            jsdata += "var d%d = %s;\n" % (
+                grade, json.dumps(zip(xdat, yset['ydat'])))
+            jsplots.append(
+                '{ data: d%d, lines: { show: false }, points: { show: true}, color: "red" }' % grade)
             if 'fitpts' in yset:
-                jsdata += 'var fit = %s;\n' % (json.dumps(zip(yset['fitx'], yset['fity'])))
-                jsplots.append('{ data: fit,  lines: { show: true }, color: "blue" }')
+                jsdata += 'var fit = %s;\n' % (json.dumps(
+                    zip(yset['fitx'], yset['fity'])))
+                jsplots.append(
+                    '{ data: fit,  lines: { show: true }, color: "blue" }')
                 (a, b) = yset['fitparam'][0]
                 irtinfo = "(2PL: D=1.7, a=%6.3f, b=%6.3f)" % (a, b)
             else:
                 irtinfo = ""
 
-            plots.append({'title': 'IRT Plot for grade=%s %s' % (grade, irtinfo),
+            plots.append(
+                {'title': 'IRT Plot for grade=%s %s' % (grade, irtinfo),
                           'id': "irt%s" % grade,
                           'info': '',
                           'data': jsdata,
                           'cmd': '[%s], %s' % (','.join(jsplots), axisopts),
-                          })
+                 })
 
     # log.debug('plots = %s' % plots)
     return msg, plots
@@ -327,7 +342,8 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
             state = json.loads(sm.state)
             done = state['done']
         except:
-            log.exception("Oops, failed to eval state for %s (state=%s)" % (sm, sm.state))
+            log.exception(
+                "Oops, failed to eval state for %s (state=%s)" % (sm, sm.state))
             return
 
         pmd.done = done
@@ -337,7 +353,8 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
             log.exception("no attempts for %s (state=%s)" % (sm, sm.state))
 
         try:
-            checktimes = eval(pmd.checktimes)                   # update log of attempt timestamps
+            checktimes = eval(pmd.checktimes)
+                              # update log of attempt timestamps
         except:
             checktimes = []
         checktimes.append(datetime.datetime.now())

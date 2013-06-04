@@ -67,8 +67,9 @@ class MockXQueueRequestHandler(BaseHTTPRequestHandler):
                 # Otherwise, the problem will not realize it's
                 # queued and it will keep waiting for a response
                 # indefinitely
-                delayed_grade_func = lambda: self._send_grade_response(callback_url,
-                                                                       xqueue_header)
+                delayed_grade_func = lambda: self._send_grade_response(
+                    callback_url,
+                    xqueue_header)
 
                 timer = threading.Timer(2, delayed_grade_func)
                 timer.start()
@@ -204,7 +205,8 @@ class MockXQueueServer(HTTPServer):
                'msg' in grade_response_dict)
 
         # Wrap the message in <div> tags to ensure that it is valid XML
-        grade_response_dict['msg'] = "<div>%s</div>" % grade_response_dict['msg']
+        grade_response_dict[
+            'msg'] = "<div>%s</div>" % grade_response_dict['msg']
 
         # Save the response dictionary
         self._grade_response = grade_response_dict

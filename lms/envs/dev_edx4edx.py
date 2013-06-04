@@ -64,7 +64,8 @@ COURSE_SETTINGS = {'edx4edx': {'number': 'edX.01',
 #-----------------------------------------------------------------------------
 
 MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
-    'ssl_auth.ssl_auth.NginxProxyHeaderMiddleware',		# ssl authentication behind nginx proxy
+    'ssl_auth.ssl_auth.NginxProxyHeaderMiddleware',
+    # ssl authentication behind nginx proxy
 )
 
 AUTHENTICATION_BACKENDS = (

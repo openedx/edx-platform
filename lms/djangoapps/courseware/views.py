@@ -58,7 +58,8 @@ def user_groups(user):
         group_names = None
 
     if group_names is None:
-        group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
+        group_names = [
+            u.name for u in UserTestGroup.objects.filter(users=user)]
         cache.set(key, group_names, cache_expiration)
 
     return group_names
@@ -91,7 +92,8 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     # grab the table of contents
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user  # keep just one instance of User
-    toc = toc_for_course(user, request, course, chapter, section, model_data_cache)
+    toc = toc_for_course(
+        user, request, course, chapter, section, model_data_cache)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
@@ -143,7 +145,8 @@ def redirect_to_course_position(course_module):
     chapter = get_current_child(course_module)
     if chapter is None:
         # oops.  Something bad has happened.
-        raise Http404("No chapter found when loading current position in course")
+        raise Http404(
+            "No chapter found when loading current position in course")
 
     urlargs['chapter'] = chapter.url_name
     if course_module.position is not None:
@@ -152,7 +155,8 @@ def redirect_to_course_position(course_module):
     # Relying on default of returning first child
     section = get_current_child(chapter)
     if section is None:
-        raise Http404("No section found when loading current position in course")
+        raise Http404(
+            "No section found when loading current position in course")
 
     urlargs['section'] = section.url_name
     return redirect(reverse('courseware_section', kwargs=urlargs))
@@ -176,30 +180,40 @@ def check_for_active_timelimit_module(request, course_id, course):
     """
     context = {}
 
-    # TODO (cpennington): Once we can query the course structure, replace this with such a query
-    timelimit_student_modules = StudentModule.objects.filter(student=request.user, course_id=course_id, module_type='timelimit')
+    # TODO (cpennington): Once we can query the course structure, replace this
+    # with such a query
+    timelimit_student_modules = StudentModule.objects.filter(
+        student=request.user, course_id=course_id, module_type='timelimit')
     if timelimit_student_modules:
         for timelimit_student_module in timelimit_student_modules:
-            # get the corresponding section_descriptor for the given StudentModel entry:
+            # get the corresponding section_descriptor for the given
+            # StudentModel entry:
             module_state_key = timelimit_student_module.module_state_key
-            timelimit_descriptor = modulestore().get_instance(course_id, Location(module_state_key))
-            timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course.id, request.user,
-                                                                                     timelimit_descriptor, depth=None)
-            timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
-                                                         timelimit_module_cache, course.id, position=None)
+            timelimit_descriptor = modulestore().get_instance(
+                course_id, Location(module_state_key))
+            timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(
+                course.id, request.user,
+                timelimit_descriptor, depth=None)
+            timelimit_module = get_module_for_descriptor(
+                request.user, request, timelimit_descriptor,
+                timelimit_module_cache, course.id, position=None)
             if timelimit_module is not None and timelimit_module.category == 'timelimit' and \
                     timelimit_module.has_begun and not timelimit_module.has_ended:
                 location = timelimit_module.location
                 # determine where to go when the timer expires:
                 if timelimit_descriptor.time_expired_redirect_url is None:
-                    raise Http404("no time_expired_redirect_url specified at this location: {} ".format(timelimit_module.location))
-                context['time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
+                    raise Http404("no time_expired_redirect_url specified at this location: {} ".format(
+                        timelimit_module.location))
+                context[
+                    'time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
                 # Fetch the remaining time relative to the end time as stored in the module when it was started.
                 # This value should be in milliseconds.
                 remaining_time = timelimit_module.get_remaining_time_in_ms()
                 context['timer_expiration_duration'] = remaining_time
-                context['suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
-                return_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
+                context[
+                    'suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
+                return_url = reverse('jump_to', kwargs={
+                                     'course_id': course_id, 'location': location})
                 context['timer_navigation_return_url'] = return_url
     return context
 
@@ -213,24 +227,31 @@ def update_timelimit_module(user, course_id, model_data_cache, timelimit_descrip
     context = {}
     # determine where to go when the exam ends:
     if timelimit_descriptor.time_expired_redirect_url is None:
-        raise Http404("No time_expired_redirect_url specified at this location: {} ".format(timelimit_module.location))
-    context['time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
+        raise Http404("No time_expired_redirect_url specified at this location: {} ".format(
+            timelimit_module.location))
+    context[
+        'time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
 
     if not timelimit_module.has_ended:
         if not timelimit_module.has_begun:
             # user has not started the exam, so start it now.
             if timelimit_descriptor.duration is None:
-                raise Http404("No duration specified at this location: {} ".format(timelimit_module.location))
+                raise Http404("No duration specified at this location: {} ".format(
+                    timelimit_module.location))
             # The user may have an accommodation that has been granted to them.
-            # This accommodation information should already be stored in the module's state.
+            # This accommodation information should already be stored in the
+            # module's state.
             timelimit_module.begin(timelimit_descriptor.duration)
 
         # the exam has been started, either because the student is returning to the
         # exam page, or because they have just visited it.  Fetch the remaining time relative to the
         # end time as stored in the module when it was started.
-        context['timer_expiration_duration'] = timelimit_module.get_remaining_time_in_ms()
-        # also use the timed module to determine whether top-level navigation is visible:
-        context['suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
+        context[
+            'timer_expiration_duration'] = timelimit_module.get_remaining_time_in_ms()
+        # also use the timed module to determine whether top-level navigation
+        # is visible:
+        context[
+            'suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
     return context
 
 
@@ -267,8 +288,10 @@ def index(request, course_id, chapter=None, section=None,
     staff_access = has_access(user, course, 'staff')
     registered = registered_for_course(course, user)
     if not registered:
-        # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug('User %s tried to view course %s but is not enrolled' % (user, course.location.url()))
+        # TODO (vshnayder): do course instructors need to be registered to see
+        # course?
+        log.debug('User %s tried to view course %s but is not enrolled' %
+                  (user, course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
 
     masq = setup_masquerade(request, staff_access)
@@ -277,7 +300,8 @@ def index(request, course_id, chapter=None, section=None,
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             course.id, user, course, depth=2)
 
-        course_module = get_module_for_descriptor(user, request, course, model_data_cache, course.id)
+        course_module = get_module_for_descriptor(
+            user, request, course, model_data_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
                         ' far, should have gotten a course module for this user')
@@ -298,13 +322,16 @@ def index(request, course_id, chapter=None, section=None,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
         }
 
-        chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
+        chapter_descriptor = course.get_child_by(
+            lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
             save_child_position(course_module, chapter)
         else:
-            raise Http404('No chapter descriptor found with name {}'.format(chapter))
+            raise Http404(
+                'No chapter descriptor found with name {}'.format(chapter))
 
-        chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
+        chapter_module = course_module.get_child_by(
+            lambda m: m.url_name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
             if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
@@ -313,7 +340,8 @@ def index(request, course_id, chapter=None, section=None,
             raise Http404
 
         if section is not None:
-            section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
+            section_descriptor = chapter_descriptor.get_child_by(
+                lambda m: m.url_name == section)
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
@@ -322,8 +350,10 @@ def index(request, course_id, chapter=None, section=None,
                 raise Http404
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
-            # which will prefetch the children more efficiently than doing a recursive load
-            section_descriptor = modulestore().get_instance(course.id, section_descriptor.location, depth=None)
+            # which will prefetch the children more efficiently than doing a
+            # recursive load
+            section_descriptor = modulestore().get_instance(
+                course.id, section_descriptor.location, depth=None)
 
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
@@ -343,33 +373,40 @@ def index(request, course_id, chapter=None, section=None,
 
             # check here if this section *is* a timed module.
             if section_module.category == 'timelimit':
-                timer_context = update_timelimit_module(user, course_id, student_module_cache,
-                                                        section_descriptor, section_module)
+                timer_context = update_timelimit_module(
+                    user, course_id, student_module_cache,
+                    section_descriptor, section_module)
                 if 'timer_expiration_duration' in timer_context:
                     context.update(timer_context)
                 else:
-                    # if there is no expiration defined, then we know the timer has expired:
+                    # if there is no expiration defined, then we know the timer
+                    # has expired:
                     return HttpResponseRedirect(timer_context['time_expired_redirect_url'])
             else:
                 # check here if this page is within a course that has an active timed module running.  If so, then
-                # add in the appropriate timer information to the rendering context:
-                context.update(check_for_active_timelimit_module(request, course_id, course))
+                # add in the appropriate timer information to the rendering
+                # context:
+                context.update(check_for_active_timelimit_module(
+                    request, course_id, course))
 
             context['content'] = section_module.get_html()
         else:
             # section is none, so display a message
             prev_section = get_current_child(chapter_module)
             if prev_section is None:
-                # Something went wrong -- perhaps this chapter has no sections visible to the user
+                # Something went wrong -- perhaps this chapter has no sections
+                # visible to the user
                 raise Http404
-            prev_section_url = reverse('courseware_section', kwargs={'course_id': course_id,
-                                                                     'chapter': chapter_descriptor.url_name,
-                                                                     'section': prev_section.url_name})
-            context['content'] = render_to_string('courseware/welcome-back.html',
-                                                  {'course': course,
-                                                   'chapter_module': chapter_module,
-                                                   'prev_section': prev_section,
-                                                   'prev_section_url': prev_section_url})
+            prev_section_url = reverse(
+                'courseware_section', kwargs={'course_id': course_id,
+                                              'chapter': chapter_descriptor.url_name,
+                                              'section': prev_section.url_name})
+            context[
+                'content'] = render_to_string('courseware/welcome-back.html',
+                                              {'course': course,
+                                               'chapter_module': chapter_module,
+                                               'prev_section': prev_section,
+                                               'prev_section_url': prev_section_url})
 
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
@@ -421,11 +458,13 @@ def jump_to(request, course_id, location):
 
     # Complain if there's not data for this location
     try:
-        (course_id, chapter, section, position) = path_to_location(modulestore(), course_id, location)
+        (course_id, chapter, section, position) = path_to_location(
+            modulestore(), course_id, location)
     except ItemNotFoundError:
         raise Http404("No data at this location: {0}".format(location))
     except NoPathToItem:
-        raise Http404("This location is not in any class: {0}".format(location))
+        raise Http404(
+            "This location is not in any class: {0}".format(location))
 
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
@@ -449,10 +488,12 @@ def course_info(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
-    masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
+    masq = setup_masquerade(
+        request, staff_access)    # allow staff to toggle masquerade on info page
 
-    return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
-                                                       'course': course, 'staff_access': staff_access, 'masquerade': masq})
+    return render_to_response(
+        'courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
+                                 'course': course, 'staff_access': staff_access, 'masquerade': masq})
 
 
 @ensure_csrf_cookie
@@ -648,7 +689,8 @@ def progress(request, course_id, student_id=None):
 
     Course staff are allowed to see the progress of students in their class.
     """
-    course = get_course_with_access(request.user, course_id, 'load', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'load', depth=None)
     staff_access = has_access(request.user, course, 'staff')
 
     if student_id is None or student_id == request.user.id:
@@ -675,7 +717,8 @@ def progress(request, course_id, student_id=None):
     grade_summary = grades.grade(student, request, course, model_data_cache)
 
     if courseware_summary is None:
-        # This means the student didn't have access to the course (which the instructor requested)
+        # This means the student didn't have access to the course (which the
+        # instructor requested)
         raise Http404
 
     context = {'course': course,

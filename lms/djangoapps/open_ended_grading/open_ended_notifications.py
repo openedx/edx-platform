@@ -21,8 +21,10 @@ KEY_PREFIX = "open_ended_"
 NOTIFICATION_TYPES = (
     ('student_needs_to_peer_grade', 'peer_grading', 'Peer Grading'),
     ('staff_needs_to_grade', 'staff_grading', 'Staff Grading'),
-    ('new_student_grading_to_view', 'open_ended_problems', 'Problems you have submitted'),
-    ('flagged_submissions_exist', 'open_ended_flagged_problems', 'Flagged Submissions')
+    ('new_student_grading_to_view', 'open_ended_problems',
+     'Problems you have submitted'),
+    ('flagged_submissions_exist',
+     'open_ended_flagged_problems', 'Flagged Submissions')
 )
 
 
@@ -34,7 +36,8 @@ def staff_grading_notifications(course, user):
     student_id = unique_id_for_user(user)
     notification_type = "staff"
 
-    success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
+    success, notification_dict = get_value_from_cache(
+        student_id, course_id, notification_type)
     if success:
         return notification_dict
 
@@ -54,9 +57,11 @@ def staff_grading_notifications(course, user):
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
 
-    notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
+    notification_dict = {'pending_grading': pending_grading,
+                         'img_path': img_path, 'response': notifications}
 
-    set_value_in_cache(student_id, course_id, notification_type, notification_dict)
+    set_value_in_cache(
+        student_id, course_id, notification_type, notification_dict)
 
     return notification_dict
 
@@ -70,19 +75,22 @@ def peer_grading_notifications(course, user):
         replace_urls=None,
         xblock_model_data={}
     )
-    peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
+    peer_gs = peer_grading_service.PeerGradingService(
+        settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
     img_path = ""
     course_id = course.id
     student_id = unique_id_for_user(user)
     notification_type = "peer"
 
-    success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
+    success, notification_dict = get_value_from_cache(
+        student_id, course_id, notification_type)
     if success:
         return notification_dict
 
     try:
-        notifications = json.loads(peer_gs.get_notifications(course_id, student_id))
+        notifications = json.loads(
+            peer_gs.get_notifications(course_id, student_id))
         if notifications['success']:
             if notifications['student_needs_to_peer_grade']:
                 pending_grading = True
@@ -97,9 +105,11 @@ def peer_grading_notifications(course, user):
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
 
-    notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
+    notification_dict = {'pending_grading': pending_grading,
+                         'img_path': img_path, 'response': notifications}
 
-    set_value_in_cache(student_id, course_id, notification_type, notification_dict)
+    set_value_in_cache(
+        student_id, course_id, notification_type, notification_dict)
 
     return notification_dict
 
@@ -117,7 +127,8 @@ def combined_notifications(course, user):
     pending_grading = False
     img_path = ""
     notifications = {}
-    notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
+    notification_dict = {'pending_grading': pending_grading,
+                         'img_path': img_path, 'response': notifications}
 
     # We don't want to show anonymous users anything.
     if not user.is_authenticated():
@@ -133,14 +144,16 @@ def combined_notifications(course, user):
         xblock_model_data={}
     )
     # Initialize controller query service using our mock system
-    controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
+    controller_qs = ControllerQueryService(
+        settings.OPEN_ENDED_GRADING_INTERFACE, system)
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, course, 'staff')
     course_id = course.id
     notification_type = "combined"
 
     # See if we have a stored value in the cache
-    success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
+    success, notification_dict = get_value_from_cache(
+        student_id, course_id, notification_type)
     if success:
         return notification_dict
 
@@ -148,22 +161,27 @@ def combined_notifications(course, user):
     last_login = user.last_login
 
     # Find the modules they have seen since they logged in
-    last_module_seen = StudentModule.objects.filter(student=user, course_id=course_id,
-                                                    modified__gt=last_login).values('modified').order_by(
-                                                        '-modified')
+    last_module_seen = StudentModule.objects.filter(
+        student=user, course_id=course_id,
+        modified__gt=last_login).values('modified').order_by(
+            '-modified')
     last_module_seen_count = last_module_seen.count()
 
     if last_module_seen_count > 0:
-        # The last time they viewed an updated notification (last module seen minus how long notifications are cached)
-        last_time_viewed = last_module_seen[0]['modified'] - datetime.timedelta(seconds=(NOTIFICATION_CACHE_TIME + 60))
+        # The last time they viewed an updated notification (last module seen
+        # minus how long notifications are cached)
+        last_time_viewed = last_module_seen[0][
+            'modified'] - datetime.timedelta(seconds=(NOTIFICATION_CACHE_TIME + 60))
     else:
-        # If they have not seen any modules since they logged in, then don't refresh
+        # If they have not seen any modules since they logged in, then don't
+        # refresh
         return {'pending_grading': False, 'img_path': img_path, 'response': notifications}
 
     try:
         # Get the notifications from the grading controller
-        controller_response = controller_qs.check_combined_notifications(course.id, student_id, user_is_staff,
-                                                                         last_time_viewed)
+        controller_response = controller_qs.check_combined_notifications(
+            course.id, student_id, user_is_staff,
+            last_time_viewed)
         notifications = json.loads(controller_response)
         if notifications['success']:
             if notifications['overall_need_to_check']:
@@ -178,10 +196,12 @@ def combined_notifications(course, user):
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
 
-    notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
+    notification_dict = {'pending_grading': pending_grading,
+                         'img_path': img_path, 'response': notifications}
 
     # Store the notifications in the cache
-    set_value_in_cache(student_id, course_id, notification_type, notification_dict)
+    set_value_in_cache(
+        student_id, course_id, notification_type, notification_dict)
 
     return notification_dict
 
