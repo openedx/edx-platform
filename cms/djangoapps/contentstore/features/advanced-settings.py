@@ -42,12 +42,8 @@ def edit_the_value_of_a_policy_key(step):
     It is hard to figure out how to get into the CodeMirror
     area, so cheat and do it from the policy key field :)
     """
-    #world.css_find(".CodeMirror")[12].click()
-    all_mirrors = world.css_find(".CodeMirror")
-    for codeMirror in all_mirrors:
-        if codeMirror.text == DISPLAY_NAME_VALUE:
-            codeMirror.click()
-    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")[0]
+    world.css_find(".CodeMirror")[get_index_of(DISPLAY_NAME_KEY)].click()
+    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
     g._element.send_keys(Keys.ARROW_LEFT, ' ', 'X')
 
 
@@ -129,11 +125,8 @@ def get_display_name_value():
 
 def change_display_name_value(step, new_value):
 
-    all_mirrors = world.css_find(".CodeMirror")
-    for codeMirror in all_mirrors:
-        if codeMirror.text == DISPLAY_NAME_VALUE:
-            codeMirror.click()
-    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")[0]
+    world.css_find(".CodeMirror")[get_index_of(DISPLAY_NAME_KEY)].click()
+    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
     display_name = get_display_name_value()
     for count in range(len(display_name)):
         g._element.send_keys(Keys.END, Keys.BACK_SPACE)
