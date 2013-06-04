@@ -230,7 +230,7 @@ def signin_user(request):
 
 
 @ensure_csrf_cookie
-def register_user(request):
+def register_user(request, extra_context={}):
     """
     This view will display the non-modal registration form
     """
@@ -241,6 +241,8 @@ def register_user(request):
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action')
     }
+    context.update(extra_context)
+
     return render_to_response('register.html', context)
 
 
@@ -282,9 +284,19 @@ def dashboard(request):
 
     # Get the 3 most recent news
     top_news = _get_news(top=3) if not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False) else None
+            
+    # get info w.r.t ExternalAuthMap
+    external_auth_map = None
+    if 'external_auth' in settings.INSTALLED_APPS:
+        from external_auth.models import ExternalAuthMap
+        try:
+            external_auth_map = ExternalAuthMap.objects.get(user=user)
+        except ExternalAuthMap.DoesNotExist:
+            pass
 
     context = {'courses': courses,
                'message': message,
+               'external_auth_map': external_auth_map,
                'staff_access': staff_access,
                'errored_courses': errored_courses,
                'show_courseware_links_for': show_courseware_links_for,
@@ -571,11 +583,19 @@ def create_account(request, post_override=None):
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
+    # unless originally we didn't get a valid email or name from the external auth
     DoExternalAuth = 'ExternalAuthMap' in request.session
     if DoExternalAuth:
         eamap = request.session['ExternalAuthMap']
-        email = eamap.external_email
-        name = eamap.external_name
+        try:
+            validate_email(eamap.external_email)
+            email = eamap.external_email
+        except ValidationError:
+            email = post_vars.get('email', '')
+        if eamap.external_name.strip() == '':
+            name = post_vars.get('name', '')
+        else:
+            name = eamap.external_name 
         password = eamap.internal_password
         post_vars = dict(post_vars.items())
         post_vars.update(dict(email=email, name=name, password=password))
@@ -665,8 +685,6 @@ def create_account(request, post_override=None):
     login(request, login_user)
     request.session.set_expiry(0)
 
-    try_change_enrollment(request)
-
     if DoExternalAuth:
         eamap.user = login_user
         eamap.dtsignup = datetime.datetime.now(UTC)
@@ -677,6 +695,8 @@ def create_account(request, post_override=None):
             log.debug('bypassing activation email')
             login_user.is_active = True
             login_user.save()
+
+    try_change_enrollment(request)
 
     statsd.increment("common.student.account_created")
 
