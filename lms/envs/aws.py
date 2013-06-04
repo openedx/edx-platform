@@ -122,6 +122,10 @@ if not THEME_NAME is None:
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
+#Additional installed apps
+for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
+    INSTALLED_APPS += (app,)
+
 for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
     MITX_FEATURES[feature] = value
 
