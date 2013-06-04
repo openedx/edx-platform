@@ -161,3 +161,11 @@ def i_created_a_video_component(step):
         'i4x://edx/templates/video/default',
         '.xmodule_VideoModule'
     )
+
+
+@step('I have clicked the new unit button')
+def open_new_unit(step):
+    step.given('I have opened a new course section in Studio')
+    step.given('I have added a new subsection')
+    step.given('I expand the first section')
+    world.css_click('a.new-unit-item')
