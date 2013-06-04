@@ -13,28 +13,18 @@ TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'Test Course'
 TEST_SECTION_NAME = 'Test Section'
 SUBSECTION_2_LOC = None
+COURSE_LOC = None
 
 
 @step(u'I am viewing a course with multiple sections')
 def view_course_multiple_sections(step):
-    # First clear the modulestore so we don't try to recreate
-    # the same course twice
-    # This also ensures that the necessary templates are loaded
-    world.clear_courses()
-
-    # Create the course
-    # We always use the same org and display name,
-    # but vary the course identifier (e.g. 600x or 191x)
-    course = world.CourseFactory.create(org=TEST_COURSE_ORG,
-                                        number="model_course",
-                                        display_name=TEST_COURSE_NAME)
-
+    create_course()
     # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=course.location,
+    section1 = world.ItemFactory.create(parent_location=COURSE_LOC,
                                        display_name=TEST_SECTION_NAME+"1")
 
     # Add a section to the course to contain problems
-    section2 = world.ItemFactory.create(parent_location=course.location,
+    section2 = world.ItemFactory.create(parent_location=COURSE_LOC,
                                        display_name=TEST_SECTION_NAME+"2")
 
     world.ItemFactory.create(parent_location=section1.location,
@@ -48,39 +38,15 @@ def view_course_multiple_sections(step):
     add_problem_to_course_section('model_course', 'multiple choice', section=1)
     add_problem_to_course_section('model_course', 'drop down', section=2)
 
-    # Create the user
-    world.create_user('robot')
-    u = User.objects.get(username='robot')
-
-    # If the user is not already enrolled, enroll the user.
-    # TODO: change to factory
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id("model_course"))
-
-    world.log_in('robot', 'test')
-    chapter_name = (TEST_SECTION_NAME+"1").replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
-                    (chapter_name, section_name))
-
-    world.browser.visit(url)
+    create_user_and_visit_course()
 
 
 @step(u'I am viewing a section with multiple subsections')
 def view_course_multiple_subsections(step):
-        # First clear the modulestore so we don't try to recreate
-    # the same course twice
-    # This also ensures that the necessary templates are loaded
-    world.clear_courses()
-
-    # Create the course
-    # We always use the same org and display name,
-    # but vary the course identifier (e.g. 600x or 191x)
-    course = world.CourseFactory.create(org=TEST_COURSE_ORG,
-                                        number="model_course",
-                                        display_name=TEST_COURSE_NAME)
+    create_course()
 
     # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=course.location,
+    section1 = world.ItemFactory.create(parent_location=COURSE_LOC,
                                        display_name=TEST_SECTION_NAME+"1")
 
     world.ItemFactory.create(parent_location=section1.location,
@@ -93,43 +59,17 @@ def view_course_multiple_subsections(step):
     global SUBSECTION_2_LOC
     SUBSECTION_2_LOC = section2.location
 
-
     add_problem_to_course_section('model_course', 'multiple choice', section=1)
     add_problem_to_course_section('model_course', 'drop down', section=1, subsection=2)
 
-    # Create the user
-    world.create_user('robot')
-    u = User.objects.get(username='robot')
-
-    # If the user is not already enrolled, enroll the user.
-    # TODO: change to factory
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id("model_course"))
-
-    world.log_in('robot', 'test')
-    chapter_name = (TEST_SECTION_NAME+"1").replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
-                    (chapter_name, section_name))
-
-    world.browser.visit(url)
+    create_user_and_visit_course()
 
 
 @step(u'I am viewing a section with multiple sequences')
 def view_course_multiple_sequences(step):
-        # First clear the modulestore so we don't try to recreate
-    # the same course twice
-    # This also ensures that the necessary templates are loaded
-    world.clear_courses()
-
-    # Create the course
-    # We always use the same org and display name,
-    # but vary the course identifier (e.g. 600x or 191x)
-    course = world.CourseFactory.create(org=TEST_COURSE_ORG,
-                                        number="model_course",
-                                        display_name=TEST_COURSE_NAME)
-
+    create_course()
     # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=course.location,
+    section1 = world.ItemFactory.create(parent_location=COURSE_LOC,
                                        display_name=TEST_SECTION_NAME+"1")
 
 
@@ -140,12 +80,70 @@ def view_course_multiple_sequences(step):
     add_problem_to_course_section('model_course', 'multiple choice', section=1)
     add_problem_to_course_section('model_course', 'drop down', section=1)
 
-    # Create the user
+    create_user_and_visit_course()
+
+
+@step(u'I click on section "([^"]*)"')
+def click_on_section(step, section):
+    section_css = 'h3[tabindex="-1"]'
+    world.css_click(section_css)
+
+    subid = "ui-accordion-accordion-panel-"+str(int(section)-1)
+    subsection_css = 'ul[id="%s"]>li[class=" "] a' % subid
+    world.css_click(subsection_css)
+
+
+@step(u'I click on subsection "([^"]*)"')
+def click_on_subsection(step, subsection):
+    subsection_css = 'ul[id="ui-accordion-accordion-panel-0"]>li[class=" "]>a'
+    world.css_click(subsection_css)
+
+
+@step(u'I click on sequence "([^"]*)"')
+def click_on_sequence(step, sequence):
+    sequence_css = 'a[data-element="%s"]' % sequence
+    world.css_click(sequence_css)
+
+
+@step(u'I should see the content of (?:sub)?section "([^"]*)"')
+def see_section_content(step, section):
+    if section == "2":
+        text = 'The correct answer is Option 2'
+    elif section == "1":
+        text = 'The correct answer is Choice 3'
+    step.given('I should see "' + text + '" somewhere on the page')
+
+
+@step(u'I should see the content of sequence "([^"]*)"')
+def see_sequence_content(step, sequence):
+    step.given('I should see the content of section "2"')
+
+
+@step(u'I return later')
+def return_to_course(step):
+    step.given('I visit the homepage')
+    world.click_link("View Course")
+    world.click_link("Courseware")
+
+#####################
+#      HELPERS
+#####################
+
+
+def create_course():
+    world.clear_courses()
+
+    course = world.CourseFactory.create(org=TEST_COURSE_ORG,
+                                        number="model_course",
+                                        display_name=TEST_COURSE_NAME)
+    global COURSE_LOC
+    COURSE_LOC = course.location
+
+
+def create_user_and_visit_course():
     world.create_user('robot')
     u = User.objects.get(username='robot')
 
-    # If the user is not already enrolled, enroll the user.
-    # TODO: change to factory
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id("model_course"))
 
     world.log_in('robot', 'test')
@@ -155,58 +153,6 @@ def view_course_multiple_sequences(step):
                     (chapter_name, section_name))
 
     world.browser.visit(url)
-
-
-@step(u'I click on section "([^"]*)"')
-def click_on_section(step, section):
-    section_css = 'h3[tabindex="-1"]'
-    elist = world.css_find(section_css)
-    assert not elist.is_empty()
-    elist.click()
-    subid = "ui-accordion-accordion-panel-"+str(int(section)-1)
-    subsection_css = 'ul[id="%s"]>li[class=" "] a' % subid
-    elist = world.css_find(subsection_css)
-    assert not elist.is_empty()
-    elist.click()
-
-
-@step(u'I click on subsection "([^"]*)"')
-def click_on_subsection(step, subsection):
-    subsection_css = 'ul[id="ui-accordion-accordion-panel-0"]>li[class=" "] a'
-    elist = world.css_find(subsection_css)
-    assert not elist.is_empty()
-    elist.click()
-
-@step(u'I click on sequence "([^"]*)"')
-def click_on_subsection(step, sequence):
-    sequence_css = 'a[data-element="%s"]' % sequence
-    elist = world.css_find(sequence_css)
-    assert not elist.is_empty()
-    elist.click()
-
-
-@step(u'I see the content of (?:sub)?section "([^"]*)"')
-def see_section_content(step, section):
-    if section == "2":
-        text = 'The correct answer is Option 2'
-    elif section == "1":
-        text = 'The correct answer is Choice 3'
-    step.given('I should see "' + text + '" somewhere on the page')
-
-
-@step(u'I see the content of sequence "([^"]*)"')
-def see_sequence_content(step, sequence):
-    step.given('I see the content of section "2"')
-
-
-@step(u'I go to the section')
-def return_to_course(step):
-    world.click_link("View Course")
-    world.click_link("Courseware")
-
-###
-#HELPERS
-###
 
 
 def add_problem_to_course_section(course, problem_type, extraMeta=None, section=1, subsection=1):
