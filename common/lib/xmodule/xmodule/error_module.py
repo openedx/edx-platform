@@ -1,3 +1,8 @@
+"""
+Modules that get shown to the users when an error has occured while
+loading or rendering other modules
+"""
+
 import hashlib
 import logging
 import json
@@ -22,12 +27,19 @@ log = logging.getLogger(__name__)
 
 
 class ErrorFields(object):
+    """
+    XBlock fields used by the ErrorModules
+    """
     contents = String(scope=Scope.content)
     error_msg = String(scope=Scope.content)
     display_name = String(scope=Scope.settings)
 
 
 class ErrorModule(ErrorFields, XModule):
+    """
+    Module that gets shown to staff when there has been an error while
+    loading or rendering other modules
+    """
 
     def get_html(self):
         '''Show an error to staff.
@@ -42,6 +54,10 @@ class ErrorModule(ErrorFields, XModule):
 
 
 class NonStaffErrorModule(ErrorFields, XModule):
+    """
+    Module that gets shown to students when there has been an error while
+    loading or rendering other modules
+    """
     def get_html(self):
         '''Show an error to a student.
         TODO (vshnayder): proper style, divs, etc.
@@ -61,7 +77,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
     module_class = ErrorModule
 
     @classmethod
-    def _construct(self, system, contents, error_msg, location):
+    def _construct(cls, system, contents, error_msg, location):
 
         if isinstance(location, dict) and 'course' in location:
             location = Location(location)
@@ -82,7 +98,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
             'contents': contents,
             'display_name': 'Error: ' + location.url()
         }
-        return ErrorDescriptor(
+        return cls(
             system,
             'error',
             location,

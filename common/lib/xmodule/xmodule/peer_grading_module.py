@@ -23,7 +23,7 @@ USE_FOR_SINGLE_LOCATION = False
 LINK_TO_LOCATION = ""
 TRUE_DICT = [True, "True", "true", "TRUE"]
 MAX_SCORE = 1
-IS_GRADED = False
+IS_GRADED = True
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
 
@@ -595,3 +595,6 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     stores_state = True
     has_score = True
     always_recalculate_grades = True
+
+    #Specify whether or not to pass in open ended interface
+    needs_open_ended_interface = True
