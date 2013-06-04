@@ -6,27 +6,6 @@ if USE_CUSTOM_THEME
     THEME_SASS = File.join(THEME_ROOT, "static", "sass")
 end
 
-# Run the specified file through the Mako templating engine, providing
-# the ENV_TOKENS to the templating context.
-def preprocess_with_mako(filename)
-    # simple command-line invocation of Mako engine
-    mako = "from mako.template import Template;" +
-           "print Template(filename=\"#{filename}\")" +
-           # Total hack. It works because a Python dict literal has
-           # the same format as a JSON object.
-           ".render(env=#{ENV_TOKENS.to_json});"
-
-    # strip off the .mako extension
-    output_filename = filename.chomp(File.extname(filename))
-
-    # just pipe from stdout into the new file, exiting on failure
-    File.open(output_filename, 'w') do |file|
-      file.write(`python -c '#{mako}'`)
-      exit_code = $?.to_i
-      abort "#{mako} failed with #{exit_code}" if exit_code.to_i != 0
-    end
-end
-
 def xmodule_cmd(watch=false, debug=false)
     xmodule_cmd = 'xmodule_assets common/static/xmodule'
     if watch
@@ -81,11 +60,12 @@ namespace :assets do
     desc "Compile all assets in debug mode"
     multitask :debug
 
-    desc "Preprocess all static assets that have the .mako extension"
-    task :preprocess do
-      # Run assets through the Mako templating engine. Right now we
-      # just hardcode the asset filenames.
-      preprocess_with_mako("lms/static/sass/application.scss.mako")
+    desc "Preprocess all templatized static asset files"
+    task :preprocess, [:system, :env] do |t, args|
+      args.with_defaults(:system => "lms", :env => "dev")
+      sh(django_admin(args.system, args.env, "preprocess_assets")) do |ok, status|
+        abort "asset preprocessing failed!" if !ok
+      end
     end
 
     desc "Watch all assets for changes and automatically recompile"
@@ -135,7 +115,6 @@ namespace :assets do
         end
     end
 
-
     multitask :sass => 'assets:xmodule'
     namespace :sass do
         # In watch mode, sass doesn't immediately compile out of date files,
@@ -150,16 +129,25 @@ namespace :assets do
     end
 end
 
+# This task does the real heavy lifting to gather all of the static
+# assets. We want people to call it via the wrapper below, so we
+# don't provide a description so that it won't show up in rake -T.
+task :gather_assets, [:system, :env] => :assets do |t, args|
+    sh("#{django_admin(args.system, args.env, 'collectstatic', '--noinput')} > /dev/null") do |ok, status|
+        if !ok
+            abort "collectstatic failed!"
+        end
+    end
+end
+
 [:lms, :cms].each do |system|
     # Per environment tasks
     environments(system).each do |env|
+        # This task wraps the one above, since we need the system and
+        # env arguments to be passed to all dependent tasks.
         desc "Compile coffeescript and sass, and then run collectstatic in the specified environment"
-        task "#{system}:gather_assets:#{env}" => :assets do
-            sh("#{django_admin(system, env, 'collectstatic', '--noinput')} > /dev/null") do |ok, status|
-                if !ok
-                    abort "collectstatic failed!"
-                end
-            end
+        task "#{system}:gather_assets:#{env}" do
+          Rake::Task[:gather_assets].invoke(system, env)
         end
     end
 end

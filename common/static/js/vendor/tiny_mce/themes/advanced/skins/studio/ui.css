@@ -25,8 +25,8 @@
 
 /* Layout */
 .studioSkin table.mceLayout {border:0;}
-.studioSkin table.mceLayout tr.mceFirst td {border-top:1px solid #3c3c3c;}
-.studioSkin table.mceLayout tr.mceLast td {border-bottom:1px solid #3c3c3c;}
+.studioSkin table.mceLayout tr.mceFirst td {border-top: 1px solid #D1DCE6; border-left: none; border-right:none;}
+.studioSkin table.mceLayout tr.mceLast td {border-bottom:none;}
 .studioSkin table.mceToolbar, .studioSkin tr.mceFirst .mceToolbar tr td, .studioSkin tr.mceLast .mceToolbar tr td {border:0; margin:0; padding:0;}
 .studioSkin td.mceToolbar {
   background: -webkit-linear-gradient(top, #d4dee8, #c9d5e2);
@@ -36,11 +36,11 @@
   background: linear-gradient(top, #d4dee8, #c9d5e2);
   border: 1px solid #3c3c3c;
   border-bottom-color: #a5aaaf;
-  border-radius: 3px 3px 0 0;
+  border-radius: 0;
   padding: 10px 10px 9px;
   vertical-align: top;
 }
-.studioSkin .mceIframeContainer {border: 1px solid #3c3c3c; border-top: none;}
+.studioSkin .mceIframeContainer {border: 1px solid white; border-top: none;}
 .studioSkin .mceStatusbar {background:#F0F0EE; font-size:9pt; line-height:16px; overflow:visible; color:#000; display:block; height:20px}
 .studioSkin .mceStatusbar div {float:left; margin:2px}
 .studioSkin .mceStatusbar a.mceResize {display:block; float:right; background:url(../../img/studio-icons.png) -800px 0; width:20px; height:20px; cursor:se-resize; outline:0}

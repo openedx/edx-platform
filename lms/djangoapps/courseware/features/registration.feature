@@ -16,5 +16,5 @@ Feature: Register for a course
     Then I should see the course numbered "6.002x" in my dashboard
     When I unregister for the course numbered "6.002x"
     Then I should be on the dashboard page
-    And I should see "Looks like you haven't registered for any courses yet." somewhere in the page
+    And I should see an empty dashboard message
     And I should NOT see the course numbered "6.002x" in my dashboard

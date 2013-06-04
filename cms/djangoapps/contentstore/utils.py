@@ -107,9 +107,18 @@ def get_lms_link_for_about_page(location):
     """
     Returns the url to the course about page from the location tuple.
     """
-    if settings.LMS_BASE is not None:
-        lms_link = "//{lms_base}/courses/{course_id}/about".format(
-            lms_base=settings.LMS_BASE,
+    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+        # Root will be "www.edx.org". The complete URL will still not be exactly correct,
+        # but redirects exist from www.edx.org to get to the drupal course about page URL.
+        about_base = settings.MKTG_URLS.get('ROOT')
+    elif settings.LMS_BASE is not None:
+        about_base = settings.LMS_BASE
+    else:
+        about_base = None
+
+    if about_base is not None:
+        lms_link = "//{about_base_url}/courses/{course_id}/about".format(
+            about_base_url=about_base,
             course_id=get_course_id(location)
         )
     else:

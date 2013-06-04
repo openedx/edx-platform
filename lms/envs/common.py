@@ -113,7 +113,10 @@ MITX_FEATURES = {
     'ENABLE_SERVICE_STATUS': False,
 
     # Toggle to indicate use of a custom theme
-    'USE_CUSTOM_THEME': False
+    'USE_CUSTOM_THEME': False,
+
+    # Do autoplay videos for students
+    'AUTOPLAY_VIDEOS': True
 }
 
 # Used for A/B testing
@@ -659,6 +662,7 @@ INSTALLED_APPS = (
     'service_status',
 
     # For asset pipelining
+    'mitxmako',
     'pipeline',
     'staticfiles',
     'static_replace',
