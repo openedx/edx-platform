@@ -29,10 +29,9 @@ def click_component_from_menu(instance_id, expected_css):
     """
     elem_css = "a[data-location='%s']" % instance_id
     elements = world.css_find(elem_css)
-    if len(elements) == 1:  # Multiple templates
+    assert(len(elements) == 1)
+    if elements[0]['id'] == instance_id:  # If this is a component with multiple templates
         world.css_click(elem_css)
-    else:  # Single template
-        assert(len(filter(lambda ele: ele.has_class('single-template'), elements)) == 1)
     assert_equal(1, len(world.css_find(expected_css)))
 
 
