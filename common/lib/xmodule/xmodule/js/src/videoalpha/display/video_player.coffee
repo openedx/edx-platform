@@ -184,7 +184,6 @@ class @VideoPlayerAlpha extends SubviewAlpha
       @caption.pause()
 
   onPlay: =>
-    @video.log 'play_video'
     unless @player.interval
       @player.interval = setInterval(@update, 200)
     if @video.show_captions is true
@@ -193,7 +192,6 @@ class @VideoPlayerAlpha extends SubviewAlpha
     @progressSlider.play()
 
   onPause: =>
-    @video.log 'pause_video'
     clearInterval(@player.interval)
     @player.interval = null
     if @video.show_captions is true
@@ -206,6 +204,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
       @caption.pause()
 
   onSeek: (event, time) =>
+    console.log 'old time = ' + @currentTime + ', new time = ' + time
     @player.seekTo(time, true)
     if @isPlaying()
       clearInterval(@player.interval)
