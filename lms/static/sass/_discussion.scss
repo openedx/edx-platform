@@ -1308,6 +1308,9 @@ body.discussion {
 
     .label {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
       display: block;
       font-size: 12px;
     }
@@ -1343,8 +1346,10 @@ body.discussion {
 >>>>>>> basic shell for discussion home page with both profile information and email notification settings
       
       .label-area {
+        padding: $baseline;
         display: inline-block;
         min-width: $baseline*5;
+<<<<<<< HEAD
 <<<<<<< HEAD
         width: 25%;
         vertical-align: middle;
@@ -1353,6 +1358,9 @@ body.discussion {
           font-weight: 700;
 =======
         width: 20%;
+=======
+        width: 25%;
+>>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
         vertical-align: middle;
 
         .profile-link {
@@ -1363,6 +1371,7 @@ body.discussion {
 
       .stats-grouping {
         display: inline-block;
+<<<<<<< HEAD
         width: 70%;
 <<<<<<< HEAD
         padding-left: $baseline;
@@ -1384,12 +1393,25 @@ body.discussion {
             vertical-align: middle;
           }
 =======
+=======
+        width: 65%;
+>>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
 
         .profile-stat {
           display: inline-block;
-          padding: $baseline;
+          width: 30%;
           vertical-align: middle;
+<<<<<<< HEAD
 >>>>>>> basic shell for discussion home page with both profile information and email notification settings
+=======
+          font-size: 12px;
+
+          .count {
+            display: inline-block;
+            font-size: 28px;
+            padding: 0 $baseline/2;
+          }
+>>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
         }
       }
     }
@@ -1495,7 +1517,9 @@ body.discussion {
 
       .row-item {
         display: inline-block;
+        font-size: 12px;
         width: 20%;
+        vertical-align: middle;
       }
     }
   }
