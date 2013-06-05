@@ -24,7 +24,7 @@ Feature: Overview Toggle Section
     Scenario: Collapse link is not removed after last section of a course is deleted
         Given I have a course with 1 section
         And I navigate to the course overview page
-        When I confirm all alerts
+        When I will confirm all alerts
         And I press the "section" delete icon
         Then I see the "Collapse All Sections" link
 

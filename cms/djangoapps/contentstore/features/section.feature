@@ -29,6 +29,6 @@ Feature: Create Section
   Scenario: Delete section
     Given I have opened a new course in Studio
     And I have added a new section
-    When I confirm all alerts
+    When I will confirm all alerts
     And I press the "section" delete icon
     Then the section does not exist
