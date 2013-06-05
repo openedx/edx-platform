@@ -535,7 +535,6 @@ if [[ "${CURRENT_RUBY#*$CLEAN_RUBY_VER}" != "$CURRENT_RUBY" ]]; then
   read dummy
 
   export PATH=$HOME/.rvm/rubies/ruby-$RUBY_VER/bin:$PATH
-
 fi
 
 cd $BASE/edx-platform
