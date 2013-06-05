@@ -13,6 +13,7 @@ from xmodule.x_module import XModuleDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.html_module import HtmlDescriptor
 
 
 class TemplateTests(unittest.TestCase):
@@ -42,6 +43,13 @@ class TemplateTests(unittest.TestCase):
         self.assertIn('data', dropdown)
         self.assertRegexpMatches(dropdown['metadata']['markdown'], r'^Dropdown.*')
         self.assertRegexpMatches(dropdown['data'], r'<problem>\s*<p>Dropdown.*')
+
+    def test_get_some_templates(self):
+        self.assertEqual(len(SequenceDescriptor.templates()), 0)
+        self.assertGreater(len(HtmlDescriptor.templates()), 0)
+        self.assertIsNone(SequenceDescriptor.get_template('doesntexist.yaml'))
+        self.assertIsNone(HtmlDescriptor.get_template('doesntexist.yaml'))
+        self.assertIsNotNone(HtmlDescriptor.get_template('announcement.yaml'))
 
     def test_factories(self):
         test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
@@ -112,9 +120,9 @@ class TemplateTests(unittest.TestCase):
 
     def test_delete_course(self):
         test_course = persistent_factories.PersistentCourseFactory.create(
-            org='testx', 
+            org='testx',
             prettyid='edu.harvard.history.doomed',
-            display_name='doomed test course', 
+            display_name='doomed test course',
             user_id='testbot')
         persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
@@ -136,9 +144,9 @@ class TemplateTests(unittest.TestCase):
         Test get_block_generations
         """
         test_course = persistent_factories.PersistentCourseFactory.create(
-            org='testx', 
+            org='testx',
             prettyid='edu.harvard.history.hist101',
-            display_name='history test course', 
+            display_name='history test course',
             user_id='testbot')
         chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location, user_id='testbot')

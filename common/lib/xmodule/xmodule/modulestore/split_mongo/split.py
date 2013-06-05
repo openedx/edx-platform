@@ -787,14 +787,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
         new_id = self.course_index.insert(index_entry)
         return self.get_course(CourseLocator(course_id=new_id, revision=master_version))
 
-    # TODO refactor or remove callers
-    def clone_item(self, source, location):
-        """
-        Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location`
-        """
-        raise NotImplementedError("Replace w/ create or update_item")
-
     def update_item(self, descriptor, user_id, force=False):
         """
         Save the descriptor's definition, metadata, & children references (i.e., it doesn't descend the tree).

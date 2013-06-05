@@ -287,6 +287,10 @@ Template = namedtuple("Template", "metadata data children")
 
 
 class ResourceTemplates(object):
+    """
+    Gets the templates associated w/ a containing cls. The cls must have a 'template_dir_name' attribute.
+    It finds the templates as directly in this directory under 'templates'.
+    """
     @classmethod
     def templates(cls):
         """
@@ -297,24 +301,52 @@ class ResourceTemplates(object):
         inside the 'templates' resource directory to pull templates from
         """
         templates = []
-        if hasattr(cls, 'template_dir_name') and getattr(cls, 'template_dir_name'):
-            dirname = os.path.join('templates', cls.template_dir_name)
-            if not resource_isdir(__name__, dirname):
-                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
-                    dir=dirname,
-                    cls_name=cls.__name__,
-                ))
-                return []
-
+        dirname = cls.get_template_dir()
+        if dirname is not None:
             for template_file in resource_listdir(__name__, dirname):
                 if not template_file.endswith('.yaml'):
                     log.warning("Skipping unknown template file %s" % template_file)
                     continue
                 template_content = resource_string(__name__, os.path.join(dirname, template_file))
                 template = yaml.safe_load(template_content)
+                template['template_id'] = template_file
                 templates.append(template)
 
         return templates
+
+    @classmethod
+    def get_template_dir(cls):
+        if getattr(cls, 'template_dir_name', None):
+            dirname = os.path.join('templates', getattr(cls, 'template_dir_name'))
+            if not resource_isdir(__name__, dirname):
+                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                    dir=dirname,
+                    cls_name=cls.__name__,
+                ))
+                return None
+            else:
+                return dirname
+        else:
+            return None
+
+    @classmethod
+    def get_template(cls, template_id):
+        """
+        Get a single template by the given id (which is the file name identifying it w/in the class's
+        template_dir_name)
+
+        """
+        dirname = cls.get_template_dir()
+        if dirname is not None:
+            try:
+                template_content = resource_string(__name__, os.path.join(dirname, template_id))
+            except IOError:
+                return None
+            template = yaml.safe_load(template_content)
+            template['template_id'] = template_id
+            return template
+        else:
+            return None
 
 
 class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):

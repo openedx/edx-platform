@@ -714,7 +714,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             html=True
         )
 
-    def test_clone_item(self):
+    def test_create_item(self):
         """Test cloning an item. E.g. creating a new section"""
         CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
@@ -724,7 +724,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             'display_name': 'Section One',
         }
 
-        resp = self.client.post(reverse('clone_item'), section_data)
+        resp = self.client.post(reverse('create_item'), section_data)
 
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
@@ -742,7 +742,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             'category': 'problem'
         }
 
-        resp = self.client.post(reverse('clone_item'), problem_data)
+        resp = self.client.post(reverse('create_item'), problem_data)
 
         self.assertEqual(resp.status_code, 200)
         payload = parse_json(resp)

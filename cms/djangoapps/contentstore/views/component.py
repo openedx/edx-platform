@@ -25,9 +25,7 @@ from models.settings.course_grading import CourseGradingModel
 
 from .requests import get_request_method, _xmodule_recurse
 from .access import has_access
-from xmodule import templates
 from xmodule.x_module import XModuleDescriptor
-from django.utils import html
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -134,8 +132,7 @@ def edit_unit(request, location):
             category,
             has_markdown,
             True,
-            None,  # don't override default data
-            None  # don't override default metadata
+            None  # no boilerplate for overrides
         ))
         # add boilerplates
         for template in component_class.templates():
@@ -144,8 +141,7 @@ def edit_unit(request, location):
                 category,
                 template['metadata'].get('markdown') is not None,
                 False,
-                template.get('data'),
-                json.dumps(template.get('metadata'))
+                template.get('template_id')
             ))
 
     # Check if there are any advanced modules specified in the course policy. These modules
@@ -166,8 +162,7 @@ def edit_unit(request, location):
                     category,
                     hasattr(component_class, 'markdown') and component_class.markdown is not None,
                     False,
-                    None,  # don't override default data
-                    None
+                    None  # don't override default data
                     ))
     else:
         log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))

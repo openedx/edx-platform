@@ -17,7 +17,7 @@ class DeleteItem(CourseTestCase):
             'category': 'static_tab'
         }
 
-        resp = self.client.post(reverse('clone_item'), data)
+        resp = self.client.post(reverse('create_item'), data)
         self.assertEqual(resp.status_code, 200)
 
         # Now delete it. There was a bug that the delete was failing (static tabs do not exist in draft modulestore).

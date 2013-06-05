@@ -349,7 +349,7 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
         'category': category,
         'display_name': 'New Unit'
@@ -631,7 +631,7 @@ function saveNewSection(e) {
         'display_name': display_name
     });
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
         'category': category,
         'display_name': display_name,
@@ -738,7 +738,7 @@ function saveNewSubsection(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
         'category': category,
         'display_name': display_name

@@ -78,7 +78,7 @@
                     % endif
                     <div class="tab current" id="tab1">
                       <ul class="new-component-template">
-                          % for name, category, has_markdown, is_empty, boilerplate_data, boiler_meta in templates:
+                          % for name, category, has_markdown, is_empty, boilerplate_name in templates:
                             % if has_markdown or type != "problem":
                                 % if is_empty:
                                   <li class="editor-md empty">
@@ -90,7 +90,7 @@
                                 % else:
                                   <li class="editor-md">
                                     <a href="#" data-category="${category}" 
-                                       data-data="${boilerplate_data|h}" data-metadata='${boiler_meta|h}'>
+                                       data-boilerplate="${boilerplate_name}">
                                       <span class="name"> ${name}</span>
                                     </a>
                                   </li>
@@ -108,11 +108,11 @@
                                   <span class="name">Blank</span>
                                 </a>
                               </li>
-                              % for name, category, has_markdown, is_empty, boilerplate_data, boiler_meta in templates:
+                              % for name, category, has_markdown, is_empty, boilerplate_name in templates:
                                 % if not has_markdown:
                                   <li class="editor-manual">
                                     <a href="#" data-category="${category}" 
-                                       data-data="${boilerplate_data|h}" data-metadata='${boiler_meta|h}'>
+                                       data-boilerplate="${boilerplate_name}">
                                       <span class="name"> ${name}</span>
                                     </a>
                                   </li>

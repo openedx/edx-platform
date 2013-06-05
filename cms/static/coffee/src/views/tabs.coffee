@@ -55,7 +55,7 @@ class CMS.Views.TabsEdit extends Backbone.View
       editor.$el.removeClass('new')
     , 500)
 
-    editor.cloneTemplate(
+    editor.createItem(
       @model.get('id'),
       {category: 'static_tab'}
     )

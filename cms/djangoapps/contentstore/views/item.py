@@ -13,8 +13,9 @@ from util.json_request import expect_json
 from ..utils import get_modulestore
 from .access import has_access
 from .requests import _xmodule_recurse
+from xmodule.x_module import XModuleDescriptor
 
-__all__ = ['save_item', 'clone_item', 'delete_item']
+__all__ = ['save_item', 'create_item', 'delete_item']
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -73,7 +74,7 @@ def save_item(request):
 
 @login_required
 @expect_json
-def clone_item(request):
+def create_item(request):
     parent_location = Location(request.POST['parent_location'])
     category = request.POST['category']
 
@@ -86,12 +87,17 @@ def clone_item(request):
     dest_location = parent_location.replace(category=category, name=uuid4().hex)
 
     # get the metadata, display_name, and definition from the request
-    data = request.POST.get('data')
-    metadata = request.POST.get('metadata')
-    if metadata is None:
-        metadata = {}
-    else:
-        metadata = json.loads(metadata)
+    metadata = {}
+    data = None
+    template_id = request.POST.get('boilerplate')
+    if template_id is not None:
+        clz = XModuleDescriptor.load_class(category)
+        if clz is not None:
+            template = clz.get_template(template_id)
+            if template is not None:
+                metadata = template.get('metadata', {})
+                data = template.get('data')
+
     if display_name is not None:
         metadata['display_name'] = display_name
 

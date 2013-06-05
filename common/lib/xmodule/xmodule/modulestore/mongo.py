@@ -644,13 +644,6 @@ class MongoModuleStore(ModuleStoreBase):
             course.tabs = existing_tabs
             self.update_metadata(course.location, course.xblock_kvs()._metadata)
 
-    def clone_item(self, source, location):
-        """
-        Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location`
-        """
-        raise NotImplementedError("Replace w/ create_and_save_xmodule")
-
     def fire_updated_modulestore_signal(self, course_id, location):
         if self.modulestore_update_signal is not None:
             self.modulestore_update_signal.send(self, modulestore=self, course_id=course_id,

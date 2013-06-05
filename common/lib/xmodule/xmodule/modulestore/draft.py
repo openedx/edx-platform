@@ -129,13 +129,6 @@ class DraftModuleStore(MongoModuleStore):
 
         return self._load_items([original])[0]
 
-    def clone_item(self, source, location):
-        """
-        Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location`
-        """
-        return wrap_draft(super(DraftModuleStore, self).clone_item(source, as_draft(location)))
-
     def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to

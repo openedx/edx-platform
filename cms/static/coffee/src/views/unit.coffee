@@ -88,7 +88,7 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     @$newComponentItem.before(editor.$el)
 
-    editor.cloneTemplate(
+    editor.createItem(
       @$el.data('id'),
       $(event.currentTarget).data()
     )
