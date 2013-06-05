@@ -243,3 +243,11 @@ MITX_FEATURES['ENABLE_PEARSON_LOGIN'] = False
 
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
+
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *
+except ImportError:
+    pass

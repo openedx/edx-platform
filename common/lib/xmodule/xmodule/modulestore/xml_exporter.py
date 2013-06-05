@@ -28,6 +28,9 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     # export the course updates
     export_extra_content(export_fs, modulestore, course_location, 'course_info', 'info', '.html')
 
+    # export the 'about' data (e.g. overview, etc.)
+    export_extra_content(export_fs, modulestore, course_location, 'about', 'about', '.html')
+
     # export the grading policy
     policies_dir = export_fs.makeopendir('policies')
     course_run_policy_dir = policies_dir.makeopendir(course.location.name)
