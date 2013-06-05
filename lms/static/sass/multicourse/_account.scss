@@ -22,7 +22,7 @@
     margin: 0 0 $baseline 0;
     font-weight: 300;
     text-transform: uppercase;
-    color: $link-color;
+    color: $link-color-d1;
   }
 
   .heading-3 {
@@ -37,7 +37,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0 !important;
-    color: saturate($link-color,15%);
+    color: saturate($link-color-d1,15%);
   }
 
   .heading-5 {
@@ -63,7 +63,7 @@
   // specific examples - buttons
   .button-primary {
     @include border-radius(0);
-    @include linear-gradient(saturate($link-color,15%) 5%, shade($link-color,15%) 95%);
+    @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
     text-transform: lowercase;
@@ -107,7 +107,7 @@
     @include clearfix;
     margin: 0 auto;
     width: 960px;
-    background: $white;
+    background: $container-bg;
   }
 
   .container {
@@ -139,18 +139,18 @@
   }
 
   a {
-    @include transition($link-color 0.15s ease-in-out, border 0.15s ease-in-out);
+    @include transition(color 0.15s ease-in-out, border 0.15s ease-in-out);
 
     &:link, &:visited, &:hover, &:active {
-      color: $link-color;
+      color: $link-color-d1;
       font-weight: 400;
-      text-decoration: none !important;
+      text-decoration: none !important; // needed but nasty
       font-family: $sans-serif;
     }
 
     &:hover, &:active {
-      border-bottom: 1px solid saturate($link-color,15%);
-      color: saturate($link-color,15%);
+      text-decoration: none !important; // needed but nasty
+      border-bottom: 1px dotted $link-color-d1;
     }
   }
 
@@ -259,13 +259,13 @@
       }
 
       label {
-        @include transition($link-color 0.15s ease-in-out);
+        @include transition(color 0.15s ease-in-out);
         margin: 0 0 ($baseline/4) 0;
         color: tint($black, 20%);
       }
 
       .tip {
-        @include transition($link-color 0.15s ease-in-out);
+        @include transition(color 0.15s ease-in-out);
         display: block;
         margin-top: ($baseline/4);
         color: tint($outer-border-color, 50%);
@@ -340,11 +340,11 @@
       &.is-focused {
 
         label {
-          color: saturate($link-color,15%);
+          color: saturate($link-color-d1,15%);
         }
 
         .tip {
-          color: saturate($link-color,15%);
+          color: saturate($link-color-d1,15%);
         }
       }
 
