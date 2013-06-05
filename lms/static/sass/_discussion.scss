@@ -1363,24 +1363,55 @@ body.discussion {
       .row-title {
         padding: $baseline;
         display: inline-block;
-        width: 20%;
+        width: 15%;
         background-color: $light-gray;
+        font-size: 12px;
       }
 
-      .row-item {
+      .row-item-full, .row-item {
         display: inline-block;
         font-size: 12px;
-        width: 20%;
+        width: 25%;
         vertical-align: middle;
 
-        i.icon {
+        .icon {
           padding: 0 $baseline/2;
           font-size: 24px;
           display: inline-block;
+          vertical-align: middle;
         }
 
+        .row-description {
+          display: inline-block;
+          width: 70%;
+          vertical-align: middle;
+        }
+      }
+
+      .row-item-full {
+        width: 70%;
+
+        .row-description {
+          width: 90%;
+        }
       }
     }
+  }
+
+  .helpgrid-row-navigation {
+    .icon-sort-down {color: $light-gray;}
+    .icon-search {color: $light-gray;}
+    .icon-sort {color: $light-gray;}
+  }
+
+  .helpgrid-row-participation {
+    .icon-plus {color: $green-u2;}
+    .icon-flag {color: $red-u2;}
+    .icon-star {color: $blue;}
+  }
+
+  .helpgrid-row-notification {
+    .icon-sign-blank {color: $green;}
   }
 
   .discussion-article {
