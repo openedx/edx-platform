@@ -162,12 +162,12 @@ def dialogs_are_closed(step):
 
 
 @step('I confirm all alerts')
-def i_confirm_with_ok(step):
+def i_confirm_all_alerts(step):
     world.browser.execute_script('window.confirm = function(){return true;} ; window.alert = function(){return;}')
 
 
 @step('I cancel all alerts')
-def i_dismiss_with_ok(step):
+def i_cancel_all_alerts(step):
     world.browser.execute_script('window.confirm = function(){return false;} ; window.alert = function(){return;}')
 
 
