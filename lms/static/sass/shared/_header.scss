@@ -1,7 +1,7 @@
 header.global {
   border-bottom: 1px solid $m-gray;
   @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
-  background: $white;
+  background: $header-bg;
   height: 76px;
   position: relative;
   width: 100%;
@@ -246,12 +246,12 @@ header.global {
       a {
         display:block;
         padding: ($baseline/4);
-        color: $m-gray-d1;
+        color: $lighter-base-font-color;
         font-weight: 600;
 
         &:hover, &:active {
           text-decoration: none;
-          color: $m-blue-s1;
+          color: $link-color;
         }
       }
 
@@ -259,7 +259,7 @@ header.global {
 
         a {
           text-decoration: none;
-          color: $m-blue-s1;
+          color: $link-color;
         }
       }
     }
@@ -280,11 +280,11 @@ header.global {
 
       a {
         @include border-radius(0);
-        @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
+        @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
         display: inline-block;
         padding: $baseline/2 $baseline*2.5;
         text-transform: lowercase;
-        color: $white;
+        color: $very-light-text;
         letter-spacing: 0.1rem;
         font-weight: 300;
         cursor: pointer;
@@ -324,6 +324,6 @@ header.global {
 
   a {
     text-decoration: none;
-    color: $m-blue-s1 !important;
+    color: $link-color !important;
   }
 }

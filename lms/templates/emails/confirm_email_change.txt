@@ -1,12 +1,25 @@
 <%! from django.core.urlresolvers import reverse %>
-This is to confirm that you changed the e-mail associated with edX
-from ${old_email} to ${new_email}. If you did not make this request,
-please contact us immediately. Contact information is listed at:
+<%namespace file="../main.html" import="stanford_theme_enabled" />
+## Again, ugly hack that needs to be changed
+## TODO: this probably needs better formatting to look nice in an
+##       email client (Mako leaves awkward whitespace)
+% if stanford_theme_enabled():
+  This is to confirm that you changed the e-mail associated with
+  ${settings.PLATFORM_NAME} from ${old_email} to ${new_email}. If you
+  did not make this request, please contact us at
 
-% if is_secure:
-  https://${ site }${reverse('contact')}
+  ${settings.CONTACT_EMAIL}
 % else:
-  http://${ site }${reverse('contact')}
+  This is to confirm that you changed the e-mail associated with
+  ${settings.PLATFORM_NAME} from ${old_email} to ${new_email}. If you
+  did not make this request, please contact us immediately. Contact
+  information is listed at:
+
+  % if is_secure:
+    https://${ site }${reverse('contact')}
+  % else:
+    http://${ site }${reverse('contact')}
+  % endif
 % endif
 
 We keep a log of old e-mails, so if this request was unintentional, we
