@@ -166,9 +166,9 @@ def i_confirm_with_ok(step):
     world.browser.execute_script('window.confirm = function(){return true;} ; window.alert = function(){return;}')
 
 
-@step('I dismiss all alerts')
+@step('I cancel all alerts')
 def i_dismiss_with_ok(step):
-    world.browser.execute_script('window.confirm = function(){return false;}')
+    world.browser.execute_script('window.confirm = function(){return false;} ; window.alert = function(){return;}')
 
 
 @step('I answer all prompts with "([^"]*)"')
