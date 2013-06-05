@@ -81,7 +81,7 @@ class TestInstructorEnrollsStudent(LoginEnrollmentTestCase):
         ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
         self.assertEqual(0, len(ce))
 
-    def test_enrollmemt_new_student_autoenroll_on(self):
+    def test_enrollment_new_student_autoenroll_on(self):
         '''
         Do auto-enroll on test
         '''

@@ -912,12 +912,13 @@ def activate_account(request, key):
             already_active = False
 
         #Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        student = request.user
-        ceas = CourseEnrollmentAllowed.objects.filter(email=student.email)
-        for cea in ceas:
-            if cea.auto_enroll:
-                course_id = cea.course_id
-                enrollment, created = CourseEnrollment.objects.get_or_create(user_id=student.id, course_id=course_id)
+        student = User.objects.filter(id=r[0].user_id)
+        if student:
+            ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
+            for cea in ceas:
+                if cea.auto_enroll:
+                    course_id = cea.course_id
+                    enrollment, created = CourseEnrollment.objects.get_or_create(user_id=student[0].id, course_id=course_id)
 
         resp = render_to_response("registration/activation_complete.html", {'user_logged_in': user_logged_in, 'already_active': already_active})
         return resp
