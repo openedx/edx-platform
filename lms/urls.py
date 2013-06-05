@@ -274,6 +274,8 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.api.grading_config', name="grading_config"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/enrolled_students_profiles$',
             'instructor.views.api.enrolled_students_profiles', name="enrolled_students_profiles"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/profile_distribution$',
+            'instructor.views.api.profile_distribution', name="profile_distribution"),
 
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',

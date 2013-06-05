@@ -29,7 +29,7 @@ from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 import xmodule.graders as xmgraders
 from django.contrib.auth.models import User, Group
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, UserProfile
 
 
 @ensure_csrf_cookie
@@ -61,8 +61,9 @@ def enrolled_students_profiles(request, course_id):
     TODO accept requests for different attribute sets
     """
 
-    enrollments = CourseEnrollment.objects.filter(course_id=course_id)
-    students = [enrollment.user for enrollment in enrollments]
+    # enrollments = CourseEnrollment.objects.filter(course_id=course_id)
+    # students = [enrollment.user for enrollment in enrollments]
+    students = User.objects.filter(courseenrollment__course_id=course_id)
 
     STUDENT_FEATURES = ['username', 'first_name', 'last_name', 'is_staff', 'email']
     PROFILE_FEATURES = ['year_of_birth', 'gender', 'level_of_education']
@@ -76,7 +77,8 @@ def enrolled_students_profiles(request, course_id):
 
     response_payload = {
         'course_id':        course_id,
-        'students':         [extract_student(student) for student in students],
+        'students':         [extract_student(student) for student in students.all()],
+        'students_count':   students.count(),
         'STUDENT_FEATURES': STUDENT_FEATURES,
         'PROFILE_FEATURES': PROFILE_FEATURES,
         'all_features':     STUDENT_FEATURES + PROFILE_FEATURES,
@@ -87,17 +89,49 @@ def enrolled_students_profiles(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def enrolled_students_choices_numbers(request, course_id):
+def profile_distribution(request, course_id):
     """
     Respond with json of the distribution of students on fields select fields which have choices.
 
+    Features to query for are passed as a query parameter array ['gender', 'level_of_education']
+    containing elements from feature lists below.
+    Right now the query list is of the format http://url?features=gender&features=level_of_education
+
     TODO respond to csv requests as well
-    TODO accept requests for different attribute sets
     """
 
     EASY_CHOICE_FEATURES = ['year_of_birth', 'gender', 'level_of_education', 'language']
     OPEN_CHOICE_FEATURES = ['language', 'location/mailing_address']
-    raise NotImplementedError()
+
+    features = request.GET.getlist('features')
+    print "param: %s<br>class: %s<br>type: %s" %(str(features), str(features.__class__), str(type(features)))
+
+    feature_results = {}
+
+    def not_implemented_feature(feature):
+        feature_results[feature] = {'error': "do not know what to do for feature %s" % feature}
+
+    for feature in features:
+        if feature in EASY_CHOICE_FEATURES:
+            # TODO generalize this switch
+            if feature == 'gender':
+                choices = [(short, full) for (short, full) in UserProfile.GENDER_CHOICES] + [(None, 'No Data')]
+
+                feature_results[feature] = {}
+                for (short, full) in choices:
+                    count = CourseEnrollment.objects.filter(course_id=course_id, user__profile__gender=short).count()
+                    feature_results[feature][full] = count
+            else:
+                not_implemented_feature(feature)
+        else:
+            not_implemented_feature(feature)
+
+    response_payload = {
+        'course_id':   course_id,
+        'feature_results': feature_results,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
 
 
 def _dump_grading_context(course):
