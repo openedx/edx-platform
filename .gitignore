@@ -10,6 +10,8 @@
 .AppleDouble
 database.sqlite
 requirements/private.txt
+lms/envs/private.py
+cms/envs/private.py
 courseware/static/js/mathjax/*
 flushdb.sh
 build
