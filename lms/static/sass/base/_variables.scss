@@ -87,7 +87,7 @@ $dashboard-profile-header-color: transparent;
 $dashboard-profile-color: rgb(252,252,252);
 $dot-color: $light-gray;
 
-$content-wrapper-bg: rgb(255,255,255);
+$content-wrapper-bg: shade($body-bg, 2%);
 $course-bg-color: #d6d6d6;
 $course-bg-image: url(../images/bg-texture.png);
 
