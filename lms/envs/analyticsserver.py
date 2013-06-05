@@ -43,8 +43,8 @@ MITX_FEATURES['RUN_AS_ANALYTICS_SERVER_ENABLED'] = True
 INSTALLED_APPS = INSTALLED_APPS + ( 'djeventstream.httphandler',
     'djcelery',
     'south',
-    'djanalytics.core',
-    'djanalytics.modulefs',
+    'edinsights.core',
+    'edinsights.modulefs',
 )
 
 INSTALLED_ANALYTICS_MODULES = open("../analytics_modules.txt").readlines()

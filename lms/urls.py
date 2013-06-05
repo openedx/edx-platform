@@ -355,9 +355,9 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 
 if settings.MITX_FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
     urlpatterns += (
-        url('^', include('djanalytics.core.urls')),
+        url('^', include('edinsights.core.urls')),
     )
-    import djanalytics.core.registry
+    import edinsights.core.registry
 
 # FoldIt views
 urlpatterns += (
