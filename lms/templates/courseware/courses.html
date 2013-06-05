@@ -5,13 +5,21 @@
 <%block name="title"><title>Courses</title></%block>
 
 <section class="find-courses">
-  <header class="search" style="background: url('/static/images/homepage-bg.jpg')">
+  <header class="search">
     <div class="inner-wrapper main-search">
       <hgroup>
         <div class="logo">
-          <img src="${static.url('images/edx_bw.png')}" />
+          % if self.stanford_theme_enabled():
+            <img src="${static.url('themes/stanford/images/seal.png')}" />
+          % else:
+            <img src="${static.url('images/edx_bw.png')}" />
+          % endif
         </div>
-        <h2>Explore free courses from leading universities.</h2>
+        % if self.stanford_theme_enabled():
+          <h2>Explore free courses from Stanford University.</h2>
+        % else:
+          <h2>Explore free courses from leading universities.</h2>
+        % endif
       </hgroup>
     </div>
   </header>
