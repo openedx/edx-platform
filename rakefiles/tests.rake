@@ -45,12 +45,6 @@ end
 directory REPORT_DIR
 
 task :clean_test_files do
-
-    # Delete all files in the reports directory, while preserving
-    # the directory structure.
-    sh("find #{REPORT_DIR} -type f -print0 | xargs --no-run-if-empty -0 rm")
-
-    # Reset the test fixtures
     sh("git clean -fqdx test_root")
 end
 
