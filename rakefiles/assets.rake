@@ -27,10 +27,11 @@ def coffee_cmd(watch=false, debug=false)
         #
         # Ref: https://github.com/joyent/node/issues/2479
         #
-        # Instead, watch 50 files per process in parallel
+        # Rather than watching all of the directories in one command
+        # watch each static files subdirectory separately
         cmds = []
-        Dir['*/static/**/*.coffee'].each_slice(50) do |coffee_files|
-            cmds << "node_modules/.bin/coffee --watch --compile #{coffee_files.join(' ')}"
+        ['lms/static/coffee', 'cms/static/coffee', 'common/static/coffee', 'common/static/xmodule'].each do |coffee_folder|
+            cmds << "node_modules/.bin/coffee --watch --compile #{coffee_folder}"
         end
         cmds
     else
@@ -119,12 +120,15 @@ namespace :assets do
     namespace :sass do
         # In watch mode, sass doesn't immediately compile out of date files,
         # so force a recompile first
-        task :_watch => 'assets:sass:debug'
+        # Also force xmodule files to be generated before we start watching anything
+        task :_watch => ['assets:sass:debug', 'assets:xmodule']
         multitask :debug => 'assets:xmodule:debug'
     end
 
     multitask :coffee => 'assets:xmodule'
     namespace :coffee do
+        # Force xmodule files to be generated before we start watching anything
+        task :_watch => 'assets:xmodule'
         multitask :debug => 'assets:xmodule:debug'
     end
 end

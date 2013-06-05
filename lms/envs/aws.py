@@ -102,6 +102,12 @@ with open(ENV_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 
+# allow for environments to specify what cookie name our login subsystem should use
+# this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
+# happen with some browsers (e.g. Firefox)
+if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
+    SESSION_COOKIE_NAME = ENV_TOKENS.get('SESSION_COOKIE_NAME')
+
 BOOK_URL = ENV_TOKENS['BOOK_URL']
 MEDIA_URL = ENV_TOKENS['MEDIA_URL']
 LOG_DIR = ENV_TOKENS['LOG_DIR']

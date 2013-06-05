@@ -87,8 +87,8 @@ def reset_data(scenario):
     LOGGER.debug("Flushing the test database...")
     call_command('flush', interactive=False)
 
-
-@after.each_scenario
+# Uncomment below to trigger a screenshot on error
+# @after.each_scenario
 def screenshot_on_error(scenario):
     """
     Save a screenshot to help with debugging.
