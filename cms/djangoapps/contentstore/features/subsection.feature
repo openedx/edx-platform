@@ -36,6 +36,6 @@ Feature: Create Subsection
     Given I have opened a new course section in Studio
     And I have added a new subsection
     And I see my subsection on the Courseware page
-    When I confirm all alerts
+    When I will confirm all alerts
     And I press the "subsection" delete icon
     Then the subsection does not exist

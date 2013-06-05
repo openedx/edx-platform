@@ -161,16 +161,16 @@ def dialogs_are_closed(step):
     assert world.dialogs_closed()
 
 
-@step('I confirm all alerts')
+@step('I will confirm all alerts')
 def i_confirm_all_alerts(step):
     world.browser.execute_script('window.confirm = function(){return true;} ; window.alert = function(){return;}')
 
 
-@step('I cancel all alerts')
+@step('I will cancel all alerts')
 def i_cancel_all_alerts(step):
     world.browser.execute_script('window.confirm = function(){return false;} ; window.alert = function(){return;}')
 
 
-@step('I answer all prompts with "([^"]*)"')
+@step('I will answer all prompts with "([^"]*)"')
 def i_answer_prompts_with(step, prompt):
     world.browser.execute_script('window.prompt = function(){return %s;}') % prompt
