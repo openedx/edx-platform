@@ -487,6 +487,29 @@ rake install_prereqs
 output "Finishing Touches"
 cd $BASE
 pip install argcomplete
+
+CURRENT_RUBY=`ruby -v`
+
+CLEAN_RUBY_VER=`echo $RUBY_VER | tr -d '-'`
+
+if [[ "${CURRENT_RUBY#*$CLEAN_RUBY_VER}" != "$CURRENT_RUBY" ]]; then
+  warning "You're almost there, but it looks like your ruby version isn't quite correct.
+            We can use a quick fix here, but for a long term fix you want to add the following
+            line to your ~/.bash_profile file:
+
+            export PATH=$HOME/.rvm/rubies/ruby-1.9.3-p374/bin:$PATH
+
+            Assuming you don't have a custom rvm installation, if you do have a custom rvm, 
+            then just make sure that the very of ruby you're using is 1.9.3-p374.
+
+            Press enter to continue and try the quick fix, or press control-C to abort"
+
+  read dummy
+
+  export PATH=$HOME/.rvm/rubies/ruby-1.9.3-p374/bin:$PATH
+
+fi
+
 cd $BASE/edx-platform
 bundle install
 rake install_prereqs
