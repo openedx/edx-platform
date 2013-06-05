@@ -18,6 +18,7 @@ from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.db.models import Count
 
 from django.conf import settings
 from courseware.access import has_access, get_access_group_name, course_beta_test_group_name
@@ -91,44 +92,66 @@ def enrolled_students_profiles(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def profile_distribution(request, course_id):
     """
-    Respond with json of the distribution of students on fields select fields which have choices.
+    Respond with json of the distribution of students over selected fields which have choices.
 
-    Features to query for are passed as a query parameter array ['gender', 'level_of_education']
-    containing elements from feature lists below.
-    Right now the query list is of the format http://url?features=gender&features=level_of_education
+    Ask for features through the 'features' query parameter.
+    The features query parameter can be either a single feature name, or a json string of feature names.
+    e.g.
+        http://localhost:8000/courses/MITx/6.002x/2013_Spring/instructor_dashboard/api/profile_distribution?features=level_of_education
+        http://localhost:8000/courses/MITx/6.002x/2013_Spring/instructor_dashboard/api/profile_distribution?features=%5B%22year_of_birth%22%2C%22gender%22%5D
 
+    Example js query:
+    $.get("http://localhost:8000/courses/MITx/6.002x/2013_Spring/instructor_dashboard/api/profile_distribution",
+          {'features': JSON.stringify(['year_of_birth', 'gender'])},
+          function(){console.log(arguments[0])})
+
+    TODO how should query parameter interpretation work?
     TODO respond to csv requests as well
     """
 
-    EASY_CHOICE_FEATURES = ['year_of_birth', 'gender', 'level_of_education', 'language']
-    OPEN_CHOICE_FEATURES = ['language', 'location/mailing_address']
+    EASY_CHOICE_FEATURES = ['gender', 'level_of_education']
+    OPEN_CHOICE_FEATURES = ['year_of_birth']
+    # OPEN_CHOICE_FEATURES = ['language', 'location/mailing_address', 'language']
 
-    features = request.GET.getlist('features')
-    print "param: %s<br>class: %s<br>type: %s" %(str(features), str(features.__class__), str(type(features)))
+    try:
+        features = json.loads(request.GET.get('features'))
+    except Exception:
+        features = [request.GET.get('features')]
+
+    # print "param: %s<br>class: %s<br>type: %s" %(str(features), str(features.__class__), str(type(features)))
 
     feature_results = {}
 
     def not_implemented_feature(feature):
-        feature_results[feature] = {'error': "do not know what to do for feature %s" % feature}
+        feature_results[feature] = {'error': "can not find distribution for '%s'" % feature}
 
     for feature in features:
-        if feature in EASY_CHOICE_FEATURES:
+        # if feature in EASY_CHOICE_FEATURES:
             # TODO generalize this switch
-            if feature == 'gender':
-                choices = [(short, full) for (short, full) in UserProfile.GENDER_CHOICES] + [(None, 'No Data')]
+        if feature in EASY_CHOICE_FEATURES:
+            choices = [(short, full) for (short, full) in UserProfile.GENDER_CHOICES] + [(None, 'No Data')]
 
-                feature_results[feature] = {}
-                for (short, full) in choices:
-                    count = CourseEnrollment.objects.filter(course_id=course_id, user__profile__gender=short).count()
-                    feature_results[feature][full] = count
-            else:
-                not_implemented_feature(feature)
+            feature_results[feature] = {}
+            for (short, full) in choices:
+                count = CourseEnrollment.objects.filter(course_id=course_id, user__profile__gender=short).count()
+                feature_results[feature][full] = count
+        elif feature in OPEN_CHOICE_FEATURES:
+            profiles = UserProfile.objects.filter(user__courseenrollment__course_id=course_id)
+            query_distribution = profiles.values('year_of_birth').annotate(Count('year_of_birth')).order_by()
+            # query_distribution is of the form [{'attribute': 'value1', 'attribute__count': 4}, {'attribute': 'value2', 'attribute__count': 2}, ...]
+
+            distribution = dict((vald[feature], vald[feature + '__count']) for vald in query_distribution)
+            # distribution is of the form {'value1': 4, 'value2': 2, ...}
+
+            feature_results[feature] = distribution
         else:
             not_implemented_feature(feature)
 
     response_payload = {
-        'course_id':   course_id,
-        'feature_results': feature_results,
+        'course_id':          course_id,
+        'queried_features':   features,
+        'available_features': ['gender', 'level_of_education', 'year_of_birth'],
+        'feature_results':    feature_results,
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
