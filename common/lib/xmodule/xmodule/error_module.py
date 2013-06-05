@@ -121,7 +121,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
     def from_descriptor(cls, descriptor, error_msg='Error not available'):
         return cls._construct(
             descriptor.system,
-            descriptor._model_data,
+            str(descriptor),
             error_msg,
             location=descriptor.location,
         )
