@@ -83,19 +83,6 @@ class @VideoAlpha
   embed: ->
     @player = new VideoPlayerAlpha video: this
 
-    @attachEventDispatchToFunctions
-      onPlay: 'play_video'
-      onPause: 'pause_video'
-
-  attachEventDispatchToFunctions: (funcList) ->
-    $.each funcList, (funcName, eventName) =>
-      @player[funcName] = @attachEventDispatch(@player[funcName], eventName)  if @player.hasOwnProperty(funcName)
-
-  attachEventDispatch: (func, eventName) ->
-    =>
-      @log eventName
-      func.apply this, arguments
-
   fetchMetadata: (url) ->
     @metadata = {}
     $.each @videos, (speed, url) =>
@@ -104,21 +91,17 @@ class @VideoAlpha
   getDuration: ->
     @metadata[@youtubeId()].duration
 
-  log: (eventName)->
-    console.log 'log'
-    console.log 'this = ', this
-    console.log
-      id: @id
-      code: @youtubeId()
-      currentTime: @player.currentTime
-      speed: @speed
-    console.log ''
-
+  log: (eventName, data)->
+    # Default parameters that always get logged.
     logInfo =
       id: @id
       code: @youtubeId()
-      currentTime: @player.currentTime
-      speed: @speed
+
+    # If extra parameters were passed to the log.
+    if data
+      $.each data, (paramName, value) ->
+        logInfo[paramName] = value
+
     if @videoType is "youtube"
       logInfo.code = @youtubeId()
     else logInfo.code = "html5"  if @videoType is "html5"

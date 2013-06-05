@@ -7,10 +7,7 @@ class @VideoProgressSliderAlpha extends SubviewAlpha
       range: 'min'
       change: @onChange
 
-      # We don't want to attach to 'slide' event because we already have 'change' event.
-      # If we have two events, then callback will be triggered twice, sending misinformation
-      # to the server.
-      # slide: @onSlide
+      slide: @onSlide
       stop: @onStop
     @buildHandle()
 
@@ -39,7 +36,7 @@ class @VideoProgressSliderAlpha extends SubviewAlpha
   onSlide: (event, ui) =>
     @frozen = true
     @updateTooltip(ui.value)
-    $(@).trigger('seek', ui.value)
+    $(@).trigger('slide_seek', ui.value)
 
   onChange: (event, ui) =>
     @updateTooltip(ui.value)
