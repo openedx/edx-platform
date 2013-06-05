@@ -73,9 +73,9 @@ class CourseDetails(object):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
-        # # TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
+        # TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
         course_location = jsondict['course_location']
-        # # Will probably want to cache the inflight courses because every blur generates an update
+        # Will probably want to cache the inflight courses because every blur generates an update
         descriptor = get_modulestore(course_location).get_item(course_location)
 
         dirty = False
