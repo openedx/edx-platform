@@ -11,3 +11,7 @@ Feature: Discussion Component Editor
     And I edit and select Settings
     Then I can modify the display name
     And my display name change is persisted on save
+
+  Scenario: Creating a discussion takes a single click
+    Given I have clicked the new unit button
+    Then creating a discussion takes a single click

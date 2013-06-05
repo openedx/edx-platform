@@ -21,3 +21,10 @@ def i_see_only_the_settings_and_values(step):
             ['Display Name', "Discussion Tag", True],
             ['Subcategory', "Topic-Level Student-Visible Label", True]
         ])
+
+
+@step('creating a discussion takes a single click')
+def discussion_takes_a_single_click(step):
+    assert(not world.is_css_present('.xmodule_DiscussionModule'))
+    world.css_click("a[data-location='i4x://edx/templates/discussion/Discussion_Tag']")
+    assert(world.is_css_present('.xmodule_DiscussionModule'))

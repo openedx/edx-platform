@@ -14,6 +14,7 @@ from django.core.management.base import NoArgsCommand
 from django.conf import settings
 
 from mako.template import Template
+import textwrap
 
 class Command(NoArgsCommand):
     """
@@ -61,5 +62,12 @@ class Command(NoArgsCommand):
         result in `outfile`.
         """
         with open(outfile, "w") as _outfile:
+            _outfile.write(textwrap.dedent("""\
+            /*
+             * This file is dynamically generated and ignored by Git.
+             * DO NOT MAKE CHANGES HERE. Instead, go edit its template:
+             * %s
+             */
+            """ % infile))
             _outfile.write(Template(filename=str(infile)).render(env=self.__context()))
 

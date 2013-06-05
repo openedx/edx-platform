@@ -14,19 +14,26 @@ def create_component_instance(step, component_button_css, instance_id, expected_
 
 @world.absorb
 def click_new_component_button(step, component_button_css):
-    step.given('I have opened a new course section in Studio')
-    step.given('I have added a new subsection')
-    step.given('I expand the first section')
-    world.css_click('a.new-unit-item')
+    step.given('I have clicked the new unit button')
     world.css_click(component_button_css)
 
 
 @world.absorb
 def click_component_from_menu(instance_id, expected_css):
+    """
+    Creates a component from `instance_id`. For components with more
+    than one template, clicks on `elem_css` to create the new
+    component. Components with only one template are created as soon
+    as the user clicks the appropriate button, so we assert that the
+    expected component is present.
+    """
     elem_css = "a[data-location='%s']" % instance_id
-    assert_equal(1, len(world.css_find(elem_css)))
-    world.css_click(elem_css)
+    elements = world.css_find(elem_css)
+    assert(len(elements) == 1)
+    if elements[0]['id'] == instance_id:  # If this is a component with multiple templates
+        world.css_click(elem_css)
     assert_equal(1, len(world.css_find(expected_css)))
+
 
 @world.absorb
 def edit_component_and_select_settings():
