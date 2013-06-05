@@ -36,7 +36,8 @@
     <a href="#" data-section="course-info" class="idash-default-section"> Course Info   </a> |
     <a href="#" data-section="enrollment"> Enrollment    </a> |
     <a href="#" data-section="student-admin"> Student Admin  </a> |
-    <a href="#" data-section="data-download"> Data Download </a>
+    <a href="#" data-section="data-download"> Data Download </a> |
+    <a href="#" data-section="analytics"> Analytics </a>
   ]</h2>
 
   ## each section corresponds to a section_data sub-dictionary provided by the view
@@ -65,6 +66,12 @@
     <div class="dumped-data-display"></div>
   </section>
 
+  <section id="analytics" class="idash-section">
+    <select id="distributions" data-endpoint="${ section_data['analytics']['profile_distributions_url'] }">
+      <option> Getting available distributions... </option>
+    </select>
+    <div class="distribution-display"></div>
+  </section>
 
 </section>
 </div>

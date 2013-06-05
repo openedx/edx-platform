@@ -126,15 +126,28 @@ def profile_distribution(request, course_id):
         feature_results[feature] = {'error': "can not find distribution for '%s'" % feature}
 
     for feature in features:
-        # if feature in EASY_CHOICE_FEATURES:
-            # TODO generalize this switch
-        if feature in EASY_CHOICE_FEATURES:
-            choices = [(short, full) for (short, full) in UserProfile.GENDER_CHOICES] + [(None, 'No Data')]
+        feature_results[feature] = {}
 
-            feature_results[feature] = {}
+        if feature in EASY_CHOICE_FEATURES:
+            if feature == 'gender':
+                choices = [(short, full) for (short, full) in UserProfile.GENDER_CHOICES] + [(None, 'No Data')]
+            elif feature == 'level_of_education':
+                choices = [(short, full) for (short, full) in UserProfile.LEVEL_OF_EDUCATION_CHOICES] + [(None, 'No Data')]
+            else:
+                raise ValueError("feature request not implemented for feature %s" % feature)
+
+            data = {}
             for (short, full) in choices:
-                count = CourseEnrollment.objects.filter(course_id=course_id, user__profile__gender=short).count()
-                feature_results[feature][full] = count
+                if feature == 'gender':
+                    count = CourseEnrollment.objects.filter(course_id=course_id, user__profile__gender=short).count()
+                elif feature == 'level_of_education':
+                    count = CourseEnrollment.objects.filter(course_id=course_id, user__profile__level_of_education=short).count()
+                else:
+                    raise ValueError("feature request not implemented for feature %s" % feature)
+                data[full] = count
+
+            feature_results[feature]['data'] = data
+            feature_results[feature]['type'] = 'EASY_CHOICE'
         elif feature in OPEN_CHOICE_FEATURES:
             profiles = UserProfile.objects.filter(user__courseenrollment__course_id=course_id)
             query_distribution = profiles.values('year_of_birth').annotate(Count('year_of_birth')).order_by()
@@ -142,8 +155,8 @@ def profile_distribution(request, course_id):
 
             distribution = dict((vald[feature], vald[feature + '__count']) for vald in query_distribution)
             # distribution is of the form {'value1': 4, 'value2': 2, ...}
-
-            feature_results[feature] = distribution
+            feature_results[feature]['data'] = distribution
+            feature_results[feature]['type'] = 'OPEN_CHOICE'
         else:
             not_implemented_feature(feature)
 
@@ -151,6 +164,11 @@ def profile_distribution(request, course_id):
         'course_id':          course_id,
         'queried_features':   features,
         'available_features': ['gender', 'level_of_education', 'year_of_birth'],
+        'display_names':      {
+            'gender': 'Gender',
+            'level_of_education': 'Level of Education',
+            'year_of_birth': 'Year Of Birth',
+        },
         'feature_results':    feature_results,
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")

@@ -40,6 +40,7 @@ def instructor_dashboard_2(request, course_id):
         'enrollment':    _section_enrollment(course_id),
         'student_admin': _section_student_admin(course_id),
         'data_download': _section_data_download(course_id),
+        'analytics': _section_analytics(course_id),
     }
 
     context = {
@@ -97,5 +98,13 @@ def _section_data_download(course_id):
     section_data = {
         'grading_config_url':             reverse('grading_config', kwargs={'course_id': course_id}),
         'enrolled_students_profiles_url': reverse('enrolled_students_profiles', kwargs={'course_id': course_id}),
+    }
+    return section_data
+
+
+def _section_analytics(course_id):
+    """ Provide data for the corresponding dashboard section """
+    section_data = {
+        'profile_distributions_url': reverse('profile_distribution', kwargs={'course_id': course_id}),
     }
     return section_data
