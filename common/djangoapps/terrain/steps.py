@@ -159,3 +159,18 @@ def registered_edx_user(step, uname):
 @step(u'All dialogs should be closed$')
 def dialogs_are_closed(step):
     assert world.dialogs_closed()
+
+
+@step('I confirm all alerts')
+def i_confirm_with_ok(step):
+    world.browser.execute_script('window.confirm = function(){return true;} ; window.alert = function(){return;}')
+
+
+@step('I dismiss all alerts')
+def i_dismiss_with_ok(step):
+    world.browser.execute_script('window.confirm = function(){return false;}')
+
+
+@step('I answer all prompts with "([^"]*)"')
+def i_answer_prompts_with(step, prompt):
+    world.browser.execute_script('window.prompt = function(){return %s;}') % prompt
