@@ -15,7 +15,6 @@ def expect_json(view_function):
         # e.g. 'charset', so we can't do a direct string compare
         if request.META.get('CONTENT_TYPE', '').lower().startswith("application/json"):
             cloned_request = copy.copy(request)
-            cloned_request.POST = cloned_request.POST.copy()
             cloned_request.POST.update(json.loads(request.body))
             return view_function(cloned_request, *args, **kwargs)
         else:

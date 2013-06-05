@@ -35,11 +35,11 @@ class TestGradebook(ModuleStoreTestCase):
         self.course = CourseFactory.create(data=course_data)
         chapter = ItemFactory.create(
             parent_location=self.course.location,
-            template="i4x://edx/templates/sequential/Empty",
+            category="sequential",
         )
         section = ItemFactory.create(
             parent_location=chapter.location,
-            template="i4x://edx/templates/sequential/Empty",
+            category="sequential",
             metadata={'graded': True, 'format': 'Homework'}
         )
 

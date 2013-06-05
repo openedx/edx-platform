@@ -565,8 +565,6 @@ class MongoModuleStore(ModuleStoreBase):
             location = Location(location)
         # differs from split mongo in that I believe most of this logic should be above the persistence
         # layer but added it here to enable quick conversion. I'll need to reconcile these.
-        if definition_data is None:
-            definition_data = {}
         if metadata is None:
             metadata = {}
         if system is None:
@@ -579,8 +577,13 @@ class MongoModuleStore(ModuleStoreBase):
                 self.render_template,
                 {}
             )
-        dbmodel = self._create_new_model_data(location.category, location, definition_data, metadata)
         xblock_class = XModuleDescriptor.load_class(location.category, self.default_class)
+        if definition_data is None:
+            if hasattr(xblock_class, 'data') and getattr(xblock_class, 'data').default is not None:
+                definition_data = getattr(xblock_class, 'data').default
+            else:
+                definition_data = {}
+        dbmodel = self._create_new_model_data(location.category, location, definition_data, metadata)
         xmodule = xblock_class(system, location.category, location, None, dbmodel)
         # force inherited fields w/ defaults to take the defaults so the children can inherit
         for attr in INHERITABLE_METADATA:

@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -10,6 +10,7 @@ from common import TEST_COURSE_ORG, TEST_COURSE_NAME
 def i_register_for_the_course(step, course):
     cleaned_name = TEST_COURSE_NAME.replace(' ', '_')
     url = django_url('courses/%s/%s/%s/about' % (TEST_COURSE_ORG, course, cleaned_name))
+    from nose.tools import set_trace; set_trace()
     world.browser.visit(url)
 
     intro_section = world.browser.find_by_css('section.intro')

@@ -90,7 +90,7 @@
                                 % else:
                                   <li class="editor-md">
                                     <a href="#" data-category="${category}" 
-                                       data-data="${boilerplate_data}" data-metadata="${boiler_meta}">
+                                       data-data="${boilerplate_data|h}" data-metadata='${boiler_meta|h}'>
                                       <span class="name"> ${name}</span>
                                     </a>
                                   </li>
@@ -112,7 +112,7 @@
                                 % if not has_markdown:
                                   <li class="editor-manual">
                                     <a href="#" data-category="${category}" 
-                                       data-data="${boilerplate_data}" data-metadata="${boiler_meta}">
+                                       data-data="${boilerplate_data|h}" data-metadata='${boiler_meta|h}'>
                                       <span class="name"> ${name}</span>
                                     </a>
                                   </li>

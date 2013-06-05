@@ -27,6 +27,7 @@ from .requests import get_request_method, _xmodule_recurse
 from .access import has_access
 from xmodule import templates
 from xmodule.x_module import XModuleDescriptor
+from django.utils import html
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -144,7 +145,7 @@ def edit_unit(request, location):
                 template['metadata'].get('markdown') is not None,
                 False,
                 template.get('data'),
-                template.get('metadata')
+                json.dumps(template.get('metadata'))
             ))
 
     # Check if there are any advanced modules specified in the course policy. These modules

@@ -46,11 +46,17 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   cloneTemplate: (parent, payload) ->
     payload.parent_location = parent
-    $.post("/clone_item", payload, 
-        (data) => 
+    $.ajax(
+        url: "/clone_item"
+        data: payload 
+        success: (data) => 
             @model.set(id: data.id)
             @$el.data('id', data.id)
             @render()
+        type: 'POST'
+        contentType: 'application/json'
+        dataType: 'json'
+        processData: false
     )
 
   render: ->

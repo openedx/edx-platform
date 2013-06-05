@@ -87,7 +87,11 @@ def clone_item(request):
 
     # get the metadata, display_name, and definition from the request
     data = request.POST.get('data')
-    metadata = request.POST.get('metadata', {})
+    metadata = request.POST.get('metadata')
+    if metadata is None:
+        metadata = {}
+    else:
+        metadata = json.loads(metadata)
     if display_name is not None:
         metadata['display_name'] = display_name
 

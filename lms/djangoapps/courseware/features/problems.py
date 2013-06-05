@@ -2,8 +2,8 @@
 Steps for problem.feature lettuce tests
 '''
 
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -114,9 +114,9 @@ def add_problem_to_course(course, problem_type):
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
+    category = "problem"
     world.ItemFactory.create(parent_location=section_location(course),
-                            template=template_name,
+                            category=category,
                             display_name=str(problem_type),
                             data=problem_xml,
                             metadata={'rerandomize': 'always'})
