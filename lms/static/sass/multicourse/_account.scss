@@ -6,7 +6,7 @@
 
 // page-level
 .view-register, .view-login, .view-passwordreset {
-  background: $body-bg;
+  background: $container-bg;
 
 
 
@@ -331,7 +331,7 @@
         }
 
         textarea, input {
-          background: $body-bg;
+          background: $container-bg;
           color: rgba(0,0,0,.25);
         }
       }
