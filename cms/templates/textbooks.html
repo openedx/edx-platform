@@ -98,7 +98,7 @@ CMS.Views.ChapterEdit = Backbone.View.extend({
     },
     events: {
         "click .action-close": "removeChapter",
-        "click .action-uploadasset": "openUploadDialog",
+        "click .action-upload": "openUploadDialog",
         "submit": "uploadAsset"
     },
     removeChapter: function(e) {
@@ -173,13 +173,13 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     show: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.options.shown = true;
-        $body.addClass('prompt-is-shown');
+        $body.addClass('dialog-is-shown');
         return this.render();
     },
     hide: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.options.shown = false;
-        $body.removeClass('prompt-is-shown');
+        $body.removeClass('dialog-is-shown');
         return this.render();
     },
     hideAndRemove: function(e) {
@@ -214,7 +214,7 @@ CMS.Views.UploadDialog = Backbone.View.extend({
             options.asset_path = response.url;
             chapter.set(options);
         }
-        this.hideAndRemove();
+        this.remove();
     },
     error: function() {
         this.model.set({
@@ -264,6 +264,9 @@ $(function() {
     <div class="inner-wrapper">
         <div class="introduction has-links">
           <p class="copy">Textbooks are happy. Textbooks are cool. This is the filler text explaining why you should use a feature as happy and as cool as textbooks. If you use textbooks, you will make friends and influence people. You will lose weight and people will compliment you on your appearance. Children around the world will sing praises to your name, and celebrities will recongize you as a totally hip and groovy person. If you don't use textbooks, your life will be forever incomplete, and you will die alone and unloved. Make the right choice. Upload your first textbook now.</p>
+
+            <p class="copy">Note: <strong>It's best practice to break your course's textbook into multiple chapters</strong> to reduce loading times for students. Breaking up textbooks into chapters can also help with students more easily finding a concept or topic-based information.</p>
+
 
           <nav class="nav-introduction-supplementary">
             <ul>

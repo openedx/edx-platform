@@ -1,16 +1,17 @@
-  <div id="prompt-assetupload"
-    class="wrapper wrapper-prompt wrapper-prompt-assetupload <% if(shown) { print('is-shown') } %>"
-    aria-describedby="prompt-assetupload-description"
-    aria-labelledby="prompt-assetupload-title"
+  <div id="dialog-assetupload"
+    class="wrapper wrapper-dialog wrapper-dialog-assetupload <% if(shown) { print('is-shown') } %>"
+    aria-describedby="dialog-assetupload-description"
+    aria-labelledby="dialog-assetupload-title"
     aria-hidden="<%= !shown %>"
     role="dialog">
-    <div class="prompt confirm">
-      <div class="copy">
+    <div class="dialog confirm">
 
 <form class="upload-dialog" method="POST" action="<%= url %>" enctype="multipart/form-data">
-  <h2><%= title %></h2>
-  <p id="prompt-assetupload-description" class="message"><%= message %></p>
+  <div class="form-content">
+  <h2 class="title"><%= title %></h2>
+  <p id="dialog-assetupload-description" class="message"><%= message %></p>
   <input type="file" name="file" />
+  <div class="wrapper-progress">
   <% if(uploading) { %>
     <% if (uploadedBytes && totalBytes) { %>
       <progress value="<%= uploadedBytes %>" max="<%= totalBytes %>"><%= uploadedBytes/totalBytes*100 %>%</progress>
@@ -18,13 +19,15 @@
       <progress></progress>
     <% } %>
   <% } %>
+  </div>
+  </div>
   <div class="actions">
     <h3 class="sr"><%= gettext('Form Actions') %></h3>
   <ul>
-  <li class="nav-item">
-    <input type="button" class="button action-upload" value="<%= gettext('Upload') %>" <% if (!selectedFile) { %>disabled="disabled"<% } %> />
+  <li class="action-item">
+    <input type="button" class="button action-upload btn-primary-blue" value="<%= gettext('Upload') %>" <% if (!selectedFile) { %>disabled="disabled"<% } %> />
   </li>
-  <li class="nav-item">
+  <li class="action-item">
     <input type="button" class="button action-cancel" value="<%= gettext('Cancel') %>" />
   </li>
   </ul>

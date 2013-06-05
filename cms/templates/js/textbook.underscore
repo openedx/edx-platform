@@ -1,21 +1,27 @@
 <form id="edit_textbook_form" class="edit-textbook">
   <div id="edit_textbook_error" class="message message-status message-status error" name="edit_textbook_error"></div>
-  <fieldset>
-  <legend class="sr"><%= gettext("Required information to edit or add a textbook and chapters") %></legend>
+
     <ol class="list-input">
       <li class="add-textbook-name field text required">
+  <fieldset class="textbook">
+  <legend class="sr"><%= gettext("Textbook information") %></legend>
         <div class="input-wrap">
-          <label for="textbook-name-input"><%= gettext("Name") %>:</label>
+          <label for="textbook-name-input"><%= gettext("Textbook Name") %>:</label>
           <input id="textbook-name-input" type="text" placeholder="<%= gettext("Introduction to Cookie Baking") %>" value="<%= name %>">
           <span class="tip tip-stacked"><%= gettext("the title/name of the text book as you would like your students to see it.") %></span>
         </div>
+  </fieldset>
       </li>
       <li>
+  <fieldset class="chapters">
+  <legend class="sr"><%= gettext("Chapter(s) information") %></legend>
+
         <ol class="chapters list-input enum"></ol>
+
+  </fieldset>
        </li>
     </ol>
-  <p class="copy"><%= gettext("Note: <strong>It's best practice to break your course's textbook into multiple chapters</strong> to reduce loading times for students. Breaking up textbooks into chapters can also help with students more easily finding a concept or topic-based information.") %></p>
-  </fieldset>
+
   <div class="actions">
     <button class="action action-add-chapter"><i class="icon-plus"></i> <%= gettext("Add a Chapter") %></button>
     <button class="action action-primary" type="submit"><%= gettext("Save") %></button>
