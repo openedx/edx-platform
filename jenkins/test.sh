@@ -84,7 +84,8 @@ rake phantomjs_jasmine_cms || TESTS_FAILED=1
 rake phantomjs_jasmine_common/lib/xmodule || TESTS_FAILED=1
 rake phantomjs_jasmine_common/static/coffee || TESTS_FAILED=1
 
-rake coverage:xml coverage:html
+# Generate coverage reports
+rake coverage
 
 [ $TESTS_FAILED == '0' ]
 rake autodeploy_properties
