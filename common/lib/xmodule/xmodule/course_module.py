@@ -93,7 +93,7 @@ class Textbook(object):
             # see if we already fetched this
             if toc_url in _cached_toc:
                 (table_of_contents, timestamp) = _cached_toc[toc_url]
-                age = datetime.now() - timestamp
+                age = datetime.now(UTC) - timestamp
                 # expire every 10 minutes
                 if age.seconds < 600:
                     return table_of_contents

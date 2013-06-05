@@ -26,6 +26,7 @@ from django.dispatch import receiver
 from django.forms import ModelForm, forms
 
 import comment_client as cc
+from pytz import UTC
 
 
 log = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ class UserProfile(models.Model):
     class Meta:
         db_table = "auth_userprofile"
 
-    # # CRITICAL TODO/SECURITY
+    # CRITICAL TODO/SECURITY
     # Sanitize all fields.
     # This is not visible to other users, but could introduce holes later
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
@@ -253,7 +254,7 @@ class TestCenterUserForm(ModelForm):
     def update_and_save(self):
         new_user = self.save(commit=False)
         # create additional values here:
-        new_user.user_updated_at = datetime.utcnow()
+        new_user.user_updated_at = datetime.now(UTC)
         new_user.upload_status = ''
         new_user.save()
         log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(new_user.user.username))
@@ -555,7 +556,7 @@ class TestCenterRegistrationForm(ModelForm):
     def update_and_save(self):
         registration = self.save(commit=False)
         # create additional values here:
-        registration.user_updated_at = datetime.utcnow()
+        registration.user_updated_at = datetime.now(UTC)
         registration.upload_status = ''
         registration.save()
         log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.user.username, registration.course_id, registration.exam_series_code))
@@ -597,7 +598,7 @@ def unique_id_for_user(user):
     return h.hexdigest()
 
 
-# # TODO: Should be renamed to generic UserGroup, and possibly
+# TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
 class UserTestGroup(models.Model):
     users = models.ManyToManyField(User, db_index=True)

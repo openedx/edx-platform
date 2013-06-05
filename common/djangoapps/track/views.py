@@ -14,6 +14,7 @@ from mitxmako.shortcuts import render_to_response
 
 from django_future.csrf import ensure_csrf_cookie
 from track.models import TrackingLog
+from pytz import UTC
 
 log = logging.getLogger("tracking")
 
@@ -59,7 +60,7 @@ def user_track(request):
         "event": request.GET['event'],
         "agent": agent,
         "page": request.GET['page'],
-        "time": datetime.datetime.utcnow().isoformat(),
+        "time": datetime.datetime.now(UTC).isoformat(),
         "host": request.META['SERVER_NAME'],
         }
     log_event(event)
@@ -85,11 +86,11 @@ def server_track(request, event_type, event, page=None):
         "event": event,
         "agent": agent,
         "page": page,
-        "time": datetime.datetime.utcnow().isoformat(),
+        "time": datetime.datetime.now(UTC).isoformat(),
         "host": request.META['SERVER_NAME'],
         }
 
-    if event_type.startswith("/event_logs") and request.user.is_staff:  	# don't log
+    if event_type.startswith("/event_logs") and request.user.is_staff:  # don't log
         return
     log_event(event)
 

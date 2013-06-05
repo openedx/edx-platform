@@ -219,7 +219,7 @@ def initialize_discussion_info(course):
 
     _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
     _DISCUSSIONINFO[course.id]['category_map'] = category_map
-    _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now()
+    _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now(UTC())
 
 
 class JsonResponse(HttpResponse):

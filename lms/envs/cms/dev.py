@@ -21,8 +21,7 @@ modulestore_options = {
     'db': 'xmodule',
     'collection': 'modulestore',
     'fs_root': DATA_DIR,
-    'render_template': 'mitxmako.shortcuts.render_to_string',
-    'tz_aware': True
+    'render_template': 'mitxmako.shortcuts.render_to_string'
 }
 
 MODULESTORE = {
