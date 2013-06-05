@@ -92,7 +92,7 @@ CACHES = ENV_TOKENS['CACHES']
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 
 # allow for environments to specify what cookie name our login subsystem should use
-# this is to fix a bug regarding simultaneous loging between edx.org and edge.edx.org which can
+# this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
 # happen with some browsers (e.g. Firefox)
 if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
     SESSION_COOKIE_NAME = ENV_TOKENS.get('SESSION_COOKIE_NAME')
