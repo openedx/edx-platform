@@ -13,6 +13,10 @@ import re
 import numpy
 import scipy.constants
 
+# have numpy raise errors on functions outside its domain
+# See http://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
+numpy.seterr(all='ignore')  # Also: 'ignore', 'warn' (default), 'raise'
+
 from pyparsing import (Word, nums, Literal,
                        ZeroOrMore, MatchFirst,
                        Optional, Forward,
