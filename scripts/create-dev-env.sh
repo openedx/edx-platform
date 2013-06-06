@@ -533,6 +533,7 @@ if [[ "${CURRENT_RUBY#*$CLEAN_RUBY_VER}" != "$CURRENT_RUBY" ]]; then
             Press enter to continue and try the quick fix, or press control-C to abort"
 
   read dummy
+
   export PATH=$HOME/.rvm/rubies/ruby-$RUBY_VER/bin:$PATH
 
 fi
