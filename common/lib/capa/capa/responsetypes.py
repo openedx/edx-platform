@@ -294,6 +294,7 @@ class LoncapaResponse(object):
                     python_path=self.context['python_path'],
                     slug=self.id,
                     random_seed=self.context['seed'],
+                    unsafely=self.system.can_execute_unsafe_code(),
                 )
             except Exception as err:
                 msg = 'Error %s in evaluating hint function %s' % (err, hintfn)
@@ -985,6 +986,7 @@ class CustomResponse(LoncapaResponse):
                             python_path=self.context['python_path'],
                             slug=self.id,
                             random_seed=self.context['seed'],
+                            unsafely=self.system.can_execute_unsafe_code(),
                         )
                         return globals_dict['cfn_return']
                     return check_function
@@ -1108,6 +1110,7 @@ class CustomResponse(LoncapaResponse):
                     cache=self.system.cache,
                     slug=self.id,
                     random_seed=self.context['seed'],
+                    unsafely=self.system.can_execute_unsafe_code(),
                 )
             except Exception as err:
                 self._handle_exec_exception(err)
@@ -1838,6 +1841,7 @@ class SchematicResponse(LoncapaResponse):
                 cache=self.system.cache,
                 slug=self.id,
                 random_seed=self.context['seed'],
+                unsafely=self.system.can_execute_unsafe_code(),
             )
         except Exception as err:
             msg = 'Error %s in evaluating SchematicResponse' % err
