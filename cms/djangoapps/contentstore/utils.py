@@ -4,6 +4,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django.core.urlresolvers import reverse
 import copy
+import logging
+import re
+
+log = logging.getLogger(__name__)
 
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
@@ -107,9 +111,29 @@ def get_lms_link_for_about_page(location):
     """
     Returns the url to the course about page from the location tuple.
     """
-    if settings.LMS_BASE is not None:
-        lms_link = "//{lms_base}/courses/{course_id}/about".format(
-            lms_base=settings.LMS_BASE,
+    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+        if not hasattr(settings, 'MKTG_URLS'):
+            log.exception("ENABLE_MKTG_SITE is True, but MKTG_URLS is not defined.")
+            about_base = None
+        else:
+            marketing_urls = settings.MKTG_URLS
+            if marketing_urls.get('ROOT', None) is None:
+                log.exception('There is no ROOT defined in MKTG_URLS')
+                about_base = None
+            else:
+                # Root will be "https://www.edx.org". The complete URL will still not be exactly correct,
+                # but redirects exist from www.edx.org to get to the Drupal course about page URL.
+                about_base = marketing_urls.get('ROOT')
+                # Strip off https:// (or http://) to be consistent with the formatting of LMS_BASE.
+                about_base = re.sub(r"^https?://", "", about_base)
+    elif settings.LMS_BASE is not None:
+        about_base = settings.LMS_BASE
+    else:
+        about_base = None
+
+    if about_base is not None:
+        lms_link = "//{about_base_url}/courses/{course_id}/about".format(
+            about_base_url=about_base,
             course_id=get_course_id(location)
         )
     else:

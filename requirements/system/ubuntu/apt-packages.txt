@@ -1,12 +1,18 @@
 python-software-properties
 pkg-config
+gfortran
+libatlas-dev
+libblas-dev
+liblapack-dev
+liblapack3gf
 curl
 git
 python-virtualenv
+python-scipy
+python-numpy
 build-essential
 python-dev
 gfortran
-liblapack-dev
 libfreetype6-dev
 libpng12-dev
 libjpeg-dev
@@ -14,6 +20,7 @@ libxml2-dev
 libxslt-dev
 yui-compressor
 graphviz
+libgraphviz-dev
 graphviz-dev
 mysql-server
 libmysqlclient-dev
@@ -23,3 +30,6 @@ libreadline6-dev
 mongodb
 nodejs
 coffeescript
+mysql-client
+virtualenvwrapper
+libgeos-ruby1.8

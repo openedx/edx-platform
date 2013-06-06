@@ -527,12 +527,12 @@ def _do_create_account(post_vars):
         js = {'success': False}
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = "An account with this username already exists."
+            js['value'] = "An account with the Public Username  '" + post_vars['username'] + "' already exists."
             js['field'] = 'username'
             return HttpResponse(json.dumps(js))
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = "An account with this e-mail already exists."
+            js['value'] = "An account with the Email '" + post_vars['email'] + "' already exists."
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
@@ -1193,6 +1193,10 @@ def accept_name_change(request):
 
 def _get_news(top=None):
     "Return the n top news items on settings.RSS_URL"
+
+    # Don't return anything if we're in a themed site
+    if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
+        return None
 
     feed_data = cache.get("students_index_rss_feed_data")
     if feed_data is None:

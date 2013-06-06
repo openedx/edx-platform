@@ -10,6 +10,7 @@ from mock import MagicMock, patch, Mock
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 from django.http import HttpResponse
+from django.conf import settings
 from mitxmako.shortcuts import render_to_string
 
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
@@ -30,7 +31,6 @@ from django.test.utils import override_settings
 from xmodule.tests import test_util_open_ended
 
 from courseware.tests import factories
-
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestStaffGradingService(LoginEnrollmentTestCase):
@@ -310,8 +310,7 @@ class TestPanel(LoginEnrollmentTestCase):
         found_module, peer_grading_module = views.find_peer_grading_module(self.course)
         self.assertTrue(found_module)
 
-    @patch('xmodule.open_ended_grading_classes.controller_query_service.ControllerQueryService',
-           controller_query_service.MockControllerQueryService)
+    @patch('open_ended_grading.views.controller_qs', controller_query_service.MockControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, views.system))
     def test_problem_list(self):
         """
         Ensure that the problem list from the grading controller server can be rendered properly locally
@@ -319,4 +318,4 @@ class TestPanel(LoginEnrollmentTestCase):
         """
         request = Mock(user=self.user)
         response = views.student_problem_list(request, self.course.id)
-        self.assertTrue(isinstance(response, HttpResponse))
+        self.assertRegexpMatches(response.content, "Here are a list of open ended problems for this course.")

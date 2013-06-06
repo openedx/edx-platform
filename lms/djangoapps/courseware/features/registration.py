@@ -19,14 +19,24 @@ def i_register_for_the_course(step, course):
     assert world.is_css_present('section.container.dashboard')
 
 
-@step(u'I should see the course numbered "([^"]*)" in my dashboard$')
-def i_should_see_that_course_in_my_dashboard(step, course):
+@step(u'I should see an empty dashboard message')
+def i_should_see_empty_dashboard(step):
+    empty_dash_css = 'section.empty-dashboard-message'
+    assert world.is_css_present(empty_dash_css)
+
+
+@step(u'I should( NOT)? see the course numbered "([^"]*)" in my dashboard$')
+def i_should_see_that_course_in_my_dashboard(step, doesnt_appear, course):
     course_link_css = 'section.my-courses a[href*="%s"]' % course
-    assert world.is_css_present(course_link_css)
+    if doesnt_appear:
+        assert world.is_css_not_present(course_link_css)
+    else:
+        assert world.is_css_present(course_link_css)
 
 
-@step(u'I press the "([^"]*)" button in the Unenroll dialog')
-def i_press_the_button_in_the_unenroll_dialog(step, value):
-    button_css = 'section#unenroll-modal input[value="%s"]' % value
+@step(u'I unregister for the course numbered "([^"]*)"')
+def i_unregister_for_that_course(step, course):
+    unregister_css = 'section.info a[href*="#unenroll-modal"][data-course-number*="%s"]' % course
+    world.css_click(unregister_css)
+    button_css = 'section#unenroll-modal input[value="Unregister"]'
     world.css_click(button_css)
-    assert world.is_css_present('section.container.dashboard')

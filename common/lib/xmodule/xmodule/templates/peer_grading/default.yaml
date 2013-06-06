@@ -1,11 +1,7 @@
 ---
 metadata:
     display_name: Peer Grading Interface
-    use_for_single_location: False
-    link_to_location: None
-    is_graded: False
     max_grade: 1
-    weight: ""
 data: |
   <peergrading>
   </peergrading>

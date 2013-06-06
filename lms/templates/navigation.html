@@ -1,6 +1,6 @@
 ## mako
 <%namespace name='static' file='static_content.html'/>
-<%namespace file='main.html' import="login_query"/>
+<%namespace file='main.html' import="login_query, stanford_theme_enabled"/>
 <%!
 from django.core.urlresolvers import reverse
 
@@ -9,6 +9,9 @@ import branding
 # app that handles site status messages
 from status.status import get_site_status_msg
 %>
+
+## Provide a hook for themes to inject branding on top.
+<%block name="navigation_top" />
 
 <%block cached="False">
 <%
@@ -38,9 +41,12 @@ site_status_msg = get_site_status_msg(course_id)
   <nav>
 
   <h1 class="logo">
-      <a href="${marketing_link('ROOT')}">
-        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/>
-      </a></h1>
+    <a href="${marketing_link('ROOT')}">
+      <%block name="navigation_logo">
+        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="edX home" />
+      </%block>
+    </a>
+  </h1>
 
     % if course:
       <h2><span class="provider">${course.org}:</span> ${course.number} ${course.display_name_with_default}</h2>
@@ -49,9 +55,11 @@ site_status_msg = get_site_status_msg(course_id)
     % if user.is_authenticated():
 
     <ol class="left nav-global authenticated">
-      <li class="nav-global-01">
-      <a href="${marketing_link('COURSES')}">Find Courses</a>
-      </li>
+      <%block name="navigation_global_links_authenticated">
+        <li class="nav-global-01">
+          <a href="${marketing_link('COURSES')}">Find Courses</a>
+        </li>
+      </%block>
     </ol>
     <ol class="user">
       <li class="primary">
@@ -63,10 +71,9 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="#" class="dropdown">&#9662</a>
         <ul class="dropdown-menu">
-            <li>
-            <a href="${marketing_link('FAQ')}">
-            Help
-          </a></li>
+          <%block name="navigation_dropdown_menu_links" >
+            <li><a href="${marketing_link('FAQ')}">Help</a></li>
+          </%block>
           <li><a href="${reverse('logout')}">Log Out</a></li>
         </ul>
       </li>
@@ -74,17 +81,19 @@ site_status_msg = get_site_status_msg(course_id)
 
     % else:
     <ol class="left nav-global">
-      % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-      <li class="nav-global-01">
-        <a href="${marketing_link('HOW_IT_WORKS')}">How it Works</a>
-      </li>
-      <li class="nav-global-02">
-        <a href="${marketing_link('COURSES')}">Courses</a>
-      </li>
-      <li class="nav-global-03">
-        <a href="${marketing_link('SCHOOLS')}">Schools</a>
-      </li>
-      % endif
+      <%block name="navigation_global_links">
+        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+          <li class="nav-global-01">
+            <a href="${marketing_link('HOW_IT_WORKS')}">How it Works</a>
+          </li>
+          <li class="nav-global-02">
+            <a href="${marketing_link('COURSES')}">Courses</a>
+          </li>
+          <li class="nav-global-03">
+            <a href="${marketing_link('SCHOOLS')}">Schools</a>
+          </li>
+        % endif
+      </%block>
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
       <li class="nav-global-04">
         <a class="cta cta-register" href="/register">Register Now</a>

@@ -1,3 +1,12 @@
-<h1>E-mail change successful!</h1> 
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="main.html" />
 
-<p> You should see your new name in your profile. 
+<section class="container activation">
+
+  <section class="message">
+    <h1 class="invalid">E-mail change successful!</h1>
+    <hr class="horizontal-divider">
+
+    <p>You should see your new email in your <a href="${reverse('dashboard')}">dashboard</a>.</p>
+  </section>
+</section>

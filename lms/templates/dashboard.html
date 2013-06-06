@@ -150,6 +150,8 @@
       </ul>
     </section>
 
+    ## `news` should be `None` whenever a non-edX theme is enabled:
+    ## see common/djangoapps/student/views.py#_get_news
     %if news:
     <article class="news-carousel">
       <header>
@@ -292,7 +294,7 @@
                            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
                       % elif cert_status['status'] == 'restricted':
                           <p class="message-copy">
-                          Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:info@edx.org">info@edx.org</a>.
+                          Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:${settings.CONTACT_EMAIL}">${settings.CONTACT_EMAIL}</a>.
                           </p>
                       % endif
                       </p>
@@ -449,11 +451,11 @@
     <div id="change_name_body">
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
-        <p>To uphold the credibility of edX certificates, all name changes will be logged and recorded.</p>
+        <p>To uphold the credibility of ${settings.PLATFORM_NAME} certificates, all name changes will be logged and recorded.</p>
         <br/>
         <fieldset>
           <div class="input-group">
-            <label>Enter your desired full name, as it will appear on the edX certificates: </label>
+            <label>Enter your desired full name, as it will appear on the ${settings.PLATFORM_NAME} certificates: </label>
             <input id="new_name_field" value="" type="text" />
             <label>Reason for name change:</label>
             <textarea id="name_rationale_field" value=""></textarea>

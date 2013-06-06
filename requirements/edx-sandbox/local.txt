@@ -4,3 +4,4 @@
 common/lib/calc
 common/lib/chem
 common/lib/sandbox-packages
+common/lib/symmath

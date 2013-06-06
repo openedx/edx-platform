@@ -16,10 +16,11 @@ output() {
 
 ### START
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BREW_FILE=$DIR/"brew-formulas.txt"
-APT_REPOS_FILE=$DIR/"apt-repos.txt"
-APT_PKGS_FILE=$DIR/"apt-packages.txt"
+SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REQUIREMENTS_DIR="$SELF_DIR/../requirements/system"
+BREW_FILE=$REQUIREMENTS_DIR/"mac_os_x/brew-formulas.txt"
+APT_REPOS_FILE=$REQUIREMENTS_DIR/"ubuntu/apt-repos.txt"
+APT_PKGS_FILE=$REQUIREMENTS_DIR/"ubuntu/apt-packages.txt"
 
 case `uname -s` in
     [Ll]inux)
@@ -30,8 +31,9 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            maya|lisa|natty|oneiric|precise|quantal)
-                output "Installing Ubuntu requirements"
+            #Tries to install the same 
+            squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+                output "Installing Debian family requirements"
 
                 # DEBIAN_FRONTEND=noninteractive is required for silent mysql-server installation
                 export DEBIAN_FRONTEND=noninteractive
@@ -39,7 +41,10 @@ case `uname -s` in
                 # add repositories
                 cat $APT_REPOS_FILE | xargs -n 1 sudo add-apt-repository -y
                 sudo apt-get -y update
-
+                sudo apt-get -y install gfortran
+                sudo apt-get -y install graphviz libgraphviz-dev graphviz-dev
+                sudo apt-get -y install libatlas-dev libblas-dev 
+                sudo apt-get -y install ruby-rvm
                 # install packages listed in APT_PKGS_FILE
                 cat $APT_PKGS_FILE | xargs sudo apt-get -y install
                 ;;
@@ -70,9 +75,12 @@ EO
 
         output "Installing OSX requirements"
         if [[ ! -r $BREW_FILE ]]; then
-            error "$BREW_FILE does not exist, needed to install brew"
+            error "$BREW_FILE does not exist, please include the brew formulas file in the requirements/system/mac_os_x directory"
             exit 1
         fi
+
+        # for some reason openssl likes to be installed by itself first
+        brew install openssl
 
         # brew errors if the package is already installed
         for pkg in $(cat $BREW_FILE); do
