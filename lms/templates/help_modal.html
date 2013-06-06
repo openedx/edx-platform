@@ -21,9 +21,12 @@
 discussion_link = get_discussion_link(course) if course else None
 %>
 
+% if discussion_link:
     <p>For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the
        <a href="${discussion_link}" target="_blank"/>course discussion forum</a>.
     </p>
+% endif
+    
     <p>Have <strong>general questions about edX</strong>? You can find lots of helpful information in the edX
        <a href="/help" target="_blank">FAQ</a>.</p>
 

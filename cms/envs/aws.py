@@ -95,7 +95,8 @@ SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
 # happen with some browsers (e.g. Firefox)
 if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
-    SESSION_COOKIE_NAME = ENV_TOKENS.get('SESSION_COOKIE_NAME')
+    # NOTE, there's a bug in Django (http://bugs.python.org/issue18012) which necessitates this being a str()
+    SESSION_COOKIE_NAME = str(ENV_TOKENS.get('SESSION_COOKIE_NAME'))
 
 #Email overrides
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)

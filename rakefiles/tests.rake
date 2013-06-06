@@ -81,12 +81,11 @@ TEST_TASK_DIRS = []
 end
 
 Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
-    task_name = "test_#{lib}"
 
     report_dir = report_dir_path(lib)
 
     desc "Run tests for common lib #{lib}"
-    task task_name => report_dir do
+    task "test_#{lib}"  => ["clean_test_files", report_dir] do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         cmd = "nosetests #{lib}"
         sh(run_under_coverage(cmd, lib)) do |ok, res|
@@ -95,10 +94,13 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     end
     TEST_TASK_DIRS << lib
 
-    desc "Run tests for common lib #{lib} (without coverage)"
-    task "fasttest_#{lib}" do
-        sh("nosetests #{lib}")
-    end
+    # There used to be a fasttest_#{lib} command that ran without coverage.
+    # However, this is an inconsistent usage of "fast":
+    # When running tests for lms and cms, "fast" means skipping
+    # staticfiles collection, but still running under coverage.
+    # We keep the fasttest_#{lib} command for backwards compatibility,
+    # but make it an alias to the normal test command.
+    task "fasttest_#{lib}" => "test_#{lib}"
 end
 
 task :report_dirs
@@ -119,30 +121,35 @@ task :test do
     end
 end
 
-namespace :coverage do
-    desc "Build the html coverage reports"
-    task :html => :report_dirs do
-        TEST_TASK_DIRS.each do |dir|
-            report_dir = report_dir_path(dir)
+desc "Build the html, xml, and diff coverage reports"
+task :coverage => :report_dirs do
 
-            if !File.file?("#{report_dir}/.coverage")
-                next
-            end
+    found_coverage_info = false
 
-            sh("coverage html --rcfile=#{dir}/.coveragerc")
+    TEST_TASK_DIRS.each do |dir|
+        report_dir = report_dir_path(dir)
+
+        if !File.file?("#{report_dir}/.coverage")
+            next
+        else
+            found_coverage_info = true
         end
+
+        # Generate the coverage.py HTML report
+        sh("coverage html --rcfile=#{dir}/.coveragerc")
+
+        # Generate the coverage.py XML report
+        sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
+
+        # Generate the diff coverage HTML report, based on the XML report
+        sh("diff-cover #{report_dir}/coverage.xml --html-report #{report_dir}/diff_cover.html")
+
+        # Print the diff coverage report to the console
+        sh("diff-cover #{report_dir}/coverage.xml")
+        puts "\n"
     end
 
-    desc "Build the xml coverage reports"
-    task :xml => :report_dirs do
-        TEST_TASK_DIRS.each do |dir|
-            report_dir = report_dir_path(dir)
-
-            if !File.file?("#{report_dir}/.coverage")
-                next
-            end
-            # Why doesn't the rcfile control the xml output file properly??
-            sh("coverage xml -o #{report_dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
-        end
+    if not found_coverage_info
+        puts "No coverage info found.  Run `rake test` before running `rake coverage`."
     end
 end

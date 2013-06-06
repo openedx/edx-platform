@@ -202,9 +202,10 @@ To view test coverage:
 
 2. Generate reports:
 
-        rake coverage:html
+        rake coverage
 
-3. HTML reports are located in the `reports` folder.
+3. Reports are located in the `reports` folder.  The command
+generates HTML and XML (Cobertura format) reports.
 
 
 ## Testing using queue servers
