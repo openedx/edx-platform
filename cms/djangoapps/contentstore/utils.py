@@ -5,6 +5,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from django.core.urlresolvers import reverse
 import copy
 import logging
+import re
 
 log = logging.getLogger(__name__)
 
@@ -120,9 +121,11 @@ def get_lms_link_for_about_page(location):
                 log.exception('There is no ROOT defined in MKTG_URLS')
                 about_base = None
             else:
-                # Root will be "www.edx.org". The complete URL will still not be exactly correct,
-                # but redirects exist from www.edx.org to get to the drupal course about page URL.
+                # Root will be "https://www.edx.org". The complete URL will still not be exactly correct,
+                # but redirects exist from www.edx.org to get to the Drupal course about page URL.
                 about_base = marketing_urls.get('ROOT')
+                # Strip off https:// (or http://) to be consistent with the formatting of LMS_BASE.
+                about_base = re.sub(r"^https?://", "", about_base)
     elif settings.LMS_BASE is not None:
         about_base = settings.LMS_BASE
     else:
