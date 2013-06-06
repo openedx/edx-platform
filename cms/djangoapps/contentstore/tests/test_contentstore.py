@@ -604,6 +604,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
+            'run': '2013_Spring'
         }
 
         module_store = modulestore('direct')
@@ -612,12 +613,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.post(reverse('create_new_course'), course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
 
         content_store = contentstore()
 
         source_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
-        dest_location = CourseDescriptor.id_to_location('MITx/999/Robot_Super_Course')
+        dest_location = CourseDescriptor.id_to_location('MITx/999/2013_Spring')
 
         clone_course(module_store, content_store, source_location, dest_location)
 
@@ -954,6 +955,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
+            'run': '2013_Spring'
         }
 
     def tearDown(self):
@@ -972,11 +974,15 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
 
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
         self.assert_created_course()
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
         self.assertTrue(are_permissions_roles_seeded('MITx/999/Robot_Super_Course'))
 
     def test_create_course_duplicate_course(self):
@@ -991,12 +997,13 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['ErrMsg'], error_message)
+        self.assertEqual(data['ErrMsg'], 'There is already a course defined with the same organization, course number, and course run.')
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
         self.client.post(reverse('create_new_course'), self.course_data)
         self.course_data['display_name'] = 'Robot Super Course Two'
+        self.course_data['run'] = '2013_Summer'
 
         self.assert_course_creation_failed('There is already a course defined with the same organization and course number.')
 

@@ -617,22 +617,25 @@ function saveNewCourse(e) {
     var org = $newCourse.find('.new-course-org').val();
     var number = $newCourse.find('.new-course-number').val();
     var display_name = $newCourse.find('.new-course-name').val();
+    var run = $newCourse.find('.new-course-run').val();
 
-    if (org == '' || number == '' || display_name == '') {
+    if (org == '' || number == '' || display_name == '' || run == '') {
         alert(gettext('You must specify all fields in order to create a new course.'));
-        return;
+       return;
     }
 
     analytics.track('Created a Course', {
         'org': org,
         'number': number,
-        'display_name': display_name
+        'display_name': display_name,
+        'run': run
     });
 
     $.post('/create_new_course', {
         'org': org,
         'number': number,
-        'display_name': display_name
+        'display_name': display_name,
+        'run': run
     },
 
     function(data) {
