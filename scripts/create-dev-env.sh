@@ -543,7 +543,7 @@ mkdir -p "$BASE/log"
 mkdir -p "$BASE/db"
 mkdir -p "$BASE/data"
 
-rake django-admin[syncdb]
+rake django-admin[syncdb,lms,dev,--noinput]
 rake django-admin[migrate]
 rake cms:update_templates
 # Configure Git
