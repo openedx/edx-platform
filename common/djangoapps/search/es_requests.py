@@ -294,7 +294,7 @@ class ElasticDatabase:
 
     def setup_type(self, index, type_, json_mapping):
         """
-        yaml_mapping should be a dictionary starting at the properties level of a mapping.
+        json_mapping should be a dictionary starting at the properties level of a mapping.
         The type level will be added, so if you include it things will break. The purpose of this
         is to encourage loose coupling between types and mappings for better code
         """
