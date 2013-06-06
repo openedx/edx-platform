@@ -23,9 +23,8 @@ ROOT_URLCONF = 'lms.urls'
 
 # import sys
 
-from .common import *
 from .dev import *
-from logsettings import get_logger_config
+# from logsettings import get_logger_config
 
 MITX_FEATURES['RUN_AS_ANALYTICS_SERVER_ENABLED'] = True
 
@@ -36,10 +35,9 @@ INSTALLED_APPS = INSTALLED_APPS + ( 'djeventstream.httphandler',
     'edinsights.modulefs',
 )
 
-INSTALLED_ANALYTICS_MODULES = open("../analytics_modules.txt").readlines()
-INSTALLED_ANALYTICS_MODULES = [x.strip() for x in INSTALLED_ANALYTICS_MODULES if x and len(x)>1]
-
-print "======JUHO==========", INSTALLED_ANALYTICS_MODULES
+INSTALLED_ANALYTICS_MODULES = ['edxdataanalytic.edxdataanalytic', 'video_heatmap.video_heatmap']
+# INSTALLED_ANALYTICS_MODULES = open("../analytics_modules.txt").readlines()
+# INSTALLED_ANALYTICS_MODULES = [x.strip() for x in INSTALLED_ANALYTICS_MODULES if x and len(x)>1]
 
 DJFS = { 'type' : 'osfs',
          'directory_root' : '/tmp/djfsmodule',
@@ -47,6 +45,5 @@ DJFS = { 'type' : 'osfs',
        }
 
 import djcelery
-
 djcelery.setup_loader()
 default_optional_kwargs = ['fs','db','query']

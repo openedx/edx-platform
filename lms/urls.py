@@ -355,7 +355,11 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 
 if settings.MITX_FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
     urlpatterns += (
-        url('^', include('edinsights.core.urls')),
+        # url('^', include('edinsights.core.urls')),
+        url(r'^view/([A-Za-z_+]+)$', 'edinsights.core.views.handle_view'),
+        url(r'^query/([A-Za-z_+]+)$', 'edinsights.core.views.handle_query'),
+        url(r'^schema$', 'edinsights.core.views.schema'),
+        url(r'^event_properties$', 'edinsights.core.views.event_properties'),
     )
     import edinsights.core.registry
 
