@@ -751,9 +751,10 @@ def enable_theme(theme_name):
     # Calculate the location of the theme's files
     theme_root = ENV_ROOT / "themes" / theme_name
 
-    # Include the theme's templates in the template search paths
-    TEMPLATE_DIRS.append(theme_root / 'templates')
-    MAKO_TEMPLATES['main'].append(theme_root / 'templates')
+    # Prepend the theme's templates to the template search paths so
+    # that themes can override templates on an as-needed basis
+    TEMPLATE_DIRS.insert(0, theme_root / 'templates')
+    MAKO_TEMPLATES['main'].insert(0, theme_root / 'templates')
 
     # Namespace the theme's static files to 'themes/<theme_name>' to
     # avoid collisions with default edX static files
