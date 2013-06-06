@@ -83,16 +83,12 @@
 
 <section class="introduction">
   <header>
-    <h1 class="sr">Register for ${settings.PLATFORM_NAME}</h1>
+    <h1 class="sr">${_("Welcome! Register below to create your %(platform_name)s account") % {'platform_name': settings.PLATFORM_NAME}}</h1>
   </header>
 </section>
 
 <section class="register container">
   <section role="main" class="content">
-    <header>
-      <h2 class="sr">${_("Welcome! Register below to create your edX account")}</h2>
-    </header>
-
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account">
 
       <!-- status messages -->
