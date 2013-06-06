@@ -198,16 +198,14 @@ class ElasticDatabase:
 
     def setup_type(self, index, type_, json_mapping):
         """
-        yaml_mapping should be a dictionary starting at the properties level of a mapping.
+        json_mapping should be a dictionary starting at the properties level of a mapping.
 
         The type level will be added, so if you include it things will break. The purpose of this
         is to encourage loose coupling between types and mappings for better code
         """
-
-        full_url = "/".join([self.url, index, type_]) + "/"
-        dictionary = json.loads(open(json_mapping).read())
-        print dictionary
-        return requests.post(full_url, data=json.dumps(dictionary))
+        full_url = "/".join([self.url, index, type_, "_mapping"])
+        json_put_body = {type_: json_mapping}
+        requests.put(full_url, data=json_put_body)
 
     def has_index(self, index):
         """Checks to see if a given index exists in the database returns existance boolean,
