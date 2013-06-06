@@ -49,8 +49,11 @@ usage() {
 
     Usage: $PROG [-c] [-v] [-h]
 
+            -y        non interactive mode (no prompt, proceed immediately)
             -c        compile scipy and numpy
+            -n        do not attempt to pull edx-platform
             -s        give access to global site-packages for virtualenv
+            -q        be more quiet (removes info at beginning & end)
             -v        set -x + spew
             -h        this
 
@@ -78,21 +81,23 @@ change_git_push_defaults() {
 
 clone_repos() {
 
-    change_git_push_defaults
-
     cd "$BASE"
 
-    if [[ -d "$BASE/edx-platform/.git" ]]; then
-        output "Pulling edx platform"
-        cd "$BASE/edx-platform"
-        git pull
-    else
-        output "Cloning edx platform"
-        if [[ -d "$BASE/edx-platform" ]]; then
-            output "Creating backup for existing edx platform"
-            mv "$BASE/edx-platform" "${BASE}/edx-platform.bak.$$"
+    if [[ ! $nopull ]]; then
+        change_git_push_defaults
+
+        if [[ -d "$BASE/edx-platform/.git" ]]; then
+            output "Pulling edx platform"
+            cd "$BASE/edx-platform"
+            git pull
+        else
+            output "Cloning edx platform"
+            if [[ -d "$BASE/edx-platform" ]]; then
+                output "Creating backup for existing edx platform"
+                mv "$BASE/edx-platform" "${BASE}/edx-platform.bak.$$"
+            fi
+            git clone https://github.com/edx/edx-platform.git
         fi
-        git clone https://github.com/edx/edx-platform.git
     fi
 }
 
@@ -149,7 +154,7 @@ if [[ "x$VIRTUAL_ENV" != "x" ]]; then
 fi
 
 # Read arguments
-ARGS=$(getopt "cvhs" "$*")
+ARGS=$(getopt "cvhsynq" "$*")
 if [[ $? != 0 ]]; then
     usage
     exit 1
@@ -170,6 +175,18 @@ while true; do
             verbose=true
             shift
             ;;
+        -y)
+            noninteractive=true
+            shift
+            ;;
+        -q)
+            quiet=true
+            shift
+            ;;
+        -n)
+            nopull=true
+            shift
+            ;;
         -h)
             usage
             exit 0
@@ -181,7 +198,8 @@ while true; do
     esac
 done
 
-cat<<EO
+if [[ ! $quiet ]]; then
+    cat<<EO
 
   This script will setup a local edX environment, this
   includes
@@ -201,10 +219,13 @@ cat<<EO
   shell.
 
 EO
-info
-output "Press return to begin or control-C to abort"
-read dummy
+fi
+    info
 
+if [[ ! $noninteractive ]]; then
+    output "Press return to begin or control-C to abort"
+    read dummy
+fi
 
 # Log all stdout and stderr
 
@@ -224,32 +245,36 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            wheezy|jessie|maya|olivia|nadia|precise|quantal)
-                warning "
-                        Debian support is not fully debugged. Assuming you have standard
-                        development packages already working like scipy rvm, the
-                        installation should go fine, but this is still a work in progress.
+            wheezy|jessie|maya|olivia|nadia|precise|quantal) 
+                if [[ ! $noninteractive ]]; then
+                    warning "
+                            Debian support is not fully debugged. Assuming you have standard
+                            development packages already working like scipy rvm, the 
+                            installation should go fine, but this is still a work in progress.
 
-                        Please report issues you have and let us know if you are able to figure
-                        out any workarounds or solutions
+                            Please report issues you have and let us know if you are able to figure
+                            out any workarounds or solutions
 
-                        Press return to continue or control-C to abort"
+                            Press return to continue or control-C to abort"
 
-                read dummy
-                sudo apt-get install git ;;
+                    read dummy
+                fi
+                sudo apt-get install -yq git ;;  
             squeeze|lisa|katya|oneiric|natty|raring)
-                warning "
-                          It seems like you're using $distro which has been deprecated.
-                          While we don't technically support this release, the install
-                          script will probably still work.
+                if [[ ! $noninteractive ]]; then
+                    warning "
+                              It seems like you're using $distro which has been deprecated.
+                              While we don't technically support this release, the install
+                              script will probably still work.
 
-                          Raring requires an install of rvm to work correctly as the raring
-                          package manager does not yet include a package for rvm
+                              Raring requires an install of rvm to work correctly as the raring
+                              package manager does not yet include a package for rvm
 
-                          Press return to continue or control-C to abort"
-                read dummy
-                sudo apt-get install git
-                ;;
+                              Press return to continue or control-C to abort"
+                    read dummy
+                fi
+                sudo apt-get install -yq git
+                ;; 
 
             *)
                 error "Unsupported distribution - $distro"
@@ -529,7 +554,8 @@ git config --global push.default current
 
 ### DONE
 
-cat<<END
+if [[ ! $quiet ]]; then
+    cat<<END
    Success!!
 
    To start using Django you will need to activate the local Python
@@ -567,4 +593,6 @@ cat<<END
 
 
 END
+fi
+
 exit 0
