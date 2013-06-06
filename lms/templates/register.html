@@ -115,20 +115,20 @@
         <ol class="list-input">
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />
+            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" />
           </li>
           <li class="field required password" id="field-password">
             <label for="password">Password</label>
-            <input id="password" type="password" name="password" value="" />
+            <input id="password" type="password" name="password" value="" required aria-required="true" />
           </li>
           <li class="field required text" id="field-username">
             <label for="username">Public Username</label>
-            <input id="username" type="text" name="username" value="" placeholder="example: JaneDoe" />
+            <input id="username" type="text" name="username" value="" placeholder="example: JaneDoe" required aria-required="true" />
             <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
           </li>
           <li class="field required text" id="field-name">
             <label for="name">Full Name</label>
-            <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" />
+            <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" required aria-required="true" />
             <span class="tip tip-input">Needed for any certificates you may earn <strong>(cannot be changed later)</strong></span>
           </li>
         </ol>
@@ -143,7 +143,7 @@
         <ol class="list-input">
           <li class="field required text" id="field-username">
             <label for="username">Public Username</label>
-            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="example: JaneDoe" />
+            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="example: JaneDoe" required aria-required="true" />
             <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
           </li>
         </ol>
@@ -211,7 +211,7 @@
         <ol class="list-input">
           <li class="field-group">
             <div class="field required checkbox" id="field-tos">
-              <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" />
+              <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
               <label for="tos-yes">I agree to the <a href="${marketing_link('TOS')}" class="new-vp">Terms of Service</a></label>
             </div>
 
