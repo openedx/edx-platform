@@ -132,7 +132,7 @@ def create_studio_user(
 def fill_in_course_info(
         name='Robot Super Course',
         org='MITx',
-        num='999',
+        num='101',
         run='2013_Spring'):
     world.css_fill('.new-course-name', name)
     world.css_fill('.new-course-org', org)
