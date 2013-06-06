@@ -53,6 +53,7 @@ usage() {
             -s        give access to global site-packages for virtualenv
             -v        set -x + spew
             -h        this
+            -u        run update commands at the end of the script
 
 EO
     info
@@ -173,6 +174,10 @@ while true; do
         -h)
             usage
             exit 0
+            ;;
+        -u)
+            update=true
+            shift
             ;;
         --)
             shift
@@ -520,16 +525,16 @@ if [[ "${CURRENT_RUBY#*$CLEAN_RUBY_VER}" != "$CURRENT_RUBY" ]]; then
             We can use a quick fix here, but for a long term fix you want to add the following
             line to your ~/.bash_profile file:
 
-            export PATH=$HOME/.rvm/rubies/ruby-1.9.3-p374/bin:$PATH
+            export PATH=$HOME/.rvm/rubies/ruby-$RUBY_VER/bin:\$PATH
 
             Assuming you don't have a custom rvm installation, if you do have a custom rvm, 
-            then just make sure that the very of ruby you're using is 1.9.3-p374.
+            then just make sure that the very of ruby you're using is $RUBY_VER.
 
             Press enter to continue and try the quick fix, or press control-C to abort"
 
   read dummy
 
-  export PATH=$HOME/.rvm/rubies/ruby-1.9.3-p374/bin:$PATH
+  export PATH=$HOME/.rvm/rubies/ruby-$RUBY_VER/bin:$PATH
 
 fi
 
@@ -541,9 +546,11 @@ mkdir -p "$BASE/log"
 mkdir -p "$BASE/db"
 mkdir -p "$BASE/data"
 
-rake django-admin[syncdb]
-rake django-admin[migrate]
-rake cms:update_templates
+if [[ $update ]]; then
+  rake django-admin[syncdb]
+  rake django-admin[migrate]
+  rake cms:update_templates
+fi
 # Configure Git
 
 output "Fixing your git default settings"
@@ -564,7 +571,7 @@ cat<<END
 
    Then, every time you're ready to work on the project, just run
 
-        $ workon mitx
+        $ source ~/.virtualenvs/edx-platform/bin/activate
 
    To initialize Django
 
