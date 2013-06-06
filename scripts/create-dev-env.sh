@@ -364,7 +364,7 @@ case `uname -s` in
         warning "Setting up rvm on linux. This is a known pain point. If the script fails here
                 refer to the following stack overflow question:
                 http://stackoverflow.com/questions/9056008/installed-ruby-1-9-3-with-rvm-but-command-line-doesnt-show-ruby-v/9056395#9056395"
-        sudo apt-get --purge remove ruby-rvm
+        sudo apt-get --purge remove -yq ruby-rvm
         sudo rm -rf /usr/share/ruby-rvm /etc/rvmrc /etc/profile.d/rvm.sh
         curl -sSL https://get.rvm.io | bash -s stable --ruby=$RUBY_VER --autolibs=enable --auto-dotfiles
     ;;
@@ -451,14 +451,14 @@ fi
 # Create edX virtualenv and link it to repo
 # virtualenvwrapper automatically sources the activation script
 if [[ $systempkgs ]]; then
-    mkvirtualenv -a "$HOME/.virtualenvs" --system-site-packages edx-platform || {
+    mkvirtualenv -q -a "$HOME/.virtualenvs" --system-site-packages edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
 else
     # default behavior for virtualenv>1.7 is
     # --no-site-packages
-    mkvirtualenv -a "$HOME/.virtualenvs" edx-platform || {
+    mkvirtualenv -q -a "$HOME/.virtualenvs" edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
