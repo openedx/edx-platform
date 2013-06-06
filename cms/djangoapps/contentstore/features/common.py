@@ -78,7 +78,7 @@ def fill_in_course_info(
         name='Robot Super Course',
         org='MITx',
         num='101',
-        run='2013_Sprin'):
+        run='2013_Spring'):
     world.css_fill('.new-course-name', name)
     world.css_fill('.new-course-org', org)
     world.css_fill('.new-course-number', num)
