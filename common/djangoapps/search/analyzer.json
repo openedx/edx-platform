@@ -1,0 +1,36 @@
+{
+"analyzer": {
+
+    "transcript_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": ["protected", "asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle"],
+        "char_filter": ["custom_mapping"]
+    }
+},
+
+"filter" : {
+
+    "custom_word_delimiter":{
+        "type": "word_delimiter",
+        "preserve_original": "true"
+    },
+
+    "custom_stemmer": {
+        "type": "stemmer",
+        "name": "english"
+    }, 
+
+    "protected": {
+        "type": "keyword_marker",
+        "keywords_path": "protectedWords.txt"
+    }
+},
+
+"char_filter": {
+    "custom_mapping": {
+        "type": "mapping",
+        "mappings": ["\n=>-"]
+    }
+}
+}
