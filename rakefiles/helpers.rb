@@ -1,8 +1,12 @@
 require 'digest/md5'
 
+def find_executable(exec)
+    path = %x(which #{exec}).strip
+    $?.exitstatus == 0 ? path : nil
+end
 
 def select_executable(*cmds)
-    cmds.find_all{ |cmd| system("which #{cmd} > /dev/null 2>&1") }[0] || fail("No executables found from #{cmds.join(', ')}")
+    cmds.find_all{ |cmd| !find_executable(cmd).nil? }[0] || fail("No executables found from #{cmds.join(', ')}")
 end
 
 def django_admin(system, env, command, *args)
@@ -85,3 +89,31 @@ def environments(system)
         env_file.gsub("#{system}/envs/", '').gsub(/\.py/, '').gsub('/', '.')
     end
 end
+
+$failed_tests = 0
+
+# Run sh on args. If TESTS_FAIL_FAST is set, then stop on the first shell failure.
+# Otherwise, a final task will be added that will fail if any tests have failed
+def test_sh(*args)
+    sh(*args) do |ok, res|
+        if ok
+            return
+        end
+
+        if ENV['TESTS_FAIL_FAST']
+            fail("Test failed!")
+        else
+            $failed_tests += 1
+        end
+    end
+end
+
+# Add a task after all other tasks that fails if any tests have failed
+if !ENV['TESTS_FAIL_FAST']
+    task :fail_tests do
+        fail("#{$failed_tests} tests failed!") if $failed_tests > 0
+    end
+
+    Rake.application.top_level_tasks << :fail_tests
+end
+
