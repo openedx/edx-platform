@@ -4,7 +4,7 @@ Feature: Video Component Editor
   Scenario: User can view metadata
     Given I have created a Video component
     And I edit and select Settings
-    Then I see only the Video display name setting
+    Then I see the correct settings and default values
 
   Scenario: User can modify display name
     Given I have created a Video component

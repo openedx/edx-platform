@@ -8,18 +8,25 @@ from django.http import Http404
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.contentstore.content import StaticContent
-from xblock.core import Integer, Scope, String
-
-import datetime
-import time
+from xmodule.editing_module import MetadataOnlyEditingDescriptor
+from xblock.core import Integer, Scope, String, Boolean, Float
 
 log = logging.getLogger(__name__)
 
+YOUTUBE_SPEEDS = ['.75', '1.0', '1.25', '1.5']
+
 
 class VideoFields(object):
-    data = String(help="XML data for the problem", scope=Scope.content)
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
+    show_captions = Boolean(help="Whether or not captions are shown", display_name="Show Captions", scope=Scope.settings, default=True)
+    youtube_id_1_0 = String(help="Youtube ID for normal speed video", display_name="Normal Speed", scope=Scope.settings, default="OEoXaMPEzfM")
+    youtube_id_0_75 = String(help="Youtube ID for .75x speed video", display_name=".75x", scope=Scope.settings, default="JMD_ifUUfsU")
+    youtube_id_1_25 = String(help="Youtube ID for 1.25x speed video", display_name="1.25x", scope=Scope.settings, default="AKqURZnYqpk")
+    youtube_id_1_5 = String(help="Youtube ID for 1.5x speed video", display_name="1.5x", scope=Scope.settings, default="DYpADpL7jAY")
+    start_time = Float(help="Time the video starts", display_name="Start Time", scope=Scope.settings, default=0.0)
+    end_time = Float(help="Time the video ends", display_name="End Time", scope=Scope.settings, default=0.0)
+    source = String(help="External source to download video", display_name="External Source", scope=Scope.settings, default="")
+    track = String(help="External source to download subtitle strack", display_name="External Track", scope=Scope.settings, default="")
 
 
 class VideoModule(VideoFields, XModule):
@@ -38,52 +45,6 @@ class VideoModule(VideoFields, XModule):
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
-
-        xmltree = etree.fromstring(self.data)
-        self.youtube = xmltree.get('youtube')
-        self.show_captions = xmltree.get('show_captions', 'true')
-        self.source = self._get_source(xmltree)
-        self.track = self._get_track(xmltree)
-        self.start_time, self.end_time = self._get_timeframe(xmltree)
-
-    def _get_source(self, xmltree):
-        # find the first valid source
-        return self._get_first_external(xmltree, 'source')
-
-    def _get_track(self, xmltree):
-        # find the first valid track
-        return self._get_first_external(xmltree, 'track')
-
-    def _get_first_external(self, xmltree, tag):
-        """
-        Will return the first valid element
-        of the given tag.
-        'valid' means has a non-empty 'src' attribute
-        """
-        result = None
-        for element in xmltree.findall(tag):
-            src = element.get('src')
-            if src:
-                result = src
-                break
-        return result
-
-    def _get_timeframe(self, xmltree):
-        """ Converts 'from' and 'to' parameters in video tag to seconds.
-        If there are no parameters, returns empty string. """
-
-        def parse_time(s):
-            """Converts s in '12:34:45' format to seconds. If s is
-            None, returns empty string"""
-            if s is None:
-                return ''
-            else:
-                x = time.strptime(s, '%H:%M:%S')
-                return datetime.timedelta(hours=x.tm_hour,
-                                      minutes=x.tm_min,
-                                      seconds=x.tm_sec).total_seconds()
-
-        return parse_time(xmltree.get('from')), parse_time(xmltree.get('to'))
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -113,37 +74,92 @@ class VideoModule(VideoFields, XModule):
         #log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
 
-    def video_list(self):
-        return self.youtube
-
     def get_html(self):
-        # We normally let JS parse this, but in the case that we need a hacked
-        # out <object> player because YouTube has broken their <iframe> API for
-        # the third time in a year, we need to extract it server side.
-        normal_speed_video_id = None # The 1.0 speed video
-
-        # video_list() example:
-        #   "0.75:nugHYNiD3fI,1.0:7m8pab1MfYY,1.25:3CxdPGXShq8,1.50:F-D7bOFCnXA"
-        for video_id_str in self.video_list().split(","):
-            if video_id_str.startswith("1.0:"):
-                normal_speed_video_id = video_id_str.split(":")[1]
-
         return self.system.render_template('video.html', {
-            'streams': self.video_list(),
+            'youtube_id_0_75': self.youtube_id_0_75,
+            'normal_speed_video_id': self.youtube_id_1_0,
+            'youtube_id_1_25': self.youtube_id_1_25,
+            'youtube_id_1_5': self.youtube_id_1_5,
             'id': self.location.html_id(),
             'position': self.position,
             'source': self.source,
             'track': self.track,
             'display_name': self.display_name_with_default,
             'caption_asset_path': "/static/subs/",
-            'show_captions': self.show_captions,
+            'show_captions': 'true' if self.show_captions else 'false',
             'start': self.start_time,
-            'end': self.end_time,
-            'normal_speed_video_id': normal_speed_video_id
+            'end': self.end_time
         })
 
+# TODO: (pfogg) I am highly uncertain about inheriting from
+# RawDescriptor for the xml-related methods. This makes LMS unit tests
+# pass, but this really shouldn't be a RawDescriptor if users can't
+# see raw xml.
 
-class VideoDescriptor(VideoFields, RawDescriptor):
+
+# also if it's just return super(...)... then we can just remove these methods, ha
+class VideoDescriptor(VideoFields,
+                      MetadataOnlyEditingDescriptor,
+                      RawDescriptor):
     module_class = VideoModule
     stores_state = True
     template_dir_name = "video"
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(MetadataOnlyEditingDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([VideoModule.start_time,
+                                    VideoModule.end_time])
+        return non_editable_fields
+
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        """
+        Creates an instance of this descriptor from the supplied xml_data.
+        This may be overridden by subclasses
+
+        xml_data: A string of xml that will be translated into data and children for
+            this module
+        system: A DescriptorSystem for interacting with external resources
+        org and course are optional strings that will be used in the generated modules
+            url identifiers
+        """
+        return super(RawDescriptor, cls).from_xml(xml_data, system, org, course)
+
+    def export_to_xml(self, resource_fs):
+        """
+        Returns an xml string representign this module, and all modules
+        underneath it.  May also write required resources out to resource_fs
+
+        Assumes that modules have single parentage (that no module appears twice
+        in the same course), and that it is thus safe to nest modules as xml
+        children as appropriate.
+
+        The returned XML should be able to be parsed back into an identical
+        XModuleDescriptor using the from_xml method with the same system, org,
+        and course
+
+        resource_fs is a pyfilesystem object (from the fs package)
+        """
+        return super(RawDescriptor, self).export_to_xml(resource_fs)
+    #     xml = etree.Element('video')
+    #     xml.set('youtube', self.video_list())
+    #     xml.set('show_captions', self.show_captions)
+    #     xml.set('from', self.start_time)
+    #     xml.set('to', self.end_time)
+
+    #     source_tag = etree.SubElement(xml, 'source')
+    #     source_tag.set('src', self.source)
+
+    #     track_tag = etree.SubElement(xml, 'track')
+    #     track_tag.set('src', self.track)
+
+    #     return etree.tostring(xml, pretty_print=True, encoding='utf-8')
+
+    # def video_list(self):
+    #     videos = [self.youtube_id_0_75, self.youtube_id_1_0,
+    #               self.youtube_id_1_25, self.youtube_id_1_5]
+    #     streams = [':'.join((video, youtube_id))
+    #                for video, youtube_id
+    #                in zip(YOUTUBE_SPEEDS, videos)]
+    #     return ','.join(streams)

@@ -4,6 +4,14 @@
 from lettuce import world, step
 
 
-@step('I see only the video display name setting$')
-def i_see_only_the_video_display_name(step):
-    world.verify_all_setting_entries([['Display Name', "default", True]])
+@step('I see the correct settings and default values$')
+def i_see_the_correct_settings_and_values(step):
+    world.verify_all_setting_entries([['.75x', 'JMD_ifUUfsU', False],
+                                      ['1.25x', 'AKqURZnYqpk', False],
+                                      ['1.5x', 'DYpADpL7jAY', False],
+                                      ['Display Name', "default", True],
+                                      ['External Source', '', False],
+                                      ['External Track', '', False],
+                                      ['Normal Speed', 'OEoXaMPEzfM', False],
+                                      ['Show Captions', 'True', False],
+                                  ])

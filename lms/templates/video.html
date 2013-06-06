@@ -32,7 +32,17 @@
            width="640" height="390"></embed>
   </object>
 %else:
-  <div id="video_${id}" class="video" data-streams="${streams}" data-show-captions="${show_captions}" data-start="${start}" data-end="${end}" data-caption-asset-path="${caption_asset_path}" data-autoplay="${settings.MITX_FEATURES['AUTOPLAY_VIDEOS']}">
+  <div id="video_${id}"
+       class="video"
+       data-youtube-id-0-75="${youtube_id_0_75}"
+       data-normal-speed-video-id="${normal_speed_video_id}"
+       data-youtube-id-1-25="${youtube_id_1_25}"
+       data-youtube-id-1-5="${youtube_id_1_5}"
+       data-show-captions="${show_captions}"
+       data-start="${start}"
+       data-end="${end}"
+       data-caption-asset-path="${caption_asset_path}"
+       data-autoplay="${settings.MITX_FEATURES['AUTOPLAY_VIDEOS']}">
     <div class="tc-wrapper">
       <article class="video-wrapper">
         <section class="video-player">

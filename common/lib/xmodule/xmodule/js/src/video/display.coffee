@@ -8,7 +8,7 @@ class @Video
     @show_captions = @el.data('show-captions') == "true"
     window.player = null
     @el = $("#video_#{@id}")
-    @parseVideos @el.data('streams')
+    @parseVideos()
     @fetchMetadata()
     @parseSpeed()
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
@@ -27,10 +27,11 @@ class @Video
 
   parseVideos: (videos) ->
     @videos = {}
-    $.each videos.split(/,/), (index, video) =>
-      video = video.split(/:/)
-      speed = parseFloat(video[0]).toFixed(2).replace /\.00$/, '.0'
-      @videos[speed] = video[1]
+    @videos['.75'] = @el.data('youtube-id-0-75')
+    @videos['1.0'] = @el.data('normal-speed-video-id')
+    @videos['1.25'] = @el.data('youtube-id-1-25')
+    @videos['1.5'] = @el.data('youtube-id-1-5')
+    alert @videos['1.5']
 
   parseSpeed: ->
     @setSpeed($.cookie('video_speed'))
