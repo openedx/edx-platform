@@ -8,7 +8,6 @@ Feature: Navigate Course
         When I click on section "2"
         Then I should see the content of section "2"
 
-
     Scenario: I can navigate to subsections
         Given I am viewing a section with multiple subsections
         When I click on subsection "2"
@@ -23,4 +22,4 @@ Feature: Navigate Course
         Given I am viewing a course with multiple sections
         When I click on section "2"
         And I return later
-        Then I should see "You were most recently in Test Section2" somewhere on the page
+        Then I should see that I was most recently in section "2"

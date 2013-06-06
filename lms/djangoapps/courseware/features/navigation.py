@@ -21,19 +21,19 @@ def view_course_multiple_sections(step):
     create_course()
     # Add a section to the course to contain problems
     section1 = world.ItemFactory.create(parent_location=COURSE_LOC,
-                                       display_name=TEST_SECTION_NAME+"1")
+                                       display_name=section_name(1))
 
     # Add a section to the course to contain problems
     section2 = world.ItemFactory.create(parent_location=COURSE_LOC,
-                                       display_name=TEST_SECTION_NAME+"2")
+                                       display_name=section_name(2))
 
     world.ItemFactory.create(parent_location=section1.location,
                                                template='i4x://edx/templates/sequential/Empty',
-                                               display_name=TEST_SECTION_NAME+"1")
+                                               display_name=section_name(1))
 
     world.ItemFactory.create(parent_location=section2.location,
                                                template='i4x://edx/templates/sequential/Empty',
-                                               display_name=TEST_SECTION_NAME+"2")
+                                               display_name=section_name(2))
 
     add_problem_to_course_section('model_course', 'multiple choice', section=1)
     add_problem_to_course_section('model_course', 'drop down', section=2)
@@ -47,14 +47,14 @@ def view_course_multiple_subsections(step):
 
     # Add a section to the course to contain problems
     section1 = world.ItemFactory.create(parent_location=COURSE_LOC,
-                                       display_name=TEST_SECTION_NAME+"1")
+                                       display_name=section_name(1))
 
     world.ItemFactory.create(parent_location=section1.location,
                                                template='i4x://edx/templates/sequential/Empty',
-                                               display_name=TEST_SECTION_NAME+"1")
+                                               display_name=section_name(1))
 
     section2 = world.ItemFactory.create(parent_location=section1.location,
-                                       display_name=TEST_SECTION_NAME+"2")
+                                       display_name=section_name(2))
 
     global SUBSECTION_2_LOC
     SUBSECTION_2_LOC = section2.location
@@ -70,12 +70,12 @@ def view_course_multiple_sequences(step):
     create_course()
     # Add a section to the course to contain problems
     section1 = world.ItemFactory.create(parent_location=COURSE_LOC,
-                                       display_name=TEST_SECTION_NAME+"1")
+                                       display_name=section_name(1))
 
 
     world.ItemFactory.create(parent_location=section1.location,
                                                template='i4x://edx/templates/sequential/Empty',
-                                               display_name=TEST_SECTION_NAME+"1")
+                                               display_name=section_name(1))
 
     add_problem_to_course_section('model_course', 'multiple choice', section=1)
     add_problem_to_course_section('model_course', 'drop down', section=1)
@@ -125,9 +125,18 @@ def return_to_course(step):
     world.click_link("View Course")
     world.click_link("Courseware")
 
+
+@step(u'I should see that I was most recently in section "([^"]*)"')
+def see_recent_section(step, section):
+    step.given('I should see "You were most recently in %s" somewhere on the page' % section_name(int(section)))
+
 #####################
 #      HELPERS
 #####################
+
+
+def section_name(section):
+    return TEST_SECTION_NAME+str(section)
 
 
 def create_course():
