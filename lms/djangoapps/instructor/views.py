@@ -9,6 +9,7 @@ import os
 import re
 import requests
 from requests.status_codes import codes
+import urllib
 from collections import OrderedDict
 
 from StringIO import StringIO
@@ -1008,8 +1009,8 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
             status[student] = 'already enrolled'
             continue
         try:
-            nce = CourseEnrollment(user=user, course_id=course_id)
-            nce.save()
+            ce = CourseEnrollment(user=user, course_id=course_id)
+            ce.save()
             status[student] = 'added'
         except:
             status[student] = 'rejected'
@@ -1050,11 +1051,11 @@ def _do_unenroll_students(course_id, students):
         except User.DoesNotExist:
             continue
 
-        nce = CourseEnrollment.objects.filter(user=user, course_id=course_id)
+        ce = CourseEnrollment.objects.filter(user=user, course_id=course_id)
         #Will be 0 or 1 records as there is a unique key on user + course_id
-        if nce:
+        if ce:
             try:
-                nce[0].delete()
+                ce[0].delete()
                 status[student] = "un-enrolled"
             except Exception as err:
                 if not isok:
