@@ -528,7 +528,7 @@ mkdir "$BASE/db" || true
 mkdir "$BASE/data" || true
 
 if [[ $update ]]; then
-  rake django-admin[syncdb]
+  rake django-admin[syncdb,lms,dev,--noinput]
   rake django-admin[migrate]
   rake cms:update_templates
 fi
