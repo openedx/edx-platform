@@ -309,7 +309,13 @@ class CapaModule(CapaFields, XModule):
         d = self.get_score()
         score = d['score']
         total = d['total']
+
         if total > 0:
+            if self.weight is not None:
+                # scale score and total by weight/total:
+                score = score * self.weight / total
+                total = self.weight
+
             try:
                 return Progress(score, total)
             except (TypeError, ValueError):
@@ -321,11 +327,13 @@ class CapaModule(CapaFields, XModule):
         """
         Return some html with data about the module
         """
+        progress = self.get_progress()
         return self.system.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
-            'progress': Progress.to_js_status_str(self.get_progress())
+            'progress_status': Progress.to_js_status_str(progress),
+            'progress_detail': Progress.to_js_detail_str(progress),
         })
 
     def check_button_name(self):
@@ -485,8 +493,7 @@ class CapaModule(CapaFields, XModule):
         """
         Return html for the problem.
 
-        Adds check, reset, save buttons as necessary based on the problem config
-        and state.
+        Adds check, reset, save buttons as necessary based on the problem config and state.
         """
 
         try:
@@ -516,13 +523,12 @@ class CapaModule(CapaFields, XModule):
                    'reset_button': self.should_show_reset_button(),
                    'save_button': self.should_show_save_button(),
                    'answer_available': self.answer_available(),
-                   'ajax_url': self.system.ajax_url,
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
-                   'progress': self.get_progress(),
                    }
 
         html = self.system.render_template('problem.html', context)
+
         if encapsulate:
             html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.system.ajax_url
@@ -584,6 +590,7 @@ class CapaModule(CapaFields, XModule):
         result.update({
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
+            'progress_detail': Progress.to_js_detail_str(after),
         })
 
         return json.dumps(result, cls=ComplexEncoder)
@@ -607,13 +614,7 @@ class CapaModule(CapaFields, XModule):
         return False
 
     def is_submitted(self):
-        """
-        Used to decide to show or hide RESET or CHECK buttons.
-
-        Means that student submitted problem and nothing more.
-        Problem can be completely wrong.
-        Pressing RESET button makes this function to return False.
-        """
+        # used by conditional module
         return self.lcp.done
 
     def is_attempted(self):
@@ -755,7 +756,8 @@ class CapaModule(CapaFields, XModule):
         Used if we want to reconfirm we have the right thing e.g. after
         several AJAX calls.
         """
-        return {'html': self.get_problem_html(encapsulate=False)}
+        return {'html': self.get_problem_html()}
+
 
     @staticmethod
     def make_dict_of_responses(data):
@@ -934,7 +936,7 @@ class CapaModule(CapaFields, XModule):
             self.system.psychometrics_handler(self.get_state_for_lcp())
 
         # render problem into HTML
-        html = self.get_problem_html(encapsulate=False)
+        html = self.get_problem_html()
 
         return {'success': success,
                 'contents': html,
@@ -1101,7 +1103,7 @@ class CapaModule(CapaFields, XModule):
         self.system.track_function('reset_problem', event_info)
 
         return {'success': True,
-                'html': self.get_problem_html(encapsulate=False)}
+                'html': self.get_problem_html()}
 
 
 class CapaDescriptor(CapaFields, RawDescriptor):
