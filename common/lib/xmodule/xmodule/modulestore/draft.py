@@ -15,14 +15,14 @@ def as_draft(location):
     """
     Returns the Location that is the draft for `location`
     """
-    return Location(location)._replace(revision=DRAFT)
+    return Location(location).replace(revision=DRAFT)
 
 
 def as_published(location):
     """
     Returns the Location that is the published version for `location`
     """
-    return Location(location)._replace(revision=None)
+    return Location(location).replace(revision=None)
 
 
 def wrap_draft(item):
@@ -32,7 +32,7 @@ def wrap_draft(item):
     non-draft location in either case
     """
     setattr(item, 'is_draft', item.location.revision == DRAFT)
-    item.location = item.location._replace(revision=None)
+    item.location = item.location.replace(revision=None)
     return item
 
 
@@ -83,6 +83,18 @@ class DraftModuleStore(MongoModuleStore):
         except ItemNotFoundError:
             return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=depth))
 
+    def create_xmodule(self, location, definition_data=None, metadata=None, system=None):
+        """
+        Create the new xmodule but don't save it. Returns the new module with a draft locator
+
+        :param location: a Location--must have a category
+        :param definition_data: can be empty. The initial definition_data for the kvs
+        :param metadata: can be empty, the initial metadata for the kvs
+        :param system: if you already have an xmodule from the course, the xmodule.system value
+        """
+        return super(DraftModuleStore, self).create_xmodule(as_draft(location), definition_data, metadata, system)
+
+
     def get_items(self, location, course_id=None, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
@@ -101,12 +113,12 @@ class DraftModuleStore(MongoModuleStore):
         draft_items = super(DraftModuleStore, self).get_items(draft_loc, course_id=course_id, depth=depth)
         items = super(DraftModuleStore, self).get_items(location, course_id=course_id, depth=depth)
 
-        draft_locs_found = set(item.location._replace(revision=None) for item in draft_items)
+        draft_locs_found = set(item.location.replace(revision=None) for item in draft_items)
         non_draft_items = [
             item
             for item in items
             if (item.location.revision != DRAFT
-                and item.location._replace(revision=None) not in draft_locs_found)
+                and item.location.replace(revision=None) not in draft_locs_found)
         ]
         return [wrap_draft(item) for item in draft_items + non_draft_items]
 
@@ -242,7 +254,7 @@ class DraftModuleStore(MongoModuleStore):
         # always return the draft - if available
         for draft in to_process_drafts:
             draft_loc = Location(draft["_id"])
-            draft_as_non_draft_loc = draft_loc._replace(revision=None)
+            draft_as_non_draft_loc = draft_loc.replace(revision=None)
 
             # does non-draft exist in the collection
             # if so, replace it

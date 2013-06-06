@@ -324,7 +324,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def update_item(self, location, data):
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data

@@ -183,10 +183,5 @@ class CourseSettingsEncoder(json.JSONEncoder):
             return obj.dict()
         elif isinstance(obj, datetime.datetime):
             return Date().to_json(obj)
-        elif isinstance(obj, datetime.datetime):
-            if obj.utcoffset() is None:
-                return obj.isoformat() + 'Z'
-            else:
-                return obj.isoformat()
         else:
             return JSONEncoder.default(self, obj)

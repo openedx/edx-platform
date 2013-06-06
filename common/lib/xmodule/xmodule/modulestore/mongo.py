@@ -696,7 +696,7 @@ class MongoModuleStore(ModuleStoreBase):
         if result['n'] == 0:
             raise ItemNotFoundError(location)
 
-    def update_item(self, location, data):
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data
@@ -704,8 +704,11 @@ class MongoModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
-
-        self._update_single_item(location, {'definition.data': data})
+        try:
+            self._update_single_item(location, {'definition.data': data})
+        except ItemNotFoundError, e:
+            if not allow_not_found:
+                raise e
 
     def update_children(self, location, children):
         """
