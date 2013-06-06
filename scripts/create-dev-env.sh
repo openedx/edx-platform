@@ -357,7 +357,7 @@ fi
 # rvm has issues in debian family, this is taken from stack overflow
 case `uname -s` in
     Darwin)
-        curl -sL get.rvm.io | bash -s -- --version 1.15.7
+        curl -sSL get.rvm.io | bash -s -- --version 1.15.7
     ;;
 
     [Ll]inux)
@@ -472,8 +472,8 @@ SCIPY_VER="0.10.1"
 
 if [[ -n $compile ]]; then
     output "Downloading numpy and scipy"
-    curl -sL -o numpy.tar.gz http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_VER}/numpy-${NUMPY_VER}.tar.gz
-    curl -sL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
+    curl -sSL -o numpy.tar.gz http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_VER}/numpy-${NUMPY_VER}.tar.gz
+    curl -sSL -o scipy.tar.gz http://downloads.sourceforge.net/project/scipy/scipy/${SCIPY_VER}/scipy-${SCIPY_VER}.tar.gz
     tar xf numpy.tar.gz
     tar xf scipy.tar.gz
     rm -f numpy.tar.gz scipy.tar.gz
@@ -492,7 +492,7 @@ DISTRIBUTE_VER="0.6.28"
 output "Building Distribute"
 SITE_PACKAGES="$HOME/.virtualenvs/edx-platform/lib/python2.7/site-packages"
 cd "$SITE_PACKAGES"
-curl -OL http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
+curl -sSLO http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
 tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
 cd distribute-${DISTRIBUTE_VER}
 python setup.py install
