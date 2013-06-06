@@ -349,6 +349,11 @@ if [ "$HOME/.rvm" != $RUBY_DIR ]; then
   fi
 fi
 
+# Let the repo override the version of Ruby to install
+if [[ -r $BASE/edx-platform/.ruby-version ]]; then
+  RUBY_VER=`cat $BASE/edx-platform/.ruby-version`
+fi
+
 # rvm has issues in debian family, this is taken from stack overflow
 case `uname -s` in
     Darwin)
@@ -361,7 +366,7 @@ case `uname -s` in
                 http://stackoverflow.com/questions/9056008/installed-ruby-1-9-3-with-rvm-but-command-line-doesnt-show-ruby-v/9056395#9056395"
         sudo apt-get --purge remove ruby-rvm
         sudo rm -rf /usr/share/ruby-rvm /etc/rvmrc /etc/profile.d/rvm.sh
-        curl -sL https://get.rvm.io | bash -s stable --ruby --autolibs=enable --auto-dotfiles
+        curl -sSL https://get.rvm.io | bash -s stable --ruby=$RUBY_VER --autolibs=enable --auto-dotfiles
     ;;
 esac
 
@@ -385,11 +390,6 @@ case `uname -s` in
         export CC=gcc
         ;;
 esac
-
-# Let the repo override the version of Ruby to install
-if [[ -r $BASE/edx-platform/.ruby-version ]]; then
-  RUBY_VER=`cat $BASE/edx-platform/.ruby-version`
-fi
 
 # Current stable version of RVM (1.19.0) requires the following to build Ruby:
 #
