@@ -9,13 +9,16 @@ EMAILS_PER_WORKER=getattr(settings, 'EMAILS_PER_WORKER', 10)
 
 @task()
 def delegate_emails(hash_for_msg, recipient, course):
-    '''Delegates emails by spinning up appropriate number of sender workers                               
-       Tries to minimize DB accesses performed by each worker.                                            
-       Especially passing query forming a queryset, which is ok practice according                        
-       to https://docs.djangoproject.com/en/dev/ref/models/querysets/#pickling-querysets                  
+    '''
+    Delegates emails by querying for the list of recipients who should
+    get the mail, chopping up into batches of EMAILS_PER_WORKER size,
+    and queueing up worker jobs.
+
+    Recipient is {'students', 'staff', or 'all'}
+
+    Returns the number of batches (workers) kicked off.
     '''
 
-    #get queryset for the recipient group
     recipient_qset = User.objects.all()
     if recipient == "students":
         #get student list
