@@ -24,6 +24,12 @@ class LMSLinksTestCase(TestCase):
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': False}):
             self.assertEquals(self.get_about_page_link(), "//localhost:8000/courses/mitX/101/test/about")
 
+    @override_settings(MKTG_URLS={})
+    def about_page_marketing_urls_not_set_test(self):
+        """ Error case. ENABLE_MKTG_SITE is True, but there is either no MKTG_URLS, or no MKTG_URLS Root property. """
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+            self.assertEquals(self.get_about_page_link(), None)
+
     @override_settings(LMS_BASE=None)
     def about_page_no_lms_base_test(self):
         """ No LMS_BASE, nor is ENABLE_MKTG_SITE True """
