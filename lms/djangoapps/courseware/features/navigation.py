@@ -5,38 +5,35 @@ from lettuce import world, step
 from django.contrib.auth.models import User
 from lettuce.django import django_url
 from student.models import CourseEnrollment
-from common import course_id
-from xmodule.modulestore import Location
+from common import course_id, course_location
 from problems_setup import PROBLEM_DICT
 
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'Test Course'
 TEST_SECTION_NAME = 'Test Section'
-SUBSECTION_2_LOC = None
-COURSE_LOC = None
 
 
 @step(u'I am viewing a course with multiple sections')
 def view_course_multiple_sections(step):
     create_course()
     # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=COURSE_LOC,
+    section1 = world.ItemFactory.create(parent_location=course_location('model_course'),
                                        display_name=section_name(1))
 
     # Add a section to the course to contain problems
-    section2 = world.ItemFactory.create(parent_location=COURSE_LOC,
+    section2 = world.ItemFactory.create(parent_location=course_location('model_course'),
                                        display_name=section_name(2))
 
-    world.ItemFactory.create(parent_location=section1.location,
+    place1 = world.ItemFactory.create(parent_location=section1.location,
                                                template='i4x://edx/templates/sequential/Empty',
                                                display_name=section_name(1))
 
-    world.ItemFactory.create(parent_location=section2.location,
+    place2 = world.ItemFactory.create(parent_location=section2.location,
                                                template='i4x://edx/templates/sequential/Empty',
                                                display_name=section_name(2))
 
-    add_problem_to_course_section('model_course', 'multiple choice', section=1)
-    add_problem_to_course_section('model_course', 'drop down', section=2)
+    add_problem_to_course_section('model_course', 'multiple choice', place1.location)
+    add_problem_to_course_section('model_course', 'drop down', place2.location)
 
     create_user_and_visit_course()
 
@@ -46,21 +43,18 @@ def view_course_multiple_subsections(step):
     create_course()
 
     # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=COURSE_LOC,
+    section1 = world.ItemFactory.create(parent_location=course_location('model_course'),
                                        display_name=section_name(1))
 
-    world.ItemFactory.create(parent_location=section1.location,
+    place1 = world.ItemFactory.create(parent_location=section1.location,
                                                template='i4x://edx/templates/sequential/Empty',
                                                display_name=section_name(1))
 
-    section2 = world.ItemFactory.create(parent_location=section1.location,
+    place2 = world.ItemFactory.create(parent_location=section1.location,
                                        display_name=section_name(2))
 
-    global SUBSECTION_2_LOC
-    SUBSECTION_2_LOC = section2.location
-
-    add_problem_to_course_section('model_course', 'multiple choice', section=1)
-    add_problem_to_course_section('model_course', 'drop down', section=1, subsection=2)
+    add_problem_to_course_section('model_course', 'multiple choice', place1.location)
+    add_problem_to_course_section('model_course', 'drop down', place2.location)
 
     create_user_and_visit_course()
 
@@ -69,21 +63,20 @@ def view_course_multiple_subsections(step):
 def view_course_multiple_sequences(step):
     create_course()
     # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=COURSE_LOC,
+    section1 = world.ItemFactory.create(parent_location=course_location('model_course'),
                                        display_name=section_name(1))
 
-
-    world.ItemFactory.create(parent_location=section1.location,
+    place1 = world.ItemFactory.create(parent_location=section1.location,
                                                template='i4x://edx/templates/sequential/Empty',
                                                display_name=section_name(1))
 
-    add_problem_to_course_section('model_course', 'multiple choice', section=1)
-    add_problem_to_course_section('model_course', 'drop down', section=1)
+    add_problem_to_course_section('model_course', 'multiple choice', place1.location)
+    add_problem_to_course_section('model_course', 'drop down', place1.location)
 
     create_user_and_visit_course()
 
 
-@step(u'I click on section "([^"]*)"')
+@step(u'I click on section "([^"]*)"$')
 def click_on_section(step, section):
     section_css = 'h3[tabindex="-1"]'
     world.css_click(section_css)
@@ -93,19 +86,19 @@ def click_on_section(step, section):
     world.css_click(subsection_css)
 
 
-@step(u'I click on subsection "([^"]*)"')
+@step(u'I click on subsection "([^"]*)"$')
 def click_on_subsection(step, subsection):
     subsection_css = 'ul[id="ui-accordion-accordion-panel-0"]>li[class=" "]>a'
     world.css_click(subsection_css)
 
 
-@step(u'I click on sequence "([^"]*)"')
+@step(u'I click on sequence "([^"]*)"$')
 def click_on_sequence(step, sequence):
     sequence_css = 'a[data-element="%s"]' % sequence
     world.css_click(sequence_css)
 
 
-@step(u'I should see the content of (?:sub)?section "([^"]*)"')
+@step(u'I should see the content of (?:sub)?section "([^"]*)"$')
 def see_section_content(step, section):
     if section == "2":
         text = 'The correct answer is Option 2'
@@ -114,7 +107,7 @@ def see_section_content(step, section):
     step.given('I should see "' + text + '" somewhere on the page')
 
 
-@step(u'I should see the content of sequence "([^"]*)"')
+@step(u'I should see the content of sequence "([^"]*)"$')
 def see_sequence_content(step, sequence):
     step.given('I should see the content of section "2"')
 
@@ -126,7 +119,7 @@ def return_to_course(step):
     world.click_link("Courseware")
 
 
-@step(u'I should see that I was most recently in section "([^"]*)"')
+@step(u'I should see that I was most recently in section "([^"]*)"$')
 def see_recent_section(step, section):
     step.given('I should see "You were most recently in %s" somewhere on the page' % section_name(int(section)))
 
@@ -142,11 +135,9 @@ def section_name(section):
 def create_course():
     world.clear_courses()
 
-    course = world.CourseFactory.create(org=TEST_COURSE_ORG,
+    world.CourseFactory.create(org=TEST_COURSE_ORG,
                                         number="model_course",
                                         display_name=TEST_COURSE_NAME)
-    global COURSE_LOC
-    COURSE_LOC = course.location
 
 
 def create_user_and_visit_course():
@@ -164,7 +155,7 @@ def create_user_and_visit_course():
     world.browser.visit(url)
 
 
-def add_problem_to_course_section(course, problem_type, extraMeta=None, section=1, subsection=1):
+def add_problem_to_course_section(course, problem_type, parent_location, extraMeta=None):
     '''
     Add a problem to the course we have created using factories.
     '''
@@ -182,16 +173,8 @@ def add_problem_to_course_section(course, problem_type, extraMeta=None, section=
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
     template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
-    world.ItemFactory.create(parent_location=section_location(course, section) if subsection == 1 else SUBSECTION_2_LOC,
+    world.ItemFactory.create(parent_location=parent_location,
                             template=template_name,
                             display_name=str(problem_type),
                             data=problem_xml,
                             metadata=metadata)
-
-
-def section_location(course_num, section_num):
-    return Location(loc_or_tag="i4x",
-                    org=TEST_COURSE_ORG,
-                    course=course_num,
-                    category='sequential',
-                    name=(TEST_SECTION_NAME+str(section_num)).replace(" ", "_"))
