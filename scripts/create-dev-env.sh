@@ -431,14 +431,14 @@ fi
 # Create edX virtualenv and link it to repo
 # virtualenvwrapper automatically sources the activation script
 if [[ $systempkgs ]]; then
-    mkvirtualenv -a "$HOME/.virtualenvs" --system-site-packages edx-platform || {
+    mkvirtualenv -a "$PYTHON_DIR" --system-site-packages edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
 else
     # default behavior for virtualenv>1.7 is
     # --no-site-packages
-    mkvirtualenv -a "$HOME/.virtualenvs" edx-platform || {
+    mkvirtualenv -a "$PYTHON_DIR" edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
@@ -470,7 +470,7 @@ fi
 # building correct version of distribute from source
 DISTRIBUTE_VER="0.6.28"
 output "Building Distribute"
-SITE_PACKAGES="$HOME/.virtualenvs/edx-platform/lib/python2.7/site-packages"
+SITE_PACKAGES="$PYTHON_DIR/edx-platform/lib/python2.7/site-packages"
 cd "$SITE_PACKAGES"
 curl -O http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
 tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
