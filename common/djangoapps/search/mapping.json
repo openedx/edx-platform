@@ -5,20 +5,7 @@
 		"index": "analyzed",
 		"store": "yes",
 		"type": "string",
-		"term_vector": "with_positions_offsets"
-	},
-
-	"phonetic_text": {
-		"boost": 1.0,
-		"index": "analyzed",
-		"store": "yes",
-		"type": "string",
-		"term_vector": "with_positions_offsets"
-	},
-
-	"uuid": {
-		"index": "not_analyzed",
-		"store": "yes",
-		"type": "string"
+		"term_vector": "with_positions_offsets",
+        "analyzer": "transcript_analyzer"
 	}
 }
