@@ -1,4 +1,5 @@
 from .utils import merge_dict, perform_request, CommentClientError
+from django.contrib.auth.models import User as django_user
 
 import models
 import settings
@@ -22,6 +23,10 @@ class User(models.Model):
 
     @classmethod
     def from_django_user(cls, user):
+
+        if type(user) is not django_user:
+            raise CommentClientError("Cannot convert unexpected class to User")
+
         return cls(id=str(user.id),
                    external_id=str(user.id),
                    username=user.username,
