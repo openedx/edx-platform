@@ -493,7 +493,7 @@
     header {
       height: 120px;
       border-bottom: 1px solid $m-gray;
-      background: transparent url($login-banner-image) 0 0 no-repeat;
+      background: transparent $login-banner-image 0 0 no-repeat;
     }
   }
 }
@@ -507,7 +507,7 @@
     header {
       height: 120px;
       border-bottom: 1px solid $m-gray;
-      background: transparent url($register-banner-image) 0 0 no-repeat;
+      background: transparent $register-banner-image 0 0 no-repeat;
     }
   }
 }
