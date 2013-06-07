@@ -9,13 +9,16 @@ EMAILS_PER_WORKER=getattr(settings, 'EMAILS_PER_WORKER', 10)
 
 @task()
 def delegate_emails(hash_for_msg, recipient, course):
-    '''Delegates emails by spinning up appropriate number of sender workers                               
-       Tries to minimize DB accesses performed by each worker.                                            
-       Especially passing query forming a queryset, which is ok practice according                        
-       to https://docs.djangoproject.com/en/dev/ref/models/querysets/#pickling-querysets                  
+    '''
+    Delegates emails by querying for the list of recipients who should
+    get the mail, chopping up into batches of EMAILS_PER_WORKER size,
+    and queueing up worker jobs.
+
+    Recipient is {'students', 'staff', or 'all'}
+
+    Returns the number of batches (workers) kicked off.
     '''
 
-    #get queryset for the recipient group
     recipient_qset = User.objects.all()
     if recipient == "students":
         #get student list
@@ -34,18 +37,17 @@ def delegate_emails(hash_for_msg, recipient, course):
 
     for i in range(num_workers):
         to_list=recipient_list[i*chunk:i*chunk+chunk]
-        course_email_with_celery.delay(hash_for_msg, to_list, False, course)
+        course_email.delay(hash_for_msg, to_list, False, course)
     return num_workers
 
+
 @task(default_retry_delay=15, max_retries=5)
-def course_email_with_celery(hash_for_msg, to_list, course, throttle=False):
+def course_email(hash_for_msg, to_list, course, throttle=False):
     """                                                                                                   
-        Takes a subject and an html formatted email and sends it from sender to all addresses             
-        in the to_list, with each recipient being the only "to".  Emails are sent multipart, in both      
-        plain text and html.  Send using celery task.                                                     
-                                                                                                          
-        For work division, this task can be called with num_workers and worker_id, where num_workers is the
-        total number of workers and worker_id is the id of this worker,                                   
-        out of a set with ids 0 to num_workers-1, in homage to the fact that python lists are zero based.
+    Takes a subject and an html formatted email and sends it from
+    sender to all addresses in the to_list, with each recipient
+    being the only "to".  Emails are sent multipart, in both plain
+    text and html.  
     """
+
     msg = CourseEmail.objects.get(hash=hash_for_msg)
