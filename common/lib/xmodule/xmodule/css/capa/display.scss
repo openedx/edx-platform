@@ -555,6 +555,15 @@ section.problem {
       @extend .blue-button;
     }
 
+    button.show {
+      height: ($baseline*2);
+
+      span {
+        font-size: 1.0em;
+        font-weight: 600;
+      }
+    }
+
     .submission_feedback {
       // background: #F3F3F3;
       // border: 1px solid #ddd;
@@ -811,13 +820,13 @@ section.problem {
       }
       .selected-grade {
         background: #666;
-        color: white; 
+        color: white;
       }
       input[type=radio]:checked + label {
         background: #666;
         color: white; }
       input[class='score-selection'] {
-        display: none; 
+        display: none;
       }
   }
 
@@ -878,11 +887,11 @@ section.problem {
         .tag-status, .tag { padding: .25em .5em; }
       }
     }
-    textarea.comment { 
+    textarea.comment {
       $num-lines-to-show: 5;
       $line-height: 1.4em;
       $padding: .2em;
-      width: 100%; 
+      width: 100%;
       padding: $padding (2 * $padding);
       line-height: $line-height;
       height: ($num-lines-to-show * $line-height) + (2*$padding) - (($line-height - 1)/2);
