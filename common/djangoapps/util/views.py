@@ -190,8 +190,13 @@ def submit_feedback(request):
         except ValidationError:
             return build_error_response(400, "email", required_field_errs["email"])
 
-    for header in ["HTTP_REFERER", "HTTP_USER_AGENT"]:
-        additional_info[header] = request.META.get(header)
+    for header, pretty in [
+        ("HTTP_REFERER", "Page"),
+        ("HTTP_USER_AGENT", "Browser"),
+        ("REMOTE_ADDR", "Client IP"),
+        ("SERVER_NAME", "Host")
+    ]:
+        additional_info[pretty] = request.META.get(header)
 
     success = _record_feedback_in_zendesk(realname, email, subject, details, tags, additional_info)
     _record_feedback_in_datadog(tags)

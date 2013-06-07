@@ -49,7 +49,9 @@ class SubmitFeedbackTest(TestCase):
             "/submit_feedback",
             data=fields,
             HTTP_REFERER="test_referer",
-            HTTP_USER_AGENT="test_user_agent"
+            HTTP_USER_AGENT="test_user_agent",
+            REMOTE_ADDR="1.2.3.4",
+            SERVER_NAME="test_server"
         )
         req.user = user
         return views.submit_feedback(req)
@@ -159,8 +161,10 @@ class SubmitFeedbackTest(TestCase):
                             "public": False,
                             "body":
                             "Additional information:\n\n"
-                            "HTTP_USER_AGENT: test_user_agent\n"
-                            "HTTP_REFERER: test_referer"
+                            "Client IP: 1.2.3.4\n"
+                            "Host: test_server\n"
+                            "Page: test_referer\n"
+                            "Browser: test_user_agent"
                         }
                     }
                 }
@@ -212,8 +216,10 @@ class SubmitFeedbackTest(TestCase):
                             "body":
                             "Additional information:\n\n"
                             "username: test\n"
-                            "HTTP_USER_AGENT: test_user_agent\n"
-                            "HTTP_REFERER: test_referer"
+                            "Client IP: 1.2.3.4\n"
+                            "Host: test_server\n"
+                            "Page: test_referer\n"
+                            "Browser: test_user_agent"
                         }
                     }
                 }
