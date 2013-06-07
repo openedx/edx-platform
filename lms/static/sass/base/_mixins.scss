@@ -9,44 +9,44 @@
 
 // image-replacement hidden text
 @mixin text-hide() {
+  overflow: hidden;
   text-indent: 100%;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 // hidden elems - screenreaders
 @mixin text-sr() {
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
   position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  margin: -1px;
+  padding: 0;
   width: 1px;
+  height: 1px;
+  border: 0;
 }
 
 @mixin vertically-and-horizontally-centered ( $height, $width ) {
-  left: 50%;
-  margin-left: -$width / 2;
-  //margin-top: -$height / 2;
-  min-height: $height;
-  min-width: $width;
   position: absolute;
   top: 150px;
+  left: 50%;
+  margin-left: -$width / 2;
+  min-width: $width;
+  min-height: $height;
+  //margin-top: -$height / 2;
 }
 
 // sunsetted, but still used mixins
 @mixin hide-text(){
-  text-indent: -9999px;
-  overflow: hidden;
   display: block;
+  overflow: hidden;
+  text-indent: -9999px;
 }
 
 
 //-----------------
 //  Theme Mixin Styles
 //-----------------
-@mixin login_register_h1_style {}
+@mixin login_register_h1_style { }
 
-@mixin footer_references_style {}
+@mixin footer_references_style { }
