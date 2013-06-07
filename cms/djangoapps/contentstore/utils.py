@@ -6,10 +6,9 @@ from django.core.urlresolvers import reverse
 import copy
 import logging
 import re
+from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 
 log = logging.getLogger(__name__)
-
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
 #In order to instantiate an open ended tab automatically, need to have this data
 OPEN_ENDED_PANEL = {"name": "Open Ended Panel", "type": "open_ended"}
@@ -229,7 +228,7 @@ def add_extra_panel_tab(tab_type, course):
     course_tabs = copy.copy(course.tabs)
     changed = False
     #Check to see if open ended panel is defined in the course
-    
+
     tab_panel = EXTRA_TAB_PANELS.get(tab_type)
     if tab_panel not in course_tabs:
         #Add panel to the tabs if it is not defined
