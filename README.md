@@ -5,8 +5,8 @@ See [code.edx.org](http://code.edx.org/) for other parts of the edX code base.
 Installation - The first time
 =============================
 
-The following instructions will help you to download and setup a virtual machine 
-with a minimal amount of steps, using Vagrant. It is recommended for a first 
+The following instructions will help you to download and setup a virtual machine
+with a minimal amount of steps, using Vagrant. It is recommended for a first
 installation, as it will save you from many of the common pitfalls of the
 installation process.
 
@@ -18,12 +18,12 @@ installation process.
 6. Enter the project directory: `cd edx-platform/`
 7. Start: `vagrant up`
 
-The last step might require your administrator password to setup NFS. 
+The last step might require your administrator password to setup NFS.
 
-Afterwards, it will download an image, install all the dependencies and configure 
+Afterwards, it will download an image, install all the dependencies and configure
 the VM. It will take a while, go grab a coffee.
 
-Once completed, hopefully you should see a "Success!" message indicating that the 
+Once completed, hopefully you should see a "Success!" message indicating that the
 installation went fine. (If not, refer to the Troubleshooting section below.)
 
 Accessing the VM
@@ -36,15 +36,15 @@ is finished. You can also type, from another terminal:
 $ vagrant ssh
 ```
 
-Note: This won't work from Windows, install install PuTTY from 
-http://www.chiark.greenend.org.uk/%7Esgtatham/putty/download.html instead. Then 
+Note: This won't work from Windows, install install PuTTY from
+http://www.chiark.greenend.org.uk/%7Esgtatham/putty/download.html instead. Then
 connect to 127.0.0.1, port 2222, using vagrant/vagrant as a user/password.
 
 Using edX
 ---------
 
 Once inside the VM, you can start Studio and LMS with the following commands
-(from the `/edx/edx-platform` folder):
+(from the `/opt/edx-platform` folder):
 
 Learning management system (LMS):
 
@@ -60,12 +60,12 @@ $ rake cms[dev,0.0.0.0:8001]
 
 Once started, open the following URLs in your browser:
 
-* Learning management system (LMS): http://192.168.20.40:8000/ 
+* Learning management system (LMS): http://192.168.20.40:8000/
 * Studio (CMS): http://192.168.20.40:8001/
 
-You can develop by editing the files directly in the `edx-platform/` directory you 
+You can develop by editing the files directly in the `edx-platform/` directory you
 downloaded before, you don't need to connect to the VM to edit them (the VM uses
-those files to run edX, mirroring the folder in `/edx/edx-platform`).
+those files to run edX, mirroring the folder in `/opt/edx-platform`).
 
 Stopping & starting
 -------------------
@@ -93,7 +93,7 @@ Troubleshooting
 
 ### Reinstalling
 
-If something goes wrong, you can easily recreate the installation from scratch by 
+If something goes wrong, you can easily recreate the installation from scratch by
 typing:
 
 ```
@@ -125,7 +125,7 @@ Installation - Advanced
 
 Note: The following installation instructions are for advanced users & developers
 who are familiar with setting up Python, Ruby & node.js virtual environments.
-Even if you know what you are doing, edX has a large code base with multiple 
+Even if you know what you are doing, edX has a large code base with multiple
 dependencies, so you might still want to use the method described above the
 first time, as Vagrant helps avoiding issues due to the different environments.
 

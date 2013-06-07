@@ -3,6 +3,7 @@
 # Copyright (C) 2013 edX <info@edx.org>
 #
 # Authors: Xavier Antoviaque <xavier@antoviaque.org>
+#          David Baumgold <david@davidbaumgold.com>
 #
 # This software's license gives you freedom; you can copy, convey,
 # propagate, redistribute and/or modify this program under the terms of
@@ -55,16 +56,15 @@ chown vagrant.vagrant ~vagrant/.ssh/known_hosts
 
 
 # edX - Development environment ###############################################
+sudo -u vagrant chown vagrant.vagrant /opt/edx-platform
 
-chown vagrant.vagrant /edx
-
-# For convenience with `vagrant ssh`, the `edx-plateform` virtualenv is always 
+# For convenience with `vagrant ssh`, the `edx-platform` virtualenv is always
 # loaded after the first run, so we need to deactivate that behavior to run
 # `create-dev-env.sh`.
 [[ -f ~vagrant/.bash_profile ]] && {
     mv ~vagrant/.bash_profile ~vagrant/.bash_profile.bak
 }
-sudo -u vagrant -i bash -c "cd /edx/edx-platform && ./scripts/create-dev-env.sh -ynq"
+sudo -u vagrant -i bash -c "cd /opt/edx-platform && ./scripts/create-dev-env.sh -ynq"
 
 
 # Virtualenv - Always load ####################################################
@@ -76,8 +76,8 @@ sudo -u vagrant -i bash -c "cd /edx/edx-platform && ./scripts/create-dev-env.sh 
 
 # Directory ###################################################################
 
-grep "cd /edx/edx-platform" ~vagrant/.bash_profile || {
-    echo -e "\ncd /edx/edx-platform\n" >> ~vagrant/.bash_profile
+grep "cd /opt/edx-platform" ~vagrant/.bash_profile || {
+    echo -e "\ncd /opt/edx-platform\n" >> ~vagrant/.bash_profile
 }
 
 
@@ -96,7 +96,7 @@ log you in already), you can start Studio & LMS with the following commands:
 
     =>  http://192.168.20.40:8000/
 
-- Studio: 
+- Studio:
     $ rake cms[dev,0.0.0.0:8001]
 
     => http://192.168.20.40:8001/
