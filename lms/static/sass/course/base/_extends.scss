@@ -1,9 +1,9 @@
 h1.top-header {
+  padding-bottom: lh();
   border-bottom: 1px solid $border-color-2;
   text-align: left;
-  font-size: em(24);
   font-weight: 100;
-  padding-bottom: lh();
+  font-size: em(24);
 }
 
 .button-reset {
@@ -18,28 +18,28 @@ h1.top-header {
 .light-button, a.light-button, // only used in askbot as classes
 .gray-button {
   @include button(simple, #eee);
-  @extend .button-reset;
   font-size: em(13);
+  @extend .button-reset;
 }
 
 .blue-button {
   @include button(simple, $blue);
-  @extend .button-reset;
   font-size: em(13);
+  @extend .button-reset;
 }
 
 .pink-button {
   @include button(simple, $pink);
-  @extend .button-reset;
   font-size: em(13);
+  @extend .button-reset;
 }
 
 .content {
   @include box-sizing(border-box);
   display: table-cell;
   padding: 2em 2.5em;
-  vertical-align: top;
   width: flex-grid(9) + flex-gutter();
+  vertical-align: top;
 
   @media print {
     @include box-shadow(none);
@@ -48,27 +48,27 @@ h1.top-header {
 
 .sidebar {
   @include box-sizing(border-box);
-  display: table-cell;
-  font-family: $sans-serif;
-  font-size: 14px;
   position: relative;
-  vertical-align: top;
+  display: table-cell;
   width: flex-grid(3);
   background: $sidebar-color;
+  vertical-align: top;
+  font-size: 14px;
+  font-family: $sans-serif;
 
   h1, h2 {
-   font-size: em(20);
-   font-weight: bold;
-   letter-spacing: 0;
-   text-transform: none;
-   font-family: $sans-serif;
    text-align: left;
+   text-transform: none;
+   letter-spacing: 0;
+   font-weight: bold;
    font-style: normal;
+   font-size: em(20);
+   font-family: $sans-serif;
   }
 
   h1 {
-    font-size: 18px;
     padding: 32px 26px 20px 26px;
+    font-size: 18px;
   }
 
   a {
@@ -85,55 +85,55 @@ h1.top-header {
   }
 
   h3 {
-    background: none;
+    overflow: hidden;
+    margin: 0;
     border: none;
+    background: none;
     color: #000;
     font-weight: normal;
-    margin: 0;
-    overflow: hidden;
     font-size: 1em;
 
     a {
+      @include transition();
       display: block;
       text-decoration: none;
-      @include transition();
     }
 
     &.active {
-      // @extend .bottom-border;
       color: #000;
       font-weight: bold;
 
       a {
         color: #000;
       }
+      // @extend .bottom-border;
     }
   }
 
   ul, ol {
-    list-style: none;
     margin: 0;
     padding-left: 0;
+    list-style: none;
 
     li {
-      // @extend .bottom-border;
       @extend .clearfix;
-      background: none;
       position: relative;
       padding: 0;
+      background: none;
 
       a {
-        display: block;
-        line-height: lh();
-        font-size: 1em;
         @include box-sizing(border-box);
+        display: block;
         padding: lh(.25) lh(.5) lh(.25) 0;
+        font-size: 1em;
+        line-height: lh();
 
         &:hover {
-          color: #666;
           background: #f6f6f6;
+          color: #666;
         }
       }
+      // @extend .bottom-border;
     }
   }
 
@@ -141,17 +141,17 @@ h1.top-header {
     position: relative;
 
     a {
-      background: #f6f6f6 url('../images/slide-left-icon.png') center center no-repeat;
-      border: 1px solid #D3D3D3;
       @include border-radius(3px 0 0 3px);
-      height: 16px;
-      padding: 6px;
       position: absolute;
-      right: -1px;
-      text-indent: -9999px;
       top: 12px;
-      width: 16px;
+      right: -1px;
       z-index: 99;
+      padding: 6px;
+      width: 16px;
+      height: 16px;
+      border: 1px solid #D3D3D3;
+      background: #f6f6f6 url('../images/slide-left-icon.png') center center no-repeat;
+      text-indent: -9999px;
 
       &:hover {
         background-color: white;
@@ -174,8 +174,8 @@ h1.top-header {
 
   a {
     &.block-link {
-      border-left: 1px solid lighten($border-color, 10%);
       display: block;
+      border-left: 1px solid lighten($border-color, 10%);
 
       &:hover {
         background: none;

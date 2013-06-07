@@ -66,22 +66,22 @@ body.cs188 {
       margin-bottom: 40px;
 
       h3 {
-        color: $base-font-color;
-        font-family: $sans-serif;
-        font-weight: 700;
         margin-bottom: 15px;
+        color: $base-font-color;
         text-transform: none;
+        font-weight: 700;
+        font-family: $sans-serif;
       }
 
       .teacher-image {
-        background: rgb(255,255,255);
-        border: 1px solid rgb(200,200,200);
-        height: 115px;
         float: left;
-        margin: 0 15px 0px 0;
         overflow: hidden;
+        margin: 0 15px 0px 0;
         padding: 1px;
         width: 115px;
+        height: 115px;
+        border: 1px solid rgb(200,200,200);
+        background: rgb(255,255,255);
 
         img {
           display: block;
