@@ -91,12 +91,17 @@ class @VideoAlpha
   getDuration: ->
     @metadata[@youtubeId()].duration
 
-  log: (eventName)->
+  log: (eventName, data)->
+    # Default parameters that always get logged.
     logInfo =
       id: @id
       code: @youtubeId()
-      currentTime: @player.currentTime
-      speed: @speed
+
+    # If extra parameters were passed to the log.
+    if data
+      $.each data, (paramName, value) ->
+        logInfo[paramName] = value
+
     if @videoType is "youtube"
       logInfo.code = @youtubeId()
     else logInfo.code = "html5"  if @videoType is "html5"

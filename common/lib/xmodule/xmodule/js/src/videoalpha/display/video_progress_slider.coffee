@@ -6,6 +6,7 @@ class @VideoProgressSliderAlpha extends SubviewAlpha
     @slider = @el.slider
       range: 'min'
       change: @onChange
+
       slide: @onSlide
       stop: @onStop
     @buildHandle()
@@ -35,7 +36,7 @@ class @VideoProgressSliderAlpha extends SubviewAlpha
   onSlide: (event, ui) =>
     @frozen = true
     @updateTooltip(ui.value)
-    $(@).trigger('seek', ui.value)
+    $(@).trigger('slide_seek', ui.value)
 
   onChange: (event, ui) =>
     @updateTooltip(ui.value)
