@@ -5,7 +5,7 @@ div.syllabus {
   text-align: center;
 
   h1 {
-    @extend .top-header
+    @extend .top-header;
   }
 
   .notes {
@@ -13,14 +13,14 @@ div.syllabus {
   }
 
   table {
+
+    margin: 10px 0;
     table-layout: auto;
     text-align: left;
 
-    margin: 10px 0;
-
     thead {
-      font-weight: bold;
       border-bottom: 1px solid black;
+      font-weight: bold;
     }
 
     tr.first {
@@ -30,8 +30,8 @@ div.syllabus {
     } 
 
     td {
-      border: none !important;
       padding: 5px 10px !important;
+      border: none !important;
       vertical-align: middle;
       font-size: 1em !important;
       line-height: auto;

@@ -4,10 +4,10 @@
 
 .notifications {
   @include news-font;
-  font-size: 0.9em;
-  padding-left: 20px;
   padding-top: 20px;
   padding-bottom: 20px;
+  padding-left: 20px;
+  font-size: 0.9em;
   .notification {
     @include news-font;
     margin-top: 15px;

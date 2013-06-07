@@ -1,10 +1,9 @@
 nav.course-material {
   @include clearfix;
-  @include box-sizing(border-box);
-  background: none;
   margin: 0px auto 0px;
   padding: 0px;
   width: 100%;
+  background: none;
 
   .inner-wrapper {
     margin: 0 auto;
@@ -14,7 +13,6 @@ nav.course-material {
 
   ol.course-tabs {
     @include border-top-radius(4px);
-    @include clearfix;
     padding: 10px 0 0 0;
 
     li {
@@ -22,14 +20,14 @@ nav.course-material {
       list-style: none;
 
       a {
-        color: darken($lighter-base-font-color, 20%);
         display: block;
-        text-align: center;
         padding: 8px 13px 12px;
-        font-size: 14px;
-        font-weight: 400;
+        color: darken($lighter-base-font-color, 20%);
+        text-align: center;
         text-decoration: none;
         text-shadow: 0 1px rgb(255,255,255);
+        font-weight: 400;
+        font-size: 14px;
 
         &:hover {
           color: $base-font-color;
@@ -40,7 +38,9 @@ nav.course-material {
         }
       }
     }
+    @include clearfix;
   }
+  @include box-sizing(border-box);
 }
 
 .course-content {

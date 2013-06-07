@@ -4,19 +4,19 @@
     @include clearfix;
 
     nav.categories {
-      border: 1px solid rgb(220,220,220);
       @include box-sizing(border-box);
       float: left;
       margin-left: flex-gutter();
       padding: 20px;
       width: flex-grid(3);
+      border: 1px solid rgb(220,220,220);
 
       a {
         display: block;
-        letter-spacing: 1px;
         margin: 0px -20px;
         padding: 12px 0px 12px 20px;
         text-align: left;
+        letter-spacing: 1px;
 
         &:hover {
           background: rgb(245,245,245);
@@ -37,9 +37,9 @@
         }
 
         > h2 {
-          border-bottom: 1px solid rgb(220,220,220);
           margin-bottom: 40px;
           padding-bottom: 20px;
+          border-bottom: 1px solid rgb(220,220,220);
         }
       }
 
@@ -47,18 +47,18 @@
         margin-bottom: 40px;
 
         h3 {
-          background: url('/static/images/bullet-closed.png') no-repeat left 0.25em;
-          font-family: $sans-serif;
-          font-weight: 700;
           margin-bottom: 10px;
           padding-left: 20px;
+          background: url('/static/images/bullet-closed.png') no-repeat left 0.25em;
+          font-weight: 700;
+          font-family: $sans-serif;
           cursor: pointer;
         }
 
         .answer {
           display: none;
-          color: #3c3c3c;
           padding-left: 16px;
+          color: #3c3c3c;
           font-family: $serif;
           li {
             line-height: 1.6em;

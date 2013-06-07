@@ -18,26 +18,26 @@
   }
 
   .heading-2 {
-    font-size: 25px;
     margin: 0 0 $baseline 0;
-    font-weight: 300;
-    text-transform: uppercase;
     color: $link-color-d1;
+    text-transform: uppercase;
+    font-weight: 300;
+    font-size: 25px;
   }
 
   .heading-3 {
-    font-size: 21px;
     margin: 0 0 $baseline 0;
-    font-weight: 300;
     color: $base-font-color;
+    font-weight: 300;
+    font-size: 21px;
   }
 
   .heading-4 {
-    font-size: 14px;
-    font-weight: 600;
+    color: saturate($link-color-d1,15%);
     text-transform: uppercase;
     letter-spacing: 0 !important;
-    color: saturate($link-color-d1,15%);
+    font-weight: 600;
+    font-size: 14px;
   }
 
   .heading-5 {
@@ -45,69 +45,69 @@
 
   // specific examples - body
   .body-text-emphasized {
-    font-size: 18px;
     margin: 0 0 $baseline 0;
-    font-weight: 300;
     color: $base-font-color;
+    font-weight: 300;
+    font-size: 18px;
     font-family: 'Open Sans', sans-serif;
     line-height: lh(1.1);
   }
 
   .body-text {
-    font-size: 15px;
     margin: 0 0 $baseline 0;
     color: $base-font-color;
+    font-size: 15px;
     line-height: lh(1);
   }
 
   // specific examples - buttons
   .button-primary {
     @include border-radius(0);
-    @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
-    text-transform: lowercase;
-    color: $very-light-text;
-    letter-spacing: 0.1rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
     border: none !important;
-    text-shadow: none;
-    letter-spacing: 0;
-    font-size: 16px;
     box-shadow: none !important;
+    color: $very-light-text;
+    text-align: center;
+    text-transform: lowercase;
+    text-shadow: none;
+    letter-spacing: 0.1rem;
+    letter-spacing: 0;
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
   }
 
   .button-secondary {
     @include linear-gradient($outer-border-color 5%, $lighter-base-font-color 95%);
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
-    text-transform: lowercase;
-    color: $very-light-text;
-    letter-spacing: 0.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
     border: none !important;
-    text-shadow: none;
-    letter-spacing: 0;
-    font-size: 16px;
     box-shadow: 0 !important;
+    color: $very-light-text;
+    text-align: center;
+    text-transform: lowercase;
+    text-shadow: none;
+    letter-spacing: 0.1rem;
+    letter-spacing: 0;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
   }
 
   // layout
   .content-wrapper {
-    background: $account-content-wrapper-bg;
     padding-bottom: 0;
+    background: $account-content-wrapper-bg;
   }
 
   .container, .introduction {
     @include box-sizing(border-box);
-    @include clearfix;
     margin: 0 auto;
     width: 960px;
     background: $container-bg;
+    @include clearfix;
   }
 
   .container {
@@ -143,14 +143,14 @@
 
     &:link, &:visited, &:hover, &:active {
       color: $link-color-d1;
-      font-weight: 400;
-      text-decoration: none !important; // needed but nasty
+      text-decoration: none !important;
+      font-weight: 400; // needed but nasty
       font-family: $sans-serif;
     }
 
-    &:hover, &:active {
-      text-decoration: none !important; // needed but nasty
+    &:hover, &:active { // needed but nasty
       border-bottom: 1px dotted $link-color-d1;
+      text-decoration: none !important;
     }
   }
 
@@ -165,14 +165,14 @@
   }
 
   .content {
+    float: left;
     margin-right: ($baseline*2);
     width: 600px;
-    float: left;
   }
 
   aside {
-    width: 280px;
     float: left;
+    width: 280px;
 
     p, ol, ul {
       font-size: 14px !important;
@@ -228,9 +228,9 @@
       .field {
         display: block;
         float: left;
-        border-bottom: none;
         margin: 0 ($baseline*1.5) 0 0;
         padding-bottom: 0;
+        border-bottom: none;
 
         input, textarea {
           width: 100%;
@@ -252,10 +252,10 @@
         @include border-radius(0);
         display: block;
         height: auto;
-        font-family: $sans-serif;
-        font-style: normal;
-        font-weight: 500;
         color: $base-font-color;
+        font-weight: 500;
+        font-style: normal;
+        font-family: $sans-serif;
       }
 
       label {
@@ -273,9 +273,9 @@
       }
 
       input, textarea {
-        width: 100%;
         margin: 0;
         padding: ($baseline/2) ($baseline*.75);
+        width: 100%;
 
         &.long {
           width: 100%;
@@ -309,8 +309,8 @@
 
         input[type="checkbox"] {
           display: inline-block;
-          width: auto;
           margin-right: ($baseline/4);
+          width: auto;
         }
 
         label {
@@ -400,17 +400,17 @@
 
     .action-primary {
       float: left;
-      width: flex-grid(8,8);
       margin-right: flex-gutter(0);
+      width: flex-grid(8,8);
     }
 
     .action-secondary {
       display: block;
       float: right;
-      width: flex-grid(3,8);
       margin: $baseline $baseline 0 0;
-      font-size: em(14);
+      width: flex-grid(3,8);
       text-align: right;
+      font-size: em(14);
     }
 
     &.error {
@@ -422,16 +422,16 @@
   .status {
     @include box-sizing(border-box);
     margin: 0 0 $baseline 0;
-    border-bottom: 3px solid shade($yellow, 10%);
     padding: $baseline $baseline;
+    border-bottom: 3px solid shade($yellow, 10%);
     background: tint($yellow,20%);
 
     .message-title {
       @extend .heading-4;
       margin: 0 0 ($baseline/4) 0;
-      font-size: em(14);
-      font-weight: 600;
       color: $m-gray-d2 !important;
+      font-weight: 600;
+      font-size: em(14);
     }
 
     .message-copy {
@@ -462,8 +462,8 @@
 
   // misc
   .orn-plus {
-    color: $very-light-text;
     padding: 0 $baseline/4;
+    color: $very-light-text;
   }
 
   #register-form, #login-form, #passwordreset-form {
@@ -524,8 +524,8 @@
   }
 
   .introduction {
-    width: auto;
     padding: 0;
+    width: auto;
 
     header h1 {
       margin: 0;
@@ -544,8 +544,8 @@
 
   .inner-wrapper {
     @include border-radius(2px);
-    background: $body-bg;
     padding-bottom: 0 !important;
+    background: $body-bg;
   }
 
   #password-reset {
@@ -580,18 +580,17 @@
 
     form {
       @include border-radius(0);
-      @include box-shadow(none);
       margin: 0;
-      border: none;
       padding: 0;
+      border: none;
 
       .field {
 
         &.text, &.email, &.textarea {
 
           input {
-            background: #fafafa;
             margin-bottom: 0;
+            background: #fafafa;
           }
         }
       }
@@ -600,22 +599,23 @@
         padding: 0 !important;
 
         .action-primary {
-          float: none;
           display: block !important;
+          float: none;
           width: 100%;
         }
       }
+      @include box-shadow(none);
     }
   }
 
   .modal-form-error {
     @extend .body-text;
-    @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
     @include box-sizing(border-box);
     margin: $baseline 0 ($baseline/2) 0 !important;
     padding: $baseline;
     border: none;
     border-bottom: 3px solid shade($red, 10%);
     background: tint($red,95%);
+    @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
   }
 }

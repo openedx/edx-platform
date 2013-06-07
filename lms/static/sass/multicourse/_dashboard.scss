@@ -3,11 +3,11 @@
   padding: 60px 0 0 0;
 
   .dashboard-banner {
-    background: $yellow;
-    border: 1px solid rgb(200,200,200);
     @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-    padding: 10px;
     margin-bottom: 30px;
+    padding: 10px;
+    border: 1px solid rgb(200,200,200);
+    background: $yellow;
 
     &:empty {
       display: none;
@@ -24,29 +24,29 @@
   }
 
   .profile-sidebar {
-    background: transparent;
     float: left;
     margin-right: flex-gutter();
     width: flex-grid(3);
+    background: transparent;
 
     header.profile {
       @include background-image($dashboard-profile-header-image);
-      background-color: $dashboard-profile-header-color;
-      border: 1px solid $border-color-2;
       @include border-radius(4px);
-      @include box-sizing(border-box);
       width: flex-grid(12);
+      border: 1px solid $border-color-2;
+      background-color: $dashboard-profile-header-color;
 
       h1.user-name {
-        color: $base-font-color;
-        font: 700 1.2em/1.2em $sans-serif;
-        margin: 0px;
         overflow: hidden;
+        margin: 0px;
         padding: 15px 10px 17px;
+        color: $base-font-color;
+        text-transform: none;
         text-wrap: nowrap;
         text-overflow: ellipsis;
-        text-transform: none;
+        font: 700 1.2em/1.2em $sans-serif;
       }
+      @include box-sizing(border-box);
     }
 
     .user-info {
@@ -54,23 +54,21 @@
       padding: 0px 10px;
 
       > ul {
-        background: $dashboard-profile-color;
-        border: 1px solid $border-color-2;
-        border-top: none;
-        //@include border-bottom-radius(4px);
         @include box-sizing(border-box);
-        @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
         @include clearfix;
         margin: 0px;
         padding: 20px 10px 10px;
         width: flex-grid(12);
+        border: 1px solid $border-color-2;
+        border-top: none;
+        background: $dashboard-profile-color;
 
         li {
           @include clearfix;
-          border-bottom: 1px dotted $border-color-2;
-          list-style: none;
           margin-bottom: 15px;
           padding-bottom: 17px;
+          border-bottom: 1px dotted $border-color-2;
+          list-style: none;
 
           &:hover {
             .title .icon {
@@ -84,17 +82,17 @@
 
           span.title {
             color: $lighter-base-font-color;
-            font-family: $sans-serif;
             font-size: 13px;
+            font-family: $sans-serif;
 
             .icon {
-              background-size: cover;
-              float: left;
-              height: 19px;
-              margin: 0 6px 0 0;
-              opacity: 0.6;
               @include transition(all, 0.15s, linear);
+              float: left;
+              margin: 0 6px 0 0;
               width: 19px;
+              height: 19px;
+              background-size: cover;
+              opacity: 0.6;
 
               &.email-icon {
                 @include background-image(url('../images/portal-icons/email-icon.png'));
@@ -115,23 +113,25 @@
           }
 
           span.data {
-            color: $lighter-base-font-color;
-            font-weight: 700;
-            margin-left: 26px;
-            white-space: nowrap;
-            text-overflow: ellipsis;
             overflow: hidden;
+            margin-left: 26px;
+            color: $lighter-base-font-color;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 700;
           }
         }
+        //@include border-bottom-radius(4px);
+        @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
       }
     }
 
     .news-carousel {
       @include clearfix;
+      @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
       margin: 30px 10px 0;
       border: 1px solid $border-color-2;
       background: $dashboard-profile-color;
-      @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
 
       * {
         font-family: $sans-serif;
@@ -171,10 +171,10 @@
       h4 {
         float: left;
         margin-left: 15px;
+        text-transform: uppercase;
+        font-weight: 700;
         font-size: 15px;
         line-height: 48px;
-        font-weight: 700;
-        text-transform: uppercase;
       }
 
       .pages {
@@ -182,10 +182,10 @@
       }
 
       .page {
-        display: none;
         position: absolute;
         top: 0;
         left: 0;
+        display: none;
 
         &:first-child {
           display: block;
@@ -197,8 +197,8 @@
       }
 
       .news-image {
-        height: 180px;
         margin-bottom: 15px;
+        height: 180px;
 
         img {
           width: 100%;
@@ -211,15 +211,15 @@
         margin-left: 5px;
 
         a {
-          font-size: 16px;
           font-weight: 700;
+          font-size: 16px;
         }
       }
 
       .excerpt {
         margin-left: 5px;
-        font-size: 13px;
         padding-bottom: 40px;
+        font-size: 13px;
       }
     }
   }
@@ -230,8 +230,8 @@
     width: flex-grid(9);
 
     > header {
-      border-bottom: 1px solid $border-color-2;
       margin-bottom: 30px;
+      border-bottom: 1px solid $border-color-2;
     }
 
     .empty-dashboard-message {
@@ -239,46 +239,46 @@
       text-align: center;
 
       p {
-        color: $lighter-base-font-color;
-        font-style: italic;
         margin-bottom: 20px;
+        color: $lighter-base-font-color;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
+        font-style: italic;
       }
 
       a {
-        background: rgb(240,240,240);
         @include background-image($button-bg-image);
-        background-color: $button-bg-color;
-        border: 1px solid $border-color-2;
         @include border-radius(4px);
-        @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
         @include box-sizing(border-box);
-        color: $base-font-color;
-        font-family: $sans-serif;
         @include inline-block;
-        letter-spacing: 1px;
         margin-left: 5px;
         padding: 5px 10px;
+        border: 1px solid $border-color-2;
+        background: rgb(240,240,240);
+        background-color: $button-bg-color;
+        color: $base-font-color;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
+        letter-spacing: 1px;
+        font-family: $sans-serif;
 
         &:hover {
           color: $link-color;
           text-decoration: none;
         }
+        @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
       }
     }
 
     .my-course {
-      clear: both;
       @include clearfix;
+      @include transition(all, 0.15s, linear);
+      position: relative;
+      z-index: 20;
+      clear: both;
       margin-right: flex-gutter();
       margin-bottom: 50px;
       padding-bottom: 50px;
-      border-bottom: 1px solid $border-color-1;
-      position: relative;
       width: flex-grid(12);
-      z-index: 20;
-      @include transition(all, 0.15s, linear);
+      border-bottom: 1px solid $border-color-1;
 
       &:last-child {
         margin-bottom: none;
@@ -286,14 +286,14 @@
 
       .cover {        
         @include box-sizing(border-box);
-        float: left;
-        height: 100%;
-        max-height: 100%;
-        margin: 0px;
-        overflow: hidden;
-        position: relative;
         @include transition(all, 0.15s, linear);
+        position: relative;
+        float: left;
+        overflow: hidden;
+        margin: 0px;
+        max-height: 100%;
         width: 200px;
+        height: 100%;
         height: 120px;
 
         img {
@@ -310,32 +310,32 @@
           width: 100%;
 
           .university {
-            color: $lighter-base-font-color;
-            font-family: $sans-serif;
-            font-size: 16px;
-            font-weight: 400;
             margin: 0 0 6px;
+            color: $lighter-base-font-color;
             text-transform: none;
             letter-spacing: 0;
+            font-weight: 400;
+            font-size: 16px;
+            font-family: $sans-serif;
           }
 
           .date-block {
             position: absolute;
             top: 0;
             right: 0;
-            font-family: $sans-serif;
-            font-size: 13px;
-            font-style: italic;
             color: $lighter-base-font-color;
+            font-style: italic;
+            font-size: 13px;
+            font-family: $sans-serif;
           }
 
           h3 a, h3 span {
             display: block;
             margin-bottom: 10px;
-            font-family: $sans-serif;
-            font-size: 34px;
-            line-height: 42px;
             font-weight: 300;
+            font-size: 34px;
+            font-family: $sans-serif;
+            line-height: 42px;
 
             &:hover {
               text-decoration: none;
@@ -344,21 +344,21 @@
         }
 
         .course-status {
-          background: $yellow;
-          border: 1px solid $border-color-2;
           @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+          @include box-sizing(border-box);
+          float: left;
           margin-top: 17px;
           margin-right: flex-gutter();
           padding: 5px;
           width: flex-grid(8);
-          float: left;
-          @include box-sizing(border-box);
+          border: 1px solid $border-color-2;
+          background: $yellow;
 
           p {
             color: $lighter-base-font-color;
-            font-style: italic;
-            letter-spacing: 1px;
             text-align: center;
+            letter-spacing: 1px;
+            font-style: italic;
           }
         }
 
@@ -377,20 +377,19 @@
 
         .enter-course {
           @include button(simple, $button-color);
-          @include box-sizing(border-box);
           @include border-radius(3px);
           display: block;
           float: left;
-          font: normal 15px/1.6rem $sans-serif;
-          letter-spacing: 0;
+          margin-top: 16px;
           padding: 6px 32px 7px;
           text-align: center;
-          margin-top: 16px;
+          letter-spacing: 0;
+          font: normal 15px/1.6rem $sans-serif;
 
           &.archived {
             @include button(simple, $button-archive-color);
-            font: normal 15px/1.6rem $sans-serif;
             padding: 6px 32px 7px;
+            font: normal 15px/1.6rem $sans-serif;
 
             &:hover {
               text-decoration: none;
@@ -400,33 +399,33 @@
           &:hover {
             text-decoration: none;
           }
+          @include box-sizing(border-box);
         }
       }
     }
 
     .message-status {
       @include clearfix;
-      @include border-radius(3px);
-      display: none;
       z-index: 10;
+      display: none;
       margin: 20px 0 10px;
       padding: 15px 20px;
-      font-family: $sans-serif;
-      background: tint($yellow,70%);
       border: 1px solid #ccc;
+      background: tint($yellow,70%);
+      font-family: $sans-serif;
 
       .message-copy {
-        font-family: $sans-serif;
-        font-size: 13px;
         margin: 0;
+        font-size: 13px;
+        font-family: $sans-serif;
 
         a {
           font-family: $sans-serif;
         }
 
         .grade-value {
-          font-size: 1.2rem;
           font-weight: bold;
+          font-size: 1.2rem;
         }
 
         strong {
@@ -440,9 +439,9 @@
 
       .actions {
          @include clearfix;
-        list-style: none;
         margin: 0;
         padding: 0;
+        list-style: none;
 
         .action {
           float: left;
@@ -454,12 +453,11 @@
 
           .btn {
             @include box-sizing(border-box);
-            @include border-radius(3px);
             float: left;
-            font: normal 0.8rem/1.2rem $sans-serif;
-            letter-spacing: 1px;
             padding: 6px 12px;
             text-align: center;
+            letter-spacing: 1px;
+            font: normal 0.8rem/1.2rem $sans-serif;
 
             &.disabled {
               cursor: default !important;
@@ -473,21 +471,22 @@
                 background-image: linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
               }
             }
+            @include border-radius(3px);
           }
 
           .cta {
             float: left;
-            font: normal 0.8rem/1.2rem $sans-serif;
-            letter-spacing: 1px;
             padding: 6px 12px;
             text-align: center;
+            letter-spacing: 1px;
+            font: normal 0.8rem/1.2rem $sans-serif;
           }
         }
       }
 
       .exam-registration-number {
-        font-family: $sans-serif;
         font-size: 18px;
+        font-family: $sans-serif;
 
         a {
           font-family: $sans-serif;
@@ -510,8 +509,8 @@
 
       .exam-button {
         @include button(simple, $pink);
-        margin-top: 0;
         float: right;
+        margin-top: 0;
       }
 
       .contact-button {
@@ -522,9 +521,9 @@
         display: inline-block;
         margin-top: 10px;
         padding: 9px 18px 10px;
-        font-size: 13px;
-        font-weight: bold;
         letter-spacing: 0;
+        font-weight: bold;
+        font-size: 13px;
 
         &:hover {
           text-decoration: none;
@@ -540,7 +539,7 @@
       }
 
       &.course-status-certnotavailable {
-        // background: #fee8d6;
+        // background: #fee8d6
       }
 
       &.course-status-certrendering {
@@ -552,19 +551,20 @@
       }
 
       &.course-status-certavailable {
-        // background: #d9e7db;
+        // background: #d9e7db
       }
+      @include border-radius(3px);
     }
 
 
     a.unenroll {
-      float: right;
       display: block;
-      font-style: italic;
+      float: right;
+      margin-top: 32px;
       color: #a0a0a0;
       text-decoration: underline;
+      font-style: italic;
       font-size: .8em;
-      margin-top: 32px;
 
       &:hover {
         color: #333;

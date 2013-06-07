@@ -1,14 +1,16 @@
 div.staff-grading,
 div.peer-grading{
+    padding: 15px;
+    border: none;
     textarea.feedback-area {
-        height: 75px;
         margin: 0px;
+        height: 75px;
     }
 
     ul.rubric-list{
-        list-style-type: none;
-        padding:0;
         margin:0;
+        padding:0;
+        list-style-type: none;
         li {
              &.rubric-list-item{
                  margin-bottom: 0px;
@@ -31,11 +33,11 @@ div.peer-grading{
     div {
         margin: 0px;
         &.submission-container{
+              @include clearfix;
               overflow-y: auto;
               height: 150px;
-              background: #F6F6F6;
               border: 1px solid #ddd;
-              @include clearfix;
+              background: #F6F6F6;
         }
     }
 
@@ -60,9 +62,9 @@ div.peer-grading{
 
     .problem-list
     {
-        text-align: center;
-        table-layout: auto;
         width:100%;
+        table-layout: auto;
+        text-align: center;
         th
         {
             padding: 2px;
@@ -77,9 +79,9 @@ div.peer-grading{
         }
         .ui-progressbar
         {
-            height:1em;
             margin:0px;
             padding:0px;
+            height:1em;
         }
     }
 
@@ -92,12 +94,14 @@ div.peer-grading{
     }
     .error-container
     {
-        background-color: #FFCCCC;
-        padding: 2px;
         margin-left: 0px;
+        padding: 2px;
+        background-color: #FFCCCC;
     }
     .submission-wrapper
     {
+        padding: 2px;
+        padding-bottom: 15px;
         h3
         {
             margin-bottom: 2px;
@@ -106,13 +110,11 @@ div.peer-grading{
         {
             margin-left:2px;
         }
-        padding: 2px;
-        padding-bottom: 15px;
     }
     .meta-info-wrapper
     {
-        background-color: #eee;
         padding:2px;
+        background-color: #eee;
         div
         {
             display : inline;
@@ -121,34 +123,35 @@ div.peer-grading{
     .message-container,
     .grading-message
     {
-        background-color: $yellow;
-        padding: 2px;
         margin-left:0px;
+        padding: 2px;
+        background-color: $yellow;
     }
     
     .breadcrumbs
     {
         margin-top:2px;
-        margin-left:0px;
         margin-bottom:2px;
+        margin-left:0px;
         font-size: .8em;
     }
 
     .instructions-panel
     {
+        @include clearfix;
 
         margin-right:2px;
         > div
         {
-            padding: 2px;
             margin-bottom: 5px;
-            background: #eee;
+            padding: 2px;
             width:47.6%;
+            background: #eee;
             h3
             {
+                color: #777;
                 text-align:center;
                 text-transform:uppercase;
-                color: #777;
             }
             p
             {
@@ -171,7 +174,6 @@ div.peer-grading{
                 color: white;
             }
         }
-        @include clearfix;
     }
 
 
@@ -194,7 +196,5 @@ div.peer-grading{
             margin-top: 20px;
         }
     }
-    padding: 15px;
-    border: none;
 }
 

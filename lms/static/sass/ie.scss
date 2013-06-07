@@ -21,8 +21,8 @@ header.global {
 
     > hgroup {
       h1 {
-        border-bottom: 0;
         padding-bottom: 0;
+        border-bottom: 0;
       }
 
       h2 {
@@ -69,11 +69,11 @@ header.global {
   width: 660px;
 
   li.partner {
-    float: left;
     display: block;
+    float: left;
+    overflow: hidden;
     padding: 0;
     width: 220px;
-    overflow: hidden;
   }
 }
 
@@ -84,31 +84,31 @@ header.global {
   }
 
   .inner-wrapper {
-    height: 100%;
-    overflow: visible;
     position: relative;
+    overflow: visible;
+    height: 100%;
   }
 
   header.course-preview {
-    left: 0px;
     position: relative;
     top: 0px;
-    width: 100%;
+    left: 0px;
     z-index: 3;
+    width: 100%;
     height: auto;
 
     hgroup {
       position: relative;
-      right: 0;
       top: 0;
+      right: 0;
     }
 
   }
 
   .info {
-    height: auto;
     position: static;
     overflow: visible;
+    height: auto;
 
     .desc {
       height: auto;
@@ -116,9 +116,9 @@ header.global {
   }
 
   &:hover {
-    background: rgb(245,245,245);
-    border-color: rgb(170,170,170);
     @include box-shadow(0 1px 16px 0 rgba($blue, 0.4));
+    border-color: rgb(170,170,170);
+    background: rgb(245,245,245);
 
     .info {
       top: 0;
@@ -171,8 +171,8 @@ div.course-wrapper {
 }
 
 .sidebar {
-  float: left !important;
   display: block !important;
+  float: left !important;
 }
 
 .sequence-nav ol {
