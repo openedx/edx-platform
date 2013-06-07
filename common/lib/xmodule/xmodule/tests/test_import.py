@@ -66,7 +66,8 @@ class ImportTestCase(BaseCourseTestCase):
     def test_fallback(self):
         '''Check that malformed xml loads as an ErrorDescriptor.'''
 
-        bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
+        # Use an exotic character to also flush out Unicode issues.
+        bad_xml = u'''<sequential display_name="oops\N{SNOWMAN}"><video url="hi"></sequential>'''
         system = self.get_system()
 
         descriptor = system.process_xml(bad_xml)
