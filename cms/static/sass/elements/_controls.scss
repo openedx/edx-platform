@@ -4,8 +4,8 @@
 // gray primary button
 .btn-primary-gray {
   @extend .btn-primary;
-  background: $gray-l1;
   border-color: $gray-l2;
+  background: $gray-l1;
   color: $white;
 
   &:hover, &:active {
@@ -26,19 +26,19 @@
 // blue primary button
 .btn-primary-blue {
   @extend .btn-primary;
-  background: $blue;
   border-color: $blue-s1;
+  background: $blue;
   color: $white;
 
   &:hover, &:active {
-    background: $blue-s2;
     border-color: $blue-s2;
+    background: $blue-s2;
   }
 
   &.current, &.active {
+    border-color: $blue-d2;
     background: $blue-d1;
     color: $blue-l4;
-    border-color: $blue-d2;
 
     &:hover, &:active {
       background: $blue-d1;
@@ -49,19 +49,19 @@
 // green primary button
 .btn-primary-green {
   @extend .btn-primary;
-  background: $green;
   border-color: $green;
+  background: $green;
   color: $white;
 
   &:hover, &:active {
-    background: $green-s1;
     border-color: $green-s1;
+    background: $green-s1;
   }
 
   &.current, &.active {
+    border-color: $green-d2;
     background: $green-d1;
     color: $green-l4;
-    border-color: $green-d2;
 
     &:hover, &:active {
       background: $green-d1;

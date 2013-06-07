@@ -8,8 +8,8 @@ body.course.checklists {
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
     margin-right: flex-gutter();
+    width: flex-grid(9, 12);
   }
 
   // checklists - general
@@ -51,22 +51,22 @@ body.course.checklists {
       @include clearfix();
       @include box-shadow(inset 0 -1px 1px $shadow-l1);
       margin-bottom: 0;
-      border-bottom: 1px solid $gray-l3;
       padding: $baseline ($baseline*1.5);
+      border-bottom: 1px solid $gray-l3;
 
       .checklist-title {
         @include transition(color .15s .25s ease-in-out);
-        width: flex-grid(6, 9);
-        margin: 0 flex-gutter() 0 0;
         float: left;
+        margin: 0 flex-gutter() 0 0;
+        width: flex-grid(6, 9);
 
         .ui-toggle-expansion {
           @include transition(rotate .15s ease-in-out .25s);
           @include font-size(21);
           display: inline-block;
-          vertical-align: middle;
           margin-right: ($baseline/2);
           color: $gray-l4;
+          vertical-align: middle;
         }
 
         &.is-selectable {
@@ -84,11 +84,11 @@ body.course.checklists {
 
       .checklist-status {
         @extend .t-copy-sub1;
-        width: flex-grid(3, 9);
         float: right;
         margin-top: ($baseline/2);
-        text-align: right;
+        width: flex-grid(3, 9);
         color: $gray-l2;
+        text-align: right;
 
 
         .icon-ok {
@@ -100,8 +100,8 @@ body.course.checklists {
 
         .status-count {
           @extend .t-copy-base;
-          margin-left: ($baseline/4);
           margin-right: ($baseline/4);
+          margin-left: ($baseline/4);
           color: $gray-d3;
           font-weight: 600;
         }
@@ -119,9 +119,8 @@ body.course.checklists {
     .course-checklist-actions {
       @include clearfix();
       @include box-shadow(inset 0 1px 1px $shadow-l1);
-      @include transition(border .15s ease-in-out .25s);
-      border-top: 1px solid $gray-l2;
       padding: $baseline ($baseline*1.5);
+      border-top: 1px solid $gray-l2;
       background: $gray-l4;
 
       .action-primary {
@@ -131,24 +130,25 @@ body.course.checklists {
         .icon-add {
           @include font-size(12);
           display: inline-block;
-          vertical-align: middle;
           margin-right: ($baseline/4);
+          vertical-align: middle;
         }
       }
 
       .action-secondary {
         @include grey-button();
         @extend .t-action3;
-        font-weight: 400;
         float: right;
+        font-weight: 400;
 
         .icon-delete {
           @include font-size(12);
           display: inline-block;
-          vertical-align: middle;
           margin-right: ($baseline/4);
+          vertical-align: middle;
         }
       }
+      @include transition(border .15s ease-in-out .25s);
     }
 
     // state - collapsed
@@ -204,17 +204,16 @@ body.course.checklists {
 
   // list of tasks
   .list-tasks {
-    height: auto;
     overflow: hidden;
+    height: auto;
 
     .task {
       @include transition(background .15s ease-in-out .25s);
       @include transition(border .15s ease-in-out .25s);
-      @include clearfix();
       position: relative;
+      padding: $baseline ($baseline*1.5);
       border-top: 1px solid $white;
       border-bottom: 1px solid $gray-l5;
-      padding: $baseline ($baseline*1.5);
       background: $white;
       opacity: 1.0;
 
@@ -226,23 +225,23 @@ body.course.checklists {
 
       .task-input {
         display: inline-block;
-        vertical-align: text-top;
         float: left;
         margin: ($baseline/2) flex-gutter() 0 0;
+        vertical-align: text-top;
       }
 
       .task-details {
         display: inline-block;
-        vertical-align: text-top;
         float: left;
         width: flex-grid(6,9);
+        vertical-align: text-top;
         font-weight: 500;
 
         .task-name {
           @include transition(color .15s .25s ease-in-out);
+          margin-bottom: 0;
           vertical-align: baseline;
           cursor: pointer;
-          margin-bottom: 0;
         }
 
         .task-description {
@@ -263,20 +262,20 @@ body.course.checklists {
         @include transition(opacity .15s .25s ease-in-out);
         @include clearfix();
         display: inline-block;
-        vertical-align: middle;
         float: right;
-        width: flex-grid(2,9);
         margin: ($baseline/2) 0 0 flex-gutter();
+        width: flex-grid(2,9);
+        vertical-align: middle;
+        text-align: right;
         opacity: 0.0;
         pointer-events: none;
-        text-align: right;
 
         .action-primary {
           @include blue-button;
           @extend .t-action4;
-          @include transition(all .15s);
-          font-weight: 600;
           text-align: center;
+          font-weight: 600;
+          @include transition(all .15s);
         }
 
         .action-secondary {
@@ -287,9 +286,9 @@ body.course.checklists {
 
       // state - hover
       &:hover {
-        background: $blue-l5;
-        border-bottom-color: $blue-l4;
         border-top-color: $blue-l4;
+        border-bottom-color: $blue-l4;
+        background: $blue-l5;
         opacity: 1.0;
 
         .task-details {
@@ -309,9 +308,9 @@ body.course.checklists {
 
       // state - completed
       &.is-completed {
-        background: $gray-l6;
         border-top-color: $gray-l5;
         border-bottom-color: $gray-l5;
+        background: $gray-l6;
 
         .task-name {
           color: $gray-l2;
@@ -322,21 +321,22 @@ body.course.checklists {
           .action-primary {
             @include grey-button;
             @extend .t-action4;
-            font-weight: 600;
             text-align: center;
+            font-weight: 600;
           }
         }
 
         &:hover {
-          background: $gray-l5;
-          border-bottom-color: $gray-l4;
           border-top-color: $gray-l4;
+          border-bottom-color: $gray-l4;
+          background: $gray-l5;
 
           .task-details {
             opacity:1.0;
           }
         }
       }
+      @include clearfix();
     }
   }
 

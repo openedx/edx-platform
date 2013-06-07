@@ -257,9 +257,9 @@
 
         a {
           color: $lighter-base-font-color;
+          text-decoration: underline;
           font-style: italic;
           font-family: $serif;
-          text-decoration: underline;
 
           &:hover {
             color: $base-font-color;

@@ -22,21 +22,21 @@ body.course.outline {
         }
 
         .gradable-status {
-          float: right;
           position: relative;
           top: -4px;
           right: 50px;
+          float: right;
           width: 100px;
 
           .status-label {
             @include font-size(12);
+            @include border-radius(3px);
             position: absolute;
             top: 2px;
             right: -5px;
             display: none;
-            width: 110px;
             padding: 5px 40px 5px 10px;
-            @include border-radius(3px);
+            width: 110px;
             color: $lightGrey;
             text-align: right;
             font-weight: bold;
@@ -44,10 +44,10 @@ body.course.outline {
           }
 
           .menu-toggle {
-                z-index: 10;
                 position: absolute;
                 top: 0;
                 right: 5px;
+                z-index: 10;
                 padding: 5px;
                 color: $mediumGrey;
 
@@ -57,32 +57,30 @@ body.course.outline {
               }
 
               [class^="icon-"] {
-                  vertical-align: middle;
-                  margin-top: -5px;
                   display: inline-block;
+                  margin-top: -5px;
+                  vertical-align: middle;
                 }
 
               .menu {
                 @include font-size(12);
-                @include border-radius(4px);
                 @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
-                @include transition(opacity .15s);
-                z-index: 1;
-                display: none;
-                opacity: 0.0;
                 position: absolute;
                 top: -1px;
                 right: 0;
+                z-index: 1;
+                display: none;
                 margin: 0;
                 padding: 8px 12px;
-                background: $white;
                 border: 1px solid $mediumGrey;
+                background: $white;
+                opacity: 0.0;
 
 
                 li {
-                  width: 115px;
                   margin-bottom: 3px;
                   padding-bottom: 3px;
+                  width: 115px;
                   border-bottom: 1px solid $lightGrey;
 
                   &:last-child {
@@ -103,6 +101,8 @@ body.course.outline {
                 font-weight: bold;
               }
             }
+                @include border-radius(4px);
+                @include transition(opacity .15s);
           }
 
           // dropdown state
@@ -137,13 +137,13 @@ body.course.outline {
 
 
   .courseware-section {
+      @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
       position: relative;
-      background: #fff;
-      border-radius: 3px;
-      border: 1px solid $mediumGrey;
       margin-top: 15px;
       padding-bottom: 12px;
-      @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+      border: 1px solid $mediumGrey;
+      border-radius: 3px;
+      background: #fff;
 
       &:first-child {
           margin-top: 0;
@@ -199,14 +199,14 @@ body.course.outline {
       .datepair .date,
       .datepair .time {
           @include font-size(13);
-          @include box-shadow(none);
-          padding-left: 0;
           padding-right: 0;
+          padding-left: 0;
           border: none;
           background: none;
-          font-weight: bold;
           color: $blue;
+          font-weight: bold;
           cursor: pointer;
+          @include box-shadow(none);
       }
 
       .datepair .date {
@@ -224,30 +224,30 @@ body.course.outline {
       }
 
       header {
-          min-height: 75px;
           @include clearfix();
+          min-height: 75px;
 
           .item-details, .section-published-date {
 
           }
 
           .item-details {
+              @include clearfix();
               display: inline-block;
               padding: 20px 0 10px 0;
-              @include clearfix();
 
               .section-name {
                 @include font-size(19);
                 float: left;
                 margin-right: 10px;
                 width: 350px;
-                font-weight: bold;
                 color: $blue;
+                font-weight: bold;
               }
 
               .section-name-span {
-                cursor: pointer;
                 @include transition(color .15s);
+                cursor: pointer;
 
                 &:hover {
                   color: $orange;
@@ -265,8 +265,8 @@ body.course.outline {
 
             .save-button {
               @include blue-button;
-              padding: 7px 20px 7px;
               margin-right: 5px;
+              padding: 7px 20px 7px;
             }
 
             .cancel-button {
@@ -276,8 +276,8 @@ body.course.outline {
           }
 
           .section-published-date {
-            float: right;
             @include border-radius(3px);
+            float: right;
             background: $lightGrey;
 
             .published-status {
@@ -308,29 +308,32 @@ body.course.outline {
               position: absolute;
               top: 20px;
               right: 70px;
+
+          float: left;
+          padding: 21px 0 0;
               width: 145px;
 
               .status-label {
                 @include font-size(12);
-                @include border-radius(3px);
                 position: absolute;
                 top: 0;
                 right: 2px;
                 display: none;
-                width: 100px;
                 padding: 10px 35px 10px 10px;
+                width: 100px;
                 background: $lightGrey;
                 color: $lightGrey;
                 text-align: right;
                 font-weight: bold;
                 line-height: 16px;
+                @include border-radius(3px);
               }
 
               .menu-toggle {
-                z-index: 10;
                 position: absolute;
                 top: 2px;
                 right: 5px;
+                z-index: 10;
                 padding: 5px;
                 color: $lightGrey;
 
@@ -342,27 +345,25 @@ body.course.outline {
 
               .menu {
                 @include font-size(12);
-                @include border-radius(4px);
                 @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
-                @include transition(opacity .15s);
                 @include transition(display .15s);
-                z-index: 1;
-                display: none;
-                opacity: 0.0;
                 position: absolute;
                 top: -1px;
                 left: 2px;
+                z-index: 1;
+                display: none;
                 margin: 0;
                 padding: 8px 12px;
-                background: $white;
                 border: 1px solid $mediumGrey;
+                background: $white;
+                opacity: 0.0;
 
 
 
                 li {
-                  width: 115px;
                   margin-bottom: 3px;
                   padding-bottom: 3px;
+                  width: 115px;
                   border-bottom: 1px solid $lightGrey;
 
                   &:last-child {
@@ -382,6 +383,8 @@ body.course.outline {
                     font-weight: bold;
                   }
                 }
+                @include border-radius(4px);
+                @include transition(opacity .15s);
             }
 
             // dropdown state
@@ -411,9 +414,6 @@ body.course.outline {
               color: $blue;
             }
           }
-
-          float: left;
-          padding: 21px 0 0;
         }
       }
 
@@ -428,9 +428,9 @@ body.course.outline {
           }
 
           .expand-collapse-icon {
+              @include transition(none);
               float: left;
               margin: 25px 6px 16px 16px;
-              @include transition(none);
 
               &.expand {
                   background-position: 0 0;
@@ -448,13 +448,13 @@ body.course.outline {
 
       h3 {
           @include font-size(19);
-          font-weight: 700;
           color: $blue;
+          font-weight: 700;
       }
 
       .section-name-span {
-          cursor: pointer;
           @include transition(color .15s);
+          cursor: pointer;
 
           &:hover {
               color: $orange;
@@ -472,8 +472,8 @@ body.course.outline {
 
           .save-button {
               @include blue-button;
-              padding: 7px 20px 7px;
               margin-right: 5px;
+              padding: 7px 20px 7px;
           }
 
           .cancel-button {
@@ -493,8 +493,8 @@ body.course.outline {
 
       .list-header {
           @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
-          background-color: #ced2db;
           border-radius: 3px 3px 0 0;
+          background-color: #ced2db;
       }
 
       .subsection-list {
@@ -530,8 +530,8 @@ body.course.outline {
 
   .toggle-button-sections {
       @include font-size(12);
-      display: none;
       position: relative;
+      display: none;
       float: right;
       margin-top: ($baseline/4);
       color: $darkGrey;
@@ -542,12 +542,12 @@ body.course.outline {
 
       [class^="icon-"] {
           @include font-size(11);
-          @include border-radius(20px);
           position: relative;
           top: -1px;
           display: inline-block;
           margin-right: 2px;
           line-height: 5px;
+          @include border-radius(20px);
       }
 
       .label {
@@ -563,8 +563,8 @@ body.course.outline {
   .new-section-name-save,
   .new-subsection-name-save {
       @include blue-button;
-      padding: 4px 20px 7px;
       margin: 0 5px;
+      padding: 4px 20px 7px;
       color: #fff !important;
   }
 
@@ -576,13 +576,13 @@ body.course.outline {
   }
 
   .dummy-calendar {
-      display: none;
+      @include box-shadow(0 1px 15px rgba(0, 0, 0, .2));
       position: absolute;
       top: 55px;
       left: 110px;
       z-index: 9999;
+      display: none;
       border: 1px solid #3C3C3C;
-      @include box-shadow(0 1px 15px rgba(0, 0, 0, .2));
   }
 
   .preview {
@@ -590,13 +590,13 @@ body.course.outline {
   }
 
   .edit-subsection-publish-settings {
-      display: none;
       position: fixed;
       top: 100px;
       left: 50%;
       z-index: 99999;
-      width: 600px;
+      display: none;
       margin-left: -300px;
+      width: 600px;
       background: #fff;
       text-align: center;
 
@@ -641,8 +641,8 @@ body.course.outline {
           @include font-size(14);
           float: left;
           margin-top: 30px;
-          line-height: 20px;
           width: 100%;
+          line-height: 20px;
       }
 
       strong {
@@ -679,8 +679,8 @@ body.course.outline {
   // sort/drag and drop
   .ui-droppable {
       @include transition (padding 0.5s ease-in-out 0s);
-      min-height: 20px;
       padding: 0;
+      min-height: 20px;
 
       &.dropover {
           padding: 15px 0;

@@ -15,8 +15,8 @@ body.course.users {
       padding: 3px 15px;
       border-radius: 3px;
       background: $error-red;
-      font-size: 14px;
       color: #fff;
+      font-size: 14px;
     }
 
     .form-elements {
@@ -29,8 +29,8 @@ body.course.users {
     }
 
     .email-input {
-      width: 350px;
       padding: 8px 8px 10px;
+      width: 350px;
       border-color: $darkGrey;
     }
 
@@ -64,14 +64,14 @@ body.course.users {
 
       .user-name {
         margin-right: 10px;
-        font-size: 24px;
         font-weight: 300;
+        font-size: 24px;
       }
 
       .user-email {
-        font-size: 14px;
-        font-style: italic;
         color: $mediumGrey;
+        font-style: italic;
+        font-size: 14px;
       }
 
       .item-actions {

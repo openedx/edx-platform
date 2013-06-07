@@ -3,18 +3,18 @@
 
 .wrapper-header {
   @extend .depth3;
+  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.2));
+  position: relative;
   margin: 0;
   padding: $baseline;
-  border-bottom: 1px solid $gray;
-  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.2));
-  background: $white;
-  height: 76px;
-  position: relative;
   width: 100%;
+  height: 76px;
+  border-bottom: 1px solid $gray;
+  background: $white;
 
   a {
-    color: $baseFontColor;
     display: block;
+    color: $baseFontColor;
 
     &:hover, &:active {
       color: $blue;
@@ -23,10 +23,10 @@
 
   header.primary {
     @include clearfix();
-    max-width: $fg-max-width;
-    min-width: $fg-min-width;
-    width: flex-grid(12);
     margin: 0 auto;
+    min-width: $fg-min-width;
+    max-width: $fg-max-width;
+    width: flex-grid(12);
     color: $gray-l1;
   }
 
@@ -43,14 +43,14 @@
 }
 
 .wrapper-left {
-  width: flex-grid(10, 12);
   float: left;
   margin-right: flex-gutter();
+  width: flex-grid(10, 12);
 }
 
 .wrapper-right {
-  width: flex-grid(2, 12);
   float: right;
+  width: flex-grid(2, 12);
 }
 
 // ====================
@@ -86,31 +86,31 @@
 
   &:before {
     @extend .faded-vertical-divider;
-    content: "";
-    display: block;
-    height: 50px;
     position: absolute;
-    right: 1px;
     top: -8px;
+    right: 1px;
+    display: block;
     width: 1px;
+    height: 50px;
+    content: "";
   }
 
   &:after {
     @extend .faded-vertical-divider-light;
-    content: "";
-    display: block;
-    height: 50px;
     position: absolute;
-    right: 0px;
     top: -12px;
+    right: 0px;
+    display: block;
     width: 1px;
+    height: 50px;
+    content: "";
   }
 
   .course-number, .course-org {
     @include font-size(12);
     display: inline-block;
-    max-width: 70px;
     overflow: hidden;
+    max-width: 70px;
     text-overflow: ellipsis;
     white-space: nowrap;
     line-height: 1.3;
@@ -122,14 +122,14 @@
   }
 
   .course-title {
+    @include font-size(16);
     display: block;
-    width: 100%;
-    max-width: 220px;
     overflow: hidden;
     margin-top: -4px;
-    white-space: nowrap;
+    max-width: 220px;
+    width: 100%;
     text-overflow: ellipsis;
-    @include font-size(16);
+    white-space: nowrap;
     font-weight: 600;
   }
 }
@@ -138,13 +138,13 @@
 
 // specific elements - course nav
 .nav-course {
-  width: 290px;
   @extend .t-copy-sub1;
   margin-top: -($baseline/4);
+  width: 290px;
 
   > ol > .nav-item {
-    vertical-align: bottom;
     margin: 0 ($baseline/2) 0 0;
+    vertical-align: bottom;
 
     &:last-child {
       margin-right: 0;
@@ -153,9 +153,9 @@
     .title {
       display: block;
       padding: 0 ($baseline/4);
+      color: $gray-d3;
       text-transform: uppercase;
       font-weight: 600;
-      color: $gray-d3;
 
       .label-prefix {
         @include font-size(11);
@@ -180,28 +180,28 @@
 
 // specific elements - account-based nav
 .nav-account {
-  width: 100%;
-  margin-top: ($baseline*0.75);
   @include font-size(14);
+  margin-top: ($baseline*0.75);
+  width: 100%;
   text-align: right;
 
   .nav-account-username {
     width: 100%;
 
     .icon-user {
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 3px;
       @include font-size(12);
+      display: inline-block;
+      margin-right: 3px;
+      vertical-align: middle;
     }
 
     .account-username {
       display: inline-block;
-      vertical-align: middle;
-      width: 80%;
       overflow: hidden;
-      white-space: nowrap;
+      width: 80%;
+      vertical-align: middle;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .icon-expand {
@@ -221,12 +221,12 @@
 
     .icon-caret-down {
       @include font-size(14);
-      @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
       display: inline-block;
-      vertical-align: middle;
       margin-left: 2px;
-      opacity: 0.5;
       color: $gray-l2;
+      vertical-align: middle;
+      opacity: 0.5;
+      @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
     }
 
     &:hover {
@@ -240,8 +240,8 @@
 
   .wrapper-nav-sub {
     position: absolute;
-    left: -7px;
     top: 47px;
+    left: -7px;
     width: 140px;
     opacity: 0.0;
     pointer-events: none;
@@ -249,57 +249,57 @@
 
   .nav-sub {
     @include border-radius(2px);
-    @include box-sizing(border-box);
     @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
     position: relative;
+    padding: ($baseline/4) ($baseline/2);
     width: 100%;
     border: 1px solid $gray-l2;
-    padding: ($baseline/4) ($baseline/2);
     background: $white;
 
     &:after, &:before {
+      position: absolute;
       bottom: 100%;
+      width: 0;
+      height: 0;
       border: solid transparent;
       content: " ";
-      height: 0;
-      width: 0;
-      position: absolute;
       pointer-events: none;
     }
 
     &:after {
-      border-color: rgba(255, 255, 255, 0);
-      border-bottom-color: #fff;
-      border-width: 5px;
       right: 3px;
       margin-left: -5px;
+      border-width: 5px;
+      border-color: rgba(255, 255, 255, 0);
+      border-bottom-color: #fff;
     }
 
     &:before {
-      border-color: rgba(178, 178, 178, 0);
-      border-bottom-color: $gray-l2;
-      border-width: 6px;
       right: 3px;
       margin-left: -6px;
+      border-width: 6px;
+      border-color: rgba(178, 178, 178, 0);
+      border-bottom-color: $gray-l2;
     }
 
     .nav-item {
+      @include font-size(13);
       display: block;
       margin: 0 0 ($baseline/4) 0;
-      border-bottom: 1px solid $gray-l5;
       padding: 0 0($baseline/4) 0;
-      @include font-size(13);
+      border-bottom: 1px solid $gray-l5;
 
       &:last-child {
         margin-bottom: 0;
-        border-bottom: none;
         padding-bottom: 0;
+        border-bottom: none;
       }
 
       a {
         display: block;
       }
     }
+    @include box-sizing(border-box);
   }
 
   // UI - dropdown - specific navs
@@ -307,8 +307,8 @@
 
     .wrapper-nav-sub {
       top: 27px;
-      left: auto;
       right: -13px;
+      left: auto;
       width: 110px;
     }
 
@@ -321,13 +321,13 @@
     }
 
     .nav-sub:after {
-      left: auto;
       right: 11px;
+      left: auto;
     }
 
     .nav-sub:before {
-      left: auto;
       right: 10px;
+      left: auto;
     }
   }
 
@@ -382,24 +382,24 @@
 
     &:before {
       @extend .faded-vertical-divider;
-      content: "";
-      display: block;
-      height: 50px;
       position: absolute;
-      right: 1px;
       top: -8px;
+      right: 1px;
+      display: block;
       width: 1px;
+      height: 50px;
+      content: "";
     }
 
     &:after {
       @extend .faded-vertical-divider-light;
-      content: "";
-      display: block;
-      height: 50px;
       position: absolute;
-      right: 0px;
       top: -12px;
+      right: 0px;
+      display: block;
       width: 1px;
+      height: 50px;
+      content: "";
     }
   }
 }
@@ -424,16 +424,16 @@
 
     .nav-item {
       @include font-size(16);
-      vertical-align: middle;
       margin: 0 $baseline 0 0;
+      vertical-align: middle;
 
       &:last-child {
         margin-right: 0;
       }
 
       .action {
-        margin-top: -($baseline/4);
         display: inline-block;
+        margin-top: -($baseline/4);
         padding: ($baseline/4) ($baseline/2);
       }
     }
@@ -448,11 +448,11 @@
 
       .action-signup {
         @include blue-button;
-        @include transition(all .15s);
         @include font-size(14);
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;
         font-weight: 600;
+        @include transition(all .15s);
       }
     }
 
@@ -460,11 +460,11 @@
 
       .action-signin {
         @include white-button;
-        @include transition(all .15s);
         @include font-size(14);
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;
         font-weight: 600;
+        @include transition(all .15s);
       }
     }
   }

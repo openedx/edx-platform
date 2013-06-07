@@ -63,6 +63,7 @@
   // specific examples - buttons
   .button-primary {
     @include border-radius(0);
+    @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
     border: none !important;
@@ -76,7 +77,6 @@
     font-weight: 500;
     font-size: 16px;
     cursor: pointer;
-    @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
   }
 
   .button-secondary {
@@ -104,10 +104,10 @@
 
   .container, .introduction {
     @include box-sizing(border-box);
+    @include clearfix;
     margin: 0 auto;
     width: 960px;
     background: $container-bg;
-    @include clearfix;
   }
 
   .container {
@@ -580,6 +580,7 @@
 
     form {
       @include border-radius(0);
+      @include box-shadow(none);
       margin: 0;
       padding: 0;
       border: none;
@@ -604,18 +605,17 @@
           width: 100%;
         }
       }
-      @include box-shadow(none);
     }
   }
 
   .modal-form-error {
     @extend .body-text;
-    @include box-sizing(border-box);
+    @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
     margin: $baseline 0 ($baseline/2) 0 !important;
     padding: $baseline;
     border: none;
     border-bottom: 3px solid shade($red, 10%);
     background: tint($red,95%);
-    @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
+    @include box-sizing(border-box);
   }
 }

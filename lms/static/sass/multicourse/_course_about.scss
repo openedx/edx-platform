@@ -5,7 +5,6 @@
 
   header.course-profile {
     @include background-image(url($homepage-bg-image));
-    @include box-shadow(0 1px 80px 0 rgba(0,0,0, 0.5));
     @include box-shadow(inset 0 1px 5px 0 rgba(0,0,0, 0.1));
     position: relative;
     overflow: hidden;
@@ -19,7 +18,7 @@
 
     .intro-inner-wrapper {
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
-      @include clearfix;
+      @include box-sizing(border-box);
       position: relative;
       z-index: 2;
       margin: 0 auto;
@@ -34,6 +33,7 @@
       }
       .intro {
         @include box-sizing(border-box);
+        @include clearfix;
         position: relative;
         z-index: 2;
         display: table-cell;
@@ -91,14 +91,13 @@
 
         .main-cta {
           @include clearfix;
-          @include transition(all, 0.15s, linear);
           float: left;
           margin-right: flex-gutter();
           width: flex-grid(12);
 
           > a.find-courses, a.register {
             @include button(shiny, $button-color);
-            @include border-radius(3px);
+            @include box-sizing(border-box);
             display: block;
             padding: 10px 0px;
             width: flex-grid(6);
@@ -110,7 +109,7 @@
             &:hover {
               color: rgb(255,255,255);
             }
-            @include box-sizing(border-box);
+            @include border-radius(3px);
           }
 
           a {
@@ -121,7 +120,7 @@
 
           strong {
             @include button(shiny, $button-color);
-            @include border-radius(3px);
+            @include box-sizing(border-box);
             display: block;
             float: left;
             padding: 10px 0px;
@@ -134,12 +133,11 @@
             &:hover {
               color: rgb(255,255,255);
             }
-            @include box-sizing(border-box);
+            @include border-radius(3px);
           }
 
           span.register {
             @include box-sizing(border-box);
-            @include transition();
             display: block;
             float: left;
             margin: 1px flex-gutter(8) 0 0;
@@ -151,6 +149,7 @@
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 1px;
+            @include transition();
           }
 
           #register_error {
@@ -161,8 +160,8 @@
             background: $error-red;
             color: rgb(143, 14, 14);
           }
+          @include transition(all, 0.15s, linear);
         }
-        @include clearfix;
       }
 
       .media {
@@ -182,7 +181,7 @@
 
           .play-intro {
             @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
-            @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.4));
+            @include border-radius(4px);
             position: absolute;
             top: 50%;
             left: 50%;
@@ -204,7 +203,7 @@
               text-shadow: 0 -1px rgba(0,0,0, 0.8);
               font: normal 2em/1em $sans-serif;
             }
-            @include border-radius(4px);
+            @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.4));
           }
 
           img {
@@ -218,17 +217,18 @@
 
           .play-intro {
             @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.75), rgba(0,0,0, 0.8)));
+            @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.5));
             border-color: rgba(255,255,255, 0.9);
 
             &::after {
               color: rgba(255,255,255, 1);
             }
-            @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.5));
           }
         }
       }
-      @include box-sizing(border-box);
+      @include clearfix;
     }
+    @include box-shadow(0 1px 80px 0 rgba(0,0,0, 0.5));
   }
 
   .container {
@@ -236,6 +236,7 @@
 
     nav {
       @include box-sizing(border-box);
+      @include clearfix;
       margin: 40px 0;
       width: flex-grid(12);
       border-bottom: 1px solid $border-color-2;
@@ -266,7 +267,6 @@
           text-decoration: none;
         }
       }
-      @include clearfix;
     }
   }
 
@@ -439,7 +439,6 @@
                                                             rgba(0,0,0, 0.7) 100%));
           @include border-radius(4px);
           @include box-sizing(border-box);
-          @include transition(all, 0.15s, ease-out);
           position: absolute;
           top: 65px;
           left: 50%;
@@ -459,11 +458,11 @@
             opacity: 0;
           }
           @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+          @include transition(all, 0.15s, ease-out);
         }
 
         .share {
           @include inline-block;
-          @include transition(all, 0.15s, linear);
           margin-right: 10px;
           width: 44px;
           height: 44px;
@@ -480,6 +479,7 @@
           &:last-child {
             margin-right: 0px;
           }
+          @include transition(all, 0.15s, linear);
         }
       }
 

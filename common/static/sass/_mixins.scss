@@ -17,8 +17,8 @@
 
 // mixins - sizing
 @mixin size($width: $baseline, $height: $baseline) {
-  height: $height;
   width: $width;
+  height: $height;
 }
 
 // mixins - sizing
@@ -55,9 +55,9 @@
 
 // removes list styling/spacing when using uls, ols for navigation and less content-centric cases
 .no-list {
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
   text-indent: 0;
 
   li {
@@ -68,21 +68,21 @@
 
 // extends - image-replacement hidden text
 .text-hide {
+  overflow: hidden;
   text-indent: 100%;
   white-space: nowrap;
-  overflow: hidden;
 }
 
 // extends - hidden elems - screenreaders
 .text-sr {
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
   position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  margin: -1px;
+  padding: 0;
   width: 1px;
+  height: 1px;
+  border: 0;
 }
 
 // extends - wrapping
@@ -100,8 +100,8 @@
 
 // extends - functional disable
 .disabled {
-  pointer-events: none;
   outline: none;
+  pointer-events: none;
 }
 
 // extends - depth levels
@@ -126,15 +126,15 @@
   }
 
   &.disabled, &[disabled] {
+    opacity: 0.5;
     cursor: default;
     pointer-events: none;
-    opacity: 0.5;
   }
 
   .icon-inline {
     display: inline-block;
-    vertical-align: middle;
     margin-right: ($baseline/4);
+    vertical-align: middle;
   }
 }
 
@@ -154,8 +154,8 @@
   padding:($baseline/2) $baseline;
   border-width: 1px;
   border-style: solid;
-  line-height: 1.5em;
   text-align: center;
+  line-height: 1.5em;
 
   &:hover, &:active {
     @include box-shadow(0 2px 1px $shadow-l1);
@@ -174,12 +174,12 @@
 .btn-secondary {
   @extend .btn;
   @extend .btn-pill;
+  padding:($baseline/2) $baseline;
   border-width: 1px;
   border-style: solid;
-  padding:($baseline/2) $baseline;
   background: transparent;
-  line-height: 1.5em;
   text-align: center;
+  line-height: 1.5em;
 
   &:hover, &:active {
 

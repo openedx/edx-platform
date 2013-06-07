@@ -77,9 +77,8 @@ header.global {
 
       > a {
         @include background-image($button-bg-image);
+        @include box-sizing(border-box);
         @include border-radius(3px);
-        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-        @include inline-block;
         display: inline-block;
         margin: 1px 5px;
         padding: 10px 12px;
@@ -100,7 +99,8 @@ header.global {
         &:hover, &.active {
           background: $button-bg-hover-color;
         }
-        @include box-sizing(border-box);
+        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+        @include inline-block;
       }
     }
 
@@ -138,7 +138,6 @@ header.global {
         .avatar {
           @include background-image(url('../images/small-header-home-icon.png'));
           @include inline-block;
-          @include transition(all, 0.15s, linear);
           position: absolute;
           top: 4px;
           left: 8px;
@@ -147,6 +146,7 @@ header.global {
           height: 26px;
           background-repeat: no-repeat;
           opacity: 0.5;
+          @include transition(all, 0.15s, linear);
         }
 
         &:hover {

@@ -148,37 +148,37 @@
   @include transition(all 0.05s ease-in-out);
   position: fixed;
   top: 0;
-  background: $black-t0;
   width: 100%;
   height: 100%;
+  background: $black-t0;
   text-align: center;
 
   &:before {
-    content: '';
     display: inline-block;
-    height: 100%;
-    vertical-align: middle;
     margin-right: -0.25em; /* Adjusts for spacing */
+    height: 100%;
+    content: '';
+    vertical-align: middle;
   }
 
   .prompt {
     @include border-radius(($baseline/5));
     @include box-shadow(0 0 3px $shadow-d1);
     display: inline-block;
-    vertical-align: middle;
     width: $baseline*17.5;
     border: 4px solid $black;
+    vertical-align: middle;
     text-align: left;
 
     .copy {
-      border-top: 4px solid $blue;
       padding: $baseline;
+      border-top: 4px solid $blue;
     }
 
     .nav-actions {
       @include box-shadow(inset 0 1px 2px $shadow-d1);
-      border-top: 1px solid $black-t1;
       padding: ($baseline*0.75) $baseline;
+      border-top: 1px solid $black-t1;
       background: $gray-d4;
 
       .nav-item {
@@ -244,11 +244,10 @@
 .wrapper-notification {
   @extend .depth5;
   @include clearfix();
-  @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $blue);
   position: fixed;
   bottom: 0;
-  width: 100%;
   padding: $baseline ($baseline*2);
+  width: 100%;
 
   &.wrapper-notification-warning {
     @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $orange);
@@ -281,29 +280,29 @@
   // shorter/status notifications
   &.wrapper-notification-status {
     @include border-top-radius(3px);
-    width: ($baseline*8);
     right: ($baseline);
+    padding: ($baseline/2) $baseline;
+    width: ($baseline*8);
     border: 4px solid $black;
     border-bottom: none;
-    padding: ($baseline/2) $baseline;
 
     .notification {
       @include box-sizing(border-box);
       @include clearfix();
-      width: 100%;
-      max-width: none;
       min-width: none;
+      max-width: none;
+      width: 100%;
 
       [class^="icon"], .copy {
-        float: none;
         display: inline-block;
+        float: none;
         vertical-align: middle;
       }
 
       [class^="icon"] {
+        margin-right: ($baseline*0.75);
         width: $baseline;
         height: ($baseline*1.25);
-        margin-right: ($baseline*0.75);
         line-height: 3rem;
       }
 
@@ -316,22 +315,22 @@
   // help notifications
   &.wrapper-notification-help {
     @include border-top-radius(3px);
-    width: ($baseline*14);
     right: ($baseline);
+    padding: $baseline;
+    width: ($baseline*14);
     border: 4px solid $black;
     border-bottom: none;
-    padding: $baseline;
 
     .notification {
       @include box-sizing(border-box);
       @include clearfix();
-      width: 100%;
-      max-width: none;
       min-width: none;
+      max-width: none;
+      width: 100%;
 
       [class^="icon"] {
-        width: $baseline;
         margin-right: ($baseline*0.75);
+        width: $baseline;
       }
 
       .action-notification-close {
@@ -343,35 +342,36 @@
       }
     }
   }
+  @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $blue);
 }
 
 .notification {
   @include box-sizing(border-box);
   @include clearfix();
   margin: 0 auto;
-  width: flex-grid(12);
-  max-width: $fg-max-width;
   min-width: $fg-min-width;
+  max-width: $fg-max-width;
+  width: flex-grid(12);
 
   strong {
     font-weight: 700;
   }
 
   [class^="icon"], .copy {
-    float: left;
     display: inline-block;
+    float: left;
     vertical-align: middle;
   }
 
   [class^="icon"] {
     @include transition (color 0.5s ease-in-out);
     @include font-size(22);
-    width: flex-grid(1, 12);
-    height: ($baseline*1.25);
     margin-top: ($baseline/4);
     margin-right: flex-gutter();
-    text-align: right;
+    width: flex-grid(1, 12);
+    height: ($baseline*1.25);
     color: $white;
+    text-align: right;
   }
 
   .copy {
@@ -394,20 +394,20 @@
     }
 
     .copy {
-      width: flex-grid(7, 12);
       margin-right: flex-gutter();
+      width: flex-grid(7, 12);
     }
 
     .nav-actions {
-      width: flex-grid(4, 12);
       float: right;
       margin-top: ($baseline/4);
+      width: flex-grid(4, 12);
       text-align: right;
 
       .nav-item {
         display: inline-block;
-        vertical-align: middle;
         margin-right: ($baseline/2);
+        vertical-align: middle;
 
         &:last-child {
           margin-right: 0;
@@ -438,8 +438,8 @@
 
     [class^="icon"] {
       @include anim-rotateClockwise(3s, linear, infinite);
-      width: 25px;
       margin: -4px 10px 0 0;
+      width: 25px;
       @include transform-origin(52% 60%);
     }
 
@@ -455,16 +455,15 @@
 .wrapper-alert {
   @extend .depth2;
   @include box-sizing(border-box);
-  @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue);
   position: relative;
-  overflow: hidden;
-  width: 100%;
-  border-top: 1px solid $black;
-  padding: $baseline ($baseline*2) ($baseline*1.5) ($baseline*2);
-  background: $gray-d3;
 
   // needed since page load is very slow
   display: none;
+  overflow: hidden;
+  padding: $baseline ($baseline*2) ($baseline*1.5) ($baseline*2);
+  width: 100%;
+  border-top: 1px solid $black;
+  background: $gray-d3;
 
   // needed since page load is very slow
   &.is-shown {
@@ -510,6 +509,7 @@
       color: $pink;
     }
   }
+  @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue);
 }
 
 // adopted alerts
@@ -517,9 +517,9 @@
   @include box-sizing(border-box);
   @include clearfix();
   margin: 0 auto;
-  width: flex-grid(12);
-  max-width: $fg-max-width;
   min-width: $fg-min-width;
+  max-width: $fg-max-width;
+  width: flex-grid(12);
   color: $white;
 
   strong {
@@ -533,8 +533,8 @@
   [class^="icon"] {
     @include transition (color 0.5s ease-in-out);
     @include font-size(22);
-    width: flex-grid(1, 12);
     margin: ($baseline/4) flex-gutter() 0 0;
+    width: flex-grid(1, 12);
     text-align: right;
   }
 
@@ -556,25 +556,25 @@
       width: flex-grid(1, 12);
     }
 
-  	.copy {
-  		width: flex-grid(7, 12);
-  		margin-right: flex-gutter();
-  	}
+    .copy {
+      margin-right: flex-gutter();
+      width: flex-grid(7, 12);
+    }
 
-  	.nav-actions {
-  	  width: flex-grid(4, 12);
+    .nav-actions {
       float: right;
       margin-top: ($baseline/2);
-  	  text-align: right;
+      width: flex-grid(4, 12);
+      text-align: right;
 
-  	  .nav-item {
-  	    display: inline-block;
-  	    vertical-align: middle;
-  	    margin-right: ($baseline/2);
+      .nav-item {
+        display: inline-block;
+        margin-right: ($baseline/2);
+        vertical-align: middle;
 
-  	    &:last-child {
-  	      margin-right: 0;
-  	    }
+        &:last-child {
+          margin-right: 0;
+        }
 
         .action-primary {
           @extend .t-action4;
@@ -584,8 +584,8 @@
         .action-secondary {
           @extend .t-action4;
         }
-  	  }
-  	}
+      }
+    }
   }
 
   // with cancel
@@ -604,10 +604,10 @@
 
     [class^="icon"] {
       @include font-size(14);
-      color: $white;
-      width: auto;
       margin: 0;
       padding: 2px;
+      width: auto;
+      color: $white;
     }
 
     &:hover {
@@ -686,9 +686,9 @@ body.uxdesign.alerts {
 
   .content-primary {
     @extend .window;
-    width: flex-grid(12, 12);
     margin-right: flex-gutter();
     padding: $baseline ($baseline*1.5);
+    width: flex-grid(12, 12);
 
     > section {
       margin-bottom: ($baseline*2);
@@ -702,21 +702,21 @@ body.uxdesign.alerts {
 
       li {
         @include clearfix();
-        width: flex-grid(12, 12);
         margin-bottom: ($baseline/4);
-        border-bottom: 1px solid $gray-l4;
         padding-bottom: ($baseline/4);
+        width: flex-grid(12, 12);
+        border-bottom: 1px solid $gray-l4;
 
         &:last-child {
           margin-bottom: 0;
-          border-bottom: none;
           padding-bottom: 0;
+          border-bottom: none;
         }
 
         a {
           float: left;
-          width: flex-grid(5, 12);
           margin-right: flex-gutter();
+          width: flex-grid(5, 12);
         }
       }
     }
@@ -728,15 +728,15 @@ body.uxdesign.alerts {
 // artifact styles
 .main-wrapper {
   .alert {
-    padding: 15px 20px;
+    @include clearfix;
     margin-bottom: 30px;
-    border-radius: 3px;
+    padding: 15px 20px;
     border: 1px solid #edbd3c;
+    border-radius: 3px;
     border-radius: 3px;
     background: #fbf6e1;
     // background: #edbd3c;
     font-size: 14px;
-    @include clearfix;
 
     .alert-message {
       float: left;
@@ -759,38 +759,38 @@ body.uxdesign.alerts {
 }
 
 body.error {
-	background: $gray-d4;
-	color: $gray-d3;
+  background: $gray-d4;
+  color: $gray-d3;
 
-	.primary-header {
-		display: none;
-	}
+  .primary-header {
+    display: none;
+  }
 
-	.error-prompt {
-		width: 700px;
-		margin: 150px auto;
-		padding: 60px 50px 90px;
-		border-radius: 3px;
-		background: $white;
-		text-align: center;
-	}
+  .error-prompt {
+    margin: 150px auto;
+    padding: 60px 50px 90px;
+    width: 700px;
+    border-radius: 3px;
+    background: $white;
+    text-align: center;
+  }
 
-	h1 {
-		float: none;
-		margin: 0;
-		font-size: 60px;
-		font-weight: 300;
-		color: $gray-d3;
-	}
+  h1 {
+    float: none;
+    margin: 0;
+    color: $gray-d3;
+    font-weight: 300;
+    font-size: 60px;
+  }
 
-	.description {
-		margin-bottom: 50px;
-		font-size: 21px;
-	}
+  .description {
+    margin-bottom: 50px;
+    font-size: 21px;
+  }
 
-	.back-button {
-		@include blue-button;
-		padding: 14px 40px 18px;
-		font-size: 18px;
-	}
+  .back-button {
+    @include blue-button;
+    padding: 14px 40px 18px;
+    font-size: 18px;
+  }
 }

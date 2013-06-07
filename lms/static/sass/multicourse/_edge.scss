@@ -51,7 +51,6 @@ $paleYellow: #fffcf1;
 @mixin grey-button {
   @include button;
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
   border: 1px solid $darkGrey;
   border-radius: 3px;
   background-color: #d1dae3;
@@ -61,6 +60,7 @@ $paleYellow: #fffcf1;
     background-color: #d9e3ee;
     color: #6d788b;
   }
+  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
 }
 
 .edge-landing {  

@@ -32,8 +32,8 @@
 
     .course {
       @include border-radius(2px);
+      @include box-sizing(border-box);
       @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9));
-      @include transition(all, 0.15s, linear);
       position: relative;
       margin-bottom: 30px;
       width: 100%;
@@ -71,8 +71,8 @@
 
       .meta-info {
         @include border-right-radius(2px);
+        @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.15));
         @include clearfix;
-        @include transition(all, 0.15s, linear);
         position: absolute;
         right: -4px;
         bottom: 6px;
@@ -85,7 +85,7 @@
           font-style: italic;
           line-height: 1.2em;
         }
-        @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.15));
+        @include transition(all, 0.15s, linear);
       }
 
       .inner-wrapper {
@@ -251,7 +251,7 @@
           opacity: 0;
         }
       }
-      @include box-sizing(border-box);
+      @include transition(all, 0.15s, linear);
     }
   }
 

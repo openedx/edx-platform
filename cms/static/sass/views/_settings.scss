@@ -10,9 +10,9 @@ body.course.settings {
 
   .content-primary {
     @extend .window;
-    width: flex-grid(9, 12);
     margin-right: flex-gutter();
     padding: $baseline ($baseline*1.5);
+    width: flex-grid(9, 12);
   }
 
   // messages - should be synced up with global messages in the future
@@ -21,15 +21,15 @@ body.course.settings {
     font-size: 14px;
   }
 
-  .message-status { 
-    display: none;
+  .message-status {
     @include border-top-radius(2px);
-    @include box-sizing(border-box);
-    border-bottom: 2px solid $yellow;
+    @include box-sizing(border-box); 
+    display: none;
     margin: 0 0 20px 0;
     padding: 10px 20px;
-    font-weight: 500;
+    border-bottom: 2px solid $yellow;
     background: $paleYellow;
+    font-weight: 500;
 
     .text {
       display: inline-block;
@@ -60,18 +60,18 @@ body.course.settings {
       @include clearfix();
 
       .title-2 {
-        width: flex-grid(4, 9);
-        margin: 0 flex-gutter() 0 0;
         float: left;
+        margin: 0 flex-gutter() 0 0;
+        width: flex-grid(4, 9);
       }
 
       .tip {
         @extend .t-copy-sub2;
-        width: flex-grid(5, 9);
         float: right;
         margin-top: ($baseline/2);
-        text-align: right;
+        width: flex-grid(5, 9);
         color: $gray-l2;
+        text-align: right;
       }
     }
 
@@ -161,7 +161,6 @@ body.course.settings {
         input, textarea {
           @extend .t-copy-base;
           @include placeholder($gray-l4);
-          @include size(100%,100%);
           padding: ($baseline/2);
 
           &.long {
@@ -180,6 +179,7 @@ body.course.settings {
               color: $gray;
             }
           }
+          @include size(100%,100%);
         }
 
         textarea.long {
@@ -209,8 +209,8 @@ body.course.settings {
         .field-group {
           @include box-sizing(border-box);
           @include border-radius(3px);
-          background: $gray-l5;
           padding: $baseline;
+          background: $gray-l5;
 
           &:last-child {
             padding-bottom: $baseline;
@@ -219,8 +219,8 @@ body.course.settings {
           .actions {
             @include clearfix();
             margin-top: ($baseline/2);
-            border-top: 1px solid $gray-l4;
             padding-top: ($baseline/2);
+            border-top: 1px solid $gray-l4;
 
             .remove-item {
               float: right;
@@ -261,24 +261,24 @@ body.course.settings {
         input, textarea {
           @extend .t-copy-lead1;
           @include box-shadow(none);
+          margin: 0;
+          padding: 0;
           border: none;
           background: none;
-          padding: 0;
-          margin: 0;
           font-weight: 600;
         }
       }
 
       #field-course-organization {
         float: left;
-        width: flex-grid(2, 9);
         margin-right: flex-gutter();
+        width: flex-grid(2, 9);
       }
 
       #field-course-number {
         float: left;
-        width: flex-grid(2, 9);
         margin-right: flex-gutter();
+        width: flex-grid(2, 9);
       }
 
       #field-course-name {
@@ -291,8 +291,8 @@ body.course.settings {
         @include box-shadow(0 2px 1px $shadow-l1);
         @include border-radius(($baseline/5));
         margin-top: ($baseline*1.5);
-        border: 1px solid $gray-l2;
         padding: ($baseline/2) 0 0 0;
+        border: 1px solid $gray-l2;
 
         .title {
           @extend .t-copy-sub1;
@@ -319,8 +319,8 @@ body.course.settings {
 
         .list-actions {
           @include box-shadow(inset 0 1px 1px $shadow-l1);
-          border-top: 1px solid $gray-l2;
           padding:  ($baseline/2);
+          border-top: 1px solid $gray-l2;
           background: $gray-l5;
 
           .action-primary {
@@ -332,8 +332,8 @@ body.course.settings {
               @extend .t-icon;
               @include font-size(16);
               display: inline-block;
-              vertical-align: middle;
               margin-top: -3px;
+              vertical-align: middle;
             }
           }
         }
@@ -353,19 +353,19 @@ body.course.settings {
 
       .field-group {
         @include clearfix();
-        border-bottom: 1px solid $gray-l5;
         padding-bottom: ($baseline/2);
+        border-bottom: 1px solid $gray-l5;
 
         &:last-child {
-          border: none;
           padding-bottom: 0;
+          border: none;
         }
 
         .field {
           float: left;
-          width: flex-grid(3, 9);
-          margin-bottom: ($baseline/4);
           margin-right: flex-gutter();
+          margin-bottom: ($baseline/4);
+          width: flex-grid(3, 9);
         }
 
         .field.time {
@@ -399,14 +399,14 @@ body.course.settings {
       .input-existing {
         @include box-sizing(border-box);
         @include border-radius(3px);
-        background: $gray-l5;
         padding: ($baseline/2);
+        background: $gray-l5;
 
         .actions {
           @include clearfix();
           margin-top: ($baseline/2);
-          border-top: 1px solid $gray-l4;
           padding-top: ($baseline/2);
+          border-top: 1px solid $gray-l4;
 
           .remove-item {
             float: right;
@@ -416,8 +416,8 @@ body.course.settings {
 
       .actions {
         margin-top: ($baseline/2);
-        border-top: 1px solid $gray-l5;
         padding-top: ($baseline/2);
+        border-top: 1px solid $gray-l5;
       }
     }
 
@@ -441,31 +441,31 @@ body.course.settings {
       .new-grade-button {
         @include box-sizing(border-box);
         @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
-        @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-        width: flex-grid(1,9);
-        height: ($baseline*2);
         position: relative;
         display: inline-block;
-        vertical-align: middle;
         margin-right: flex-gutter();
-        border-radius: 20px;
+        width: flex-grid(1,9);
+        height: ($baseline*2);
         border: 1px solid $darkGrey;
+        border-radius: 20px;
         background-color: #d1dae3;
         color: #6d788b;
+        vertical-align: middle;
 
         .plus-icon {
           position: absolute;
           top: 50%;
           left: 50%;
-          margin-left: -6px;
           margin-top: -6px;
+          margin-left: -6px;
         }
+        @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
       }
 
       .grade-slider {
         @include box-sizing(border-box);
-        width: flex-grid(8,9);
         display: inline-block;
+        width: flex-grid(8,9);
         vertical-align: middle;
 
         .grade-bar {
@@ -480,10 +480,10 @@ body.course.settings {
             li {
               position: absolute;
               top: 52px;
-              width: 30px;
               margin-left: -15px;
-              font-size: 9px;
+              width: 30px;
               text-align: center;
+              font-size: 9px;
 
               &.increment-0 {
                 left: 0;
@@ -539,11 +539,11 @@ body.course.settings {
             position: relative;
 
             li {
+              @include border-radius(2px);
               position: absolute;
               top: 0;
               height: 50px;
               text-align: right;
-              @include border-radius(2px);
 
               &:hover,
               &.is-dragging {
@@ -557,10 +557,10 @@ body.course.settings {
               }
 
               .remove-button {
-                display: none;
                 position: absolute;
                 top: -17px;
                 right: 1px;
+                display: none;
                 height: 17px;
                 font-size: 10px;
               }
@@ -589,8 +589,8 @@ body.course.settings {
               .letter-grade {
                 display: block;
                 margin: 10px 15px 0 0;
-                font-size: 16px;
                 font-weight: 700;
+                font-size: 16px;
                 line-height: 14px;
               }
 
@@ -602,21 +602,21 @@ body.course.settings {
               }
 
               .drag-bar {
+                @include box-shadow(-1px 0 3px rgba(0,0,0,0.1));
                 position: absolute;
                 top: 0;
                 right: -1px;
-                height: 50px;
                 width: 2px;
+                height: 50px;
                 background-color: #fff;
-                @include box-shadow(-1px 0 3px rgba(0,0,0,0.1));
 
                 cursor: ew-resize;
-                @include transition(none);
 
                 &:hover {
-                  width: 6px;
                   right: -2px;
+                  width: 6px;
                 }
+                @include transition(none);
               }
             }
           }
@@ -643,22 +643,22 @@ body.course.settings {
 
       .field-group {
         @include clearfix();
-        width: flex-grid(9, 9);
         margin-bottom: ($baseline*1.5);
-        border-bottom: 1px solid $gray-l5;
         padding-bottom: ($baseline*1.5);
+        width: flex-grid(9, 9);
+        border-bottom: 1px solid $gray-l5;
 
         &:last-child {
-          border: none;
           padding-bottom: 0;
+          border: none;
         }
 
         .field {
           display: inline-block;
-          vertical-align: top;
-          width: flex-grid(3, 6);
-          margin-bottom: ($baseline/2);
           margin-right: flex-gutter();
+          margin-bottom: ($baseline/2);
+          width: flex-grid(3, 6);
+          vertical-align: top;
         }
 
         #field-course-grading-assignment-shortname,
@@ -686,8 +686,8 @@ body.course.settings {
         margin-bottom: ($baseline*1.5);
 
         &:last-child {
-          border: none;
           padding-bottom: 0;
+          border: none;
         }
       }
 
@@ -703,9 +703,9 @@ body.course.settings {
 
           .tip {
             @include transition (opacity 0.5s ease-in-out 0s);
-            opacity: 0.0;
             position: absolute;
             bottom: ($baseline*1.25);
+            opacity: 0.0;
           }
 
           input:focus {
@@ -729,8 +729,8 @@ body.course.settings {
         }
 
        .key {
-         width: flex-grid(3, 9);
          margin-right: flex-gutter();
+         width: flex-grid(3, 9);
         }
 
         .value {
@@ -756,15 +756,13 @@ body.course.settings {
       .CodeMirror {
         @extend .t-copy-base;
         @include box-sizing(border-box);
-        @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
-        @include linear-gradient($lightGrey, tint($lightGrey, 90%));
         padding: 5px 8px;
+        outline: 0;
         border: 1px solid $mediumGrey;
         border-radius: 2px;
         background-color: $lightGrey;
-        font-family: 'Open Sans', sans-serif;
         color: $baseFontColor;
-        outline: 0;
+        font-family: 'Open Sans', sans-serif;
 
         &.CodeMirror-focused {
           @include linear-gradient($paleYellow, tint($paleYellow, 90%));
@@ -773,9 +771,9 @@ body.course.settings {
 
         .CodeMirror-scroll {
           overflow: hidden;
-          height: auto;
           min-height: ($baseline*1.5);
           max-height: ($baseline*10);
+          height: auto;
         }
 
         // editor color changes just for JSON
@@ -789,6 +787,8 @@ body.course.settings {
             line-height: 2.0rem;
           }
         }
+        @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+        @include linear-gradient($lightGrey, tint($lightGrey, 90%));
       }
     }
   }

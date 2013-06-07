@@ -121,8 +121,8 @@
             font-weight: 700;
           }
         }
-        //@include border-bottom-radius(4px);
         @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
+        //@include border-bottom-radius(4px)
       }
     }
 
@@ -247,9 +247,8 @@
 
       a {
         @include background-image($button-bg-image);
+        @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
         @include border-radius(4px);
-        @include box-sizing(border-box);
-        @include inline-block;
         margin-left: 5px;
         padding: 5px 10px;
         border: 1px solid $border-color-2;
@@ -264,7 +263,8 @@
           color: $link-color;
           text-decoration: none;
         }
-        @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
+        @include box-sizing(border-box);
+        @include inline-block;
       }
     }
 
