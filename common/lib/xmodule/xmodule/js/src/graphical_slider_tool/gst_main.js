@@ -51,6 +51,8 @@ define(
         // state object.
         state = State(gstId, config);
 
+        state.showDebugInfo = false;
+
         // It is possible that something goes wrong while extracting parameters
         // from the JSON config object. In this case, we will not continue.
         if (state === undefined) {
