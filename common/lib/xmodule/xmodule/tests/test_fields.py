@@ -2,7 +2,7 @@
 import datetime
 import unittest
 from django.utils.timezone import UTC
-from xmodule.fields import Date
+from xmodule.fields import Date, Timedelta
 import time
 
 class DateTest(unittest.TestCase):
@@ -92,4 +92,41 @@ class DateTest(unittest.TestCase):
         self.assertEqual(
             '2012-12-31T23:59:59Z',
             DateTest.date.deserialize('"2012-12-31T23:59:59Z"'),
+        )
+
+
+class TimedeltaTest(unittest.TestCase):
+    delta = Timedelta()
+
+    def test_from_json(self):
+        self.assertEqual(
+            TimedeltaTest.delta.from_json('1 day 12 hours 59 minutes 59 seconds'),
+            datetime.timedelta(days=1, hours=12, minutes=59, seconds=59)
+        )
+
+        self.assertEqual(
+            TimedeltaTest.delta.from_json('1 day 46799 seconds'),
+            datetime.timedelta(days=1, seconds=46799)
+        )
+
+    def test_to_json(self):
+        self.assertEqual(
+            '1 days 46799 seconds',
+            TimedeltaTest.delta.to_json(datetime.timedelta(days=1, hours=12, minutes=59, seconds=59))
+        )
+
+    def test_serialize(self):
+        self.assertEqual(
+            TimedeltaTest.delta.serialize('1 day 12 hours 59 minutes 59 seconds'),
+            '"1 day 12 hours 59 minutes 59 seconds"'
+        )
+
+    def test_deserialize(self):
+        self.assertEqual(
+            '1 day 12 hours 59 minutes 59 seconds',
+            TimedeltaTest.delta.deserialize('1 day 12 hours 59 minutes 59 seconds')
+        )
+        self.assertEqual(
+            '1 day 12 hours 59 minutes 59 seconds',
+            TimedeltaTest.delta.deserialize('"1 day 12 hours 59 minutes 59 seconds"')
         )

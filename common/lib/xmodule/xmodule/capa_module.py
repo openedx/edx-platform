@@ -782,7 +782,7 @@ class CapaModule(CapaFields, XModule):
                 return {'success': msg}
             raise
 
-        self.attempts += 1
+        self.attempts = self.attempts + 1
         self.lcp.done = True
 
         self.set_state_from_lcp()
