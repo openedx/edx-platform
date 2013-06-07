@@ -18,8 +18,8 @@ from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Object
-from .fields import Timedelta, Date, StringyInteger, StringyFloat
+from xblock.core import Scope, String, Boolean, Object, Integer, Float
+from .fields import Timedelta, Date
 from xmodule.util.date_utils import time_to_datetime
 
 log = logging.getLogger("mitx.courseware")
@@ -65,8 +65,8 @@ class ComplexEncoder(json.JSONEncoder):
 
 
 class CapaFields(object):
-    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
-    max_attempts = StringyInteger(
+    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
+    max_attempts = Integer(
         display_name="Maximum Attempts",
         help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
         values={"min": 1}, scope=Scope.settings
@@ -99,8 +99,8 @@ class CapaFields(object):
     input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
-    seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
-    weight = StringyFloat(
+    seed = Integer(help="Random seed for this student", scope=Scope.user_state)
+    weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point.",
         values={"min": 0, "step": .1},
@@ -315,7 +315,7 @@ class CapaModule(CapaFields, XModule):
         # If the user has forced the save button to display,
         # then show it as long as the problem is not closed
         # (past due / too many attempts)
-        if self.force_save_button == "true":
+        if self.force_save_button:
             return not self.closed()
         else:
             is_survey_question = (self.max_attempts == 0)
@@ -782,7 +782,7 @@ class CapaModule(CapaFields, XModule):
                 return {'success': msg}
             raise
 
-        self.attempts = self.attempts + 1
+        self.attempts += 1
         self.lcp.done = True
 
         self.set_state_from_lcp()

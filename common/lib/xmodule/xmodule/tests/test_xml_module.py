@@ -2,8 +2,8 @@
 #pylint: disable=C0111
 
 from xmodule.x_module import XModuleFields
-from xblock.core import Scope, String, Object, Boolean
-from xmodule.fields import Date, StringyInteger, StringyFloat
+from xblock.core import Scope, String, Object, Boolean, Integer, Float
+from xmodule.fields import Date
 from xmodule.xml_module import XmlDescriptor
 import unittest
 from .import test_system
@@ -17,7 +17,7 @@ class CrazyJsonString(String):
 
 class TestFields(object):
     # Will be returned by editable_metadata_fields.
-    max_attempts = StringyInteger(scope=Scope.settings, default=1000, values={'min': 1, 'max': 10})
+    max_attempts = Integer(scope=Scope.settings, default=1000, values={'min': 1, 'max': 10})
     # Will not be returned by editable_metadata_fields because filtered out by non_editable_metadata_fields.
     due = Date(scope=Scope.settings)
     # Will not be returned by editable_metadata_fields because is not Scope.settings.
@@ -33,9 +33,9 @@ class TestFields(object):
                 {'display_name': 'second', 'value': 'value b'}]
     )
     # Used for testing select type
-    float_select = StringyFloat(scope=Scope.settings, default=.999, values=[1.23, 0.98])
+    float_select = Float(scope=Scope.settings, default=.999, values=[1.23, 0.98])
     # Used for testing float type
-    float_non_select = StringyFloat(scope=Scope.settings, default=.999, values={'min': 0, 'step': .3})
+    float_non_select = Float(scope=Scope.settings, default=.999, values={'min': 0, 'step': .3})
     # Used for testing that Booleans get mapped to select type
     boolean_select = Boolean(scope=Scope.settings)
 

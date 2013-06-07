@@ -120,25 +120,15 @@ class XmlDescriptor(XModuleDescriptor):
 
     metadata_to_export_to_policy = ('discussion_topics')
 
-    # A dictionary mapping xml attribute names AttrMaps that describe how
-    # to import and export them
-    # Allow json to specify either the string "true", or the bool True.  The string is preferred.
-    to_bool = lambda val: val == 'true' or val == True
-    from_bool = lambda val: str(val).lower()
-    bool_map = AttrMap(to_bool, from_bool)
+    @classmethod
+    def get_map_for_field(cls, attr):
+        for field in set(cls.fields + cls.lms.fields):
+            if field.name == attr:
+                from_xml = lambda val: field.deserialize(val)
+                to_xml = lambda val : field.serialize(val)
+                return AttrMap(from_xml, to_xml)
 
-    to_int = lambda val: int(val)
-    from_int = lambda val: str(val)
-    int_map = AttrMap(to_int, from_int)
-    xml_attribute_map = {
-        # type conversion: want True/False in python, "true"/"false" in xml
-        'graded': bool_map,
-        'hide_progress_tab': bool_map,
-        'allow_anonymous': bool_map,
-        'allow_anonymous_to_peers': bool_map,
-        'show_timezone': bool_map,
-    }
-
+        return AttrMap()
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -187,7 +177,6 @@ class XmlDescriptor(XModuleDescriptor):
             msg = 'Unable to load file contents at path %s for item %s: %s ' % (
                 filepath, location.url(), str(err))
             raise Exception, msg, sys.exc_info()[2]
-
 
     @classmethod
     def load_definition(cls, xml_object, system, location):
@@ -246,7 +235,7 @@ class XmlDescriptor(XModuleDescriptor):
                     # don't load these
                     continue
 
-                attr_map = cls.xml_attribute_map.get(attr, AttrMap())
+                attr_map = cls.get_map_for_field(attr)
                 metadata[attr] = attr_map.from_xml(val)
         return metadata
 
@@ -258,7 +247,7 @@ class XmlDescriptor(XModuleDescriptor):
         through the attrmap.  Updates the metadata dict in place.
         """
         for attr in policy:
-            attr_map = cls.xml_attribute_map.get(attr, AttrMap())
+            attr_map = cls.get_map_for_field(attr)
             metadata[cls._translate(attr)] = attr_map.from_xml(policy[attr])
 
     @classmethod
@@ -347,7 +336,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     def export_to_xml(self, resource_fs):
         """
-        Returns an xml string representign this module, and all modules
+        Returns an xml string representing this module, and all modules
         underneath it.  May also write required resources out to resource_fs
 
         Assumes that modules have single parentage (that no module appears twice
@@ -372,7 +361,7 @@ class XmlDescriptor(XModuleDescriptor):
             """Get the value for this attribute that we want to store.
             (Possible format conversion through an AttrMap).
              """
-            attr_map = self.xml_attribute_map.get(attr, AttrMap())
+            attr_map = self.get_map_for_field(attr)
             return attr_map.to_xml(self._model_data[attr])
 
         # Add the non-inherited metadata

@@ -2,7 +2,7 @@
 import datetime
 import unittest
 from django.utils.timezone import UTC
-from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
+from xmodule.fields import Date
 import time
 
 class DateTest(unittest.TestCase):
@@ -77,56 +77,4 @@ class DateTest(unittest.TestCase):
             DateTest.date.to_json(
                 DateTest.date.from_json("2012-12-31T23:00:01-01:00")),
             "2013-01-01T00:00:01Z")
-
-
-class StringyIntegerTest(unittest.TestCase):
-    def assertEquals(self, expected, arg):
-        self.assertEqual(expected, StringyInteger().from_json(arg))
-
-    def test_integer(self):
-        self.assertEquals(5, '5')
-        self.assertEquals(0, '0')
-        self.assertEquals(-1023, '-1023')
-
-    def test_none(self):
-        self.assertEquals(None, None)
-        self.assertEquals(None, 'abc')
-        self.assertEquals(None, '[1]')
-        self.assertEquals(None, '1.023')
-
-
-class StringyFloatTest(unittest.TestCase):
-
-    def assertEquals(self, expected, arg):
-        self.assertEqual(expected, StringyFloat().from_json(arg))
-
-    def test_float(self):
-        self.assertEquals(.23, '.23')
-        self.assertEquals(5, '5')
-        self.assertEquals(0, '0.0')
-        self.assertEquals(-1023.22, '-1023.22')
-
-    def test_none(self):
-        self.assertEquals(None, None)
-        self.assertEquals(None, 'abc')
-        self.assertEquals(None, '[1]')
-
-
-class StringyBooleanTest(unittest.TestCase):
-
-    def assertEquals(self, expected, arg):
-        self.assertEqual(expected, StringyBoolean().from_json(arg))
-
-    def test_false(self):
-        self.assertEquals(False, "false")
-        self.assertEquals(False, "False")
-        self.assertEquals(False, "")
-        self.assertEquals(False, "hahahahah")
-
-    def test_true(self):
-        self.assertEquals(True, "true")
-        self.assertEquals(True, "TruE")
-
-    def test_pass_through(self):
-        self.assertEquals(123, 123)
 

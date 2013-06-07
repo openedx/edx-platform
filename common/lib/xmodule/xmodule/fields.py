@@ -7,8 +7,6 @@ from xblock.core import ModelType
 import datetime
 import dateutil.parser
 
-from xblock.core import Integer, Float, Boolean
-
 log = logging.getLogger(__name__)
 
 
@@ -83,42 +81,3 @@ class Timedelta(ModelType):
             if cur_value > 0:
                 values.append("%d %s" % (cur_value, attr))
         return ' '.join(values)
-
-
-class StringyInteger(Integer):
-    """
-    A model type that converts from strings to integers when reading from json.
-    If value does not parse as an int, returns None.
-    """
-    def from_json(self, value):
-        try:
-            return int(value)
-        except:
-            return None
-
-
-class StringyFloat(Float):
-    """
-    A model type that converts from string to floats when reading from json.
-    If value does not parse as a float, returns None.
-    """
-    def from_json(self, value):
-        try:
-            return float(value)
-        except:
-            return None
-
-
-class StringyBoolean(Boolean):
-    """
-    Reads strings from JSON as booleans.
-
-    If the string is 'true' (case insensitive), then return True,
-    otherwise False.
-
-    JSON values that aren't strings are returned as-is.
-    """
-    def from_json(self, value):
-        if isinstance(value, basestring):
-            return value.lower() == 'true'
-        return value
