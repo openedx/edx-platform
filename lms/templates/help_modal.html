@@ -64,7 +64,7 @@ discussion_link = get_discussion_link(course) if course else None
       <label data-field="details">Tell us the details*
 <span class="tip">Include error messages, steps which lead to the issue, etc</span></label>
       <textarea name="details"></textarea>
-      <input name="tag" type="hidden">
+      <input name="issue_type" type="hidden">
       <div class="submit">
         <input name="submit" type="submit" value="Submit">
       </div>
@@ -114,9 +114,9 @@ discussion_link = get_discussion_link(course) if course else None
         $("#feedback_success_wrapper").css("display", "none");
         $("#help_wrapper").css("display", "block");
     });
-    showFeedback = function(e, tag, title) {
+    showFeedback = function(e, issue_type, title) {
         $("#help_wrapper").css("display", "none");
-        $("#feedback_form input[name='tag']").val(tag);
+        $("#feedback_form input[name='issue_type']").val(issue_type);
         $("#feedback_form_wrapper").css("display", "block");
         $("#feedback_form_wrapper header").html("<h2>" + title + "</h2><hr>");
         e.preventDefault();
