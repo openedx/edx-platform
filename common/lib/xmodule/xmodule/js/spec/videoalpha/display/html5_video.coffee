@@ -52,7 +52,7 @@ describe 'VideoAlpha HTML5Video', ->
     it 'check if click event is handled on the player', ->
         expect(@videoEl).toHandle 'click'
 
-  describe 'events:', ->
+  xdescribe 'events:', ->
 
     beforeEach ->
       spyOn(@player, 'callStateChangeCallback').andCallThrough()
@@ -201,7 +201,7 @@ describe 'VideoAlpha HTML5Video', ->
           jasmine.fireEvent @videoEl, "timeupdate"
           expect(@player.end).toBe @videoEl.duration
 
-  describe 'methods:', ->
+  xdescribe 'methods:', ->
 
     beforeEach ->
       waitsFor ( ->
