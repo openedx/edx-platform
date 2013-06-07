@@ -5,7 +5,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="title"><title>Log into your edX Account</title></%block>
+<%block name="title"><title>Log into your ${settings.PLATFORM_NAME} Account</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -66,7 +66,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Log into My edX Account <span class="orn-plus">+</span> Access My Courses');
+          html('Log into My ${settings.PLATFORM_NAME} Account <span class="orn-plus">+</span> Access My Courses');
       }
       else {
         $submitButton.
@@ -86,15 +86,11 @@
 
 <section class="login container">
   <section role="main" class="content">
-    <header>
-      <h2 class="sr">${_("Login Form")}</h2>
-    </header>
-
     <form role="form" id="login-form" method="post" data-remote="true" action="/login_ajax">
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">We're Sorry, edX accounts are unavailable currently</h3>
+        <h3 class="message-title">We're Sorry, ${settings.PLATFORM_NAME} accounts are unavailable currently</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
@@ -106,7 +102,7 @@
       </div>
 
       <p class="instructions sr">
-        Please provide the following information to log into your edX account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
+        Please provide the following information to log into your ${settings.PLATFORM_NAME} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
@@ -164,14 +160,16 @@
 
     <div class="cta cta-help">
       <h3>Not Enrolled?</h3>
-      <p><a href="${reverse('register_user')}">Sign up for edX today!</a></p>
+      <p><a href="${reverse('register_user')}">Sign up for ${settings.PLATFORM_NAME} today!</a></p>
 
-      <h3>Need Help?</h3>
-      <p>Looking for help in logging in or with your edX account?
-      <a href="${marketing_link('FAQ')}">
-          View our help section for answers to commonly asked questions.
-      </a></p>
-
+      ## Disable help unless the FAQ marketing link is enabled
+      % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
+        <h3>Need Help?</h3>
+        <p>Looking for help in logging in or with your ${settings.PLATFORM_NAME} account?
+        <a href="${marketing_link('FAQ')}">
+            View our help section for answers to commonly asked questions.
+        </a></p>
+      % endif
     </div>
   </aside>
   </section>

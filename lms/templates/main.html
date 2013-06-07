@@ -1,9 +1,28 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
+
+## Define a couple of helper functions to make life easier when
+## embedding theme conditionals into templates. All inheriting
+## templates have access to these functions, and we can import these
+## into non-inheriting templates via the %namespace tag.
+<%def name="theme_enabled()">
+  <% return settings.MITX_FEATURES["USE_CUSTOM_THEME"] %>
+</%def>
+
+<%def name="stanford_theme_enabled()">
+  <% return theme_enabled() and getattr(settings, "THEME_NAME") == "stanford" %>
+</%def>
+
 <!DOCTYPE html>
 <html>
 <head>
-  <%block name="title"><title>edX</title></%block>
+  <%block name="title">
+    % if stanford_theme_enabled():
+      <title>Home | class.stanford.edu</title>
+    % else:
+      <title>edX</title>
+    % endif
+  </%block>
   <script type="text/javascript">
   /* immediately break out of an iframe if coming
      from the marketing website */
@@ -14,12 +33,15 @@
   })(this);
   </script>
 
-  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
+  <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
 
   <%static:css group='application'/>
 
   <%static:js group='main_vendor'/>
   <%block name="headextra"/>
+  % if theme_enabled():
+    <%include file="theme-head-extra.html" />
+  % endif
 
   <!--[if lt IE 9]>
   <script src="${static.url('js/html5shiv.js')}"></script>
@@ -32,14 +54,22 @@
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   % if not course:
-  <%include file="google_analytics.html" />
+    % if theme_enabled():
+      <%include file="theme-google-analytics.html" />
+    % else:
+      <%include file="google_analytics.html" />
+    % endif
   % endif
+
+  <%include file="widgets/segment-io.html" />
 
 </head>
 
 <body class="<%block name='bodyclass'/>">
 
-% if not suppress_toplevel_navigation:
+% if theme_enabled():
+  <%include file="theme-header.html" />
+% elif not suppress_toplevel_navigation:
   <%include file="navigation.html" />
 % endif
 
@@ -48,7 +78,9 @@
     <%block name="bodyextra"/>
   </section>
 
-% if not suppress_toplevel_navigation:
+% if theme_enabled():
+  <%include file="theme-footer.html" />
+% elif not suppress_toplevel_navigation:
   <%include file="footer.html" />
 % endif
 

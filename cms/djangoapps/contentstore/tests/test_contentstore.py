@@ -486,6 +486,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check for custom_tags
         self.verify_content_existence(module_store, root_dir, location, 'custom_tags', 'custom_tag_template')
 
+        # check for about content
+        self.verify_content_existence(module_store, root_dir, location, 'about', 'about', '.html')
+
         # check for graiding_policy.json
         filesystem = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
         self.assertTrue(filesystem.exists('grading_policy.json'))

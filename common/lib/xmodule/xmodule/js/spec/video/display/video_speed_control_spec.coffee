@@ -1,6 +1,6 @@
-# TODO: figure out why failing
-xdescribe 'VideoSpeedControl', ->
+describe 'VideoSpeedControl', ->
   beforeEach ->
+    window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn false
     jasmine.stubVideoPlayer @
     $('.speeds').remove()
 
@@ -10,22 +10,23 @@ xdescribe 'VideoSpeedControl', ->
         @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
       it 'add the video speed control to player', ->
-        expect($('.secondary-controls').html()).toContain '''
-          <div class="speeds">
-            <a href="#">
-              <h3>Speed</h3>
-              <p class="active">1.0x</p>
-            </a>
-            <ol class="video_speeds"><li data-speed="1.0" class="active"><a href="#">1.0x</a></li><li data-speed="0.75"><a href="#">0.75x</a></li></ol>
-          </div>
-        '''
+        secondaryControls = $('.secondary-controls')
+        li = secondaryControls.find('.video_speeds li')
+        expect(secondaryControls).toContain '.speeds'
+        expect(secondaryControls).toContain '.video_speeds'
+        expect(secondaryControls.find('p.active').text()).toBe '1.0x'
+        expect(li.filter('.active')).toHaveData 'speed', @speedControl.currentSpeed
+        expect(li.length).toBe @speedControl.speeds.length
+        $.each li.toArray().reverse(), (index, link) =>
+          expect($(link)).toHaveData 'speed', @speedControl.speeds[index]
+          expect($(link).find('a').text()).toBe @speedControl.speeds[index] + 'x'
 
       it 'bind to change video speed link', ->
         expect($('.video_speeds a')).toHandleWith 'click', @speedControl.changeVideoSpeed
 
     describe 'when running on touch based device', ->
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn true
+        window.onTouchBasedDevice.andReturn true
         $('.speeds').removeClass 'open'
         @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 
@@ -37,7 +38,6 @@ xdescribe 'VideoSpeedControl', ->
 
     describe 'when running on non-touch based device', ->
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn false
         $('.speeds').removeClass 'open'
         @speedControl = new VideoSpeedControl el: $('.secondary-controls'), speeds: @video.speeds, currentSpeed: '1.0'
 

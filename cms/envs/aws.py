@@ -91,11 +91,19 @@ CACHES = ENV_TOKENS['CACHES']
 
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 
+# allow for environments to specify what cookie name our login subsystem should use
+# this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
+# happen with some browsers (e.g. Firefox)
+if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
+    # NOTE, there's a bug in Django (http://bugs.python.org/issue18012) which necessitates this being a str()
+    SESSION_COOKIE_NAME = str(ENV_TOKENS.get('SESSION_COOKIE_NAME'))
+
 #Email overrides
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)
 ADMINS = ENV_TOKENS.get('ADMINS', ADMINS)
 SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
+MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)

@@ -11,7 +11,7 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>Register for edX</title></%block>
+<%block name="title"><title>Register for ${settings.PLATFORM_NAME}</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -69,7 +69,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Create my edX Account');
+          html('Create my ${settings.PLATFORM_NAME} Account');
       }
       else {
         $submitButton.
@@ -83,21 +83,17 @@
 
 <section class="introduction">
   <header>
-    <h1 class="sr">${_("Register for edX")}</h1>
+    <h1 class="sr">${_("Welcome! Register below to create your %(platform_name)s account") % {'platform_name': settings.PLATFORM_NAME}}</h1>
   </header>
 </section>
 
 <section class="register container">
   <section role="main" class="content">
-    <header>
-      <h2 class="sr">${_("Welcome! Register below to create your edX account")}</h2>
-    </header>
-
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account">
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">We're sorry, edX enrollment is not available in your region</h3>
+        <h3 class="message-title">We're sorry, ${settings.PLATFORM_NAME} enrollment is not available in your region</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
@@ -107,7 +103,7 @@
       </div>
 
       <p class="instructions">
-        Please complete the following fields to register for an edX account. <br />
+        Please complete the following fields to register for an account. <br />
         Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
       </p>
 
@@ -203,7 +199,7 @@
           </li>
 
           <li class="field text" id="field-goals">
-            <label for="goals">Please share with us your reasons for registering with edX</label>
+            <label for="goals">Please share with us your reasons for registering with ${settings.PLATFORM_NAME}</label>
             <textarea id="goals" name="goals" value=""></textarea>
           </li>
         </ol>
@@ -221,7 +217,14 @@
 
             <div class="field required checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
-              <label for="honorcode-yes">I agree to the <a href="${marketing_link('HONOR')}" class="new-vp">Honor Code</a></label>
+              <%
+                ## TODO: provide a better way to override these links
+                if self.stanford_theme_enabled():
+                  honor_code_path = marketing_link('TOS') + "#honor"
+                else:
+                  honor_code_path = marketing_link('HONOR')
+              %>
+              <label for="honorcode-yes">I agree to the <a href="${honor_code_path}" class="new-vp">Honor Code</a></label>
             </div>
           </li>
         </ol>
@@ -252,23 +255,33 @@
       </p>
     </div>
 
-    <div class="cta cta-welcome">
-      <h3>Welcome to edX</h3>
-      <p>Registering with edX gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list – we will update you as courses are added.</p>
-    </div>
+    ## TODO: Use a %block tag or something to allow themes to
+    ##       override in a more generalizable fashion.
+    % if not self.stanford_theme_enabled():
+      <div class="cta cta-welcome">
+        <h3>Welcome to ${settings.PLATFORM_NAME}</h3>
+        <p>Registering with ${settings.PLATFORM_NAME} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list – we will update you as courses are added.</p>
+      </div>
+    % endif
 
     <div class="cta cta-nextsteps">
       <h3>Next Steps</h3>
-      <p>As part of joining edX, you will receive an activation email.  You must click on the activation link to complete the process.  Don’t see the email?  Check your spam folder and mark edX emails as ‘not spam’.  At edX, we communicate mostly through email.</p>
+      % if self.stanford_theme_enabled():
+        <p>You will receive an activation email.  You must click on the activation link to complete the process.  Don’t see the email?  Check your spam folder and mark emails from class.stanford.edu as ‘not spam’, since you'll want to be able to receive email from your courses.</p>
+      % else:
+      <p>As part of joining ${settings.PLATFORM_NAME}, you will receive an activation email.  You must click on the activation link to complete the process.  Don’t see the email?  Check your spam folder and mark ${settings.PLATFORM_NAME} emails as ‘not spam’.  At ${settings.PLATFORM_NAME}, we communicate mostly through email.</p>
+      % endif
     </div>
 
-    <div class="cta cta-help">
-      <h3>Need Help?</h3>
-      <p>Need help in registering with edX?
-        <a href="${marketing_link('FAQ')}">
-            View our FAQs for answers to commonly asked questions.
-        </a>
-        Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.</p>
-    </div>
+    % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
+      <div class="cta cta-help">
+        <h3>Need Help?</h3>
+        <p>Need help in registering with ${settings.PLATFORM_NAME}?
+          <a href="${marketing_link('FAQ')}">
+              View our FAQs for answers to commonly asked questions.
+          </a>
+          Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.</p>
+      </div>
+    % endif
   </aside>
 </section>

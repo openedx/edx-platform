@@ -141,21 +141,36 @@ Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you i
 
 ### Running Javascript Unit Tests
 
-These commands start a development server with jasmine testing enabled, and launch your default browser
-pointing to those tests
+To run all of the javascript unit tests, use
 
-    rake browse_jasmine_{lms,cms}
+    rake jasmine
 
-To run the tests headless, you must install [phantomjs](http://phantomjs.org/download.html), then run:
+If the `phantomjs` binary is on the path, or the `PHANTOMJS_PATH` environment variable is
+set to point to it, then the tests will be run headless. Otherwise, they will be run in
+your default browser
 
-    rake phantomjs_jasmine_{lms,cms}
+    export PATH=/path/to/phantomjs:$PATH
+    rake jasmine  # Runs headless
 
-If the `phantomjs` binary is not on the path, set the `PHANTOMJS_PATH` environment variable to point to it
+or
 
-    PHANTOMJS_PATH=/path/to/phantomjs rake phantomjs_jasmine_{lms,cms}
+    PHANTOMJS_PATH=/path/to/phantomjs rake jasmine  # Runs headless
 
-Once you have run the `rake` command, your browser should open to
-to `http://localhost/_jasmine/`, which displays the test results.
+or
+
+    rake jasmine  # Runs in browser
+
+You can also force a run using phantomjs or the browser using the commands
+
+    rake jasmine:browser  # Runs in browser
+    rake jasmine:phantomjs  # Runs headless
+
+You can run tests for a specific subsystems as well
+
+    rake jasmine:lms  # Runs all lms javascript unit tests using the default method
+    rake jasmine:cms:browser  # Runs all cms javascript unit tests in the browser
+
+Use `rake -T` to get a list of all available subsystems
 
 **Troubleshooting**: If you get an error message while running the `rake` task,
 try running `bundle install` to install the required ruby gems.
@@ -202,9 +217,10 @@ To view test coverage:
 
 2. Generate reports:
 
-        rake coverage:html
+        rake coverage
 
-3. HTML reports are located in the `reports` folder.
+3. Reports are located in the `reports` folder.  The command
+generates HTML and XML (Cobertura format) reports.
 
 
 ## Testing using queue servers

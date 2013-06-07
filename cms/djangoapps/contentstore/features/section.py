@@ -69,8 +69,8 @@ def i_see_complete_section_name_with_quote_in_editor(step):
 
 @step('the section does not exist$')
 def section_does_not_exist(step):
-    css = 'span.section-name-span'
-    assert world.browser.is_element_not_present_by_css(css)
+    css = 'h3[data-name="My Section"]'
+    assert world.is_css_not_present(css)
 
 
 @step('I see a release date for my section$')
