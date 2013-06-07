@@ -175,7 +175,7 @@ def submit_feedback(request):
     subject = request.POST["subject"]
     details = request.POST["details"]
     tags = dict(
-        [(tag, request.POST[tag]) for tag in ["issue_type"] if tag in request.POST]
+        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
     )
 
     if request.user.is_authenticated():

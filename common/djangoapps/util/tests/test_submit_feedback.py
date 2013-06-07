@@ -27,15 +27,16 @@ class SubmitFeedbackTest(TestCase):
             username="test",
             profile__name="Test User"
         )
-        # This contains an issue_type to ensure that tags are submitted correctly
+        # This contains issue_type and course_id to ensure that tags are submitted correctly
         self._anon_fields = {
             "email": "test@edx.org",
             "name": "Test User",
             "subject": "a subject",
             "details": "some details",
-            "issue_type": "test_issue"
+            "issue_type": "test_issue",
+            "course_id": "test_course"
         }
-        # This does not contain an issue_type to ensure that it is optional
+        # This does not contain issue_type nor course_id to ensure that they are optional
         self._auth_fields = {"subject": "a subject", "details": "some details"}
 
     def _build_and_run_request(self, user, fields):
@@ -112,6 +113,15 @@ class SubmitFeedbackTest(TestCase):
         resp = self._build_and_run_request(user, fields)
         self.assertEqual(resp.status_code, 200)
 
+    def _assert_datadog_called(self, datadog_mock, with_tags):
+        expected_datadog_calls = [
+            mock.call.increment(
+                views.DATADOG_FEEDBACK_METRIC,
+                tags=(["course_id:test_course", "issue_type:test_issue"] if with_tags else [])
+            )
+        ]
+        self.assertEqual(datadog_mock.mock_calls, expected_datadog_calls)
+
     def test_bad_request_anon_user_no_name(self, zendesk_mock_class, datadog_mock):
         """Test a request from an anonymous user not specifying `name`."""
         self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "name", zendesk_mock_class, datadog_mock)
@@ -149,7 +159,7 @@ class SubmitFeedbackTest(TestCase):
                         "requester": {"name": "Test User", "email": "test@edx.org"},
                         "subject": "a subject",
                         "comment": {"body": "some details"},
-                        "tags": ["test_issue"]
+                        "tags": ["test_course", "test_issue"]
                     }
                 }
             ),
@@ -170,11 +180,8 @@ class SubmitFeedbackTest(TestCase):
                 }
             )
         ]
-        expected_datadog_calls = [
-            mock.call.increment(views.DATADOG_FEEDBACK_METRIC, tags=["issue_type:test_issue"])
-        ]
         self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
-        self.assertEqual(datadog_mock.mock_calls, expected_datadog_calls)
+        self._assert_datadog_called(datadog_mock, with_tags=True)
 
     def test_bad_request_auth_user_no_subject(self, zendesk_mock_class, datadog_mock):
         """Test a request from an authenticated user not specifying `subject`."""
@@ -225,11 +232,8 @@ class SubmitFeedbackTest(TestCase):
                 }
             )
         ]
-        expected_datadog_calls = [
-            mock.call.increment(views.DATADOG_FEEDBACK_METRIC, tags=[])
-        ]
         self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
-        self.assertEqual(datadog_mock.mock_calls, expected_datadog_calls)
+        self._assert_datadog_called(datadog_mock, with_tags=False)
 
     def test_get_request(self, zendesk_mock_class, datadog_mock):
         """Test that a GET results in a 405 even with all required fields"""
@@ -255,10 +259,7 @@ class SubmitFeedbackTest(TestCase):
         resp = self._build_and_run_request(self._anon_user, self._anon_fields)
         self.assertEqual(resp.status_code, 500)
         self.assertFalse(resp.content)
-        expected_datadog_calls = [
-            mock.call.increment(views.DATADOG_FEEDBACK_METRIC, tags=["issue_type:test_issue"])
-        ]
-        self.assertEqual(datadog_mock.mock_calls, expected_datadog_calls)
+        self._assert_datadog_called(datadog_mock, with_tags=True)
 
     def test_zendesk_error_on_update(self, zendesk_mock_class, datadog_mock):
         """
@@ -273,10 +274,7 @@ class SubmitFeedbackTest(TestCase):
         zendesk_mock_instance.update_ticket.side_effect = err
         resp = self._build_and_run_request(self._anon_user, self._anon_fields)
         self.assertEqual(resp.status_code, 200)
-        expected_datadog_calls = [
-            mock.call.increment(views.DATADOG_FEEDBACK_METRIC, tags=["issue_type:test_issue"])
-        ]
-        self.assertEqual(datadog_mock.mock_calls, expected_datadog_calls)
+        self._assert_datadog_called(datadog_mock, with_tags=True)
 
     @mock.patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": False})
     def test_not_enabled(self, zendesk_mock_class, datadog_mock):

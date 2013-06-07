@@ -65,6 +65,9 @@ discussion_link = get_discussion_link(course) if course else None
 <span class="tip">Include error messages, steps which lead to the issue, etc</span></label>
       <textarea name="details"></textarea>
       <input name="issue_type" type="hidden">
+% if course:
+      <input name="course_id" type="hidden" value="${course.id | h}">
+% endif
       <div class="submit">
         <input name="submit" type="submit" value="Submit">
       </div>
