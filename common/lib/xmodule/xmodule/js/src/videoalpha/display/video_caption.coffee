@@ -120,7 +120,7 @@ class @VideoCaptionAlpha extends SubviewAlpha
   seekPlayer: (event) =>
     event.preventDefault()
     time = Math.round(Time.convert($(event.target).data('start'), '1.0', @currentSpeed) / 1000)
-    $(@).trigger('seek', time)
+    $(@).trigger('caption_seek', time)
 
   calculateOffset: (element) ->
     @captionHeight() / 2 - element.height() / 2
