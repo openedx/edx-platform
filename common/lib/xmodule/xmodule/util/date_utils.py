@@ -16,7 +16,7 @@ def get_default_time_display(dt, show_timezone=True):
             try:
                 timezone = " " + dt.tzinfo.tzname(dt)
             except NotImplementedError:
-                timezone = " UTC"
+                timezone = dt.strftime('%z')
         else:
             timezone = " UTC"
     return dt.strftime("%b %d, %Y at %H:%M") + timezone
