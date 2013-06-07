@@ -539,17 +539,17 @@ function goto( mode)
     <br/>
     <p>
       <hr width="100%">
-      <h2>${datatable['title']}</h2>
+      <h2>${datatable['title'] | h}</h2>
       <table class="stat_table">
         <tr>
 	%for hname in datatable['header']:
-	  <th>${hname}</th>
+	  <th>${hname | h}</th>
 	%endfor
 	</tr>
         %for row in datatable['data']:
           <tr>
 	    %for value in row:
-	      <td>${value}</td>
+	      <td>${value | h}</td>
 	    %endfor
 	  </tr>
         %endfor
