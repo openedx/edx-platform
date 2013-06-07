@@ -159,7 +159,7 @@ class SubmitFeedbackTest(TestCase):
                         "requester": {"name": "Test User", "email": "test@edx.org"},
                         "subject": "a subject",
                         "comment": {"body": "some details"},
-                        "tags": ["test_course", "test_issue"]
+                        "tags": ["test_course", "test_issue", "LMS"]
                     }
                 }
             ),
@@ -210,7 +210,7 @@ class SubmitFeedbackTest(TestCase):
                         "requester": {"name": "Test User", "email": "test@edx.org"},
                         "subject": "a subject",
                         "comment": {"body": "some details"},
-                        "tags": []
+                        "tags": ["LMS"]
                     }
                 }
             ),

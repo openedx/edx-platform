@@ -90,7 +90,8 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
         "\n".join("%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
     )
 
-    zendesk_tags = list(tags.values())
+    # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
+    zendesk_tags = list(tags.values()) + ["LMS"]
     new_ticket = {
         "ticket": {
             "requester": {"name": realname, "email": email},
