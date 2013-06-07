@@ -1,5 +1,9 @@
+import os.path
+
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.xml import XMLModuleStore
+
+from nose.tools import assert_raises
 
 from .test_modulestore import check_path_to_location
 from . import DATA_DIR
@@ -18,6 +22,12 @@ class TestXMLModuleStore(object):
     def test_unicode_chars_in_xml_content(self):
         # edX/full/6.002_Spring_2012 has non-ASCII chars, and during
         # uniquification of names, would raise a UnicodeError. It no longer does.
+
+        # Ensure that there really is a non-ASCII character in the course.
+        with open(os.path.join(DATA_DIR, "full/sequential/Administrivia_and_Circuit_Elements.xml")) as xmlf:
+            xml = xmlf.read()
+            with assert_raises(UnicodeDecodeError):
+                xml.decode('ascii')
 
         # Load the course, but don't make error modules.  This will succeed,
         # but will record the errors.
