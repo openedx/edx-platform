@@ -7,6 +7,8 @@ import string
 from pyes import *
 import nltk.stem.snowball as snowball
 import fuzzy
+import nltk.data
+from nltk.tokenize import word_tokenize as word_splitter
 
 
 def grab_transcripts(sjson_directory):
@@ -49,12 +51,19 @@ def index_course(database, sjson_directory, course_name, mapping):
     all_transcripts = grab_transcripts(sjson_directory)
     video_counter = 0
     for transcript_tuple in all_transcripts:
-        data_map = {"searchable_text": transcript_tuple[0], "uuid": transcript_tuple[1]}
+        data_map = {"searchable_text": transcript tuple[0], "uuid": transcript_tuple[1]}
         data_map['phonetic_text'] = phonetic_transcript(transcript_tuple[0], stemmer)
         database.index(data_map, "transcript-index", course_name)
         video_counter += 1
     database.indices.refresh("transcript-index")
 
+
+def tokenize(transcript, punkt):
+    """Turns a clean transcript string into a series of sentences"""
+    sentences = punkt.tokenize(transcript)
+    words = []
+    words = [words.extend(word_splitter(sentence)) for sentence in sentences]
+    return words
 
 def fuzzy_search(database, query, course_name):
     search_query = FuzzyLikeThisFieldQuery("searchable_text", query)

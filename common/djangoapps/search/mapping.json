@@ -1,11 +1,12 @@
 {
-
-	"searchable_text": {
-		"boost": 1.0,
-		"index": "analyzed",
-		"store": "yes",
-		"type": "string",
-		"term_vector": "with_positions_offsets",
-        "analyzer": "transcript_analyzer"
+	"properties": {
+		"searchable_text": {
+			"boost": 1.0,
+			"index": "analyzed",
+			"store": "yes",
+			"type": "string",
+			"term_vector": "with_positions_offsets",
+	        "analyzer": "transcript_analyzer"
+		}
 	}
 }
