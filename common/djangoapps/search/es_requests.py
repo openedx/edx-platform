@@ -487,4 +487,3 @@ class EnchantDictionary:
 #print test.get_type_mapping("transcript-index", "2-1x")
 #print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
 #test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
-test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
