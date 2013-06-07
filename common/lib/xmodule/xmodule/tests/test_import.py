@@ -41,7 +41,7 @@ class DummySystem(ImportSystem):
         )
 
     def render_template(self, template, context):
-            raise Exception("Shouldn't be called")
+        raise Exception("Shouldn't be called")
 
 
 class BaseCourseTestCase(unittest.TestCase):
@@ -72,8 +72,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         descriptor = system.process_xml(bad_xml)
 
-        self.assertEqual(descriptor.__class__.__name__,
-                         'ErrorDescriptor')
+        self.assertEqual(descriptor.__class__.__name__, 'ErrorDescriptor')
 
     def test_unique_url_names(self):
         '''Check that each error gets its very own url_name'''
