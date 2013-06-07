@@ -323,7 +323,7 @@ class XMLModuleStore(ModuleStoreBase):
         '''
         String representation - for debugging
         '''
-        return '<XMLModuleStore>data_dir=%s, %d courses, %d modules' % (
+        return '<XMLModuleStore data_dir=%r, %d courses, %d modules>' % (
             self.data_dir, len(self.courses), len(self.modules))
 
     def load_policy(self, policy_path, tracker):
