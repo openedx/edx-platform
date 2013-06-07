@@ -4,7 +4,7 @@ import json
 
 class ElasticDatabase:
 
-    def __init__(self, url, index_settings_file, analyzer_file, *args):
+    def __init__(self, url, index_settings_file, *args):
         """
         Will initialize elastic search object with any indices specified by args
 
@@ -33,7 +33,6 @@ class ElasticDatabase:
         self.url = url
         self.args = args
         self.index_settings = json.loads(open(index_settings_file, 'rb').read())
-        self.index_settings['analysis'] = json.loads(open(analyzer_file).read())
 
     def parse_args(self):
         for mapping in self.args:
@@ -62,9 +61,9 @@ class ElasticDatabase:
         is to encourage loose coupling between types and mappings for better code
         """
 
-        full_url = "/".join([self.url, index, type_, "_mapping"])
-        json_put_body = {type_: json_mapping}
-        requests.put(full_url, data=json_put_body)
+        full_url = "/".join([self.url, index, type_, "_mapping"]) + "/"
+        json_put_body = json.dumps({type_: json_mapping})
+        return requests.put(full_url, data=json_put_body)
 
     def has_index(self, index):
         """Checks to see if a given index exists in the database returns existance boolean,
@@ -83,7 +82,17 @@ class ElasticDatabase:
     def setup_index(self, index):
         """Creates a new elasticsearch index, returns the response it gets"""
         full_url = "/".join([self.url, index]) + "/"
-        return requests.put(full_url, data=self.index_settings)
+        return requests.post(full_url, data=json.dumps(self.index_settings))
+
+    def add_index_settings(self, index, index_settings=None):
+        index_settings = index_settings or self.index_settings
+        full_url = "/".join([self.url, index]) + "/"
+        #closing the index so it can be changed
+        requests.post(full_url+"/_close")
+        response = requests.post(full_url+"/_settings", data=json.dumps(index_settings))
+        #reopening the index so it can be read
+        requests.post(full_url+"/_open")
+        return response
 
     def index_data(self, index, type_, id_, data):
         """Data should be passed in as a dictionary, assumes it matches the given mapping"""
@@ -106,8 +115,7 @@ mapping = json.loads(open("mapping.json", 'rb').read())
 analyzer = "analyzer.json"
 
 test = ElasticDatabase("http://localhost:9200", settings_file, analyzer)
-test.setup_index("transcript")
+print test.setup_index("transcript")._content
 print test.get_index_settings("transcript")
-test.setup_type("transcript", "cleaning", mapping)
-print test.get_type_mapping("transcript", "cleaning")
-
+print test.setup_type("transcript", "cleaning", mapping)._content
+test.get_type_mapping("transcript", "cleaning")
