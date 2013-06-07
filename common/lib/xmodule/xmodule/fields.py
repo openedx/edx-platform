@@ -74,6 +74,8 @@ class Timedelta(ModelType):
 
         Returns a datetime.timedelta parsed from the string
         """
+        if time_str is None:
+            return None
         parts = TIMEDELTA_REGEX.match(time_str)
         if not parts:
             return

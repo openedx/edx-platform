@@ -76,6 +76,23 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
 
+    def test_ooc_encoder(self):
+        """
+        Test the encoder out of its original constrained purpose to see if it functions for general use
+        """
+        details = {'location': Location(['tag', 'org', 'course', 'category', 'name']),
+            'number': 1,
+            'string': 'string',
+            'datetime': datetime.datetime.now(UTC())}
+        jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
+        jsondetails = json.loads(jsondetails)
+
+        self.assertIn('location', jsondetails)
+        self.assertIn('org', jsondetails['location'])
+        self.assertEquals('org', jsondetails['location'][1])
+        self.assertEquals(1, jsondetails['number'])
+        self.assertEqual(jsondetails['string'], 'string')
+
     def test_update_and_fetch(self):
         # # NOTE: I couldn't figure out how to validly test time setting w/ all the conversions
         jsondetails = CourseDetails.fetch(self.course_location)
@@ -153,11 +170,7 @@ class CourseDetailsViewTest(CourseTestCase):
             date = Date()
             if field in encoded and encoded[field] is not None:
                 dt1 = date.from_json(encoded[field])
-
-                if isinstance(details[field], datetime.datetime):
-                    dt2 = details[field]
-                else:
-                    dt2 = date.from_json(details[field])
+                dt2 = details[field]
 
                 expected_delta = datetime.timedelta(0)
                 self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
