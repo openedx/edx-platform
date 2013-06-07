@@ -25,7 +25,10 @@ class User(models.Model):
     def from_django_user(cls, user):
 
         if type(user) is not django_user:
-            raise CommentClientError("Cannot convert unexpected class to User")
+            raise CommentClientError(
+                "Cannot convert unexpected class to User. "
+                "Type recieved was {type}".format(
+                type=user.__class__.__name__))
 
         return cls(id=str(user.id),
                    external_id=str(user.id),
