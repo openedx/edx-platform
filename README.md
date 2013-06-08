@@ -44,7 +44,7 @@ Using edX
 ---------
 
 Once inside the VM, you can start Studio and LMS with the following commands
-(from the `/opt/edx-platform` folder):
+(from the `/opt/edx/edx-platform` folder):
 
 Learning management system (LMS):
 
@@ -65,7 +65,7 @@ Once started, open the following URLs in your browser:
 
 You can develop by editing the files directly in the `edx-platform/` directory you
 downloaded before, you don't need to connect to the VM to edit them (the VM uses
-those files to run edX, mirroring the folder in `/opt/edx-platform`).
+those files to run edX, mirroring the folder in `/opt/edx/edx-platform`).
 
 Stopping & starting
 -------------------

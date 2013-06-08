@@ -56,7 +56,8 @@ chown vagrant.vagrant ~vagrant/.ssh/known_hosts
 
 
 # edX - Development environment ###############################################
-sudo -u vagrant chown vagrant.vagrant /opt/edx-platform
+
+chown vagrant.vagrant /opt/edx
 
 # For convenience with `vagrant ssh`, the `edx-platform` virtualenv is always
 # loaded after the first run, so we need to deactivate that behavior to run
@@ -64,7 +65,7 @@ sudo -u vagrant chown vagrant.vagrant /opt/edx-platform
 [[ -f ~vagrant/.bash_profile ]] && {
     mv ~vagrant/.bash_profile ~vagrant/.bash_profile.bak
 }
-sudo -u vagrant -i bash -c "cd /opt/edx-platform && ./scripts/create-dev-env.sh -ynq"
+sudo -u vagrant -i bash -c "cd /opt/edx/edx-platform && ./scripts/create-dev-env.sh -ynq"
 
 
 # Virtualenv - Always load ####################################################
@@ -76,8 +77,8 @@ sudo -u vagrant -i bash -c "cd /opt/edx-platform && ./scripts/create-dev-env.sh 
 
 # Directory ###################################################################
 
-grep "cd /opt/edx-platform" ~vagrant/.bash_profile || {
-    echo -e "\ncd /opt/edx-platform\n" >> ~vagrant/.bash_profile
+grep "cd /opt/edx/edx-platform" ~vagrant/.bash_profile || {
+    echo -e "\ncd /opt/edx/edx-platform\n" >> ~vagrant/.bash_profile
 }
 
 
