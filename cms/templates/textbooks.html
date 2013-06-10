@@ -136,7 +136,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         return this;
     },
     events: {
-        "submit": "save",
+        "submit": "saveAndRemove",
         "click .action-cancel": "cancel",
         "click .action-add-chapter": "createChapter"
     },
@@ -150,10 +150,10 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
     },
     createChapter: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
+        this.save();
         this.model.chapters.add([{}])
     },
-    save: function(e) {
-        if(e && e.preventDefault) { e.preventDefault(); }
+    save: function() {
         var name = this.$("#textbook-name-input").val();
         var textbook = this.model;
         textbook.set("name", name);
@@ -164,8 +164,11 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
                 "asset_path": $(".chapter-asset-path", li).val()
             })
         });
-        this.remove();
         return this;
+    },
+    saveAndRemove: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        return this.save().remove();
     },
     cancel: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
