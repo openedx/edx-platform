@@ -26,9 +26,9 @@ class TestErrorModule(unittest.TestCase):
             self.valid_xml, self.system, self.org, self.course, self.error_msg)
         self.assertTrue(isinstance(descriptor, error_module.ErrorDescriptor))
         module = descriptor.xmodule(self.system)
-        rendered_html = module.get_html()
-        self.assertIn(self.error_msg, rendered_html)
-        self.assertIn(repr(self.valid_xml), rendered_html)
+        context_repr = module.get_html()
+        self.assertIn(self.error_msg, context_repr)
+        self.assertIn(repr(self.valid_xml), context_repr)
 
     def test_error_module_from_descriptor(self):
         descriptor = MagicMock([XModuleDescriptor],
@@ -40,9 +40,9 @@ class TestErrorModule(unittest.TestCase):
             descriptor, self.error_msg)
         self.assertTrue(isinstance(error_descriptor, error_module.ErrorDescriptor))
         module = error_descriptor.xmodule(self.system)
-        rendered_html = module.get_html()
-        self.assertIn(self.error_msg, rendered_html)
-        self.assertIn(repr(descriptor), rendered_html)
+        context_repr = module.get_html()
+        self.assertIn(self.error_msg, context_repr)
+        self.assertIn(repr(descriptor), context_repr)
 
 
 class TestNonStaffErrorModule(TestErrorModule):
@@ -59,9 +59,9 @@ class TestNonStaffErrorModule(TestErrorModule):
         descriptor = error_module.NonStaffErrorDescriptor.from_xml(
             self.valid_xml, self.system, self.org, self.course)
         module = descriptor.xmodule(self.system)
-        rendered_html = module.get_html()
-        self.assertNotIn(self.error_msg, rendered_html)
-        self.assertNotIn(repr(self.valid_xml), rendered_html)
+        context_repr = module.get_html()
+        self.assertNotIn(self.error_msg, context_repr)
+        self.assertNotIn(repr(self.valid_xml), context_repr)
 
     def test_error_module_from_descriptor(self):
         descriptor = MagicMock([XModuleDescriptor],
@@ -73,6 +73,6 @@ class TestNonStaffErrorModule(TestErrorModule):
             descriptor, self.error_msg)
         self.assertTrue(isinstance(error_descriptor, error_module.ErrorDescriptor))
         module = error_descriptor.xmodule(self.system)
-        rendered_html = module.get_html()
-        self.assertNotIn(self.error_msg, rendered_html)
-        self.assertNotIn(str(descriptor), rendered_html)
+        context_repr = module.get_html()
+        self.assertNotIn(self.error_msg, context_repr)
+        self.assertNotIn(str(descriptor), context_repr)
