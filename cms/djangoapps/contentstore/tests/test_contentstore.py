@@ -32,6 +32,8 @@ from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from contentstore.views.component import ADVANCED_COMPONENT_TYPES
+
 from django_comment_common.utils import are_permissions_roles_seeded
 import datetime
 from xmodule.fields import Date
@@ -75,6 +77,49 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.client = Client()
         self.client.login(username=uname, password=password)
+
+    def check_components_on_page(self, component_types, expected_types):
+        """
+        Ensure that the right types end up on the page.
+
+        component_types is the list of advanced components.
+
+        expected_types is the list of elements that should appear on the page.
+
+        expected_types and component_types should be similar, but not
+        exactly the same -- for example, 'videoalpha' in
+        component_types should cause 'Video Alpha' to be present.
+        """
+        store = modulestore('direct')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        course = store.get_item(Location(['i4x', 'edX', 'simple',
+                                          'course', '2012_Fall', None]), depth=None)
+
+        course.advanced_modules = component_types
+
+        store.update_metadata(course.location, own_metadata(course))
+
+        # just pick one vertical
+        descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
+
+        resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+        self.assertEqual(resp.status_code, 200)
+
+        for expected in expected_types:
+            self.assertIn(expected, resp.content)
+
+    def test_advanced_components_in_edit_unit(self):
+        # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page
+        # response HTML
+        self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Video Alpha',
+                                                                 'Word cloud',
+                                                                 'Annotation',
+                                                                 'Open Ended Response',
+                                                                 'Peer Grading Interface'])
+
+    def test_advanced_components_require_two_clicks(self):
+        self.check_components_on_page(['videoalpha'], ['Video Alpha'])
 
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
@@ -258,7 +303,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_import_polls(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
-
 
         items = module_store.get_items(['i4x', 'edX', 'full', 'poll_question', None, None])
         found = len(items) > 0
@@ -447,6 +491,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # check for custom_tags
         self.verify_content_existence(module_store, root_dir, location, 'custom_tags', 'custom_tag_template')
+
+        # check for about content
+        self.verify_content_existence(module_store, root_dir, location, 'about', 'about', '.html')
 
         # check for graiding_policy.json
         fs = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')

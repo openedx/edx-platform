@@ -58,7 +58,12 @@ def _ensure_dir(dir_):
 
 
 def _write_styles(selector, output_root, classes):
-    _ensure_dir(output_root)
+    """
+    Write the css fragments from all XModules in `classes`
+    into `output_root` as individual files, hashed by the contents to remove
+    duplicates
+    """
+    contents = {}
 
     css_fragments = defaultdict(set)
     for class_ in classes:
@@ -73,25 +78,34 @@ def _write_styles(selector, output_root, classes):
             hash=hashlib.md5(fragment).hexdigest(),
             type=filetype)
         # Prepend _ so that sass just includes the files into a single file
-        with open(output_root / '_' + fragment_name, 'w') as css_file:
-            css_file.write(fragment)
+        filename = '_' + fragment_name
+        contents[filename] = fragment
 
         for class_ in classes:
             css_imports[class_].add(fragment_name)
 
-    with open(output_root / '_module-styles.scss', 'w') as module_styles:
+    module_styles_lines = []
+    module_styles_lines.append("@import 'bourbon/bourbon';")
+    module_styles_lines.append("@import 'bourbon/addons/button';")
+    for class_, fragment_names in css_imports.items():
+        module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
+            class_=class_, selector=selector
+        ))
+        module_styles_lines.extend('  @import "{0}";'.format(name) for name in fragment_names)
+        module_styles_lines.append('}')
 
-        module_styles.write("@import 'bourbon/bourbon';\n")
-        module_styles.write("@import 'bourbon/addons/button';\n")
-        for class_, fragment_names in css_imports.items():
-            imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
-            module_styles.write("""{selector}.xmodule_{class_} {{ {imports} }}\n""".format(
-                class_=class_, imports=imports, selector=selector
-            ))
+    contents['_module-styles.scss'] = '\n'.join(module_styles_lines)
+
+    _write_files(output_root, contents)
 
 
 def _write_js(output_root, classes):
-    _ensure_dir(output_root)
+    """
+    Write the javascript fragments from all XModules in `classes`
+    into `output_root` as individual files, hashed by the contents to remove
+    duplicates
+    """
+    contents = {}
 
     js_fragments = set()
     for class_ in classes:
@@ -100,18 +114,25 @@ def _write_js(output_root, classes):
             for idx, fragment in enumerate(module_js.get(filetype, [])):
                 js_fragments.add((idx, filetype, fragment))
 
-    module_js = []
     for idx, filetype, fragment in sorted(js_fragments):
-        path = output_root / "{idx:0=3d}-{hash}.{type}".format(
+        filename = "{idx:0=3d}-{hash}.{type}".format(
             idx=idx,
             hash=hashlib.md5(fragment).hexdigest(),
             type=filetype)
-        with open(path, 'w') as js_file:
-            js_file.write(fragment)
+        contents[filename] = fragment
 
-        module_js.append(path)
+    _write_files(output_root, contents)
 
-    return module_js
+    return [output_root / filename for filename in contents.keys()]
+
+
+def _write_files(output_root, contents):
+    _ensure_dir(output_root)
+    for extra_file in set(output_root.files()) - set(contents.keys()):
+        extra_file.remove()
+
+    for filename, file_content in contents.iteritems():
+        (output_root / filename).write_bytes(file_content)
 
 
 def main():
@@ -122,7 +143,6 @@ def main():
     args = docopt(main.__doc__)
     root = path(args['<output_root>'])
 
-    root.rmtree(ignore_errors=True)
     write_descriptor_js(root / 'descriptors/js')
     write_descriptor_styles(root / 'descriptors/css')
     write_module_js(root / 'modules/js')

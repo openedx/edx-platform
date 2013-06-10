@@ -112,7 +112,7 @@ def all_sections_are_expanded(step):
 
 
 @step(u'all sections are collapsed$')
-def all_sections_are_expanded(step):
+def all_sections_are_collapsed(step):
     subsection_locator = 'div.subsection-list'
     subsections = world.css_find(subsection_locator)
     for s in subsections:

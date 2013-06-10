@@ -1,6 +1,8 @@
 ---
 metadata:
     display_name: Circuit Schematic Builder
+    rerandomize: never
+    showanswer: finished
 data: |
       <problem >
         Please make a voltage divider that splits the provided voltage evenly.

@@ -48,31 +48,30 @@ def i_press_the_category_delete_icon(_step, category):
 
 @step('I have opened a new course in Studio$')
 def i_have_opened_a_new_course(_step):
+    open_new_course()
+
+
+####### HELPER FUNCTIONS ##############
+def open_new_course():
     world.clear_courses()
     log_into_studio()
     create_a_course()
 
 
-####### HELPER FUNCTIONS ##############
 def create_studio_user(
         uname='robot',
         email='robot+studio@edx.org',
         password='test',
         is_staff=False):
-    studio_user = world.UserFactory.build(
+    studio_user = world.UserFactory(
         username=uname,
         email=email,
         password=password,
         is_staff=is_staff)
-    studio_user.set_password(password)
-    studio_user.save()
 
     registration = world.RegistrationFactory(user=studio_user)
     registration.register(studio_user)
     registration.activate()
-
-    world.UserProfileFactory(user=studio_user)
-
 
 def fill_in_course_info(
         name='Robot Super Course',
@@ -153,3 +152,20 @@ def set_date_and_time(date_css, desired_date, time_css, desired_time):
     e = world.css_find(time_css).first
     e._element.send_keys(Keys.TAB)
     time.sleep(float(1))
+
+
+@step('I have created a Video component$')
+def i_created_a_video_component(step):
+    world.create_component_instance(
+        step, '.large-video-icon',
+        'video',
+        '.xmodule_VideoModule'
+    )
+
+
+@step('I have clicked the new unit button')
+def open_new_unit(step):
+    step.given('I have opened a new course section in Studio')
+    step.given('I have added a new subsection')
+    step.given('I expand the first section')
+    world.css_click('a.new-unit-item')

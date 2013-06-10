@@ -70,23 +70,12 @@ rake clobber
 rake pep8 > pep8.log || cat pep8.log
 rake pylint > pylint.log || cat pylint.log
 
-TESTS_FAILED=0
+# Run the unit tests (use phantomjs for javascript unit tests)
+rake test
 
-# Run the python unit tests
-rake test_cms || TESTS_FAILED=1
-rake test_lms || TESTS_FAILED=1
-rake test_common/lib/capa || TESTS_FAILED=1
-rake test_common/lib/xmodule || TESTS_FAILED=1
+# Generate coverage reports
+rake coverage
 
-# Run the javascript unit tests
-rake phantomjs_jasmine_lms || TESTS_FAILED=1
-rake phantomjs_jasmine_cms || TESTS_FAILED=1
-rake phantomjs_jasmine_common/lib/xmodule || TESTS_FAILED=1
-rake phantomjs_jasmine_common/static/coffee || TESTS_FAILED=1
-
-rake coverage:xml coverage:html
-
-[ $TESTS_FAILED == '0' ]
 rake autodeploy_properties
 
 github_status state:success "passed"

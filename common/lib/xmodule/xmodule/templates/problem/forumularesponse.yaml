@@ -1,6 +1,8 @@
 ---
 metadata:
     display_name: Math Expression Input
+    rerandomize: never
+    showanswer: finished
 data: |
   <problem>
   <p>

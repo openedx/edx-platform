@@ -99,8 +99,17 @@ CELERY_QUEUES = {
 with open(ENV_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
+PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
+
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
+
+# allow for environments to specify what cookie name our login subsystem should use
+# this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
+# happen with some browsers (e.g. Firefox)
+if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
+    # NOTE, there's a bug in Django (http://bugs.python.org/issue18012) which necessitates this being a str()
+    SESSION_COOKIE_NAME = str(ENV_TOKENS.get('SESSION_COOKIE_NAME'))
 
 BOOK_URL = ENV_TOKENS['BOOK_URL']
 MEDIA_URL = ENV_TOKENS['MEDIA_URL']
@@ -113,11 +122,18 @@ DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)
 ADMINS = ENV_TOKENS.get('ADMINS', ADMINS)
 SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
+TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
+CONTACT_EMAIL = ENV_TOKENS.get('CONTACT_EMAIL', CONTACT_EMAIL)
+BUGS_EMAIL = ENV_TOKENS.get('BUGS_EMAIL', BUGS_EMAIL)
 
 #Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 if not THEME_NAME is None:
     enable_theme(THEME_NAME)
+    FAVICON_PATH = 'themes/%s/images/favicon.ico' % THEME_NAME
+
+# Marketing link overrides
+MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
@@ -155,6 +171,11 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
         CODE_JAIL[name] = value
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
+
+# If segment.io key specified, load it and turn on segment IO if the feature flag is set
+SEGMENT_IO_LMS_KEY = ENV_TOKENS.get('SEGMENT_IO_LMS_KEY')
+if SEGMENT_IO_LMS_KEY:
+    MITX_FEATURES['SEGMENT_IO_LMS'] = ENV_TOKENS.get('SEGMENT_IO_LMS', False)
 
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.

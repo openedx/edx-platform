@@ -84,3 +84,38 @@ Feature: Answer problems
         | formula           | incorrect     |
         | script            | correct       |
         | script            | incorrect     |
+
+
+    Scenario: I can answer a problem with one attempt correctly and not reset
+        Given I am viewing a "multiple choice" problem with "1" attempt
+        When I answer a "multiple choice" problem "correctly"
+        Then The "Reset" button does not appear
+
+    Scenario: I can answer a problem with multiple attempts correctly and still reset the problem
+        Given I am viewing a "multiple choice" problem with "3" attempts
+        Then I should see "You have used 0 of 3 submissions" somewhere in the page
+        When I answer a "multiple choice" problem "correctly"
+        Then The "Reset" button does appear
+
+    Scenario: I can view how many attempts I have left on a problem
+        Given I am viewing a "multiple choice" problem with "3" attempts
+        Then I should see "You have used 0 of 3 submissions" somewhere in the page
+        When I answer a "multiple choice" problem "incorrectly"
+        And I reset the problem
+        Then I should see "You have used 1 of 3 submissions" somewhere in the page
+        When I answer a "multiple choice" problem "incorrectly"
+        And I reset the problem
+        Then I should see "You have used 2 of 3 submissions" somewhere in the page
+        And The "Final Check" button does appear
+        When I answer a "multiple choice" problem "correctly"
+        Then The "Reset" button does not appear
+
+    Scenario: I can view and hide the answer if the problem has it:
+        Given I am viewing a "numerical" that shows the answer "always"
+        When I press the "Show Answer" button
+        Then The "Hide Answer" button does appear
+        And The "Show Answer" button does not appear
+        And I should see "4.14159" somewhere in the page
+        When I press the "Hide Answer" button
+        Then The "Show Answer" button does appear
+        And I should not see "4.14159" anywhere on the page

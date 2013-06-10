@@ -40,7 +40,10 @@ MITX_FEATURES = {
     'SEGMENT_IO': True,
 
     # Enable URL that shows information about the status of various services
-    'ENABLE_SERVICE_STATUS': False
+    'ENABLE_SERVICE_STATUS': False,
+
+    # Don't autoplay videos for course authors
+    'AUTOPLAY_VIDEOS': False
 }
 ENABLE_JASMINE = False
 
@@ -223,7 +226,8 @@ PIPELINE_JS = {
             rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.js')
         ) + ['js/hesitate.js', 'js/base.js',
              'js/models/feedback.js', 'js/views/feedback.js',
-             'js/models/section.js', 'js/views/section.js'],
+             'js/models/section.js', 'js/views/section.js',
+             'js/models/metadata_model.js', 'js/views/metadata_editor_view.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
     },
@@ -319,6 +323,7 @@ INSTALLED_APPS = (
     'track',
 
     # For asset pipelining
+    'mitxmako',
     'pipeline',
     'staticfiles',
     'static_replace',
@@ -330,3 +335,14 @@ INSTALLED_APPS = (
 ################# EDX MARKETING SITE ##################################
 
 EDXMKTG_COOKIE_NAME = 'edxloggedin'
+MKTG_URLS = {}
+MKTG_URL_LINK_MAP = {
+    'ABOUT': 'about_edx',
+    'CONTACT': 'contact',
+    'FAQ': 'help_edx',
+    'COURSES': 'courses',
+    'ROOT': 'root',
+    'TOS': 'tos',
+    'HONOR': 'honor',
+    'PRIVACY': 'privacy_edx',
+}

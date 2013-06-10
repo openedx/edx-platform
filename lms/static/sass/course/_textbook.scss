@@ -38,7 +38,7 @@ div.book-wrapper {
         line-height: 2.1em;
         text-align: right;
         color: #9a9a9a;
-        opacity: 0;
+        opacity: 0.0;
         @include transition(opacity .15s);
       }
 
@@ -55,7 +55,7 @@ div.book-wrapper {
             background-color: transparent;
 
             .page-number {
-              opacity: 1;
+              opacity: 1.0;
             }
           }
         }
@@ -119,7 +119,7 @@ div.book-wrapper {
             @include box-sizing(border-box);
             display: table;
             height: 100%;
-            opacity: 0;
+            opacity: 0.0;
             filter: alpha(opacity=0);
             text-indent: -9999px;
             @include transition;
@@ -127,7 +127,7 @@ div.book-wrapper {
             width: 100%;
 
             &:hover {
-              opacity: 1;
+              opacity: 1.0;
               filter: alpha(opacity=100);
             }
           }

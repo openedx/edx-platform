@@ -6,38 +6,15 @@ if USE_CUSTOM_THEME
     THEME_SASS = File.join(THEME_ROOT, "static", "sass")
 end
 
-# Run the specified file through the Mako templating engine, providing
-# the ENV_TOKENS to the templating context.
-def preprocess_with_mako(filename)
-    # simple command-line invocation of Mako engine
-    # cdodge: the .gsub() are used to translate true->True and false->False to make the generated
-    # python actually valid python. This is just a short term hack to unblock the release train
-    # until a real fix can be made by people who know this better
-    mako = "from mako.template import Template;" +
-           "print Template(filename=\"#{filename}\")" +
-           # Total hack. It works because a Python dict literal has
-           # the same format as a JSON object.
-           ".render(env=#{ENV_TOKENS.to_json.gsub("true","True").gsub("false","False")});"
-
-    # strip off the .mako extension
-    output_filename = filename.chomp(File.extname(filename))
-
-    # just pipe from stdout into the new file, exiting on failure
-    File.open(output_filename, 'w') do |file|
-      file.write(`python -c '#{mako}'`)
-      exit_code = $?.to_i
-      abort "#{mako} failed with #{exit_code}" if exit_code.to_i != 0
-    end
-end
-
 def xmodule_cmd(watch=false, debug=false)
     xmodule_cmd = 'xmodule_assets common/static/xmodule'
     if watch
         "watchmedo shell-command " +
-                   "--patterns='*.js;*.coffee;*.sass;*.scss;*.css' " +
-                   "--recursive " +
-                   "--command='#{xmodule_cmd}' " +
-                   "common/lib/xmodule"
+                  "--patterns='*.js;*.coffee;*.sass;*.scss;*.css' " +
+                  "--recursive " +
+                  "--command='#{xmodule_cmd}' " +
+                  "--wait " +
+                  "common/lib/xmodule"
     else
         xmodule_cmd
     end
@@ -51,14 +28,16 @@ def coffee_cmd(watch=false, debug=false)
         #
         # Ref: https://github.com/joyent/node/issues/2479
         #
-        # Instead, watch 50 files per process in parallel
-        cmds = []
-        Dir['*/static/**/*.coffee'].each_slice(50) do |coffee_files|
-            cmds << "node_modules/.bin/coffee --watch --compile #{coffee_files.join(' ')}"
-        end
-        cmds
+        # So, instead, we use watchmedo, which works around the problem
+        "watchmedo shell-command " +
+                  "--command 'node_modules/.bin/coffee -c ${watch_src_path}' " +
+                  "--recursive " +
+                  "--patterns '*.coffee' " +
+                  "--ignore-directories " +
+                  "--wait " +
+                  "."
     else
-        'node_modules/.bin/coffee --compile */static'
+        'node_modules/.bin/coffee --compile .'
     end
 end
 
@@ -84,11 +63,12 @@ namespace :assets do
     desc "Compile all assets in debug mode"
     multitask :debug
 
-    desc "Preprocess all static assets that have the .mako extension"
-    task :preprocess do
-      # Run assets through the Mako templating engine. Right now we
-      # just hardcode the asset filenames.
-      preprocess_with_mako("lms/static/sass/application.scss.mako")
+    desc "Preprocess all templatized static asset files"
+    task :preprocess, [:system, :env] do |t, args|
+      args.with_defaults(:system => "lms", :env => "dev")
+      sh(django_admin(args.system, args.env, "preprocess_assets")) do |ok, status|
+        abort "asset preprocessing failed!" if !ok
+      end
     end
 
     desc "Watch all assets for changes and automatically recompile"
@@ -97,8 +77,8 @@ namespace :assets do
         $stdin.gets
     end
 
-    {:xmodule => :install_python_prereqs,
-     :coffee => :install_node_prereqs,
+    {:xmodule => [:install_python_prereqs],
+     :coffee => [:install_node_prereqs],
      :sass => [:install_ruby_prereqs, :preprocess]}.each_pair do |asset_type, prereq_tasks|
         desc "Compile all #{asset_type} assets"
         task asset_type => prereq_tasks do
@@ -127,7 +107,8 @@ namespace :assets do
                 $stdin.gets
             end
 
-            task :_watch => prereq_tasks do
+            # Fully compile before watching for changes
+            task :_watch => (prereq_tasks + ["assets:#{asset_type}:debug"]) do
                 cmd = send(asset_type.to_s + "_cmd", watch=true, debug=true)
                 if cmd.kind_of?(Array)
                     cmd.each {|c| background_process(c)}
@@ -138,12 +119,8 @@ namespace :assets do
         end
     end
 
-
     multitask :sass => 'assets:xmodule'
     namespace :sass do
-        # In watch mode, sass doesn't immediately compile out of date files,
-        # so force a recompile first
-        task :_watch => 'assets:sass:debug'
         multitask :debug => 'assets:xmodule:debug'
     end
 
@@ -151,18 +128,32 @@ namespace :assets do
     namespace :coffee do
         multitask :debug => 'assets:xmodule:debug'
     end
+
+    namespace :xmodule do
+        # Only start the xmodule watcher after the coffee and sass watchers have already started
+        task :_watch => ['assets:coffee:_watch', 'assets:sass:_watch']
+    end
+end
+
+# This task does the real heavy lifting to gather all of the static
+# assets. We want people to call it via the wrapper below, so we
+# don't provide a description so that it won't show up in rake -T.
+task :gather_assets, [:system, :env] => :assets do |t, args|
+    sh("#{django_admin(args.system, args.env, 'collectstatic', '--noinput')} > /dev/null") do |ok, status|
+        if !ok
+            abort "collectstatic failed!"
+        end
+    end
 end
 
 [:lms, :cms].each do |system|
     # Per environment tasks
     environments(system).each do |env|
+        # This task wraps the one above, since we need the system and
+        # env arguments to be passed to all dependent tasks.
         desc "Compile coffeescript and sass, and then run collectstatic in the specified environment"
-        task "#{system}:gather_assets:#{env}" => :assets do
-            sh("#{django_admin(system, env, 'collectstatic', '--noinput')} > /dev/null") do |ok, status|
-                if !ok
-                    abort "collectstatic failed!"
-                end
-            end
+        task "#{system}:gather_assets:#{env}" do
+          Rake::Task[:gather_assets].invoke(system, env)
         end
     end
 end

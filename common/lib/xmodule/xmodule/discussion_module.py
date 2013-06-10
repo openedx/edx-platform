@@ -9,11 +9,20 @@ from uuid import uuid4
 
 class DiscussionFields(object):
     discussion_id = String(scope=Scope.settings, default="$$GUID$$")
-    discussion_category = String(scope=Scope.settings)
-    discussion_target = String(scope=Scope.settings, default="Topic-Level Student-Visible Label")
     display_name = String(help="Display name for this module", default="Discussion Tag", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content,
         default="<discussion></discussion>")
+    discussion_category = String(
+        display_name="Category",
+        help="A category name for the discussion. This name appears in the left pane of the discussion forum for the course.",
+        scope=Scope.settings
+    )
+    discussion_target = String(
+        display_name="Subcategory",
+        default="Topic-Level Student-Visible Label"
+        help="A subcategory name for the discussion. This name appears in the left pane of the discussion forum for the course.",
+        scope=Scope.settings
+    )
     sort_key = String(scope=Scope.settings)
 
 

@@ -53,9 +53,15 @@
               <div class="new-component">
                 <h5>Add New Component</h5>
                 <ul class="new-component-type">
-                  % for type in sorted(component_templates.keys()):
+                  % for type, templates in sorted(component_templates.items()):
                   <li>
-                    <a href="#" data-type="${type}">
+                  % if type == 'advanced' or len(templates) > 1:
+                    <a href="#" class="multiple-templates" data-type="${type}">
+                  % else:
+                    % for _, category, _ in templates:
+                    <a href="#" class="single-template" data-type="${type}" data-category="${category}">
+                    % endfor
+                  % endif
                       <span class="large-template-icon large-${type}-icon"></span>
                       <span class="name">${type}</span>
                     </a>
@@ -64,6 +70,7 @@
                 </ul>
               </div>
                 % for type, templates in sorted(component_templates.items()):
+                  % if len(templates) > 1 or type == 'advanced':
                 <div class="new-component-templates new-component-${type}">
                     % if type == "problem":
                     <div class="tab-group tabs">
@@ -124,6 +131,7 @@
                     % endif
                     <a href="#" class="cancel-button">Cancel</a>
                 </div>
+                @endif
                 % endfor
             </li>
           </ol>

@@ -4,7 +4,7 @@
 from lettuce import world
 import time
 from urllib import quote_plus
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -32,8 +32,13 @@ def url_equals(url):
 
 
 @world.absorb
-def is_css_present(css_selector):
-    return world.browser.is_element_present_by_css(css_selector, wait_time=4)
+def is_css_present(css_selector, wait_time=5):
+    return world.browser.is_element_present_by_css(css_selector, wait_time=wait_time)
+
+
+@world.absorb
+def is_css_not_present(css_selector, wait_time=5):
+    return world.browser.is_element_not_present_by_css(css_selector, wait_time=wait_time)
 
 
 @world.absorb
@@ -42,11 +47,11 @@ def css_has_text(css_selector, text):
 
 
 @world.absorb
-def css_find(css):
+def css_find(css, wait_time=5):
     def is_visible(driver):
         return EC.visibility_of_element_located((By.CSS_SELECTOR, css,))
 
-    world.browser.is_element_present_by_css(css, 5)
+    world.browser.is_element_present_by_css(css, wait_time=wait_time)
     wait_for(is_visible)
     return world.browser.find_by_css(css)
 
@@ -56,6 +61,7 @@ def css_click(css_selector):
     """
     Perform a click on a CSS selector, retrying if it initially fails
     """
+    assert is_css_present(css_selector)
     try:
         world.browser.find_by_css(css_selector).click()
 
@@ -63,7 +69,7 @@ def css_click(css_selector):
         # Occassionally, MathJax or other JavaScript can cover up
         # an element  temporarily.
         # If this happens, wait a second, then try again
-        time.sleep(1)
+        world.wait(1)
         world.browser.find_by_css(css_selector).click()
 
 
@@ -80,7 +86,16 @@ def css_click_at(css, x=10, y=10):
 
 
 @world.absorb
+def id_click(elem_id):
+    """
+    Perform a click on an element as specified by its id
+    """
+    world.css_click('#%s' % elem_id)
+
+
+@world.absorb
 def css_fill(css_selector, text):
+    assert is_css_present(css_selector)
     world.browser.find_by_css(css_selector).first.fill(text)
 
 
@@ -94,13 +109,19 @@ def css_text(css_selector):
 
     # Wait for the css selector to appear
     if world.is_css_present(css_selector):
-        return world.browser.find_by_css(css_selector).first.text
+        try:
+            return world.browser.find_by_css(css_selector).first.text
+        except StaleElementReferenceException:
+            # The DOM was still redrawing. Wait a second and try again.
+            world.wait(1)
+            return world.browser.find_by_css(css_selector).first.text
     else:
         return ""
 
 
 @world.absorb
 def css_visible(css_selector):
+    assert is_css_present(css_selector)
     return world.browser.find_by_css(css_selector).visible
 
 

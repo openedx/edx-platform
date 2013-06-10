@@ -67,15 +67,39 @@ class ComplexEncoder(json.JSONEncoder):
 class CapaFields(object):
     attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0,
         scope=Scope.user_state)
-    max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    max_attempts = StringyInteger(
+        display_name="Maximum Attempts",
+        help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
+        values={"min": 1}, scope=Scope.settings
+    )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted",
         scope=Scope.settings)
-    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings,
-        default="closed", values=["answered", "always", "attempted", "closed", "never"])
+    showanswer = String(
+        display_name="Show Answer",
+        default="closed",
+        help="Defines when to show the answer to the problem. A default value can be set in Advanced Settings.",
+        scope=Scope.settings, default="closed",
+        values=[
+            {"display_name": "Always", "value": "always"},
+            {"display_name": "Answered", "value": "answered"},
+            {"display_name": "Attempted", "value": "attempted"},
+            {"display_name": "Closed", "value": "closed"},
+            {"display_name": "Finished", "value": "finished"},
+            {"display_name": "Past Due", "value": "past_due"},
+            {"display_name": "Never", "value": "never"}]
+    )
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings,
         default=False)
-    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    rerandomize = Randomization(
+        display_name="Randomization", help="Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings.",
+        default="always", 
+        scope=Scope.settings, 
+        values=[{"display_name": "Always", "value": "always"},
+            {"display_name": "On Reset", "value": "onreset"},
+            {"display_name": "Never", "value": "never"},
+            {"display_name": "Per Student", "value": "per_student"}]
+    )
     data = String(help="XML data for the problem", default="<problem></problem>", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers",
         scope=Scope.user_state, default={})
@@ -83,7 +107,12 @@ class CapaFields(object):
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    weight = StringyFloat(
+        display_name="Problem Weight",
+        help="Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point.",
+        values={"min": 0, "step": .1},
+        scope=Scope.settings
+    )
     # markdown is tricky but unit.html has hardcoding for adding the blank advanced version; so, the default is ""
     markdown = String(help="Markdown source of this module", default="", scope=Scope.settings)
     source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.",
@@ -902,16 +931,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
                          'enable_markdown': self.markdown is not None})
         return _context
 
-    @property
-    def editable_metadata_fields(self):
-        """Remove metadata from the editable fields since it has its own editor"""
-        subset = super(CapaDescriptor, self).editable_metadata_fields
-        if 'markdown' in subset:
-            del subset['markdown']
-        if 'empty' in subset:
-            del subset['empty']
-        return subset
-
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
@@ -921,3 +940,10 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
+                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown])
+        return non_editable_fields

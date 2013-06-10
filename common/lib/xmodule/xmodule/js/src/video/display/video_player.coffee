@@ -15,7 +15,7 @@ class @VideoPlayer extends Subview
     $(@progressSlider).bind('seek', @onSeek)
     if @volumeControl
       $(@volumeControl).bind('volumeChange', @onVolumeChange)
-    $(document).keyup @bindExitFullScreen
+    $(document.documentElement).keyup @bindExitFullScreen
 
     @$('.add-fullscreen').click @toggleFullScreen
     @addToolTip() unless onTouchBasedDevice()
@@ -66,7 +66,7 @@ class @VideoPlayer extends Subview
         at: 'top center'
 
   onReady: (event) =>
-    unless onTouchBasedDevice()
+    unless onTouchBasedDevice() or $('.video:first').data('autoplay') == 'False'
       $('.video-load-complete:first').data('video').player.play()
 
   onStateChange: (event) =>
