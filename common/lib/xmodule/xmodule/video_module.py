@@ -25,8 +25,8 @@ class VideoFields(object):
     youtube_id_1_5 = String(help="Youtube ID for 1.5x speed video", display_name="1.5x", scope=Scope.settings, default="DYpADpL7jAY")
     start_time = Float(help="Time the video starts", display_name="Start Time", scope=Scope.settings, default=0.0)
     end_time = Float(help="Time the video ends", display_name="End Time", scope=Scope.settings, default=0.0)
-    source = String(help="External source to download video", display_name="External Source", scope=Scope.settings, default="")
-    track = String(help="External source to download subtitle strack", display_name="External Track", scope=Scope.settings, default="")
+    source = String(help="Source to download video", display_name="Source", scope=Scope.settings, default="")
+    track = String(help="Source to download subtitle track", display_name="Track", scope=Scope.settings, default="")
 
 
 class VideoModule(VideoFields, XModule):
