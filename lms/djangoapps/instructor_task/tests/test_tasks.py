@@ -22,13 +22,14 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminFactory
 
 from courseware.model_data import StudentModule
-from courseware.task_submit import (submit_rescore_problem_for_all_students,
-                                    submit_rescore_problem_for_student,
-                                    course_task_status,
-                                    submit_reset_problem_attempts_for_all_students,
-                                    submit_delete_problem_state_for_all_students)
+from instructor_task.api import (submit_rescore_problem_for_all_students,
+                                 submit_rescore_problem_for_student,
+                                 submit_reset_problem_attempts_for_all_students,
+                                 submit_delete_problem_state_for_all_students)
+from instructor_task.views import instructor_task_status
+
 from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
-from courseware.tests.factories import CourseTaskFactory
+from instructor_task.tests.factories import InstructorTaskFactory
 
 
 log = logging.getLogger(__name__)
@@ -197,10 +198,10 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
                                                   student)
 
     def _create_course_task(self, task_state="QUEUED", task_input=None, student=None):
-        """Creates a CourseTask entry for testing."""
+        """Creates a InstructorTask entry for testing."""
         task_id = str(uuid4())
         task_key = "dummy value"
-        course_task = CourseTaskFactory.create(requester=self.instructor,
+        course_task = InstructorTaskFactory.create(requester=self.instructor,
                                                       task_input=json.dumps(task_input),
                                                       task_key=task_key,
                                                       task_id=task_id,
@@ -321,7 +322,7 @@ class TestRescoring(TestRescoringBase):
         # check status returned:
         mock_request = Mock()
         mock_request.REQUEST = {'task_id': course_task.task_id}
-        response = course_task_status(mock_request)
+        response = instructor_task_status(mock_request)
         status = json.loads(response.content)
         self.assertEqual(status['message'], expected_message)
 
@@ -371,7 +372,7 @@ class TestRescoring(TestRescoringBase):
 
         mock_request = Mock()
         mock_request.REQUEST = {'task_id': course_task.task_id}
-        response = course_task_status(mock_request)
+        response = instructor_task_status(mock_request)
         status = json.loads(response.content)
         self.assertEqual(status['message'], "Problem's definition does not support rescoring")
 
@@ -532,7 +533,7 @@ class TestResetAttempts(TestRescoringBase):
         # check status returned:
         mock_request = Mock()
         mock_request.REQUEST = {'task_id': course_task.task_id}
-        response = course_task_status(mock_request)
+        response = instructor_task_status(mock_request)
         status = json.loads(response.content)
         self.assertEqual(status['message'], expected_message)
 
@@ -610,7 +611,7 @@ class TestDeleteProblem(TestRescoringBase):
         # check status returned:
         mock_request = Mock()
         mock_request.REQUEST = {'task_id': course_task.task_id}
-        response = course_task_status(mock_request)
+        response = instructor_task_status(mock_request)
         status = json.loads(response.content)
         self.assertEqual(status['message'], expected_message)
 

@@ -58,7 +58,6 @@ urlpatterns = ('',  # nopep8
         name='auth_password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
-    url(r'^course_task_status/$', 'courseware.task_submit.course_task_status', name='course_task_status'),
 )
 
 # University profiles only make sense in the default edX context
@@ -393,6 +392,11 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
         url(r'^status/', include('service_status.urls')),
+    )
+
+if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+    urlpatterns += (
+        url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
     )
 
 # FoldIt views

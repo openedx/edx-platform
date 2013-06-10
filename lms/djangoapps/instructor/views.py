@@ -25,7 +25,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from courseware import grades
-from courseware import task_submit
+from instructor_task import api as task_api
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
 from courseware.courses import get_course_with_access
@@ -70,7 +70,7 @@ def instructor_dashboard(request, course_id):
     problems = []
     plots = []
     datatable = None
-    
+
     # the instructor dashboard page is modal: grades, psychometrics, admin
     # keep that state in request.session (defaults to grades mode)
     idash_mode = request.POST.get('idash_mode', '')
@@ -250,7 +250,7 @@ def instructor_dashboard(request, course_id):
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         try:
-            course_task = task_submit.submit_rescore_problem_for_all_students(request, course_id, problem_url)
+            course_task = task_api.submit_rescore_problem_for_all_students(request, course_id, problem_url)
             if course_task is None:
                 msg += '<font color="red">Failed to create a background task for rescoring "{0}".</font>'.format(problem_url)
             else:
@@ -266,7 +266,7 @@ def instructor_dashboard(request, course_id):
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         try:
-            course_task = task_submit.submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
+            course_task = task_api.submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
             if course_task is None:
                 msg += '<font color="red">Failed to create a background task for resetting "{0}".</font>'.format(problem_url)
             else:
@@ -357,7 +357,7 @@ def instructor_dashboard(request, course_id):
             else:
                 # "Rescore student's problem submission" case
                 try:
-                    course_task = task_submit.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
+                    course_task = task_api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
                     if course_task is None:
                         msg += '<font color="red">Failed to create a background task for rescoring "{0}" for student {1}.</font>'.format(module_state_key, unique_student_identifier)
                     else:
@@ -722,7 +722,7 @@ def instructor_dashboard(request, course_id):
 
     # generate list of pending background tasks
     if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
-        course_tasks = task_submit.get_running_course_tasks(course_id)
+        course_tasks = task_api.get_running_course_tasks(course_id)
     else:
         course_tasks = None
 
@@ -1299,7 +1299,7 @@ def get_background_task_table(course_id, problem_url, student=None):
     Returns a tuple of (msg, datatable), where the msg is a possible error message,
     and the datatable is the datatable to be used for display.
     """
-    history_entries = task_submit.get_course_task_history(course_id, problem_url, student)
+    history_entries = task_api.get_instructor_task_history(course_id, problem_url, student)
     datatable = None
     msg = ""
     # first check to see if there is any history at all
