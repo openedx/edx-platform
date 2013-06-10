@@ -1,0 +1,11 @@
+<li class="textbook">
+    <span class="name"><%= name %></span>
+    <% if(chapters.length > 1) {%>
+        <%= chapters.length %> PDF Chapters
+    <% } else if(chapters.length === 1) { %>
+        <%= chapters.at(0).asset_path %>
+    <% } %>
+    <a href="#" class="view"><%= gettext("view in course") %></a>
+    <button class="edit"><%= gettext("Edit") %></button>
+    <button class="delete"><%= gettext("Delete") %></button>
+</li>

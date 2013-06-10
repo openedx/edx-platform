@@ -6,10 +6,16 @@
 
 <%block name="header_extras">
   <script type="text/template" id="new-textbook-tpl">
-    <%static:include path="js/textbook.underscore" />
+    <%static:include path="js/textbook-edit.underscore" />
+  </script>
+  <script type="text/template" id="show-textbook-tpl">
+    <%static:include path="js/textbook-show.underscore" />
   </script>
   <script type="text/template" id="new-chapter-tpl">
     <%static:include path="js/chapter.underscore" />
+  </script>
+  <script type="text/template" id="no-textbooks-tpl">
+    <%static:include path="js/no-textbooks.underscore" />
   </script>
   <script type="text/template" id="upload-dialog-tpl">
     <%static:include path="js/upload-dialog.underscore" />
@@ -22,11 +28,75 @@ window.UPLOAD_ASSET_CALLBACK_URL = "${upload_asset_callback_url}"
 
 CMS.Models.Textbook = Backbone.Model.extend({
     defaults: {
-        name: ""
+        name: "",
     },
     initialize: function() {
         this.chapters = new CMS.Collections.ChapterSet;
         this.chapters.add([{}]);
+    }
+})
+CMS.Views.TextbookShow = Backbone.View.extend({
+    initialize: function() {
+        this.template = _.template($("#show-textbook-tpl").text());
+        this.listenTo(this.model, "change", this.render);
+    },
+    events: {
+        "click .edit": "editTextbook",
+    },
+    render: function() {
+        var attrs = $.extend({}, this.model.attributes);
+        attrs.chapters = this.model.chapters;
+        this.$el.html(this.template(attrs));
+        return this;
+    },
+    editTextbook: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.collection.trigger("editOne", this.model);
+    }
+})
+CMS.Collections.TextbookSet = Backbone.Collection.extend({
+    model: CMS.Models.Textbook,
+    initialize: function() {
+        this.listenTo(this, "editOne", this.editOne);
+    },
+    editOne: function(textbook) {
+        // the old TextbookEdit view is listening for the editOne event, and
+        // will remove itself when the event is fired, so this method doesnt
+        // need to worry about it.
+        $(".inner-wrapper").append(
+            new CMS.Views.TextbookEdit({model: textbook}).render().el
+        );
+    }
+})
+CMS.Views.ListTextbooks = Backbone.View.extend({
+    initialize: function() {
+        this.emptyTemplate = _.template($("#no-textbooks-tpl").text());
+        this.listenTo(this.collection, 'all', this.render);
+    },
+    tagName: "ul",
+    className: "textbooks",
+    render: function() {
+        if(this.collection.length === 0) {
+            this.$el.html(this.emptyTemplate());
+        } else {
+            var $el = this.$el;
+            $el.empty();
+            this.collection.each(function(textbook) {
+                $el.append(
+                    new CMS.Views.TextbookShow({model: textbook}).render().el
+                );
+            })
+        }
+        return this;
+    },
+    events: {
+        "click .new-button": "addOne"
+    },
+    addOne: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        var m = new this.collection.model;
+        this.collection.add(m);
+        this.collection.trigger("editOne", m);
     }
 })
 CMS.Models.Chapter = Backbone.Model.extend({
@@ -52,17 +122,22 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         this.listenTo(this.model.chapters, "add", this.addOne);
         this.listenTo(this.model.chapters, "reset", this.addAll);
         this.listenTo(this.model.chapters, "all", this.render);
+        this.listenTo(this.model.collection, "editOne", this.remove);
     },
+    tagName: "form",
+    className: "edit-textbook",
+    id: "edit_textbook_form",
     render: function() {
         this.$el.html(this.template({
             name: this.model.escape('name'),
+            errors: null
         }));
         this.addAll();
         return this;
     },
     events: {
         "submit": "save",
-        "click .action-cancel": "remove",
+        "click .action-cancel": "cancel",
         "click .action-add-chapter": "createChapter"
     },
     addOne: function(chapter) {
@@ -79,14 +154,34 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
     },
     save: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
-        alert("save is currently unimplemented")
+        var name = this.$("#textbook-name-input").val();
+        var textbook = this.model;
+        textbook.set("name", name);
+        _.each(this.$("li"), function(li, i) {
+            var chapter = textbook.chapters.at(i);
+            chapter.set({
+                "name": $(".chapter-name", li).val(),
+                "asset_path": $(".chapter-asset-path", li).val()
+            })
+        });
+        this.remove();
+        return this;
+    },
+    cancel: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.remove();
+        return this;
     }
 
 })
 CMS.Views.ChapterEdit = Backbone.View.extend({
     initialize: function() {
         this.template = _.template($("#new-chapter-tpl").text());
-        this.listenTo(this.model, "change", this.render)
+        this.listenTo(this.model, "change", this.render);
+    },
+    tagName: "li",
+    className: function() {
+        return "field-group chapter chapter" + this.model.get('order');
     },
     render: function() {
         this.$el.html(this.template({
@@ -228,11 +323,13 @@ var section = new CMS.Models.Section({
     id: "${course.id}",
     name: "${course.display_name_with_default | h}"
 });
+var textbooks = new CMS.Collections.TextbookSet();
+var tbView = new CMS.Views.ListTextbooks({collection: textbooks});
+
 $(function() {
-    $(".new-button").click(function() {
-        var textbook = new CMS.Models.Textbook();
-        var view = new CMS.Views.TextbookEdit({model: textbook})
-        $(".inner-wrapper").append(view.render().el);
+    $(".inner-wrapper").append(tbView.render().el);
+    $(".nav-actions .new-button").click(function(e) {
+        tbView.addOne(e);
     })
 })
 </script>
@@ -273,11 +370,6 @@ $(function() {
               <li class="nav-item"><a href="#" rel="modal" title="This link will open in a modal window"><i class="icon-question-sign"></i> Need help adding a textbook?</a></li>
             </ul>
           </nav>
-        </div>
-
-        <div class="no-textbook-content">
-            <p>You haven't added any textbooks to this course yet.</p>
-            <p><a href="#" class="button upload-button new-button">Add your first textbook</a></p>
         </div>
 
     </div>
