@@ -87,7 +87,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
                 # but url_names aren't guaranteed to be unique between descriptor types,
                 # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
                 # it will be written out with the original url_name.
-                name=hashlib.sha1(contents).hexdigest()
+                name=hashlib.sha1(contents.encode('utf8')).hexdigest()
             )
 
         # real metadata stays in the content, but add a display name
