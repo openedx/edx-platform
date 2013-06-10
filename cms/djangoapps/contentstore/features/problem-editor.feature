@@ -52,7 +52,7 @@ Feature: Problem Editor
   Scenario: User cannot type out of range values in an integer number field
     Given I have created a Blank Common Problem
     And I edit and select Settings
-    Then if I set the max attempts to "-3", it displays initially as "-3", and is persisted as "1"
+    Then if I set the max attempts to "-3", it displays initially as "-3", and is persisted as "0"
 
   Scenario: Settings changes are not saved on Cancel
     Given I have created a Blank Common Problem
