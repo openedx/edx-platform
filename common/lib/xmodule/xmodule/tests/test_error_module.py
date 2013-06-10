@@ -18,8 +18,7 @@ class TestErrorModule(unittest.TestCase):
         self.org = "org"
         self.course = "course"
         self.location = Location(['i4x', self.org, self.course, None, None])
-        self.valid_xml = "<problem />"
-        self.broken_xml = "<problem>"
+        self.valid_xml = u"<problem>ABC \N{SNOWMAN}</problem>"
         self.error_msg = "Error"
 
     def test_error_module_xml_rendering(self):
@@ -29,7 +28,7 @@ class TestErrorModule(unittest.TestCase):
         module = descriptor.xmodule(self.system)
         rendered_html = module.get_html()
         self.assertIn(self.error_msg, rendered_html)
-        self.assertIn(self.valid_xml, rendered_html)
+        self.assertIn(repr(self.valid_xml), rendered_html)
 
     def test_error_module_from_descriptor(self):
         descriptor = MagicMock([XModuleDescriptor],
@@ -43,7 +42,7 @@ class TestErrorModule(unittest.TestCase):
         module = error_descriptor.xmodule(self.system)
         rendered_html = module.get_html()
         self.assertIn(self.error_msg, rendered_html)
-        self.assertIn(str(descriptor), rendered_html)
+        self.assertIn(repr(descriptor), rendered_html)
 
 
 class TestNonStaffErrorModule(TestErrorModule):
@@ -62,7 +61,7 @@ class TestNonStaffErrorModule(TestErrorModule):
         module = descriptor.xmodule(self.system)
         rendered_html = module.get_html()
         self.assertNotIn(self.error_msg, rendered_html)
-        self.assertNotIn(self.valid_xml, rendered_html)
+        self.assertNotIn(repr(self.valid_xml), rendered_html)
 
     def test_error_module_from_descriptor(self):
         descriptor = MagicMock([XModuleDescriptor],
