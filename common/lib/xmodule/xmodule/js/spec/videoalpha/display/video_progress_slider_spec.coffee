@@ -114,9 +114,7 @@ describe 'VideoProgressSliderAlpha', ->
     beforeEach ->
       @player = jasmine.stubVideoPlayerAlpha @
       @progressSlider = @player.progressSlider
-      @time = null
-      $(@progressSlider).bind 'seek', (event, time) => @time = time
-      spyOnEvent @progressSlider, 'seek'
+      spyOnEvent @progressSlider, 'slide_seek'
       @progressSlider.onSlide {}, value: 20
 
     it 'freeze the slider', ->
@@ -126,8 +124,8 @@ describe 'VideoProgressSliderAlpha', ->
       expect($.fn.qtip).toHaveBeenCalled()
 
     it 'trigger seek event', ->
-      expect('seek').toHaveBeenTriggeredOn @progressSlider
-      expect(@time).toEqual 20
+      expect('slide_seek').toHaveBeenTriggeredOn @progressSlider
+      expect(@player.currentTime).toEqual 20
 
   describe 'onChange', ->
     beforeEach ->
@@ -142,17 +140,15 @@ describe 'VideoProgressSliderAlpha', ->
     beforeEach ->
       @player = jasmine.stubVideoPlayerAlpha @
       @progressSlider = @player.progressSlider
-      @time = null
-      $(@progressSlider).bind 'seek', (event, time) => @time = time
-      spyOnEvent @progressSlider, 'seek'
+      spyOnEvent @progressSlider, 'slide_seek'
       @progressSlider.onStop {}, value: 20
 
     it 'freeze the slider', ->
       expect(@progressSlider.frozen).toBeTruthy()
 
     it 'trigger seek event', ->
-      expect('seek').toHaveBeenTriggeredOn @progressSlider
-      expect(@time).toEqual 20
+      expect('slide_seek').toHaveBeenTriggeredOn @progressSlider
+      expect(@player.currentTime).toEqual 20
 
     it 'set timeout to unfreeze the slider', ->
       expect(window.setTimeout).toHaveBeenCalledWith jasmine.any(Function), 200

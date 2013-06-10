@@ -316,7 +316,6 @@ describe 'VideoCaptionAlpha', ->
     beforeEach ->
       @player = jasmine.stubVideoPlayerAlpha @
       @caption = @player.caption
-      @time = null
       $(@caption).bind 'seek', (event, time) => @time = time
 
     describe 'when the video speed is 1.0x', ->
@@ -325,7 +324,7 @@ describe 'VideoCaptionAlpha', ->
         $('.subtitles li[data-start="30000"]').trigger('click')
 
       it 'trigger seek event with the correct time', ->
-        expect(@time).toEqual 30.000
+        expect(@player.currentTime).toEqual 30.000
 
     describe 'when the video speed is not 1.0x', ->
       beforeEach ->
@@ -333,7 +332,7 @@ describe 'VideoCaptionAlpha', ->
         $('.subtitles li[data-start="30000"]').trigger('click')
 
       it 'trigger seek event with the correct time', ->
-        expect(@time).toEqual 40.000
+        expect(@player.currentTime).toEqual 40.000
 
   describe 'toggle', ->
     beforeEach ->

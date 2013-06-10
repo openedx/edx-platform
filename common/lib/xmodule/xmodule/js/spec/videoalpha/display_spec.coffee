@@ -272,12 +272,13 @@ describe 'VideoAlpha', ->
     beforeEach ->
       loadFixtures 'videoalpha.html'
       @video = new VideoAlpha '#example', @videosDefinition
-      @video.setSpeed '1.0'
       spyOn Logger, 'log'
-      @video.player = { currentTime: 25 }
-      @video.log 'someEvent'
+      @video.log 'someEvent', {
+        currentTime: 25,
+        speed: '1.0'
+      }
 
-    it 'call the logger with valid parameters', ->
+    it 'call the logger with valid extra parameters', ->
       expect(Logger.log).toHaveBeenCalledWith 'someEvent',
         id: 'id'
         code: @normalSpeedYoutubeId

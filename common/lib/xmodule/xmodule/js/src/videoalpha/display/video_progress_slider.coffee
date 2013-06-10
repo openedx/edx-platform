@@ -43,7 +43,7 @@ class @VideoProgressSliderAlpha extends SubviewAlpha
 
   onStop: (event, ui) =>
     @frozen = true
-    $(@).trigger('seek', ui.value)
+    $(@).trigger('slide_seek', ui.value)
     setTimeout (=> @frozen = false), 200
 
   updateTooltip: (value)->

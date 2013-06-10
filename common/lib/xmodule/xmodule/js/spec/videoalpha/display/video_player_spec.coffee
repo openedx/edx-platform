@@ -67,13 +67,13 @@ describe 'VideoPlayerAlpha', ->
         expect($(@player.control)).toHandleWith 'pause', @player.pause
 
       it 'bind to video caption seek event', ->
-        expect($(@player.caption)).toHandleWith 'seek', @player.onSeek
+        expect($(@player.caption)).toHandleWith 'caption_seek', @player.onSeek
 
       it 'bind to video speed control speedChange event', ->
         expect($(@player.speedControl)).toHandleWith 'speedChange', @player.onSpeedChange
 
       it 'bind to video progress slider seek event', ->
-        expect($(@player.progressSlider)).toHandleWith 'seek', @player.onSeek
+        expect($(@player.progressSlider)).toHandleWith 'slide_seek', @player.onSeek
 
       it 'bind to video volume control volumeChange event', ->
         expect($(@player.volumeControl)).toHandleWith 'volumeChange', @player.onVolumeChange
@@ -145,12 +145,16 @@ describe 'VideoPlayerAlpha', ->
   describe 'onReady', ->
     beforeEach ->
       jasmine.stubVideoPlayerAlpha @, [], false
+      spyOn @video, 'log'
       $('.video').append $('<div class="add-fullscreen" /><div class="hide-subtitles" />')
       @video.embed()
       @player = @video.player
       spyOnEvent @player, 'ready'
       spyOnEvent @player, 'updatePlayTime'
       @player.onReady()
+
+    it 'log the load_video event', ->
+      expect(@video.log).toHaveBeenCalledWith 'load_video'
 
     describe 'when not on a touch based device', ->
       beforeEach ->
@@ -201,7 +205,7 @@ describe 'VideoPlayerAlpha', ->
         @player.onStateChange data: YT.PlayerState.PLAYING
 
       it 'log the play_video event', ->
-        expect(@video.log).toHaveBeenCalledWith 'play_video'
+        expect(@video.log).toHaveBeenCalledWith 'play_video', {currentTime: 0}
 
       it 'pause other video player', ->
         expect(@anotherPlayer.onPause).toHaveBeenCalled()
@@ -234,7 +238,7 @@ describe 'VideoPlayerAlpha', ->
         @player.onStateChange data: YT.PlayerState.PAUSED
 
       it 'log the pause_video event', ->
-        expect(@video.log).toHaveBeenCalledWith 'pause_video'
+        expect(@video.log).toHaveBeenCalledWith 'pause_video', {currentTime: 0}
 
       it 'clear update interval', ->
         expect(window.clearInterval).toHaveBeenCalledWith 100
@@ -260,6 +264,16 @@ describe 'VideoPlayerAlpha', ->
         expect(@player.caption.pause).toHaveBeenCalled()
 
   describe 'onSeek', ->
+    conf = [{
+        desc : 'check if seek_video is logged with slide_seek type',
+        type: 'slide_seek',
+        obj: 'progressSlider'
+      },{
+        desc : 'check if seek_video is logged with caption_seek type',
+        type: 'caption_seek',
+        obj: 'caption'
+      }]
+
     beforeEach ->
       jasmine.stubVideoPlayerAlpha @, [], false
       $('.video').append $('<div class="add-fullscreen" /><div class="hide-subtitles" />')
@@ -267,16 +281,30 @@ describe 'VideoPlayerAlpha', ->
       spyOn window, 'clearInterval'
       @player.player.interval = 100
       spyOn @player, 'updatePlayTime'
-      @player.onSeek {}, 60
+      spyOn @video, 'log'
+
+    $.each conf, (key, value) ->
+      it value.desc, ->
+        type = value.type
+        old_time = 0
+        new_time = 60
+        $(@player[value.obj]).trigger value.type, new_time
+        expect(@video.log).toHaveBeenCalledWith 'seek_video',
+          old_time: old_time
+          new_time: new_time
+          type: value.type
 
     it 'seek the player', ->
+      $(@player.progressSlider).trigger 'slide_seek', 60
       expect(@player.player.seekTo).toHaveBeenCalledWith 60, true
 
     it 'call updatePlayTime on player', ->
+      $(@player.progressSlider).trigger 'slide_seek', 60
       expect(@player.updatePlayTime).toHaveBeenCalledWith 60
 
     describe 'when the player is playing', ->
       beforeEach ->
+        $(@player.progressSlider).trigger 'slide_seek', 60
         @player.player.getPlayerState.andReturn YT.PlayerState.PLAYING
         @player.onSeek {}, 60
 
@@ -285,6 +313,7 @@ describe 'VideoPlayerAlpha', ->
 
     describe 'when the player is not playing', ->
       beforeEach ->
+        $(@player.progressSlider).trigger 'slide_seek', 60
         @player.player.getPlayerState.andReturn YT.PlayerState.PAUSED
         @player.onSeek {}, 60
 
@@ -299,10 +328,17 @@ describe 'VideoPlayerAlpha', ->
       @player.currentTime = 60
       spyOn @player, 'updatePlayTime'
       spyOn(@video, 'setSpeed').andCallThrough()
+      spyOn(@video, 'log')
 
     describe 'always', ->
       beforeEach ->
         @player.onSpeedChange {}, '0.75', false
+
+      it 'check if speed_change_video is logged', ->
+        expect(@video.log).toHaveBeenCalledWith 'speed_change_video',
+          currentTime: @player.currentTime
+          old_speed: '1.0'
+          new_speed: '0.75'
 
       it 'convert the current time to the new speed', ->
         expect(@player.currentTime).toEqual '80.000'
