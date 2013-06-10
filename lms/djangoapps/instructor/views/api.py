@@ -63,7 +63,7 @@ def grading_config(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def enrolled_students_profiles(request, course_id):
+def enrolled_students_profiles(request, course_id, csv=False):
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -73,26 +73,13 @@ def enrolled_students_profiles(request, course_id):
     TODO accept requests for different attribute sets
     """
 
-    # enrollments = CourseEnrollment.objects.filter(course_id=course_id)
-    # students = [enrollment.user for enrollment in enrollments]
-    students = User.objects.filter(courseenrollment__course_id=course_id)
-
-    STUDENT_FEATURES = ['username', 'first_name', 'last_name', 'is_staff', 'email']
-    PROFILE_FEATURES = ['year_of_birth', 'gender', 'level_of_education']
-
-    def extract_student(student):
-        student_dict = dict((feature, getattr(student, feature)) for feature in STUDENT_FEATURES)
-        profile = student.profile
-        profile_dict = dict((feature, getattr(profile, feature)) for feature in PROFILE_FEATURES)
-        student_dict.update(profile_dict)
-        return student_dict
-
     available_features = analytics.basic.AVAILABLE_STUDENT_FEATURES + analytics.basic.AVAILABLE_PROFILE_FEATURES
 
+    data = analytics.basic.enrolled_students_profiles(course_id, available_features)
     response_payload = {
         'course_id':          course_id,
-        'students':           analytics.basic.enrolled_students_profiles(course_id, available_features),
-        'students_count':     students.count(),
+        'students':           data,
+        'students_count':     len(data),
         'available_features': available_features
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
@@ -137,7 +124,7 @@ def profile_distribution(request, course_id):
     response_payload = {
         'course_id':          course_id,
         'queried_features':   features,
-        'available_features': ['gender', 'level_of_education', 'year_of_birth'],
+        'available_features': analytics.distributions.AVAILABLE_PROFILE_FEATURES,
         'display_names':      {
             'gender': 'Gender',
             'level_of_education': 'Level of Education',
