@@ -32,7 +32,7 @@ def enrolled_students_profiles(course_id, features):
         student_dict.update(profile_dict)
         return student_dict
 
-    return [extract_student(student) for student in students.all()],
+    return [extract_student(student) for student in students.all()]
 
 
 def create_csv_response(filename, header, datarows):
