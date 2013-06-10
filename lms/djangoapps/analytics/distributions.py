@@ -6,13 +6,13 @@ from django.db.models import Count
 from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment, UserProfile
 
-AVAILABLE_FEATURES = ['gender', 'level_of_education', 'year_of_birth']
+AVAILABLE_PROFILE_FEATURES = ['gender', 'level_of_education', 'year_of_birth']
 
 
-def get_profile_distribution(course_id, feature):
+def profile_distribution(course_id, feature):
     """
     Retrieve distribution of students over a given feature.
-    feature is one of AVAILABLE_FEATURES.
+    feature is one of AVAILABLE_PROFILE_FEATURES.
 
     Returna dictionary {'type': 'SOME_TYPE', 'data': {'key': 'val'}}
     data types e.g.
@@ -25,7 +25,7 @@ def get_profile_distribution(course_id, feature):
 
     feature_results = {}
 
-    if not feature in AVAILABLE_FEATURES:
+    if not feature in AVAILABLE_PROFILE_FEATURES:
         raise ValueError("unsupported feature requested for distribution '%s'" % feature)
 
     if feature in EASY_CHOICE_FEATURES:
@@ -58,6 +58,6 @@ def get_profile_distribution(course_id, feature):
         feature_results['data'] = distribution
         feature_results['type'] = 'OPEN_CHOICE'
     else:
-        raise ValueError("feature requested for distribution has not been implemented but is advertised in AVAILABLE_FEATURES! '%s'" % feature)
+        raise ValueError("feature requested for distribution has not been implemented but is advertised in AVAILABLE_PROFILE_FEATURES! '%s'" % feature)
 
     return feature_results

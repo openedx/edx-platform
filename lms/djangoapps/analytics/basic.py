@@ -4,9 +4,36 @@ Student and course analytics.
 Serve miscellaneous course and student data
 """
 
+from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 
-def _dump_grading_context(course):
+
+AVAILABLE_STUDENT_FEATURES = ['username', 'first_name', 'last_name', 'is_staff', 'email']
+AVAILABLE_PROFILE_FEATURES = ['year_of_birth', 'gender', 'level_of_education']
+
+
+def enrolled_students_profiles(course_id, features):
+    """
+    Return array of student features e.g. [{?}, ...]
+    """
+    # enrollments = CourseEnrollment.objects.filter(course_id=course_id)
+    # students = [enrollment.user for enrollment in enrollments]
+    students = User.objects.filter(courseenrollment__course_id=course_id)
+
+    def extract_student(student):
+        student_features = [feature for feature in features if feature in AVAILABLE_STUDENT_FEATURES]
+        profile_features = [feature for feature in features if feature in AVAILABLE_PROFILE_FEATURES]
+
+        student_dict = dict((feature, getattr(student, feature)) for feature in student_features)
+        profile = student.profile
+        profile_dict = dict((feature, getattr(profile, feature)) for feature in profile_features)
+        student_dict.update(profile_dict)
+        return student_dict
+
+    return [extract_student(student) for student in students.all()],
+
+
+def dump_grading_context(course):
     """
     Dump information about course grading context (eg which problems are graded in what assignments)
     Very useful for debugging grading_policy.json and policy.json

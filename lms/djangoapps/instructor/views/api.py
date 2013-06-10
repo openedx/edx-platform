@@ -27,10 +27,10 @@ from instructor.offline_gradecalc import student_grades, offline_grades_availabl
 from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 
-from analytics.analytics import _dump_grading_context
-from analytics.profile_distribution import get_profile_distribution
+import analytics.basic
+import analytics.distributions
 
 
 @ensure_csrf_cookie
@@ -42,7 +42,7 @@ def grading_config(request, course_id):
     TODO maybe this shouldn't be html already
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
-    grading_config_summary = _dump_grading_context(course)
+    grading_config_summary = analytics.basic.dump_grading_context(course)
 
     response_payload = {
         'course_id': course_id,
@@ -57,6 +57,8 @@ def grading_config(request, course_id):
 def enrolled_students_profiles(request, course_id):
     """
     Respond with json which contains a summary of all enrolled students profile information.
+
+    Response {"students": [{-student-info-}, ...]}
 
     TODO respond to csv requests as well
     TODO accept requests for different attribute sets
@@ -76,13 +78,13 @@ def enrolled_students_profiles(request, course_id):
         student_dict.update(profile_dict)
         return student_dict
 
+    available_features = analytics.basic.AVAILABLE_STUDENT_FEATURES + analytics.basic.AVAILABLE_PROFILE_FEATURES
+
     response_payload = {
-        'course_id':        course_id,
-        'students':         [extract_student(student) for student in students.all()],
-        'students_count':   students.count(),
-        'STUDENT_FEATURES': STUDENT_FEATURES,
-        'PROFILE_FEATURES': PROFILE_FEATURES,
-        'all_features':     STUDENT_FEATURES + PROFILE_FEATURES,
+        'course_id':          course_id,
+        'students':           analytics.basic.enrolled_students_profiles(course_id, available_features),
+        'students_count':     students.count(),
+        'available_features': available_features
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
@@ -118,8 +120,8 @@ def profile_distribution(request, course_id):
 
     for feature in features:
         try:
-            feature_results[feature] = get_profile_distribution(course_id, feature)
-        except:
+            feature_results[feature] = analytics.distributions.profile_distribution(course_id, feature)
+        except Exception as e:
             feature_results[feature] = {'error': "can not find distribution for '%s'" % feature}
             raise e
 
