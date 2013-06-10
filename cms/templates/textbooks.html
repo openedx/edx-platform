@@ -33,6 +33,9 @@ CMS.Models.Textbook = Backbone.Model.extend({
     initialize: function() {
         this.chapters = new CMS.Collections.ChapterSet;
         this.chapters.add([{}]);
+    },
+    isEmpty: function() {
+        return !this.get('name');
     }
 })
 CMS.Views.TextbookShow = Backbone.View.extend({
@@ -42,6 +45,7 @@ CMS.Views.TextbookShow = Backbone.View.extend({
     },
     events: {
         "click .edit": "editTextbook",
+        "click .delete": "removeSelf"
     },
     render: function() {
         var attrs = $.extend({}, this.model.attributes);
@@ -52,68 +56,10 @@ CMS.Views.TextbookShow = Backbone.View.extend({
     editTextbook: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.model.collection.trigger("editOne", this.model);
-    }
-})
-CMS.Collections.TextbookSet = Backbone.Collection.extend({
-    model: CMS.Models.Textbook,
-    initialize: function() {
-        this.listenTo(this, "editOne", this.editOne);
     },
-    editOne: function(textbook) {
-        // the old TextbookEdit view is listening for the editOne event, and
-        // will remove itself when the event is fired, so this method doesnt
-        // need to worry about it.
-        $(".inner-wrapper").append(
-            new CMS.Views.TextbookEdit({model: textbook}).render().el
-        );
-    }
-})
-CMS.Views.ListTextbooks = Backbone.View.extend({
-    initialize: function() {
-        this.emptyTemplate = _.template($("#no-textbooks-tpl").text());
-        this.listenTo(this.collection, 'all', this.render);
-    },
-    tagName: "ul",
-    className: "textbooks",
-    render: function() {
-        if(this.collection.length === 0) {
-            this.$el.html(this.emptyTemplate());
-        } else {
-            var $el = this.$el;
-            $el.empty();
-            this.collection.each(function(textbook) {
-                $el.append(
-                    new CMS.Views.TextbookShow({model: textbook}).render().el
-                );
-            })
-        }
-        return this;
-    },
-    events: {
-        "click .new-button": "addOne"
-    },
-    addOne: function(e) {
+    removeSelf: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
-        var m = new this.collection.model;
-        this.collection.add(m);
-        this.collection.trigger("editOne", m);
-    }
-})
-CMS.Models.Chapter = Backbone.Model.extend({
-    defaults: function() {
-        return {
-            name: "",
-            asset_path: "",
-            order: this.collection ? this.collection.nextOrder() : 1
-        }
-    }
-})
-CMS.Collections.ChapterSet = Backbone.Collection.extend({
-    model: CMS.Models.Chapter,
-    comparator: "order",
-    nextOrder: function() {
-        if(!this.length) return 1;
-        return this.last().get('order') + 1;
+        this.model.collection.remove(this.model);
     }
 })
 CMS.Views.TextbookEdit = Backbone.View.extend({
@@ -136,7 +82,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         return this;
     },
     events: {
-        "submit": "saveAndRemove",
+        "submit": "saveAndClose",
         "click .action-cancel": "cancel",
         "click .action-add-chapter": "createChapter"
     },
@@ -166,16 +112,91 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         });
         return this;
     },
-    saveAndRemove: function(e) {
+    saveAndClose: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
-        return this.save().remove();
+        return this.save().close();
     },
     cancel: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
+        return this.close();
+    },
+    close: function() {
+        var textbooks = this.model.collection;
+        delete textbooks.editing;
         this.remove();
+        // if the textbook has no content, remove it from the collection
+        var chapterIsEmpty = function(chapter) { return chapter.isEmpty(); }
+        if(this.model.isEmpty() && this.model.chapters.every(chapterIsEmpty)) {
+            textbooks.remove(this.model);
+        }
+        textbooks.trigger('render');
         return this;
     }
-
+})
+CMS.Collections.TextbookSet = Backbone.Collection.extend({
+    model: CMS.Models.Textbook,
+    initialize: function() {
+        this.listenTo(this, "editOne", this.editOne);
+    },
+    editOne: function(textbook) {
+        this.editing = textbook;
+    }
+})
+CMS.Views.ListTextbooks = Backbone.View.extend({
+    initialize: function() {
+        this.emptyTemplate = _.template($("#no-textbooks-tpl").text());
+        this.listenTo(this.collection, 'all', this.render);
+    },
+    tagName: "ul",
+    className: "textbooks",
+    render: function() {
+        var textbooks = this.collection;
+        if(textbooks.length === 0) {
+            this.$el.html(this.emptyTemplate());
+        } else {
+            var $el = this.$el;
+            $el.empty();
+            textbooks.each(function(textbook) {
+                var view;
+                if (textbook === textbooks.editing) {
+                    view = new CMS.Views.TextbookEdit({model: textbook});
+                } else {
+                    view = new CMS.Views.TextbookShow({model: textbook});
+                }
+                $el.append(view.render().el);
+            })
+        }
+        return this;
+    },
+    events: {
+        "click .new-button": "addOne"
+    },
+    addOne: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        var m = new this.collection.model;
+        this.collection.add(m);
+        this.collection.trigger("editOne", m);
+    }
+})
+CMS.Models.Chapter = Backbone.Model.extend({
+    defaults: function() {
+        return {
+            name: "",
+            asset_path: "",
+            order: this.collection ? this.collection.nextOrder() : 1
+        }
+    },
+    isEmpty: function() {
+        return !this.get('name') && !this.get('asset_path');
+    }
+})
+CMS.Collections.ChapterSet = Backbone.Collection.extend({
+    model: CMS.Models.Chapter,
+    comparator: "order",
+    nextOrder: function() {
+        if(!this.length) return 1;
+        return this.last().get('order') + 1;
+    }
 })
 CMS.Views.ChapterEdit = Backbone.View.extend({
     initialize: function() {
