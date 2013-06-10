@@ -74,9 +74,10 @@ def enrolled_students_profiles(request, course_id, csv=False):
     """
 
     available_features = analytics.basic.AVAILABLE_STUDENT_FEATURES + analytics.basic.AVAILABLE_PROFILE_FEATURES
-    queried_features = available_features
+    query_features = ['username', 'name', 'language', 'location', 'year_of_birth', 'gender',
+                      'level_of_education', 'mailing_address', 'goals']
 
-    student_data = analytics.basic.enrolled_students_profiles(course_id, queried_features)
+    student_data = analytics.basic.enrolled_students_profiles(course_id, query_features)
 
     if not csv:
         response_payload = {

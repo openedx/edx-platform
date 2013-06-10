@@ -9,7 +9,7 @@ import xmodule.graders as xmgraders
 
 
 AVAILABLE_STUDENT_FEATURES = ['username', 'first_name', 'last_name', 'is_staff', 'email']
-AVAILABLE_PROFILE_FEATURES = ['year_of_birth', 'gender', 'level_of_education']
+AVAILABLE_PROFILE_FEATURES = ['name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education', 'mailing_address', 'goals']
 
 
 def enrolled_students_profiles(course_id, features):
@@ -18,7 +18,7 @@ def enrolled_students_profiles(course_id, features):
     """
     # enrollments = CourseEnrollment.objects.filter(course_id=course_id)
     # students = [enrollment.user for enrollment in enrollments]
-    students = User.objects.filter(courseenrollment__course_id=course_id)
+    students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username').select_related('profile')
 
     def extract_student(student):
         student_features = [feature for feature in features if feature in AVAILABLE_STUDENT_FEATURES]
@@ -30,7 +30,7 @@ def enrolled_students_profiles(course_id, features):
         student_dict.update(profile_dict)
         return student_dict
 
-    return [extract_student(student) for student in students.all()]
+    return [extract_student(student) for student in students]
 
 
 def dump_grading_context(course):
