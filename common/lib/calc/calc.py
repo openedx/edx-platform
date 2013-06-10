@@ -57,7 +57,8 @@ DEFAULT_FUNCTIONS = {'sin': numpy.sin,
                      'arccsch': calcfunctions.arccsch,
                      'arccoth': calcfunctions.arccoth
                      }
-DEFAULT_VARIABLES = {'j': numpy.complex(0, 1),
+DEFAULT_VARIABLES = {'i': numpy.complex(0, 1),
+                     'j': numpy.complex(0, 1),
                      'e': numpy.e,
                      'pi': numpy.pi,
                      'k': scipy.constants.k,
