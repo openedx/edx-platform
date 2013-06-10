@@ -67,15 +67,20 @@ setup_section_data_download = (section) ->
   list_studs_btn = section.find("input[name='list-profiles']'")
   list_studs_btn.click (e) ->
     log "fetching student list"
-    $.getJSON list_studs_btn.data('endpoint'), (data) ->
-      section.find('.dumped-data-display').text JSON.stringify(data)
+    url = $(this).data('endpoint')
+    if $(this).data 'csv'
+      url += '/csv'
+      location.href = url
+    else
+      $.getJSON url, (data) ->
+        section.find('.dumped-data-display').text JSON.stringify(data)
 
   grade_config_btn = section.find("input[name='dump-gradeconf']'")
   grade_config_btn.click (e) ->
     log "fetching grading config"
-    $.getJSON grade_config_btn.data('endpoint'), (data) ->
+    url = $(this).data('endpoint')
+    $.getJSON url, (data) ->
       section.find('.dumped-data-display').html data['grading_config_summary']
-
 
 
 # setup the analytics section

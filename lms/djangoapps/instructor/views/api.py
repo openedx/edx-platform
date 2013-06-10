@@ -69,21 +69,32 @@ def enrolled_students_profiles(request, course_id, csv=False):
 
     Response {"students": [{-student-info-}, ...]}
 
-    TODO respond to csv requests as well
     TODO accept requests for different attribute sets
     """
 
     available_features = analytics.basic.AVAILABLE_STUDENT_FEATURES + analytics.basic.AVAILABLE_PROFILE_FEATURES
+    queried_features = available_features
 
-    data = analytics.basic.enrolled_students_profiles(course_id, available_features)
-    response_payload = {
-        'course_id':          course_id,
-        'students':           data,
-        'students_count':     len(data),
-        'available_features': available_features
-    }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
-    return response
+    student_data = analytics.basic.enrolled_students_profiles(course_id, queried_features)
+
+    if not csv:
+        response_payload = {
+            'course_id':          course_id,
+            'students':           student_data,
+            'students_count':     len(student_data),
+            'available_features': available_features
+        }
+        response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+        return response
+    else:
+        header = queried_features
+        datarows = []
+        for student in student_data:
+            ordered = sorted(student.items(), key=lambda (k, v): header.index(k))
+            vals = map(lambda (k, v): v, ordered)
+            datarows.append(vals)
+
+        return analytics.basic.create_csv_response("enrolled_profiles.csv", header, datarows)
 
 
 @ensure_csrf_cookie
