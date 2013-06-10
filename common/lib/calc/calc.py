@@ -21,7 +21,7 @@ from pyparsing import (Word, nums, Literal,
                        ZeroOrMore, MatchFirst,
                        Optional, Forward,
                        CaselessLiteral,
-                       NoMatch, stringEnd, Suppress, Combine)
+                       stringEnd, Suppress, Combine)
 
 DEFAULT_FUNCTIONS = {'sin': numpy.sin,
                      'cos': numpy.cos,
@@ -258,31 +258,27 @@ def evaluator(variables, functions, string, cs=False):
     # Predefine recursive variables
     expr = Forward()
 
-    # Handle variables passed in. E.g. if we have {'R':0.5}, we make the substitution.
-    # Special case for no variables because of how we understand PyParsing is put together
-    if len(all_variables) > 0:
-        # We sort the list so that var names (like "e2") match before
-        # mathematical constants (like "e"). This is kind of a hack.
-        all_variables_keys = sorted(all_variables.keys(), key=len, reverse=True)
-        varnames = MatchFirst([CasedLiteral(k) for k in all_variables_keys])
-        varnames.setParseAction(
-            lambda x: [all_variables[k] for k in x]
-        )
-    else:
-        # all_variables includes DEFAULT_VARIABLES, which isn't empty
-        # this is unreachable. Get rid of it?
-        varnames = NoMatch()
+    # Handle variables passed in.
+    #  E.g. if we have {'R':0.5}, we make the substitution.
+    # We sort the list so that var names (like "e2") match before
+    # mathematical constants (like "e"). This is kind of a hack.
+    all_variables_keys = sorted(all_variables.keys(), key=len, reverse=True)
+    varnames = MatchFirst([CasedLiteral(k) for k in all_variables_keys])
+    varnames.setParseAction(
+        lambda x: [all_variables[k] for k in x]
+    )
+
+    # if all_variables were empty, then pyparsing wants
+    # varnames = NoMatch()
+    # this is not the case, as all_variables contains the defaults
 
     # Same thing for functions.
-    if len(all_functions) > 0:
-        funcnames = MatchFirst([CasedLiteral(k) for k in all_functions.keys()])
-        function = funcnames + Suppress("(") + expr + Suppress(")")
-        function.setParseAction(
-            lambda x: [all_functions[x[0]](x[1])]
-        )
-    else:
-        # see note above (this is unreachable)
-        function = NoMatch()
+    all_functions_keys = sorted(all_functions.keys(), key=len, reverse=True)
+    funcnames = MatchFirst([CasedLiteral(k) for k in all_functions_keys])
+    function = funcnames + Suppress("(") + expr + Suppress(")")
+    function.setParseAction(
+        lambda x: [all_functions[x[0]](x[1])]
+    )
 
     atom = number | function | varnames | Suppress("(") + expr + Suppress(")")
 
