@@ -24,15 +24,15 @@
 	}
 
 	.content {
+		float: left;
 		margin-right: flex-gutter();
 		width: flex-grid(8);
-		float: left;
 	}
 
 	aside {
+		float: left;
 		margin: 0;
 		width: flex-grid(4);
-		float: left;
 	}
 
 	// introduction
@@ -42,15 +42,15 @@
 			
 			h2 {
 				margin: 0;
-				font-family: $sans-serif;
-				font-size: 16px;
 				color: $lighter-base-font-color;
+				font-size: 16px;
+				font-family: $sans-serif;
 			}
 
 			h1 {
-				font-family: $sans-serif;
-				font-size: 34px;
 				text-align: left;
+				font-size: 34px;
+				font-family: $sans-serif;
 			}			
 		}
 	}
@@ -62,20 +62,19 @@
 
 	// form
 	.form-fields-primary, .form-fields-secondary {
-		border-bottom: 1px solid rgba(0,0,0,0.25);
 		@include box-shadow(0 1px 2px 0 rgba(0,0,0, 0.1));
+		border-bottom: 1px solid rgba(0,0,0,0.25);
 	}
 
 	form {
-		border: 1px solid rgb(216, 223, 230);
 		@include border-radius(3px);
-		@include box-shadow(0 1px 2px 0 rgba(0,0,0, 0.2));
+		border: 1px solid rgb(216, 223, 230);
 
 		.instructions, .note {
 			margin: 0;
 			padding: ($baseline*1.5) ($baseline*1.5) 0 ($baseline*1.5);
-			font-size: 14px;
 			color: tint($base-font-color, 20%);
+			font-size: 14px;
 
 			strong {
 				font-weight: normal;
@@ -88,8 +87,8 @@
 		}
 
 		fieldset {
-			border-bottom: 1px solid rgba(216, 223, 230, 0.50);
 			padding: ($baseline*1.5);
+			border-bottom: 1px solid rgba(216, 223, 230, 0.50);
 		}
 
 		.form-actions {
@@ -97,36 +96,36 @@
 			padding: ($baseline*1.5);
 
 			button[type="submit"] {
-				display: block;
 				@include button(simple, $blue);
-				@include box-sizing(border-box);
 				@include border-radius(3px);
-				font: bold 15px/1.6rem $sans-serif;
-				letter-spacing: 0;
+				display: block;
 				padding: ($baseline*0.75) $baseline;
 				text-align: center;
+				letter-spacing: 0;
+				font: bold 15px/1.6rem $sans-serif;
 
 
 				&:disabled {
 					opacity: 0.3;
 				}
+				@include box-sizing(border-box);
 			}
 
 			.action-primary {
 				float: left;
-				width: flex-grid(5,8);
 				margin-right: flex-gutter(2);
+				width: flex-grid(5,8);
 			}
 
 			.action-secondary {
 				display: block;
 				float: left;
-				width: flex-grid(2,8);
 				margin-top: $baseline;
 				padding: ($baseline/4);
-				font-size: 13px;
+				width: flex-grid(2,8);
 				text-align: right;
 				text-transform: uppercase;
+				font-size: 13px;
 			}
 
 			&.error {
@@ -140,14 +139,14 @@
 			list-style: none;
 
 			.field {
-				border-bottom: 1px dotted rgba(216, 223, 230, 0.5);
 				margin: 0 0 $baseline 0;
 				padding: 0 0 $baseline 0;
+				border-bottom: 1px dotted rgba(216, 223, 230, 0.5);
 
 				&:last-child {
-					border: none;
 					margin-bottom: 0;
 					padding-bottom: 0;
+					border: none;
 				}
 
 				&.disabled, &.submitted {
@@ -182,8 +181,8 @@
 
 					.value {
 						@include border-radius(3px);
-						border: 1px solid #C8C8C8;
 						padding: $baseline ($baseline*0.75);
+						border: 1px solid #C8C8C8;
 						background: #FAFAFA;
 					}
 				}
@@ -213,13 +212,13 @@
 
 				label, input, textarea {
 					display: block;
-					font-family: $sans-serif;
 					font-style: normal;
+					font-family: $sans-serif;
 				}
 
 				label {
-					margin: 0 0 ($baseline/4) 0;
 					@include transition(color, 0.15s, ease-in-out);
+					margin: 0 0 ($baseline/4) 0;
 
 					&.is-focused {
 						color: $blue;
@@ -227,9 +226,9 @@
 				}
 
 				input, textarea {
-					height: 100%;
+					padding: ($baseline/2);
 					width: 100%;
-					padding: ($baseline/2);					
+					height: 100%;					
 
 					&.long {
 						width: 100%;
@@ -247,16 +246,16 @@
 
 			.field-group {
 				@include clearfix();
-				border-bottom: 1px dotted rgba(216, 223, 230, 0.5);
 				margin: 0 0 $baseline 0;
 				padding: 0 0 $baseline 0;
+				border-bottom: 1px dotted rgba(216, 223, 230, 0.5);
 
 				.field {
 					display: block;
 					float: left;
-					border-bottom: none;
 					margin: 0 $baseline ($baseline/2) 0;
 					padding-bottom: 0;
+					border-bottom: none;
 
 					input, textarea {
 						width: 100%;
@@ -271,9 +270,9 @@
 				}
 
 				&.postal-2 {
-					border-bottom: none;
 					margin-bottom: 0;
 					padding-bottom: 0;
+					border-bottom: none;
 
 				}
 
@@ -301,6 +300,7 @@
 				display: none;
 			}
 		}
+		@include box-shadow(0 1px 2px 0 rgba(0,0,0, 0.2));
 	}
 
 	// form - specifics
@@ -338,8 +338,8 @@
 		.message-status {
 			@include border-radius(3px);
 			margin: 0 0 ($baseline*2) 0;
-			border: 1px solid #ccc;
 			padding: 0;
+			border: 1px solid #ccc;
 			background: tint($yellow,90%);
 
 			> * {
@@ -361,8 +361,8 @@
 			}
 
 			h3 {
-				border-bottom: 1px solid tint(rgb(0,0,0), 90%);
 				padding-bottom: ($baseline*0.75);
+				border-bottom: 1px solid tint(rgb(0,0,0), 90%);
 			}
 
 			h4 {
@@ -370,25 +370,25 @@
 			}
 
 			.status-list {
-				list-style: none;
 				margin: 0;
 				padding: $baseline;
+				list-style: none;
 
 				> .item {
 					@include clearfix();
 					margin: 0 0 ($baseline*0.75) 0;
-					border-bottom: 1px solid tint(rgb(0,0,0), 95%);
 					padding: 0 0 ($baseline/2) 0;
+					border-bottom: 1px solid tint(rgb(0,0,0), 95%);
 
 					&:last-child {
 						margin-bottom: 0;
-						border-bottom: none;
 						padding-bottom: 0;
+						border-bottom: none;
 					}
 
 					.title {
-						margin-bottom: ($baseline/4);
 						position: relative;
+						margin-bottom: ($baseline/4);
 						font-weight: bold;
 						font-size: 14px;
 
@@ -399,8 +399,8 @@
 							margin-left: $baseline;
 							content: "not started";
 							text-transform: uppercase;
-							font-size: 11px;
 							font-weight: normal;
+							font-size: 11px;
 							opacity: 0.5;
 						}
 					}
@@ -417,9 +417,9 @@
 						top: 3px;
 						display: block;
 						float: left;
+						margin: 0 ($baseline/2) 0 0;
 						width: ($baseline/2);
 						height: ($baseline/2);
-						margin: 0 ($baseline/2) 0 0;
 						background: $dark-gray;
 						content: "";
 					}
@@ -446,8 +446,8 @@
 					&.status-pending {
 
 						&:before {
-							background: transparent;
 							border: 1px dotted gray;
+							background: transparent;
 						}
 
 						.title:after {
@@ -475,8 +475,8 @@
 					&.status-initial {
 
 						&:before {
-							background: transparent;
 							border: 1px dotted gray;
+							background: transparent;
 						}
 
 						.title:after {
@@ -494,9 +494,9 @@
 
 				// sub menus
 				.accommodations-list, .error-list {
-					list-style: none;
 					margin: ($baseline/2) 0;
 					padding: 0;
+					list-style: none;
 					font-size: 13px;
 
 					.item {
@@ -513,8 +513,8 @@
 
 			.actions {
 				@include box-shadow(inset 0 1px 1px 0px rgba(0,0,0,0.2));
-				border-top: 1px solid tint(rgb(0,0,0), 90%);
 				padding-top: ($baseline*0.75);
+				border-top: 1px solid tint(rgb(0,0,0), 90%);
 				background: tint($yellow,70%);
 				font-size: 14px;
 
@@ -543,8 +543,8 @@
 				  display: block;
 				  margin: ($baseline/2) 0 0 0;
 				  padding: ($baseline/2) $baseline;
-				  font-size: 13px;
 				  font-weight: bold;
+				  font-size: 13px;
 
 				  &:hover {
 				    text-decoration: none;
@@ -571,25 +571,25 @@
 		}
 
 		> .details {
-			border-bottom: 1px solid rgba(216, 223, 230, 0.5);
 			margin: 0 0 $baseline 0;
 			padding: 0 $baseline $baseline $baseline;
-			font-family: $sans-serif;
+			border-bottom: 1px solid rgba(216, 223, 230, 0.5);
 			font-size: 14px;
+			font-family: $sans-serif;
 
 			&:last-child {
-				border: none;
 				margin-bottom: 0;
 				padding-bottom: 0;
+				border: none;
 			}
 
 			h4 {
 				margin: 0 0 ($baseline/2) 0;
-				font-family: $sans-serif;
-				font-size: 14px;
+				color: #ccc;
 				text-transform: uppercase;
 				letter-spacing: 0.5px;
-				color: #ccc;
+				font-size: 14px;
+				font-family: $sans-serif;
 			}
 
 			.label, .value {
@@ -597,8 +597,8 @@
 			}
 
 			.label {
-				color: rgba(0,0,0,.65);
 				margin-right: ($baseline/2);
+				color: rgba(0,0,0,.65);
 			}
 
 			.value {
@@ -645,8 +645,8 @@
 			@include border-radius(3px);
 			position: relative;
 			margin: 0 0 ($baseline*2) 0;
-			border: 1px solid #ccc;
 			padding-top: ($baseline*0.75);
+			border: 1px solid #ccc;
 			background: tint($yellow,70%);
 			font-size: 14px;
 
@@ -654,9 +654,9 @@
 			}
 
 			.message-title {
+				margin: 0 0 ($baseline/4) 0;
 				font-weight: bold;
 				font-size: 16px;
-				margin: 0 0 ($baseline/4) 0;
 			}
 
 			.message-copy {
@@ -677,9 +677,9 @@
 				right: $baseline;
 				margin: ($baseline/2) 0 0 0;
 				padding: ($baseline/2) $baseline;
-				font-size: 13px;
-				font-weight: bold;
 				letter-spacing: 0;
+				font-weight: bold;
+				font-size: 13px;
 
 				&:hover {
 				  text-decoration: none;
@@ -705,8 +705,8 @@
 
 			#submission-error-heading {
 				margin-bottom: ($baseline/2);
-				border-bottom: 1px solid tint($red, 85%);
 				padding-bottom: ($baseline/2);
+				border-bottom: 1px solid tint($red, 85%);
 				font-weight: bold;
 			}
 
@@ -765,8 +765,8 @@
 		&.registration-closed {
 			@include border-bottom-radius(0);
 			margin-top: 0;
-			border-bottom: 1px solid $light-gray;
 			padding: $baseline;
+			border-bottom: 1px solid $light-gray;
 			background: tint($light-gray,50%);
 
 			.message-title {

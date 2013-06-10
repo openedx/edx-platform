@@ -3,23 +3,22 @@
 
 .wrapper-footer {
   position: relative;
-  width: 100%;
   margin: 0 0 $baseline 0;
   padding: $baseline;
+  width: 100%;
 
   footer.primary {
     @extend .t-copy-sub2;
-    @include clearfix();
-    max-width: $fg-max-width;
-    min-width: $fg-min-width;
-    width: flex-grid(12);
     margin: 0 auto;
+    min-width: $fg-min-width;
+    max-width: $fg-max-width;
+    width: flex-grid(12);
     color: $gray-l1;
 
     .colophon {
-      width: flex-grid(4, 12);
       float: left;
       margin-right: flex-gutter(2);
+      width: flex-grid(4, 12);
     }
 
     a {
@@ -31,8 +30,8 @@
     }
 
     .nav-peripheral {
-      width: flex-grid(6, 12);
       float: right;
+      width: flex-grid(6, 12);
       text-align: right;
 
       .nav-item {
@@ -50,11 +49,11 @@
 
           [class^="icon-"] {
             @include transition(top .25s ease-in-out .25s);
-            @include font-size(15);
             display: inline-block;
-            vertical-align: middle;
             margin-right: ($baseline/4);
             color: $gray-l1;
+            vertical-align: middle;
+            @include font-size(15);
           }
 
           &:hover, &:active {
@@ -71,5 +70,6 @@
         }
       }
     }
+    @include clearfix();
   }
 }

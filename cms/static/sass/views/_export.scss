@@ -11,14 +11,14 @@ body.course.export {
 
   .description {
     float: left;
-    width: 62%;
     margin-right: 3%;
+    width: 62%;
     font-size: 14px;
 
     h2 {
+      margin-bottom: 20px;
       font-weight: 700;
       font-size: 19px;
-      margin-bottom: 20px;
     }
 
     strong {
@@ -42,10 +42,10 @@ body.course.export {
   .export-form-wrapper {
   
     .export-form {
-      float: left;
-      width: 35%;
-      padding: 25px 30px 35px;
       @include box-sizing(border-box);
+      float: left;
+      padding: 25px 30px 35px;
+      width: 35%;
       border: 1px solid $mediumGrey;
       border-radius: 3px;
       background: $lightGrey;
@@ -53,8 +53,8 @@ body.course.export {
 
       h2 {
         margin-bottom: 30px;
-        font-size: 26px;
         font-weight: 300;
+        font-size: 26px;
       }
 
       .error-block {
@@ -80,9 +80,9 @@ body.course.export {
 
       .progress-bar {
         display: none;
+        margin: 30px auto 10px;
         width: 350px;
         height: 30px;
-        margin: 30px auto 10px;
         border: 1px solid $blue;
 
         &.loaded {
@@ -115,9 +115,9 @@ body.course.export {
         font-size: 17px;
 
         &.disabled {
+          cursor: default;
 
           pointer-events: none;
-          cursor: default;
         }
       }
     }

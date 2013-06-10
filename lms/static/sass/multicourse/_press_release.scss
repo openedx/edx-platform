@@ -13,16 +13,16 @@
     }
 
     h3 {
-      color: $lighter-base-font-color;
-      font-style: italic;
       margin-bottom: 30px;
+      color: $lighter-base-font-color;
       text-align: center;
+      font-style: italic;
     }
 
     li {
+      margin: 0px;
       color: $base-font-color;
       font: normal 1em/1.6em $serif;
-      margin: 0px;
 
       a {
         font: 1em $serif;
@@ -34,19 +34,19 @@
     }
 
     > article {
-      border: 1px solid rgb(220,220,220);
       @include border-radius(10px);
-      @include box-sizing(border-box);
       @include box-shadow(0 2px 16px 0 rgba(0,0,0, 0.1));
       margin: 0 auto;
       padding: 80px 80px 40px 80px;
       width: flex-grid(10);
+      border: 1px solid rgb(220,220,220);
 
       .footer {
         hr {
           margin: 80px 0px 40px;
         }
       }
+      @include box-sizing(border-box);
     }
 
     figure {
@@ -60,8 +60,8 @@
       }
 
       figcaption {
-        font: normal 0.8em/1em $serif;
         padding: 5px;
+        font: normal 0.8em/1em $serif;
         a {
           font: normal 1em $serif;
         }
@@ -97,9 +97,9 @@
       }
 
       .fb-like {
+        float: left;
         margin-top: 8px;
         margin-left: 10px;
-        float: left;
       }
 
       p {

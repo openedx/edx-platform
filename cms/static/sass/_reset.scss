@@ -25,11 +25,11 @@ footer, header, hgroup, menu, nav, section, summary,
 time, mark, audio, video {
 	margin: 0;
 	padding: 0;
-	border: 0;
 	outline: 0;
-	font-size: 100%;
-	font: inherit;
+	border: 0;
 	vertical-align: baseline;
+	font: inherit;
+	font-size: 100%;
 }
 
 html,body {
@@ -63,8 +63,8 @@ del {
 }
 
 table {
-	border-collapse: collapse;
 	border-spacing: 0;
+	border-collapse: collapse;
 }
 
 abbr[title] {
@@ -84,9 +84,9 @@ abbr[title] {
 }
 
 .ui-corner-all, .ui-corner-bottom, .ui-corner-left, ui-corner-top, .ui-corner-br, .ui-corner-right {
+	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 	border-bottom-left-radius: 0;
-	border-top-right-radius: 0;
 	border-top-left-radius: 0;
 }
 
@@ -96,8 +96,8 @@ abbr[title] {
 	background: none;
 }
 .ui-widget {
-	font-family: 'Open Sans', sans-serif;
 	font-size: 16px;
+	font-family: 'Open Sans', sans-serif;
 }
 
 .ui-widget-header {
@@ -110,14 +110,14 @@ abbr[title] {
 }
 
 .ui-tabs .ui-tabs-nav li {
+	top: 0;
+	float: none;
+	margin: 0;
 	margin: 0;
 	padding: 0;
 	border: none;
-	top: 0;
-	margin: 0;
-	float: none;
-	border-top-left-radius: 0;
 	border-top-right-radius: 0;
+	border-top-left-radius: 0;
 }
 
 .ui-tabs-nav {
@@ -138,12 +138,12 @@ abbr[title] {
 
 // reapplying the tab styles from unit.scss after removing jquery ui ui-lightness styling
 .problem-type-tabs {
+	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
+	width: 100%;
 	border:none;
 	list-style-type: none;
-	width: 100%;
-	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
 	//background-color: $lightBluishGrey;
-	@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
 
 	li:first-child {
 		margin-left: 20px;
@@ -153,8 +153,8 @@ abbr[title] {
 
 		&:ui-state-active {
 			background-color: rgba(255, 255, 255, .3);
-			opacity: 1.0;
 			font-weight: 400;
+			opacity: 1.0;
 		}
 		a:focus {
 			outline: none;

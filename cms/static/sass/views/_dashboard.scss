@@ -8,11 +8,11 @@ body.dashboard {
 	}
 
 	.class-list {
-		margin-top: 20px;
-		border-radius: 3px;
-		border: 1px solid $darkGrey;	
-		background: #fff;
 		@include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
+		margin-top: 20px;
+		border: 1px solid $darkGrey;
+		border-radius: 3px;	
+		background: #fff;
 
 		li {
 			position: relative;
@@ -41,23 +41,23 @@ body.dashboard {
 
 		.class-name {
 			display: block;
-			font-size: 19px;
 			font-weight: 300;
+			font-size: 19px;
 		}
 
 		.detail {
-			font-size: 14px;
-			font-weight: 400;
 			margin-right: 20px;
 			color: #3c3c3c;
+			font-weight: 400;
+			font-size: 14px;
 		}
 
 		// view live button
 		.view-live-button {
-			z-index: 10000;
 			position: absolute;
 			top: 15px;
-			right: $baseline;		
+			right: $baseline;
+			z-index: 10000;		
 			padding: ($baseline/4) ($baseline/2);
 			opacity: 0.0;
 			pointer-events: none;
@@ -70,17 +70,17 @@ body.dashboard {
 	}
 
 	.new-course {
-		padding: 15px 25px;
+		@include clearfix;
 		margin-top: 20px;
-		border-radius: 3px;
-		border: 1px solid $darkGrey;	
+		padding: 15px 25px;
+		border: 1px solid $darkGrey;
+		border-radius: 3px;	
 		background: #fff;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
-		@include clearfix;
 
 		.row {
-			margin-bottom: 15px;
 			@include clearfix;
+			margin-bottom: 15px;
 		}
 
 		.column {
@@ -98,8 +98,8 @@ body.dashboard {
 
 		label {
 			display: block;
-			font-size: 13px;
 			font-weight: 700;
+			font-size: 13px;
 		}
 
 		.new-course-org,
@@ -109,8 +109,8 @@ body.dashboard {
 		}
 
 		.new-course-name {
-			font-size: 19px;
 			font-weight: 300;
+			font-size: 19px;
 		}
 
 		.new-course-save {

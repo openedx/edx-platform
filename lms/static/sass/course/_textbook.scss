@@ -1,8 +1,8 @@
 div.book-wrapper {
   @extend .table-wrapper;
   display: table;
-  table-layout:  fixed;
-  padding: 1em 8em; 
+  padding: 1em 8em;
+  table-layout:  fixed; 
 
 
   #open_close_accordion {
@@ -11,13 +11,12 @@ div.book-wrapper {
 
   section.book-sidebar {
     @extend .sidebar;
-    @extend .tran;
     @include box-sizing(border-box);
     padding: 10px 0;
-    border-radius: 3px 0 0 3px;
+    width: 250px;
     border: 1px solid #ccc;
     border-right: none;
-    width: 250px;
+    border-radius: 3px 0 0 3px;
 
     ul#booknav {
       font-size: em(14);
@@ -32,24 +31,24 @@ div.book-wrapper {
       }
 
       .page-number {
+        @include transition(opacity .15s);
         float: right;
         width: 12%;
+        color: #9a9a9a;
+        text-align: right;
         font-size: .8em;
         line-height: 2.1em;
-        text-align: right;
-        color: #9a9a9a;
         opacity: 0.0;
-        @include transition(opacity .15s);
       }
 
       li {
-        background: none;
+        padding-left: lh();
         border-bottom: 0;
-        padding-left: lh();       
+        background: none;       
 
         a {
-          padding: 0;
           @include clearfix;
+          padding: 0;
 
           &:hover {
             background-color: transparent;
@@ -61,21 +60,21 @@ div.book-wrapper {
         }
 
         div.hitarea {
-          background-image: url('../images/treeview-default.gif');
           
           position: relative;
           top: 4px;
+          background-image: url('../images/treeview-default.gif');
 
           &:hover {
-            filter: alpha(opacity=60);
             opacity: 0.6;
+            filter: alpha(opacity=60);
           }
         }
 
         ul {
-          background: none;
           margin-top: lh(.25);
           padding-top: lh(.25);
+          background: none;
 
           li {
             padding-bottom: 10px;
@@ -84,10 +83,11 @@ div.book-wrapper {
       }
 
       > li {
-        padding: 5px 6px;
         margin: 0 16px 5px 25px;
+        padding: 5px 6px;
       }
     }
+    @extend .tran;
   }
 
   section.book {
@@ -108,23 +108,23 @@ div.book-wrapper {
 
         li {
           position: absolute;
-          height: 100%;
-          width: flex-grid(2, 8);
           z-index: 1;
+          width: flex-grid(2, 8);
+          height: 100%;
 
           a {
+            @include box-sizing(border-box);
+            @include transition;
+            display: table;
+            width: 100%;
+            height: 100%;
             background-color: rgba(#000, .7);
             background-position: center;
             background-repeat: no-repeat;
-            @include box-sizing(border-box);
-            display: table;
-            height: 100%;
+            vertical-align: middle;
+            text-indent: -9999px;
             opacity: 0.0;
             filter: alpha(opacity=0);
-            text-indent: -9999px;
-            @include transition;
-            vertical-align: middle;
-            width: 100%;
 
             &:hover {
               opacity: 1.0;
@@ -152,33 +152,33 @@ div.book-wrapper {
       }
 
       &.bottom-nav {
-        border-bottom: 0;
-        margin-bottom: -(lh());
         margin-top: lh();
+        margin-bottom: -(lh());
+        border-bottom: 0;
       }
     }
 
     section.page {
-      border: 1px solid $border-color;
-      background-color: #fff;
       position: relative;
-      text-align: center;
-      padding: lh();
       margin-right:10%;
+      padding: lh();
+      border: 1px solid $border-color;
       border-radius: 0 3px 3px 0;
+      background-color: #fff;
+      text-align: center;
 
       img {
         max-width: 100%;
       }
 
       div {
+        margin: 5px;
         text-align: left;
-      	line-height: 1.6em;
-      	margin: 5px;
-	
-	.Paragraph, h2 {
-	   margin-top: 10px;
-	}	   
+        line-height: 1.6em;
+  
+  .Paragraph, h2 {
+     margin-top: 10px;
+  }    
       }
     }
   }
@@ -195,17 +195,17 @@ div.book-wrapper {
         }
 
         h2 {
-          padding: 0;
           visibility: hidden;
+          padding: 0;
           width: 10px;
         }
       }
 
       ul#booknav {
-        max-height: 100px;
+        visibility: hidden;
         overflow: hidden;
         padding: 0;
-        visibility: hidden;
+        max-height: 100px;
         width: 10px;
       }
     }

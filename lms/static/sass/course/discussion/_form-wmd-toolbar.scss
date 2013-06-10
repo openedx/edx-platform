@@ -5,17 +5,17 @@
 }
 
 #wmd-button-bar {
-  border: 1px solid #ddd;
-  height:36px;
   float:left;
   width:99%;
+  height:36px;
+  border: 1px solid #ddd;
 }
 
 #wmd-input {
-  height: 500px;
-  background-color: Gainsboro;
-  border: 1px solid DarkGray;
   margin-top: -20px;
+  height: 500px;
+  border: 1px solid DarkGray;
+  background-color: Gainsboro;
 }
 
 #wmd-preview {
@@ -27,45 +27,45 @@
 }
 
 #wmd-button-row {
-  position: relative; 
-  margin-left: 5px;
-  margin-right: 5px;
-  margin-bottom: 0px;
+  position: relative;
   margin-top: 10px;
+  margin-right: 5px;
+  margin-bottom: 0px; 
+  margin-left: 5px;
   padding: 0px;  
   height: 20px;
 }
 
 .wmd-spacer {
-  width: 1px; 
-  height: 20px; 
-  margin-left: 14px;
   position: absolute;
-  background-color: Silver;
   display: inline-block; 
+  margin-left: 14px;
+  width: 1px; 
+  height: 20px;
+  background-color: Silver; 
   list-style: none;
 }
 
 .wmd-button {
-  width: 20px; 
-  height: 20px; 
-  margin-left: 5px;
-  margin-right: 5px;
   position: absolute;
+  display: inline-block;
+  margin-right: 5px; 
+  margin-left: 5px;
+  width: 20px; 
+  height: 20px;
   background-image: url(../images/askbot/wmd-buttons.png);
-  background-repeat: no-repeat;
   background-position: 0px 0px;
-  display: inline-block; 
+  background-repeat: no-repeat; 
   list-style: none;
 }
 
 .wmd-button > a {
+  position: absolute;
+  display: inline-block;
+  margin-right: 5px; 
+  margin-left: 5px;
   width: 20px; 
   height: 20px; 
-  margin-left: 5px;
-  margin-right: 5px;
-  position: absolute;
-  display: inline-block; 
 }
 
 
@@ -113,8 +113,8 @@
 
 .wmd-prompt-dialog > form > input[type="button"]{
   border: 1px solid #888888;
-  font-family: trebuchet MS, helvetica, sans-serif;
-  font-size: 1em;
   font-weight: bold;
+  font-size: 1em;
+  font-family: trebuchet MS, helvetica, sans-serif;
 }
 

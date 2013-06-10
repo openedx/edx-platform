@@ -11,8 +11,8 @@
       text-align: center;
   }
   th {
-      padding: 5px;
       margin: 5px;
+      padding: 5px;
       text-align: center;
   }
   .points-header th {
@@ -21,13 +21,13 @@
   .rubric-label
   {
       position: relative;
-      font-size: .9em;
       display: block;
+      font-size: .9em;
   }
   .grade {
     position: absolute;
-    bottom:0px;
     right:0px;
+    bottom:0px;
   }
   .selected-grade,
   .selected-grade .rubric-label {
@@ -48,9 +48,9 @@
   }
   ul.rubric-list
   {
-      list-style-type: none;
-      padding:0;
       margin:0;
+      padding:0;
+      list-style-type: none;
   }
 }
 

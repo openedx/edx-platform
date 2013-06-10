@@ -8,8 +8,8 @@ body.course.uploads {
 
     .icon-cloud-upload {
       @include font-size(16);
-      vertical-align: bottom;
       margin-right: ($baseline/5);
+      vertical-align: bottom;
     }
 
   }
@@ -26,22 +26,22 @@ body.course.uploads {
 
     table {
       width: 100%;
-      border-radius: 3px 3px 0 0;
       border: 1px solid #c5cad4;
+      border-radius: 3px 3px 0 0;
 
       td,
       th {
         padding: 10px 20px;
-        text-align: left;
         vertical-align: middle;
+        text-align: left;
       }
 
       thead th {
         @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
         background-color: #ced2db;
-        font-size: 12px;
-        font-weight: 700;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+        font-weight: 700;
+        font-size: 12px;
       }
 
       tbody {
@@ -82,8 +82,8 @@ body.course.uploads {
       }
 
       .thumb {
-        width: 100px;
         max-height: 80px;
+        width: 100px;
 
         img {
           width: 100%;
@@ -101,8 +101,8 @@ body.course.uploads {
 
       a {
         display: inline-block;
-        height: 25px;
         padding: 0 4px;
+        height: 25px;
         text-align: center;
         line-height: 25px;
       }
@@ -115,12 +115,12 @@ body.course.uploads {
 
 .upload-modal {
   display: none;
-  width: 640px !important;
   margin-left: -320px !important;
+  width: 640px !important;
 
   .modal-body {
-    height: auto !important;
     overflow-y: auto !important;
+    height: auto !important;
     text-align: center;
   }
 
@@ -136,9 +136,9 @@ body.course.uploads {
 
   .progress-bar {
     display: none;
+    margin: 30px auto 10px;
     width: 350px;
     height: 50px;
-    margin: 30px auto 10px;
     border: 1px solid $blue;
 
     &.loaded {
@@ -161,8 +161,8 @@ body.course.uploads {
   h1 {
     float: none;
     margin: 40px 0 30px;
-    font-size: 34px;
     font-weight: 300;
+    font-size: 34px;
   }
 
   .close-button {
@@ -170,12 +170,12 @@ body.course.uploads {
     position: absolute;
     top: 0;
     right: 15px;
+    padding: 0 !important;
     width: 29px;
     height: 29px;
-    padding: 0 !important;
     border-radius: 17px !important;
-    line-height: 29px;
     text-align: center;
+    line-height: 29px;
   }
 
   .embeddable {

@@ -16,43 +16,43 @@
     @include box-sizing('border-box');
     display: block;
     padding: $baseline/2;
-    text-transform: lowercase;
-    color: $white;
-    letter-spacing: 0.1rem;
-    cursor: pointer;
-    text-align: center;
     border: none !important;
+    box-shadow: 0 !important;
+    color: $white;
+    text-align: center;
     text-decoration: none;
+    text-transform: lowercase;
     text-shadow: none;
     letter-spacing: 0.1rem;
-    font-size: 17px;
+    letter-spacing: 0.1rem;
     font-weight: 300;
-    box-shadow: 0 !important;
+    font-size: 17px;
+    cursor: pointer;
 
     strong {
-      font-weight: 400;
       text-transform: none;
+      font-weight: 400;
     }
   }
 
   .btn-primary {
     @extend .btn;
-    @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
 
     // no hover state conventions to follow from marketing :/
     &:hover, &:active {
 
     }
+    @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
   }
 
   .btn-secondary {
     @extend .btn;
-    @include linear-gradient($m-gray 5%, $m-gray-d1 95%);
 
     // no hover state conventions to follow from marketing :/
     &:hover, &:active {
 
     }
+    @include linear-gradient($m-gray 5%, $m-gray-d1 95%);
   }
 
   .btn-tertiary {
@@ -68,9 +68,9 @@
 
   // nav list
   .list-actions {
-    list-style: none;
     margin: 0;
     padding: 0;
+    list-style: none;
 
     .item {
       margin: 0;
@@ -93,8 +93,8 @@
     // coming soon
     &.coming-soon {
       @extend .btn-tertiary;
-      pointer-events: none !important;
       outline: none;
+      pointer-events: none !important;
     }
   }
 }

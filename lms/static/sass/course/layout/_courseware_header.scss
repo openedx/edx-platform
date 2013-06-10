@@ -1,10 +1,9 @@
 nav.course-material {
   @include clearfix;
-  @include box-sizing(border-box);
-  border-bottom: none;
   margin: 0px auto 0px;
   padding: 0px;
   width: 100%;
+  border-bottom: none;
 
   .inner-wrapper {
     margin: 0 auto;
@@ -14,42 +13,43 @@ nav.course-material {
 
   ol.course-tabs {
     @include border-top-radius(4px);
-    @include clearfix;
-    padding: 28px 0 10px 0;
     margin-left: 10px;
+    padding: 28px 0 10px 0;
 
     li {
       float: left;
-      list-style: none;
       margin-right: 6px;
+      list-style: none;
 
       a {
+        display: block;
+        padding: 10px 13px 12px;
         border-radius: 3px;
         color: #555;
-        display: block;
         text-align: center;
-        padding: 10px 13px 12px;
-        font-size: 14px;
-        font-weight: bold;
         text-decoration: none;
         // text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
+        font-weight: bold;
+        font-size: 14px;
 
         &:hover {
-          color: #333;
           background: rgba(255, 255, 255, .6);
+          color: #333;
         }
 
         &.active {
-          // background: rgba(0, 0, 0, .2);
           @include linear-gradient(top, rgba(0, 0, 0, .4), rgba(0, 0, 0, .25));
-          background-color: transparent;
           @include box-shadow(0 1px 0 rgba(255, 255, 255, .5), 0 1px 1px rgba(0, 0, 0, .3) inset);
+          // background: rgba(0, 0, 0, .2);
+          background-color: transparent;
           color: #fff;
           text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
         }
       }
     }
+    @include clearfix;
   }
+  @include box-sizing(border-box);
 }
 
 .course-content {
@@ -62,8 +62,8 @@ nav.course-material {
 
 header.global.slim {
   @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
-  height: auto;
   padding: 5px 0 10px 0;
+  height: auto;
   border-bottom: 1px solid $outer-border-color;
   background: $header-bg;
 
@@ -75,31 +75,31 @@ header.global.slim {
     display: none;
 
     &#login {
-      display: block;
       @include background-image(linear-gradient(-90deg, lighten($link-color, 8%), lighten($link-color, 5%) 50%, $link-color 50%, darken($link-color, 10%) 100%));
-      border: 1px solid transparent;
-      border-color: darken($link-color, 10%);
       @include border-radius(3px);
-      @include box-sizing(border-box);
       @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-      color: #fff;
-      display: inline-block;
-      font-family: $sans-serif;
-      font-size: 14px;
-      font-weight: bold;
       @include inline-block;
-      letter-spacing: 0;
-      line-height: 1em;
+      display: block;
+      display: inline-block;
       margin: 4px;
       padding: 6px 12px 8px;
+      border: 1px solid transparent;
+      border-color: darken($link-color, 10%);
+      color: #fff;
+      vertical-align: middle;
       text-decoration: none;
       text-transform: none;
       text-shadow: 0 -1px rgba(0, 0, 0, 0.6);
-      vertical-align: middle;
+      letter-spacing: 0;
+      font-weight: bold;
+      font-size: 14px;
+      font-family: $sans-serif;
+      line-height: 1em;
 
       &:hover, &.active {
         @include background-image(linear-gradient(-90deg, $link-color, $link-color 50%, $link-color 50%, $link-color 100%));
       }
+      @include box-sizing(border-box);
     }
   }
 
@@ -113,24 +113,24 @@ header.global.slim {
 
     &:before {
       @extend .faded-vertical-divider;
-      content: "";
-      display: block;
-      height: 35px;
       position: absolute;
-      right: 3px;
       top: 0;
+      right: 3px;
+      display: block;
       width: 1px;
+      height: 35px;
+      content: "";
     }
 
     &:after {
       @extend .faded-vertical-divider-light;
-      content: "";
-      display: block;
-      height: 35px;
       position: absolute;
-      right: 0;
       top: 0;
+      right: 0;
+      display: block;
       width: 1px;
+      height: 35px;
+      content: "";
     }
 
     img {
@@ -144,19 +144,19 @@ header.global.slim {
 
   h2 {
     display: block;
-    width: 700px;
     float: left;
-    font-size: 0.9em;
-    font-weight: 600;
-    color: #777;
-    letter-spacing: 0;
+    overflow: hidden;
     margin-top: 9px;
     margin-bottom: 0;
+    width: 700px;
+    color: #777;
     text-transform: none;
+    text-overflow: ellipsis;
     text-shadow: 0 1px 0 #fff;
     white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    letter-spacing: 0;
+    font-weight: 600;
+    font-size: 0.9em;
 
     .provider {
       font: inherit;
@@ -169,8 +169,8 @@ header.global.slim {
     margin-top: 3px;
     padding: 6px 12px 8px;
     text-transform: none;
-    font-size: 14px;
-    font-weight: bold;
     letter-spacing: 0;
+    font-weight: bold;
+    font-size: 14px;
   }
 }

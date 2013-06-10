@@ -11,14 +11,14 @@ body.course.import {
 
   .description {
     float: left;
-    width: 62%;
     margin-right: 3%;
+    width: 62%;
     font-size: 14px;
 
     h2 {
+      margin-bottom: 20px;
       font-weight: 700;
       font-size: 19px;
-      margin-bottom: 20px;
     }
 
     strong {
@@ -31,10 +31,10 @@ body.course.import {
   }
 
   .import-form {
-    float: left;
-    width: 35%;
-    padding: 25px 30px 35px;
     @include box-sizing(border-box);
+    float: left;
+    padding: 25px 30px 35px;
+    width: 35%;
     border: 1px solid $mediumGrey;
     border-radius: 3px;
     background: $lightGrey;
@@ -42,8 +42,8 @@ body.course.import {
 
     h2 {
       margin-bottom: 30px;
-      font-size: 26px;
       font-weight: 300;
+      font-size: 26px;
     }
 
     .file-name-block,
@@ -74,17 +74,17 @@ body.course.import {
     .submit-button {
       @include orange-button;
       display: none;
-      max-width: 100%;
       padding: 8px 20px 10px;
+      max-width: 100%;
       white-space: normal;
     }
   }
 
   .progress-bar {
     display: none;
+    margin: 30px auto 10px;
     width: 350px;
     height: 30px;
-    margin: 30px auto 10px;
     border: 1px solid $blue;
 
     &.loaded {

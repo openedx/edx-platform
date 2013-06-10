@@ -13,12 +13,12 @@
 
 // inherited - vertical and horizontal centering
 @mixin vertically-and-horizontally-centered ($height, $width) {
-  left: 50%;
-  margin-left: -$width / 2;
-  min-height: $height;
-  min-width: $width;
   position: absolute;
   top: 150px;
+  left: 50%;
+  margin-left: -$width / 2;
+  min-width: $width;
+  min-height: $height;
 }
 
 // ====================
@@ -28,40 +28,40 @@
   @include background-image(linear-gradient(180deg, rgba(200,200,200, 0) 0%,
                                                     rgba(200,200,200, 1) 50%,
                                                     rgba(200,200,200, 0)));
-  height: 1px;
   width: 100%;
+  height: 1px;
 }
 
 .faded-hr-divider-medium {
   @include background-image(linear-gradient(180deg, rgba(240,240,240, 0) 0%,
                                                     rgba(240,240,240, 1) 50%,
                                                     rgba(240,240,240, 0)));
-  height: 1px;
   width: 100%;
+  height: 1px;
 }
 
 .faded-hr-divider-light {
   @include background-image(linear-gradient(180deg, rgba(255,255,255, 0) 0%,
                                                     rgba(255,255,255, 0.8) 50%,
                                                     rgba(255,255,255, 0)));
-  height: 1px;
   width: 100%;
+  height: 1px;
 }
 
 .faded-vertical-divider {
   @include background-image(linear-gradient(90deg, rgba(200,200,200, 0) 0%,
                                                     rgba(200,200,200, 1) 50%,
                                                     rgba(200,200,200, 0)));
-  height: 100%;
   width: 1px;
+  height: 100%;
 }
 
 .faded-vertical-divider-light {
   @include background-image(linear-gradient(90deg, rgba(255,255,255, 0) 0%,
                                                     rgba(255,255,255, 0.6) 50%,
                                                     rgba(255,255,255, 0)));
-  height: 100%;
   width: 1px;
+  height: 100%;
 }
 
 .vertical-divider {
@@ -70,24 +70,24 @@
 
   &::after {
     @extend .faded-vertical-divider-light;
-    content: "";
-    display: block;
     position: absolute;
     left: 1px;
+    display: block;
+    content: "";
   }
 }
 
 .horizontal-divider {
-  border: none;
   @extend .faded-hr-divider;
   position: relative;
+  border: none;
 
   &::after {
     @extend .faded-hr-divider-light;
-    content: "";
-    display: block;
     position: absolute;
     top: 1px;
+    display: block;
+    content: "";
   }
 }
 
@@ -108,11 +108,11 @@
 // inherited - ui
 .window {
   @include clearfix();
-  @include border-radius(3px);
   @include box-shadow(0 1px 1px $shadow-l1);
   margin-bottom: $baseline;
   border: 1px solid $gray-l2;
   background: $white;
+  @include border-radius(3px);
 }
 
 // ====================
@@ -120,7 +120,6 @@
 // mixins - grandfathered
 @mixin button {
   @include font-size(14);
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
   @include transition(background-color .15s, box-shadow .15s);
   display: inline-block;
   padding: ($baseline/5) $baseline ($baseline/4);
@@ -131,8 +130,8 @@
     border-radius: 3px !important;
     background: $gray-l1 !important;
     color: $gray-d1 !important;
-    pointer-events: none;
     cursor: none;
+    pointer-events: none;
     &:hover {
       box-shadow: 0 0 0 0 !important;
     }
@@ -141,11 +140,11 @@
   &:hover, &.active {
     @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15));
   }
+  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
 }
 
 @mixin green-button {
   @include button;
-  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
   border: 1px solid $green-d1;
   border-radius: 3px;
@@ -158,16 +157,16 @@
   }
 
   &.disabled {
+    @include box-shadow(none);
     border: 1px solid $green-l3 !important;
     background: $green-l3 !important;
     color: $white !important;
-    @include box-shadow(none);
   }
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
 }
 
 @mixin blue-button {
   @include button;
-  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   border: 1px solid $blue-d1;
   border-radius: 3px;
   background-color: $blue;
@@ -184,11 +183,11 @@
     background: $blue-l3 !important;
     color: $white !important;
   }
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
 }
 
 @mixin red-button {
   @include button;
-  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   border: 1px solid $red-d1;
   border-radius: 3px;
   background-color: $red;
@@ -205,11 +204,11 @@
     background: $red-l3 !important;
     color: $white !important;
   }
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
 }
 
 @mixin pink-button {
   @include button;
-  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   border: 1px solid $pink-d1;
   border-radius: 3px;
   background-color: $pink;
@@ -226,11 +225,11 @@
     background: $pink-l3 !important;
     color: $white !important;
   }
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
 }
 
 @mixin orange-button {
   @include button;
-  @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
   @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
   border: 1px solid $orange-d1;
   border-radius: 3px;
@@ -243,16 +242,16 @@
   }
 
   &.disabled {
+    @include box-shadow(none);
     border: 1px solid $orange-l3 !important;
     background: $orange-l2 !important;
     color: $gray-l1 !important;
-    @include box-shadow(none);
   }
+  @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
 }
 
 @mixin white-button {
   @include button;
-  @include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
   @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
   border: 1px solid $mediumGrey;
   border-radius: 3px;
@@ -264,11 +263,11 @@
     background-color: rgb(222, 236, 247);
     color: rgb(92, 103, 122);
   }
+  @include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
 }
 
 @mixin grey-button {
   @include button;
-  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
   border: 1px solid $gray-d2;
   border-radius: 3px;
@@ -279,11 +278,11 @@
     background-color: #d9e3ee;
     color: #6d788b;
   }
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
 }
 
 @mixin gray-button {
   @include button;
-  @include linear-gradient(top, $white-t1, rgba(255, 255, 255, 0));
   @include box-shadow(0 1px 0 $white-t1 inset);
   border: 1px solid $gray-d1;
   border-radius: 3px;
@@ -294,6 +293,7 @@
     background-color: $gray-d3;
     color: $white;
   }
+  @include linear-gradient(top, $white-t1, rgba(255, 255, 255, 0));
 }
 
 @mixin dark-grey-button {
@@ -392,9 +392,9 @@
     .public-item:after,
     .private-item:after {
       margin-left: 3px;
-      font-size: 9px;
-      font-weight: 600;
       text-transform: uppercase;
+      font-weight: 600;
+      font-size: 9px;
     }
 
     .draft-item:after {
@@ -448,7 +448,7 @@
 // sunsetted mixins
 @mixin active {
   @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-  @include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset);
   background-color: rgba(255, 255, 255, .3);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  @include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset);
 }

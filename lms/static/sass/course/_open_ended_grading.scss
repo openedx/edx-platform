@@ -4,9 +4,9 @@
     padding: 40px;
     .problem-list
     {
-        table-layout: auto;
         margin-top: 10px;
         width:70%;
+        table-layout: auto;
         td, th
         {
             padding: 7px;
@@ -19,29 +19,30 @@
 
     .notification
     {
+        @include inline-block;
+        @include clearfix;
         margin: 10px;
         width: 30%;
-        @include inline-block;
         vertical-align: top;
         .notification-link
         {
             display:block;
-            height: 9em;
             padding: 10px;
+            height: 9em;
             border: 1px solid black;
             text-align: center;
             p
             {
-                font-size: .9em;
                 text-align: center;
+                font-size: .9em;
             }
         }
         .notification-title 
         {
-            text-transform: uppercase;
+            padding: 5px 0px;
             background: $blue;
             color: white;
-            padding: 5px 0px;
+            text-transform: uppercase;
             font-size: 1.1em;
         }
         .notification-link:hover
@@ -59,7 +60,6 @@
                 vertical-align: baseline;
             }
         }
-        @include clearfix;
     }
 
 }

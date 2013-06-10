@@ -5,72 +5,70 @@
     @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
     @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4), inset 0 0 0 -1px rgba(255,255,255, 0.4));
     @include box-sizing(border-box);
-    border: 1px solid rgb(190,190,190);
-    border-bottom-color: rgb(200,200,200);
-    border-top: none;
-    @include border-bottom-radius(4px);
-    @include clearfix;
-    height: 60px;
-    padding: 12px 10px;
     position: relative;
     z-index: 9;
+    padding: 12px 10px;
+    height: 60px;
+    border: 1px solid rgb(190,190,190);
+    border-top: none;
+    border-bottom-color: rgb(200,200,200);
 
     &.fixed-top {
       @include box-shadow(0 1px 15px 0 rgba(0,0,0, 0.2), inset 0 0 0 1px rgba(255,255,255, 0.4));
-      max-width: 1200px;
       position: fixed;
       top: 0px;
+      max-width: 1200px;
       width: flex-grid(12);
     }
 
     .dropdown {
+      position: relative;
       float: left;
       margin-right: 15px;
-      position: relative;
 
       .filter-heading {
         @include background-image(linear-gradient(-90deg, rgb(250,250,250) 0%, rgb(245,245,245) 50%, rgb(235,235,235) 50%, rgb(230,230,230) 100%));
-        @include border-radius(4px);
         @include box-sizing(border-box);
-        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.4), inset 0 1px 0 0 rgba(255,255,255, 0.6));
+        position: relative;
+        z-index: 11;
+        padding: 9px;
+        width: 150px;
+        height: 36px;
         border: 1px solid rgb(200,200,200);
         color: $base-font-color;
-        cursor: pointer;
-        height: 36px;
-        padding: 9px;
-        position: relative;
         text-align: center;
         text-shadow: 0 1px rgba(255,255,255, 0.8);
-        width: 150px;
-        z-index: 11;
+        cursor: pointer;
+        @include border-radius(4px);
+        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.4), inset 0 1px 0 0 rgba(255,255,255, 0.6));
       }
 
       ul {
-        background: rgb(255,255,255);
         @include border-radius(0px 4px 4px 4px);
-        border: 1px solid rgb(200,200,200);
         @include box-shadow(0 2px 15px 0 rgba(0,0,0, 0.2));
-        padding: 20px 0px 5px 20px;
         position: absolute;
-        visibility: hidden;
-        width: 200px;
         z-index: 10;
+        visibility: hidden;
+        padding: 20px 0px 5px 20px;
+        width: 200px;
+        border: 1px solid rgb(200,200,200);
+        background: rgb(255,255,255);
 
         li {
-          list-style: none;
           margin-bottom: 15px;
+          list-style: none;
         }
       }
 
       &:hover {
         .filter-heading {
-          background: rgb(255,255,255);
           @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(255,255,255)));
-          @include border-radius(4px 4px 0px 0px);
-          border-bottom: 1px dotted rgb(200,200,200);
           @include box-shadow(0 2px 0 -1px rgb(255,255,255));
-          color: $base-font-color;
           height: 40px;
+          border-bottom: 1px dotted rgb(200,200,200);
+          background: rgb(255,255,255);
+          color: $base-font-color;
+          @include border-radius(4px 4px 0px 0px);
         }
 
         ul {
@@ -85,16 +83,18 @@
       input[type="text"] {
         @include border-radius(3px 0px 0px 3px);
         float: left;
-        height: 36px;
         width: 200px;
+        height: 36px;
       }
 
       input[type="submit"] {
         @include border-radius(0px 3px 3px 0px);
         float: left;
-        height: 36px;
         padding: 2px 20px;
+        height: 36px;
       }
     }
+    @include border-bottom-radius(4px);
+    @include clearfix;
   }
 }

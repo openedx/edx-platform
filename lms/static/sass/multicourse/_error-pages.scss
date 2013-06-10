@@ -1,7 +1,7 @@
 section.outside-app {
   @extend .container;
-  text-align: left;
   padding: 80px 0;
+  text-align: left;
 
   h1 {
     @extend h2;
@@ -9,7 +9,7 @@ section.outside-app {
   }
   
   p {
-    max-width: 600px;
     margin: 0 auto;
+    max-width: 600px;
   }
 }

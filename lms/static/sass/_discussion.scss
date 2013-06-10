@@ -1,16 +1,16 @@
 @mixin blue-button {
-  display: block;
-  height: 35px;
+    @include linear-gradient(top, #6dccf1, #38a8e5);
+    zdisplay: block;
   padding: 0 15px;
-  border-radius: 3px;
+  height: 35px;
   border: 1px solid #2d81ad;
-  @include linear-gradient(top, #6dccf1, #38a8e5);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 32px;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
   color: #fff;
   text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 32px;
 
   &:hover {
     border-color: #297095;

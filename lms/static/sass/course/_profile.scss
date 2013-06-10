@@ -4,13 +4,13 @@ div.profile-wrapper {
 
   section.user-info {
     @extend .sidebar;
-    border-left: 1px solid #d3d3d3;
     @include border-radius(0px 4px 4px 0);
     border-right: 0;
+    border-left: 1px solid #d3d3d3;
 
     &:after {
-      left: -1px;
       right: auto;
+      left: -1px;
     }
 
     header {
@@ -25,23 +25,23 @@ div.profile-wrapper {
     }
 
     ul {
-      list-style: none;
-      padding: 0;
       margin: 0;
+      padding: 0;
+      list-style: none;
 
       li {
-        border-bottom: 1px solid #d3d3d3;
         @include box-shadow(0 1px 0 #eee);
-        color: lighten($text-color, 10%);
+        @include transition();
+        position: relative;
         display: block;
         padding: lh(.5) 0 lh(.5) lh(.5);
-        position: relative;
+        border-bottom: 1px solid #d3d3d3;
+        color: lighten($text-color, 10%);
         text-decoration: none;
-        @include transition();
 
         div#location_sub, div#language_sub {
-          font-weight: bold;
           @include inline-block();
+          font-weight: bold;
 
           form {
             width: 100%;
@@ -73,12 +73,12 @@ div.profile-wrapper {
         a.edit-email,
         a.name-edit,
         a.email-edit {
-          color: #999;
-          font-size: 12px;
           position: absolute;
-          right: lh(.5);
-          text-transform: uppercase;
           top: 9px;
+          right: lh(.5);
+          color: #999;
+          text-transform: uppercase;
+          font-size: 12px;
 
           &:hover {
             color: #555;
@@ -86,10 +86,10 @@ div.profile-wrapper {
         }
 
         p {
+          margin-top: 4px;
+          margin-bottom: 0;
           color: #999;
           font-size: 12px;
-          margin-bottom: 0;
-          margin-top: 4px;
         }
 
         a.deactivate {
@@ -98,18 +98,18 @@ div.profile-wrapper {
         }
 
         input#pwd_reset_button {
-          background: none;
-          border: none;
           @include box-shadow(none);
-          color: #999;
-          font-size: 12px;
-          font-weight: normal;
+          position: absolute;
+          top: 9px;
+          right: lh(.5);
           margin: 0;
           padding: 0;
-          position: absolute;
-          right: lh(.5);
+          border: none;
+          background: none;
+          color: #999;
           text-transform: uppercase;
-          top: 9px;
+          font-weight: normal;
+          font-size: 12px;
 
           &:hover {
             color: #555;
@@ -119,16 +119,16 @@ div.profile-wrapper {
     }
 
     div#change_password_pop {
-      border-bottom: 1px solid #d3d3d3;
       @include box-shadow(0 1px 0 #eee);
-      color: #4D4D4D;
       padding: 7px lh();
+      border-bottom: 1px solid #d3d3d3;
+      color: #4D4D4D;
 
       h2 {
-        font-size: $body-font-size;
-        font-weight: bold;
         margin-top: 0;
         text-transform: uppercase;
+        font-weight: bold;
+        font-size: $body-font-size;
       }
     }
   }
@@ -138,15 +138,15 @@ div.profile-wrapper {
 
     header {
       @extend .clearfix;
-      @extend h1.top-header;
       margin-bottom: lh();
 
       h1 {
         float: left;
-        font-size: 1em;
-        font-weight: 100;
         margin: 0;
+        font-weight: 100;
+        font-size: 1em;
       }
+      @extend h1.top-header;
     }
 
     div#grade-detail-graph {
@@ -155,39 +155,39 @@ div.profile-wrapper {
     }
 
     > ol {
-      border-top: 1px solid #e3e3e3;
-      list-style: none;
       margin-top: lh();
       padding-left: 0;
+      border-top: 1px solid #e3e3e3;
+      list-style: none;
 
       > li {
         @extend .clearfix;
-        border-bottom: 1px solid #e3e3e3;
         display: table;
         padding: lh() 0;
         width: 100%;
+        border-bottom: 1px solid #e3e3e3;
 
         &:last-child {
           border-bottom: 0px;
         }
 
         h2 {
-          border-right: 1px dashed #ddd;
           @include box-sizing(border-box);
           display: table-cell;
-          letter-spacing: 0;
           margin: 0;
           padding: 0;
           padding-right: flex-gutter(9);
-          text-transform: none;
           width: flex-grid(2, 9);
+          border-right: 1px dashed #ddd;
+          text-transform: none;
+          letter-spacing: 0;
         }
 
         ol.sections {
           display: table-cell;
-          list-style: none;
           padding-left: flex-gutter(9);
           width: flex-grid(7, 9);
+          list-style: none;
 
           > li {
             padding:0 0 lh() 0;
@@ -205,8 +205,8 @@ div.profile-wrapper {
 
               span {
                 color: #999;
-                font-size: em(14);
                 font-weight: 100;
+                font-size: em(14);
               }
             }
 
@@ -219,21 +219,21 @@ div.profile-wrapper {
               margin: lh(.5) 0;
 
               h3 {
-                font-size: em(14);
                 @include inline-block;
+                font-size: em(14);
               }
 
               ol {
-                list-style: none;
+                @include inline-block;
                 margin: 0;
                 padding: 0;
-                @include inline-block;
+                list-style: none;
 
                 li {
                   @include inline-block;
-                  font-size: em(14);
-                  font-weight: normal;
                   padding-right: 1em;
+                  font-weight: normal;
+                  font-size: em(14);
                 }
               }
             }

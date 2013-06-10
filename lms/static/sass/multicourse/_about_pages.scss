@@ -3,26 +3,26 @@
 
   > nav {
     margin-bottom: 80px;
-    text-align: center;
     width: flex-grid(12);
+    text-align: center;
 
     &::after {
       @extend .faded-hr-divider;
-      content: "";
       display: block;
+      content: "";
     }
 
     a {
-      border-bottom: 3px solid transparent;
-      color: $lighter-base-font-color;
-      font-family: $serif;
-      font-style: italic;
       @include inline-block;
-      letter-spacing: 1px;
+      @include transition(all, 0.15s, linear);
       margin: 0px 15px;
       padding: 20px 10px;
-      @include transition(all, 0.15s, linear);
+      border-bottom: 3px solid transparent;
+      color: $lighter-base-font-color;
       text-transform: lowercase;
+      letter-spacing: 1px;
+      font-style: italic;
+      font-family: $serif;
 
       &:hover, &.active {
         border-color: rgb(200,200,200);
@@ -38,19 +38,19 @@
     }
 
     .our-mission {
-      border-bottom: 1px solid rgb(220,220,220);
       @include clearfix;
       margin: 0 auto 100px;
       padding-bottom: 40px;
+      border-bottom: 1px solid rgb(220,220,220);
 
       .logo {
-        border-right: 1px solid rgb(200,200,200);
         @include box-sizing(border-box);
         float: left;
-        height: 115px;
         margin-right: flex-gutter();
-        text-align: center;
         width: flex-grid(3);
+        height: 115px;
+        border-right: 1px solid rgb(200,200,200);
+        text-align: center;
 
         > img {
           @include inline-block;
@@ -62,47 +62,47 @@
       h2.mission-quote {
         @include box-sizing(border-box);
         float: right;
-        font-style: italic;
-        line-height: 1.4;
         margin: 0px;
         padding: 5px 0px 5px 20px;
-        text-transform: none;
         width: flex-grid(9);
+        text-transform: none;
+        font-style: italic;
+        line-height: 1.4;
       }
     }
 
     .message {
-      border-bottom: 1px solid rgb(220,220,220);
       @include clearfix;
+      position: relative;
       margin-bottom: 80px;
       padding-bottom: 80px;
-      position: relative;
+      border-bottom: 1px solid rgb(220,220,220);
 
       hr {
+        position: absolute;
         bottom: 0px;
         display: none;
         margin: 0px;
-        position: absolute;
         width: 100%;
       }
 
       h2 {
-        border-bottom: 1px solid rgb(200,200,200);
         padding-bottom: 15px;
+        border-bottom: 1px solid rgb(200,200,200);
       }
 
       .photo {
         @include box-sizing(border-box);
-        background: rgb(255,255,255);
-        border: 1px solid rgb(210,210,210);
         margin-top: 37px;
         padding: 1px;
         width: flex-grid(3);
+        border: 1px solid rgb(210,210,210);
+        background: rgb(255,255,255);
 
         img {
-          background: rgb(245,245,245);
           display: block;
           width: 100%;
+          background: rgb(245,245,245);
         }
       }
 
@@ -151,19 +151,19 @@
     @include clearfix;
 
     nav.categories {
-      border: 1px solid rgb(220,220,220);
       @include box-sizing(border-box);
       float: left;
       margin-left: flex-gutter();
       padding: 20px;
       width: flex-grid(3);
+      border: 1px solid rgb(220,220,220);
 
       a {
         display: block;
-        letter-spacing: 1px;
         margin: 0px -20px;
         padding: 12px 0px 12px 20px;
         text-align: left;
+        letter-spacing: 1px;
 
         &:hover {
           background: rgb(245,245,245);
@@ -184,9 +184,9 @@
         }
 
         > h2 {
-          border-bottom: 1px solid rgb(220,220,220);
           margin-bottom: 40px;
           padding-bottom: 20px;
+          border-bottom: 1px solid rgb(220,220,220);
         }
       }
 
@@ -194,9 +194,9 @@
         margin-bottom: 40px;
 
         h3 {
-          font-family: $sans-serif;
-          font-weight: 700;
           margin-bottom: 15px;
+          font-weight: 700;
+          font-family: $sans-serif;
         }
       }
     }
@@ -204,31 +204,31 @@
 
   .press {
     .press-story {
-      border-bottom: 1px solid rgb(220,220,220);
       @include clearfix;
       margin-bottom: 40px;
       padding-bottom: 40px;
+      border-bottom: 1px solid rgb(220,220,220);
 
       &:last-child {
-        border: none;
         margin: 0px;
         padding: 0px;
+        border: none;
       }
 
       .article-cover {
-        background: rgb(255,255,255);
-        border: 1px solid rgb(120,120,120);
         @include box-sizing(border-box);
         float: left;
-        height: 140px;
-        margin-right: flex-gutter();
         overflow: hidden;
+        margin-right: flex-gutter();
         width: flex-grid(2);
+        height: 140px;
+        border: 1px solid rgb(120,120,120);
+        background: rgb(255,255,255);
 
         img {
           display: block;
           //min-height: 100%;
-          //width: 100%;
+          //width: 100%
         }
       }
 
@@ -240,14 +240,14 @@
           margin-bottom: 10px;
 
           h3 {
-            font-family: $sans-serif;
-            font-weight: 700;
             margin-bottom: 5px;
+            font-weight: 700;
+            font-family: $sans-serif;
           }
 
           span.post-date {
-            color: $lighter-base-font-color;
             margin-right: 10px;
+            color: $lighter-base-font-color;
           }
         }
       }
@@ -260,11 +260,11 @@
 
     .photo {
       @include box-sizing(border-box);
-      background: rgb(255,255,255);
-      border: 1px solid rgb(210,210,210);
-      padding: 1px;
       float: left;
+      padding: 1px;
       width: flex-grid(3);
+      border: 1px solid rgb(210,210,210);
+      background: rgb(255,255,255);
 
       img {
         max-width: 100%;
@@ -278,9 +278,9 @@
       width: flex-grid(9);
 
       ul {
-        list-style: none;
         margin: 0px;
         padding: 0px;
+        list-style: none;
 
         li {
           margin-bottom: 10px;

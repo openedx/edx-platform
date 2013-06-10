@@ -19,20 +19,20 @@ div#wiki_panel {
     padding: lh(.5) lh() lh(.5) 0;
 
     label {
-      font-family: $sans-serif;
       margin-bottom: lh(.5);
+      font-family: $sans-serif;
     }
 
     input[type="text"] {
       @include box-sizing(border-box);
       display: block;
-      width: 100%;
       margin-bottom: lh(.5);
+      width: 100%;
     }
 
     ul {
-      list-style: none;
       margin: 0;
+      list-style: none;
 
       li {
         float: left;

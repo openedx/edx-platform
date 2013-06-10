@@ -1,12 +1,12 @@
 .ui-tooltip.qtip .ui-tooltip-content {
-  background: rgba($pink, .8);
-  border: 0;
-  color: #fff;
-  font: bold 12px $body-font-family;
-  margin-bottom: 6px;
-  margin-right: 0;
   overflow: visible;
+  margin-right: 0;
+  margin-bottom: 6px;
   padding: 4px;
+  border: 0;
+  background: rgba($pink, .8);
+  color: #fff;
   text-align: center;
+  font: bold 12px $body-font-family;
   -webkit-font-smoothing: antialiased;
 }

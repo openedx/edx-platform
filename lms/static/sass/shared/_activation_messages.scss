@@ -19,12 +19,12 @@
   }
 
   .message {
-    background: rgb(252,252,252);
-    border: 1px solid rgb(200,200,200);
     @include box-shadow(0 3px 20px 0 rgba(0,0,0, 0.2));
-    @include border-radius(4px);
     margin: 0 auto;
     padding: 40px;
     width: flex-grid(6);
+    border: 1px solid rgb(200,200,200);
+    background: rgb(252,252,252);
+    @include border-radius(4px);
   }
 }

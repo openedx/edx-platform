@@ -15,9 +15,9 @@ form#wiki_revision {
 
   .CodeMirror {
     @extend textarea;
-    @include box-sizing(border-box);
-    font-family: monospace;
     margin-bottom: 20px;
+    font-family: monospace;
+    @include box-sizing(border-box);
   }
 
   textarea {
@@ -33,13 +33,13 @@ form#wiki_revision {
   }
 
   #submit_delete {
-    background: none;
-    border: none;
     @include box-shadow(none);
-    color: #999;
     float: right;
-    font-weight: normal;
+    border: none;
+    background: none;
+    color: #999;
     text-decoration: underline;
+    font-weight: normal;
   }
 
   input[type="submit"] {
@@ -48,25 +48,25 @@ form#wiki_revision {
 }
 
 #wiki_edit_instructions {
-  color: #666;
   float: left;
   margin-top: lh();
   width: flex-grid(3, 9);
+  color: #666;
 
   &:hover {
     color: #333;
   }
 
   .markdown-example {
-    background-color: #e3e3e3;
-    line-height: 1.0;
     margin: 5px 0 7px;
+    background-color: #e3e3e3;
+    text-shadow: 0 1px 0 #fff;
+    line-height: 1.0;
     padding: {
       top: 5px;
       right: 2px;
       bottom: 5px;
       left: 5px;
     }
-    text-shadow: 0 1px 0 #fff;
   }
 }

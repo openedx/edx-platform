@@ -1,27 +1,26 @@
 #lean_overlay {
-    background: transparent;
     @include background-image(radial-gradient(50% 30%, circle cover, rgba(0,0,0, 0.3), rgba(0,0,0, 0.8)));
-    display: none;
-    height:100%;
-    left: 0px;
     position: fixed;
     top: 0px;
-    width:100%;
+    left: 0px;
     z-index:100;
+    display: none;
+    width:100%;
+    height:100%;
+    background: transparent;
 }
 
 .modal {
-  background: rgba(0,0,0, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.9);
   @include border-radius(0px);
-  @include box-shadow(0 15px 80px 15px rgba(0,0,0, 0.5));
-  color: #fff;
-  display: none;
-  left: 50%;
-  padding: 8px;
   position: absolute;
-  width: grid-width(5);
+  left: 50%;
   z-index: 12;
+  display: none;
+  padding: 8px;
+  width: grid-width(5);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  background: rgba(0,0,0, 0.6);
+  color: #fff;
 
   &.video-modal {
     left: 50%;
@@ -29,11 +28,11 @@
     width: 582px;
 
     .inner-wrapper {
-      background: #000;
       @include box-shadow(none);
-      height: 315px;
       padding: 10px;
       width: 560px;
+      height: 315px;
+      background: #000;
     }
   }
 
@@ -43,87 +42,87 @@
     width: 662px;
 
     .inner-wrapper {
-      background: #000;
       @include box-shadow(none);
-      height: 360px;
       padding: 10px;
       width: 640px;
+      height: 360px;
+      background: #000;
     }
   }
 
   .inner-wrapper {
-    background: $modal-bg-color;
     @include border-radius(0px);
-    border: 1px solid rgba(0, 0, 0, 0.9);
     @include box-shadow(inset 0 1px 0 0 rgba(255, 255, 255, 0.7));
-    overflow: hidden;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 30px;
     position: relative;
     z-index: 2;
+    overflow: hidden;
+    padding-right: 10px;
+    padding-bottom: 30px;
+    padding-left: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.9);
+    background: $modal-bg-color;
 
     header {
-      margin-bottom: 30px;
-      overflow: hidden;
-      padding: 28px 20px 0px;
       position: relative;
       z-index: 2;
+      overflow: hidden;
+      margin-bottom: 30px;
+      padding: 28px 20px 0px;
 
       &::before {
         @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 0.8) 0%, rgba(255,255,255, 0) 100%));
-        content: "";
-        display: block;
-        height: 400px;
-        left: 0px;
-        margin: 0 auto;
         position: absolute;
         top: -140px;
-        width: 100%;
+        left: 0px;
         z-index: 1;
+        display: block;
+        margin: 0 auto;
+        width: 100%;
+        height: 400px;
+        content: "";
       }
 
       hr {
         @extend .faded-hr-divider-light;
-        border: none;
-        margin: 0px;
         position: relative;
         z-index: 2;
+        margin: 0px;
+        border: none;
 
         &::after {
           @extend .faded-hr-divider;
-          bottom: 0px;
-          content: "";
-          display: block;
           position: absolute;
           top: -1px;
+          bottom: 0px;
+          display: block;
+          content: "";
         }
       }
 
       h2 {
         position: relative;
+        z-index: 2;
         text-align: center;
         text-shadow: 0 1px rgba(255,255,255, 0.4);
-        z-index: 2;
       }
     }
 
     .modal-form-error {
-      background: $error-red;
-      border: 1px solid rgb(202, 17, 17);
-      color: rgb(143, 14, 14);
       display: none;
       margin-bottom: 20px;
       padding: 12px;
+      border: 1px solid rgb(202, 17, 17);
+      background: $error-red;
+      color: rgb(143, 14, 14);
     }
 
     .notice {
-      background: $yellow;
-      border: 1px solid darken($yellow, 60%);
-      color: darken($yellow, 60%);
       display: none;
       margin-bottom: 20px;
       padding: 12px;
+      border: 1px solid darken($yellow, 60%);
+      background: $yellow;
+      color: darken($yellow, 60%);
     }
 
     .activation-message, .message {
@@ -135,17 +134,17 @@
     }
 
     form {
-      margin-bottom: 12px;
-      padding: 0px 40px;
       position: relative;
       z-index: 2;
+      margin-bottom: 12px;
+      padding: 0px 40px;
 
       .input-group {
         @include clearfix;
-        border-bottom: 1px solid rgb(210,210,210);
         @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
         margin-bottom: 30px;
         padding-bottom: 10px;
+        border-bottom: 1px solid rgb(210,210,210);
       }
 
       label {
@@ -167,33 +166,32 @@
       }
 
       textarea {
-        background: rgb(255,255,255);
         display: block;
-        height: 45px;
         margin-bottom: 20px;
         width: 100%;
+        height: 45px;
+        background: rgb(255,255,255);
       }
 
       input[type="email"],
       input[type="text"],
       input[type="password"] {
-        background: rgb(255,255,255);
         display: block;
-        height: 45px;
         margin-bottom: 20px;
         width: 100%;
+        height: 45px;
+        background: rgb(255,255,255);
       }
 
       label.remember-me,
       label.terms-of-service,
       label.honor-code {
-        background: rgb(233,233,233);
-        border: 1px solid rgb(200,200,200);
         @include border-radius(3px);
-        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
         display: block;
         margin-bottom: 20px;
         padding: 8px 10px;
+        border: 1px solid rgb(200,200,200);
+        background: rgb(233,233,233);
 
         &:hover {
           background: rgb(230,230,230);
@@ -204,14 +202,15 @@
         }
 
         a {
-          font-family: $serif;
           font-style: italic;
+          font-family: $serif;
         }
+        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
       }
 
       .citizenship, .gender, .date-of-birth {
-        margin-bottom: 20px;
         float: left;
+        margin-bottom: 20px;
         width: flex-grid(4);
 
         label {
@@ -219,9 +218,9 @@
         }
 
         select {
-          width: 100%;
           @include box-sizing(border-box);
           display: block;
+          width: 100%;
         }
       }
 
@@ -234,9 +233,9 @@
 
         input[type="submit"] {
           display: block;
-          height: 45px;
           margin: 0 auto;
           width: 100%;
+          height: 45px;
         }
       }
     }
@@ -247,20 +246,20 @@
 
       p {
         color: $lighter-base-font-color;
-        font-style: italic;
         text-align: center;
+        font-style: italic;
 
         span {
           color: $lighter-base-font-color;
-          font-family: $serif;
           font-style: italic;
+          font-family: $serif;
         }
 
         a {
           color: $lighter-base-font-color;
-          font-family: $serif;
-          font-style: italic;
           text-decoration: underline;
+          font-style: italic;
+          font-family: $serif;
 
           &:hover {
             color: $base-font-color;
@@ -275,21 +274,21 @@
 
     .close-modal {
       @include border-radius(2px);
-      cursor: pointer;
       @include inline-block;
-      padding: 10px;
       position: absolute;
-      right: 2px;
       top: 0px;
+      right: 2px;
       z-index: 3;
+      padding: 10px;
+      cursor: pointer;
 
       .inner {
         p {
+          @include transition(all, 0.15s, ease-out);
           color: $lighter-base-font-color;
-          font: normal 1.2rem/1.2rem $sans-serif;
           text-align: center;
           text-shadow: 0 1px rgba(255,255,255, 0.8);
-          @include transition(all, 0.15s, ease-out);
+          font: normal 1.2rem/1.2rem $sans-serif;
         }
       }
 
@@ -314,10 +313,11 @@
   }
 
   .tip {
-    font-size: 12px;
     display: block;
     color: $dark-gray;
+    font-size: 12px;
   }
+  @include box-shadow(0 15px 80px 15px rgba(0,0,0, 0.5));
 
 
 }

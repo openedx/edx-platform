@@ -4,14 +4,14 @@
   q {
     display: block;
     margin: 10px 0;
-    font-style: italic;
     text-align: justify;
+    font-style: italic;
   }
 
   small.author {
-    text-align: right;
     display: block;
     color: rgb(100, 100, 100);
+    text-align: right;
   }
 
   h1 + hr {
@@ -20,21 +20,21 @@
 
   .message {
     @include clearfix;
-    margin-bottom: 80px;
     position: relative;
+    margin-bottom: 80px;
 
     .photo {
-      background: rgb(255,255,255);
-      border: 1px solid rgb(210,210,210);
       float: left;
       margin-right: flex-gutter();
       padding: 1px;
       width: flex-grid(4);
+      border: 1px solid rgb(210,210,210);
+      background: rgb(255,255,255);
 
       img {
-        background: rgb(245,245,245);
         display: block;
         max-width: 100%;
+        background: rgb(245,245,245);
       }
     }
 
@@ -43,8 +43,8 @@
       width: flex-grid(7);
 
       blockquote {
-        margin-left: 0;
         margin-bottom: 40px;
+        margin-left: 0;
 
         &:last-child {
           margin-bottom: 0;
@@ -52,15 +52,15 @@
 
         p {
           margin-left: 0;
-          font-style: italic;
-          line-height: 1.6;
-          font-size: 1.1em;
           color: #666;
+          font-style: italic;
+          font-size: 1.1em;
+          line-height: 1.6;
         }
 
         cite {
-          margin-top: 12px;
           display: block;
+          margin-top: 12px;
           color: #a0a0a0;
           font-weight: 300;
         }
@@ -82,20 +82,20 @@
 
     .jobs-sidebar {
       @include box-sizing(border-box);
-      border: 1px solid rgb(220,220,220);
       float: left;
       padding: 20px;
       width: flex-grid(3);
+      border: 1px solid rgb(220,220,220);
 
       nav {
         margin-bottom: 40px;
 
         a {
           display: block;
-          letter-spacing: 1px;
           margin: 0px -20px;
           padding: 12px 0px 12px 20px;
           text-align: left;
+          letter-spacing: 1px;
 
           &:hover {
             background: rgb(245,245,245);
@@ -115,33 +115,33 @@
       width: flex-grid(9);
 
       .job {
-        border-bottom: 1px solid rgb(220,220,220);
         padding: 40px 0px;
+        border-bottom: 1px solid rgb(220,220,220);
 
         &:first-child {
           padding-top: 0px;
         }
 
         &:last-child {
-          border: none;
           padding-bottom: 0px;
+          border: none;
         }
 
         .inner-wrapper {
         }
 
         h3 {
-          font-family: $sans-serif;
-          font-weight: 700;
           margin-bottom: 15px;
+          font-weight: 700;
+          font-family: $sans-serif;
         }
 
         h4 {
-          font-size: 1.0em;
-          font-family: $sans-serif;
-          font-weight: 700;
           margin-top: 25px;
           margin-bottom: 10px;
+          font-weight: 700;
+          font-size: 1.0em;
+          font-family: $sans-serif;
         }
 
         ul {
@@ -149,11 +149,11 @@
         }
 
         li {
-          font-family: $serif;
-          font-size: 1em;
-          line-height: 1.6em;
-          color: #3c3c3c;
           margin-bottom: 0.2em;
+          color: #3c3c3c;
+          font-size: 1em;
+          font-family: $serif;
+          line-height: 1.6em;
         }
       }
     }

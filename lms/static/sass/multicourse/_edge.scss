@@ -6,23 +6,22 @@ $extraDarkGrey: #3d4043;
 $paleYellow: #fffcf1;
 
 @mixin button {
+  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
   display: inline-block;
   padding: 4px 20px 6px;
-  font-family: $sans-serif;
-  font-size: 14px;
-  font-weight: 700;
   text-transform: none;
   letter-spacing: 0;
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
-  @include transition(background-color .15s, box-shadow .15s);
+  font-weight: 700;
+  font-size: 14px;
+  font-family: $sans-serif;
 
   &.disabled {
     border: 1px solid $lightGrey !important;
     border-radius: 3px !important;
     background: $lightGrey !important;
     color: $darkGrey !important;
-    pointer-events: none;
     cursor: none;
+    pointer-events: none;
     &:hover {
       box-shadow: 0 0 0 0 !important;
     }
@@ -32,13 +31,14 @@ $paleYellow: #fffcf1;
     @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15));
     text-decoration: none;
   }
+  @include transition(background-color .15s, box-shadow .15s);
 }
 
 @mixin blue-button {
   @include button;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   border: 1px solid #437fbf;
   border-radius: 3px;
-  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   background-color: $blue;
   color: #fff;
 
@@ -50,17 +50,17 @@ $paleYellow: #fffcf1;
 
 @mixin grey-button {
   @include button;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   border: 1px solid $darkGrey;
   border-radius: 3px;
-  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   background-color: #d1dae3;
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
   color: #6d788b;
 
   &:hover {
     background-color: #d9e3ee;
     color: #6d788b;
   }
+  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
 }
 
 .edge-landing {  
@@ -68,8 +68,8 @@ $paleYellow: #fffcf1;
 
   header {
     @include clearfix;
-    background: $extraDarkGrey;
     border-bottom: 3px solid $blue;
+    background: $extraDarkGrey;
   }
 
   a:hover {
@@ -77,23 +77,23 @@ $paleYellow: #fffcf1;
   }
 
   .main-wrapper {
-    width: 942px;
     margin: auto;
+    width: 942px;
 
     .content {
+      @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
       padding: 40px 60px 36px;
-      background: #fff;
       border: 1px solid $darkGrey;
       border-radius: 3px;
-      @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
+      background: #fff;
       @include clearfix;
     }
 
     .log-in-form {
       float: left;
-      width: 470px;
       margin-right: 50px;
       padding-right: 49px;
+      width: 470px;
       border-right: 1px solid $lightGrey;
 
       .row {
@@ -102,33 +102,33 @@ $paleYellow: #fffcf1;
       }
 
       label {
-        font-family: $sans-serif;
-        font-size: 13px;
         font-weight: 700;
         font-style: normal;
+        font-size: 13px;
+        font-family: $sans-serif;
       }
 
       input {
         width: 100%;
         height: 43px;
-        font-family: $sans-serif;
-        font-size: 21px;
-        font-style: normal;
         font-weight: 300;
+        font-style: normal;
+        font-size: 21px;
+        font-family: $sans-serif;
       }
 
       .log-in-submit-button {
         @include blue-button;
-        width: 130px;
         padding: 8px 20px 10px;
-        font-size: 16px;
+        width: 130px;
         text-shadow: none;
+        font-size: 16px;
       }
 
       .forgot-button {
+        margin-left: 10px;
         font-size: 12px;
         line-height: 41px;
-        margin-left: 10px;
       }
     }
 
@@ -138,27 +138,27 @@ $paleYellow: #fffcf1;
 
       .register-button {
         @include grey-button;
-        padding: 10px 20px 12px;
         margin-top: 20px;
+        padding: 10px 20px 12px;
       }
     }
 
     h2 {
       margin-bottom: 30px;
-      font-family: $sans-serif;
-      font-size: 24px;
-      font-weight: 300;
+      color: #3c3c3c;
       text-transform: none;
       letter-spacing: 0;
-      color: #3c3c3c;
+      font-weight: 300;
+      font-size: 24px;
+      font-family: $sans-serif;
     }
 
     h3 {
       margin-bottom: 30px;
-      font-family: $sans-serif;
-      font-size: 24px;
-      font-weight: 300;
       color: #3c3c3c;
+      font-weight: 300;
+      font-size: 24px;
+      font-family: $sans-serif;
     }
 
     p {
@@ -168,12 +168,12 @@ $paleYellow: #fffcf1;
 
   .edx-edge-logo-large {
     display: block;
+    overflow: hidden;
+    margin: 150px auto 50px;
     width: 263px;
     height: 72px;
-    margin: 150px auto 50px;
     background: url(../images/edge-logo-large.png) no-repeat;
     text-indent: -9999px;
-    overflow: hidden;
   }
 
   #signup-modal {
@@ -190,16 +190,16 @@ $paleYellow: #fffcf1;
     font-family: $sans-serif;
 
     * {
-      font-family: $sans-serif;
-      font-style: normal;
-      letter-spacing: 0;
-      text-transform: none;
       color: #3c3c3c;
+      text-transform: none;
+      letter-spacing: 0;
+      font-style: normal;
+      font-family: $sans-serif;
     }
 
     header {
-      padding-top: 13px;
       margin-bottom: 15px;
+      padding-top: 13px;
       border: none;
       background: none;
     }
@@ -209,17 +209,17 @@ $paleYellow: #fffcf1;
     }
 
     label {
-      font-size: 13px;
       font-weight: 700;
+      font-size: 13px;
     }
 
     input[type="email"],
     input[type="text"],
     input[type="password"] {
-      height: 40px;
       margin-bottom: 15px;
-      font-size: 13px;
+      height: 40px;
       font-weight: 400;
+      font-size: 13px;
     }
 
     input[type="submit"] {
@@ -231,8 +231,8 @@ $paleYellow: #fffcf1;
 
     textarea {
       height: 50px;
-      font-size: 13px;
       font-weight: 400;
+      font-size: 13px;
     }
 
     .input-group {
@@ -253,8 +253,8 @@ $paleYellow: #fffcf1;
     }
 
     .modal-form-error {
-      font-size: 14px;
       color: #fff;
+      font-size: 14px;
     }
   }
 }
