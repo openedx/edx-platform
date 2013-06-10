@@ -6,7 +6,6 @@ Non-html views which the instructor dashboard requests.
 TODO add tracking
 """
 
-import csv
 import json
 import logging
 import os
@@ -31,6 +30,16 @@ from django.contrib.auth.models import User
 
 import analytics.basic
 import analytics.distributions
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def test(request, course_id):
+    response_payload = {
+        'testing': 'ok',
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
 
 
 @ensure_csrf_cookie

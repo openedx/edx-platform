@@ -270,6 +270,8 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
 
         # api endpoints for instructor
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/test$',
+            'instructor.views.api.test', name="instructor_dash_api_test"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/grading_config$',
             'instructor.views.api.grading_config', name="grading_config"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/enrolled_students_profiles$',
