@@ -227,13 +227,13 @@ def instructor_dashboard(request, course_id):
         if student_to_reset is not None:
             # find the module in question
             if '/' not in problem_to_reset:				# allow state of modules other than problem to be reset
-                problem_to_reset = "problem/" + problem_to_reset	# but problem is the default
+                problem_to_reset = "problem/" + problem_to_reset    # but problem is the default
             try:
                 (org, course_name, _) = course_id.split("/")
                 module_state_key = "i4x://" + org + "/" + course_name + "/" + problem_to_reset
                 module_to_reset = StudentModule.objects.get(student_id=student_to_reset.id,
-                                                          course_id=course_id,
-                                                          module_state_key=module_state_key)
+                                                            course_id=course_id,
+                                                            module_state_key=module_state_key)
                 msg += "Found module to reset.  "
             except Exception:
                 msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
@@ -257,18 +257,17 @@ def instructor_dashboard(request, course_id):
                 module_to_reset.state = json.dumps(problem_state)
                 module_to_reset.save()
                 track.views.server_track(request,
-                                        '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
-                                            old_attempts=old_number_of_attempts,
-                                            student=student_to_reset,
-                                            problem=module_to_reset.module_state_key,
-                                            instructor=request.user,
-                                            course=course_id),
-                                        {},
-                                        page='idashboard')
+                                         '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
+                                             old_attempts=old_number_of_attempts,
+                                             student=student_to_reset,
+                                             problem=module_to_reset.module_state_key,
+                                             instructor=request.user,
+                                             course=course_id),
+                                         {},
+                                         page='idashboard')
                 msg += "<font color='green'>Module state successfully reset!</font>"
             except:
                 msg += "<font color='red'>Couldn't reset module state.  </font>"
-
 
     elif "Get link to student's progress page" in action:
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
@@ -279,12 +278,12 @@ def instructor_dashboard(request, course_id):
                 student_to_reset = User.objects.get(username=unique_student_identifier)
             progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student_to_reset.id})
             track.views.server_track(request,
-                                    '{instructor} requested progress page for {student} in {course}'.format(
-                                        student=student_to_reset,
-                                        instructor=request.user,
-                                        course=course_id),
-                                    {},
-                                    page='idashboard')
+                                     '{instructor} requested progress page for {student} in {course}'.format(
+                                         student=student_to_reset,
+                                         instructor=request.user,
+                                         course=course_id),
+                                     {},
+                                     page='idashboard')
             msg += "<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url, student_to_reset.username, student_to_reset.email)
         except:
             msg += "<font color='red'>Couldn't find student with that username.  </font>"
@@ -312,6 +311,7 @@ def instructor_dashboard(request, course_id):
         msg2, rg_stud_data = _do_remote_gradebook(request.user, course, 'get-membership')
         datatable = {'header': ['Student  email', 'Match?']}
         rg_students = [x['email'] for x in rg_stud_data['retdata']]
+
         def domatch(x):
             return 'yes' if x.email in rg_students else 'No'
         datatable['data'] = [[x.email, domatch(x)] for x in stud_data['students']]
@@ -346,7 +346,6 @@ def instructor_dashboard(request, course_id):
                     files = {'datafile': fp}
                     msg2, _ = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
                     msg += msg2
-
 
     #----------------------------------------
     # Admin
@@ -413,6 +412,7 @@ def instructor_dashboard(request, course_id):
         profkeys = ['name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education',
                     'mailing_address', 'goals']
         datatable = {'header': ['username', 'email'] + profkeys}
+
         def getdat(u):
             p = u.profile
             return [u.username, u.email] + [getattr(p, x, '') for x in profkeys]
@@ -421,9 +421,8 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'Student profile data for course %s' % course_id
         return return_csv('profiledata_%s.csv' % course_id, datatable)
 
-
     elif 'Download CSV of all responses to problem' in action:
-        problem_to_dump = request.POST.get('problem_to_dump','')
+        problem_to_dump = request.POST.get('problem_to_dump', '')
 
         if problem_to_dump[-4:] == ".xml":
             problem_to_dump = problem_to_dump[:-4]
@@ -441,7 +440,7 @@ def instructor_dashboard(request, course_id):
 
         if smdat:
             datatable = {'header': ['username', 'state']}
-            datatable['data'] = [ [x.student.username, x.state] for x in smdat ]
+            datatable['data'] = [[x.student.username, x.state] for x in smdat]
             datatable['title'] = 'Student state for problem %s' % problem_to_dump
             return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
 
@@ -477,7 +476,6 @@ def instructor_dashboard(request, course_id):
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
-
 
     elif action == 'Remove forum admin':
         uname = request.POST['forumadmin']
@@ -536,35 +534,17 @@ def instructor_dashboard(request, course_id):
         datatable['data'] = [[x.email] for x in ceaset]
         datatable['title'] = action
 
-    elif action == 'Enroll student':
-
-        student = request.POST.get('enstudent', '')
-        ret = _do_enroll_students(course, course_id, student)
-        datatable = ret['datatable']
-
-    elif action == 'Un-enroll student':
-
-        student = request.POST.get('enstudent', '')
-        datatable = {}
-        isok = False
-        cea = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=student)
-        if cea:
-            cea.delete()
-            msg += "Un-enrolled student with email '%s'" % student
-            isok = True
-        try:
-            nce = CourseEnrollment.objects.get(user=User.objects.get(email=student), course_id=course_id)
-            nce.delete()
-            msg += "Un-enrolled student with email '%s'" % student
-        except Exception as err:
-            if not isok:
-                msg += "Error!  Failed to un-enroll student with email '%s'\n" % student
-                msg += str(err) + '\n'
-
     elif action == 'Enroll multiple students':
 
-        students = request.POST.get('enroll_multiple', '')
-        ret = _do_enroll_students(course, course_id, students)
+        students = request.POST.get('multiple_students', '')
+        auto_enroll = bool(request.POST.get('auto_enroll'))
+        ret = _do_enroll_students(course, course_id, students, auto_enroll=auto_enroll)
+        datatable = ret['datatable']
+
+    elif action == 'Unenroll multiple students':
+
+        students = request.POST.get('multiple_students', '')
+        ret = _do_unenroll_students(course_id, students)
         datatable = ret['datatable']
 
     elif action == 'List sections available in remote gradebook':
@@ -586,7 +566,6 @@ def instructor_dashboard(request, course_id):
             ret = _do_enroll_students(course, course_id, students, overload=overload)
             datatable = ret['datatable']
 
-
     #----------------------------------------
     # psychometrics
 
@@ -606,9 +585,9 @@ def instructor_dashboard(request, course_id):
         logs and swallows errors.
         """
         url = settings.ANALYTICS_SERVER_URL + \
-              "get?aname={}&course_id={}&apikey={}".format(analytics_name,
-                                                           course_id,
-                                                           settings.ANALYTICS_API_KEY)
+            "get?aname={}&course_id={}&apikey={}".format(analytics_name,
+                                                         course_id,
+                                                         settings.ANALYTICS_API_KEY)
         try:
             res = requests.get(url)
         except Exception:
@@ -667,7 +646,7 @@ def instructor_dashboard(request, course_id):
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
                'analytics_results': analytics_results,
-            }
+               }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 
@@ -830,7 +809,7 @@ def _add_or_remove_user_group(request, username_or_email, group, group_title, ev
         action = "Added" if do_add else "Removed"
         prep = "to" if do_add else "from"
         msg = '<font color="green">{action} {0} {prep} {1} group = {2}</font>'.format(user, group_title, group.name,
-                                                                                  action=action, prep=prep)
+                                                                                      action=action, prep=prep)
         if do_add:
             user.groups.add(group)
         else:
@@ -956,7 +935,7 @@ def gradebook(request, course_id):
                      'grade_summary': student_grades(student, request, course),
                      'realname': student.profile.name,
                      }
-                     for student in enrolled_students]
+                    for student in enrolled_students]
 
     return render_to_response('courseware/gradebook.html', {
         'students': student_info,
@@ -982,17 +961,11 @@ def grade_summary(request, course_id):
 #-----------------------------------------------------------------------------
 # enrollment
 
-def _do_enroll_students(course, course_id, students, overload=False):
+def _do_enroll_students(course, course_id, students, overload=False, auto_enroll=False):
     """Do the actual work of enrolling multiple students, presented as a string
     of emails separated by commas or returns"""
 
-    new_students = split_by_comma_and_whitespace(students)
-    new_students = [str(s.strip()) for s in new_students]
-    new_students_lc = [x.lower() for x in new_students]
-
-    if '' in new_students:
-        new_students.remove('')
-
+    new_students, new_students_lc = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in new_students)
 
     if overload:  	# delete all but staff
@@ -1012,27 +985,35 @@ def _do_enroll_students(course, course_id, students, overload=False):
         try:
             user = User.objects.get(email=student)
         except User.DoesNotExist:
-            # user not signed up yet, put in pending enrollment allowed table
-            if CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_id):
-                status[student] = 'user does not exist, enrollment already allowed, pending'
+
+            #User not signed up yet, put in pending enrollment allowed table
+            cea = CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_id)
+
+            #If enrollmentallowed already exists, update auto_enroll flag to however it was set in UI
+            #Will be 0 or 1 records as there is a unique key on email + course_id
+            if cea:
+                cea[0].auto_enroll = auto_enroll
+                cea[0].save()
+                status[student] = 'user does not exist, enrollment already allowed, pending with auto enrollment ' \
+                    + ('on' if auto_enroll else 'off')
                 continue
-            cea = CourseEnrollmentAllowed(email=student, course_id=course_id)
+            cea = CourseEnrollmentAllowed(email=student, course_id=course_id, auto_enroll=auto_enroll)
             cea.save()
-            status[student] = 'user does not exist, enrollment allowed, pending'
+            status[student] = 'user does not exist, enrollment allowed, pending with auto enrollment ' + ('on' if auto_enroll else 'off')
             continue
 
         if CourseEnrollment.objects.filter(user=user, course_id=course_id):
             status[student] = 'already enrolled'
             continue
         try:
-            nce = CourseEnrollment(user=user, course_id=course_id)
-            nce.save()
+            ce = CourseEnrollment(user=user, course_id=course_id)
+            ce.save()
             status[student] = 'added'
         except:
             status[student] = 'rejected'
 
     datatable = {'header': ['StudentEmail', 'action']}
-    datatable['data'] = [[x, status[x]] for x in status]
+    datatable['data'] = [[x, status[x]] for x in sorted(status)]
     datatable['title'] = 'Enrollment of students'
 
     def sf(stat):
@@ -1044,38 +1025,68 @@ def _do_enroll_students(course, course_id, students, overload=False):
     return data
 
 
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def enroll_students(request, course_id):
-    """Allows a staff member to enroll students in a course.
+#Unenrollment
+def _do_unenroll_students(course_id, students):
+    """Do the actual work of un-enrolling multiple students, presented as a string
+    of emails separated by commas or returns"""
 
-    This is a short-term hack for Berkeley courses launching fall
-    2012. In the long term, we would like functionality like this, but
-    we would like both the instructor and the student to agree. Right
-    now, this allows any instructor to add students to their course,
-    which we do not want.
+    old_students, old_students_lc = get_and_clean_student_list(students)
+    status = dict([x, 'unprocessed'] for x in old_students)
 
-    It is poorly written and poorly tested, but it's designed to be
-    stripped out.
+    for student in old_students:
+
+        isok = False
+        cea = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=student)
+        #Will be 0 or 1 records as there is a unique key on email + course_id
+        if cea:
+            cea[0].delete()
+            status[student] = "un-enrolled"
+            isok = True
+
+        try:
+            user = User.objects.get(email=student)
+        except User.DoesNotExist:
+            continue
+
+        ce = CourseEnrollment.objects.filter(user=user, course_id=course_id)
+        #Will be 0 or 1 records as there is a unique key on user + course_id
+        if ce:
+            try:
+                ce[0].delete()
+                status[student] = "un-enrolled"
+            except Exception as err:
+                if not isok:
+                    status[student] = "Error!  Failed to un-enroll"
+
+    datatable = {'header': ['StudentEmail', 'action']}
+    datatable['data'] = [[x, status[x]] for x in sorted(status)]
+    datatable['title'] = 'Un-enrollment of students'
+
+    data = dict(datatable=datatable)
+    return data
+
+
+def get_and_clean_student_list(students):
+    """
+    Separate out individual student email from the comma, or space separated string.
+
+    In:
+    students: string coming from the input text area
+    Return:
+    students: list of cleaned student emails
+    students_lc: list of lower case cleaned student emails
     """
 
-    course = get_course_with_access(request.user, course_id, 'staff')
-    existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id=course_id)]
+    students = split_by_comma_and_whitespace(students)
+    students = [str(s.strip()) for s in students]
+    students = [s for s in students if s != '']
+    students_lc = [x.lower() for x in students]
 
-    new_students = request.POST.get('new_students')
-    ret = _do_enroll_students(course, course_id, new_students)
-    added_students = ret['added']
-    rejected_students = ret['rejected']
-
-    return render_to_response("enroll_students.html", {'course': course_id,
-                                                       'existing_students': existing_students,
-                                                       'added_students': added_students,
-                                                       'rejected_students': rejected_students,
-                                                       'debug': new_students})
-
+    return students, students_lc
 
 #-----------------------------------------------------------------------------
 # answer distribution
+
 
 def get_answers_distribution(request, course_id):
     """
@@ -1168,5 +1179,5 @@ def dump_grading_context(course):
             msg += "      %s (format=%s, Assignment=%s%s)\n" % (s.display_name, format, aname, notes)
     msg += "all descriptors:\n"
     msg += "length=%d\n" % len(gc['all_descriptors'])
-    msg = '<pre>%s</pre>' % msg.replace('<','&lt;')
+    msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')
     return msg
