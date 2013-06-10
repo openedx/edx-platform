@@ -26,12 +26,11 @@ class @Video
     @videos[speed || @speed]
 
   parseVideos: (videos) ->
-    @videos = {}
-    @videos['.75'] = @el.data('youtube-id-0-75')
-    @videos['1.0'] = @el.data('normal-speed-video-id')
-    @videos['1.25'] = @el.data('youtube-id-1-25')
-    @videos['1.5'] = @el.data('youtube-id-1-5')
-    alert @videos['1.5']
+    @videos =
+      '0.75': @el.data('youtube-id-0-75')
+      '1.0': @el.data('normal-speed-video-id')
+      '1.25': @el.data('youtube-id-1-25')
+      '1.50': @el.data('youtube-id-1-5')
 
   parseSpeed: ->
     @setSpeed($.cookie('video_speed'))
