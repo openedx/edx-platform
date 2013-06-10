@@ -1,0 +1,11 @@
+<%page args="section_data"/>
+
+<h2>Distributions</h2>
+<select id="distributions" data-endpoint="${ section_data['profile_distributions_url'] }">
+  <option> Getting available distributions... </option>
+</select>
+<div class="distribution-display">
+  <div class="distribution-display-text"></div>
+  <div class="distribution-display-graph"></div>
+  <div class="distribution-display-table"></div>
+</div>

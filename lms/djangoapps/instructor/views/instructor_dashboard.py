@@ -15,10 +15,11 @@ from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
+from django.http import Http404
 
 from django.conf import settings
 from courseware.access import has_access, get_access_group_name, course_beta_test_group_name
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_by_id
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
 from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
@@ -31,17 +32,21 @@ from student.models import CourseEnrollment
 def instructor_dashboard_2(request, course_id):
     """Display the instructor dashboard for a course."""
 
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_by_id(course_id, depth=None)
     instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
+    staff_access = has_access(request.user, course, 'staff')
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
-    section_data = {
-        'course_info':   _section_course_info(request, course_id),
-        'enrollment':    _section_enrollment(course_id),
-        'student_admin': _section_student_admin(course_id),
-        'data_download': _section_data_download(course_id),
-        'analytics': _section_analytics(course_id),
-    }
+    if not staff_access:
+        raise Http404
+
+    sections = [
+        _section_course_info(course_id),
+        _section_enrollment(course_id),
+        _section_student_admin(course_id),
+        _section_data_download(course_id),
+        _section_analytics(course_id),
+    ]
 
     context = {
         'course': course,
@@ -52,19 +57,34 @@ def instructor_dashboard_2(request, course_id):
         'djangopid': os.getpid(),
         'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
-        'section_data': section_data
+        'sections': sections
     }
 
     return render_to_response('courseware/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
-def _section_course_info(request, course_id):
+"""
+Section functions starting with _section return a dictionary of section data.
+
+The dictionary must include at least {
+    'section_key': 'circus_expo'
+    'section_display_name': 'Circus Expo'
+}
+
+section_display_name will be used to generate link titles in the nav bar.
+sek will be used as a css attribute, javascript tie-in, and template import filename.
+"""
+
+
+def _section_course_info(course_id):
     """ Provide data for the corresponding dashboard section """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_by_id(course_id, depth=None)
 
     section_data = {}
+    section_data['section_key'] = 'course_info'
+    section_data['section_display_name'] = 'Course Info'
     section_data['course_id'] = course_id
-    section_data['display_name'] = course.display_name
+    section_data['course_display_name'] = course.display_name
     section_data['enrollment_count'] = CourseEnrollment.objects.filter(course_id=course_id).count()
     section_data['has_started'] = course.has_started()
     section_data['has_ended'] = course.has_ended()
@@ -81,21 +101,29 @@ def _section_course_info(request, course_id):
 
 def _section_enrollment(course_id):
     """ Provide data for the corresponding dashboard section """
-    section_data = {}
-    section_data['placeholder'] = "Enrollment content."
+    section_data = {
+        'section_key': 'enrollment',
+        'section_display_name': 'Enrollment',
+        'enroll_button_url':   reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+        'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+    }
     return section_data
 
 
 def _section_student_admin(course_id):
     """ Provide data for the corresponding dashboard section """
-    section_data = {}
-    section_data['placeholder'] = "Student Admin content."
+    section_data = {
+        'section_key': 'student_admin',
+        'section_display_name': 'Student Admin',
+    }
     return section_data
 
 
 def _section_data_download(course_id):
     """ Provide data for the corresponding dashboard section """
     section_data = {
+        'section_key': 'data_download',
+        'section_display_name': 'Data Download',
         'grading_config_url':             reverse('grading_config', kwargs={'course_id': course_id}),
         'enrolled_students_profiles_url': reverse('enrolled_students_profiles', kwargs={'course_id': course_id}),
     }
@@ -105,6 +133,8 @@ def _section_data_download(course_id):
 def _section_analytics(course_id):
     """ Provide data for the corresponding dashboard section """
     section_data = {
+        'section_key': 'analytics',
+        'section_display_name': 'Analytics',
         'profile_distributions_url': reverse('profile_distribution', kwargs={'course_id': course_id}),
     }
     return section_data

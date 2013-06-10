@@ -50,7 +50,7 @@ def profile_distribution(course_id, feature):
         feature_results['type'] = 'EASY_CHOICE'
     elif feature in OPEN_CHOICE_FEATURES:
         profiles = UserProfile.objects.filter(user__courseenrollment__course_id=course_id)
-        query_distribution = profiles.values('year_of_birth').annotate(Count('year_of_birth')).order_by()
+        query_distribution = profiles.values(feature).annotate(Count(feature)).order_by()
         # query_distribution is of the form [{'attribute': 'value1', 'attribute__count': 4}, {'attribute': 'value2', 'attribute__count': 2}, ...]
 
         distribution = dict((vald[feature], vald[feature + '__count']) for vald in query_distribution)

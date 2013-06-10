@@ -1,49 +1,50 @@
+<%page args="section_data"/>
+
+<h2>Course Information</h2>
+
 <div class="basic-data">
   Course Name:
-  ${ section_data['course_info']['display_name'] }
+  ${ section_data['course_display_name'] }
 </div>
 
 <div class="basic-data">
   Course ID:
-  ${ section_data['course_info']['course_id'] }
+  ${ section_data['course_id'] }
 </div>
 
 <div class="basic-data">
   Students Enrolled:
-  ${ section_data['course_info']['enrollment_count'] }
+  ${ section_data['enrollment_count'] }
 </div>
 
 <div class="basic-data">
   Started:
-  ${ section_data['course_info']['has_started'] }
+  ${ section_data['has_started'] }
 </div>
 
 <div class="basic-data">
   Ended:
-  ${ section_data['course_info']['has_ended'] }
+  ${ section_data['has_ended'] }
 </div>
 
 <div class="basic-data">
   Grade Cutoffs:
-  ${ section_data['course_info']['grade_cutoffs'] }
+  ${ section_data['grade_cutoffs'] }
 </div>
 
 <div class="basic-data">
   Offline Grades Available:
-  ${ section_data['course_info']['offline_grades'] }
+  ${ section_data['offline_grades'] }
 </div>
 
 <div class="error-log">
-  <h2>Course Errors:</h2>
-  %for error in section_data['course_info']['course_errors']:
-    <div class="course-error">
-      <code class=course-error-first>  ${ error[0] } </code><br>
-      <code class=course-error-second> ${ error[1] } </code>
-    </div>
-  %endfor
+  %if len(section_data['course_errors']):
+    <h2>Course Errors:</h2>
+    %for error in section_data['course_errors']:
+      <div class="course-error">
+        <code class=course-error-first>  ${ error[0] } </code><br>
+        <code class=course-error-second> ${ error[1] } </code>
+      </div>
+    %endfor
+  %endif
 </div>
-
-## <div class="basic-data">
-##   Section Dump<br>
-##   ${ section_data['course_info'] }
-## </div>

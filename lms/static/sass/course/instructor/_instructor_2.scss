@@ -8,8 +8,14 @@
     width: 100%;
     position: relative;
 
+    .slick-header-column {
+      height: 100%;
+    }
+
     h1 {
       @extend .top-header;
+      border-bottom: 0;
+      padding-bottom: 0;
     }
 
     .instructor_dash_glob_info {
@@ -20,9 +26,16 @@
     }
 
     .instructor-nav {
+      a {
+        margin-right: 1.2em;
+      }
+
       .active-section {
         color: #551A8B;
       }
+
+      border-bottom: 1px solid #C8C8C8;
+      padding-bottom: 1em;
     }
 
     section.idash-section {
@@ -42,7 +55,7 @@
 }
 
 
-.instructor-dashboard-wrapper-2 section.idash-section#course-info {
+.instructor-dashboard-wrapper-2 section.idash-section#course_info {
   .error-log {
     margin-top: 1em;
 
@@ -63,15 +76,77 @@
 }
 
 
-.instructor-dashboard-wrapper-2 section.idash-section#data-download {
-  input {
-    display: block;
-    margin-bottom: 1em;
+.instructor-dashboard-wrapper-2 section.idash-section#enrollment {
+  div {
+    margin-top: 2em;
+  }
+
+  textarea {
+    height: 100px;
+    width: 500px;
+  }
+
+  .task-res-section {
+    h3 {
+      color: #646464;
+    }
+
+    ul {
+      padding: 0;
+      margin: 0;
+      margin-top: 0.5em;
+      line-height: 1.5em;
+      list-style-type: none;
+      li {
+      }
+    }
   }
 }
 
+
+.instructor-dashboard-wrapper-2 section.idash-section#student_admin {
+  .h-row {
+    margin-bottom: 1em;
+    clear: both;
+  }
+
+  p input select {
+    float: left;
+  }
+}
+
+
+.instructor-dashboard-wrapper-2 section.idash-section#data_download {
+  input {
+    // display: block;
+    margin-bottom: 1em;
+  }
+
+  .data-display {
+    .data-display-table {
+      .slickgrid {
+        height: 400px;
+      }
+    }
+  }
+}
+
+
 .instructor-dashboard-wrapper-2 section.idash-section#analytics {
   .distribution-display {
-    margin-top: 1em;
+    margin-top: 1.2em;
+
+    .distribution-display-graph {
+      .year-of-birth {
+        width: 500px;
+        height: 200px;
+      }
+    }
+
+    .distribution-display-table {
+      .slickgrid {
+        height: 400px;
+      }
+    }
   }
 }

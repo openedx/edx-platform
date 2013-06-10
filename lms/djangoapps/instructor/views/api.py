@@ -4,34 +4,77 @@ Instructor Dashboard API views
 Non-html views which the instructor dashboard requests.
 
 TODO add tracking
+TODO a lot of these GETs should be PUTs
 """
 
-import csv
 import json
-import logging
-import os
-import re
-import requests
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from mitxmako.shortcuts import render_to_response
-from django.core.urlresolvers import reverse
-from django.utils.html import escape
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 
-from django.conf import settings
-from courseware.access import has_access, get_access_group_name, course_beta_test_group_name
 from courseware.courses import get_course_with_access
-from django_comment_client.utils import has_forum_access
-from instructor.offline_gradecalc import student_grades, offline_grades_available
-from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-from xmodule.modulestore.django import modulestore
-from student.models import CourseEnrollment
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
+from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
+from instructor.access import allow_access, revoke_access
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def enroll_unenroll(request, course_id):
+    """
+    Enroll or unenroll students by email.
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    emails_to_enroll = split_input_list(request.GET.get('enroll', ''))
+    emails_to_unenroll = split_input_list(request.GET.get('unenroll', ''))
+
+    enrolled_result = enroll_emails(course_id, emails_to_enroll)
+    unenrolled_result = unenroll_emails(course_id, emails_to_unenroll)
+
+    response_payload = {
+        'enrolled':   enrolled_result,
+        'unenrolled': unenrolled_result,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def access_allow_revoke(request, course_id):
+    """
+    Modify staff/instructor access. (instructor available only)
+
+    Query parameters:
+    email is the target users email
+    level is one of ['instructor', 'staff']
+    mode is one of ['allow', 'revoke']
+    """
+    course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
+
+    email = request.GET.get('email')
+    level = request.GET.get('level')
+    mode = request.GET.get('mode')
+
+    user = User.objects.get(email=email)
+
+    if mode == 'allow':
+        allow_access(course, user, level)
+    elif mode == 'revoke':
+        revoke_access(course, user, level)
+    else:
+        raise ValueError("unrecognized mode '{}'".format(mode))
+
+    response_payload = {
+        'done': 'yup',
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
 
 
 @ensure_csrf_cookie
@@ -63,9 +106,10 @@ def enrolled_students_profiles(request, course_id, csv=False):
 
     TODO accept requests for different attribute sets
     """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     available_features = analytics.basic.AVAILABLE_STUDENT_FEATURES + analytics.basic.AVAILABLE_PROFILE_FEATURES
-    query_features = ['username', 'name', 'language', 'location', 'year_of_birth', 'gender',
+    query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
                       'level_of_education', 'mailing_address', 'goals']
 
     student_data = analytics.basic.enrolled_students_profiles(course_id, query_features)
@@ -75,7 +119,8 @@ def enrolled_students_profiles(request, course_id, csv=False):
             'course_id':          course_id,
             'students':           student_data,
             'students_count':     len(student_data),
-            'available_features': available_features
+            'queried_features':   query_features,
+            'available_features': available_features,
         }
         response = HttpResponse(json.dumps(response_payload), content_type="application/json")
         return response
@@ -104,6 +149,7 @@ def profile_distribution(request, course_id):
     TODO how should query parameter interpretation work?
     TODO respond to csv requests as well
     """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     try:
         features = json.loads(request.GET.get('features'))
