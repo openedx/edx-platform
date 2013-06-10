@@ -19,7 +19,7 @@ class DiscussionFields(object):
     )
     discussion_target = String(
         display_name="Subcategory",
-        default="Topic-Level Student-Visible Label"
+        default="Topic-Level Student-Visible Label",
         help="A subcategory name for the discussion. This name appears in the left pane of the discussion forum for the course.",
         scope=Scope.settings
     )

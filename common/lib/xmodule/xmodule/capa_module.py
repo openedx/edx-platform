@@ -79,7 +79,7 @@ class CapaFields(object):
         display_name="Show Answer",
         default="closed",
         help="Defines when to show the answer to the problem. A default value can be set in Advanced Settings.",
-        scope=Scope.settings, default="closed",
+        scope=Scope.settings,
         values=[
             {"display_name": "Always", "value": "always"},
             {"display_name": "Answered", "value": "answered"},
@@ -93,8 +93,8 @@ class CapaFields(object):
         default=False)
     rerandomize = Randomization(
         display_name="Randomization", help="Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings.",
-        default="always", 
-        scope=Scope.settings, 
+        default="always",
+        scope=Scope.settings,
         values=[{"display_name": "Always", "value": "always"},
             {"display_name": "On Reset", "value": "onreset"},
             {"display_name": "Never", "value": "never"},

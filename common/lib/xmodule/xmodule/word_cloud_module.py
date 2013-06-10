@@ -14,7 +14,7 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
-from xblock.core import Scope, Object, Boolean, List
+from xblock.core import Scope, Object, Boolean, List, String
 from fields import StringyBoolean, StringyInteger
 
 log = logging.getLogger(__name__)

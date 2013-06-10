@@ -26,6 +26,7 @@ from models.settings.course_grading import CourseGradingModel
 from .requests import get_request_method, _xmodule_recurse
 from .access import has_access
 from xmodule.x_module import XModuleDescriptor
+from xblock.plugin import PluginMissingError
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -155,15 +156,19 @@ def edit_unit(request, location):
             if category in ADVANCED_COMPONENT_TYPES:
                 # Do I need to allow for boilerplates or just defaults on the class? i.e., can an advanced
                 # have more than one entry in the menu? one for default and others for prefilled boilerplates?
-                component_class = XModuleDescriptor.load_class(category)
+                try:
+                    component_class = XModuleDescriptor.load_class(category)
 
-                component_templates['advanced'].append((
-                    component_class.display_name.default or category,
-                    category,
-                    hasattr(component_class, 'markdown') and component_class.markdown is not None,
-                    False,
-                    None  # don't override default data
-                    ))
+                    component_templates['advanced'].append((
+                        component_class.display_name.default or category,
+                        category,
+                        hasattr(component_class, 'markdown') and component_class.markdown is not None,
+                        False,
+                        None  # don't override default data
+                        ))
+                except PluginMissingError:
+                    # dhm: i got this condition on 'notes'; so, I assume it's an expected condition
+                    pass
     else:
         log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
 
