@@ -73,7 +73,28 @@ setup_section_data_download = (section) ->
       location.href = url
     else
       $.getJSON url, (data) ->
-        section.find('.dumped-data-display').text JSON.stringify(data)
+        display = section.find('.dumped-data-display')
+        display.text JSON.stringify(data)
+        log data
+
+        # setup SlickGrid
+
+        options = enableCellNavigation: true, enableColumnReorder: false
+        # columns = [{id: feature, name: feature} for feature in data.queried_features]
+
+        log options
+        # log columns
+
+        # new Slick.Grid(display, data.students, columns, options)
+
+        data = [{'label1': 'val1,1', 'label2': 'val2,1'}, {'label1': 'val1,2', 'label2': 'val2,2'}]
+        columns = [{id: 'label1', name: 'Label One', width: 80, minWidth: 80}, {id: 'label2', name: 'Label Two'}]
+
+        log 'columns', columns
+        log 'data', data
+
+        grid = new Slick.Grid(display, data, columns, options)
+        grid.autosizeColumns()
 
   grade_config_btn = section.find("input[name='dump-gradeconf']'")
   grade_config_btn.click (e) ->
