@@ -120,6 +120,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_advanced_components_require_two_clicks(self):
         self.check_components_on_page(['videoalpha'], ['Video Alpha'])
 
+    def test_malformed_edit_unit_request(self):
+        store = modulestore('direct')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        # just pick one vertical
+        descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
+        location = descriptor.location._replace(name='.' + descriptor.location.name)
+
+        resp = self.client.get(reverse('edit_unit', kwargs={'location': location.url()}))
+        self.assertEqual(resp.status_code, 400)
+
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
 
