@@ -60,6 +60,7 @@ def index_course(database, sjson_directory, course_name, mapping):
 
 def tokenize(transcript, punkt):
     """Turns a clean transcript string into a series of sentences"""
+    print transcript
     sentences = punkt.tokenize(transcript)
     words = []
     words = [words.extend(word_splitter(sentence)) for sentence in sentences]
