@@ -5,7 +5,7 @@ from functools import partial
 
 from django.conf import settings
 from django.core.context_processors import csrf
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -240,9 +240,7 @@ def chat_settings(course, user):
     """
     domain = getattr(settings, "JABBER_DOMAIN", None)
     if domain is None:
-        log.warning('You must set JABBER_DOMAIN in the settings to '
-                    'enable the chat widget')
-        return None
+        raise ImproperlyConfigured("Missing JABBER_DOMAIN in the settings")
 
     return {
         'domain': domain,
@@ -327,17 +325,11 @@ def index(request, course_id, chapter=None, section=None,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
-        # Only show the chat if it's enabled by the course and in the
-        # settings.
-        show_chat = course.show_chat and settings.MITX_FEATURES['ENABLE_CHAT']
-        if show_chat:
+        # Only show the chat if it's enabled both in the settings and
+        # by the course.
+        context['show_chat'] = course.show_chat and settings.MITX_FEATURES.get('ENABLE_CHAT')
+        if context['show_chat']:
             context['chat'] = chat_settings(course, user)
-            # If we couldn't load the chat settings, then don't show
-            # the widget in the courseware.
-            if context['chat'] is None:
-                show_chat = False
-
-        context['show_chat'] = show_chat
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
