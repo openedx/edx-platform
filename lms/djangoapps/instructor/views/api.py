@@ -30,6 +30,7 @@ from django.contrib.auth.models import User
 
 import analytics.basic
 import analytics.distributions
+import analytics.csvs
 
 
 @ensure_csrf_cookie
@@ -87,14 +88,8 @@ def enrolled_students_profiles(request, course_id, csv=False):
         response = HttpResponse(json.dumps(response_payload), content_type="application/json")
         return response
     else:
-        header = queried_features
-        datarows = []
-        for student in student_data:
-            ordered = sorted(student.items(), key=lambda (k, v): header.index(k))
-            vals = map(lambda (k, v): v, ordered)
-            datarows.append(vals)
-
-        return analytics.basic.create_csv_response("enrolled_profiles.csv", header, datarows)
+        formatted = analytics.csvs.format_dictlist(student_data)
+        return analytics.csvs.create_csv_response("enrolled_profiles.csv", formatted['header'], formatted['datarows'])
 
 
 @ensure_csrf_cookie

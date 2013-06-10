@@ -4,8 +4,6 @@ Student and course analytics.
 Serve miscellaneous course and student data
 """
 
-import csv
-from django.http import HttpResponse
 from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 
@@ -33,23 +31,6 @@ def enrolled_students_profiles(course_id, features):
         return student_dict
 
     return [extract_student(student) for student in students.all()]
-
-
-def create_csv_response(filename, header, datarows):
-    """
-    Create an HttpResponse with an attached .csv file
-
-    header   e.g. ['Name', 'Email']
-    datarows e.g. [['Jim', 'jim@edy.org'], ['Jake', 'jake@edy.org'], ...]
-    """
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
-    writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-    writer.writerow(header)
-    for datarow in datarows:
-        encoded_row = [unicode(s).encode('utf-8') for s in datarow]
-        writer.writerow(encoded_row)
-    return response
 
 
 def dump_grading_context(course):
