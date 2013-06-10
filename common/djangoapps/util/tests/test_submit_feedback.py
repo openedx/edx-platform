@@ -132,6 +132,13 @@ class SubmitFeedbackTest(TestCase):
         self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "email", zendesk_mock_class, datadog_mock)
         self._test_bad_request_empty_field(self._anon_user, self._anon_fields, "email", zendesk_mock_class, datadog_mock)
 
+    def test_bad_request_anon_user_invalid_email(self, zendesk_mock_class, datadog_mock):
+        """Test a request from an anonymous user specifying an invalid `email`."""
+        fields = self._anon_fields.copy()
+        fields["email"] = "This is not a valid email address!"
+        resp = self._build_and_run_request(self._anon_user, fields)
+        self._assert_bad_request(resp, "email", zendesk_mock_class, datadog_mock)
+
     def test_bad_request_anon_user_no_subject(self, zendesk_mock_class, datadog_mock):
         """Test a request from an anonymous user not specifying `subject`."""
         self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "subject", zendesk_mock_class, datadog_mock)
