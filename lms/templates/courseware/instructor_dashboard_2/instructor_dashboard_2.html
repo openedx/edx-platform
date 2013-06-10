@@ -10,7 +10,12 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
   <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
-
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drag-2.2.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drop-2.2.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/slick.core.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/slick.grid.js')}"></script>
+  <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/slick.grid.css')}">
+  <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/jquery-ui-1.8.16.custom.css')}">
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='instructor_2'" />
@@ -64,7 +69,9 @@
     <input type="submit" name="list-grades" value="Student grades"></input>
     <input type="submit" name="list-answer-distributions" value="Answer distributions (x students got y points)"></input>
     <input type="submit" name="dump-gradeconf" value="Grading Configuration" data-endpoint="${ section_data['data_download']['grading_config_url'] }"></input>
-    <div class="dumped-data-display"></div>
+    <div class="dumped-data-display">
+      <div class="dtable"></grid>
+    </div>
   </section>
 
   <section id="analytics" class="idash-section">

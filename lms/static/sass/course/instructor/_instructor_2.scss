@@ -68,7 +68,16 @@
     display: block;
     margin-bottom: 1em;
   }
+
+  .dumped-data-display {
+    height: 500px;
+
+    .slick-header-column {
+      height: 100%;
+    }
+  }
 }
+
 
 .instructor-dashboard-wrapper-2 section.idash-section#analytics {
   .distribution-display {

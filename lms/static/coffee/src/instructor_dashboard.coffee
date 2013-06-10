@@ -72,29 +72,82 @@ setup_section_data_download = (section) ->
       url += '/csv'
       location.href = url
     else
+      # setup SlickGrid
       $.getJSON url, (data) ->
         display = section.find('.dumped-data-display')
         display.text JSON.stringify(data)
-        log data
 
-        # setup SlickGrid
+        options =
+          enableCellNavigation: true
+          enableColumnReorder: false
 
-        options = enableCellNavigation: true, enableColumnReorder: false
-        # columns = [{id: feature, name: feature} for feature in data.queried_features]
+        columns = ({id: feature, field: feature, name: feature} for feature in data.queried_features)
+        # columns = [
+        #   name: 'Name'
+        #   id: 'name'
+        #   field: 'name'
+        # ,
+        #   name: 'Username'
+        #   id: 'username'
+        #   field: 'username'
+        # ,
+        #   name: 'YOB'
+        #   id: 'year_of_birth'
+        #   field: 'year_of_birth'
+        # ]
+        grid_data = data.students
+        # grid_data = [{'name': 'val1,1'}, {'name': 'val1,2', 'label2': 'val2,2', 'extra': 'foo'}]
 
-        log options
-        # log columns
+        log columns
+        # log grid_data
 
-        # new Slick.Grid(display, data.students, columns, options)
-
-        data = [{'label1': 'val1,1', 'label2': 'val2,1'}, {'label1': 'val1,2', 'label2': 'val2,2'}]
-        columns = [{id: 'label1', name: 'Label One', width: 80, minWidth: 80}, {id: 'label2', name: 'Label Two'}]
-
-        log 'columns', columns
-        log 'data', data
-
-        grid = new Slick.Grid(display, data, columns, options)
+        grid = new Slick.Grid(display, grid_data, columns, options)
         grid.autosizeColumns()
+
+        # columns = [
+        #   id: "title"
+        #   name: "Title"
+        #   field: "title"
+        # ,
+        #   id: "duration"
+        #   name: "Duration"
+        #   field: "duration"
+        # ,
+        #   id: "%"
+        #   name: "% Complete"
+        #   field: "percentComplete"
+        # ,
+        #   id: "start"
+        #   name: "Start"
+        #   field: "start"
+        # ,
+        #   id: "finish"
+        #   name: "Finish"
+        #   field: "finish"
+        # ,
+        #   id: "effort-driven"
+        #   name: "Effort Driven"
+        #   field: "effortDriven"
+        # ]
+
+        # options =
+        #   enableCellNavigation: true
+        #   enableColumnReorder: false
+
+        # data = []
+        # i = 0
+
+        # while i < 500
+        #   data[i] =
+        #     title: "Task " + i
+        #     duration: "5 days"
+        #     percentComplete: Math.round(Math.random() * 100)
+        #     start: "01/01/2009"
+        #     finish: "01/05/2009"
+        #     effortDriven: (i % 5 is 0)
+        #   i++
+
+        #   grid = new Slick.Grid(display, data, columns, options)
 
   grade_config_btn = section.find("input[name='dump-gradeconf']'")
   grade_config_btn.click (e) ->

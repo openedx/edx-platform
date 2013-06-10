@@ -84,7 +84,8 @@ def enrolled_students_profiles(request, course_id, csv=False):
             'course_id':          course_id,
             'students':           student_data,
             'students_count':     len(student_data),
-            'available_features': available_features
+            'queried_features':   query_features,
+            'available_features': available_features,
         }
         response = HttpResponse(json.dumps(response_payload), content_type="application/json")
         return response
