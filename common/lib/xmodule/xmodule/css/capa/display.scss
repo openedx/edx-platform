@@ -555,11 +555,11 @@ section.problem {
       @extend .blue-button;
     }
 
-    input.check {
+    .check {
       height: ($baseline*2);
     }
 
-    button.show {
+    .show {
       height: ($baseline*2);
 
       .show-label {
