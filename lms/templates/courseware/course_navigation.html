@@ -20,6 +20,9 @@ def url_class(is_active):
           <li>
              <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
                  ${tab.name | h}
+                 % if tab.is_active == True:
+                  <span class="sr">, current location</span>
+                 %endif
                  % if tab.has_img == True:
                     <img src="${tab.img}"/>
                  %endif
