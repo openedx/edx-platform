@@ -126,6 +126,15 @@ def press_the_button_with_label(step, buttonname):
 
 @step(u'The "([^"]*)" button does( not)? appear')
 def action_button_present(step, buttonname, doesnt_appear):
+    button_css = 'section.action input[value*="%s"]' % buttonname
+    if doesnt_appear:
+        assert world.is_css_not_present(button_css)
+    else:
+        assert world.is_css_present(button_css)
+
+
+@step(u'the button with the label "([^"]*)" does( not)? appear')
+def button_with_label_present(step, buttonname, doesnt_appear):
     button_css = 'button span.show-label'
     elem = world.css_find(button_css).first
     if doesnt_appear:
