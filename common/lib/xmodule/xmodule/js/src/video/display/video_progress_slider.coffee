@@ -11,7 +11,7 @@ class @VideoProgressSlider extends Subview
     @buildHandle()
 
   buildHandle: ->
-    @handle = @$('.slider .ui-slider-handle')
+    @handle = @$('.ui-slider-handle')
     @handle.qtip
       content: "#{Time.format(@slider.slider('value'))}"
       position:

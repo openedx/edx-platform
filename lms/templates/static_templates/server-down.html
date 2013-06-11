@@ -1,6 +1,6 @@
 <%inherit file="../main.html" />
 
 <section class="outside-app">
-  <h1>Currently the <em>edX</em> servers are down</h1>
-  <p>Our staff is currently working to get the site back up as soon as possible. Please email us at <a href="mailto:technical@edx.org">technical@edx.org</a> to report any problems or downtime.</p>
+  <h1>Currently the <em>${settings.PLATFORM_NAME}</em> servers are down</h1>
+  <p>Our staff is currently working to get the site back up as soon as possible. Please email us at <a href="mailto:${settings.TECH_SUPPORT_EMAIL}">${settings.TECH_SUPPORT_EMAIL}</a> to report any problems or downtime.</p>
 </section>

@@ -69,7 +69,7 @@ class CapaFields(object):
     max_attempts = StringyInteger(
         display_name="Maximum Attempts",
         help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
-        values={"min": 1}, scope=Scope.settings
+        values={"min": 0}, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)

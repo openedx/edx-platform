@@ -3,6 +3,11 @@ require 'erb'
 require 'launchy'
 require 'net/http'
 
+PHANTOMJS_PATH = find_executable(ENV['PHANTOMJS_PATH'] || 'phantomjs')
+PREFERRED_METHOD = PHANTOMJS_PATH.nil? ? 'browser' : 'phantomjs'
+if PHANTOMJS_PATH.nil?
+    puts("phantomjs not found on path. Set $PHANTOMJS_PATH. Using browser for jasmine tests".blue)
+end
 
 def django_for_jasmine(system, django_reload)
     if !django_reload
@@ -35,18 +40,6 @@ def django_for_jasmine(system, django_reload)
 end
 
 def template_jasmine_runner(lib)
-    case lib
-    when /common\/lib\/.+/
-        coffee_files = Dir["#{lib}/**/js/**/*.coffee", "common/static/coffee/src/**/*.coffee"]
-    when /common\/static\/coffee/
-        coffee_files = Dir["#{lib}/**/*.coffee"]
-    else
-        puts('I do not know how to run jasmine tests for #{lib}')
-        exit
-    end
-    if !coffee_files.empty?
-        sh("node_modules/.bin/coffee -c #{coffee_files.join(' ')}")
-    end
     phantom_jasmine_path = File.expand_path("node_modules/phantom-jasmine")
     jasmine_reporters_path = File.expand_path("node_modules/jasmine-reporters")
     common_js_root = File.expand_path("common/static/js")
@@ -54,8 +47,8 @@ def template_jasmine_runner(lib)
 
     # Get arrays of spec and source files, ordered by how deep they are nested below the library
     # (and then alphabetically) and expanded from a relative to an absolute path
-    spec_glob = File.join("#{lib}", "**", "spec", "**", "*.js")
-    src_glob = File.join("#{lib}", "**", "src", "**", "*.js")
+    spec_glob = File.join(lib, "**", "spec", "**", "*.js")
+    src_glob = File.join(lib, "**", "src", "**", "*.js")
     js_specs = Dir[spec_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
     js_source = Dir[src_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
 
@@ -68,74 +61,90 @@ def template_jasmine_runner(lib)
     yield File.expand_path(template_output)
 end
 
-def run_phantom_js(url)
-    phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
-    sh("#{phantomjs} node_modules/jasmine-reporters/test/phantomjs-testrunner.js #{url}")
+def jasmine_browser(url, wait=10)
+    # Jitter starting the browser so that the tests don't all try and
+    # start the browser simultaneously
+    sleep(rand(3))
+    sh("python -m webbrowser -t '#{url}'")
+    sleep(wait)
 end
 
-# Open jasmine tests for :system in the default browser. The :env
-# should (always?) be 'jasmine', but it's passed as an arg so that
-# the :assets dependency gets it.
-#
-# This task should be invoked via the wrapper below, so we don't
-# include a description to keep it from showing up in rake -T.
-task :browse_jasmine, [:system, :env] => :assets do |t, args|
-    django_for_jasmine(args.system, true) do |jasmine_url|
-        Launchy.open(jasmine_url)
-        puts "Press ENTER to terminate".red
-        $stdin.gets
-    end
-end
-
-# Use phantomjs to run jasmine tests from the console. The :env
-# should (always?) be 'jasmine', but it's passed as an arg so that
-# the :assets dependency gets it.
-#
-# This task should be invoked via the wrapper below, so we don't
-# include a description to keep it from showing up in rake -T.
-task :phantomjs_jasmine, [:system, :env] => :assets do |t, args|
-    django_for_jasmine(args.system, false) do |jasmine_url|
-        run_phantom_js(jasmine_url)
-    end
+def jasmine_phantomjs(url)
+    fail("phantomjs not found. Add it to your path, or set $PHANTOMJS_PATH") if PHANTOMJS_PATH.nil?
+    test_sh("#{PHANTOMJS_PATH} node_modules/jasmine-reporters/test/phantomjs-testrunner.js #{url}")
 end
 
 # Wrapper tasks for the real browse_jasmine and phantomjs_jasmine
 # tasks above. These have a nicer UI since there's no arg passing.
 [:lms, :cms].each do |system|
-    desc "Open jasmine tests for #{system} in your default browser"
-    task "browse_jasmine_#{system}" do
-        Rake::Task[:browse_jasmine].invoke(system, 'jasmine')
-    end
+    namespace :jasmine do
+        namespace system do
+            desc "Open jasmine tests for #{system} in your default browser"
+            task :browser do
+                Rake::Task[:assets].invoke(system, 'jasmine')
+                django_for_jasmine(system, true) do |jasmine_url|
+                    jasmine_browser(jasmine_url)
+                end
+            end
 
-    desc "Use phantomjs to run jasmine tests for #{system} from the console"
-    task "phantomjs_jasmine_#{system}" do
-        Rake::Task[:phantomjs_jasmine].invoke(system, 'jasmine')
+            desc "Use phantomjs to run jasmine tests for #{system} from the console"
+            task :phantomjs do
+                Rake::Task[:assets].invoke(system, 'jasmine')
+                phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
+                django_for_jasmine(system, false) do |jasmine_url|
+                    jasmine_phantomjs(jasmine_url)
+                end
+            end
+        end
+
+        desc "Run jasmine tests for #{system} using #{PREFERRED_METHOD}"
+        task system => "jasmine:#{system}:#{PREFERRED_METHOD}"
+
+        task :phantomjs => "jasmine:#{system}:phantomjs"
+        multitask :browser => "jasmine:#{system}:browser"
     end
 end
 
-STATIC_JASMINE_TESTS = Dir["common/lib/*"].select{|lib| File.directory?(lib)}
-STATIC_JASMINE_TESTS << 'common/static/coffee'
+static_js_dirs = Dir["common/lib/*"].select{|lib| File.directory?(lib)}
+static_js_dirs << 'common/static/coffee'
+static_js_dirs.select!{|lib| !Dir["#{lib}/**/spec"].empty?}
 
-STATIC_JASMINE_TESTS.each do |lib|
-    desc "Open jasmine tests for #{lib} in your default browser"
-    task "browse_jasmine_#{lib}" do
-        template_jasmine_runner(lib) do |f|
-            sh("python -m webbrowser -t 'file://#{f}'")
-            puts "Press ENTER to terminate".red
-            $stdin.gets
-        end
-    end
+static_js_dirs.each do |dir|
+    namespace :jasmine do
+        namespace dir do
+            desc "Open jasmine tests for #{dir} in your default browser"
+            task :browser do
+                # We need to use either CMS or LMS to preprocess files. Use LMS by default
+                Rake::Task['assets:coffee'].invoke('lms', 'jasmine')
+                template_jasmine_runner(dir) do |f|
+                    jasmine_browser("file://#{f}")
+                end
+            end
 
-    desc "Use phantomjs to run jasmine tests for #{lib} from the console"
-    task "phantomjs_jasmine_#{lib}" do
-        template_jasmine_runner(lib) do |f|
-            run_phantom_js(f)
+            desc "Use phantomjs to run jasmine tests for #{dir} from the console"
+            task :phantomjs do
+                # We need to use either CMS or LMS to preprocess files. Use LMS by default
+                Rake::Task[:assets].invoke('lms', 'jasmine')
+                template_jasmine_runner(dir) do |f|
+                    jasmine_phantomjs(f)
+                end
+            end
         end
+
+        desc "Run jasmine tests for #{dir} using #{PREFERRED_METHOD}"
+        task dir => "jasmine:#{dir}:#{PREFERRED_METHOD}"
+
+        task :phantomjs => "jasmine:#{dir}:phantomjs"
+        multitask :browser => "jasmine:#{dir}:browser"
     end
 end
 
-desc "Open jasmine tests for discussion in your default browser"
-task "browse_jasmine_discussion" => "browse_jasmine_common/static/coffee"
+desc "Run all jasmine tests using #{PREFERRED_METHOD}"
+task :jasmine => "jasmine:#{PREFERRED_METHOD}"
 
-desc "Use phantomjs to run jasmine tests for discussion from the console"
-task "phantomjs_jasmine_discussion" => "phantomjs_jasmine_common/static/coffee"
+['phantomjs', 'browser'].each do |method|
+    desc "Run all jasmine tests using #{method}"
+    task "jasmine:#{method}"
+end
+
+task :test => :jasmine

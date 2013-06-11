@@ -1,12 +1,20 @@
-# TODO: figure out why failing
-xdescribe 'Video', ->
+describe 'Video', ->
+  metadata = undefined
+
   beforeEach ->
     loadFixtures 'video.html'
     jasmine.stubRequests()
 
-    @videosDefinition = '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
+    @videosDefinition = '0.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
     @slowerSpeedYoutubeId = 'slowerSpeedYoutubeId'
     @normalSpeedYoutubeId = 'normalSpeedYoutubeId'
+    metadata =
+      slowerSpeedYoutubeId:
+        id: @slowerSpeedYoutubeId
+        duration: 300
+      normalSpeedYoutubeId:
+        id: @normalSpeedYoutubeId
+        duration: 200
 
   afterEach ->
     window.player = undefined
@@ -16,17 +24,18 @@ xdescribe 'Video', ->
     beforeEach ->
       @stubVideoPlayer = jasmine.createSpy('VideoPlayer')
       $.cookie.andReturn '0.75'
-      window.player = 100
+      window.player = undefined
 
     describe 'by default', ->
       beforeEach ->
-        @video = new Video 'example', @videosDefinition
-
+        spyOn(window.Video.prototype, 'fetchMetadata').andCallFake ->
+          @metadata = metadata
+        @video = new Video '#example', @videosDefinition
       it 'reset the current video player', ->
         expect(window.player).toBeNull()
 
       it 'set the elements', ->
-        expect(@video.el).toBe '#video_example'
+        expect(@video.el).toBe '#video_id'
 
       it 'parse the videos', ->
         expect(@video.videos).toEqual
@@ -34,13 +43,8 @@ xdescribe 'Video', ->
           '1.0': @normalSpeedYoutubeId
 
       it 'fetch the video metadata', ->
-        expect(@video.metadata).toEqual
-          slowerSpeedYoutubeId:
-            id: @slowerSpeedYoutubeId
-            duration: 300
-          normalSpeedYoutubeId:
-            id: @normalSpeedYoutubeId
-            duration: 200
+        expect(@video.fetchMetadata).toHaveBeenCalled
+        expect(@video.metadata).toEqual metadata
 
       it 'parse available video speeds', ->
         expect(@video.speeds).toEqual ['0.75', '1.0']
@@ -56,7 +60,7 @@ xdescribe 'Video', ->
         @originalYT = window.YT
         window.YT = { Player: true }
         spyOn(window, 'VideoPlayer').andReturn(@stubVideoPlayer)
-        @video = new Video 'example', @videosDefinition
+        @video = new Video '#example', @videosDefinition
 
       afterEach ->
         window.YT = @originalYT
@@ -69,7 +73,7 @@ xdescribe 'Video', ->
       beforeEach ->
         @originalYT = window.YT
         window.YT = {}
-        @video = new Video 'example', @videosDefinition
+        @video = new Video '#example', @videosDefinition
 
       afterEach ->
         window.YT = @originalYT
@@ -82,7 +86,7 @@ xdescribe 'Video', ->
         @originalYT = window.YT
         window.YT = {}
         spyOn(window, 'VideoPlayer').andReturn(@stubVideoPlayer)
-        @video = new Video 'example', @videosDefinition
+        @video = new Video '#example', @videosDefinition
         window.onYouTubePlayerAPIReady()
 
       afterEach ->
@@ -95,7 +99,7 @@ xdescribe 'Video', ->
   describe 'youtubeId', ->
     beforeEach ->
       $.cookie.andReturn '1.0'
-      @video = new Video 'example', @videosDefinition
+      @video = new Video '#example', @videosDefinition
 
     describe 'with speed', ->
       it 'return the video id for given speed', ->
@@ -108,7 +112,7 @@ xdescribe 'Video', ->
 
   describe 'setSpeed', ->
     beforeEach ->
-      @video = new Video 'example', @videosDefinition
+      @video = new Video '#example', @videosDefinition
 
     describe 'when new speed is available', ->
       beforeEach ->
@@ -129,14 +133,14 @@ xdescribe 'Video', ->
 
   describe 'getDuration', ->
     beforeEach ->
-      @video = new Video 'example', @videosDefinition
+      @video = new Video '#example', @videosDefinition
 
     it 'return duration for current video', ->
       expect(@video.getDuration()).toEqual 200
 
   describe 'log', ->
     beforeEach ->
-      @video = new Video 'example', @videosDefinition
+      @video = new Video '#example', @videosDefinition
       @video.setSpeed '1.0'
       spyOn Logger, 'log'
       @video.player = { currentTime: 25 }
@@ -144,7 +148,7 @@ xdescribe 'Video', ->
 
     it 'call the logger with valid parameters', ->
       expect(Logger.log).toHaveBeenCalledWith 'someEvent',
-        id: 'example'
+        id: 'id'
         code: @normalSpeedYoutubeId
         currentTime: 25
         speed: '1.0'

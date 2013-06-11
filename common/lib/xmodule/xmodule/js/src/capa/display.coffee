@@ -19,12 +19,12 @@ class @Problem
 
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^=input_#{problem_prefix}_]")
-    
+
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
     #@$('section.action input.check').click @check
     @$('section.action input.reset').click @reset
-    @$('section.action input.show').click @show
+    @$('section.action button.show').click @show
     @$('section.action input.save').click @save
 
     # Collapsibles
@@ -44,7 +44,7 @@ class @Problem
   forceUpdate: (response) =>
     @el.attr progress: response.progress_status
     @el.trigger('progressChanged')
-    
+
 
   queueing: =>
     @queued_items = @$(".xqueue")
@@ -59,11 +59,11 @@ class @Problem
   get_queuelen: =>
     minlen = Infinity
     @queued_items.each (index, qitem) ->
-      len = parseInt($.text(qitem))  
+      len = parseInt($.text(qitem))
       if len < minlen
         minlen = len
     return minlen
-    
+
   poll: =>
     $.postWithPrefix "#{@url}/problem_get", (response) =>
       # If queueing status changed, then render
@@ -73,9 +73,9 @@ class @Problem
         JavascriptLoader.executeModuleScripts @el, () =>
           @setupInputTypes()
           @bind()
-      
+
       @num_queued_items = @new_queued_items.length
-      if @num_queued_items == 0 
+      if @num_queued_items == 0
         @forceUpdate response
         delete window.queuePollerID
       else
@@ -83,12 +83,12 @@ class @Problem
         window.queuePollerID = window.setTimeout(@poll, 1000)
 
 
-  # Use this if you want to make an ajax call on the input type object 
+  # Use this if you want to make an ajax call on the input type object
   # static method so you don't have to instantiate a Problem in order to use it
   # Input:
-  #   url: the AJAX url of the problem 
+  #   url: the AJAX url of the problem
   #   input_id: the input_id of the input you would like to make the call on
-  #     NOTE: the id is the ${id} part of "input_${id}" during rendering 
+  #     NOTE: the id is the ${id} part of "input_${id}" during rendering
   #           If this function is passed the entire prefixed id, the backend may have trouble
   #           finding the correct input
   #   dispatch: string that indicates how this data should be handled by the inputtype
@@ -98,7 +98,7 @@ class @Problem
     data['dispatch'] = dispatch
     data['input_id'] = input_id
     $.postWithPrefix "#{url}/input_ajax", data, callback
-    
+
 
   render: (content) ->
     if content
@@ -141,7 +141,7 @@ class @Problem
     Logger.log 'problem_check', @answers
 
     # If there are no file inputs in the problem, we can fall back on @check
-    if $('input:file').length == 0 
+    if $('input:file').length == 0
       @check()
       return
 
@@ -150,7 +150,7 @@ class @Problem
       return
 
     fd = new FormData()
-    
+
     # Sanity checks on submission
     max_filesize = 4*1000*1000 # 4 MB
     file_too_large = false
@@ -195,19 +195,19 @@ class @Problem
 
     abort_submission = file_too_large or file_not_selected or unallowed_file_submitted or required_files_not_submitted
 
-    settings = 
+    settings =
       type: "POST"
       data: fd
       processData: false
       contentType: false
-      success: (response) => 
+      success: (response) =>
         switch response.success
           when 'incorrect', 'correct'
             @render(response.contents)
             @updateProgress response
           else
             @gentle_alert response.success
-    
+
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
@@ -260,14 +260,14 @@ class @Problem
           @el.find('.problem > div').each (index, element) =>
             MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
-        @$('.show').val 'Hide Answer'
+        @$('.show-label').text 'Hide Answer(s)'
         @el.addClass 'showed'
         @updateProgress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @el.removeClass 'showed'
-      @$('.show').val 'Show Answer'
+      @$('.show-label').text 'Show Answer(s)'
 
       @el.find(".capa_inputtype").each (index, inputtype) =>
         display = @inputtypeDisplays[$(inputtype).attr('id')]
@@ -306,7 +306,7 @@ class @Problem
       MathJax.Hub.Queue(['Text', jax, eqn], [@updateMathML, jax, element])
 
     return # Explicit return for CoffeeScript
-    
+
   updateMathML: (jax, element) =>
     try
       $("##{element.id}_dynamath").val(jax.root.toMathML '')

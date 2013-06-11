@@ -620,7 +620,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
             raise exceptions.PermissionDenied(msg)
 
     except exceptions.PermissionDenied, err:
-        error = unicode(e)
+        error = unicode(err)
     except Exception, err:
         print err
         logging.critical(unicode(err))

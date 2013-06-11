@@ -24,9 +24,9 @@ class @VideoPlayerAlpha extends SubviewAlpha
     if @video.videoType is 'youtube'
       $(@qualityControl).bind('changeQuality', @handlePlaybackQualityChange)
     if @video.show_captions is true
-      $(@caption).bind('seek', @onSeek)
+      $(@caption).bind('caption_seek', @onSeek)
     $(@speedControl).bind('speedChange', @onSpeedChange)
-    $(@progressSlider).bind('seek', @onSeek)
+    $(@progressSlider).bind('slide_seek', @onSeek)
     if @volumeControl
       $(@volumeControl).bind('volumeChange', @onVolumeChange)
     $(document).keyup @bindExitFullScreen
@@ -96,6 +96,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
         at: 'top center'
 
   onReady: (event) =>
+    @video.log 'load_video'
     if @video.videoType is 'html5'
       @player.setPlaybackRate @video.speed
     unless onTouchBasedDevice()
@@ -184,7 +185,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
       @caption.pause()
 
   onPlay: =>
-    @video.log 'play_video'
+    @video.log 'play_video',
+      currentTime: @currentTime
     unless @player.interval
       @player.interval = setInterval(@update, 200)
     if @video.show_captions is true
@@ -193,7 +195,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
     @progressSlider.play()
 
   onPause: =>
-    @video.log 'pause_video'
+    @video.log 'pause_video',
+      currentTime: @currentTime
     clearInterval(@player.interval)
     @player.interval = null
     if @video.show_captions is true
@@ -206,6 +209,10 @@ class @VideoPlayerAlpha extends SubviewAlpha
       @caption.pause()
 
   onSeek: (event, time) =>
+    @video.log 'seek_video',
+      old_time: @currentTime
+      new_time: time
+      type: event.type
     @player.seekTo(time, true)
     if @isPlaying()
       clearInterval(@player.interval)
@@ -218,6 +225,12 @@ class @VideoPlayerAlpha extends SubviewAlpha
     if @video.videoType is 'youtube'
       @currentTime = Time.convert(@currentTime, parseFloat(@currentSpeed()), newSpeed)
     newSpeed = parseFloat(newSpeed).toFixed(2).replace /\.00$/, '.0'
+
+    @video.log 'speed_change_video',
+      currentTime: @currentTime
+      old_speed: @currentSpeed()
+      new_speed: newSpeed
+
     @video.setSpeed newSpeed, updateCookie
     if @video.videoType is 'youtube'
       if @video.show_captions is true

@@ -1,3 +1,6 @@
+# pylint: disable=W0223
+"""Video is ungraded Xmodule for support video content."""
+
 import json
 import logging
 
@@ -15,6 +18,7 @@ log = logging.getLogger(__name__)
 
 
 class VideoFields(object):
+    """Fields for `VideoModule` and `VideoDescriptor`."""
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
     show_captions = Boolean(help="Whether or not captions are shown", display_name="Show Captions", scope=Scope.settings, default=True)
     youtube_id_1_0 = String(help="Youtube ID for normal speed video", display_name="Normal Speed", scope=Scope.settings, default="OEoXaMPEzfM")
@@ -28,16 +32,20 @@ class VideoFields(object):
 
 
 class VideoModule(VideoFields, XModule):
+    """Video Xmodule."""
     video_time = 0
     icon_class = 'video'
 
-    js = {'coffee':
-        [resource_string(__name__, 'js/src/time.coffee'),
-         resource_string(__name__, 'js/src/video/display.coffee')] +
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/time.coffee'),
+            resource_string(__name__, 'js/src/video/display.coffee')
+        ] +
         [resource_string(__name__, 'js/src/video/display/' + filename)
          for filename
          in sorted(resource_listdir(__name__, 'js/src/video/display'))
-         if filename.endswith('.coffee')]}
+         if filename.endswith('.coffee')]
+    }
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 
@@ -45,31 +53,13 @@ class VideoModule(VideoFields, XModule):
         XModule.__init__(self, *args, **kwargs)
 
     def handle_ajax(self, dispatch, get):
-        '''
-        Handle ajax calls to this video.
-        TODO (vshnayder): This is not being called right now, so the position
-        is not being saved.
-        '''
+        """This is not being called right now and we raise 404 error."""
         log.debug(u"GET {0}".format(get))
         log.debug(u"DISPATCH {0}".format(dispatch))
-        if dispatch == 'goto_position':
-            self.position = int(float(get['position']))
-            log.info(u"NEW POSITION {0}".format(self.position))
-            return json.dumps({'success': True})
         raise Http404()
 
-    def get_progress(self):
-        ''' TODO (vshnayder): Get and save duration of youtube video, then return
-        fraction watched.
-        (Be careful to notice when video link changes and update)
-
-        For now, we have no way of knowing if the video has even been watched, so
-        just return None.
-        '''
-        return None
-
     def get_instance_state(self):
-        #log.debug(u"STATE POSITION {0}".format(self.position))
+        """Return information about state (position)."""
         return json.dumps({'position': self.position})
 
     def get_html(self):
