@@ -198,7 +198,8 @@ function goto( mode)
     <H2>Student-specific grade inspection and adjustment</h2>
     <p>edX email address or their username: </p>
     <p><input type="text" name="unique_student_identifier">  <input type="submit" name="action" value="Get link to student's progress page"></p>
-    <p>and, if you want to reset the number of attempts for a problem, the urlname of that problem</p>
+    <p>and, if you want to reset the number of attempts for a problem, the urlname of that problem 
+    (e.g. if the location is <tt>i4x://university/course/problem/problemname</tt>, then the urlname is <tt>problemname</tt>).</p>
     <p> <input type="text" name="problem_to_reset" size="60"> <input type="submit" name="action" value="Reset student's attempts">  </p>
 
     %if instructor_access:
