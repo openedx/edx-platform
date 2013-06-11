@@ -55,6 +55,9 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
             response.chapters = {"url": response.url};
             delete response.url;
         }
+        _.each(response.chapters, function(chapter, i) {
+            chapter.order = chapter.order || i+1;
+        })
         return response;
     },
     toJSON: function() {
