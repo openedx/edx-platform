@@ -12,7 +12,8 @@ from django.http import Http404
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
-from xblock.core import Integer, Scope, String, Boolean, Float
+from xblock.core import Integer, Scope, String, Boolean
+from fields import StringyFloat
 
 log = logging.getLogger(__name__)
 
@@ -25,8 +26,8 @@ class VideoFields(object):
     youtube_id_0_75 = String(help="Youtube ID for .75x speed video", display_name=".75x", scope=Scope.settings, default="JMD_ifUUfsU")
     youtube_id_1_25 = String(help="Youtube ID for 1.25x speed video", display_name="1.25x", scope=Scope.settings, default="AKqURZnYqpk")
     youtube_id_1_5 = String(help="Youtube ID for 1.5x speed video", display_name="1.5x", scope=Scope.settings, default="DYpADpL7jAY")
-    start_time = Float(help="Time the video starts", display_name="Start Time", scope=Scope.settings, default=0.0)
-    end_time = Float(help="Time the video ends", display_name="End Time", scope=Scope.settings, default=0.0)
+    start_time = StringyFloat(help="Time the video starts", display_name="Start Time", scope=Scope.settings, default=0.0)
+    end_time = StringyFloat(help="Time the video ends", display_name="End Time", scope=Scope.settings, default=0.0)
     source = String(help="Source to download video", display_name="Source", scope=Scope.settings, default="")
     track = String(help="Source to download subtitle track", display_name="Track", scope=Scope.settings, default="")
 
