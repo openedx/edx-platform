@@ -55,6 +55,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self.db = pymongo.database.Database(pymongo.MongoClient(
             host=host,
             port=port,
+            tz_aware=True,
             **kwargs
         ), db)
 
