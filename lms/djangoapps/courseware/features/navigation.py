@@ -11,6 +11,7 @@ from problems_setup import PROBLEM_DICT
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'Test Course'
 TEST_SECTION_NAME = 'Test Section'
+TEST_SUBSECTION_NAME = 'Test Subsection'
 
 
 @step(u'I am viewing a course with multiple sections')
@@ -26,11 +27,11 @@ def view_course_multiple_sections(step):
 
     place1 = world.ItemFactory.create(parent_location=section1.location,
                                                template='i4x://edx/templates/sequential/Empty',
-                                               display_name=section_name(1))
+                                               display_name=subsection_name(1))
 
     place2 = world.ItemFactory.create(parent_location=section2.location,
                                                template='i4x://edx/templates/sequential/Empty',
-                                               display_name=section_name(2))
+                                               display_name=subsection_name(2))
 
     add_problem_to_course_section('model_course', 'multiple choice', place1.location)
     add_problem_to_course_section('model_course', 'drop down', place2.location)
@@ -48,10 +49,10 @@ def view_course_multiple_subsections(step):
 
     place1 = world.ItemFactory.create(parent_location=section1.location,
                                                template='i4x://edx/templates/sequential/Empty',
-                                               display_name=section_name(1))
+                                               display_name=subsection_name(1))
 
     place2 = world.ItemFactory.create(parent_location=section1.location,
-                                       display_name=section_name(2))
+                                       display_name=subsection_name(2))
 
     add_problem_to_course_section('model_course', 'multiple choice', place1.location)
     add_problem_to_course_section('model_course', 'drop down', place2.location)
@@ -68,7 +69,7 @@ def view_course_multiple_sequences(step):
 
     place1 = world.ItemFactory.create(parent_location=section1.location,
                                                template='i4x://edx/templates/sequential/Empty',
-                                               display_name=section_name(1))
+                                               display_name=subsection_name(1))
 
     add_problem_to_course_section('model_course', 'multiple choice', place1.location)
     add_problem_to_course_section('model_course', 'drop down', place1.location)
@@ -81,15 +82,15 @@ def click_on_section(step, section):
     section_css = 'h3[tabindex="-1"]'
     world.css_click(section_css)
 
-    subid = "ui-accordion-accordion-panel-"+str(int(section)-1)
-    subsection_css = 'ul[id="%s"]>li[class=" "] a' % subid
+    subid = "ui-accordion-accordion-panel-" + str(int(section) - 1)
+    subsection_css = 'ul[id="%s"]> li > a' % subid
     world.css_click(subsection_css)
 
 
 @step(u'I click on subsection "([^"]*)"$')
 def click_on_subsection(step, subsection):
-    subsection_css = 'ul[id="ui-accordion-accordion-panel-0"]>li[class=" "]>a'
-    world.css_click(subsection_css)
+    subsection_css = 'ul[id="ui-accordion-accordion-panel-0"]> li > a'
+    world.css_find(subsection_css)[int(subsection) - 1].click()
 
 
 @step(u'I click on sequence "([^"]*)"$')
@@ -121,7 +122,7 @@ def return_to_course(step):
 
 @step(u'I should see that I was most recently in section "([^"]*)"$')
 def see_recent_section(step, section):
-    step.given('I should see "You were most recently in %s" somewhere on the page' % section_name(int(section)))
+    step.given('I should see "You were most recently in %s" somewhere on the page' % subsection_name(int(section)))
 
 #####################
 #      HELPERS
@@ -129,7 +130,11 @@ def see_recent_section(step, section):
 
 
 def section_name(section):
-    return TEST_SECTION_NAME+str(section)
+    return TEST_SECTION_NAME + str(section)
+
+
+def subsection_name(section):
+    return TEST_SUBSECTION_NAME + str(section)
 
 
 def create_course():
@@ -147,8 +152,8 @@ def create_user_and_visit_course():
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id("model_course"))
 
     world.log_in('robot', 'test')
-    chapter_name = (TEST_SECTION_NAME+"1").replace(" ", "_")
-    section_name = chapter_name
+    chapter_name = (TEST_SECTION_NAME + "1").replace(" ", "_")
+    section_name = (TEST_SUBSECTION_NAME + "1").replace(" ", "_")
     url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
                     (chapter_name, section_name))
 
