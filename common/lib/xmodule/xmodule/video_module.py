@@ -12,8 +12,8 @@ from django.http import Http404
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
-from xblock.core import Integer, Scope, String, Boolean
-from fields import StringyFloat
+from xblock.core import Integer, Scope, String
+from fields import StringyFloat, StringyBoolean
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
-    show_captions = Boolean(help="Whether or not captions are shown", display_name="Show Captions", scope=Scope.settings, default=True)
+    show_captions = StringyBoolean(help="Whether or not captions are shown", display_name="Show Captions", scope=Scope.settings, default=True)
     youtube_id_1_0 = String(help="Youtube ID for normal speed video", display_name="Normal Speed", scope=Scope.settings, default="OEoXaMPEzfM")
     youtube_id_0_75 = String(help="Youtube ID for .75x speed video", display_name=".75x", scope=Scope.settings, default="JMD_ifUUfsU")
     youtube_id_1_25 = String(help="Youtube ID for 1.25x speed video", display_name="1.25x", scope=Scope.settings, default="AKqURZnYqpk")
@@ -75,7 +75,7 @@ class VideoModule(VideoFields, XModule):
             'track': self.track,
             'display_name': self.display_name_with_default,
             'caption_asset_path': "/static/subs/",
-            'show_captions': 'true' if self.show_captions else 'false',
+            'show_captions': self.show_captions,
             'start': self.start_time,
             'end': self.end_time
         })
