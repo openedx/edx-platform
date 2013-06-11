@@ -1,5 +1,9 @@
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-course_modx_root="/course/modx" >
   <nav aria-label="Section Navigation" class="sequence-nav">
+    <ul class="sequence-nav-buttons">
+      <li class="prev"><a href="#">Previous</a></li>
+    </ul>
+    
     <div class="sequence-list-wrapper">
       <ol id="sequence-list">
         % for idx, item in enumerate(items):
@@ -20,7 +24,6 @@
     </div>
 
     <ul class="sequence-nav-buttons">
-      <li class="prev"><a href="#">Previous</a></li>
       <li class="next"><a href="#">Next</a></li>
     </ul>
   </nav>

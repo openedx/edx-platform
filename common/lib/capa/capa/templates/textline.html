@@ -20,7 +20,7 @@
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" value="${value|h}"
+  <input type="text" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"
         % if do_math:
             class="math"
         % endif
@@ -33,7 +33,7 @@
    />
    ${trailing_text | h}
 
-      <p class="status">
+      <p class="status" aria-describedby="input_${id}">
         % if status == 'unsubmitted':
         unanswered
         % elif status == 'correct':
