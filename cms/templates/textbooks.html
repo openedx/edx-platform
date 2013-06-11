@@ -45,6 +45,17 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
     }],
     isEmpty: function() {
         return !this.get('name') && this.get('chapters').isEmpty();
+    },
+    parse: function(response) {
+        if("tab_title" in response && !("name" in response)) {
+            response.name = response.tab_title;
+            delete response.tab_title;
+        }
+        if("url" in response && !("chapters" in response)) {
+            response.chapters = {"url": response.url};
+            delete response.url;
+        }
+        return response;
     }
 })
 CMS.Views.TextbookShow = Backbone.View.extend({
@@ -207,6 +218,17 @@ CMS.Models.Chapter = Backbone.AssociatedModel.extend({
     },
     isEmpty: function() {
         return !this.get('name') && !this.get('asset_path');
+    },
+    parse: function(response) {
+        if("title" in response && !("name" in response)) {
+            response.name = response.title;
+            delete response.title;
+        }
+        if("url" in response && !("asset_path" in response)) {
+            response.asset_path = response.url;
+            delete response.url;
+        }
+        return response;
     }
 })
 CMS.Collections.ChapterSet = Backbone.Collection.extend({
