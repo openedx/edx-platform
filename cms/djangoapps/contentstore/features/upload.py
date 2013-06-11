@@ -43,11 +43,6 @@ def no_duplicate(step, file_name):
     assert only_one
 
 
-@step(u'I PAUSE')
-def pause(step):
-    from pdb import set_trace; set_trace()
-
-
 def get_index(file_name):
     names_css = '.name-col > a.filename'
     all_names = world.css_find(names_css)
