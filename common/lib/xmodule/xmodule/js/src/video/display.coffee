@@ -5,7 +5,7 @@ class @Video
     @start = @el.data('start')
     @end = @el.data('end')
     @caption_asset_path = @el.data('caption-asset-path')
-    @show_captions = !!@el.data('show-captions')
+    @show_captions = @el.data('show-captions')
     window.player = null
     @el = $("#video_#{@id}")
     @parseVideos @el.data('streams')
