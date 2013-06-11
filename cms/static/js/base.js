@@ -411,7 +411,7 @@ function showFileSelectionMenu(e) {
 }
 
 function startUpload(e) {
-    files = $('.file-input').get(0).files;
+    var files = $('.file-input').get(0).files;
     if (files.length === 0)
         return;
 
