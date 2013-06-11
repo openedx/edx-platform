@@ -1,4 +1,6 @@
 #pylint: disable=C0111
+#pylint: disable=W0613
+#pylint: disable=W0621
 
 from lettuce import world, step
 from lettuce.django import django_url
