@@ -49,9 +49,15 @@ class Command(BaseCommand):
         user = User(username='johndoe%s' % seed_num, email=email, password=password)
         user.save()
 
+        def get_year_of_birth():
+            if random.random() > 0.9:
+                return None
+            else:
+                return random.triangular(UserProfile.this_year - 100, UserProfile.this_year, UserProfile.this_year - 22)
+
         profile = UserProfile(user=User.objects.filter(email=email)[0], name='John Doe %s' % seed_num)
         profile.language = random.choice(["English", "English", "English", "English", "English", "English", "English", "English", "English", "French", "french", "Esperanto"])
-        profile.year_of_birth = random.choice([None] + profile.VALID_YEARS)
+        profile.year_of_birth = get_year_of_birth()
         # TODO why don't gender and level_of_educationin fail validation when switched to invalids?
         profile.gender = random.choice([(None, None)] + list(profile.GENDER_CHOICES))[0]
         profile.level_of_education = random.choice([(None, None)] + list(profile.LEVEL_OF_EDUCATION_CHOICES))[0]
