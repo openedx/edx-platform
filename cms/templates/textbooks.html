@@ -244,7 +244,7 @@ CMS.Views.ChapterEdit = Backbone.View.extend({
         var msg = new CMS.Models.FileUpload({
             title: _.str.sprintf(gettext("Upload a new asset to %s"),
                 section.escape('name')),
-            message: "[asset upload requirements]"
+            message: "This is sample text about asset upload requirements, like no bigger than 2MB, must be in PDF format or whatever."
         })
         var view = new CMS.Views.UploadDialog({model: msg, chapter: this.model})
         $(".wrapper-view").after(view.show().el)
@@ -398,9 +398,7 @@ $(function() {
     <section class="content">
     <div class="inner-wrapper">
         <div class="introduction has-links">
-          <p class="copy">Textbooks are happy. Textbooks are cool. This is the filler text explaining why you should use a feature as happy and as cool as textbooks. If you use textbooks, you will make friends and influence people. You will lose weight and people will compliment you on your appearance. Children around the world will sing praises to your name, and celebrities will recongize you as a totally hip and groovy person. If you don't use textbooks, your life will be forever incomplete, and you will die alone and unloved. Make the right choice. Upload your first textbook now.</p>
-
-            <p class="copy">Note: <strong>It's best practice to break your course's textbook into multiple chapters</strong> to reduce loading times for students. Breaking up textbooks into chapters can also help with students more easily finding a concept or topic-based information.</p>
+          <p class="copy">Use this page to upload textbooks for your course. Note: <strong>It's best practice to break your course's textbook into multiple chapters</strong> to reduce loading times for students. Breaking up textbooks into chapters can also help with students more easily finding a concept or topic-based information.</p>
 
 
           <nav class="nav-introduction-supplementary">

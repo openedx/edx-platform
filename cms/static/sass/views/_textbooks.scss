@@ -4,10 +4,14 @@
 body.course.textbooks {
 
   .no-textbook-content {
-    margin: $baseline*2;
+    @include box-shadow(0 0 4px $shadow-d1 inset);
     padding: $baseline*2;
     background-color: #ddd;
     text-align: center;
+
+    .button {
+      margin-left: 20px;
+    }
   }
 
   form {
@@ -16,22 +20,14 @@ body.course.textbooks {
     @include border-radius(2px);
     width: 100%;
     border: 1px solid $gray-l2;
-//    padding: $baseline ($baseline*1.5);
+    padding: $baseline ($baseline*1.5);
     background: $white;
 
     fieldset {
-      padding: 0 ($baseline*1.5);
-    }
-
-    fieldset.textbook {
-      border-bottom: 2px solid $gray-l3;
-      background-color: $gray-l5;
-      padding: $baseline ($baseline*1.5);
+        margin-bottom: $baseline;
     }
 
     .actions {
-      margin-top: $baseline;
-      padding: 0 ($baseline*1.5) $baseline ($baseline*1.5);
 
       .action-add-chapter {
           @extend .t-action2;
@@ -89,9 +85,8 @@ body.course.textbooks {
 
     }
 
-    .list-input {
-      margin: 0;
-      padding: 0;
+    .list-input,
+    .textbook {
       list-style: none;
 
       .field {
@@ -272,7 +267,7 @@ body.course.textbooks {
   .dialog  {
     @include box-sizing(border-box);
     @include border-radius(($baseline/5));
-    background-color: $gray-l6;
+    background-color: $gray-l5;
     display: inline-block;
     vertical-align: middle;
     width: $baseline*20;
@@ -280,36 +275,42 @@ body.course.textbooks {
 
     .title {
       @include font-size(18);
+      margin-bottom: ($baseline/2);
       font-weight: bold;
       color: $black;
     }
 
-    .copy {
+    .message {
       @extend .t-copy-sub2;
-      color: $gray-l1;
+      color: $gray;
     }
 
     form {
-      padding: 0;
+      border: 2px solid $gray-l2;
       background-color: transparent;
+      padding: 0;
 
       .form-content {
-        padding: ($baseline*1.5) ($baseline*1.5) 0 ($baseline*1.5);
+        padding: ($baseline*1.5);
+      }
+
+      input[type="file"] {
+        @include font-size(12);
       }
 
       .wrapper-progress {
-        @include box-shadow(inset 0 0 4px $shadow-d1);
+        @include box-shadow(inset 0 0 5px $shadow-d1);
         margin-top: $baseline;
         border-radius: ($baseline*.75);
-        background-color: $white;
-        padding: 3px 8px;
+        background-color: $gray-l4;
+        padding: 2px 8px 1px 8px;
         height: 25px;
 
         progress {
           width: 100%;
           border: none;
           border-radius: ($baseline*.75);
-          background-color: #eee;
+          background-color: $gray-l4;
 
           &::-webkit-progress-bar {
             background-color: transparent;
@@ -335,6 +336,7 @@ body.course.textbooks {
         border-top: 1px solid $gray-l1;
         padding: ($baseline*0.75) $baseline;
         background: $white;
+        text-align: center;
 
         .action-item {
           @extend .t-action4;

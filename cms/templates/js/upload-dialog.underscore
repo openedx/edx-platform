@@ -11,15 +11,16 @@
   <h2 class="title"><%= title %></h2>
   <p id="dialog-assetupload-description" class="message"><%= message %></p>
   <input type="file" name="file" />
-  <div class="wrapper-progress">
+
   <% if(uploading) { %>
     <% if (uploadedBytes && totalBytes) { %>
+      <div class="wrapper-progress">
       <progress value="<%= uploadedBytes %>" max="<%= totalBytes %>"><%= uploadedBytes/totalBytes*100 %>%</progress>
+      </div>
     <% } else { %>
       <progress></progress>
     <% } %>
   <% } %>
-  </div>
   </div>
   <div class="actions">
     <h3 class="sr"><%= gettext('Form Actions') %></h3>

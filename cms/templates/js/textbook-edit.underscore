@@ -4,10 +4,10 @@
   </div>
 <% } %>
 
-<fieldset class="textbook add-textbook-name field text required">
+<fieldset class="textbook">
   <legend class="sr"><%= gettext("Textbook information") %></legend>
-      <div class="input-wrap">
-        <label for="textbook-name-input"><%= gettext("Textbook Name") %>:</label>
+      <div class="input-wrap field text required add-textbook-name">
+        <label for="textbook-name-input"><%= gettext("Textbook Name") %></label>
         <input id="textbook-name-input" type="text" placeholder="<%= gettext("Introduction to Cookie Baking") %>" value="<%= name %>">
         <span class="tip tip-stacked"><%= gettext("the title/name of the text book as you would like your students to see it.") %></span>
       </div>
