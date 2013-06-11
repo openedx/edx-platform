@@ -70,7 +70,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db': 'xcontent',
+        'db': 'test_xcontent',
     }
 }
 

@@ -11,6 +11,7 @@ from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import _MODULESTORES, modulestore
+from xmodule.contentstore.django import contentstore
 from xmodule.templates import update_templates
 from bs4 import BeautifulSoup
 import os.path
@@ -133,3 +134,4 @@ def clear_courses():
     _MODULESTORES = {}
     modulestore().collection.drop()
     update_templates(modulestore('direct'))
+    contentstore().fs_files.drop()
