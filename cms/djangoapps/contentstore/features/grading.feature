@@ -21,8 +21,6 @@ Feature: Course Grading
         And I delete a grade
         Then I see I now have "2" grades
 
-    #Cannot reliably move the slider
-    @skip
     Scenario: Users can move grading ranges
         Given I have opened a new course in Studio
         And I am viewing the grading settings

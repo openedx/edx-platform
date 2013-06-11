@@ -39,7 +39,15 @@ def view_grade_slider(step, how_many):
 def move_grade_slider(step):
     moveable_css = '.ui-resizable-e'
     f = world.css_find(moveable_css).first
-    f.action_chains.click_and_hold().move_by_offset(100, 100).release().perform()
+    f.action_chains.drag_and_drop_by_offset(f._element, 100, 0).perform()
+
+
+@step(u'I see that the grade range has changed')
+def confirm_change(step):
+    range_css = '.range'
+    all_ranges = world.css_find(range_css)
+    for i in range(len(all_ranges)):
+        assert all_ranges[i].html != '0-50'
 
 
 @step(u'I change assignment type "([^"]*)" to "([^"]*)"$')
