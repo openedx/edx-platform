@@ -37,13 +37,13 @@
   ## links which are tied to idash-sections below.
   ## the links are acativated and handled in instructor_dashboard.coffee
   ## when the javascript loads, it clicks on idash-default-section
-  <h2 class="instructor-nav">[
-    <a href="" data-section="course-info" class="idash-default-section"> Course Info   </a> |
-    <a href="" data-section="enrollment"> Enrollment    </a> |
-    <a href="" data-section="student-admin"> Student Admin  </a> |
-    <a href="" data-section="data-download"> Data Download </a> |
+  <h2 class="instructor-nav">
+    <a href="" data-section="course-info" class="idash-default-section"> Course Info   </a>
+    <a href="" data-section="enrollment"> Enrollment    </a>
+    <a href="" data-section="student-admin"> Student Admin  </a>
+    <a href="" data-section="data-download"> Data Download </a>
     <a href="" data-section="analytics"> Analytics </a>
-  ]</h2>
+  </h2>
 
   ## each section corresponds to a section_data sub-dictionary provided by the view
   ## to keep this short, sections can be pulled out into their own files
@@ -54,23 +54,47 @@
 
 
   <section id="enrollment" class="idash-section">
-    ${ section_data['enrollment']['placeholder'] }
+    <div class="single">
+      <h2>Single Student Enrollment</h2>
+      <input type="email" name="student-email" value="Student Email">
+      <input type="button" name="enroll" value="Enroll">
+      <input type="button" name="unenroll" value="Unenroll">
+    </div>
+
+    <div>
+      <h2>Batch Enrollment</h2>
+      <p>Enter student emails separated by new lines or commas.</p>
+      <input type="text" name="student-emails" value="Student Emails">
+      <input type="button" name="enroll" value="Enroll">
+      <input type="button" name="unenroll" value="Unenroll">
+    </div>
   </section>
 
 
   <section id="student-admin" class="idash-section">
-    ${ section_data['student_admin']['placeholder'] }
+    <p> Select student </p>
+    <input type="text" name="student-select" value="Jerry Smort">
+    <p>grade</p><p>85 (B)</p>
+    <a href="" class="progress-link">progress link</a>
+    <input type="button" name="unenroll" value="Unenroll">
+    ## TODO make this a dropdown
+    <input type="button" name="unenroll" value="Unenroll">
+    <select class="problems">
+      <option>Getting problems...</option>
+    </select>
+    <input type="button" name="reset-attempts" value="Reset Student Attempts">
   </section>
 
 
   <section id="data-download" class="idash-section">
-    <input type="submit" name="list-profiles" value="List enrolled students with profile information" data-endpoint="${ section_data['data_download']['enrolled_students_profiles_url'] }" ></input>
-    <input type="submit" name="list-profiles" value="[CSV]" data-csv="true" data-endpoint="${ section_data['data_download']['enrolled_students_profiles_url'] }" ></input>
-    <input type="submit" name="list-grades" value="Student grades"></input>
-    <input type="submit" name="list-answer-distributions" value="Answer distributions (x students got y points)"></input>
-    <input type="submit" name="dump-gradeconf" value="Grading Configuration" data-endpoint="${ section_data['data_download']['grading_config_url'] }"></input>
-    <div class="dumped-data-display">
-      <div class="dtable"></grid>
+    <input type="button" name="list-profiles" value="List enrolled students with profile information" data-endpoint="${ section_data['data_download']['enrolled_students_profiles_url'] }" >
+    <input type="button" name="list-profiles" value="[CSV]" data-csv="true" data-endpoint="${ section_data['data_download']['enrolled_students_profiles_url'] }" >
+    <input type="button" name="list-grades" value="Student grades">
+    <input type="button" name="list-answer-distributions" value="Answer distributions (x students got y points)">
+    <input type="button" name="dump-gradeconf" value="Grading Configuration" data-endpoint="${ section_data['data_download']['grading_config_url'] }">
+    <div class="data-display">
+      <div class="data-display-text"></div>
+      <div class="data-display-table"></div>
     </div>
   </section>
 
@@ -78,7 +102,11 @@
     <select id="distributions" data-endpoint="${ section_data['analytics']['profile_distributions_url'] }">
       <option> Getting available distributions... </option>
     </select>
-    <div class="distribution-display"></div>
+    <div class="distribution-display">
+      <div class="distribution-display-text"></div>
+      <div class="distribution-display-graph"></div>
+      <div class="distribution-display-table"></div>
+    </div>
   </section>
 
 </section>

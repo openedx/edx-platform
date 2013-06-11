@@ -82,14 +82,12 @@ def _section_course_info(request, course_id):
 def _section_enrollment(course_id):
     """ Provide data for the corresponding dashboard section """
     section_data = {}
-    section_data['placeholder'] = "Enrollment content."
     return section_data
 
 
 def _section_student_admin(course_id):
     """ Provide data for the corresponding dashboard section """
     section_data = {}
-    section_data['placeholder'] = "Student Admin content."
     return section_data
 
 

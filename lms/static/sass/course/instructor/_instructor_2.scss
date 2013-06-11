@@ -8,8 +8,14 @@
     width: 100%;
     position: relative;
 
+    .slick-header-column {
+      height: 100%;
+    }
+
     h1 {
       @extend .top-header;
+      border-bottom: 0;
+      padding-bottom: 0;
     }
 
     .instructor_dash_glob_info {
@@ -20,9 +26,16 @@
     }
 
     .instructor-nav {
+      a {
+        margin-right: 1.2em;
+      }
+
       .active-section {
         color: #551A8B;
       }
+
+      border-bottom: 1px solid #C8C8C8;
+      padding-bottom: 1em;
     }
 
     section.idash-section {
@@ -63,17 +76,24 @@
 }
 
 
+.instructor-dashboard-wrapper-2 section.idash-section#enrollment {
+  div {
+    margin-top: 2em;
+  }
+}
+
+
 .instructor-dashboard-wrapper-2 section.idash-section#data-download {
   input {
-    display: block;
+    // display: block;
     margin-bottom: 1em;
   }
 
-  .dumped-data-display {
-    height: 500px;
-
-    .slick-header-column {
-      height: 100%;
+  .data-display {
+    .data-display-table {
+      .slickgrid {
+        height: 400px;
+      }
     }
   }
 }
@@ -81,6 +101,12 @@
 
 .instructor-dashboard-wrapper-2 section.idash-section#analytics {
   .distribution-display {
-    margin-top: 1em;
+    margin-top: 1.2em;
+
+    .distribution-display-table {
+      .slickgrid {
+        height: 400px;
+      }
+    }
   }
 }

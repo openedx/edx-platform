@@ -64,6 +64,14 @@ setup_instructor_dashboard_sections = (idash_content) ->
 
 # setup the data download section
 setup_section_data_download = (section) ->
+  display = section.find('.data-display')
+  display_text = display.find('.data-display-text')
+  display_table = display.find('.data-display-table')
+
+  reset_display = ->
+    display_text.empty()
+    display_table.empty()
+
   list_studs_btn = section.find("input[name='list-profiles']'")
   list_studs_btn.click (e) ->
     log "fetching student list"
@@ -72,96 +80,46 @@ setup_section_data_download = (section) ->
       url += '/csv'
       location.href = url
     else
-      # setup SlickGrid
+      reset_display()
       $.getJSON url, (data) ->
-        display = section.find('.dumped-data-display')
-        display.text JSON.stringify(data)
-
+        # setup SlickGrid
         options =
           enableCellNavigation: true
           enableColumnReorder: false
 
         columns = ({id: feature, field: feature, name: feature} for feature in data.queried_features)
-        # columns = [
-        #   name: 'Name'
-        #   id: 'name'
-        #   field: 'name'
-        # ,
-        #   name: 'Username'
-        #   id: 'username'
-        #   field: 'username'
-        # ,
-        #   name: 'YOB'
-        #   id: 'year_of_birth'
-        #   field: 'year_of_birth'
-        # ]
         grid_data = data.students
-        # grid_data = [{'name': 'val1,1'}, {'name': 'val1,2', 'label2': 'val2,2', 'extra': 'foo'}]
 
-        log columns
-        # log grid_data
-
-        grid = new Slick.Grid(display, grid_data, columns, options)
+        table_placeholder = $ '<div/>', class: 'slickgrid'
+        display_table.append table_placeholder
+        grid = new Slick.Grid(table_placeholder, grid_data, columns, options)
         grid.autosizeColumns()
 
-        # columns = [
-        #   id: "title"
-        #   name: "Title"
-        #   field: "title"
-        # ,
-        #   id: "duration"
-        #   name: "Duration"
-        #   field: "duration"
-        # ,
-        #   id: "%"
-        #   name: "% Complete"
-        #   field: "percentComplete"
-        # ,
-        #   id: "start"
-        #   name: "Start"
-        #   field: "start"
-        # ,
-        #   id: "finish"
-        #   name: "Finish"
-        #   field: "finish"
-        # ,
-        #   id: "effort-driven"
-        #   name: "Effort Driven"
-        #   field: "effortDriven"
-        # ]
-
-        # options =
-        #   enableCellNavigation: true
-        #   enableColumnReorder: false
-
-        # data = []
-        # i = 0
-
-        # while i < 500
-        #   data[i] =
-        #     title: "Task " + i
-        #     duration: "5 days"
-        #     percentComplete: Math.round(Math.random() * 100)
-        #     start: "01/01/2009"
-        #     finish: "01/05/2009"
-        #     effortDriven: (i % 5 is 0)
-        #   i++
-
-        #   grid = new Slick.Grid(display, data, columns, options)
 
   grade_config_btn = section.find("input[name='dump-gradeconf']'")
   grade_config_btn.click (e) ->
     log "fetching grading config"
     url = $(this).data('endpoint')
     $.getJSON url, (data) ->
-      section.find('.dumped-data-display').html data['grading_config_summary']
+      reset_display()
+      display_text.html data['grading_config_summary']
 
 
 # setup the analytics section
 setup_section_analytics = (section) ->
   log "setting up instructor dashboard section - analytics"
 
+  display = section.find('.distribution-display')
+  display_text = display.find('.distribution-display-text')
+  display_graph = display.find('.distribution-display-graph')
+  display_table = display.find('.distribution-display-table')
+
+  reset_display = ->
+    display_text.empty()
+    display_table.empty()
+
   distribution_select = section.find('select#distributions')
+
   # ask for available distributions
   $.getJSON distribution_select.data('endpoint'), features: JSON.stringify([]), (data) ->
       distribution_select.find('option').eq(0).text "-- Select distribution"
@@ -178,17 +136,47 @@ setup_section_analytics = (section) ->
         opt = $(this).children('option:selected')
         log "distribution selected: #{opt.data 'feature'}"
         feature = opt.data 'feature'
+        reset_display()
         $.getJSON distribution_select.data('endpoint'), features: JSON.stringify([feature]), (data) ->
           feature_res = data.feature_results[feature]
           # feature response format: {'error': 'optional error string', 'type': 'SOME_TYPE', 'data': [stuff]}
-          display = section.find('.distribution-display').eq(0)
           if feature_res.error
             console.warn(feature_res.error)
-            display.text 'Error fetching data'
+            display_text.text 'Error fetching data'
           else
             if feature_res.type is 'EASY_CHOICE'
-              display.text JSON.stringify(feature_res.data)
+              # display_text.text JSON.stringify(feature_res.data)
               log feature_res.data
+
+              # setup SlickGrid
+              options =
+                enableCellNavigation: true
+                enableColumnReorder: false
+
+              columns = [
+                id: feature
+                field: feature
+                name: feature
+              ,
+                id: 'count'
+                field: 'count'
+                name: 'Count'
+              ]
+
+              grid_data = _.map feature_res.data, (value, key) ->
+                datapoint = {}
+                datapoint[feature] = key
+                datapoint['count'] = value
+                datapoint
+
+              log grid_data
+
+              table_placeholder = $ '<div/>', class: 'slickgrid'
+              display_table.append table_placeholder
+              grid = new Slick.Grid(table_placeholder, grid_data, columns, options)
+              grid.autosizeColumns()
             else
               console.warn("don't know how to show #{feature_res.type}")
-              display.text 'Unavailable Metric'
+              # display_text.text 'Unavailable Metric\n' + JSON.stringify(feature_res)
+
+              $.plot display_graph
