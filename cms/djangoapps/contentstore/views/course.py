@@ -427,19 +427,21 @@ def textbook_index(request, org, course, name):
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    course_reference = StaticContent.compute_location(org, course, name)
-    store = contentstore()
-    assets_db_objs = store.get_all_content_for_course(course_reference)
-    assets_json_objs = assets_to_json_dict(assets_db_objs)
-    assets_pdfs = [asset for asset in assets_json_objs if asset["path"].endswith(".pdf")]
     location = get_location_and_verify_access(request, org, course, name)
-    course_module = modulestore().get_item(location, depth=3)
+    store = modulestore()
+    course_module = store.get_item(location, depth=3)
 
     if request.is_ajax():
         if request.method == 'GET':
             return HttpResponse(json.dumps(course_module.pdf_textbooks), content_type="application/json")
         elif request.method == 'POST':
-            store.update_metadata(course.location, own_metadata(request.POST))
+            try:
+                obj = json.loads(request.raw_post_data)
+            except ValueError:
+                msg = {"error": "invalid JSON"}
+                return HttpResponseBadRequest(json.dumps(msg), content_type="application/json")
+            course_module.pdf_textbooks = obj
+            store.update_metadata(course_module.location, own_metadata(course_module))
             return HttpResponse('', content_type="application/json", status=201)
     else:
         upload_asset_callback_url = reverse('upload_asset', kwargs={
@@ -447,7 +449,7 @@ def textbook_index(request, org, course, name):
             'course': course,
             'coursename': name,
         })
-        asset_index_url = reverse('asset_index', kwargs={
+        textbook_url = reverse('textbook_index', kwargs={
             'org': org,
             'course': course,
             'name': name,
@@ -455,7 +457,6 @@ def textbook_index(request, org, course, name):
         return render_to_response('textbooks.html', {
             'context_course': course_module,
             'course': course_module,
-            'assets': assets_pdfs,
             'upload_asset_callback_url': upload_asset_callback_url,
-            'asset_index_url': asset_index_url,
+            'textbook_url': textbook_url,
         })

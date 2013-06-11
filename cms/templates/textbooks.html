@@ -27,7 +27,7 @@
 <script type="text/javascript" src="${static.url('js/vendor/backbone-associations-min.js')}"></script>
 <script type="text/javascript">
 window.UPLOAD_ASSET_CALLBACK_URL = "${upload_asset_callback_url}"
-window.ASSET_INDEX_URL = "${asset_index_url}"
+window.TEXTBOOK_URL = "${textbook_url}"
 
 CMS.Models.Textbook = Backbone.AssociatedModel.extend({
     defaults: function() {
@@ -56,6 +56,12 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
             delete response.url;
         }
         return response;
+    },
+    toJSON: function() {
+        return {
+            tab_title: this.get('name'),
+            chapters: this.get('chapters').toJSON()
+        }
     }
 })
 CMS.Views.TextbookShow = Backbone.View.extend({
@@ -70,9 +76,7 @@ CMS.Views.TextbookShow = Backbone.View.extend({
         "click .hide-chapters": "hideChapters"
     },
     render: function() {
-        var attrs = $.extend({}, this.model.attributes);
-        attrs.chapters = this.model.chapters;
-        this.$el.html(this.template(attrs));
+        this.$el.html(this.template(this.model.attributes));
         return this;
     },
     editTextbook: function(e) {
@@ -95,9 +99,10 @@ CMS.Views.TextbookShow = Backbone.View.extend({
 CMS.Views.TextbookEdit = Backbone.View.extend({
     initialize: function() {
         this.template = _.template($("#new-textbook-tpl").text());
-        this.listenTo(this.model.chapters, "add", this.addOne);
-        this.listenTo(this.model.chapters, "reset", this.addAll);
-        this.listenTo(this.model.chapters, "all", this.render);
+        var chapters = this.model.get('chapters');
+        this.listenTo(chapters, "add", this.addOne);
+        this.listenTo(chapters, "reset", this.addAll);
+        this.listenTo(chapters, "all", this.render);
         this.listenTo(this.model.collection, "editOne", this.remove);
     },
     tagName: "form",
@@ -122,19 +127,19 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         return this;
     },
     addAll: function() {
-        this.model.chapters.each(this.addOne, this);
+        this.model.get('chapters').each(this.addOne, this);
     },
     createChapter: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.save();
-        this.model.chapters.add([{}])
+        this.model.get('chapters').add([{}]);
     },
     save: function() {
         var name = this.$("#textbook-name-input").val();
         var textbook = this.model;
         textbook.set("name", name);
         _.each(this.$("li"), function(li, i) {
-            var chapter = textbook.chapters.at(i);
+            var chapter = textbook.get('chapters').at(i);
             chapter.set({
                 "name": $(".chapter-name", li).val(),
                 "asset_path": $(".chapter-asset-path", li).val()
@@ -144,7 +149,25 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
     },
     saveAndClose: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
-        return this.save().close();
+        this.save();
+        msg = new CMS.Models.SystemFeedback({
+            intent: "saving",
+            title: gettext("Saving&hellip;")
+        });
+        notif = new CMS.Views.Notification({
+            model: msg,
+            closeIcon: false,
+            minShown: 1250
+        });
+        var that = this;
+        this.model.collection.save({
+            success: function() {
+                that.close();
+            },
+            complete: function() {
+                notif.hide();
+            }
+        })
     },
     cancel: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
@@ -164,12 +187,15 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
 })
 CMS.Collections.TextbookSet = Backbone.Collection.extend({
     model: CMS.Models.Textbook,
-    url: ASSET_INDEX_URL,
+    url: TEXTBOOK_URL,
     initialize: function() {
         this.listenTo(this, "editOne", this.editOne);
     },
     editOne: function(textbook) {
         this.editing = textbook;
+    },
+    save: function(options) {
+        return this.sync('update', this, options);
     }
 })
 CMS.Views.ListTextbooks = Backbone.View.extend({
@@ -229,6 +255,12 @@ CMS.Models.Chapter = Backbone.AssociatedModel.extend({
             delete response.url;
         }
         return response;
+    },
+    toJSON: function() {
+        return {
+            title: this.get('name'),
+            url: this.get('asset_path')
+        }
     }
 })
 CMS.Collections.ChapterSet = Backbone.Collection.extend({
@@ -391,7 +423,7 @@ var section = new CMS.Models.Section({
     id: "${course.id}",
     name: "${course.display_name_with_default | h}"
 });
-var textbooks = new CMS.Collections.TextbookSet(${json.dumps(assets)});
+var textbooks = new CMS.Collections.TextbookSet(${json.dumps(course.pdf_textbooks)}, {parse: true});
 var tbView = new CMS.Views.ListTextbooks({collection: textbooks});
 
 $(function() {
