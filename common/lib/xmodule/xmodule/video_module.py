@@ -13,8 +13,6 @@ from xblock.core import Integer, Scope, String, Boolean, Float
 
 log = logging.getLogger(__name__)
 
-YOUTUBE_SPEEDS = ['.75', '1.0', '1.25', '1.5']
-
 
 class VideoFields(object):
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
@@ -91,13 +89,7 @@ class VideoModule(VideoFields, XModule):
             'end': self.end_time
         })
 
-# TODO: (pfogg) I am highly uncertain about inheriting from
-# RawDescriptor for the xml-related methods. This makes LMS unit tests
-# pass, but this really shouldn't be a RawDescriptor if users can't
-# see raw xml.
 
-
-# also if it's just return super(...)... then we can just remove these methods, ha
 class VideoDescriptor(VideoFields,
                       MetadataOnlyEditingDescriptor,
                       RawDescriptor):
@@ -124,42 +116,62 @@ class VideoDescriptor(VideoFields,
         org and course are optional strings that will be used in the generated modules
             url identifiers
         """
-        return super(RawDescriptor, cls).from_xml(xml_data, system, org, course)
+        video = super(RawDescriptor, cls).from_xml(xml_data, system, org, course)
+        xml = etree.fromstring(xml_data)
+        video.display_name = xml.get('display_name')
+        youtube = xml.get('youtube')
+        if youtube:
+            speeds = _parse_youtube(youtube)
+            if speeds['0.75']:
+                video.youtube_id_0_75 = speeds['0.75']
+            if speeds['1.00']:
+                video.youtube_id_1_0 = speeds['1.00']
+            if speeds['1.25']:
+                video.youtube_id_1_25 = speeds['1.25']
+            if speeds['1.50']:
+                video.youtube_id_1_5 = speeds['1.50']
+        video.show_captions = True if xml.get('show_captions') == 'true' else False
+        source = _get_first_external(xml, 'source')
+        if source:
+            video.source = source
+        tag = _get_first_external(xml, 'tag')
+        if tag:
+            video.tag = tag
+        start_time = xml.get('from')
+        if start_time:
+            video.start_time = start_time
+        end_time = xml.get('to')
+        if end_time:
+            video.end_time = end_time
+        return video
 
-    def export_to_xml(self, resource_fs):
-        """
-        Returns an xml string representign this module, and all modules
-        underneath it.  May also write required resources out to resource_fs
 
-        Assumes that modules have single parentage (that no module appears twice
-        in the same course), and that it is thus safe to nest modules as xml
-        children as appropriate.
+def _get_first_external(xmltree, tag):
+    '''
+    Returns the src attribute of the nested `tag` in `xmltree`, if it
+    exists.
+    '''
+    for element in xmltree.findall(tag):
+        src = element.get('src')
+        if src:
+            return src
+    return None
 
-        The returned XML should be able to be parsed back into an identical
-        XModuleDescriptor using the from_xml method with the same system, org,
-        and course
 
-        resource_fs is a pyfilesystem object (from the fs package)
-        """
-        return super(RawDescriptor, self).export_to_xml(resource_fs)
-    #     xml = etree.Element('video')
-    #     xml.set('youtube', self.video_list())
-    #     xml.set('show_captions', self.show_captions)
-    #     xml.set('from', self.start_time)
-    #     xml.set('to', self.end_time)
-
-    #     source_tag = etree.SubElement(xml, 'source')
-    #     source_tag.set('src', self.source)
-
-    #     track_tag = etree.SubElement(xml, 'track')
-    #     track_tag.set('src', self.track)
-
-    #     return etree.tostring(xml, pretty_print=True, encoding='utf-8')
-
-    # def video_list(self):
-    #     videos = [self.youtube_id_0_75, self.youtube_id_1_0,
-    #               self.youtube_id_1_25, self.youtube_id_1_5]
-    #     streams = [':'.join((video, youtube_id))
-    #                for video, youtube_id
-    #                in zip(YOUTUBE_SPEEDS, videos)]
-    #     return ','.join(streams)
+def _parse_youtube(data):
+    '''
+    Parses a string of Youtube IDs into a dictionary.
+    '''
+    ret = {'0.75': None, '1.00': None, '1.25': None, '1.50': None}
+    videos = data.split(',')
+    for video in videos:
+        pieces = video.split(':')
+        # HACK
+        # To elaborate somewhat: in many LMS tests, the keys for
+        # Youtube IDs are inconsistent. Sometimes a particular
+        # speed isn't present, and formatting is also inconsistent
+        # ('1.0' versus '1.00'). So it's necessary to either do
+        # something like this or update all the tests to work
+        # properly.
+        ret['%.2f' % float(pieces[0])] = pieces[1]
+    return ret
