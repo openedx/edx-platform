@@ -4,6 +4,7 @@ from . import ModuleStoreBase, Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
 from xmodule.exceptions import InvalidVersionError
+from pytz import UTC
 
 DRAFT = 'draft'
 # Things w/ these categories should never be marked as version='draft'
@@ -197,7 +198,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         draft = self.get_item(location)
 
-        draft.cms.published_date = datetime.utcnow()
+        draft.cms.published_date = datetime.now(UTC)
         draft.cms.published_by = published_by_id
         super(DraftModuleStore, self).update_item(location, draft._model_data._kvs._data)
         super(DraftModuleStore, self).update_children(location, draft._model_data._kvs._children)

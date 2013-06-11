@@ -25,6 +25,7 @@ Longer TODO:
 
 import sys
 import lms.envs.common
+from lms.envs.common import USE_TZ
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -34,8 +35,8 @@ MITX_FEATURES = {
     'GITHUB_PUSH': False,
     'ENABLE_DISCUSSION_SERVICE': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
-    'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
-    'STAFF_EMAIL': '',			# email address for staff (eg to request course creation)
+    'STUB_VIDEO_FOR_TESTING': False,  # do not display video when running automated acceptance tests
+    'STAFF_EMAIL': '',  # email address for staff (eg to request course creation)
     'STUDIO_NPS_SURVEY': True,
     'SEGMENT_IO': True,
 
@@ -183,7 +184,7 @@ STATICFILES_DIRS = [
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'            # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 USE_I18N = True
 USE_L10N = True
