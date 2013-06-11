@@ -72,17 +72,27 @@
 
 
   <section id="student-admin" class="idash-section">
-    <p> Select student </p>
-    <input type="text" name="student-select" value="Jerry Smort">
-    <p>grade</p><p>85 (B)</p>
-    <a href="" class="progress-link">progress link</a>
-    <input type="button" name="unenroll" value="Unenroll">
-    ## TODO make this a dropdown
-    <input type="button" name="unenroll" value="Unenroll">
-    <select class="problems">
-      <option>Getting problems...</option>
-    </select>
-    <input type="button" name="reset-attempts" value="Reset Student Attempts">
+    <div class="h-row">
+      <p> Select student </p>
+      <input type="text" name="student-select" value="Jerry Smort">
+    </div>
+
+    <div class="h-row">
+      <p>grade</p>
+      <p>85 (B)</p>
+    </div>
+
+    <div class="h-row">
+      <a href="" class="progress-link">progress link</a>
+      <input type="button" name="unenroll" value="Unenroll">
+    </div>
+
+    <div class="h-row">
+      <select class="problems">
+        <option>Getting problems...</option>
+      </select>
+      <input type="button" name="reset-attempts" value="Reset Student Attempts">
+    </div>
   </section>
 
 
@@ -99,6 +109,7 @@
   </section>
 
   <section id="analytics" class="idash-section">
+    <h2>Distributions</h2>
     <select id="distributions" data-endpoint="${ section_data['analytics']['profile_distributions_url'] }">
       <option> Getting available distributions... </option>
     </select>

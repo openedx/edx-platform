@@ -83,6 +83,18 @@
 }
 
 
+.instructor-dashboard-wrapper-2 section.idash-section#student-admin {
+  .h-row {
+    margin-bottom: 1em;
+    clear: both;
+  }
+
+  p input select {
+    float: left;
+  }
+}
+
+
 .instructor-dashboard-wrapper-2 section.idash-section#data-download {
   input {
     // display: block;
