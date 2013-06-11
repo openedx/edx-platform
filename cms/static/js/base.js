@@ -411,8 +411,12 @@ function showFileSelectionMenu(e) {
 }
 
 function startUpload(e) {
+    file_input = $('.file-input').val().replace('C:\\fakepath\\', '');
+    if (file_input === '')
+        return;
+
     $('.upload-modal h1').html(gettext('Uploading…'));
-    $('.upload-modal .file-name').html($('.file-input').val().replace('C:\\fakepath\\', ''));
+    $('.upload-modal .file-name').html(file_input);
     $('.upload-modal .file-chooser').ajaxSubmit({
         beforeSend: resetUploadBar,
         uploadProgress: showUploadFeedback,
