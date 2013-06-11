@@ -29,6 +29,7 @@ window.UPLOAD_ASSET_CALLBACK_URL = "${upload_asset_callback_url}"
 CMS.Models.Textbook = Backbone.Model.extend({
     defaults: {
         name: "",
+        showChapters: false
     },
     initialize: function() {
         this.chapters = new CMS.Collections.ChapterSet;
@@ -45,7 +46,9 @@ CMS.Views.TextbookShow = Backbone.View.extend({
     },
     events: {
         "click .edit": "editTextbook",
-        "click .delete": "removeSelf"
+        "click .delete": "removeSelf",
+        "click .show-chapters": "showChapters",
+        "click .hide-chapters": "hideChapters"
     },
     render: function() {
         var attrs = $.extend({}, this.model.attributes);
@@ -60,6 +63,14 @@ CMS.Views.TextbookShow = Backbone.View.extend({
     removeSelf: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.model.collection.remove(this.model);
+    },
+    showChapters: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.set('showChapters', true);
+    },
+    hideChapters: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.set('showChapters', false);
     }
 })
 CMS.Views.TextbookEdit = Backbone.View.extend({
