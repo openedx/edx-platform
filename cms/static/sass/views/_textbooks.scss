@@ -3,11 +3,25 @@
 
 body.course.textbooks {
 
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    @extend .window;
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
+    padding: $baseline ($baseline*1.5);
+  }
+
   .no-textbook-content {
     @include box-shadow(0 0 4px $shadow-d1 inset);
+    @include border-radius(2px);
     padding: $baseline*2;
     background-color: #ddd;
     text-align: center;
+    color: $gray;
 
     .button {
       margin-left: 20px;
@@ -16,11 +30,8 @@ body.course.textbooks {
 
   form {
     @include box-sizing(border-box);
-    @include box-shadow(0 1px 2px $shadow-l1);
     @include border-radius(2px);
     width: 100%;
-    border: 1px solid $gray-l2;
-    padding: $baseline ($baseline*1.5);
     background: $white;
 
     fieldset {
@@ -243,7 +254,9 @@ body.course.textbooks {
     }
   }
 
-
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
 
  // dialog
 .wrapper-dialog {
@@ -267,7 +280,7 @@ body.course.textbooks {
   .dialog  {
     @include box-sizing(border-box);
     @include border-radius(($baseline/5));
-    background-color: $gray-l5;
+    background-color: $white;
     display: inline-block;
     vertical-align: middle;
     width: $baseline*20;
@@ -299,7 +312,7 @@ body.course.textbooks {
       }
 
       .wrapper-progress {
-        @include box-shadow(inset 0 0 5px $shadow-d1);
+        @include box-shadow(inset 0 0 3px $shadow-d1);
         margin-top: $baseline;
         border-radius: ($baseline*.75);
         background-color: $gray-l4;
@@ -335,8 +348,7 @@ body.course.textbooks {
         @include box-shadow(inset 0 1px 2px $shadow);
         border-top: 1px solid $gray-l1;
         padding: ($baseline*0.75) $baseline;
-        background: $white;
-        text-align: center;
+        background: $gray-l4;
 
         .action-item {
           @extend .t-action4;
@@ -406,6 +418,8 @@ body.course.textbooks {
   }
 
 }
+
+
 
 
 
